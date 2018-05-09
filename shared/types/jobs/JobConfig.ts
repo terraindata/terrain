@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 export class JobConfig
 {
-  public createdAt: Date = null;                   // when the job was created
+  public createdAt?: Date = null;                  // when the job was created
   public createdBy: number = null;                 // who created the job (user ID)
   public id?: number;                              // job ID
   public logId?: number;                           // jobLog table ID

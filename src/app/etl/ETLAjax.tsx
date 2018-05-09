@@ -51,6 +51,8 @@ const { List, Map } = Immutable;
 import * as download from 'downloadjs';
 import MidwayError from 'shared/error/MidwayError';
 import { SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { JobConfig } from 'shared/types/jobs/JobConfig';
+import { TaskEnum } from 'shared/types/jobs/TaskEnum';
 import { recordForSave } from 'shared/util/Classes';
 import { AuthActions as Actions } from 'src/app/auth/data/AuthRedux';
 import { Ajax } from 'util/Ajax';
@@ -288,10 +290,31 @@ class ETLAjax
   {
     return new Promise((resolve, reject) =>
     {
+      const job: JobConfig = {
+        meta: null,
+        pausedFilename: null,
+        running: false,
+        runNowPriority: null,
+        scheduleId: null,
+        status: null,
+        workerId: null,
+        name: null,
+        createdBy: null,
+        priority: -1,
+        type: 'ETL',
+        tasks: JSON.stringify([
+          {
+            id: 0,
+            taskId: TaskEnum.taskETL,
+            params: null,
+          },
+        ]),
+      };
+
       return Ajax.req(
         'post',
-        'etl/create',
-        {},
+        'jobs/create',
+        job,
         (resp) =>
         {
           if (resp[0] !== undefined)
