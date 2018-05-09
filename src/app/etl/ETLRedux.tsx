@@ -86,10 +86,25 @@ export interface ETLActionTypes
     onError?: ErrorHandler;
   };
   executeTemplate: {
-    actionType: 'executeTemplate',
-    template: ETLTemplate,
-    onSuccess?: () => void,
-    onError?: (ev: any) => void,
+    actionType: 'executeTemplate';
+    template: ETLTemplate;
+    onSuccess?: () => void;
+    onError?: (ev: any) => void;
+  };
+  createExecuteJob: {
+    actionType: 'createExecuteJob';
+    onLoad: (id: number) => void;
+    onError: (ev: any) => void;
+  };
+  runExecuteJob: {
+    actionType: 'runExecuteJob';
+    jobId: number;
+    template: ETLTemplate;
+    files?: { [k: string]: File };
+    downloadName?: string;
+    mimeType?: string;
+    onLoad: () => void;
+    onError: (ev: any) => void;
   };
   fetchTemplates: {
     actionType: 'fetchTemplates';
@@ -194,6 +209,8 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       getTemplate: (state, action) => state, // overriden reducers
       fetchTemplates: (state, action) => state,
       executeTemplate: (state, action) => state,
+      createExecuteJob: (state, action) => state,
+      runExecuteJob: (state, action) => state,
       deleteTemplate: (state, action) => state,
       createTemplate: (state, action) => state,
       saveAsTemplate: (state, action) => state,
@@ -402,6 +419,38 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         .then(this.onLoadFactory<any>([onLoad], directDispatch, name))
         .catch(this.onErrorFactory(action.onError, directDispatch, name));
     }
+  }
+
+  public createExecuteJob(action: ETLActionType<'createExecuteJob'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const name = action.actionType;
+
+    directDispatch({
+      actionType: 'setLoading',
+      isLoading: true,
+      key: name,
+    });
+
+    ETLAjax.createExecuteJob()
+      .then(this.onLoadFactory([action.onLoad], directDispatch, name))
+      .catch(this.onErrorFactory(action.onError, directDispatch, name));
+  }
+
+  public runExecuteJob(action: ETLActionType<'runExecuteJob'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const name = action.actionType;
+
+    directDispatch({
+      actionType: 'setLoading',
+      isLoading: true,
+      key: name,
+    });
+
+    ETLAjax.runExecuteJob(action.jobId, action.template, action.files, action.downloadName, action.mimeType)
+      .then(this.onLoadFactory([action.onLoad], directDispatch, name))
+      .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
 
   public fetchTemplates(action: ETLActionType<'fetchTemplates'>, dispatch)
@@ -633,6 +682,10 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         return this.getTemplate.bind(this, action);
       case 'executeTemplate':
         return this.executeTemplate.bind(this, action);
+      case 'createExecuteJob':
+        return this.createExecuteJob.bind(this, action);
+      case 'runExecuteJob':
+        return this.runExecuteJob.bind(this, action);
       case 'deleteTemplate':
         return this.deleteTemplate.bind(this, action);
       case 'createTemplate':

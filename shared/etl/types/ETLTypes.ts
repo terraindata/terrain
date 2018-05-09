@@ -49,6 +49,7 @@ import * as _ from 'lodash';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { SinkConfig, SourceConfig } from './EndpointTypes';
 
+// languages and filetypes don't follow the same capitalization conventions because of legacy reasons (?)
 export enum Languages
 {
   Elastic = 'elastic',
