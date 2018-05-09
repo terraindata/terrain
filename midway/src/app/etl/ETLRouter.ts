@@ -94,7 +94,6 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
     scheduleId: null,
     status: null,
     workerId: null,
-
     createdAt: new Date(),
     createdBy: ctx.state.user.id,
     name: null,

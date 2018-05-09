@@ -79,7 +79,7 @@ export class TaskETL extends Task
       templates.executeETL(this.taskConfig['params']['options'] as object,
         this.taskConfig['params']['options']['inputStreams']).then((result) =>
         {
-          taskOutputConfig.options.outputStream = result;
+          taskOutputConfig['options']['outputStream'] = result;
           resolve(taskOutputConfig);
         }).catch((err) =>
         {

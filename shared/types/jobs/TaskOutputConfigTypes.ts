@@ -50,7 +50,7 @@ import TaskConfigTypes from './TaskConfigTypes';
 
 export class TaskOutputConfigTypes extends TaskConfigTypes
 {
-  public outputStreams: stream.Readable[] = null;
+  public outputStream: stream.Readable = null;
 }
 
 export default TaskOutputConfigTypes;
