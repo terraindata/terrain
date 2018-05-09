@@ -404,10 +404,14 @@ export class ElasticMapping
           `Cannot set new primary key to '${primaryKey}'. There is already a primary key '${this.primaryKey}'`,
         );
       }
-      else if (elasticType !== ElasticTypes.Text && elasticType !== ElasticTypes.Keyword)
+      else if (
+        elasticType === ElasticTypes.Array
+        || elasticType === ElasticTypes.Nested
+        || elasticType === ElasticTypes.Boolean
+      )
       {
         this.errors.push(
-          `Field '${primaryKey}' of type '${elasticType}' cannot be a primary key. Primary keys must be text or keyword`,
+          `Field '${primaryKey}' of type '${elasticType}' cannot be a primary key. Primary keys cannot be Array, Nested or Boolean.`,
         );
       }
       else
