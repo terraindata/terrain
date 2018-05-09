@@ -44,19 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { Readable } from 'stream';
+import * as stream from 'stream';
 
-import { ATaskConfig } from 'shared/types/jobs/ATaskConfig';
+import TaskConfigTypes from './TaskConfigTypes';
 
-export class TaskOutputConfig extends ATaskConfig
+export class TaskOutputConfigTypes extends TaskConfigTypes
 {
-  public exit: boolean = null;
-  public status: boolean = null;
-  public options: object =
-    {
-      logStream?: Readable;
-      outputStream?: Readable;
-    };
+  public outputStreams: stream.Readable[] = null;
 }
 
-export default TaskOutputConfig;
+export default TaskOutputConfigTypes;

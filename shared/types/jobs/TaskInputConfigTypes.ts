@@ -46,7 +46,9 @@ THE SOFTWARE.
 
 import * as stream from 'stream';
 
-export class TaskInputConfigTypes
+import TaskConfigTypes from './TaskConfigTypes';
+
+export class TaskInputConfigTypes extends TaskConfigTypes
 {
   public logStream: stream.Readable = null;
   public overrideSinks?: string = '';

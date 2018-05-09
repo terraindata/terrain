@@ -69,26 +69,31 @@ export class TaskETL extends Task
       const taskOutputConfig: TaskOutputConfig =
         {
           exit: false,
+          options: {
+            logStream: null,
+            outputStream: null,
+          },
           status: true,
         };
 
-      templates.executeETL(this.taskConfig.params as object, this.taskConfig.params.inputStreams).then((result) =>
-      {
-        taskOutputConfig.outputStream = result;
-        resolve(taskOutputConfig);
-      }).catch((err) =>
-      {
-        taskOutputConfig.status = false;
-        try
+      templates.executeETL(this.taskConfig['params']['options'] as object,
+        this.taskConfig['params']['options']['inputStreams']).then((result) =>
         {
-          winston.warn('Error while running ETL task: ' + ((err as any).toString() as string));
-        }
-        catch (e)
+          taskOutputConfig.options.outputStream = result;
+          resolve(taskOutputConfig);
+        }).catch((err) =>
         {
-          winston.warn('Tried to print out ETL output error and failed');
-        }
-        resolve(taskOutputConfig);
-      });
+          taskOutputConfig.status = false;
+          try
+          {
+            winston.warn('Error while running ETL task: ' + ((err as any).toString() as string));
+          }
+          catch (e)
+          {
+            winston.warn('Tried to print out ETL output error and failed');
+          }
+          resolve(taskOutputConfig);
+        });
     });
   }
 
