@@ -64,6 +64,8 @@ import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import EndpointSection from 'etl/templates/components/endpoints/EndpointSection';
 import EdgeSection from 'etl/templates/components/graph/EdgeSection';
+// import TemplateSettingsForm from 'etl/common/components/TemplateSettingsForm';
+import { _TemplateSettings, TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
 
 import './OptionsColumn.less';
 const { List, Map } = Immutable;
@@ -102,6 +104,36 @@ export class StepsColumn extends TerrainComponent<{}>
     );
   }
 }
+
+class OptionsColumnC extends TerrainComponent<{}>
+{
+  public render()
+  {
+    return (
+      <div
+        className='template-editor-options-column'
+        style={columnStyle}
+      >
+        <div className='options-column-content'>
+          <TemplateSettingsForm
+            onChange={this.handleTemplateSettingsChange}
+            settings={}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  public handleTemplateSettingsChange()
+  {
+    
+  }
+}
+export const OptionsColumn = Util.createTypedContainer(
+  OptionsColumnC,
+  [['templateEditor', 'template']],
+  { editorAct: TemplateEditorActions }
+);
 
 const columnStyle = _.extend({},
   backgroundColor(Colors().bg3),

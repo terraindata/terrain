@@ -111,12 +111,14 @@ export enum ColumnOptions
   Preview = 'Preview',
   Endpoints = 'Endpoints',
   Steps = 'Steps',
+  Options = 'Options'
 }
 
 export const columnOptions = List([
   ColumnOptions.Preview,
   ColumnOptions.Endpoints,
   ColumnOptions.Steps,
+  ColumnOptions.Options,
 ]);
 
 export enum FetchStatus
