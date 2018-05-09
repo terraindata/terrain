@@ -85,12 +85,6 @@ export interface ETLActionTypes
     onLoad: (response: List<ETLTemplate>) => void;
     onError?: ErrorHandler;
   };
-  executeTemplate: {
-    actionType: 'executeTemplate';
-    template: ETLTemplate;
-    onSuccess?: () => void;
-    onError?: (ev: any) => void;
-  };
   createExecuteJob: {
     actionType: 'createExecuteJob';
     onLoad: (id: number) => void;
@@ -208,7 +202,6 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     {
       getTemplate: (state, action) => state, // overriden reducers
       fetchTemplates: (state, action) => state,
-      executeTemplate: (state, action) => state,
       createExecuteJob: (state, action) => state,
       runExecuteJob: (state, action) => state,
       deleteTemplate: (state, action) => state,
@@ -340,85 +333,6 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         }
       }
     };
-  }
-
-  public getFileTypeExtension(fileType: any): string
-  {
-    switch (fileType)
-    {
-      case FileTypes.Json:
-        return '.json';
-      case FileTypes.Csv:
-        return '.csv';
-      case FileTypes.Xml:
-        return '.xml';
-      default:
-        return '.txt';
-    }
-  }
-
-  public getFileTypeMIMEType(fileType: any): string
-  {
-    switch (fileType)
-    {
-      case FileTypes.Json:
-        return 'application/json';
-      case FileTypes.Csv:
-        return 'text/csv';
-      case FileTypes.Xml:
-        return 'text/xml';
-      default:
-        return 'text';
-    }
-  }
-
-  public executeTemplate(action: ETLActionType<'executeTemplate'>, dispatch)
-  {
-    const directDispatch = this._dispatchReducerFactory(dispatch);
-    const name = action.actionType;
-
-    const template = action.template;
-    const defaultSink = template.getDefaultSink();
-
-    if (defaultSink === undefined)
-    {
-      // tslint:disable-next-line
-      console.error('default sink not defined');
-      return; // todo error
-    }
-    else
-    {
-      const options: ExecuteConfig = {};
-      if (defaultSink.type === Sinks.Download)
-      {
-        const extension = this.getFileTypeExtension(defaultSink.fileConfig.fileType);
-        const mimeType = this.getFileTypeMIMEType(defaultSink.fileConfig.fileType);
-        const downloadFilename = `Export_${template.id}${extension}`;
-        options.download = {
-          downloadFilename,
-          mimeType,
-        };
-      }
-      template.getSources().forEach((source, key) =>
-      {
-        if (source.type === Sources.Upload)
-        {
-          _.set(options, ['files', key], (source.options as SourceOptionsType<Sources.Upload>).file);
-        }
-      });
-
-      const onLoad = () =>
-      {
-        if (action.onSuccess !== undefined)
-        {
-          action.onSuccess();
-        }
-      };
-
-      ETLAjax.executeTemplate(template, options)
-        .then(this.onLoadFactory<any>([onLoad], directDispatch, name))
-        .catch(this.onErrorFactory(action.onError, directDispatch, name));
-    }
   }
 
   public createExecuteJob(action: ETLActionType<'createExecuteJob'>, dispatch)
@@ -680,8 +594,6 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         return this.fetchTemplates.bind(this, action);
       case 'getTemplate':
         return this.getTemplate.bind(this, action);
-      case 'executeTemplate':
-        return this.executeTemplate.bind(this, action);
       case 'createExecuteJob':
         return this.createExecuteJob.bind(this, action);
       case 'runExecuteJob':

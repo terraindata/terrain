@@ -284,39 +284,6 @@ class ETLAjax
     });
   }
 
-  // if download is provided, then the response will be downloaded as the mime type with provided filename
-  public executeTemplate(
-    template: ETLTemplate,
-    options: ExecuteConfig,
-  ): Promise<void>
-  {
-    return new Promise((resolve, reject) =>
-    {
-      const config: ReqConfig = {
-        onError: reject,
-      };
-      if (options.download !== undefined)
-      {
-        config.downloadName = options.download.downloadFilename;
-        config.mimeType = options.download.mimeType;
-      }
-      const templateToRun = JSON.stringify(templateForBackend(template));
-      const payload = {
-        template: templateToRun,
-      };
-      if (options.files !== undefined)
-      {
-        _.extend(payload, options.files);
-      }
-      this.reqFormData(
-        'etl/execute',
-        payload,
-        (resp) => resolve(resp),
-        config,
-      );
-    });
-  }
-
   public createExecuteJob(): Promise<number>
   {
     return new Promise((resolve, reject) =>
