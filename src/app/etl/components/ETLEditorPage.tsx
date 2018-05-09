@@ -59,6 +59,7 @@ import Util from 'util/Util';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { ETLState } from 'etl/ETLTypes';
+import ExecutionHelpers from 'etl/helpers/ExecutionHelpers';
 import Initializers from 'etl/helpers/TemplateInitializers';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
@@ -208,87 +209,7 @@ class ETLEditorPage extends TerrainComponent<Props>
 
   public executeTemplate(template: ETLTemplate)
   {
-    const { runningTemplates } = this.props.etl;
-    const verifyErrors = TemplateUtil.verifyExecutable(template);
-    if (verifyErrors.length > 0)
-    {
-      this.props.etlAct({
-        actionType: 'addModal',
-        props: {
-          message: `Cannot run template "${template.templateName}": ${JSON.stringify(verifyErrors)}`,
-          title: `Error`,
-          error: true,
-        },
-      });
-    }
-    else if (runningTemplates.has(template.id))
-    {
-      this.props.etlAct({
-        actionType: 'addModal',
-        props: {
-          message: `Cannot run template "${template.templateName}". This template is already running`,
-          title: `Error`,
-          error: true,
-        },
-      });
-    }
-    else
-    {
-      const updateUIAfterResponse = () =>
-      {
-        this.props.etlAct({
-          actionType: 'clearRunningTemplate',
-          templateId: template.id,
-        });
-        this.props.etlAct({
-          actionType: 'setAcknowledgedRun',
-          templateId: template.id,
-          value: false,
-        });
-      };
-
-      this.props.etlAct({
-        actionType: 'setRunningTemplate',
-        templateId: template.id,
-        template,
-      });
-      this.props.etlAct({
-        actionType: 'setAcknowledgedRun',
-        templateId: template.id,
-        value: false,
-      });
-
-      this.props.etlAct({
-        actionType: 'executeTemplate',
-        template,
-        onSuccess: () =>
-        {
-          updateUIAfterResponse();
-          this.props.schemaAct({
-            actionType: 'fetch',
-          });
-          this.props.etlAct({
-            actionType: 'addModal',
-            props: {
-              message: `"${template.templateName}" finished running`,
-              title: 'Task Complete',
-            },
-          });
-        },
-        onError: (ev) =>
-        {
-          updateUIAfterResponse();
-          this.props.etlAct({
-            actionType: 'addModal',
-            props: {
-              message: `Error while executing: ${String(ev)}`,
-              title: `Error`,
-              error: true,
-            },
-          });
-        },
-      });
-    }
+    ExecutionHelpers.runInlineTemplate(template);
   }
 
   // is there a better pattern for this?

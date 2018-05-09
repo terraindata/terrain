@@ -144,7 +144,6 @@ class ETLUploadStep extends ETLStepComponent
   }
 }
 
-const transitionRowHeight = '28px';
 export default Util.createTypedContainer(
   ETLUploadStep,
   ['walkthrough'],

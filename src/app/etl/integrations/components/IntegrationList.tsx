@@ -129,7 +129,6 @@ export class IntegrationListUncontained extends TerrainComponent<Props>
   {
     const { integrations } = this.props;
     const keys = integrations.keySeq().toList().sort();
-    // TODO move this to parent component
     EtlRouteUtil.gotoEditIntegration(keys.get(index));
   }
 

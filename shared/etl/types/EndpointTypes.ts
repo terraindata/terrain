@@ -52,6 +52,7 @@ export interface FileConfig
   fileType: FileTypes;
   hasCsvHeader?: boolean;
   jsonNewlines?: boolean;
+  xmlPath?: string;
 }
 
 export enum Sources
@@ -141,7 +142,6 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
       credentialId: -1,
     },
     Http: {
-      url: 'http://localhost',
       method: 'GET',
       headers: {
         accept: '',
@@ -152,18 +152,8 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
       path: '',
     },
     Mysql: {
-      ip: '127.0.0.1',
-      port: 3306,
-      database: 'databasename',
-      table: 'tablename',
-      credentialId: -1,
     },
     Postgresql: {
-      ip: '127.0.0.1',
-      port: 5432,
-      database: 'databasename',
-      table: 'tablename',
-      credentialId: -1,
     },
   };
 
@@ -201,7 +191,6 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
       credentialId: -1,
     },
     Http: {
-      url: 'http://localhost',
       method: 'POST',
       headers: {
         accept: '',
@@ -215,8 +204,6 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
 
 export interface SftpOptions
 {
-  // ip: string; // get rid of this when integration ui / backend support is created
-  // port: number; // get rid of this when integration ui / backend support is created
   filepath: string;
   credentialId: number; // get rid of this when integration ui / backend support is created
   meta?: any;
@@ -224,7 +211,6 @@ export interface SftpOptions
 
 export interface HttpOptions
 {
-  url: string;
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   headers: {
     accept: string;
@@ -234,11 +220,6 @@ export interface HttpOptions
 
 export interface SQLOptions
 {
-  ip: string;
-  port: number;
-  database: string;
-  table: string;
-  credentialId: number;
   meta?: any;
   query?: string;
 }
