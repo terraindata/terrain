@@ -89,10 +89,9 @@ export abstract class Task
     this.taskConfig.params['options']['inputStreams'] = [taskOutputConfig['options']['outputStream']];
   }
 
-  public setInputConfigStream(inputStream: stream.Readable | stream.Readable[], logStream: stream.Readable): void
+  public setInputConfigStream(inputStream: stream.Readable | stream.Readable[]): void
   {
     this.taskConfig.params['options']['inputStreams'] = Array.isArray(inputStream) ? inputStream : [inputStream];
-    this.taskConfig.params['options']['logStream'] = logStream;
   }
 
   public abstract async printNode(): Promise<TaskOutputConfig>;

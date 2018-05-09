@@ -48,7 +48,7 @@ export class JobConfig
 {
   public createdAt: Date = null;                   // when the job was created
   public createdBy: number = null;                 // who created the job (user ID)
-  public id: number = -1;                              // job ID
+  public id?: number;                              // job ID
   public logId?: number;                           // jobLog table ID
   public meta: string = '';                        // meta
   public name: string = '';                        // name of the job

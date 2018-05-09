@@ -50,7 +50,6 @@ import TaskConfigTypes from './TaskConfigTypes';
 
 export class TaskInputConfigTypes extends TaskConfigTypes
 {
-  public logStream: stream.Readable = null;
   public overrideSinks?: string = '';
   public overrideSources?: string = '';
   public inputStreams: stream.Readable[] = null;
