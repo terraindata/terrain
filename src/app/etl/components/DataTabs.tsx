@@ -52,6 +52,7 @@ import * as React from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import Util from 'util/Util';
+import './DataTabs.less';
 
 interface DataTabsProps
 {
@@ -91,15 +92,19 @@ class DataTabs extends TerrainComponent<DataTabsProps>
     const { params } = this.props;
 
     return (
-      <TerrainTabs
-        tabs={this.tabs}
-        selectedTab={params.tab}
-        tabToRouteMap={this.tabToRouteMap}
-      >
-        <TemplateList />
-        <IntegrationList />
-        <h2>Any content 3</h2>
-      </TerrainTabs>
+      <div className='etl'>
+        <div className='etl-tabs'>
+          <TerrainTabs
+            tabs={this.tabs}
+            selectedTab={params.tab}
+            tabToRouteMap={this.tabToRouteMap}
+          >
+            <TemplateList />
+            <IntegrationList />
+            <h2>Any content 3</h2>
+          </TerrainTabs>
+        </div>
+      </div>
     );
   }
 }
