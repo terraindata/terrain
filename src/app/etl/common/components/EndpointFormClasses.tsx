@@ -58,6 +58,7 @@ import { DisplayState, DisplayType, InputDeclarationMap } from 'common/component
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import DatabasePicker from 'etl/common/components/DatabasePicker';
+import FileConfigForm from 'etl/common/components/FileConfigForm';
 import UploadFileButton from 'etl/common/components/UploadFileButton';
 import AlgorithmSelector from 'library/components/AlgorithmSelector';
 import { LibraryState } from 'library/LibraryTypes';
@@ -79,40 +80,12 @@ export interface Props
   onChange: (newConfig: SinkConfig | SourceConfig, apply?: boolean) => void;
 }
 
-const fileTypeList = List([FileTypes.Json, FileTypes.Csv]);
+const fileTypeList = List([FileTypes.Json, FileTypes.Csv, FileTypes.Xml]);
 
 abstract class EndpointFormBase<State, P extends Props = Props> extends TerrainComponent<P>
 {
   public abstract inputMap: InputDeclarationMap<State>;
   public showFileConfig = true; // override this to hide
-
-  public fileConfigInputMap: InputDeclarationMap<FileConfigI> =
-    {
-      fileType: {
-        type: DisplayType.Pick,
-        displayName: 'File Type',
-        widthFactor: 2,
-        group: 'file type',
-        options: {
-          pickOptions: (s: FileConfigI) => fileTypeList,
-          indexResolver: (value) => fileTypeList.indexOf(value),
-        },
-      },
-      hasCsvHeader: {
-        type: DisplayType.CheckBox,
-        displayName: 'File Has CSV Header',
-        group: 'file type',
-        widthFactor: 4,
-        getDisplayState: (s: FileConfigI) => s.fileType === FileTypes.Csv ? DisplayState.Active : DisplayState.Hidden,
-      },
-      jsonNewlines: {
-        type: DisplayType.CheckBox,
-        displayName: 'Objects separated by newlines',
-        group: 'file type',
-        widthFactor: 4,
-        getDisplayState: (s: FileConfigI) => s.fileType === FileTypes.Json ? DisplayState.Active : DisplayState.Hidden,
-      },
-    };
 
   constructor(props)
   {
@@ -133,17 +106,6 @@ abstract class EndpointFormBase<State, P extends Props = Props> extends TerrainC
     return newState;
   }
 
-  @instanceFnDecorator(memoizeOne)
-  public fileConfigToFormState(config: FileConfig): FileConfigI
-  {
-    const { fileType, hasCsvHeader, jsonNewlines } = config;
-    return {
-      fileType,
-      hasCsvHeader,
-      jsonNewlines,
-    };
-  }
-
   public render()
   {
     const { fileConfig, options } = this.props.endpoint;
@@ -157,21 +119,19 @@ abstract class EndpointFormBase<State, P extends Props = Props> extends TerrainC
         />
         {
           this.showFileConfig ?
-            <DynamicForm
-              inputMap={this.fileConfigInputMap}
-              inputState={this.fileConfigToFormState(fileConfig)}
-              onStateChange={this.handleFileConfigChange}
+            <FileConfigForm
+              fileConfig={fileConfig}
+              onChange={this.handleFileConfigChange}
             /> : null
         }
       </div>
     );
   }
 
-  private handleFileConfigChange(configState: FileConfigI)
+  private handleFileConfigChange(config: FileConfig, apply?: boolean)
   {
     const { onChange, endpoint } = this.props;
-    const newFileConfig = _FileConfig(configState);
-    onChange(endpoint.set('fileConfig', newFileConfig));
+    onChange(endpoint.set('fileConfig', config), apply);
   }
 
   private handleOptionsFormChange(formState: State, apply?: boolean)
@@ -314,18 +274,6 @@ type SftpState = SftpOptions;
 class SftpEndpoint extends EndpointFormBase<SftpState>
 {
   public inputMap: InputDeclarationMap<SftpState> = {
-    // ip: {
-    //   type: DisplayType.TextBox,
-    //   displayName: 'IP Address',
-    //   group: 'addr row',
-    //   widthFactor: 3,
-    // },
-    // port: {
-    //   type: DisplayType.NumberBox,
-    //   displayName: 'Port',
-    //   group: 'addr row',
-    //   widthFactor: 1,
-    // },
     filepath: {
       type: DisplayType.TextBox,
       displayName: 'Filepath',
@@ -348,10 +296,6 @@ const httpMethods = List(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']);
 class HttpEndpoint extends EndpointFormBase<HttpState>
 {
   public inputMap: InputDeclarationMap<HttpState> = {
-    url: {
-      type: DisplayType.TextBox,
-      displayName: 'URL',
-    },
     method: {
       type: DisplayType.Pick,
       displayName: 'Method',
@@ -372,10 +316,9 @@ class HttpEndpoint extends EndpointFormBase<HttpState>
 
   public optionsToFormState(options: HttpOptions): HttpState
   {
-    const { url, method } = options;
+    const { method } = options;
     const headers = _.get(options, 'headers', {});
     return {
-      url,
       method,
       accept: headers['accept'],
       contentType: headers['contentType'],
@@ -384,9 +327,8 @@ class HttpEndpoint extends EndpointFormBase<HttpState>
 
   public formStateToOptions(newState: HttpState): HttpOptions
   {
-    const { url, method, accept, contentType } = newState;
+    const { method, accept, contentType } = newState;
     return {
-      url,
       method,
       headers: {
         accept,
@@ -458,30 +400,6 @@ type SQLState = SQLOptions;
 class SQLEndpoint extends EndpointFormBase<SQLState>
 {
   public inputMap: InputDeclarationMap<SQLState> = {
-    ip: {
-      type: DisplayType.TextBox,
-      displayName: 'IP Address',
-      group: 'addr row',
-      widthFactor: 3,
-    },
-    port: {
-      type: DisplayType.NumberBox,
-      displayName: 'Port',
-      group: 'addr row',
-      widthFactor: 1,
-    },
-    database: {
-      type: DisplayType.TextBox,
-      displayName: 'Database',
-    },
-    table: {
-      type: DisplayType.TextBox,
-      displayName: 'Table',
-    },
-    credentialId: {
-      type: DisplayType.NumberBox,
-      displayName: 'Credential ID',
-    },
     query: {
       type: DisplayType.TextBox,
       displayName: 'Query',

@@ -78,6 +78,7 @@ export default class BufferTransform
       if (this.arr.length >= (size as number))
       {
         this.stream.removeListener('end', done);
+        this.stream.destroy();
         callback(null, this.arr);
       }
       else

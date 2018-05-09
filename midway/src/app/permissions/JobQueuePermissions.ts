@@ -89,6 +89,11 @@ export class JobQueuePermissions
     return PermissionUtil.defaultSuperUser(user, params);
   }
 
+  public async verifyRunNowRoute(user: UserConfig, params: object): Promise<string>
+  {
+    return PermissionUtil.defaultSuperUser(user, params);
+  }
+
   public async verifyUnpauseRoute(user: UserConfig, params: object): Promise<string>
   {
     return PermissionUtil.defaultSuperUser(user, params);

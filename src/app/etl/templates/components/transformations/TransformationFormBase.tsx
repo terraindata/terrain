@@ -53,7 +53,6 @@ import * as React from 'react';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -72,9 +71,8 @@ export interface TransformationFormProps
   transformation?: TransformationNode; // must be supplied if isCreate is false
   engine: TransformationEngine;
   fieldId: number;
-  onEditOrCreate: (structural: boolean) => void;
   onClose: () => void;
-  // calls handler with a bool indicating if transform results in structural changes to the document
+  tryMutateEngine: (tryFn: (proxy: EngineProxy) => void) => void;
 }
 type TFProps = TransformationFormProps; // short alias
 
@@ -211,44 +209,23 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
 
   protected handleMainAction()
   {
-    const { isCreate, engine, fieldId, onEditOrCreate, onClose } = this.props;
+    const { isCreate, engine, fieldId, onClose } = this.props;
     const overrideStructuralChange = this.isStructuralChange();
     if (isCreate)
     {
-      GraphHelpers.mutateEngine((proxy) =>
+      this.props.tryMutateEngine((proxy) =>
       {
         this.createTransformation(proxy);
-      }).then((structuralChange) =>
-      {
-        if (overrideStructuralChange !== undefined)
-        {
-          onEditOrCreate(overrideStructuralChange);
-        }
-        else
-        {
-          onEditOrCreate(structuralChange);
-        }
-        onClose();
-      }).catch(onClose);
+      });
+      onClose();
     }
     else
     {
-      const { transformation } = this.props;
-      GraphHelpers.mutateEngine((proxy) =>
+      this.props.tryMutateEngine((proxy) =>
       {
         this.editTransformation(proxy);
-      }).then((structuralChange) =>
-      {
-        if (overrideStructuralChange !== undefined)
-        {
-          onEditOrCreate(overrideStructuralChange);
-        }
-        else
-        {
-          onEditOrCreate(structuralChange);
-        }
-        onClose();
-      }).catch(onClose);
+      });
+      onClose();
     }
   }
 }

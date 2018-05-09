@@ -234,9 +234,9 @@ export class JobQueue
     });
   }
 
-  public async run(id: number, runImmediately: boolean = false): Promise<JobConfig[] | stream.Readable> // runs the job and
+  public async run(id: number): Promise<JobConfig[]> // runs the job and returns immediately
   {
-    return new Promise<JobConfig[] | stream.Readable>(async (resolve, reject) =>
+    return new Promise<JobConfig[]>(async (resolve, reject) =>
     {
       const getJobs: JobConfig[] = await this.get(id, false) as JobConfig[];
       if (getJobs.length === 0)
@@ -244,53 +244,71 @@ export class JobQueue
         return reject(new Error('Job not found.'));
       }
 
-      if (runImmediately === true)
-      {
-        if (this.runningRunNowJobs.size >= this.maxConcurrentRunNowJobs)
-        {
-          return reject(new Error('Too many jobs set to run now currently in the queue.'));
-        }
-        const status: boolean = await this._setJobStatus(getJobs[0].id, true, 'RUNNING');
-        if (!status)
-        {
-          winston.warn('Job running status was not toggled.');
-        }
-        const newJob: Job = new Job();
-        let newJobTasks: TaskConfig[] = [];
-        try
-        {
-          newJobTasks = JSON.parse(getJobs[0].tasks);
-        }
-        catch (e)
-        {
-          winston.warn(((e as any).toString() as string));
-        }
+      await this._setJobStatus(id, true, 'RUNNING');
+      getJobs[0] = await this._setRunNow(getJobs[0]);
+      return resolve(await App.DB.upsert(this.jobTable, getJobs[0]) as JobConfig[]);
+    });
+  }
 
-        const jobCreationStatus: boolean | string = newJob.create(newJobTasks, 'some random filename');
-        winston.info('created job');
-        if (typeof jobCreationStatus === 'string' || (jobCreationStatus as boolean) !== true)
-        {
-          winston.warn('Error while creating job: ' + (jobCreationStatus as string));
-        }
-        // update the table to running = true
-        this.runningRunNowJobs.set(getJobs[0].id, newJob);
-        // actually run the job
-
-        const jobResult: TaskOutputConfig = await this.runningRunNowJobs.get(getJobs[0].id).run() as TaskOutputConfig;
-        const jobsFromId: JobConfig[] = await this.get(getJobs[0].id);
-        const jobStatus: string = jobResult.status === true ? 'SUCCESS' : 'FAILURE';
-        await this._setJobStatus(jobsFromId[0].id, false, jobStatus);
-        await App.SKDR.setRunning(jobsFromId[0].scheduleId, false);
-        this.runningJobs.delete(getJobs[0].id);
-        // TODO: log job result
-        return resolve(jobResult['outputStream'] as stream.Readable);
-      }
-      else
+  // runs the job and returns a resolved Promise of a stream
+  public async runNow(id: number, fields: object, files: stream.Readable[]): Promise<stream.Readable>
+  {
+    return new Promise<stream.Readable>(async (resolve, reject) =>
+    {
+      const getJobs: JobConfig[] = await this.get(id, false) as JobConfig[];
+      if (getJobs.length === 0)
       {
-        await this._setJobStatus(id, true, 'RUNNING');
-        getJobs[0] = await this._setRunNow(getJobs[0]);
-        return resolve(await App.DB.upsert(this.jobTable, getJobs[0]) as JobConfig[]);
+        return reject(new Error('Job not found.'));
       }
+
+      if (this.runningRunNowJobs.size >= this.maxConcurrentRunNowJobs)
+      {
+        return reject(new Error('Too many jobs set to run now currently in the queue.'));
+      }
+      const status: boolean = await this._setJobStatus(getJobs[0].id, true, 'RUNNING');
+      if (!status)
+      {
+        winston.warn('Job running status was not toggled.');
+      }
+      const newJob: Job = new Job();
+      let newJobTasks: TaskConfig[] = [];
+      try
+      {
+        newJobTasks = JSON.parse(getJobs[0].tasks);
+        newJobTasks[0].params =
+          {
+            options:
+              {
+                overrideSinks: fields['overrideSinks'],
+                overrideSources: fields['overrideSources'],
+                template: fields['template'],
+                templateId: fields['templateId'],
+                inputStreams: files,
+              },
+          };
+      }
+      catch (e)
+      {
+        winston.warn(((e as any).toString() as string));
+      }
+
+      const jobCreationStatus: boolean | string = newJob.create(newJobTasks, 'some random filename');
+      winston.info('created job');
+      if (typeof jobCreationStatus === 'string' || (jobCreationStatus as boolean) !== true)
+      {
+        winston.warn('Error while creating job: ' + (jobCreationStatus as string));
+      }
+      // update the table to running = true
+      this.runningRunNowJobs.set(getJobs[0].id, newJob);
+      // actually run the job
+      const jobResult: TaskOutputConfig = await this.runningRunNowJobs.get(getJobs[0].id).run() as TaskOutputConfig;
+      const jobsFromId: JobConfig[] = await this.get(getJobs[0].id);
+      const jobStatus: string = jobResult.status === true ? 'SUCCESS' : 'FAILURE';
+      await this._setJobStatus(jobsFromId[0].id, false, jobStatus);
+      this.runningRunNowJobs.delete(getJobs[0].id);
+      // TODO: log job result
+
+      return resolve(jobResult['options']['outputStream'] as stream.Readable);
     });
   }
 
@@ -453,7 +471,7 @@ export class JobQueue
         // TODO
       }
 
-      const results: JobConfig[] = rawResults.map((result: object) => new JobConfig(result));
+      const results: JobConfig[] = rawResults.map((result: object) => new JobConfig(result as JobConfig));
       resolve(results);
     });
   }
