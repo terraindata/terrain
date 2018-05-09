@@ -73,7 +73,7 @@ export interface Props
   users?: Immutable.Map<ID, User>;
 }
 
-class IntegrationList extends TerrainComponent<Props>
+export class IntegrationListUncontained extends TerrainComponent<Props>
 {
   public state: {
     confirmModalOpen: boolean,
@@ -233,8 +233,8 @@ class IntegrationList extends TerrainComponent<Props>
   }
 }
 
-export default Util.createContainer(
-  IntegrationList,
+const IntegrationList = Util.createContainer(
+  IntegrationListUncontained,
   [
     ['etl', 'integrations'],
     ['users', 'users'],
@@ -243,3 +243,5 @@ export default Util.createContainer(
     etlActions: ETLActions,
   },
 );
+
+export default IntegrationList;
