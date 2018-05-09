@@ -71,6 +71,7 @@ import { destringifySavedTemplate, recordToConfig, TemplateConfig, templateForSa
 import { _SinkConfig, _SourceConfig, SinkConfig as SinkRecord, SourceConfig as SourceRecord } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { ETLProcess, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
+import ProgressStream from '../io/streams/ProgressStream';
 
 export default class Templates
 {
@@ -225,6 +226,33 @@ export default class Templates
     });
   }
 
+  public async upsert(newTemplate: TemplateConfig): Promise<TemplateConfig[]>
+  {
+    return new Promise<TemplateConfig[]>(async (resolve, reject) =>
+    {
+      let toUpsert;
+      try
+      {
+        toUpsert = templateForSave(newTemplate);
+      }
+      catch (e)
+      {
+        return reject(`Failed to prepare template for save: ${String(e)}`);
+      }
+      const rawTemplates = await App.DB.upsert(this.templateTable, toUpsert) as TemplateInDatabase[];
+      try
+      {
+        const templates = rawTemplates.map((value, index) =>
+          destringifySavedTemplate(value as TemplateInDatabase));
+        resolve(templates);
+      }
+      catch (e)
+      {
+        return reject(`Failed to destringify saved templates: ${String(e)}`);
+      }
+    });
+  }
+
   public async executeETL(
     fields?: {
       template?: string,
@@ -233,7 +261,7 @@ export default class Templates
       overrideSinks?: string,
     },
     files?: Readable[],
-  ): Promise<Readable>
+  ): Promise<{ outputStream: Readable, logStream: Readable }>
   {
     try
     {
@@ -265,34 +293,7 @@ export default class Templates
     }
   }
 
-  public async upsert(newTemplate: TemplateConfig): Promise<TemplateConfig[]>
-  {
-    return new Promise<TemplateConfig[]>(async (resolve, reject) =>
-    {
-      let toUpsert;
-      try
-      {
-        toUpsert = templateForSave(newTemplate);
-      }
-      catch (e)
-      {
-        return reject(`Failed to prepare template for save: ${String(e)}`);
-      }
-      const rawTemplates = await App.DB.upsert(this.templateTable, toUpsert) as TemplateInDatabase[];
-      try
-      {
-        const templates = rawTemplates.map((value, index) =>
-          destringifySavedTemplate(value as TemplateInDatabase));
-        resolve(templates);
-      }
-      catch (e)
-      {
-        return reject(`Failed to destringify saved templates: ${String(e)}`);
-      }
-    });
-  }
-
-  public async executeById(id: number, files?: Readable[]): Promise<Readable>
+  public async executeById(id: number, files?: Readable[]): Promise<{ outputStream: Readable, logStream: Readable }>
   {
     const ts: TemplateConfig[] = await this.get(id);
     if (ts.length < 1)
@@ -303,7 +304,11 @@ export default class Templates
     return this.execute(template, files);
   }
 
-  public async executeByOverride(id: number, files?: Readable[], overrideSources?: string, overrideSinks?: string)
+  public async executeByOverride(
+    id: number,
+    files?: Readable[],
+    overrideSources?: string,
+    overrideSinks?: string): Promise<{ outputStream: Readable, logStream: Readable }>
   {
     let template: ETLTemplate = null;
 
@@ -341,7 +346,7 @@ export default class Templates
     return this.execute(recordToConfig(template), files);
   }
 
-  public async execute(template: TemplateConfig, files?: Readable[]): Promise<Readable>
+  public async execute(template: TemplateConfig, files?: Readable[]): Promise<{ outputStream: Readable, logStream: Readable }>
   {
     winston.info('Executing template', template.templateName);
     winston.debug(JSON.stringify(template, null, 2));
@@ -397,7 +402,23 @@ export default class Templates
     winston.info('Beginning execution of ETL pipeline graph...');
     const nodes: any[] = GraphLib.alg.topsort(dag);
     const streamMap = await this.executeGraph(template, dag, nodes, files);
-    return streamMap[defaultSink][defaultSink];
+
+    const outputStream = streamMap[defaultSink][defaultSink];
+    const logStream = streamMap['log'];
+
+    // push execution summary / progress to the log stream when done
+    if (outputStream instanceof ProgressStream)
+    {
+      outputStream.on('end', () =>
+      {
+        logStream.push(outputStream.progress());
+      });
+    }
+
+    return {
+      outputStream,
+      logStream,
+    };
   }
 
   private logErrToStreams(logStream: Readable, ...streams: Array<Readable | Writable | Transform>)
