@@ -56,20 +56,20 @@ describe('SimpleTable', () =>
 {
   let tableComponent = null;
 
-  const columns = [
-    {
+  const columnsConfig = {
+    id: {
       columnKey: 'id',
       columnLabel: 'Id',
     },
-    {
+    name: {
       columnKey: 'name',
       columnLabel: 'Name',
     },
-    {
+    status: {
       columnKey: 'status',
       columnLabel: 'Status',
     },
-  ];
+  };
 
   let tableData = Immutable.Map<ID, any>({});
   const TableItem = Record({ id: 0, name: '', status: '' });
@@ -85,7 +85,7 @@ describe('SimpleTable', () =>
   }));
 
   const tableState = {
-    header: columns,
+    columnsConfig,
     data: tableData,
   };
 
@@ -106,14 +106,16 @@ describe('SimpleTable', () =>
       expect(tableComponent.find('.simple-table-header')).toHaveLength(1);
       expect(tableComponent.find('.simple-table-body')).toHaveLength(1);
 
+      const columnsCount = Object.keys(columnsConfig).length;
+
       expect(tableComponent.find('.simple-table-header .simple-table-cell'))
-        .toHaveLength(columns.length);
+        .toHaveLength(columnsCount);
 
       expect(tableComponent.find('.simple-table-body .simple-table-row'))
         .toHaveLength(2);
 
       expect(tableComponent.find('.simple-table-body .simple-table-cell'))
-        .toHaveLength(2 * columns.length);
+        .toHaveLength(2 * columnsCount);
 
       expect(tableComponent.find('.simple-table-body .simple-table-cell').at(0).text())
         .toEqual('1');

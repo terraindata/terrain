@@ -49,6 +49,7 @@ THE SOFTWARE.
 import { List } from 'immutable';
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import BadgeColumn from 'common/components/simple-table/BadgeColumn';
 
 import './SimpleTable.less';
 
@@ -58,11 +59,12 @@ export interface SimpleTableColumn
 {
   columnKey: string;
   columnLabel: string;
+  component?: JSX.Element; // a component to wrap the column value with
 }
 
 export interface Props
 {
-  header: SimpleTableColumn[];
+  columnsConfig: { [colKey: string]: SimpleTableColumn };
   data: Immutable.Map<ID, any>;
 }
 
@@ -70,19 +72,36 @@ export class SimpleTable extends TerrainComponent<Props>
 {
   public state: {};
 
+  public renderValue(colKey, value)
+  {
+    const { columnsConfig } = this.props;
+
+    const component = columnsConfig[colKey].component;
+
+    let processedValue = value;
+
+    if (component !== undefined)
+    {
+      processedValue = React.cloneElement(component, { value })
+    }
+
+    return processedValue;
+  }
+
   public render()
   {
-    const { header, data } = this.props;
+    const { columnsConfig, data } = this.props;
 
-    const columnKeys = header.reduce((keys, column) => keys.concat(column.columnKey), []);
+    const columnKeys = Object.keys(columnsConfig);
 
     return (
       <table className='simple-table'>
         <thead className='simple-table-header'>
           <tr className='simple-table-row'>
             {
-              header.map((column, index) =>
+              Object.keys(columnsConfig).map((colKey) =>
               {
+                const column = columnsConfig[colKey];
                 return <th key={column.columnKey} className='simple-table-cell'>{column.columnLabel}</th>;
               })
             }
@@ -97,7 +116,11 @@ export class SimpleTable extends TerrainComponent<Props>
                   {
                     columnKeys.map((key, index) =>
                     {
-                      return <td key={key} className='simple-table-cell'>{entry[key]}</td>;
+                      return (
+                        <td key={key} className='simple-table-cell'>
+                          {this.renderValue(key, entry[key])}
+                        </td>
+                      );
                     })
                   }
                 </tr>
@@ -110,4 +133,5 @@ export class SimpleTable extends TerrainComponent<Props>
   }
 }
 
+export { BadgeColumn };
 export default SimpleTable;

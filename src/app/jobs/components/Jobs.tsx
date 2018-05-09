@@ -44,20 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console
-import SimpleTable from 'common/components/SimpleTable';
+import SimpleTable, { BadgeColumn } from 'common/components/SimpleTable';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import { JobsActions } from 'jobs/data/JobsRedux';
-import { getFailedJobs, getSuccessfulJobs } from 'jobs/data/JobsSelectors';
-import JobsApi from 'jobs/JobsApi';
+import {
+  getFailedJobs,
+  getSuccessfulJobs,
+  getPendingJobs,
+  getRunningJobs,
+  getAbortedJobs,
+} from 'jobs/data/JobsSelectors';
 import * as React from 'react';
 import Util from 'util/Util';
-import XHR from 'util/XHR';
+import './Jobs.less';
 
 class Jobs extends TerrainComponent<any> {
-
-  public jobsApi: JobsApi = new JobsApi(XHR.getInstance());
-
   public constructor(props)
   {
     super(props);
@@ -87,56 +89,87 @@ class Jobs extends TerrainComponent<any> {
       });
   }
 
-  public getJob(id: number)
+  public getStatusColor(status)
   {
-    this.jobsApi.getJob(id)
-      .then((response) =>
-      {
-        this.setState({ responseText: JSON.stringify(response) });
-      })
-      .catch((error) =>
-      {
-        this.setState({ responseText: error });
-      });
+    switch (status)
+    {
+      case 'SUCCESS':
+        return '#94be6b';
+      case 'ABORTED':
+        return '#ffa8b9';
+      case 'RUNNING':
+        return '#1eb4fa';
+      case 'FAILURE':
+        return '#ea526f';
+      case 'PAUSED':
+        return '#ff8a5b';
+      case 'PENDING':
+        return '#cccccc';
+    }
   }
 
   public render()
   {
-    const { successfulJobs, failedJobs } = this.props;
+    const {
+      successfulJobs,
+      failedJobs,
+      pendingJobs,
+      runningJobs,
+      abortedJobs,
+    } = this.props;
     const { id } = this.state;
 
-    const jobsHeader = [
-      {
+    const jobsHeader = {
+      id: {
         columnKey: 'id',
         columnLabel: 'Id',
       },
-      {
+      name: {
         columnKey: 'name',
         columnLabel: 'Name',
       },
-      {
+      status: {
         columnKey: 'status',
-        columnLabel: 'Status',
+        columnLabel: '',
+        component: <BadgeColumn
+          getColor={this.getStatusColor}
+        />
       },
-    ];
+    };
 
     return (
-      <div>
-        <div>
-          {this.state.responseText}
+      <div className="jobs">
+        <div className="job-lists">
+          <h2>Successful Jobs</h2>
+          <SimpleTable
+            columnsConfig={jobsHeader}
+            data={successfulJobs}
+          />
+
+          <h2>Failed Jobs</h2>
+          <SimpleTable
+            columnsConfig={jobsHeader}
+            data={failedJobs}
+          />
+
+          <h2>Pending Jobs</h2>
+          <SimpleTable
+            columnsConfig={jobsHeader}
+            data={pendingJobs}
+          />
+
+          <h2>Running Jobs</h2>
+          <SimpleTable
+            columnsConfig={jobsHeader}
+            data={runningJobs}
+          />
+
+          <h2>Aborted Jobs</h2>
+          <SimpleTable
+            columnsConfig={jobsHeader}
+            data={abortedJobs}
+          />
         </div>
-
-        <h2>Successful Jobs</h2>
-        <SimpleTable
-          header={jobsHeader}
-          data={successfulJobs}
-        />
-
-        <h2>Failed Jobs</h2>
-        <SimpleTable
-          header={jobsHeader}
-          data={failedJobs}
-        />
       </div>
     );
   }
@@ -147,6 +180,9 @@ export default Util.createTypedContainer(
   {
     successfulJobs: getSuccessfulJobs,
     failedJobs: getFailedJobs,
+    pendingJobs: getPendingJobs,
+    runningJobs: getRunningJobs,
+    abortedJobs: getAbortedJobs,
   },
   { jobsActions: JobsActions },
 );
