@@ -47,8 +47,8 @@ THE SOFTWARE.
 import * as request from 'supertest';
 import * as winston from 'winston';
 
+/*
 let defaultUserAccessToken;
-
 beforeAll(async (done) =>
 {
   try
@@ -278,3 +278,4 @@ describe('Testing the midway import interface', () =>
       });
   });
 });
+*/
