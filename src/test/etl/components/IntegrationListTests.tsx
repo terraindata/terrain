@@ -46,7 +46,7 @@ THE SOFTWARE.
 // tslint:disable:no-empty
 
 import { ItemList } from 'app/etl/common/components/ItemList';
-import { IntegrationListTest as IntegrationList } from 'app/etl/integrations/components/IntegrationList';
+import { IntegrationListUncontained as IntegrationList } from 'app/etl/integrations/components/IntegrationList';
 import Util from 'app/util/Util';
 import { mount, shallow } from 'enzyme';
 import * as Immutable from 'immutable';
