@@ -202,7 +202,7 @@ export class ElasticMapping
 
   protected getTextConfig(elasticProps: ElasticFieldProps): TypeConfig
   {
-    return {
+    const config: TypeConfig = {
       type: elasticProps.isAnalyzed ? 'text' : 'keyword',
       index: true,
       fields:
@@ -219,8 +219,12 @@ export class ElasticMapping
               ignore_above: 256,
             },
         },
-      analyzer: elasticProps.analyzer,
     };
+    if (elasticProps.isAnalyzed)
+    {
+      config.analyzer = elasticProps.analyzer;
+    }
+    return config;
   }
 
   protected getTypeConfig(fieldID: number): TypeConfig | null
