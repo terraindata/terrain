@@ -235,9 +235,16 @@ class EditorColumnActionsSection extends TerrainComponent<Props>
       this.props.editorAct({
         actionType: 'rebuildFieldMap',
       });
-    }).catch((ev) =>
+    }).catch((e) =>
     {
-      // TODO
+      this.props.editorAct({
+        actionType: 'addModal',
+        props: {
+          title: 'Error',
+          message: `Could not perform that action: ${String(e)}`,
+          error: true,
+        },
+      });
     });
   }
 }

@@ -42,77 +42,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 import * as stream from 'stream';
 
-import { TaskConfig } from 'shared/types/jobs/TaskConfig';
-import { TaskEnum } from 'shared/types/jobs/TaskEnum';
-import { TaskInputConfig } from 'shared/types/jobs/TaskInputConfig';
-import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
+import TaskConfigTypes from './TaskConfigTypes';
 
-export abstract class Task
+export class TaskOutputConfigTypes extends TaskConfigTypes
 {
-  protected taskConfig: TaskConfig;
-  constructor(taskConfig: TaskConfig)
-  {
-    this.taskConfig = taskConfig;
-  }
-
-  public getCancelStatus(): boolean
-  {
-    if (this.taskConfig.cancel === true)
-    {
-      return true;
-    }
-    return false;
-  }
-
-  public getOnFailure(): number
-  {
-    return this.taskConfig.onFailure;
-  }
-
-  public getOnSuccess(): number
-  {
-    return this.taskConfig.onSuccess;
-  }
-
-  public getTaskId(): number
-  {
-    return this.taskConfig.taskId;
-  }
-
-  public setInputConfig(taskOutputConfig: TaskOutputConfig): void
-  {
-    this.taskConfig.params['options']['logStream'] = taskOutputConfig['options']['logStream'];
-    this.taskConfig.params['options']['inputStreams'] = [taskOutputConfig['options']['outputStream']];
-  }
-
-  public setInputConfigStream(inputStream: stream.Readable | stream.Readable[]): void
-  {
-    this.taskConfig.params['options']['inputStreams'] = Array.isArray(inputStream) ? inputStream : [inputStream];
-  }
-
-  public abstract async printNode(): Promise<TaskOutputConfig>;
-
-  public recurse(tasks: Task[], traversedNodes: number[]): boolean
-  {
-    if (this.taskConfig.taskId === TaskEnum.taskDefaultExit || this.taskConfig.taskId === TaskEnum.taskDefaultFailure)
-    {
-      return true;
-    }
-    if (traversedNodes.includes(this.taskConfig.id)
-      || this.taskConfig.onSuccess === undefined || this.taskConfig.onFailure === undefined
-      || tasks[this.taskConfig.onSuccess] === undefined || tasks[this.taskConfig.onFailure] === undefined)
-    {
-      return false;
-    }
-    return tasks[this.taskConfig.onSuccess].recurse(tasks, traversedNodes.concat(this.taskConfig.id))
-      && tasks[this.taskConfig.onFailure].recurse(tasks, traversedNodes.concat(this.taskConfig.id));
-  }
-
-  public abstract async run(): Promise<TaskOutputConfig>;
+  public outputStream: stream.Readable = null;
 }
 
-export default Task;
+export default TaskOutputConfigTypes;

@@ -144,6 +144,11 @@ class GraphHelpers extends ETLHelpers
         this._try((proxy) =>
         {
           proxy.createInitialEdgeEngine(edgeId, documents);
+        }).then(() =>
+        {
+          this.editorAct({
+            actionType: 'rebuildFieldMap',
+          });
         }).catch(this._logError);
       }).catch(this._logError);
     }

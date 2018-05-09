@@ -44,75 +44,74 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as stream from 'stream';
+import { Readable, Transform } from 'stream';
+import * as xmlNodes from 'xml-nodes';
+import * as xml2js from 'xml2js';
 
-import { TaskConfig } from 'shared/types/jobs/TaskConfig';
-import { TaskEnum } from 'shared/types/jobs/TaskEnum';
-import { TaskInputConfig } from 'shared/types/jobs/TaskInputConfig';
-import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
-
-export abstract class Task
+/**
+ * Converts result stream to XML text stream
+ */
+export default class XMLImportTransform extends Transform
 {
-  protected taskConfig: TaskConfig;
-  constructor(taskConfig: TaskConfig)
-  {
-    this.taskConfig = taskConfig;
-  }
+  private filterStream: Transform;
 
-  public getCancelStatus(): boolean
+  private doneReading: boolean;
+
+  constructor(path: string)
   {
-    if (this.taskConfig.cancel === true)
+    super({
+      writableObjectMode: false,
+      readableObjectMode: true,
+    });
+    this.doneReading = false;
+    this.filterStream = new xmlNodes(path);
+
+    this.filterStream.on('readable', () =>
     {
-      return true;
-    }
-    return false;
+      let result = this.filterStream.read();
+      while (result !== null)
+      {
+        this.parseXML(result);
+        result = this.filterStream.read();
+      }
+    });
+    this.filterStream.on('end', () => { this.doneReading = true; });
+    this.filterStream.on('error', (e) => this.emit('error', e));
   }
 
-  public getOnFailure(): number
+  public _destroy(error, callback)
   {
-    return this.taskConfig.onFailure;
-  }
-
-  public getOnSuccess(): number
-  {
-    return this.taskConfig.onSuccess;
-  }
-
-  public getTaskId(): number
-  {
-    return this.taskConfig.taskId;
-  }
-
-  public setInputConfig(taskOutputConfig: TaskOutputConfig): void
-  {
-    this.taskConfig.params['options']['logStream'] = taskOutputConfig['options']['logStream'];
-    this.taskConfig.params['options']['inputStreams'] = [taskOutputConfig['options']['outputStream']];
-  }
-
-  public setInputConfigStream(inputStream: stream.Readable | stream.Readable[]): void
-  {
-    this.taskConfig.params['options']['inputStreams'] = Array.isArray(inputStream) ? inputStream : [inputStream];
-  }
-
-  public abstract async printNode(): Promise<TaskOutputConfig>;
-
-  public recurse(tasks: Task[], traversedNodes: number[]): boolean
-  {
-    if (this.taskConfig.taskId === TaskEnum.taskDefaultExit || this.taskConfig.taskId === TaskEnum.taskDefaultFailure)
+    this.filterStream._destroy(error, (e) =>
     {
-      return true;
-    }
-    if (traversedNodes.includes(this.taskConfig.id)
-      || this.taskConfig.onSuccess === undefined || this.taskConfig.onFailure === undefined
-      || tasks[this.taskConfig.onSuccess] === undefined || tasks[this.taskConfig.onFailure] === undefined)
-    {
-      return false;
-    }
-    return tasks[this.taskConfig.onSuccess].recurse(tasks, traversedNodes.concat(this.taskConfig.id))
-      && tasks[this.taskConfig.onFailure].recurse(tasks, traversedNodes.concat(this.taskConfig.id));
+      this.push(null);
+      callback(e);
+    });
   }
 
-  public abstract async run(): Promise<TaskOutputConfig>;
+  public _write(chunk, encoding, callback)
+  {
+    this.filterStream.write(chunk, callback);
+  }
+
+  private parseXML(result: string): void
+  {
+    if (this.doneReading)
+    {
+      this.push(null);
+      return;
+    }
+
+    xml2js.parseString(result, {
+      explicitRoot: false,
+      explicitArray: false,
+      mergeAttrs: true,
+    }, (err, obj) =>
+      {
+        if (err !== null && err !== undefined)
+        {
+          this.emit('error', err);
+        }
+        this.push(obj);
+      });
+  }
 }
-
-export default Task;

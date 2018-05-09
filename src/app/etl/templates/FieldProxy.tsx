@@ -275,6 +275,14 @@ export class FieldProxy
   {
     postorderForEach(this.engine, rootId, (fieldId) =>
     {
+      const dependents: List<number> = EngineUtil.getFieldDependents(this.engine, fieldId);
+      if (dependents.size > 0)
+      {
+        const paths = JSON.stringify(
+          dependents.map((id) => this.engine.getOutputKeyPath(id),
+          ).toList().toJS(), null, 2);
+        throw new Error(`Cannot delete field. This field has ${dependents.size} dependent fields: ${paths}`);
+      }
       this.engine.deleteField(fieldId);
     });
     this.syncWithEngine(true);

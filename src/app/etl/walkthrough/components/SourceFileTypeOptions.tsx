@@ -60,8 +60,10 @@ import Util from 'util/Util';
 import * as FileUtil from 'shared/etl/FileUtil';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
+import FileConfigForm from 'etl/common/components/FileConfigForm';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { SourceOptionsType } from 'shared/etl/types/EndpointTypes';
 import { Sources } from 'shared/etl/types/EndpointTypes';
 import { ETLStepComponent, TransitionParams } from './ETLStepComponent';
@@ -78,99 +80,33 @@ interface Props
 
 class SourceFileTypeOptions extends TerrainComponent<Props>
 {
-  public hasCsvHeader(): boolean
-  {
-    const { walkthrough } = this.props;
-    return walkthrough.source.fileConfig.hasCsvHeader;
-  }
-
-  public jsonHasNewlines(): boolean
-  {
-    const { walkthrough } = this.props;
-    return walkthrough.source.fileConfig.jsonNewlines;
-  }
-
-  public renderCsvOptions()
-  {
-    const hasHeader = this.hasCsvHeader();
-
-    return (
-      <div
-        className='source-file-type-row-button'
-        onClick={this.handleCsvHeaderChange}
-      >
-        <CheckBox
-          checked={hasHeader}
-          onChange={() => null}
-        />
-        <div className='source-file-type-checkbox-label'>
-          This file has a header
-        </div>
-      </div>
-    );
-  }
-
-  public renderJsonOptions()
-  {
-    const hasNewlines = this.jsonHasNewlines();
-
-    return (
-      <div
-        className='source-file-type-row-button'
-        onClick={this.handleJsonNewlinesChange}
-      >
-        <CheckBox
-          checked={hasNewlines}
-          onChange={() => null}
-        />
-        <div className='source-file-type-checkbox-label'>
-          Objects seperated by newlines
-        </div>
-      </div>
-    );
-  }
-
   public render()
   {
-    // const { file } = this.props.walkthrough;
-    const { file } = this.props.walkthrough.source.options as SourceOptionsType<Sources.Upload>;
-    const type = file != null ? FileUtil.getFileType(file) : null;
+    const { walkthrough } = this.props;
     return (
-      <span style={{ height: transitionRowHeight }}>
+      <span
+        style={{ maxHeight: transitionRowHeight }}
+        className='source-filetype-options'
+      >
         <div
           className='etl-transition-element field-type-q'
-          style={{ height: !this.props.hide ? transitionRowHeight : '0px' }}
+          style={{ maxHeight: !this.props.hide ? transitionRowHeight : '0px' }}
         >
-          <div className='source-file-type-options'>
-            {type === FileTypes.Csv ? this.renderCsvOptions() : null}
-            {type === FileTypes.Json ? this.renderJsonOptions() : null}
-          </div>
+          <FileConfigForm
+            fileConfig={walkthrough.source.fileConfig}
+            onChange={this.handleFileConfigChange}
+            hideTypePicker={true}
+            style={{ padding: '3px' }}
+          />
         </div>
       </span>
     );
   }
 
-  public handleCsvHeaderChange()
+  public handleFileConfigChange(newConfig: FileConfig)
   {
     const { walkthrough } = this.props;
-    const hasHeader = this.hasCsvHeader();
-    const newSource = walkthrough.source
-      .setIn(['fileConfig', 'hasCsvHeader'], !hasHeader);
-    this.props.act({
-      actionType: 'setState',
-      state: {
-        source: newSource,
-      },
-    });
-  }
-
-  public handleJsonNewlinesChange()
-  {
-    const { walkthrough } = this.props;
-    const hasNewlines = this.jsonHasNewlines();
-
-    const newSource = walkthrough.source
-      .setIn(['fileConfig', 'jsonNewlines'], !hasNewlines);
+    const newSource = walkthrough.source.set('fileConfig', newConfig);
     this.props.act({
       actionType: 'setState',
       state: {
@@ -180,7 +116,7 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
   }
 }
 
-const transitionRowHeight = '28px';
+const transitionRowHeight = '48px';
 
 export default Util.createTypedContainer(
   SourceFileTypeOptions,

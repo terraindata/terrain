@@ -63,10 +63,11 @@ import Dropdown from 'common/components/Dropdown';
 import { Menu, MenuOption } from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 
-import { TemplateField, TransformationNode } from 'etl/templates/FieldTypes';
-
+import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { TransformationCreator } from 'etl/templates/components/transformations/TransformationCreator';
 import { TransformationEditor } from 'etl/templates/components/transformations/TransformationEditor';
+import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
+import { TemplateField, TransformationNode } from 'etl/templates/FieldTypes';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
@@ -117,8 +118,8 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
           transformation={field.transformations.get(currentIndex)}
           engine={engine}
           fieldID={this._field().fieldId}
-          onTransformationChange={this.handleTransformationChange}
           onClose={this.handleUIClose}
+          tryMutateEngine={this.mutateEngine}
         />
       );
     }
@@ -137,8 +138,8 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
         <TransformationCreator
           engine={engine}
           fieldID={this._field().fieldId}
-          onTransformationCreated={this.handleTransformationChange}
           onClose={this.handleUIClose}
+          tryMutateEngine={this.mutateEngine}
         />
       );
     }
@@ -271,6 +272,25 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
         }
       </div>
     );
+  }
+
+  public mutateEngine(tryFn: (proxy: EngineProxy) => void)
+  {
+    GraphHelpers.mutateEngine(tryFn)
+      .then(this.handleTransformationChange)
+      .catch(this.handleTransformationError);
+  }
+
+  public handleTransformationError(err: any)
+  {
+    this.props.act({
+      actionType: 'addModal',
+      props: {
+        title: 'Error',
+        message: `Could not edit or add transformation: ${String(err)}`,
+        error: true,
+      },
+    });
   }
 
   public handleTransformationChange(structuralChanges: boolean)
