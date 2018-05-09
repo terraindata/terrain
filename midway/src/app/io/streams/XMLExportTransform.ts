@@ -44,75 +44,40 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as stream from 'stream';
+import * as xml2js from 'xml2js';
 
-import { TaskConfig } from 'shared/types/jobs/TaskConfig';
-import { TaskEnum } from 'shared/types/jobs/TaskEnum';
-import { TaskInputConfig } from 'shared/types/jobs/TaskInputConfig';
-import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
+import AExportTransform from './AExportTransform';
 
-export abstract class Task
+/**
+ * Converts result stream to XML text stream
+ */
+export default class XMLExportTransform extends AExportTransform
 {
-  protected taskConfig: TaskConfig;
-  constructor(taskConfig: TaskConfig)
+  private builder: xml2js.Builder;
+
+  constructor()
   {
-    this.taskConfig = taskConfig;
+    super();
+    this.builder = new xml2js.Builder();
   }
 
-  public getCancelStatus(): boolean
+  protected preamble(): string
   {
-    if (this.taskConfig.cancel === true)
-    {
-      return true;
-    }
-    return false;
+    return '\n';
   }
 
-  public getOnFailure(): number
+  protected transform(input: object, chunkNumber: number): string
   {
-    return this.taskConfig.onFailure;
+    return this.builder.buildObject(input);
   }
 
-  public getOnSuccess(): number
+  protected delimiter(): string
   {
-    return this.taskConfig.onSuccess;
+    return '\n';
   }
 
-  public getTaskId(): number
+  protected conclusion(chunkNumber: number): string
   {
-    return this.taskConfig.taskId;
+    return '\n';
   }
-
-  public setInputConfig(taskOutputConfig: TaskOutputConfig): void
-  {
-    this.taskConfig.params['options']['logStream'] = taskOutputConfig['options']['logStream'];
-    this.taskConfig.params['options']['inputStreams'] = [taskOutputConfig['options']['outputStream']];
-  }
-
-  public setInputConfigStream(inputStream: stream.Readable | stream.Readable[]): void
-  {
-    this.taskConfig.params['options']['inputStreams'] = Array.isArray(inputStream) ? inputStream : [inputStream];
-  }
-
-  public abstract async printNode(): Promise<TaskOutputConfig>;
-
-  public recurse(tasks: Task[], traversedNodes: number[]): boolean
-  {
-    if (this.taskConfig.taskId === TaskEnum.taskDefaultExit || this.taskConfig.taskId === TaskEnum.taskDefaultFailure)
-    {
-      return true;
-    }
-    if (traversedNodes.includes(this.taskConfig.id)
-      || this.taskConfig.onSuccess === undefined || this.taskConfig.onFailure === undefined
-      || tasks[this.taskConfig.onSuccess] === undefined || tasks[this.taskConfig.onFailure] === undefined)
-    {
-      return false;
-    }
-    return tasks[this.taskConfig.onSuccess].recurse(tasks, traversedNodes.concat(this.taskConfig.id))
-      && tasks[this.taskConfig.onFailure].recurse(tasks, traversedNodes.concat(this.taskConfig.id));
-  }
-
-  public abstract async run(): Promise<TaskOutputConfig>;
 }
-
-export default Task;

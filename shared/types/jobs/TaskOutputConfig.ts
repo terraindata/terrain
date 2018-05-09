@@ -47,13 +47,18 @@ THE SOFTWARE.
 import { Readable } from 'stream';
 
 import { ATaskConfig } from 'shared/types/jobs/ATaskConfig';
+import { TaskConfigTypes } from 'shared/types/jobs/TaskConfigTypes';
+import { TaskOutputConfigTypes } from 'shared/types/jobs/TaskOutputConfigTypes';
 
 export class TaskOutputConfig extends ATaskConfig
 {
   public exit: boolean = null;
   public status: boolean = null;
-  public logStream?: Readable;
-  public outputStream?: Readable;
+  public options: TaskOutputConfigTypes =
+    {
+      logStream: null,
+      outputStream: null,
+    } as TaskOutputConfigTypes;
 }
 
 export default TaskOutputConfig;

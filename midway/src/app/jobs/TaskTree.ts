@@ -208,8 +208,11 @@ export class TaskTree
           {
             exit: true,
             status: true,
-            logStream: null,
-            outputStream: null,
+            options:
+              {
+                logStream: null,
+                outputStream: null,
+              },
           };
         return resolve(taskOutputConfig);
       }
@@ -236,6 +239,7 @@ export class TaskTree
           default:
             ind = this.tasks[ind].getOnFailure();
         }
+
         if (this.taskTreeConfig.cancel === true)
         {
           break;
@@ -244,7 +248,7 @@ export class TaskTree
         this.tasks[ind].setInputConfig(result);
         if (this.taskTreeConfig.jobStatus === 2) // was paused
         {
-          const saveResults: boolean | string = await this._saveToFile(result['options']['stream'], this.taskTreeConfig.filename);
+          const saveResults: boolean | string = await this._saveToFile(result['options']['outputStream'], this.taskTreeConfig.filename);
           if (typeof saveResults === 'boolean')
           {
             winston.info('Saved as ' + this.taskTreeConfig.filename);

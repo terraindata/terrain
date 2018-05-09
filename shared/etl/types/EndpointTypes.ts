@@ -52,6 +52,7 @@ export interface FileConfig
   fileType: FileTypes;
   hasCsvHeader?: boolean;
   jsonNewlines?: boolean;
+  xmlPath?: string;
 }
 
 export enum Sources
