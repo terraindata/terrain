@@ -53,7 +53,6 @@ import * as xml2js from 'xml2js';
  */
 export default class XMLImportTransform extends Transform
 {
-  private path: string;
   private filterStream: Transform;
 
   private doneReading: boolean;
@@ -64,7 +63,6 @@ export default class XMLImportTransform extends Transform
       writableObjectMode: false,
       readableObjectMode: true,
     });
-    this.path = path;
     this.doneReading = false;
     this.filterStream = new xmlNodes(path);
 

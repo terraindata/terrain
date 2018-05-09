@@ -140,8 +140,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
           importStream = sourceStream.pipe(CSVTransform.createImportStream());
           break;
         case 'xml':
-          // const xmlPath: string | undefined = source.fileConfig.xmlPath;
-          const xmlPath = 'property';
+          const xmlPath: string | undefined = source.fileConfig.xmlPath;
           importStream = sourceStream.pipe(XMLTransform.createImportStream(xmlPath));
           break;
         default:
