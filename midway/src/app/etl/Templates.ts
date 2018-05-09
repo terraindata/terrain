@@ -52,7 +52,7 @@ import GraphLib = require('graphlib');
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as request from 'request';
-import { Readable, Transform } from 'stream';
+import { Readable, Transform, Writable } from 'stream';
 import * as winston from 'winston';
 
 import * as Tasty from '../../tasty/Tasty';
@@ -350,7 +350,7 @@ export default class Templates
     const numSinks = Object.keys(template.sinks).length;
     const numEdges = Object.keys(template.process.edges).length;
 
-    // TODO: multi-source import and exports
+    // TODO: multi-source export
     if (numSinks > 1 || template.sinks._default === undefined)
     {
       throw new Error('Only single sinks are supported.');
@@ -400,6 +400,17 @@ export default class Templates
     return streamMap[defaultSink][defaultSink];
   }
 
+  private logErrToStreams(logStream: Readable, ...streams: Array<Readable | Writable | Transform>)
+  {
+    for (const stream of streams)
+    {
+      stream.on('error', (e: Error) =>
+      {
+        logStream.push(e.toString());
+      });
+    }
+  }
+
   private async executeGraph(template: TemplateConfig, dag: any, nodes: any[], files?: Readable[], streamMap?: object): Promise<object>
   {
     // if there are no nodes to process, we are done
@@ -417,6 +428,7 @@ export default class Templates
       {
         (streamMap as object)[n] = {};
       });
+      streamMap['log'] = new Readable();
     }
 
     try
@@ -440,6 +452,14 @@ export default class Templates
               const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
               const transformStream = new TransformationEngineTransform([], transformationEngine);
               streamMap[nodeId][e.w] = sourceStream.pipe(transformStream);
+
+              // log all errors to the log stream
+              this.logErrToStreams(
+                streamMap['log'],
+                transformStream,
+                sourceStream,
+                streamMap[nodeId][e.w],
+              );
             }
             return this.executeGraph(template, dag, nodes, files, streamMap);
           }
@@ -458,6 +478,14 @@ export default class Templates
             const sink = template.sinks[node.endpoint];
             const sinkStream = await getSinkStream(sink, transformationEngine);
             streamMap[nodeId][nodeId] = streamMap[e.v][nodeId].pipe(sinkStream);
+
+            // log all errors to the log stream
+            this.logErrToStreams(
+              streamMap['log'],
+              sinkStream,
+              streamMap[e.v][nodeId],
+              streamMap[nodeId][nodeId],
+            );
             return this.executeGraph(template, dag, nodes, files, streamMap);
           }
 
@@ -497,6 +525,12 @@ export default class Templates
                   done.emit('done');
                 }
               });
+
+              this.logErrToStreams(
+                streamMap['log'],
+                tempSinkStream,
+                inputStream,
+              );
             }
 
             // listen for the done event on the EventEmitter
@@ -539,6 +573,14 @@ export default class Templates
                   winston.info('Deleted temporary indices: ' + JSON.stringify(indices));
                 }
               });
+
+              // log all errors to the log stream
+              this.logErrToStreams(
+                streamMap['log'],
+                transformStream,
+                mergeJoinStream,
+                streamMap[nodeId][e.w],
+              );
             }
 
             return this.executeGraph(template, dag, nodes, files, streamMap);
