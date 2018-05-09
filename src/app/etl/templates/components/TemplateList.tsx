@@ -177,6 +177,7 @@ class TemplateList extends TerrainComponent<Props>
         columnConfig={this.displayConfig}
         onRowClicked={this.handleOnClick}
         getMenuOptions={computeOptions}
+        itemsName='template'
       />
     );
   }

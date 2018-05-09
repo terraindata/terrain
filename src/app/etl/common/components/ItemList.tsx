@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:strict-boolean-expressions
 
 import * as classNames from 'classnames';
 import { List } from 'immutable';
@@ -72,6 +73,7 @@ export interface Props<T>
   onRowClicked?: (index) => void; // callback for when a row is clicked
   getMenuOptions?: (item, index) => any; // passed to <Menu/> for each item if a context menu is desired
   getActions?: (index: number, item: T) => El;
+  itemsName?: string;
 }
 
 const memoize = _.memoize;
@@ -193,7 +195,9 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
           }
         </div>
         :
-        <div> List Has No Items </div>
+        <div className='item-list-message'>
+          There aren't yet any {this.props.itemsName || 'item'}s
+        </div>
     );
   }
 }
