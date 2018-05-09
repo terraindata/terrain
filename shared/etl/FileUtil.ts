@@ -53,16 +53,42 @@ import { FileTypes } from './types/ETLTypes';
 import { FileConfig } from 'shared/etl/types/EndpointTypes';
 import Util from 'shared/Util';
 
+export const mimeToFileType: { [k: string]: FileTypes } = {
+  'text/csv': FileTypes.Csv,
+  'application/json': FileTypes.Json,
+  'application/xml': FileTypes.Xml,
+  'text/xml': FileTypes.Xml,
+};
+
+export const fileTypeToMime = {
+  [FileTypes.Csv]: 'text/csv',
+  [FileTypes.Json]: 'application/json',
+  [FileTypes.Xml]: 'text/xml',
+};
+
 export function getFileType(file: File): FileTypes
 {
-  switch (file.type)
+  const type = mimeToFileType[file.type];
+  if (type !== undefined)
   {
-    case 'text/csv':
-      return FileTypes.Csv;
-    case 'application/json':
-      return FileTypes.Json;
-    default:
-      return FileTypes.Json;
+    return type;
+  }
+  else
+  {
+    return FileTypes.Json;
+  }
+}
+
+export function getMimeType(type: FileTypes): string
+{
+  const mime = fileTypeToMime[type];
+  if (mime !== undefined)
+  {
+    return mime;
+  }
+  else
+  {
+    return 'application/json';
   }
 }
 
@@ -74,6 +100,7 @@ export function getSampleRows(
   opts?: {
     hasCsvHeader?: boolean;
     jsonNewlines?: boolean;
+    xmlPath?: string;
   },
 )
 {
@@ -145,6 +172,10 @@ export function getSampleRows(
     };
     fr.readAsText(fileChunk);
   }
+  else if (getFileType(file) === FileTypes.Xml)
+  {
+    onError(`XML File Parsing not supported`);
+  }
 }
 // TODO for json, use a streaming implementation
 
@@ -157,6 +188,7 @@ export function guessFileOptions(file: File): Promise<FileConfig>
       fileType,
       hasCsvHeader: true,
       jsonNewlines: false,
+      xmlPath: '',
     };
     guessJsonFileOptions(
       file,

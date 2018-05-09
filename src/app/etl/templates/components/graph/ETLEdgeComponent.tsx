@@ -92,6 +92,8 @@ class ETLEdgeComponent extends TerrainComponent<Props>
   public computeMenuOptions(): List<MenuOption>
   {
     const { edge } = this.props;
+    const template = this.props.templateEditor.template;
+
     let options = List([
       {
         text: 'Edit This Step',
@@ -105,6 +107,15 @@ class ETLEdgeComponent extends TerrainComponent<Props>
         onClick: this.openMergeUI,
       });
     }
+    const fromNode = template.findNodes((n) => n.id === edge.from).first();
+    if (fromNode !== undefined && template.getNode(fromNode).type === NodeTypes.Source)
+    {
+      options = options.push({
+        text: 'Reset this Edge',
+        onClick: this.recomputeEdge,
+      });
+    }
+
     return options;
   }
 
@@ -179,6 +190,24 @@ class ETLEdgeComponent extends TerrainComponent<Props>
   {
     const { act, edgeId, templateEditor } = this.props;
     GraphHelpers.switchEdge(edgeId);
+  }
+
+  public recomputeEdge()
+  {
+    const onConfirm = () =>
+    {
+      GraphHelpers.createEngineForSourceEdge(this.props.edgeId);
+    };
+    this.props.act({
+      actionType: 'addModal',
+      props: {
+        title: 'Confirm Action',
+        message: 'Are you sure you want to reset this edge? You will lose all settings associated with this edge',
+        confirm: true,
+        closeOnConfirm: true,
+        onConfirm,
+      },
+    });
   }
 
   public openMergeUI()

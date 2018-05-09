@@ -85,11 +85,20 @@ export interface ETLActionTypes
     onLoad: (response: List<ETLTemplate>) => void;
     onError?: ErrorHandler;
   };
-  executeTemplate: {
-    actionType: 'executeTemplate',
-    template: ETLTemplate,
-    onSuccess?: () => void,
-    onError?: (ev: any) => void,
+  createExecuteJob: {
+    actionType: 'createExecuteJob';
+    onLoad: (id: number) => void;
+    onError: (ev: any) => void;
+  };
+  runExecuteJob: {
+    actionType: 'runExecuteJob';
+    jobId: number;
+    template: ETLTemplate;
+    files?: { [k: string]: File };
+    downloadName?: string;
+    mimeType?: string;
+    onLoad: () => void;
+    onError: (ev: any) => void;
   };
   fetchTemplates: {
     actionType: 'fetchTemplates';
@@ -193,7 +202,8 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     {
       getTemplate: (state, action) => state, // overriden reducers
       fetchTemplates: (state, action) => state,
-      executeTemplate: (state, action) => state,
+      createExecuteJob: (state, action) => state,
+      runExecuteJob: (state, action) => state,
       deleteTemplate: (state, action) => state,
       createTemplate: (state, action) => state,
       saveAsTemplate: (state, action) => state,
@@ -325,55 +335,36 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     };
   }
 
-  public executeTemplate(action: ETLActionType<'executeTemplate'>, dispatch)
+  public createExecuteJob(action: ETLActionType<'createExecuteJob'>, dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     const name = action.actionType;
 
-    const template = action.template;
-    const defaultSink = template.getDefaultSink();
+    directDispatch({
+      actionType: 'setLoading',
+      isLoading: true,
+      key: name,
+    });
 
-    if (defaultSink === undefined)
-    {
-      // tslint:disable-next-line
-      console.error('default sink not defined');
-      return; // todo error
-    }
-    else
-    {
-      const options: ExecuteConfig = {};
-      if (defaultSink.type === Sinks.Download)
-      {
-        const extension = defaultSink.fileConfig.fileType === FileTypes.Json ?
-          '.json' : '.csv';
-        const mimeType = defaultSink.fileConfig.fileType === FileTypes.Json ?
-          'application/json' : 'text/csv';
-        const downloadFilename = `Export_${template.id}${extension}`;
-        options.download = {
-          downloadFilename,
-          mimeType,
-        };
-      }
-      template.getSources().forEach((source, key) =>
-      {
-        if (source.type === Sources.Upload)
-        {
-          _.set(options, ['files', key], (source.options as SourceOptionsType<Sources.Upload>).file);
-        }
-      });
+    ETLAjax.createExecuteJob()
+      .then(this.onLoadFactory([action.onLoad], directDispatch, name))
+      .catch(this.onErrorFactory(action.onError, directDispatch, name));
+  }
 
-      const onLoad = () =>
-      {
-        if (action.onSuccess !== undefined)
-        {
-          action.onSuccess();
-        }
-      };
+  public runExecuteJob(action: ETLActionType<'runExecuteJob'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const name = action.actionType;
 
-      ETLAjax.executeTemplate(template, options)
-        .then(this.onLoadFactory<any>([onLoad], directDispatch, name))
-        .catch(this.onErrorFactory(action.onError, directDispatch, name));
-    }
+    directDispatch({
+      actionType: 'setLoading',
+      isLoading: true,
+      key: name,
+    });
+
+    ETLAjax.runExecuteJob(action.jobId, action.template, action.files, action.downloadName, action.mimeType)
+      .then(this.onLoadFactory([action.onLoad], directDispatch, name))
+      .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
 
   public fetchTemplates(action: ETLActionType<'fetchTemplates'>, dispatch)
@@ -603,8 +594,10 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         return this.fetchTemplates.bind(this, action);
       case 'getTemplate':
         return this.getTemplate.bind(this, action);
-      case 'executeTemplate':
-        return this.executeTemplate.bind(this, action);
+      case 'createExecuteJob':
+        return this.createExecuteJob.bind(this, action);
+      case 'runExecuteJob':
+        return this.runExecuteJob.bind(this, action);
       case 'deleteTemplate':
         return this.deleteTemplate.bind(this, action);
       case 'createTemplate':

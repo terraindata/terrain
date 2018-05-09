@@ -290,7 +290,14 @@ class ExtractFieldModal extends TerrainComponent<Props>
       });
     }).catch((e) =>
     {
-      // Todo handle
+      this.props.editorAct({
+        actionType: 'addModal',
+        props: {
+          title: 'Error',
+          message: `Could not extract field: ${String(e)}`,
+          error: true,
+        },
+      });
     });
   }
 }

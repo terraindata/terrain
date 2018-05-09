@@ -43,12 +43,13 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-console strict-boolean-expressions
-import Colors from 'app/colors/Colors';
+// tslint:disable:strict-boolean-expressions
+import Colors, { fontColor } from 'app/colors/Colors';
 import CRONEditor from 'app/common/components/CRONEditor';
 import FloatingInput from 'app/common/components/FloatingInput';
 import RouteSelector from 'app/common/components/RouteSelector';
 import EndpointForm from 'app/etl/common/components/EndpointForm';
+import ETLRouteutil from 'app/etl/ETLRouteUtil';
 import { _SchedulerConfig, _TaskConfig, SchedulerConfig, SchedulerState, TaskConfig } from 'app/scheduler/SchedulerTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
@@ -219,7 +220,9 @@ class Schedule extends TerrainComponent<Props>
     const task = this.getTask();
     // Template Option Set
     const templateOptions = this.props.templates.filter((t) =>
-      t.canSchedule(),
+    {
+      return t.canSchedule();
+    },
     ).map((t) =>
     {
       return {
@@ -227,12 +230,27 @@ class Schedule extends TerrainComponent<Props>
         displayName: t.templateName,
       };
     }).toList();
+    let templateHeaderText: string | El = 'Template';
+    if (templateOptions.size === 0)
+    {
+      templateHeaderText =
+        <div>
+          There are no schedulable templates. Create one in the
+            <span
+            className='link'
+            onClick={ETLRouteutil.gotoNewTemplate}
+            style={fontColor(Colors().active)}
+          >
+            Template Editor
+            </span>
+        </div>;
+    }
 
     const templateOptionSet = {
       key: 'template',
       options: templateOptions,
       shortNameText: 'Schedule',
-      headerText: 'Template',
+      headerText: templateHeaderText,
       column: true,
       forceFloat: true,
       getCustomDisplayName: this._fn(this.getScheduleName, '--'),
