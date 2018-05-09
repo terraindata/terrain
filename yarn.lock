@@ -323,6 +323,12 @@
   version "2.0.49"
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-2.0.49.tgz#95bd7064caebf65bde10429dff491a1aea05b67d"
 
+"@types/jsonstream@^0.8.30":
+  version "0.8.30"
+  resolved "https://registry.yarnpkg.com/@types/jsonstream/-/jsonstream-0.8.30.tgz#1c6b386df42c6d93bf7f0cd339eab6fb56bdc124"
+  dependencies:
+    "@types/node" "*"
+
 "@types/keygrip@*":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@types/keygrip/-/keygrip-1.0.1.tgz#ff540462d2fb4d0a88441ceaf27d287b01c3d878"
@@ -11414,10 +11420,6 @@ xml-name-validator@^3.0.0:
 xml-nodes@^0.1.5:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/xml-nodes/-/xml-nodes-0.1.5.tgz#9505c74dfd954867212c7d6f16d8c9fecafbb118"
-
-xml-to-json-stream@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/xml-to-json-stream/-/xml-to-json-stream-1.0.2.tgz#8a1d2215c9a3bd534df5888aa2b02f50405e6c6c"
 
 xml2js@0.4.17:
   version "0.4.17"

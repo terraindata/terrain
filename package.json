@@ -221,7 +221,6 @@
     "victory": "^0.23.0",
     "winston": "^2.4.2",
     "xml-nodes": "^0.1.5",
-    "xml-to-json-stream": "^1.0.2",
     "xml2js": "^0.4.19",
     "zxcvbn": "^4.4.2"
   },
@@ -237,6 +236,7 @@
     "@types/graphlib": "^2.1.4",
     "@types/jest": "^22.2.3",
     "@types/jquery": "^2.0.41",
+    "@types/jsonstream": "^0.8.30",
     "@types/koa": "^2.0.45",
     "@types/koa-bodyparser": "^4.2.0",
     "@types/koa-favicon": "^2.0.19",
