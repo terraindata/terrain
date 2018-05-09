@@ -30,6 +30,7 @@ stages:
 lint:
   before_script:
     - . .monorepo.gitlab/last_green_commit.sh
+    - yarn add npm-run-all tslint tsfmt
   script:
    - yarn lint-parallel
   stage: style-and-compilation
@@ -37,6 +38,7 @@ lint:
 diff-style:
   before_script:
     - . .monorepo.gitlab/last_green_commit.sh
+    - yarn add npm-run-all tslint tsfmt
   script:
    - yarn diff-style
   stage: style-and-compilation
@@ -46,6 +48,7 @@ diff-style:
 style:
   before_script:
     - . .monorepo.gitlab/last_green_commit.sh
+    - yarn add npm-run-all tslint tsfmt
   script:
    - yarn style
   stage: style-and-compilation
