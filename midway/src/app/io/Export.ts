@@ -294,6 +294,21 @@ export class Export
   {
     // merge groupJoins with _source if necessary
     doc = Export.mergeGroupJoin(doc);
+    const columnTypes = cfg.exportConfig.columnTypes;
+    const newSource = _.extend({}, doc['_source']);
+    if (newSource['fields'] != null)
+    {
+      for (const k of Object.keys(newSource['fields']))
+      {
+        const value = newSource['fields'][k];
+        if (k !== 'fields' && newSource[k] === undefined && columnTypes[k] !== undefined &&
+          Array.isArray(value) && value.length > 0 && value[0] != null)
+        {
+          newSource[k] = value[0];
+        }
+      }
+      doc['_source'] = newSource;
+    }
 
     // extract field after doing all merge joins
     cfg.extractTransformations.forEach((transform) =>
@@ -456,6 +471,15 @@ export class Export
           {
             delete obj[mergeCol];
           }
+          break;
+        case 'extract':
+          const extractOldColName: string | undefined = transform['colName'];
+          const extractPath: string | undefined = transform['args']['path'];
+          if (extractOldColName === undefined || extractPath === undefined)
+          {
+            throw new Error('Extract column name and path must be provided.');
+          }
+          obj[extractOldColName] = _.get(obj[extractOldColName], extractPath, null);
           break;
         case 'duplicate':
           colName = transform['colName'];
