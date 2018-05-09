@@ -94,7 +94,6 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
     scheduleId: null,
     status: null,
     workerId: null,
-
     createdAt: new Date(),
     createdBy: ctx.state.user.id,
     name: null,
@@ -102,6 +101,7 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
     type: 'ETL',
     tasks: JSON.stringify([
       {
+        id: 0,
         taskId: TaskEnum.taskETL,
         params: null,
       },
