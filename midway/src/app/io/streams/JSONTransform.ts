@@ -43,12 +43,13 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:no-var-requires
 
-import * as JSONStream from 'JSONStream';
 import { Transform } from 'stream';
 
 import JSONExportTransform from './JSONExportTransform';
 
+const JSONStream = require('JSONStream');
 /**
  * Import/Export from a JSON format. *
  * Additional configuration options are possible.
