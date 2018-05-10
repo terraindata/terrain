@@ -52,7 +52,7 @@ import * as winston from 'winston';
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
 import { ESJSONParser } from '../../../../shared/database/elastic/parser/ESJSONParser';
 import * as SharedUtil from '../../../../shared/Util';
-// import { getParsedQuery } from '../../app/Util';
+import { getParsedQuery } from '../../app/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import ItemConfig from '../items/ItemConfig';
@@ -61,9 +61,10 @@ import { QueryHandler } from '../query/QueryHandler';
 
 import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 import AExportTransform from './streams/AExportTransform';
+import CSVExportTransform from './streams/CSVExportTransform';
 import ExportTransform from './streams/ExportTransform';
 import JSONExportTransform from './streams/JSONExportTransform';
-// import JSONObjectExportTransform from './streams/JSONObjectExportTransform';
+import JSONObjectExportTransform from './streams/JSONObjectExportTransform';
 import ExportTemplateConfig from './templates/ExportTemplateConfig';
 import ExportTemplates from './templates/ExportTemplates';
 import TemplateBase from './templates/TemplateBase';
@@ -243,10 +244,10 @@ export class Export
             {
               throw Error('Missing object key for export type JSON [type object]');
             }
-            // exportTransform = new JSONObjectExportTransform(exportConfig.objectKey);
+            exportTransform = new JSONObjectExportTransform(exportConfig.objectKey);
             break;
           case 'csv':
-            // exportTransform = new CSVExportTransform(columnNames);
+            exportTransform = new CSVExportTransform(columnNames);
             break;
           default:
             throw Error('File type must be either CSV or JSON.');
