@@ -68,6 +68,7 @@ import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/
 
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import './TemplateList.less';
 
 export interface AllowedActions
 {
@@ -141,6 +142,7 @@ class TemplateList extends TerrainComponent<Props>
   public computeMenuOptionsFactory(allowedActions: AllowedActions)
     : (template: ETLTemplate, index: number) => List<MenuOption>
   {
+    console.log(allowedActions);
     if (allowedActions === undefined)
     {
       return undefined;
@@ -170,15 +172,19 @@ class TemplateList extends TerrainComponent<Props>
   public render()
   {
     const computeOptions = this.computeMenuOptionsFactory(this.props.allowedActions);
-
+    console.log(computeOptions);
     return (
-      <ItemList
-        items={this.props.templates}
-        columnConfig={this.displayConfig}
-        onRowClicked={this.handleOnClick}
-        getMenuOptions={computeOptions}
-        itemsName='template'
-      />
+      <div
+        className='template-table-wrapper'
+       >
+        <ItemList
+          items={this.props.templates}
+          columnConfig={this.displayConfig}
+          onRowClicked={this.handleOnClick}
+          getMenuOptions={computeOptions}
+          itemsName='template'
+        />
+      </div>
     );
   }
 

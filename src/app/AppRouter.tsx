@@ -48,7 +48,7 @@ import { browserHistory } from 'react-router';
 import { IndexRoute, Route, Router } from 'react-router';
 
 import DataTabs from 'etl/components/DataTabs';
-import TemplateList from 'etl/templates/components/TemplateList';
+import PickTemplateStep from 'app/etl/walkthrough/components/PickTemplateStep';
 import Jobs from 'jobs/components/Jobs';
 import Scheduler from 'scheduler/components/Scheduler';
 import App from './App';
@@ -149,7 +149,7 @@ class AppRouter extends TerrainComponent<{}> {
           <Route path='/data' component={DataTabs}>
             <IndexRoute component={ETLWalkthrough} />
             <Route path='templates/new/:step' component={ETLWalkthrough} />
-            <Route path='templates' component={TemplateList} />
+            <Route path='templates' component={PickTemplateStep} />
             <Route path='templates/edit/new' component={ETLEditorPage} />
             <Route path='templates/edit/algorithmId=:algorithmId' component={ETLEditorPage} />
             <Route path='templates/edit/templateId=:templateId' component={ETLEditorPage} />
