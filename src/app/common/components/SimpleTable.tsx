@@ -60,6 +60,7 @@ export interface SimpleTableColumn
 {
   columnKey: string;
   columnLabel: string;
+  columnRelativeSize?: number; // works sort of as css flex property
   component?: JSX.Element; // a component to wrap the column value with
 }
 
@@ -72,6 +73,26 @@ export interface Props
 export class SimpleTable extends TerrainComponent<Props>
 {
   public state: {};
+  public columnWidths = this.calculateColumnWidhts();
+
+  public calculateColumnWidhts()
+  {
+    const { columnsConfig } = this.props;
+    const columnKeys = Object.keys(columnsConfig);
+    // By default, each column takes an equal portion of the 100% width
+    const defaultSize = 100 / columnKeys.length;
+
+    const columnWidths = {};
+    columnKeys.map((colKey) =>
+    {
+      const columnRelativeSize = columnsConfig[colKey].columnRelativeSize !== undefined ?
+        columnsConfig[colKey].columnRelativeSize : 1;
+
+      columnWidths[colKey] = columnRelativeSize * defaultSize;
+    });
+
+    return columnWidths;
+  }
 
   public renderValue(colKey, rowData)
   {
@@ -102,7 +123,15 @@ export class SimpleTable extends TerrainComponent<Props>
               Object.keys(columnsConfig).map((colKey) =>
               {
                 const column = columnsConfig[colKey];
-                return <th key={column.columnKey} className='simple-table-cell'>{column.columnLabel}</th>;
+                return (
+                  <th
+                    key={column.columnKey}
+                    className='simple-table-cell'
+                    style={{ width: `${this.columnWidths[colKey]}%` }}
+                  >
+                    {column.columnLabel}
+                  </th>
+                );
               })
             }
           </tr>
@@ -114,11 +143,15 @@ export class SimpleTable extends TerrainComponent<Props>
               return (
                 <tr key={entry.id} className='simple-table-row'>
                   {
-                    columnKeys.map((key, index) =>
+                    columnKeys.map((colKey, index) =>
                     {
                       return (
-                        <td key={key} className='simple-table-cell'>
-                          {this.renderValue(key, entry)}
+                        <td
+                          key={colKey}
+                          className='simple-table-cell'
+                          style={{ width: `${this.columnWidths[colKey]}%` }}
+                        >
+                          {this.renderValue(colKey, entry)}
                         </td>
                       );
                     })

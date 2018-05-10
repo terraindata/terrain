@@ -147,10 +147,12 @@ class Jobs extends TerrainComponent<any> {
       id: {
         columnKey: 'id',
         columnLabel: 'Id',
+        columnRelativeSize: .5,
       },
       name: {
         columnKey: 'name',
         columnLabel: 'Name',
+        columnRelativeSize: 2,
       },
       status: {
         columnKey: 'status',
