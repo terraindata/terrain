@@ -45,6 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as mysql from 'mysql';
+
+import { DatabaseControllerStatus } from '../../DatabaseControllerStatus';
 import MySQLConfig from '../MySQLConfig';
 import MySQLController from '../MySQLController';
 
@@ -62,6 +64,8 @@ class MySQLClient
   {
     this.controller = controller;
     this.config = config;
+
+    this.controller.setStatus(DatabaseControllerStatus.CONNECTING);
     this.delegate = mysql.createPool(config);
 
     this.delegate.on('acquire', (connection: mysql.Connection) =>
@@ -77,18 +81,36 @@ class MySQLClient
     });
   }
 
-  public isConnected(): Promise<boolean>
+  public async isConnected(): Promise<boolean>
   {
     this.controller.log('MySQLClient.isConnected');
     return new Promise<boolean>((resolve, reject) =>
     {
-      this.getConnection((err, conn) =>
+      this.controller.setStatus(DatabaseControllerStatus.CONNECTING);
+      this.getConnection((err: mysql.MysqlError, conn: mysql.Connection) =>
       {
         if (err !== null && err !== undefined)
         {
-          resolve(false);
+          if (err.code === 'ER_ACCESS_DENIED_ERROR' || err.code === 'ER_DBACCESS_DENIED_ERROR'
+            || err.code === 'ER_ACCESS_DENIED_ERROR_WITHOUT_PASSWORD'
+            || err.code === 'ER_ACCESS_DENIED_ERROR_WITH_PASSWORD'
+            || err.code === 'ER_ACCESS_DENIED_FOR_USER_ACCOUNT_LOCKED')
+          {
+            this.controller.setStatus(DatabaseControllerStatus.ACCESS_DENIED);
+          }
+          else if (err.code === 'ECONNREFUSED' || err.code === 'ER_CONNECT_TO_MASTER')
+          {
+            this.controller.setStatus(DatabaseControllerStatus.CONN_TIMEOUT);
+          }
+          else
+          {
+            this.controller.setStatus(DatabaseControllerStatus.DISCONNECTED);
+          }
+          return resolve(false);
         }
-        conn.ping((e) => resolve((e === undefined)));
+
+        this.controller.setStatus(DatabaseControllerStatus.CONNECTED);
+        resolve(true);
       });
     });
   }
@@ -102,7 +124,12 @@ class MySQLClient
   public end(callback: (err: mysql.MysqlError, ...args: any[]) => void): void
   {
     this.controller.log('MySQLClient.end');
-    return this.delegate.end(callback);
+    this.controller.setStatus(DatabaseControllerStatus.DISCONNECTING);
+    return this.delegate.end((err) =>
+    {
+      this.controller.setStatus(DatabaseControllerStatus.DISCONNECTED);
+      callback(err);
+    });
   }
 
   public getConnection(callback: (err: mysql.MysqlError, connection: mysql.Connection) => void): void

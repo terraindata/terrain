@@ -43,28 +43,16 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
 
-import { Transform } from 'stream';
-
-import JSONExportTransform from './JSONExportTransform';
-
-const JSONStream = require('JSONStream');
-/**
- * Import/Export from a JSON format. *
- * Additional configuration options are possible.
- */
-export class JSONTransform
+export enum DatabaseControllerStatus
 {
-  public static createImportStream(pattern?: any, map?: any): Transform
-  {
-    return JSONStream.parse(pattern, map);
-  }
-
-  public static createExportStream(open?: any, sep?: any, close?: any): Transform
-  {
-    return new JSONExportTransform(open, sep, close);
-  }
+  CONNECTING = 'CONNECTING',
+  CONNECTED = 'CONNECTED',
+  ACCESS_DENIED = 'ACCESS_DENIED',
+  CONN_TIMEOUT = 'CONN_TIMEOUT',
+  DISCONNECTING = 'DISCONNECTING',
+  DISCONNECTED = 'DISCONNECTED',
+  UNKNOWN = 'UNKNOWN',
 }
 
-export default JSONTransform;
+export default DatabaseControllerStatus;

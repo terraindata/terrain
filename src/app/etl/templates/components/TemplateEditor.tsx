@@ -57,7 +57,7 @@ import { MultiModal } from 'common/components/overlay/MultiModal';
 import { ETLActions } from 'etl/ETLRedux';
 import DocumentsPreviewColumn from 'etl/templates/components/columns/DocumentsPreviewColumn';
 import EditorColumnBar from 'etl/templates/components/columns/EditorColumnBar';
-import { EndpointsColumn, StepsColumn } from 'etl/templates/components/columns/OptionsColumn';
+import { EndpointsColumn, OptionsColumn, StepsColumn } from 'etl/templates/components/columns/OptionsColumn';
 import AddFieldModal from 'etl/templates/components/field/AddFieldModal';
 import ExtractFieldModal from 'etl/templates/components/field/ExtractFieldModal';
 import MoveFieldModal from 'etl/templates/components/field/MoveFieldModal';
@@ -185,6 +185,7 @@ class TemplateEditor extends TerrainComponent<Props>
         {columnState === ColumnOptions.Preview ? <DocumentsPreviewColumn /> : null}
         {columnState === ColumnOptions.Endpoints ? <EndpointsColumn /> : null}
         {columnState === ColumnOptions.Steps ? <StepsColumn /> : null}
+        {columnState === ColumnOptions.Options ? <OptionsColumn /> : null}
       </div>
     );
   }

@@ -62,8 +62,11 @@ import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
+import TemplateSettingsForm from 'etl/common/components/TemplateSettingsForm';
 import EndpointSection from 'etl/templates/components/endpoints/EndpointSection';
 import EdgeSection from 'etl/templates/components/graph/EdgeSection';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { _TemplateSettings, TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
 
 import './OptionsColumn.less';
 const { List, Map } = Immutable;
@@ -102,6 +105,81 @@ export class StepsColumn extends TerrainComponent<{}>
     );
   }
 }
+
+interface OptionsProps
+{
+  // injected props
+  template?: ETLTemplate;
+  editorAct?: typeof TemplateEditorActions;
+}
+
+class OptionsColumnC extends TerrainComponent<OptionsProps>
+{
+  public state: {
+    templateSettings: TemplateSettings;
+  };
+
+  constructor(props)
+  {
+    super(props);
+    this.state = {
+      templateSettings: props.template.settings,
+    };
+  }
+
+  public componentWillReceiveProps(nextProps: OptionsProps)
+  {
+    if (this.props.template.settings !== nextProps.template.settings)
+    {
+      this.setState({
+        templateSettings: nextProps.template.settings,
+      });
+    }
+  }
+
+  public render()
+  {
+    return (
+      <div
+        className='template-editor-options-column'
+        style={columnStyle}
+      >
+        <div className='options-column-content'>
+          <div className='options-column-title'>
+            Execution Settings
+          </div>
+          <TemplateSettingsForm
+            onChange={this.handleTemplateSettingsChange}
+            settings={this.state.templateSettings}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  public handleTemplateSettingsChange(settings: TemplateSettings, isBlur?: boolean)
+  {
+    this.setState({
+      templateSettings: settings,
+    }, isBlur ? this.applyTemplateSettingsChanges : undefined);
+  }
+
+  public applyTemplateSettingsChanges()
+  {
+    const newTemplate = this.props.template.set('settings', this.state.templateSettings);
+    this.props.editorAct({
+      actionType: 'setTemplate',
+      template: newTemplate,
+      history: 'push',
+    });
+  }
+}
+
+export const OptionsColumn = Util.createTypedContainer(
+  OptionsColumnC,
+  [['templateEditor', 'template']],
+  { editorAct: TemplateEditorActions },
+);
 
 const columnStyle = _.extend({},
   backgroundColor(Colors().bg3),

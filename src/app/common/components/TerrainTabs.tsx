@@ -43,28 +43,93 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
+import TerrainComponent from 'common/components/TerrainComponent';
+import 'common/components/TerrainTabs.less';
+import * as React from 'react';
+import { browserHistory } from 'react-router';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
-import { Transform } from 'stream';
-
-import JSONExportTransform from './JSONExportTransform';
-
-const JSONStream = require('JSONStream');
-/**
- * Import/Export from a JSON format. *
- * Additional configuration options are possible.
- */
-export class JSONTransform
+interface TabConfig
 {
-  public static createImportStream(pattern?: any, map?: any): Transform
+  key: string;
+  label: string;
+}
+
+interface TabsProps
+{
+  tabs: TabConfig[];
+  children: any;
+  tabToRouteMap: { [tabKey: string]: string };
+  router: any;
+}
+
+interface TabsState
+{
+  tabIndex: number;
+}
+
+class TerrainTabs extends TerrainComponent<TabsProps>
+{
+  public state: TabsState = {
+    tabIndex: 0,
+  };
+
+  public constructor(props)
   {
-    return JSONStream.parse(pattern, map);
+    super(props);
+
+    this.state = {
+      tabIndex: this.getActiveTabIndex(),
+    };
   }
 
-  public static createExportStream(open?: any, sep?: any, close?: any): Transform
+  public handleSelect(tabIndex: number)
   {
-    return new JSONExportTransform(open, sep, close);
+    const { tabs, tabToRouteMap } = this.props;
+
+    this.setState({ tabIndex });
+
+    if (tabToRouteMap !== undefined)
+    {
+      const tabKey = tabs[tabIndex].key;
+      browserHistory.replace(tabToRouteMap[tabKey]);
+    }
+  }
+
+  public getActiveTabIndex()
+  {
+    const { tabs, router, tabToRouteMap } = this.props;
+    const activeTabIndex = tabs.findIndex((tab) =>
+    {
+      return router.location.pathname.startsWith(tabToRouteMap[tab.key]);
+    });
+
+    return activeTabIndex;
+  }
+
+  public render()
+  {
+    const { tabs, children, tabToRouteMap, router } = this.props;
+    const { tabIndex } = this.state;
+
+    return (
+      <Tabs selectedIndex={tabIndex} onSelect={this.handleSelect}>
+        <TabList>
+          {
+            tabs.map((tab, index) => <Tab key={`tab-${tab.key}`}>{tab.label}</Tab>)
+          }
+        </TabList>
+        {
+          tabs.map((tab, index) =>
+          {
+            const content = router.location.pathname.startsWith(tabToRouteMap[tab.key]) ?
+              children : <div />;
+            return <TabPanel key={`tab-panel-${tab.key}`}>{content}</TabPanel>;
+          })
+        }
+      </Tabs>
+    );
   }
 }
 
-export default JSONTransform;
+export default TerrainTabs;

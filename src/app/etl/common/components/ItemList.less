@@ -6,18 +6,29 @@
 @icon-size: calc(1em*@icon-ratio);
 
 .item-list-table {
-  display: table;
   margin-top: @spacing;
   border-collapse: collapse;
-
+  width: calc(~"100% - 4px");
+  border-radius: 4px;
+  padding: 2px;
   .row-info {
-    display: table-row;
+    width: 100%;
+    display: flex;
     border-top: @border-style;
     border-bottom: @border-style;
-
+    cursor: pointer;
+    &:hover {
+      .item-list-menu-options-wrapper {
+        opacity: 1;
+      }
+    }
     .row-info-data {
       .common-cell-properties;
-      padding: @half-spacing @spacing;
+      padding: 20px 12px;
+      font-size: 18px;
+      &.row-info-data-menu {
+        padding: 20px 0px;
+      }
     }
     .row-info-actions {
       position: relative;
@@ -25,8 +36,9 @@
   }
 
   .row-info-header {
-    display: table-row;
-
+    display: flex;
+    text-transform: uppercase;
+    font-size: 14px;
     .row-info-data {
       .common-cell-properties;
       padding: @half-spacing @spacing;
@@ -34,17 +46,23 @@
   }
 
   .common-cell-properties {
-    display: table-cell;
     .big-text;
-    vertical-align: middle;
   }
-
+  
   .item-list-menu-options-wrapper {
+    opacity: 0;
+    .transition;
     position: relative;
     padding: @half-spacing;
     width: @icon-size;
     height: @icon-size;
     margin: auto;
   }
+}
+
+.item-list-message {
+  margin: 12px 6px;
+  text-align: center;
+  font-size: 18px;
 }
 
