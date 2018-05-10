@@ -45,6 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as pg from 'pg';
+import pgErrors = require('pg-error-constants');
+
+import { DatabaseControllerStatus } from '../../DatabaseControllerStatus';
 import PostgreSQLConfig from '../PostgreSQLConfig';
 import PostgreSQLController from '../PostgreSQLController';
 
@@ -62,6 +65,8 @@ class PostgreSQLClient
   {
     this.controller = controller;
     this.config = config;
+
+    this.controller.setStatus(DatabaseControllerStatus.CONNECTING);
     this.delegate = new pg.Pool(config);
 
     this.delegate.on('acquire', (connection: pg.PoolClient) =>
@@ -75,12 +80,37 @@ class PostgreSQLClient
     });
   }
 
-  public isConnected(): Promise<boolean>
+  public async isConnected(): Promise<boolean>
   {
     this.controller.log('PostgreSQLClient.isConnected');
     return new Promise<boolean>((resolve, reject) =>
     {
-      this.delegate.connect((err, client, done) => resolve((err === undefined)));
+      this.controller.setStatus(DatabaseControllerStatus.CONNECTING);
+      this.delegate.connect((err: any, client, done) =>
+      {
+        if (err !== null && err !== undefined)
+        {
+          if (err.code === pgErrors.INVALID_PASSWORD
+            || err.code === pgErrors.INVALID_AUTHORIZATION_SPECIFICATION)
+          {
+            this.controller.setStatus(DatabaseControllerStatus.ACCESS_DENIED);
+          }
+          else if (err.code === pgErrors.CONNECTION_EXCEPTION
+            || err.code === pgErrors.CONNECTION_FAILURE
+            || err.code === pgErrors.CONNECTION_DOES_NOT_EXIST)
+          {
+            this.controller.setStatus(DatabaseControllerStatus.CONN_TIMEOUT);
+          }
+          else
+          {
+            this.controller.setStatus(DatabaseControllerStatus.DISCONNECTED);
+          }
+          return resolve(false);
+        }
+
+        this.controller.setStatus(DatabaseControllerStatus.CONNECTED);
+        resolve(true);
+      });
     });
   }
 
@@ -93,7 +123,12 @@ class PostgreSQLClient
   public end(callback: () => void): void
   {
     this.controller.log('PostgreSQLClient.end');
-    return this.delegate.end(callback);
+    this.controller.setStatus(DatabaseControllerStatus.DISCONNECTING);
+    return this.delegate.end(() =>
+    {
+      this.controller.setStatus(DatabaseControllerStatus.DISCONNECTED);
+      callback();
+    });
   }
 
   public getConfig(): PostgreSQLConfig

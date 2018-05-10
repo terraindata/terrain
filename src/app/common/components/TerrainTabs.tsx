@@ -59,8 +59,8 @@ interface TabsProps
 {
   tabs: TabConfig[];
   children: any;
-  selectedTab?: string;
-  tabToRouteMap?: { [tabKey: string]: string };
+  tabToRouteMap: { [tabKey: string]: string };
+  router: any;
 }
 
 interface TabsState
@@ -74,24 +74,13 @@ class TerrainTabs extends TerrainComponent<TabsProps>
     tabIndex: 0,
   };
 
-  public componentWillMount()
+  public constructor(props)
   {
-    const { tabs, tabToRouteMap, selectedTab } = this.props;
-    if (selectedTab !== undefined)
-    {
-      const tabIndex = this.getTabIndex(selectedTab);
+    super(props);
 
-      this.setState({ tabIndex });
-    }
-    else
-    {
-      if (tabToRouteMap !== undefined)
-      {
-        const { tabIndex } = this.state;
-        const tabKey = tabs[tabIndex].key;
-        browserHistory.replace(tabToRouteMap[tabKey]);
-      }
-    }
+    this.state = {
+      tabIndex: this.getActiveTabIndex(),
+    };
   }
 
   public handleSelect(tabIndex: number)
@@ -107,25 +96,36 @@ class TerrainTabs extends TerrainComponent<TabsProps>
     }
   }
 
-  public getTabIndex(tabKey)
+  public getActiveTabIndex()
   {
-    return this.props.tabs.findIndex((tab) => tab.key === tabKey);
+    const { tabs, router, tabToRouteMap } = this.props;
+    const activeTabIndex = tabs.findIndex((tab) =>
+    {
+      return router.location.pathname.startsWith(tabToRouteMap[tab.key]);
+    });
+
+    return activeTabIndex;
   }
 
   public render()
   {
-    const { tabs, children } = this.props;
+    const { tabs, children, tabToRouteMap, router } = this.props;
     const { tabIndex } = this.state;
 
     return (
       <Tabs selectedIndex={tabIndex} onSelect={this.handleSelect}>
         <TabList>
           {
-            tabs.map((tab, index) => <Tab key={index}>{tab.label}</Tab>)
+            tabs.map((tab, index) => <Tab key={`tab-${tab.key}`}>{tab.label}</Tab>)
           }
         </TabList>
         {
-          children.map((child, index) => (<TabPanel key={index}>{child}</TabPanel>))
+          tabs.map((tab, index) =>
+          {
+            const content = router.location.pathname.startsWith(tabToRouteMap[tab.key]) ?
+              children : <div />;
+            return <TabPanel key={`tab-panel-${tab.key}`}>{content}</TabPanel>;
+          })
         }
       </Tabs>
     );

@@ -71,10 +71,12 @@ describe('TerrainTabs', () =>
   beforeEach(() =>
   {
     tabsComponent = shallow(
-      <TerrainTabs tabs={tabs}>
-        <div id='tab-content-1' />
+      <TerrainTabs
+        tabs={tabs}
+        tabToRouteMap={{ tab1: '/path/to/tab1', tab2: '/path/to/tab2' }}
+        router={{ location: { pathname: '/path/to/tab2' } }}
+      >
         <div id='tab-content-2' />
-        <div id='tab-content-3' />
       </TerrainTabs>,
     );
   });
@@ -82,95 +84,39 @@ describe('TerrainTabs', () =>
   it('should display the tabbed layout', () =>
   {
     expect(tabsComponent.find('Tabs')).toHaveLength(1);
-    expect(tabsComponent.find('Tabs').props().selectedIndex).toEqual(0);
+    expect(tabsComponent.find('Tabs').props().selectedIndex).toEqual(1);
     expect(tabsComponent.find('TabList')).toHaveLength(1);
     expect(tabsComponent.find('Tab')).toHaveLength(tabs.length);
     expect(tabsComponent.find('TabList').find('Tab').at(0).childAt(0).text()).toEqual('Tab 1');
     expect(tabsComponent.find('TabList').find('Tab').at(1).childAt(0).text()).toEqual('Tab 2');
 
     expect(tabsComponent.find('TabPanel')).toHaveLength(tabs.length);
-    expect(tabsComponent.find('TabPanel').at(0).find('#tab-content-1')).toHaveLength(1);
+    expect(tabsComponent.find('TabPanel').at(0).find('div')).toHaveLength(1);
     expect(tabsComponent.find('TabPanel').at(1).find('#tab-content-2')).toHaveLength(1);
-    expect(tabsComponent.find('TabPanel').at(2).find('#tab-content-3')).toHaveLength(1);
+    expect(tabsComponent.find('TabPanel').at(2).find('div')).toHaveLength(1);
   });
 
-  describe('when there is no specified selectedTab', () =>
+  it('should activate the tab matching the browser route by default', () =>
   {
-    it('should activate the tab matching the browser route by default', () =>
-    {
-      tabsComponent = shallow(
-        <TerrainTabs
-          tabs={tabs}
-          tabToRouteMap={{ tab1: '/path/to/tab1', tab2: '/path/to/tab2' }}
-        >
-          <div id='tab-content-1' />
-          <div id='tab-content-2' />
-          <div id='tab-content-3' />
-        </TerrainTabs>,
-      );
-
-      expect(tabsComponent.find('Tabs').props().selectedIndex).toEqual(0);
-      expect(browserHistory.replace).toHaveBeenCalledTimes(1);
-    });
+    expect(tabsComponent.find('Tabs').props().selectedIndex).toEqual(1);
   });
 
-  describe('when a selectedTab is specified', () =>
+  describe('#getActiveTabIndex', () =>
   {
-    it('should activate the tab matching the browser route by default', () =>
+    it('should return the active tab index', () =>
     {
-      tabsComponent = shallow(
-        <TerrainTabs tabs={tabs} selectedTab={'tab2'}>
-          <div id='tab-content-1' />
-          <div id='tab-content-2' />
-          <div id='tab-content-3' />
-        </TerrainTabs>,
-      );
-
-      expect(tabsComponent.find('Tabs').props().selectedIndex).toEqual(1);
-    });
-  });
-
-  describe('#getTabIndex', () =>
-  {
-    it('should return the tab index', () =>
-    {
-      expect(tabsComponent.instance().getTabIndex('tab1')).toEqual(0);
-      expect(tabsComponent.instance().getTabIndex('tab3')).toEqual(2);
+      expect(tabsComponent.instance().getActiveTabIndex()).toEqual(1);
     });
   });
 
   describe('#handleSelect', () =>
   {
-    describe('when there is no tabToRouteMap specified', () =>
+    it('should update the selected tab index and update the browser address bar', () =>
     {
-      it('should update the selected tab index', () =>
-      {
-        tabsComponent.instance().handleSelect(1);
+      tabsComponent.instance().handleSelect(1);
 
-        expect(tabsComponent.state().tabIndex).toEqual(1);
-      });
-    });
-
-    describe('when tabToRouteMap is specified', () =>
-    {
-      it('should update the selected tab index and update the browser address bar', () =>
-      {
-        tabsComponent = shallow(
-          <TerrainTabs
-            tabs={tabs}
-            tabToRouteMap={{ tab1: '/path/to/tab1', tab2: '/path/to/tab2' }}
-          >
-            <div id='tab-content-1' />
-            <div id='tab-content-2' />
-            <div id='tab-content-3' />
-          </TerrainTabs>,
-        );
-
-        tabsComponent.instance().handleSelect(1);
-
-        expect(tabsComponent.state().tabIndex).toEqual(1);
-        expect(browserHistory.replace).toHaveBeenCalledTimes(2);
-      });
+      expect(tabsComponent.state().tabIndex).toEqual(1);
+      expect(browserHistory.replace).toHaveBeenCalledTimes(1);
     });
   });
 });

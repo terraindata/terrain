@@ -6,10 +6,17 @@
 }
 .integration-list-wrapper {
 	padding: 12px;
-	border-radius: 4px;
 	margin: 12px;
-	border: 1px solid;
+	max-height: calc(100% - 30px);
+    overflow: auto;
+    .row-info:hover {
+		.close {
+	    	opacity: 1;
+		}
+    }
 	.close {
+		opacity: 0;
+		.transition;
 		position: absolute;
     	left: -16px;
     	top: 27px;
@@ -20,19 +27,6 @@
 	    padding-bottom: 6px;
 	    padding-left: 6px;
 		font-size: @pretty-large-font-size;
-	}
-	.item-list-table {
-		width: 100%;
-		max-width: 100%;
-		margin-top: 0px;
-		overflow: hidden;
-		border-radius: 4px;
-		.row-info {
-			width: 100%;
-			.row-info-data {
-				padding: 12px;
-			}
-		}
 	}
 }
 

@@ -7840,6 +7840,10 @@ pg-cursor@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/pg-cursor/-/pg-cursor-1.3.0.tgz#b220f1908976b7b40daa373c7ada5fca823ab0d9"
 
+pg-error-constants@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/pg-error-constants/-/pg-error-constants-1.0.0.tgz#8169a9649b55d1cfd1452eaabb3fedadaf6f35d5"
+
 pg-pool@~2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/pg-pool/-/pg-pool-2.0.3.tgz#c022032c8949f312a4f91fb6409ce04076be3257"
