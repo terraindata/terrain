@@ -174,7 +174,7 @@ class TemplateList extends TerrainComponent<Props>
     return (
       <RemoveIcon
         className='template-delete close'
-        onClick={this._fn(this.deleteTemplateClickFactory, template)}
+        onClick={this._fn(this.deleteAction, template)}
       />
     );
   }
@@ -229,28 +229,37 @@ class TemplateList extends TerrainComponent<Props>
   {
     return (event) =>
     {
-      const onConfirm = () =>
-      {
-        this.props.etlAct({
-          actionType: 'deleteTemplate',
-          template,
-        });
-      };
-      this.props.etlAct({
-        actionType: 'addModal',
-        props: {
-          title: 'Confirm Action',
-          message: 'Are you sure you want to delete this template?',
-          closeOnConfirm: true,
-          confirm: true,
-          onConfirm,
-        },
-      });
-      if (this.props.onMenuItemClicked !== undefined)
-      {
-        this.props.onMenuItemClicked(template, 'delete');
-      }
+     this.deleteAction(template, event);
     };
+  }
+
+  public deleteAction(template: ETLTemplate, e?)
+  {
+    if (e !== undefined)
+    {
+      e.stopPropagation();
+    }
+    const onConfirm = () =>
+    {
+      this.props.etlAct({
+        actionType: 'deleteTemplate',
+        template,
+      });
+    };
+    this.props.etlAct({
+      actionType: 'addModal',
+      props: {
+        title: 'Confirm Action',
+        message: 'Are you sure you want to delete this template?',
+        closeOnConfirm: true,
+        confirm: true,
+        onConfirm,
+      },
+    });
+    if (this.props.onMenuItemClicked !== undefined)
+    {
+      this.props.onMenuItemClicked(template, 'delete');
+      }
   }
 }
 
