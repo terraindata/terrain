@@ -208,7 +208,6 @@ export class IntegrationListUncontained extends TerrainComponent<Props>
               },
             ]}
             onRowClicked={this.handleRowClick}
-            hideHeaders={true}
             getActions={this.getIntegrationActions}
             itemsName='integration'
           />
