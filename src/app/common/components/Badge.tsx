@@ -54,7 +54,7 @@ interface BadgeProps
 }
 
 const Badge = (props: BadgeProps) => (
-  <div className="badge" style={{ backgroundColor: props.color }}>{props.label}</div>
+  <div className='badge' style={{ backgroundColor: props.color }}>{props.label}</div>
 );
 
 export default Badge;

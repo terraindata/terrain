@@ -42,9 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as React from 'react';
-import TerrainComponent from 'common/components/TerrainComponent';
+// Copyright 2018 Terrain Data, Inc.
 import Badge from 'common/components/Badge';
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as React from 'react';
 
 interface BadgeColumnProps
 {

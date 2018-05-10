@@ -44,16 +44,20 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console
+import 'builder/components/pathfinder/filter/PathfinderFilter.less';
+import 'builder/components/pathfinder/Pathfinder.less';
+import Section from 'common/components/Section';
 import SimpleTable, { BadgeColumn } from 'common/components/SimpleTable';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import { JobsActions } from 'jobs/data/JobsRedux';
-import {
+import
+{
+  getAbortedJobs,
   getFailedJobs,
-  getSuccessfulJobs,
   getPendingJobs,
   getRunningJobs,
-  getAbortedJobs,
+  getSuccessfulJobs,
 } from 'jobs/data/JobsSelectors';
 import * as React from 'react';
 import Util from 'util/Util';
@@ -67,6 +71,13 @@ class Jobs extends TerrainComponent<any> {
       responseText: '',
       jobs: null,
       id: '',
+      expanded: Immutable.Map({
+        successful: false,
+        failed: false,
+        pending: false,
+        running: true,
+        aborted: false,
+      }),
     };
   }
 
@@ -105,7 +116,15 @@ class Jobs extends TerrainComponent<any> {
         return '#ff8a5b';
       case 'PENDING':
         return '#cccccc';
+      default:
+        return '#fff';
     }
+  }
+
+  public expandSection(isExpanded, section)
+  {
+    const { expanded } = this.state;
+    this.setState({ expanded: expanded.set(section, !isExpanded) });
   }
 
   public render()
@@ -133,42 +152,77 @@ class Jobs extends TerrainComponent<any> {
         columnLabel: '',
         component: <BadgeColumn
           getColor={this.getStatusColor}
-        />
+        />,
       },
     };
 
     return (
-      <div className="jobs">
-        <div className="job-lists">
-          <h2>Successful Jobs</h2>
-          <SimpleTable
-            columnsConfig={jobsHeader}
-            data={successfulJobs}
-          />
+      <div className='jobs'>
+        <div className='job-lists'>
+          <Section
+            title={'Succesful Jobs'}
+            canExpand={true}
+            onExpand={(isExpanded) => this.expandSection(isExpanded, 'successful')}
+            expanded={this.state.expanded.get('successful')}
+            contentCount={successfulJobs.count()}
+          >
+            <SimpleTable
+              columnsConfig={jobsHeader}
+              data={successfulJobs}
+            />
+          </Section>
 
-          <h2>Failed Jobs</h2>
-          <SimpleTable
-            columnsConfig={jobsHeader}
-            data={failedJobs}
-          />
+          <Section
+            title={'Failed Jobs'}
+            canExpand={true}
+            onExpand={(isExpanded) => this.expandSection(isExpanded, 'failed')}
+            expanded={this.state.expanded.get('failed')}
+            contentCount={failedJobs.count()}
+          >
+            <SimpleTable
+              columnsConfig={jobsHeader}
+              data={failedJobs}
+            />
+          </Section>
 
-          <h2>Pending Jobs</h2>
-          <SimpleTable
-            columnsConfig={jobsHeader}
-            data={pendingJobs}
-          />
+          <Section
+            title={'Pending Jobs'}
+            canExpand={true}
+            onExpand={(isExpanded) => this.expandSection(isExpanded, 'pending')}
+            expanded={this.state.expanded.get('pending')}
+            contentCount={pendingJobs.count()}
+          >
+            <SimpleTable
+              columnsConfig={jobsHeader}
+              data={pendingJobs}
+            />
+          </Section>
 
-          <h2>Running Jobs</h2>
-          <SimpleTable
-            columnsConfig={jobsHeader}
-            data={runningJobs}
-          />
+          <Section
+            title={'Running Jobs'}
+            canExpand={true}
+            onExpand={(isExpanded) => this.expandSection(isExpanded, 'running')}
+            expanded={this.state.expanded.get('running')}
+            contentCount={runningJobs.count()}
+          >
+            <SimpleTable
+              columnsConfig={jobsHeader}
+              data={runningJobs}
+            />
+          </Section>
 
-          <h2>Aborted Jobs</h2>
-          <SimpleTable
-            columnsConfig={jobsHeader}
-            data={abortedJobs}
-          />
+          <Section
+            title={'Aborted Jobs'}
+            canExpand={true}
+            onExpand={(isExpanded) => this.expandSection(isExpanded, 'aborted')}
+            expanded={this.state.expanded.get('aborted')}
+            contentCount={abortedJobs.count()}
+          >
+            <SimpleTable
+              columnsConfig={jobsHeader}
+              data={abortedJobs}
+            />
+          </Section>
         </div>
       </div>
     );
