@@ -71,6 +71,7 @@ import { destringifySavedTemplate, recordToConfig, TemplateConfig, templateForSa
 import { _SinkConfig, _SourceConfig, SinkConfig as SinkRecord, SourceConfig as SourceRecord } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { ETLProcess, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
+import LogWriter from '../io/streams/LogWriter';
 import ProgressStream from '../io/streams/ProgressStream';
 
 export default class Templates
@@ -404,7 +405,7 @@ export default class Templates
     const streamMap = await this.executeGraph(template, dag, nodes, files);
 
     const outputStream = streamMap[defaultSink][defaultSink];
-    const logStream = streamMap['log'];
+    const logStream = streamMap['log'].getLogStream();
 
     // push execution summary / progress to the log stream when done
     if (outputStream instanceof ProgressStream)
@@ -421,17 +422,6 @@ export default class Templates
     };
   }
 
-  private logErrToStreams(logStream: Readable, ...streams: Array<Readable | Writable | Transform>)
-  {
-    for (const stream of streams)
-    {
-      stream.on('error', (e: Error) =>
-      {
-        logStream.push(e.toString());
-      });
-    }
-  }
-
   private async executeGraph(template: TemplateConfig, dag: any, nodes: any[], files?: Readable[], streamMap?: object): Promise<object>
   {
     // if there are no nodes to process, we are done
@@ -444,12 +434,13 @@ export default class Templates
     // use the "process dag" to store this information...
     if (streamMap === undefined)
     {
-      streamMap = {};
+      streamMap = {
+        log: new LogWriter(new Readable()),
+      };
       nodes.forEach((n) =>
       {
         (streamMap as object)[n] = {};
       });
-      streamMap['log'] = new Readable();
     }
 
     try
@@ -475,8 +466,7 @@ export default class Templates
               streamMap[nodeId][e.w] = sourceStream.pipe(transformStream);
 
               // log all errors to the log stream
-              this.logErrToStreams(
-                streamMap['log'],
+              streamMap['log'].addStreams(
                 transformStream,
                 sourceStream,
                 streamMap[nodeId][e.w],
@@ -501,8 +491,7 @@ export default class Templates
             streamMap[nodeId][nodeId] = streamMap[e.v][nodeId].pipe(sinkStream);
 
             // log all errors to the log stream
-            this.logErrToStreams(
-              streamMap['log'],
+            streamMap['log'].addStreams(
               sinkStream,
               streamMap[e.v][nodeId],
               streamMap[nodeId][nodeId],
@@ -547,8 +536,7 @@ export default class Templates
                 }
               });
 
-              this.logErrToStreams(
-                streamMap['log'],
+              streamMap['log'].addStreams(
                 tempSinkStream,
                 inputStream,
               );
@@ -596,8 +584,7 @@ export default class Templates
               });
 
               // log all errors to the log stream
-              this.logErrToStreams(
-                streamMap['log'],
+              streamMap['log'].addStreams(
                 transformStream,
                 mergeJoinStream,
                 streamMap[nodeId][e.w],
