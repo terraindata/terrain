@@ -64,7 +64,6 @@ import { User } from 'users/UserTypes';
 import XHR from 'util/XHR';
 import './IntegrationStyle.less';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
-const Color = require('color');
 
 export interface Props
 {

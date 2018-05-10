@@ -20,7 +20,7 @@
 		.transition;
 		position: absolute;
     	left: -16px;
-    	top: 27px;
+		top: calc(~"50% - 6px");
 	}
 	.integration-list-header {
 		height: 20px;
@@ -35,6 +35,10 @@
 	padding: 24px;
 	border-radius: 4px;
 	align-items: center;
+    width: 200px;
+    margin: auto;
+    height: calc(100% - 48px);
+    overflow: auto;
 	.integration-editor-header {
 		font-size: @pretty-large-font-size;
 		padding-bottom: 6px;

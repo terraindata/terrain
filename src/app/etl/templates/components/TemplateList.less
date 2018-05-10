@@ -6,4 +6,16 @@
 	max-height: calc(100% - 30px);
     overflow: auto;
     margin-top: 0px;
+	.template-delete {
+		position: relative;
+		top: calc(~"50% - 6px");
+		margin: 6px;
+		opacity: 0;
+		.transition;
+	}
+	.row-info:hover {
+		.template-delete {
+	    	opacity: 1;
+		}
+    }
 }

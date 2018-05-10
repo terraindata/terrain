@@ -63,12 +63,13 @@ import { ETLActions } from 'etl/ETLRedux';
 import Initializers from 'etl/helpers/TemplateInitializers';
 import { MidwayError } from 'shared/error/MidwayError';
 import { instanceFnDecorator } from 'shared/util/Classes';
-
+import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
 
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import './TemplateList.less';
+const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface AllowedActions
 {
@@ -169,10 +170,19 @@ class TemplateList extends TerrainComponent<Props>
     };
   }
 
+  public getActions(index: number, template)
+  {
+    return (
+      <RemoveIcon
+        className='template-delete close'
+        onClick={this._fn(this.deleteTemplateClickFactory, template)}
+      />
+    );
+  }
+
   public render()
   {
     const computeOptions = this.computeMenuOptionsFactory(this.props.allowedActions);
-    console.log(computeOptions);
     return (
       <div
         className='template-table-wrapper'
@@ -183,6 +193,7 @@ class TemplateList extends TerrainComponent<Props>
           onRowClicked={this.handleOnClick}
           getMenuOptions={computeOptions}
           itemsName='template'
+          getActions={!computeOptions ? this.getActions : undefined}
         />
       </div>
     );
@@ -190,11 +201,16 @@ class TemplateList extends TerrainComponent<Props>
 
   public handleOnClick(index)
   {
+    const { templates } = this.props;
+    const template = templates.get(index);
     if (this.props.onClick != null)
     {
-      const { templates } = this.props;
-      const template = templates.get(index);
       this.props.onClick(template);
+    }
+    else
+    {
+      // open that template in the template editor
+      ETLRouteUtil.gotoEditTemplate(template.id)
     }
   }
 
