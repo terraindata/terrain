@@ -48,6 +48,7 @@ import * as Elastic from 'elasticsearch';
 import * as _ from 'lodash';
 import * as request from 'request';
 
+import { DatabaseControllerStatus } from '../../DatabaseControllerStatus';
 import ElasticConfig from '../ElasticConfig';
 import ElasticController from '../ElasticController';
 import ElasticCluster from './ElasticCluster';
@@ -73,6 +74,7 @@ class ElasticClient
     // Do not reuse objects to configure the elasticsearch Client class:
     // https://github.com/elasticsearch/elasticsearch-js/issues/33
     this.config = JSON.parse(JSON.stringify(config));
+    this.controller.setStatus(DatabaseControllerStatus.CONNECTING);
     this.delegate = new Elastic.Client(_.extend(this.config, { apiVersion: '5.5' }));
 
     this.cluster = new ElasticCluster(controller, this.delegate);
@@ -288,6 +290,25 @@ class ElasticClient
   public getConfig(): ElasticConfig
   {
     return this.config;
+  }
+
+  public async isConnected(): Promise<boolean>
+  {
+    return new Promise<boolean>((resolve, reject) =>
+    {
+      this.controller.setStatus(DatabaseControllerStatus.CONNECTING);
+      this.ping({}, (err: any, response) =>
+      {
+        if (err !== null && err !== undefined)
+        {
+          this.controller.setStatus(DatabaseControllerStatus.CONN_TIMEOUT);
+          return resolve(false);
+        }
+
+        this.controller.setStatus(DatabaseControllerStatus.CONNECTED);
+        resolve(true);
+      });
+    });
   }
 
   private log(methodName: string, info: any)
