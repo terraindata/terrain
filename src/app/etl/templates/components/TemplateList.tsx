@@ -229,7 +229,7 @@ class TemplateList extends TerrainComponent<Props>
   {
     return (event) =>
     {
-     this.deleteAction(template, event);
+      this.deleteAction(template, event);
     };
   }
 
@@ -259,7 +259,7 @@ class TemplateList extends TerrainComponent<Props>
     if (this.props.onMenuItemClicked !== undefined)
     {
       this.props.onMenuItemClicked(template, 'delete');
-      }
+    }
   }
 }
 

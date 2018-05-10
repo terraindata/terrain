@@ -47,7 +47,6 @@ THE SOFTWARE.
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import Colors, { backgroundColor, borderColor } from 'app/colors/Colors';
 import FloatingInput from 'app/common/components/FloatingInput';
-import Modal from 'app/common/components/Modal';
 import { ETLActions } from 'app/etl/ETLRedux';
 import EtlRouteUtil from 'app/etl/ETLRouteUtil';
 import { ETLState } from 'app/etl/ETLTypes';
@@ -74,13 +73,6 @@ export interface Props
 
 export class IntegrationListUncontained extends TerrainComponent<Props>
 {
-  public state: {
-    confirmModalOpen: boolean,
-    deleteIntegrationId: ID,
-  } = {
-      confirmModalOpen: false,
-      deleteIntegrationId: -1,
-    };
 
   public componentWillMount()
   {
@@ -107,20 +99,28 @@ export class IntegrationListUncontained extends TerrainComponent<Props>
     });
   }
 
-  public deleteIntegration()
+  public deleteIntegration(integrationId: ID, e?)
   {
+    if (e !== undefined)
+    {
+      e.stopPropagation();
+    }
+    const onConfirm = () =>
+    {
+      this.props.etlActions({
+        actionType: 'deleteIntegration',
+        integrationId,
+      });
+    };
     this.props.etlActions({
-      actionType: 'deleteIntegration',
-      integrationId: this.state.deleteIntegrationId,
-    });
-  }
-
-  public confirmDeleteIntegration(integrationId: ID, e)
-  {
-    e.stopPropagation();
-    this.setState({
-      confirmModalOpen: true,
-      deleteIntegrationId: integrationId,
+      actionType: 'addModal',
+      props: {
+        title: 'Confirm Action',
+        message: 'Are you sure you want to delete this integration?',
+        closeOnConfirm: true,
+        confirm: true,
+        onConfirm,
+      },
     });
   }
 
@@ -163,7 +163,7 @@ export class IntegrationListUncontained extends TerrainComponent<Props>
     return (
       <RemoveIcon
         className='close'
-        onClick={this._fn(this.confirmDeleteIntegration, integration.id)}
+        onClick={this._fn(this.deleteIntegration, integration.id)}
       />
     );
   }
@@ -173,8 +173,6 @@ export class IntegrationListUncontained extends TerrainComponent<Props>
     const { integrations } = this.props;
     const keys = integrations.keySeq().toList().sort();
     const integrationList = keys.map((id) => integrations.get(id));
-    const toDelete = integrations.get(this.state.deleteIntegrationId) ?
-      integrations.get(this.state.deleteIntegrationId).name : '';
     return (
       <div
         className='integration-page'
@@ -215,15 +213,6 @@ export class IntegrationListUncontained extends TerrainComponent<Props>
             canEdit={TerrainTools.isAdmin()}
             onCreate={this.createIntegration}
             showText={true}
-          />
-          <Modal
-            open={this.state.confirmModalOpen}
-            confirm={true}
-            title={'Confirm Action'}
-            message={`Are you sure you want to delete ${toDelete}?`}
-            confirmButtonText={'Yes'}
-            onConfirm={this.deleteIntegration}
-            onClose={this._toggle('confirmModalOpen')}
           />
         </div>
       </div>
