@@ -43,28 +43,80 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
+// tslint:disable:no-empty
 
-import { Transform } from 'stream';
+import TerrainTabs from 'common/components/TerrainTabs';
+import { shallow } from 'enzyme';
+import * as React from 'react';
+import { browserHistory } from 'react-router';
 
-import JSONExportTransform from './JSONExportTransform';
-
-const JSONStream = require('JSONStream');
-/**
- * Import/Export from a JSON format. *
- * Additional configuration options are possible.
- */
-export class JSONTransform
+describe('TerrainTabs', () =>
 {
-  public static createImportStream(pattern?: any, map?: any): Transform
-  {
-    return JSONStream.parse(pattern, map);
-  }
+  let tabsComponent = null;
+  const tabs = [
+    {
+      key: 'tab1',
+      label: 'Tab 1',
+    },
+    {
+      key: 'tab2',
+      label: 'Tab 2',
+    },
+    {
+      key: 'tab3',
+      label: 'Tab 3',
+    },
+  ];
 
-  public static createExportStream(open?: any, sep?: any, close?: any): Transform
+  beforeEach(() =>
   {
-    return new JSONExportTransform(open, sep, close);
-  }
-}
+    tabsComponent = shallow(
+      <TerrainTabs
+        tabs={tabs}
+        tabToRouteMap={{ tab1: '/path/to/tab1', tab2: '/path/to/tab2' }}
+        router={{ location: { pathname: '/path/to/tab2' } }}
+      >
+        <div id='tab-content-2' />
+      </TerrainTabs>,
+    );
+  });
 
-export default JSONTransform;
+  it('should display the tabbed layout', () =>
+  {
+    expect(tabsComponent.find('Tabs')).toHaveLength(1);
+    expect(tabsComponent.find('Tabs').props().selectedIndex).toEqual(1);
+    expect(tabsComponent.find('TabList')).toHaveLength(1);
+    expect(tabsComponent.find('Tab')).toHaveLength(tabs.length);
+    expect(tabsComponent.find('TabList').find('Tab').at(0).childAt(0).text()).toEqual('Tab 1');
+    expect(tabsComponent.find('TabList').find('Tab').at(1).childAt(0).text()).toEqual('Tab 2');
+
+    expect(tabsComponent.find('TabPanel')).toHaveLength(tabs.length);
+    expect(tabsComponent.find('TabPanel').at(0).find('div')).toHaveLength(1);
+    expect(tabsComponent.find('TabPanel').at(1).find('#tab-content-2')).toHaveLength(1);
+    expect(tabsComponent.find('TabPanel').at(2).find('div')).toHaveLength(1);
+  });
+
+  it('should activate the tab matching the browser route by default', () =>
+  {
+    expect(tabsComponent.find('Tabs').props().selectedIndex).toEqual(1);
+  });
+
+  describe('#getActiveTabIndex', () =>
+  {
+    it('should return the active tab index', () =>
+    {
+      expect(tabsComponent.instance().getActiveTabIndex()).toEqual(1);
+    });
+  });
+
+  describe('#handleSelect', () =>
+  {
+    it('should update the selected tab index and update the browser address bar', () =>
+    {
+      tabsComponent.instance().handleSelect(1);
+
+      expect(tabsComponent.state().tabIndex).toEqual(1);
+      expect(browserHistory.replace).toHaveBeenCalledTimes(1);
+    });
+  });
+});

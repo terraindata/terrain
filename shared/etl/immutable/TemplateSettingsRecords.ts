@@ -55,7 +55,7 @@ import { TemplateSettings as TemplateSettingsI } from 'shared/etl/types/ETLTypes
 
 class TemplateSettingsC implements TemplateSettingsI
 {
-  public abortThreshhold = 0;
+  public abortThreshold = 0;
 }
 export type TemplateSettings = WithIRecord<TemplateSettingsC>;
 export const _TemplateSettings = makeExtendedConstructor(TemplateSettingsC, true);

@@ -1,44 +1,64 @@
 variables:
   GIT_SSL_NO_VERIFY: "true"
   GIT_STRATEGY: "clone"
+  GIT_SUBMODULE_STRATEGY: "recursive"
   GET_SOURCES_ATTEMPTS: "3"
+  CI_SERVER_URL: https://git.terrain.int
 
 # This folder is cached between builds
 # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
 cache:
+  key: search-node-modules
   paths:
-  - node_modules
+   - node_modules
+  policy: pull
 
 before_script:
+  - . .monorepo.gitlab/last_green_commit.sh
   - yarn
-  - ( cd sigint && yarn )
-  - ( cd analytics.js && yarn )
 
+# Stages defined which groups of jobs run in parallel,
+# and they are executed in order.  Things more likely
+# to fail should come sooner, and as many jobs as
+# possible should be run in parallel.
 stages:
-  - lint
-  - style
-  - test-front
-  - test-back
-  - test-sigint
-  - build
+  - style-and-compilation
+  - standard-tests
+  - fullstack-tests
   - deploy
-  - fullstack-meta
-  - fullstack-screenshot
 
 lint:
+  before_script:
+    - . .monorepo.gitlab/last_green_commit.sh
+    - yarn add npm-run-all tslint typescript-formatter
   script:
    - yarn lint-parallel
-  stage: lint
+  stage: style-and-compilation
+
+diff-style:
+  before_script:
+    - . .monorepo.gitlab/last_green_commit.sh
+    - yarn add npm-run-all tslint typescript-formatter
+  script:
+   - yarn diff-style
+  stage: style-and-compilation
+  except:
+   - master
 
 style:
+  before_script:
+    - . .monorepo.gitlab/last_green_commit.sh
+    - yarn add npm-run-all tslint typescript-formatter
   script:
    - yarn style
-  stage: style
+  stage: style-and-compilation
+  only:
+   - master
 
 test-frontend:
   script:
    - yarn test-front
-  stage: test-front
+  stage: standard-tests
   when: always
 
 test-backend:
@@ -47,44 +67,61 @@ test-backend:
    - yarn test-back
   after_script:
    - timeout 240 yarn test-back-teardown
-  stage: test-back
+  stage: standard-tests
   artifacts:
     paths:
       - coverage
 
 test-sigint:
+  before_script:
+    - . .monorepo.gitlab/last_green_commit.sh
   script:
-    - timeout 240 yarn test-sigint-setup
-    - ( cd sigint && yarn test )
+    - .monorepo.gitlab/build_if_changed.sh sigint "( cd sigint && yarn ) && timeout 240 yarn test-sigint-setup"
+    - .monorepo.gitlab/build_if_changed.sh sigint "( cd sigint && yarn test )"
   after_script:
-    - timeout 240 yarn test-sigint-teardown
-  stage: test-sigint
+    - .monorepo.gitlab/build_if_changed.sh sigint "timeout 240 yarn test-sigint-teardown"
+  stage: standard-tests
 
 build-frontend:
   script:
    - yarn build
-  stage: build
+  stage: style-and-compilation
 
 build-analytics-js:
+  before_script:
+    - . .monorepo.gitlab/last_green_commit.sh
   script:
-   - ( cd analytics.js && yarn build )
-  stage: build
+   - .monorepo.gitlab/build_if_changed.sh analytics.js "( cd analytics.js && yarn )"
+   - .monorepo.gitlab/build_if_changed.sh analytics.js "( cd analytics.js && yarn build )"
+  stage: style-and-compilation
 
-fullstack-meta:
+# Dummy task that will push new cache while all other jobs have `policy: pull` set
+update-cache:
+  stage: style-and-compilation
   script:
-    - pkill node || true;
-    - timeout 240 yarn test-fullstack-setup
-    - yarn clean
-    - MIDWAY_HOST=`hostname`:3000 yarn build
-    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
-    - sleep 10
-    # - yarn test-fullstack-import
-    - yarn test-fullstack-component
-  stage: fullstack-meta
-  after_script:
-    - tail -n20 ./midwayConsole.log || true
-    - timeout 240 yarn test-fullstack-teardown
-    - pkill node || true;
+      - echo "The cache should be updated at the end of this job..."
+  cache:
+    key: search-node-modules
+    paths:
+     - node_modules
+    policy: pull-push
+
+# TODO reenable these tests when they're updated for the new system
+#fullstack-meta:
+#  script:
+#    - pkill node || true;
+#    - timeout 240 yarn test-fullstack-setup
+#    - yarn clean
+#    - MIDWAY_HOST=`hostname`:3000 yarn build
+#    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
+#    - sleep 10
+#    - yarn test-fullstack-import
+#    - yarn test-fullstack-component
+#  stage: fullstack-tests
+#  after_script:
+#    - tail -n20 ./midwayConsole.log || true
+#    - timeout 240 yarn test-fullstack-teardown
+#    - pkill node || true;
 
 fullstack-screenshot:
   script:
@@ -97,7 +134,7 @@ fullstack-screenshot:
     - yarn test-fullstack-login
     - yarn test-rr-pathfinder
     - yarn test-rr-builder
-  stage: fullstack-screenshot
+  stage: fullstack-tests
   allow_failure: true
   artifacts:
     when: on_failure
@@ -134,3 +171,4 @@ deploy:
 #  only:
 #   - master
 #  stage: build
+

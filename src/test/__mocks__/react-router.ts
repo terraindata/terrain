@@ -43,28 +43,14 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
+const replace = jest.fn();
+export const browserHistory = {
+  replace,
+};
 
-import { Transform } from 'stream';
-
-import JSONExportTransform from './JSONExportTransform';
-
-const JSONStream = require('JSONStream');
-/**
- * Import/Export from a JSON format. *
- * Additional configuration options are possible.
- */
-export class JSONTransform
+const mock = jest.fn().mockImplementation(() =>
 {
-  public static createImportStream(pattern?: any, map?: any): Transform
-  {
-    return JSONStream.parse(pattern, map);
-  }
+  return { browserHistory };
+});
 
-  public static createExportStream(open?: any, sep?: any, close?: any): Transform
-  {
-    return new JSONExportTransform(open, sep, close);
-  }
-}
-
-export default JSONTransform;
+export default mock;
