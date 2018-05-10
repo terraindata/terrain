@@ -52,17 +52,17 @@ import { mount, shallow } from 'enzyme';
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as React from 'react';
-import { _IntegrationConfig } from '../../../../shared/etl/immutable/IntegrationRecords';
+import { _IntegrationConfig, IntegrationConfig } from '../../../../shared/etl/immutable/IntegrationRecords';
 
-const integrations = Map({
+const integrations: IMMap<ID, IntegrationConfig> = Map<ID, IntegrationConfig>({
   1: _IntegrationConfig({
     id: 1,
     name: 'Integration 1',
     type: 'Sftp',
-    authConfig: {},
+    authConfig: { jwt: '' },
     connectionConfig: {},
     createdBy: 1,
-    lastModifed: '5/6/2017',
+    lastModified: null,
     readPermission: null,
     writePermission: null,
     meta: '',
@@ -71,10 +71,10 @@ const integrations = Map({
     id: 2,
     name: 'Integration 2',
     type: 'Http',
-    authConfig: {},
+    authConfig: { jwt: '' },
     connectionConfig: {},
     createdBy: 1,
-    lastModifed: '5/1/2017',
+    lastModified: null,
     readPermission: null,
     writePermission: null,
     meta: '',
@@ -85,7 +85,7 @@ describe('IntegrationList', () =>
 {
   let listComponent = null;
   const listState = {
-    integrations: Map({}),
+    integrations: Map<ID, IntegrationConfig>(),
     etlActions: (options: { actionType: string }) => { },
     users: Map({
       1: { name: 'User 1' } as any,

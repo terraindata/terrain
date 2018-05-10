@@ -43,28 +43,78 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
+import TerrainComponent from 'common/components/TerrainComponent';
+import TerrainTabs from 'common/components/TerrainTabs';
+import { ETLActions } from 'etl/ETLRedux';
+import IntegrationList from 'etl/integrations/components/IntegrationList';
+import TemplateList from 'etl/templates/components/TemplateList';
+import * as React from 'react';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import Util from 'util/Util';
+import './DataTabs.less';
 
-import { Transform } from 'stream';
-
-import JSONExportTransform from './JSONExportTransform';
-
-const JSONStream = require('JSONStream');
-/**
- * Import/Export from a JSON format. *
- * Additional configuration options are possible.
- */
-export class JSONTransform
+interface DataTabsProps
 {
-  public static createImportStream(pattern?: any, map?: any): Transform
+  templates: List<ETLTemplate>;
+  etlActions?: typeof ETLActions;
+  params: any;
+  router: any;
+  children: JSX.Element;
+}
+
+class DataTabs extends TerrainComponent<DataTabsProps>
+{
+  public tabs = [
+    { key: 'templates', label: 'Templates' },
+    { key: 'integrations', label: 'Integrations' },
+    { key: 'runnow', label: 'Import / Export Run Now' },
+  ];
+
+  public tabToRouteMap = {
+    templates: '/data/templates',
+    integrations: '/data/integrations',
+    runnow: '/data/runnow',
+  };
+
+  public state = {
+    tabIndex: this.tabs.indexOf(this.props.params.tab),
+  };
+
+  public componentDidMount()
   {
-    return JSONStream.parse(pattern, map);
+    this.props.etlActions({
+      actionType: 'fetchTemplates',
+    });
+
+    this.props.etlActions({
+      actionType: 'getIntegrations',
+    });
+    // TODO lock UI until done?
   }
 
-  public static createExportStream(open?: any, sep?: any, close?: any): Transform
+  public render()
   {
-    return new JSONExportTransform(open, sep, close);
+    const { params, router, children } = this.props;
+
+    return (
+      <div className='etl'>
+        <div className='etl-tabs'>
+          <TerrainTabs
+            tabs={this.tabs}
+            tabToRouteMap={this.tabToRouteMap}
+            router={router}
+          >
+            {this.props.children}
+          </TerrainTabs>
+        </div>
+      </div>
+    );
   }
 }
 
-export default JSONTransform;
+export default Util.createContainer(
+  DataTabs,
+  [],
+  { etlActions: ETLActions },
+);
