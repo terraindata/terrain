@@ -52,27 +52,27 @@ export default class ETLRouteUtil
 {
   public static gotoWalkthroughStep(step)
   {
-    browserHistory.push(`/data/new/${step}`);
+    browserHistory.push(`/data/templates/new/${step}`);
   }
 
   public static gotoNewTemplate()
   {
-    browserHistory.push(`/data/template/edit/new`);
+    browserHistory.push(`/data/templates/edit/new`);
   }
 
   public static gotoEditAlgorithm(algorithmId)
   {
-    browserHistory.push(`/data/template/edit/algorithmId=${algorithmId}`);
+    browserHistory.push(`/data/templates/edit/algorithmId=${algorithmId}`);
   }
 
   public static gotoEditTemplate(templateId)
   {
-    browserHistory.push(`/data/template/edit/templateId=${templateId}`);
+    browserHistory.push(`/data/templates/edit/templateId=${templateId}`);
   }
 
   public static isRouteNewTemplate(location)
   {
-    return location.pathname === '/data/template/edit/new';
+    return location.pathname === '/data/templates/edit/new';
   }
 
   public static gotoEditIntegration(integrationId)

@@ -59,6 +59,8 @@ interface DataTabsProps
   templates: List<ETLTemplate>;
   etlActions?: typeof ETLActions;
   params: any;
+  router: any;
+  children: JSX.Element;
 }
 
 class DataTabs extends TerrainComponent<DataTabsProps>
@@ -84,24 +86,26 @@ class DataTabs extends TerrainComponent<DataTabsProps>
     this.props.etlActions({
       actionType: 'fetchTemplates',
     });
+
+    this.props.etlActions({
+      actionType: 'getIntegrations',
+    });
     // TODO lock UI until done?
   }
 
   public render()
   {
-    const { params } = this.props;
+    const { params, router, children } = this.props;
 
     return (
       <div className='etl'>
         <div className='etl-tabs'>
           <TerrainTabs
             tabs={this.tabs}
-            selectedTab={params.tab}
             tabToRouteMap={this.tabToRouteMap}
+            router={router}
           >
-            <TemplateList />
-            <IntegrationList />
-            <h2>Any content 3</h2>
+            {this.props.children}
           </TerrainTabs>
         </div>
       </div>
