@@ -111,7 +111,7 @@ export enum ColumnOptions
   Preview = 'Preview',
   Endpoints = 'Endpoints',
   Steps = 'Steps',
-  Options = 'Options'
+  Options = 'Options',
 }
 
 export const columnOptions = List([
