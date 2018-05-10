@@ -59,12 +59,12 @@ import { Menu, MenuOption } from 'common/components/Menu';
 import Modal from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
 import { ETLActions } from 'etl/ETLRedux';
+import ETLRouteUtil from 'etl/ETLRouteUtil';
 import Initializers from 'etl/helpers/TemplateInitializers';
 import { MidwayError } from 'shared/error/MidwayError';
 import { instanceFnDecorator } from 'shared/util/Classes';
-import ETLRouteUtil from 'etl/ETLRouteUtil';
-import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
 
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
@@ -143,7 +143,6 @@ class TemplateList extends TerrainComponent<Props>
   public computeMenuOptionsFactory(allowedActions: AllowedActions)
     : (template: ETLTemplate, index: number) => List<MenuOption>
   {
-    console.log(allowedActions);
     if (allowedActions === undefined)
     {
       return undefined;
@@ -186,7 +185,7 @@ class TemplateList extends TerrainComponent<Props>
     return (
       <div
         className='template-table-wrapper'
-       >
+      >
         <ItemList
           items={this.props.templates}
           columnConfig={this.displayConfig}
@@ -210,7 +209,7 @@ class TemplateList extends TerrainComponent<Props>
     else
     {
       // open that template in the template editor
-      ETLRouteUtil.gotoEditTemplate(template.id)
+      ETLRouteUtil.gotoEditTemplate(template.id);
     }
   }
 
