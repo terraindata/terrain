@@ -42,20 +42,79 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+import TerrainComponent from 'common/components/TerrainComponent';
+import TerrainTabs from 'common/components/TerrainTabs';
+import { ETLActions } from 'etl/ETLRedux';
+import IntegrationList from 'etl/integrations/components/IntegrationList';
+import TemplateList from 'etl/templates/components/TemplateList';
+import * as React from 'react';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import Util from 'util/Util';
+import './DataTabs.less';
 
-// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-const { List, Map } = Immutable;
-import { makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
-
-import { TemplateSettings as TemplateSettingsI } from 'shared/etl/types/ETLTypes';
-
-class TemplateSettingsC implements TemplateSettingsI
+interface DataTabsProps
 {
-  public abortThreshold = 0;
+  templates: List<ETLTemplate>;
+  etlActions?: typeof ETLActions;
+  params: any;
+  router: any;
+  children: JSX.Element;
 }
-export type TemplateSettings = WithIRecord<TemplateSettingsC>;
-export const _TemplateSettings = makeExtendedConstructor(TemplateSettingsC, true);
+
+class DataTabs extends TerrainComponent<DataTabsProps>
+{
+  public tabs = [
+    { key: 'templates', label: 'Templates' },
+    { key: 'integrations', label: 'Integrations' },
+    { key: 'runnow', label: 'Import / Export Run Now' },
+  ];
+
+  public tabToRouteMap = {
+    templates: '/data/templates',
+    integrations: '/data/integrations',
+    runnow: '/data/runnow',
+  };
+
+  public state = {
+    tabIndex: this.tabs.indexOf(this.props.params.tab),
+  };
+
+  public componentDidMount()
+  {
+    this.props.etlActions({
+      actionType: 'fetchTemplates',
+    });
+
+    this.props.etlActions({
+      actionType: 'getIntegrations',
+    });
+    // TODO lock UI until done?
+  }
+
+  public render()
+  {
+    const { params, router, children } = this.props;
+
+    return (
+      <div className='etl'>
+        <div className='etl-tabs'>
+          <TerrainTabs
+            tabs={this.tabs}
+            tabToRouteMap={this.tabToRouteMap}
+            router={router}
+          >
+            {this.props.children}
+          </TerrainTabs>
+        </div>
+      </div>
+    );
+  }
+}
+
+export default Util.createContainer(
+  DataTabs,
+  [],
+  { etlActions: ETLActions },
+);

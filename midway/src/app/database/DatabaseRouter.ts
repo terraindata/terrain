@@ -58,13 +58,13 @@ export const databases = new Databases();
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting all databases');
-  ctx.body = await databases.select(['id', 'name', 'type', 'host', 'status', 'isAnalytics', 'analyticsIndex', 'analyticsType']);
+  ctx.body = await databases.select(['id', 'name', 'type', 'host', 'isAnalytics', 'analyticsIndex', 'analyticsType']);
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting database ID ' + String(ctx.params.id));
-  ctx.body = await databases.get(Number(ctx.params.id), ['id', 'name', 'type', 'host', 'status']);
+  ctx.body = await databases.get(Number(ctx.params.id), ['id', 'name', 'type', 'host']);
 });
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -85,10 +85,8 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     }
   }
 
-  db.status = 'DISCONNECTED';
   ctx.body = await databases.upsert(ctx.state.user, db);
-  const id = Number(ctx.body[0].id);
-  await databases.connect(ctx.state.user, id);
+  await databases.connect(ctx.state.user, db.id);
 });
 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -108,6 +106,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   }
 
   ctx.body = await databases.upsert(ctx.state.user, db);
+  await databases.connect(ctx.state.user, db.id);
 });
 
 Router.post('/:id/connect', passport.authenticate('access-token-local'), async (ctx, next) =>

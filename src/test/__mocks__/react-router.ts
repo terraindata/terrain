@@ -42,20 +42,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+const replace = jest.fn();
+export const browserHistory = {
+  replace,
+};
 
-// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-const { List, Map } = Immutable;
-import { makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
-
-import { TemplateSettings as TemplateSettingsI } from 'shared/etl/types/ETLTypes';
-
-class TemplateSettingsC implements TemplateSettingsI
+const mock = jest.fn().mockImplementation(() =>
 {
-  public abortThreshold = 0;
-}
-export type TemplateSettings = WithIRecord<TemplateSettingsC>;
-export const _TemplateSettings = makeExtendedConstructor(TemplateSettingsC, true);
+  return { browserHistory };
+});
+
+export default mock;

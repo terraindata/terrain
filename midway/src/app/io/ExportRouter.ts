@@ -51,13 +51,13 @@ import * as stream from 'stream';
 
 import * as Util from '../AppUtil';
 import { Permissions } from '../permissions/Permissions';
-import { Export, ExportConfig } from './Export';
+// import { Export, ExportConfig } from './Export';
 import { ExportTypes } from './ExportTypes';
 import * as Auth from './templates/Authenticate';
 import ExportTemplateRouter from './templates/ExportTemplateRouter';
 
 const Router = new KoaRouter();
-export const exprt: Export = new Export();
+// export const exprt: Export = new Export();
 export const exprtTypes: ExportTypes = new ExportTypes();
 const perm: Permissions = new Permissions();
 
@@ -65,6 +65,7 @@ Router.use('/templates', ExportTemplateRouter.routes(), ExportTemplateRouter.all
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
+  /*
   const requestObj: object = JSON.parse(ctx.request.body.data).body;
   Util.verifyParameters(requestObj, ['columnTypes', 'dbid', 'filetype', 'query', 'rank', 'transformations']);
   const exprtConf: ExportConfig = requestObj as ExportConfig;
@@ -76,17 +77,21 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   ctx.type = 'text/plain';
   ctx.attachment(ctx.request.body.filename);
   ctx.body = exportStream;
+  */
 });
 
 Router.post('/types', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
+  /*
   const typeObj: object = ctx.request.body.body;
   Util.verifyParameters(typeObj, ['dbid', 'query']);
   ctx.body = await exprtTypes.getNamesAndTypesFromQuery(typeObj['dbid'], typeObj['query']);
+  */
 });
 
 Router.post('/headless', async (ctx, next) =>
 {
+  /*
   const exprtConf: ExportConfig = ctx.request.body.body;
   const authStream: object = await Auth.authenticatePersistentAccessToken(ctx.request.body);
   if (authStream['template'] === null)
@@ -105,10 +110,12 @@ Router.post('/headless', async (ctx, next) =>
   {
     ctx.body = await exprt.export(exprtConf, true);
   }
+  */
 });
 
 Router.get('/headless', async (ctx, next) =>
 {
+  /*
   const authStream: object = await Auth.authenticatePersistentAccessToken(ctx.request.query);
   if (authStream['template'] === null)
   {
@@ -139,6 +146,7 @@ Router.get('/headless', async (ctx, next) =>
   {
     ctx.body = await exprt.export(exprtConf, true);
   }
+  */
 });
 
 export default Router;

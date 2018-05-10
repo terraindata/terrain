@@ -42,20 +42,94 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+import TerrainComponent from 'common/components/TerrainComponent';
+import 'common/components/TerrainTabs.less';
+import * as React from 'react';
+import { browserHistory } from 'react-router';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
-// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-const { List, Map } = Immutable;
-import { makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
-
-import { TemplateSettings as TemplateSettingsI } from 'shared/etl/types/ETLTypes';
-
-class TemplateSettingsC implements TemplateSettingsI
+interface TabConfig
 {
-  public abortThreshold = 0;
+  key: string;
+  label: string;
 }
-export type TemplateSettings = WithIRecord<TemplateSettingsC>;
-export const _TemplateSettings = makeExtendedConstructor(TemplateSettingsC, true);
+
+interface TabsProps
+{
+  tabs: TabConfig[];
+  children: any;
+  tabToRouteMap: { [tabKey: string]: string };
+  router: any;
+}
+
+interface TabsState
+{
+  tabIndex: number;
+}
+
+class TerrainTabs extends TerrainComponent<TabsProps>
+{
+  public state: TabsState = {
+    tabIndex: 0,
+  };
+
+  public constructor(props)
+  {
+    super(props);
+
+    this.state = {
+      tabIndex: this.getActiveTabIndex(),
+    };
+  }
+
+  public handleSelect(tabIndex: number)
+  {
+    const { tabs, tabToRouteMap } = this.props;
+
+    this.setState({ tabIndex });
+
+    if (tabToRouteMap !== undefined)
+    {
+      const tabKey = tabs[tabIndex].key;
+      browserHistory.replace(tabToRouteMap[tabKey]);
+    }
+  }
+
+  public getActiveTabIndex()
+  {
+    const { tabs, router, tabToRouteMap } = this.props;
+    const activeTabIndex = tabs.findIndex((tab) =>
+    {
+      return router.location.pathname.startsWith(tabToRouteMap[tab.key]);
+    });
+
+    return activeTabIndex;
+  }
+
+  public render()
+  {
+    const { tabs, children, tabToRouteMap, router } = this.props;
+    const { tabIndex } = this.state;
+
+    return (
+      <Tabs selectedIndex={tabIndex} onSelect={this.handleSelect}>
+        <TabList>
+          {
+            tabs.map((tab, index) => <Tab key={`tab-${tab.key}`}>{tab.label}</Tab>)
+          }
+        </TabList>
+        {
+          tabs.map((tab, index) =>
+          {
+            const content = router.location.pathname.startsWith(tabToRouteMap[tab.key]) ?
+              children : <div />;
+            return <TabPanel key={`tab-panel-${tab.key}`}>{content}</TabPanel>;
+          })
+        }
+      </Tabs>
+    );
+  }
+}
+
+export default TerrainTabs;

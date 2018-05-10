@@ -42,20 +42,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-const { List, Map } = Immutable;
-import { makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
-
-import { TemplateSettings as TemplateSettingsI } from 'shared/etl/types/ETLTypes';
-
-class TemplateSettingsC implements TemplateSettingsI
+export enum DatabaseControllerStatus
 {
-  public abortThreshold = 0;
+  CONNECTING = 'CONNECTING',
+  CONNECTED = 'CONNECTED',
+  ACCESS_DENIED = 'ACCESS_DENIED',
+  CONN_TIMEOUT = 'CONN_TIMEOUT',
+  DISCONNECTING = 'DISCONNECTING',
+  DISCONNECTED = 'DISCONNECTED',
+  UNKNOWN = 'UNKNOWN',
 }
-export type TemplateSettings = WithIRecord<TemplateSettingsC>;
-export const _TemplateSettings = makeExtendedConstructor(TemplateSettingsC, true);
+
+export default DatabaseControllerStatus;

@@ -43,95 +43,75 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:no-var-requires import-spacing max-classes-per-file
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
+import * as React from 'react';
+import Util from 'util/Util';
 
-import * as winston from 'winston';
+import { DynamicForm } from 'common/components/DynamicForm';
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { instanceFnDecorator } from 'shared/util/Classes';
 
-import { DatabaseConfig } from '../app/database/DatabaseConfig';
-import QueryHandler from '../app/query/QueryHandler';
-import * as Tasty from '../tasty/Tasty';
-import DatabaseControllerStatus from './DatabaseControllerStatus';
+import { _TemplateSettings, TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
+import { TemplateSettings as TemplateSettingsI } from 'shared/etl/types/ETLTypes';
 
-/**
- * An client which acts as a selective isomorphic wrapper around
- * midway databases
- */
-abstract class DatabaseController
+const { List, Map } = Immutable;
+
+export interface Props
 {
-  private id: number;                       // unique id
-  private lsn: number;                      // log sequence number
-  private type: string;                     // connection type
-  private name: string;                     // connection name
-  private header: string;                   // log entry header
-  private config: DatabaseConfig;           // database configuration
-  private status: DatabaseControllerStatus; // controller status
-
-  constructor(type: string, id: number, name: string)
-  {
-    this.id = id;
-    this.lsn = -1;
-    this.type = type;
-    this.name = name;
-    this.header = 'DB:' + this.id.toString() + ':' + this.name + ':' + this.type + ':';
-    this.config = null;
-    this.status = DatabaseControllerStatus.UNKNOWN;
-  }
-
-  public log(methodName: string, info?: any, moreInfo?: any)
-  {
-    const header = this.header + (++this.lsn).toString() + ':' + methodName;
-    winston.info(header);
-    if (info !== undefined)
-    {
-      winston.debug(header + ': ' + JSON.stringify(info, null, 1));
-    }
-    if (moreInfo !== undefined)
-    {
-      winston.debug(header + ': ' + JSON.stringify(moreInfo, null, 1));
-    }
-  }
-
-  public getID(): number
-  {
-    return this.id;
-  }
-
-  public getType(): string
-  {
-    return this.type;
-  }
-
-  public getName(): string
-  {
-    return this.name;
-  }
-
-  public getStatus(): DatabaseControllerStatus
-  {
-    return this.status;
-  }
-
-  public getConfig(): DatabaseConfig
-  {
-    return this.config;
-  }
-
-  public setConfig(config: DatabaseConfig)
-  {
-    this.config = config;
-  }
-
-  public setStatus(status: DatabaseControllerStatus)
-  {
-    this.status = status;
-  }
-
-  public abstract getClient();
-
-  public abstract getTasty(): Tasty.Tasty;
-
-  public abstract getQueryHandler(): QueryHandler;
-
-  public abstract getAnalyticsDB();
+  settings: TemplateSettings;
+  onChange: (config: TemplateSettings, isBlur?: boolean) => void;
 }
 
-export default DatabaseController;
+export default class TemplateSettingsForm extends TerrainComponent<Props>
+{
+  public inputMap: InputDeclarationMap<TemplateSettingsI & { tooltip: any }> =
+    {
+      abortThreshold: {
+        type: DisplayType.NumberBox,
+        displayName: 'Abort Threshold',
+        widthFactor: 2,
+        group: 'main',
+      },
+      tooltip: {
+        type: DisplayType.Custom,
+        displayName: '',
+        widthFactor: 3,
+        group: 'main',
+        getDisplayState: (s: TemplateSettingsI) => s.abortThreshold === 0 ? DisplayState.Active : DisplayState.Hidden,
+        options: {
+          render: this.renderAbortTooltip,
+        },
+      },
+    };
+
+  public renderAbortTooltip(state: TemplateSettingsI, disabled: boolean)
+  {
+    return <div style={{ position: 'relative', top: '5px' }}> (No Limit) </div>;
+  }
+
+  public render()
+  {
+    return (
+      <DynamicForm
+        inputMap={this.inputMap}
+        inputState={this.configToState(this.props.settings)}
+        onStateChange={this.handleFormChange}
+      />
+    );
+  }
+
+  @instanceFnDecorator(memoizeOne)
+  public configToState(config: TemplateSettings): TemplateSettingsI
+  {
+    return config.toJS() as TemplateSettingsI;
+  }
+
+  public handleFormChange(state: TemplateSettingsI, isBlur?: boolean)
+  {
+    this.props.onChange(_TemplateSettings(state), isBlur);
+  }
+}
