@@ -51,6 +51,9 @@ import TemplateList from 'etl/templates/components/TemplateList';
 import * as React from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import ETLRouteUtil from 'app/etl/ETLRouteUtil';
+import ScheduleList from 'scheduler/components/ScheduleList';
+import Jobs from 'jobs/components/Jobs';
 import Util from 'util/Util';
 import './DataTabs.less';
 
@@ -66,12 +69,18 @@ class DataTabs extends TerrainComponent<DataTabsProps>
   public tabs = [
     { key: 'templates', label: 'Templates' },
     { key: 'integrations', label: 'Integrations' },
-    { key: 'runnow', label: 'Import / Export Run Now' },
+    { key: 'schedules', label: 'Schedules' },
+    { key: 'jobs', label: 'Jobs' },
+    
+    { key: 'runnow', label: 'Import / Export Now' },
   ];
 
   public tabToRouteMap = {
     templates: '/data/templates',
     integrations: '/data/integrations',
+    schedules: '/data/schedules',
+    jobs: '/data/jobs',
+    
     runnow: '/data/runnow',
   };
 
@@ -101,7 +110,14 @@ class DataTabs extends TerrainComponent<DataTabsProps>
           >
             <TemplateList />
             <IntegrationList />
-            <h2>Any content 3</h2>
+            <ScheduleList />
+            <Jobs />
+            
+            <h2
+              onLoad={ETLRouteUtil.gotoNewTemplate}
+            >
+              Redirecting...
+            </h2>
           </TerrainTabs>
         </div>
       </div>

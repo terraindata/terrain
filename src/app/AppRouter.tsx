@@ -50,7 +50,7 @@ import { IndexRoute, Route, Router } from 'react-router';
 import DataTabs from 'etl/components/DataTabs';
 import TemplateList from 'etl/templates/components/TemplateList';
 import Jobs from 'jobs/components/Jobs';
-import Scheduler from 'scheduler/components/Scheduler';
+import ScheduleList from 'scheduler/components/ScheduleList';
 import App from './App';
 import Builder from './builder/components/Builder';
 import Logout from './common/components/Logout';
@@ -155,6 +155,9 @@ class AppRouter extends TerrainComponent<{}> {
             <Route path='template/edit/templateId=:templateId' component={ETLEditorPage} />
             <Route path='integrations' component={IntegrationList} />
             <Route path='integrations/edit/integrationId=:integrationId' component={IntegrationEditorPage} />
+            
+            <Route path='schedules' component={ScheduleList} />
+            <Route path='jobs' component={Jobs} />
           </Route>
 
           <Route path='/analytics'>
@@ -169,14 +172,7 @@ class AppRouter extends TerrainComponent<{}> {
               </Route>
             </Route>
           </Route>
-
-          <Route path='/scheduler'>
-            <IndexRoute component={Scheduler} />
-          </Route>
-
-          <Route path='/jobs'>
-            <IndexRoute component={Jobs} />
-          </Route>
+          
         </Route>
       </Router>
     );
