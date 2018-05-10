@@ -242,6 +242,11 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     const { canEdit, preview, displayKeyPath, previewLabel } = this.props;
     const field = this._field();
 
+    if (field.isHidden === true)
+    {
+      return null;
+    }
+
     const style = (canEdit === true && field.isIncluded === false) ?
       getStyle('opacity', '0.5') : {};
 
