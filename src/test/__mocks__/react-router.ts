@@ -43,40 +43,14 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
+const replace = jest.fn();
+export const browserHistory = {
+  replace,
+};
 
-import * as _ from 'lodash';
-import { browserHistory } from 'react-router';
-
-export default class ETLRouteUtil
+const mock = jest.fn().mockImplementation(() =>
 {
-  public static gotoWalkthroughStep(step)
-  {
-    browserHistory.push(`/data/templates/new/${step}`);
-  }
+  return { browserHistory };
+});
 
-  public static gotoNewTemplate()
-  {
-    browserHistory.push(`/data/templates/edit/new`);
-  }
-
-  public static gotoEditAlgorithm(algorithmId)
-  {
-    browserHistory.push(`/data/templates/edit/algorithmId=${algorithmId}`);
-  }
-
-  public static gotoEditTemplate(templateId)
-  {
-    browserHistory.push(`/data/templates/edit/templateId=${templateId}`);
-  }
-
-  public static isRouteNewTemplate(location)
-  {
-    return location.pathname === '/data/templates/edit/new';
-  }
-
-  public static gotoEditIntegration(integrationId)
-  {
-    browserHistory.push(`/data/integrations/edit/integrationId=${integrationId}`);
-  }
-}
+export default mock;

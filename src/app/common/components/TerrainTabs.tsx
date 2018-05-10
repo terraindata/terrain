@@ -43,40 +43,93 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
-
-import * as _ from 'lodash';
+import TerrainComponent from 'common/components/TerrainComponent';
+import 'common/components/TerrainTabs.less';
+import * as React from 'react';
 import { browserHistory } from 'react-router';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
-export default class ETLRouteUtil
+interface TabConfig
 {
-  public static gotoWalkthroughStep(step)
+  key: string;
+  label: string;
+}
+
+interface TabsProps
+{
+  tabs: TabConfig[];
+  children: any;
+  tabToRouteMap: { [tabKey: string]: string };
+  router: any;
+}
+
+interface TabsState
+{
+  tabIndex: number;
+}
+
+class TerrainTabs extends TerrainComponent<TabsProps>
+{
+  public state: TabsState = {
+    tabIndex: 0,
+  };
+
+  public constructor(props)
   {
-    browserHistory.push(`/data/templates/new/${step}`);
+    super(props);
+
+    this.state = {
+      tabIndex: this.getActiveTabIndex(),
+    };
   }
 
-  public static gotoNewTemplate()
+  public handleSelect(tabIndex: number)
   {
-    browserHistory.push(`/data/templates/edit/new`);
+    const { tabs, tabToRouteMap } = this.props;
+
+    this.setState({ tabIndex });
+
+    if (tabToRouteMap !== undefined)
+    {
+      const tabKey = tabs[tabIndex].key;
+      browserHistory.replace(tabToRouteMap[tabKey]);
+    }
   }
 
-  public static gotoEditAlgorithm(algorithmId)
+  public getActiveTabIndex()
   {
-    browserHistory.push(`/data/templates/edit/algorithmId=${algorithmId}`);
+    const { tabs, router, tabToRouteMap } = this.props;
+    const activeTabIndex = tabs.findIndex((tab) =>
+    {
+      return router.location.pathname.startsWith(tabToRouteMap[tab.key]);
+    });
+
+    return activeTabIndex;
   }
 
-  public static gotoEditTemplate(templateId)
+  public render()
   {
-    browserHistory.push(`/data/templates/edit/templateId=${templateId}`);
-  }
+    const { tabs, children, tabToRouteMap, router } = this.props;
+    const { tabIndex } = this.state;
 
-  public static isRouteNewTemplate(location)
-  {
-    return location.pathname === '/data/templates/edit/new';
-  }
-
-  public static gotoEditIntegration(integrationId)
-  {
-    browserHistory.push(`/data/integrations/edit/integrationId=${integrationId}`);
+    return (
+      <Tabs selectedIndex={tabIndex} onSelect={this.handleSelect}>
+        <TabList>
+          {
+            tabs.map((tab, index) => <Tab key={`tab-${tab.key}`}>{tab.label}</Tab>)
+          }
+        </TabList>
+        {
+          tabs.map((tab, index) =>
+          {
+            const content = router.location.pathname.startsWith(tabToRouteMap[tab.key]) ?
+              children : <div />;
+            return <TabPanel key={`tab-panel-${tab.key}`}>{content}</TabPanel>;
+          })
+        }
+      </Tabs>
+    );
   }
 }
+
+export default TerrainTabs;

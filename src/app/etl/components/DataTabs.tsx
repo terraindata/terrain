@@ -43,40 +43,78 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
+import TerrainComponent from 'common/components/TerrainComponent';
+import TerrainTabs from 'common/components/TerrainTabs';
+import { ETLActions } from 'etl/ETLRedux';
+import IntegrationList from 'etl/integrations/components/IntegrationList';
+import TemplateList from 'etl/templates/components/TemplateList';
+import * as React from 'react';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import Util from 'util/Util';
+import './DataTabs.less';
 
-import * as _ from 'lodash';
-import { browserHistory } from 'react-router';
-
-export default class ETLRouteUtil
+interface DataTabsProps
 {
-  public static gotoWalkthroughStep(step)
+  templates: List<ETLTemplate>;
+  etlActions?: typeof ETLActions;
+  params: any;
+  router: any;
+  children: JSX.Element;
+}
+
+class DataTabs extends TerrainComponent<DataTabsProps>
+{
+  public tabs = [
+    { key: 'templates', label: 'Templates' },
+    { key: 'integrations', label: 'Integrations' },
+    { key: 'runnow', label: 'Import / Export Run Now' },
+  ];
+
+  public tabToRouteMap = {
+    templates: '/data/templates',
+    integrations: '/data/integrations',
+    runnow: '/data/runnow',
+  };
+
+  public state = {
+    tabIndex: this.tabs.indexOf(this.props.params.tab),
+  };
+
+  public componentDidMount()
   {
-    browserHistory.push(`/data/templates/new/${step}`);
+    this.props.etlActions({
+      actionType: 'fetchTemplates',
+    });
+
+    this.props.etlActions({
+      actionType: 'getIntegrations',
+    });
+    // TODO lock UI until done?
   }
 
-  public static gotoNewTemplate()
+  public render()
   {
-    browserHistory.push(`/data/templates/edit/new`);
-  }
+    const { params, router, children } = this.props;
 
-  public static gotoEditAlgorithm(algorithmId)
-  {
-    browserHistory.push(`/data/templates/edit/algorithmId=${algorithmId}`);
-  }
-
-  public static gotoEditTemplate(templateId)
-  {
-    browserHistory.push(`/data/templates/edit/templateId=${templateId}`);
-  }
-
-  public static isRouteNewTemplate(location)
-  {
-    return location.pathname === '/data/templates/edit/new';
-  }
-
-  public static gotoEditIntegration(integrationId)
-  {
-    browserHistory.push(`/data/integrations/edit/integrationId=${integrationId}`);
+    return (
+      <div className='etl'>
+        <div className='etl-tabs'>
+          <TerrainTabs
+            tabs={this.tabs}
+            tabToRouteMap={this.tabToRouteMap}
+            router={router}
+          >
+            {this.props.children}
+          </TerrainTabs>
+        </div>
+      </div>
+    );
   }
 }
+
+export default Util.createContainer(
+  DataTabs,
+  [],
+  { etlActions: ETLActions },
+);
