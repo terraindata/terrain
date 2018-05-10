@@ -9,12 +9,6 @@
             "isAnalytics": true,
             "analyticsIndex": "terrain-analytics",
             "analyticsType": "events"
-        },
-        {
-            "name": "My MySQL Instance",
-            "type": "mysql",
-            "dsn": "t3rr41n-demo:r3curs1v3$@127.0.0.1:63306",
-            "host": "127.0.0.1:63306"
         }
     ]
 }

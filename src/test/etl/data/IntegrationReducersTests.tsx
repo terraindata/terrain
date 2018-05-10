@@ -43,8 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import { ETLActionTypes, ETLReducers as reducer } from 'app/etl/ETLRedux';
-import { _ETLState, ETLState } from 'app/etl/ETLTypes';
+import { ETLActionTypes, ETLReducers as reducer } from 'etl/ETLRedux';
+import { _ETLState, ETLState } from 'etl/ETLTypes';
 import * as Immutable from 'immutable';
 import ETLHelper from 'test-helpers/ETLHelper';
 import Util from 'util/Util';
