@@ -49,6 +49,8 @@ import * as KoaRouter from 'koa-router';
 import * as os from 'os';
 import * as process from 'process';
 import * as v8 from 'v8';
+
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import appStats from '../AppStats';
 
 const Router = new KoaRouter();
@@ -66,6 +68,17 @@ Router.get('/', async (ctx, next) =>
  */
 Router.get('/stats', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
+  const databases = {};
+  for (const entry of DatabaseRegistry.getAll())
+  {
+    const id = entry[0];
+    const controller = entry[1];
+    await controller.getClient().isConnected();
+    const config = controller.getConfig();
+    config['status'] = controller.getStatus();
+    databases[id] = config;
+  }
+
   ctx.body = {
     startTime: appStats.startTime,
     currentTime: new Date(),
@@ -105,6 +118,8 @@ Router.get('/stats', passport.authenticate('access-token-local'), async (ctx, ne
         pid: process.pid,
         // ppid: process.ppid,
       },
+
+    databases,
   };
 });
 
