@@ -47,7 +47,7 @@ THE SOFTWARE.
 import 'builder/components/pathfinder/filter/PathfinderFilter.less';
 import 'builder/components/pathfinder/Pathfinder.less';
 import Section from 'common/components/Section';
-import SimpleTable, { BadgeColumn } from 'common/components/SimpleTable';
+import SimpleTable, { BadgeColumn, ButtonColumn } from 'common/components/SimpleTable';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import { JobsActions } from 'jobs/data/JobsRedux';
@@ -127,6 +127,11 @@ class Jobs extends TerrainComponent<any> {
     this.setState({ expanded: expanded.set(section, !isExpanded) });
   }
 
+  public handleJobViewLog(colKey, rowData)
+  {
+    console.error(rowData);
+  }
+
   public render()
   {
     const {
@@ -152,6 +157,14 @@ class Jobs extends TerrainComponent<any> {
         columnLabel: '',
         component: <BadgeColumn
           getColor={this.getStatusColor}
+        />,
+      },
+      viewlog: {
+        columnKey: 'viewlog',
+        columnLabel: '',
+        component: <ButtonColumn
+          label={'View Log'}
+          onClick={this.handleJobViewLog}
         />,
       },
     };

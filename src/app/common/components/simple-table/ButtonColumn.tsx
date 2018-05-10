@@ -43,23 +43,32 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import Badge from 'common/components/Badge';
+import Button from 'common/components/Button';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as React from 'react';
 
-interface BadgeColumnProps
+interface ButtonColumnProps
 {
-  colKey?: string;
-  rowData?: any;
+  colKey?: string; // columnKey
+  rowData?: any; // the whole row data
 
-  getColor: (value: string) => string;
+  label: string;
+  onClick: (key, rowData) => void;
 }
 
-const BadgeColumn = (props: BadgeColumnProps) => (
-  <Badge
-    label={props.rowData[props.colKey]}
-    color={props.getColor(props.rowData[props.colKey])}
-  />
-);
+class BadgeColumn extends TerrainComponent<ButtonColumnProps>
+{
+  public render()
+  {
+    const { colKey, rowData } = this.props;
+
+    return (
+      <Button
+        text={this.props.label}
+        onClick={() => this.props.onClick(colKey, rowData)}
+      />
+    );
+  }
+}
 
 export default BadgeColumn;

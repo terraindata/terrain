@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions
 
 import BadgeColumn from 'common/components/simple-table/BadgeColumn';
+import ButtonColumn from 'common/components/simple-table/ButtonColumn';
 import { List } from 'immutable';
 import * as Immutable from 'immutable';
 import * as React from 'react';
@@ -72,17 +73,16 @@ export class SimpleTable extends TerrainComponent<Props>
 {
   public state: {};
 
-  public renderValue(colKey, value)
+  public renderValue(colKey, rowData)
   {
     const { columnsConfig } = this.props;
 
+    let processedValue = rowData[colKey];
+
     const component = columnsConfig[colKey].component;
-
-    let processedValue = value;
-
     if (component !== undefined)
     {
-      processedValue = React.cloneElement(component, { value });
+      processedValue = React.cloneElement(component, { colKey, rowData });
     }
 
     return processedValue;
@@ -118,7 +118,7 @@ export class SimpleTable extends TerrainComponent<Props>
                     {
                       return (
                         <td key={key} className='simple-table-cell'>
-                          {this.renderValue(key, entry[key])}
+                          {this.renderValue(key, entry)}
                         </td>
                       );
                     })
@@ -133,5 +133,9 @@ export class SimpleTable extends TerrainComponent<Props>
   }
 }
 
-export { BadgeColumn };
+export
+{
+  BadgeColumn,
+  ButtonColumn,
+};
 export default SimpleTable;
