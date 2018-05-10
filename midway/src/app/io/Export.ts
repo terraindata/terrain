@@ -52,7 +52,7 @@ import * as winston from 'winston';
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
 import { ESJSONParser } from '../../../../shared/database/elastic/parser/ESJSONParser';
 import * as SharedUtil from '../../../../shared/Util';
-import { getParsedQuery } from '../../app/Util';
+// import { getParsedQuery } from '../../app/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import ItemConfig from '../items/ItemConfig';
