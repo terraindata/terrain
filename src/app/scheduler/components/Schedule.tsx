@@ -98,7 +98,7 @@ class Schedule extends TerrainComponent<Props>
     {
       return '--';
     }
-    template = template.applyOverrides(this.getParam('overrideSources'), this.getParam('overrideSinks'));
+    template = template.applyOverrides(this.getOption('overrideSources'), this.getOption('overrideSinks'));
     return template.getDescription(this.props.algorithms);
   }
 
@@ -106,7 +106,7 @@ class Schedule extends TerrainComponent<Props>
   {
     const task = this.getTask(schedule);
     const sourceKey = isSource ? 'overrideSources' : 'overrideSinks';
-    const newSchedule = schedule.setIn(['tasks', 0], task.setIn(['params', sourceKey, key], endpoint));
+    const newSchedule = schedule.setIn(['tasks', 0], task.setIn(['params', 'options', sourceKey, key], endpoint));
     this.props.onChange(newSchedule);
   }
 
@@ -115,7 +115,7 @@ class Schedule extends TerrainComponent<Props>
     const sourceKey = isSource ? 'overrideSources' : 'overrideSinks';
     return List(endpoints.keySeq().toList().map((key) =>
     {
-      const endpoint = (this.getParam(sourceKey) as any).get(key) || endpoints.get(key);
+      const endpoint = (this.getOption(sourceKey) as any).get(key) || endpoints.get(key);
       return {
         value: isSource ? 'source' + key : 'sink' + key,
         displayName: endpoint.name,
@@ -137,9 +137,9 @@ class Schedule extends TerrainComponent<Props>
       case 0: // Template
         let task: TaskConfig = this.getTask();
         task = task
-          .setIn(['params', 'templateId'], value)
-          .setIn(['params', 'overrideSources'], Map({}))
-          .setIn(['params', 'overrideSinks'], Map({}));
+          .setIn(['params', 'options', 'templateId'], value)
+          .setIn(['params', 'options', 'overrideSources'], Map({}))
+          .setIn(['params', 'options', 'overrideSinks'], Map({}));
         schedule = schedule.setIn(['tasks', 0], task);
         if (!schedule.name)
         {
@@ -205,7 +205,7 @@ class Schedule extends TerrainComponent<Props>
   public getValues()
   {
     const { schedule } = this.props;
-    const templateId = this.getParam('templateId', -1);
+    const templateId = this.getOption('templateId', -1);
     const statusValue = templateId === -1 ? '' : schedule.running ? 'Running' :
       schedule.shouldRunNext ? 'Disable' : 'Enable';
     const buttonValue = templateId === -1 ? '' :
@@ -264,9 +264,10 @@ class Schedule extends TerrainComponent<Props>
     let configurationOptions = List([]);
     let configurationHeaderText = 'Choose a Template';
     let template;
-    if (task && task.params && task.params.get('templateId') !== undefined)
+    const templateId = this.getOption('templateId');
+    if (templateId !== undefined)
     {
-      template = this.props.templates.filter((temp) => temp.id === task.params.get('templateId')).get(0);
+      template = this.props.templates.filter((temp) => temp.id === templateId).get(0);
       if (template)
       {
         configurationHeaderText = '';
@@ -361,12 +362,12 @@ class Schedule extends TerrainComponent<Props>
     return (schedule.tasks && schedule.tasks.get(index)) || _TaskConfig({});
   }
 
-  public getParam(key, defaultValue?)
+  public getOption(key, defaultValue?)
   {
     const task = this.getTask();
-    if (task && task.params && task.params.get(key) !== undefined)
+    if (task && task.params && task.params.get('options') && task.params.getIn(['options', key]) !== undefined)
     {
-      return task.params.get(key);
+      return task.params.getIn(['options', key]);
     }
     return defaultValue;
   }
