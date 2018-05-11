@@ -71,7 +71,7 @@ import { destringifySavedTemplate, recordToConfig, TemplateConfig, templateForSa
 import { _SinkConfig, _SourceConfig, SinkConfig as SinkRecord, SourceConfig as SourceRecord } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { ETLProcess, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
-import LogWriter from '../io/streams/LogWriter';
+import LogStream from '../io/streams/LogStream';
 import ProgressStream from '../io/streams/ProgressStream';
 
 export default class Templates
@@ -405,7 +405,7 @@ export default class Templates
     const streamMap = await this.executeGraph(template, dag, nodes, files);
 
     const outputStream = streamMap[defaultSink][defaultSink];
-    const logStream = streamMap['log'].getLogStream();
+    const logStream = streamMap['log'];
 
     // push execution summary / progress to the log stream when done
     if (outputStream instanceof ProgressStream)
@@ -435,7 +435,7 @@ export default class Templates
     if (streamMap === undefined)
     {
       streamMap = {
-        log: new LogWriter(template.settings.abortThreshhold),
+        log: new LogStream(template.settings.abortThreshhold),
       };
       nodes.forEach((n) =>
       {

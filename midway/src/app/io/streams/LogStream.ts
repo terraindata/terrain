@@ -50,18 +50,30 @@ import * as winston from 'winston';
 /**
  * A log stream
  */
-export default class LogWriter
+export default class LogStream extends Readable
 {
-  private logStream: Readable | null = null;
+  private buffers: string[];
   private abortThreshold: number;
-
   private errorCount: number;
 
   constructor(abortThreshold: number = 1000)
   {
-    this.logStream = new Readable();
+    super();
+
+    this.buffers = [];
     this.abortThreshold = abortThreshold;
     this.errorCount = 0;
+  }
+
+  public _read(size?: number)
+  {
+    this.drainLog();
+  }
+
+  public _destroy(error, callback)
+  {
+    this.drainLog();
+    callback();
   }
 
   public addStream(stream: Readable | Writable | Transform)
@@ -75,7 +87,7 @@ export default class LogWriter
         // TODO: abort!
       }
 
-      this.logStream.push(e.toString());
+      this.buffers.push(e.toString());
     });
   }
 
@@ -87,8 +99,13 @@ export default class LogWriter
     }
   }
 
-  public getLogStream(): Readable
+  public drainLog()
   {
-    return this.logStream;
+    let buffer = this.buffers.shift();
+    while (buffer !== undefined)
+    {
+      this.push(buffer);
+      buffer = this.buffers.shift();
+    }
   }
 }

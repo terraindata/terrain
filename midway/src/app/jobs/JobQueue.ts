@@ -307,7 +307,7 @@ export class JobQueue
       this.runningRunNowJobs.delete(getJobs[0].id);
       // TODO: log job result
 
-      return resolve(jobResult['options']['outputStream'] as stream.Readable);
+      return resolve(jobResult.options.outputStream as stream.Readable);
     });
   }
 
