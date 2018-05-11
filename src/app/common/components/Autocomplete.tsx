@@ -130,7 +130,7 @@ class Autocomplete extends TerrainComponent<Props>
     }
   }
 
-  private executeChange(value)
+  public executeChange(value)
   {
     if (this.props.onChange)
     {
