@@ -59,6 +59,7 @@ import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } 
 class TemplateFieldC
 {
   public readonly isIncluded: boolean = true;
+  public readonly isHidden: boolean = false;
   public readonly fieldProps: object = {};
   public readonly type: FieldTypes = 'object';
   public readonly fieldId: number = -1;
