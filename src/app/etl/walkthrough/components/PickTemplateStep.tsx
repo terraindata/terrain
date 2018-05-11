@@ -91,7 +91,6 @@ class PickTemplateStep extends ETLStepComponent
   {
     return (
       <div
-        className='etl-transition-column etl-pick-template'
         style={templateListStyle}
       >
         <TemplateList
