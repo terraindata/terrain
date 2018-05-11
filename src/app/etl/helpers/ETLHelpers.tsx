@@ -47,9 +47,6 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
-import * as Radium from 'radium';
-import * as React from 'react';
-import { withRouter } from 'react-router';
 
 import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import TerrainStore from 'src/app/store/TerrainStore';
@@ -58,7 +55,6 @@ import Util from 'util/Util';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { ETLState } from 'etl/ETLTypes';
-import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
@@ -70,7 +66,7 @@ import
   TemplateEditorState,
 } from 'etl/templates/TemplateEditorTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { SchemaActions } from 'schema/data/SchemaRedux';
 import { TemplateProxy } from 'shared/etl/immutable/TemplateProxy';
 import { _ETLTemplate, copyTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
@@ -82,6 +78,7 @@ export default abstract class ETLHelpers
 {
   protected editorAct: typeof TemplateEditorActions;
   protected etlAct: typeof ETLActions;
+  protected schemaAct: typeof SchemaActions;
 
   protected get _state(): Immutable.Map<string, any>
   {
@@ -117,6 +114,10 @@ export default abstract class ETLHelpers
     this.etlAct = (action) =>
     {
       this.store.dispatch(ETLActions(action));
+    };
+    this.schemaAct = (action) =>
+    {
+      this.store.dispatch(SchemaActions(action));
     };
   }
 

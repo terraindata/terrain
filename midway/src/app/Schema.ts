@@ -72,7 +72,6 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      type text NOT NULL,
      dsn text NOT NULL,
      host text NOT NULL,
-     status text,
      isAnalytics bool DEFAULT ` + falseValue + `,
      analyticsIndex text,
      analyticsType text);`,

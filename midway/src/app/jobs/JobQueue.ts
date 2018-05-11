@@ -277,11 +277,14 @@ export class JobQueue
         newJobTasks = JSON.parse(getJobs[0].tasks);
         newJobTasks[0].params =
           {
-            overrideSinks: fields['overrideSinks'],
-            overrideSources: fields['overrideSources'],
-            template: fields['template'],
-            templateId: fields['templateId'],
-            inputStreams: files,
+            options:
+              {
+                overrideSinks: fields['overrideSinks'],
+                overrideSources: fields['overrideSources'],
+                template: fields['template'],
+                templateId: fields['templateId'],
+                inputStreams: files,
+              },
           };
       }
       catch (e)
@@ -298,15 +301,14 @@ export class JobQueue
       // update the table to running = true
       this.runningRunNowJobs.set(getJobs[0].id, newJob);
       // actually run the job
-
       const jobResult: TaskOutputConfig = await this.runningRunNowJobs.get(getJobs[0].id).run() as TaskOutputConfig;
       const jobsFromId: JobConfig[] = await this.get(getJobs[0].id);
       const jobStatus: string = jobResult.status === true ? 'SUCCESS' : 'FAILURE';
       await this._setJobStatus(jobsFromId[0].id, false, jobStatus);
-      await App.SKDR.setRunning(jobsFromId[0].scheduleId, false);
-      this.runningJobs.delete(getJobs[0].id);
+      this.runningRunNowJobs.delete(getJobs[0].id);
       // TODO: log job result
-      return resolve(jobResult['outputStream'] as stream.Readable);
+
+      return resolve(jobResult['options']['outputStream'] as stream.Readable);
     });
   }
 
@@ -469,7 +471,7 @@ export class JobQueue
         // TODO
       }
 
-      const results: JobConfig[] = rawResults.map((result: object) => new JobConfig(result));
+      const results: JobConfig[] = rawResults.map((result: object) => new JobConfig(result as JobConfig));
       resolve(results);
     });
   }

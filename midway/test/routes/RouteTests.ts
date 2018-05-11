@@ -59,13 +59,13 @@ let elasticDB: ElasticDB;
 let server;
 
 let defaultUserAccessToken: string = '';
-let exportTemplateID: number = -1;
-let persistentExportAccessToken: string = '';
+const exportTemplateID: number = -1;
+const persistentExportAccessToken: string = '';
 
 let templateId: number = -1; // ETL
 
-let mySQLImportTemplateID: number = -1;
-let persistentImportMySQLAccessToken: string = '';
+const mySQLImportTemplateID: number = -1;
+const persistentImportMySQLAccessToken: string = '';
 
 let schedulerExportId = '';
 
@@ -961,6 +961,7 @@ describe('Query route tests', () =>
   });
 });
 
+/*
 describe('File import route tests', () =>
 {
   test('Import JSON: POST /midway/v1/import/', async () =>
@@ -1107,7 +1108,7 @@ describe('File import route tests', () =>
       });
   });
 
-  /*test('Invalid import: POST /midway/v1/import/', async () =>
+  test('Invalid import: POST /midway/v1/import/', async () =>
   {
     await request(server)
       .post('/midway/v1/import/')
@@ -1144,8 +1145,7 @@ describe('File import route tests', () =>
       {
         fail('POST /midway/v1/import/ request returned an error: ' + String(error));
       });
-  });*/
-
+  });
 });
 
 describe('File io templates route tests', () =>
@@ -1574,6 +1574,7 @@ describe('File io templates route tests', () =>
       });
   });
 });
+*/
 
 describe('Integration tests', () =>
 {

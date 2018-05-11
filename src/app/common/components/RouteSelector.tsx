@@ -92,7 +92,7 @@ export interface RouteSelectorOptionSet
   hasOther?: boolean;
   focusOtherByDefault?: boolean;
   shortNameText?: string;
-  headerText?: string;
+  headerText?: string | El;
   forceFloat?: boolean;
   isButton?: boolean;
   onButtonClick?: () => void;

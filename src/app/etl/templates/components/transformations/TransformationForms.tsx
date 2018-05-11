@@ -60,7 +60,7 @@ import { CastTFF } from './CastTransformationForm';
 import { DuplicateTFF } from './DuplicateTransformationForm';
 import { JoinTFF } from './JoinTransformationForm';
 import { SetIfTFF } from './SetIfTransformationForm';
-import { AddTFF, DivideTFF, HashTFF, MultiplyTFF, SubstringTFF, SubtractTFF, UppercaseTFF } from './SimpleTransformations';
+import { AddTFF, DivideTFF, FindReplaceTFF, HashTFF, MultiplyTFF, SubstringTFF, SubtractTFF, UppercaseTFF } from './SimpleTransformations';
 import { SplitTFF } from './SplitTransformationForm';
 
 export function getTransformationForm(type: TransformationNodeType): React.ComponentClass<TransformationFormProps>
@@ -93,6 +93,8 @@ export function getTransformationForm(type: TransformationNodeType): React.Compo
       return DivideTFF;
     case TransformationNodeType.SetIfNode:
       return SetIfTFF;
+    case TransformationNodeType.FindReplaceNode:
+      return FindReplaceTFF;
     default:
       return null;
   }

@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:strict-boolean-expressions
 
 import * as classNames from 'classnames';
 import { List } from 'immutable';
@@ -50,7 +51,7 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
 
-import { backgroundColor, borderColor, Colors } from 'app/colors/Colors';
+import { backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
 import { Menu, MenuOption } from 'common/components/Menu';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { instanceFnDecorator } from 'shared/util/Classes';
@@ -70,11 +71,9 @@ export interface Props<T>
   items: List<T>;
   columnConfig: HeaderConfig<T>;
   onRowClicked?: (index) => void; // callback for when a row is clicked
-  getRowStyle?: (index) => object[] | object;
   getMenuOptions?: (item, index) => any; // passed to <Menu/> for each item if a context menu is desired
-  state?: any; // for specifying dependencies so ItemList knows when to rerender
-  hideHeaders?: boolean;
   getActions?: (index: number, item: T) => El;
+  itemsName?: string;
 }
 
 const memoize = _.memoize;
@@ -101,30 +100,11 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
     return this.rowClickedMemoized(this.props.onRowClicked)(index);
   }
 
-  @instanceFnDecorator(memoizeOne)
-  public getRowStyle(style)
-  {
-    if (style !== undefined)
-    {
-      if (Array.isArray(style))
-      {
-        return [tableRowStyle, ...style];
-      }
-      else
-      {
-        return [tableRowStyle, style];
-      }
-    }
-    else
-    {
-      return tableRowStyle;
-    }
-  }
-
   public renderRow(item: T, index: number)
   {
     const onClick = this.getRowClickedFn(index);
-    const style = this.getRowStyle(this.props.getRowStyle !== undefined ? this.props.getRowStyle(index) : undefined);
+    const style = [backgroundColor(Colors().fontWhite, Colors().blockBg), borderColor(Colors().blockBg)];
+    const { columnConfig } = this.props;
     return (
       <Quarantine key={index}>
         <div
@@ -133,10 +113,18 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
           style={style}
         >
           {
-            this.props.columnConfig.map((headerItem: HeaderConfigItem<T>, i: number) =>
+            columnConfig.map((headerItem: HeaderConfigItem<T>, i: number) =>
             {
               return (
-                <div className='row-info-data' key={i}>
+                <div
+                  className='row-info-data'
+                  key={i}
+                  style={_.extend(
+                    {},
+                    { width: `${100 / columnConfig.length}%` },
+                    fontColor(Colors().active),
+                  )}
+                >
                   {headerItem.render(item, index)}
                 </div>
               );
@@ -144,7 +132,7 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
           }
           {
             this.props.getMenuOptions !== undefined ?
-              <div className='row-info-data' key='context-menu'>
+              <div className='row-info-data row-info-data-menu' key='context-menu'>
                 <div className='item-list-menu-options-wrapper'>
                   <Menu
                     options={this.props.getMenuOptions(item, index)}
@@ -169,46 +157,47 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
 
   public render()
   {
+    const { columnConfig, items, getMenuOptions } = this.props;
     return (
-      this.props.items.size > 0 ?
-        <div className='item-list-table'>
+      items.size > 0 ?
+        <div
+          className='item-list-table'
+          style={backgroundColor(Colors().blockOutline)}
+        >
           {
-            !this.props.hideHeaders ?
-              <div
-                className={classNames({
-                  'row-info-header': true,
-                })}
-                key='header'
-              >
+            <div
+              className='row-info-header'
+              key='header'
+            >
+              {
+                columnConfig.map((headerItem: HeaderConfigItem<T>, i: number) =>
                 {
-                  this.props.columnConfig.map((headerItem: HeaderConfigItem<T>, i: number) =>
-                  {
-                    return (
-                      <div className='row-info-data' key={i}>
-                        {headerItem.name}
-                      </div>
-                    );
-                  })
-                }
-                {
-                  this.props.getMenuOptions !== undefined ?
-                    <div className='row-info-data' key='context-menu' />
-                    : undefined
-                }
-              </div>
-              : null
+                  return (
+                    <div
+                      className='row-info-data'
+                      key={i}
+                      style={{ width: `${100 / columnConfig.length}%` }}
+                    >
+                      {headerItem.name}
+                    </div>
+                  );
+                })
+              }
+              {
+                getMenuOptions !== undefined ?
+                  <div className='row-info-data' key='context-menu' />
+                  : undefined
+              }
+            </div>
           }
           {
-            this.props.items.map(this.renderRow).toList()
+            items.map(this.renderRow).toList()
           }
         </div>
         :
-        <div> List Has No Items </div>
+        <div className='item-list-message'>
+          There aren't yet any {this.props.itemsName || 'item'}s
+        </div>
     );
   }
 }
-
-const tableRowStyle = _.extend({},
-  backgroundColor(Colors().bg3),
-  borderColor(Colors().bg2),
-);
