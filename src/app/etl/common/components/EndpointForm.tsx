@@ -206,10 +206,16 @@ class EndpointForm extends TerrainComponent<Props>
         <FadeInOut
           open={showForm}
         >
-          <FormClass
-            endpoint={endpoint}
-            onChange={this.handleEndpointChange}
-          />
+          {
+            FormClass ?
+              <FormClass
+                endpoint={endpoint}
+                onChange={this.handleEndpointChange}
+              />
+              :
+              null
+          }
+
         </FadeInOut>
       </div>
     );
