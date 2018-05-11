@@ -79,10 +79,6 @@ class DataTabs extends TerrainComponent<DataTabsProps>
     newtemplate: '/data/newtemplate',
   };
 
-  public state = {
-    tabIndex: this.tabs.indexOf(this.props.params.tab),
-  };
-
   public componentDidMount()
   {
     this.props.etlActions({
