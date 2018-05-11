@@ -52,14 +52,14 @@ import * as winston from 'winston';
  */
 export default class LogWriter
 {
-  private logStream: Readable;
+  private logStream: Readable | null = null;
   private abortThreshold: number;
 
   private errorCount: number;
 
-  constructor(logStream: Readable, abortThreshold: number = 1000)
+  constructor(abortThreshold: number = 1000)
   {
-    this.logStream = logStream;
+    this.logStream = new Readable();
     this.abortThreshold = abortThreshold;
     this.errorCount = 0;
   }

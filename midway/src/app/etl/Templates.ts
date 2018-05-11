@@ -435,7 +435,7 @@ export default class Templates
     if (streamMap === undefined)
     {
       streamMap = {
-        log: new LogWriter(new Readable()),
+        log: new LogWriter(template.settings.abortThreshhold),
       };
       nodes.forEach((n) =>
       {
