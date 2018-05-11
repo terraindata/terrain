@@ -220,3 +220,28 @@ export class DivideTFF extends TransformationForm<DivideOptions, TransformationN
     return _.extend({}, args, { options });
   }
 }
+
+type FindReplaceOptions = NodeOptionsType<TransformationNodeType.FindReplaceNode>;
+export class FindReplaceTFF extends TransformationForm<FindReplaceOptions, TransformationNodeType.FindReplaceNode>
+{
+  protected readonly type = TransformationNodeType.FindReplaceNode;
+  protected readonly inputMap: InputDeclarationMap<FindReplaceOptions> = {
+    find: {
+      type: DisplayType.TextBox,
+      displayName: 'Find',
+    },
+    replace: {
+      type: DisplayType.TextBox,
+      displayName: 'Replace',
+    },
+    regex: {
+      type: DisplayType.CheckBox,
+      displayName: 'Use Regex',
+    },
+  };
+  protected readonly initialState = {
+    find: '',
+    replace: '',
+    regex: false,
+  };
+}
