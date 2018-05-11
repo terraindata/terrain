@@ -79,7 +79,7 @@ class TerrainTabs extends TerrainComponent<TabsProps>
     super(props);
 
     this.state = {
-      tabIndex: this.getActiveTabIndex(),
+      tabIndex: this.getActiveTabIndex(props),
     };
   }
 
@@ -96,9 +96,9 @@ class TerrainTabs extends TerrainComponent<TabsProps>
     }
   }
 
-  public getActiveTabIndex()
+  public getActiveTabIndex(props: TabsProps)
   {
-    const { tabs, router, tabToRouteMap } = this.props;
+    const { tabs, router, tabToRouteMap } = props;
     const activeTabIndex = tabs.findIndex((tab) =>
     {
       return router.location.pathname.startsWith(tabToRouteMap[tab.key]);
@@ -110,7 +110,8 @@ class TerrainTabs extends TerrainComponent<TabsProps>
   public render()
   {
     const { tabs, children, tabToRouteMap, router } = this.props;
-    const { tabIndex } = this.state;
+    // const { tabIndex } = this.state;
+    const tabIndex = this.getActiveTabIndex(this.props);
 
     return (
       <Tabs selectedIndex={tabIndex} onSelect={this.handleSelect}>

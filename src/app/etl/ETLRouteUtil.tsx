@@ -52,7 +52,7 @@ export default class ETLRouteUtil
 {
   public static gotoWalkthroughStep(step)
   {
-    browserHistory.push(`/data/templates/new/${step}`);
+    browserHistory.push(`/data/newtemplate/${step}`);
   }
 
   public static gotoNewTemplate()

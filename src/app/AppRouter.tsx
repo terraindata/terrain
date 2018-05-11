@@ -147,11 +147,11 @@ class AppRouter extends TerrainComponent<{}> {
           <Route path='/import' component={FileImport /*TODO get rid of this once ETL is merged*/} />
 
           <Route path='/data' component={DataTabs}>
-            <Route path='templates/new(/:step)' component={ETLWalkthrough} />
-            <Route path='templates' component={TemplateList} />
             <Route path='templates/edit/new' component={ETLEditorPage} />
             <Route path='templates/edit/algorithmId=:algorithmId' component={ETLEditorPage} />
             <Route path='templates/edit/templateId=:templateId' component={ETLEditorPage} />
+            <Route path='newtemplate(/:step)' component={ETLWalkthrough} />
+            <Route path='templates' component={TemplateList} />
             <Route path='integrations' component={IntegrationList} />
             <Route path='integrations/edit/integrationId=:integrationId' component={IntegrationEditorPage} />
           </Route>
