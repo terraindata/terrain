@@ -313,7 +313,7 @@ class ETLAjax
 
       return Ajax.req(
         'post',
-        'jobs/create',
+        'jobs/',
         job,
         (resp) =>
         {
