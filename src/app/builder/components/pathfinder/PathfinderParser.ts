@@ -61,6 +61,12 @@ import { _FilterGroup, DistanceValue, FilterGroup, FilterLine, More, Path, Score
 
 export const PathFinderDefaultSize = 101;
 const NEGATIVES = ['notcontain', 'notequal', 'isnotin', 'notexists'];
+const FlipNegativeMap = {
+  notcontain: 'contain',
+  notequal: 'equal',
+  isnotin: 'isin',
+  notexists: 'exists',
+};
 
 export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
 {
@@ -102,26 +108,22 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   // (originalShould) => originalShould.concat(baseQuery.getIn(['query', 'bool', 'should'])));
 
   // Scores
-  /*
-    if ((path.score.type !== 'terrain' && path.score.type !== 'linear') || path.score.lines.size)
-    {
-      let sortObj = parseScore(path.score, true);
-      if (path.score.type !== 'random')
-      {
-        baseQuery = baseQuery.set('sort', sortObj);
-      }
-      else
-      {
-        sortObj = sortObj.setIn(['function_score', 'query'], baseQuery.get('query'));
-        baseQuery = baseQuery.set('query', sortObj);
-        baseQuery = baseQuery.delete('sort');
-      }
-    }
-  */
 
-  // More
-  // const moreObj = parseAggregations(path.more);
-  // baseQuery = baseQuery.set('aggs', Map(moreObj));
+  if ((path.score.type !== 'terrain' && path.score.type !== 'linear') || path.score.lines.size)
+  {
+    let sortObj = parseScore(path.score, true);
+    if (path.score.type !== 'random')
+    {
+      queryBody['sort'] = sortObj;
+    }
+    else
+    {
+      sortObj = sortObj['function_score']['query'] = queryBody.query;
+      queryBody.query = sortObj;
+      delete queryBody['sort'];
+    }
+  }
+
   const collapse = path.more.collapse;
   if (collapse)
   {
@@ -134,26 +136,30 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   }
 
   // Scripts
-  //const scripts = parseScripts(path.more.scripts);
-  //baseQuery = baseQuery.set('script_fields', scripts);
+  const scripts = parseScripts(path.more.scripts);
+  queryBody['script_fields'] = scripts;
 
   // Nested algorithms (groupjoins)
-  //const groupJoin = parseNested(path.reference, path.nested, inputs);
-  //if (groupJoin)
-  //{
-  //  baseQuery = baseQuery.set('groupJoin', groupJoin);
-  //}
+  const groupJoin = parseGroupJoin(path.reference, path.nested, inputs);
+  if (groupJoin)
+  {
+    queryBody['groupJoin'] = groupJoin;
+  }
 
   // Export, without inputs
-  //  if (ignoreInputs)
-  //  {
-  //    return baseQuery;
-  //  }
+  if (ignoreInputs)
+  {
+    return queryBody;
+  }
 
   // Export, with inputs
   const text = stringifyWithParameters(queryBody, (name) => isInput(name, inputs));
   const parser: ESJSONParser = new ESJSONParser(text, true);
   return ESParseTreeToCode(parser, {}, inputs);
+
+  // TODO
+  // const moreObj = parseAggregations(path.more);
+  // baseQuery = baseQuery.set('aggs', Map(moreObj));
 }
 
 function parseSource(source: Source): any
@@ -177,15 +183,15 @@ export function parseScore(score: Score, simpleParser: boolean = false): any
     case 'elastic':
       return { _score: { order: 'desc' } };
     case 'random':
-      return Map({
-        function_score: Map({
+      return {
+        function_score: {
           boost_mode: 'sum',
           random_score: {
             seed: score.seed,
           },
           query: {},
-        }),
-      });
+        },
+      };
     case 'none':
     default:
       return {};
@@ -295,41 +301,15 @@ function parseTerrainScore(score: Score, simpleParser: boolean = false)
   return simpleParser ? sortObj : factors || [];
 }
 
-function groupNestedFilters(filterGroup: FilterGroup): FilterGroup
-{
-  const nestedLines = filterGroup.lines.filter((line) =>
-  {
-    return ((line.field && line.field.indexOf('.') !== -1) || line.fieldType === FieldType.Nested)
-      && line.comparison !== 'notexists' && !line.filterGroup;
-  }).toList();
-  let nestedPathMap: Map<string, List<FilterLine>> = Map({});
-  nestedLines.forEach((line) =>
-  {
-    const nestedPath = line.field.split('.')[0];
-    if (nestedPathMap.get(nestedPath) !== undefined)
-    {
-      nestedPathMap = nestedPathMap.set(nestedPath, nestedPathMap.get(nestedPath).push(line));
-    }
-    else
-    {
-      nestedPathMap = nestedPathMap.set(nestedPath, List([line]));
-    }
-  });
-
-  let newLines: List<any> = filterGroup.lines.filter((line) => nestedLines.indexOf(line) === -1).toList();
-  _.keys(nestedPathMap.toJS()).forEach((key) =>
-  {
-    newLines = newLines.push(nestedPathMap.get(key));
-  });
-  return filterGroup.set('lines', newLines);
-}
-
-function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = false, ignoreNested = false): any
+/*
+ * Generate a bool query from a filtergroup.
+ */
+function parseFilters(filterGroup: FilterGroup, inputs, isSoftGroup = false, ignoreNested = false): any
 {
   const filterQuery = { bool: { filter: [], should: [] } };
   const filterBool = filterQuery.bool;
   let filterClause = filterBool.filter;
-  if (inMatchQualityContext === true)
+  if (isSoftGroup === true)
   {
     // make sure the bool is softbool
     const dummyQuery = {
@@ -339,13 +319,13 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
     };
     filterBool.filter.push(dummyQuery);
   }
-  if (filterGroup.minMatches === 'any' || inMatchQualityContext === true)
+  if (filterGroup.minMatches === 'any' || isSoftGroup === true)
   {
     filterClause = filterBool.should;
   }
 
   const filterMap = PathToCards.MapFilterGroup(filterGroup, ignoreNested);
-  console.log('FilterMap: ', filterMap);
+  // normal filter lines first
   filterMap.filter.map((line: FilterLine) =>
   {
     const q = filterLineToQuery(line);
@@ -354,55 +334,52 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
       filterClause.push(q);
     }
   });
-  return filterQuery;
-  /*
-    if (!ignoreNested)
+  // then inner groups
+  filterMap.group.map((line: FilterLine) =>
+  {
+    const boolQuery = parseFilters(line.filterGroup, inputs, isSoftGroup, ignoreNested);
+    filterClause.push(boolQuery);
+  });
+
+  const filterLinePathMap = {};
+  filterMap.nested.map((line: FilterLine) =>
+  {
+    const path = line.field.split('.')[0];
+    if (filterLinePathMap[path])
     {
-      filterGroup = groupNestedFilters(filterGroup);
+      filterLinePathMap[path].push(line);
     }
-    filterGroup.lines.forEach((line) =>
+    else
     {
-      if (line.filterGroup)
-      {
-        const nestedFilter = parseFilters(line.filterGroup, inputs, inMatchQualityContext);
-        filterClause.push(nestedFilter);
-      }
-      // Special case for a nested filter that is do not exist
-      else if (((line.field && line.field.indexOf('.') !== -1) ||
-        line.fieldType === FieldType.Nested)
-        && line.comparison === 'notexists'
-      )
-      {
-        const inner = parseFilterLine(List([line.set('comparison', 'exists')]), useShould, inputs, ignoreNested);
-        if (useShould)
-        {
-          should = should.push(Map({ bool: Map({ must_not: inner }) }));
-        }
-        else
-        {
-          mustNot = mustNot.push(inner);
-        }
-      }
-      else if ((!line.filterGroup && line.comparison) || List.isList(line))
-      {
-        const lineInfo = parseFilterLine(line, useShould, inputs, ignoreNested);
+      filterLinePathMap[path] = [line];
+    }
+  });
+  _.keys(filterLinePathMap).forEach((path, i) =>
+  {
+    const group = _FilterGroup({ lines: List(filterLinePathMap[path]), minMatches: filterGroup.minMatches });
+    const boolQuery = parseFilters(group, inputs, isSoftGroup, true);
+    // put the boolQuery in the wrapper
+    const nestedQuery = {
+      nested: {
+        path,
+        score_mode: 'avg',
+        ignore_unmapped: true,
+        query: boolQuery,
+      },
+    };
+    filterClause.push(nestedQuery);
+  });
 
-        if (useShould)
-        {
-          should = should.push(lineInfo);
-        }
-        else if (NEGATIVES.indexOf(line.comparison) !== -1)
-        {
-          mustNot = mustNot.push(lineInfo);
-        }
-        else
-        {
-          must = must.push(lineInfo);
-        }
-      }
-    });*/
+  filterMap.negativeNested.map((line: FilterLine) =>
+  {
+    const q = nestedFilterLineToQuery(line);
+    if (q !== null)
+    {
+      filterClause.push(q);
+    }
+  });
 
-  // return filterObj;
+  return filterQuery;
 }
 
 /*
@@ -443,6 +420,38 @@ export function PathFinderStringToJSONArray(value: string)
       return [rootValue.value];
     }
   }
+}
+
+function nestedFilterLineToQuery(line: FilterLine)
+{
+  const path = line.field.split('.')[0];
+  const boost = typeof line.boost === 'string' ? parseFloat(line.boost) : line.boost;
+  let wrapper: any = {
+    nested: {
+      path,
+      score_mode: 'avg',
+      ignore_unmapped: true,
+      query: undefined,
+    },
+  };
+  const nestQuery = wrapper.nested;
+  if (NEGATIVES.indexOf(line.comparison) !== -1)
+  {
+    wrapper = {
+      bool: {
+        must_not: wrapper,
+        boost,
+      },
+    };
+    line = line.set('comparison', FlipNegativeMap[line.comparison]);
+  }
+  const query = filterLineToQuery(line);
+  if (query === null)
+  {
+    return null;
+  }
+  nestQuery.query = query;
+  return wrapper;
 }
 
 /*
@@ -748,23 +757,23 @@ function parseAggregations(more: More): {}
 }
 
 // Put a nested path inside of a groupJoin
-function parseNested(reference: string, nested: List<Path>, inputs)
+function parseGroupJoin(reference: string, nested: List<Path>, inputs)
 {
   if (nested.size === 0)
   {
-    return undefined;
+    return null;
   }
-  let groupJoins = Map({});
+  const groupJoins = {};
   if (nested.get(0) && nested.get(0).minMatches)
   {
-    groupJoins = groupJoins.set('dropIfLessThan', parseFloat(String(nested.get(0).minMatches)));
+    groupJoins['dropIfLessThan'] = parseFloat(String(nested.get(0).minMatches));
   }
-  groupJoins = groupJoins.set('parentAlias', reference);
+  groupJoins['parentAlias'] = reference;
   nested.forEach((n, i) =>
   {
     if (n)
     {
-      groupJoins = groupJoins.set(n.name, parsePath(n, inputs, true));
+      groupJoins[n.name] = parsePath(n, inputs, true);
     }
   });
   return groupJoins;
@@ -772,21 +781,21 @@ function parseNested(reference: string, nested: List<Path>, inputs)
 
 function parseScripts(scripts: List<Script>)
 {
-  let scriptObj = Map({});
+  const scriptObj = {};
   scripts.forEach((script: Script) =>
   {
-    let params = Map({});
+    const params = {};
     script.params.forEach((param) =>
     {
-      params = params.set(param.name, param.value);
+      params[param.name] = param.value;
     });
-    const s = Map({
+    const s = {
       script: {
-        params: params.toJS(),
+        params,
         inline: script.script,
       },
-    });
-    scriptObj = scriptObj.set(script.name, s);
+    };
+    scriptObj[script.name] = s;
   });
   return scriptObj;
 }
