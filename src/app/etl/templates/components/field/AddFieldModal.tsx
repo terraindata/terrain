@@ -184,6 +184,7 @@ class AddFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
         confirm={true}
         closeOnConfirm={true}
         confirmDisabled={!isValid}
+        allowOverflow={true}
       >
         {this.renderInner()}
       </Modal>
