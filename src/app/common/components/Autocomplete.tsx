@@ -110,6 +110,7 @@ class Autocomplete extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
+    this.value = String(props.value);
     this.debouncedExecuteChange = _.debounce(this.executeChange, 750);
     this.state =
       {
@@ -128,6 +129,7 @@ class Autocomplete extends TerrainComponent<Props>
         value: nextProps.value ? nextProps.value : '',
       });
     }
+    this.value = nextProps.value;
   }
 
   public executeChange(value)
@@ -147,6 +149,7 @@ class Autocomplete extends TerrainComponent<Props>
     }
 
     const { value } = target;
+    this.value = value;
     this.setState({
       value,
     });
