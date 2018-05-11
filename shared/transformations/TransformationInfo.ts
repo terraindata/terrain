@@ -52,6 +52,7 @@ import HashTransformationNode from 'shared/transformations/nodes/HashTransformat
 import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
 import SetIfTransformationNode from 'shared/transformations/nodes/SetIfTransformationNode';
 import SubtractTransformationNode from 'shared/transformations/nodes/SubtractTransformationNode';
+import ArrayCountTransformationNode from './nodes/ArrayCountTransformationNode';
 import CastTransformationNode from './nodes/CastTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
@@ -260,28 +261,6 @@ const TransformationNodeInfo: AllNodeInfoType =
           options: object) =>
           visitor.visitHashNode(transformationNode, docCopy, options),
       },
-    [TransformationNodeType.ArraySumNode]:
-      {
-        humanName: 'Array Sum',
-        editable: false,
-        creatable: true,
-        description: `Sums the values of this array`,
-        type: ArraySumTransformationNode,
-        isAvailable: (engine, fieldId) =>
-        {
-          return (
-            EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
-            EngineUtil.getValueType(fieldId, engine) === 'number' &&
-            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
-          );
-        },
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitArraySumNode(transformationNode, docCopy, options),
-        newFieldType: 'number',
-      },
     [TransformationNodeType.AddNode]:
       {
         humanName: 'Add',
@@ -385,6 +364,50 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitFindReplaceNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.ArraySumNode]:
+      {
+        humanName: 'Array Sum',
+        editable: false,
+        creatable: true,
+        description: `Sum the entries of an array`,
+        type: ArraySumTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+            EngineUtil.getValueType(fieldId, engine) === 'number' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+                          transformationNode: TransformationNode,
+                          docCopy: object,
+                          options: object) =>
+          visitor.visitArraySumNode(transformationNode, docCopy, options),
+        newFieldType: 'number',
+      },
+    [TransformationNodeType.ArrayCountNode]:
+      {
+        humanName: 'Array Count',
+        editable: false,
+        creatable: true,
+        description: `Counts how many elements are in an array`,
+        type: ArrayCountTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+            EngineUtil.getValueType(fieldId, engine) === 'number' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+                          transformationNode: TransformationNode,
+                          docCopy: object,
+                          options: object) =>
+          visitor.visitArrayCountNode(transformationNode, docCopy, options),
+        newFieldType: 'number',
       },
   };
 

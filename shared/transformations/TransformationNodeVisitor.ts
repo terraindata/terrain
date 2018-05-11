@@ -52,6 +52,7 @@ import HashTransformationNode from 'shared/transformations/nodes/HashTransformat
 import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
 import SetIfTransformationNode from 'shared/transformations/nodes/SetIfTransformationNode';
 import SubtractTransformationNode from 'shared/transformations/nodes/SubtractTransformationNode';
+import ArrayCountTransformationNode from './nodes/ArrayCountTransformationNode';
 import CastTransformationNode from './nodes/CastTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
@@ -107,11 +108,6 @@ export default abstract class TransformationNodeVisitor
     return this.visitDefault(node, doc, options);
   }
 
-  public visitArraySumNode(node: ArraySumTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
   public visitUppercaseNode(node: UppercaseTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
@@ -143,6 +139,16 @@ export default abstract class TransformationNodeVisitor
   }
 
   public visitFindReplaceNode(node: FindReplaceTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitArraySumNode(node: ArraySumTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitArrayCountNode(node: ArrayCountTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }

@@ -49,6 +49,8 @@ import * as Immutable from 'immutable';
 import { keccak256 } from 'js-sha3';
 
 import AddTransformationNode from 'shared/transformations/nodes/AddTransformationNode';
+import ArrayCountTransformationNode from 'shared/transformations/nodes/ArrayCountTransformationNode';
+import ArraySumTransformationNode from 'shared/transformations/nodes/ArraySumTransformationNode';
 import DivideTransformationNode from 'shared/transformations/nodes/DivideTransformationNode';
 import FindReplaceTransformationNode from 'shared/transformations/nodes/FindReplaceTransformationNode';
 import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
@@ -601,48 +603,6 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     } as TransformationVisitResult;
   }
 
-  public visitArraySumNode(node: HashTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    const opts = node.meta as NodeOptionsType<TransformationNodeType.ArraySumNode>;
-
-    node.fields.forEach((field) =>
-    {
-      const el = yadeep.get(doc, field);
-      if (Array.isArray(el))
-      {
-        let sum: number = 0;
-        for (let i: number = 0; i < el.length; i++)
-        {
-          let kpi: KeyPath = field;
-          if (kpi.contains('*'))
-          {
-            kpi = kpi.set(kpi.indexOf('*'), i.toString());
-          }
-          else
-          {
-            kpi = kpi.push(i.toString());
-          }
-          sum += yadeep.get(doc, kpi);
-        }
-        yadeep.set(doc, opts.newFieldKeyPaths.get(0), sum, { create: true });
-      }
-      else
-      {
-        return {
-          errors: [
-            {
-              message: 'Attempted to sum a non-array (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-    });
-
-    return {
-      document: doc,
-    } as TransformationVisitResult;
-  }
-
   public visitAddNode(node: AddTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.AddNode>;
@@ -938,6 +898,90 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         {
           yadeep.set(doc, field, el.split(opts.find).join(opts.replace));
         }
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
+
+  public visitArraySumNode(node: ArraySumTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.ArraySumNode>;
+
+    node.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        let sum: number = 0;
+        for (let i: number = 0; i < el.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+          sum += yadeep.get(doc, kpi);
+        }
+        yadeep.set(doc, opts.newFieldKeyPaths.get(0), sum, { create: true });
+      }
+      else
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to sum a non-array (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
+
+  public visitArrayCountNode(node: ArrayCountTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.ArrayCountNode>;
+
+    node.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        let count: number = 0;
+        for (let i: number = 0; i < el.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+          count++;
+        }
+        yadeep.set(doc, opts.newFieldKeyPaths.get(0), count, { create: true });
+      }
+      else
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to count a non-array (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
       }
     });
 
