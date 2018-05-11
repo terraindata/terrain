@@ -70,13 +70,13 @@ class DataTabs extends TerrainComponent<DataTabsProps>
   public tabs = [
     { key: 'templates', label: 'Templates' },
     { key: 'integrations', label: 'Integrations' },
-    { key: 'runnow', label: 'Import / Export Run Now' },
+    { key: 'runnow', label: 'New Import or Export' },
   ];
 
   public tabToRouteMap = {
     templates: '/data/templates',
     integrations: '/data/integrations',
-    runnow: '/data/runnow',
+    runnow: '/data/templates/new',
   };
 
   public state = {
