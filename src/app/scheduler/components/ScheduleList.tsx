@@ -125,11 +125,11 @@ class ScheduleList extends TerrainComponent<Props>
       tasks: [{
         params: {
           options: {
-            templateId: -1
-          }
-         },
+            templateId: -1,
+          },
+        },
         id: 0,
-        taskId: 2
+        taskId: 2,
       }],
     };
     this.props.schedulerActions({

@@ -78,6 +78,7 @@ export interface Props
   ref?: string;
   className?: string;
   disabled?: boolean;
+  debounce?: boolean;
 
   onFocus?: (event: React.FocusEvent<any>) => void;
   onBlur?: (event: React.FocusEvent<any>, value: string | number) => void;
@@ -100,30 +101,41 @@ class Autocomplete extends TerrainComponent<Props>
     open: boolean;
     selectedIndex: number;
     hoveredIndex: number;
+    value: string | number; // For debouncing
   };
 
   public blurValue: string = '';
+  public debouncedExecuteChange;
 
   constructor(props: Props)
   {
     super(props);
-    this.value = String(props.value);
+    this.debouncedExecuteChange = _.debounce(this.executeChange, 750);
     this.state =
       {
         open: false,
         selectedIndex: -1,
         hoveredIndex: -1,
+        value: props.value ? props.value : '',
       };
-  }
-
-  public componentWillMount()
-  {
-    this.value = this.props.value;
   }
 
   public componentWillReceiveProps(nextProps)
   {
-    this.value = nextProps.value;
+    if (!nextProps.debounce && nextProps.value !== this.props.value)
+    {
+      this.setState({
+        value: nextProps.value ? nextProps.value : '',
+      });
+    }
+  }
+
+  private executeChange(value)
+  {
+    if (this.props.onChange)
+    {
+      this.props.onChange(value);
+    }
   }
 
   public handleChange(event)
@@ -135,11 +147,16 @@ class Autocomplete extends TerrainComponent<Props>
     }
 
     const { value } = target;
-    this.value = value;
-
-    if (this.props.onChange)
+    this.setState({
+      value,
+    });
+    if (this.props.debounce)
     {
-      this.props.onChange(value);
+      this.debouncedExecuteChange(value);
+    }
+    else
+    {
+      this.executeChange(value);
     }
   }
 
@@ -165,13 +182,17 @@ class Autocomplete extends TerrainComponent<Props>
       open: false,
       selectedIndex: -1,
     });
-    this.props.onBlur && this.props.onBlur(event, this.blurValue || this.props.value);
+    this.props.onBlur && this.props.onBlur(event, this.blurValue || this.state.value);
     this.blurValue = '';
+    if (this.props.debounce)
+    {
+      this.debouncedExecuteChange.flush();
+    }
   }
 
   public handleSelect(value)
   {
-    this.props.onChange(value);
+    this.executeChange(value);
     if (this.props.onSelectOption !== undefined)
     {
       this.props.onSelectOption(value);
@@ -179,6 +200,7 @@ class Autocomplete extends TerrainComponent<Props>
     this.setState({
       open: false,
       selectedIndex: -1,
+      value,
     });
   }
 
@@ -226,6 +248,9 @@ class Autocomplete extends TerrainComponent<Props>
         });
         this.blurValue = value;
         this.props.onChange(value);
+        this.setState({
+          value,
+        });
         this.props.onEnter && this.props.onEnter(value);
         this.refs['input']['blur']();
       }
@@ -265,6 +290,9 @@ class Autocomplete extends TerrainComponent<Props>
         });
         this.blurValue = value;
         this.props.onChange(value);
+        this.setState({
+          value,
+        });
         this.props.onEnter && this.props.onEnter(value);
         this.refs['input']['blur']();
         break;
@@ -294,13 +322,13 @@ class Autocomplete extends TerrainComponent<Props>
       return false;
     }
 
-    if (!this.props.value)
+    if (!this.state.value)
     {
       return true;
     }
 
     const haystack = option.toLowerCase();
-    const needle = typeof this.props.value === 'string' ? this.props.value.toLowerCase() : '';
+    const needle = typeof this.state.value === 'string' ? this.state.value.toLowerCase() : '';
 
     const isFirst =
       haystack.indexOf(needle) === 0
@@ -343,7 +371,7 @@ class Autocomplete extends TerrainComponent<Props>
     let second = '';
     let third = '';
 
-    const { value } = this.props;
+    const { value } = this.state;
     if (value && typeof value === 'string' && value.length && this.showOption(option))
     {
       // if this was part of the found set, show a highlight
@@ -393,13 +421,12 @@ class Autocomplete extends TerrainComponent<Props>
 
     const open = this.state.open && !!options && options.size > 0;
 
-    let { value } = this.props;
+    let { value } = this.state;
     if (value === null || value === undefined)
     {
       // HTML inputs should not have null/undefined value
       value = '';
     }
-
     return (
       <div
         className='autocomplete'

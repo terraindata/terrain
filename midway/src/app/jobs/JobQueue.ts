@@ -369,7 +369,7 @@ export class JobQueue
         .sort(this.jobTable['runNowPriority'], 'desc').sort(this.jobTable['createdAt'], 'asc').take(newJobSlots);
       const queryStr: string = App.DB.getDB().generateString(query);
       const rawResults = await App.DB.getDB().execute([queryStr]);
-      const jobs: JobConfig[] = rawResults.map((result: object) => new JobConfig(result));
+      const jobs: JobConfig[] = rawResults.map((result: object) => new JobConfig(result as JobConfig));
 
       let i = 0;
       while (i < newJobSlots)
