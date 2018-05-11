@@ -114,13 +114,14 @@ export class SimpleTable extends TerrainComponent<Props>
     const { columnsConfig, data } = this.props;
 
     const columnKeys = Object.keys(columnsConfig);
+    const dataValues = data.valueSeq();
 
     return (
       <table className='simple-table'>
         <thead className='simple-table-header'>
           <tr className='simple-table-row'>
             {
-              Object.keys(columnsConfig).map((colKey) =>
+              columnKeys.map((colKey) =>
               {
                 const column = columnsConfig[colKey];
                 return (
@@ -138,27 +139,35 @@ export class SimpleTable extends TerrainComponent<Props>
         </thead>
         <tbody className='simple-table-body'>
           {
-            data.valueSeq().map((entry) =>
-            {
-              return (
-                <tr key={entry.id} className='simple-table-row'>
-                  {
-                    columnKeys.map((colKey, index) =>
+            dataValues.count() > 0 ?
+              dataValues.map((entry) =>
+              {
+                return (
+                  <tr key={entry.id} className='simple-table-row'>
                     {
-                      return (
-                        <td
-                          key={colKey}
-                          className='simple-table-cell'
-                          style={{ width: `${this.columnWidths[colKey]}%` }}
-                        >
-                          {this.renderValue(colKey, entry)}
-                        </td>
-                      );
-                    })
-                  }
+                      columnKeys.map((colKey, index) =>
+                      {
+                        return (
+                          <td
+                            key={colKey}
+                            className='simple-table-cell'
+                            style={{ width: `${this.columnWidths[colKey]}%` }}
+                          >
+                            {this.renderValue(colKey, entry)}
+                          </td>
+                        );
+                      })
+                    }
+                  </tr>
+                );
+              })
+              : (
+                <tr>
+                  <td colSpan={columnKeys.length} className='simple-table-cell'>
+                    No results
+                  </td>
                 </tr>
-              );
-            })
+              )
           }
         </tbody>
       </table>
