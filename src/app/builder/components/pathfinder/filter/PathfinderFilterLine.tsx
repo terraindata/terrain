@@ -670,6 +670,19 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   private handleChange(key, value, meta?, fieldChange?)
   {
+    if (key === 'value')
+    {
+      const t = this.props.filterLine.fieldType;
+      if (t === FieldType.Date)
+      {
+        const valueString = String(value || '');
+        const date = Util.formatInputDate(new Date(valueString), 'elastic');
+        if (date)
+        {
+          value = date;
+        }
+      }
+    }
     let filterLine = this.props.filterLine.set(key, value);
     const { pathfinderContext } = this.props;
     const { source } = pathfinderContext;

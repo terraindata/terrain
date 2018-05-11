@@ -82,7 +82,18 @@ export function stringifyWithParameters(
     {
       return obj;
     }
-    return '"' + obj + '"';
+
+    if (obj.search('"') !== -1)
+    {
+      const s = obj.trim();
+      if (s.startsWith('"') && s.endsWith('"'))
+      {
+        // we assume that the string is a JSON string already
+        return s;
+      }
+    }
+
+    return JSON.stringify(obj);
   }
   else if (Array.isArray(obj))
   {
