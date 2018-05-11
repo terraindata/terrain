@@ -190,10 +190,10 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
           link: ViewState.PickExportAlgorithm,
           buttonText: 'Start a New Export',
         },
-        {
-          link: ViewState.PickTemplate,
-          buttonText: 'Edit an Existing Template',
-        },
+        // {
+        //   link: ViewState.PickTemplate,
+        //   buttonText: 'Edit an Existing Template',
+        // },
       ],
     },
     [ViewState.PickTemplate]: {
