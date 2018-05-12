@@ -47,7 +47,6 @@ THE SOFTWARE.
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import Colors, { backgroundColor, borderColor } from 'app/colors/Colors';
 import FloatingInput from 'app/common/components/FloatingInput';
-import Modal from 'app/common/components/Modal';
 import { ETLActions } from 'app/etl/ETLRedux';
 import EtlRouteUtil from 'app/etl/ETLRouteUtil';
 import { ETLState } from 'app/etl/ETLTypes';
@@ -64,7 +63,6 @@ import { User } from 'users/UserTypes';
 import XHR from 'util/XHR';
 import './IntegrationStyle.less';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
-const Color = require('color');
 
 export interface Props
 {
@@ -73,15 +71,8 @@ export interface Props
   users?: Immutable.Map<ID, User>;
 }
 
-class IntegrationList extends TerrainComponent<Props>
+export class IntegrationListUncontained extends TerrainComponent<Props>
 {
-  public state: {
-    confirmModalOpen: boolean,
-    deleteIntegrationId: ID,
-  } = {
-      confirmModalOpen: false,
-      deleteIntegrationId: -1,
-    };
 
   public componentWillMount()
   {
@@ -108,20 +99,28 @@ class IntegrationList extends TerrainComponent<Props>
     });
   }
 
-  public deleteIntegration()
+  public deleteIntegration(integrationId: ID, e?)
   {
+    if (e !== undefined)
+    {
+      e.stopPropagation();
+    }
+    const onConfirm = () =>
+    {
+      this.props.etlActions({
+        actionType: 'deleteIntegration',
+        integrationId,
+      });
+    };
     this.props.etlActions({
-      actionType: 'deleteIntegration',
-      integrationId: this.state.deleteIntegrationId,
-    });
-  }
-
-  public confirmDeleteIntegration(integrationId: ID, e)
-  {
-    e.stopPropagation();
-    this.setState({
-      confirmModalOpen: true,
-      deleteIntegrationId: integrationId,
+      actionType: 'addModal',
+      props: {
+        title: 'Confirm Action',
+        message: 'Are you sure you want to delete this integration?',
+        closeOnConfirm: true,
+        confirm: true,
+        onConfirm,
+      },
     });
   }
 
@@ -129,7 +128,6 @@ class IntegrationList extends TerrainComponent<Props>
   {
     const { integrations } = this.props;
     const keys = integrations.keySeq().toList().sort();
-    // TODO move this to parent component
     EtlRouteUtil.gotoEditIntegration(keys.get(index));
   }
 
@@ -140,29 +138,23 @@ class IntegrationList extends TerrainComponent<Props>
       case 'createdBy':
         const user = this.props.users.get(value);
         const userName = user ? user.name ? user.name : user.email : value;
-        return { label: 'Created By', value: userName };
+        return userName;
       case 'lastModified':
-        return { label: 'Last Modified', value: Util.formatDate(value, true) };
+        return Util.formatDate(value, true);
       case 'id':
       case 'name':
       case 'type':
       default:
-        return { label: name, value };
+        return value;
     }
   }
 
   public renderProperty(propertyName, item: IntegrationConfig, index: number)
   {
-    const { label, value } = this.formatValue(propertyName, item.get(propertyName));
     return (
-      <FloatingInput
-        label={label}
-        value={value}
-        isTextInput={false}
-        noBorder={true}
-        forceFloat={true}
-        noBg={true}
-      />
+      <div>
+        {this.formatValue(propertyName, item.get(propertyName))}
+      </div>
     );
   }
 
@@ -171,7 +163,7 @@ class IntegrationList extends TerrainComponent<Props>
     return (
       <RemoveIcon
         className='close'
-        onClick={this._fn(this.confirmDeleteIntegration, integration.id)}
+        onClick={this._fn(this.deleteIntegration, integration.id)}
       />
     );
   }
@@ -181,24 +173,13 @@ class IntegrationList extends TerrainComponent<Props>
     const { integrations } = this.props;
     const keys = integrations.keySeq().toList().sort();
     const integrationList = keys.map((id) => integrations.get(id));
-    const toDelete = integrations.get(this.state.deleteIntegrationId) ?
-      integrations.get(this.state.deleteIntegrationId).name : '';
     return (
       <div
         className='integration-page'
       >
         <div
           className='integration-list-wrapper'
-          style={_.extend({},
-            backgroundColor(Colors().blockBg),
-            borderColor(Colors().blockOutline),
-          )}
         >
-          <div
-            className='integration-list-header'
-          >
-            Integrations
-          </div>
           <ItemList
             items={integrationList.toList()}
             columnConfig={[
@@ -215,18 +196,17 @@ class IntegrationList extends TerrainComponent<Props>
                 render: this._fn(this.renderProperty, 'type'),
               },
               {
-                name: 'createdBy',
+                name: 'created By',
                 render: this._fn(this.renderProperty, 'createdBy'),
               },
               {
-                name: 'lastModified',
+                name: 'last Modified',
                 render: this._fn(this.renderProperty, 'lastModified'),
               },
             ]}
             onRowClicked={this.handleRowClick}
-            hideHeaders={true}
-            getRowStyle={(i) => rowStyle}
             getActions={this.getIntegrationActions}
+            itemsName='integration'
           />
           <PathfinderCreateLine
             text='Add Integration'
@@ -234,28 +214,14 @@ class IntegrationList extends TerrainComponent<Props>
             onCreate={this.createIntegration}
             showText={true}
           />
-          <Modal
-            open={this.state.confirmModalOpen}
-            confirm={true}
-            title={'Confirm Action'}
-            message={`Are you sure you want to delete ${toDelete}?`}
-            confirmButtonText={'Yes'}
-            onConfirm={this.deleteIntegration}
-            onClose={this._toggle('confirmModalOpen')}
-          />
         </div>
       </div>
     );
   }
 }
 
-const rowStyle = [
-  { cursor: 'pointer' },
-  backgroundColor(Colors().fontWhite, Color(Colors().activeHover).fade(0.9)),
-];
-
-export default Util.createContainer(
-  IntegrationList,
+const IntegrationList = Util.createContainer(
+  IntegrationListUncontained,
   [
     ['etl', 'integrations'],
     ['users', 'users'],
@@ -264,3 +230,5 @@ export default Util.createContainer(
     etlActions: ETLActions,
   },
 );
+
+export default IntegrationList;

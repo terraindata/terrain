@@ -47,6 +47,7 @@ import * as React from 'react';
 import { browserHistory } from 'react-router';
 import { IndexRoute, Route, Router } from 'react-router';
 
+import DataTabs from 'etl/components/DataTabs';
 import TemplateList from 'etl/templates/components/TemplateList';
 import Jobs from 'jobs/components/Jobs';
 import Scheduler from 'scheduler/components/Scheduler';
@@ -145,13 +146,12 @@ class AppRouter extends TerrainComponent<{}> {
 
           <Route path='/import' component={FileImport /*TODO get rid of this once ETL is merged*/} />
 
-          <Route path='/data' component={ETLPage}>
-            <IndexRoute component={ETLWalkthrough} />
-            <Route path='new/:step' component={ETLWalkthrough} />
-            <Route path='template' component={TemplateList} />
-            <Route path='template/edit/new' component={ETLEditorPage} />
-            <Route path='template/edit/algorithmId=:algorithmId' component={ETLEditorPage} />
-            <Route path='template/edit/templateId=:templateId' component={ETLEditorPage} />
+          <Route path='/data' component={DataTabs}>
+            <Route path='templates/edit/new' component={ETLEditorPage} />
+            <Route path='templates/edit/algorithmId=:algorithmId' component={ETLEditorPage} />
+            <Route path='templates/edit/templateId=:templateId' component={ETLEditorPage} />
+            <Route path='newtemplate(/:step)' component={ETLWalkthrough} />
+            <Route path='templates' component={TemplateList} />
             <Route path='integrations' component={IntegrationList} />
             <Route path='integrations/edit/integrationId=:integrationId' component={IntegrationEditorPage} />
           </Route>

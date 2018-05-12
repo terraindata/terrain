@@ -161,6 +161,7 @@ class FilterGroupC extends BaseClass
 export type FilterGroup = FilterGroupC & IRecord<FilterGroupC>;
 export const _FilterGroup = (config?: { [key: string]: any }) =>
 {
+  config = Util.extendId(config);
   let filterGroup = New<FilterGroup>(new FilterGroupC(config), config);
   filterGroup = filterGroup.set('lines',
     List(filterGroup.lines.map((line) => _FilterLine(line))));
@@ -410,6 +411,7 @@ class FilterLineC extends LineC
 export type FilterLine = FilterLineC & IRecord<FilterLineC>;
 export const _FilterLine = (config?: { [key: string]: any }) =>
 {
+  config = Util.extendId(Util.asJS(config));
   let filterLine = New<FilterLine>(new FilterLineC(Util.asJS(config)), Util.asJS(config));
   if (config && config.filterGroup !== null && config.filterGroup !== undefined)
   {

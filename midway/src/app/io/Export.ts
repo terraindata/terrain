@@ -45,13 +45,14 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as _ from 'lodash';
+import sha1 = require('sha1');
 import * as stream from 'stream';
 import * as winston from 'winston';
 
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
 import { ESJSONParser } from '../../../../shared/database/elastic/parser/ESJSONParser';
-import SharedUtil from '../../../../shared/Util';
-import { getQueryFromAlgorithm } from '../../app/AppUtil';
+import * as SharedUtil from '../../../../shared/Util';
+import { getParsedQuery } from '../../app/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import ItemConfig from '../items/ItemConfig';
@@ -60,15 +61,13 @@ import { QueryHandler } from '../query/QueryHandler';
 
 import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 import AExportTransform from './streams/AExportTransform';
-import CSVTransform from './streams/CSVTransform';
+import CSVExportTransform from './streams/CSVExportTransform';
 import ExportTransform from './streams/ExportTransform';
-import JSONTransform from './streams/JSONTransform';
-import TransformationEngineTransform from './streams/TransformationEngineTransform';
+import JSONExportTransform from './streams/JSONExportTransform';
+import JSONObjectExportTransform from './streams/JSONObjectExportTransform';
 import ExportTemplateConfig from './templates/ExportTemplateConfig';
 import ExportTemplates from './templates/ExportTemplates';
 import TemplateBase from './templates/TemplateBase';
-
-import * as Common from './Common';
 
 const exportTemplates = new ExportTemplates();
 const TastyItems: Items = new Items();
@@ -81,6 +80,36 @@ export interface ExportConfig extends TemplateBase, ExportTemplateConfig
 
 export class Export
 {
+  public static mergeGroupJoin(doc: object): object
+  {
+    if (doc['_source'] !== undefined)
+    {
+      const sourceKeys = Object.keys(doc['_source']);
+      const rootKeys = _.without(Object.keys(doc), '_index', '_type', '_id', '_score', '_source');
+      if (rootKeys.length > 0) // there were group join objects
+      {
+        const duplicateRootKeys: string[] = [];
+        rootKeys.forEach((rootKey) =>
+        {
+          if (sourceKeys.indexOf(rootKey) > -1)
+          {
+            duplicateRootKeys.push(rootKey);
+          }
+        });
+        if (duplicateRootKeys.length !== 0)
+        {
+          throw new Error('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
+        }
+        rootKeys.forEach((rootKey) =>
+        {
+          doc['_source'][rootKey] = doc[rootKey];
+          delete doc[rootKey];
+        });
+      }
+    }
+    return doc;
+  }
+
   private NUMERIC_TYPES: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
 
   public async export(exportConfig: ExportConfig, headless: boolean): Promise<stream.Readable>
@@ -88,17 +117,17 @@ export class Export
     const database: DatabaseController | undefined = DatabaseRegistry.get(exportConfig.dbid);
     if (database === undefined)
     {
-      throw new Error('Database "' + exportConfig.dbid.toString() + '" not found.');
+      throw Error('Database "' + exportConfig.dbid.toString() + '" not found.');
     }
 
     if (database.getType() !== 'ElasticController')
     {
-      throw new Error('File export currently is only supported for Elastic databases.');
+      throw Error('File export currently is only supported for Elastic databases.');
     }
 
     if (exportConfig.filetype !== 'csv' && exportConfig.filetype !== 'json' && exportConfig.filetype !== 'json [type object]')
     {
-      throw new Error('Filetype must be either CSV or JSON.');
+      throw Error('File type must be either CSV or JSON.');
     }
 
     if (headless)
@@ -107,12 +136,12 @@ export class Export
       const templates: ExportTemplateConfig[] = await exportTemplates.get(exportConfig.templateId);
       if (templates.length === 0)
       {
-        throw new Error('Template not found. Did you supply an export template ID?');
+        throw Error('Template not found. Did you supply an export template ID?');
       }
       const template = templates[0] as object;
       if (exportConfig.dbid !== template['dbid'])
       {
-        throw new Error('Template database ID does not match supplied database ID.');
+        throw Error('Template database ID does not match supplied database ID.');
       }
       for (const templateKey of Object.keys(template))
       {
@@ -120,36 +149,58 @@ export class Export
       }
     }
 
-    if (exportConfig.columnTypes === undefined)
+    const mapping: object = exportConfig.columnTypes;
+    if (mapping === undefined)
     {
-      throw new Error('Must provide export template column types.');
+      throw Error('Must provide export template column types.');
     }
 
     return new Promise<stream.Readable>(async (resolve, reject) =>
     {
       // get query data from algorithmId or query (or variant Id if necessary)
-      let query: string = '';
+      let qry: string = '';
       if (exportConfig['variantId'] !== undefined && exportConfig.algorithmId === undefined)
       {
         exportConfig.algorithmId = exportConfig['variantId'];
       }
       if (exportConfig.algorithmId !== undefined && exportConfig.query === undefined)
       {
-        query = await getQueryFromAlgorithm(exportConfig.algorithmId);
+        qry = await this._getQueryFromAlgorithm(exportConfig.algorithmId);
       }
       else if (exportConfig.algorithmId === undefined && exportConfig.query !== undefined)
       {
-        query = exportConfig.query;
+        qry = exportConfig.query;
       }
       else
       {
-        throw new Error('Must provide either algorithm ID or query, not both or neither.');
+        throw Error('Must provide either algorithm ID or query, not both or neither.');
       }
 
-      if (query === '')
+      if (qry === '')
       {
-        throw new Error('Empty query provided.');
+        throw Error('Empty query provided.');
       }
+
+      // get list of export column names
+      const columnNames: string[] = Object.keys(mapping);
+      if (exportConfig.rank === true && columnNames.indexOf('TERRAINRANK') === -1)
+      {
+        columnNames.push('TERRAINRANK');
+      }
+
+      const originalMapping: object = {};
+      // generate original mapping if there were any renames
+      const allNames = Object.keys(mapping);
+      allNames.forEach((value, i) =>
+      {
+        originalMapping[value] = value;
+      });
+
+      const renameTransformations: object[] = exportConfig.transformations.filter((transformation) => transformation['name'] === 'rename');
+      renameTransformations.forEach((transformation) =>
+      {
+        originalMapping[transformation['colName']] = mapping[transformation['args']['newName']];
+      });
 
       // TODO add transformation check for addcolumn and update mapping accordingly
       const qh: QueryHandler = database.getQueryHandler();
@@ -157,38 +208,49 @@ export class Export
         database: exportConfig.dbid,
         type: 'search',
         streaming: true,
-        body: query,
+        databasetype: 'elastic',
+        body: qry,
       };
 
       const respStream: stream.Readable = await qh.handleQuery(payload) as stream.Readable;
       if (respStream === undefined)
       {
-        throw new Error('Nothing to export.');
+        throw Error('Nothing to export.');
       }
 
       try
       {
+        const extractTransformations = exportConfig.transformations.filter((transformation) => transformation['name'] === 'extract');
+        exportConfig.transformations = exportConfig.transformations.filter((transformation) => transformation['name'] !== 'extract');
+
         winston.info('Beginning export transformations.');
-        const documentTransform: ExportTransform = new ExportTransform(this, exportConfig);
-        const TETransform = new TransformationEngineTransform(exportConfig.transformations);
-        let exportTransform: stream.Transform;
+        const exportTransformConfig = {
+          extractTransformations,
+          exportConfig,
+          fieldArrayDepths: {},
+          id: 1,
+          mapping: originalMapping,
+        };
+
+        const documentTransform: ExportTransform = new ExportTransform(this, exportTransformConfig);
+        let exportTransform: AExportTransform;
         switch (exportConfig.filetype)
         {
           case 'json':
-            exportTransform = JSONTransform.createExportStream();
+            exportTransform = new JSONExportTransform();
             break;
           case 'json [type object]':
             if (exportConfig.objectKey === undefined)
             {
               throw Error('Missing object key for export type JSON [type object]');
             }
-            exportTransform = JSONTransform.createExportStream('{\n"' + exportConfig.objectKey + '":[', ',\n', ']\n}\n');
+            exportTransform = new JSONObjectExportTransform(exportConfig.objectKey);
             break;
           case 'csv':
-            exportTransform = CSVTransform.createExportStream();
+            exportTransform = new CSVExportTransform(columnNames);
             break;
           default:
-            throw new Error('File type must be either CSV or JSON.');
+            throw Error('File type must be either CSV or JSON.');
         }
 
         resolve(
@@ -199,7 +261,6 @@ export class Export
               respStream.destroy();
               documentTransform.destroy();
               exportTransform.destroy();
-              TETransform.destroy();
               reject(e);
             })
             .pipe(documentTransform)
@@ -209,17 +270,6 @@ export class Export
               respStream.destroy();
               documentTransform.destroy();
               exportTransform.destroy();
-              TETransform.destroy();
-              reject(e);
-            })
-            .pipe(TETransform)
-            .on('error', (e) =>
-            {
-              winston.error('Error in transformation engine stream: ', e.toString());
-              respStream.destroy();
-              documentTransform.destroy();
-              exportTransform.destroy();
-              TETransform.destroy();
               reject(e);
             })
             .pipe(exportTransform)
@@ -229,7 +279,6 @@ export class Export
               respStream.destroy();
               documentTransform.destroy();
               exportTransform.destroy();
-              TETransform.destroy();
               reject(e);
             }),
         );
@@ -241,13 +290,280 @@ export class Export
     });
   }
 
-  public _postProcessDoc(doc: object, exportConfig: ExportConfig): object
+  public _postProcessDoc(doc: object, cfg: any): object
   {
-    // merge top-level fields with _source if necessary
-    doc = Common.mergeDocument(doc);
+    // merge groupJoins with _source if necessary
+    doc = Export.mergeGroupJoin(doc);
+    const columnTypes = cfg.exportConfig.columnTypes;
+    const newSource = _.extend({}, doc['_source']);
+    if (newSource['fields'] != null)
+    {
+      for (const k of Object.keys(newSource['fields']))
+      {
+        const value = newSource['fields'][k];
+        if (k !== 'fields' && newSource[k] === undefined && columnTypes[k] !== undefined &&
+          Array.isArray(value) && value.length > 0 && value[0] != null)
+        {
+          newSource[k] = value[0];
+        }
+      }
+      doc['_source'] = newSource;
+    }
+
+    // extract field after doing all merge joins
+    cfg.extractTransformations.forEach((transform) =>
+    {
+      const oldColName: string | undefined = transform['colName'];
+      const newColName: string | undefined = transform['args']['newName'];
+      const path: string | undefined = transform['args']['path'];
+      if (oldColName !== undefined && newColName !== undefined && path !== undefined)
+      {
+        doc['_source'][newColName] = _.get(doc['_source'], path);
+      }
+    });
 
     // verify schema mapping with documents and fix documents accordingly
-    return this._transformAndCheck(doc, exportConfig, false);
+    doc = this._checkDocumentAgainstMapping(doc['_source'], cfg.mapping);
+    for (const field of Object.keys(doc))
+    {
+      if (doc[field] !== null && doc[field] !== undefined)
+      {
+        if (cfg.fieldArrayDepths[field] !== undefined)
+        {
+          cfg.fieldArrayDepths[field] = Number(cfg.fieldArrayDepths[field]) + this._getArrayDepth(doc[field]);
+          if (cfg.fieldArrayDepths[field] > 1)
+          {
+            throw new Error('Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.');
+          }
+        }
+        else
+        {
+          cfg.fieldArrayDepths[field] = this._getArrayDepth(doc[field]);
+        }
+
+        if (Array.isArray(doc[field]) && cfg.exportConfig.filetype === 'csv')
+        {
+          doc[field] = this._convertArrayToCSVArray(doc[field]);
+        }
+      }
+    }
+
+    doc = this._transformAndCheck(doc, cfg.exportConfig, false);
+    if (cfg.exportConfig.rank === true)
+    {
+      if (doc['TERRAINRANK'] !== undefined)
+      {
+        throw new Error('Conflicting field: TERRAINRANK.');
+      }
+      doc['TERRAINRANK'] = cfg.id;
+      cfg.id++;
+    }
+    return doc;
+  }
+
+  private async _getQueryFromAlgorithm(algorithmId: number): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      const algorithms: ItemConfig[] = await TastyItems.get(algorithmId);
+      if (algorithms.length === 0)
+      {
+        return reject('Algorithm not found.');
+      }
+
+      try
+      {
+        if (algorithms[0].meta !== undefined)
+        {
+          const query = JSON.parse(algorithms[0].meta as string)['query'];
+          const inputMap = ESInterpreter.toInputMap(query.inputs);
+          const queryTree = new ESInterpreter(query.tql, inputMap);
+          if (queryTree.hasError())
+          {
+            return reject('Errors when interpreting the query:' + JSON.stringify(queryTree.getErrors()));
+          }
+          try
+          {
+            const queryString = queryTree.toCode({ replaceInputs: true });
+            return resolve(queryString);
+          } catch (e)
+          {
+            reject('Error when the interpreter generates the code:' + JSON.stringify(e));
+          }
+        }
+      }
+      catch (e)
+      {
+        return reject('Malformed algorithm');
+      }
+    });
+  }
+
+  private _applyTransforms(obj: object, transforms: object[]): object
+  {
+    let colName: string | undefined;
+    for (const transform of transforms)
+    {
+      switch (transform['name'])
+      {
+        case 'rename':
+          const oldName: string | undefined = transform['colName'];
+          const newName: string | undefined = transform['args']['newName'];
+          if (oldName === undefined || newName === undefined)
+          {
+            throw new Error('Rename transformation must supply colName and newName arguments.');
+          }
+          if (oldName !== newName)
+          {
+            obj[newName] = obj[oldName];
+            delete obj[oldName];
+          }
+          break;
+        case 'split':
+          const oldCol: string | undefined = transform['colName'];
+          const newCols: string[] | undefined = transform['args']['newName'];
+          const splitText: string | undefined = transform['args']['text'];
+          if (oldCol === undefined || newCols === undefined || splitText === undefined)
+          {
+            throw new Error('Split transformation must supply colName, newName, and text arguments.');
+          }
+          if (newCols.length !== 2)
+          {
+            throw new Error('Split transformation currently only supports splitting into two columns.');
+          }
+          if (typeof obj[oldCol] !== 'string')
+          {
+            throw new Error('Can only split columns containing text.');
+          }
+          const oldText: string = obj[oldCol];
+          delete obj[oldCol];
+          const ind: number = oldText.indexOf(splitText);
+          if (ind === -1)
+          {
+            obj[newCols[0]] = oldText;
+            obj[newCols[1]] = '';
+          }
+          else
+          {
+            obj[newCols[0]] = oldText.substring(0, ind);
+            obj[newCols[1]] = oldText.substring(ind + splitText.length);
+          }
+          break;
+        case 'merge':
+          const startCol: string | undefined = transform['colName'];
+          const mergeCol: string | undefined = transform['args']['mergeName'];
+          const newCol: string | undefined = transform['args']['newName'];
+          const mergeText: string | undefined = transform['args']['text'];
+          if (startCol === undefined || mergeCol === undefined || newCol === undefined || mergeText === undefined)
+          {
+            throw new Error('Merge transformation must supply colName, mergeName, newName, and text arguments.');
+          }
+          if (typeof obj[startCol] !== 'string' || typeof obj[mergeCol] !== 'string')
+          {
+            throw new Error('Can only merge columns containing text.');
+          }
+          obj[newCol] = String(obj[startCol]) + mergeText + String(obj[mergeCol]);
+          if (startCol !== newCol)
+          {
+            delete obj[startCol];
+          }
+          if (mergeCol !== newCol)
+          {
+            delete obj[mergeCol];
+          }
+          break;
+        case 'extract':
+          const extractOldColName: string | undefined = transform['colName'];
+          const extractPath: string | undefined = transform['args']['path'];
+          if (extractOldColName === undefined || extractPath === undefined)
+          {
+            throw new Error('Extract column name and path must be provided.');
+          }
+          obj[extractOldColName] = _.get(obj[extractOldColName], extractPath, null);
+          break;
+        case 'duplicate':
+          colName = transform['colName'];
+          const copyName: string | undefined = transform['args']['newName'];
+          if (colName === undefined || copyName === undefined)
+          {
+            throw new Error('Duplicate transformation must supply colName and newName arguments.');
+          }
+          obj[copyName] = obj[colName];
+          break;
+        default:
+          if (transform['name'] !== 'prepend' && transform['name'] !== 'append')
+          {
+            throw new Error('Invalid transform name encountered: ' + String(transform['name']));
+          }
+          colName = transform['colName'];
+          const text: string | undefined = transform['args']['text'];
+          if (colName === undefined || text === undefined)
+          {
+            throw new Error('Prepend/append transformation must supply colName and text arguments.');
+          }
+          if (typeof obj[colName] !== 'string')
+          {
+            throw new Error('Can only prepend/append to columns containing text.');
+          }
+          if (transform['name'] === 'prepend')
+          {
+            obj[colName] = text + String(obj[colName]);
+          }
+          else
+          {
+            obj[colName] = String(obj[colName]) + text;
+          }
+      }
+    }
+    return obj;
+  }
+
+  /* return the target hash an object with the specified field names and types should have
+     * nameToType: maps field name (string) to object (contains "type" field (string)) */
+  private _buildDesiredHash(nameToType: object): string
+  {
+    let strToHash: string = 'object';
+    const nameToTypeArr: string[] = Object.keys(nameToType).sort();
+    nameToTypeArr.forEach((name) =>
+    {
+      strToHash += '|' + name + ':' + this._buildDesiredHashHelper(nameToType[name]) + '|';
+    });
+    return sha1(strToHash);
+  }
+  /* recursive helper to handle arrays */
+
+  private _buildDesiredHashHelper(typeObj: object): string
+  {
+    if (this.NUMERIC_TYPES.has(typeObj['type']))
+    {
+      return 'number';
+    }
+    if (typeObj['type'] === 'array')
+    {
+      return 'array-' + this._buildDesiredHashHelper(typeObj['innerType']);
+    }
+    return typeObj['type'];
+  }
+
+  private _checkDocumentAgainstMapping(document: object, mapping: object): object
+  {
+    const newDocument: object = document;
+    const fieldsInMappingNotInDocument: string[] = _.difference(Object.keys(mapping), Object.keys(document));
+    for (const field of fieldsInMappingNotInDocument)
+    {
+      newDocument[field] = null;
+      // TODO: Case 740
+      // if (fields[field]['type'] === 'text')
+      // {
+      //   newDocument[field] = '';
+      // }
+    }
+    const fieldsInDocumentNotMapping = _.difference(Object.keys(newDocument), Object.keys(mapping));
+    for (const field of fieldsInDocumentNotMapping)
+    {
+      delete newDocument[field];
+    }
+    return newDocument;
   }
 
   /* checks whether obj has the fields and types specified by nameToType
@@ -255,7 +571,7 @@ export class Export
    * nameToType: maps field name (string) to object (contains "type" field (string)) */
   private _checkTypes(obj: object, exportConfig: ExportConfig): void
   {
-    const targetHash: string = SharedUtil.elastic.buildDesiredHash(exportConfig.columnTypes);
+    const targetHash: string = this._buildDesiredHash(exportConfig.columnTypes);
     const targetKeys: string = JSON.stringify(Object.keys(exportConfig.columnTypes).sort());
 
     // parse dates
@@ -275,7 +591,7 @@ export class Export
       });
     }
 
-    if (SharedUtil.elastic.hashObjectStructure(obj) !== targetHash)
+    if (this._hashObjectStructure(obj) !== targetHash)
     {
       if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
       {
@@ -299,12 +615,27 @@ export class Export
     {
       if (exportConfig.columnTypes[field]['type'] === 'array')
       {
-        if (obj[field] !== null && !SharedUtil.elastic.isTypeConsistent(obj[field]))
+        if (obj[field] !== null && !SharedUtil.isTypeConsistent(obj[field]))
         {
           throw new Error('Array in field "' + field + '" of the following object contains inconsistent types: ' + JSON.stringify(obj));
         }
       }
     }
+  }
+
+  private _convertArrayToCSVArray(arr: any[]): string
+  {
+    return JSON.stringify(arr);
+  }
+
+  /* assumes arrays are of uniform depth */
+  private _getArrayDepth(obj: any): number
+  {
+    if (Array.isArray(obj))
+    {
+      return this._getArrayDepth(obj[0]) + 1;
+    }
+    return 0;
   }
 
   /* return ES type from type specification format of ImportConfig
@@ -322,10 +653,47 @@ export class Export
     }
   }
 
+  private _getObjectStructureStr(payload: object): string
+  {
+    let structStr: string = SharedUtil.getType(payload);
+    if (structStr === 'object')
+    {
+      structStr = Object.keys(payload).sort().reduce((res, item) =>
+      {
+        res += '|' + item + ':' + this._getObjectStructureStr(payload[item]) + '|';
+        return res;
+      },
+        structStr);
+    }
+    else if (structStr === 'array')
+    {
+      if (Object.keys(structStr).length > 0)
+      {
+        structStr += '-' + this._getObjectStructureStr(payload[0]);
+      }
+      else
+      {
+        structStr += '-empty';
+      }
+    }
+    return structStr;
+  }
+
+  /* returns a hash based on the object's field names and data types
+   * handles object fields recursively ; only checks the type of the first element of arrays */
+  private _hashObjectStructure(payload: object): string
+  {
+    return sha1(this._getObjectStructureStr(payload));
+  }
+
   // manually checks types (rather than checking hashes) ; handles arrays recursively
   private _jsonCheckTypesHelper(item: object, typeObj: object): boolean
   {
-    const type: string = SharedUtil.elastic.getType(item);
+    const type: string = SharedUtil.getType(item);
+    if (typeObj['type'] === 'text' && type === 'date')
+    {
+      return true;
+    }
     if (type === 'null')
     {
       return true;
@@ -385,6 +753,14 @@ export class Export
   // asynchronously perform transformations on each item to upsert, and check against expected resultant types
   private _transformAndCheck(doc: object, exportConfig: ExportConfig, dontCheck?: boolean): object
   {
+    try
+    {
+      doc = this._applyTransforms(doc, exportConfig.transformations);
+    }
+    catch (e)
+    {
+      throw new Error('Failed to apply transforms: ' + String(e));
+    }
     // only include the specified columns
     // NOTE: unclear if faster to copy everything over or delete the unused ones
     const trimmedDoc: object = {};

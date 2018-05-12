@@ -42,13 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+// tslint:disable:no-var-requires
 
-import * as JSONStream from 'JSONStream';
 import { Transform } from 'stream';
 
 import JSONExportTransform from './JSONExportTransform';
 
+const JSONStream = require('JSONStream');
 /**
  * Import/Export from a JSON format. *
  * Additional configuration options are possible.

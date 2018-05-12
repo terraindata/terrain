@@ -92,7 +92,7 @@ export interface RouteSelectorOptionSet
   hasOther?: boolean;
   focusOtherByDefault?: boolean;
   shortNameText?: string;
-  headerText?: string;
+  headerText?: string | El;
   forceFloat?: boolean;
   isButton?: boolean;
   onButtonClick?: () => void;
@@ -195,12 +195,16 @@ export class RouteSelector extends TerrainComponent<Props>
     {
       this.setState({
         optionSets: this.props.getOptionSets(),
+        showBoxValues: true,
+        // in case React reuses same component after a neighbor has been deleted
       });
     }
     else if (this.props.optionSets !== nextProps.optionSets)
     {
       this.setState({
         optionSets: nextProps.optionSets,
+        showBoxValues: true,
+        // ditto
       });
     }
   }
@@ -325,7 +329,7 @@ export class RouteSelector extends TerrainComponent<Props>
         {
           (this.props.canDelete && this.props.canEdit && !this.state.open) &&
           <div
-            onClick={this.props.onDelete}
+            onClick={this.handleDelete}
             className='routeselector-delete close'
           >
             <RemoveIcon />
@@ -1150,6 +1154,16 @@ export class RouteSelector extends TerrainComponent<Props>
     {
       this.open();
     }
+  }
+
+  private handleDelete()
+  {
+    this.setState({
+      showBoxValues: false, // animate up
+      open: false, // just to be safe
+    });
+
+    setTimeout(this.props.onDelete, 500); // coordinate with LESS
   }
 
   private handleValueRef(valueRef)

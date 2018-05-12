@@ -344,6 +344,7 @@ export default class Templates
   public async execute(template: TemplateConfig, files?: Readable[]): Promise<Readable>
   {
     winston.info('Executing template', template.templateName);
+    winston.debug(JSON.stringify(template, null, 2));
 
     const numSources = Object.keys(template.sources).length;
     const numSinks = Object.keys(template.sinks).length;

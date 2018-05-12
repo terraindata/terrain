@@ -388,8 +388,12 @@ const Util = {
     return Math.random();
   },
 
-  extendId(obj: object, isString?: boolean): object
+  extendId(obj: object = {}, isString?: boolean): object
   {
+    if (obj === null)
+    {
+      obj = {};
+    }
     if (obj['id'])
     {
       return obj;

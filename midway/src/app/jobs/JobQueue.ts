@@ -370,6 +370,7 @@ export class JobQueue
       const queryStr: string = App.DB.getDB().generateString(query);
       const rawResults = await App.DB.getDB().execute([queryStr]);
       const jobs: JobConfig[] = rawResults.map((result) => new JobConfig(result as JobConfig));
+
       let i = 0;
       while (i < newJobSlots)
       {

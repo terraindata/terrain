@@ -79,7 +79,7 @@ export interface Props<FState>
 {
   inputMap: InputDeclarationMap<FState>; // inputMap is memoized, so be careful about changing its properties on the fly!
   inputState: FState;
-  onStateChange: (newState: FState, apply?: boolean) => void;
+  onStateChange: (newState: FState, blur?: boolean) => void;
   mainButton?: ButtonOptions; // active styling by default
   secondButton?: ButtonOptions; // buttons are rendered from right to left
   thirdButton?: ButtonOptions;
@@ -141,6 +141,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           onChange={this.setStateNoApplyHOC(stateName)}
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
+          debounce={true}
         />
       </div>
     );
@@ -163,6 +164,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           onChange={this.setStateNoApplyNumberBoxHOC(stateName)}
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
+          debounce={true}
         />
       </div>
     );
