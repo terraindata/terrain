@@ -141,6 +141,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           onChange={this.setStateNoApplyHOC(stateName)}
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
+          debounce={true}
         />
       </div>
     );
@@ -163,6 +164,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           onChange={this.setStateNoApplyNumberBoxHOC(stateName)}
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
+          debounce={true}
         />
       </div>
     );

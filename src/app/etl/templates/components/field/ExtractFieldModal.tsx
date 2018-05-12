@@ -175,6 +175,7 @@ class ExtractFieldModal extends TerrainComponent<Props>
         closeOnConfirm={true}
         onClose={this.handleCloseModal}
         onConfirm={this.handleConfirmModal}
+        allowOverflow={true}
       >
         {extractField !== null ? this.renderInnerForm() : null}
       </Modal>
