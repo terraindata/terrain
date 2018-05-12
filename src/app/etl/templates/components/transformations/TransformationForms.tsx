@@ -58,6 +58,7 @@ const { List, Map } = Immutable;
 import { ArraySumTFF } from './ArraySumTransformationForm';
 import { CastTFF } from './CastTransformationForm';
 import { DuplicateTFF } from './DuplicateTransformationForm';
+import { InsertTFF } from './InsertTransformationForm';
 import { JoinTFF } from './JoinTransformationForm';
 import { SetIfTFF } from './SetIfTransformationForm';
 import { AddTFF, DivideTFF, FindReplaceTFF, HashTFF, MultiplyTFF, SubstringTFF, SubtractTFF, UppercaseTFF } from './SimpleTransformations';
@@ -95,6 +96,8 @@ export function getTransformationForm(type: TransformationNodeType): React.Compo
       return SetIfTFF;
     case TransformationNodeType.FindReplaceNode:
       return FindReplaceTFF;
+    case TransformationNodeType.InsertNode:
+      return InsertTFF;
     default:
       return null;
   }

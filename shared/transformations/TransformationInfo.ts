@@ -177,11 +177,30 @@ const TransformationNodeInfo: AllNodeInfoType =
       },
     [TransformationNodeType.InsertNode]:
       {
-        humanName: 'Insert String',
+        humanName: 'Append / Prepend',
         editable: true,
         creatable: true,
-        description: `Insert a string at a given position in this field's value`,
+        description: `Append, Prepend, or Insert Text`,
         type: InsertTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+        },
+        shortSummary: (meta) =>
+        {
+          if (meta.at === -1)
+          {
+            return 'Append Text';
+          }
+          else if (meta.at === 0)
+          {
+            return 'Prepend Text';
+          }
+          else
+          {
+            return `Insert Text at Position ${meta.at}`;
+          }
+        },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,
@@ -214,6 +233,10 @@ const TransformationNodeInfo: AllNodeInfoType =
         isAvailable: (engine, fieldId) =>
         {
           return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+        },
+        shortSummary: (meta) =>
+        {
+          return `Substring from ${meta.from} to ${meta.from + meta.length}`;
         },
         type: SubstringTransformationNode,
         targetedVisitor: (visitor: TransformationNodeVisitor,
@@ -292,6 +315,10 @@ const TransformationNodeInfo: AllNodeInfoType =
         {
           return EngineUtil.getRepresentedType(fieldId, engine) === 'number';
         },
+        shortSummary: (meta) =>
+        {
+          return `Add ${meta.shift}`;
+        },
         type: AddTransformationNode,
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
@@ -308,6 +335,10 @@ const TransformationNodeInfo: AllNodeInfoType =
         isAvailable: (engine, fieldId) =>
         {
           return EngineUtil.getRepresentedType(fieldId, engine) === 'number';
+        },
+        shortSummary: (meta) =>
+        {
+          return `Subtract ${meta.shift}`;
         },
         type: SubtractTransformationNode,
         targetedVisitor: (visitor: TransformationNodeVisitor,
@@ -326,6 +357,10 @@ const TransformationNodeInfo: AllNodeInfoType =
         {
           return EngineUtil.getRepresentedType(fieldId, engine) === 'number';
         },
+        shortSummary: (meta) =>
+        {
+          return `Multiply by ${meta.factor}`;
+        },
         type: MultiplyTransformationNode,
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
@@ -342,6 +377,10 @@ const TransformationNodeInfo: AllNodeInfoType =
         isAvailable: (engine, fieldId) =>
         {
           return EngineUtil.getRepresentedType(fieldId, engine) === 'number';
+        },
+        shortSummary: (meta) =>
+        {
+          return `Divide by ${meta.factor}`;
         },
         type: DivideTransformationNode,
         targetedVisitor: (visitor: TransformationNodeVisitor,
