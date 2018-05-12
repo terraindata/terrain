@@ -277,11 +277,14 @@ export class JobQueue
         newJobTasks = JSON.parse(getJobs[0].tasks);
         newJobTasks[0].params =
           {
-            overrideSinks: fields['overrideSinks'],
-            overrideSources: fields['overrideSources'],
-            template: fields['template'],
-            templateId: fields['templateId'],
-            inputStreams: files,
+            options:
+              {
+                overrideSinks: fields['overrideSinks'],
+                overrideSources: fields['overrideSources'],
+                template: fields['template'],
+                templateId: fields['templateId'],
+                inputStreams: files,
+              },
           };
       }
       catch (e)
@@ -298,15 +301,14 @@ export class JobQueue
       // update the table to running = true
       this.runningRunNowJobs.set(getJobs[0].id, newJob);
       // actually run the job
-
       const jobResult: TaskOutputConfig = await this.runningRunNowJobs.get(getJobs[0].id).run() as TaskOutputConfig;
       const jobsFromId: JobConfig[] = await this.get(getJobs[0].id);
       const jobStatus: string = jobResult.status === true ? 'SUCCESS' : 'FAILURE';
       await this._setJobStatus(jobsFromId[0].id, false, jobStatus);
-      await App.SKDR.setRunning(jobsFromId[0].scheduleId, false);
-      this.runningJobs.delete(getJobs[0].id);
+      this.runningRunNowJobs.delete(getJobs[0].id);
       // TODO: log job result
-      return resolve(jobResult['outputStream'] as stream.Readable);
+
+      return resolve(jobResult['options']['outputStream'] as stream.Readable);
     });
   }
 
@@ -363,12 +365,11 @@ export class JobQueue
       }
       const query = new Tasty.Query(this.jobTable).filter(this.jobTable['status'].equals('PENDING'))
         .filter(this.jobTable['priority'].greaterThan(-1))
-        .filter(this.jobTable['running'].equals('false')).sort(this.jobTable['priority'], 'asc')
+        .filter(this.jobTable['running'].equals(false)).sort(this.jobTable['priority'], 'asc')
         .sort(this.jobTable['runNowPriority'], 'desc').sort(this.jobTable['createdAt'], 'asc').take(newJobSlots);
       const queryStr: string = App.DB.getDB().generateString(query);
       const rawResults = await App.DB.getDB().execute([queryStr]);
-      const jobs: JobConfig[] = rawResults.map((result: object) => new JobConfig(result));
-
+      const jobs: JobConfig[] = rawResults.map((result) => new JobConfig(result as JobConfig));
       let i = 0;
       while (i < newJobSlots)
       {
@@ -469,7 +470,7 @@ export class JobQueue
         // TODO
       }
 
-      const results: JobConfig[] = rawResults.map((result: object) => new JobConfig(result));
+      const results: JobConfig[] = rawResults.map((result: object) => new JobConfig(result as JobConfig));
       resolve(results);
     });
   }
@@ -502,12 +503,12 @@ export class JobQueue
     {
       let maxRunNowPriority: number = 1;
       const query = new Tasty.Query(this.jobTable).filter(this.jobTable['status'].equals('PENDING'))
-        .filter(this.jobTable['running'].equals('false')).filter(this.jobTable['priority'].equals(0))
+        .filter(this.jobTable['running'].equals(false)).filter(this.jobTable['priority'].equals(0))
         .sort(this.jobTable['runNowPriority'], 'desc').take(1);
       const queryStr: string = App.DB.getDB().generateString(query);
       const rawResults = await App.DB.getDB().execute([queryStr]);
 
-      const jobs: JobConfig[] = rawResults.map((result: object) => new JobConfig(result));
+      const jobs: JobConfig[] = rawResults.map((result: object) => new JobConfig(result as JobConfig));
       if (jobs.length !== 0)
       {
         maxRunNowPriority = jobs[0].runNowPriority;

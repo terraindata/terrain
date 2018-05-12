@@ -219,7 +219,11 @@ export class Scheduler
       {
         if (running === true)
         {
-          schedules[0].lastRun = new Date();
+          const currDate = new Date();
+          // if (schedules[0].lastRun.valueOf() < currDate)
+          // {
+          schedules[0].lastRun = currDate;
+          // }
         }
         schedules[0].running = running;
         return resolve(await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[]);
@@ -261,10 +265,12 @@ export class Scheduler
         {
           return reject(new Error('Schedule name and cron must be provided.'));
         }
+        const currIntervalCronDate = cronParser.parseExpression(schedule.cron);
+
         schedule.createdAt = creationDate;
         schedule.createdBy = user !== undefined ? user.id : -1;
         schedule.lastModified = creationDate;
-        schedule.lastRun = new Date(0); // beginning of epoch time
+        schedule.lastRun = new Date(currIntervalCronDate.prev().toDate().valueOf() + 1000);
         schedule.meta = (schedule.meta !== undefined && schedule.meta !== null) ? schedule.meta : '';
         schedule.priority = (schedule.priority !== undefined && schedule.priority !== null) ? schedule.priority : 1;
         schedule.running = (schedule.running !== undefined && schedule.running !== null) ? schedule.running : false;
@@ -331,7 +337,7 @@ export class Scheduler
         try
         {
           const lastRun = new Date(schedule.lastRun);
-          const currTime = new Date();
+          const currTime = new Date(new Date().valueOf() + 1000);
           const currIntervalCronDate = cronParser.parseExpression(schedule.cron);
           const prevInterval = currIntervalCronDate.prev().toDate();
 
@@ -382,7 +388,7 @@ export class Scheduler
         // TODO
       }
 
-      const results: SchedulerConfig[] = rawResults.map((result: object) => new SchedulerConfig(result));
+      const results: SchedulerConfig[] = rawResults.map((result: object) => new SchedulerConfig(result as SchedulerConfig));
       resolve(results);
     });
   }
