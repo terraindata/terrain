@@ -187,7 +187,7 @@ const links =
     {
       icon: <ImportIcon />,
       text: 'Import',
-      route: '/data',
+      route: '/data/templates',
     },
     {
       icon: <ReportingIcon />,
