@@ -46,8 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions
 
+import BadgeColumn from 'common/components/simple-table/BadgeColumn';
+import ButtonColumn from 'common/components/simple-table/ButtonColumn';
 import { List } from 'immutable';
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
 
 import './SimpleTable.less';
@@ -58,51 +61,118 @@ export interface SimpleTableColumn
 {
   columnKey: string;
   columnLabel: string;
+  columnRelativeSize?: number; // works sort of as css flex property
+  component?: JSX.Element; // a component to wrap the column value with
 }
 
 export interface Props
 {
-  header: SimpleTableColumn[];
+  columnsConfig: SimpleTableColumn[];
   data: Immutable.Map<ID, any>;
 }
 
 export class SimpleTable extends TerrainComponent<Props>
 {
   public state: {};
+  public columnWidths = this.calculateColumnWidhts();
+
+  public calculateColumnWidhts()
+  {
+    const { columnsConfig } = this.props;
+    // By default, each column takes an equal portion of the 100% width
+    const defaultSize = 100 / columnsConfig.length;
+    const totalRelativeSize = columnsConfig
+      .reduce((total, column) =>
+      {
+        const relativeSize = column.columnRelativeSize ? column.columnRelativeSize : 1;
+        return total + relativeSize;
+      }, 0);
+
+    const columnWidths = {};
+    columnsConfig.map((column) =>
+    {
+      const columnRelativeSize = column.columnRelativeSize !== undefined ?
+        column.columnRelativeSize : 1;
+
+      columnWidths[column.columnKey] = _.round(columnRelativeSize * 100 / totalRelativeSize, 2);
+    });
+
+    return columnWidths;
+  }
+
+  public renderValue(colKey, rowData)
+  {
+    const { columnsConfig } = this.props;
+
+    let processedValue = rowData[colKey];
+
+    const column = columnsConfig.find((col) => col.columnKey === colKey);
+    if (column !== undefined && column.component !== undefined)
+    {
+      processedValue = React.cloneElement(column.component, { colKey, rowData });
+    }
+
+    return processedValue;
+  }
 
   public render()
   {
-    const { header, data } = this.props;
+    const { columnsConfig, data } = this.props;
 
-    const columnKeys = header.reduce((keys, column) => keys.concat(column.columnKey), []);
+    const columnKeys = columnsConfig.map((config) => config.columnKey);
+    const dataValues = data.valueSeq();
 
     return (
       <table className='simple-table'>
         <thead className='simple-table-header'>
           <tr className='simple-table-row'>
             {
-              header.map((column, index) =>
+              columnsConfig.map((column) =>
               {
-                return <th key={column.columnKey} className='simple-table-cell'>{column.columnLabel}</th>;
+                return (
+                  <th
+                    key={column.columnKey}
+                    className='simple-table-cell'
+                    style={{ width: `${this.columnWidths[column.columnKey]}%` }}
+                  >
+                    {column.columnLabel}
+                  </th>
+                );
               })
             }
           </tr>
         </thead>
         <tbody className='simple-table-body'>
           {
-            data.valueSeq().map((entry) =>
-            {
-              return (
-                <tr key={entry.id} className='simple-table-row'>
-                  {
-                    columnKeys.map((key, index) =>
+            dataValues.count() > 0 ?
+              dataValues.map((entry) =>
+              {
+                return (
+                  <tr key={entry.id} className='simple-table-row'>
                     {
-                      return <td key={key} className='simple-table-cell'>{entry[key]}</td>;
-                    })
-                  }
+                      columnsConfig.map((column) =>
+                      {
+                        return (
+                          <td
+                            key={column.columnKey}
+                            className='simple-table-cell'
+                            style={{ width: `${this.columnWidths[column.columnKey]}%` }}
+                          >
+                            {this.renderValue(column.columnKey, entry)}
+                          </td>
+                        );
+                      })
+                    }
+                  </tr>
+                );
+              })
+              : (
+                <tr>
+                  <td colSpan={columnKeys.length} className='simple-table-cell'>
+                    No results
+                  </td>
                 </tr>
-              );
-            })
+              )
           }
         </tbody>
       </table>
@@ -110,4 +180,9 @@ export class SimpleTable extends TerrainComponent<Props>
   }
 }
 
+export
+{
+  BadgeColumn,
+  ButtonColumn,
+};
 export default SimpleTable;
