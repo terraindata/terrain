@@ -20,6 +20,7 @@
             "app/*": ["src/app/*"],
             "builder/*": ["src/app/builder/*"],
             "charts/*": ["src/app/charts/*"],
+            "colors/*": ["src/app/colors/*"],
             "common/*": ["src/app/common/*"],
             "control/*": ["src/app/control/*"],
             "database/*": ["src/database/*"],
