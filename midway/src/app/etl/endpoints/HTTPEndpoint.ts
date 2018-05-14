@@ -91,7 +91,7 @@ export default class HTTPEndpoint extends AEndpointStream
 
     return new Promise<Readable | Writable>((resolve, reject) =>
     {
-      request(httpConfig.url)
+      request(httpConfig.url, httpConfig.method, httpConfig.headers)
         .on('error', (err) =>
         {
           if (err !== null && err !== undefined)
