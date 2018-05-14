@@ -119,7 +119,7 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
   }
 
   // Create a field if it doesn't exist
-  if (options['create'] === true && !obj.hasOwnProperty(waypoint))
+  if (options['create'] === true && !obj.hasOwnProperty(waypoint) && !isPrimitive(obj))
   {
     obj[waypoint] = {};
     keys.push(waypoint);

@@ -43,91 +43,126 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
+
+// tslint:disable:strict-boolean-expressions
+
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
-
+const { List, Map } = Immutable;
+import { backgroundColor, Colors, fontColor } from 'app/colors/Colors';
+import Util from 'app/util/Util';
+import ExpandIcon from 'common/components/ExpandIcon';
 import FadeInOut from 'common/components/FadeInOut';
+import { tooltip } from 'common/components/tooltip/Tooltips';
+import './Section.less';
 
-import { instanceFnDecorator } from 'shared/util/Classes';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
-
-import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateList';
-import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
-import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
-
-import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';
-import './ETLStepComponent.less';
-
-const loadTemplateActions: AllowedActions = {
-  delete: true,
-};
-
-class PickTemplateStep extends ETLStepComponent
+export interface SectionProps
 {
-  public static onRevert(params: TransitionParams)
-  {
-    params.act({
-      actionType: 'setState',
-      state: {
-        chosenTemplateId: -1,
-      },
-    });
-  }
+  title: string;
+  canExpand: boolean;
+  tooltipText?: string;
+  children: JSX.Element;
+  onExpand?: (expanded: boolean) => void;
+  expanded?: boolean;
+  contentCount?: number;
+  sectionClass?: string;
+  sectionTitleClass?: string;
+}
 
-  public getTemplateItemStyle(template)
+interface SectionTitleProps
+{
+  title: string;
+  text?: string;
+  tooltipText?: string;
+  canExpand?: boolean;
+  onExpand?: (expanded: boolean) => void;
+  expanded?: boolean;
+  contentCount?: number; // number of items under this expandable title
+  className?: string;
+}
+
+const SectionTitle = (props: SectionTitleProps) =>
+  (
+    <div
+      className={`section-title ${props.className !== undefined ? props.className : ''}`}
+    >
+      {
+        props.canExpand &&
+        <ExpandIcon
+          onClick={() => props.onExpand(props.expanded)}
+          open={props.expanded}
+        />
+      }
+      <div
+        className='section-title-text'
+        style={fontColor(Colors().text3)}
+      >
+        {
+          tooltip(
+            props.title,
+            props.tooltipText,
+          )
+        }
+      </div>
+      <div
+        className='section-title-text'
+        style={fontColor(Colors().text3)}
+      >
+        {
+          props.text
+        }
+      </div>
+      {
+        props.contentCount !== undefined && !props.expanded ?
+          <div className='section-title-count'>
+            {props.contentCount}
+          </div> : null
+      }
+    </div>
+  );
+
+class Section extends TerrainComponent<SectionProps>
+{
+  public toggleExpanded(expanded)
   {
-    return templateListItemStyle;
+    this.props.onExpand(expanded);
   }
 
   public render()
   {
+    const {
+      title,
+      tooltipText,
+      canExpand,
+      onExpand,
+      expanded,
+      contentCount,
+      children,
+      sectionClass,
+    } = this.props;
+
     return (
       <div
-        style={templateListStyle}
+        className={`section ${sectionClass}`}
       >
-        <TemplateList
-          onClick={this.handleLoadTemplateItemClicked}
-          getRowStyle={this.getTemplateItemStyle}
-          allowedActions={loadTemplateActions}
+        <SectionTitle
+          title={title}
+          tooltipText={tooltipText}
+          canExpand={canExpand}
+          onExpand={canExpand ? this.toggleExpanded : undefined}
+          expanded={expanded}
+          contentCount={contentCount}
         />
+        <FadeInOut
+          open={!canExpand || (canExpand && expanded)}
+        >
+          {children}
+        </FadeInOut>
       </div>
     );
   }
-
-  public handleLoadTemplateItemClicked(template: ETLTemplate)
-  {
-    const { onDone, act } = this.props;
-    act({
-      actionType: 'setState',
-      state: {
-        chosenTemplateId: template.id,
-      },
-    });
-    onDone();
-  }
 }
 
-const templateListItemStyle = [
-  { cursor: 'pointer' },
-  backgroundColor('rgba(0,0,0,0)', Colors().activeHover),
-];
-
-const templateListStyle = _.extend({},
-  backgroundColor(Colors().bg3),
-  getStyle('boxShadow', `2px 2px 3px ${Colors().boxShadow}`),
-);
-
-const transitionRowHeight = '28px';
-export default Util.createTypedContainer(
-  PickTemplateStep,
-  ['walkthrough'],
-  { act: WalkthroughActions },
-);
+export default Section;

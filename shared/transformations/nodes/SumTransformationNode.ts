@@ -43,78 +43,20 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import TerrainComponent from 'common/components/TerrainComponent';
-import 'common/components/TerrainTabs.less';
-import * as React from 'react';
-import { browserHistory } from 'react-router';
-import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
-interface TabConfig
+import { List } from 'immutable';
+
+import { KeyPath } from '../../util/KeyPath';
+import TransformationNodeType from '../TransformationNodeType';
+import TransformationNode from './TransformationNode';
+
+export default class SumTransformationNode extends TransformationNode
 {
-  key: string;
-  label: string;
-}
-
-interface TabsProps
-{
-  tabs: TabConfig[];
-  children: any;
-  tabToRouteMap: { [tabKey: string]: string };
-  router: any;
-}
-
-class TerrainTabs extends TerrainComponent<TabsProps>
-{
-  public constructor(props)
+  public constructor(id: number,
+    fields: List<KeyPath>,
+    options: object = {},
+    typeCode: TransformationNodeType = TransformationNodeType.SumNode)
   {
-    super(props);
-  }
-
-  public handleSelect(tabIndex: number)
-  {
-    const { tabs, tabToRouteMap } = this.props;
-
-    if (tabToRouteMap !== undefined)
-    {
-      const tabKey = tabs[tabIndex].key;
-      browserHistory.replace(tabToRouteMap[tabKey]);
-    }
-  }
-
-  public getActiveTabIndex()
-  {
-    const { tabs, router, tabToRouteMap } = this.props;
-    const activeTabIndex = tabs.findIndex((tab) =>
-    {
-      return router.location.pathname.startsWith(tabToRouteMap[tab.key]);
-    });
-
-    return activeTabIndex;
-  }
-
-  public render()
-  {
-    const { tabs, children, tabToRouteMap, router } = this.props;
-    const tabIndex = this.getActiveTabIndex();
-
-    return (
-      <Tabs selectedIndex={tabIndex} onSelect={this.handleSelect}>
-        <TabList>
-          {
-            tabs.map((tab, index) => <Tab key={`tab-${tab.key}`}>{tab.label}</Tab>)
-          }
-        </TabList>
-        {
-          tabs.map((tab, index) =>
-          {
-            const content = router.location.pathname.startsWith(tabToRouteMap[tab.key]) ?
-              children : <div />;
-            return <TabPanel key={`tab-panel-${tab.key}`}>{content}</TabPanel>;
-          })
-        }
-      </Tabs>
-    );
+    super(id, fields, options, typeCode);
   }
 }
-
-export default TerrainTabs;

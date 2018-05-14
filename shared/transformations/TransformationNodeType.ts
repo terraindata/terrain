@@ -58,13 +58,20 @@ enum TransformationNodeType
   SubstringNode = 'SubstringNode',
   CastNode = 'CastNode',
   HashNode = 'HashNode',
-  ArraySumNode = 'ArraySumNode',
   AddNode = 'AddNode',
   SubtractNode = 'SubtractNode',
   MultiplyNode = 'MultiplyNode',
   DivideNode = 'DivideNode',
   SetIfNode = 'SetIfNode',
   FindReplaceNode = 'FindReplaceNode',
+  ArraySumNode = 'ArraySumNode',
+  ArrayCountNode = 'ArrayCountNode',
+  ProductNode = 'ProductNode',
+  QuotientNode = 'QuotientNode',
+  SumNode = 'SumNode',
+  DifferenceNode = 'DifferenceNode',
+  EncryptNode = 'EncryptNode',
+  DecryptNode = 'DecryptNode',
 }
 
 // if this has errors, double check TransformationNodeType's keys are equal to its values
@@ -113,9 +120,6 @@ interface TransformationOptionTypes
   HashNode: {
     salt: string;
   };
-  ArraySumNode: {
-    newFieldKeyPaths: List<KeyPath>;
-  };
   AddNode: {
     shift: number;
   };
@@ -140,6 +144,28 @@ interface TransformationOptionTypes
     find: string;
     replace: string;
     regex: boolean;
+  };
+  ArraySumNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  ArrayCountNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  ProductNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  QuotientNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  SumNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  DifferenceNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  EncryptNode: {
+  };
+  DecryptNode: {
   };
 }
 
