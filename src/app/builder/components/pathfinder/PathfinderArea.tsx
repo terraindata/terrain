@@ -282,6 +282,7 @@ class PathfinderArea extends TerrainComponent<Props>
             {
               <PathfinderFilterSection
                 isSoftFilter={true}
+                path={path}
                 pathfinderContext={pathfinderContext}
                 filterGroup={path.softFilterGroup}
                 keyPath={this._ikeyPath(keyPath, 'softFilterGroup')}

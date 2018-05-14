@@ -390,6 +390,7 @@ class TransformCard extends TerrainComponent<Props>
 
   private handleElasticDomainAggregationResponse(resp: MidwayQueryResponse)
   {
+    const { data, keyPath } = this.props;
     this.setState({
       domainAggregationAjax: {
         xhr: null,
@@ -406,9 +407,33 @@ class TransformCard extends TerrainComponent<Props>
       chartDomain: newDomain,
       maxDomain: newDomain,
     });
-    this.props.onChange(this._ikeyPath(this.props.keyPath, 'domain'), newDomain, true);
-    this.props.onChange(this._ikeyPath(this.props.keyPath, 'dataDomain'), newDomain, true);
-    this.computeBars(this.props.data.input, this.state.maxDomain);
+
+    if (data.autoBound)
+    {
+      // adjust to new bounds
+      const max = newDomain.get(1);
+      const min = newDomain.get(0);
+      const oldMax = data.domain.get(1);
+      const oldMin = data.domain.get(0);
+
+      if (max - min > 0 && oldMax - oldMin > 0) // prevent divide-by-zero
+      {
+        const ratio = (max - min) / (oldMax - oldMin);
+
+        if (ratio !== 1) // no point
+        {
+          const points = data.scorePoints.map(
+            (point) => point.set('value', point.value * ratio),
+          ).toList();
+
+          this.handleUpdatePoints(points, true);
+        }
+      }
+    }
+
+    this.props.onChange(this._ikeyPath(keyPath, 'domain'), newDomain, true);
+    this.props.onChange(this._ikeyPath(keyPath, 'dataDomain'), newDomain, true);
+    this.computeBars(data.input, this.state.maxDomain);
   }
 
   // TODO move the bars computation to a higher level
@@ -552,6 +577,7 @@ class TransformCard extends TerrainComponent<Props>
           },
         };
       }
+
       const domainAggregationAjax = Ajax.query(
         JSON.stringify(domainQuery),
         db,

@@ -65,7 +65,11 @@ import FadeInOut from 'common/components/FadeInOut';
 import SingleRouteSelector from 'common/components/SingleRouteSelector';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
-import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
+import
+{
+  _FilterGroup, _FilterLine, _ScoreLine, FilterGroup, FilterLine, Path,
+  PathfinderContext, PathfinderSteps, Source,
+} from '../PathfinderTypes';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
 import './PathfinderFilterStyle.less';
@@ -83,6 +87,7 @@ export interface Props
   onUpdateScript?: (fieldName: string, name: string, lat?: any, lon?: any) => void;
   builderActions?: typeof BuilderActions;
   colorsActions?: typeof ColorsActions;
+  path?: Path;
 }
 
 class PathfinderFilterSection extends TerrainComponent<Props>
@@ -203,6 +208,39 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         canDrag: false,
         addingFilterLine: true,
       });
+
+      const { path, isSoftFilter } = this.props;
+      if (isSoftFilter && path !== undefined)
+      {
+        const hasMatchQuality = path.score.lines.some(
+          (line) => line.field === '_score',
+        );
+        if (!hasMatchQuality)
+        {
+          // create a match quality score
+          const newScoreLines = path.score.lines.push(_ScoreLine({
+            field: '_score',
+            transformData: {
+              scorePoints: [
+                {
+                  value: 0.05,
+                  score: 0,
+                  id: String(Math.random()),
+                },
+                {
+                  value: 10,
+                  score: 0.95,
+                  id: String(Math.random()),
+                },
+              ],
+            },
+          }));
+          this.props.builderActions.changePath(
+            this.props.keyPath.butLast().toList().push('score').push('lines'),
+            newScoreLines,
+          );
+        }
+      }
     }
   }
 

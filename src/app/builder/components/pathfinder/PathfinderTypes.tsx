@@ -256,6 +256,7 @@ class TransformDataC extends BaseClass
   public dataDomain: List<number> = List([0, 10]);
   public hasCustomDomain: boolean = false;
   public mode: string = 'linear';
+  public autoBound: boolean = false;
 }
 
 export type TransformData = TransformDataC & IRecord<TransformDataC>;
