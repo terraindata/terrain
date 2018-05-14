@@ -1961,7 +1961,7 @@ describe('Scheduler tests', () =>
         id: 1,
         accessToken: defaultUserAccessToken,
         body: {
-          cron: '0 2 29 2 0', // some absurd leap year date at 2 AM
+          cron: '0 2 28 2 0', // some absurd leap year date at 2 AM
           name: 'test ETL',
           priority: 1,
           shouldRunNext: true,
