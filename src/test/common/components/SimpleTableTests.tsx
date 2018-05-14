@@ -56,20 +56,22 @@ describe('SimpleTable', () =>
 {
   let tableComponent = null;
 
-  const columnsConfig = {
-    id: {
+  const columnsConfig = [
+    {
       columnKey: 'id',
       columnLabel: 'Id',
     },
-    name: {
+    {
       columnKey: 'name',
       columnLabel: 'Name',
+      columnRelativeSize: 4,
     },
-    status: {
+    {
       columnKey: 'status',
       columnLabel: 'Status',
+      columnRelativeSize: 0.5,
     },
-  };
+  ];
 
   let tableData = Immutable.Map<ID, any>({});
   const TableItem = Record({ id: 0, name: '', status: '' });
@@ -123,6 +125,22 @@ describe('SimpleTable', () =>
         .toEqual('item 1');
       expect(tableComponent.find('.simple-table-body .simple-table-cell').at(2).text())
         .toEqual('success');
+    });
+  });
+
+  describe('#calculateColumnWidhts', () =>
+  {
+    it('should balance column widths to fill 100% based on the defined columnRelativeSize', () =>
+    {
+      // take the columnRelativeSize (defaults to 1 if not defined), multiply by 100
+      // and divide by the sum of all the columns columnRelativeSize.
+      expect(tableComponent.instance().calculateColumnWidhts()).toEqual(
+        {
+          id: 18.18,
+          name: 72.73,
+          status: 9.09,
+        },
+      );
     });
   });
 });

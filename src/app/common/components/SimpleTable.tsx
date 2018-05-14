@@ -50,6 +50,7 @@ import BadgeColumn from 'common/components/simple-table/BadgeColumn';
 import ButtonColumn from 'common/components/simple-table/ButtonColumn';
 import { List } from 'immutable';
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
 
 import './SimpleTable.less';
@@ -66,7 +67,7 @@ export interface SimpleTableColumn
 
 export interface Props
 {
-  columnsConfig: { [colKey: string]: SimpleTableColumn };
+  columnsConfig: SimpleTableColumn[];
   data: Immutable.Map<ID, any>;
 }
 
@@ -78,17 +79,22 @@ export class SimpleTable extends TerrainComponent<Props>
   public calculateColumnWidhts()
   {
     const { columnsConfig } = this.props;
-    const columnKeys = Object.keys(columnsConfig);
     // By default, each column takes an equal portion of the 100% width
-    const defaultSize = 100 / columnKeys.length;
+    const defaultSize = 100 / columnsConfig.length;
+    const totalRelativeSize = columnsConfig
+      .reduce((total, column) =>
+      {
+        const relativeSize = column.columnRelativeSize ? column.columnRelativeSize : 1;
+        return total + relativeSize;
+      }, 0);
 
     const columnWidths = {};
-    columnKeys.map((colKey) =>
+    columnsConfig.map((column) =>
     {
-      const columnRelativeSize = columnsConfig[colKey].columnRelativeSize !== undefined ?
-        columnsConfig[colKey].columnRelativeSize : 1;
+      const columnRelativeSize = column.columnRelativeSize !== undefined ?
+        column.columnRelativeSize : 1;
 
-      columnWidths[colKey] = columnRelativeSize * defaultSize;
+      columnWidths[column.columnKey] = _.round(columnRelativeSize * 100 / totalRelativeSize, 2);
     });
 
     return columnWidths;
@@ -100,10 +106,10 @@ export class SimpleTable extends TerrainComponent<Props>
 
     let processedValue = rowData[colKey];
 
-    const component = columnsConfig[colKey].component;
-    if (component !== undefined)
+    const column = columnsConfig.find((col) => col.columnKey === colKey);
+    if (column !== undefined && column.component !== undefined)
     {
-      processedValue = React.cloneElement(component, { colKey, rowData });
+      processedValue = React.cloneElement(column.component, { colKey, rowData });
     }
 
     return processedValue;
@@ -113,7 +119,7 @@ export class SimpleTable extends TerrainComponent<Props>
   {
     const { columnsConfig, data } = this.props;
 
-    const columnKeys = Object.keys(columnsConfig);
+    const columnKeys = columnsConfig.map((config) => config.columnKey);
     const dataValues = data.valueSeq();
 
     return (
@@ -121,14 +127,13 @@ export class SimpleTable extends TerrainComponent<Props>
         <thead className='simple-table-header'>
           <tr className='simple-table-row'>
             {
-              columnKeys.map((colKey) =>
+              columnsConfig.map((column) =>
               {
-                const column = columnsConfig[colKey];
                 return (
                   <th
                     key={column.columnKey}
                     className='simple-table-cell'
-                    style={{ width: `${this.columnWidths[colKey]}%` }}
+                    style={{ width: `${this.columnWidths[column.columnKey]}%` }}
                   >
                     {column.columnLabel}
                   </th>
@@ -145,15 +150,15 @@ export class SimpleTable extends TerrainComponent<Props>
                 return (
                   <tr key={entry.id} className='simple-table-row'>
                     {
-                      columnKeys.map((colKey, index) =>
+                      columnsConfig.map((column) =>
                       {
                         return (
                           <td
-                            key={colKey}
+                            key={column.columnKey}
                             className='simple-table-cell'
-                            style={{ width: `${this.columnWidths[colKey]}%` }}
+                            style={{ width: `${this.columnWidths[column.columnKey]}%` }}
                           >
-                            {this.renderValue(colKey, entry)}
+                            {this.renderValue(column.columnKey, entry)}
                           </td>
                         );
                       })

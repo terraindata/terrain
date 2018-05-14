@@ -53,11 +53,9 @@ import * as Immutable from 'immutable';
 import { JobsActions } from 'jobs/data/JobsRedux';
 import
 {
-  getAbortedJobs,
-  getFailedJobs,
+  getCompletedJobs,
   getPendingJobs,
   getRunningJobs,
-  getSuccessfulJobs,
 } from 'jobs/data/JobsSelectors';
 import * as React from 'react';
 import Util from 'util/Util';
@@ -72,11 +70,9 @@ class Jobs extends TerrainComponent<any> {
       jobs: null,
       id: '',
       expanded: Immutable.Map({
-        successful: false,
-        failed: false,
+        completed: false,
         pending: false,
         running: true,
-        aborted: false,
       }),
     };
   }
@@ -107,6 +103,7 @@ class Jobs extends TerrainComponent<any> {
       case 'SUCCESS':
         return '#94be6b';
       case 'ABORTED':
+      case 'CANCELED':
         return '#ffa8b9';
       case 'RUNNING':
         return '#1eb4fa';
@@ -135,33 +132,35 @@ class Jobs extends TerrainComponent<any> {
   public render()
   {
     const {
-      successfulJobs,
-      failedJobs,
+      completedJobs,
       pendingJobs,
       runningJobs,
-      abortedJobs,
     } = this.props;
     const { id } = this.state;
 
-    const jobsHeader = {
-      id: {
+    const jobsHeader = [
+      {
         columnKey: 'id',
         columnLabel: 'Id',
         columnRelativeSize: .5,
       },
-      name: {
+      {
         columnKey: 'name',
         columnLabel: 'Name',
         columnRelativeSize: 2,
       },
-      status: {
+      {
         columnKey: 'status',
-        columnLabel: '',
+        columnLabel: 'Status',
         component: <BadgeColumn
           getColor={this.getStatusColor}
         />,
       },
-      viewlog: {
+      {
+        columnKey: 'createdAt',
+        columnLabel: 'Start',
+      },
+      {
         columnKey: 'viewlog',
         columnLabel: '',
         component: <ButtonColumn
@@ -169,37 +168,11 @@ class Jobs extends TerrainComponent<any> {
           onClick={this.handleJobViewLog}
         />,
       },
-    };
+    ];
 
     return (
       <div className='jobs'>
         <div className='job-lists'>
-          <Section
-            title={'Succesful Jobs'}
-            canExpand={true}
-            onExpand={(isExpanded) => this.expandSection(isExpanded, 'successful')}
-            expanded={this.state.expanded.get('successful')}
-            contentCount={successfulJobs.count()}
-          >
-            <SimpleTable
-              columnsConfig={jobsHeader}
-              data={successfulJobs}
-            />
-          </Section>
-
-          <Section
-            title={'Failed Jobs'}
-            canExpand={true}
-            onExpand={(isExpanded) => this.expandSection(isExpanded, 'failed')}
-            expanded={this.state.expanded.get('failed')}
-            contentCount={failedJobs.count()}
-          >
-            <SimpleTable
-              columnsConfig={jobsHeader}
-              data={failedJobs}
-            />
-          </Section>
-
           <Section
             title={'Pending Jobs'}
             canExpand={true}
@@ -227,15 +200,15 @@ class Jobs extends TerrainComponent<any> {
           </Section>
 
           <Section
-            title={'Aborted Jobs'}
+            title={'Completed Jobs'}
             canExpand={true}
-            onExpand={(isExpanded) => this.expandSection(isExpanded, 'aborted')}
-            expanded={this.state.expanded.get('aborted')}
-            contentCount={abortedJobs.count()}
+            onExpand={(isExpanded) => this.expandSection(isExpanded, 'completed')}
+            expanded={this.state.expanded.get('completed')}
+            contentCount={completedJobs.count()}
           >
             <SimpleTable
               columnsConfig={jobsHeader}
-              data={abortedJobs}
+              data={completedJobs}
             />
           </Section>
         </div>
@@ -247,11 +220,9 @@ class Jobs extends TerrainComponent<any> {
 export default Util.createTypedContainer(
   Jobs,
   {
-    successfulJobs: getSuccessfulJobs,
-    failedJobs: getFailedJobs,
+    completedJobs: getCompletedJobs,
     pendingJobs: getPendingJobs,
     runningJobs: getRunningJobs,
-    abortedJobs: getAbortedJobs,
   },
   { jobsActions: JobsActions },
 );

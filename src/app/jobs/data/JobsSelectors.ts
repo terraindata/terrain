@@ -47,14 +47,11 @@ import { createSelector } from 'reselect';
 
 const getJobs = (state) => state.get('jobs').jobs;
 
-export const getSuccessfulJobs = createSelector(
+export const getCompletedJobs = createSelector(
   getJobs,
-  (jobs) => jobs.filter((j) => j.status === 'SUCCESS'),
-);
-
-export const getFailedJobs = createSelector(
-  getJobs,
-  (jobs) => jobs.filter((j) => j.status === 'FAILURE'),
+  (jobs) => jobs.filter((j) =>
+    ['SUCCESS', 'FAILURE', 'ABORTED', 'CANCELED'].indexOf(j.status) > -1,
+  ),
 );
 
 export const getPendingJobs = createSelector(
@@ -65,9 +62,4 @@ export const getPendingJobs = createSelector(
 export const getRunningJobs = createSelector(
   getJobs,
   (jobs) => jobs.filter((j) => j.status === 'RUNNING'),
-);
-
-export const getAbortedJobs = createSelector(
-  getJobs,
-  (jobs) => jobs.filter((j) => j.status === 'ABORTED'),
 );
