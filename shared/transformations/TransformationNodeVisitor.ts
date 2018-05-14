@@ -46,12 +46,18 @@ THE SOFTWARE.
 
 import AddTransformationNode from 'shared/transformations/nodes/AddTransformationNode';
 import ArraySumTransformationNode from 'shared/transformations/nodes/ArraySumTransformationNode';
+import DecryptTransformationNode from 'shared/transformations/nodes/DecryptTransformationNode';
+import DifferenceTransformationNode from 'shared/transformations/nodes/DifferenceTransformationNode';
 import DivideTransformationNode from 'shared/transformations/nodes/DivideTransformationNode';
+import EncryptTransformationNode from 'shared/transformations/nodes/EncryptTransformationNode';
 import FindReplaceTransformationNode from 'shared/transformations/nodes/FindReplaceTransformationNode';
 import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
 import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
+import ProductTransformationNode from 'shared/transformations/nodes/ProductTransformationNode';
+import QuotientTransformationNode from 'shared/transformations/nodes/QuotientTransformationNode';
 import SetIfTransformationNode from 'shared/transformations/nodes/SetIfTransformationNode';
 import SubtractTransformationNode from 'shared/transformations/nodes/SubtractTransformationNode';
+import SumTransformationNode from 'shared/transformations/nodes/SumTransformationNode';
 import ArrayCountTransformationNode from './nodes/ArrayCountTransformationNode';
 import CastTransformationNode from './nodes/CastTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
@@ -152,4 +158,34 @@ export default abstract class TransformationNodeVisitor
   {
     return this.visitDefault(node, doc, options);
   }
+
+    public visitProductNode(node: ProductTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+    {
+        return this.visitDefault(node, doc, options);
+    }
+
+    public visitQuotientNode(node: QuotientTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+    {
+        return this.visitDefault(node, doc, options);
+    }
+
+    public visitSumNode(node: SumTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+    {
+        return this.visitDefault(node, doc, options);
+    }
+
+    public visitDifferenceNode(node: DifferenceTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+    {
+        return this.visitDefault(node, doc, options);
+    }
+
+    public visitEncryptNode(node: EncryptTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+    {
+        return this.visitDefault(node, doc, options);
+    }
+
+    public visitDecryptNode(node: DecryptTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+    {
+        return this.visitDefault(node, doc, options);
+    }
 }

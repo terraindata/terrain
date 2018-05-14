@@ -66,6 +66,12 @@ enum TransformationNodeType
   FindReplaceNode = 'FindReplaceNode',
   ArraySumNode = 'ArraySumNode',
   ArrayCountNode = 'ArrayCountNode',
+  ProductNode = 'ProductNode',
+  QuotientNode = 'QuotientNode',
+  SumNode = 'SumNode',
+  DifferenceNode = 'DifferenceNode',
+  EncryptNode = 'EncryptNode',
+  DecryptNode = 'DecryptNode',
 }
 
 // if this has errors, double check TransformationNodeType's keys are equal to its values
@@ -145,6 +151,22 @@ interface TransformationOptionTypes
   ArrayCountNode: {
     newFieldKeyPaths: List<KeyPath>;
   };
+    ProductNode: {
+        newFieldKeyPaths: List<KeyPath>;
+    };
+    QuotientNode: {
+        newFieldKeyPaths: List<KeyPath>;
+    };
+    SumNode: {
+        newFieldKeyPaths: List<KeyPath>;
+    };
+    DifferenceNode: {
+        newFieldKeyPaths: List<KeyPath>;
+    };
+    EncryptNode: {
+    };
+    DecryptNode: {
+    };
 }
 
 export type NodeTypes = keyof TransformationOptionTypes;

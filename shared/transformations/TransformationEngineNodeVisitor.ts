@@ -45,33 +45,41 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 // import * as winston from 'winston';
+import aesjs = require('aes-js');
 import * as Immutable from 'immutable';
 import { keccak256 } from 'js-sha3';
 
-import AddTransformationNode from 'shared/transformations/nodes/AddTransformationNode';
-import ArrayCountTransformationNode from 'shared/transformations/nodes/ArrayCountTransformationNode';
-import ArraySumTransformationNode from 'shared/transformations/nodes/ArraySumTransformationNode';
-import DivideTransformationNode from 'shared/transformations/nodes/DivideTransformationNode';
-import FindReplaceTransformationNode from 'shared/transformations/nodes/FindReplaceTransformationNode';
-import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
-import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
-import SetIfTransformationNode from 'shared/transformations/nodes/SetIfTransformationNode';
-import SubtractTransformationNode from 'shared/transformations/nodes/SubtractTransformationNode';
 import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
+import AddTransformationNode from './nodes/AddTransformationNode';
+import ArrayCountTransformationNode from './nodes/ArrayCountTransformationNode';
+import ArraySumTransformationNode from './nodes/ArraySumTransformationNode';
 import CastTransformationNode from './nodes/CastTransformationNode';
+import DecryptTransformationNode from './nodes/DecryptTransformationNode';
+import DifferenceTransformationNode from './nodes/DifferenceTransformationNode';
+import DivideTransformationNode from './nodes/DivideTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
+import EncryptTransformationNode from './nodes/EncryptTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
+import FindReplaceTransformationNode from './nodes/FindReplaceTransformationNode';
+import HashTransformationNode from './nodes/HashTransformationNode';
 import InsertTransformationNode from './nodes/InsertTransformationNode';
 import JoinTransformationNode from './nodes/JoinTransformationNode';
+import MultiplyTransformationNode from './nodes/MultiplyTransformationNode';
+import ProductTransformationNode from './nodes/ProductTransformationNode';
+import QuotientTransformationNode from './nodes/QuotientTransformationNode';
+import SetIfTransformationNode from './nodes/SetIfTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
+import SubtractTransformationNode from './nodes/SubtractTransformationNode';
+import SumTransformationNode from './nodes/SumTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
 import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
 import TransformationNodeType, { NodeOptionsType } from './TransformationNodeType';
 import TransformationNodeVisitor from './TransformationNodeVisitor';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
+import {diff} from 'semver';
 
 export default class TransformationEngineNodeVisitor extends TransformationNodeVisitor
 {
@@ -989,4 +997,263 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       document: doc,
     } as TransformationVisitResult;
   }
+
+    public visitProductNode(node: ProductTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+    {
+        const opts = node.meta as NodeOptionsType<TransformationNodeType.ProductNode>;
+
+        let product: number = 0;
+        let initialized: boolean = false;
+
+        node.fields.forEach((field) =>
+        {
+            const el = yadeep.get(doc, field);
+            if (typeof el === 'number')
+            {
+                if (initialized)
+                {
+                    product *= el;
+                }
+                else
+                {
+                    product = el;
+                    initialized = true;
+                }
+            }
+            else
+            {
+                return {
+                    errors: [
+                        {
+                            message: 'Attempted to compute a product using non-numeric fields (this is not supported)',
+                        } as TransformationVisitError,
+                    ],
+                } as TransformationVisitResult;
+            }
+        });
+
+        yadeep.set(doc, opts.newFieldKeyPaths.get(0), product, { create: true });
+
+        return {
+            document: doc,
+        } as TransformationVisitResult;
+    }
+
+    public visitQuotientNode(node: QuotientTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+    {
+        const opts = node.meta as NodeOptionsType<TransformationNodeType.QuotientNode>;
+
+        let quotient: number = 0;
+        let initialized: boolean = false;
+
+        node.fields.forEach((field) =>
+        {
+            const el = yadeep.get(doc, field);
+            if (typeof el === 'number')
+            {
+                if (initialized)
+                {
+                    quotient /= el;
+                }
+                else
+                {
+                    quotient = el;
+                    initialized = true;
+                }
+            }
+            else
+            {
+                return {
+                    errors: [
+                        {
+                            message: 'Attempted to compute a quotient using non-numeric fields (this is not supported)',
+                        } as TransformationVisitError,
+                    ],
+                } as TransformationVisitResult;
+            }
+        });
+
+        yadeep.set(doc, opts.newFieldKeyPaths.get(0), quotient, { create: true });
+
+        return {
+            document: doc,
+        } as TransformationVisitResult;
+    }
+
+    public visitSumNode(node: SumTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+    {
+        const opts = node.meta as NodeOptionsType<TransformationNodeType.SumNode>;
+
+        let sum: number = 0;
+
+        node.fields.forEach((field) =>
+        {
+            const el = yadeep.get(doc, field);
+            if (typeof el === 'number')
+            {
+                sum += el;
+            }
+            else
+            {
+                return {
+                    errors: [
+                        {
+                            message: 'Attempted to compute a sum using non-numeric fields (this is not supported)',
+                        } as TransformationVisitError,
+                    ],
+                } as TransformationVisitResult;
+            }
+        });
+
+        yadeep.set(doc, opts.newFieldKeyPaths.get(0), sum, { create: true });
+
+        return {
+            document: doc,
+        } as TransformationVisitResult;
+    }
+
+    public visitDifferenceNode(node: DifferenceTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+    {
+        const opts = node.meta as NodeOptionsType<TransformationNodeType.DifferenceNode>;
+
+        let difference: number = 0;
+        let initialized: boolean = false;
+
+        node.fields.forEach((field) =>
+        {
+            const el = yadeep.get(doc, field);
+            if (typeof el === 'number')
+            {
+                if (initialized)
+                {
+                    difference -= el;
+                }
+                else
+                {
+                    difference = el;
+                    initialized = true;
+                }
+            }
+            else
+            {
+                return {
+                    errors: [
+                        {
+                            message: 'Attempted to compute a difference using non-numeric fields (this is not supported)',
+                        } as TransformationVisitError,
+                    ],
+                } as TransformationVisitResult;
+            }
+        });
+
+        yadeep.set(doc, opts.newFieldKeyPaths.get(0), difference, { create: true });
+
+        return {
+            document: doc,
+        } as TransformationVisitResult;
+    }
+
+    public visitEncryptNode(node: EncryptTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+    {
+        const opts = node.meta as NodeOptionsType<TransformationNodeType.EncryptNode>;
+
+        node.fields.forEach((field) =>
+        {
+            const el = yadeep.get(doc, field);
+            if (Array.isArray(el))
+            {
+                for (let i: number = 0; i < el.length; i++)
+                {
+                    let kpi: KeyPath = field;
+                    if (kpi.contains('*'))
+                    {
+                        kpi = kpi.set(kpi.indexOf('*'), i.toString());
+                    }
+                    else
+                    {
+                        kpi = kpi.push(i.toString());
+                    }
+                    yadeep.set(doc, kpi, this.encryptHelper(yadeep.get(doc, kpi), node.key));
+                }
+            }
+            else if (typeof el !== 'string')
+            {
+                return {
+                    errors: [
+                        {
+                            message: 'Attempted to encrypt a non-string (this is not supported)',
+                        } as TransformationVisitError,
+                    ],
+                } as TransformationVisitResult;
+            }
+            else
+            {
+                yadeep.set(doc, field, this.encryptHelper(el, node.key));
+            }
+        });
+
+        return {
+            document: doc,
+        } as TransformationVisitResult;
+    }
+
+    public visitDecryptNode(node: DecryptTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+    {
+        const opts = node.meta as NodeOptionsType<TransformationNodeType.DecryptNode>;
+
+        node.fields.forEach((field) =>
+        {
+            const el = yadeep.get(doc, field);
+            if (Array.isArray(el))
+            {
+                for (let i: number = 0; i < el.length; i++)
+                {
+                    let kpi: KeyPath = field;
+                    if (kpi.contains('*'))
+                    {
+                        kpi = kpi.set(kpi.indexOf('*'), i.toString());
+                    }
+                    else
+                    {
+                        kpi = kpi.push(i.toString());
+                    }
+                    yadeep.set(doc, kpi, this.decryptHelper(yadeep.get(doc, kpi), node.key));
+                }
+            }
+            else if (typeof el !== 'string')
+            {
+                return {
+                    errors: [
+                        {
+                            message: 'Attempted to decrypt a non-string (this is not supported)',
+                        } as TransformationVisitError,
+                    ],
+                } as TransformationVisitResult;
+            }
+            else
+            {
+                yadeep.set(doc, field, this.decryptHelper(el, node.key));
+            }
+        });
+
+        return {
+            document: doc,
+        } as TransformationVisitResult;
+    }
+
+    // use standard AES 128 decryption
+    private decryptHelper(msg: string, key?: any): string
+    {
+            const msgBytes: any = aesjs.utils.hex.toBytes(msg);
+            const aesCtr: any = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+            return aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes));
+    }
+
+    // use standard AES 128 rencryption
+    private encryptHelper(msg: string, key?: any): string
+    {
+            const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
+            const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+            return aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes));
+    }
 }

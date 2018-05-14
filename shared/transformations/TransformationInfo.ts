@@ -44,22 +44,28 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import AddTransformationNode from 'shared/transformations/nodes/AddTransformationNode';
-import ArraySumTransformationNode from 'shared/transformations/nodes/ArraySumTransformationNode';
-import DivideTransformationNode from 'shared/transformations/nodes/DivideTransformationNode';
-import FindReplaceTransformationNode from 'shared/transformations/nodes/FindReplaceTransformationNode';
-import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
-import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
-import SetIfTransformationNode from 'shared/transformations/nodes/SetIfTransformationNode';
-import SubtractTransformationNode from 'shared/transformations/nodes/SubtractTransformationNode';
+import AddTransformationNode from './nodes/AddTransformationNode';
 import ArrayCountTransformationNode from './nodes/ArrayCountTransformationNode';
+import ArraySumTransformationNode from './nodes/ArraySumTransformationNode';
 import CastTransformationNode from './nodes/CastTransformationNode';
+import DecryptTransformationNode from './nodes/DecryptTransformationNode';
+import DifferenceTransformationNode from './nodes/DifferenceTransformationNode';
+import DivideTransformationNode from './nodes/DivideTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
+import EncryptTransformationNode from './nodes/EncryptTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
+import FindReplaceTransformationNode from './nodes/FindReplaceTransformationNode';
+import HashTransformationNode from './nodes/HashTransformationNode';
 import InsertTransformationNode from './nodes/InsertTransformationNode';
 import JoinTransformationNode from './nodes/JoinTransformationNode';
+import MultiplyTransformationNode from './nodes/MultiplyTransformationNode';
+import ProductTransformationNode from './nodes/ProductTransformationNode';
+import QuotientTransformationNode from './nodes/QuotientTransformationNode';
+import SetIfTransformationNode from './nodes/SetIfTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
+import SubtractTransformationNode from './nodes/SubtractTransformationNode';
+import SumTransformationNode from './nodes/SumTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
 import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
 import { TransformationEngine } from './TransformationEngine';
@@ -448,6 +454,124 @@ const TransformationNodeInfo: AllNodeInfoType =
           visitor.visitArrayCountNode(transformationNode, docCopy, options),
         newFieldType: 'number',
       },
+      [TransformationNodeType.ProductNode]:
+          {
+              humanName: 'Product of two or more fields',
+              editable: false,
+              creatable: true,
+              description: `Multiplies two or more fields together and puts the result in a new field`,
+              type: ProductTransformationNode,
+              isAvailable: (engine, fieldId) =>
+              {
+                  return (
+                      EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
+                      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+                  );
+              },
+              targetedVisitor: (visitor: TransformationNodeVisitor,
+                                transformationNode: TransformationNode,
+                                docCopy: object,
+                                options: object) =>
+                  visitor.visitProductNode(transformationNode, docCopy, options),
+              newFieldType: 'number',
+          },
+      [TransformationNodeType.QuotientNode]:
+          {
+              humanName: 'Quotient of two fields',
+              editable: false,
+              creatable: true,
+              description: `Divides two fields and puts the result in a new field`,
+              type: QuotientTransformationNode,
+              isAvailable: (engine, fieldId) =>
+              {
+                  return (
+                      EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
+                      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+                  );
+              },
+              targetedVisitor: (visitor: TransformationNodeVisitor,
+                                transformationNode: TransformationNode,
+                                docCopy: object,
+                                options: object) =>
+                  visitor.visitQuotientNode(transformationNode, docCopy, options),
+              newFieldType: 'number',
+          },
+      [TransformationNodeType.SumNode]:
+          {
+              humanName: 'Sum of two or more fields',
+              editable: false,
+              creatable: true,
+              description: `Sums two or more fields and puts the result in a new field`,
+              type: SumTransformationNode,
+              isAvailable: (engine, fieldId) =>
+              {
+                  return (
+                      EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
+                      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+                  );
+              },
+              targetedVisitor: (visitor: TransformationNodeVisitor,
+                                transformationNode: TransformationNode,
+                                docCopy: object,
+                                options: object) =>
+                  visitor.visitSumNode(transformationNode, docCopy, options),
+              newFieldType: 'number',
+          },
+      [TransformationNodeType.DifferenceNode]:
+          {
+              humanName: 'Difference of two fields',
+              editable: false,
+              creatable: true,
+              description: `Subtracts one field from another and puts the result in a new field`,
+              type: DifferenceTransformationNode,
+              isAvailable: (engine, fieldId) =>
+              {
+                  return (
+                      EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
+                      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+                  );
+              },
+              targetedVisitor: (visitor: TransformationNodeVisitor,
+                                transformationNode: TransformationNode,
+                                docCopy: object,
+                                options: object) =>
+                  visitor.visitDifferenceNode(transformationNode, docCopy, options),
+              newFieldType: 'number',
+          },
+      [TransformationNodeType.EncryptNode]:
+          {
+              humanName: 'Encrypt',
+              editable: true,
+              creatable: true,
+              description: `Encrypt a field using the secure AES algorithm`,
+              isAvailable: (engine, fieldId) =>
+              {
+                  return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+              },
+              type: EncryptTransformationNode,
+              targetedVisitor: (visitor: TransformationNodeVisitor,
+                                transformationNode: TransformationNode,
+                                docCopy: object,
+                                options: object) =>
+                  visitor.visitEncryptNode(transformationNode, docCopy, options),
+          },
+      [TransformationNodeType.DecryptNode]:
+          {
+              humanName: 'Decrypt',
+              editable: true,
+              creatable: true,
+              description: `Decrypt a field that was previously encrypted with an Encrypt transformation`,
+              isAvailable: (engine, fieldId) =>
+              {
+                  return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+              },
+              type: DecryptTransformationNode,
+              targetedVisitor: (visitor: TransformationNodeVisitor,
+                                transformationNode: TransformationNode,
+                                docCopy: object,
+                                options: object) =>
+                  visitor.visitDecryptNode(transformationNode, docCopy, options),
+          },
   };
 
 export type TNodeObject = Pick<TransformationNode, 'fields' | 'meta'>;
