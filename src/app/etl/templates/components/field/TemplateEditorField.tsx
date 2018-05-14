@@ -235,18 +235,6 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return _.extend(_.pick(this.props, ['fieldId', 'canEdit', 'noInteract', 'preview', 'displayKeyPath']), config);
   }
 
-  protected _isPrimaryKey()
-  {
-    const language = this._getCurrentLanguage();
-    switch (language)
-    {
-      case 'elastic':
-        return _.get(this._field().fieldProps, ['elastic', 'isPrimaryKey']) === true;
-      default:
-        return false;
-    }
-  }
-
   protected _isRootField()
   {
     const { fieldId } = this.props;
