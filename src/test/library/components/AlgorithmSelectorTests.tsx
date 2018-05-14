@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-empty
 
+import { DynamicForm } from 'app/common/components/DynamicForm';
 import { AlgorithmSelectorUncontained as AlgorithmSelector } from 'app/library/components/AlgorithmSelector';
 import Util from 'app/util/Util';
 import { mount, shallow } from 'enzyme';
@@ -53,7 +54,6 @@ import { List, Map } from 'immutable';
 import * as LibraryTypes from 'library/LibraryTypes';
 import { _LibraryState, LibraryState } from 'library/LibraryTypes';
 import * as React from 'react';
-import {DynamicForm} from 'app/common/components/DynamicForm';
 
 describe('AlgorithmSelector', () =>
 {
@@ -100,11 +100,11 @@ describe('AlgorithmSelector', () =>
       modelVersion: 5,
     }));
   const selectorState =
-  {
-    ids: List([-1, -1, -1]),
-    onChangeSelection: (ids) => {},
-    library,
-  };
+    {
+      ids: List([-1, -1, -1]),
+      onChangeSelection: (ids) => { },
+      library,
+    };
 
   beforeEach(() =>
   {
@@ -132,33 +132,33 @@ describe('AlgorithmSelector', () =>
 
   describe('#componentWillReceiveProps', () =>
   {
-     it('should update available groups based on category', () =>
-     {
-        selectorComponent.setProps({ids: List([1, -1, -1])});
-        const state = selectorComponent.state();
-        expect(state.categories).toEqual(List([1, 2]));
-        expect(state.groups).toEqual(List([3]));
-        expect(state.algorithms).toEqual(List([]));
-        const categoryNames = Map();
-        expect(state.categoryNames).toEqual(categoryNames.set(1, 'Category 1').set(2, 'Category 2'));
-        const groupNames = Map();
-        expect(state.groupNames).toEqual(groupNames.set(3, 'Group 1'));
-        expect(state.algorithmNames).toEqual(Map());
-     });
-     it('should update available algorithms based on group', () =>
-     {
-        selectorComponent.setProps({ids: List([1, 3, -1])});
-        const state = selectorComponent.state();
-        expect(state.categories).toEqual(List([1, 2]));
-        expect(state.groups).toEqual(List([3]));
-        expect(state.algorithms).toEqual(List([5]));
-        const categoryNames = Map();
-        expect(state.categoryNames).toEqual(categoryNames.set(1, 'Category 1').set(2, 'Category 2'));
-        const groupNames = Map();
-        expect(state.groupNames).toEqual(groupNames.set(3, 'Group 1'));
-        const algorithmNames = Map();
-        expect(state.algorithmNames).toEqual(algorithmNames.set(5: 'Algorithm 1'));
-     });
+    it('should update available groups based on category', () =>
+    {
+      selectorComponent.setProps({ ids: List([1, -1, -1]) });
+      const state = selectorComponent.state();
+      expect(state.categories).toEqual(List([1, 2]));
+      expect(state.groups).toEqual(List([3]));
+      expect(state.algorithms).toEqual(List([]));
+      const categoryNames = Map();
+      expect(state.categoryNames).toEqual(categoryNames.set(1, 'Category 1').set(2, 'Category 2'));
+      const groupNames = Map();
+      expect(state.groupNames).toEqual(groupNames.set(3, 'Group 1'));
+      expect(state.algorithmNames).toEqual(Map());
+    });
+    it('should update available algorithms based on group', () =>
+    {
+      selectorComponent.setProps({ ids: List([1, 3, -1]) });
+      const state = selectorComponent.state();
+      expect(state.categories).toEqual(List([1, 2]));
+      expect(state.groups).toEqual(List([3]));
+      expect(state.algorithms).toEqual(List([5]));
+      const categoryNames = Map();
+      expect(state.categoryNames).toEqual(categoryNames.set(1, 'Category 1').set(2, 'Category 2'));
+      const groupNames = Map();
+      expect(state.groupNames).toEqual(groupNames.set(3, 'Group 1'));
+      const algorithmNames = Map();
+      expect(state.algorithmNames).toEqual(algorithmNames.set(5: 'Algorithm 1'));
+    });
   });
 
   describe('#render', () =>
