@@ -78,11 +78,11 @@ Router.post('/delete/:id', passport.authenticate('access-token-local'), async (c
   ctx.body = await App.JobQ.delete(ctx.params.id);
 });
 
-// Retrieve job log by id
-Router.get('/log/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+// Retrieve job log by id, or all if none provided
+Router.get('/log/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.JobQueuePermissions.verifyGetLogRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.JobQ.getLog(ctx.params.id);
+  ctx.body = await App.JobL.get(ctx.params.id);
 });
 
 // pause job by id

@@ -55,6 +55,7 @@ import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import { Job } from './Job';
 import JobConfig from './JobConfig';
+import JobLogConfig from './JobLogConfig';
 import { Task } from './Task';
 import { TaskTree } from './TaskTree';
 
@@ -80,6 +81,7 @@ export class JobQueue
       [
         'createdAt',
         'createdBy',
+        'endTime',
         'logId',
         'meta',
         'name',
@@ -88,6 +90,7 @@ export class JobQueue
         'running',
         'runNowPriority',
         'scheduleId',
+        'startTime',
         'status',
         'tasks',
         'type',
@@ -168,6 +171,7 @@ export class JobQueue
         delete job.id;
       }
       job.createdBy = userId !== undefined ? userId : null;
+      job.endTime = null;
       job.meta = (job.meta !== undefined && job.meta !== null) ? job.meta : '';
       job.name = (job.name !== undefined && job.name !== null) ? job.name : '';
       job.pausedFilename = (job.pausedFilename !== undefined && job.pausedFilename !== null) ? job.pausedFilename : '';
@@ -175,6 +179,7 @@ export class JobQueue
       job.running = (job.running !== undefined && job.running !== null) ? job.running : false;
       job.runNowPriority = (job.runNowPriority !== undefined && job.runNowPriority !== null) ? job.runNowPriority : 1;
       job.scheduleId = (job.scheduleId !== undefined) ? job.scheduleId : null;
+      job.startTime = null;
       job.status = (job.status !== undefined && job.status !== null && job.status !== '') ? job.status : 'PENDING';
       job.tasks = (job.tasks !== undefined && job.tasks !== null) ? job.tasks : '[]';
       job.type = (job.type !== undefined && job.type !== null) ? job.type : 'default';
@@ -308,6 +313,8 @@ export class JobQueue
       this.runningRunNowJobs.delete(getJobs[0].id);
       // TODO: log job result
 
+      const jobLogConfig: JobLogConfig[] = await App.JobL.create(getJobs[0].id, jobResult['options']['logStream']);
+      await this._setJobLogId(getJobs[0].id, jobLogConfig[0].id);
       return resolve(jobResult['options']['outputStream'] as stream.Readable);
     });
   }
@@ -476,7 +483,23 @@ export class JobQueue
     });
   }
 
-  // Status codes: SUCCESS FAILURE PAUSED CANCELED RUNNING ABORTED (PAUSED/RUNNING when midway was restarted)
+  private async _setJobLogId(id: number, jobLogId: number): Promise<boolean>
+  {
+    return new Promise<boolean>(async (resolve, reject) =>
+    {
+      const jobs: JobConfig[] = await this._select([], { id }) as JobConfig[];
+      if (jobs.length === 0)
+      {
+        return resolve(false);
+      }
+
+      jobs[0].logId = jobLogId;
+      const doNothing: JobConfig[] = await App.DB.upsert(this.jobTable, jobs[0]) as JobConfig[];
+      resolve(true);
+    });
+  }
+
+  // Status codes: PENDING SUCCESS FAILURE PAUSED CANCELED RUNNING ABORTED (PAUSED/RUNNING when midway was restarted)
   private async _setJobStatus(id: number, running: boolean, status: string): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>
@@ -490,6 +513,16 @@ export class JobQueue
       {
         return resolve(false);
       }
+
+      if (jobs[0].running === false && running === true) // set start time
+      {
+        jobs[0].startTime = new Date();
+      }
+      if (jobs[0].running === true && running === false) // set end time
+      {
+        jobs[0].endTime = new Date();
+      }
+
       jobs[0].running = running;
       jobs[0].status = status;
       const doNothing: JobConfig[] = await App.DB.upsert(this.jobTable, jobs[0]) as JobConfig[];
