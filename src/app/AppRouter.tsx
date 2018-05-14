@@ -58,7 +58,6 @@ import Placeholder from './common/components/Placeholder';
 import Redirect from './common/components/Redirect';
 import TerrainComponent from './common/components/TerrainComponent';
 import UIComponentsPage from './common/UIComponentsPage';
-import ControlPage from './control/components/ControlPage';
 import ETLEditorPage from './etl/components/ETLEditorPage';
 import ETLPage from './etl/components/ETLPage';
 import ETLWalkthrough from './etl/walkthrough/components/ETLWalkthrough';
@@ -142,19 +141,18 @@ class AppRouter extends TerrainComponent<{}> {
 
           <Route path='/schema' component={SchemaPage} />
 
-          <Route path='/control' component={ControlPage} />
-
           <Route path='/import' component={FileImport /*TODO get rid of this once ETL is merged*/} />
 
           <Route path='/data' component={DataTabs}>
+            <Route path='templates' component={TemplateList} />
+            <Route path='newtemplate(/:step)' component={ETLWalkthrough} />
             <Route path='templates/edit/new' component={ETLEditorPage} />
             <Route path='templates/edit/algorithmId=:algorithmId' component={ETLEditorPage} />
             <Route path='templates/edit/templateId=:templateId' component={ETLEditorPage} />
-            <Route path='newtemplate(/:step)' component={ETLWalkthrough} />
-            <Route path='templates' component={TemplateList} />
+
             <Route path='integrations' component={IntegrationList} />
             <Route path='integrations/edit/integrationId=:integrationId' component={IntegrationEditorPage} />
-            
+
             <Route path='schedules' component={ScheduleList} />
             <Route path='jobs' component={Jobs} />
           </Route>
@@ -171,7 +169,7 @@ class AppRouter extends TerrainComponent<{}> {
               </Route>
             </Route>
           </Route>
-          
+
         </Route>
       </Router>
     );

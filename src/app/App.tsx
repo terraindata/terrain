@@ -186,7 +186,7 @@ const links =
     },
     {
       icon: <ImportIcon />,
-      text: 'Import',
+      text: 'Data',
       route: '/data/templates',
     },
     {
@@ -194,11 +194,6 @@ const links =
       text: 'Analytics',
       route: '/analytics',
       enabled: TerrainTools.isFeatureEnabled(TerrainTools.ANALYTICS),
-    },
-    {
-      icon: <ControlIcon />,
-      text: 'Control',
-      route: '/control',
     },
     // {
     //   icon: <ManualIcon />,

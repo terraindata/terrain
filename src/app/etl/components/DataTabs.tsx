@@ -43,18 +43,18 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+import ETLRouteUtil from 'app/etl/ETLRouteUtil';
 import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 import TerrainComponent from 'common/components/TerrainComponent';
 import TerrainTabs from 'common/components/TerrainTabs';
 import { ETLActions } from 'etl/ETLRedux';
 import IntegrationList from 'etl/integrations/components/IntegrationList';
 import TemplateList from 'etl/templates/components/TemplateList';
+import Jobs from 'jobs/components/Jobs';
 import * as React from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
-import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
-import ETLRouteUtil from 'app/etl/ETLRouteUtil';
 import ScheduleList from 'scheduler/components/ScheduleList';
-import Jobs from 'jobs/components/Jobs';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import Util from 'util/Util';
 import './DataTabs.less';
 
@@ -75,7 +75,7 @@ class DataTabs extends TerrainComponent<DataTabsProps>
     { key: 'integrations', label: 'Integrations' },
     { key: 'schedules', label: 'Schedules' },
     { key: 'jobs', label: 'Jobs' },
-    
+
     { key: 'newtemplate', label: 'New Import or Export' },
   ];
 
@@ -84,7 +84,7 @@ class DataTabs extends TerrainComponent<DataTabsProps>
     integrations: '/data/integrations',
     schedules: '/data/schedules',
     jobs: '/data/jobs',
-    
+
     newtemplate: '/data/newtemplate',
   };
 
