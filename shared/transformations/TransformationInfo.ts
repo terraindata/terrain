@@ -426,9 +426,9 @@ const TransformationNodeInfo: AllNodeInfoType =
           );
         },
         targetedVisitor: (visitor: TransformationNodeVisitor,
-                          transformationNode: TransformationNode,
-                          docCopy: object,
-                          options: object) =>
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
           visitor.visitArraySumNode(transformationNode, docCopy, options),
         newFieldType: 'number',
       },
@@ -448,130 +448,130 @@ const TransformationNodeInfo: AllNodeInfoType =
           );
         },
         targetedVisitor: (visitor: TransformationNodeVisitor,
-                          transformationNode: TransformationNode,
-                          docCopy: object,
-                          options: object) =>
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
           visitor.visitArrayCountNode(transformationNode, docCopy, options),
         newFieldType: 'number',
       },
-      [TransformationNodeType.ProductNode]:
-          {
-              humanName: 'Product of two or more fields',
-              editable: false,
-              creatable: true,
-              description: `Multiplies two or more fields together and puts the result in a new field`,
-              type: ProductTransformationNode,
-              isAvailable: (engine, fieldId) =>
-              {
-                  return (
-                      EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
-                      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
-                  );
-              },
-              targetedVisitor: (visitor: TransformationNodeVisitor,
-                                transformationNode: TransformationNode,
-                                docCopy: object,
-                                options: object) =>
-                  visitor.visitProductNode(transformationNode, docCopy, options),
-              newFieldType: 'number',
-          },
-      [TransformationNodeType.QuotientNode]:
-          {
-              humanName: 'Quotient of two fields',
-              editable: false,
-              creatable: true,
-              description: `Divides two fields and puts the result in a new field`,
-              type: QuotientTransformationNode,
-              isAvailable: (engine, fieldId) =>
-              {
-                  return (
-                      EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
-                      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
-                  );
-              },
-              targetedVisitor: (visitor: TransformationNodeVisitor,
-                                transformationNode: TransformationNode,
-                                docCopy: object,
-                                options: object) =>
-                  visitor.visitQuotientNode(transformationNode, docCopy, options),
-              newFieldType: 'number',
-          },
-      [TransformationNodeType.SumNode]:
-          {
-              humanName: 'Sum of two or more fields',
-              editable: false,
-              creatable: true,
-              description: `Sums two or more fields and puts the result in a new field`,
-              type: SumTransformationNode,
-              isAvailable: (engine, fieldId) =>
-              {
-                  return (
-                      EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
-                      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
-                  );
-              },
-              targetedVisitor: (visitor: TransformationNodeVisitor,
-                                transformationNode: TransformationNode,
-                                docCopy: object,
-                                options: object) =>
-                  visitor.visitSumNode(transformationNode, docCopy, options),
-              newFieldType: 'number',
-          },
-      [TransformationNodeType.DifferenceNode]:
-          {
-              humanName: 'Difference of two fields',
-              editable: false,
-              creatable: true,
-              description: `Subtracts one field from another and puts the result in a new field`,
-              type: DifferenceTransformationNode,
-              isAvailable: (engine, fieldId) =>
-              {
-                  return (
-                      EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
-                      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
-                  );
-              },
-              targetedVisitor: (visitor: TransformationNodeVisitor,
-                                transformationNode: TransformationNode,
-                                docCopy: object,
-                                options: object) =>
-                  visitor.visitDifferenceNode(transformationNode, docCopy, options),
-              newFieldType: 'number',
-          },
-      [TransformationNodeType.EncryptNode]:
-          {
-              humanName: 'Encrypt',
-              editable: true,
-              creatable: true,
-              description: `Encrypt a field using the secure AES algorithm`,
-              isAvailable: (engine, fieldId) =>
-              {
-                  return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
-              },
-              type: EncryptTransformationNode,
-              targetedVisitor: (visitor: TransformationNodeVisitor,
-                                transformationNode: TransformationNode,
-                                docCopy: object,
-                                options: object) =>
-                  visitor.visitEncryptNode((transformationNode as EncryptTransformationNode), docCopy, options),
-          },
-      [TransformationNodeType.DecryptNode]:
-          {
-              humanName: 'Decrypt',
-              editable: true,
-              creatable: true,
-              description: `Decrypt a field that was previously encrypted with an Encrypt transformation`,
-              isAvailable: (engine, fieldId) =>
-              {
-                  return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
-              },
-              type: DecryptTransformationNode,
-              targetedVisitor: (visitor: TransformationNodeVisitor,
-                                transformationNode: TransformationNode,
-                                docCopy: object,
-                                options: object) =>
-                  visitor.visitDecryptNode((transformationNode as DecryptTransformationNode), docCopy, options),
-          },
+    [TransformationNodeType.ProductNode]:
+      {
+        humanName: 'Product of two or more fields',
+        editable: false,
+        creatable: true,
+        description: `Multiplies two or more fields together and puts the result in a new field`,
+        type: ProductTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitProductNode(transformationNode, docCopy, options),
+        newFieldType: 'number',
+      },
+    [TransformationNodeType.QuotientNode]:
+      {
+        humanName: 'Quotient of two fields',
+        editable: false,
+        creatable: true,
+        description: `Divides two fields and puts the result in a new field`,
+        type: QuotientTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitQuotientNode(transformationNode, docCopy, options),
+        newFieldType: 'number',
+      },
+    [TransformationNodeType.SumNode]:
+      {
+        humanName: 'Sum of two or more fields',
+        editable: false,
+        creatable: true,
+        description: `Sums two or more fields and puts the result in a new field`,
+        type: SumTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitSumNode(transformationNode, docCopy, options),
+        newFieldType: 'number',
+      },
+    [TransformationNodeType.DifferenceNode]:
+      {
+        humanName: 'Difference of two fields',
+        editable: false,
+        creatable: true,
+        description: `Subtracts one field from another and puts the result in a new field`,
+        type: DifferenceTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitDifferenceNode(transformationNode, docCopy, options),
+        newFieldType: 'number',
+      },
+    [TransformationNodeType.EncryptNode]:
+      {
+        humanName: 'Encrypt',
+        editable: true,
+        creatable: true,
+        description: `Encrypt a field using the secure AES algorithm`,
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+        },
+        type: EncryptTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitEncryptNode((transformationNode as EncryptTransformationNode), docCopy, options),
+      },
+    [TransformationNodeType.DecryptNode]:
+      {
+        humanName: 'Decrypt',
+        editable: true,
+        creatable: true,
+        description: `Decrypt a field that was previously encrypted with an Encrypt transformation`,
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+        },
+        type: DecryptTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitDecryptNode((transformationNode as DecryptTransformationNode), docCopy, options),
+      },
   };
 
 export type TNodeObject = Pick<TransformationNode, 'fields' | 'meta'>;

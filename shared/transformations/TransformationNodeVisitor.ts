@@ -159,33 +159,33 @@ export default abstract class TransformationNodeVisitor
     return this.visitDefault(node, doc, options);
   }
 
-    public visitProductNode(node: ProductTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-    {
-        return this.visitDefault(node, doc, options);
-    }
+  public visitProductNode(node: ProductTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
 
-    public visitQuotientNode(node: QuotientTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-    {
-        return this.visitDefault(node, doc, options);
-    }
+  public visitQuotientNode(node: QuotientTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
 
-    public visitSumNode(node: SumTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-    {
-        return this.visitDefault(node, doc, options);
-    }
+  public visitSumNode(node: SumTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
 
-    public visitDifferenceNode(node: DifferenceTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-    {
-        return this.visitDefault(node, doc, options);
-    }
+  public visitDifferenceNode(node: DifferenceTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
 
-    public visitEncryptNode(node: EncryptTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-    {
-        return this.visitDefault(node, doc, options);
-    }
+  public visitEncryptNode(node: EncryptTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
 
-    public visitDecryptNode(node: DecryptTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-    {
-        return this.visitDefault(node, doc, options);
-    }
+  public visitDecryptNode(node: DecryptTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
 }

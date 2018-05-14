@@ -790,95 +790,95 @@ test('test find replace transformation', () =>
 
 test('array count transformation', () =>
 {
-    const doc = {
-        foo: [{}, {a: 3}, {b: 'fo'}, 4, []],
-    };
+  const doc = {
+    foo: [{}, { a: 3 }, { b: 'fo' }, 4, []],
+  };
 
-    const e: TransformationEngine = new TransformationEngine(doc);
-    e.appendTransformation(
-        TransformationNodeType.ArrayCountNode,
-        List<KeyPath>([KeyPath(['foo'])]),
-        {
-            newFieldKeyPaths: List<KeyPath>([KeyPath(['foocount'])]),
-        });
-    const r = e.transform(doc);
-    expect(r['foocount']).toBe(5);
+  const e: TransformationEngine = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.ArrayCountNode,
+    List<KeyPath>([KeyPath(['foo'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([KeyPath(['foocount'])]),
+    });
+  const r = e.transform(doc);
+  expect(r['foocount']).toBe(5);
 });
 
 test('take product of several fields', () =>
 {
-    const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
-    e.appendTransformation(
-        TransformationNodeType.ProductNode,
-        List<KeyPath>([KeyPath(['deepArray', '0', '0']), KeyPath(['deepArray', '1', '0'])]),
-        {
-            newFieldKeyPaths: List<KeyPath>([KeyPath(['producto'])]),
-        });
-    const r = e.transform(TestDocs.doc7);
-    expect(r['producto']).toBe(30);
+  const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
+  e.appendTransformation(
+    TransformationNodeType.ProductNode,
+    List<KeyPath>([KeyPath(['deepArray', '0', '0']), KeyPath(['deepArray', '1', '0'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([KeyPath(['producto'])]),
+    });
+  const r = e.transform(TestDocs.doc7);
+  expect(r['producto']).toBe(30);
 });
 
 test('take quotient of several fields', () =>
 {
-    const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
-    e.appendTransformation(
-        TransformationNodeType.QuotientNode,
-        List<KeyPath>([KeyPath(['deepArray', '1', '0']), KeyPath(['deepArray', '0', '0'])]),
-        {
-            newFieldKeyPaths: List<KeyPath>([KeyPath(['quotiento'])]),
-        });
-    const r = e.transform(TestDocs.doc7);
-    expect(r['quotiento']).toBe(1.2);
+  const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
+  e.appendTransformation(
+    TransformationNodeType.QuotientNode,
+    List<KeyPath>([KeyPath(['deepArray', '1', '0']), KeyPath(['deepArray', '0', '0'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([KeyPath(['quotiento'])]),
+    });
+  const r = e.transform(TestDocs.doc7);
+  expect(r['quotiento']).toBe(1.2);
 });
 
 test('take sum of several fields', () =>
 {
-    const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
-    e.appendTransformation(
-        TransformationNodeType.SumNode,
-        List<KeyPath>([KeyPath(['deepArray', '0', '0']), KeyPath(['deepArray', '1', '0'])]),
-        {
-            newFieldKeyPaths: List<KeyPath>([KeyPath(['summo'])]),
-        });
-    const r = e.transform(TestDocs.doc7);
-    expect(r['summo']).toBe(11);
+  const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
+  e.appendTransformation(
+    TransformationNodeType.SumNode,
+    List<KeyPath>([KeyPath(['deepArray', '0', '0']), KeyPath(['deepArray', '1', '0'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([KeyPath(['summo'])]),
+    });
+  const r = e.transform(TestDocs.doc7);
+  expect(r['summo']).toBe(11);
 });
 
 test('take difference of several fields', () =>
 {
-    const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
-    e.appendTransformation(
-        TransformationNodeType.DifferenceNode,
-        List<KeyPath>([KeyPath(['deepArray', '0', '0']), KeyPath(['deepArray', '1', '0'])]),
-        {
-            newFieldKeyPaths: List<KeyPath>([KeyPath(['differenceo'])]),
-        });
-    const r = e.transform(TestDocs.doc7);
-    expect(r['differenceo']).toBe(-1);
+  const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
+  e.appendTransformation(
+    TransformationNodeType.DifferenceNode,
+    List<KeyPath>([KeyPath(['deepArray', '0', '0']), KeyPath(['deepArray', '1', '0'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([KeyPath(['differenceo'])]),
+    });
+  const r = e.transform(TestDocs.doc7);
+  expect(r['differenceo']).toBe(-1);
 });
 
 test('Encrypt a field', () =>
 {
-    const e: TransformationEngine = new TransformationEngine(TestDocs.doc2);
-    e.appendTransformation(
-        TransformationNodeType.EncryptNode,
-        List<KeyPath>([KeyPath(['name'])]),
-    );
-    const r = e.transform(TestDocs.doc2);
-    expect(r['name']).toBe('cd1ae3');
+  const e: TransformationEngine = new TransformationEngine(TestDocs.doc2);
+  e.appendTransformation(
+    TransformationNodeType.EncryptNode,
+    List<KeyPath>([KeyPath(['name'])]),
+  );
+  const r = e.transform(TestDocs.doc2);
+  expect(r['name']).toBe('cd1ae3');
 });
 
 test('Encrypt and decrypt a field', () =>
 {
-    const e: TransformationEngine = new TransformationEngine(TestDocs.doc2);
-    e.appendTransformation(
-        TransformationNodeType.EncryptNode,
-        List<KeyPath>([KeyPath(['name'])]),
-    );
-    e.appendTransformation(
-        TransformationNodeType.DecryptNode,
-        List<KeyPath>([KeyPath(['name'])]),
-    );
-    const r = e.transform(TestDocs.doc2);
-    expect(r['name']).toBe('Bob');
+  const e: TransformationEngine = new TransformationEngine(TestDocs.doc2);
+  e.appendTransformation(
+    TransformationNodeType.EncryptNode,
+    List<KeyPath>([KeyPath(['name'])]),
+  );
+  e.appendTransformation(
+    TransformationNodeType.DecryptNode,
+    List<KeyPath>([KeyPath(['name'])]),
+  );
+  const r = e.transform(TestDocs.doc2);
+  expect(r['name']).toBe('Bob');
 });

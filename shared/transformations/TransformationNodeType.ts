@@ -151,22 +151,22 @@ interface TransformationOptionTypes
   ArrayCountNode: {
     newFieldKeyPaths: List<KeyPath>;
   };
-    ProductNode: {
-        newFieldKeyPaths: List<KeyPath>;
-    };
-    QuotientNode: {
-        newFieldKeyPaths: List<KeyPath>;
-    };
-    SumNode: {
-        newFieldKeyPaths: List<KeyPath>;
-    };
-    DifferenceNode: {
-        newFieldKeyPaths: List<KeyPath>;
-    };
-    EncryptNode: {
-    };
-    DecryptNode: {
-    };
+  ProductNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  QuotientNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  SumNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  DifferenceNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  EncryptNode: {
+  };
+  DecryptNode: {
+  };
 }
 
 export type NodeTypes = keyof TransformationOptionTypes;

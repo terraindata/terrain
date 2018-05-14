@@ -54,12 +54,12 @@ import TransformationNode from './TransformationNode';
 
 export default class DecryptTransformationNode extends TransformationNode
 {
-    public privateKey: string = sha1(`0VAtqVlzusw8nqA8TMoSfGHR3ik3dB-c9t4-gKUjD5iRbsWQWRzeL
+  public privateKey: string = sha1(`0VAtqVlzusw8nqA8TMoSfGHR3ik3dB-c9t4-gKUjD5iRbsWQWRzeL
                        -6mBtRGWV4M2A7ZZryVT7-NZjTvzuY7qhjrZdJTv4iGPmcbta-3iL
                        kgfEzY3QufFvm14dqtzfsCXhboiOC23idadrMNGlQwyJ783XlGwLB
                        xDeGI01olmhg0oiNCeoGc_4zDrHq3wcgcwQ_mpZYAj9mJsv_OI_yD
                        iN83Y_gDQCTzA9u3NdmmxquD2jSrR2fSKRokspxqBjb5`).substring(0, 16);
-    public key: any = aesjs.utils.utf8.toBytes(this.privateKey);
+  public key: any = aesjs.utils.utf8.toBytes(this.privateKey);
 
   public constructor(id: number,
     fields: List<KeyPath>,
