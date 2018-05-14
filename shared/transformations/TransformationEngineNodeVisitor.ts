@@ -49,6 +49,7 @@ import aesjs = require('aes-js');
 import * as Immutable from 'immutable';
 import { keccak256 } from 'js-sha3';
 
+import {diff} from 'semver';
 import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 import AddTransformationNode from './nodes/AddTransformationNode';
@@ -79,7 +80,6 @@ import TransformationNodeType, { NodeOptionsType } from './TransformationNodeTyp
 import TransformationNodeVisitor from './TransformationNodeVisitor';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
-import {diff} from 'semver';
 
 export default class TransformationEngineNodeVisitor extends TransformationNodeVisitor
 {

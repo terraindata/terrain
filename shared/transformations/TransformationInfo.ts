@@ -553,7 +553,7 @@ const TransformationNodeInfo: AllNodeInfoType =
                                 transformationNode: TransformationNode,
                                 docCopy: object,
                                 options: object) =>
-                  visitor.visitEncryptNode(transformationNode, docCopy, options),
+                  visitor.visitEncryptNode((transformationNode as EncryptTransformationNode), docCopy, options),
           },
       [TransformationNodeType.DecryptNode]:
           {
@@ -570,7 +570,7 @@ const TransformationNodeInfo: AllNodeInfoType =
                                 transformationNode: TransformationNode,
                                 docCopy: object,
                                 options: object) =>
-                  visitor.visitDecryptNode(transformationNode, docCopy, options),
+                  visitor.visitDecryptNode((transformationNode as DecryptTransformationNode), docCopy, options),
           },
   };
 
