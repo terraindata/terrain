@@ -124,11 +124,6 @@ class Jobs extends TerrainComponent<any> {
 
     const jobsHeader = [
       {
-        columnKey: 'id',
-        columnLabel: 'Id',
-        columnRelativeSize: .5,
-      },
-      {
         columnKey: 'name',
         columnLabel: 'Name',
         columnRelativeSize: 2,
