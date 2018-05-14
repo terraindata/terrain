@@ -43,23 +43,18 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import { createSelector } from 'reselect';
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as React from 'react';
+import './Badge.less';
 
-const getJobs = (state) => state.get('jobs').jobs;
+interface BadgeProps
+{
+  label: string;
+  color: string;
+}
 
-export const getCompletedJobs = createSelector(
-  getJobs,
-  (jobs) => jobs.filter((j) =>
-    ['SUCCESS', 'FAILURE', 'ABORTED', 'CANCELED'].indexOf(j.status) > -1,
-  ),
+const Badge = (props: BadgeProps) => (
+  <div className='badge' style={{ backgroundColor: props.color }}>{props.label}</div>
 );
 
-export const getPendingJobs = createSelector(
-  getJobs,
-  (jobs) => jobs.filter((j) => j.status === 'PENDING'),
-);
-
-export const getRunningJobs = createSelector(
-  getJobs,
-  (jobs) => jobs.filter((j) => j.status === 'RUNNING'),
-);
+export default Badge;

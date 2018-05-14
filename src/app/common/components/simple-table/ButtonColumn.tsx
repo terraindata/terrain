@@ -43,23 +43,32 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import { createSelector } from 'reselect';
+import Button from 'common/components/Button';
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as React from 'react';
 
-const getJobs = (state) => state.get('jobs').jobs;
+interface ButtonColumnProps
+{
+  colKey?: string; // columnKey
+  rowData?: any; // the whole row data
 
-export const getCompletedJobs = createSelector(
-  getJobs,
-  (jobs) => jobs.filter((j) =>
-    ['SUCCESS', 'FAILURE', 'ABORTED', 'CANCELED'].indexOf(j.status) > -1,
-  ),
-);
+  label: string;
+  onClick: (key, rowData) => void;
+}
 
-export const getPendingJobs = createSelector(
-  getJobs,
-  (jobs) => jobs.filter((j) => j.status === 'PENDING'),
-);
+class BadgeColumn extends TerrainComponent<ButtonColumnProps>
+{
+  public render()
+  {
+    const { colKey, rowData } = this.props;
 
-export const getRunningJobs = createSelector(
-  getJobs,
-  (jobs) => jobs.filter((j) => j.status === 'RUNNING'),
-);
+    return (
+      <Button
+        text={this.props.label}
+        onClick={() => this.props.onClick(colKey, rowData)}
+      />
+    );
+  }
+}
+
+export default BadgeColumn;
