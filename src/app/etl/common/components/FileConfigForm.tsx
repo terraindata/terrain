@@ -55,6 +55,7 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
+import Util from 'app/util/Util';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { FileConfig as FileConfigI } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
@@ -127,7 +128,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
   @instanceFnDecorator(memoizeOne)
   public configToState(config: FileConfig): FileConfigI
   {
-    return config.toJS() as FileConfigI;
+    return Util.asJS(config) as FileConfigI;
   }
 
   public handleFormChange(state: FileConfigI, isBlur?: boolean)

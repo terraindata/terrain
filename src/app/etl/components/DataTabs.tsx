@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 import TerrainComponent from 'common/components/TerrainComponent';
 import TerrainTabs from 'common/components/TerrainTabs';
 import { ETLActions } from 'etl/ETLRedux';
@@ -61,6 +62,7 @@ interface DataTabsProps
   params: any;
   router: any;
   children: JSX.Element;
+  modalRequests: List<ModalProps>;
 }
 
 class DataTabs extends TerrainComponent<DataTabsProps>
@@ -68,17 +70,13 @@ class DataTabs extends TerrainComponent<DataTabsProps>
   public tabs = [
     { key: 'templates', label: 'Templates' },
     { key: 'integrations', label: 'Integrations' },
-    { key: 'runnow', label: 'Import / Export Run Now' },
+    { key: 'newtemplate', label: 'New Import or Export' },
   ];
 
   public tabToRouteMap = {
     templates: '/data/templates',
     integrations: '/data/integrations',
-    runnow: '/data/runnow',
-  };
-
-  public state = {
-    tabIndex: this.tabs.indexOf(this.props.params.tab),
+    newtemplate: '/data/newtemplate',
   };
 
   public componentDidMount()
@@ -93,9 +91,17 @@ class DataTabs extends TerrainComponent<DataTabsProps>
     // TODO lock UI until done?
   }
 
+  public setModalRequests(requests)
+  {
+    this.props.etlActions({
+      actionType: 'setModalRequests',
+      requests,
+    });
+  }
+
   public render()
   {
-    const { params, router, children } = this.props;
+    const { params, router, children, modalRequests } = this.props;
 
     return (
       <div className='etl'>
@@ -107,6 +113,10 @@ class DataTabs extends TerrainComponent<DataTabsProps>
           >
             {this.props.children}
           </TerrainTabs>
+          <MultiModal
+            requests={modalRequests}
+            setRequests={this.setModalRequests}
+          />
         </div>
       </div>
     );
@@ -115,6 +125,6 @@ class DataTabs extends TerrainComponent<DataTabsProps>
 
 export default Util.createContainer(
   DataTabs,
-  [],
+  [['etl', 'modalRequests']],
   { etlActions: ETLActions },
 );

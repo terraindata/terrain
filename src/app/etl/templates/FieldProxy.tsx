@@ -114,6 +114,17 @@ export class EngineProxy
     this.engine.deleteTransformation(id);
   }
 
+  public setFieldHidden(id: number, hidden: boolean)
+  {
+    this.setUIFieldProp(id, 'hidden', hidden);
+  }
+
+  public setUIFieldProp(fieldId: number, key: string, value: any)
+  {
+    this.engine.setFieldProp(fieldId, EnginePath(['uiState', key]), value);
+    this.requestRebuild();
+  }
+
   /*
    *  This is a rather complicated operation
    *  If the given keypath is [foo, *], then we need to create the specific field [foo, index]
@@ -196,7 +207,7 @@ export class EngineProxy
     this.engine.setOutputKeyPath(destId, destKP);
     this.engine.setOutputKeyPath(newOrigId, originalOKP);
     this.engine.disableField(sourceId);
-
+    this.setFieldHidden(sourceId, true);
     this.requestRebuild();
   }
 

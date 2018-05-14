@@ -62,6 +62,7 @@ import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
+const hiddenPath = List(['uiState', 'hidden']);
 export function createTreeFromEngine(engine: TransformationEngine): FieldMap
 {
   const ids = engine.getAllFieldIDs();
@@ -127,6 +128,7 @@ export function createFieldFromEngine(
 
   return _TemplateField({
     isIncluded: engine.getFieldEnabled(id),
+    isHidden: engine.getFieldProp(id, hiddenPath) === true,
     fieldId: id,
     fieldProps: engine.getFieldProps(id),
     inputKeyPath: engine.getInputKeyPath(id),

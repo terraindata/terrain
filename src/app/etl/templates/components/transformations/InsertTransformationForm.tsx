@@ -43,125 +43,121 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires import-spacing
-
-import * as classNames from 'classnames';
+// tslint:disable:no-var-requires no-empty-interface max-classes-per-file
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { borderColor, Colors, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
+
+import { instanceFnDecorator } from 'shared/util/Classes';
+
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { TransformationNode } from 'etl/templates/FieldTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
+
+import { DynamicForm } from 'common/components/DynamicForm';
+import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-
-import { availableTransformations, getTransformationForm } from 'etl/templates/components/transformations/TransformationForms';
-import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
-import { TransformationNode } from 'etl/templates/FieldTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { InfoType, TransformationInfo } from 'shared/transformations/TransformationInfo';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-
-import './TransformationEditor.less';
-
-interface FormState
+interface InsertOptions
 {
-  transformationIndex: number;
+  insertType: TypeOptions;
+  customIndex: number;
+  value: string;
 }
 
-export interface Props
-{
-  onClose: () => void;
-  engine: TransformationEngine;
-  fieldID: number;
-  tryMutateEngine: (tryFn: (proxy: EngineProxy) => void) => void;
-}
+type TypeOptions = 'append' | 'prepend' | 'custom';
+const typeOptions: List<TypeOptions> = List(['append', 'prepend', 'custom'] as TypeOptions[]);
 
-@Radium
-export class TransformationCreator extends TerrainComponent<Props>
+export class InsertTFF extends TransformationForm<InsertOptions, TransformationNodeType.InsertNode>
 {
-  public state: FormState = {
-    transformationIndex: -1,
+  protected readonly inputMap: InputDeclarationMap<InsertOptions> = {
+    insertType: {
+      type: DisplayType.Pick,
+      displayName: 'Type',
+      group: 'first',
+      widthFactor: 2,
+      options: {
+        pickOptions: (s) => typeOptions,
+        indexResolver: (option) => typeOptions.indexOf(option),
+      },
+    },
+    customIndex: {
+      type: DisplayType.NumberBox,
+      displayName: 'Position',
+      group: 'first',
+      widthFactor: 2,
+      getDisplayState: (s: InsertOptions) => s.insertType === 'custom' ? DisplayState.Active : DisplayState.Hidden,
+    },
+    value: {
+      type: DisplayType.TextBox,
+      displayName: 'Value to Add',
+      group: 'second',
+      widthFactor: 4,
+    },
   };
+  protected readonly initialState = {
+    insertType: 'append' as 'append',
+    customIndex: 0,
+    value: '',
+  };
+  protected readonly type = TransformationNodeType.InsertNode;
 
-  private inputMap: InputDeclarationMap<FormState> =
-    {
-      transformationIndex: {
-        type: DisplayType.Pick,
-        displayName: 'Transformation',
-        group: 'main',
-        options: {
-          pickOptions: this.getOptionNames,
-        },
-      },
-    };
-
-  public getValidOptions(): List<TransformationNodeType>
+  protected computeInitialState()
   {
-    return availableTransformations.filter(
-      (type, index) =>
+    const { isCreate, transformation } = this.props;
+    if (isCreate)
+    {
+      return this.initialState;
+    }
+    else
+    {
+      const meta = transformation.meta as NodeOptionsType<TransformationNodeType.InsertNode>;
+      let type: TypeOptions = 'custom';
+      if (meta.at === 0)
       {
-        return TransformationInfo.isAvailable(type, this.props.engine, this.props.fieldID);
-      },
-    ).toList();
+        type = 'prepend';
+      }
+      else if (meta.at === -1)
+      {
+        type = 'append';
+      }
+      return {
+        insertType: type,
+        customIndex: meta.at,
+        value: meta.value as string,
+      };
+    }
   }
 
-  public getOptionNames(s: FormState)
+  protected computeArgs()
   {
-    const transformations = this.getValidOptions();
-    return transformations.map((type) => TransformationInfo.getReadableName(type)).toList();
-  }
+    const { engine, fieldId } = this.props;
+    const { value, insertType, customIndex } = this.state;
+    const args = super.computeArgs();
 
-  public renderCreateTransformation()
-  {
-    const { transformationIndex } = this.state;
-    let compComponent = null;
-    if (transformationIndex !== -1)
+    let index = customIndex;
+    if (insertType === 'append')
     {
-      const type = this.getValidOptions().get(transformationIndex);
-      const CompClass = getTransformationForm(type);
-      compComponent = (
-        <CompClass
-          isCreate={true}
-          engine={this.props.engine}
-          fieldId={this.props.fieldID}
-          onClose={this.props.onClose}
-          tryMutateEngine={this.props.tryMutateEngine}
-        />
-      );
+      index = -1;
+    }
+    else if (insertType === 'prepend')
+    {
+      index = 0;
     }
 
-    return (
-      <div className='create-transformation-container'>
-        <DynamicForm
-          inputMap={this.inputMap}
-          inputState={this.state}
-          onStateChange={this.handleStateChange}
-        />
-        <div className='create-transformation-component'>
-          {compComponent}
-        </div>
-      </div>
-    );
+    return {
+      options: {
+        value,
+        at: index,
+      },
+      fields: args.fields,
+    };
   }
-
-  public render()
-  {
-    return (
-      <div className='transformation-editor'>
-        {this.renderCreateTransformation()}
-      </div>
-    );
-  }
-
-  public handleStateChange(s: FormState)
-  {
-    this.setState(s);
-  }
-
 }

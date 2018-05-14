@@ -59,15 +59,17 @@ import { Menu, MenuOption } from 'common/components/Menu';
 import Modal from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
 import { ETLActions } from 'etl/ETLRedux';
+import ETLRouteUtil from 'etl/ETLRouteUtil';
 import Initializers from 'etl/helpers/TemplateInitializers';
 import { MidwayError } from 'shared/error/MidwayError';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
-import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
-
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import './TemplateList.less';
+const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface AllowedActions
 {
@@ -167,28 +169,47 @@ class TemplateList extends TerrainComponent<Props>
     };
   }
 
+  public getActions(index: number, template)
+  {
+    return (
+      <RemoveIcon
+        className='template-delete close'
+        onClick={this._fn(this.deleteAction, template)}
+      />
+    );
+  }
+
   public render()
   {
     const computeOptions = this.computeMenuOptionsFactory(this.props.allowedActions);
-
     return (
-      <ItemList
-        items={this.props.templates}
-        columnConfig={this.displayConfig}
-        onRowClicked={this.handleOnClick}
-        getMenuOptions={computeOptions}
-        itemsName='template'
-      />
+      <div
+        className='template-table-wrapper'
+      >
+        <ItemList
+          items={this.props.templates}
+          columnConfig={this.displayConfig}
+          onRowClicked={this.handleOnClick}
+          getMenuOptions={computeOptions}
+          itemsName='template'
+          getActions={!computeOptions ? this.getActions : undefined}
+        />
+      </div>
     );
   }
 
   public handleOnClick(index)
   {
+    const { templates } = this.props;
+    const template = templates.get(index);
     if (this.props.onClick != null)
     {
-      const { templates } = this.props;
-      const template = templates.get(index);
       this.props.onClick(template);
+    }
+    else
+    {
+      // open that template in the template editor
+      ETLRouteUtil.gotoEditTemplate(template.id);
     }
   }
 
@@ -208,28 +229,37 @@ class TemplateList extends TerrainComponent<Props>
   {
     return (event) =>
     {
-      const onConfirm = () =>
-      {
-        this.props.etlAct({
-          actionType: 'deleteTemplate',
-          template,
-        });
-      };
-      this.props.etlAct({
-        actionType: 'addModal',
-        props: {
-          title: 'Confirm Action',
-          message: 'Are you sure you want to delete this template?',
-          closeOnConfirm: true,
-          confirm: true,
-          onConfirm,
-        },
-      });
-      if (this.props.onMenuItemClicked !== undefined)
-      {
-        this.props.onMenuItemClicked(template, 'delete');
-      }
+      this.deleteAction(template, event);
     };
+  }
+
+  public deleteAction(template: ETLTemplate, e?)
+  {
+    if (e !== undefined)
+    {
+      e.stopPropagation();
+    }
+    const onConfirm = () =>
+    {
+      this.props.etlAct({
+        actionType: 'deleteTemplate',
+        template,
+      });
+    };
+    this.props.etlAct({
+      actionType: 'addModal',
+      props: {
+        title: 'Confirm Action',
+        message: 'Are you sure you want to delete this template?',
+        closeOnConfirm: true,
+        confirm: true,
+        onConfirm,
+      },
+    });
+    if (this.props.onMenuItemClicked !== undefined)
+    {
+      this.props.onMenuItemClicked(template, 'delete');
+    }
   }
 }
 

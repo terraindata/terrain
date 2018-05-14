@@ -115,7 +115,7 @@ describe('TerrainTabs', () =>
     {
       tabsComponent.instance().handleSelect(1);
 
-      expect(tabsComponent.state().tabIndex).toEqual(1);
+      expect(tabsComponent.instance().getActiveTabIndex()).toEqual(1);
       expect(browserHistory.replace).toHaveBeenCalledTimes(1);
     });
   });
