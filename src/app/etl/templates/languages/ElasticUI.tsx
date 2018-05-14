@@ -49,16 +49,16 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import * as _ from 'lodash';
 
-import { LanguageInterface } from 'etl/templates/languages/LanguageUI';
 import ElasticFieldSettings from 'etl/templates/components/field/ElasticFieldSettings';
+import { LanguageInterface } from 'etl/templates/languages/LanguageUI';
+import { defaultProps, ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
 import TypeUtil from 'shared/etl/TypeUtil';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
-import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import { ElasticTypes, defaultProps } from 'shared/etl/types/ETLElasticTypes';
 
 class ElasticUI implements LanguageInterface
 {

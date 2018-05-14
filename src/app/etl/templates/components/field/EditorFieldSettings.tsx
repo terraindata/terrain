@@ -61,10 +61,10 @@ import { leftColumnWidth } from 'etl/templates/components/field/NestedView';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { Languages } from 'shared/etl/types/ETLTypes';
 
+import LanguageUI from 'etl/templates/languages/LanguageUI';
 import FieldMainSettings from './FieldMainSettings';
 import FieldSettingsTransformations from './FieldSettingsTransformations';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
-import LanguageUI from 'etl/templates/languages/LanguageUI';
 
 import EditorFieldPreview from './EditorFieldPreview';
 import './FieldSettings.less';
@@ -158,7 +158,7 @@ class EditorFieldSettings extends TemplateEditorField<Props>
         <Component
           {...this._passProps()}
         />
-      )
+      );
     }
     else
     {

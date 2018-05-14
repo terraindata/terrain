@@ -47,8 +47,8 @@ THE SOFTWARE.
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-import { LanguageInterface } from 'shared/etl/languages/LanguageControllers';
 import * as Immutable from 'immutable';
+import { LanguageInterface } from 'shared/etl/languages/LanguageControllers';
 const { List, Map } = Immutable;
 
 class DefaultController implements LanguageInterface

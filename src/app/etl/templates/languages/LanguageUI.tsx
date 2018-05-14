@@ -46,9 +46,9 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires import-spacing strict-boolean-expressions
 import * as React from 'react';
 
+import { TemplateEditorFieldProps } from 'etl/templates/components/field/TemplateEditorField';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { TemplateEditorFieldProps } from 'etl/templates/components/field/TemplateEditorField';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
@@ -64,7 +64,7 @@ export interface LanguageInterface
   overrideTypeNames: (
     engine: TransformationEngine,
     fieldId: number,
-    displayOptions: Immutable.Map<string, string>
+    displayOptions: Immutable.Map<string, string>,
   ) => Immutable.Map<string, string>;
 }
 

@@ -48,9 +48,9 @@ import * as React from 'react';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
+import { TemplateEditorFieldProps } from 'etl/templates/components/field/TemplateEditorField';
 import { LanguageInterface } from 'etl/templates/languages/LanguageUI';
 import * as Immutable from 'immutable';
-import { TemplateEditorFieldProps } from 'etl/templates/components/field/TemplateEditorField';
 const { List, Map } = Immutable;
 
 class DefaultUI implements LanguageInterface
