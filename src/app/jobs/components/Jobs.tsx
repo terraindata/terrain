@@ -46,6 +46,7 @@ THE SOFTWARE.
 // tslint:disable:no-console
 import 'builder/components/pathfinder/filter/PathfinderFilter.less';
 import 'builder/components/pathfinder/Pathfinder.less';
+import { Colors } from 'colors/Colors';
 import Section from 'common/components/Section';
 import SimpleTable, { BadgeColumn, ButtonColumn } from 'common/components/SimpleTable';
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -98,24 +99,7 @@ class Jobs extends TerrainComponent<any> {
 
   public getStatusColor(status)
   {
-    switch (status)
-    {
-      case 'SUCCESS':
-        return '#94be6b';
-      case 'ABORTED':
-      case 'CANCELED':
-        return '#ffa8b9';
-      case 'RUNNING':
-        return '#1eb4fa';
-      case 'FAILURE':
-        return '#ea526f';
-      case 'PAUSED':
-        return '#ff8a5b';
-      case 'PENDING':
-        return '#cccccc';
-      default:
-        return '#fff';
-    }
+    return Colors().statuses[status];
   }
 
   public expandSection(isExpanded, section)
