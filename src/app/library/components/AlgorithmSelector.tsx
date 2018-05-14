@@ -84,7 +84,7 @@ interface State
 
 type AvailableItemsType = [List<ID>, Map<ID, string>];
 
-class AlgorithmSelector extends TerrainComponent<Props>
+export class AlgorithmSelectorUncontained extends TerrainComponent<Props>
 {
   public state: State = {
     categories: List(),
@@ -175,10 +175,10 @@ class AlgorithmSelector extends TerrainComponent<Props>
   public getAvailableItems(libraryState: LibraryState, key: string, filterFn: (item) => boolean): AvailableItemsType
   {
     const items = libraryState[key].filter(filterFn).toList();
-    return [items.map((item) => item.id), this.itemsToMap(items)];
+    return [items.map((item) => item.id), this.itemsToNameMap(items)];
   }
 
-  public itemsToMap(items: List<LibraryItem>): Map<ID, string>
+  public itemsToNameMap(items: List<LibraryItem>): Map<ID, string>
   {
     let displayNames: Map<ID, string> = Map();
     items.forEach((item) =>
@@ -189,7 +189,7 @@ class AlgorithmSelector extends TerrainComponent<Props>
 
   public handleSelectorChange(newState)
   {
-    let newIds = List(_.values(newState));
+    let newIds = List([newState.category, newState.group, newState.algorithm]);
     const { ids } = this.props;
     // If category changes, reset group + algorithm
     if (newIds.get(0) !== ids.get(0))
@@ -218,8 +218,10 @@ class AlgorithmSelector extends TerrainComponent<Props>
   }
 }
 
-export default Util.createTypedContainer(
-  AlgorithmSelector,
+const AlgorithmSelector = Util.createTypedContainer(
+  AlgorithmSelectorUncontained,
   ['library'],
   {},
 );
+
+export default AlgorithmSelector;
