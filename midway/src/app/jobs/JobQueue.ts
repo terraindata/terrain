@@ -216,9 +216,18 @@ export class JobQueue
     return this._select([], { id, running });
   }
 
-  public async getLog(id: number): Promise<object>
+  public async getLog(id?: number): Promise<JobLogConfig[]>
   {
-    return Promise.resolve({}); // TODO implement this
+    return new Promise<JobLogConfig[]>(async (resolve, reject) =>
+    {
+      const jobs: JobConfig[] = await this.get(id);
+      if (jobs.length === 0)
+      {
+        throw new Error('Job not found.');
+      }
+      const jobLogConfig: JobLogConfig[] = await App.JobL.get(id);
+      return resolve(jobLogConfig);
+    });
   }
 
   public async pause(id: number): Promise<JobConfig[]>
