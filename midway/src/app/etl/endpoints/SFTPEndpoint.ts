@@ -62,38 +62,20 @@ export default class SFTPEndpoint extends AEndpointStream
 
   public async getSource(source: SourceConfig): Promise<Readable>
   {
-    const integrationId = source['integrationId'];
-    const sftp: SSH.SFTPWrapper = await this.getSFTPClientByintegrationId(integrationId);
+    const config: SSH.ConnectConfig = await this.getIntegrationConfig(source.integrationId);
+    const sftp: SSH.SFTPWrapper = await this.getSFTPClient(config);
     return sftp.createReadStream(source.options['filepath']);
   }
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
-    const integrationId = sink['integrationId'];
-    const sftp: SSH.SFTPWrapper = await this.getSFTPClientByintegrationId(integrationId);
+    const config: SSH.ConnectConfig = await this.getIntegrationConfig(sink.integrationId);
+    const sftp: SSH.SFTPWrapper = await this.getSFTPClient(config);
     return sftp.createWriteStream(sink.options['filepath']);
   }
 
-  private async getSFTPClientByintegrationId(integrationId: number): Promise<SSH.SFTPWrapper>
+  private async getSFTPClient(sftpConfig: SSH.ConnectConfig): Promise<SSH.SFTPWrapper>
   {
-    const integration: IntegrationConfig[] = await integrations.get(null, integrationId);
-    if (integration.length === 0)
-    {
-      throw new Error('Invalid SFTP integration ID.');
-    }
-
-    let sftpConfig: object = {};
-    try
-    {
-      const connectionConfig = JSON.parse(integration[0].connectionConfig);
-      const authConfig = JSON.parse(integration[0].authConfig);
-      sftpConfig = Object.assign(connectionConfig, authConfig);
-    }
-    catch (e)
-    {
-      throw new Error('Retrieving integration ID ' + String(integrationId));
-    }
-
     return new Promise<SSH.SFTPWrapper>((resolve, reject) =>
     {
       const client = new SSH.Client();
