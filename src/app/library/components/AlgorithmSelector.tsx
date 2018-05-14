@@ -45,18 +45,20 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:no-var-requires strict-boolean-expressions
-
 import * as classNames from 'classnames';
-import { List } from 'immutable';
+import { List, Map } from 'immutable';
+import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
 
+import { DynamicForm } from 'app/common/components/DynamicForm';
 import Dropdown from 'common/components/Dropdown';
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { LibraryState } from 'library/LibraryTypes';
 import { LibraryItem } from 'library/LibraryTypes';
 import Util from 'util/Util';
-
+import { ItemStatus } from '../../../items/types/Item';
 import './AlgorithmSelector.less';
 
 const Color = require('color');
@@ -70,139 +72,148 @@ export interface Props
   library?: LibraryState;
 }
 
-type AvailableItemsType = [List<LibraryItem>, List<string>, number];
+interface State
+{
+  categories: List<ID>;
+  categoryNames: Map<ID, string>;
+  groups: List<ID>;
+  groupNames: Map<ID, string>;
+  algorithms: List<ID>;
+  algorithmNames: Map<ID, string>;
+}
+
+type AvailableItemsType = [List<ID>, Map<ID, string>];
 
 class AlgorithmSelector extends TerrainComponent<Props>
 {
-  public constructor(props)
-  {
-    super(props);
-    this.getAvailableCategories = memoizeOne(this.getAvailableCategories);
-    this.getAvailableGroups = memoizeOne(this.getAvailableGroups);
-    this.getAvailableAlgorithms = memoizeOne(this.getAvailableAlgorithms);
-  }
+  public state: State = {
+    categories: List(),
+    categoryNames: Map(),
+    groups: List(),
+    groupNames: Map(),
+    algorithms: List(),
+    algorithmNames: Map(),
+  };
 
-  public handleCategoryChange(index, event)
+  public selectorMap = {
+    category: {
+      type: DisplayType.Pick,
+      displayName: 'Category',
+      options: {
+        pickOptions: (state) => this.state.categories,
+        displayNames: (state) => this.state.categoryNames,
+        indexResolver: (state) => this.state.categories.indexOf(state),
+      },
+    },
+    group: {
+      type: DisplayType.Pick,
+      displayName: 'Group',
+      options: {
+        pickOptions: (state) => this.state.groups,
+        displayNames: (state) => this.state.groupNames,
+        indexResolver: (state) => this.state.groups.indexOf(state),
+      },
+    },
+    algorithm: {
+      type: DisplayType.Pick,
+      displayName: 'Algorithm',
+      options: {
+        pickOptions: (state) => this.state.algorithms,
+        displayNames: (state) => this.state.algorithmNames,
+        indexResolver: (state) => this.state.algorithms.indexOf(state),
+      },
+    },
+  };
+
+  public componentDidMount()
   {
-    const [categories, categoryNames, categoryIndex] =
-      this.getAvailableCategories(this.props.library, this.props.ids.get(0));
-    const id = categories.get(index).id;
-    if (id === this.props.ids.get(0)) // nothing changed
+    if (this.props.library)
     {
-      return;
+      this.setItems(this.props.library, this.props.ids);
     }
-    this.props.onChangeSelection(List([id as number, -1, -1]));
   }
 
-  public handleGroupChange(index, event)
+  public componentWillReceiveProps(nextProps: Props)
   {
-    const [groups, groupNames, groupIndex] =
-      this.getAvailableGroups(this.props.library, this.props.ids.get(0), this.props.ids.get(1));
-    const id = groups.get(index).id;
-    if (id === this.props.ids.get(1)) // nothing changed
+    if (Util.didStateChange(this.props.library, nextProps.library, ['categories', 'groups', 'algorithms'])
+      || this.props.ids !== nextProps.ids)
     {
-      return;
+      if (nextProps.library)
+      {
+        this.setItems(nextProps.library, nextProps.ids);
+      }
     }
-    this.props.onChangeSelection(List([this.props.ids.get(0), id as number, -1]));
   }
 
-  public handleAlgorithmChange(index, event)
+  public setItems(library: LibraryState, ids: List<ID>)
   {
-    const [algorithms, algorithmNames, algorithmIndex] =
-      this.getAvailableAlgorithms(this.props.library, this.props.ids.get(1), this.props.ids.get(2));
-    const id = algorithms.get(index).id;
-    if (id === this.props.ids.get(2)) // nothing changed
+    const [categories, categoryNames] = this.getAvailableItems(
+      library,
+      'categories',
+      (item) => item.status !== ItemStatus.Archive,
+    );
+    const [groups, groupNames] = this.getAvailableItems(
+      library,
+      'groups',
+      (item) => item.status !== ItemStatus.Archive && item.categoryId === ids.get(0),
+    );
+    const [algorithms, algorithmNames] = this.getAvailableItems(
+      library,
+      'algorithms',
+      (item) => item.status !== ItemStatus.Archive && item.groupId === ids.get(1),
+    );
+    this.setState({
+      categories,
+      categoryNames,
+      groups,
+      groupNames,
+      algorithms,
+      algorithmNames,
+    });
+  }
+
+  public getAvailableItems(libraryState: LibraryState, key: string, filterFn: (item) => boolean): AvailableItemsType
+  {
+    const items = libraryState[key].filter(filterFn).toList();
+    return [items.map((item) => item.id), this.itemsToMap(items)];
+  }
+
+  public itemsToMap(items: List<LibraryItem>): Map<ID, string>
+  {
+    let displayNames: Map<ID, string> = Map();
+    items.forEach((item) =>
+      displayNames = displayNames.set(item.id, item.name),
+    );
+    return displayNames;
+  }
+
+  public handleSelectorChange(newState)
+  {
+    let newIds = List(_.values(newState));
+    const { ids } = this.props;
+    // If category changes, reset group + algorithm
+    if (newIds.get(0) !== ids.get(0))
     {
-      return;
+      newIds = newIds.set(1, -1).set(2, -1);
     }
-    this.props.onChangeSelection(List([this.props.ids.get(0), this.props.ids.get(1), id as number]));
-  }
-
-  public getAvailableCategories(libraryState: LibraryState, categoryId: ID): AvailableItemsType
-  {
-    const items = libraryState.categories.toList();
-    const index = items.findIndex((v, i) => v.id === categoryId);
-    return [items, this.itemsToText(items), index];
-  }
-
-  public getAvailableGroups(libraryState: LibraryState, categoryId: ID, groupId: ID): AvailableItemsType
-  {
-    const items = libraryState.groups.filter(
-      (v, k) => v.categoryId === categoryId,
-    ).toList();
-    const index = items.findIndex((v, i) => v.id === groupId);
-    return [items, this.itemsToText(items), index];
-  }
-
-  public getAvailableAlgorithms(libraryState: LibraryState, groupId: ID, algorithmId: ID): AvailableItemsType
-  {
-    const items = libraryState.algorithms.filter((v, k) => v.groupId === groupId).toList();
-    const index = items.findIndex((v, i) => v.id === algorithmId);
-    return [items, this.itemsToText(items), index];
-  }
-
-  public itemsToText(items: List<LibraryItem>): List<string>
-  {
-    return items.map((item, index) => item.name).toList();
+    // If group changes, reset algorithm
+    else if (newIds.get(1) !== ids.get(1))
+    {
+      newIds = newIds.set(2, -1);
+    }
+    this.props.onChangeSelection(newIds);
   }
 
   public render()
   {
-    const [categories, categoryNames, categoryIndex] =
-      this.getAvailableCategories(this.props.library, this.props.ids.get(0));
-    const [groups, groupNames, groupIndex] =
-      this.getAvailableGroups(this.props.library, this.props.ids.get(0), this.props.ids.get(1));
-    const [algorithms, algorithmNames, algorithmIndex] =
-      this.getAvailableAlgorithms(this.props.library, this.props.ids.get(1), this.props.ids.get(2));
+    const { library, ids } = this.props;
+    const selectorState = { category: ids.get(0), group: ids.get(1), algorithm: ids.get(2) };
     return (
-      <div className='algorithm-selector-wrapper'>
-        <div className='algorithm-selector-column'>
-          <div className='algorithm-selector-label'>
-            Category
-          </div>
-          <div className='algorithm-selector-input'>
-            <Dropdown
-              options={categoryNames.size !== 0 ? categoryNames : undefined}
-              selectedIndex={categoryIndex}
-              canEdit={true}
-              onChange={this.handleCategoryChange}
-              openDown={true}
-              className='alg-selector-grow-to-fit'
-            />
-          </div>
-        </div>
-        <div className='algorithm-selector-column'>
-          <div className='algorithm-selector-label'>
-            Group
-          </div>
-          <div className='algorithm-selector-input'>
-            <Dropdown
-              options={groupNames.size !== 0 ? groupNames : undefined}
-              selectedIndex={groupIndex}
-              canEdit={true}
-              onChange={this.handleGroupChange}
-              openDown={true}
-              className='alg-selector-grow-to-fit'
-            />
-          </div>
-        </div>
-        <div className='algorithm-selector-column'>
-          <div className='algorithm-selector-label'>
-            Algorithm
-          </div>
-          <div className='algorithm-selector-input'>
-            <Dropdown
-              options={algorithmNames.size !== 0 ? algorithmNames : undefined}
-              selectedIndex={algorithmIndex}
-              canEdit={true}
-              onChange={this.handleAlgorithmChange}
-              openDown={true}
-              className='alg-selector-grow-to-fit'
-            />
-          </div>
-        </div>
-      </div>
-
+      <DynamicForm
+        inputMap={this.selectorMap}
+        inputState={selectorState}
+        onStateChange={this.handleSelectorChange}
+      />
     );
   }
 }
