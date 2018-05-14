@@ -56,7 +56,7 @@ describe('SimpleTable', () =>
 {
   let tableComponent = null;
 
-  const columns = [
+  const columnsConfig = [
     {
       columnKey: 'id',
       columnLabel: 'Id',
@@ -64,10 +64,12 @@ describe('SimpleTable', () =>
     {
       columnKey: 'name',
       columnLabel: 'Name',
+      columnRelativeSize: 4,
     },
     {
       columnKey: 'status',
       columnLabel: 'Status',
+      columnRelativeSize: 0.5,
     },
   ];
 
@@ -85,7 +87,7 @@ describe('SimpleTable', () =>
   }));
 
   const tableState = {
-    header: columns,
+    columnsConfig,
     data: tableData,
   };
 
@@ -106,14 +108,16 @@ describe('SimpleTable', () =>
       expect(tableComponent.find('.simple-table-header')).toHaveLength(1);
       expect(tableComponent.find('.simple-table-body')).toHaveLength(1);
 
+      const columnsCount = Object.keys(columnsConfig).length;
+
       expect(tableComponent.find('.simple-table-header .simple-table-cell'))
-        .toHaveLength(columns.length);
+        .toHaveLength(columnsCount);
 
       expect(tableComponent.find('.simple-table-body .simple-table-row'))
         .toHaveLength(2);
 
       expect(tableComponent.find('.simple-table-body .simple-table-cell'))
-        .toHaveLength(2 * columns.length);
+        .toHaveLength(2 * columnsCount);
 
       expect(tableComponent.find('.simple-table-body .simple-table-cell').at(0).text())
         .toEqual('1');
@@ -121,6 +125,22 @@ describe('SimpleTable', () =>
         .toEqual('item 1');
       expect(tableComponent.find('.simple-table-body .simple-table-cell').at(2).text())
         .toEqual('success');
+    });
+  });
+
+  describe('#calculateColumnWidhts', () =>
+  {
+    it('should balance column widths to fill 100% based on the defined columnRelativeSize', () =>
+    {
+      // take the columnRelativeSize (defaults to 1 if not defined), multiply by 100
+      // and divide by the sum of all the columns columnRelativeSize.
+      expect(tableComponent.instance().calculateColumnWidhts()).toEqual(
+        {
+          id: 18.18,
+          name: 72.73,
+          status: 9.09,
+        },
+      );
     });
   });
 });
