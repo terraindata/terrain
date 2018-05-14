@@ -109,10 +109,12 @@ export const _TaskConfig =
   {
     let task = new TaskConfig_Record(config) as any as TaskConfig;
     task = task.set('params', task.params ? Immutable.Map(task.params) : Immutable.Map({}));
-    task = task.setIn(['params', 'overrideSources'],
-      Util.objectToImmutableMap(parseToObject(task, ['params', 'overrideSources']), _SourceConfig));
-    task = task.setIn(['params', 'overrideSinks'],
-      Util.objectToImmutableMap(parseToObject(task, ['params', 'overrideSinks']), _SinkConfig));
+    task = task.setIn(['params', 'options'], task.getIn(['params', 'options']) ?
+      Immutable.Map(task.getIn(['params', 'options'])) : Immutable.Map({}));
+    task = task.setIn(['params', 'options', 'overrideSources'],
+      Util.objectToImmutableMap(parseToObject(task, ['params', 'options', 'overrideSources']), _SourceConfig));
+    task = task.setIn(['params', 'options', 'overrideSinks'],
+      Util.objectToImmutableMap(parseToObject(task, ['params', 'options', 'overrideSinks']), _SinkConfig));
     return task;
   };
 
@@ -140,7 +142,8 @@ function parseToObject(parent, keyPath, defaultVal = {}): object
 export function scheduleForDatabase(schedule: SchedulerConfig): object
 {
   schedule = schedule
-    .updateIn(['tasks', 0, 'params', 'overrideSinks'], (value) => JSON.stringify(value))
-    .updateIn(['tasks', 0, 'params', 'overrideSources'], (value) => JSON.stringify(value));
+    .updateIn(['tasks', 0, 'params', 'options', 'overrideSinks'], (value) => JSON.stringify(value))
+    .updateIn(['tasks', 0, 'params', 'options', 'overrideSources'], (value) => JSON.stringify(value))
+    .updateIn(['tasks'], (value) => JSON.stringify(value));
   return schedule.toJS();
 }

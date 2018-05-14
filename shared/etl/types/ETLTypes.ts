@@ -80,7 +80,7 @@ export interface TemplateBase
 
 export interface TemplateSettings
 {
-  abortThreshhold?: number;
+  abortThreshold?: number;
 }
 
 // currently unused

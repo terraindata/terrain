@@ -202,7 +202,7 @@ export class ElasticMapping
 
   protected getTextConfig(elasticProps: ElasticFieldProps): TypeConfig
   {
-    return {
+    const config: TypeConfig = {
       type: elasticProps.isAnalyzed ? 'text' : 'keyword',
       index: true,
       fields:
@@ -219,8 +219,12 @@ export class ElasticMapping
               ignore_above: 256,
             },
         },
-      analyzer: elasticProps.analyzer,
     };
+    if (elasticProps.isAnalyzed)
+    {
+      config.analyzer = elasticProps.analyzer;
+    }
+    return config;
   }
 
   protected getTypeConfig(fieldID: number): TypeConfig | null
@@ -404,10 +408,14 @@ export class ElasticMapping
           `Cannot set new primary key to '${primaryKey}'. There is already a primary key '${this.primaryKey}'`,
         );
       }
-      else if (elasticType !== ElasticTypes.Text && elasticType !== ElasticTypes.Keyword)
+      else if (
+        elasticType === ElasticTypes.Array
+        || elasticType === ElasticTypes.Nested
+        || elasticType === ElasticTypes.Boolean
+      )
       {
         this.errors.push(
-          `Field '${primaryKey}' of type '${elasticType}' cannot be a primary key. Primary keys must be text or keyword`,
+          `Field '${primaryKey}' of type '${elasticType}' cannot be a primary key. Primary keys cannot be Array, Nested or Boolean.`,
         );
       }
       else

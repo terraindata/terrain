@@ -567,7 +567,7 @@ export default class EngineUtil
   public static transferFieldData(id1: number, id2: number, e1: TransformationEngine, e2: TransformationEngine)
   {
     e2.setFieldType(id2, e1.getFieldType(id1));
-    e2.setFieldProps(id2, e1.getFieldProps(id1));
+    e2.setFieldProps(id2, _.cloneDeep(e1.getFieldProps(id1)));
     if (e1.getFieldEnabled(id1))
     {
       e2.enableField(id2);

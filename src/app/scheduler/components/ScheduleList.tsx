@@ -122,7 +122,15 @@ class ScheduleList extends TerrainComponent<Props>
     const blankSchedule = {
       cron: '0 0 * * 1',
       name: '',
-      tasks: [{ params: { templateId: -1 }, id: 0, taskId: 2 }],
+      tasks: [{
+        params: {
+          options: {
+            templateId: -1,
+          },
+        },
+        id: 0,
+        taskId: 2,
+      }],
     };
     this.props.schedulerActions({
       actionType: 'createSchedule',

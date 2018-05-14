@@ -43,40 +43,80 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
+// tslint:disable:no-empty
 
-import * as _ from 'lodash';
+import TerrainTabs from 'common/components/TerrainTabs';
+import { shallow } from 'enzyme';
+import * as React from 'react';
 import { browserHistory } from 'react-router';
 
-export default class ETLRouteUtil
+describe('TerrainTabs', () =>
 {
-  public static gotoWalkthroughStep(step)
-  {
-    browserHistory.push(`/data/newtemplate/${step}`);
-  }
+  let tabsComponent = null;
+  const tabs = [
+    {
+      key: 'tab1',
+      label: 'Tab 1',
+    },
+    {
+      key: 'tab2',
+      label: 'Tab 2',
+    },
+    {
+      key: 'tab3',
+      label: 'Tab 3',
+    },
+  ];
 
-  public static gotoNewTemplate()
+  beforeEach(() =>
   {
-    browserHistory.push(`/data/templates/edit/new`);
-  }
+    tabsComponent = shallow(
+      <TerrainTabs
+        tabs={tabs}
+        tabToRouteMap={{ tab1: '/path/to/tab1', tab2: '/path/to/tab2' }}
+        router={{ location: { pathname: '/path/to/tab2' } }}
+      >
+        <div id='tab-content-2' />
+      </TerrainTabs>,
+    );
+  });
 
-  public static gotoEditAlgorithm(algorithmId)
+  it('should display the tabbed layout', () =>
   {
-    browserHistory.push(`/data/templates/edit/algorithmId=${algorithmId}`);
-  }
+    expect(tabsComponent.find('Tabs')).toHaveLength(1);
+    expect(tabsComponent.find('Tabs').props().selectedIndex).toEqual(1);
+    expect(tabsComponent.find('TabList')).toHaveLength(1);
+    expect(tabsComponent.find('Tab')).toHaveLength(tabs.length);
+    expect(tabsComponent.find('TabList').find('Tab').at(0).childAt(0).text()).toEqual('Tab 1');
+    expect(tabsComponent.find('TabList').find('Tab').at(1).childAt(0).text()).toEqual('Tab 2');
 
-  public static gotoEditTemplate(templateId)
-  {
-    browserHistory.push(`/data/templates/edit/templateId=${templateId}`);
-  }
+    expect(tabsComponent.find('TabPanel')).toHaveLength(tabs.length);
+    expect(tabsComponent.find('TabPanel').at(0).find('div')).toHaveLength(1);
+    expect(tabsComponent.find('TabPanel').at(1).find('#tab-content-2')).toHaveLength(1);
+    expect(tabsComponent.find('TabPanel').at(2).find('div')).toHaveLength(1);
+  });
 
-  public static isRouteNewTemplate(location)
+  it('should activate the tab matching the browser route by default', () =>
   {
-    return location.pathname === '/data/templates/edit/new';
-  }
+    expect(tabsComponent.find('Tabs').props().selectedIndex).toEqual(1);
+  });
 
-  public static gotoEditIntegration(integrationId)
+  describe('#getActiveTabIndex', () =>
   {
-    browserHistory.push(`/data/integrations/edit/integrationId=${integrationId}`);
-  }
-}
+    it('should return the active tab index', () =>
+    {
+      expect(tabsComponent.instance().getActiveTabIndex()).toEqual(1);
+    });
+  });
+
+  describe('#handleSelect', () =>
+  {
+    it('should update the selected tab index and update the browser address bar', () =>
+    {
+      tabsComponent.instance().handleSelect(1);
+
+      expect(tabsComponent.instance().getActiveTabIndex()).toEqual(1);
+      expect(browserHistory.replace).toHaveBeenCalledTimes(1);
+    });
+  });
+});

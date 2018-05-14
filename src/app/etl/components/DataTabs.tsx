@@ -43,91 +43,88 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
+import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
+import TerrainTabs from 'common/components/TerrainTabs';
+import { ETLActions } from 'etl/ETLRedux';
+import IntegrationList from 'etl/integrations/components/IntegrationList';
+import TemplateList from 'etl/templates/components/TemplateList';
 import * as React from 'react';
-
-import FadeInOut from 'common/components/FadeInOut';
-
-import { instanceFnDecorator } from 'shared/util/Classes';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
-
-import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateList';
-import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
-import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import Util from 'util/Util';
+import './DataTabs.less';
 
-import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';
-import './ETLStepComponent.less';
-
-const loadTemplateActions: AllowedActions = {
-  delete: true,
-};
-
-class PickTemplateStep extends ETLStepComponent
+interface DataTabsProps
 {
-  public static onRevert(params: TransitionParams)
+  templates: List<ETLTemplate>;
+  etlActions?: typeof ETLActions;
+  params: any;
+  router: any;
+  children: JSX.Element;
+  modalRequests: List<ModalProps>;
+}
+
+class DataTabs extends TerrainComponent<DataTabsProps>
+{
+  public tabs = [
+    { key: 'templates', label: 'Templates' },
+    { key: 'integrations', label: 'Integrations' },
+    { key: 'newtemplate', label: 'New Import or Export' },
+  ];
+
+  public tabToRouteMap = {
+    templates: '/data/templates',
+    integrations: '/data/integrations',
+    newtemplate: '/data/newtemplate',
+  };
+
+  public componentDidMount()
   {
-    params.act({
-      actionType: 'setState',
-      state: {
-        chosenTemplateId: -1,
-      },
+    this.props.etlActions({
+      actionType: 'fetchTemplates',
     });
+
+    this.props.etlActions({
+      actionType: 'getIntegrations',
+    });
+    // TODO lock UI until done?
   }
 
-  public getTemplateItemStyle(template)
+  public setModalRequests(requests)
   {
-    return templateListItemStyle;
+    this.props.etlActions({
+      actionType: 'setModalRequests',
+      requests,
+    });
   }
 
   public render()
   {
+    const { params, router, children, modalRequests } = this.props;
+
     return (
-      <div
-        style={templateListStyle}
-      >
-        <TemplateList
-          onClick={this.handleLoadTemplateItemClicked}
-          getRowStyle={this.getTemplateItemStyle}
-          allowedActions={loadTemplateActions}
-        />
+      <div className='etl'>
+        <div className='etl-tabs'>
+          <TerrainTabs
+            tabs={this.tabs}
+            tabToRouteMap={this.tabToRouteMap}
+            router={router}
+          >
+            {this.props.children}
+          </TerrainTabs>
+          <MultiModal
+            requests={modalRequests}
+            setRequests={this.setModalRequests}
+          />
+        </div>
       </div>
     );
   }
-
-  public handleLoadTemplateItemClicked(template: ETLTemplate)
-  {
-    const { onDone, act } = this.props;
-    act({
-      actionType: 'setState',
-      state: {
-        chosenTemplateId: template.id,
-      },
-    });
-    onDone();
-  }
 }
 
-const templateListItemStyle = [
-  { cursor: 'pointer' },
-  backgroundColor('rgba(0,0,0,0)', Colors().activeHover),
-];
-
-const templateListStyle = _.extend({},
-  backgroundColor(Colors().bg3),
-  getStyle('boxShadow', `2px 2px 3px ${Colors().boxShadow}`),
-);
-
-const transitionRowHeight = '28px';
-export default Util.createTypedContainer(
-  PickTemplateStep,
-  ['walkthrough'],
-  { act: WalkthroughActions },
+export default Util.createContainer(
+  DataTabs,
+  [['etl', 'modalRequests']],
+  { etlActions: ETLActions },
 );

@@ -43,91 +43,78 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
+import 'common/components/TerrainTabs.less';
 import * as React from 'react';
+import { browserHistory } from 'react-router';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
-import FadeInOut from 'common/components/FadeInOut';
-
-import { instanceFnDecorator } from 'shared/util/Classes';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
-
-import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateList';
-import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
-import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
-
-import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';
-import './ETLStepComponent.less';
-
-const loadTemplateActions: AllowedActions = {
-  delete: true,
-};
-
-class PickTemplateStep extends ETLStepComponent
+interface TabConfig
 {
-  public static onRevert(params: TransitionParams)
+  key: string;
+  label: string;
+}
+
+interface TabsProps
+{
+  tabs: TabConfig[];
+  children: any;
+  tabToRouteMap: { [tabKey: string]: string };
+  router: any;
+}
+
+class TerrainTabs extends TerrainComponent<TabsProps>
+{
+  public constructor(props)
   {
-    params.act({
-      actionType: 'setState',
-      state: {
-        chosenTemplateId: -1,
-      },
-    });
+    super(props);
   }
 
-  public getTemplateItemStyle(template)
+  public handleSelect(tabIndex: number)
   {
-    return templateListItemStyle;
+    const { tabs, tabToRouteMap } = this.props;
+
+    if (tabToRouteMap !== undefined)
+    {
+      const tabKey = tabs[tabIndex].key;
+      browserHistory.replace(tabToRouteMap[tabKey]);
+    }
+  }
+
+  public getActiveTabIndex()
+  {
+    const { tabs, router, tabToRouteMap } = this.props;
+    const activeTabIndex = tabs.findIndex((tab) =>
+    {
+      return router.location.pathname.startsWith(tabToRouteMap[tab.key]);
+    });
+
+    return activeTabIndex;
   }
 
   public render()
   {
-    return (
-      <div
-        style={templateListStyle}
-      >
-        <TemplateList
-          onClick={this.handleLoadTemplateItemClicked}
-          getRowStyle={this.getTemplateItemStyle}
-          allowedActions={loadTemplateActions}
-        />
-      </div>
-    );
-  }
+    const { tabs, children, tabToRouteMap, router } = this.props;
+    const tabIndex = this.getActiveTabIndex();
 
-  public handleLoadTemplateItemClicked(template: ETLTemplate)
-  {
-    const { onDone, act } = this.props;
-    act({
-      actionType: 'setState',
-      state: {
-        chosenTemplateId: template.id,
-      },
-    });
-    onDone();
+    return (
+      <Tabs selectedIndex={tabIndex} onSelect={this.handleSelect}>
+        <TabList>
+          {
+            tabs.map((tab, index) => <Tab key={`tab-${tab.key}`}>{tab.label}</Tab>)
+          }
+        </TabList>
+        {
+          tabs.map((tab, index) =>
+          {
+            const content = router.location.pathname.startsWith(tabToRouteMap[tab.key]) ?
+              children : <div />;
+            return <TabPanel key={`tab-panel-${tab.key}`}>{content}</TabPanel>;
+          })
+        }
+      </Tabs>
+    );
   }
 }
 
-const templateListItemStyle = [
-  { cursor: 'pointer' },
-  backgroundColor('rgba(0,0,0,0)', Colors().activeHover),
-];
-
-const templateListStyle = _.extend({},
-  backgroundColor(Colors().bg3),
-  getStyle('boxShadow', `2px 2px 3px ${Colors().boxShadow}`),
-);
-
-const transitionRowHeight = '28px';
-export default Util.createTypedContainer(
-  PickTemplateStep,
-  ['walkthrough'],
-  { act: WalkthroughActions },
-);
+export default TerrainTabs;
