@@ -62,6 +62,7 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+import LanguageUI from 'etl/templates/languages/LanguageUI';
 
 import './TemplateEditorField.less';
 
@@ -136,6 +137,12 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     );
   }
 
+  public isPrimaryKey()
+  {
+    const language = this._getCurrentLanguage();
+    return LanguageUI.get(language).isFieldPrimaryKey(this._field().fieldProps);
+  }
+
   public render()
   {
     const { canEdit, preview, labelOverride, labelOnly } = this.props;
@@ -184,7 +191,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
               {labelOverride != null ? labelOverride : field.name}
             </div>
             {
-              this._isPrimaryKey() ?
+              this.isPrimaryKey() ?
                 <div
                   className='primary-key-icon'
                   style={fontColor(Colors().active)}

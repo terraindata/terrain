@@ -404,8 +404,6 @@ export default class EngineUtil
     }
   }
 
-  // attempt to detect date types and integer float
-  // does not add type casts
   public static autodetectElasticTypes(engine: TransformationEngine, documents: List<object>)
   {
     const docs = EngineUtil.preprocessDocuments(documents);
@@ -578,7 +576,7 @@ export default class EngineUtil
     }
   }
 
-  private static preprocessDocuments(documents: List<object>): List<object>
+  public static preprocessDocuments(documents: List<object>): List<object>
   {
     return documents.map((doc) => objectify(doc)).toList();
   }
