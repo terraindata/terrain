@@ -66,49 +66,46 @@ import { TransformationArgs, TransformationForm, TransformationFormProps } from 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-interface JoinOptions
+interface FormOptions
 {
   otherFieldIds: List<number>;
   outputName: string;
-  preserveOldFields: boolean;
-  delimiter: any;
 }
 
-export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeType.JoinNode>
+export class NumericFormBase<NodeType extends TransformationNodeType>
+  extends TransformationForm<FormOptions, NodeType>
 {
-  protected readonly inputMap: InputDeclarationMap<JoinOptions> = {
-    otherFieldIds: {
-      type: DisplayType.Custom,
-      displayName: 'Fields to Join',
-      widthFactor: 4,
-      options: {
-        render: this.renderFieldPicker,
+  protected initialOutputName: string = '';
+  protected fieldLabel: string = '';
+  protected type = null;
+
+  protected inputMap: InputDeclarationMap<FormOptions> = null;
+
+  protected initialState = null;
+
+  public init(fieldLabel: string, initialOutputName: string)
+  {
+    this.initialOutputName = initialOutputName;
+    this.fieldLabel = fieldLabel;
+    this.inputMap = {
+      otherFieldIds: {
+        type: DisplayType.Custom,
+        displayName: '',
+        widthFactor: 4,
+        options: {
+          render: () => this.renderFieldPicker(),
+        },
       },
-    },
-    outputName: {
-      type: DisplayType.TextBox,
-      displayName: 'Output Field',
-    },
-    delimiter: {
-      type: DisplayType.TextBox,
-      displayName: 'Delimiter',
-      group: 'row2',
-      widthFactor: 2,
-    },
-    preserveOldFields: {
-      type: DisplayType.CheckBox,
-      displayName: 'Keep Original Field',
-      group: 'row2',
-      widthFactor: 3,
-    },
-  };
-  protected readonly initialState = {
-    otherFieldIds: List([-1]),
-    outputName: 'Joined Field',
-    preserveOldFields: false,
-    delimiter: '-',
-  };
-  protected readonly type = TransformationNodeType.JoinNode; // lack of type safety here
+      outputName: {
+        type: DisplayType.TextBox,
+        displayName: 'Output Field',
+      },
+    };
+    this.initialState = {
+      otherFieldIds: List([-1]),
+      outputName: initialOutputName,
+    };
+  }
 
   public renderFieldPicker()
   {
@@ -118,7 +115,7 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
     return (
       <FieldPicker
         selectedIds={this.state.otherFieldIds}
-        labelText={'Field to Join'}
+        labelText={this.fieldLabel}
         onChange={this._setStateWrapper('otherFieldIds')}
         engine={engine}
         availableFields={this.computeAvailableFields(fieldId)}
@@ -133,7 +130,7 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
     const currentKP = engine.getOutputKeyPath(fieldId);
     return engine.getAllFieldIDs().filter((id, i) => fieldId !== id
       && areFieldsLocal(currentKP, engine.getOutputKeyPath(id))
-      && engine.getFieldType(id) === 'string',
+      && engine.getFieldType(id) === 'number',
     ).toList();
   }
 
@@ -145,7 +142,7 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
   protected computeArgs()
   {
     const { engine, fieldId } = this.props;
-    const { otherFieldIds, outputName, delimiter, preserveOldFields } = this.state;
+    const { otherFieldIds, outputName } = this.state;
 
     const currentKeyPath = engine.getOutputKeyPath(fieldId);
     const changeIndex = currentKeyPath.size - 1;
@@ -161,10 +158,52 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
     return {
       options: {
         newFieldKeyPaths,
-        delimiter,
-        preserveOldFields,
       },
       fields: inputFields,
     };
+  }
+}
+
+export class SumTFF extends NumericFormBase<TransformationNodeType.SumNode>
+{
+  public readonly type = TransformationNodeType.SumNode;
+
+  constructor(props)
+  {
+    super(props);
+    this.init('Field to Add', 'New Sum Field');
+  }
+}
+
+export class DifferenceTFF extends NumericFormBase<TransformationNodeType.DifferenceNode>
+{
+  public readonly type = TransformationNodeType.DifferenceNode;
+
+  constructor(props)
+  {
+    super(props);
+    this.init('Field to Subtract', 'New Difference Field');
+  }
+}
+
+export class ProductTFF extends NumericFormBase<TransformationNodeType.ProductNode>
+{
+  public readonly type = TransformationNodeType.ProductNode;
+
+  constructor(props)
+  {
+    super(props);
+    this.init('Field to Multiply', 'New Product Field');
+  }
+}
+
+export class QuotientTFF extends NumericFormBase<TransformationNodeType.QuotientNode>
+{
+  public readonly type = TransformationNodeType.QuotientNode;
+
+  constructor(props)
+  {
+    super(props);
+    this.init('Field to Divide', 'New Quotient Field');
   }
 }

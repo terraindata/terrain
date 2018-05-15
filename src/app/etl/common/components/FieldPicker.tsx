@@ -70,6 +70,7 @@ import './FieldPicker.less';
 interface Props
 {
   selectedIds: List<number>;
+  labelText?: string;
   onChange: (ids: List<number>) => void;
   engine: TransformationEngine;
   availableFields: List<number>;
@@ -134,7 +135,7 @@ export class FieldPicker extends TerrainComponent<Props>
         <div
           className='engine-field-picker-title'
         >
-          Fields to Join
+          {this.props.labelText !== undefined ? this.props.labelText : 'Field'}
         </div>
         <div
           className='field-options-section'
