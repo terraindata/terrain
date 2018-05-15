@@ -264,6 +264,8 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         }
         else if (filterLine.boost !== filterGroup.getIn(keyPath.skip(skip).toList()))
         {
+          // Gets the set of lines that filterLine is a part of, and updates filterLine to its changed value so
+          // that these lines can be used to calculate the maxBoost
           const newLines = filterGroup.getIn(keyPath.skip(skip).butLast().toList()).set(keyPath.last(), filterLine);
           const newBoost = this.calculateMaxBoost(newLines);
           if (newBoost !== filterGroup.maxBoost)
