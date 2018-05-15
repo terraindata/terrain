@@ -215,9 +215,9 @@ export class JobQueue
     return this._select([], { id, running });
   }
 
-  public async getLog(id?: number): Promise<JobLogConfig[]>
+  public async getLog(id?: number): Promise<JobLogConfig>
   {
-    return new Promise<JobLogConfig[]>(async (resolve, reject) =>
+    return new Promise<JobLogConfig>(async (resolve, reject) =>
     {
       const jobs: JobConfig[] = await this.get(id);
       if (jobs.length === 0)
@@ -225,7 +225,7 @@ export class JobQueue
         throw new Error('Job not found.');
       }
       const jobLogConfig: JobLogConfig[] = await App.JobL.get(id);
-      return resolve(jobLogConfig);
+      return resolve(jobLogConfig[0]);
     });
   }
 
@@ -319,8 +319,10 @@ export class JobQueue
       const jobStatus: string = jobResult.status === true ? 'SUCCESS' : 'FAILURE';
       await this._setJobStatus(jobsFromId[0].id, false, jobStatus);
       this.runningRunNowJobs.delete(getJobs[0].id);
-      // TODO: log job result
 
+      // log job result
+      const jobLogConfig: JobLogConfig[] = await App.JobL.create(getJobs[0].id, jobResult['options']['logStream']);
+      await this._setJobLogId(getJobs[0].id, jobLogConfig[0].id);
       return resolve(jobResult.options.outputStream as stream.Readable);
     });
   }
@@ -346,6 +348,9 @@ export class JobQueue
           await this._setJobStatus(id, false, jobStatus);
           await App.SKDR.setRunning(jobsFromId[0].scheduleId, false);
           this.runningJobs.delete(id);
+
+          const jobLogConfig: JobLogConfig[] = await App.JobL.create(id, jobResult['options']['logStream']);
+          await this._setJobLogId(id, jobLogConfig[0].id);
         }
       }
       catch (e)
@@ -434,8 +439,10 @@ export class JobQueue
         await this._setJobStatus(jobsFromId[0].id, false, jobStatus);
         await App.SKDR.setRunning(jobsFromId[0].scheduleId, false);
         this.runningJobs.delete(jobId);
-        // TODO: log job result
         winston.info('Job result: ' + JSON.stringify(jobResult, null, 2));
+
+        const jobLogConfig: JobLogConfig[] = await App.JobL.create(jobId, jobResult['options']['logStream']);
+        await this._setJobLogId(jobId, jobLogConfig[0].id);
       });
 
     });
