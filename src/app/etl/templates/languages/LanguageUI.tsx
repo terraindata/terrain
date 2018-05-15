@@ -43,31 +43,41 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
+// tslint:disable:no-var-requires import-spacing strict-boolean-expressions
 import * as React from 'react';
 
-import ScheduleList from 'app/scheduler/components/ScheduleList';
-import TerrainComponent from 'common/components/TerrainComponent';
-import ImportExportControl from './importExport/ImportExportControl';
+import { TemplateEditorFieldProps } from 'etl/templates/components/field/TemplateEditorField';
+import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-import './ControlPage.less';
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
 
-export interface Props
+import DefaultLanguageUI from 'etl/templates/languages/DefaultLanguageUI';
+import ElasticUI from 'etl/templates/languages/ElasticUI';
+
+export interface LanguageInterface
 {
-  params?: any;
-  location?: any;
+  language: Languages;
+  getSettingsComponent: () => React.ComponentClass<TemplateEditorFieldProps>;
+  isFieldPrimaryKey: (fieldProps: object) => boolean;
+  overrideTypeNames: (
+    engine: TransformationEngine,
+    fieldId: number,
+    displayOptions: Immutable.Map<string, string>,
+  ) => Immutable.Map<string, string>;
 }
 
-class ControlPage extends TerrainComponent<Props>
+export default class LanguageUI
 {
-  public render()
+  public static get(language: Languages): LanguageInterface
   {
-    return (
-      <div className='control-body'>
-        <ScheduleList />
-      </div>
-    );
+    switch (language)
+    {
+      case Languages.Elastic:
+        return ElasticUI;
+      default:
+        return DefaultLanguageUI;
+    }
   }
 }
-
-export default ControlPage;
