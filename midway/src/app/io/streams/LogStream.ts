@@ -78,6 +78,11 @@ export default class LogStream extends Readable
 
   public push(chunk: any, encoding?: string): boolean
   {
+    if (chunk === null)
+    {
+      return super.push(null);
+    }
+
     const logMsg = {
       timestamp: new Date(),
       level: 'info',

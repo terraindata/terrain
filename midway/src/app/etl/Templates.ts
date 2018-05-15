@@ -412,7 +412,9 @@ export default class Templates
     {
       outputStream.on('end', () =>
       {
+        logStream.info(`Finished executing ETL job for template ${template.templateName}`);
         logStream.log(outputStream.progress());
+        logStream.push(null);
       });
     }
 
