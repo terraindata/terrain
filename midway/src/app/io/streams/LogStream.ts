@@ -76,6 +76,40 @@ export default class LogStream extends Readable
     callback();
   }
 
+  public push(chunk: any, encoding?: string): boolean
+  {
+    const logMsg = {
+      timestamp: new Date(),
+      level: 'info',
+      message: '',
+    };
+
+    try
+    {
+      const c = JSON.parse(chunk);
+      if (c.timestamp !== undefined)
+      {
+        logMsg.timestamp = c.timestamp;
+      }
+
+      if (c.level !== undefined)
+      {
+        logMsg.level = c.level;
+      }
+
+      if (c.message !== undefined)
+      {
+        logMsg.message = c.message;
+      }
+    }
+    catch (e)
+    {
+      logMsg.message = chunk;
+    }
+
+    return super.push(logMsg, encoding);
+  }
+
   public addStream(stream: Readable | Writable | Transform)
   {
     stream.on('error', (e: Error) =>
@@ -99,7 +133,7 @@ export default class LogStream extends Readable
     }
   }
 
-  public drainLog()
+  private drainLog()
   {
     let buffer = this.buffers.shift();
     while (buffer !== undefined)
