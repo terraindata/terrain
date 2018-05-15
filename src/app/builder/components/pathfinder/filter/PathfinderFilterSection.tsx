@@ -239,6 +239,12 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     }
   }
 
+  public calculateMaxBoost(overrideLines?©)
+  {
+    const { lines } = this.props.filterGroup;
+    return Math.max(...((overrideLines || lines).map((line) => line.boost).toArray()));
+  }
+
   public handleFilterChange(
     keyPath: KeyPath,
     filter: FilterGroup | FilterLine,
@@ -246,6 +252,23 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     fieldChange?: boolean,
   )
   {
+    const { isSoftFilter, filterGroup } = this.props;
+    const skip: number = this.props.toSkip !== undefined ? this.props.toSkip : 3;
+    if (isSoftFilter)
+    {
+      if ((filter as any).boost !== undefined)
+      {
+        const filterLine = filter as FilterLine;
+        if (filterLine.boost > filterGroup.maxBoost)
+        {
+          this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'maxBoost'), filterLine.boost);
+        }
+        else if (filterLine.boost !== filterGroup.getIn(keyPath.skip(skip).toList()))
+        {
+          this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'maxBoost'), this.calculateMaxBoost());
+        }
+      }
+    }
     this.props.builderActions.changePath(keyPath, filter, notDirty, fieldChange);
   }
 
@@ -259,7 +282,12 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     const parentKeyPath = keyPath.butLast().toList();
     const parent = this.props.filterGroup.getIn(parentKeyPath.skip(skip).toList());
     const index = keyPath.last();
-    this.props.builderActions.changePath(parentKeyPath, parent.splice(index, 1));
+    const newLines = parent.splice(index, 1);
+    this.props.builderActions.changePath(parentKeyPath, newLines);
+    if (this.props.isSoftFilter)
+    {
+      this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'maxBoost'), this.calculateMaxBoost(newLines));
+    }
   }
 
   public renderFilterLine(filterLine, keyPath: List<string | number>)
@@ -288,6 +316,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         onAddScript={this.props.onAddScript}
         onDeleteScript={this.props.onDeleteScript}
         onUpdateScript={this.props.onUpdateScript}
+        maxBoost={Math.max(10, this.props.filterGroup.maxBoost)}
       />
     );
   }
@@ -520,11 +549,11 @@ class PathfinderFilterSection extends TerrainComponent<Props>
                       onDragStart={this._toggle('dragging')}
                       onDragStop={this._toggle('dragging')}
                       dropZoneStyle={dropZoneStyle}
-                      canDrag={canEdit && this.state.canDrag}
+                      canDrag={canEdit && this.state.canDrag && !isSoftFilter}
                     />
                     :
                     <DragDropGroup
-                      canDrag={canEdit && this.state.canDrag}
+                      canDrag={canEdit && this.state.canDrag && !isSoftFilter}
                       items={line.filterGroup.lines}
                       data={line.filterGroup}
                       onDrop={this.handleGroupDrop}

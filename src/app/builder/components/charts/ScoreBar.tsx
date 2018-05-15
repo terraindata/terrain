@@ -85,13 +85,27 @@ class ScoreBar extends TerrainComponent<Props>
 {
   public state = {
     editingWeight: false,
+    weight: this.props.weight,
   };
+
+  public componentWillReceiveProps(nextProps: Props)
+   {
+    if (nextProps.weight !== this.props.weight)
+    {
+      // console.log('RECIEVING PROPS ', nextProps.weight);
+      this.setState({
+        weight: nextProps.weight,
+      });
+     }
+   }
 
   public render()
   {
-    const { weight, min, max, height, canEdit, altStyle, step, round } = this.props;
-
+    const { min, max, height, canEdit, altStyle, step, round } = this.props;
+    const { weight } = this.state;
     const color = Colors().active;
+    console.log('WEIGHT IS ', weight);
+    console.log('Max is ', max);
     return (
       <div
         className={classNames({
@@ -123,8 +137,8 @@ class ScoreBar extends TerrainComponent<Props>
               type='text'
               className='score-bar-text'
               value={round ? Math.round(weight) : weight}
-              onChange={this.handleWeightTextChange}
               onBlur={this.handleTextBlur}
+              onChange={this.handleTextChange}
               onKeyDown={this.handleTextKeyDown}
               style={[
                 fontColor(Colors().active),
@@ -190,6 +204,7 @@ class ScoreBar extends TerrainComponent<Props>
   {
     if (this.props.onAfterChange)
     {
+      console.log('ON AFTER CHANGE ', value);
       if (this.props.round)
       {
         value = Math.round(value);
@@ -199,28 +214,32 @@ class ScoreBar extends TerrainComponent<Props>
     }
   }
 
-  private handleWeightTextChange(e)
+  private handleTextChange(e)
   {
-    if (this.props.canEdit && this.props.onAfterChange)
-    {
-      this.props.onAfterChange(e.target.value);
-    }
+    // console.log('CHANGE ', e.target.value);
+    this.setState({
+      weight: e.target.value,
+    });
   }
 
   private handleTextBlur()
   {
+   // console.log('Handle text blur');
     this.setState({
       editingWeight: false,
     });
+    this.handleWeightAfterChange(this.state.weight);
   }
 
   private handleTextKeyDown(e)
   {
     if (e.keyCode === 13)
     {
+      // console.log('Handle enter key down');
       this.setState({
         editingWeight: false,
       });
+      this.handleWeightAfterChange(this.state.weight);
     }
   }
 
