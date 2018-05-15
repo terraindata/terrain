@@ -265,7 +265,11 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         }
         else if (filterLine.boost !== filterGroup.getIn(keyPath.skip(skip).toList()))
         {
-          this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'maxBoost'), this.calculateMaxBoost());
+          const newBoost = this.calculateMaxBoost();
+          if (newBoost !== filterGroup.maxBoost)
+          {
+            this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'maxBoost'), newBoost);
+          }
         }
       }
     }
@@ -286,7 +290,11 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     this.props.builderActions.changePath(parentKeyPath, newLines);
     if (this.props.isSoftFilter)
     {
-      this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'maxBoost'), this.calculateMaxBoost(newLines));
+      const newBoost = this.calculateMaxBoost(newLines);
+      if (newBoost !== this.props.filterGroup.maxBoost)
+      {
+        this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'maxBoost'), newBoost);
+      }
     }
   }
 

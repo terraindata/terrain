@@ -89,15 +89,15 @@ class ScoreBar extends TerrainComponent<Props>
   };
 
   public componentWillReceiveProps(nextProps: Props)
-   {
+  {
     if (nextProps.weight !== this.props.weight)
     {
       // console.log('RECIEVING PROPS ', nextProps.weight);
       this.setState({
         weight: nextProps.weight,
       });
-     }
-   }
+    }
+  }
 
   public render()
   {
@@ -224,7 +224,7 @@ class ScoreBar extends TerrainComponent<Props>
 
   private handleTextBlur()
   {
-   // console.log('Handle text blur');
+    // console.log('Handle text blur');
     this.setState({
       editingWeight: false,
     });
