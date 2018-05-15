@@ -412,7 +412,7 @@ export default class Templates
     {
       outputStream.on('end', () =>
       {
-        logStream.push(outputStream.progress());
+        logStream.log(outputStream.progress());
       });
     }
 
@@ -443,6 +443,8 @@ export default class Templates
       });
     }
 
+    const logStream = streamMap['log'];
+
     try
     {
       const nodeId = nodes.shift();
@@ -452,7 +454,7 @@ export default class Templates
       {
         case 'Source':
           {
-            winston.info('Processing source node', nodeId);
+            logStream.info(`Processing source node ${String(nodeId)}`);
             const source = template.sources[node.endpoint];
             const sourceStream = await getSourceStream(node.endpoint, source, files);
 
@@ -477,7 +479,7 @@ export default class Templates
 
         case 'Sink':
           {
-            winston.info('Processing sink node', nodeId);
+            logStream.info(`Processing sink node ${String(nodeId)}`);
             const inEdges: any[] = dag.inEdges(nodeId);
             if (inEdges.length > 1)
             {
@@ -501,7 +503,7 @@ export default class Templates
 
         case 'MergeJoin':
           {
-            winston.info('Processing merge-join node', nodeId);
+            logStream.info(`Processing merge-join node ${String(nodeId)}`);
             const inEdges: any[] = dag.inEdges(nodeId);
 
             const done = new EventEmitter();
@@ -547,7 +549,7 @@ export default class Templates
             // following code in an event-passing style
             await new Promise((resolve, reject) => done.on('done', resolve).on('error', reject));
 
-            winston.info('Finished creating temporary indices: ', JSON.stringify(tempIndices));
+            logStream.info(`Finished creating temporary indices: ${JSON.stringify(tempIndices)}`);
 
             const dbName: string = template.sinks._default['options']['serverId'];
 
@@ -561,7 +563,7 @@ export default class Templates
             const indices = tempIndices.map((i) => i['index']);
             await elasticDB.refreshIndex(indices);
 
-            winston.info('Finished refreshing temporary indices; now ready for searching / sorting ...');
+            logStream.info('Finished refreshing temporary indices; now ready for searching / sorting ...');
 
             // pipe the merge stream to all outgoing edges
             const outEdges: any[] = dag.outEdges(nodeId);
@@ -579,7 +581,7 @@ export default class Templates
                   // delete the temporary indices once the merge stream has been piped
                   // out to all outgoing edges
                   await elasticDB.deleteIndex(indices);
-                  winston.info('Deleted temporary indices: ' + JSON.stringify(indices));
+                  logStream.info(`Deleted temporary indices: ${JSON.stringify(indices)}`);
                 }
               });
 
@@ -600,7 +602,7 @@ export default class Templates
     }
     catch (e)
     {
-      winston.error(e);
+      logStream.error(`Failed to execute ETL pipeline: ${String(e)}`);
       throw new Error(`Failed to execute ETL pipeline: ${String(e)}`);
     }
   }

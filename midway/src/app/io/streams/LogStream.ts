@@ -118,10 +118,11 @@ export default class LogStream extends Readable
 
       if (this.errorCount > this.abortThreshold)
       {
-        // TODO: abort!
+        // TODO: abort pipeline!
+        stream.destroy(e);
       }
 
-      this.buffers.push(e.toString());
+      this.log(e.toString());
     });
   }
 
@@ -131,6 +132,45 @@ export default class LogStream extends Readable
     {
       this.addStream(stream);
     }
+  }
+
+  public log(message: string, level: string = 'info')
+  {
+    const timestamp = new Date();
+    const msg: string = String(timestamp) + ':' + level + ':' + message;
+    if (level === 'warn')
+    {
+      winston.warn(msg);
+    }
+    else if (level === 'error')
+    {
+      winston.error(msg);
+    }
+    else
+    {
+      winston.info(msg);
+    }
+
+    this.buffers.push(JSON.stringify({
+      timestamp,
+      level,
+      message,
+    }));
+  }
+
+  public info(message: string)
+  {
+    this.log(message, 'info');
+  }
+
+  public warn(message: string)
+  {
+    this.log(message, 'warn');
+  }
+
+  public error(message: string)
+  {
+    this.log(message, 'error');
   }
 
   private drainLog()
