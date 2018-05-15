@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console strict-boolean-expressions no-var-requires
-import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import Colors, { backgroundColor, borderColor } from 'app/colors/Colors';
 import FloatingInput from 'app/common/components/FloatingInput';
 import { ETLActions } from 'app/etl/ETLRedux';
@@ -207,12 +206,8 @@ export class IntegrationListUncontained extends TerrainComponent<Props>
             onRowClicked={this.handleRowClick}
             getActions={this.getIntegrationActions}
             itemsName='integration'
-          />
-          <PathfinderCreateLine
-            text='Add Integration'
-            canEdit={TerrainTools.isAdmin()}
+            canCreate={TerrainTools.isAdmin()}
             onCreate={this.createIntegration}
-            showText={true}
           />
         </div>
       </div>
