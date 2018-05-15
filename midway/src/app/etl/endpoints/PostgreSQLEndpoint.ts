@@ -50,8 +50,6 @@ import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/Endpoi
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import PostgreSQLConfig from '../../../database/pg/PostgreSQLConfig';
 import PostgreSQLReader from '../../../database/pg/streams/PostgreSQLReader';
-import IntegrationConfig from '../../integrations/IntegrationConfig';
-import { integrations } from '../../integrations/IntegrationRouter';
 import AEndpointStream from './AEndpointStream';
 
 export default class PostgreSQLEndpoint extends AEndpointStream
@@ -63,8 +61,7 @@ export default class PostgreSQLEndpoint extends AEndpointStream
 
   public async getSource(source: SourceConfig): Promise<Readable>
   {
-    const integrationId = source.options['integrationId'];
-    const config: PostgreSQLConfig = await this.getConfig(integrationId, source.options);
+    const config: PostgreSQLConfig = await this.getIntegrationConfig(source.integrationId);
     const table = source.options['table'];
     const query: string = source.options['query'];
     return new PostgreSQLReader(config, query, table);
@@ -72,38 +69,11 @@ export default class PostgreSQLEndpoint extends AEndpointStream
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
-    const integrationId = sink.options['integrationId'];
-    const config: PostgreSQLConfig = await this.getConfig(integrationId, sink.options);
+    const config: PostgreSQLConfig = await this.getIntegrationConfig(sink.integrationId);
     const table = sink.options['table'];
     const query: string = sink.options['query'];
 
     throw new Error('not implemented');
     // return new PostgreSQLWriter(config, database, table);
-  }
-
-  private async getConfig(integrationId: number, options?: object): Promise<PostgreSQLConfig>
-  {
-    return new Promise(async (resolve, reject) =>
-    {
-      const integration: IntegrationConfig[] = await integrations.get(null, integrationId);
-      if (integration.length === 0)
-      {
-        return reject(new Error('Invalid PostgreSQL integration ID.'));
-      }
-
-      let postgreSQLConfig: PostgreSQLConfig = {};
-      try
-      {
-        const connectionConfig = JSON.parse(integration[0].connectionConfig);
-        const authConfig = JSON.parse(integration[0].authConfig);
-        postgreSQLConfig = Object.assign(connectionConfig, authConfig);
-      }
-      catch (e)
-      {
-        return reject(new Error('Retrieving integration ID ' + String(integrationId)));
-      }
-
-      resolve(postgreSQLConfig);
-    });
   }
 }

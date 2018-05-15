@@ -43,37 +43,41 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:no-var-requires import-spacing strict-boolean-expressions
+import * as React from 'react';
 
-import { Readable, Writable } from 'stream';
+import { TemplateEditorFieldProps } from 'etl/templates/components/field/TemplateEditorField';
+import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
-import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
-import IntegrationConfig from '../../integrations/IntegrationConfig';
-import { integrations } from '../../scheduler/SchedulerRouter';
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
 
-/**
- * Abstract class for converting a result stream to a string stream for export formatting
- */
-export default abstract class AEndpointStream
+import DefaultLanguageUI from 'etl/templates/languages/DefaultLanguageUI';
+import ElasticUI from 'etl/templates/languages/ElasticUI';
+
+export interface LanguageInterface
 {
-  constructor()
-  {
-  }
+  language: Languages;
+  getSettingsComponent: () => React.ComponentClass<TemplateEditorFieldProps>;
+  isFieldPrimaryKey: (fieldProps: object) => boolean;
+  overrideTypeNames: (
+    engine: TransformationEngine,
+    fieldId: number,
+    displayOptions: Immutable.Map<string, string>,
+  ) => Immutable.Map<string, string>;
+}
 
-  public async getIntegrationConfig(integrationId: number): Promise<object>
+export default class LanguageUI
+{
+  public static get(language: Languages): LanguageInterface
   {
-    const integration: IntegrationConfig[] = await integrations.get(null, integrationId);
-    if (integration.length === 0)
+    switch (language)
     {
-      throw new Error('Invalid integration ID.');
+      case Languages.Elastic:
+        return ElasticUI;
+      default:
+        return DefaultLanguageUI;
     }
-
-    const connectionConfig = integration[0].connectionConfig;
-    const authConfig = integration[0].authConfig;
-    return Object.assign(connectionConfig, authConfig);
   }
-
-  public abstract async getSource(source: SourceConfig): Promise<Readable>;
-
-  public abstract async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>;
 }

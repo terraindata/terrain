@@ -43,37 +43,33 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:no-var-requires import-spacing strict-boolean-expressions
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
 
-import { Readable, Writable } from 'stream';
+import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
-import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
-import IntegrationConfig from '../../integrations/IntegrationConfig';
-import { integrations } from '../../scheduler/SchedulerRouter';
+import DefaultLanguageController from './DefaultLanguageController';
+import ElasticController from './ElasticController';
 
-/**
- * Abstract class for converting a result stream to a string stream for export formatting
- */
-export default abstract class AEndpointStream
+export interface LanguageInterface
 {
-  constructor()
-  {
-  }
+  language: Languages;
+  changeFieldTypeSideEffects: (engine: TransformationEngine, fieldId: number, newType: FieldTypes) => void;
+  autodetectFieldTypes: (engine: TransformationEngine, documents: List<object>) => void;
+}
 
-  public async getIntegrationConfig(integrationId: number): Promise<object>
+export default class LanguageControllers
+{
+  public static get(language: Languages): LanguageInterface
   {
-    const integration: IntegrationConfig[] = await integrations.get(null, integrationId);
-    if (integration.length === 0)
+    switch (language)
     {
-      throw new Error('Invalid integration ID.');
+      case Languages.Elastic:
+        return ElasticController;
+      default:
+        return DefaultLanguageController;
     }
-
-    const connectionConfig = integration[0].connectionConfig;
-    const authConfig = integration[0].authConfig;
-    return Object.assign(connectionConfig, authConfig);
   }
-
-  public abstract async getSource(source: SourceConfig): Promise<Readable>;
-
-  public abstract async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>;
 }

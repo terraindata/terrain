@@ -238,7 +238,7 @@ class Schedule extends TerrainComponent<Props>
           There are no schedulable templates. Create one in the
             <span
             className='link'
-            onClick={ETLRouteUtil.gotoNewTemplate}
+            onClick={() => ETLRouteUtil.gotoWalkthroughStep(0)}
             style={fontColor(Colors().active)}
           >
             Template Editor
