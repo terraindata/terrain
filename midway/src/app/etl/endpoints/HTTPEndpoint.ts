@@ -62,41 +62,26 @@ export default class HTTPEndpoint extends AEndpointStream
 
   public async getSource(source: SourceConfig): Promise<Readable>
   {
-    return this.getRequestStreamByIntegrationId(source.integrationId) as Promise<Readable>;
+    const config = await this.getIntegrationConfig(source.integrationId);
+    return this.getRequestStream(config) as Promise<Readable>;
   }
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
-    return this.getRequestStreamByIntegrationId(sink.integrationId) as Promise<Writable>;
+    const config = await this.getIntegrationConfig(sink.integrationId);
+    return this.getRequestStream(config) as Promise<Writable>;
   }
 
-  private async getRequestStreamByIntegrationId(integrationId: number): Promise<Readable | Writable>
+  private async getRequestStream(httpConfig: object): Promise<Readable | Writable>
   {
-    const integration: IntegrationConfig[] = await integrations.get(null, integrationId);
-    if (integration.length === 0)
-    {
-      throw new Error('Invalid HTTP Integration ID');
-    }
-    let httpConfig: any = {};
-    try
-    {
-      const connectionconfig = JSON.parse(integration[0].connectionConfig);
-      const authConfig = JSON.parse(integration[0].authConfig);
-      httpConfig = Object.assign(connectionconfig, authConfig);
-    }
-    catch (e)
-    {
-      throw new Error('Retrieving integration ID ' + String(integrationId));
-    }
-
     return new Promise<Readable | Writable>((resolve, reject) =>
     {
-      request(httpConfig.url, httpConfig.method, httpConfig.headers)
+      request(httpConfig['url'], httpConfig['method'], httpConfig['headers'])
         .on('error', (err) =>
         {
           if (err !== null && err !== undefined)
           {
-            const e = Error(`Error reading from HTTP endpoint ${httpConfig.url} ${err.toString()}`);
+            const e = Error(`Error reading from HTTP endpoint ${httpConfig['url']} ${err.toString()}`);
             return reject(e);
           }
         })
