@@ -370,7 +370,7 @@ class DatabaseEndpoint extends EndpointFormBase<DatabaseState>
         language={state.language}
         serverId={serverId != null ? serverId : -1}
         database={database != null ? database : ''}
-        table={table != null ? table : ''}
+        table={'data'}
         onChange={this.handleDbPickerChange}
         constantHeight={true}
       />
