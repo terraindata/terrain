@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions
 
+import Button from 'common/components/Button';
 import BadgeColumn from 'common/components/simple-table/BadgeColumn';
 import ButtonColumn from 'common/components/simple-table/ButtonColumn';
 import { List } from 'immutable';
@@ -69,12 +70,40 @@ export interface Props
 {
   columnsConfig: SimpleTableColumn[];
   data: Immutable.Map<ID, any>;
+  displayRowCount?: number;
 }
+
+export interface State
+{
+  visibleRowCount: number;
+}
+
+const ShowMore = (props) =>
+{
+  return (
+    <tr>
+      <td style={{ textAlign: 'center' }} colSpan={props.colSpan}>
+        <Button text='+ Show More' onClick={props.onClick} />
+      </td>
+    </tr>
+  );
+};
 
 export class SimpleTable extends TerrainComponent<Props>
 {
-  public state: {};
+  public static defaultProps = {
+    displayRowCount: 10,
+  };
+  public state: State = {
+    visibleRowCount: this.props.displayRowCount,
+  };
   public columnWidths = this.calculateColumnWidhts();
+
+  public componentWillReceiveProps(nextProps)
+  {
+    const { displayRowCount } = nextProps;
+    this.setState({ visibleRowCount: displayRowCount });
+  }
 
   public calculateColumnWidhts()
   {
@@ -100,6 +129,20 @@ export class SimpleTable extends TerrainComponent<Props>
     return columnWidths;
   }
 
+  public handleShowMoreClick()
+  {
+    const { displayRowCount, data } = this.props;
+    const { visibleRowCount } = this.state;
+    const dataValuesCount = data.valueSeq().count();
+
+    if (visibleRowCount < dataValuesCount)
+    {
+      this.setState((state: State) =>
+        ({ visibleRowCount: state.visibleRowCount + displayRowCount }),
+      );
+    }
+  }
+
   public renderValue(colKey, rowData)
   {
     const { columnsConfig } = this.props;
@@ -118,9 +161,11 @@ export class SimpleTable extends TerrainComponent<Props>
   public render()
   {
     const { columnsConfig, data } = this.props;
+    const { visibleRowCount } = this.state;
 
     const columnKeys = columnsConfig.map((config) => config.columnKey);
     const dataValues = data.valueSeq();
+    const visibleDataValues = dataValues.take(visibleRowCount);
 
     return (
       <table className='simple-table'>
@@ -144,8 +189,8 @@ export class SimpleTable extends TerrainComponent<Props>
         </thead>
         <tbody className='simple-table-body'>
           {
-            dataValues.count() > 0 ?
-              dataValues.map((entry) =>
+            visibleDataValues.count() > 0 ?
+              visibleDataValues.map((entry) =>
               {
                 return (
                   <tr key={entry.id} className='simple-table-row'>
@@ -173,6 +218,13 @@ export class SimpleTable extends TerrainComponent<Props>
                   </td>
                 </tr>
               )
+          }
+          {
+            dataValues.count() > visibleRowCount ?
+              <ShowMore
+                colSpan={columnKeys.length}
+                onClick={this.handleShowMoreClick}
+              /> : null
           }
         </tbody>
       </table>
