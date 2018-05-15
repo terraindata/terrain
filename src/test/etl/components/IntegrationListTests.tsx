@@ -105,7 +105,7 @@ describe('IntegrationList', () =>
   {
     expect(listComponent.find(ItemList)).toHaveLength(1);
     expect(listComponent.find(ItemList).node.props.items.toJS()).toHaveLength(0);
-    expect(listComponent.find(ItemList).render().text()).toEqual("There aren't yet any integrations");
+    expect(listComponent.find(ItemList).render().text()).toContain("There aren't yet any integrations");
   });
 
   describe('#render', () =>
