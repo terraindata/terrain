@@ -245,3 +245,17 @@ export class FindReplaceTFF extends TransformationForm<FindReplaceOptions, Trans
     regex: false,
   };
 }
+
+export class EncryptTFF extends TransformationForm<{}, TransformationNodeType.EncryptNode>
+{
+  protected readonly type = TransformationNodeType.EncryptNode;
+  protected readonly inputMap = {};
+  protected readonly initialState = {};
+}
+
+export class DecryptTFF extends TransformationForm<{}, TransformationNodeType.DecryptNode>
+{
+  protected readonly type = TransformationNodeType.DecryptNode;
+  protected readonly inputMap = {};
+  protected readonly initialState = {};
+}
