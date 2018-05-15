@@ -162,7 +162,7 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
       items.size > 0 ?
         <div
           className='item-list-table'
-          style={backgroundColor(Colors().blockOutline)}
+          style={backgroundColor(Colors().blockBg)}
         >
           {
             <div
