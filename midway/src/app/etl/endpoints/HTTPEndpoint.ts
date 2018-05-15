@@ -86,7 +86,7 @@ export default class HTTPEndpoint extends AEndpointStream
     }
     catch (e)
     {
-      throw new Error('Retrieveing integration ID ' + String(integrationId));
+      throw new Error('Retrieving integration ID ' + String(integrationId));
     }
 
     return new Promise<Readable | Writable>((resolve, reject) =>
