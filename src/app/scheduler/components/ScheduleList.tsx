@@ -152,16 +152,11 @@ class ScheduleList extends TerrainComponent<Props>
     return (
       <div
         className='schedule-list-wrapper'
-        style={_.extend(backgroundColor(Colors().blockBg), borderColor(Colors().blockOutline))}
+        style={backgroundColor(Colors().blockBg)}
       >
         <div
           className='schedule-list-header'
         >
-          <div
-            className='schedule-list-title'
-          >
-            Schedules
-          </div>
           <div
             className='schedule-list-refresh-wrapper'
           >
