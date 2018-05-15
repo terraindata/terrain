@@ -151,46 +151,44 @@ class Jobs extends TerrainComponent<any> {
 
     return (
       <div className='jobs'>
-        <div className='job-lists'>
-          <Section
-            title={'Pending Jobs'}
-            canExpand={true}
-            onExpand={(isExpanded) => this.expandSection(isExpanded, 'pending')}
-            expanded={this.state.expanded.get('pending')}
-            contentCount={pendingJobs.count()}
-          >
-            <SimpleTable
-              columnsConfig={jobsHeader}
-              data={pendingJobs}
-            />
-          </Section>
+        <Section
+          title={'Pending Jobs'}
+          canExpand={true}
+          onExpand={(isExpanded) => this.expandSection(isExpanded, 'pending')}
+          expanded={this.state.expanded.get('pending')}
+          contentCount={pendingJobs.count()}
+        >
+          <SimpleTable
+            columnsConfig={jobsHeader}
+            data={pendingJobs}
+          />
+        </Section>
 
-          <Section
-            title={'Running Jobs'}
-            canExpand={true}
-            onExpand={(isExpanded) => this.expandSection(isExpanded, 'running')}
-            expanded={this.state.expanded.get('running')}
-            contentCount={runningJobs.count()}
-          >
-            <SimpleTable
-              columnsConfig={jobsHeader}
-              data={runningJobs}
-            />
-          </Section>
+        <Section
+          title={'Running Jobs'}
+          canExpand={true}
+          onExpand={(isExpanded) => this.expandSection(isExpanded, 'running')}
+          expanded={this.state.expanded.get('running')}
+          contentCount={runningJobs.count()}
+        >
+          <SimpleTable
+            columnsConfig={jobsHeader}
+            data={runningJobs}
+          />
+        </Section>
 
-          <Section
-            title={'Completed Jobs'}
-            canExpand={true}
-            onExpand={(isExpanded) => this.expandSection(isExpanded, 'completed')}
-            expanded={this.state.expanded.get('completed')}
-            contentCount={completedJobs.count()}
-          >
-            <SimpleTable
-              columnsConfig={jobsHeader}
-              data={completedJobs}
-            />
-          </Section>
-        </div>
+        <Section
+          title={'Completed Jobs'}
+          canExpand={true}
+          onExpand={(isExpanded) => this.expandSection(isExpanded, 'completed')}
+          expanded={this.state.expanded.get('completed')}
+          contentCount={completedJobs.count()}
+        >
+          <SimpleTable
+            columnsConfig={jobsHeader}
+            data={completedJobs}
+          />
+        </Section>
       </div>
     );
   }
