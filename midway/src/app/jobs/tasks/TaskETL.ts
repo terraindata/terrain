@@ -76,24 +76,20 @@ export class TaskETL extends Task
           status: true,
         };
 
-      templates.executeETL(this.taskConfig['params']['options'] as object,
-        this.taskConfig['params']['options']['inputStreams']).then((result) =>
-        {
-          taskOutputConfig['options']['outputStream'] = result;
-          resolve(taskOutputConfig);
-        }).catch((err) =>
-        {
-          taskOutputConfig.status = false;
-          try
-          {
-            winston.warn('Error while running ETL task: ' + ((err as any).toString() as string));
-          }
-          catch (e)
-          {
-            winston.warn('Tried to print out ETL output error and failed');
-          }
-          resolve(taskOutputConfig);
-        });
+      try
+      {
+        const streams = await templates.executeETL(this.taskConfig['params']['options'],
+          this.taskConfig['params']['options']['inputStreams']);
+
+        taskOutputConfig['options']['outputStream'] = streams['outputStream'];
+        taskOutputConfig['options']['logStream'] = streams['logStream'];
+        resolve(taskOutputConfig);
+      }
+      catch (e)
+      {
+        taskOutputConfig.status = false;
+        winston.error('Error while running ETL task: ' + String(e.toString()));
+      }
     });
   }
 

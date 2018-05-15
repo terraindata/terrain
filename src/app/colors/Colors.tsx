@@ -79,6 +79,16 @@ const NTColors =
     green: '#72ee7c',
   };
 
+const statuses = {
+  SUCCESS: '#94be6b',
+  ABORTED: '#ffa8b9',
+  CANCELED: '#ffa8b9',
+  RUNNING: '#1eb4fa',
+  FAILURE: '#ea526f',
+  PAUSED: '#ff8a5b',
+  PENDING: '#cccccc',
+};
+
 const NewTheme =
   {
     fontColor: NTColors.dark3,
@@ -98,6 +108,7 @@ const NewTheme =
     lightBlue: NTColors.blue1,
 
     success: NTColors.green,
+    statuses,
   };
 
 // Will be deprecated

@@ -42,38 +42,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+import Button from 'common/components/Button';
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as React from 'react';
 
-import { Readable, Writable } from 'stream';
-
-import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
-import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
-import IntegrationConfig from '../../integrations/IntegrationConfig';
-import { integrations } from '../../scheduler/SchedulerRouter';
-
-/**
- * Abstract class for converting a result stream to a string stream for export formatting
- */
-export default abstract class AEndpointStream
+interface ButtonColumnProps
 {
-  constructor()
-  {
-  }
+  colKey?: string; // columnKey
+  rowData?: any; // the whole row data
 
-  public async getIntegrationConfig(integrationId: number): Promise<object>
-  {
-    const integration: IntegrationConfig[] = await integrations.get(null, integrationId);
-    if (integration.length === 0)
-    {
-      throw new Error('Invalid integration ID.');
-    }
-
-    const connectionConfig = integration[0].connectionConfig;
-    const authConfig = integration[0].authConfig;
-    return Object.assign(connectionConfig, authConfig);
-  }
-
-  public abstract async getSource(source: SourceConfig): Promise<Readable>;
-
-  public abstract async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>;
+  label: string;
+  onClick: (key, rowData) => void;
 }
+
+class BadgeColumn extends TerrainComponent<ButtonColumnProps>
+{
+  public render()
+  {
+    const { colKey, rowData } = this.props;
+
+    return (
+      <Button
+        text={this.props.label}
+        onClick={() => this.props.onClick(colKey, rowData)}
+      />
+    );
+  }
+}
+
+export default BadgeColumn;

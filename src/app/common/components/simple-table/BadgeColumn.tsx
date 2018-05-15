@@ -42,38 +42,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+import Badge from 'common/components/Badge';
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as React from 'react';
 
-import { Readable, Writable } from 'stream';
-
-import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
-import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
-import IntegrationConfig from '../../integrations/IntegrationConfig';
-import { integrations } from '../../scheduler/SchedulerRouter';
-
-/**
- * Abstract class for converting a result stream to a string stream for export formatting
- */
-export default abstract class AEndpointStream
+interface BadgeColumnProps
 {
-  constructor()
-  {
-  }
+  colKey?: string;
+  rowData?: any;
 
-  public async getIntegrationConfig(integrationId: number): Promise<object>
-  {
-    const integration: IntegrationConfig[] = await integrations.get(null, integrationId);
-    if (integration.length === 0)
-    {
-      throw new Error('Invalid integration ID.');
-    }
-
-    const connectionConfig = integration[0].connectionConfig;
-    const authConfig = integration[0].authConfig;
-    return Object.assign(connectionConfig, authConfig);
-  }
-
-  public abstract async getSource(source: SourceConfig): Promise<Readable>;
-
-  public abstract async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>;
+  getColor: (value: string) => string;
 }
+
+const BadgeColumn = (props: BadgeColumnProps) => (
+  <Badge
+    label={props.rowData[props.colKey]}
+    color={props.getColor(props.rowData[props.colKey])}
+  />
+);
+
+export default BadgeColumn;

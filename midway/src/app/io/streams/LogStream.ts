@@ -44,36 +44,68 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Readable, Writable } from 'stream';
-
-import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
-import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
-import IntegrationConfig from '../../integrations/IntegrationConfig';
-import { integrations } from '../../scheduler/SchedulerRouter';
+import { Readable, Transform, Writable } from 'stream';
+import * as winston from 'winston';
 
 /**
- * Abstract class for converting a result stream to a string stream for export formatting
+ * A log stream
  */
-export default abstract class AEndpointStream
+export default class LogStream extends Readable
 {
-  constructor()
+  private buffers: string[];
+  private abortThreshold: number;
+  private errorCount: number;
+
+  constructor(abortThreshold: number = 1000)
   {
+    super();
+
+    this.buffers = [];
+    this.abortThreshold = abortThreshold;
+    this.errorCount = 0;
   }
 
-  public async getIntegrationConfig(integrationId: number): Promise<object>
+  public _read(size?: number)
   {
-    const integration: IntegrationConfig[] = await integrations.get(null, integrationId);
-    if (integration.length === 0)
+    this.drainLog();
+  }
+
+  public _destroy(error, callback)
+  {
+    this.drainLog();
+    callback();
+  }
+
+  public addStream(stream: Readable | Writable | Transform)
+  {
+    stream.on('error', (e: Error) =>
     {
-      throw new Error('Invalid integration ID.');
-    }
+      this.errorCount++;
 
-    const connectionConfig = integration[0].connectionConfig;
-    const authConfig = integration[0].authConfig;
-    return Object.assign(connectionConfig, authConfig);
+      if (this.errorCount > this.abortThreshold)
+      {
+        // TODO: abort!
+      }
+
+      this.buffers.push(e.toString());
+    });
   }
 
-  public abstract async getSource(source: SourceConfig): Promise<Readable>;
+  public addStreams(...streams: Array<Readable | Writable | Transform>): void
+  {
+    for (const stream of streams)
+    {
+      this.addStream(stream);
+    }
+  }
 
-  public abstract async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>;
+  public drainLog()
+  {
+    let buffer = this.buffers.shift();
+    while (buffer !== undefined)
+    {
+      this.push(buffer);
+      buffer = this.buffers.shift();
+    }
+  }
 }

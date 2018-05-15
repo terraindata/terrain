@@ -61,7 +61,7 @@ import { leftColumnWidth } from 'etl/templates/components/field/NestedView';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { Languages } from 'shared/etl/types/ETLTypes';
 
-import ElasticFieldSettings from './ElasticFieldSettings';
+import LanguageUI from 'etl/templates/languages/LanguageUI';
 import FieldMainSettings from './FieldMainSettings';
 import FieldSettingsTransformations from './FieldSettingsTransformations';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
@@ -80,7 +80,7 @@ enum ViewCategory
 {
   Settings,
   Transformations,
-  Elastic,
+  Language,
 }
 
 @Radium
@@ -148,6 +148,24 @@ class EditorFieldSettings extends TemplateEditorField<Props>
     );
   }
 
+  public renderLanguageCategory()
+  {
+    const language = this._getCurrentLanguage();
+    const Component = LanguageUI.get(language).getSettingsComponent();
+    if (Component != null)
+    {
+      return (
+        <Component
+          {...this._passProps()}
+        />
+      );
+    }
+    else
+    {
+      return null;
+    }
+  }
+
   public renderLabelSection()
   {
     const field = this._field();
@@ -166,9 +184,9 @@ class EditorFieldSettings extends TemplateEditorField<Props>
   {
     const language = this._getCurrentLanguage();
     const categories = [];
-    if (language === Languages.Elastic && this._field().canEditField())
+    if (language !== Languages.JavaScript && this._field().canEditField())
     {
-      categories.push(this.renderCategory(ViewCategory.Elastic, 'Elastic'));
+      categories.push(this.renderCategory(ViewCategory.Language, language));
     }
     return categories;
   }
@@ -199,10 +217,9 @@ class EditorFieldSettings extends TemplateEditorField<Props>
               /> : null
           }
           {
-            this.currentCategory() === ViewCategory.Elastic ?
-              <ElasticFieldSettings
-                {...this._passProps()}
-              /> : null
+            this.currentCategory() === ViewCategory.Language ?
+              this.renderLanguageCategory()
+              : null
           }
         </div>
       </div>

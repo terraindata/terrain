@@ -18,6 +18,7 @@
             "analytics/*": ["app/analytics/*"],
             "builder/*": ["app/builder/*"],
             "charts/*": ["app/charts/*"],
+            "colors/*": ["app/colors/*"],
             "common/*": ["app/common/*"],
             "deploy/*": ["app/deploy/*"],
             "etl*": ["src/app/etl/*"],
