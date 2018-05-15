@@ -54,51 +54,20 @@ import { List, Map } from 'immutable';
 import * as LibraryTypes from 'library/LibraryTypes';
 import { _LibraryState, LibraryState } from 'library/LibraryTypes';
 import * as React from 'react';
+import LibraryHelper from 'test-helpers/LibraryHelper';
 
 describe('AlgorithmSelector', () =>
 {
   let selectorComponent = null;
-  let library = _LibraryState({
-    categories: Immutable.Map<number, LibraryTypes.Category>(),
-    groups: Immutable.Map<number, LibraryTypes.Category>(),
-    algorithms: Immutable.Map<number, LibraryTypes.Algorithm>(),
-  });
-
-  library = library
-    .setIn(['categories', 1], LibraryTypes._Category({
-      id: 1,
-      name: 'Category 1',
-      modelVersion: 5,
-    }))
-    .setIn(['categories', 2], LibraryTypes._Category({
-      id: 2,
-      name: 'Category 2',
-      modelVersion: 5,
-    }))
-    .setIn(['groups', 3], LibraryTypes._Group({
-      id: 3,
-      name: 'Group 1',
-      categoryId: 1,
-      modelVersion: 5,
-    }))
-    .setIn(['groups', 4], LibraryTypes._Group({
-      id: 4,
-      name: 'Group 2',
-      categoryId: 2,
-      modelVersion: 5,
-    }))
-    .setIn(['algorithms', 5], LibraryTypes._Algorithm({
-      id: 5,
-      name: 'Algorithm 1',
-      groupId: 3,
-      modelVersion: 5,
-    }))
-    .setIn(['algorithms', 6], LibraryTypes._Algorithm({
-      id: 6,
-      name: 'Algorithm 2',
-      groupId: 4,
-      modelVersion: 5,
-    }));
+  const libraryStateMock = LibraryHelper.mockState();
+  const library = libraryStateMock
+    .addCategory(1, 'Category 1')
+    .addCategory(2, 'Category 2')
+    .addGroup(1, 3, 'Group 1')
+    .addGroup(2, 4, 'Group 2')
+    .addAlgorithm(3, 5, 'Algorithm 1')
+    .addAlgorithm(4, 6, 'Algorithm 1')
+    .getState();
   const selectorState =
     {
       ids: List([-1, -1, -1]),
