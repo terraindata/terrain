@@ -102,20 +102,21 @@ class DatabasePicker extends TerrainComponent<Props>
       },
       database: {
         type: DisplayType.TextBox,
-        displayName: 'Database',
+        displayName: 'ES Index',
         getDisplayState: this.getDisplayStateBoxes,
         options: {
           acOptions: this.getDatabaseOptions,
         },
       },
-      table: {
-        type: DisplayType.TextBox,
-        displayName: 'Table',
-        getDisplayState: this.getDisplayStateBoxes,
-        options: {
-          acOptions: this.getTableOptions,
-        },
-      },
+      // Hide selector for Table (ES Type) picker, as we don't want to use it
+      // table: {
+      //   type: DisplayType.TextBox,
+      //   displayName: 'Table',
+      //   getDisplayState: this.getDisplayStateBoxes,
+      //   options: {
+      //     acOptions: this.getTableOptions,
+      //   },
+      // },
     };
   }
 
@@ -126,7 +127,7 @@ class DatabasePicker extends TerrainComponent<Props>
     {
       return 'Database name cannot be empty.';
     }
-    if (db.search(/[^a-z0-9]/) !== -1)
+    if (db.search(/[^a-z0-9\-]/) !== -1)
     {
       return 'Invalid database name. Name should be composed of lowercase letters or numbers';
     }
