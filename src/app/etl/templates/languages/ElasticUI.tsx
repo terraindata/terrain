@@ -43,37 +43,52 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:no-var-requires import-spacing strict-boolean-expressions
 
-import { Readable, Writable } from 'stream';
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
+import * as _ from 'lodash';
 
-import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
-import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
-import IntegrationConfig from '../../integrations/IntegrationConfig';
-import { integrations } from '../../scheduler/SchedulerRouter';
+import ElasticFieldSettings from 'etl/templates/components/field/ElasticFieldSettings';
+import { LanguageInterface } from 'etl/templates/languages/LanguageUI';
+import { defaultProps, ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
+import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import TypeUtil from 'shared/etl/TypeUtil';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { KeyPath } from 'shared/util/KeyPath';
+import * as yadeep from 'shared/util/yadeep';
 
-/**
- * Abstract class for converting a result stream to a string stream for export formatting
- */
-export default abstract class AEndpointStream
+class ElasticUI implements LanguageInterface
 {
-  constructor()
+  public language = Languages.Elastic;
+
+  public getSettingsComponent()
   {
+    return ElasticFieldSettings;
   }
 
-  public async getIntegrationConfig(integrationId: number): Promise<object>
+  public isFieldPrimaryKey(fieldProps: object)
   {
-    const integration: IntegrationConfig[] = await integrations.get(null, integrationId);
-    if (integration.length === 0)
+    return fieldProps !== undefined && _.get(fieldProps, ['elastic', 'isPrimaryKey']) === true;
+  }
+
+  public overrideTypeNames(engine: TransformationEngine, fieldId: number, displayOptions: Immutable.Map<string, string>)
+  {
+    const { elasticType } = defaultProps(engine.getFieldProp(fieldId, elasticKey));
+    const jsType = EngineUtil.getRepresentedType(fieldId, engine);
+    if (jsType === 'string' && elasticType === ElasticTypes.Date)
     {
-      throw new Error('Invalid integration ID.');
+      return displayOptions.set('string', 'date');
     }
-
-    const connectionConfig = integration[0].connectionConfig;
-    const authConfig = integration[0].authConfig;
-    return Object.assign(connectionConfig, authConfig);
+    else if (jsType === 'object' && elasticType === ElasticTypes.GeoPoint)
+    {
+      return displayOptions.set('object', 'geo point');
+    }
   }
-
-  public abstract async getSource(source: SourceConfig): Promise<Readable>;
-
-  public abstract async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>;
 }
+
+const elasticKey = List(['elastic']);
+
+export default new ElasticUI();

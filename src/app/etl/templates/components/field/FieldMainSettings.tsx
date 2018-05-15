@@ -59,12 +59,12 @@ const { List, Map } = Immutable;
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-
 import
 {
   _TemplateField,
   TemplateField,
 } from 'etl/templates/FieldTypes';
+import LanguageUI from 'etl/templates/languages/LanguageUI';
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
@@ -98,6 +98,7 @@ class FieldMainSettings extends TemplateEditorField<Props>
       options: {
         pickOptions: (s: SettingsState) => typeOptions,
         indexResolver: (value) => typeOptions.indexOf(value),
+        displayNames: this.computeDisplayNames,
       },
     },
     isIncluded: {
@@ -122,6 +123,12 @@ class FieldMainSettings extends TemplateEditorField<Props>
         formState: this.getFormStateFromField(nextProps),
       });
     }
+  }
+
+  public computeDisplayNames(s: SettingsState)
+  {
+    return LanguageUI.get(this._getCurrentLanguage())
+      .overrideTypeNames(this._currentEngine(), this.props.fieldId, displayOptions);
   }
 
   public getFieldNameDisplayState(s: SettingsState)
@@ -199,6 +206,13 @@ class FieldMainSettings extends TemplateEditorField<Props>
 }
 
 const typeOptions = List(['array', 'object', 'string', 'number', 'boolean']);
+const displayOptions = Map({
+  array: 'array',
+  object: 'nested',
+  string: 'text',
+  number: 'number',
+  boolean: 'boolean',
+});
 
 export default Util.createTypedContainer(
   FieldMainSettings,
