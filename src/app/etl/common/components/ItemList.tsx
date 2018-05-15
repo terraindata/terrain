@@ -51,6 +51,7 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
 
+import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import { backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
 import { Menu, MenuOption } from 'common/components/Menu';
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -74,6 +75,8 @@ export interface Props<T>
   getMenuOptions?: (item, index) => any; // passed to <Menu/> for each item if a context menu is desired
   getActions?: (index: number, item: T) => El;
   itemsName?: string;
+  canCreate?: boolean;
+  onCreate?: () => void;
 }
 
 const memoize = _.memoize;
@@ -159,45 +162,54 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
   {
     const { columnConfig, items, getMenuOptions } = this.props;
     return (
-      items.size > 0 ?
+      <div
+        className='item-list-table'
+        style={backgroundColor(Colors().blockBg)}
+      >
         <div
-          className='item-list-table'
-          style={backgroundColor(Colors().blockBg)}
+          className='row-info-header'
+          key='header'
         >
           {
-            <div
-              className='row-info-header'
-              key='header'
-            >
-              {
-                columnConfig.map((headerItem: HeaderConfigItem<T>, i: number) =>
-                {
-                  return (
-                    <div
-                      className='row-info-data'
-                      key={i}
-                      style={{ width: `${100 / columnConfig.length}%` }}
-                    >
-                      {headerItem.name}
-                    </div>
-                  );
-                })
-              }
-              {
-                getMenuOptions !== undefined ?
-                  <div className='row-info-data' key='context-menu' />
-                  : undefined
-              }
-            </div>
+            columnConfig.map((headerItem: HeaderConfigItem<T>, i: number) =>
+            {
+              return (
+                <div
+                  className='row-info-data'
+                  key={i}
+                  style={{ width: `${100 / columnConfig.length}%` }}
+                >
+                  {headerItem.name}
+                </div>
+              );
+            })
           }
           {
-            items.map(this.renderRow).toList()
+            getMenuOptions !== undefined ?
+              <div className='row-info-data' key='context-menu' />
+              : undefined
           }
         </div>
-        :
-        <div className='item-list-message'>
-          There aren't yet any {this.props.itemsName || 'item'}s
-        </div>
+
+        {
+          items.size > 0 ?
+            items.map(this.renderRow).toList()
+          :
+            <div className='item-list-message'>
+              There aren't yet any {this.props.itemsName || 'item'}s
+            </div>
+        }
+
+        {
+          this.props.canCreate &&
+            <PathfinderCreateLine
+              text={'Create ' + this.props.itemsName}
+              canEdit={true}
+              onCreate={this.props.onCreate}
+              showText={true}
+            />
+        }
+      </div>
     );
   }
 }
