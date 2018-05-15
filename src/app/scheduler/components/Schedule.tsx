@@ -49,7 +49,7 @@ import CRONEditor from 'app/common/components/CRONEditor';
 import FloatingInput from 'app/common/components/FloatingInput';
 import RouteSelector from 'app/common/components/RouteSelector';
 import EndpointForm from 'app/etl/common/components/EndpointForm';
-import ETLRouteutil from 'app/etl/ETLRouteUtil';
+import ETLRouteUtil from 'app/etl/ETLRouteUtil';
 import { _SchedulerConfig, _TaskConfig, SchedulerConfig, SchedulerState, TaskConfig } from 'app/scheduler/SchedulerTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
@@ -238,7 +238,7 @@ class Schedule extends TerrainComponent<Props>
           There are no schedulable templates. Create one in the
             <span
             className='link'
-            onClick={ETLRouteutil.gotoNewTemplate}
+            onClick={() => ETLRouteUtil.gotoWalkthroughStep(0)}
             style={fontColor(Colors().active)}
           >
             Template Editor
