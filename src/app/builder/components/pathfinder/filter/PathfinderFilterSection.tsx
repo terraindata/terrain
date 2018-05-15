@@ -258,13 +258,13 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       {
         const skip: number = this.props.toSkip !== undefined ? this.props.toSkip : 3;
         const filterLine = filter as FilterLine;
-        const newLines = filterGroup.getIn(keyPath.skip(skip).butLast().toList()).set(keyPath.last(), filterLine);
         if (filterLine.boost > filterGroup.maxBoost)
         {
           this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'maxBoost'), filterLine.boost);
         }
         else if (filterLine.boost !== filterGroup.getIn(keyPath.skip(skip).toList()))
         {
+          const newLines = filterGroup.getIn(keyPath.skip(skip).butLast().toList()).set(keyPath.last(), filterLine);
           const newBoost = this.calculateMaxBoost(newLines);
           if (newBoost !== filterGroup.maxBoost)
           {
