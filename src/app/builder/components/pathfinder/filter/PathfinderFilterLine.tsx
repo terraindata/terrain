@@ -203,6 +203,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           index: (props.pathfinderContext.source.dataSource as any).index,
           fieldValue,
           comparisonValue,
+          valueValue,
           fieldType: props.filterLine.fieldType,
         }}
         // optionSets={this.getOptionSets() /* TODO store in state? */}

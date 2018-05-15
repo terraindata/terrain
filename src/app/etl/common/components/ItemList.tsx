@@ -164,7 +164,7 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
     return (
       <div
         className='item-list-table'
-        style={backgroundColor(Colors().blockOutline)}
+        style={backgroundColor(Colors().blockBg)}
       >
         <div
           className='row-info-header'

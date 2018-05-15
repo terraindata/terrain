@@ -394,11 +394,16 @@ const Util = {
     {
       obj = {};
     }
-    if (obj['id'])
+    if (obj['id'] && obj['id'] !== -1)
     {
       return obj;
     }
-    return _.extend({}, { id: Util.getId(isString) }, _.omitBy(obj, (value) => value === undefined));
+    return _.extend({},
+      _.omitBy(obj, (value) => value === undefined),
+      {
+        id: Util.getId(isString),
+      },
+    );
   },
 
   moveIndexOffset(index: number, newIndex: number): number

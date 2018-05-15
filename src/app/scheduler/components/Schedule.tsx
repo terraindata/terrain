@@ -396,6 +396,8 @@ class Schedule extends TerrainComponent<Props>
         onChange={this.handleScheduleChange}
         useTooltip={true}
         footer={this.renderFooter()}
+        confirmDelete={true}
+        itemName={'schedule'}
       />
     );
   }
