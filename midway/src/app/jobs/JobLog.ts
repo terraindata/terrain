@@ -50,6 +50,7 @@ import * as winston from 'winston';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import BufferTransform from '../io/streams/BufferTransform';
 import JobLogConfig from './JobLogConfig';
 
 export class JobLog
@@ -93,9 +94,8 @@ export class JobLog
       resolve(upsertedJobLogs);
 
       const updatedContentJobLog: JobLogConfig = upsertedJobLogs[0];
-      // TODO process log stream here
-      const accumulatedLog: string = ''; // set this
-      updatedContentJobLog.contents = accumulatedLog;
+      const accumulatedLog: string[] = await BufferTransform.toArray(logStream);
+      updatedContentJobLog.contents = accumulatedLog.join('\n');
       await App.DB.upsert(this.jobLogTable, updatedContentJobLog);
     });
   }
