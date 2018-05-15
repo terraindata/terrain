@@ -239,10 +239,9 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     }
   }
 
-  public calculateMaxBoost(overrideLines?©)
+  public calculateMaxBoost(lines)
   {
-    const { lines } = this.props.filterGroup;
-    return Math.max(...((overrideLines || lines).map((line) => line.boost).toArray()));
+    return Math.max(...(lines.map((line) => line.boost).toArray()));
   }
 
   public handleFilterChange(
@@ -253,19 +252,20 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   )
   {
     const { isSoftFilter, filterGroup } = this.props;
-    const skip: number = this.props.toSkip !== undefined ? this.props.toSkip : 3;
     if (isSoftFilter)
     {
       if ((filter as any).boost !== undefined)
       {
+        const skip: number = this.props.toSkip !== undefined ? this.props.toSkip : 3;
         const filterLine = filter as FilterLine;
+        const newLines = filterGroup.getIn(keyPath.skip(skip).butLast().toList()).set(keyPath.last(), filterLine);
         if (filterLine.boost > filterGroup.maxBoost)
         {
           this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'maxBoost'), filterLine.boost);
         }
         else if (filterLine.boost !== filterGroup.getIn(keyPath.skip(skip).toList()))
         {
-          const newBoost = this.calculateMaxBoost();
+          const newBoost = this.calculateMaxBoost(newLines);
           if (newBoost !== filterGroup.maxBoost)
           {
             this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'maxBoost'), newBoost);

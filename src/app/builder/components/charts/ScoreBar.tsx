@@ -92,7 +92,6 @@ class ScoreBar extends TerrainComponent<Props>
   {
     if (nextProps.weight !== this.props.weight)
     {
-      // console.log('RECIEVING PROPS ', nextProps.weight);
       this.setState({
         weight: nextProps.weight,
       });
@@ -101,11 +100,10 @@ class ScoreBar extends TerrainComponent<Props>
 
   public render()
   {
-    const { min, max, height, canEdit, altStyle, step, round } = this.props;
+    const { min, height, canEdit, altStyle, step, round } = this.props;
     const { weight } = this.state;
+    const max = Math.max(weight, this.props.max);
     const color = Colors().active;
-    console.log('WEIGHT IS ', weight);
-    console.log('Max is ', max);
     return (
       <div
         className={classNames({
@@ -204,7 +202,6 @@ class ScoreBar extends TerrainComponent<Props>
   {
     if (this.props.onAfterChange)
     {
-      console.log('ON AFTER CHANGE ', value);
       if (this.props.round)
       {
         value = Math.round(value);
@@ -216,7 +213,6 @@ class ScoreBar extends TerrainComponent<Props>
 
   private handleTextChange(e)
   {
-    // console.log('CHANGE ', e.target.value);
     this.setState({
       weight: e.target.value,
     });
@@ -224,7 +220,6 @@ class ScoreBar extends TerrainComponent<Props>
 
   private handleTextBlur()
   {
-    // console.log('Handle text blur');
     this.setState({
       editingWeight: false,
     });
@@ -235,7 +230,6 @@ class ScoreBar extends TerrainComponent<Props>
   {
     if (e.keyCode === 13)
     {
-      // console.log('Handle enter key down');
       this.setState({
         editingWeight: false,
       });
