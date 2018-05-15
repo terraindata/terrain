@@ -181,7 +181,7 @@ class ScheduleList extends TerrainComponent<Props>
           {
             scheduleList.map((schedule, i) =>
               <Schedule
-                key={i}
+                key={schedule.id}
                 schedule={schedule}
                 onDelete={this._fn(this.performAction, 'deleteSchedule')}
                 onRun={this._fn(this.performAction, 'runSchedule')}
