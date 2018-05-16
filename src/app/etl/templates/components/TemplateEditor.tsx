@@ -113,7 +113,12 @@ class TemplateEditor extends TerrainComponent<Props>
     }
     try
     {
-      return engine.transform(previewDocument);
+      const resetEngine = TransformationEngine.load(JSON.stringify(engine.toJSON()));
+      resetEngine.getAllFieldIDs().forEach((id) =>
+      {
+        resetEngine.enableField(id);
+      });
+      return resetEngine.transform(previewDocument);
     }
     catch (e)
     {

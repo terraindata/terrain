@@ -201,6 +201,7 @@ class EndpointForm extends TerrainComponent<Props>
             onChange={this.handleIntegrationChange}
             hideType={true}
             hideName={!usingCustomIntegration}
+            debounceAll={true}
           />
         </FadeInOut>
         <FadeInOut
