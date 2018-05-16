@@ -239,11 +239,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     }
   }
 
-  public calculateMaxBoost(lines)
-  {
-    return Math.max(...(lines.map((line) => line.boost).toArray()));
-  }
-
   public handleFilterChange(
     keyPath: KeyPath,
     filter: FilterGroup | FilterLine,
@@ -267,8 +262,8 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         {
           // Gets the set of lines that filterLine is a part of, and updates filterLine to its changed value so
           // that these lines can be used to calculate the maxBoost
-          const newLines = filterGroup.getIn(keyPath.skip(skip).butLast().toList()).set(keyPath.last(), filterLine);
-          const newBoost = this.calculateMaxBoost(newLines);
+          const newFilterGroup = filterGroup.setIn(keyPath.skip(skip).toList(), filterLine);
+          const newBoost = findMaxBoost(newFilterGroup);
           if (newBoost !== filterGroup.maxBoost)
           {
             this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'maxBoost'), newBoost);
@@ -291,9 +286,13 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     const index = keyPath.last();
     const newLines = parent.splice(index, 1);
     this.props.builderActions.changePath(parentKeyPath, newLines);
-    if (this.props.isSoftFilter)
+    if (this.props.isSoftFilter && (!filter || (filter as any).boost === this.props.filterGroup.maxBoost))
     {
-      const newBoost = this.calculateMaxBoost(newLines);
+      const newBoost = findMaxBoost(
+        this.props.filterGroup.setIn(parentKeyPath.skip(skip).toList(),
+          newLines,
+        ),
+      );
       if (newBoost !== this.props.filterGroup.maxBoost)
       {
         this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'maxBoost'), newBoost);
@@ -560,11 +559,11 @@ class PathfinderFilterSection extends TerrainComponent<Props>
                       onDragStart={this._toggle('dragging')}
                       onDragStop={this._toggle('dragging')}
                       dropZoneStyle={dropZoneStyle}
-                      canDrag={canEdit && this.state.canDrag && !isSoftFilter}
+                      canDrag={canEdit && this.state.canDrag}
                     />
                     :
                     <DragDropGroup
-                      canDrag={canEdit && this.state.canDrag && !isSoftFilter}
+                      canDrag={canEdit && this.state.canDrag}
                       items={line.filterGroup.lines}
                       data={line.filterGroup}
                       onDrop={this.handleGroupDrop}
@@ -607,6 +606,31 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       </div>
     );
   }
+}
+
+export function applyToAllFilters(filterGroup: FilterGroup, fn: (filter: FilterLine) => void)
+{
+  filterGroup.lines.map((line) =>
+  {
+    fn(line);
+    if (line.filterGroup !== null)
+    {
+      applyToAllFilters(line.filterGroup, fn);
+    }
+  });
+}
+
+export function findMaxBoost(filterGroup: FilterGroup): number
+{
+  let max = 0;
+  applyToAllFilters(filterGroup, (line) =>
+  {
+    if (line.boost > max)
+    {
+      max = line.boost;
+    }
+  });
+  return max;
 }
 
 export default Util.createTypedContainer(
