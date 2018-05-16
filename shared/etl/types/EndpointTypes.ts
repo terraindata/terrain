@@ -79,7 +79,7 @@ export const SchedulableSinks: Sinks[] =
   [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs];
 
 export const SchedulableSources: Sources[] =
-  [Sources.Algorithm, Sources.Sftp, Sources.Http, Sources.Fs];
+  [Sources.Algorithm, Sources.Sftp, Sources.Http, Sources.Fs, Sources.Mysql, Sources.Postgresql];
 
 export interface SourceConfig
 {

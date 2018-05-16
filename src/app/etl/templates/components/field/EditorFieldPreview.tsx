@@ -190,7 +190,9 @@ class EditorFieldPreview extends TemplateEditorField<Props>
                 'field-preview-array-label': field.isWildcardField(),
                 'field-preview-can-toggle': this.props.toggleOpen !== undefined,
               })}
-              onClick={this.props.toggleOpen}
+              onClick={this.handleLabelClicked}
+              style={fontColor(Colors().text1, Colors().active)}
+              key='label'
             >
               {labelOverride != null ? labelOverride : field.name}
             </div>
