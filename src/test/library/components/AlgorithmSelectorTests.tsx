@@ -86,7 +86,6 @@ describe('AlgorithmSelector', () =>
   {
     it('should create valid state from library and ids', async () =>
     {
-      await selectorComponent.instance().componentDidMount();
       const state = selectorComponent.state();
       expect(state.categories).toEqual(List([1, 2]));
       // no algorithms or groups because category isn't chosen
