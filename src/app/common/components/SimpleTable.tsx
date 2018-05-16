@@ -64,6 +64,7 @@ export interface SimpleTableColumn
   columnLabel: string;
   columnRelativeSize?: number; // works sort of as css flex property
   component?: JSX.Element; // a component to wrap the column value with
+  formatter?: (item: any) => string;
 }
 
 export interface Props
@@ -189,9 +190,18 @@ export class SimpleTable extends TerrainComponent<Props>
     let processedValue = rowData[colKey];
 
     const column = columnsConfig.find((col) => col.columnKey === colKey);
-    if (column !== undefined && column.component !== undefined)
+
+    if (column !== undefined)
     {
-      processedValue = React.cloneElement(column.component, { colKey, rowData });
+      if (column.formatter !== undefined)
+      {
+        processedValue = column.formatter(rowData);
+      }
+
+      if (column.component !== undefined)
+      {
+        processedValue = React.cloneElement(column.component, { colKey, rowData });
+      }
     }
 
     return processedValue;
