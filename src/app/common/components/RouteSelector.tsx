@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions member-access no-var-requires no-console
 
 import Button from 'app/common/components/Button';
+import Modal from 'app/common/components/Modal';
 import Ajax from 'app/util/Ajax';
 import Hit from 'builder/components/results/Hit.tsx';
 import * as classNames from 'classnames';
@@ -127,8 +128,10 @@ export interface Props
   showWarning?: boolean;
   useTooltip?: boolean;
   warningMessage?: string;
-  onDelete?: () => void;
   onToggleOpen?: (open: boolean) => void;
+  onDelete?: () => void;
+  confirmDelete?: boolean;
+  itemName?: string; // used in confirm delete modal
 }
 
 export class RouteSelector extends TerrainComponent<Props>
@@ -147,6 +150,8 @@ export class RouteSelector extends TerrainComponent<Props>
     resultsConfig: Map({}),
     optionSets: List<RouteSelectorOptionSet>([]),
     // optionRefs: Map({}), // not needed for now, but keeping some logic around
+
+    confirmDeleteModalOpen: false,
 
     // TODO re-add animation / picked logic
     // picked: false,
@@ -240,6 +245,9 @@ export class RouteSelector extends TerrainComponent<Props>
             this.renderPicker()
           }
         </div>
+        {
+          this.renderModal()
+        }
       </div>
     );
   }
@@ -1158,6 +1166,20 @@ export class RouteSelector extends TerrainComponent<Props>
 
   private handleDelete()
   {
+    if (this.props.confirmDelete)
+    {
+      this.setState({
+        confirmDeleteModalOpen: true,
+      });
+    }
+    else
+    {
+      this.executeDelete();
+    }
+  }
+
+  private executeDelete()
+  {
     this.setState({
       showBoxValues: false, // animate up
       open: false, // just to be safe
@@ -1178,6 +1200,21 @@ export class RouteSelector extends TerrainComponent<Props>
     this.setState({
       columnRefs: this.state.columnRefs.set(optionSetIndex, columnRef),
     });
+  }
+
+  private renderModal()
+  {
+    return (
+      <Modal
+        open={this.state.confirmDeleteModalOpen}
+        confirm={true}
+        title={'Confirm Delete'}
+        message={`Are you sure you want to delete this ${this.props.itemName || 'item'}?`}
+        confirmButtonText={'Yes'}
+        onConfirm={this.executeDelete}
+        onClose={this._toggle('confirmDeleteModalOpen')}
+      />
+    );
   }
 
   // private attachOptionRef(setIndex, optionIndex, optionRef)

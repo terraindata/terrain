@@ -143,7 +143,7 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
   }
 
   @instanceFnDecorator(memoizeOne)
-  public _getTypeOptions(jsType: FieldTypes)
+  public _getTypeOptions(jsType: FieldTypes): List<string>
   {
     return List(JsToElasticOptions[jsType]);
   }

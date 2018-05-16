@@ -96,6 +96,7 @@ class PickDatabaseStep extends ETLStepComponent
           }),
           options: {
             language: Languages.Elastic,
+            table: 'data',
           },
         }),
       },

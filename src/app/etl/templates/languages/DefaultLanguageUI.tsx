@@ -43,37 +43,34 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:no-var-requires import-spacing strict-boolean-expressions
+import * as React from 'react';
+import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-import { Readable, Writable } from 'stream';
+import { TemplateEditorFieldProps } from 'etl/templates/components/field/TemplateEditorField';
+import { LanguageInterface } from 'etl/templates/languages/LanguageUI';
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
 
-import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
-import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
-import IntegrationConfig from '../../integrations/IntegrationConfig';
-import { integrations } from '../../scheduler/SchedulerRouter';
-
-/**
- * Abstract class for converting a result stream to a string stream for export formatting
- */
-export default abstract class AEndpointStream
+class DefaultUI implements LanguageInterface
 {
-  constructor()
+  public language = Languages.JavaScript;
+
+  public getSettingsComponent()
   {
+    return null;
   }
 
-  public async getIntegrationConfig(integrationId: number): Promise<object>
+  public isFieldPrimaryKey(fieldProps: object)
   {
-    const integration: IntegrationConfig[] = await integrations.get(null, integrationId);
-    if (integration.length === 0)
-    {
-      throw new Error('Invalid integration ID.');
-    }
-
-    const connectionConfig = integration[0].connectionConfig;
-    const authConfig = integration[0].authConfig;
-    return Object.assign(connectionConfig, authConfig);
+    return false;
   }
 
-  public abstract async getSource(source: SourceConfig): Promise<Readable>;
-
-  public abstract async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>;
+  public overrideTypeNames(engine: TransformationEngine, fieldId: number, displayOptions: Immutable.Map<string, string>)
+  {
+    return displayOptions;
+  }
 }
+
+export default new DefaultUI();
