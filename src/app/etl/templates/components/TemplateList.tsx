@@ -54,6 +54,7 @@ import * as React from 'react';
 import Util from 'util/Util';
 
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'app/colors/Colors';
+import TerrainTools from 'app/util/TerrainTools';
 import { notificationManager } from 'common/components/InAppNotification';
 import { Menu, MenuOption } from 'common/components/Menu';
 import Modal from 'common/components/Modal';
@@ -193,6 +194,8 @@ class TemplateList extends TerrainComponent<Props>
           getMenuOptions={computeOptions}
           itemsName='template'
           getActions={!computeOptions ? this.getActions : undefined}
+          canCreate={TerrainTools.isAdmin()}
+          onCreate={() => ETLRouteUtil.gotoWalkthroughStep(0)}
         />
       </div>
     );

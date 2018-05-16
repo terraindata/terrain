@@ -456,7 +456,7 @@ const TransformationNodeInfo: AllNodeInfoType =
       },
     [TransformationNodeType.ProductNode]:
       {
-        humanName: 'Product of two or more fields',
+        humanName: 'Product of Fields',
         editable: false,
         creatable: true,
         description: `Multiplies two or more fields together and puts the result in a new field`,
@@ -477,7 +477,7 @@ const TransformationNodeInfo: AllNodeInfoType =
       },
     [TransformationNodeType.QuotientNode]:
       {
-        humanName: 'Quotient of two fields',
+        humanName: 'Quotient of Fields',
         editable: false,
         creatable: true,
         description: `Divides two fields and puts the result in a new field`,
@@ -498,7 +498,7 @@ const TransformationNodeInfo: AllNodeInfoType =
       },
     [TransformationNodeType.SumNode]:
       {
-        humanName: 'Sum of two or more fields',
+        humanName: 'Sum of Fields',
         editable: false,
         creatable: true,
         description: `Sums two or more fields and puts the result in a new field`,
@@ -519,7 +519,7 @@ const TransformationNodeInfo: AllNodeInfoType =
       },
     [TransformationNodeType.DifferenceNode]:
       {
-        humanName: 'Difference of two fields',
+        humanName: 'Difference of Fields',
         editable: false,
         creatable: true,
         description: `Subtracts one field from another and puts the result in a new field`,
