@@ -89,12 +89,13 @@ class ExecutionHelpers extends ETLHelpers
     };
   }
 
-  public createExecuteJob(): Promise<number>
+  public createExecuteJob(templateName: string): Promise<number>
   {
     return new Promise<number>((resolve, reject) =>
     {
       this.etlAct({
         actionType: 'createExecuteJob',
+        templateName,
         onLoad: resolve,
         onError: reject,
       });
@@ -214,7 +215,7 @@ class ExecutionHelpers extends ETLHelpers
     };
 
     this.beforeRunTemplate(template);
-    this.createExecuteJob()
+    this.createExecuteJob(template.templateName)
       .then(this.runExecuteJobFactory(template))
       .then(updateUIAfterSuccess)
       .catch(updateUIAfterError);

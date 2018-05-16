@@ -286,7 +286,7 @@ class ETLAjax
     });
   }
 
-  public createExecuteJob(): Promise<number>
+  public createExecuteJob(templateName: string): Promise<number>
   {
     return new Promise((resolve, reject) =>
     {
@@ -298,7 +298,7 @@ class ETLAjax
         scheduleId: null,
         status: null,
         workerId: null,
-        name: null,
+        name: 'ETL - ' + (templateName.length > 0 ? templateName : 'Unsaved Template'),
         createdBy: null,
         priority: -1,
         type: 'ETL',
