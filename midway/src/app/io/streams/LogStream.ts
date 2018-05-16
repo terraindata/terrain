@@ -44,94 +44,148 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import { Readable, Transform, Writable } from 'stream';
 import * as winston from 'winston';
 
-import { DatabaseConfig } from '../app/database/DatabaseConfig';
-import QueryHandler from '../app/query/QueryHandler';
-import * as Tasty from '../tasty/Tasty';
-import DatabaseControllerStatus from './DatabaseControllerStatus';
-
 /**
- * An client which acts as a selective isomorphic wrapper around
- * midway databases
+ * A log stream
  */
-abstract class DatabaseController
+export default class LogStream extends Readable
 {
-  private id: number;                       // unique id
-  private lsn: number;                      // log sequence number
-  private type: string;                     // connection type
-  private name: string;                     // connection name
-  private header: string;                   // log entry header
-  private config: DatabaseConfig;           // database configuration
-  private status: DatabaseControllerStatus; // controller status
+  private buffers: string[];
+  private abortThreshold: number;
+  private errorCount: number;
 
-  constructor(type: string, id: number, name: string)
+  constructor(abortThreshold: number = 1000)
   {
-    this.id = id;
-    this.lsn = -1;
-    this.type = type;
-    this.name = name;
-    this.header = 'DB:' + this.id.toString() + ':' + this.name + ':' + this.type + ':';
-    this.config = null;
-    this.status = DatabaseControllerStatus.UNKNOWN;
+    super();
+
+    this.buffers = [];
+    this.abortThreshold = abortThreshold;
+    this.errorCount = 0;
   }
 
-  public log(methodName: string, info?: any, moreInfo?: any)
+  public _read(size?: number)
   {
-    const header = this.header + (++this.lsn).toString() + ':' + methodName;
-    winston.debug(header);
-    if (info !== undefined)
+    this.drainLog();
+  }
+
+  public _destroy(error, callback)
+  {
+    this.drainLog();
+    callback();
+  }
+
+  public push(chunk: any, encoding?: string): boolean
+  {
+    if (chunk === null)
     {
-      winston.debug(header + ': ' + JSON.stringify(info, null, 1));
+      this.drainLog();
+      return super.push(null);
     }
-    if (moreInfo !== undefined)
+
+    const logMsg = {
+      timestamp: new Date(),
+      level: 'info',
+      message: '',
+    };
+
+    try
     {
-      winston.debug(header + ': ' + JSON.stringify(moreInfo, null, 1));
+      const c = JSON.parse(chunk);
+      if (c.timestamp !== undefined)
+      {
+        logMsg.timestamp = c.timestamp;
+      }
+
+      if (c.level !== undefined)
+      {
+        logMsg.level = c.level;
+      }
+
+      if (c.message !== undefined)
+      {
+        logMsg.message = c.message;
+      }
+    }
+    catch (e)
+    {
+      logMsg.message = chunk;
+    }
+
+    return super.push(JSON.stringify(logMsg), encoding);
+  }
+
+  public addStream(stream: Readable | Writable | Transform)
+  {
+    stream.on('error', (e: Error) =>
+    {
+      this.errorCount++;
+
+      if (this.errorCount > this.abortThreshold)
+      {
+        // TODO: abort pipeline!
+        stream.destroy(e);
+      }
+
+      this.log(e.toString());
+    });
+  }
+
+  public addStreams(...streams: Array<Readable | Writable | Transform>): void
+  {
+    for (const stream of streams)
+    {
+      this.addStream(stream);
     }
   }
 
-  public getID(): number
+  public log(message: string, level: string = 'info')
   {
-    return this.id;
+    const timestamp = new Date();
+    const msg: string = level + ':' + message;
+    if (level === 'warn')
+    {
+      winston.warn(msg);
+    }
+    else if (level === 'error')
+    {
+      winston.error(msg);
+    }
+    else
+    {
+      winston.info(msg);
+    }
+
+    this.buffers.push(JSON.stringify({
+      timestamp,
+      level,
+      message,
+    }));
   }
 
-  public getType(): string
+  public info(message: string)
   {
-    return this.type;
+    this.log(message, 'info');
   }
 
-  public getName(): string
+  public warn(message: string)
   {
-    return this.name;
+    this.log(message, 'warn');
   }
 
-  public getStatus(): DatabaseControllerStatus
+  public error(message: string)
   {
-    return this.status;
+    this.log(message, 'error');
   }
 
-  public getConfig(): DatabaseConfig
+  private drainLog()
   {
-    return this.config;
+    let buffer = this.buffers.shift();
+    while (buffer !== undefined)
+    {
+      this.push(buffer);
+      buffer = this.buffers.shift();
+    }
   }
-
-  public setConfig(config: DatabaseConfig)
-  {
-    this.config = config;
-  }
-
-  public setStatus(status: DatabaseControllerStatus)
-  {
-    this.status = status;
-  }
-
-  public abstract getClient();
-
-  public abstract getTasty(): Tasty.Tasty;
-
-  public abstract getQueryHandler(): QueryHandler;
-
-  public abstract getAnalyticsDB();
 }
-
-export default DatabaseController;

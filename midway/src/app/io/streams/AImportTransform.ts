@@ -63,25 +63,32 @@ export default abstract class AImportTransform extends Transform
 
   public _transform(chunk, encoding, callback)
   {
-    const preamble = this.preamble();
-    const chunkNumber = this.chunkNumber++;
-    if (chunkNumber === 0)
+    try
     {
-      if (preamble !== null)
+      const preamble = this.preamble();
+      const chunkNumber = this.chunkNumber++;
+      if (chunkNumber === 0)
       {
-        this.push(preamble);
+        if (preamble !== null)
+        {
+          this.push(preamble);
+        }
+      }
+
+      const out = this.transform(chunk as string, chunkNumber);
+      if (Array.isArray(out))
+      {
+        out.forEach((o) => this.push(o));
+        callback();
+      }
+      else
+      {
+        callback(null, out);
       }
     }
-
-    const out = this.transform(chunk as string, chunkNumber);
-    if (Array.isArray(out))
+    catch (e)
     {
-      out.forEach((o) => this.push(o));
-      callback();
-    }
-    else
-    {
-      callback(null, out);
+      this.emit('error', e);
     }
   }
 
