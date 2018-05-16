@@ -61,6 +61,7 @@ import Menu from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import LanguageUI from 'etl/templates/languages/LanguageUI';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
@@ -346,8 +347,8 @@ class EditorFieldPreview extends TemplateEditorField<Props>
 
   private renderTypeIcon()
   {
-    const field = this._field();
-    const Icon = typeToIcon[field.type];
+    const type = EngineUtil.getRepresentedType(this.props.fieldId, this._currentEngine());
+    const Icon = typeToIcon[type];
     return (
       <div
         className='field-type-icon'
