@@ -223,6 +223,7 @@ export default class TemplateUtil
     {
       errors.push(`Error while trying to determine if template is executable: ${String(e)}`);
     }
+    console.log(errors);
     return errors;
   }
 
@@ -234,18 +235,22 @@ export default class TemplateUtil
    */
   public static canSchedule(template: ETLTemplate): boolean
   {
+    console.log(template);
     const invalidSources = template.getSources().find((v) => SchedulableSources.indexOf(v.type) === -1);
+    console.log(invalidSources);
     if (invalidSources !== undefined)
     {
       return false;
     }
     const invalidSinks = template.getSinks().find((v) => SchedulableSinks.indexOf(v.type) === -1);
+    console.log(invalidSinks);
     if (invalidSinks !== undefined)
     {
       return false;
     }
     if (!(TemplateUtil.verifyExecutable(template).length === 0))
     {
+      console.log('f');
       return false;
     }
     return true;

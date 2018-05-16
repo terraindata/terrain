@@ -132,7 +132,7 @@ export class SimpleTable extends TerrainComponent<Props>
 
     const defaultOrderChanged = nextDefaultOrder.columnKey !== defaultOrder.columnKey ||
       nextDefaultOrder.direction !== defaultOrder.direction;
-    if (defaultOrderChanged)
+    if (defaultOrderChanged || data !== this.props.data)
     {
       this.setState({
         orderedData: this.orderData(

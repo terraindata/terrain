@@ -62,6 +62,8 @@ import * as React from 'react';
 import Util from 'util/Util';
 import './Jobs.less';
 
+const INTERVAL = 60000;
+
 class Jobs extends TerrainComponent<any> {
   public constructor(props)
   {
@@ -71,16 +73,24 @@ class Jobs extends TerrainComponent<any> {
       jobs: null,
       id: '',
       expanded: Immutable.Map({
-        completed: false,
+        completed: true,
         pending: false,
         running: true,
       }),
     };
   }
 
+  public interval;
+
   public componentDidMount()
   {
     this.getJobs();
+    this.interval = setInterval(this.getJobs, INTERVAL);
+  }
+
+  public componentWillUnmount()
+  {
+    clearInterval(this.interval);
   }
 
   public getJobs()
