@@ -97,6 +97,14 @@ class Jobs extends TerrainComponent<any> {
       });
   }
 
+  public calculateJobDuration(job)
+  {
+    const startMoment = Util.moment(job.startTime);
+    const endMoment = Util.moment(job.endTime);
+
+    return endMoment.preciseDiff(startMoment);
+  }
+
   public getStatusColor(status)
   {
     return Colors().statuses[status];
@@ -136,8 +144,19 @@ class Jobs extends TerrainComponent<any> {
         />,
       },
       {
-        columnKey: 'createdAt',
+        columnKey: 'startTime',
         columnLabel: 'Start',
+        formatter: (job) => Util.formatDate(job.startTime, true),
+      },
+      {
+        columnKey: 'duration',
+        columnLabel: 'Duration',
+        formatter: (job) => this.calculateJobDuration(job),
+      },
+      {
+        columnKey: 'endTime',
+        columnLabel: 'End',
+        formatter: (job) => Util.formatDate(job.endTime, true),
       },
       {
         columnKey: 'viewlog',
