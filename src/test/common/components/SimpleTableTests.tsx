@@ -163,6 +163,7 @@ describe('SimpleTable', () =>
       );
 
       const tableRows = tableComponent.find('.simple-table-body .simple-table-row');
+
       const firstRow = tableRows.at(0);
       const lastRow = tableRows.at(9);
 
@@ -170,6 +171,45 @@ describe('SimpleTable', () =>
       const lastRowName = lastRow.find('.simple-table-cell').at(1).text();
       expect(firstRowName).toEqual('item 9');
       expect(lastRowName).toEqual('item 1');
+    });
+
+    it('should format a column value using the formatter if one was specified', () =>
+    {
+      const columnsConfigWithFormatter = [
+        {
+          columnKey: 'id',
+          columnLabel: 'Id',
+        },
+        {
+          columnKey: 'name',
+          columnLabel: 'Name',
+          columnRelativeSize: 4,
+          formatter: (item) => item.name.toUpperCase(),
+        },
+        {
+          columnKey: 'status',
+          columnLabel: 'Status',
+          columnRelativeSize: 0.5,
+        },
+      ];
+
+      const tableStateWithFormatter = {
+        ...tableState,
+        columnsConfig: columnsConfigWithFormatter,
+      };
+
+      tableComponent = shallow(
+        <SimpleTable
+          {...tableStateWithFormatter}
+        />,
+      );
+
+      const tableRows = tableComponent.find('.simple-table-body .simple-table-row');
+
+      expect(tableRows.at(0).find('.simple-table-cell').at(1).text())
+        .toEqual('ITEM 1');
+      expect(tableRows.at(1).find('.simple-table-cell').at(1).text())
+        .toEqual('ITEM 2');
     });
   });
 
