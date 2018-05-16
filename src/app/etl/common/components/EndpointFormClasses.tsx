@@ -314,7 +314,7 @@ class HttpEndpointForm extends EndpointFormBase<HttpOptions>
     },
     params: {
       type: DisplayType.Custom,
-      widthFactor: 6,
+      widthFactor: 7,
       options: {
         render: this.renderParamsForm,
       },
