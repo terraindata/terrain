@@ -85,12 +85,24 @@ class ScoreBar extends TerrainComponent<Props>
 {
   public state = {
     editingWeight: false,
+    weight: this.props.weight,
   };
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (nextProps.weight !== this.props.weight)
+    {
+      this.setState({
+        weight: nextProps.weight,
+      });
+    }
+  }
 
   public render()
   {
-    const { weight, min, max, height, canEdit, altStyle, step, round } = this.props;
-
+    const { min, height, canEdit, altStyle, step, round } = this.props;
+    const { weight } = this.state;
+    const max = Math.max(weight, this.props.max);
     const color = Colors().active;
     return (
       <div
@@ -123,8 +135,8 @@ class ScoreBar extends TerrainComponent<Props>
               type='text'
               className='score-bar-text'
               value={round ? Math.round(weight) : weight}
-              onChange={this.handleWeightTextChange}
               onBlur={this.handleTextBlur}
+              onChange={this.handleTextChange}
               onKeyDown={this.handleTextKeyDown}
               style={[
                 fontColor(Colors().active),
@@ -199,12 +211,11 @@ class ScoreBar extends TerrainComponent<Props>
     }
   }
 
-  private handleWeightTextChange(e)
+  private handleTextChange(e)
   {
-    if (this.props.canEdit && this.props.onAfterChange)
-    {
-      this.props.onAfterChange(e.target.value);
-    }
+    this.setState({
+      weight: e.target.value,
+    });
   }
 
   private handleTextBlur()
@@ -212,6 +223,7 @@ class ScoreBar extends TerrainComponent<Props>
     this.setState({
       editingWeight: false,
     });
+    this.handleWeightAfterChange(this.state.weight);
   }
 
   private handleTextKeyDown(e)
@@ -221,6 +233,7 @@ class ScoreBar extends TerrainComponent<Props>
       this.setState({
         editingWeight: false,
       });
+      this.handleWeightAfterChange(this.state.weight);
     }
   }
 
