@@ -92,7 +92,7 @@ export default class ObjectForm extends TerrainComponent<Props>
       group: 'main',
       widthFactor: 3,
     },
-  }
+  };
 
   public renderAddNewRow()
   {
@@ -115,7 +115,7 @@ export default class ObjectForm extends TerrainComponent<Props>
       <div key={index}>
         <DynamicForm
           inputMap={this.rowInputMap}
-          inputState={{key, value}}
+          inputState={{ key, value }}
           onStateChange={this.rowChangeFactory(index)}
         />
       </div>
@@ -129,21 +129,22 @@ export default class ObjectForm extends TerrainComponent<Props>
       <div className='object-form-container'>
         {
           this.props.label === undefined ? null :
-          <div className='object-form-label'>
-            { this.props.label }
-          </div>
+            <div className='object-form-label'>
+              {this.props.label}
+            </div>
         }
         <div className='object-kv-body' style={borderColor(Colors().border1)}>
           {keys.map(this.renderRow)}
           {this.renderAddNewRow()}
         </div>
-     </div>
+      </div>
     );
   }
 
   public rowChangeFactory(index)
   {
-    return (newKV: KVPair, apply) => {
+    return (newKV: KVPair, apply) =>
+    {
       const oldKey = Object.keys(this.props.object)[index];
       const newState = _.extend({}, this.props.object);
 
@@ -199,5 +200,5 @@ export default class ObjectForm extends TerrainComponent<Props>
 }
 
 const overrideCreateStyle = {
-  height: '24px'
+  height: '24px',
 };

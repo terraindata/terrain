@@ -88,6 +88,7 @@ export interface Props<FState>
   children?: any; // children get rendered between the buttons and the form components
   centerForm?: boolean; // if true, the form content gets centered in the container
   validate?: (state: FState) => string | undefined; // return a string if there's an error
+  debounceAll?: boolean;
 }
 // if we want to allow immutable state objects, add an optional state mutator to each input declaration type
 
@@ -141,7 +142,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           onChange={this.setStateNoApplyHOC(stateName)}
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
-          debounce={options.debounce}
+          debounce={this.props.debounceAll === true || options.debounce}
         />
       </div>
     );
@@ -164,7 +165,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           onChange={this.setStateNoApplyNumberBoxHOC(stateName)}
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
-          debounce={options.debounce}
+          debounce={this.props.debounceAll === true || options.debounce}
         />
       </div>
     );
