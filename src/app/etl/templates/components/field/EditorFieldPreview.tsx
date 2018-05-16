@@ -180,6 +180,9 @@ class EditorFieldPreview extends TemplateEditorField<Props>
             onMouseLeave={this.handleMouseLeave}
             style={labelStyle}
           >
+            {
+              this.renderTypeIcon()
+            }
             <div
               className={classNames({
                 'field-preview-label': true,
@@ -340,7 +343,39 @@ class EditorFieldPreview extends TemplateEditorField<Props>
       this.openSettings();
     }
   }
+
+  private renderTypeIcon()
+  {
+    const field = this._field();
+    const Icon = typeToIcon[field.type];
+    return (
+      <div
+        className='field-type-icon'
+        style={fontColor(Colors().text2)}
+      >
+        <Icon />
+      </div>
+    );
+  }
 }
+
+const TextTypeIcon = require('./../../../../../images/icon_type_text.svg?name=TextTypeIcon');
+const DateTypeIcon = require('./../../../../../images/icon_type_date.svg?name=DateTypeIcon');
+const NumberTypeIcon = require('./../../../../../images/icon_type_number.svg?name=NumberTypeIcon');
+const ArrayTypeIcon = require('./../../../../../images/icon_type_array.svg?name=ArrayTypeIcon');
+const ObjectTypeIcon = require('./../../../../../images/icon_type_object.svg?name=ObjectTypeIcon');
+const GeoTypeIcon = require('./../../../../../images/icon_type_geo.svg?name=GeoTypeIcon');
+const BooleanTypeIcon = require('./../../../../../images/icon_type_boolean.svg?name=BooleanTypeIcon');
+
+const typeToIcon = {
+  string: TextTypeIcon,
+  object: ObjectTypeIcon,
+  number: NumberTypeIcon,
+  boolean: BooleanTypeIcon,
+  array: ArrayTypeIcon,
+  date: DateTypeIcon,
+  geo: GeoTypeIcon,
+};
 
 const emptyOptions = List([]);
 
