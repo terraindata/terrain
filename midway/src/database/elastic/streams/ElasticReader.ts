@@ -73,12 +73,19 @@ export class ElasticReader extends SafeReadable
 
   private numRequested: number = 0;
 
-  constructor(client: ElasticClient, query: any, streaming: boolean = false)
+  constructor(client: ElasticClient, query: string | object, streaming: boolean = false)
   {
     super({ objectMode: true, highWaterMark: 1024 * 8 });
 
     this.client = client;
-    this.query = query;
+    if (typeof query === 'string')
+    {
+      this.query = JSON.parse(query);
+    }
+    else
+    {
+      this.query = query;
+    }
     this.streaming = streaming;
 
     this.size = (query['size'] !== undefined) ? query['size'] as number : this.DEFAULT_SEARCH_SIZE;
