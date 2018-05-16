@@ -60,8 +60,10 @@ const { List, Map } = Immutable;
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import Quarantine from 'util/RadiumQuarantine';
 
 import './ObjectForm.less';
+const DeleteIcon = require('images/icon_close.svg');
 
 interface Props
 {
@@ -112,12 +114,24 @@ export default class ObjectForm extends TerrainComponent<Props>
     const value = this.props.object[key];
 
     return (
-      <div key={index}>
+      <div
+        key={index}
+        className='object-form-row'
+      >
         <DynamicForm
           inputMap={this.rowInputMap}
           inputState={{ key, value }}
           onStateChange={this.rowChangeFactory(index)}
         />
+        <Quarantine>
+          <div
+            className='object-form-row-delete'
+            style={fontColor(Colors().text3, Colors().text2)}
+            onClick={this.handleDeleteRowFactory(index)}
+          >
+            <DeleteIcon />
+          </div>
+        </Quarantine>
       </div>
     );
   }
@@ -141,7 +155,20 @@ export default class ObjectForm extends TerrainComponent<Props>
     );
   }
 
-  public rowChangeFactory(index)
+  @instanceFnDecorator(_.memoize)
+  public handleDeleteRowFactory(index: number)
+  {
+    return () =>
+    {
+      const keyToDelete = Object.keys(this.props.object)[index];
+      const newState = _.extend({}, this.props.object);
+      delete newState[keyToDelete];
+      this.props.onChange(newState, true);
+    };
+  }
+
+  @instanceFnDecorator(_.memoize)
+  public rowChangeFactory(index: number)
   {
     return (newKV: KVPair, apply) =>
     {
@@ -172,7 +199,7 @@ export default class ObjectForm extends TerrainComponent<Props>
 
     // find a unique key
     let newName = 'New Field';
-    for (let i = 1; i < 100; i++)
+    for (let i = 1; i < 100; i++) // is there a better way to do this?
     {
       if (object[newName] === undefined)
       {

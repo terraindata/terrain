@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires no-unused-expression strict-boolean-expressions
 
-// most common imports
 export enum DisplayType
 {
   TextBox = 'TextBox',
