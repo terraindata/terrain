@@ -71,6 +71,7 @@ export interface Props
   onChange: (newConfig: IntegrationConfig) => void;
   hideType?: boolean;
   hideName?: boolean;
+  debounceAll?: boolean;
 }
 
 export default class IntegrationForm extends TerrainComponent<Props>
@@ -114,6 +115,7 @@ export default class IntegrationForm extends TerrainComponent<Props>
             inputMap={this.nameMap}
             inputState={this.nameValueToState(integration)}
             onStateChange={this.handleNameChange}
+            debounceAll={this.props.debounceAll}
           />
         }
         {
@@ -129,6 +131,7 @@ export default class IntegrationForm extends TerrainComponent<Props>
             <FormClass
               integration={integration}
               onChange={this.handleIntegrationChange}
+              debounceAll={this.props.debounceAll}
             />
             : null
         }

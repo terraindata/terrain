@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires no-unused-expression strict-boolean-expressions
 
-// most common imports
 export enum DisplayType
 {
   TextBox = 'TextBox',
@@ -64,22 +63,24 @@ export type InputDeclarationMap<State extends { [k: string]: any }> =
 export interface InputDeclarationOptionTypes<S = any>
 {
   TextBox: {
-    acOptions?: (state: S) => List<string>,
+    acOptions?: (state: S) => List<string>;
+    debounce?: boolean;
   };
   NumberBox: {
     acOptions?: (state: S) => List<string>;
+    debounce?: boolean;
   };
   CheckBox: {
     large?: boolean;
   };
   Pick: {
-    pickOptions: (state: S) => List<string>,
-    indexResolver?: (option) => number,
-    displayNames?: (state: S) => Immutable.Map<any, string>,
+    pickOptions: (state: S) => List<string>;
+    indexResolver?: (option) => number;
+    displayNames?: (state: S) => Immutable.Map<any, string>;
     textColor?: (index: number) => string;
   };
   Custom: {
-    render: (state: S, disabled: boolean) => any,
+    render: (state: S, disabled: boolean) => any;
   };
 }
 
