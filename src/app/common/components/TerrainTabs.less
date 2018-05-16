@@ -32,3 +32,12 @@
 .react-tabs__tab:focus:after {
   content: none;
 }
+
+.react-tabs {
+  height: 100%;
+
+  .react-tabs__tab-panel--selected {
+    height: calc(~"100% - 47px");
+    overflow: auto;
+  }
+}

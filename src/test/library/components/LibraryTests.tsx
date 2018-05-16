@@ -106,6 +106,8 @@ describe('Library', () =>
           schema={schema}
           canPinAlgorithms={true}
           router={{ params: { categoryId: '1' } }}
+          roleActions={{ fetch: jest.fn() }}
+          userActions={jest.fn()}
         />,
       );
     });
@@ -175,6 +177,8 @@ describe('Library', () =>
           schema={schema}
           canPinAlgorithms={false}
           router={{ params: { categoryId: '1' } }}
+          roleActions={{ fetch: jest.fn() }}
+          userActions={jest.fn()}
         />,
       );
     });
@@ -200,6 +204,8 @@ describe('Library', () =>
           schema={schema}
           singleColumn={true}
           router={{ params: {} }}
+          roleActions={{ fetch: jest.fn() }}
+          userActions={jest.fn()}
         />,
       );
     });
@@ -228,6 +234,8 @@ describe('Library', () =>
               schema={schema}
               singleColumn={true}
               router={{ params: { categoryId } }}
+              roleActions={{ fetch: jest.fn() }}
+              userActions={jest.fn()}
             />,
           );
           expect(libraryComponent.find(connect('CategoriesColumn'))).toHaveLength(0);
@@ -248,6 +256,8 @@ describe('Library', () =>
               schema={schema}
               singleColumn={true}
               router={{ params: { categoryId, groupId } }}
+              roleActions={{ fetch: jest.fn() }}
+              userActions={jest.fn()}
             />,
           );
           expect(libraryComponent.find(connect('CategoriesColumn'))).toHaveLength(0);
@@ -268,6 +278,8 @@ describe('Library', () =>
               schema={schema}
               singleColumn={true}
               router={{ params: { categoryId, groupId, algorithmId: algorithmId.toString() } }}
+              roleActions={{ fetch: jest.fn() }}
+              userActions={jest.fn()}
             />,
           );
           expect(libraryComponent.find(connect('CategoriesColumn'))).toHaveLength(0);

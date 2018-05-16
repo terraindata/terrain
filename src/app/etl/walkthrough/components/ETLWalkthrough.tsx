@@ -90,7 +90,7 @@ export interface Props
 
 class ETLWalkthrough extends TerrainComponent<Props>
 {
-  public componentWillMount()
+  public componentDidMount()
   {
     this.getStepFromRoute(true);
   }
@@ -99,6 +99,7 @@ class ETLWalkthrough extends TerrainComponent<Props>
   {
     const { walkthrough } = this.props;
     const currentStep = this.getStepFromRoute();
+
     return (
       <div className='etl-walkthrough'>
         <WalkthroughComponentClass

@@ -66,22 +66,6 @@ const perm: Permissions = new Permissions();
 
 Router.use('/templates', TemplateRouter.routes(), TemplateRouter.allowedMethods());
 
-Router.post('/execute', async (ctx, next) =>
-{
-  const { fields, files } = await asyncBusboy(ctx.req);
-
-  Util.verifyParameters(fields, ['id', 'accessToken']);
-  const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
-  if (user === null)
-  {
-    ctx.body = 'Unauthorized';
-    ctx.status = 400;
-    return;
-  }
-
-  ctx.body = await templates.executeETL(fields, files);
-});
-
 Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   // verify if the user has permissions to create this job and run this ETL pipeline

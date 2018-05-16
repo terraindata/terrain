@@ -45,12 +45,12 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import { browserHistory } from 'react-router';
-import { IndexRoute, Route, Router } from 'react-router';
+import { IndexRedirect, IndexRoute, Route, Router } from 'react-router';
 
 import DataTabs from 'etl/components/DataTabs';
 import TemplateList from 'etl/templates/components/TemplateList';
 import Jobs from 'jobs/components/Jobs';
-import Scheduler from 'scheduler/components/Scheduler';
+import ScheduleList from 'scheduler/components/ScheduleList';
 import App from './App';
 import Builder from './builder/components/Builder';
 import Logout from './common/components/Logout';
@@ -58,7 +58,6 @@ import Placeholder from './common/components/Placeholder';
 import Redirect from './common/components/Redirect';
 import TerrainComponent from './common/components/TerrainComponent';
 import UIComponentsPage from './common/UIComponentsPage';
-import ControlPage from './control/components/ControlPage';
 import ETLEditorPage from './etl/components/ETLEditorPage';
 import ETLPage from './etl/components/ETLPage';
 import ETLWalkthrough from './etl/walkthrough/components/ETLWalkthrough';
@@ -142,19 +141,21 @@ class AppRouter extends TerrainComponent<{}> {
 
           <Route path='/schema' component={SchemaPage} />
 
-          <Route path='/control' component={ControlPage} />
-
           <Route path='/import' component={FileImport /*TODO get rid of this once ETL is merged*/} />
 
           <Route path='/data' component={DataTabs}>
-            <IndexRoute component={ETLWalkthrough} />
-            <Route path='templates/new/:step' component={ETLWalkthrough} />
+            <IndexRedirect to='/data/templates' />
             <Route path='templates' component={TemplateList} />
+            <Route path='newtemplate(/:step)' component={ETLWalkthrough} />
             <Route path='templates/edit/new' component={ETLEditorPage} />
             <Route path='templates/edit/algorithmId=:algorithmId' component={ETLEditorPage} />
             <Route path='templates/edit/templateId=:templateId' component={ETLEditorPage} />
+
             <Route path='integrations' component={IntegrationList} />
             <Route path='integrations/edit/integrationId=:integrationId' component={IntegrationEditorPage} />
+
+            <Route path='schedules' component={ScheduleList} />
+            <Route path='jobs' component={Jobs} />
           </Route>
 
           <Route path='/analytics'>
@@ -170,13 +171,6 @@ class AppRouter extends TerrainComponent<{}> {
             </Route>
           </Route>
 
-          <Route path='/scheduler'>
-            <IndexRoute component={Scheduler} />
-          </Route>
-
-          <Route path='/jobs'>
-            <IndexRoute component={Jobs} />
-          </Route>
         </Route>
       </Router>
     );

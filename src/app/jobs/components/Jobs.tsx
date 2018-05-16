@@ -44,20 +44,25 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console
-import SimpleTable from 'common/components/SimpleTable';
+import 'builder/components/pathfinder/filter/PathfinderFilter.less';
+import 'builder/components/pathfinder/Pathfinder.less';
+import { Colors } from 'colors/Colors';
+import Section from 'common/components/Section';
+import SimpleTable, { BadgeColumn, ButtonColumn } from 'common/components/SimpleTable';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import { JobsActions } from 'jobs/data/JobsRedux';
-import { getFailedJobs, getSuccessfulJobs } from 'jobs/data/JobsSelectors';
-import JobsApi from 'jobs/JobsApi';
+import
+{
+  getCompletedJobs,
+  getPendingJobs,
+  getRunningJobs,
+} from 'jobs/data/JobsSelectors';
 import * as React from 'react';
 import Util from 'util/Util';
-import XHR from 'util/XHR';
+import './Jobs.less';
 
 class Jobs extends TerrainComponent<any> {
-
-  public jobsApi: JobsApi = new JobsApi(XHR.getInstance());
-
   public constructor(props)
   {
     super(props);
@@ -65,6 +70,11 @@ class Jobs extends TerrainComponent<any> {
       responseText: '',
       jobs: null,
       id: '',
+      expanded: Immutable.Map({
+        completed: false,
+        pending: false,
+        running: true,
+      }),
     };
   }
 
@@ -87,56 +97,106 @@ class Jobs extends TerrainComponent<any> {
       });
   }
 
-  public getJob(id: number)
+  public getStatusColor(status)
   {
-    this.jobsApi.getJob(id)
-      .then((response) =>
-      {
-        this.setState({ responseText: JSON.stringify(response) });
-      })
-      .catch((error) =>
-      {
-        this.setState({ responseText: error });
-      });
+    return Colors().statuses[status];
+  }
+
+  public expandSection(isExpanded, section)
+  {
+    const { expanded } = this.state;
+    this.setState({ expanded: expanded.set(section, !isExpanded) });
+  }
+
+  public handleJobViewLog(colKey, rowData)
+  {
+    console.error(rowData);
   }
 
   public render()
   {
-    const { successfulJobs, failedJobs } = this.props;
+    const {
+      completedJobs,
+      pendingJobs,
+      runningJobs,
+    } = this.props;
     const { id } = this.state;
 
     const jobsHeader = [
       {
-        columnKey: 'id',
-        columnLabel: 'Id',
-      },
-      {
         columnKey: 'name',
         columnLabel: 'Name',
+        columnRelativeSize: 2,
       },
       {
         columnKey: 'status',
         columnLabel: 'Status',
+        component: <BadgeColumn
+          getColor={this.getStatusColor}
+        />,
+      },
+      {
+        columnKey: 'createdAt',
+        columnLabel: 'Start',
+      },
+      {
+        columnKey: 'viewlog',
+        columnLabel: '',
+        component: <ButtonColumn
+          label={'View Log'}
+          onClick={this.handleJobViewLog}
+        />,
       },
     ];
 
+    const defaultOrder = {
+      columnKey: 'createdAt',
+      direction: 'desc' as 'asc' | 'desc',
+    };
+
     return (
-      <div>
-        <div>
-          {this.state.responseText}
-        </div>
+      <div className='jobs'>
+        <Section
+          title={'Pending Jobs'}
+          canExpand={true}
+          onExpand={(isExpanded) => this.expandSection(isExpanded, 'pending')}
+          expanded={this.state.expanded.get('pending')}
+          contentCount={pendingJobs.count()}
+        >
+          <SimpleTable
+            columnsConfig={jobsHeader}
+            data={pendingJobs}
+            defaultOrder={defaultOrder}
+          />
+        </Section>
 
-        <h2>Successful Jobs</h2>
-        <SimpleTable
-          header={jobsHeader}
-          data={successfulJobs}
-        />
+        <Section
+          title={'Running Jobs'}
+          canExpand={true}
+          onExpand={(isExpanded) => this.expandSection(isExpanded, 'running')}
+          expanded={this.state.expanded.get('running')}
+          contentCount={runningJobs.count()}
+        >
+          <SimpleTable
+            columnsConfig={jobsHeader}
+            data={runningJobs}
+            defaultOrder={defaultOrder}
+          />
+        </Section>
 
-        <h2>Failed Jobs</h2>
-        <SimpleTable
-          header={jobsHeader}
-          data={failedJobs}
-        />
+        <Section
+          title={'Completed Jobs'}
+          canExpand={true}
+          onExpand={(isExpanded) => this.expandSection(isExpanded, 'completed')}
+          expanded={this.state.expanded.get('completed')}
+          contentCount={completedJobs.count()}
+        >
+          <SimpleTable
+            columnsConfig={jobsHeader}
+            data={completedJobs}
+            defaultOrder={defaultOrder}
+          />
+        </Section>
       </div>
     );
   }
@@ -145,8 +205,9 @@ class Jobs extends TerrainComponent<any> {
 export default Util.createTypedContainer(
   Jobs,
   {
-    successfulJobs: getSuccessfulJobs,
-    failedJobs: getFailedJobs,
+    completedJobs: getCompletedJobs,
+    pendingJobs: getPendingJobs,
+    runningJobs: getRunningJobs,
   },
   { jobsActions: JobsActions },
 );

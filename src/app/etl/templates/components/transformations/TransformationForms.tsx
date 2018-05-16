@@ -58,9 +58,15 @@ const { List, Map } = Immutable;
 import { ArraySumTFF } from './ArraySumTransformationForm';
 import { CastTFF } from './CastTransformationForm';
 import { DuplicateTFF } from './DuplicateTransformationForm';
+import { InsertTFF } from './InsertTransformationForm';
 import { JoinTFF } from './JoinTransformationForm';
+import { DifferenceTFF, ProductTFF, QuotientTFF, SumTFF } from './NumericOperationForms';
 import { SetIfTFF } from './SetIfTransformationForm';
-import { AddTFF, DivideTFF, FindReplaceTFF, HashTFF, MultiplyTFF, SubstringTFF, SubtractTFF, UppercaseTFF } from './SimpleTransformations';
+import
+{
+  AddTFF, DecryptTFF, DivideTFF, EncryptTFF, FindReplaceTFF, HashTFF,
+  MultiplyTFF, SubstringTFF, SubtractTFF, UppercaseTFF,
+} from './SimpleTransformations';
 import { SplitTFF } from './SplitTransformationForm';
 
 export function getTransformationForm(type: TransformationNodeType): React.ComponentClass<TransformationFormProps>
@@ -95,6 +101,20 @@ export function getTransformationForm(type: TransformationNodeType): React.Compo
       return SetIfTFF;
     case TransformationNodeType.FindReplaceNode:
       return FindReplaceTFF;
+    case TransformationNodeType.InsertNode:
+      return InsertTFF;
+    case TransformationNodeType.SumNode:
+      return SumTFF;
+    case TransformationNodeType.DifferenceNode:
+      return DifferenceTFF;
+    case TransformationNodeType.ProductNode:
+      return ProductTFF;
+    case TransformationNodeType.QuotientNode:
+      return QuotientTFF;
+    case TransformationNodeType.EncryptNode:
+      return EncryptTFF;
+    case TransformationNodeType.DecryptNode:
+      return DecryptTFF;
     default:
       return null;
   }

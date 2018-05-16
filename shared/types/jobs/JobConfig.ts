@@ -46,10 +46,11 @@ THE SOFTWARE.
 
 export class JobConfig
 {
-  public createdAt: Date = null;                   // when the job was created
+  public createdAt?: Date = null;                  // when the job was created
   public createdBy: number = null;                 // who created the job (user ID)
-  public id?: number;                              // job ID
-  public logId?: number;                           // jobLog table ID
+  public endTime?: Date = null;                    // when the job ended
+  public id?: number = null;                       // job ID
+  public logId?: number = null;                    // jobLog table ID
   public meta: string = '';                        // meta
   public name: string = '';                        // name of the job
   public pausedFilename: string = '';              // filename of the stored paused output
@@ -57,6 +58,7 @@ export class JobConfig
   public running: boolean = false;                 // whether the task is running or not (TODO: lock this)
   public runNowPriority: number = null;            // determines the order of jobs set to run manually. 1 is lowest priority
   public scheduleId: number = null;                // (optional) schedule ID
+  public startTime?: Date = null;                  // when the job was started
   public status: string = '';                      // the status of the job: success, failure, cancelled
   public tasks: string = '';                       // a stringified representation of TaskConfig[]
   public type: string = '';                        // whether the job is a scheduled run, a scheduled ad hoc run, or an ETL run

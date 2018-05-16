@@ -92,7 +92,7 @@ export class TransformationCreator extends TerrainComponent<Props>
   private inputMap: InputDeclarationMap<FormState> =
     {
       transformationIndex: {
-        type: DisplayType.Pick;
+        type: DisplayType.Pick,
         displayName: 'Transformation',
         group: 'main',
         options: {

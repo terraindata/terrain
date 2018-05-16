@@ -63,25 +63,32 @@ export default abstract class AExportTransform extends Transform
 
   public _transform(chunk, encoding, callback)
   {
-    let result: string;
-    const chunkNumber = this.chunkNumber++;
-    if (chunkNumber === 0)
+    try
     {
-      result = this.preamble();
-    }
-    else
-    {
-      result = this.delimiter();
-    }
+      let result: string;
+      const chunkNumber = this.chunkNumber++;
+      if (chunkNumber === 0)
+      {
+        result = this.preamble();
+      }
+      else
+      {
+        result = this.delimiter();
+      }
 
-    const transformed = this.transform(chunk as object, chunkNumber);
-    if (transformed instanceof Promise)
-    {
-      transformed.then((str) => callback(null, result + str)).catch((e) => this.emit('error', e));
+      const transformed = this.transform(chunk as object, chunkNumber);
+      if (transformed instanceof Promise)
+      {
+        transformed.then((str) => callback(null, result + str)).catch((e) => this.emit('error', e));
+      }
+      else
+      {
+        callback(null, result + transformed);
+      }
     }
-    else
+    catch (e)
     {
-      callback(null, result + transformed);
+      this.emit('error', e);
     }
   }
 

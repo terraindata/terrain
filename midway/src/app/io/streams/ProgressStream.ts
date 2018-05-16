@@ -56,6 +56,7 @@ export default class ProgressStream extends Transform
   private writer: Writable;
   private frequency: number;
   private asyncRead: any = null;
+  private doneWriting: boolean = false;
 
   private count: number = 0;
   private errors: number = 0;
@@ -105,7 +106,7 @@ export default class ProgressStream extends Transform
 
   public _read()
   {
-    if (this.asyncRead === null)
+    if (this.asyncRead === null && !this.doneWriting)
     {
       this.asyncRead = setTimeout(() =>
       {
@@ -121,13 +122,15 @@ export default class ProgressStream extends Transform
     if (this.asyncRead !== null)
     {
       clearTimeout(this.asyncRead);
+      this.asyncRead = null;
     }
 
     this.push(this.progress());
     this.writer.end(callback);
+    this.doneWriting = true;
   }
 
-  private progress()
+  public progress()
   {
     return JSON.stringify({
       successful: this.count,

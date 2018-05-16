@@ -133,18 +133,22 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
       switch (source.fileConfig.fileType)
       {
         case 'json':
-          const jsonNewlines: string | undefined = source.fileConfig.jsonNewlines ? undefined : '*';
-          importStream = sourceStream.pipe(JSONTransform.createImportStream(jsonNewlines));
+          // const jsonPath: string | undefined = source.fileConfig.jsonNewlines ? '*' : undefined;
+          const jsonPath = '*';
+          importStream = sourceStream.pipe(JSONTransform.createImportStream(jsonPath));
           break;
         case 'csv':
           importStream = sourceStream.pipe(CSVTransform.createImportStream());
+          break;
+        case 'tsv':
+          importStream = sourceStream.pipe(CSVTransform.createImportStream(true, '\t'));
           break;
         case 'xml':
           const xmlPath: string | undefined = source.fileConfig.xmlPath;
           importStream = sourceStream.pipe(XMLTransform.createImportStream(xmlPath));
           break;
         default:
-          throw new Error('Download file type must be either CSV, JSON or XML.');
+          throw new Error('Download file type must be either CSV, TSV, JSON or XML.');
       }
       resolve(importStream);
     }
@@ -183,11 +187,14 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
           case 'csv':
             transformStream = CSVTransform.createExportStream();
             break;
+          case 'tsv':
+            transformStream = CSVTransform.createExportStream(true, '\t');
+            break;
           case 'xml':
             transformStream = XMLTransform.createExportStream();
             break;
           default:
-            throw new Error('Export file type must be either CSV, JSON or XML.');
+            throw new Error('Export file type must be either CSV, TSV, JSON or XML.');
         }
       }
 

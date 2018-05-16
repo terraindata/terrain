@@ -63,31 +63,16 @@ interface TabsProps
   router: any;
 }
 
-interface TabsState
-{
-  tabIndex: number;
-}
-
 class TerrainTabs extends TerrainComponent<TabsProps>
 {
-  public state: TabsState = {
-    tabIndex: 0,
-  };
-
   public constructor(props)
   {
     super(props);
-
-    this.state = {
-      tabIndex: this.getActiveTabIndex(),
-    };
   }
 
   public handleSelect(tabIndex: number)
   {
     const { tabs, tabToRouteMap } = this.props;
-
-    this.setState({ tabIndex });
 
     if (tabToRouteMap !== undefined)
     {
@@ -110,7 +95,7 @@ class TerrainTabs extends TerrainComponent<TabsProps>
   public render()
   {
     const { tabs, children, tabToRouteMap, router } = this.props;
-    const { tabIndex } = this.state;
+    const tabIndex = this.getActiveTabIndex();
 
     return (
       <Tabs selectedIndex={tabIndex} onSelect={this.handleSelect}>

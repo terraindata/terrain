@@ -46,15 +46,15 @@ THE SOFTWARE.
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 
-import { FieldTypes, validJSTypes } from 'shared/etl/types/ETLTypes';
+import LanguageController from 'shared/etl/languages/LanguageControllers';
+import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
+import { FieldTypes, Languages, validJSTypes } from 'shared/etl/types/ETLTypes';
 import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import objectify from 'shared/util/deepObjectify';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
-
-import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 
 export type PathHash = string;
 export interface PathHashMap<T>
@@ -393,60 +393,10 @@ export default class EngineUtil
 
   public static changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType: FieldTypes)
   {
-    // Elastic side effects
-    const elasticProps = engine.getFieldProp(fieldId, List(['elastic']));
-    if (elasticProps !== undefined)
-    {
-      const newProps = _.extend({}, elasticProps, {
-        elasticType: ElasticTypes.Auto,
-      });
-      engine.setFieldProp(fieldId, List(['elastic']), newProps);
-    }
-  }
-
-  // attempt to detect date types and integer float
-  // does not add type casts
-  public static autodetectElasticTypes(engine: TransformationEngine, documents: List<object>)
-  {
-    const docs = EngineUtil.preprocessDocuments(documents);
-    engine.getAllFieldIDs().forEach((id) =>
-    {
-      if (engine.getFieldProp(id, List(['elastic', 'isPrimaryKey'])))
-      {
-        return;
-      }
-      const ikp = engine.getInputKeyPath(id);
-      const okp = engine.getOutputKeyPath(id);
-
-      let values = [];
-      docs.forEach((doc) =>
-      {
-        const vals = yadeep.get(engine.transform(doc), okp);
-        values = values.concat(vals);
-      });
-      const repType = EngineUtil.getRepresentedType(id, engine);
-      if (repType === 'string')
-      {
-        const type = TypeUtil.getCommonElasticType(values);
-        if (type === ElasticTypes.GeoPoint)
-        {
-          engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), { toTypename: 'object' });
-          engine.setFieldType(id, 'object');
-          const latField = engine.addField(ikp.push('lat'), 'number');
-          const longField = engine.addField(ikp.push('lon'), 'number');
-          engine.setOutputKeyPath(latField, okp.push('lat'));
-          engine.setOutputKeyPath(longField, okp.push('lon'));
-          EngineUtil.castField(engine, latField, 'number');
-          EngineUtil.castField(engine, longField, 'number');
-        }
-        engine.setFieldProp(id, List(['elastic', 'elasticType']), type);
-      }
-      else if (repType === 'number')
-      {
-        const type = TypeUtil.getCommonElasticNumberType(values);
-        engine.setFieldProp(id, List(['elastic', 'elasticType']), type);
-      }
-    });
+    LanguageController.get(Languages.Elastic)
+      .changeFieldTypeSideEffects(engine, fieldId, newType);
+    LanguageController.get(Languages.JavaScript)
+      .changeFieldTypeSideEffects(engine, fieldId, newType);
   }
 
   // cast the field to the specified type (or the field's current type if type is not specified)
@@ -578,7 +528,7 @@ export default class EngineUtil
     }
   }
 
-  private static preprocessDocuments(documents: List<object>): List<object>
+  public static preprocessDocuments(documents: List<object>): List<object>
   {
     return documents.map((doc) => objectify(doc)).toList();
   }
