@@ -202,11 +202,11 @@ export class SimpleTable extends TerrainComponent<Props>
     let orderedData = data.toList();
     if (columnKey !== undefined)
     {
-      orderedData = orderedData.sortBy((entry) => entry[columnKey]);
+      orderedData = orderedData.sortBy((entry) => entry[columnKey]).toList();
 
       if (direction === 'desc')
       {
-        orderedData = orderedData.reverse();
+        orderedData = orderedData.reverse().toList();
       }
     }
 
