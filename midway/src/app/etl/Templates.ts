@@ -52,7 +52,7 @@ import GraphLib = require('graphlib');
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as request from 'request';
-import { Readable, Transform } from 'stream';
+import { Readable, Transform, Writable } from 'stream';
 import * as winston from 'winston';
 
 import * as Tasty from '../../tasty/Tasty';
@@ -71,6 +71,8 @@ import { destringifySavedTemplate, recordToConfig, TemplateConfig, templateForSa
 import { _SinkConfig, _SourceConfig, SinkConfig as SinkRecord, SourceConfig as SourceRecord } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { ETLProcess, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
+import LogStream from '../io/streams/LogStream';
+import ProgressStream from '../io/streams/ProgressStream';
 
 export default class Templates
 {
@@ -225,6 +227,33 @@ export default class Templates
     });
   }
 
+  public async upsert(newTemplate: TemplateConfig): Promise<TemplateConfig[]>
+  {
+    return new Promise<TemplateConfig[]>(async (resolve, reject) =>
+    {
+      let toUpsert;
+      try
+      {
+        toUpsert = templateForSave(newTemplate);
+      }
+      catch (e)
+      {
+        return reject(`Failed to prepare template for save: ${String(e)}`);
+      }
+      const rawTemplates = await App.DB.upsert(this.templateTable, toUpsert) as TemplateInDatabase[];
+      try
+      {
+        const templates = rawTemplates.map((value, index) =>
+          destringifySavedTemplate(value as TemplateInDatabase));
+        resolve(templates);
+      }
+      catch (e)
+      {
+        return reject(`Failed to destringify saved templates: ${String(e)}`);
+      }
+    });
+  }
+
   public async executeETL(
     fields?: {
       template?: string,
@@ -233,7 +262,7 @@ export default class Templates
       overrideSinks?: string,
     },
     files?: Readable[],
-  ): Promise<Readable>
+  ): Promise<{ outputStream: Readable, logStream: Readable }>
   {
     try
     {
@@ -265,34 +294,7 @@ export default class Templates
     }
   }
 
-  public async upsert(newTemplate: TemplateConfig): Promise<TemplateConfig[]>
-  {
-    return new Promise<TemplateConfig[]>(async (resolve, reject) =>
-    {
-      let toUpsert;
-      try
-      {
-        toUpsert = templateForSave(newTemplate);
-      }
-      catch (e)
-      {
-        return reject(`Failed to prepare template for save: ${String(e)}`);
-      }
-      const rawTemplates = await App.DB.upsert(this.templateTable, toUpsert) as TemplateInDatabase[];
-      try
-      {
-        const templates = rawTemplates.map((value, index) =>
-          destringifySavedTemplate(value as TemplateInDatabase));
-        resolve(templates);
-      }
-      catch (e)
-      {
-        return reject(`Failed to destringify saved templates: ${String(e)}`);
-      }
-    });
-  }
-
-  public async executeById(id: number, files?: Readable[]): Promise<Readable>
+  public async executeById(id: number, files?: Readable[]): Promise<{ outputStream: Readable, logStream: Readable }>
   {
     const ts: TemplateConfig[] = await this.get(id);
     if (ts.length < 1)
@@ -303,7 +305,11 @@ export default class Templates
     return this.execute(template, files);
   }
 
-  public async executeByOverride(id: number, files?: Readable[], overrideSources?: string, overrideSinks?: string)
+  public async executeByOverride(
+    id: number,
+    files?: Readable[],
+    overrideSources?: string,
+    overrideSinks?: string): Promise<{ outputStream: Readable, logStream: Readable }>
   {
     let template: ETLTemplate = null;
 
@@ -341,7 +347,7 @@ export default class Templates
     return this.execute(recordToConfig(template), files);
   }
 
-  public async execute(template: TemplateConfig, files?: Readable[]): Promise<Readable>
+  public async execute(template: TemplateConfig, files?: Readable[]): Promise<{ outputStream: Readable, logStream: Readable }>
   {
     winston.info('Executing template', template.templateName);
     winston.debug(JSON.stringify(template, null, 2));
@@ -350,7 +356,7 @@ export default class Templates
     const numSinks = Object.keys(template.sinks).length;
     const numEdges = Object.keys(template.process.edges).length;
 
-    // TODO: multi-source import and exports
+    // TODO: multi-source export
     if (numSinks > 1 || template.sinks._default === undefined)
     {
       throw new Error('Only single sinks are supported.');
@@ -397,7 +403,25 @@ export default class Templates
     winston.info('Beginning execution of ETL pipeline graph...');
     const nodes: any[] = GraphLib.alg.topsort(dag);
     const streamMap = await this.executeGraph(template, dag, nodes, files);
-    return streamMap[defaultSink][defaultSink];
+
+    const outputStream = streamMap[defaultSink][defaultSink];
+    const logStream = streamMap['log'];
+
+    outputStream.on('end', () =>
+    {
+      logStream.info(`Finished executing ETL job for template ${template.templateName}`);
+      // push execution summary / progress to the log stream when done
+      if (outputStream instanceof ProgressStream)
+      {
+        logStream.info(outputStream.progress());
+      }
+      logStream.push(null);
+    });
+
+    return {
+      outputStream,
+      logStream,
+    };
   }
 
   private async executeGraph(template: TemplateConfig, dag: any, nodes: any[], files?: Readable[], streamMap?: object): Promise<object>
@@ -412,12 +436,16 @@ export default class Templates
     // use the "process dag" to store this information...
     if (streamMap === undefined)
     {
-      streamMap = {};
+      streamMap = {
+        log: new LogStream(template.settings.abortThreshold),
+      };
       nodes.forEach((n) =>
       {
         (streamMap as object)[n] = {};
       });
     }
+
+    const logStream = streamMap['log'];
 
     try
     {
@@ -428,7 +456,7 @@ export default class Templates
       {
         case 'Source':
           {
-            winston.info('Processing source node', nodeId);
+            logStream.info(`Processing source node: ${JSON.stringify(node, null, 2)}`);
             const source = template.sources[node.endpoint];
             const sourceStream = await getSourceStream(node.endpoint, source, files);
 
@@ -440,13 +468,20 @@ export default class Templates
               const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
               const transformStream = new TransformationEngineTransform([], transformationEngine);
               streamMap[nodeId][e.w] = sourceStream.pipe(transformStream);
+
+              // log all errors to the log stream
+              streamMap['log'].addStreams(
+                transformStream,
+                sourceStream,
+                streamMap[nodeId][e.w],
+              );
             }
             return this.executeGraph(template, dag, nodes, files, streamMap);
           }
 
         case 'Sink':
           {
-            winston.info('Processing sink node', nodeId);
+            logStream.info(`Processing sink node: ${JSON.stringify(node, null, 2)}`);
             const inEdges: any[] = dag.inEdges(nodeId);
             if (inEdges.length > 1)
             {
@@ -458,12 +493,19 @@ export default class Templates
             const sink = template.sinks[node.endpoint];
             const sinkStream = await getSinkStream(sink, transformationEngine);
             streamMap[nodeId][nodeId] = streamMap[e.v][nodeId].pipe(sinkStream);
+
+            // log all errors to the log stream
+            streamMap['log'].addStreams(
+              sinkStream,
+              streamMap[e.v][nodeId],
+              streamMap[nodeId][nodeId],
+            );
             return this.executeGraph(template, dag, nodes, files, streamMap);
           }
 
         case 'MergeJoin':
           {
-            winston.info('Processing merge-join node', nodeId);
+            logStream.info(`Processing merge-join node: ${JSON.stringify(node, null, 2)}`);
             const inEdges: any[] = dag.inEdges(nodeId);
 
             const done = new EventEmitter();
@@ -497,6 +539,11 @@ export default class Templates
                   done.emit('done');
                 }
               });
+
+              streamMap['log'].addStreams(
+                tempSinkStream,
+                inputStream,
+              );
             }
 
             // listen for the done event on the EventEmitter
@@ -504,7 +551,7 @@ export default class Templates
             // following code in an event-passing style
             await new Promise((resolve, reject) => done.on('done', resolve).on('error', reject));
 
-            winston.info('Finished creating temporary indices: ', JSON.stringify(tempIndices));
+            logStream.info(`Finished creating temporary indices: ${JSON.stringify(tempIndices)}`);
 
             const dbName: string = template.sinks._default['options']['serverId'];
 
@@ -518,7 +565,7 @@ export default class Templates
             const indices = tempIndices.map((i) => i['index']);
             await elasticDB.refreshIndex(indices);
 
-            winston.info('Finished refreshing temporary indices; now ready for searching / sorting ...');
+            logStream.info('Finished refreshing temporary indices; now ready for searching / sorting ...');
 
             // pipe the merge stream to all outgoing edges
             const outEdges: any[] = dag.outEdges(nodeId);
@@ -536,9 +583,16 @@ export default class Templates
                   // delete the temporary indices once the merge stream has been piped
                   // out to all outgoing edges
                   await elasticDB.deleteIndex(indices);
-                  winston.info('Deleted temporary indices: ' + JSON.stringify(indices));
+                  logStream.info(`Deleted temporary indices: ${JSON.stringify(indices)}`);
                 }
               });
+
+              // log all errors to the log stream
+              streamMap['log'].addStreams(
+                transformStream,
+                mergeJoinStream,
+                streamMap[nodeId][e.w],
+              );
             }
 
             return this.executeGraph(template, dag, nodes, files, streamMap);
@@ -550,7 +604,7 @@ export default class Templates
     }
     catch (e)
     {
-      winston.error(e);
+      logStream.error(`Failed to execute ETL pipeline: ${String(e)}`);
       throw new Error(`Failed to execute ETL pipeline: ${String(e)}`);
     }
   }

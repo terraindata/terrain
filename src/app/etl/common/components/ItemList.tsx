@@ -194,7 +194,7 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
         {
           items.size > 0 ?
             items.map(this.renderRow).toList()
-          :
+            :
             <div className='item-list-message'>
               There aren't yet any {this.props.itemsName || 'item'}s
             </div>
@@ -202,12 +202,12 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
 
         {
           this.props.canCreate &&
-            <PathfinderCreateLine
-              text={'Create ' + this.props.itemsName}
-              canEdit={true}
-              onCreate={this.props.onCreate}
-              showText={true}
-            />
+          <PathfinderCreateLine
+            text={'Create ' + this.props.itemsName}
+            canEdit={true}
+            onCreate={this.props.onCreate}
+            showText={true}
+          />
         }
       </div>
     );
