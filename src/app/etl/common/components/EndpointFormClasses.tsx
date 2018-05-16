@@ -332,12 +332,12 @@ class HttpEndpointForm extends EndpointFormBase<HttpOptions>
     );
   }
 
-  public handleHeadersChange(newHeaders)
+  public handleHeadersChange(newHeaders, apply?: boolean)
   {
     const { options } = this.props.endpoint;
     const newFormState: HttpOptions = _.extend({}, options);
     newFormState.headers = newHeaders;
-    this.handleOptionsFormChange(newFormState);
+    this.handleOptionsFormChange(newFormState, apply);
   }
 
   public renderParamsForm(state: HttpOptions, disabled)
@@ -351,12 +351,12 @@ class HttpEndpointForm extends EndpointFormBase<HttpOptions>
     );
   }
 
-  public handleParamsChange(newParams)
+  public handleParamsChange(newParams, apply?: boolean)
   {
     const { options } = this.props.endpoint;
     const newFormState: HttpOptions = _.extend({}, options);
     newFormState.params = newParams;
-    this.handleOptionsFormChange(newFormState);
+    this.handleOptionsFormChange(newFormState, apply);
   }
 }
 
