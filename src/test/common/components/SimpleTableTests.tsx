@@ -184,11 +184,13 @@ describe('SimpleTable', () =>
         />,
       );
 
-      tableComponent.instance().handleShowMoreClick();
+      const showMoreButton = tableComponent.find('ShowMore');
+
+      showMoreButton.simulate('click');
       expect(tableComponent.find('.simple-table-body .simple-table-row')).toHaveLength(8);
       expect(tableComponent.find('ShowMore')).toHaveLength(1);
 
-      tableComponent.instance().handleShowMoreClick();
+      showMoreButton.simulate('click');
       expect(tableComponent.find('.simple-table-body .simple-table-row')).toHaveLength(10);
       expect(tableComponent.find('ShowMore')).toHaveLength(0);
     });
