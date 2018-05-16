@@ -44,7 +44,8 @@ THE SOFTWARE.
 
 // PerformantDragLayer.js
 /* eslint-disable */
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import { PropTypes } from 'prop-types';
 import shallowEqual from 'react-dnd/lib/utils/shallowEqual';
 import shallowEqualScalar from 'react-dnd/lib/utils/shallowEqualScalar';
 import isPlainObject from 'lodash/isPlainObject';

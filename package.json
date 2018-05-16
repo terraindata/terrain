@@ -101,6 +101,7 @@
     "setupFiles": [
       "<rootDir>/src/test/__mocks__/browserMock.ts"
     ],
+    "setupTestFrameworkScriptFile": "<rootDir>/src/test/setup.ts",
     "testURL": "http://localhost",
     "clearMocks": true
   },
@@ -291,7 +292,8 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "css-loader": "^0.28.11",
-    "enzyme": "^2.9.1",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-15": "^1.0.5",
     "expose-loader": "^0.7.5",
     "file-loader": "^1.1.11",
     "fork-ts-checker-webpack-plugin": "^0.4.1",
@@ -305,7 +307,7 @@
     "pre-commit": "^1.2.2",
     "puppeteer": "^0.13.0",
     "raw-loader": "^0.5.1",
-    "react-test-renderer": "^15.6.1",
+    "react-test-renderer": "15.6.2",
     "redux-mock-store": "^1.5.1",
     "sleep": "^5.1.1",
     "string-replace-loader": "^2.1.1",
