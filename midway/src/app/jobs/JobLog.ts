@@ -102,7 +102,7 @@ export class JobLog
       }
       catch (e)
       {
-        App.JobQ.setJobStatus(jobId, false, 'FAILURE');
+        await App.JobQ.setJobStatus(jobId, false, 'FAILURE');
       }
     });
   }
