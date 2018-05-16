@@ -149,6 +149,11 @@ class Jobs extends TerrainComponent<any> {
       },
     ];
 
+    const defaultOrder = {
+      columnKey: 'createdAt',
+      direction: 'desc' as 'asc' | 'desc',
+    };
+
     return (
       <div className='jobs'>
         <Section
@@ -161,6 +166,7 @@ class Jobs extends TerrainComponent<any> {
           <SimpleTable
             columnsConfig={jobsHeader}
             data={pendingJobs}
+            defaultOrder={defaultOrder}
           />
         </Section>
 
@@ -174,6 +180,7 @@ class Jobs extends TerrainComponent<any> {
           <SimpleTable
             columnsConfig={jobsHeader}
             data={runningJobs}
+            defaultOrder={defaultOrder}
           />
         </Section>
 
@@ -187,6 +194,7 @@ class Jobs extends TerrainComponent<any> {
           <SimpleTable
             columnsConfig={jobsHeader}
             data={completedJobs}
+            defaultOrder={defaultOrder}
           />
         </Section>
       </div>

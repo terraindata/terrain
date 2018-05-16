@@ -70,12 +70,14 @@ export interface Props
 {
   columnsConfig: SimpleTableColumn[];
   data: Immutable.Map<ID, any>;
+  defaultOrder?: { columnKey: string, direction: 'asc' | 'desc' };
   displayRowCount?: number;
 }
 
 export interface State
 {
   visibleRowCount: number;
+  orderedData: Immutable.List<any>;
 }
 
 const ShowMore = (props) =>
@@ -93,16 +95,53 @@ export class SimpleTable extends TerrainComponent<Props>
 {
   public static defaultProps = {
     displayRowCount: 10,
+    defaultOrder: {},
   };
-  public state: State = {
-    visibleRowCount: this.props.displayRowCount,
-  };
+  public state: State = null;
   public columnWidths = this.calculateColumnWidhts();
+
+  public constructor(props)
+  {
+    super(props);
+
+    const { displayRowCount, data, defaultOrder } = props;
+
+    this.state = {
+      visibleRowCount: displayRowCount,
+      orderedData: this.orderData(
+        data,
+        defaultOrder.columnKey,
+        defaultOrder.direction,
+      ),
+    };
+  }
 
   public componentWillReceiveProps(nextProps)
   {
-    const { displayRowCount } = nextProps;
-    this.setState({ visibleRowCount: displayRowCount });
+    const {
+      displayRowCount,
+      defaultOrder: nextDefaultOrder,
+      data,
+    } = nextProps;
+
+    const { defaultOrder } = this.props;
+
+    this.setState({
+      visibleRowCount: displayRowCount,
+    });
+
+    const defaultOrderChanged = nextDefaultOrder.columnKey !== defaultOrder.columnKey ||
+      nextDefaultOrder.direction !== defaultOrder.direction;
+    if (defaultOrderChanged)
+    {
+      this.setState({
+        orderedData: this.orderData(
+          data,
+          defaultOrder.columnKey,
+          defaultOrder.direction,
+        ),
+      });
+    }
   }
 
   public calculateColumnWidhts()
@@ -158,14 +197,29 @@ export class SimpleTable extends TerrainComponent<Props>
     return processedValue;
   }
 
+  public orderData(data: Immutable.Map<ID, any>, columnKey: string, direction: 'asc' | 'desc' = 'asc')
+  {
+    let orderedData = data.toList();
+    if (columnKey !== undefined)
+    {
+      orderedData = orderedData.sortBy((entry) => entry[columnKey]);
+
+      if (direction === 'desc')
+      {
+        orderedData = orderedData.reverse();
+      }
+    }
+
+    return orderedData;
+  }
+
   public render()
   {
-    const { columnsConfig, data } = this.props;
-    const { visibleRowCount } = this.state;
+    const { columnsConfig } = this.props;
+    const { visibleRowCount, orderedData } = this.state;
 
     const columnKeys = columnsConfig.map((config) => config.columnKey);
-    const dataValues = data.valueSeq();
-    const visibleDataValues = dataValues.take(visibleRowCount);
+    const visibleDataValues = orderedData.take(visibleRowCount);
 
     return (
       <table className='simple-table'>
@@ -220,7 +274,7 @@ export class SimpleTable extends TerrainComponent<Props>
               )
           }
           {
-            dataValues.count() > visibleRowCount ?
+            orderedData.count() > visibleRowCount ?
               <ShowMore
                 colSpan={columnKeys.length}
                 onClick={this.handleShowMoreClick}

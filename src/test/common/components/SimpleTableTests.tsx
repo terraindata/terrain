@@ -152,6 +152,25 @@ describe('SimpleTable', () =>
     {
       expect(tableComponent.instance().props.displayRowCount).toEqual(10);
     });
+
+    it('should order entries by defaultOrder.columnKey in direction defaultOrder.direction', () =>
+    {
+      tableComponent = shallow(
+        <SimpleTable
+          {...tableState}
+          defaultOrder={{ columnKey: 'name', direction: 'desc' }}
+        />,
+      );
+
+      const tableRows = tableComponent.find('.simple-table-body .simple-table-row');
+      const firstRow = tableRows.at(0);
+      const lastRow = tableRows.at(9);
+
+      const firstRowName = firstRow.find('.simple-table-cell').at(1).text();
+      const lastRowName = lastRow.find('.simple-table-cell').at(1).text();
+      expect(firstRowName).toEqual('item 9');
+      expect(lastRowName).toEqual('item 1');
+    });
   });
 
   describe('#handleShowMoreClick', () =>
@@ -188,6 +207,24 @@ describe('SimpleTable', () =>
           status: 9.09,
         },
       );
+    });
+  });
+
+  describe('#orderData', () =>
+  {
+    it('should return the data ordered by the specified criteria', () =>
+    {
+      let orderedData = tableComponent.instance().orderData(tableData);
+
+      expect(orderedData).toEqual(tableData.toList());
+
+      orderedData = tableComponent.instance().orderData(tableData, 'name');
+      expect(orderedData.get(0).name).toEqual('item 1');
+      expect(orderedData.get(9).name).toEqual('item 9');
+
+      orderedData = tableComponent.instance().orderData(tableData, 'name', 'desc');
+      expect(orderedData.get(0).name).toEqual('item 9');
+      expect(orderedData.get(9).name).toEqual('item 1');
     });
   });
 });
