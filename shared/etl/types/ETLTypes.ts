@@ -60,6 +60,7 @@ export enum FileTypes
 {
   Json = 'json',
   Csv = 'csv',
+  Tsv = 'tsv',
   Xml = 'xml',
 }
 
