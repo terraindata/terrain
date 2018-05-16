@@ -194,13 +194,13 @@ describe('SimpleTable', () =>
     });
   });
 
-  describe('#calculateColumnWidhts', () =>
+  describe('#calculateColumnWidths', () =>
   {
     it('should balance column widths to fill 100% based on the defined columnRelativeSize', () =>
     {
       // take the columnRelativeSize (defaults to 1 if not defined), multiply by 100
       // and divide by the sum of all the columns columnRelativeSize.
-      expect(tableComponent.instance().calculateColumnWidhts()).toEqual(
+      expect(tableComponent.instance().calculateColumnWidths()).toEqual(
         {
           id: 18.18,
           name: 72.73,

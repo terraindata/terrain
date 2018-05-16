@@ -98,7 +98,7 @@ export class SimpleTable extends TerrainComponent<Props>
     defaultOrder: {},
   };
   public state: State = null;
-  public columnWidths = this.calculateColumnWidhts();
+  public columnWidths = this.calculateColumnWidths();
 
   public constructor(props)
   {
@@ -144,7 +144,7 @@ export class SimpleTable extends TerrainComponent<Props>
     }
   }
 
-  public calculateColumnWidhts()
+  public calculateColumnWidths()
   {
     const { columnsConfig } = this.props;
     // By default, each column takes an equal portion of the 100% width
