@@ -365,6 +365,10 @@ describe('Version route tests', () =>
   {
     await request(server)
       .get('/midway/v1/versions')
+      .query({
+        id: 1,
+        accessToken: defaultUserAccessToken,
+      })
       .expect(200)
       .then((response) =>
       {
