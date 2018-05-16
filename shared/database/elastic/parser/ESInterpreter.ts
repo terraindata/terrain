@@ -235,13 +235,13 @@ export default class ESInterpreter
     return this.getInterpretingErrorMessages().concat(this.parser.getErrorMessages());
   }
 
-  public toCode(options: CardsToCodeOptions)
+  public toCode(options: CardsToCodeOptions): string
   {
-    let queryObj = this.rootValueInfo.value;
+    let query = this.rootValueInfo.value;
     if (options.replaceInputs === true)
     {
-      queryObj = ESParameterFiller.generate(this.rootValueInfo, this.params);
+      query = ESParameterFiller.generate(this.rootValueInfo, this.params);
     }
-    return JSON.stringify(queryObj);
+    return query;
   }
 }
