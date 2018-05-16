@@ -229,6 +229,14 @@ export class JobQueue
     });
   }
 
+  public async initializeJobQueue(): Promise<void>
+  {
+    // set all jobs that are currently running to ABORTED
+    await this._resetAllRunningJobs();
+
+    setTimeout(this._jobLoop.bind(this), INTERVAL - new Date().getTime() % INTERVAL);
+  }
+
   public async pause(id: number): Promise<JobConfig[]>
   {
     return new Promise<JobConfig[]>(async (resolve, reject) =>
@@ -327,6 +335,37 @@ export class JobQueue
     });
   }
 
+  // Status codes: PENDING SUCCESS FAILURE PAUSED CANCELED RUNNING ABORTED (PAUSED/RUNNING when midway was restarted)
+  public async setJobStatus(id: number, running: boolean, status: string): Promise<boolean>
+  {
+    return new Promise<boolean>(async (resolve, reject) =>
+    {
+      const jobs: JobConfig[] = await this._select([], { id }) as JobConfig[];
+      if (jobs.length === 0)
+      {
+        return resolve(false);
+      }
+      if (jobs[0].running === running)
+      {
+        return resolve(false);
+      }
+
+      if (jobs[0].running === false && running === true) // set start time
+      {
+        jobs[0].startTime = new Date();
+      }
+      if (jobs[0].running === true && running === false) // set end time
+      {
+        jobs[0].endTime = new Date();
+      }
+
+      jobs[0].running = running;
+      jobs[0].status = status;
+      const doNothing: JobConfig[] = await App.DB.upsert(this.jobTable, jobs[0]) as JobConfig[];
+      resolve(true);
+    });
+  }
+
   public async unpause(id: number): Promise<JobConfig[]>
   {
     return new Promise<JobConfig[]>(async (resolve, reject) =>
@@ -358,45 +397,6 @@ export class JobQueue
         // do nothing, job was not found
       }
       return reject(new Error('Job not found.'));
-    });
-  }
-
-  public async initializeJobQueue(): Promise<void>
-  {
-    // set all jobs that are currently running to ABORTED
-    await this._resetAllRunningJobs();
-
-    setTimeout(this._jobLoop.bind(this), INTERVAL - new Date().getTime() % INTERVAL);
-  }
-
-  // Status codes: PENDING SUCCESS FAILURE PAUSED CANCELED RUNNING ABORTED (PAUSED/RUNNING when midway was restarted)
-  public async setJobStatus(id: number, running: boolean, status: string): Promise<boolean>
-  {
-    return new Promise<boolean>(async (resolve, reject) =>
-    {
-      const jobs: JobConfig[] = await this._select([], { id }) as JobConfig[];
-      if (jobs.length === 0)
-      {
-        return resolve(false);
-      }
-      if (jobs[0].running === running)
-      {
-        return resolve(false);
-      }
-
-      if (jobs[0].running === false && running === true) // set start time
-      {
-        jobs[0].startTime = new Date();
-      }
-      if (jobs[0].running === true && running === false) // set end time
-      {
-        jobs[0].endTime = new Date();
-      }
-
-      jobs[0].running = running;
-      jobs[0].status = status;
-      const doNothing: JobConfig[] = await App.DB.upsert(this.jobTable, jobs[0]) as JobConfig[];
-      resolve(true);
     });
   }
 
