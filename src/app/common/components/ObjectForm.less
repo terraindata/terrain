@@ -1,0 +1,35 @@
+@import "~common/Common.less";
+
+.object-form-container {
+  display: flex;
+  flex-direction: column;
+
+  .object-kv-body {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid;
+    padding: @quarter-spacing;
+  }
+
+  .object-form-label {
+    padding: @quarter-spacing 0px;
+  }
+
+  .object-form-row {
+    display: flex;
+  }
+
+  .object-form-row-delete {
+    .transition;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    svg {
+      width: 10px;
+      height: 10px;
+      fill: currentColor;
+      position: relative;
+      top: 5px;
+    }
+  }
+}

@@ -127,7 +127,7 @@ export default class ProgressStream extends Transform
     this.writer.end(callback);
   }
 
-  private progress()
+  public progress()
   {
     return JSON.stringify({
       successful: this.count,

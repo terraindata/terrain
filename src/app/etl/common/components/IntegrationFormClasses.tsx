@@ -65,6 +65,7 @@ export interface Props
 {
   integration: IntegrationConfig;
   onChange: (newIntegration: IntegrationConfig) => void;
+  debounceAll?: boolean;
 }
 
 abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props = Props> extends TerrainComponent<P>
@@ -113,11 +114,13 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
           inputMap={this.authMap}
           inputState={authState}
           onStateChange={this.handleAuthFormChange}
+          debounceAll={this.props.debounceAll}
         />
         <DynamicForm
           inputMap={this.connectionMap}
           inputState={connectionState}
           onStateChange={this.handleConnectionFormChange}
+          debounceAll={this.props.debounceAll}
         />
       </div>
     );
