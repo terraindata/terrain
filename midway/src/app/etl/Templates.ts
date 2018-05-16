@@ -407,16 +407,16 @@ export default class Templates
     const outputStream = streamMap[defaultSink][defaultSink];
     const logStream = streamMap['log'];
 
-    // push execution summary / progress to the log stream when done
-    if (outputStream instanceof ProgressStream)
+    outputStream.on('end', () =>
     {
-      outputStream.on('end', () =>
+      logStream.info(`Finished executing ETL job for template ${template.templateName}`);
+      // push execution summary / progress to the log stream when done
+      if (outputStream instanceof ProgressStream)
       {
-        logStream.info(`Finished executing ETL job for template ${template.templateName}`);
-        logStream.log(outputStream.progress());
-        logStream.push(null);
-      });
-    }
+        logStream.info(outputStream.progress());
+      }
+      logStream.push(null);
+    });
 
     return {
       outputStream,
@@ -456,7 +456,7 @@ export default class Templates
       {
         case 'Source':
           {
-            logStream.info(`Processing source node ${String(nodeId)}`);
+            logStream.info(`Processing source node: ${JSON.stringify(node, null, 2)}`);
             const source = template.sources[node.endpoint];
             const sourceStream = await getSourceStream(node.endpoint, source, files);
 
@@ -481,7 +481,7 @@ export default class Templates
 
         case 'Sink':
           {
-            logStream.info(`Processing sink node ${String(nodeId)}`);
+            logStream.info(`Processing sink node: ${JSON.stringify(node, null, 2)}`);
             const inEdges: any[] = dag.inEdges(nodeId);
             if (inEdges.length > 1)
             {
@@ -505,7 +505,7 @@ export default class Templates
 
         case 'MergeJoin':
           {
-            logStream.info(`Processing merge-join node ${String(nodeId)}`);
+            logStream.info(`Processing merge-join node: ${JSON.stringify(node, null, 2)}`);
             const inEdges: any[] = dag.inEdges(nodeId);
 
             const done = new EventEmitter();

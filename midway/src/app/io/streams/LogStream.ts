@@ -80,6 +80,7 @@ export default class LogStream extends Readable
   {
     if (chunk === null)
     {
+      this.drainLog();
       return super.push(null);
     }
 
@@ -112,7 +113,7 @@ export default class LogStream extends Readable
       logMsg.message = chunk;
     }
 
-    return super.push(logMsg, encoding);
+    return super.push(JSON.stringify(logMsg), encoding);
   }
 
   public addStream(stream: Readable | Writable | Transform)
@@ -142,7 +143,7 @@ export default class LogStream extends Readable
   public log(message: string, level: string = 'info')
   {
     const timestamp = new Date();
-    const msg: string = String(timestamp) + ':' + level + ':' + message;
+    const msg: string = level + ':' + message;
     if (level === 'warn')
     {
       winston.warn(msg);
