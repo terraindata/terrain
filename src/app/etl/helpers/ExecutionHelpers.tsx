@@ -185,11 +185,14 @@ class ExecutionHelpers extends ETLHelpers
 
     const updateUIAfterSuccess = () =>
     {
+      const templateName = (template !== null && template.id === -1) ?
+        'Unsaved Template' :
+        template.templateName;
       this.afterRunTemplate(template);
       this.etlAct({
         actionType: 'addModal',
         props: {
-          message: `"${template.templateName}" finished running`,
+          message: `"${templateName}" finished running`,
           title: 'Task Complete',
         },
       });
