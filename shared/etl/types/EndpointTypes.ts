@@ -144,9 +144,9 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
     Http: {
       method: 'GET',
       headers: {
-        accept: '',
         contentType: 'application/json',
       },
+      params: {},
     },
     Fs: {
       path: '',
@@ -193,9 +193,9 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
     Http: {
       method: 'POST',
       headers: {
-        accept: '',
         contentType: 'application/json',
       },
+      params: {},
     },
     Fs: {
       path: '',
@@ -213,8 +213,12 @@ export interface HttpOptions
 {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   headers: {
-    accept: string;
-    contentType: string;
+    contentType?: string;
+    accept?: string;
+    [k: string]: any;
+  };
+  params: {
+    [k: string]: any;
   };
 }
 

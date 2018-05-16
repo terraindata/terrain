@@ -57,6 +57,7 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
+import ObjectForm from 'common/components/ObjectForm';
 import DatabasePicker from 'etl/common/components/DatabasePicker';
 import FileConfigForm from 'etl/common/components/FileConfigForm';
 import UploadFileButton from 'etl/common/components/UploadFileButton';
@@ -128,17 +129,17 @@ abstract class EndpointFormBase<State, P extends Props = Props> extends TerrainC
     );
   }
 
-  private handleFileConfigChange(config: FileConfig, apply?: boolean)
-  {
-    const { onChange, endpoint } = this.props;
-    onChange(endpoint.set('fileConfig', config), apply);
-  }
-
-  private handleOptionsFormChange(formState: State, apply?: boolean)
+  public handleOptionsFormChange(formState: State, apply?: boolean)
   {
     const { onChange, endpoint } = this.props;
     const newOptions = this.formStateToOptions(formState);
     onChange(endpoint.set('options', newOptions), apply);
+  }
+
+  private handleFileConfigChange(config: FileConfig, apply?: boolean)
+  {
+    const { onChange, endpoint } = this.props;
+    onChange(endpoint.set('fileConfig', config), apply);
   }
 }
 
@@ -293,9 +294,9 @@ interface HttpState extends Partial<HttpOptions>
 
 const httpMethods = List(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']);
 
-class HttpEndpoint extends EndpointFormBase<HttpState>
+class HttpEndpointForm extends EndpointFormBase<HttpOptions>
 {
-  public inputMap: InputDeclarationMap<HttpState> = {
+  public inputMap: InputDeclarationMap<HttpOptions> = {
     method: {
       type: DisplayType.Pick,
       displayName: 'Method',
@@ -304,37 +305,58 @@ class HttpEndpoint extends EndpointFormBase<HttpState>
         indexResolver: (value) => httpMethods.indexOf(value),
       },
     },
-    accept: {
-      type: DisplayType.TextBox,
-      displayName: 'Accept',
+    headers: {
+      type: DisplayType.Custom,
+      widthFactor: 6,
+      options: {
+        render: this.renderHeadersForm,
+      }
     },
-    contentType: {
-      type: DisplayType.TextBox,
-      displayName: 'Content Type',
+    params: {
+      type: DisplayType.Custom,
+      widthFactor: 6,
+      options: {
+        render: this.renderParamsForm,
+      }
     },
   };
 
-  public optionsToFormState(options: HttpOptions): HttpState
+  public renderHeadersForm(state: HttpOptions, disabled)
   {
-    const { method } = options;
-    const headers = _.get(options, 'headers', {});
-    return {
-      method,
-      accept: headers['accept'],
-      contentType: headers['contentType'],
-    };
+    return (
+      <ObjectForm
+        object={state.headers}
+        onChange={this.handleHeadersChange}
+        label='Headers'
+      />
+    );
   }
 
-  public formStateToOptions(newState: HttpState): HttpOptions
+  public handleHeadersChange(newHeaders)
   {
-    const { method, accept, contentType } = newState;
-    return {
-      method,
-      headers: {
-        accept,
-        contentType,
-      },
-    };
+    const { options } = this.props.endpoint;
+    const newFormState: HttpOptions = _.extend({}, options);
+    newFormState.headers = newHeaders;
+    this.handleOptionsFormChange(newFormState);
+  }
+
+  public renderParamsForm(state: HttpOptions, disabled)
+  {
+    return (
+      <ObjectForm
+        object={state.params}
+        onChange={this.handleParamsChange}
+        label='Parameters'
+      />
+    );
+  }
+
+  public handleParamsChange(newParams)
+  {
+    const { options } = this.props.endpoint;
+    const newFormState: HttpOptions = _.extend({}, options);
+    newFormState.params = newParams;
+    this.handleOptionsFormChange(newFormState);
   }
 }
 
@@ -418,7 +440,7 @@ export const SourceFormMap: FormLookupMap<Sources> =
     [Sources.Upload]: UploadEndpoint,
     [Sources.Algorithm]: AlgorithmEndpoint,
     [Sources.Sftp]: SftpEndpoint,
-    [Sources.Http]: HttpEndpoint,
+    [Sources.Http]: HttpEndpointForm,
     [Sources.Fs]: FsEndpoint,
     [Sources.Mysql]: SQLEndpoint,
     [Sources.Postgresql]: SQLEndpoint,
@@ -429,6 +451,6 @@ export const SinkFormMap: FormLookupMap<Sinks> =
     [Sinks.Download]: DownloadEndpoint,
     [Sinks.Database]: DatabaseEndpoint,
     [Sinks.Sftp]: SftpEndpoint,
-    [Sinks.Http]: HttpEndpoint,
+    [Sinks.Http]: HttpEndpointForm,
     [Sinks.Fs]: FsEndpoint,
   };
