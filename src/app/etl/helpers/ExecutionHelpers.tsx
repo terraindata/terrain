@@ -89,12 +89,13 @@ class ExecutionHelpers extends ETLHelpers
     };
   }
 
-  public createExecuteJob(): Promise<number>
+  public createExecuteJob(templateName: string): Promise<number>
   {
     return new Promise<number>((resolve, reject) =>
     {
       this.etlAct({
         actionType: 'createExecuteJob',
+        templateName,
         onLoad: resolve,
         onError: reject,
       });
@@ -185,11 +186,14 @@ class ExecutionHelpers extends ETLHelpers
 
     const updateUIAfterSuccess = () =>
     {
+      const templateName = (template !== null && template.id === -1) ?
+        'Unsaved Template' :
+        template.templateName;
       this.afterRunTemplate(template);
       this.etlAct({
         actionType: 'addModal',
         props: {
-          message: `"${template.templateName}" finished running`,
+          message: `"${templateName}" finished running`,
           title: 'Task Complete',
         },
       });
@@ -211,7 +215,7 @@ class ExecutionHelpers extends ETLHelpers
     };
 
     this.beforeRunTemplate(template);
-    this.createExecuteJob()
+    this.createExecuteJob(template.templateName)
       .then(this.runExecuteJobFactory(template))
       .then(updateUIAfterSuccess)
       .catch(updateUIAfterError);

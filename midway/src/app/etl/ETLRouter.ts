@@ -66,34 +66,6 @@ const perm: Permissions = new Permissions();
 
 Router.use('/templates', TemplateRouter.routes(), TemplateRouter.allowedMethods());
 
-Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  // verify if the user has permissions to create this job and run this ETL pipeline
-  await perm.JobQueuePermissions.verifyCreateRoute(ctx.state.user as UserConfig, ctx.req);
-  const job: JobConfig = {
-    meta: null,
-    pausedFilename: null,
-    running: false,
-    runNowPriority: null,
-    scheduleId: null,
-    status: null,
-    workerId: null,
-    createdAt: new Date(),
-    createdBy: ctx.state.user.id,
-    name: null,
-    priority: -1,
-    type: 'ETL',
-    tasks: JSON.stringify([
-      {
-        id: 0,
-        taskId: TaskEnum.taskETL,
-        params: null,
-      },
-    ]),
-  };
-  ctx.body = await App.JobQ.create(job, false, ctx.state.user.id);
-});
-
 interface ETLUIPreviewConfig
 {
   source: SourceConfig;
