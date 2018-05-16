@@ -152,6 +152,25 @@ describe('SimpleTable', () =>
     {
       expect(tableComponent.instance().props.displayRowCount).toEqual(10);
     });
+
+    it('should order entries by defaultOrder.columnKey in direction defaultOrder.direction', () =>
+    {
+      tableComponent = shallow(
+        <SimpleTable
+          {...tableState}
+          defaultOrder={{ columnKey: 'name', direction: 'desc' }}
+        />,
+      );
+
+      const tableRows = tableComponent.find('.simple-table-body .simple-table-row');
+      const firstRow = tableRows.at(0);
+      const lastRow = tableRows.at(9);
+
+      const firstRowName = firstRow.find('.simple-table-cell').at(1).text();
+      const lastRowName = lastRow.find('.simple-table-cell').at(1).text();
+      expect(firstRowName).toEqual('item 9');
+      expect(lastRowName).toEqual('item 1');
+    });
   });
 
   describe('#handleShowMoreClick', () =>
@@ -165,29 +184,49 @@ describe('SimpleTable', () =>
         />,
       );
 
-      tableComponent.instance().handleShowMoreClick();
+      const showMoreButton = tableComponent.find('ShowMore');
+
+      showMoreButton.simulate('click');
       expect(tableComponent.find('.simple-table-body .simple-table-row')).toHaveLength(8);
       expect(tableComponent.find('ShowMore')).toHaveLength(1);
 
-      tableComponent.instance().handleShowMoreClick();
+      showMoreButton.simulate('click');
       expect(tableComponent.find('.simple-table-body .simple-table-row')).toHaveLength(10);
       expect(tableComponent.find('ShowMore')).toHaveLength(0);
     });
   });
 
-  describe('#calculateColumnWidhts', () =>
+  describe('#calculateColumnWidths', () =>
   {
     it('should balance column widths to fill 100% based on the defined columnRelativeSize', () =>
     {
       // take the columnRelativeSize (defaults to 1 if not defined), multiply by 100
       // and divide by the sum of all the columns columnRelativeSize.
-      expect(tableComponent.instance().calculateColumnWidhts()).toEqual(
+      expect(tableComponent.instance().calculateColumnWidths()).toEqual(
         {
           id: 18.18,
           name: 72.73,
           status: 9.09,
         },
       );
+    });
+  });
+
+  describe('#orderData', () =>
+  {
+    it('should return the data ordered by the specified criteria', () =>
+    {
+      let orderedData = tableComponent.instance().orderData(tableData);
+
+      expect(orderedData).toEqual(tableData.toList());
+
+      orderedData = tableComponent.instance().orderData(tableData, 'name');
+      expect(orderedData.get(0).name).toEqual('item 1');
+      expect(orderedData.get(9).name).toEqual('item 9');
+
+      orderedData = tableComponent.instance().orderData(tableData, 'name', 'desc');
+      expect(orderedData.get(0).name).toEqual('item 9');
+      expect(orderedData.get(9).name).toEqual('item 1');
     });
   });
 });
