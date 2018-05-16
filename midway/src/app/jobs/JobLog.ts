@@ -94,9 +94,16 @@ export class JobLog
       resolve(upsertedJobLogs);
 
       const updatedContentJobLog: JobLogConfig = upsertedJobLogs[0];
-      const accumulatedLog: string[] = await BufferTransform.toArray(logStream);
-      updatedContentJobLog.contents = accumulatedLog.join('\n');
-      await App.DB.upsert(this.jobLogTable, updatedContentJobLog);
+      try
+      {
+        const accumulatedLog: string[] = await BufferTransform.toArray(logStream);
+        updatedContentJobLog.contents = accumulatedLog.join('\n');
+        await App.DB.upsert(this.jobLogTable, updatedContentJobLog);
+      }
+      catch (e)
+      {
+        App.JobQ.setJobStatus(jobId, false, 'FAILURE');
+      }
     });
   }
 
