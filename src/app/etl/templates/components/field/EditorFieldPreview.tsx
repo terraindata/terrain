@@ -57,6 +57,7 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
+import { FieldTypes, ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 import Menu from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
@@ -353,7 +354,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
 
   private renderTypeIcon()
   {
-    const type = EngineUtil.getRepresentedType(this.props.fieldId, this._currentEngine());
+    const type = EngineUtil.getETLFieldType(this.props.fieldId, this._currentEngine());
     const Icon = typeToIcon[type];
     return (
       <div
@@ -374,14 +375,17 @@ const ObjectTypeIcon = require('./../../../../../images/icon_type_object.svg?nam
 const GeoTypeIcon = require('./../../../../../images/icon_type_geo.svg?name=GeoTypeIcon');
 const BooleanTypeIcon = require('./../../../../../images/icon_type_boolean.svg?name=BooleanTypeIcon');
 
-const typeToIcon = {
-  string: TextTypeIcon,
-  object: ObjectTypeIcon,
-  number: NumberTypeIcon,
-  boolean: BooleanTypeIcon,
-  array: ArrayTypeIcon,
-  date: DateTypeIcon,
-  geo: GeoTypeIcon,
+const typeToIcon: {
+  [k in ETLFieldTypes]: any;
+} = {
+  [ETLFieldTypes.String]: TextTypeIcon,
+  [ETLFieldTypes.Object]: ObjectTypeIcon,
+  [ETLFieldTypes.Number]: NumberTypeIcon,
+  [ETLFieldTypes.Integer]: NumberTypeIcon,
+  [ETLFieldTypes.Boolean]: BooleanTypeIcon,
+  [ETLFieldTypes.Array]: ArrayTypeIcon,
+  [ETLFieldTypes.Date]: DateTypeIcon,
+  [ETLFieldTypes.GeoPoint]: GeoTypeIcon,
 };
 
 const emptyOptions = List([]);

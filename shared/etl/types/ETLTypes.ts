@@ -97,6 +97,42 @@ export type TemplateObject = {
 export type FieldTypes = 'array' | 'object' | 'string' | 'number' | 'boolean';
 export const validJSTypes: FieldTypes[] = ['array', 'object', 'string', 'number', 'boolean'];
 
+export enum ETLFieldTypes
+{
+  Array = 'Array',
+  Object = 'Object',
+  String = 'String',
+  Number = 'Number',
+  Boolean = 'Boolean',
+  Date = 'Date',
+  Integer = 'Integer',
+  GeoPoint = 'GeoPoint',
+}
+
+export const JSToETLType: {
+  [k in FieldTypes]: ETLFieldTypes;
+} = {
+  array: ETLFieldTypes.Array,
+  object: ETLFieldTypes.Object,
+  string: ETLFieldTypes.String,
+  number: ETLFieldTypes.Number,
+  boolean: ETLFieldTypes.Boolean,
+};
+
+// its an array because geo point could eventually also be a string
+export const ETLToJSType: {
+  [k in ETLFieldTypes]: string[]
+} = {
+  [ETLFieldTypes.Array]: ['array'],
+  [ETLFieldTypes.Object]: ['object'],
+  [ETLFieldTypes.String]: ['string'],
+  [ETLFieldTypes.Number]: ['number'],
+  [ETLFieldTypes.Boolean]: ['boolean'],
+  [ETLFieldTypes.Date]: ['string'],
+  [ETLFieldTypes.Integer]: ['number'],
+  [ETLFieldTypes.GeoPoint]: ['object'],
+};
+
 export enum NodeTypes
 {
   MergeJoin = 'MergeJoin',

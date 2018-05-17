@@ -48,7 +48,7 @@ import * as _ from 'lodash';
 
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
-import { FieldTypes, Languages, validJSTypes } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, FieldTypes, JSToETLType, Languages, validJSTypes } from 'shared/etl/types/ETLTypes';
 import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -62,7 +62,7 @@ export interface PathHashMap<T>
   [k: string]: T;
 }
 const valueTypeKeyPath = List(['valueType']);
-
+const etlTypeKeyPath = List(['etlType']);
 export default class EngineUtil
 {
   /*
@@ -329,6 +329,19 @@ export default class EngineUtil
     }
   }
 
+  public static getETLFieldType(id: number, engine: TransformationEngine): ETLFieldTypes
+  {
+    const etlType = engine.getFieldProp(id, etlTypeKeyPath) as ETLFieldTypes;
+    if (etlType == null)
+    {
+      return JSToETLType[EngineUtil.getRepresentedType(id, engine)];
+    }
+    else
+    {
+      return etlType;
+    }
+  }
+
   // take two engines and return an engine whose fields most closely resembles the result of the merge
   public static mergeJoinEngines(
     leftEngine: TransformationEngine,
@@ -387,6 +400,61 @@ export default class EngineUtil
           engine.setFieldProp(id, valueTypeKeyPath, bestType);
         }
         EngineUtil.castField(engine, id, bestType as FieldTypes);
+      }
+    });
+  }
+
+  public static interpretETLTypes(engine: TransformationEngine, documents?: List<object>)
+  {
+    if (documents === undefined)
+    {
+      engine.getAllFieldIDs().forEach((id) =>
+      {
+        const repType = EngineUtil.getRepresentedType(id, engine);
+        const type = JSToETLType[repType];
+        engine.setFieldProp(id, etlTypeKeyPath, type);
+      });
+      return;
+    }
+
+    const docs = EngineUtil.preprocessDocuments(documents);
+    engine.getAllFieldIDs().forEach((id) =>
+    {
+      const ikp = engine.getInputKeyPath(id);
+      const okp = engine.getOutputKeyPath(id);
+
+      let values = [];
+      docs.forEach((doc) =>
+      {
+        const vals = yadeep.get(engine.transform(doc), okp);
+        values = values.concat(vals);
+      });
+      const repType = EngineUtil.getRepresentedType(id, engine);
+      if (repType === 'string')
+      {
+        const type = TypeUtil.getCommonETLType(values);
+        if (type === ETLFieldTypes.GeoPoint)
+        {
+          engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), { toTypename: 'object' });
+          engine.setFieldType(id, 'object');
+          const latField = engine.addField(ikp.push('lat'), 'number');
+          const longField = engine.addField(ikp.push('lon'), 'number');
+          engine.setOutputKeyPath(latField, okp.push('lat'));
+          engine.setOutputKeyPath(longField, okp.push('lon'));
+          EngineUtil.castField(engine, latField, 'number');
+          EngineUtil.castField(engine, longField, 'number');
+        }
+        engine.setFieldProp(id, etlTypeKeyPath, type);
+      }
+      else if (repType === 'number')
+      {
+        const type = TypeUtil.getCommonETLNumberType(values);
+        engine.setFieldProp(id, etlTypeKeyPath, type);
+      }
+      else
+      {
+        const type = JSToETLType[repType];
+        engine.setFieldProp(id, etlTypeKeyPath, type);
       }
     });
   }

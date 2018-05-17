@@ -397,7 +397,16 @@ class ETLAjax
         payload,
         handleResponse,
         {
-          onError: reject,
+          onError: (ev) => {
+            if (ev === undefined)
+            {
+              reject('Unknown Error Trying to Retrieve Preview Documents');
+            }
+            else
+            {
+              reject(ev);
+            }
+          },
         },
       );
     });

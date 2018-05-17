@@ -47,6 +47,7 @@ THE SOFTWARE.
 
 import * as _ from 'lodash';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
+import { FieldTypes, ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 
 export default class TypeUtil
 {
@@ -76,7 +77,75 @@ export default class TypeUtil
     return type === null ? 'string' : type;
   }
 
-  // todo deal with things like $500
+  public static getCommonETLType(values: string[]): ETLFieldTypes
+  {
+    if (values.length === 0)
+    {
+      return ETLFieldTypes.String;
+    }
+
+    let allDate = true;
+    let allGeo = true;
+
+    for (const val of values)
+    {
+      if (!TypeUtil.isNullHelper(val))
+      {
+        if (!TypeUtil.isDateHelper(val))
+        {
+          allDate = false;
+        }
+        if (!TypeUtil.isGeoHelper(val))
+        {
+          allGeo = false;
+        }
+      }
+    }
+
+    if (allDate)
+    {
+      return ETLFieldTypes.Date;
+    }
+    else if (allGeo)
+    {
+      return ETLFieldTypes.GeoPoint;
+    }
+    else
+    {
+      return ETLFieldTypes.String;
+    }
+  }
+
+  public static getCommonETLNumberType(values: number[]): ETLFieldTypes
+  {
+    if (values.length === 0)
+    {
+      return ETLFieldTypes.Number;
+    }
+
+    let allIntegers = true;
+
+    for (const val of values)
+    {
+      if (val != null && !Number.isNaN(val))
+      {
+        if (!TypeUtil.numberIsInteger(val))
+        {
+          allIntegers = false;
+        }
+      }
+    }
+
+    if (allIntegers)
+    {
+      return ETLFieldTypes.Integer;
+    }
+    else
+    {
+      return ETLFieldTypes.Number;
+    }
+  }
+
   public static getCommonElasticType(values: string[]): ElasticTypes
   {
     let type: ElasticTypes = null;

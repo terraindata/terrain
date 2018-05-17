@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 import * as _ from 'lodash';
-import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes, ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 // string values for this enum are how elastic expects them
 
 export enum ElasticTypes
@@ -113,8 +113,20 @@ export const JsAutoMap: {
     boolean: ElasticTypes.Boolean,
   };
 
-export function jsToElastic(type): ElasticTypes
+export const FieldTypeAutoMap: {
+  [k in ETLFieldTypes]: ElasticTypes
+} = {
+  [ETLFieldTypes.Array]: ElasticTypes.Array,
+  [ETLFieldTypes.Object]: ElasticTypes.Nested,
+  [ETLFieldTypes.String]: ElasticTypes.Text,
+  [ETLFieldTypes.Number]: ElasticTypes.Double,
+  [ETLFieldTypes.Boolean]: ElasticTypes.Boolean,
+  [ETLFieldTypes.Date]: ElasticTypes.Date,
+  [ETLFieldTypes.Integer]: ElasticTypes.Integer,
+  [ETLFieldTypes.GeoPoint]: ElasticTypes.GeoPoint,
+};
+
+export function typeToElastic(type: ETLFieldTypes): ElasticTypes
 {
-  const eType = JsToElasticOptions[type][0];
-  return eType !== undefined ? eType : ElasticTypes.Text;
+  return FieldTypeAutoMap[type];
 }
