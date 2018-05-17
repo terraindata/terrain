@@ -459,7 +459,7 @@ export default class EngineUtil
     });
   }
 
-  public static changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType: FieldTypes)
+  public static changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType: ETLFieldTypes)
   {
     LanguageController.get(Languages.Elastic)
       .changeFieldTypeSideEffects(engine, fieldId, newType);

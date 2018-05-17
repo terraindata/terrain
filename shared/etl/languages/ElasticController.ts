@@ -64,7 +64,7 @@ class ElasticController implements LanguageInterface
 {
   public language = Languages.Elastic;
 
-  public changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType: FieldTypes)
+  public changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType)
   {
     const elasticProps = engine.getFieldProp(fieldId, List(['elastic']));
     if (elasticProps !== undefined)

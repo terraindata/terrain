@@ -49,6 +49,9 @@ import * as _ from 'lodash';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { SinkConfig, SourceConfig } from './EndpointTypes';
 
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
+
 // languages and filetypes don't follow the same capitalization conventions because of legacy reasons (?)
 export enum Languages
 {
@@ -109,6 +112,28 @@ export enum ETLFieldTypes
   GeoPoint = 'GeoPoint',
 }
 
+export const etlFieldTypesList = List([
+  ETLFieldTypes.Array,
+  ETLFieldTypes.Object,
+  ETLFieldTypes.String,
+  ETLFieldTypes.Number,
+  ETLFieldTypes.Boolean,
+  ETLFieldTypes.Date,
+  ETLFieldTypes.Integer,
+  ETLFieldTypes.GeoPoint,
+]);
+
+export const etlFieldTypesNames = Immutable.Map<string, string>({
+  [ETLFieldTypes.Array]: 'Array',
+  [ETLFieldTypes.Object]: 'Nested',
+  [ETLFieldTypes.String]: 'Text',
+  [ETLFieldTypes.Number]: 'Number',
+  [ETLFieldTypes.Boolean]: 'Boolean',
+  [ETLFieldTypes.Date]: 'Date',
+  [ETLFieldTypes.Integer]: 'Integer',
+  [ETLFieldTypes.GeoPoint]: 'Geo Point',
+});
+
 export const JSToETLType: {
   [k in FieldTypes]: ETLFieldTypes;
 } = {
@@ -121,7 +146,7 @@ export const JSToETLType: {
 
 // its an array because geo point could eventually also be a string
 export const ETLToJSType: {
-  [k in ETLFieldTypes]: string[]
+  [k in ETLFieldTypes]: FieldTypes[]
 } = {
   [ETLFieldTypes.Array]: ['array'],
   [ETLFieldTypes.Object]: ['object'],
@@ -132,6 +157,11 @@ export const ETLToJSType: {
   [ETLFieldTypes.Integer]: ['number'],
   [ETLFieldTypes.GeoPoint]: ['object'],
 };
+
+export function getJSFromETL(type: ETLFieldTypes): FieldTypes
+{
+  return ETLToJSType[type][0];
+}
 
 export enum NodeTypes
 {

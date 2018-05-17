@@ -50,7 +50,7 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
 import { postorderForEach, preorderForEach } from 'etl/templates/SyncUtil';
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { FieldTypes, ETLFieldTypes, Languages, getJSFromETL } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
@@ -139,19 +139,19 @@ export class EngineProxy
       throw new Error('Cannot extract array field, source keypath is empty');
     }
     const specifiedSourceKP = sourceKP.set(sourceKP.size - 1, String(index));
-    const specifiedSourceType = EngineUtil.getRepresentedType(sourceId, this.engine);
+    const specifiedSourceType = EngineUtil.getETLFieldType(sourceId, this.engine);
 
     let specifiedSourceId: number;
 
-    if (specifiedSourceType === 'array')
+    if (specifiedSourceType === ETLFieldTypes.Array)
     {
       const anyChildId = EngineUtil.findChildField(sourceId, this.engine);
       if (anyChildId === undefined)
       {
         throw new Error('Field type is array, but could not find any children in the Transformation Engine');
       }
-      const childType = EngineUtil.getRepresentedType(anyChildId, this.engine);
-      specifiedSourceId = this.addField(specifiedSourceKP, 'array', childType);
+      const childType = EngineUtil.getETLFieldType(anyChildId, this.engine);
+      specifiedSourceId = this.addField(specifiedSourceKP, ETLFieldTypes.Array, childType);
     }
     else
     {
@@ -211,25 +211,25 @@ export class EngineProxy
     this.requestRebuild();
   }
 
-  public addField(keypath: List<string>, type: string, valueType: FieldTypes = 'string')
+  public addField(keypath: List<string>, type: ETLFieldTypes, valueType: ETLFieldTypes = ETLFieldTypes.String)
   {
     let newId: number;
-    if (type === 'array')
+    if (type === ETLFieldTypes.Array)
     {
       newId = this.engine.addField(keypath, type, { valueType });
       const wildId = this.engine.addField(keypath.push('*'), 'array', { valueType });
-      EngineUtil.castField(this.engine, wildId, valueType);
+      EngineUtil.castField(this.engine, wildId, getJSFromETL(valueType));
     }
     else
     {
       newId = this.engine.addField(keypath, type);
     }
-    EngineUtil.castField(this.engine, newId, type as FieldTypes);
+    EngineUtil.castField(this.engine, newId, getJSFromETL(type));
     this.requestRebuild();
     return newId;
   }
 
-  public addRootField(name: string, type: string)
+  public addRootField(name: string, type: ETLFieldTypes)
   {
     const pathToAdd = List([name]);
     if (validateNewFieldName(this.engine, -1, pathToAdd).isValid)
@@ -334,7 +334,7 @@ export class FieldProxy
   }
 
   // add a field under this field
-  public addNewField(name: string, type: FieldTypes)
+  public addNewField(name: string, type: ETLFieldTypes)
   {
     const newPath = this.engine.getOutputKeyPath(this.fieldId).push(name);
     if (validateNewFieldName(this.engine, this.fieldId, newPath).isValid)
@@ -348,7 +348,7 @@ export class FieldProxy
     }
   }
 
-  public changeType(newType: FieldTypes)
+  public changeType(newType: ETLFieldTypes)
   {
     if (EngineUtil.isWildcardField(this.engine.getInputKeyPath(this.fieldId)))
     {
@@ -359,7 +359,7 @@ export class FieldProxy
       this.engine.setFieldType(this.fieldId, newType);
     }
     EngineUtil.changeFieldTypeSideEffects(this.engine, this.fieldId, newType);
-    EngineUtil.castField(this.engine, this.fieldId, newType);
+    EngineUtil.castField(this.engine, this.fieldId, getJSFromETL(newType));
     this.syncWithEngine(true);
   }
 

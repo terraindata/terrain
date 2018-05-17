@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { FieldTypes, Languages, ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 import DefaultLanguageController from './DefaultLanguageController';
@@ -56,7 +56,7 @@ import ElasticController from './ElasticController';
 export interface LanguageInterface
 {
   language: Languages;
-  changeFieldTypeSideEffects: (engine: TransformationEngine, fieldId: number, newType: FieldTypes) => void;
+  changeFieldTypeSideEffects: (engine: TransformationEngine, fieldId: number, newType: ETLFieldTypes) => void;
   autodetectFieldTypes: (engine: TransformationEngine, documents: List<object>) => void;
 }
 

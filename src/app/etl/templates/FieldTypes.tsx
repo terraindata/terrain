@@ -47,14 +47,13 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { FieldTypes, Languages, ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 import TransformationNodeBase from 'shared/transformations/nodes/TransformationNode';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType, NodeTypes } from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
-
 // only put fields in here that are needed to track display-sensitive state
 class TemplateFieldC
 {
@@ -62,6 +61,7 @@ class TemplateFieldC
   public readonly isHidden: boolean = false;
   public readonly fieldProps: object = {};
   public readonly type: FieldTypes = 'object';
+  public readonly etlType: ETLFieldTypes = ETLFieldTypes.Object;
   public readonly fieldId: number = -1;
   public readonly name: string = '';
   public readonly inputKeyPath: List<string> = List([]);

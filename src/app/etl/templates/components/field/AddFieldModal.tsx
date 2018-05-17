@@ -65,7 +65,7 @@ import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, FieldTypes, etlFieldTypesList, etlFieldTypesNames } from 'shared/etl/types/ETLTypes';
 import { kpToString, stringToKP, validateNewFieldName } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
@@ -103,7 +103,7 @@ export default class Injector extends TerrainComponent<TemplateEditorFieldProps>
 interface FormState
 {
   name: string;
-  type: FieldTypes;
+  type: ETLFieldTypes;
 }
 
 const addFieldMap: InputDeclarationMap<FormState> =
@@ -117,19 +117,19 @@ const addFieldMap: InputDeclarationMap<FormState> =
       type: DisplayType.Pick,
       displayName: 'Field Type',
       options: {
-        pickOptions: (s) => typeOptions,
-        indexResolver: (value) => typeOptions.indexOf(value),
+        pickOptions: (s) => etlFieldTypesList,
+        indexResolver: (value) => etlFieldTypesList.indexOf(value),
+        displayNames: (s) => etlFieldTypesNames,
       },
     },
   };
-const typeOptions = List(['string', 'number', 'boolean', 'array', 'object']);
 
 // UI to add a new field underneath this field
 class AddFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
 {
   public state: FormState = {
     name: 'new_field',
-    type: 'string',
+    type: ETLFieldTypes.String,
   };
 
   @instanceFnDecorator(memoizeOne)
@@ -233,7 +233,7 @@ class AddRootFieldModalC extends TerrainComponent<RootFieldProps>
 {
   public state: FormState = {
     name: 'new_field',
-    type: 'string',
+    type: ETLFieldTypes.String,
   };
 
   @instanceFnDecorator(memoizeOne)
