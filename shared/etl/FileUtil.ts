@@ -58,12 +58,15 @@ export const mimeToFileType: { [k: string]: FileTypes } = {
   'application/json': FileTypes.Json,
   'application/xml': FileTypes.Xml,
   'text/xml': FileTypes.Xml,
+  'text/tab-separated-values': FileTypes.Tsv,
+  'text/tsv': FileTypes.Tsv,
 };
 
 export const fileTypeToMime = {
   [FileTypes.Csv]: 'text/csv',
   [FileTypes.Json]: 'application/json',
   [FileTypes.Xml]: 'text/xml',
+  [FileTypes.Tsv]: 'text/tab-separated-values',
 };
 
 export function getFileType(file: File): FileTypes
@@ -111,8 +114,8 @@ export function getSampleRows(
     },
     opts,
   );
-
-  if (getFileType(file) === FileTypes.Csv)
+  const fileType = getFileType(file);
+  if (fileType === FileTypes.Csv || fileType === FileTypes.Tsv)
   {
     const handleError = (err) =>
     {
@@ -133,9 +136,10 @@ export function getSampleRows(
       complete: handleResults,
       error: handleError,
       dynamicTyping: true,
+      delimiter: fileType === FileTypes.Csv ? ',' : '\t',
     });
   }
-  else if (getFileType(file) === FileTypes.Json)
+  else if (fileType === FileTypes.Json)
   {
     const fileChunk = file.slice(0, ChunkSize);
     const fr = new FileReader();
@@ -172,7 +176,7 @@ export function getSampleRows(
     };
     fr.readAsText(fileChunk);
   }
-  else if (getFileType(file) === FileTypes.Xml)
+  else if (fileType === FileTypes.Xml)
   {
     onError(`XML File Parsing not supported`);
   }
