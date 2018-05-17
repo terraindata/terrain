@@ -110,7 +110,10 @@ export default class ProgressStream extends Transform
     {
       this.asyncRead = setTimeout(() =>
       {
-        this.push(this.progress());
+        if (!this.doneWriting)
+        {
+          this.push(this.progress());
+        }
         this.asyncRead = null;
       },
         this.frequency);
@@ -125,9 +128,9 @@ export default class ProgressStream extends Transform
       this.asyncRead = null;
     }
 
+    this.doneWriting = true;
     this.push(this.progress());
     this.writer.end(callback);
-    this.doneWriting = true;
   }
 
   public progress()
