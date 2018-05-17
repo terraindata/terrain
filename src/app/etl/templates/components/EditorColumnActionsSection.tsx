@@ -143,7 +143,8 @@ class EditorColumnActionsSection extends TerrainComponent<Props>
     const { fieldMap } = this.props;
     GraphHelpers.mutateEngine((proxy) =>
     {
-      fieldMap.forEach((field, id) => {
+      fieldMap.forEach((field, id) =>
+      {
         fn(proxy, Number(id));
       });
     }).then((structural) =>
