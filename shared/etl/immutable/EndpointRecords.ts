@@ -68,7 +68,8 @@ class FileConfigC implements FileConfigI
   public fileType: FileTypes = FileTypes.Json;
   public hasCsvHeader = true;
   public jsonNewlines = false;
-  public xmlPath = '';
+  public xmlPath = null;
+  public jsonPath = null;
 }
 export type FileConfig = WithIRecord<FileConfigC>;
 export const _FileConfig = makeConstructor(FileConfigC);
