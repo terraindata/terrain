@@ -58,8 +58,9 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import FadeInOut from 'common/components/FadeInOut';
-
+import GraphHelpers from 'etl/helpers/GraphHelpers';
 import NestedView from 'etl/templates/components/field/NestedView';
+import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import EditorFieldPreview from './EditorFieldPreview';
 import EditorFieldSettings from './EditorFieldSettings';
@@ -290,9 +291,24 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
 
   public handleCheckboxClicked()
   {
-    this.props.act({
-      actionType: 'updateIncludedFields',
-      fields: [this.props.fieldId],
+    GraphHelpers.mutateEngine((proxy) =>
+    {
+      proxy.setFieldEnabled(this.props.fieldId, !this._field().isIncluded);
+    }).then((structural) =>
+    {
+      this.props.act({
+        actionType: 'rebuildFieldMap',
+      });
+    }).catch((e) =>
+    {
+      this.props.act({
+        actionType: 'addModal',
+        props: {
+          title: 'Error',
+          message: `Could not perform that action: ${String(e)}`,
+          error: true,
+        },
+      });
     });
   }
 

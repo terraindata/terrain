@@ -124,17 +124,43 @@ class EditorColumnActionsSection extends TerrainComponent<Props>
 
   public handleSelectAll()
   {
-    this.props.editorAct({
-      actionType: 'updateIncludedFields',
-      fields: true,
+    this.mutateCheckedFields((proxy, id) =>
+    {
+      proxy.setFieldEnabled(id, true);
     });
   }
 
   public handleSelectNone()
   {
-    this.props.editorAct({
-      actionType: 'updateIncludedFields',
-      fields: false,
+    this.mutateCheckedFields((proxy, id) =>
+    {
+      proxy.setFieldEnabled(id, false);
+    });
+  }
+
+  private mutateCheckedFields(fn: (proxy: EngineProxy, id: number) => void)
+  {
+    const { fieldMap } = this.props;
+    GraphHelpers.mutateEngine((proxy) =>
+    {
+      fieldMap.forEach((field, id) => {
+        fn(proxy, Number(id));
+      });
+    }).then((structural) =>
+    {
+      this.props.editorAct({
+        actionType: 'rebuildFieldMap',
+      });
+    }).catch((e) =>
+    {
+      this.props.editorAct({
+        actionType: 'addModal',
+        props: {
+          title: 'Error',
+          message: `Could not perform that action: ${String(e)}`,
+          error: true,
+        },
+      });
     });
   }
 }
