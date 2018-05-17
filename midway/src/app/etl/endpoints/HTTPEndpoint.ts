@@ -76,7 +76,13 @@ export default class HTTPEndpoint extends AEndpointStream
   {
     return new Promise<Readable | Writable>((resolve, reject) =>
     {
-      request(httpConfig['url'], httpConfig['method'], httpConfig['headers'])
+      request({
+        url: httpConfig['url'],
+        method: httpConfig['method'],
+        headers: httpConfig['headers'],
+        qs: (httpConfig['method'] === 'GET') ? httpConfig['params'] : undefined,
+        body: (httpConfig['method'] !== 'GET') ? httpConfig['params'] : undefined,
+      })
         .on('error', (err) =>
         {
           if (err !== null && err !== undefined)
@@ -89,7 +95,8 @@ export default class HTTPEndpoint extends AEndpointStream
         {
           if (res.statusCode !== 200)
           {
-            const e = new Error(`Error reading from source HTTP endpoint: ${res.statusCode} ${res.statusMessage}`);
+            const e =
+              new Error(`Error reading from source HTTP endpoint: ${res.statusCode} ${res.statusMessage} ${JSON.stringify(res)}`);
             return reject(e);
           }
 
