@@ -156,6 +156,10 @@ export interface TemplateEditorActionTypes
     actionType: 'setCurrentEdge';
     edge: number;
   };
+  updateIncludedFields: {
+    actionType: 'updateIncludedFields',
+    fields: boolean | ID[];
+  };
 }
 
 class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, TemplateEditorState>
@@ -359,6 +363,33 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       {
         return state.setIn(['uiState', 'currentEdge'], action.payload.edge);
       },
+      updateIncludedFields: (state, action) =>
+      {
+        let { fieldMap } = state;
+        const { fields } = action.payload;
+        if (fields === true || fields === false)
+        {
+          // Include or exclude all fields
+          fieldMap.forEach((field, id) =>
+          {
+            fieldMap = fieldMap.setIn([id, 'isIncluded'], fields);
+          });
+          return state.set('fieldMap', fieldMap);
+        }
+        else
+        {
+          // Toggle include / exclude state of all fields in list
+          fields.forEach((fieldId) =>
+          {
+            fieldMap = fieldMap.setIn(
+              [fieldId, 'isIncluded'],
+              !fieldMap.getIn([fieldId, 'isIncluded']),
+            );
+          });
+          return state.set('fieldMap', fieldMap);
+        }
+      },
+
     };
 
   public undoHistory(action: TemplateEditorActionType<'undoHistory'>, dispatch)

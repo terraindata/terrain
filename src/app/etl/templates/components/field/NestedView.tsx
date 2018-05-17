@@ -68,7 +68,6 @@ export interface Props
   style?: any;
   children?: any; // the expandable content rendered beneath the content
   injectedContent?: any;
-  showCheckbox?: boolean;
   checked?: boolean;
   hideControls?: boolean;
   onCheckboxClicked?: () => void;
@@ -114,39 +113,22 @@ class ExpandableView extends TerrainComponent<Props>
 
   public renderCheckboxSection()
   {
-    if (!this.props.showCheckbox)
-    {
-      return (
-        <div
-          className='nested-view-checkbox-column nested-view-checkbox-hidden'
-          style={{
-            width: '0px',
-            height: '0px',
-            paddingLeft: '0px',
-          }}
-        >
-        </div>
-      );
-    }
-    else
-    {
-      return (
-        <div
-          className='nested-view-checkbox-column'
-          style={{
-            width: `${checkboxSize}px`,
-            height: `${checkboxSize}px`,
-            marginLeft: `${checkboxMargin}px`,
-          }}
-        >
-          <CheckBox
-            checked={this.props.checked}
-            className='nested-view-checkbox'
-            onChange={this.props.onCheckboxClicked}
-          />
-        </div>
-      );
-    }
+    return (
+      <div
+        className='nested-view-checkbox-column'
+        style={{
+          width: `${checkboxSize}px`,
+          height: `${checkboxSize}px`,
+          marginLeft: `${checkboxMargin}px`,
+        }}
+      >
+        <CheckBox
+          checked={this.props.checked}
+          className='nested-view-checkbox'
+          onChange={this.props.onCheckboxClicked}
+        />
+      </div>
+    );
   }
 
   public renderChildren()

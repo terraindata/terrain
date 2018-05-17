@@ -210,15 +210,9 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     );
   }
 
-  public getCheckboxState()
+  public getCheckboxState(): boolean
   {
-    const canEditField = this._field().canEditField();
-    const checkedState = this._checkedState();
-
-    return {
-      checked: checkedState === true,
-      showCheckbox: (canEditField && checkedState !== null),
-    };
+    return this._field().isIncluded;
   }
 
   public renderRow()
@@ -250,8 +244,6 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     const style = (canEdit === true && field.isIncluded === false) ?
       getStyle('opacity', '0.5') : {};
 
-    const { checked, showCheckbox } = this.getCheckboxState();
-
     const content = this.renderRow();
     const showSettings = this._settingsAreOpen();
 
@@ -274,8 +266,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
           children={childrenComponent}
           hideControls={showSettings}
           style={style}
-          showCheckbox={showCheckbox}
-          checked={checked}
+          checked={this.getCheckboxState()}
           onCheckboxClicked={this.handleCheckboxClicked}
         />
       );
@@ -290,8 +281,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
           children={null}
           hideControls={showSettings}
           style={style}
-          showCheckbox={showCheckbox}
-          checked={checked}
+          checked={this.getCheckboxState()}
           onCheckboxClicked={this.handleCheckboxClicked}
         />
       );
@@ -300,17 +290,10 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
 
   public handleCheckboxClicked()
   {
-    const { act, fieldId } = this.props;
-    const { checked, showCheckbox } = this.getCheckboxState();
-    if (showCheckbox)
-    {
-      this.props.act({
-        actionType: 'updateDisplayState',
-        updaters: {
-          checkedFields: (fields) => fields.set(fieldId, !Boolean(checked)),
-        },
-      });
-    }
+    this.props.act({
+      actionType: 'updateIncludedFields',
+      fields: [this.props.fieldId],
+    });
   }
 
   public handleToggleOpen()
