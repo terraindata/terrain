@@ -216,13 +216,13 @@ export class EngineProxy
     let newId: number;
     if (type === ETLFieldTypes.Array)
     {
-      newId = this.engine.addField(keypath, type, { valueType });
-      const wildId = this.engine.addField(keypath.push('*'), 'array', { valueType });
+      newId = this.addFieldToEngine(keypath, type, valueType)
+      const wildId = this.addFieldToEngine(keypath.push('*'), ETLFieldTypes.Array, valueType);
       EngineUtil.castField(this.engine, wildId, getJSFromETL(valueType));
     }
     else
     {
-      newId = this.engine.addField(keypath, type);
+      newId = this.addFieldToEngine(keypath, type);
     }
     EngineUtil.castField(this.engine, newId, getJSFromETL(type));
     this.requestRebuild();
@@ -261,6 +261,15 @@ export class EngineProxy
   private randomId(): string
   {
     return Math.random().toString(36).substring(2);
+  }
+
+  private addFieldToEngine(
+    keypath: List<string>,
+    etlType: ETLFieldTypes,
+    valueType?: ETLFieldTypes
+  ): number
+  {
+    return EngineUtil.addFieldToEngine(this.engine, keypath, etlType, valueType);
   }
 }
 
@@ -326,7 +335,7 @@ export class FieldProxy
         const parentId = this.engine.getOutputFieldID(ancestorPath);
         if (parentId === undefined)
         {
-          this.engine.addField(ancestorPath, 'object');
+          this.engineProxy.addField(ancestorPath, ETLFieldTypes.Object);
         }
       }
       this.syncWithEngine(true);
@@ -350,16 +359,18 @@ export class FieldProxy
 
   public changeType(newType: ETLFieldTypes)
   {
+    const jsType = getJSFromETL(newType);
+    this.engine.setFieldProp(this.fieldId, etlTypeKeyPath, newType);
     if (EngineUtil.isWildcardField(this.engine.getInputKeyPath(this.fieldId)))
     {
-      this.engine.setFieldProp(this.fieldId, List(['valueType']), newType);
+      this.engine.setFieldProp(this.fieldId, List(['valueType']), jsType);
     }
     else
     {
-      this.engine.setFieldType(this.fieldId, newType);
+      this.engine.setFieldType(this.fieldId, jsType);
     }
     EngineUtil.changeFieldTypeSideEffects(this.engine, this.fieldId, newType);
-    EngineUtil.castField(this.engine, this.fieldId, getJSFromETL(newType));
+    EngineUtil.castField(this.engine, this.fieldId, jsType);
     this.syncWithEngine(true);
   }
 
@@ -388,4 +399,5 @@ export class FieldProxy
   }
 }
 
+const etlTypeKeyPath = List(['etlType']);
 const doNothing = () => null;

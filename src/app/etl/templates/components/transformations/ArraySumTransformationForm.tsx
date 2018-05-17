@@ -52,6 +52,8 @@ import * as React from 'react';
 
 import { instanceFnDecorator } from 'shared/util/Classes';
 
+import { FieldTypes, ETLFieldTypes } from 'shared/etl/types/ETLTypes';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { FieldPicker } from 'etl/common/components/FieldPicker.tsx';
@@ -104,6 +106,6 @@ export class ArraySumTFF extends TransformationForm<ArraySumOptions, Transformat
     proxy.addTransformation(this.type, inputFields, { newFieldKeyPaths });
 
     const newlyAdded = engine.getInputFieldID(newFieldKeyPaths.get(0));
-    engine.setFieldType(newlyAdded, 'number');
+    EngineUtil.changeFieldType(engine, newlyAdded, ETLFieldTypes.Number);
   }
 }

@@ -48,7 +48,7 @@ import * as _ from 'lodash';
 
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
-import { ETLFieldTypes, FieldTypes, JSToETLType, Languages, validJSTypes } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, FieldTypes, JSToETLType, Languages, validJSTypes, getJSFromETL } from 'shared/etl/types/ETLTypes';
 import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -315,7 +315,34 @@ export default class EngineUtil
     });
   }
 
-  // get the type of a field. If it represents an array wildcard, get the valueType
+  public static addFieldToEngine(
+    engine: TransformationEngine,
+    keypath: List<string>,
+    etlType: ETLFieldTypes,
+    valueType?: ETLFieldTypes,
+  ): number
+  {
+    const cfg = {
+      etlType,
+    };
+    if (valueType !== undefined)
+    {
+      cfg['valueType'] = getJSFromETL(valueType);
+    }
+    return engine.addField(keypath, getJSFromETL(etlType), cfg);
+  }
+
+  public static changeFieldType(
+    engine: TransformationEngine,
+    fieldId: number,
+    newType: ETLFieldTypes,
+  )
+  {
+    engine.setFieldType(fieldId, getJSFromETL(newType));
+    engine.setFieldProp(fieldId, etlTypeKeyPath, newType);
+  }
+
+  // get the JS type of a field. If it represents an array wildcard, get the valueType
   public static getRepresentedType(id: number, engine: TransformationEngine): FieldTypes
   {
     const kp = engine.getOutputKeyPath(id);
@@ -329,6 +356,7 @@ export default class EngineUtil
     }
   }
 
+  // get the ETL type of a field
   public static getETLFieldType(id: number, engine: TransformationEngine): ETLFieldTypes
   {
     const etlType = engine.getFieldProp(id, etlTypeKeyPath) as ETLFieldTypes;
@@ -357,8 +385,9 @@ export default class EngineUtil
     });
     const outputKeyPathBase = List([outputKey, '*']);
     const valueTypePath = List(['valueType']);
-    const outputFieldId = newEngine.addField(List([outputKey]), 'array');
-    const outputFieldWildcardId = newEngine.addField(outputKeyPathBase, 'array');
+    const outputFieldId = EngineUtil.addFieldToEngine(newEngine, List([outputKey]), ETLFieldTypes.Array);
+    const outputFieldWildcardId = EngineUtil.addFieldToEngine(newEngine, outputKeyPathBase, ETLFieldTypes.Array);
+
     newEngine.setFieldProp(outputFieldId, valueTypePath, 'object');
     newEngine.setFieldProp(outputFieldWildcardId, valueTypePath, 'object');
     rightEngine.getAllFieldIDs().forEach((id) =>
@@ -436,9 +465,9 @@ export default class EngineUtil
         if (type === ETLFieldTypes.GeoPoint)
         {
           engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), { toTypename: 'object' });
-          engine.setFieldType(id, 'object');
-          const latField = engine.addField(ikp.push('lat'), 'number');
-          const longField = engine.addField(ikp.push('lon'), 'number');
+          EngineUtil.changeFieldType(engine, id, ETLFieldTypes.Object);
+          const latField = EngineUtil.addFieldToEngine(engine, ikp.push('lat'), ETLFieldTypes.Number);
+          const longField = EngineUtil.addFieldToEngine(engine, ikp.push('lon'), ETLFieldTypes.Number);
           engine.setOutputKeyPath(latField, okp.push('lat'));
           engine.setOutputKeyPath(longField, okp.push('lon'));
           EngineUtil.castField(engine, latField, 'number');
