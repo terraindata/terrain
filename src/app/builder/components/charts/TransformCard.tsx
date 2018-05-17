@@ -328,13 +328,16 @@ class TransformCard extends TerrainComponent<Props>
 
   private trimDomain(curStateDomain: List<number>, maxDomain: List<number>): List<number>
   {
-    const low = maxDomain.get(0);
-    const high = maxDomain.get(1);
+    let low = maxDomain.get(0);
+    let high = maxDomain.get(1);
     if (Number.isNaN(low) || Number.isNaN(high) || low >= high)
     {
       // TODO: show an error message about the wrong domain values.
       return curStateDomain;
     }
+    const diff = (high - low) * 0.05;
+    low -= diff;
+    high += diff;
     return List([low, high]);
   }
 
@@ -441,11 +444,12 @@ class TransformCard extends TerrainComponent<Props>
       if (max - min > 0 && oldMax - oldMin > 0) // prevent divide-by-zero
       {
         const ratio = (max - min) / (oldMax - oldMin);
+        const offset = min - oldMin; // correct for nonzero mins
 
-        if (ratio !== 1) // no point
+        if (ratio !== 1 || offset !== 0) // no point
         {
           const points = data.scorePoints.map(
-            (point) => point.set('value', point.value * ratio),
+            (point) => point.set('value', (point.value - oldMin) * ratio + min),
           ).toList();
 
           this.handleUpdatePoints(points, true);

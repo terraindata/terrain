@@ -80,6 +80,7 @@ class EasterEggs extends TerrainComponent<Props>
     const keys = [];
     $('body').keydown((evt) =>
     {
+      console.log(evt);
       keys.unshift(evt.keyCode);
       if (keys[0] === 39 && keys[1] === 37 && keys[2] === 39 && keys[3] === 37 && keys[4] === 40
         && keys[5] === 40 && keys[6] === 38 && keys[7] === 38)

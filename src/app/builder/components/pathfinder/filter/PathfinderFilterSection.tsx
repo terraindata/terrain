@@ -224,16 +224,18 @@ class PathfinderFilterSection extends TerrainComponent<Props>
               autoBound: true,
               scorePoints: [
                 {
-                  value: 0.05,
+                  value: 0,
                   score: 0,
                   id: String(Math.random()),
                 },
                 {
                   value: 10,
-                  score: 0.95,
+                  score: 1,
                   id: String(Math.random()),
                 },
               ],
+              domain: [-0.5, 10.5],
+              dataDomain: [-0.5, 10.5],
             },
           }));
           this.props.builderActions.changePath(
