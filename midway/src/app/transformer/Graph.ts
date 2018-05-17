@@ -1,4 +1,4 @@
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 /*
 University of Illinois/NCSA Open Source License 
 

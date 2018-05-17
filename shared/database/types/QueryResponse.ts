@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.QueryResponse
+// Copyright 2018 Terrain Data, Inc.QueryResponse
 
 import MidwayErrorItem from '../../error/MidwayErrorItem';
 import AQueryResponse from './AQueryResponse';

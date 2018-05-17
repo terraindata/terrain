@@ -29,7 +29,7 @@ for file in lintErrors:
     insertAt = 0
     for i in range(len(lines)):
       # todo: skip over multi-line comments too
-      if lines[i].startswith('// Copyright 2017 Terrain Data, Inc.'):
+      if lines[i].startswith('// Copyright 2018 Terrain Data, Inc.'):
         continue
       insertAt = i
       break
