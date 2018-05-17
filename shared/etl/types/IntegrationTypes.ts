@@ -91,9 +91,7 @@ export interface AuthConfigTypes
   Http: {
     jwt: string;
   };
-  Fs: {
-    user: string;
-  };
+  Fs: {};
   Mysql: {
     password: string;
   };
@@ -120,7 +118,9 @@ export interface ConnectionConfigTypes
   Http: {
     url: string;
   };
-  Fs: {};
+  Fs: {
+    path: string;
+  };
   Mysql: {
     user: string;
     host: string;

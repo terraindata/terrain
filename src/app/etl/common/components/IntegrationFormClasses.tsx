@@ -191,14 +191,14 @@ type FsAuthT = AuthConfigType<Integrations.Fs>;
 type FsConnectionT = ConnectionConfigType<Integrations.Fs>;
 class FsForm extends IntegrationFormBase<FsAuthT, FsConnectionT>
 {
-  public authMap: InputDeclarationMap<FsAuthT> = {
-    user: {
+  public authMap: InputDeclarationMap<FsAuthT> = {};
+
+  public connectionMap: InputDeclarationMap<FsConnectionT> = {
+    path: {
       type: DisplayType.TextBox,
-      displayName: 'User',
+      displayName: 'File Path',
     },
   };
-
-  public connectionMap: InputDeclarationMap<FsConnectionT> = {};
 }
 
 type MysqlAuthT = AuthConfigType<Integrations.Mysql>;

@@ -410,12 +410,7 @@ class DatabaseEndpoint extends EndpointFormBase<DatabaseState>
 type FsState = SinkOptionsType<Sinks.Fs>;
 class FsEndpoint extends EndpointFormBase<FsState>
 {
-  public inputMap: InputDeclarationMap<FsState> = {
-    path: {
-      type: DisplayType.TextBox,
-      displayName: 'File path',
-    },
-  };
+  public inputMap: InputDeclarationMap<FsState> = {};
 }
 
 type SQLState = SQLOptions;
