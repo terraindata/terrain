@@ -170,7 +170,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     let previewText: string = preview == null ? 'N/A' : preview.toString();
     if (previewText.length >= MAX_STRING_LENGTH)
     {
-      previewText = preview.slice(0, MAX_STRING_LENGTH) + '...';
+      previewText = previewText.slice(0, MAX_STRING_LENGTH) + '...';
     }
     const menuOptions = this.getMenuOptions();
     const showMenu = menuOptions.size > 0 && (this.state.hovered || this.state.menuOpen);
