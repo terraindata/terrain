@@ -76,6 +76,22 @@ export enum Sinks
   Fs = 'Fs',
 }
 
+export const EndpointTypeNames =
+  {
+    Upload: 'Upload',
+    Download: 'Download',
+    Algorithm: 'Algorithm',
+    Database: 'Database',
+    Sftp: 'SFTP',
+    Http: 'HTTP',
+    Fs: 'File System',
+    Mysql: 'MySQL',
+    Postgresql: 'PostgreSQL',
+    Magento: 'Magento',
+    GoogleAPI: 'Google API',
+    Mailchimp: 'MailChimp',
+  };
+
 export const SchedulableSinks: Sinks[] =
   [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs];
 
