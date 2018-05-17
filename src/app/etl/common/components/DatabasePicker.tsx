@@ -127,9 +127,13 @@ class DatabasePicker extends TerrainComponent<Props>
     {
       return 'Database name cannot be empty.';
     }
-    if (db.search(/[^a-z0-9\-]/) !== -1 && db.substr(0, 1) !== '-')
+    if (db.search(/[^a-z0-9\-\_]/) !== -1 && db.substr(0, 1) !== '-')
     {
-      return 'Invalid database name. You can use lowercase letters or numbers, and cannot start with a "-".';
+      return 'Invalid database name. You must use lowercase letters, numbers, - and _.';
+    }
+    if (db[0] === '_' || db[0] === '-')
+    {
+      return 'Invalid database name. Database name cannot start with - or _.';
     }
     const table = state.table;
     if (table === '')
