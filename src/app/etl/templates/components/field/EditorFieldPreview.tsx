@@ -68,6 +68,7 @@ import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorField
 import './TemplateEditorField.less';
 
 const KeyIcon = require('images/icon_key-2.svg');
+const MAX_STRING_LENGTH = 400;
 
 export interface Props extends TemplateEditorFieldProps
 {
@@ -166,8 +167,11 @@ class EditorFieldPreview extends TemplateEditorField<Props>
         fontColor(Colors().text2, Colors().text1);
     }
 
-    const previewText = preview == null ? 'N/A' : preview.toString();
-
+    let previewText: string = preview == null ? 'N/A' : preview.toString();
+    if (previewText.length >= MAX_STRING_LENGTH)
+    {
+      previewText = preview.slice(0, MAX_STRING_LENGTH) + '...';
+    }
     const menuOptions = this.getMenuOptions();
     const showMenu = menuOptions.size > 0 && (this.state.hovered || this.state.menuOpen);
     const hidePreviewValue = field.isArray() || field.isNested() || labelOnly;
