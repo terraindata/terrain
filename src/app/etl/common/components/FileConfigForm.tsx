@@ -92,10 +92,11 @@ export default class FileConfigForm extends TerrainComponent<Props>
       },
       hasCsvHeader: {
         type: DisplayType.CheckBox,
-        displayName: 'File Has CSV Header',
+        displayName: 'File Has Header',
         group: 'file type',
         widthFactor: 4,
-        getDisplayState: (s: FormState) => s.fileType === FileTypes.Csv ? DisplayState.Active : DisplayState.Hidden,
+        getDisplayState: (s: FormState) => (s.fileType === FileTypes.Csv || s.fileType === FileTypes.Tsv)
+          ? DisplayState.Active : DisplayState.Hidden,
       },
       jsonNewlines: {
         type: DisplayType.CheckBox,
@@ -202,4 +203,4 @@ export default class FileConfigForm extends TerrainComponent<Props>
   }
 }
 
-const fileTypeList = List([FileTypes.Json, FileTypes.Csv, FileTypes.Xml]);
+const fileTypeList = List([FileTypes.Json, FileTypes.Csv, FileTypes.Xml, FileTypes.Tsv]);
