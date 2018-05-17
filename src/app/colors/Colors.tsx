@@ -79,15 +79,23 @@ const NTColors =
     green: '#72ee7c',
   };
 
-const statuses = {
-  SUCCESS: '#94be6b',
-  ABORTED: '#ffa8b9',
-  CANCELED: '#ffa8b9',
-  RUNNING: '#1eb4fa',
-  FAILURE: '#ea526f',
-  PAUSED: '#ff8a5b',
-  PENDING: '#cccccc',
-};
+const statuses =
+  {
+    SUCCESS: '#94be6b',
+    ABORTED: '#ffa8b9',
+    CANCELED: '#ffa8b9',
+    RUNNING: '#1eb4fa',
+    FAILURE: '#ea526f',
+    PAUSED: '#ff8a5b',
+    PENDING: '#cccccc',
+  };
+
+const logLevels =
+  {
+    info: '#1eb4fa',
+    warn: '#ff8a5b',
+    error: '#ea526f',
+  };
 
 const NewTheme =
   {
@@ -109,6 +117,7 @@ const NewTheme =
 
     success: NTColors.green,
     statuses,
+    logLevels,
   };
 
 // Will be deprecated
