@@ -92,7 +92,7 @@ export class DuplicateTFF extends TransformationForm<DuplicateOptions, Transform
       const baseName = `Copy of ${myKP.last()}`;
       let outputName = baseName;
       let i = 2;
-      const fieldNames = engine.getAllFieldNames().map((name) => name.last());
+      const fieldNames = engine.getAllFieldNames().map((name) => name.last()).toList();
       while (fieldNames.indexOf(outputName) !== -1)
       {
         outputName = baseName + ' ' + String(i);
