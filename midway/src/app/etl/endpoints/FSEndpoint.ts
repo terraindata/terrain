@@ -60,14 +60,14 @@ export default class HTTPEndpoint extends AEndpointStream
 
   public async getSource(source: SourceConfig): Promise<Readable>
   {
-    const path: string = source.options['path'];
+    const config = await this.getIntegrationConfig(source.integrationId);
     // TODO: sanitize path here to allow reading only from whitelisted locations
-    return fs.createReadStream(path);
+    return fs.createReadStream(config['path']);
   }
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
-    const path: string = sink.options['path'];
-    return fs.createWriteStream(path);
+    const config = await this.getIntegrationConfig(sink.integrationId);
+    return fs.createWriteStream(config['path']);
   }
 }

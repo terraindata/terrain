@@ -172,9 +172,7 @@ export function getEndpointDescription(
   {
     case Sinks.Fs:
     case Sources.Fs: {
-      const options = endpoint.options as SourceOptionsType<Sources.Fs>;
-      const text = String(options.path);
-      return `File System at '${text}'`;
+      return `Local File System'`;
     }
     case Sinks.Http:
     case Sources.Http: {
