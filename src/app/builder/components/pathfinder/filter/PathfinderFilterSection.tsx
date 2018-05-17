@@ -221,6 +221,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
           const newScoreLines = path.score.lines.push(_ScoreLine({
             field: '_score',
             transformData: {
+              autoBound: true,
               scorePoints: [
                 {
                   value: 0.05,

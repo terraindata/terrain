@@ -64,6 +64,9 @@ import TransformCardPeriscope from './TransformCardPeriscope';
 
 import { BuilderState } from 'app/builder/data/BuilderState';
 import Util from 'app/util/Util';
+import PathfinderText from 'builder/components/pathfinder/PathfinderText';
+import FadeInOut from 'common/components/FadeInOut';
+import Switch from 'common/components/Switch';
 import { ElasticQueryResult } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import { MidwayError } from '../../../../../shared/error/MidwayError';
 import { isInput } from '../../../../blocks/types/Input';
@@ -300,6 +303,25 @@ class TransformCard extends TerrainComponent<Props>
           language={this.props.language}
           colors={this.props.data.static.colors}
         />
+        <FadeInOut
+          open={this.canAutoBound()}
+        >
+          <div className='flex-container-left transform-card-options'>
+            <Switch
+              first={'Auto-Bound'}
+              second={'Fixed'}
+              selected={data.autoBound ? 1 : 0}
+              onChange={this.handleAutoBoundChange}
+              darker={true}
+              longer={true}
+            />
+            <div className='small-font'>
+              {
+                data.autoBound ? PathfinderText.autoBoundOn : PathfinderText.autoBoundOff
+              }
+            </div>
+          </div>
+        </FadeInOut>
       </div>
     );
   }
@@ -408,7 +430,7 @@ class TransformCard extends TerrainComponent<Props>
       maxDomain: newDomain,
     });
 
-    if (data.autoBound)
+    if (data.autoBound && this.canAutoBound())
     {
       // adjust to new bounds
       const max = newDomain.get(1);
@@ -870,6 +892,18 @@ class TransformCard extends TerrainComponent<Props>
     this.setState({
       bars: List([]), // no can do get bars sadly, need to figure it out one day
     });
+  }
+
+  private canAutoBound()
+  {
+    return this.props.data.mode === 'linear';
+  }
+
+  private handleAutoBoundChange(selected: 0 | 1)
+  {
+    this.props.onChange(
+      this._ikeyPath(this.props.keyPath, 'autoBound'), selected === 1,
+      true);
   }
 }
 
