@@ -460,7 +460,6 @@ function nestedFilterLineToQuery(line: FilterLine)
  */
 function filterLineToQuery(line: FilterLine)
 {
-  let field;
   // type priority: Date -> Number -> String
   // for how these values are finally tuned to query string, see ParseElasticQuery::stringifyWithParameters.
   let value: any = String(line.value || '');
@@ -642,23 +641,21 @@ function filterLineToQuery(line: FilterLine)
       }
       break;
     case 'isin':
-      field = line.analyzed && line.fieldType === FieldType.Text ? line.field + '.keyword' : line.field;
       value = PathFinderStringToJSONArray(value);
       query = {
         terms: {
-          [field]: value,
+          [line.field]: value,
           boost,
         },
       };
       break;
     case 'isnotin':
-      field = line.analyzed && line.fieldType === FieldType.Text ? line.field + '.keyword' : line.field;
       value = PathFinderStringToJSONArray(value);
       query = {
         bool: {
           must_not: {
             terms: {
-              [field]: value,
+              [line.field]: value,
             },
           },
           boost,
