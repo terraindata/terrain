@@ -58,8 +58,9 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import FadeInOut from 'common/components/FadeInOut';
-
+import GraphHelpers from 'etl/helpers/GraphHelpers';
 import NestedView from 'etl/templates/components/field/NestedView';
+import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import EditorFieldPreview from './EditorFieldPreview';
 import EditorFieldSettings from './EditorFieldSettings';
@@ -210,15 +211,9 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     );
   }
 
-  public getCheckboxState()
+  public getCheckboxState(): boolean
   {
-    const canEditField = this._field().canEditField();
-    const checkedState = this._checkedState();
-
-    return {
-      checked: checkedState === true,
-      showCheckbox: (canEditField && checkedState !== null),
-    };
+    return this._field().isIncluded;
   }
 
   public renderRow()
@@ -250,8 +245,6 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     const style = (canEdit === true && field.isIncluded === false) ?
       getStyle('opacity', '0.5') : {};
 
-    const { checked, showCheckbox } = this.getCheckboxState();
-
     const content = this.renderRow();
     const showSettings = this._settingsAreOpen();
 
@@ -274,8 +267,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
           children={childrenComponent}
           hideControls={showSettings}
           style={style}
-          showCheckbox={showCheckbox}
-          checked={checked}
+          checked={this.getCheckboxState()}
           onCheckboxClicked={this.handleCheckboxClicked}
         />
       );
@@ -290,8 +282,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
           children={null}
           hideControls={showSettings}
           style={style}
-          showCheckbox={showCheckbox}
-          checked={checked}
+          checked={this.getCheckboxState()}
           onCheckboxClicked={this.handleCheckboxClicked}
         />
       );
@@ -300,17 +291,25 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
 
   public handleCheckboxClicked()
   {
-    const { act, fieldId } = this.props;
-    const { checked, showCheckbox } = this.getCheckboxState();
-    if (showCheckbox)
+    GraphHelpers.mutateEngine((proxy) =>
+    {
+      proxy.setFieldEnabled(this.props.fieldId, !this._field().isIncluded);
+    }).then((structural) =>
     {
       this.props.act({
-        actionType: 'updateDisplayState',
-        updaters: {
-          checkedFields: (fields) => fields.set(fieldId, !Boolean(checked)),
+        actionType: 'rebuildFieldMap',
+      });
+    }).catch((e) =>
+    {
+      this.props.act({
+        actionType: 'addModal',
+        props: {
+          title: 'Error',
+          message: `Could not perform that action: ${String(e)}`,
+          error: true,
         },
       });
-    }
+    });
   }
 
   public handleToggleOpen()
