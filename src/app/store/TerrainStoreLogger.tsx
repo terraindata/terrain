@@ -90,7 +90,9 @@ export default class TerrainStoreLogger
         }
         if (TerrainStoreLogger.serializeAction)
         {
-          TerrainStoreLogger.actionSerializationLog.push(RecordsSerializer.stringify(action));
+          const actionString = RecordsSerializer.stringify(action);
+          const queryString = RecordsSerializer.stringify(store.getState().get('builder').query);
+          TerrainStoreLogger.actionSerializationLog.push({ query: queryString, action: actionString });
         }
         TerrainLog.debug(String(action.type) + ' takes ' + String(actionLatency) + 'ms');
         if (TerrainStoreLogger.printStateChange === true)

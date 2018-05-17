@@ -52,13 +52,10 @@ import * as jsonfile from 'jsonfile';
 import * as puppeteer from 'puppeteer';
 import * as sleep from 'sleep';
 import * as winston from 'winston';
-import { filteringRecordBuilderActions, replayBuilderActions, waitForInput } from './FullstackUtils';
+import { filteringRecordBuilderActions, loginToBuilder, replayBuilderActions, waitForInput } from './FullstackUtils';
 
-const USERNAME_SELECTOR = '#login-email';
-const PASSWORD_SELECTOR = '#login-password';
 const COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > svg';
 const CARDS_COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > div > div.menu-options-wrapper > div:nth-child(3) > div > div.menu-text-padding';
-const BUTTON_SELECTOR = '#app > div > div.app-wrapper > div > div.login-container > div.login-submit-button-wrapper > div';
 const CARDSTARTER_SELECTOR = '#cards-column-inner > div.info-area > div.info-area-buttons-container > div';
 
 const optionDefinitions = [
@@ -111,16 +108,6 @@ const usageSections = [
   },
 ];
 
-export async function loginToBuilder(page, url?)
-{
-  await loadPage(page, url);
-  await page.click(USERNAME_SELECTOR);
-  await page.keyboard.type('admin@terraindata.com');
-  await page.click(PASSWORD_SELECTOR);
-  await page.keyboard.type('CnAATPys6tEB*ypTvqRRP5@2fUzTuY!C^LZP#tBQcJiC*5');
-  await page.click(BUTTON_SELECTOR);
-}
-
 async function startBuilder(page)
 {
   await page.waitForSelector(COLUMN_SELECTOR);
@@ -133,16 +120,6 @@ async function startBuilder(page)
   sleep.sleep(1);
   await page.waitForSelector(CARDSTARTER_SELECTOR);
   await page.click(CARDSTARTER_SELECTOR);
-}
-
-async function loadPage(page, url)
-{
-  if (url)
-  {
-    await page.goto(url);
-    sleep.sleep(3);
-    await page.waitForSelector(USERNAME_SELECTOR);
-  }
 }
 
 async function recordBuilderActions(browser, url, column: 'builder' | 'pathfinder')

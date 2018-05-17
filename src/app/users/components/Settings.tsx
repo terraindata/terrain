@@ -107,6 +107,7 @@ class Settings extends TerrainComponent<Props>
       advancedResultsEnabled: Number(TerrainTools.isFeatureEnabled(TerrainTools.ADVANCED_RESULTS)),
       analyticsEnabled: Number(TerrainTools.isFeatureEnabled(TerrainTools.ANALYTICS)),
       simpleParser: Number(TerrainTools.isFeatureEnabled(TerrainTools.SIMPLE_PARSER)),
+      complexParser: Number(TerrainTools.isFeatureEnabled(TerrainTools.COMPLEX_PARSER)),
     };
   }
 
@@ -503,20 +504,20 @@ class Settings extends TerrainComponent<Props>
     }
   }
 
-  public handleSimpleParserSwitch(selected)
+  public handleComplexParserSwitch(selected)
   {
     this.setState((state) =>
     {
-      return { simpleParser: selected };
+      return { complexParser: selected };
     });
 
-    if (TerrainTools.isFeatureEnabled(TerrainTools.SIMPLE_PARSER))
+    if (TerrainTools.isFeatureEnabled(TerrainTools.COMPLEX_PARSER))
     {
-      TerrainTools.deactivate(TerrainTools.SIMPLE_PARSER);
+      TerrainTools.deactivate(TerrainTools.COMPLEX_PARSER);
     }
     else
     {
-      TerrainTools.activate(TerrainTools.SIMPLE_PARSER);
+      TerrainTools.activate(TerrainTools.COMPLEX_PARSER);
     }
   }
 
@@ -530,8 +531,8 @@ class Settings extends TerrainComponent<Props>
         <div className='settings-row'>
           <Switch
             medium={true}
-            first='On'
-            second='Off'
+            first='Off'
+            second='On'
             selected={this.state.analyticsEnabled}
             onChange={this.handleAnalyticsSwitch}
           />
@@ -557,18 +558,18 @@ class Settings extends TerrainComponent<Props>
 
     ) : undefined;
 
-    const terrainSettingsSimpleParser = TerrainTools.isAdmin() ? (
+    const terrainSettingsComplexParser = TerrainTools.isAdmin() ? (
       <div>
         <div className='settings-field-title'>
-          Simple Parser (Pathfinder to Code Connection Only)
+          Complex Parser (Changes in the Pathfinder -> Builder -> Code.)
         </div>
         <div className='settings-row'>
           <Switch
             medium={true}
             first='On'
             second='Off'
-            selected={this.state.simpleParser}
-            onChange={this.handleSimpleParserSwitch}
+            selected={this.state.complexParser}
+            onChange={this.handleComplexParserSwitch}
           />
         </div>
       </div>
@@ -592,7 +593,7 @@ class Settings extends TerrainComponent<Props>
         <br />
         {terrainSettingsAnalyticsContent}
         {terrainSettingsAdvancedResultsContent}
-        {terrainSettingsSimpleParser}
+        {terrainSettingsComplexParser}
       </div>
     );
   }

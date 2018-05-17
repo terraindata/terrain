@@ -410,25 +410,24 @@ const BuilderReducers =
         TerrainLog.debug('Cards and code not synchronized (from TQL mutation).');
         return state;
       }
-      if (!TerrainTools.isFeatureEnabled(TerrainTools.SIMPLE_PARSER))
-      {
-        const { parser, path } = CardsToPath.updatePath(query, state.db.name);
-        state = state.setIn(['query', 'path'], path);
-        // Because updatePath might update cards, we have to propagate the builder changes back to the editor
-        // if the cards are mutated.
-        if (parser && parser.isMutated)
-        {
-          const newCards = ESCardParser.parseAndUpdateCards(List([parser.getValueInfo().card]), state.query);
-          state = state.setIn(['query', 'cards'], newCards);
-          const tql = AllBackendsMap[state.query.language].queryToCode(state.query, {});
-          state = state
-            .setIn(['query', 'tql'], tql);
-          state = state
-            .setIn(['query', 'parseTree'], AllBackendsMap[state.query.language].parseQuery(state.query))
-            .setIn(['query', 'lastMutation'], state.query.lastMutation + 1)
-            .setIn(['query', 'cardsAndCodeInSync'], true);
-        }
-      }
+      console.log('New Query Card ', query.cards);
+      // we might have to update the path and the card
+      const { parser, path } = CardsToPath.updatePath(query, state.db.name);
+      state = state.setIn(['query', 'path'], path);
+      // Because updatePath might update cards, we have to propagate the builder changes back to the editor
+      // if the cards are mutated.
+      /*      if (parser && parser.isMutated)
+            {
+              const newCards = ESCardParser.parseAndUpdateCards(List([parser.getValueInfo().card]), state.query);
+              state = state.setIn(['query', 'cards'], newCards);
+              const tql = AllBackendsMap[state.query.language].queryToCode(state.query, {});
+              state = state
+                .setIn(['query', 'tql'], tql);
+              state = state
+                .setIn(['query', 'parseTree'], AllBackendsMap[state.query.language].parseQuery(state.query))
+                .setIn(['query', 'lastMutation'], state.query.lastMutation + 1)
+                .setIn(['query', 'cardsAndCodeInSync'], true);
+            }*/
       return state;
     },
 
@@ -607,14 +606,14 @@ const BuilderReducersWrapper = (
       if (!action.payload.notDirty)
       {
         const path = state.query.path;
-        if (TerrainTools.isFeatureEnabled(TerrainTools.SIMPLE_PARSER))
+        if (TerrainTools.isFeatureEnabled(TerrainTools.COMPLEX_PARSER))
         {
-          state = state.setIn(['query', 'tql'],
-            AllBackendsMap[state.query.language].pathToCode(path, state.query.inputs));
+          state = state.setIn(['query', 'cards'], PathToCards.updateRootCard(state.query));
         }
         else
         {
-          state = state.setIn(['query', 'cards'], PathToCards.updateRootCard(state.query));
+          state = state.setIn(['query', 'tql'],
+            AllBackendsMap[state.query.language].pathToCode(path, state.query.inputs));
         }
       }
     }
@@ -622,10 +621,10 @@ const BuilderReducersWrapper = (
     // path/card -> tql
     // a card changed and we need to re-translate the tql
     //  needs to be after the card change has affected the state
-    if (!TerrainTools.isFeatureEnabled(TerrainTools.SIMPLE_PARSER) && !action.payload.notDirty)
+    if (TerrainTools.isFeatureEnabled(TerrainTools.COMPLEX_PARSER) && !action.payload.notDirty)
     {
-      const newCards = ESCardParser.parseAndUpdateCards(state.query.cards, state.query);
-      state = state.setIn(['query', 'cards'], newCards);
+      //const newCards = ESCardParser.parseAndUpdateCards(state.query.cards, state.query);
+      //state = state.setIn(['query', 'cards'], newCards);
       // update query
       state = state
         .setIn(['query', 'tql'], AllBackendsMap[state.query.language].queryToCode(state.query, {}));

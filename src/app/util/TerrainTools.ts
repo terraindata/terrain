@@ -76,6 +76,7 @@ class TerrainTools
   public static ANALYTICS = 'analytics';
   public static ADVANCED_RESULTS = 'advanced_results';
   public static SIMPLE_PARSER = 'simple_parser';
+  public static COMPLEX_PARSER = 'complex_parser';
   public static OPERATORS = 'operators';
 
   public static terrainStoreLogger = TerrainStoreLogger;

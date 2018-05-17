@@ -96,7 +96,6 @@ fullstack-screenshot:
     - sleep 10
     - yarn test-fullstack-login
     - yarn test-rr-pathfinder
-    - yarn test-rr-builder
   stage: fullstack-screenshot
   allow_failure: true
   artifacts:
