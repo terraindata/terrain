@@ -180,7 +180,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     {
       return this.renderArrayChild(null, -1, true);
     }
-    return List(preview.map((value, index) =>
+    return List(preview.slice(0, 3).map((value, index) =>
     {
       return this.renderArrayChild(value, index);
     }));
