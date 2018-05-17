@@ -61,9 +61,9 @@ import { LibraryState } from 'library/LibraryTypes';
 
 import { IntegrationFormMap } from 'etl/common/components/IntegrationFormClasses';
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
-import { Integrations } from 'shared/etl/types/IntegrationTypes';
+import { IntegrationNames, Integrations } from 'shared/etl/types/IntegrationTypes';
 
-const { List } = Immutable;
+const { List, Map } = Immutable;
 
 export interface Props
 {
@@ -82,6 +82,7 @@ export default class IntegrationForm extends TerrainComponent<Props>
       displayName: 'Type',
       options: {
         pickOptions: (s) => integrationList,
+        displayNames: (s) => integrationNames,
         indexResolver: (value) => integrationList.indexOf(value),
       },
     },
@@ -178,3 +179,4 @@ export default class IntegrationForm extends TerrainComponent<Props>
 }
 
 const integrationList = List(Object.keys(Integrations));
+const integrationNames = Map(IntegrationNames);

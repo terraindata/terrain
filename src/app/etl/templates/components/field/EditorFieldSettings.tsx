@@ -186,7 +186,7 @@ class EditorFieldSettings extends TemplateEditorField<Props>
     const categories = [];
     if (language !== Languages.JavaScript && this._field().canEditField())
     {
-      categories.push(this.renderCategory(ViewCategory.Language, language));
+      categories.push(this.renderCategory(ViewCategory.Language, 'Advanced'));
     }
     return categories;
   }
