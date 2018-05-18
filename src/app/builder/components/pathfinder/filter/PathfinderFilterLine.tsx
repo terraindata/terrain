@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
@@ -89,6 +89,7 @@ export interface Props
   isSoftFilter?: boolean; // does this section apply to soft filters?
   fieldOptionSet: RouteSelectorOptionSet;
   valueOptions: List<RouteSelectorOption>;
+  maxBoost: number;
   onToggleOpen?: (open: boolean) => void;
   onAddScript?: (fieldName: string, lat: any, lon: any, name: string) => string;
   onDeleteScript?: (scriptName: string) => void;
@@ -203,6 +204,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           index: (props.pathfinderContext.source.dataSource as any).index,
           fieldValue,
           comparisonValue,
+          valueValue,
           fieldType: props.filterLine.fieldType,
         }}
         // optionSets={this.getOptionSets() /* TODO store in state? */}
@@ -443,7 +445,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     {
       return null;
     }
-    const { filterLine, pathfinderContext } = this.props;
+    const { filterLine, maxBoost, pathfinderContext } = this.props;
 
     // if (filterLine.field === null || filterLine.fieldType === null || filterLine.comparison === null)
     // {
@@ -458,7 +460,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           onChange={this.handleBoostChange}
           onAfterChange={this.handleBoostFinish}
           altStyle={true}
-          max={10}
+          max={Math.max(this.state.boost, maxBoost)}
           min={0}
           step={0.1}
           round={true}

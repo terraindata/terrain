@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 import { Transform } from 'stream';
 
@@ -63,15 +63,22 @@ export default abstract class ADocumentTransform extends Transform
 
   public _transform(chunk: object, encoding, callback)
   {
-    const out = this.transform(chunk, this.chunkNumber++);
-    if (Array.isArray(out))
+    try
     {
-      out.forEach((o) => this.push(o));
-      callback();
+      const out = this.transform(chunk, this.chunkNumber++);
+      if (Array.isArray(out))
+      {
+        out.forEach((o) => this.push(o));
+        callback();
+      }
+      else
+      {
+        callback(null, out);
+      }
     }
-    else
+    catch (e)
     {
-      callback(null, out);
+      this.emit('error', e);
     }
   }
 

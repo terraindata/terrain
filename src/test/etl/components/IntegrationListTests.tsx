@@ -60,7 +60,7 @@ const integrations: IMMap<ID, IntegrationConfig> = Map<ID, IntegrationConfig>({
     name: 'Integration 1',
     type: 'Sftp',
     authConfig: { jwt: '' },
-    connectionConfig: {},
+    connectionConfig: { path: '' },
     createdBy: 1,
     lastModified: null,
     readPermission: null,
@@ -104,8 +104,8 @@ describe('IntegrationList', () =>
   it('should render an item list with no elements', () =>
   {
     expect(listComponent.find(ItemList)).toHaveLength(1);
-    expect(listComponent.find(ItemList).node.props.items.toJS()).toHaveLength(0);
-    expect(listComponent.find(ItemList).render().text()).toEqual("There aren't yet any integrations");
+    expect(listComponent.find(ItemList).getElement().props.items.toJS()).toHaveLength(0);
+    expect(listComponent.find(ItemList).render().text()).toContain("There aren't yet any integrations");
   });
 
   describe('#render', () =>

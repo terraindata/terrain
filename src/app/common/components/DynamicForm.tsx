@@ -51,6 +51,8 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
+import * as TagsInput from 'react-tagsinput';
+import 'react-tagsinput/react-tagsinput.css';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
@@ -88,6 +90,7 @@ export interface Props<FState>
   children?: any; // children get rendered between the buttons and the form components
   centerForm?: boolean; // if true, the form content gets centered in the container
   validate?: (state: FState) => string | undefined; // return a string if there's an error
+  debounceAll?: boolean;
 }
 // if we want to allow immutable state objects, add an optional state mutator to each input declaration type
 
@@ -101,6 +104,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       [DisplayType.NumberBox]: this.renderNumberBox,
       [DisplayType.TextBox]: this.renderTextBox,
       [DisplayType.Pick]: this.renderPick,
+      [DisplayType.TagsBox]: this.renderTagsBox,
       [DisplayType.Custom]: this.renderCustom,
     };
 
@@ -111,6 +115,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       [DisplayType.NumberBox]: 0,
       [DisplayType.TextBox]: 0,
       [DisplayType.Pick]: 0,
+      [DisplayType.TagsBox]: 0,
       [DisplayType.Custom]: 0,
     };
   constructor(props)
@@ -141,7 +146,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           onChange={this.setStateNoApplyHOC(stateName)}
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
-          debounce={true}
+          debounce={this.props.debounceAll === true || options.debounce}
         />
       </div>
     );
@@ -164,7 +169,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           onChange={this.setStateNoApplyNumberBoxHOC(stateName)}
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
-          debounce={true}
+          debounce={this.props.debounceAll === true || options.debounce}
         />
       </div>
     );
@@ -190,6 +195,35 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           large={options.large}
         />
         <div className='dynamic-form-label'> {inputInfo.displayName} </div>
+      </div>
+    );
+  }
+
+  public renderTagsBox(inputInfo: InputDeclarationType<S>, stateName, state: S, index, disabled: boolean)
+  {
+    const options: OptionType<DisplayType.TagsBox> = inputInfo.options || {};
+
+    const value = this.props.inputState[stateName] ? this.props.inputState[stateName] : [];
+    const transformedValue = options.transformValue !== undefined ?
+      options.transformValue(value) : value;
+
+    return (
+      <div className='dynamic-form-default-block' key={index}>
+        <div className='dynamic-form-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
+        <TagsInput
+          value={transformedValue}
+          onChange={
+            (val) =>
+            {
+              const untransformedValue = options.untransformValue !== undefined ?
+                options.untransformValue(val) : val;
+
+              return this.setStateNoApplyHOC(stateName)(untransformedValue);
+            }
+          }
+          focusedClassName={''}
+          inputProps={{ placeholder: 'Add new' }}
+        />
       </div>
     );
   }

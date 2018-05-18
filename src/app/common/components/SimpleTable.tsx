@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions
 
+import Button from 'common/components/Button';
 import BadgeColumn from 'common/components/simple-table/BadgeColumn';
 import ButtonColumn from 'common/components/simple-table/ButtonColumn';
 import { List } from 'immutable';
@@ -63,20 +64,88 @@ export interface SimpleTableColumn
   columnLabel: string;
   columnRelativeSize?: number; // works sort of as css flex property
   component?: JSX.Element; // a component to wrap the column value with
+  formatter?: (item: any) => string;
 }
 
 export interface Props
 {
   columnsConfig: SimpleTableColumn[];
   data: Immutable.Map<ID, any>;
+  defaultOrder?: { columnKey: string, direction: 'asc' | 'desc' };
+  displayRowCount?: number;
 }
+
+export interface State
+{
+  visibleRowCount: number;
+  orderedData: Immutable.List<any>;
+}
+
+const ShowMore = (props) =>
+{
+  return (
+    <tr>
+      <td style={{ textAlign: 'center' }} colSpan={props.colSpan}>
+        <Button text='+ Show More' onClick={props.onClick} />
+      </td>
+    </tr>
+  );
+};
 
 export class SimpleTable extends TerrainComponent<Props>
 {
-  public state: {};
-  public columnWidths = this.calculateColumnWidhts();
+  public static defaultProps = {
+    displayRowCount: 10,
+    defaultOrder: {},
+  };
+  public state: State = null;
+  public columnWidths = this.calculateColumnWidths();
 
-  public calculateColumnWidhts()
+  public constructor(props)
+  {
+    super(props);
+
+    const { displayRowCount, data, defaultOrder } = props;
+
+    this.state = {
+      visibleRowCount: displayRowCount,
+      orderedData: this.orderData(
+        data,
+        defaultOrder.columnKey,
+        defaultOrder.direction,
+      ),
+    };
+  }
+
+  public componentWillReceiveProps(nextProps)
+  {
+    const {
+      displayRowCount,
+      defaultOrder: nextDefaultOrder,
+      data: nextData,
+    } = nextProps;
+
+    const { defaultOrder, data } = this.props;
+
+    this.setState({
+      visibleRowCount: displayRowCount,
+    });
+
+    const defaultOrderChanged = nextDefaultOrder.columnKey !== defaultOrder.columnKey ||
+      nextDefaultOrder.direction !== defaultOrder.direction;
+    if (defaultOrderChanged || nextData !== data)
+    {
+      this.setState({
+        orderedData: this.orderData(
+          nextData,
+          defaultOrder.columnKey,
+          defaultOrder.direction,
+        ),
+      });
+    }
+  }
+
+  public calculateColumnWidths()
   {
     const { columnsConfig } = this.props;
     // By default, each column takes an equal portion of the 100% width
@@ -100,6 +169,20 @@ export class SimpleTable extends TerrainComponent<Props>
     return columnWidths;
   }
 
+  public handleShowMoreClick()
+  {
+    const { displayRowCount, data } = this.props;
+    const { visibleRowCount } = this.state;
+    const dataValuesCount = data.valueSeq().count();
+
+    if (visibleRowCount < dataValuesCount)
+    {
+      this.setState((state: State) =>
+        ({ visibleRowCount: state.visibleRowCount + displayRowCount }),
+      );
+    }
+  }
+
   public renderValue(colKey, rowData)
   {
     const { columnsConfig } = this.props;
@@ -107,20 +190,46 @@ export class SimpleTable extends TerrainComponent<Props>
     let processedValue = rowData[colKey];
 
     const column = columnsConfig.find((col) => col.columnKey === colKey);
-    if (column !== undefined && column.component !== undefined)
+
+    if (column !== undefined)
     {
-      processedValue = React.cloneElement(column.component, { colKey, rowData });
+      if (column.formatter !== undefined)
+      {
+        processedValue = column.formatter(rowData);
+      }
+
+      if (column.component !== undefined)
+      {
+        processedValue = React.cloneElement(column.component, { key: colKey, colKey, rowData });
+      }
     }
 
     return processedValue;
   }
 
+  public orderData(data: Immutable.Map<ID, any>, columnKey: string, direction: 'asc' | 'desc' = 'asc')
+  {
+    let orderedData = data.toList();
+    if (columnKey !== undefined)
+    {
+      orderedData = orderedData.sortBy((entry) => entry[columnKey]).toList();
+
+      if (direction === 'desc')
+      {
+        orderedData = orderedData.reverse().toList();
+      }
+    }
+
+    return orderedData;
+  }
+
   public render()
   {
-    const { columnsConfig, data } = this.props;
+    const { columnsConfig } = this.props;
+    const { visibleRowCount, orderedData } = this.state;
 
     const columnKeys = columnsConfig.map((config) => config.columnKey);
-    const dataValues = data.valueSeq();
+    const visibleDataValues = orderedData.take(visibleRowCount);
 
     return (
       <table className='simple-table'>
@@ -144,11 +253,11 @@ export class SimpleTable extends TerrainComponent<Props>
         </thead>
         <tbody className='simple-table-body'>
           {
-            dataValues.count() > 0 ?
-              dataValues.map((entry) =>
+            visibleDataValues.count() > 0 ?
+              visibleDataValues.map((entry, key) =>
               {
                 return (
-                  <tr key={entry.id} className='simple-table-row'>
+                  <tr key={key} className='simple-table-row'>
                     {
                       columnsConfig.map((column) =>
                       {
@@ -173,6 +282,13 @@ export class SimpleTable extends TerrainComponent<Props>
                   </td>
                 </tr>
               )
+          }
+          {
+            orderedData.count() > visibleRowCount ?
+              <ShowMore
+                colSpan={columnKeys.length}
+                onClick={this.handleShowMoreClick}
+              /> : null
           }
         </tbody>
       </table>

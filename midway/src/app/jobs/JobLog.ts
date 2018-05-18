@@ -50,6 +50,7 @@ import * as winston from 'winston';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import BufferTransform from '../io/streams/BufferTransform';
 import JobLogConfig from './JobLogConfig';
 
 export class JobLog
@@ -83,20 +84,26 @@ export class JobLog
       }
 
       const newJobLog: JobLogConfig =
-      {
-        contents: '',
-        createdAt: new Date(),
-        id: jobId,
-      };
+        {
+          contents: '',
+          createdAt: new Date(),
+          id: jobId,
+        };
 
       const upsertedJobLogs: JobLogConfig[] = await App.DB.upsert(this.jobLogTable, newJobLog) as JobLogConfig[];
       resolve(upsertedJobLogs);
 
       const updatedContentJobLog: JobLogConfig = upsertedJobLogs[0];
-      // TODO process log stream here
-      let accumulatedLog: string = ''; // set this
-      updatedContentJobLog.contents = accumulatedLog;
-      await App.DB.upsert(this.jobLogTable, updatedContentJobLog);
+      try
+      {
+        const accumulatedLog: string[] = await BufferTransform.toArray(logStream);
+        updatedContentJobLog.contents = accumulatedLog.join('\n');
+        await App.DB.upsert(this.jobLogTable, updatedContentJobLog);
+      }
+      catch (e)
+      {
+        await App.JobQ.setJobStatus(jobId, false, 'FAILURE');
+      }
     });
   }
 

@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
 import * as winston from 'winston';
@@ -73,12 +73,19 @@ export class ElasticReader extends SafeReadable
 
   private numRequested: number = 0;
 
-  constructor(client: ElasticClient, query: any, streaming: boolean = false)
+  constructor(client: ElasticClient, query: string | object, streaming: boolean = false)
   {
     super({ objectMode: true, highWaterMark: 1024 * 8 });
 
     this.client = client;
-    this.query = query;
+    if (typeof query === 'string')
+    {
+      this.query = JSON.parse(query);
+    }
+    else
+    {
+      this.query = query;
+    }
     this.streaming = streaming;
 
     this.size = (query['size'] !== undefined) ? query['size'] as number : this.DEFAULT_SEARCH_SIZE;

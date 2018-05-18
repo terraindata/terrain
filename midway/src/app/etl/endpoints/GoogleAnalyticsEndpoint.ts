@@ -45,12 +45,22 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as googleoauthjwt from 'google-oauth-jwt';
+import * as _ from 'lodash';
 import { PassThrough, Readable, Writable } from 'stream';
+import * as winston from 'winston';
 
-import { PostProcessTransformTypes, SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
+import
+{
+  PostProcessTransformConfig,
+  PostProcessTransformOptionsTypes,
+  PostProcessTransformTypes,
+  SinkConfig,
+  SourceConfig,
+} from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import IntegrationConfig from '../../integrations/IntegrationConfig';
 import { integrations } from '../../integrations/IntegrationRouter';
+import JSONTransform from '../../io/streams/JSONTransform';
 import AEndpointStream from './AEndpointStream';
 import { PostProcessTransform } from './PostProcessTransform';
 
@@ -125,7 +135,7 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
     return this.getRequestStream(config, source, url) as Promise<Readable>;
   }
 
-  public async getSink(sink: SinkConfig): Promise<Readable>
+  public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
     throw new Error('not implemented');
   }
@@ -141,7 +151,18 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
       }
       const currDate: any = new Date(Date.now() - 1000 * 3600 * 24);
 
-      const padDate = (str: string): string => str.padStart(2, '0');
+      const padDate = (str: string): string =>
+        {
+          const fullLength: number = 2;
+          if (str.length < fullLength)
+          {
+            for(let i = 0; i < fullLength-str.length; ++i)
+            {
+              str = '0' + str;
+            }
+          }
+          return str;
+        };
       const startDate: any = new Date(currDate - 1000 * 3600 * 24 * dayInterval);
       const currDateStr = (currDate.getFullYear().toString() as string) + '-'
         + (padDate((currDate.getMonth() as number + 1).toString()) as string) + '-'
@@ -166,9 +187,10 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
       let colNames: string[] = [];
       let constructedHeader: boolean = false;
       let potentialError: string = '';
+      let zippedRows: object[] = [];
       const writeStream = JSONTransform.createExportStream();
-      const scopeURL = 'https://www.googleapis.com/auth/analytics.readonly';
-      const scopes: object[] = [];
+      const scopeURL: string = 'https://www.googleapis.com/auth/analytics.readonly';
+      const scopes: string[] = [];
       const hasPostProcessTransforms: boolean = Array.isArray(gaSource.options['transforms'])
         && gaSource.options['transforms'].length !== 0;
 
@@ -186,18 +208,18 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
         winston.info(gaConfig['email']);
         winston.info('<redacted private key contents>');
         request(
-        {
-          method: gaConfig['method'],
-          url,
-          jwt:
           {
-            email: gaConfig['email'],
-            key: gaConfig['privateKey'],
-            scopes,
-          },
-          json: true,
-          body: analyticsBody,
-        }, (err, res, body) =>
+            method: gaConfig['method'],
+            url,
+            jwt:
+              {
+                email: gaConfig['email'],
+                key: gaConfig['privateKey'],
+                scopes,
+              },
+            json: true,
+            body: analyticsBody,
+          }, (err, res, body) =>
           {
             if (err !== null && err !== undefined)
             {
@@ -258,7 +280,7 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
                 if (hasPostProcessTransforms)
                 {
                   const postProcessedRows: object[]
-                    = postProcessTransform.process(gaSource.options['transforms'] as PostProcessTransformConfig, zippedRows);
+                    = postProcessTransform.process(gaSource.options['transforms'] as PostProcessTransformConfig[], zippedRows);
                   resolve(writeStream);
                   postProcessedRows.forEach((pPR) =>
                   {

@@ -75,16 +75,15 @@ describe('SimpleTable', () =>
 
   let tableData = Immutable.Map<ID, any>({});
   const TableItem = Record({ id: 0, name: '', status: '' });
-  tableData = tableData.set(1, new TableItem({
-    id: 1,
-    name: 'item 1',
-    status: 'success',
-  }));
-  tableData = tableData.set(2, new TableItem({
-    id: 2,
-    name: 'item 2',
-    status: 'failure',
-  }));
+
+  for (let i = 1; i <= 10; i++)
+  {
+    tableData = tableData.set(i, new TableItem({
+      id: i,
+      name: `item ${i}`,
+      status: 'success',
+    }));
+  }
 
   const tableState = {
     columnsConfig,
@@ -108,16 +107,16 @@ describe('SimpleTable', () =>
       expect(tableComponent.find('.simple-table-header')).toHaveLength(1);
       expect(tableComponent.find('.simple-table-body')).toHaveLength(1);
 
-      const columnsCount = Object.keys(columnsConfig).length;
+      const columnsCount = columnsConfig.length;
 
       expect(tableComponent.find('.simple-table-header .simple-table-cell'))
         .toHaveLength(columnsCount);
 
       expect(tableComponent.find('.simple-table-body .simple-table-row'))
-        .toHaveLength(2);
+        .toHaveLength(10); // displayRowCount defaults to 10
 
       expect(tableComponent.find('.simple-table-body .simple-table-cell'))
-        .toHaveLength(2 * columnsCount);
+        .toHaveLength(10 * columnsCount);
 
       expect(tableComponent.find('.simple-table-body .simple-table-cell').at(0).text())
         .toEqual('1');
@@ -125,22 +124,149 @@ describe('SimpleTable', () =>
         .toEqual('item 1');
       expect(tableComponent.find('.simple-table-body .simple-table-cell').at(2).text())
         .toEqual('success');
+
+      expect(tableComponent.find('ShowMore')).toHaveLength(0);
+    });
+
+    it('should limit the rendered rows to props.displayRowCount', () =>
+    {
+      tableComponent = shallow(
+        <SimpleTable
+          {...tableState}
+          displayRowCount={5}
+        />,
+      );
+      expect(tableComponent.find('.simple-table-body .simple-table-row')).toHaveLength(5);
+
+      const showMore = tableComponent.find('ShowMore');
+      expect(showMore).toHaveLength(1);
+      expect(showMore.props().colSpan).toEqual(columnsConfig.length);
+      expect(showMore.props().onClick).toEqual(tableComponent.instance().handleShowMoreClick);
+
+      tableComponent.setProps({ displayRowCount: 15 });
+      expect(tableComponent.find('.simple-table-body .simple-table-row')).toHaveLength(10);
+      expect(tableComponent.find('ShowMore')).toHaveLength(0);
+    });
+
+    it('should set the default props', () =>
+    {
+      expect(tableComponent.instance().props.displayRowCount).toEqual(10);
+    });
+
+    it('should order entries by defaultOrder.columnKey in direction defaultOrder.direction', () =>
+    {
+      tableComponent = shallow(
+        <SimpleTable
+          {...tableState}
+          defaultOrder={{ columnKey: 'name', direction: 'desc' }}
+        />,
+      );
+
+      const tableRows = tableComponent.find('.simple-table-body .simple-table-row');
+
+      const firstRow = tableRows.at(0);
+      const lastRow = tableRows.at(9);
+
+      const firstRowName = firstRow.find('.simple-table-cell').at(1).text();
+      const lastRowName = lastRow.find('.simple-table-cell').at(1).text();
+      expect(firstRowName).toEqual('item 9');
+      expect(lastRowName).toEqual('item 1');
+    });
+
+    it('should format a column value using the formatter if one was specified', () =>
+    {
+      const columnsConfigWithFormatter = [
+        {
+          columnKey: 'id',
+          columnLabel: 'Id',
+        },
+        {
+          columnKey: 'name',
+          columnLabel: 'Name',
+          columnRelativeSize: 4,
+          formatter: (item) => item.name.toUpperCase(),
+        },
+        {
+          columnKey: 'status',
+          columnLabel: 'Status',
+          columnRelativeSize: 0.5,
+        },
+      ];
+
+      const tableStateWithFormatter = {
+        ...tableState,
+        columnsConfig: columnsConfigWithFormatter,
+      };
+
+      tableComponent = shallow(
+        <SimpleTable
+          {...tableStateWithFormatter}
+        />,
+      );
+
+      const tableRows = tableComponent.find('.simple-table-body .simple-table-row');
+
+      expect(tableRows.at(0).find('.simple-table-cell').at(1).text())
+        .toEqual('ITEM 1');
+      expect(tableRows.at(1).find('.simple-table-cell').at(1).text())
+        .toEqual('ITEM 2');
     });
   });
 
-  describe('#calculateColumnWidhts', () =>
+  describe('#handleShowMoreClick', () =>
+  {
+    it('should make visible the next props.displayRowCount chunk of rows', () =>
+    {
+      tableComponent = shallow(
+        <SimpleTable
+          {...tableState}
+          displayRowCount={4}
+        />,
+      );
+
+      const showMoreButton = tableComponent.find('ShowMore');
+
+      showMoreButton.simulate('click');
+      expect(tableComponent.find('.simple-table-body .simple-table-row')).toHaveLength(8);
+      expect(tableComponent.find('ShowMore')).toHaveLength(1);
+
+      showMoreButton.simulate('click');
+      expect(tableComponent.find('.simple-table-body .simple-table-row')).toHaveLength(10);
+      expect(tableComponent.find('ShowMore')).toHaveLength(0);
+    });
+  });
+
+  describe('#calculateColumnWidths', () =>
   {
     it('should balance column widths to fill 100% based on the defined columnRelativeSize', () =>
     {
       // take the columnRelativeSize (defaults to 1 if not defined), multiply by 100
       // and divide by the sum of all the columns columnRelativeSize.
-      expect(tableComponent.instance().calculateColumnWidhts()).toEqual(
+      expect(tableComponent.instance().calculateColumnWidths()).toEqual(
         {
           id: 18.18,
           name: 72.73,
           status: 9.09,
         },
       );
+    });
+  });
+
+  describe('#orderData', () =>
+  {
+    it('should return the data ordered by the specified criteria', () =>
+    {
+      let orderedData = tableComponent.instance().orderData(tableData);
+
+      expect(orderedData).toEqual(tableData.toList());
+
+      orderedData = tableComponent.instance().orderData(tableData, 'name');
+      expect(orderedData.get(0).name).toEqual('item 1');
+      expect(orderedData.get(9).name).toEqual('item 9');
+
+      orderedData = tableComponent.instance().orderData(tableData, 'name', 'desc');
+      expect(orderedData.get(0).name).toEqual('item 9');
+      expect(orderedData.get(9).name).toEqual('item 1');
     });
   });
 });

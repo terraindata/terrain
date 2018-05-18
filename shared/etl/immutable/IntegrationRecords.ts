@@ -63,8 +63,8 @@ class IntegrationConfigC implements IntegrationConfigBase
   public id = -1;
   public name = '';
   public type = null;
-  public authConfig: AuthConfigType<Integrations> = {} as any;
-  public connectionConfig: ConnectionConfigType<Integrations> = {} as any;
+  public authConfig: AuthConfigType<Integrations> | {} = {};
+  public connectionConfig: ConnectionConfigType<Integrations> | {} = {};
   public createdBy = -1;
   public lastModified: Date = null;
   public readPermission = null;

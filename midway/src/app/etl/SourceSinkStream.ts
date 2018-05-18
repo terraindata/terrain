@@ -145,12 +145,15 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
         case 'csv':
           importStream = sourceStream.pipe(CSVTransform.createImportStream());
           break;
+        case 'tsv':
+          importStream = sourceStream.pipe(CSVTransform.createImportStream(true, '\t'));
+          break;
         case 'xml':
           const xmlPath: string | undefined = source.fileConfig.xmlPath;
           importStream = sourceStream.pipe(XMLTransform.createImportStream(xmlPath));
           break;
         default:
-          throw new Error('Download file type must be either CSV, JSON or XML.');
+          throw new Error('Download file type must be either CSV, TSV, JSON or XML.');
       }
       resolve(importStream);
     }
@@ -189,11 +192,14 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
           case 'csv':
             transformStream = CSVTransform.createExportStream();
             break;
+          case 'tsv':
+            transformStream = CSVTransform.createExportStream(true, '\t');
+            break;
           case 'xml':
             transformStream = XMLTransform.createExportStream();
             break;
           default:
-            throw new Error('Export file type must be either CSV, JSON or XML.');
+            throw new Error('Export file type must be either CSV, TSV, JSON or XML.');
         }
       }
 

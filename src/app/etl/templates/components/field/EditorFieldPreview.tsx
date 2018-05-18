@@ -61,12 +61,14 @@ import Menu from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import LanguageUI from 'etl/templates/languages/LanguageUI';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './TemplateEditorField.less';
 
 const KeyIcon = require('images/icon_key-2.svg');
+const MAX_STRING_LENGTH = 400;
 
 export interface Props extends TemplateEditorFieldProps
 {
@@ -165,8 +167,11 @@ class EditorFieldPreview extends TemplateEditorField<Props>
         fontColor(Colors().text2, Colors().text1);
     }
 
-    const previewText = preview == null ? 'N/A' : preview.toString();
-
+    let previewText: string = preview == null ? 'N/A' : preview.toString();
+    if (previewText.length >= MAX_STRING_LENGTH)
+    {
+      previewText = previewText.slice(0, MAX_STRING_LENGTH) + '...';
+    }
     const menuOptions = this.getMenuOptions();
     const showMenu = menuOptions.size > 0 && (this.state.hovered || this.state.menuOpen);
     const hidePreviewValue = field.isArray() || field.isNested() || labelOnly;
@@ -180,13 +185,18 @@ class EditorFieldPreview extends TemplateEditorField<Props>
             onMouseLeave={this.handleMouseLeave}
             style={labelStyle}
           >
+            {
+              this.renderTypeIcon()
+            }
             <div
               className={classNames({
                 'field-preview-label': true,
                 'field-preview-array-label': field.isWildcardField(),
                 'field-preview-can-toggle': this.props.toggleOpen !== undefined,
               })}
-              onClick={this.props.toggleOpen}
+              onClick={this.handleLabelClicked}
+              style={fontColor(Colors().text1, Colors().active)}
+              key='label'
             >
               {labelOverride != null ? labelOverride : field.name}
             </div>
@@ -340,7 +350,39 @@ class EditorFieldPreview extends TemplateEditorField<Props>
       this.openSettings();
     }
   }
+
+  private renderTypeIcon()
+  {
+    const type = EngineUtil.getRepresentedType(this.props.fieldId, this._currentEngine());
+    const Icon = typeToIcon[type];
+    return (
+      <div
+        className='field-type-icon'
+        style={fontColor(Colors().text2)}
+      >
+        <Icon />
+      </div>
+    );
+  }
 }
+
+const TextTypeIcon = require('./../../../../../images/icon_type_text.svg?name=TextTypeIcon');
+const DateTypeIcon = require('./../../../../../images/icon_type_date.svg?name=DateTypeIcon');
+const NumberTypeIcon = require('./../../../../../images/icon_type_number.svg?name=NumberTypeIcon');
+const ArrayTypeIcon = require('./../../../../../images/icon_type_array.svg?name=ArrayTypeIcon');
+const ObjectTypeIcon = require('./../../../../../images/icon_type_object.svg?name=ObjectTypeIcon');
+const GeoTypeIcon = require('./../../../../../images/icon_type_geo.svg?name=GeoTypeIcon');
+const BooleanTypeIcon = require('./../../../../../images/icon_type_boolean.svg?name=BooleanTypeIcon');
+
+const typeToIcon = {
+  string: TextTypeIcon,
+  object: ObjectTypeIcon,
+  number: NumberTypeIcon,
+  boolean: BooleanTypeIcon,
+  array: ArrayTypeIcon,
+  date: DateTypeIcon,
+  geo: GeoTypeIcon,
+};
 
 const emptyOptions = List([]);
 

@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 // tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions
 

@@ -42,10 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 import * as React from 'react';
 import { browserHistory } from 'react-router';
-import { IndexRoute, Route, Router, IndexRedirect } from 'react-router';
+import { IndexRedirect, IndexRoute, Route, Router } from 'react-router';
 
 import DataTabs from 'etl/components/DataTabs';
 import TemplateList from 'etl/templates/components/TemplateList';
@@ -144,7 +144,7 @@ class AppRouter extends TerrainComponent<{}> {
           <Route path='/import' component={FileImport /*TODO get rid of this once ETL is merged*/} />
 
           <Route path='/data' component={DataTabs}>
-            <IndexRedirect to="/data/templates" />
+            <IndexRedirect to='/data/templates' />
             <Route path='templates' component={TemplateList} />
             <Route path='newtemplate(/:step)' component={ETLWalkthrough} />
             <Route path='templates/edit/new' component={ETLEditorPage} />

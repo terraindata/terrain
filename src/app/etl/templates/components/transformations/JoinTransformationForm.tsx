@@ -118,6 +118,7 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
     return (
       <FieldPicker
         selectedIds={this.state.otherFieldIds}
+        labelText={'Field to Join'}
         onChange={this._setStateWrapper('otherFieldIds')}
         engine={engine}
         availableFields={this.computeAvailableFields(fieldId)}

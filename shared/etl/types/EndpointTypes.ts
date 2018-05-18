@@ -53,6 +53,7 @@ export interface FileConfig
   hasCsvHeader?: boolean;
   jsonNewlines?: boolean;
   xmlPath?: string;
+  jsonPath?: string;
 }
 
 export enum Sources
@@ -76,11 +77,27 @@ export enum Sinks
   Fs = 'Fs',
 }
 
+export const EndpointTypeNames =
+  {
+    Upload: 'Upload',
+    Download: 'Download',
+    Algorithm: 'Algorithm',
+    Database: 'Database',
+    Sftp: 'SFTP',
+    Http: 'HTTP',
+    Fs: 'File System',
+    Mysql: 'MySQL',
+    Postgresql: 'PostgreSQL',
+    Magento: 'Magento',
+    GoogleAPI: 'Google API',
+    Mailchimp: 'MailChimp',
+  };
+
 export const SchedulableSinks: Sinks[] =
   [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs];
 
 export const SchedulableSources: Sources[] =
-  [Sources.Algorithm, Sources.Sftp, Sources.GoogleAnalytics, Sources.Http, Sources.Fs];
+  [Sources.Algorithm, Sources.Sftp, Sources.GoogleAnalytics, Sources.Http, Sources.Fs, Sources.Mysql, Sources.Postgresql];
 
 export interface SourceConfig
 {
@@ -124,19 +141,18 @@ export interface SourceOptionsTypes // TODO check that these are right
   Sftp: SftpOptions;
   GoogleAnalytics: GoogleAnalyticsOptions;
   Http: HttpOptions;
-  Fs: {
-    path: string;
-  };
+  Fs: {};
   Mysql: SQLOptions;
   Postgresql: SQLOptions;
 }
 
 export interface PostProcessTransformConfig
 {
-  type: PostProcessTransformOptionTypes;
+  type: PostProcessTransformTypes;
+  options: PostProcessTransformOptionsType<PostProcessTransformTypes>;
 }
 
-export interface PostProcessTransformOptionTypes
+export interface PostProcessTransformOptionsTypes
 {
   Aggregate: {
     fields: string[];
@@ -172,13 +188,11 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
     Http: {
       method: 'GET',
       headers: {
-        accept: '',
         contentType: 'application/json',
       },
+      params: {},
     },
-    Fs: {
-      path: '',
-    },
+    Fs: {},
     Mysql: {
     },
     Postgresql: {
@@ -198,9 +212,7 @@ export interface SinkOptionsTypes
   };
   Sftp: SftpOptions;
   Http: HttpOptions;
-  Fs: {
-    path: string;
-  };
+  Fs: {};
 }
 
 export const SinkOptionsDefaults: SinkOptionsTypes =
@@ -221,13 +233,11 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
     Http: {
       method: 'POST',
       headers: {
-        accept: '',
         contentType: 'application/json',
       },
+      params: {},
     },
-    Fs: {
-      path: '',
-    },
+    Fs: {},
   };
 
 export interface SftpOptions
@@ -240,15 +250,19 @@ export interface SftpOptions
 export interface GoogleAnalyticsOptions
 {
   dayInterval: number;
-  transformations?: PostProcessTransformTypes[];
+  transformations?: PostProcessTransformConfig[];
 }
 
 export interface HttpOptions
 {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   headers: {
-    accept: string;
-    contentType: string;
+    contentType?: string;
+    accept?: string;
+    [k: string]: any;
+  };
+  params: {
+    [k: string]: any;
   };
 }
 

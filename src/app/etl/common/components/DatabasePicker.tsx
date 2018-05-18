@@ -102,20 +102,21 @@ class DatabasePicker extends TerrainComponent<Props>
       },
       database: {
         type: DisplayType.TextBox,
-        displayName: 'Database',
+        displayName: 'ES Index',
         getDisplayState: this.getDisplayStateBoxes,
         options: {
           acOptions: this.getDatabaseOptions,
         },
       },
-      table: {
-        type: DisplayType.TextBox,
-        displayName: 'Table',
-        getDisplayState: this.getDisplayStateBoxes,
-        options: {
-          acOptions: this.getTableOptions,
-        },
-      },
+      // Hide selector for Table (ES Type) picker, as we don't want to use it
+      // table: {
+      //   type: DisplayType.TextBox,
+      //   displayName: 'Table',
+      //   getDisplayState: this.getDisplayStateBoxes,
+      //   options: {
+      //     acOptions: this.getTableOptions,
+      //   },
+      // },
     };
   }
 
@@ -126,9 +127,13 @@ class DatabasePicker extends TerrainComponent<Props>
     {
       return 'Database name cannot be empty.';
     }
-    if (db.search(/[^a-z0-9]/) !== -1)
+    if (db.search(/[^a-z0-9\-\_]/) !== -1 && db.substr(0, 1) !== '-')
     {
-      return 'Invalid database name. Name should be composed of lowercase letters or numbers';
+      return 'Invalid database name. You must use lowercase letters, numbers, - and _.';
+    }
+    if (db[0] === '_' || db[0] === '-')
+    {
+      return 'Invalid database name. Database name cannot start with - or _.';
     }
     const table = state.table;
     if (table === '')
@@ -257,7 +262,7 @@ class DatabasePicker extends TerrainComponent<Props>
   }
 }
 
-const minHeight = '175px';
+const minHeight = '120px';
 
 export default Util.createTypedContainer(
   DatabasePicker,

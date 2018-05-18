@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
-
 import TerrainComponent from 'common/components/TerrainComponent';
+import { Map } from 'immutable';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
@@ -54,13 +54,13 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { Menu, MenuOption } from 'common/components/Menu';
 import Modal from 'common/components/Modal';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import GraphHelpers from 'etl/helpers/GraphHelpers';
 import TemplateList from 'etl/templates/components/TemplateList';
 import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
+import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
@@ -70,31 +70,21 @@ const { List } = Immutable;
 export interface Props
 {
   // below from container
-  templateEditor?: TemplateEditorState;
+  fieldMap?: Map<ID, TemplateField>;
   editorAct?: typeof TemplateEditorActions;
 }
 
 @Radium
 class EditorColumnActionsSection extends TerrainComponent<Props>
 {
-  public selectedFieldMenuOptions = List([
-    {
-      text: 'Disable Selected',
-      onClick: this.handleDisableSelected,
-    },
-    {
-      text: 'Enable Selected',
-      onClick: this.handleEnableSelected,
-    },
-    {
-      text: 'Clear Selections',
-      onClick: this.handleRemoveSelections,
-    },
-  ]);
+
+  public shouldComponentUpdate(nextProps, nextState)
+  {
+    return this.props !== nextProps;
+  }
 
   public render()
   {
-    const { checkedFields } = this.props.templateEditor.uiState;
     return (
       <div className='template-editor-title-bar-actions'>
         <div
@@ -113,81 +103,26 @@ class EditorColumnActionsSection extends TerrainComponent<Props>
         >
           Select None
         </div>
-        {
-          checkedFields !== null ?
-            <div
-              key='num-selected'
-              className='title-bar-action'
-              style={{ cursor: 'default' }}
-            >
-              {checkedFields !== null ? `${this.numFieldsSelected(checkedFields)} fields selected` : ''}
-            </div>
-            :
-            <div
-              key='num-selected'
-              className='title-bar-action'
-            />
-        }
-        {
-          checkedFields !== null ?
-            <div
-              key='menu-options'
-              className='title-bar-menu-wrapper'
-            >
-              <Menu
-                options={this.selectedFieldMenuOptions}
-                small={true}
-                openRight={true}
-              />
-            </div>
-            :
-            <div
-              key='menu-options'
-            />
-        }
+        <div
+          key='num-selected'
+          className='title-bar-action'
+          style={{ cursor: 'default' }}
+        >
+          {`${this.numFieldsSelected()} fields selected`}
+        </div>
       </div>
     );
   }
 
-  @instanceFnDecorator(memoizeOne)
-  public numFieldsSelected(checkedFields: Immutable.Map<number, boolean>)
+  public numFieldsSelected()
   {
-    return checkedFields.count((isChecked) => isChecked === true);
+    return this.props.fieldMap.count((field) =>
+    {
+      return field.isIncluded;
+    });
   }
 
   public handleSelectAll()
-  {
-    const { editorAct, templateEditor } = this.props;
-    const { fieldMap } = templateEditor;
-
-    const checkedFields = Immutable.Map<number, boolean>().withMutations((fields) =>
-    {
-      fieldMap.forEach((field, id) =>
-      {
-        if (field.canEditField())
-        {
-          fields.set(id, true);
-        }
-      });
-    });
-
-    editorAct({
-      actionType: 'setDisplayState',
-      state: {
-        checkedFields,
-      },
-    });
-  }
-
-  public handleDisableSelected()
-  {
-    this.mutateCheckedFields((proxy, id) =>
-    {
-      proxy.setFieldEnabled(id, false);
-    });
-  }
-
-  public handleEnableSelected()
   {
     this.mutateCheckedFields((proxy, id) =>
     {
@@ -197,39 +132,21 @@ class EditorColumnActionsSection extends TerrainComponent<Props>
 
   public handleSelectNone()
   {
-    this.props.editorAct({
-      actionType: 'setDisplayState',
-      state: {
-        checkedFields: Immutable.Map<number, boolean>(),
-      },
-    });
-  }
-
-  public handleRemoveSelections()
-  {
-    this.props.editorAct({
-      actionType: 'setDisplayState',
-      state: {
-        checkedFields: null,
-      },
+    this.mutateCheckedFields((proxy, id) =>
+    {
+      proxy.setFieldEnabled(id, false);
     });
   }
 
   private mutateCheckedFields(fn: (proxy: EngineProxy, id: number) => void)
   {
-    const { checkedFields } = this.props.templateEditor.uiState;
+    const { fieldMap } = this.props;
     GraphHelpers.mutateEngine((proxy) =>
     {
-      if (checkedFields !== null)
+      fieldMap.forEach((field, id) =>
       {
-        checkedFields.forEach((isChecked, id) =>
-        {
-          if (isChecked)
-          {
-            fn(proxy, id);
-          }
-        });
-      }
+        fn(proxy, Number(id));
+      });
     }).then((structural) =>
     {
       this.props.editorAct({
@@ -251,7 +168,7 @@ class EditorColumnActionsSection extends TerrainComponent<Props>
 
 export default Util.createContainer(
   EditorColumnActionsSection,
-  ['templateEditor'],
+  [['templateEditor', 'fieldMap']],
   {
     editorAct: TemplateEditorActions,
   },

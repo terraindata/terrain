@@ -327,9 +327,11 @@ class ETLEditorPage extends TerrainComponent<Props>
     return (
       <div
         className='template-display-wrapper'
-        style={[fontColor(Colors().text1)]}
+        style={[
+          fontColor(Colors().text1),
+          backgroundColor(Colors().blockBg),
+        ]}
       >
-        <div className='export-display-logo-bg' />
         <TemplateEditor
           onSave={this.saveTemplate}
           onSwitchTemplate={this.switchTemplate}

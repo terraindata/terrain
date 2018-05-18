@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 import * as winston from 'winston';
 import * as Tasty from '../tasty/Tasty';
@@ -131,7 +131,7 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
     (id ` + primaryKeyType + ` PRIMARY KEY,
      createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
      createdBy integer,
-     endTime date,
+     endTime ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
      logId integer,
      meta text NOT NULL,
      name text NOT NULL,
@@ -140,12 +140,12 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      running bool NOT NULL,
      runNowPriority integer NOT NULL,
      scheduleId integer,
-     startTime date,
+     startTime ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
      status text NOT NULL,
      tasks text NOT NULL,
      type text NOT NULL,
      workerId integer NOT NULL);`,
-   `CREATE TABLE IF NOT EXISTS jobLogs
+  `CREATE TABLE IF NOT EXISTS jobLogs
     (id integer PRIMARY KEY,
      createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
      contents text);`,

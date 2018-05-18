@@ -87,6 +87,7 @@ export interface ETLActionTypes
   };
   createExecuteJob: {
     actionType: 'createExecuteJob';
+    templateName: string;
     onLoad: (id: number) => void;
     onError: (ev: any) => void;
   };
@@ -346,7 +347,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       key: name,
     });
 
-    ETLAjax.createExecuteJob()
+    ETLAjax.createExecuteJob(action.templateName)
       .then(this.onLoadFactory([action.onLoad], directDispatch, name))
       .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }

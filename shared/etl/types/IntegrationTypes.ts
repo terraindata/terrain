@@ -57,6 +57,18 @@ export enum Integrations
   Mailchimp = 'Mailchimp',
 }
 
+export const IntegrationNames =
+  {
+    Sftp: 'SFTP',
+    Http: 'HTTP',
+    Fs: 'File System',
+    Mysql: 'MySQL',
+    Postgresql: 'PostgreSQL',
+    Magento: 'Magento',
+    GoogleAnalytics: 'Google Analytics',
+    Mailchimp: 'MailChimp',
+  };
+
 export interface IntegrationConfigBase
 {
   id?: number;
@@ -79,9 +91,7 @@ export interface AuthConfigTypes
   Http: {
     jwt: string;
   };
-  Fs: {
-    user: string;
-  };
+  Fs: {};
   Mysql: {
     password: string;
   };
@@ -108,7 +118,9 @@ export interface ConnectionConfigTypes
   Http: {
     url: string;
   };
-  Fs: {};
+  Fs: {
+    path: string;
+  };
   Mysql: {
     user: string;
     host: string;

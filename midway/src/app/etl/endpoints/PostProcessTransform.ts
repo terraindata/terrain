@@ -44,6 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import * as _ from 'lodash';
+import * as winston from 'winston';
+
 import { PostProcessTransformConfig, PostProcessTransformOptionsTypes } from '../../../../../shared/etl/types/EndpointTypes';
 
 export class PostProcessTransform
@@ -68,7 +71,7 @@ export class PostProcessTransform
         switch (transformConfig.type)
         {
           case 'Aggregate':
-            processedData = this._aggregate(transformConfig.options as PostProcessTransformOptionsTypes, processedData);
+            processedData = this._aggregate(transformConfig.options, processedData);
             break;
           default:
             break;
@@ -82,19 +85,19 @@ export class PostProcessTransform
     return processedData;
   }
 
-  private _aggregate(options: PostProcessTransformOptionsTypes, data: object[]): object[]
+  private _aggregate(options: object, data: object[]): object[]
   {
-    const patternRegExp = new RegExp(options.pattern);
-    const patternRegExpFull = new RegExp(options.pattern as string + '.*');
-    const aggParams: string[] = options.fields;
+    const patternRegExp = new RegExp(options['pattern']);
+    const patternRegExpFull = new RegExp(options['pattern'] as string + '.*');
+    const aggParams: string[] = options['fields'];
     const newDataDict: object = {};
     // step 1
     data.forEach((row) =>
     {
-      if (patternRegExpFull.test(row[options.primaryKeyName]))
+      if (patternRegExpFull.test(row[options['primaryKeyName']]))
       {
-        const extractedPrimaryKey: string = row[options.primaryKeyName]
-          .replace(row[options.primaryKeyName].replace(patternRegExp, ''), '');
+        const extractedPrimaryKey: string = row[options['primaryKeyName']]
+          .replace(row[options['primaryKeyName']].replace(patternRegExp, ''), '');
         if (newDataDict[extractedPrimaryKey] === undefined)
         {
           newDataDict[extractedPrimaryKey] = [];
@@ -111,16 +114,15 @@ export class PostProcessTransform
         const nDDValue: object = _.cloneDeep(newDataDict[nDDKey][0]);
         for (let i = 1; i < newDataDict[nDDKey].length; ++i)
         {
-          options.fields.forEach((aggField) =>
+          options['fields'].forEach((aggField) =>
           {
             nDDValue[aggField] = parseFloat(nDDValue[aggField]) + parseFloat(newDataDict[nDDKey][i][aggField]);
           });
         }
-        nDDValue[options.primaryKeyName] = nDDKey;
+        nDDValue[options['primaryKeyName']] = nDDKey;
         returnData.push(nDDValue);
       }
     });
-    newData = returnData.slice(0);
-    return newData;
+    return returnData;
   }
 }

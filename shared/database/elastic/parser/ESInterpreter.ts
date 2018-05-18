@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 import ESParameterFiller from 'shared/database/elastic/parser/EQLParameterFiller';
 import CardsToCodeOptions from 'shared/database/types/CardsToCodeOptions';
@@ -235,13 +235,13 @@ export default class ESInterpreter
     return this.getInterpretingErrorMessages().concat(this.parser.getErrorMessages());
   }
 
-  public toCode(options: CardsToCodeOptions)
+  public toCode(options: CardsToCodeOptions): string
   {
-    let queryObj = this.rootValueInfo.value;
+    let query = this.rootValueInfo.value;
     if (options.replaceInputs === true)
     {
-      queryObj = ESParameterFiller.generate(this.rootValueInfo, this.params);
+      query = ESParameterFiller.generate(this.rootValueInfo, this.params);
     }
-    return JSON.stringify(queryObj);
+    return query;
   }
 }

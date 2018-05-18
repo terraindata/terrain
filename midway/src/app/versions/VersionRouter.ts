@@ -42,8 +42,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
+import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 import { Versions } from './Versions';
@@ -52,14 +53,14 @@ export * from './Versions';
 const Router = new KoaRouter();
 export const versions: Versions = new Versions();
 
-Router.get('/', async (ctx, next) =>
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   // return all versions
   winston.info('get all versions');
   ctx.body = await versions.get();
 });
 
-Router.get('/:objtype/:id', async (ctx, next) =>
+Router.get('/:objtype/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('get versions by object type and id');
   ctx.body = await versions.get(ctx.params.objtype, ctx.params.id);
