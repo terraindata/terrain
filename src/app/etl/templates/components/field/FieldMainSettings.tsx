@@ -65,7 +65,7 @@ import
   TemplateField,
 } from 'etl/templates/FieldTypes';
 import LanguageUI from 'etl/templates/languages/LanguageUI';
-import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, etlFieldTypesList, etlFieldTypesNames, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './FieldSettings.less';
@@ -76,7 +76,7 @@ interface SettingsState
 {
   fieldName: string;
   isIncluded: boolean;
-  type: FieldTypes;
+  type: ETLFieldTypes;
 }
 
 @Radium
@@ -96,9 +96,9 @@ class FieldMainSettings extends TemplateEditorField<Props>
       type: DisplayType.Pick,
       displayName: 'Field Type',
       options: {
-        pickOptions: (s: SettingsState) => typeOptions,
-        indexResolver: (value) => typeOptions.indexOf(value),
-        displayNames: this.computeDisplayNames,
+        pickOptions: (s) => etlFieldTypesList,
+        indexResolver: (value) => etlFieldTypesList.indexOf(value),
+        displayNames: (s) => etlFieldTypesNames,
       },
     },
     isIncluded: {
@@ -125,12 +125,6 @@ class FieldMainSettings extends TemplateEditorField<Props>
     }
   }
 
-  public computeDisplayNames(s: SettingsState)
-  {
-    return LanguageUI.get(this._getCurrentLanguage())
-      .overrideTypeNames(this._currentEngine(), this.props.fieldId, displayOptions);
-  }
-
   public getFieldNameDisplayState(s: SettingsState)
   {
     return this._field().canEditName() ? DisplayState.Active : DisplayState.Hidden;
@@ -142,7 +136,7 @@ class FieldMainSettings extends TemplateEditorField<Props>
     return {
       fieldName: field.name,
       isIncluded: field.isIncluded,
-      type: field.representedType(),
+      type: field.etlType,
     };
   }
 
@@ -190,7 +184,7 @@ class FieldMainSettings extends TemplateEditorField<Props>
       {
         proxy.changeName(formState.fieldName);
       }
-      if (field.representedType() !== formState.type)
+      if (field.etlType !== formState.type)
       {
         proxy.changeType(formState.type);
       }
@@ -204,15 +198,6 @@ class FieldMainSettings extends TemplateEditorField<Props>
     });
   }
 }
-
-const typeOptions = List(['array', 'object', 'string', 'number', 'boolean']);
-const displayOptions = Map({
-  array: 'array',
-  object: 'nested',
-  string: 'text',
-  number: 'number',
-  boolean: 'boolean',
-});
 
 export default Util.createTypedContainer(
   FieldMainSettings,

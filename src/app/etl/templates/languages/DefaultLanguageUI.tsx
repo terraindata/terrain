@@ -66,11 +66,6 @@ class DefaultUI implements LanguageInterface
   {
     return false;
   }
-
-  public overrideTypeNames(engine: TransformationEngine, fieldId: number, displayOptions: Immutable.Map<string, string>)
-  {
-    return displayOptions;
-  }
 }
 
 export default new DefaultUI();

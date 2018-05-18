@@ -66,8 +66,8 @@ import
   _TemplateField,
   TemplateField,
 } from 'etl/templates/FieldTypes';
-import { defaultProps, ElasticFieldProps, ElasticTypes, JsToElasticOptions } from 'shared/etl/types/ETLElasticTypes';
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { defaultProps, ElasticFieldProps, ElasticTypes, ETLToElasticOptions } from 'shared/etl/types/ETLElasticTypes';
+import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './FieldSettings.less';
@@ -143,19 +143,19 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
   }
 
   @instanceFnDecorator(memoizeOne)
-  public _getTypeOptions(jsType: FieldTypes): List<string>
+  public _getTypeOptions(etlType: ETLFieldTypes): List<string>
   {
-    return List(JsToElasticOptions[jsType]);
+    return List(ETLToElasticOptions[etlType]);
   }
 
   public getTypeOptions()
   {
-    return this._getTypeOptions(this._field().representedType());
+    return this._getTypeOptions(this._field().etlType);
   }
 
   public resolveTypeIndex(option)
   {
-    return JsToElasticOptions[this._field().representedType()].indexOf(option);
+    return ETLToElasticOptions[this._field().etlType].indexOf(option);
   }
 
   @instanceFnDecorator(memoizeOne)
