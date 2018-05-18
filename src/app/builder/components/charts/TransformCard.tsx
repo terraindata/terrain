@@ -64,6 +64,9 @@ import TransformCardPeriscope from './TransformCardPeriscope';
 
 import { BuilderState } from 'app/builder/data/BuilderState';
 import Util from 'app/util/Util';
+import PathfinderText from 'builder/components/pathfinder/PathfinderText';
+import FadeInOut from 'common/components/FadeInOut';
+import Switch from 'common/components/Switch';
 import { ElasticQueryResult } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import { MidwayError } from '../../../../../shared/error/MidwayError';
 import { isInput } from '../../../../blocks/types/Input';
@@ -300,6 +303,25 @@ class TransformCard extends TerrainComponent<Props>
           language={this.props.language}
           colors={this.props.data.static.colors}
         />
+        <FadeInOut
+          open={this.canAutoBound()}
+        >
+          <div className='flex-container-left transform-card-options'>
+            <Switch
+              first={'Auto-Bound'}
+              second={'Fixed'}
+              selected={data.autoBound ? 1 : 0}
+              onChange={this.handleAutoBoundChange}
+              darker={true}
+              longer={true}
+            />
+            <div className='small-font'>
+              {
+                data.autoBound ? PathfinderText.autoBoundOn : PathfinderText.autoBoundOff
+              }
+            </div>
+          </div>
+        </FadeInOut>
       </div>
     );
   }
@@ -313,6 +335,9 @@ class TransformCard extends TerrainComponent<Props>
       // TODO: show an error message about the wrong domain values.
       return curStateDomain;
     }
+    // const diff = (high - low) * 0.05;
+    // low -= diff;
+    // high += diff;
     return List([low, high]);
   }
 
@@ -390,6 +415,7 @@ class TransformCard extends TerrainComponent<Props>
 
   private handleElasticDomainAggregationResponse(resp: MidwayQueryResponse)
   {
+    const { data, keyPath } = this.props;
     this.setState({
       domainAggregationAjax: {
         xhr: null,
@@ -406,9 +432,37 @@ class TransformCard extends TerrainComponent<Props>
       chartDomain: newDomain,
       maxDomain: newDomain,
     });
-    this.props.onChange(this._ikeyPath(this.props.keyPath, 'domain'), newDomain, true);
-    this.props.onChange(this._ikeyPath(this.props.keyPath, 'dataDomain'), newDomain, true);
-    this.computeBars(this.props.data.input, this.state.maxDomain);
+
+    if (data.autoBound && this.canAutoBound())
+    {
+      // adjust to new bounds
+      const max = newDomain.get(1);
+      const min = newDomain.get(0);
+      const oldMax = data.dataDomain.get(1);
+      const oldMin = data.dataDomain.get(0);
+
+      if (max - min > 0 && oldMax - oldMin > 0) // prevent divide-by-zero
+      {
+        const ratio = (max - min) / (oldMax - oldMin);
+        const offset = min - oldMin; // correct for nonzero mins
+
+        if (
+          !isNaN(ratio) && !isNaN(offset) && isFinite(ratio) &&
+          (ratio !== 1 || offset !== 0) // no point
+        )
+        {
+          const points = data.scorePoints.map(
+            (point) => point.set('value', (point.value - oldMin) * ratio + min),
+          ).toList();
+
+          this.handleUpdatePoints(points, true);
+        }
+      }
+    }
+
+    this.props.onChange(this._ikeyPath(keyPath, 'domain'), newDomain, true);
+    this.props.onChange(this._ikeyPath(keyPath, 'dataDomain'), newDomain, true);
+    this.computeBars(data.input, this.state.maxDomain);
   }
 
   // TODO move the bars computation to a higher level
@@ -552,6 +606,7 @@ class TransformCard extends TerrainComponent<Props>
           },
         };
       }
+
       const domainAggregationAjax = Ajax.query(
         JSON.stringify(domainQuery),
         db,
@@ -844,6 +899,18 @@ class TransformCard extends TerrainComponent<Props>
     this.setState({
       bars: List([]), // no can do get bars sadly, need to figure it out one day
     });
+  }
+
+  private canAutoBound()
+  {
+    return this.props.data.mode === 'linear';
+  }
+
+  private handleAutoBoundChange(selected: 0 | 1)
+  {
+    this.props.onChange(
+      this._ikeyPath(this.props.keyPath, 'autoBound'), selected === 1,
+      true);
   }
 }
 
