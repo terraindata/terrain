@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // import * as winston from 'winston';
 import aesjs = require('aes-js');
+import dateFormat = require('date-format');
 import * as Immutable from 'immutable';
 import { keccak256 } from 'js-sha3';
 
@@ -545,6 +546,17 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
           }
           case 'array': {
             yadeep.set(doc, f, []);
+            break;
+          }
+          case 'date': {
+            if (opts.format === 'ISOstring')
+            {
+              yadeep.set(doc, f, new Date(el).toISOString());
+            }
+            else if (opts.format === 'MMDDYYYY')
+            {
+              yadeep.set(doc, f, dateFormat('MM/dd/yyyy', new Date(el)));
+            }
             break;
           }
           default: {
