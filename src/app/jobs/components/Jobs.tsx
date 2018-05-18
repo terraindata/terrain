@@ -102,10 +102,16 @@ class Jobs extends TerrainComponent<any> {
 
   public calculateJobDuration(job)
   {
-    const startMoment = Util.moment(job.startTime);
-    const endMoment = Util.moment(job.endTime);
+    let duration = '';
+    if (job.endTime !== null)
+    {
+      const startMoment = Util.moment(job.startTime);
+      const endMoment = Util.moment(job.endTime);
 
-    return endMoment.preciseDiff(startMoment);
+      duration = endMoment.preciseDiff(startMoment);
+    }
+
+    return duration;
   }
 
   public getStatusColor(status)
