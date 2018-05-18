@@ -61,7 +61,7 @@ import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, Source
 import { EndpointTypeNames, SchedulableSinks, SchedulableSources, Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
-import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormClasses';
+import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormLookups';
 
 import FadeInOut from 'app/common/components/FadeInOut';
 import IntegrationForm from 'etl/common/components/IntegrationForm';

@@ -59,7 +59,7 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 
 import EndpointForm from 'etl/common/components/EndpointForm';
-import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormClasses';
+import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormLookups';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { getFileType } from 'shared/etl/FileUtil';
