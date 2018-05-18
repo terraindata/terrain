@@ -47,7 +47,7 @@ THE SOFTWARE.
 
 import * as _ from 'lodash';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
-import { FieldTypes, ETLFieldTypes } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 
 export default class TypeUtil
 {

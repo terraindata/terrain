@@ -60,8 +60,8 @@ import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords'
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
 const hiddenPath = List(['uiState', 'hidden']);
 export function createTreeFromEngine(engine: TransformationEngine): FieldMap

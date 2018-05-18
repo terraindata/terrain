@@ -50,7 +50,7 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
 import { postorderForEach, preorderForEach } from 'etl/templates/SyncUtil';
-import { FieldTypes, ETLFieldTypes, Languages, getJSFromETL } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, FieldTypes, getJSFromETL, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
@@ -216,7 +216,7 @@ export class EngineProxy
     let newId: number;
     if (type === ETLFieldTypes.Array)
     {
-      newId = this.addFieldToEngine(keypath, type, valueType)
+      newId = this.addFieldToEngine(keypath, type, valueType);
       const wildId = this.addFieldToEngine(keypath.push('*'), ETLFieldTypes.Array, valueType);
       EngineUtil.castField(this.engine, wildId, getJSFromETL(valueType));
     }
@@ -266,7 +266,7 @@ export class EngineProxy
   private addFieldToEngine(
     keypath: List<string>,
     etlType: ETLFieldTypes,
-    valueType?: ETLFieldTypes
+    valueType?: ETLFieldTypes,
   ): number
   {
     return EngineUtil.addFieldToEngine(this.engine, keypath, etlType, valueType);

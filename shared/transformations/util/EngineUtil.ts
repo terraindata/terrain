@@ -48,7 +48,7 @@ import * as _ from 'lodash';
 
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
-import { ETLFieldTypes, FieldTypes, JSToETLType, Languages, validJSTypes, getJSFromETL } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, FieldTypes, getJSFromETL, JSToETLType, Languages, validJSTypes, ETLToJSType } from 'shared/etl/types/ETLTypes';
 import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -78,7 +78,7 @@ export default class EngineUtil
    */
   public static verifyIntegrity(engine: TransformationEngine)
   {
-    const errors = [];
+    let errors = [];
     try
     {
       const fields = engine.getAllFieldIDs();
@@ -127,10 +127,10 @@ export default class EngineUtil
             errors.push(`Field ${okp.toJS()} is not of type array, but has name '*'. This is not allowed`);
           }
         }
-        const fieldType = engine.getFieldType(id);
-        if (!EngineUtil.fieldHasValidType(engine, id))
+        const fieldTypeErrors = EngineUtil.fieldHasValidType(engine, id);
+        if (fieldTypeErrors.length > 0)
         {
-          errors.push(`Field ${okp.toJS()} has an invalid type: ${fieldType}`);
+          errors = errors.concat(fieldTypeErrors);
         }
       });
     }
@@ -142,19 +142,26 @@ export default class EngineUtil
   }
 
   // check to make sure the field's types exist and if its an array that it has a valid valueType
-  public static fieldHasValidType(engine: TransformationEngine, id: number)
+  public static fieldHasValidType(engine: TransformationEngine, id: number): string[]
   {
     const fieldType = engine.getFieldType(id) as FieldTypes;
+    const etlType = EngineUtil.getETLFieldType(id, engine);
     const valueType = engine.getFieldProp(id, valueTypeKeyPath) as FieldTypes;
     if (validJSTypes.indexOf(fieldType) === -1)
     {
-      return false;
+      return [`Field Type ${fieldType} is not a valid js type`];
     }
     if (fieldType === 'array' && validJSTypes.indexOf(valueType) === -1)
     {
-      return false;
+      return [`Field Type is an Array, but valueType: ${valueType} is invalid.`];
     }
-    return true;
+
+    const jsType = EngineUtil.getRepresentedType(id, engine);
+    if (ETLToJSType[etlType].indexOf(jsType) === -1)
+    {
+      return [`Field JS Type and ETL Type are Incompatible. ${fieldType} is incompatible with ${etlType}`];
+    }
+    return [];
   }
 
   // get all fields that are computed from this field

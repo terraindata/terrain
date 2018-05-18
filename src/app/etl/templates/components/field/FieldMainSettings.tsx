@@ -65,7 +65,7 @@ import
   TemplateField,
 } from 'etl/templates/FieldTypes';
 import LanguageUI from 'etl/templates/languages/LanguageUI';
-import { FieldTypes, ETLFieldTypes, etlFieldTypesList, etlFieldTypesNames } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, etlFieldTypesList, etlFieldTypesNames, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './FieldSettings.less';

@@ -137,26 +137,26 @@ export const etlFieldTypesNames = Immutable.Map<string, string>({
 export const JSToETLType: {
   [k in FieldTypes]: ETLFieldTypes;
 } = {
-  array: ETLFieldTypes.Array,
-  object: ETLFieldTypes.Object,
-  string: ETLFieldTypes.String,
-  number: ETLFieldTypes.Number,
-  boolean: ETLFieldTypes.Boolean,
-};
+    array: ETLFieldTypes.Array,
+    object: ETLFieldTypes.Object,
+    string: ETLFieldTypes.String,
+    number: ETLFieldTypes.Number,
+    boolean: ETLFieldTypes.Boolean,
+  };
 
 // its an array because geo point could eventually also be a string
 export const ETLToJSType: {
   [k in ETLFieldTypes]: FieldTypes[]
 } = {
-  [ETLFieldTypes.Array]: ['array'],
-  [ETLFieldTypes.Object]: ['object'],
-  [ETLFieldTypes.String]: ['string'],
-  [ETLFieldTypes.Number]: ['number'],
-  [ETLFieldTypes.Boolean]: ['boolean'],
-  [ETLFieldTypes.Date]: ['string'],
-  [ETLFieldTypes.Integer]: ['number'],
-  [ETLFieldTypes.GeoPoint]: ['object'],
-};
+    [ETLFieldTypes.Array]: ['array'],
+    [ETLFieldTypes.Object]: ['object'],
+    [ETLFieldTypes.String]: ['string'],
+    [ETLFieldTypes.Number]: ['number'],
+    [ETLFieldTypes.Boolean]: ['boolean'],
+    [ETLFieldTypes.Date]: ['string'],
+    [ETLFieldTypes.Integer]: ['number'],
+    [ETLFieldTypes.GeoPoint]: ['object'],
+  };
 
 export function getJSFromETL(type: ETLFieldTypes): FieldTypes
 {

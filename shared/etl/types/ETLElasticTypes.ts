@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 import * as _ from 'lodash';
-import { FieldTypes, ETLFieldTypes } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 // string values for this enum are how elastic expects them
 
 export enum ElasticTypes
@@ -116,15 +116,15 @@ export const JsAutoMap: {
 export const FieldTypeAutoMap: {
   [k in ETLFieldTypes]: ElasticTypes
 } = {
-  [ETLFieldTypes.Array]: ElasticTypes.Array,
-  [ETLFieldTypes.Object]: ElasticTypes.Nested,
-  [ETLFieldTypes.String]: ElasticTypes.Text,
-  [ETLFieldTypes.Number]: ElasticTypes.Double,
-  [ETLFieldTypes.Boolean]: ElasticTypes.Boolean,
-  [ETLFieldTypes.Date]: ElasticTypes.Date,
-  [ETLFieldTypes.Integer]: ElasticTypes.Integer,
-  [ETLFieldTypes.GeoPoint]: ElasticTypes.GeoPoint,
-};
+    [ETLFieldTypes.Array]: ElasticTypes.Array,
+    [ETLFieldTypes.Object]: ElasticTypes.Nested,
+    [ETLFieldTypes.String]: ElasticTypes.Text,
+    [ETLFieldTypes.Number]: ElasticTypes.Double,
+    [ETLFieldTypes.Boolean]: ElasticTypes.Boolean,
+    [ETLFieldTypes.Date]: ElasticTypes.Date,
+    [ETLFieldTypes.Integer]: ElasticTypes.Integer,
+    [ETLFieldTypes.GeoPoint]: ElasticTypes.GeoPoint,
+  };
 
 export function typeToElastic(type: ETLFieldTypes): ElasticTypes
 {

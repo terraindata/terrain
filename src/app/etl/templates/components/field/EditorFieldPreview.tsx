@@ -57,11 +57,11 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { FieldTypes, ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 import Menu from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import LanguageUI from 'etl/templates/languages/LanguageUI';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
@@ -378,15 +378,15 @@ const BooleanTypeIcon = require('./../../../../../images/icon_type_boolean.svg?n
 const typeToIcon: {
   [k in ETLFieldTypes]: any;
 } = {
-  [ETLFieldTypes.String]: TextTypeIcon,
-  [ETLFieldTypes.Object]: ObjectTypeIcon,
-  [ETLFieldTypes.Number]: NumberTypeIcon,
-  [ETLFieldTypes.Integer]: NumberTypeIcon,
-  [ETLFieldTypes.Boolean]: BooleanTypeIcon,
-  [ETLFieldTypes.Array]: ArrayTypeIcon,
-  [ETLFieldTypes.Date]: DateTypeIcon,
-  [ETLFieldTypes.GeoPoint]: GeoTypeIcon,
-};
+    [ETLFieldTypes.String]: TextTypeIcon,
+    [ETLFieldTypes.Object]: ObjectTypeIcon,
+    [ETLFieldTypes.Number]: NumberTypeIcon,
+    [ETLFieldTypes.Integer]: NumberTypeIcon,
+    [ETLFieldTypes.Boolean]: BooleanTypeIcon,
+    [ETLFieldTypes.Array]: ArrayTypeIcon,
+    [ETLFieldTypes.Date]: DateTypeIcon,
+    [ETLFieldTypes.GeoPoint]: GeoTypeIcon,
+  };
 
 const emptyOptions = List([]);
 
