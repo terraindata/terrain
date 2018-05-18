@@ -92,13 +92,13 @@ export default class HTTPEndpoint extends AEndpointStream
       }
 
       request({
-          url: httpConfig['url'],
-          method: httpConfig['method'],
-          gzip: httpConfig['gzip'] !== undefined ? httpConfig['gzip'] : false,
-          headers,
-          qs: (httpConfig['method'] === 'GET') ? httpConfig['params'] : undefined,
-          body: (httpConfig['method'] !== 'GET') ? httpConfig['params'] : undefined,
-        })
+        url: httpConfig['url'],
+        method: httpConfig['method'],
+        gzip: httpConfig['gzip'] !== undefined ? httpConfig['gzip'] : false,
+        headers,
+        qs: (httpConfig['method'] === 'GET') ? httpConfig['params'] : undefined,
+        body: (httpConfig['method'] !== 'GET') ? httpConfig['params'] : undefined,
+      })
         .on('error', (err) =>
         {
           if (err !== null && err !== undefined)

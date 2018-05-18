@@ -199,6 +199,10 @@ class HttpForm extends IntegrationFormBase<HttpAuthT, HttpConnectionT>
         render: this.renderParamsForm,
       },
     },
+    gzip: {
+      type: DisplayType.CheckBox,
+      displayName: 'gzip',
+    },
   };
 
   public defaultState = {
