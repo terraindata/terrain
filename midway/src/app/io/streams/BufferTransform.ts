@@ -87,7 +87,11 @@ export default class BufferTransform
       }
     });
 
-    this.stream.on('error', callback);
+    this.stream.on('error', (e) =>
+    {
+      e['logs'] = this.arr;
+      callback(e, null);
+    });
   }
 
   private onEvent(err: any): void

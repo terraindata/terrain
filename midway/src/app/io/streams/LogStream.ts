@@ -124,6 +124,7 @@ export default class LogStream extends Readable
 
       if (this.errorCount >= this.abortThreshold)
       {
+        this.log(e.toString());
         this.drainLog();
         this.emit('error', e);
         stream.destroy(e);
