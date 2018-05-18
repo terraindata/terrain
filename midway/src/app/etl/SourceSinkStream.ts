@@ -70,6 +70,7 @@ import AEndpointStream from './endpoints/AEndpointStream';
 import AlgorithmEndpoint from './endpoints/AlgorithmEndpoint';
 import ElasticEndpoint from './endpoints/ElasticEndpoint';
 import FSEndpoint from './endpoints/FSEndpoint';
+import GoogleAnalyticsEndpoint from './endpoints/GoogleAnalyticsEndpoint';
 import HTTPEndpoint from './endpoints/HTTPEndpoint';
 import MySQLEndpoint from './endpoints/MySQLEndpoint';
 import PostgreSQLEndpoint from './endpoints/PostgreSQLEndpoint';
@@ -103,6 +104,10 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
           break;
         case 'Sftp':
           endpoint = new SFTPEndpoint();
+          sourceStream = await endpoint.getSource(source);
+          break;
+        case 'GoogleAnalytics':
+          endpoint = new GoogleAnalyticsEndpoint();
           sourceStream = await endpoint.getSource(source);
           break;
         case 'Http':

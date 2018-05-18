@@ -60,6 +60,7 @@ export enum Sources
   Upload = 'Upload', // from a browser
   Algorithm = 'Algorithm',
   Sftp = 'Sftp',
+  GoogleAnalytics = 'GoogleAnalytics',
   Http = 'Http',
   Fs = 'Fs',
   Mysql = 'Mysql',
@@ -79,7 +80,7 @@ export const SchedulableSinks: Sinks[] =
   [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs];
 
 export const SchedulableSources: Sources[] =
-  [Sources.Algorithm, Sources.Sftp, Sources.Http, Sources.Fs];
+  [Sources.Algorithm, Sources.Sftp, Sources.GoogleAnalytics, Sources.Http, Sources.Fs];
 
 export interface SourceConfig
 {
@@ -121,12 +122,36 @@ export interface SourceOptionsTypes // TODO check that these are right
     algorithmId: number;
   };
   Sftp: SftpOptions;
+  GoogleAnalytics: GoogleAnalyticsOptions;
   Http: HttpOptions;
   Fs: {
     path: string;
   };
   Mysql: SQLOptions;
   Postgresql: SQLOptions;
+}
+
+export interface PostProcessTransformConfig
+{
+  type: PostProcessTransformOptionTypes;
+}
+
+export interface PostProcessTransformOptionTypes
+{
+  Aggregate: {
+    fields: string[];
+    operation: PostProcessTransformAggregationTypes;
+    pattern: string;
+    primaryKey: string;
+  };
+}
+
+export enum PostProcessTransformAggregationTypes
+{
+  Average = 'Average',
+  Merge = 'Merge',
+  Concat = 'Concat',
+  Sum = 'Sum',
 }
 
 export const SourceOptionsDefaults: SourceOptionsTypes =
@@ -140,6 +165,9 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
     Sftp: {
       filepath: 'filename.json',
       credentialId: -1,
+    },
+    GoogleAnalytics: {
+      dayInterval: -1,
     },
     Http: {
       method: 'GET',
@@ -209,6 +237,12 @@ export interface SftpOptions
   meta?: any;
 }
 
+export interface GoogleAnalyticsOptions
+{
+  dayInterval: number;
+  transformations?: PostProcessTransformTypes[];
+}
+
 export interface HttpOptions
 {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -225,7 +259,9 @@ export interface SQLOptions
 }
 
 export type SourceTypes = keyof SourceOptionsTypes;
+export type PostProcessTransformTypes = keyof PostProcessTransformOptionsTypes;
 export type SourceOptionsType<key extends SourceTypes> = SourceOptionsTypes[key];
+export type PostProcessTransformOptionsType<key extends PostProcessTransformTypes> = PostProcessTransformOptionsTypes[key];
 export type SinkTypes = keyof SinkOptionsTypes;
 export type SinkOptionsType<key extends SinkTypes> = SinkOptionsTypes[key];
 
