@@ -77,16 +77,33 @@ class EasterEggs extends TerrainComponent<Props>
   public componentDidMount()
   {
     // setTimeout(this.startChristmas, 200);
+    const keyCodes = [];
     const keys = [];
     $('body').keydown((evt) =>
     {
-      console.log(evt);
-      keys.unshift(evt.keyCode);
-      if (keys[0] === 39 && keys[1] === 37 && keys[2] === 39 && keys[3] === 37 && keys[4] === 40
-        && keys[5] === 40 && keys[6] === 38 && keys[7] === 38)
+      if (evt.key !== 'Shift')
+      {
+        keys.unshift(evt.key);
+      }
+      keyCodes.unshift(evt.keyCode);
+
+      if (keyCodes[0] === 39 && keyCodes[1] === 37 && keyCodes[2] === 39 && keyCodes[3] === 37 && keyCodes[4] === 40
+        && keyCodes[5] === 40 && keyCodes[6] === 38 && keyCodes[7] === 38)
       {
         this.startChristmas();
         $('body').keydown(null);
+      }
+
+      if (keys.slice(0, 'independence'.length).reverse().join('') === 'independence')
+      {
+        // $("body").append("<div class='july-easter flag' style='position: fixed; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 9999; background: rgba(0,0,0,0.25); pointer-events: none;' ></div>");
+        $('body').append("<img class='flag' src='http://bestanimations.com/Flags/USA/usa-american-flag-gif-3.gif' style='position: fixed; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 99999; opacity: 0.25; pointer-events: none;' />");
+        $('body').append("<img class='firework' src='https://i.giphy.com/media/c1R3XcUXVWAFy/giphy.webp' style='position: fixed; top: 30px; left: 30px; width: 200px; height: 200px; z-index: 99999; pointer-events: none; mix-blend-mode: screen;' />");
+        $('body').append("<img class='firework' src='https://i.giphy.com/media/c1R3XcUXVWAFy/giphy.webp' style='position: fixed; bottom: 130px; left: 70px; width: 200px; height: 200px; z-index: 99999; pointer-events: none; mix-blend-mode: screen;' />");
+        $('body').append("<img class='firework' src='https://i.giphy.com/media/c1R3XcUXVWAFy/giphy.webp' style='position: fixed; top: 2000px; right: 40px; width: 200px; height: 200px; z-index: 99999; pointer-events: none; mix-blend-mode: screen;' />");
+        $('body').append("<img class='firework' src='https://i.giphy.com/media/c1R3XcUXVWAFy/giphy.webp' style='position: fixed; bottom: 90px; right: 250px; width: 200px; height: 200px; z-index: 99999; pointer-events: none; mix-blend-mode: screen;' />");
+
+        $('body').append('<iframe width="560" height="315" src="https://www.youtube.com/embed/M1wLtAXDgqg?autohide=1&autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>');
       }
     });
   }

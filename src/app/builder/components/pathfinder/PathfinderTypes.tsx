@@ -267,7 +267,8 @@ export const _TransformData = (config?: { [key: string]: any }) =>
   transform = transform
     .set('scorePoints', List(transform['scorePoints'].map((p) => _ScorePoint(p))))
     .set('visiblePoints', List(transform['visiblePoints'].map((p) => _ScorePoint(p))))
-    .set('domain', List(transform['domain']));
+    .set('domain', List(transform['domain']))
+    .set('dataDomain', List(transform['dataDomain']));
   return transform;
 };
 

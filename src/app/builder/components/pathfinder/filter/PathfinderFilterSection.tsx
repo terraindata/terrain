@@ -234,8 +234,8 @@ class PathfinderFilterSection extends TerrainComponent<Props>
                   id: String(Math.random()),
                 },
               ],
-              domain: [-0.5, 10.5],
-              dataDomain: [-0.5, 10.5],
+              domain: [0, 10],
+              dataDomain: [0, 10],
             },
           }));
           this.props.builderActions.changePath(
