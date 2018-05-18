@@ -73,20 +73,6 @@ class ElasticUI implements LanguageInterface
   {
     return fieldProps !== undefined && _.get(fieldProps, ['elastic', 'isPrimaryKey']) === true;
   }
-
-  public overrideTypeNames(engine: TransformationEngine, fieldId: number, displayOptions: Immutable.Map<string, string>)
-  {
-    const { elasticType } = defaultProps(engine.getFieldProp(fieldId, elasticKey));
-    const jsType = EngineUtil.getRepresentedType(fieldId, engine);
-    if (jsType === 'string' && elasticType === ElasticTypes.Date)
-    {
-      return displayOptions.set('string', 'date');
-    }
-    else if (jsType === 'object' && elasticType === ElasticTypes.GeoPoint)
-    {
-      return displayOptions.set('object', 'geo point');
-    }
-  }
 }
 
 const elasticKey = List(['elastic']);

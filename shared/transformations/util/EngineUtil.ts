@@ -48,7 +48,7 @@ import * as _ from 'lodash';
 
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
-import { FieldTypes, Languages, validJSTypes } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, ETLToJSType, FieldTypes, getJSFromETL, JSToETLType, Languages, validJSTypes } from 'shared/etl/types/ETLTypes';
 import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -62,7 +62,7 @@ export interface PathHashMap<T>
   [k: string]: T;
 }
 const valueTypeKeyPath = List(['valueType']);
-
+const etlTypeKeyPath = List(['etlType']);
 export default class EngineUtil
 {
   /*
@@ -78,7 +78,7 @@ export default class EngineUtil
    */
   public static verifyIntegrity(engine: TransformationEngine)
   {
-    const errors = [];
+    let errors = [];
     try
     {
       const fields = engine.getAllFieldIDs();
@@ -127,10 +127,10 @@ export default class EngineUtil
             errors.push(`Field ${okp.toJS()} is not of type array, but has name '*'. This is not allowed`);
           }
         }
-        const fieldType = engine.getFieldType(id);
-        if (!EngineUtil.fieldHasValidType(engine, id))
+        const fieldTypeErrors = EngineUtil.fieldHasValidType(engine, id);
+        if (fieldTypeErrors.length > 0)
         {
-          errors.push(`Field ${okp.toJS()} has an invalid type: ${fieldType}`);
+          errors = errors.concat(fieldTypeErrors);
         }
       });
     }
@@ -142,19 +142,26 @@ export default class EngineUtil
   }
 
   // check to make sure the field's types exist and if its an array that it has a valid valueType
-  public static fieldHasValidType(engine: TransformationEngine, id: number)
+  public static fieldHasValidType(engine: TransformationEngine, id: number): string[]
   {
     const fieldType = engine.getFieldType(id) as FieldTypes;
+    const etlType = EngineUtil.getETLFieldType(id, engine);
     const valueType = engine.getFieldProp(id, valueTypeKeyPath) as FieldTypes;
     if (validJSTypes.indexOf(fieldType) === -1)
     {
-      return false;
+      return [`Field Type ${fieldType} is not a valid js type`];
     }
     if (fieldType === 'array' && validJSTypes.indexOf(valueType) === -1)
     {
-      return false;
+      return [`Field Type is an Array, but valueType: ${valueType} is invalid.`];
     }
-    return true;
+
+    const jsType = EngineUtil.getRepresentedType(id, engine);
+    if (ETLToJSType[etlType].indexOf(jsType) === -1)
+    {
+      return [`Field JS Type and ETL Type are Incompatible. ${fieldType} is incompatible with ${etlType}`];
+    }
+    return [];
   }
 
   // get all fields that are computed from this field
@@ -315,7 +322,34 @@ export default class EngineUtil
     });
   }
 
-  // get the type of a field. If it represents an array wildcard, get the valueType
+  public static addFieldToEngine(
+    engine: TransformationEngine,
+    keypath: List<string>,
+    etlType: ETLFieldTypes,
+    valueType?: ETLFieldTypes,
+  ): number
+  {
+    const cfg = {
+      etlType,
+    };
+    if (valueType !== undefined)
+    {
+      cfg['valueType'] = getJSFromETL(valueType);
+    }
+    return engine.addField(keypath, getJSFromETL(etlType), cfg);
+  }
+
+  public static changeFieldType(
+    engine: TransformationEngine,
+    fieldId: number,
+    newType: ETLFieldTypes,
+  )
+  {
+    engine.setFieldType(fieldId, getJSFromETL(newType));
+    engine.setFieldProp(fieldId, etlTypeKeyPath, newType);
+  }
+
+  // get the JS type of a field. If it represents an array wildcard, get the valueType
   public static getRepresentedType(id: number, engine: TransformationEngine): FieldTypes
   {
     const kp = engine.getOutputKeyPath(id);
@@ -326,6 +360,20 @@ export default class EngineUtil
     else
     {
       return engine.getFieldType(id) as FieldTypes;
+    }
+  }
+
+  // get the ETL type of a field
+  public static getETLFieldType(id: number, engine: TransformationEngine): ETLFieldTypes
+  {
+    const etlType = engine.getFieldProp(id, etlTypeKeyPath) as ETLFieldTypes;
+    if (etlType == null)
+    {
+      return JSToETLType[EngineUtil.getRepresentedType(id, engine)];
+    }
+    else
+    {
+      return etlType;
     }
   }
 
@@ -344,8 +392,9 @@ export default class EngineUtil
     });
     const outputKeyPathBase = List([outputKey, '*']);
     const valueTypePath = List(['valueType']);
-    const outputFieldId = newEngine.addField(List([outputKey]), 'array');
-    const outputFieldWildcardId = newEngine.addField(outputKeyPathBase, 'array');
+    const outputFieldId = EngineUtil.addFieldToEngine(newEngine, List([outputKey]), ETLFieldTypes.Array);
+    const outputFieldWildcardId = EngineUtil.addFieldToEngine(newEngine, outputKeyPathBase, ETLFieldTypes.Array);
+
     newEngine.setFieldProp(outputFieldId, valueTypePath, 'object');
     newEngine.setFieldProp(outputFieldWildcardId, valueTypePath, 'object');
     rightEngine.getAllFieldIDs().forEach((id) =>
@@ -391,7 +440,62 @@ export default class EngineUtil
     });
   }
 
-  public static changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType: FieldTypes)
+  public static interpretETLTypes(engine: TransformationEngine, documents?: List<object>)
+  {
+    if (documents === undefined)
+    {
+      engine.getAllFieldIDs().forEach((id) =>
+      {
+        const repType = EngineUtil.getRepresentedType(id, engine);
+        const type = JSToETLType[repType];
+        engine.setFieldProp(id, etlTypeKeyPath, type);
+      });
+      return;
+    }
+
+    const docs = EngineUtil.preprocessDocuments(documents);
+    engine.getAllFieldIDs().forEach((id) =>
+    {
+      const ikp = engine.getInputKeyPath(id);
+      const okp = engine.getOutputKeyPath(id);
+
+      let values = [];
+      docs.forEach((doc) =>
+      {
+        const vals = yadeep.get(engine.transform(doc), okp);
+        values = values.concat(vals);
+      });
+      const repType = EngineUtil.getRepresentedType(id, engine);
+      if (repType === 'string')
+      {
+        const type = TypeUtil.getCommonETLType(values);
+        if (type === ETLFieldTypes.GeoPoint)
+        {
+          engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), { toTypename: 'object' });
+          EngineUtil.changeFieldType(engine, id, ETLFieldTypes.Object);
+          const latField = EngineUtil.addFieldToEngine(engine, ikp.push('lat'), ETLFieldTypes.Number);
+          const longField = EngineUtil.addFieldToEngine(engine, ikp.push('lon'), ETLFieldTypes.Number);
+          engine.setOutputKeyPath(latField, okp.push('lat'));
+          engine.setOutputKeyPath(longField, okp.push('lon'));
+          EngineUtil.castField(engine, latField, 'number');
+          EngineUtil.castField(engine, longField, 'number');
+        }
+        engine.setFieldProp(id, etlTypeKeyPath, type);
+      }
+      else if (repType === 'number')
+      {
+        const type = TypeUtil.getCommonETLNumberType(values);
+        engine.setFieldProp(id, etlTypeKeyPath, type);
+      }
+      else
+      {
+        const type = JSToETLType[repType];
+        engine.setFieldProp(id, etlTypeKeyPath, type);
+      }
+    });
+  }
+
+  public static changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType: ETLFieldTypes)
   {
     LanguageController.get(Languages.Elastic)
       .changeFieldTypeSideEffects(engine, fieldId, newType);

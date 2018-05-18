@@ -122,10 +122,10 @@ export class SimpleTable extends TerrainComponent<Props>
     const {
       displayRowCount,
       defaultOrder: nextDefaultOrder,
-      data,
+      data: nextData,
     } = nextProps;
 
-    const { defaultOrder } = this.props;
+    const { defaultOrder, data } = this.props;
 
     this.setState({
       visibleRowCount: displayRowCount,
@@ -133,11 +133,11 @@ export class SimpleTable extends TerrainComponent<Props>
 
     const defaultOrderChanged = nextDefaultOrder.columnKey !== defaultOrder.columnKey ||
       nextDefaultOrder.direction !== defaultOrder.direction;
-    if (defaultOrderChanged)
+    if (defaultOrderChanged || nextData !== data)
     {
       this.setState({
         orderedData: this.orderData(
-          data,
+          nextData,
           defaultOrder.columnKey,
           defaultOrder.direction,
         ),
@@ -200,7 +200,7 @@ export class SimpleTable extends TerrainComponent<Props>
 
       if (column.component !== undefined)
       {
-        processedValue = React.cloneElement(column.component, { colKey, rowData });
+        processedValue = React.cloneElement(column.component, { key: colKey, colKey, rowData });
       }
     }
 
@@ -254,10 +254,10 @@ export class SimpleTable extends TerrainComponent<Props>
         <tbody className='simple-table-body'>
           {
             visibleDataValues.count() > 0 ?
-              visibleDataValues.map((entry) =>
+              visibleDataValues.map((entry, key) =>
               {
                 return (
-                  <tr key={entry.id} className='simple-table-row'>
+                  <tr key={key} className='simple-table-row'>
                     {
                       columnsConfig.map((column) =>
                       {

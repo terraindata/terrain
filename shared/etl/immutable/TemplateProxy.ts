@@ -201,7 +201,7 @@ export class TemplateProxy
     if (fromNode.type === NodeTypes.Source)
     {
       const source = this.template.getSource(fromNode.endpoint);
-      if (source.fileConfig.fileType === FileTypes.Csv)
+      if (source.fileConfig.fileType === FileTypes.Csv || source.fileConfig.fileType === FileTypes.Tsv)
       {
         interpretText = true;
       }
@@ -245,6 +245,7 @@ export class TemplateProxy
         EngineUtil.interpretTextFields(engine, documentConfig.documents);
       }
 
+      EngineUtil.interpretETLTypes(engine, documentConfig.documents);
       EngineUtil.addInitialTypeCasts(engine);
 
       const language = this.template.getEdgeLanguage(edgeId);
@@ -255,6 +256,7 @@ export class TemplateProxy
     }
     else
     {
+      EngineUtil.interpretETLTypes(engine);
       EngineUtil.addInitialTypeCasts(engine);
     }
   }

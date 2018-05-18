@@ -46,7 +46,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires no-empty-interface max-classes-per-file
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { InfoType, TransformationInfo } from 'shared/transformations/TransformationInfo';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';

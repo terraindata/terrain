@@ -60,7 +60,7 @@ const integrations: IMMap<ID, IntegrationConfig> = Map<ID, IntegrationConfig>({
     name: 'Integration 1',
     type: 'Sftp',
     authConfig: { jwt: '' },
-    connectionConfig: {},
+    connectionConfig: { path: '' },
     createdBy: 1,
     lastModified: null,
     readPermission: null,

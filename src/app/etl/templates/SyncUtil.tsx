@@ -60,6 +60,7 @@ import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords'
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
 const hiddenPath = List(['uiState', 'hidden']);
@@ -134,6 +135,7 @@ export function createFieldFromEngine(
     inputKeyPath: engine.getInputKeyPath(id),
     outputKeyPath: engine.getOutputKeyPath(id),
     type: engine.getFieldType(id) as FieldTypes,
+    etlType: EngineUtil.getETLFieldType(id, engine),
     transformations,
     name: enginePath.last(),
   });

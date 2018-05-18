@@ -61,6 +61,7 @@ import Menu from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import LanguageUI from 'etl/templates/languages/LanguageUI';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
@@ -68,6 +69,7 @@ import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorField
 import './TemplateEditorField.less';
 
 const KeyIcon = require('images/icon_key-2.svg');
+const MAX_STRING_LENGTH = 400;
 
 export interface Props extends TemplateEditorFieldProps
 {
@@ -166,8 +168,11 @@ class EditorFieldPreview extends TemplateEditorField<Props>
         fontColor(Colors().text2, Colors().text1);
     }
 
-    const previewText = preview == null ? 'N/A' : preview.toString();
-
+    let previewText: string = preview == null ? 'N/A' : preview.toString();
+    if (previewText.length >= MAX_STRING_LENGTH)
+    {
+      previewText = previewText.slice(0, MAX_STRING_LENGTH) + '...';
+    }
     const menuOptions = this.getMenuOptions();
     const showMenu = menuOptions.size > 0 && (this.state.hovered || this.state.menuOpen);
     const hidePreviewValue = field.isArray() || field.isNested() || labelOnly;
@@ -349,7 +354,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
 
   private renderTypeIcon()
   {
-    const type = EngineUtil.getRepresentedType(this.props.fieldId, this._currentEngine());
+    const type = EngineUtil.getETLFieldType(this.props.fieldId, this._currentEngine());
     const Icon = typeToIcon[type];
     return (
       <div
@@ -370,15 +375,18 @@ const ObjectTypeIcon = require('./../../../../../images/icon_type_object.svg?nam
 const GeoTypeIcon = require('./../../../../../images/icon_type_geo.svg?name=GeoTypeIcon');
 const BooleanTypeIcon = require('./../../../../../images/icon_type_boolean.svg?name=BooleanTypeIcon');
 
-const typeToIcon = {
-  string: TextTypeIcon,
-  object: ObjectTypeIcon,
-  number: NumberTypeIcon,
-  boolean: BooleanTypeIcon,
-  array: ArrayTypeIcon,
-  date: DateTypeIcon,
-  geo: GeoTypeIcon,
-};
+const typeToIcon: {
+  [k in ETLFieldTypes]: any;
+} = {
+    [ETLFieldTypes.String]: TextTypeIcon,
+    [ETLFieldTypes.Object]: ObjectTypeIcon,
+    [ETLFieldTypes.Number]: NumberTypeIcon,
+    [ETLFieldTypes.Integer]: NumberTypeIcon,
+    [ETLFieldTypes.Boolean]: BooleanTypeIcon,
+    [ETLFieldTypes.Array]: ArrayTypeIcon,
+    [ETLFieldTypes.Date]: DateTypeIcon,
+    [ETLFieldTypes.GeoPoint]: GeoTypeIcon,
+  };
 
 const emptyOptions = List([]);
 

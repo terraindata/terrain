@@ -70,9 +70,14 @@ export interface Props
   style?: any;
 }
 
+type FormState = FileConfigI & {
+  useXmlPath: boolean;
+  useJsonPath: boolean;
+};
+
 export default class FileConfigForm extends TerrainComponent<Props>
 {
-  public inputMap: InputDeclarationMap<FileConfigI> =
+  public inputMap: InputDeclarationMap<FormState> =
     {
       fileType: {
         type: DisplayType.Pick,
@@ -80,31 +85,53 @@ export default class FileConfigForm extends TerrainComponent<Props>
         widthFactor: 2,
         group: 'file type',
         options: {
-          pickOptions: (s: FileConfigI) => fileTypeList,
+          pickOptions: (s: FormState) => fileTypeList,
           indexResolver: (value) => fileTypeList.indexOf(value),
         },
         getDisplayState: this.fileTypeDisplayState,
       },
       hasCsvHeader: {
         type: DisplayType.CheckBox,
-        displayName: 'File Has CSV Header',
+        displayName: 'File Has Header',
         group: 'file type',
         widthFactor: 4,
-        getDisplayState: (s: FileConfigI) => s.fileType === FileTypes.Csv ? DisplayState.Active : DisplayState.Hidden,
+        getDisplayState: (s: FormState) => (s.fileType === FileTypes.Csv || s.fileType === FileTypes.Tsv)
+          ? DisplayState.Active : DisplayState.Hidden,
       },
       jsonNewlines: {
         type: DisplayType.CheckBox,
         displayName: 'Objects separated by newlines',
         group: 'file type',
         widthFactor: 4,
-        getDisplayState: (s: FileConfigI) => s.fileType === FileTypes.Json ? DisplayState.Active : DisplayState.Hidden,
+        getDisplayState: (s: FormState) => s.fileType === FileTypes.Json ? DisplayState.Active : DisplayState.Hidden,
+      },
+      useXmlPath: {
+        type: DisplayType.CheckBox,
+        displayName: 'Use XML Extract Key',
+        group: 'path',
+        widthFactor: 2,
+        getDisplayState: (s: FormState) => s.fileType === FileTypes.Xml ? DisplayState.Active : DisplayState.Hidden,
       },
       xmlPath: {
         type: DisplayType.TextBox,
-        displayName: 'XML Path',
-        group: 'file type',
+        displayName: 'XML Extract Key',
+        group: 'path',
         widthFactor: 4,
-        getDisplayState: (s: FileConfigI) => s.fileType === FileTypes.Xml ? DisplayState.Active : DisplayState.Hidden,
+        getDisplayState: this.xmlPathDisplay,
+      },
+      useJsonPath: {
+        type: DisplayType.CheckBox,
+        displayName: 'Use JSON Path',
+        group: 'path',
+        widthFactor: 2,
+        getDisplayState: (s: FormState) => s.fileType === FileTypes.Json ? DisplayState.Active : DisplayState.Hidden,
+      },
+      jsonPath: {
+        type: DisplayType.TextBox,
+        displayName: 'JSON Path',
+        group: 'path',
+        widthFactor: 4,
+        getDisplayState: this.jsonPathDisplay,
       },
     };
 
@@ -120,21 +147,60 @@ export default class FileConfigForm extends TerrainComponent<Props>
     );
   }
 
-  public fileTypeDisplayState(s: FileConfigI)
+  public xmlPathDisplay(s: FormState)
+  {
+    return (s.fileType === FileTypes.Xml && s.useXmlPath === true) ? DisplayState.Active : DisplayState.Hidden;
+  }
+
+  public jsonPathDisplay(s: FormState)
+  {
+    return (s.fileType === FileTypes.Json && s.useJsonPath === true) ? DisplayState.Active : DisplayState.Hidden;
+  }
+
+  public fileTypeDisplayState(s: FormState)
   {
     return this.props.hideTypePicker === true ? DisplayState.Hidden : DisplayState.Active;
   }
 
   @instanceFnDecorator(memoizeOne)
-  public configToState(config: FileConfig): FileConfigI
+  public configToState(config: FileConfig): FormState
   {
-    return Util.asJS(config) as FileConfigI;
+    const state = Util.asJS(config) as FormState;
+    if (state.xmlPath !== null)
+    {
+      state.useXmlPath = true;
+    }
+    if (state.jsonPath !== null)
+    {
+      state.useJsonPath = true;
+    }
+    return state;
   }
 
-  public handleFormChange(state: FileConfigI, isBlur?: boolean)
+  public handleFormChange(formState: FormState, isBlur?: boolean)
   {
+    const state = _.extend({}, formState);
+
+    if (state.useXmlPath && state.xmlPath === null)
+    {
+      state.xmlPath = '';
+    }
+    else if (!state.useXmlPath && state.xmlPath !== null)
+    {
+      state.xmlPath = null;
+    }
+
+    if (state.useJsonPath && state.jsonPath === null)
+    {
+      state.jsonPath = '';
+    }
+    else if (!state.useJsonPath && state.jsonPath !== null)
+    {
+      state.jsonPath = null;
+    }
+
     this.props.onChange(_FileConfig(state), isBlur);
   }
 }
 
-const fileTypeList = List([FileTypes.Json, FileTypes.Csv, FileTypes.Xml]);
+const fileTypeList = List([FileTypes.Json, FileTypes.Csv, FileTypes.Xml, FileTypes.Tsv]);

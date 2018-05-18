@@ -53,6 +53,7 @@ export interface FileConfig
   hasCsvHeader?: boolean;
   jsonNewlines?: boolean;
   xmlPath?: string;
+  jsonPath?: string;
 }
 
 export enum Sources
@@ -74,6 +75,22 @@ export enum Sinks
   Http = 'Http',
   Fs = 'Fs',
 }
+
+export const EndpointTypeNames =
+  {
+    Upload: 'Upload',
+    Download: 'Download',
+    Algorithm: 'Algorithm',
+    Database: 'Database',
+    Sftp: 'SFTP',
+    Http: 'HTTP',
+    Fs: 'File System',
+    Mysql: 'MySQL',
+    Postgresql: 'PostgreSQL',
+    Magento: 'Magento',
+    GoogleAPI: 'Google API',
+    Mailchimp: 'MailChimp',
+  };
 
 export const SchedulableSinks: Sinks[] =
   [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs];
@@ -122,9 +139,7 @@ export interface SourceOptionsTypes // TODO check that these are right
   };
   Sftp: SftpOptions;
   Http: HttpOptions;
-  Fs: {
-    path: string;
-  };
+  Fs: {};
   Mysql: SQLOptions;
   Postgresql: SQLOptions;
 }
@@ -148,9 +163,7 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
       },
       params: {},
     },
-    Fs: {
-      path: '',
-    },
+    Fs: {},
     Mysql: {
     },
     Postgresql: {
@@ -170,9 +183,7 @@ export interface SinkOptionsTypes
   };
   Sftp: SftpOptions;
   Http: HttpOptions;
-  Fs: {
-    path: string;
-  };
+  Fs: {};
 }
 
 export const SinkOptionsDefaults: SinkOptionsTypes =
@@ -197,9 +208,7 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
       },
       params: {},
     },
-    Fs: {
-      path: '',
-    },
+    Fs: {},
   };
 
 export interface SftpOptions

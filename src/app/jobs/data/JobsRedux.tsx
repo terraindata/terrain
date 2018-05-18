@@ -75,6 +75,11 @@ export interface JobActionTypes
     actionType: 'getJobsFailed';
     error: string;
   };
+
+  getJobLogs?: {
+    actionType: 'getJobLogs';
+    jobId: ID;
+  };
 }
 
 class JobRedux extends TerrainRedux<JobActionTypes, JobsState>
@@ -132,10 +137,22 @@ class JobRedux extends TerrainRedux<JobActionTypes, JobsState>
       });
   }
 
+  public getJobLogs(action, dispatch)
+  {
+    return this.api.getJobLogs(action.jobId)
+      .then((response) =>
+      {
+        const jobLogs = response.data;
+
+        return Promise.resolve(jobLogs);
+      });
+  }
+
   public overrideAct(action: Unroll<JobActionTypes>)
   {
     const asyncActions = [
       'getJobs',
+      'getJobLogs',
     ];
 
     if (asyncActions.indexOf(action.actionType) > -1)

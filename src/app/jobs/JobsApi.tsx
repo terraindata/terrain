@@ -66,6 +66,11 @@ class JobsApi
   {
     return this.xhr.get(`/jobs/${id}`);
   }
+
+  public getJobLogs(jobId: string)
+  {
+    return this.xhr.get(`/jobs/log/${jobId}`);
+  }
 }
 
 export default JobsApi;
