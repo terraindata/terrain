@@ -114,7 +114,18 @@ export class GoogleAPI
       }
       const currDate: any = new Date(Date.now() - 1000 * 3600 * 24);
       // @ts-ignore
-      const padDate = (str: string): string => str.padStart(2, '0');
+      const padDate = (str: string): string =>
+      {
+        const fullLength: number = 2;
+        if (str.length < fullLength)
+        {
+          for (let i = 0; i < fullLength - str.length; ++i)
+          {
+            str = '0' + str;
+          }
+        }
+        return str;
+      };
       const startDate: any = new Date(currDate - 1000 * 3600 * 24 * dayInterval);
       const currDateStr = (currDate.getFullYear().toString() as string) + '-'
         + (padDate((currDate.getMonth() as number + 1).toString()) as string) + '-'

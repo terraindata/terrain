@@ -434,6 +434,10 @@
   version "9.4.6"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-9.4.6.tgz#d8176d864ee48753d053783e4e463aec86b8d82e"
 
+"@types/node@^10.1.0":
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.1.0.tgz#2783ee1b6c47cbd4044f4a233976c1ac5fa9e942"
+
 "@types/node@^7.0.31":
   version "7.0.55"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.55.tgz#7bb6215ff9425a1d714106be9f0d3e0e28829288"
@@ -441,10 +445,6 @@
 "@types/node@^8.0.0":
   version "8.9.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.9.4.tgz#dfd327582a06c114eb6e0441fa3d6fab35edad48"
-
-"@types/node@^9.6.6":
-  version "9.6.6"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-9.6.6.tgz#439b91f9caf3983cad2eef1e11f6bedcbf9431d2"
 
 "@types/papaparse@^4.1.34":
   version "4.1.34"
@@ -9043,6 +9043,10 @@ react-tabs@^2.2.2:
   dependencies:
     classnames "^2.2.0"
     prop-types "^15.5.0"
+
+react-tagsinput@^3.19.0:
+  version "3.19.0"
+  resolved "https://registry.yarnpkg.com/react-tagsinput/-/react-tagsinput-3.19.0.tgz#6e3b45595f2d295d4657bf194491988f948caabf"
 
 react-test-renderer@15.6.2:
   version "15.6.2"

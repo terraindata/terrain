@@ -46,6 +46,7 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file no-unused-expression
 
 import { FileTypes, Languages } from './ETLTypes';
+import { PostProcessTransformConfig } from './PostProcessTypes';
 
 export interface FileConfig
 {
@@ -61,6 +62,7 @@ export enum Sources
   Upload = 'Upload', // from a browser
   Algorithm = 'Algorithm',
   Sftp = 'Sftp',
+  GoogleAnalytics = 'GoogleAnalytics',
   Http = 'Http',
   Fs = 'Fs',
   Mysql = 'Mysql',
@@ -88,7 +90,7 @@ export const EndpointTypeNames =
     Mysql: 'MySQL',
     Postgresql: 'PostgreSQL',
     Magento: 'Magento',
-    GoogleAPI: 'Google API',
+    GoogleAnalytics: 'Google Analytics',
     Mailchimp: 'MailChimp',
   };
 
@@ -96,7 +98,7 @@ export const SchedulableSinks: Sinks[] =
   [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs];
 
 export const SchedulableSources: Sources[] =
-  [Sources.Algorithm, Sources.Sftp, Sources.Http, Sources.Fs, Sources.Mysql, Sources.Postgresql];
+  [Sources.Algorithm, Sources.Sftp, Sources.GoogleAnalytics, Sources.Http, Sources.Fs, Sources.Mysql, Sources.Postgresql];
 
 export interface SourceConfig
 {
@@ -138,6 +140,7 @@ export interface SourceOptionsTypes // TODO check that these are right
     algorithmId: number;
   };
   Sftp: SftpOptions;
+  GoogleAnalytics: GoogleAnalyticsOptions;
   Http: HttpOptions;
   Fs: {};
   Mysql: SQLOptions;
@@ -155,6 +158,9 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
     Sftp: {
       filepath: 'filename.json',
       credentialId: -1,
+    },
+    GoogleAnalytics: {
+      dayInterval: -1,
     },
     Http: {
       method: 'GET',
@@ -213,6 +219,12 @@ export interface SftpOptions
 export interface HttpOptions
 {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+}
+
+export interface GoogleAnalyticsOptions
+{
+  dayInterval: number;
+  transformations?: PostProcessTransformConfig[];
 }
 
 export interface SQLOptions

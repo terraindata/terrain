@@ -45,130 +45,31 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file no-unused-expression
 
-export enum Integrations
+import { FileTypes, Languages } from './ETLTypes';
+
+export enum PostProcessTransformAggregationTypes
 {
-  Sftp = 'Sftp',
-  Http = 'Http',
-  Fs = 'Fs',
-  Mysql = 'Mysql',
-  Postgresql = 'Postgresql',
-  Magento = 'Magento',
-  GoogleAnalytics = 'GoogleAnalytics',
-  Mailchimp = 'Mailchimp',
+  Average = 'Average',
+  Merge = 'Merge',
+  Concat = 'Concat',
+  Sum = 'Sum',
 }
 
-export const IntegrationNames =
-  {
-    Sftp: 'SFTP',
-    Http: 'HTTP',
-    Fs: 'File System',
-    Mysql: 'MySQL',
-    Postgresql: 'PostgreSQL',
-    Magento: 'Magento',
-    GoogleAnalytics: 'Google Analytics',
-    Mailchimp: 'MailChimp',
-  };
-
-export interface IntegrationConfigBase
+export interface PostProcessTransformConfig
 {
-  id?: number;
-  name: string;
-  type: Integrations;
-  authConfig: any;
-  connectionConfig: any;
-  createdBy: number;
-  lastModified: any;
-  readPermission: any;
-  writePermission: any;
-  meta?: any;
+  type: PostProcessTransformTypes;
+  options: PostProcessTransformOptionsType<PostProcessTransformTypes>;
 }
 
-export interface AuthConfigTypes
+export interface PostProcessTransformOptionsTypes
 {
-  Sftp: {
-    key: string;
-  };
-  Http: {
-    jwt: string;
-  };
-  Fs: {};
-  Mysql: {
-    password: string;
-  };
-  Postgresql: {
-    password: string;
-  };
-  Magento: {
-    apiKey: string;
-  };
-  GoogleAnalytics: {
-    privateKey: string;
-  };
-  Mailchimp: {
-    apiKey: string;
+  Aggregate: {
+    fields: string[];
+    operation: PostProcessTransformAggregationTypes;
+    pattern: string;
+    primaryKey: string;
   };
 }
 
-export interface ConnectionConfigTypes
-{
-  Sftp: {
-    ip: string;
-    port: number;
-  };
-  Http: {
-    url: string;
-    gzip: boolean;
-    headers?: {
-      [k: string]: any;
-    };
-    params?: {
-      [k: string]: any;
-    };
-  };
-  Fs: {
-    path: string;
-  };
-  Mysql: {
-    user: string;
-    host: string;
-    port: number;
-    database: string;
-  };
-  Postgresql: {
-    user: string;
-    host: string;
-    port: number;
-    database: string;
-  };
-  Magento: {
-    apiUser: string;
-  };
-  GoogleAnalytics: {
-    email: string;
-    metrics: object[];
-    scopes: string[];
-    dimensions: object[];
-    viewId: number;
-  };
-  Mailchimp: {
-    host: string;
-  };
-}
-
-export type AuthTypes = keyof AuthConfigTypes;
-export type AuthConfigType<key extends AuthTypes> = AuthConfigTypes[key];
-export type ConnectionTypes = keyof ConnectionConfigTypes;
-export type ConnectionConfigType<key extends ConnectionTypes> = ConnectionConfigTypes[key];
-
-// Type wizardry
-type IntegrationNamingAssertion = {
-  [K in keyof typeof Integrations]: K;
-};
-Integrations as IntegrationNamingAssertion;
-
-type AuthAssertTypesExhaustive = {
-  [K in Integrations]: AuthConfigTypes[K];
-};
-type ConnectionAssertTypesExhaustive = {
-  [K in Integrations]: ConnectionConfigTypes[K];
-};
+export type PostProcessTransformTypes = keyof PostProcessTransformOptionsTypes;
+export type PostProcessTransformOptionsType<key extends PostProcessTransformTypes> = PostProcessTransformOptionsTypes[key];
