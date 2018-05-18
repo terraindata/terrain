@@ -42,93 +42,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
-
+// Copyright 2017 Terrain Data, Inc.
+// tslint:disable:no-var-requires max-classes-per-file
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
-
-import FadeInOut from 'common/components/FadeInOut';
-
-import { instanceFnDecorator } from 'shared/util/Classes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormLookups';
-import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
-import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { getFileType } from 'shared/etl/FileUtil';
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
-import { Sources } from 'shared/etl/types/EndpointTypes';
-import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';
-import './ETLStepComponent.less';
+import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 
-class PickAlgorithmStep extends ETLStepComponent
+import { GoogleAnalyticsForm } from 'etl/endpoints/GoogleAnalyticsIntegration';
+import
 {
-  public static onRevert(params: TransitionParams)
+  AlgorithmEndpoint,
+  DatabaseEndpoint, DownloadEndpoint, FsEndpoint
+  HttpEndpointForm, Props, SftpEndpoint,
+  SQLEndpoint, UploadEndpoint,
+} from './EndpointFormClasses';
+
+type FormLookupMap<E extends string> =
   {
-    params.act({
-      actionType: 'setState',
-      state: {
-        source: _SourceConfig(),
-      },
-    });
-  }
+    [k in E]: React.ComponentClass<Props>
+  };
 
-  public static onArrive(params: TransitionParams)
+export const SourceFormMap: FormLookupMap<Sources> =
   {
-    params.act({
-      actionType: 'setState',
-      state: {
-        source: _SourceConfig({
-          type: Sources.Algorithm,
-        }),
-      },
-    });
-  }
+    [Sources.Upload]: UploadEndpoint,
+    [Sources.Algorithm]: AlgorithmEndpoint,
+    [Sources.Sftp]: SftpEndpoint,
+    [Sources.GoogleAnalytics]: GoogleAnalyticsForm,
+    [Sources.Http]: HttpEndpointForm,
+    [Sources.Fs]: FsEndpoint,
+    [Sources.Mysql]: SQLEndpoint,
+    [Sources.Postgresql]: SQLEndpoint,
+  };
 
-  public render()
+export const SinkFormMap: FormLookupMap<Sinks> =
   {
-    const { walkthrough } = this.props;
-    const source = walkthrough.source;
-    const algorithmPicked = source.options['algorithmId'] !== -1;
-
-    const AlgorithmForm = SourceFormMap[Sources.Algorithm];
-
-    return (
-      <div className='etl-transition-column'>
-        <AlgorithmForm
-          endpoint={source}
-          onChange={this.handleChange}
-        />
-        <div className='etl-step-next-button-spacer'>
-          {this._renderNextButton(algorithmPicked)}
-        </div>
-      </div>
-    );
-  }
-
-  public handleChange(source: SourceConfig)
-  {
-    const { walkthrough, act } = this.props;
-    act({
-      actionType: 'setState',
-      state: {
-        source,
-      },
-    });
-  }
-
-}
-
-const transitionRowHeight = '28px';
-export default Util.createTypedContainer(
-  PickAlgorithmStep,
-  ['walkthrough'],
-  { act: WalkthroughActions },
-);
+    [Sinks.Download]: DownloadEndpoint,
+    [Sinks.Database]: DatabaseEndpoint,
+    [Sinks.Sftp]: SftpEndpoint,
+    [Sinks.Http]: HttpEndpointForm,
+    [Sinks.Fs]: FsEndpoint,
+  };
