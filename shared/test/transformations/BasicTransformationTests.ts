@@ -394,6 +394,31 @@ test('boolean cast tests', () =>
   expect(r['fb']).toEqual('0');
 });
 
+test('date cast tests', () =>
+{
+  const doc = {
+    foo: '5-18-2018',
+    bar: '5-19-2018',
+  };
+  const e: TransformationEngine = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.CastNode,
+    List<KeyPath>([KeyPath(['foo'])]),
+    {
+      toTypename: 'date',
+      format: 'ISOstring',
+    });
+  e.appendTransformation(
+    TransformationNodeType.CastNode,
+    List<KeyPath>([KeyPath(['bar'])]),
+    {
+      toTypename: 'date',
+      format: 'MMDDYYYY',
+    });
+  expect(e.transform(doc)['foo'].substr(0, 11)).toEqual('2018-05-18T');
+  expect(e.transform(doc)['bar']).toEqual('05/19/2018');
+});
+
 test('super deep transformation preserves arrays', () =>
 {
   const doc = {
