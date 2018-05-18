@@ -137,10 +137,10 @@ export interface ConnectionConfigTypes
     apiUser: string;
   };
   GoogleAnalytics: {
-    dimensions: object[];
     email: string;
     metrics: object[];
-    scopes: string;
+    scopes: string[];
+    dimensions: object[];
     viewId: number;
   };
   Mailchimp: {
