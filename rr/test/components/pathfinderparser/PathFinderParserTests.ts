@@ -43,20 +43,26 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
 
 import * as fs from 'fs';
 import * as ip from 'ip';
 import * as winston from 'winston';
+import * as sleep from 'sleep';
+
+import * as jsonfile from 'jsonfile';
 
 import * as puppeteer from 'puppeteer';
-import { makePromiseCallback } from '../../../shared/test/Utils';
-import { getChromeDebugAddress } from '../../FullstackUtils';
+import { makePromiseCallback } from '../../../../shared/test/Utils';
+import { getChromeDebugAddress } from '../../../FullstackUtils';
 
 const USERNAME_SELECTOR = '#login-email';
+const PASSWORD_SELECTOR = '#login-password';
+const BUTTON_SELECTOR = '#app > div > div.app-wrapper > div > div.login-container > div.login-submit-button-wrapper > div';
 
-function getExpectedFile(): string
+function getExpectedActionFile(): string
 {
-  return __filename.split('.')[0] + '.expected';
+  return __dirname + '/actions.json';
 }
 
 async function loadPage(page, url)
@@ -64,27 +70,24 @@ async function loadPage(page, url)
   await page.goto(url);
 }
 
-describe('Testing the card parser', () =>
+describe('Testing the pathfinder parser', () =>
 {
-  let expected;
   let browser;
   let page;
+  let actions;
 
   beforeAll(async () =>
   {
-    // TODO: get rid of this monstrosity once @types/winston is updated.
-    const contents: any = await new Promise((resolve, reject) =>
-    {
-      fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
-    });
-
-    expected = JSON.parse(contents);
+    const actionFileName = getExpectedActionFile();
+    const actionFileData = jsonfile.readFileSync(actionFileName);
+    actions = actionFileData.actions;
+    winston.info('Testing ' + actions.length + ' queries.');
     const wsAddress = await getChromeDebugAddress();
     browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
     winston.info('Connected to the Chrome ' + String(wsAddress));
   });
 
-  it('parse card', async () =>
+  it('pathfinder parser test', async () =>
   {
     page = await browser.newPage();
     winston.info('Created a new browser page.');
@@ -95,17 +98,16 @@ describe('Testing the card parser', () =>
     await page.goto(url);
     winston.info('Visited url:' + url);
     await page.waitForSelector(USERNAME_SELECTOR);
-    winston.info('Loaded the page ' + url);
-    for (const testName of Object.keys(expected))
+
+    for (let i = 0; i < actions.length; i++)
     {
-      const testValue: any = expected[testName];
-      const request = JSON.stringify(testValue);
-      winston.info('Testing request ' + request);
-      const cardResult = await page.evaluate((theRequest, theValue) =>
+      const query = actions[i].query;
+      const newTql = await page.evaluate((theQuery) =>
       {
-        return window['TerrainTools'].terrainTests.testCardParser(theRequest, theValue);
-      }, request, testValue);
-      expect(cardResult).toMatchObject({ passed: true, message: 'The test is passed' });
+        return window['TerrainTools'].terrainTests.PathFinderToQuery(theQuery);
+      }, query);
+      winston.info('Parsing ' + JSON.stringify(query.path));
+      expect(newTql).toBe(query.tql);
     }
   }, 30000);
 

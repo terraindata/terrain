@@ -467,10 +467,11 @@ function filterLineToQuery(line: FilterLine)
   const isNumberValue = !isNaN(value) && (!isNaN(parseFloat(value))) && (!isDateValue);
   if (isDateValue)
   {
-    const date = Util.formatInputDate(new Date(value), 'elastic');
-    if (date)
+    const newDate = Util.formatInputDate(new Date(value), 'elastic');
+    // console.log('Date '+ value + " is formatted to " + newDate);
+    if (newDate)
     {
-      value = date;
+      value = newDate;
     }
   } else if (isNumberValue)
   {

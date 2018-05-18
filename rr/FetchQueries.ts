@@ -136,7 +136,7 @@ async function getAccessToken(url, info)
           return null;
         }
         const respData = JSON.parse(response.text);
-        token = respData.accessToken;
+        token = respData;
       })
       .catch((error) =>
       {
@@ -151,14 +151,13 @@ async function getAccessToken(url, info)
 
 async function sendQueryFromItem(url, token, queryString, inputs, dbid, name)
 {
-  console.log('Querying Item ' + name);
   const inputMap = ESInterpreter.toInputMap(inputs);
   const queryTree = new ESInterpreter(queryString, inputMap);
   if (queryTree.hasError())
   {
     console.log('Item ' + name + ' has errros ' + JSON.stringify(queryTree.getErrors()));
   }
-  const finalQueryString = queryTree.toCode({replaceInputs: true, limit: MAX_HITS});
+  const finalQueryString = queryTree.toCode({replaceInputs: true, limit: 20});
   return sendQuery(url, token, finalQueryString, dbid);
 }
 
@@ -169,8 +168,8 @@ async function sendQuery(url, token, queryString, databaseID)
   await request(url)
     .post('/midway/v1/query/')
     .send({
-      id: 1,
-      accessToken: token,
+      id: token.id,
+      accessToken: token.accessToken,
       body: {
         database: databaseID,
         datebasetype: 'elastic',
@@ -197,8 +196,8 @@ async function getQueryFromItem(url, token, id)
   await request(url)
     .get(route)
     .query({
-      id: 1,
-      accessToken: token,
+      id: token.id,
+      accessToken: token.accessToken,
     })
     .expect(200)
     .then((response) =>
@@ -228,8 +227,8 @@ async function getAllLiveItems(url, token)
   await request(url)
     .get('/midway/v1/items/live')
     .query({
-      id: 1,
-      accessToken: token,
+      id: token.id,
+      accessToken: token.accessToken,
     })
     .expect(200)
     .then((response) =>
@@ -338,6 +337,7 @@ async function fetch()
     const meta = JSON.parse(r.meta);
     if (meta.query && meta.query.tql)
     {
+      console.log('======== Item ' + r.name + '=======');
       r['fetchedquery'] = meta.query.tql;
       console.log(meta.query.tql);
       const results = await sendQueryFromItem(url, accessToken, meta.query.tql, meta.query.inputs, meta.db.id, r.name);

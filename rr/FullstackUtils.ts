@@ -149,7 +149,7 @@ export async function replayBuilderActions(page, url, actions, records, actionCa
   // replay the log
   for (let i = 0; i < actions.length; i = i + 1)
   {
-    let action = actions[i];
+    let action = actions[i].action;
     console.log('Replaying Action ' + typeof action + ':' + action);
 
     if (ignoreBuilderAction(action))
