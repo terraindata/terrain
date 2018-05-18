@@ -106,6 +106,14 @@ export class PostProcess
       }
     });
 
+    Object.keys(newDataDict).forEach((nDDKey) =>
+    {
+      newDataDict[nDDKey].sort((a, b) =>
+      {
+        return a[options['primaryKeyName']] > b[options['primaryKeyName']];
+      });
+    });
+
     const returnData: object[] = [];
     switch (options.operation)
     {
