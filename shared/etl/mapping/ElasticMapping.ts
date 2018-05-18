@@ -49,8 +49,8 @@ THE SOFTWARE.
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 
-import { defaultProps, ElasticFieldProps, ElasticTypes, JsAutoMap } from 'shared/etl/types/ETLElasticTypes';
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { defaultProps, ElasticFieldProps, ElasticTypes, etlTypeToElastic } from 'shared/etl/types/ETLElasticTypes';
+import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil, { PathHashMap } from 'shared/transformations/util/EngineUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
@@ -231,9 +231,9 @@ export class ElasticMapping
   {
     const elasticProps = this.getElasticProps(fieldID);
 
-    const jsType = this.getRepresentedType(fieldID);
+    const etlType = this.getETLType(fieldID);
     const elasticType = elasticProps.elasticType === ElasticTypes.Auto ?
-      JsAutoMap[jsType]
+      etlTypeToElastic(etlType)
       :
       elasticProps.elasticType;
 
@@ -254,9 +254,9 @@ export class ElasticMapping
     }
   }
 
-  protected getRepresentedType(fieldID: number): FieldTypes
+  protected getETLType(fieldID: number): ETLFieldTypes
   {
-    return EngineUtil.getRepresentedType(fieldID, this.engine);
+    return EngineUtil.getETLFieldType(fieldID, this.engine);
   }
 
   // converts engine keypaths to keypaths in the elastic mapping
@@ -270,11 +270,6 @@ export class ElasticMapping
     ).toList() as EnginePath;
   }
 
-  protected getValueType(fieldID: number): FieldTypes
-  {
-    return this.engine.getFieldProp(fieldID, valueTypePath) as FieldTypes;
-  }
-
   protected getElasticProps(fieldID: number): ElasticFieldProps
   {
     const props: Partial<ElasticFieldProps> = this.engine.getFieldProp(fieldID, elasticPropPath);
@@ -286,8 +281,8 @@ export class ElasticMapping
     const ids = this.engine.getAllFieldIDs();
     ids.forEach((id, i) =>
     {
-      const elasticProps = this.getElasticProps(id);
-      if (elasticProps === undefined || _.get(elasticProps, 'elasticType') !== ElasticTypes.GeoPoint)
+      const etlType = this.getETLType(id);
+      if (etlType !== ETLFieldTypes.GeoPoint)
       {
         return;
       }
@@ -371,9 +366,9 @@ export class ElasticMapping
   protected verifyAndSetPrimaryKey(id: number)
   {
     const elasticProps = this.getElasticProps(id);
-    const jsType = this.getRepresentedType(id);
+    const etlType = this.getETLType(id);
     const elasticType = elasticProps.elasticType === ElasticTypes.Auto ?
-      JsAutoMap[jsType]
+      etlTypeToElastic(etlType)
       :
       elasticProps.elasticType;
     const enginePath = this.engine.getOutputKeyPath(id);
@@ -464,4 +459,3 @@ export class ElasticMapping
 }
 
 const elasticPropPath = EnginePath([Languages.Elastic]);
-const valueTypePath = EnginePath(['valueType']);

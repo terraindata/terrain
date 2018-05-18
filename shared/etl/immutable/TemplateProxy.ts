@@ -245,6 +245,7 @@ export class TemplateProxy
         EngineUtil.interpretTextFields(engine, documentConfig.documents);
       }
 
+      EngineUtil.interpretETLTypes(engine, documentConfig.documents);
       EngineUtil.addInitialTypeCasts(engine);
 
       const language = this.template.getEdgeLanguage(edgeId);
@@ -255,6 +256,7 @@ export class TemplateProxy
     }
     else
     {
+      EngineUtil.interpretETLTypes(engine);
       EngineUtil.addInitialTypeCasts(engine);
     }
   }
