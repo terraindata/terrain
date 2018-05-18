@@ -61,6 +61,7 @@ import ObjectForm from 'common/components/ObjectForm';
 import DatabasePicker from 'etl/common/components/DatabasePicker';
 import FileConfigForm from 'etl/common/components/FileConfigForm';
 import UploadFileButton from 'etl/common/components/UploadFileButton';
+import { GoogleAnalyticsForm } from 'etl/endpoints/GoogleAnalyticsIntegration.tsx';
 import AlgorithmSelector from 'library/components/AlgorithmSelector';
 import { LibraryState } from 'library/LibraryTypes';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
@@ -70,7 +71,6 @@ import
   SftpOptions, SinkOptionsType, Sinks, SourceOptionsType,
   Sources, SQLOptions,
 } from 'shared/etl/types/EndpointTypes';
-import { GoogleAnalyticsForm } from 'etl/endpoints/GoogleAnalyticsIntegration.tsx';
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 
 const { List } = Immutable;
@@ -145,7 +145,7 @@ export abstract class EndpointFormBase<State, P extends Props = Props> extends T
 }
 
 type UploadState = SourceOptionsType<Sources.Upload>;
-class UploadEndpoint extends EndpointFormBase<UploadState>
+export class UploadEndpoint extends EndpointFormBase<UploadState>
 {
   public inputMap: InputDeclarationMap<UploadState> = {
     file: {
@@ -266,14 +266,14 @@ class AlgorithmEndpointC extends EndpointFormBase<AlgorithmState>
     onChange(endpoint.set('options', newOptions));
   }
 }
-const AlgorithmEndpoint = Util.createContainer(
+export const AlgorithmEndpoint = Util.createContainer(
   AlgorithmEndpointC,
   ['library'],
   {},
 );
 
 type SftpState = SftpOptions;
-class SftpEndpoint extends EndpointFormBase<SftpState>
+export class SftpEndpoint extends EndpointFormBase<SftpState>
 {
   public inputMap: InputDeclarationMap<SftpState> = {
     filepath: {
@@ -295,7 +295,7 @@ interface HttpState extends Partial<HttpOptions>
 
 const httpMethods = List(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']);
 
-class HttpEndpointForm extends EndpointFormBase<HttpOptions>
+export class HttpEndpointForm extends EndpointFormBase<HttpOptions>
 {
   public inputMap: InputDeclarationMap<HttpOptions> = {
     method: {
@@ -362,7 +362,7 @@ class HttpEndpointForm extends EndpointFormBase<HttpOptions>
 }
 
 type DownloadState = SinkOptionsType<Sinks.Download>;
-class DownloadEndpoint extends EndpointFormBase<DownloadState>
+export class DownloadEndpoint extends EndpointFormBase<DownloadState>
 {
   public inputMap: InputDeclarationMap<DownloadState> = {
 
@@ -371,7 +371,7 @@ class DownloadEndpoint extends EndpointFormBase<DownloadState>
 
 type DatabaseState = SinkOptionsType<Sinks.Database>;
 
-class DatabaseEndpoint extends EndpointFormBase<DatabaseState>
+export class DatabaseEndpoint extends EndpointFormBase<DatabaseState>
 {
   public showFileConfig = false;
   public inputMap: InputDeclarationMap<DatabaseState> = {
@@ -409,13 +409,13 @@ class DatabaseEndpoint extends EndpointFormBase<DatabaseState>
 }
 
 type FsState = SinkOptionsType<Sinks.Fs>;
-class FsEndpoint extends EndpointFormBase<FsState>
+export class FsEndpoint extends EndpointFormBase<FsState>
 {
   public inputMap: InputDeclarationMap<FsState> = {};
 }
 
 type SQLState = SQLOptions;
-class SQLEndpoint extends EndpointFormBase<SQLState>
+export class SQLEndpoint extends EndpointFormBase<SQLState>
 {
   public inputMap: InputDeclarationMap<SQLState> = {
     query: {
@@ -424,30 +424,3 @@ class SQLEndpoint extends EndpointFormBase<SQLState>
     },
   };
 }
-
-// exports
-type FormLookupMap<E extends string> =
-  {
-    [k in E]: React.ComponentClass<Props>
-  };
-
-export const SourceFormMap: FormLookupMap<Sources> =
-  {
-    [Sources.Upload]: UploadEndpoint,
-    [Sources.Algorithm]: AlgorithmEndpoint,
-    [Sources.Sftp]: SftpEndpoint,
-    [Sources.GoogleAnalytics]: GoogleAnalyticsForm,
-    [Sources.Http]: HttpEndpointForm,
-    [Sources.Fs]: FsEndpoint,
-    [Sources.Mysql]: SQLEndpoint,
-    [Sources.Postgresql]: SQLEndpoint,
-  };
-
-export const SinkFormMap: FormLookupMap<Sinks> =
-  {
-    [Sinks.Download]: DownloadEndpoint,
-    [Sinks.Database]: DatabaseEndpoint,
-    [Sinks.Sftp]: SftpEndpoint,
-    [Sinks.Http]: HttpEndpointForm,
-    [Sinks.Fs]: FsEndpoint,
-  };

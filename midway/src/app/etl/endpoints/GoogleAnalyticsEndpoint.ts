@@ -49,13 +49,13 @@ import * as _ from 'lodash';
 import { PassThrough, Readable, Writable } from 'stream';
 import * as winston from 'winston';
 
+import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
 import
 {
   PostProcessTransformConfig,
   PostProcessTransformOptionsTypes,
   PostProcessTransformTypes,
 } from 'shared/etl/types/PostProcessTypes';
-import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
 
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import IntegrationConfig from '../../integrations/IntegrationConfig';
@@ -152,17 +152,17 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
       const currDate: any = new Date(Date.now() - 1000 * 3600 * 24);
 
       const padDate = (str: string): string =>
+      {
+        const fullLength: number = 2;
+        if (str.length < fullLength)
         {
-          const fullLength: number = 2;
-          if (str.length < fullLength)
+          for (let i = 0; i < fullLength - str.length; ++i)
           {
-            for(let i = 0; i < fullLength-str.length; ++i)
-            {
-              str = '0' + str;
-            }
+            str = '0' + str;
           }
-          return str;
-        };
+        }
+        return str;
+      };
       const startDate: any = new Date(currDate - 1000 * 3600 * 24 * dayInterval);
       const currDateStr = (currDate.getFullYear().toString() as string) + '-'
         + (padDate((currDate.getMonth() as number + 1).toString()) as string) + '-'
@@ -186,8 +186,8 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
 
       let colNames: string[] = [];
       let constructedHeader: boolean = false;
-      let potentialError: string = '';
-      let zippedRows: object[] = [];
+      const potentialError: string = '';
+      const zippedRows: object[] = [];
       const writeStream = JSONTransform.createExportStream();
       const scopeURL: string = 'https://www.googleapis.com/auth/analytics.readonly';
       const scopes: string[] = [];

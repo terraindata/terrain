@@ -46,6 +46,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires import-spacing
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
@@ -53,11 +54,10 @@ import * as React from 'react';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
-import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import Autocomplete from 'common/components/Autocomplete';
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
+import Autocomplete from 'common/components/Autocomplete';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import Quarantine from 'util/RadiumQuarantine';
@@ -105,7 +105,7 @@ export default class ListForm extends TerrainComponent<Props>
         />
         <Quarantine>
           <div
-            className='object-form-row-delete'
+            className='list-form-row-delete'
             style={fontColor(Colors().text3, Colors().text2)}
             onClick={this.handleDeleteRowFactory(index)}
           >
@@ -138,7 +138,8 @@ export default class ListForm extends TerrainComponent<Props>
   @instanceFnDecorator(_.memoize)
   public onBlurFactory(index: number)
   {
-    return () => {
+    return () =>
+    {
       this.props.onChange(this.props.items, true);
     };
   }
@@ -148,7 +149,7 @@ export default class ListForm extends TerrainComponent<Props>
   {
     return () =>
     {
-      let newItems = this.props.items.slice();
+      const newItems = this.props.items.slice();
       newItems.splice(index, 1);
       this.props.onChange(newItems, true);
     };

@@ -57,9 +57,10 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
-import ObjectForm from 'common/components/ObjectForm';
+import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import ListForm from 'common/components/ListForm';
-
+import ObjectForm from 'common/components/ObjectForm';
+import { EndpointFormBase } from 'etl/common/components/EndpointFormClasses.tsx';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import
 {
@@ -67,18 +68,20 @@ import
   SftpOptions, SinkOptionsType, Sinks, SourceOptionsType,
   Sources, SQLOptions,
 } from 'shared/etl/types/EndpointTypes';
+import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 import
 {
+  PostProcessTransformAggregationTypes as AggregationTypes,
   PostProcessTransformConfig,
   PostProcessTransformOptionsType,
   PostProcessTransformTypes,
-  PostProcessTransformAggregationTypes as AggregationTypes,
 } from 'shared/etl/types/PostProcessTypes';
-import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
+import Quarantine from 'util/RadiumQuarantine';
+
+const DeleteIcon = require('images/icon_close.svg');
+import 'common/components/ObjectForm.less';
 
 const { List } = Immutable;
-
-import { EndpointFormBase } from 'etl/common/components/EndpointFormClasses.tsx';
 
 type FormState = SourceOptionsType<Sources.GoogleAnalytics>;
 export class GoogleAnalyticsForm extends EndpointFormBase<FormState>
@@ -90,10 +93,11 @@ export class GoogleAnalyticsForm extends EndpointFormBase<FormState>
     },
     transformations: {
       type: DisplayType.Custom,
+      widthFactor: -1,
       options: {
         render: this.renderTransformations,
-      }
-    }
+      },
+    },
   };
 
   @instanceFnDecorator(memoizeOne)
@@ -112,18 +116,31 @@ export class GoogleAnalyticsForm extends EndpointFormBase<FormState>
   public renderTransformation(transformation: PostProcessTransformConfig, index: number)
   {
     return (
-      <div key={index}>
+      <div
+        key={index}
+        className='object-form-row'
+      >
         <PostProcessTransformForm
           transformation={transformation}
           onChange={this.transformationChangeFactory(index)}
         />
+        <Quarantine>
+          <div
+            className='object-form-row-delete'
+            style={fontColor(Colors().text3, Colors().text2)}
+            onClick={this.handleDeleteRowFactory(index)}
+          >
+            <DeleteIcon />
+          </div>
+        </Quarantine>
       </div>
     );
   }
 
   public transformationChangeFactory(index: number)
   {
-    return (cfg: PostProcessTransformConfig) => {
+    return (cfg: PostProcessTransformConfig, apply?: boolean) =>
+    {
       const { endpoint, onChange } = this.props;
       const options: FormState = endpoint.options;
       const newList = options.transformations.slice();
@@ -131,20 +148,81 @@ export class GoogleAnalyticsForm extends EndpointFormBase<FormState>
       const newOptions = _.extend({}, options, {
         transformations: newList,
       });
-      onChange(endpoint.set('options', newOptions));
+      onChange(endpoint.set('options', newOptions), apply);
     };
   }
 
   public renderTransformations(state: FormState, disabled)
   {
     return (
-      <div>
-        { this.transformationList(state.transformations).map(this.renderTransformation) }
+      <div className='object-form-container'>
+        <div className='object-form-label'>
+          Transformations
+        </div>
+        <div className='object-kv-body' style={borderColor(Colors().border1)}>
+          {this.transformationList(state.transformations).map(this.renderTransformation)}
+          {this.renderAddNewRow()}
+        </div>
       </div>
     );
+  }
 
+  public renderAddNewRow()
+  {
+    return (
+      <PathfinderCreateLine
+        text={'Add New'}
+        canEdit={true}
+        onCreate={this.addRow}
+        showText={true}
+        style={overrideCreateStyle}
+      />
+    );
+  }
+
+  public addRow()
+  {
+    const { endpoint, onChange } = this.props;
+    const transformations = endpoint.options.transformations !== undefined ?
+      endpoint.options.transformations :
+      [];
+
+    const newItems = transformations.slice();
+    newItems.push({
+      type: 'Aggregate',
+      options: {},
+    });
+
+    const newOptions = _.extend({}, endpoint.options, {
+      transformations: newItems,
+    });
+    onChange(endpoint.set('options', newOptions), true);
+  }
+
+  @instanceFnDecorator(_.memoize)
+  public handleDeleteRowFactory(index: number)
+  {
+    return () =>
+    {
+      const { endpoint, onChange } = this.props;
+      const transformations = endpoint.options.transformations !== undefined ?
+        endpoint.options.transformations :
+        [];
+
+      const newItems = transformations.slice();
+      newItems.splice(index, 1);
+
+      const newOptions = _.extend({}, endpoint.options, {
+        transformations: newItems,
+      });
+      onChange(endpoint.set('options', newOptions), true);
+    };
   }
 }
+
+const overrideCreateStyle = {
+  height: '24px',
+};
 
 export interface PPTProps
 {
@@ -162,14 +240,14 @@ export class PostProcessTransformForm extends TerrainComponent<PPTProps>
       options: {
         pickOptions: (s) => this.postProcessOptions,
         indexResolver: (value) => this.postProcessOptions.indexOf(value),
-      }
+      },
     },
     options: {
       type: DisplayType.Custom,
       options: {
         render: this.renderOptions,
-      }
-    }
+      },
+    },
   };
 
   public render()
@@ -190,7 +268,7 @@ export class PostProcessTransformForm extends TerrainComponent<PPTProps>
     {
       return (
         <AggregateForm
-          options={options}
+          options={options as AggregateState}
           onChange={this.handleOptionsChange}
         />
       );
@@ -232,8 +310,8 @@ export class AggregateForm extends TerrainComponent<AggregateProps>
     fields: {
       type: DisplayType.Custom,
       options: {
-        render: this.renderFieldsForm
-      }
+        render: this.renderFieldsForm,
+      },
     },
     operation: {
       type: DisplayType.Pick,
@@ -241,7 +319,7 @@ export class AggregateForm extends TerrainComponent<AggregateProps>
       options: {
         pickOptions: (s) => this.aggregationOptions,
         indexResolver: (value) => this.aggregationOptions.indexOf(value),
-      }
+      },
     },
     pattern: {
       type: DisplayType.TextBox,
@@ -250,8 +328,19 @@ export class AggregateForm extends TerrainComponent<AggregateProps>
     primaryKey: {
       type: DisplayType.TextBox,
       displayName: 'Primary Key Name',
-    }
+    },
   };
+
+  public render()
+  {
+    return (
+      <DynamicForm
+        inputMap={this.inputMap}
+        onStateChange={this.props.onChange}
+        inputState={this.props.options}
+      />
+    );
+  }
 
   public renderFieldsForm(state: AggregateState, disabled)
   {
@@ -268,7 +357,7 @@ export class AggregateForm extends TerrainComponent<AggregateProps>
   public handleFieldsChange(newFields: string[], apply?: boolean)
   {
     const newState = _.extend({}, this.props.options, {
-      fields: newFields
+      fields: newFields,
     });
     this.props.onChange(newState, apply);
   }

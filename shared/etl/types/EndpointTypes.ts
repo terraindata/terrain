@@ -90,7 +90,7 @@ export const EndpointTypeNames =
     Mysql: 'MySQL',
     Postgresql: 'PostgreSQL',
     Magento: 'Magento',
-    GoogleAPI: 'Google API',
+    GoogleAnalytics: 'Google Analytics',
     Mailchimp: 'MailChimp',
   };
 
