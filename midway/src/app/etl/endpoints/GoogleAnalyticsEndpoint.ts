@@ -54,9 +54,9 @@ import
   PostProcessTransformConfig,
   PostProcessTransformOptionsTypes,
   PostProcessTransformTypes,
-  SinkConfig,
-  SourceConfig,
-} from '../../../../../shared/etl/types/EndpointTypes';
+} from 'shared/etl/types/PostProcessTypes';
+import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
+
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import IntegrationConfig from '../../integrations/IntegrationConfig';
 import { integrations } from '../../integrations/IntegrationRouter';

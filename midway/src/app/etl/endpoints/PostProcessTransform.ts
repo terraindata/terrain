@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 import * as winston from 'winston';
 
-import { PostProcessTransformConfig, PostProcessTransformOptionsTypes } from '../../../../../shared/etl/types/EndpointTypes';
+import { PostProcessTransformConfig, PostProcessTransformOptionsTypes } from 'shared/etl/types/PostProcessTypes';
 
 export class PostProcessTransform
 {

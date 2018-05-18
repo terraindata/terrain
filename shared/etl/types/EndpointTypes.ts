@@ -46,6 +46,7 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file no-unused-expression
 
 import { FileTypes, Languages } from './ETLTypes';
+import { PostProcessTransformConfig } from './PostProcessTypes';
 
 export interface FileConfig
 {
@@ -146,30 +147,6 @@ export interface SourceOptionsTypes // TODO check that these are right
   Postgresql: SQLOptions;
 }
 
-export interface PostProcessTransformConfig
-{
-  type: PostProcessTransformTypes;
-  options: PostProcessTransformOptionsType<PostProcessTransformTypes>;
-}
-
-export interface PostProcessTransformOptionsTypes
-{
-  Aggregate: {
-    fields: string[];
-    operation: PostProcessTransformAggregationTypes;
-    pattern: string;
-    primaryKey: string;
-  };
-}
-
-export enum PostProcessTransformAggregationTypes
-{
-  Average = 'Average',
-  Merge = 'Merge',
-  Concat = 'Concat',
-  Sum = 'Sum',
-}
-
 export const SourceOptionsDefaults: SourceOptionsTypes =
   {
     Upload: {
@@ -247,12 +224,6 @@ export interface SftpOptions
   meta?: any;
 }
 
-export interface GoogleAnalyticsOptions
-{
-  dayInterval: number;
-  transformations?: PostProcessTransformConfig[];
-}
-
 export interface HttpOptions
 {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -266,6 +237,12 @@ export interface HttpOptions
   };
 }
 
+export interface GoogleAnalyticsOptions
+{
+  dayInterval: number;
+  transformations?: PostProcessTransformConfig[];
+}
+
 export interface SQLOptions
 {
   meta?: any;
@@ -273,9 +250,7 @@ export interface SQLOptions
 }
 
 export type SourceTypes = keyof SourceOptionsTypes;
-export type PostProcessTransformTypes = keyof PostProcessTransformOptionsTypes;
 export type SourceOptionsType<key extends SourceTypes> = SourceOptionsTypes[key];
-export type PostProcessTransformOptionsType<key extends PostProcessTransformTypes> = PostProcessTransformOptionsTypes[key];
 export type SinkTypes = keyof SinkOptionsTypes;
 export type SinkOptionsType<key extends SinkTypes> = SinkOptionsTypes[key];
 

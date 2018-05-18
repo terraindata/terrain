@@ -70,6 +70,7 @@ import
   SftpOptions, SinkOptionsType, Sinks, SourceOptionsType,
   Sources, SQLOptions,
 } from 'shared/etl/types/EndpointTypes';
+import { GoogleAnalyticsForm } from 'etl/endpoints/GoogleAnalyticsIntegration.tsx';
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 
 const { List } = Immutable;
@@ -83,7 +84,7 @@ export interface Props
 
 const fileTypeList = List([FileTypes.Json, FileTypes.Csv, FileTypes.Xml]);
 
-abstract class EndpointFormBase<State, P extends Props = Props> extends TerrainComponent<P>
+export abstract class EndpointFormBase<State, P extends Props = Props> extends TerrainComponent<P>
 {
   public abstract inputMap: InputDeclarationMap<State>;
   public showFileConfig = true; // override this to hide
@@ -271,12 +272,6 @@ const AlgorithmEndpoint = Util.createContainer(
   {},
 );
 
-const GoogleAnalyticsEndpoint = Util.createContainer(
-  GoogleAnalyticsEndpointC,
-  ['library'],
-  {},
-);
-
 type SftpState = SftpOptions;
 class SftpEndpoint extends EndpointFormBase<SftpState>
 {
@@ -441,7 +436,7 @@ export const SourceFormMap: FormLookupMap<Sources> =
     [Sources.Upload]: UploadEndpoint,
     [Sources.Algorithm]: AlgorithmEndpoint,
     [Sources.Sftp]: SftpEndpoint,
-    [Sources.GoogleAnalytics]: GoogleAnalyticsEndpoint,
+    [Sources.GoogleAnalytics]: GoogleAnalyticsForm,
     [Sources.Http]: HttpEndpointForm,
     [Sources.Fs]: FsEndpoint,
     [Sources.Mysql]: SQLEndpoint,
