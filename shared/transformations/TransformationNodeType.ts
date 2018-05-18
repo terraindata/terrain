@@ -116,6 +116,7 @@ interface TransformationOptionTypes
   };
   CastNode: {
     toTypename: string;
+    format?: string;
   };
   HashNode: {
     salt: string;

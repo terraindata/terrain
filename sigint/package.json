@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "command-line-args": "^5.0.2",
-    "command-line-usage": "^5.0.4",
+    "command-line-usage": "^5.0.5",
     "date-format": "^1.2.0",
     "elasticsearch": "^14.2.2",
     "jsurl": "^0.1.5",
@@ -66,18 +66,18 @@
   "devDependencies": {
     "@types/jest": "^22.2.3",
     "@types/koa": "^2.0.45",
-    "@types/node": "^10.0.3",
+    "@types/node": "^10.1.0",
     "apidoc": "^0.17.6",
     "bench-rest": "^1.2.4",
     "jest": "^22.4.3",
-    "nodemon": "^1.17.3",
-    "supertest": "^3.0.0",
-    "ts-jest": "^22.4.4",
-    "ts-loader": "^4.2.0",
-    "ts-node": "^6.0.2",
+    "nodemon": "^1.17.4",
+    "supertest": "^3.1.0",
+    "ts-jest": "^22.4.6",
+    "ts-loader": "^4.3.0",
+    "ts-node": "^6.0.3",
     "tslint": "^5.10.0",
     "typescript": "^2.8.3",
     "typescript-formatter": "^7.2.0",
-    "webpack": "^4.7.0"
+    "webpack": "^4.8.3"
   }
 }
