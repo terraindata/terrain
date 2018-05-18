@@ -61,12 +61,6 @@ export interface LanguageInterface
   language: Languages;
   getSettingsComponent: () => React.ComponentClass<TemplateEditorFieldProps>;
   isFieldPrimaryKey: (fieldProps: object) => boolean;
-  // this is deprecated
-  overrideTypeNames: (
-    engine: TransformationEngine,
-    fieldId: number,
-    displayOptions: Immutable.Map<string, string>,
-  ) => Immutable.Map<string, string>;
 }
 
 export default class LanguageUI

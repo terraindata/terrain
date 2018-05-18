@@ -112,14 +112,15 @@ export enum ETLFieldTypes
   GeoPoint = 'GeoPoint',
 }
 
+// Displayed in the order they appear
 export const etlFieldTypesList = List([
-  ETLFieldTypes.Array,
-  ETLFieldTypes.Object,
   ETLFieldTypes.String,
   ETLFieldTypes.Number,
+  ETLFieldTypes.Integer,
   ETLFieldTypes.Boolean,
   ETLFieldTypes.Date,
-  ETLFieldTypes.Integer,
+  ETLFieldTypes.Array,
+  ETLFieldTypes.Object,
   ETLFieldTypes.GeoPoint,
 ]);
 

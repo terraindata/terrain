@@ -92,28 +92,20 @@ export function defaultProps(obj: Partial<ElasticFieldProps> = {}): ElasticField
   );
 }
 
-export const JsToElasticOptions: {
-  [k in FieldTypes]: ElasticTypes[]
+export const ETLToElasticOptions: {
+  [k in ETLFieldTypes]: ElasticTypes[]
 } = {
-    array: [ElasticTypes.Auto, ElasticTypes.Array],
-    object: [ElasticTypes.Auto, ElasticTypes.Nested, ElasticTypes.GeoPoint],
-    string: [ElasticTypes.Auto, ElasticTypes.Text, ElasticTypes.Date, ElasticTypes.GeoPoint],
-    number: [ElasticTypes.Auto, ElasticTypes.Double, ElasticTypes.Long, ElasticTypes.Short, ElasticTypes.Byte,
-    ElasticTypes.Integer, ElasticTypes.HalfFloat, ElasticTypes.Float],
-    boolean: [ElasticTypes.Auto, ElasticTypes.Boolean],
+    [ETLFieldTypes.Array]: [ElasticTypes.Auto, ElasticTypes.Array],
+    [ETLFieldTypes.Object]: [ElasticTypes.Auto, ElasticTypes.Nested],
+    [ETLFieldTypes.String]: [ElasticTypes.Auto, ElasticTypes.Text],
+    [ETLFieldTypes.Number]: [ElasticTypes.Auto, ElasticTypes.Double, ElasticTypes.Float, ElasticTypes.HalfFloat],
+    [ETLFieldTypes.Boolean]: [ElasticTypes.Auto, ElasticTypes.Boolean],
+    [ETLFieldTypes.Date]: [ElasticTypes.Auto, ElasticTypes.Date],
+    [ETLFieldTypes.Integer]: [ElasticTypes.Auto, ElasticTypes.Long, ElasticTypes.Integer, ElasticTypes.Short, ElasticTypes.Byte],
+    [ETLFieldTypes.GeoPoint]: [ElasticTypes.Auto, ElasticTypes.GeoPoint],
   };
 
-export const JsAutoMap: {
-  [k in FieldTypes]: ElasticTypes
-} = {
-    array: ElasticTypes.Array,
-    object: ElasticTypes.Nested,
-    string: ElasticTypes.Text,
-    number: ElasticTypes.Double,
-    boolean: ElasticTypes.Boolean,
-  };
-
-export const FieldTypeAutoMap: {
+export const ETLTypeAutoMap: {
   [k in ETLFieldTypes]: ElasticTypes
 } = {
     [ETLFieldTypes.Array]: ElasticTypes.Array,
@@ -122,11 +114,11 @@ export const FieldTypeAutoMap: {
     [ETLFieldTypes.Number]: ElasticTypes.Double,
     [ETLFieldTypes.Boolean]: ElasticTypes.Boolean,
     [ETLFieldTypes.Date]: ElasticTypes.Date,
-    [ETLFieldTypes.Integer]: ElasticTypes.Integer,
+    [ETLFieldTypes.Integer]: ElasticTypes.Long,
     [ETLFieldTypes.GeoPoint]: ElasticTypes.GeoPoint,
   };
 
-export function typeToElastic(type: ETLFieldTypes): ElasticTypes
+export function etlTypeToElastic(type: ETLFieldTypes): ElasticTypes
 {
-  return FieldTypeAutoMap[type];
+  return ETLTypeAutoMap[type];
 }

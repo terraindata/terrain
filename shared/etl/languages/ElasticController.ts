@@ -78,45 +78,7 @@ class ElasticController implements LanguageInterface
 
   public autodetectFieldTypes(engine: TransformationEngine, documents: List<object>)
   {
-    // const docs = EngineUtil.preprocessDocuments(documents);
-    // engine.getAllFieldIDs().forEach((id) =>
-    // {
-    //   if (engine.getFieldProp(id, List(['elastic', 'isPrimaryKey'])))
-    //   {
-    //     return;
-    //   }
-    //   const ikp = engine.getInputKeyPath(id);
-    //   const okp = engine.getOutputKeyPath(id);
 
-    //   let values = [];
-    //   docs.forEach((doc) =>
-    //   {
-    //     const vals = yadeep.get(engine.transform(doc), okp);
-    //     values = values.concat(vals);
-    //   });
-    //   const repType = EngineUtil.getRepresentedType(id, engine);
-    //   if (repType === 'string')
-    //   {
-    //     const type = TypeUtil.getCommonElasticType(values);
-    //     if (type === ElasticTypes.GeoPoint)
-    //     {
-    //       engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), { toTypename: 'object' });
-    //       engine.setFieldType(id, 'object');
-    //       const latField = engine.addField(ikp.push('lat'), 'number');
-    //       const longField = engine.addField(ikp.push('lon'), 'number');
-    //       engine.setOutputKeyPath(latField, okp.push('lat'));
-    //       engine.setOutputKeyPath(longField, okp.push('lon'));
-    //       EngineUtil.castField(engine, latField, 'number');
-    //       EngineUtil.castField(engine, longField, 'number');
-    //     }
-    //     engine.setFieldProp(id, List(['elastic', 'elasticType']), type);
-    //   }
-    //   else if (repType === 'number')
-    //   {
-    //     const type = TypeUtil.getCommonElasticNumberType(values);
-    //     engine.setFieldProp(id, List(['elastic', 'elasticType']), type);
-    //   }
-    // });
   }
 }
 
