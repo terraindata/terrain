@@ -186,7 +186,7 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
 
       let colNames: string[] = [];
       let constructedHeader: boolean = false;
-      const potentialError: string = '';
+      let potentialError: string = '';
       const zippedRows: object[] = [];
       const writeStream = JSONTransform.createExportStream();
       const scopeURL: string = 'https://www.googleapis.com/auth/analytics.readonly';
@@ -227,7 +227,6 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
               winston.warn('<redacted private key contents>');
               winston.warn(err);
             }
-            let potentialError: string = '';
             try
             {
               potentialError = JSON.stringify(body, null, 2);
