@@ -262,7 +262,7 @@ class DatabasePicker extends TerrainComponent<Props>
   }
 }
 
-const minHeight = '175px';
+const minHeight = '120px';
 
 export default Util.createTypedContainer(
   DatabasePicker,

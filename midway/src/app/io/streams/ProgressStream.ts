@@ -64,7 +64,7 @@ export default class ProgressStream extends Transform
   constructor(writer: Writable, frequency: number = 500)
   {
     super({
-      allowHalfOpen: false,
+      allowHalfOpen: true,
       readableObjectMode: false,
       writableObjectMode: true,
     });
@@ -76,15 +76,23 @@ export default class ProgressStream extends Transform
       winston.error(e.toString());
       this.errors++;
     });
+
+    this.writer.on('finish', () =>
+    {
+      this.doneWriting = true;
+      this.push(null);
+    });
   }
 
   public _write(chunk: any, encoding: string, callback: (err?: Error) => void)
   {
     this.writer.write(chunk, encoding, (err?: Error) =>
     {
-      this.count++;
-      // note: we ignore err here because our onError handler on the writer
-      //       stream accounts for errors
+      if (err === undefined)
+      {
+        this.count++;
+      }
+
       callback(err);
     });
   }
@@ -128,9 +136,12 @@ export default class ProgressStream extends Transform
       this.asyncRead = null;
     }
 
-    this.doneWriting = true;
-    this.push(this.progress());
-    this.writer.end(callback);
+    if (!this.doneWriting)
+    {
+      this.doneWriting = true;
+      this.push(this.progress());
+      this.writer.end(callback);
+    }
   }
 
   public progress()

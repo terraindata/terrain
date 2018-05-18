@@ -506,6 +506,12 @@ export default class Templates
         case 'MergeJoin':
           {
             logStream.info(`Processing merge-join node: ${JSON.stringify(node, null, 2)}`);
+            const dbName: string = template.sinks._default['options']['serverId'];
+            if (dbName === undefined)
+            {
+              throw new Error('Cannot find a valid database sink to use for merge-joins.');
+            }
+
             const inEdges: any[] = dag.inEdges(nodeId);
 
             const done = new EventEmitter();
@@ -552,8 +558,6 @@ export default class Templates
             await new Promise((resolve, reject) => done.on('done', resolve).on('error', reject));
 
             logStream.info(`Finished creating temporary indices: ${JSON.stringify(tempIndices)}`);
-
-            const dbName: string = template.sinks._default['options']['serverId'];
 
             // we refresh all temporary elastic indexes to make them ready for search
             const controller: DatabaseController | undefined = DatabaseRegistry.getByName(dbName);
