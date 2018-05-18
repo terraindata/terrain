@@ -160,7 +160,7 @@ class Jobs extends TerrainComponent<any> {
 
   public parseJobLogContents(jobLogs)
   {
-    return jobLogs.contents !== '' ?
+    return jobLogs.contents ?
       jobLogs.contents.split('\n').map((logLine) => JSON.parse(logLine)) : [];
   }
 
