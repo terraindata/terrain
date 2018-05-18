@@ -52,9 +52,9 @@ import * as winston from 'winston';
 import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
 import
 {
-  PostProcessTransformConfig,
-  PostProcessTransformOptionsTypes,
-  PostProcessTransformTypes,
+  PostProcessConfig,
+  PostProcessOptionsTypes,
+  PostProcessTypes,
 } from 'shared/etl/types/PostProcessTypes';
 
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
@@ -62,10 +62,10 @@ import IntegrationConfig from '../../integrations/IntegrationConfig';
 import { integrations } from '../../integrations/IntegrationRouter';
 import JSONTransform from '../../io/streams/JSONTransform';
 import AEndpointStream from './AEndpointStream';
-import { PostProcessTransform } from './PostProcessTransform';
+import { PostProcess } from './PostProcess';
 
 const request = googleoauthjwt.requestWithJWT();
-export const postProcessTransform: PostProcessTransform = new PostProcessTransform();
+export const postProcessTransform: PostProcess = new PostProcess();
 
 export interface GoogleAnalyticsConfig
 {
@@ -279,7 +279,7 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
                 if (hasPostProcessTransforms)
                 {
                   const postProcessedRows: object[]
-                    = postProcessTransform.process(gaSource.options['transforms'] as PostProcessTransformConfig[], zippedRows);
+                    = postProcessTransform.process(gaSource.options['transforms'] as PostProcessConfig[], zippedRows);
                   resolve(writeStream);
                   postProcessedRows.forEach((pPR) =>
                   {
