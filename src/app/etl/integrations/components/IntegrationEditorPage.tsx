@@ -142,6 +142,7 @@ class IntegrationEditorPage extends TerrainComponent<Props>
   public render()
   {
     const { integration } = this.state;
+
     return (
       <div
         className='integration-wrapper'

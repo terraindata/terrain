@@ -53,7 +53,7 @@ export enum Integrations
   Mysql = 'Mysql',
   Postgresql = 'Postgresql',
   Magento = 'Magento',
-  GoogleAPI = 'GoogleAPI',
+  GoogleAnalytics = 'GoogleAnalytics',
   Mailchimp = 'Mailchimp',
 }
 
@@ -65,7 +65,7 @@ export const IntegrationNames =
     Mysql: 'MySQL',
     Postgresql: 'PostgreSQL',
     Magento: 'Magento',
-    GoogleAPI: 'Google API',
+    GoogleAnalytics: 'Google Analytics',
     Mailchimp: 'MailChimp',
   };
 
@@ -101,7 +101,7 @@ export interface AuthConfigTypes
   Magento: {
     apiKey: string;
   };
-  GoogleAPI: {
+  GoogleAnalytics: {
     privateKey: string;
   };
   Mailchimp: {
@@ -136,8 +136,12 @@ export interface ConnectionConfigTypes
   Magento: {
     apiUser: string;
   };
-  GoogleAPI: {
+  GoogleAnalytics: {
     email: string;
+    metrics: object[];
+    scopes: string[];
+    dimensions: object[];
+    viewId: number;
   };
   Mailchimp: {
     host: string;

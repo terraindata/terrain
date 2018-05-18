@@ -290,21 +290,45 @@ class MagentoForm extends IntegrationFormBase<MagentoAuthT, MagentoConnectionT>
   };
 }
 
-type GoogleAPIAuthT = AuthConfigType<Integrations.GoogleAPI>;
-type GoogleAPIConnectionT = ConnectionConfigType<Integrations.GoogleAPI>;
-class GoogleAPIForm extends IntegrationFormBase<GoogleAPIAuthT, GoogleAPIConnectionT>
+type GoogleAnalyticsAuthT = AuthConfigType<Integrations.GoogleAnalytics>;
+type GoogleAnalyticsConnectionT = ConnectionConfigType<Integrations.GoogleAnalytics>;
+class GoogleAnalyticsForm extends IntegrationFormBase<GoogleAnalyticsAuthT, GoogleAnalyticsConnectionT>
 {
-  public authMap: InputDeclarationMap<GoogleAPIAuthT> = {
+  public authMap: InputDeclarationMap<GoogleAnalyticsAuthT> = {
     privateKey: {
       type: DisplayType.TextBox,
       displayName: 'Private Key',
     },
   };
 
-  public connectionMap: InputDeclarationMap<GoogleAPIConnectionT> = {
+  public connectionMap: InputDeclarationMap<GoogleAnalyticsConnectionT> = {
     email: {
       type: DisplayType.TextBox,
       displayName: 'Email',
+    },
+    metrics: {
+      type: DisplayType.TagsBox,
+      displayName: 'Metrics',
+      options: {
+        transformValue: (value) => value.map((v) => v.alias),
+        untransformValue: (value) => value.map((v) => ({ alias: v, expression: v })),
+      },
+    },
+    dimensions: {
+      type: DisplayType.TagsBox,
+      displayName: 'Dimensions',
+      options: {
+        transformValue: (value) => value.map((v) => v.name),
+        untransformValue: (value) => value.map((v) => ({ name: v })),
+      },
+    },
+    scopes: {
+      type: DisplayType.TagsBox,
+      displayName: 'Scopes',
+    },
+    viewId: {
+      type: DisplayType.NumberBox,
+      displayName: 'View Id',
     },
   };
 }
@@ -341,6 +365,6 @@ export const IntegrationFormMap: FormLookupMap =
     [Integrations.Mysql]: MysqlForm,
     [Integrations.Postgresql]: PostgresqlForm,
     [Integrations.Magento]: MagentoForm,
-    [Integrations.GoogleAPI]: GoogleAPIForm,
+    [Integrations.GoogleAnalytics]: GoogleAnalyticsForm,
     [Integrations.Mailchimp]: MailchimpForm,
   };
