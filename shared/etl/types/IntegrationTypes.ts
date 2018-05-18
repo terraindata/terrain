@@ -117,6 +117,7 @@ export interface ConnectionConfigTypes
   };
   Http: {
     url: string;
+    gzip: boolean;
     headers?: {
       [k: string]: any;
     };

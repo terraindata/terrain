@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as request from 'request';
 import { PassThrough, Readable, Writable } from 'stream';
 import * as _ from 'lodash';
+import * as zlib from 'zlib';
 
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
@@ -86,20 +87,20 @@ export default class HTTPEndpoint extends AEndpointStream
       if (httpConfig.jwt !== undefined && httpConfig.jwt !== '')
       {
         headers['Authorization'] = httpConfig.jwt;
-        // headers['gzip'] = true;
       }
-      console.log(JSON.stringify(httpConfig));
+
       const requestObj: object =
-      {
-        url: httpConfig['url'],
-        method: httpConfig['method'],
-        gzip: true,
-        headers: headers,
-        qs: (httpConfig['method'] === 'GET') ? httpConfig['params'] : undefined,
-        body: (httpConfig['method'] !== 'GET') ? httpConfig['params'] : undefined,
-      };
-      console.log(JSON.stringify(requestObj, null, 2), 'lol');
+        {
+          url: httpConfig['url'],
+          method: httpConfig['method'],
+          gzip: httpConfig['gzip'] !== undefined ? httpConfig['gzip'] : false,
+          headers: headers,
+          qs: (httpConfig['method'] === 'GET') ? httpConfig['params'] : undefined,
+          body: (httpConfig['method'] !== 'GET') ? httpConfig['params'] : undefined,
+        };
       const passThrough = new PassThrough({ highWaterMark: 128 * 1024 });
+      let isGzip: boolean = false;
+
       request(requestObj)
         .on('error', (err) =>
         {
@@ -109,27 +110,29 @@ export default class HTTPEndpoint extends AEndpointStream
             return reject(e);
           }
         })
-        .on('data', (data) =>
+        .on('response', (res) =>
         {
-          passThrough.write(data);
-          resolve(passThrough);
-        })
-        .on('end', () =>
+          if (res.headers['content-encoding'] === 'gzip')
           {
-            passThrough.end();
-          });
-        // .on('response', (res) =>
-        // {
-        //   if (res.statusCode !== 200)
-        //   {
-        //     const e =
-        //       new Error(`Error reading from source HTTP endpoint: ${res.statusCode} ${res.statusMessage} ${JSON.stringify(res)}`);
-        //     return reject(e);
-        //   }
-
-        //   const passThrough = new PassThrough({ highWaterMark: 128 * 1024 });
-        //   resolve(res.pipe(passThrough));
-        // });
+            resolve(passThrough);
+            const gunzip = zlib.createGunzip();
+            gunzip.on('data', (data) =>
+            {
+              passThrough.write(data);
+            });
+            res.pipe(gunzip);
+          }
+          else
+          {
+            if (res.statusCode !== 200)
+            {
+              const e =
+                new Error(`Error reading from source HTTP endpoint: ${res.statusCode} ${res.statusMessage} ${JSON.stringify(res)}`);
+              return reject(e);
+            }
+            resolve(res.pipe(passThrough));
+          }
+        });
     });
   }
 }
