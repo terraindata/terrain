@@ -46,12 +46,16 @@ THE SOFTWARE.
 
 import * as request from 'request';
 import { PassThrough, Readable, Writable } from 'stream';
+import * as _ from 'lodash';
 
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import IntegrationConfig from '../../integrations/IntegrationConfig';
 import { integrations } from '../../integrations/IntegrationRouter';
 import AEndpointStream from './AEndpointStream';
+import { AuthConfigType, ConnectionConfigType, Integrations } from 'shared/etl/types/IntegrationTypes';
+
+type HttpConfig = AuthConfigType<Integrations.Http> & ConnectionConfigType<Integrations.Http>;
 
 export default class HTTPEndpoint extends AEndpointStream
 {
@@ -62,27 +66,41 @@ export default class HTTPEndpoint extends AEndpointStream
 
   public async getSource(source: SourceConfig): Promise<Readable>
   {
-    const config = await this.getIntegrationConfig(source.integrationId);
-    return this.getRequestStream(config) as Promise<Readable>;
+    let config = await this.getIntegrationConfig(source.integrationId);
+    config = _.extend({}, source.options, config);
+    return this.getRequestStream(config as any) as Promise<Readable>;
   }
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
-    const config = await this.getIntegrationConfig(sink.integrationId);
-    return this.getRequestStream(config) as Promise<Writable>;
+    let config = await this.getIntegrationConfig(sink.integrationId);
+    config = _.extend({}, sink.options, config);
+    return this.getRequestStream(config as any) as Promise<Writable>;
   }
 
-  private async getRequestStream(httpConfig: object): Promise<Readable | Writable>
+  private async getRequestStream(httpConfig: HttpConfig): Promise<Readable | Writable>
   {
     return new Promise<Readable | Writable>((resolve, reject) =>
     {
-      request({
+      const headers = httpConfig['headers'] !== undefined ? httpConfig['headers'] : {};
+      if (httpConfig.jwt !== undefined && httpConfig.jwt !== '')
+      {
+        headers['Authorization'] = httpConfig.jwt;
+        // headers['gzip'] = true;
+      }
+      console.log(JSON.stringify(httpConfig));
+      const requestObj: object =
+      {
         url: httpConfig['url'],
         method: httpConfig['method'],
-        headers: httpConfig['headers'],
+        gzip: true,
+        headers: headers,
         qs: (httpConfig['method'] === 'GET') ? httpConfig['params'] : undefined,
         body: (httpConfig['method'] !== 'GET') ? httpConfig['params'] : undefined,
-      })
+      };
+      console.log(JSON.stringify(requestObj, null, 2), 'lol');
+      const passThrough = new PassThrough({ highWaterMark: 128 * 1024 });
+      request(requestObj)
         .on('error', (err) =>
         {
           if (err !== null && err !== undefined)
@@ -91,18 +109,27 @@ export default class HTTPEndpoint extends AEndpointStream
             return reject(e);
           }
         })
-        .on('response', (res) =>
+        .on('data', (data) =>
         {
-          if (res.statusCode !== 200)
+          passThrough.write(data);
+          resolve(passThrough);
+        })
+        .on('end', () =>
           {
-            const e =
-              new Error(`Error reading from source HTTP endpoint: ${res.statusCode} ${res.statusMessage} ${JSON.stringify(res)}`);
-            return reject(e);
-          }
+            passThrough.end();
+          });
+        // .on('response', (res) =>
+        // {
+        //   if (res.statusCode !== 200)
+        //   {
+        //     const e =
+        //       new Error(`Error reading from source HTTP endpoint: ${res.statusCode} ${res.statusMessage} ${JSON.stringify(res)}`);
+        //     return reject(e);
+        //   }
 
-          const passThrough = new PassThrough({ highWaterMark: 128 * 1024 });
-          resolve(res.pipe(passThrough));
-        });
+        //   const passThrough = new PassThrough({ highWaterMark: 128 * 1024 });
+        //   resolve(res.pipe(passThrough));
+        // });
     });
   }
 }

@@ -117,6 +117,12 @@ export interface ConnectionConfigTypes
   };
   Http: {
     url: string;
+    headers?: {
+      [k: string]: any;
+    };
+    params?: {
+      [k: string]: any;
+    };
   };
   Fs: {
     path: string;
