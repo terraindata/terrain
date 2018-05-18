@@ -51,6 +51,7 @@ export enum DisplayType
   NumberBox = 'NumberBox',
   CheckBox = 'CheckBox',
   Pick = 'Pick',
+  TagsBox = 'TagsBox',
   Custom = 'Custom',
 }
 
@@ -78,6 +79,12 @@ export interface InputDeclarationOptionTypes<S = any>
     indexResolver?: (option) => number;
     displayNames?: (state: S) => Immutable.Map<any, string>;
     textColor?: (index: number) => string;
+  };
+  TagsBox: {
+    acOptions?: (state: S) => List<string>;
+    debounce?: boolean;
+    transformValue?: (value) => string[];
+    untransformValue?: (value) => any;
   };
   Custom: {
     render: (state: S, disabled: boolean) => any;
