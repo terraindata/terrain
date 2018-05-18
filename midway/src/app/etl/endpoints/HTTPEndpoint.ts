@@ -44,17 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as _ from 'lodash';
 import * as request from 'request';
 import { PassThrough, Readable, Writable } from 'stream';
-import * as _ from 'lodash';
 import * as zlib from 'zlib';
 
+import { AuthConfigType, ConnectionConfigType, Integrations } from 'shared/etl/types/IntegrationTypes';
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import IntegrationConfig from '../../integrations/IntegrationConfig';
 import { integrations } from '../../integrations/IntegrationRouter';
 import AEndpointStream from './AEndpointStream';
-import { AuthConfigType, ConnectionConfigType, Integrations } from 'shared/etl/types/IntegrationTypes';
 
 type HttpConfig = AuthConfigType<Integrations.Http> & ConnectionConfigType<Integrations.Http>;
 
@@ -84,24 +84,21 @@ export default class HTTPEndpoint extends AEndpointStream
     return new Promise<Readable | Writable>((resolve, reject) =>
     {
       const headers = httpConfig['headers'] !== undefined ? httpConfig['headers'] : {};
+      const passThrough = new PassThrough({ highWaterMark: 128 * 1024 });
+      const isGzip: boolean = false;
       if (httpConfig.jwt !== undefined && httpConfig.jwt !== '')
       {
         headers['Authorization'] = httpConfig.jwt;
       }
 
-      const requestObj: object =
-        {
+      request({
           url: httpConfig['url'],
           method: httpConfig['method'],
           gzip: httpConfig['gzip'] !== undefined ? httpConfig['gzip'] : false,
-          headers: headers,
+          headers,
           qs: (httpConfig['method'] === 'GET') ? httpConfig['params'] : undefined,
           body: (httpConfig['method'] !== 'GET') ? httpConfig['params'] : undefined,
-        };
-      const passThrough = new PassThrough({ highWaterMark: 128 * 1024 });
-      let isGzip: boolean = false;
-
-      request(requestObj)
+        })
         .on('error', (err) =>
         {
           if (err !== null && err !== undefined)
