@@ -122,10 +122,12 @@ export default class LogStream extends Readable
     {
       this.errorCount++;
 
-      if (this.errorCount > this.abortThreshold)
+      if (this.errorCount >= this.abortThreshold)
       {
-        // TODO: abort pipeline!
+        this.drainLog();
+        this.emit('error', e);
         stream.destroy(e);
+        return;
       }
 
       this.log(e.toString());
