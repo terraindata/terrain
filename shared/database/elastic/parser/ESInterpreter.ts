@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import ESConverter from 'shared/database/elastic/formatter/ESConverter';
 import ESParameterFiller from 'shared/database/elastic/parser/EQLParameterFiller';
 import CardsToCodeOptions from 'shared/database/types/CardsToCodeOptions';
 import ESClause from './clauses/ESClause';
@@ -237,11 +238,16 @@ export default class ESInterpreter
 
   public toCode(options: CardsToCodeOptions): string
   {
-    let query = this.rootValueInfo.value;
+    let query;
     if (options.replaceInputs === true)
     {
       query = ESParameterFiller.generate(this.rootValueInfo, this.params);
     }
-    return query;
+    else
+    {
+      query = JSON.stringify(this.rootValueInfo.value);
+    }
+
+    return ESConverter.formatES(new ESJSONParser(query));
   }
 }
