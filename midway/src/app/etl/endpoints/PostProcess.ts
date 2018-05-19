@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 import * as winston from 'winston';
 
-import { PostProcessConfig, PostProcessOptionsTypes } from 'shared/etl/types/PostProcessTypes';
+import { PostProcessAggregationTypes, PostProcessConfig, PostProcessOptionsTypes } from 'shared/etl/types/PostProcessTypes';
 
 export class PostProcess
 {
@@ -115,7 +115,7 @@ export class PostProcess
     });
 
     const returnData: object[] = [];
-    switch (options.operation)
+    switch (options['operation'])
     {
       case PostProcessAggregationTypes.Sum:
         Object.keys(newDataDict).forEach((nDDKey) =>

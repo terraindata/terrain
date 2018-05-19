@@ -179,7 +179,7 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
               dateRanges: dateRange,
               dimensions: gaConfig['dimensions'],
               metrics: gaConfig['metrics'],
-              viewId: gaConfig['viewId'],
+              viewId: gaConfig['viewId'].toString(),
             },
           ],
         };
@@ -189,19 +189,25 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
       let potentialError: string = '';
       const zippedRows: object[] = [];
       const writeStream = JSONTransform.createExportStream();
-      const scopeURL: string = 'https://www.googleapis.com/auth/analytics.readonly';
+      const scopeURL: string = 'https://www.googleapis.com/auth/';
       const scopes: string[] = [];
-      const hasPostProcessTransforms: boolean = Array.isArray(gaSource.options['transforms'])
-        && gaSource.options['transforms'].length !== 0;
+      const hasPostProcessTransforms: boolean = Array.isArray(gaSource.options['transformations'])
+        && gaSource.options['transformations'].length !== 0;
+      const gaConfigPrivateKey: string = '-----BEGIN PRIVATE KEY-----' + ((gaConfig['privateKey'] as string)
+        .replace('-----BEGIN PRIVATE KEY-----', '').replace('-----END PRIVATE KEY-----', '')
+        .replace(new RegExp('\\s', 'g'), '\n') as string) + '-----END PRIVATE KEY-----';
 
-      switch (gaConfig['scopes'])
+      gaConfig['scopes'].forEach((gaConfigScope) =>
       {
-        case 'edit':
-          scopes.push(scopeURL + 'analytics');
-          break;
-        default:
-          scopes.push(scopeURL + 'analytics.readonly');
-      }
+        switch (gaConfigScope)
+        {
+          case 'edit':
+            scopes.push(scopeURL + 'analytics');
+            break;
+          default:
+            scopes.push(scopeURL + 'analytics.readonly');
+        }
+      });
 
       const analyticsBatchGet = (analyticsBodyPassed) =>
       {
@@ -209,12 +215,12 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
         winston.info('<redacted private key contents>');
         request(
           {
-            method: gaConfig['method'],
+            method: gaConfig['method'] != null ? gaConfig['method'] : 'POST',
             url,
             jwt:
               {
                 email: gaConfig['email'],
-                key: gaConfig['privateKey'],
+                key: gaConfigPrivateKey,
                 scopes,
               },
             json: true,
@@ -244,7 +250,7 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
                 }
               }
 
-              writeStream.write(colNames);
+              // writeStream.write(colNames);
               const rows: object[] = report.data.rows;
 
               if (Array.isArray(rows))

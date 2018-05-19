@@ -310,7 +310,7 @@ class GoogleAnalyticsForm extends IntegrationFormBase<GoogleAnalyticsAuthT, Goog
       type: DisplayType.TagsBox,
       displayName: 'Metrics',
       options: {
-        transformValue: (value) => value.map((v) => v.alias + ',' + v.expression),
+        transformValue: (value) => value.map((v) => (v.alias as string) + ',' + (v.expression as string)),
         untransformValue: (value) => value.map((v) =>
         {
           const pieces = v != null ? v.split(',') : ['', ''];
