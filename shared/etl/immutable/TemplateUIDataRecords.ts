@@ -49,87 +49,22 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
+import { makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
-import
+import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
+
+type FieldOrder = ReorderableSet<number>;
+
+class TemplateUIDataC
 {
-  ConfigType,
-  instanceFnDecorator,
-  makeConstructor,
-  makeExtendedConstructor,
-  WithIRecord,
-} from 'shared/util/Classes';
-
-// current implementation:
-// O(n) inserts and deletes
-// O(n log n) sorts
-// There are better data structures out there but this is a quick and simple one that's also Immutable
-class ReorderableSetC<T>
-{
-  private ordering: List<T> = List([]);
-
-  // if after is not provided, then insert at the end
-  public insert(value: T, after?: T)
-  {
-    const rset: ReorderableSet<T> = this as any;
-    let items = rset.ordering;
-
-    const existingPosition = items.indexOf(value);
-    if (existingPosition !== -1)
-    {
-      items = items.delete(existingPosition);
-    }
-
-    let newPosition = items.size;
-    if (after !== undefined)
-    {
-      const afterIndex = items.indexOf(after);
-      if (afterIndex !== -1)
-      {
-        newPosition = afterIndex + 1;
-      }
-    }
-    items = items.insert(newPosition, value);
-
-    return rset.set('ordering', items);
-  }
-
-  public remove(value: T)
-  {
-    const rset: ReorderableSet<T> = this as any;
-    let items = rset.ordering;
-
-    const position = items.indexOf(value);
-    if (position !== -1)
-    {
-      items = items.delete(position);
-    }
-
-    return rset.set('ordering', items);
-  }
-
-  // costs O(n) time to create, comparison is O(1)
-  public comparator(): (a: T, b: T) => number
-  {
-    const lookup: Immutable.Map<T, number> = Map(this.ordering.map((value, index) => [value, index]));
-    return (a: T, b: T) => {
-      const aPos = lookup.get(a);
-      const bPos = lookup.get(b);
-      if (aPos === undefined || bPos === undefined)
-      {
-        return 0;
-      }
-      else
-      {
-        return aPos - bPos;
-      }
-    }
-  }
+  public engineFieldOrders: Immutable.Map<number, FieldOrder> = Immutable.Map<number, FieldOrder>({});
 }
+export type TemplateUIData = WithIRecord<TemplateUIDataC>;
+export const _TemplateUIData = makeExtendedConstructor(TemplateUIDataC, true, {
+  engineFieldOrders: (orders) => {
+    return Map(orders).mapEntries<number, FieldOrder>(
+      ([key, obj]) => [Number(key), _ReorderableSet<number>(obj, true)],
+    ).toMap();
+  },
+});
 
-export type ReorderableSet<T> = WithIRecord<ReorderableSetC<T>>;
-
-const _RealReorderableSet = makeExtendedConstructor(ReorderableSetC, true);
-export function _ReorderableSet<T>(config?: ConfigType<ReorderableSetC<T>>, deep?: boolean): WithIRecord<ReorderableSetC<T>>
-{
-  return _RealReorderableSet(config, deep) as any;
-}
