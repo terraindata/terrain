@@ -60,7 +60,6 @@ const { List, Map } = Immutable;
 import FadeInOut from 'common/components/FadeInOut';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
 import NestedView from 'etl/templates/components/field/NestedView';
-import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import EditorFieldPreview from './EditorFieldPreview';
 import EditorFieldSettings from './EditorFieldSettings';

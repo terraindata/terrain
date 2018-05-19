@@ -66,7 +66,7 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { TransformationCreator } from 'etl/templates/components/transformations/TransformationCreator';
 import { TransformationEditor } from 'etl/templates/components/transformations/TransformationEditor';
-import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
+import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
 import { TemplateField, TransformationNode } from 'etl/templates/FieldTypes';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
