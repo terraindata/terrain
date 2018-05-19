@@ -205,3 +205,9 @@ export interface MergeJoinOptions
   rightJoinKey: string;
   outputKey: string;
 }
+
+export enum DateFormats
+{
+  ISOstring = 'ISOstring',
+  MMDDYYYY = 'MMDDYYYY',
+}

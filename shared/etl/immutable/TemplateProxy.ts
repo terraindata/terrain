@@ -196,14 +196,14 @@ export class TemplateProxy
   {
     const { engine, warnings, softWarnings } = EngineUtil.createEngineFromDocuments(documents);
 
-    let interpretText = false;
+    let castStringsToPrimitives = false;
     const fromNode = this.template.getNode(this.template.getEdge(edgeId).from);
     if (fromNode.type === NodeTypes.Source)
     {
       const source = this.template.getSource(fromNode.endpoint);
       if (source.fileConfig.fileType === FileTypes.Csv || source.fileConfig.fileType === FileTypes.Tsv)
       {
-        interpretText = true;
+        castStringsToPrimitives = true;
       }
     }
 
@@ -211,7 +211,7 @@ export class TemplateProxy
     this.performTypeDetection(edgeId,
       {
         documents,
-        interpretText,
+        castStringsToPrimitives,
       });
     return { warnings, softWarnings };
   }
@@ -232,32 +232,19 @@ export class TemplateProxy
     edgeId: number,
     documentConfig?: {
       documents: List<object>,
-      interpretText?: boolean,
+      castStringsToPrimitives?: boolean,
     },
   )
   {
     const engine = this.template.getTransformationEngine(edgeId);
 
-    if (documentConfig !== undefined)
-    {
-      if (documentConfig.interpretText === true)
-      {
-        EngineUtil.interpretTextFields(engine, documentConfig.documents);
-      }
+    EngineUtil.interpretETLTypes(engine, documentConfig);
+    EngineUtil.addInitialTypeCasts(engine);
 
-      EngineUtil.interpretETLTypes(engine, documentConfig.documents);
-      EngineUtil.addInitialTypeCasts(engine);
-
-      const language = this.template.getEdgeLanguage(edgeId);
-      if (language !== Languages.JavaScript)
-      {
-        LanguageController.get(language).autodetectFieldTypes(engine, documentConfig.documents);
-      }
-    }
-    else
+    const language = this.template.getEdgeLanguage(edgeId);
+    if (language !== Languages.JavaScript)
     {
-      EngineUtil.interpretETLTypes(engine);
-      EngineUtil.addInitialTypeCasts(engine);
+      LanguageController.get(language).autodetectFieldTypes(engine, documentConfig.documents);
     }
   }
 

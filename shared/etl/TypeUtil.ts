@@ -77,7 +77,7 @@ export default class TypeUtil
     return type === null ? 'string' : type;
   }
 
-  public static getCommonETLType(values: string[]): ETLFieldTypes
+  public static getCommonETLStringType(values: string[]): ETLFieldTypes
   {
     if (values.length === 0)
     {
