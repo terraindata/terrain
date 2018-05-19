@@ -107,7 +107,8 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
     }
     catch (e)
     {
-      // todo
+      // todo catch error?
+      this.setState(this.initialState);
     }
   }
 
@@ -201,10 +202,16 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
     proxy.editTransformation(transformation.id, args.fields, args.options);
   }
 
+  // override this to customize how the state object changes when a form element changes
+  protected transformFormOnChange(state: State): State
+  {
+    return state;
+  }
+
   // the below shouldn't need to be overidden
   protected handleFormChange(state: State)
   {
-    this.setState(state);
+    this.setState(this.transformFormOnChange(state));
   }
 
   protected handleMainAction()
