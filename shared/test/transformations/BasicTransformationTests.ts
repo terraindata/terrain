@@ -907,3 +907,30 @@ test('Encrypt and decrypt a field', () =>
   const r = e.transform(TestDocs.doc2);
   expect(r['name']).toBe('Bob');
 });
+
+test('Duplicate a nested field', () =>
+{
+  const wrap = (kp: string[]) =>
+  {
+    return List([List(kp)]);
+  };
+
+  const doc = {
+    field: {
+      subField: {
+        foo: 'bar',
+      }
+    }
+  };
+  const e = new TransformationEngine(doc);
+  e.appendTransformation(TransformationNodeType.DuplicateNode, wrap(['field']), {
+    newFieldKeyPaths: wrap(['copy1'])
+  });
+
+  const sub1 = e.addField(List(['copy1', 'subField']), 'object');
+  e.disableField(sub1);
+
+  const r = e.transform(doc);
+  expect(Object.keys(r['copy1']).length).toEqual(0);
+  expect(Object.keys(r['field']).length).toEqual(1);
+});
