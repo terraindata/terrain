@@ -171,3 +171,14 @@ test('gracefully handle invalid rename (TE remains in some working/recoverable s
   };
   expect(e.transform(doc)).toEqual(doc);
 });
+
+test('rename a nested field that contains an array', () =>
+{
+  const e = new TransformationEngine();
+  e.addField(List(['nested']), 'object');
+  const id1 = e.addField(List(['nested', 'foo']), 'array', { valueType: 'number' });
+  const id2 = e.addField(List(['nested', 'foo', '*']), 'array', { valueType: 'number' });
+  e.setOutputKeyPath(id1, List(['foo']));
+  expect(e.getOutputKeyPath(id1)).toEqual(KeyPath(['foo']));
+  expect(e.getOutputKeyPath(id2)).toEqual(KeyPath(['foo', '*']));
+});

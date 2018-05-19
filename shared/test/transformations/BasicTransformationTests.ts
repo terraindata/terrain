@@ -919,12 +919,12 @@ test('Duplicate a nested field', () =>
     field: {
       subField: {
         foo: 'bar',
-      }
-    }
+      },
+    },
   };
   const e = new TransformationEngine(doc);
   e.appendTransformation(TransformationNodeType.DuplicateNode, wrap(['field']), {
-    newFieldKeyPaths: wrap(['copy1'])
+    newFieldKeyPaths: wrap(['copy1']),
   });
 
   const sub1 = e.addField(List(['copy1', 'subField']), 'object');
