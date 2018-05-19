@@ -47,7 +47,7 @@ THE SOFTWARE.
 
 import { FileTypes, Languages } from './ETLTypes';
 
-export enum PostProcessTransformAggregationTypes
+export enum PostProcessAggregationTypes
 {
   Average = 'Average',
   Merge = 'Merge',
@@ -55,21 +55,21 @@ export enum PostProcessTransformAggregationTypes
   Sum = 'Sum',
 }
 
-export interface PostProcessTransformConfig
+export interface PostProcessConfig
 {
-  type: PostProcessTransformTypes;
-  options: PostProcessTransformOptionsType<PostProcessTransformTypes>;
+  type: PostProcessTypes;
+  options: PostProcessOptionsType<PostProcessTypes>;
 }
 
-export interface PostProcessTransformOptionsTypes
+export interface PostProcessOptionsTypes
 {
   Aggregate: {
     fields: string[];
-    operation: PostProcessTransformAggregationTypes;
+    operation: PostProcessAggregationTypes;
     pattern: string;
     primaryKey: string;
   };
 }
 
-export type PostProcessTransformTypes = keyof PostProcessTransformOptionsTypes;
-export type PostProcessTransformOptionsType<key extends PostProcessTransformTypes> = PostProcessTransformOptionsTypes[key];
+export type PostProcessTypes = keyof PostProcessOptionsTypes;
+export type PostProcessOptionsType<key extends PostProcessTypes> = PostProcessOptionsTypes[key];

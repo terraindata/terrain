@@ -71,10 +71,10 @@ import
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 import
 {
-  PostProcessTransformAggregationTypes as AggregationTypes,
-  PostProcessTransformConfig,
-  PostProcessTransformOptionsType,
-  PostProcessTransformTypes,
+  PostProcessAggregationTypes as AggregationTypes,
+  PostProcessConfig,
+  PostProcessOptionsType,
+  PostProcessTypes,
 } from 'shared/etl/types/PostProcessTypes';
 import Quarantine from 'util/RadiumQuarantine';
 
@@ -101,7 +101,7 @@ export class GoogleAnalyticsForm extends EndpointFormBase<FormState>
   };
 
   @instanceFnDecorator(memoizeOne)
-  public transformationList(transformations: PostProcessTransformConfig[]): List<PostProcessTransformConfig>
+  public transformationList(transformations: PostProcessConfig[]): List<PostProcessConfig>
   {
     if (transformations === undefined)
     {
@@ -113,14 +113,14 @@ export class GoogleAnalyticsForm extends EndpointFormBase<FormState>
     }
   }
 
-  public renderTransformation(transformation: PostProcessTransformConfig, index: number)
+  public renderTransformation(transformation: PostProcessConfig, index: number)
   {
     return (
       <div
         key={index}
         className='object-form-row'
       >
-        <PostProcessTransformForm
+        <PostProcessForm
           transformation={transformation}
           onChange={this.transformationChangeFactory(index)}
         />
@@ -139,7 +139,7 @@ export class GoogleAnalyticsForm extends EndpointFormBase<FormState>
 
   public transformationChangeFactory(index: number)
   {
-    return (cfg: PostProcessTransformConfig, apply?: boolean) =>
+    return (cfg: PostProcessConfig, apply?: boolean) =>
     {
       const { endpoint, onChange } = this.props;
       const options: FormState = endpoint.options;
@@ -226,14 +226,14 @@ const overrideCreateStyle = {
 
 export interface PPTProps
 {
-  transformation: PostProcessTransformConfig;
-  onChange: (cfg: PostProcessTransformConfig, apply?: boolean) => void;
+  transformation: PostProcessConfig;
+  onChange: (cfg: PostProcessConfig, apply?: boolean) => void;
 }
 
-export class PostProcessTransformForm extends TerrainComponent<PPTProps>
+export class PostProcessForm extends TerrainComponent<PPTProps>
 {
   public postProcessOptions: List<string> = List(['Aggregate']);
-  public inputMap: InputDeclarationMap<PostProcessTransformConfig> = {
+  public inputMap: InputDeclarationMap<PostProcessConfig> = {
     type: {
       type: DisplayType.Pick,
       displayName: 'Type',
@@ -290,7 +290,7 @@ export class PostProcessTransformForm extends TerrainComponent<PPTProps>
   }
 }
 
-type AggregateState = PostProcessTransformOptionsType<'Aggregate'>;
+type AggregateState = PostProcessOptionsType<'Aggregate'>;
 export interface AggregateProps
 {
   options: AggregateState;

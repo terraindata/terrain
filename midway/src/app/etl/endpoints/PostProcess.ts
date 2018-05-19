@@ -47,16 +47,16 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 import * as winston from 'winston';
 
-import { PostProcessTransformConfig, PostProcessTransformOptionsTypes } from 'shared/etl/types/PostProcessTypes';
+import { PostProcessAggregationTypes, PostProcessConfig, PostProcessOptionsTypes } from 'shared/etl/types/PostProcessTypes';
 
-export class PostProcessTransform
+export class PostProcess
 {
   constructor()
   {
 
   }
 
-  public process(transformConfigs: PostProcessTransformConfig[], data: object[]): object[]
+  public process(transformConfigs: PostProcessConfig[], data: object[]): object[]
   {
     // [{"name":"aggregate","pattern":"[0-9]{1,}-[0-9]{1,}","primaryKeyName":"ga:productSku","aggParams":["Item Quantity","Item Revenue"]}]
     let processedData: object[] = _.cloneDeep(data);
@@ -105,24 +105,64 @@ export class PostProcessTransform
         newDataDict[extractedPrimaryKey] = newDataDict[extractedPrimaryKey].concat(row);
       }
     });
-    const returnData: object[] = [];
-    // steps 2, 3 and 4
+
     Object.keys(newDataDict).forEach((nDDKey) =>
     {
-      if (Array.isArray(newDataDict[nDDKey]) && newDataDict[nDDKey].length > 0)
+      newDataDict[nDDKey].sort((a, b) =>
       {
-        const nDDValue: object = _.cloneDeep(newDataDict[nDDKey][0]);
-        for (let i = 1; i < newDataDict[nDDKey].length; ++i)
-        {
-          options['fields'].forEach((aggField) =>
-          {
-            nDDValue[aggField] = parseFloat(nDDValue[aggField]) + parseFloat(newDataDict[nDDKey][i][aggField]);
-          });
-        }
-        nDDValue[options['primaryKeyName']] = nDDKey;
-        returnData.push(nDDValue);
-      }
+        return a[options['primaryKeyName']] > b[options['primaryKeyName']];
+      });
     });
+
+    const returnData: object[] = [];
+    switch (options['operation'])
+    {
+      case PostProcessAggregationTypes.Sum:
+        Object.keys(newDataDict).forEach((nDDKey) =>
+        {
+          if (Array.isArray(newDataDict[nDDKey]) && newDataDict[nDDKey].length > 0)
+          {
+            const nDDValue: object = _.cloneDeep(newDataDict[nDDKey][0]);
+            for (let i = 1; i < newDataDict[nDDKey].length; ++i)
+            {
+              options['fields'].forEach((aggField) =>
+              {
+                nDDValue[aggField] = parseFloat(nDDValue[aggField]) + parseFloat(newDataDict[nDDKey][i][aggField]);
+              });
+            }
+            nDDValue[options['primaryKeyName']] = nDDKey;
+            returnData.push(nDDValue);
+          }
+        });
+        break;
+      case PostProcessAggregationTypes.Average:
+        Object.keys(newDataDict).forEach((nDDKey) =>
+        {
+          if (Array.isArray(newDataDict[nDDKey]) && newDataDict[nDDKey].length > 0)
+          {
+            const nDDValue: object = _.cloneDeep(newDataDict[nDDKey][0]);
+            for (let i = 1; i < newDataDict[nDDKey].length; ++i)
+            {
+              options['fields'].forEach((aggField) =>
+              {
+                nDDValue[aggField] = parseFloat(nDDValue[aggField]) + parseFloat(newDataDict[nDDKey][i][aggField]);
+              });
+            }
+            if (newDataDict[nDDKey].length !== 0)
+            {
+              options['fields'].forEach((aggField) =>
+              {
+                nDDValue[aggField] = nDDValue[aggField] / newDataDict[nDDKey].length;
+              });
+            }
+            nDDValue[options['primaryKeyName']] = nDDKey;
+            returnData.push(nDDValue);
+          }
+        });
+        break;
+
+      default:
+    }
     return returnData;
   }
 }
