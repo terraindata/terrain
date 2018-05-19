@@ -324,14 +324,12 @@ export class JobQueue
       // actually run the job
       const jobResult: TaskOutputConfig = await this.runningRunNowJobs.get(getJobs[0].id).run() as TaskOutputConfig;
       const jobsFromId: JobConfig[] = await this.get(getJobs[0].id);
-      const jobStatus: string = jobResult.status === true ? 'SUCCESS' : 'FAILURE';
-      await this.setJobStatus(jobsFromId[0].id, false, jobStatus);
       this.runningRunNowJobs.delete(getJobs[0].id);
 
       // log job result
       const jobLogConfig: JobLogConfig[] = await App.JobL.create(getJobs[0].id, jobResult['options']['logStream']);
       await this._setJobLogId(getJobs[0].id, jobLogConfig[0].id);
-      return resolve(jobResult.options.outputStream as stream.Readable);
+      resolve(jobResult.options.outputStream as stream.Readable);
     });
   }
 

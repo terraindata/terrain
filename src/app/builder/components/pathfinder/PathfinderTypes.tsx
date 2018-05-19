@@ -257,6 +257,7 @@ class TransformDataC extends BaseClass
   public dataDomain: List<number> = List([0, 10]);
   public hasCustomDomain: boolean = false;
   public mode: string = 'linear';
+  public autoBound: boolean = false;
 }
 
 export type TransformData = TransformDataC & IRecord<TransformDataC>;
@@ -266,7 +267,8 @@ export const _TransformData = (config?: { [key: string]: any }) =>
   transform = transform
     .set('scorePoints', List(transform['scorePoints'].map((p) => _ScorePoint(p))))
     .set('visiblePoints', List(transform['visiblePoints'].map((p) => _ScorePoint(p))))
-    .set('domain', List(transform['domain']));
+    .set('domain', List(transform['domain']))
+    .set('dataDomain', List(transform['dataDomain']));
   return transform;
 };
 
