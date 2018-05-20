@@ -103,9 +103,48 @@ export class EngineProxy
     return new FieldProxy(this, fieldId);
   }
 
-  public addTransformation(type: TransformationNodeType, fields: List<EnginePath>, options)
+  // automatically orders synthetic fields to be after the current field
+  public addTransformation(
+    type: TransformationNodeType,
+    fields: List<EnginePath>,
+    rawOptions: {
+      newFieldKeyPaths?: List<EnginePath>,
+      [k: string]: any,
+    }
+  )
   {
+    let options = rawOptions;
+
+    const isSynthetic = options.newFieldKeyPaths !== undefined;
+    let syntheticPaths: List<EnginePath>;
+    if (isSynthetic)
+    {
+      syntheticPaths = options.newFieldKeyPaths.map((kp) => this.getSyntheticInputPath(kp)).toList();
+      options = _.extend({}, options, {
+        newFieldKeyPaths: syntheticPaths
+      });
+    }
+
     this.engine.appendTransformation(type, fields, options);
+
+    if (isSynthetic)
+    {
+      let sourceFieldId;
+      if (fields.size > 0)
+      {
+        sourceFieldId = this.engine.getInputFieldID(fields.get(0));
+      }
+
+      syntheticPaths.forEach((path, index) => {
+        const synthId = this.engine.getInputFieldID(path);
+        this.engine.setOutputKeyPath(synthId, rawOptions.newFieldKeyPaths.get(index));
+        if (sourceFieldId !== undefined)
+        {
+          this.orderField(synthId, sourceFieldId);
+        }
+      });
+    }
+
     this.requestRebuild();
   }
 
@@ -165,7 +204,7 @@ export class EngineProxy
     }
 
     this.requestRebuild();
-    this.duplicateField(specifiedSourceId, destKP, true);
+    this.copyField(specifiedSourceId, destKP, true);
   }
 
   public copyField(sourceId: number, destKP: List<string>, despecify = false): number
@@ -178,14 +217,14 @@ export class EngineProxy
       List([this.engine.getInputKeyPath(sourceId)]),
       optionsNew,
     );
-    const newFieldId = this.engine.getInputFieldID(destKP);
+    const newFieldId = this.engine.getOutputFieldID(destKP);
     EngineUtil.transferFieldData(sourceId, newFieldId, this.engine, this.engine);
 
     let idToCopy = sourceId;
     if (despecify)
     {
-      const kpToCopy = EngineUtil.turnIndicesIntoValue(this.engine.getOutputKeyPath(sourceId));
-      idToCopy = this.engine.getOutputFieldID(kpToCopy);
+      const kpToCopy = EngineUtil.turnIndicesIntoValue(this.engine.getInputKeyPath(sourceId));
+      idToCopy = this.engine.getInputFieldID(kpToCopy);
     }
 
     const rootOutputKP = this.engine.getOutputKeyPath(sourceId);
@@ -196,33 +235,26 @@ export class EngineProxy
       {
         const toTransferKeypath = this.engine.getOutputKeyPath(childId);
         const pathAfterRoot = toTransferKeypath.slice(rootOutputKP.size);
-        EngineUtil.transferField(childId, destKP.concat(pathAfterRoot).toList(), this.engine);
+
+        const newFieldKP = destKP.concat(pathAfterRoot).toList();
+        const newFieldSyntheticPath = this.getSyntheticInputPath(newFieldKP);
+        EngineUtil.transferField(childId, newFieldSyntheticPath, this.engine);
+        const newChildId = this.engine.getInputFieldID(newFieldSyntheticPath);
+        this.engine.setOutputKeyPath(newChildId, newFieldKP);
       }
     });
     return newFieldId;
   }
 
-  public duplicateField(sourceId: number, destKP: List<string>, despecify = false):
-    {
-      newOriginalId: number,
-      destinationId: number,
-    }
+  public duplicateField(sourceId: number, destKP: List<string>, despecify = false)
   {
     const originalOKP = this.engine.getOutputKeyPath(sourceId);
     this.engine.setOutputKeyPath(sourceId, originalOKP.set(-1, '_' + originalOKP.last()));
-    const tempDestKP = this.getSyntheticInputPath(destKP);
-    const tempOriginalKP = this.getSyntheticInputPath(originalOKP);
-    const destId = this.copyField(sourceId, tempDestKP, despecify);
-    const newOrigId = this.copyField(sourceId, tempOriginalKP, despecify);
-    this.engine.setOutputKeyPath(destId, destKP);
-    this.engine.setOutputKeyPath(newOrigId, originalOKP);
+    const destId = this.copyField(sourceId, destKP, despecify);
+    const newOrigId = this.copyField(sourceId, originalOKP, despecify);
     this.engine.disableField(sourceId);
     this.setFieldHidden(sourceId, true);
     this.requestRebuild();
-    return {
-      newOriginalId: newOrigId,
-      destinationId: destId,
-    };
   }
 
   public addField(keypath: List<string>, type: ETLFieldTypes, valueType: ETLFieldTypes = ETLFieldTypes.String)
@@ -266,7 +298,8 @@ export class EngineProxy
     this.requestRebuild(fieldId);
   }
 
-  public orderField(fieldId: number, afterId: number)
+  // Reorder fieldId so that it appears after afterId
+  public orderField(fieldId: number, afterId?: number)
   {
     const order = this.orderController.getOrder();
     this.orderController.setOrder(order.insert(fieldId, afterId));

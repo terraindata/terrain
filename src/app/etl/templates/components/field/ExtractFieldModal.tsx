@@ -127,7 +127,7 @@ class ExtractFieldModal extends TerrainComponent<Props>
       const displayIndex = extractField.index !== -1 ? extractField.index : 0;
       return {
         name: `Item ${displayIndex}`,
-        index: displayIndex,
+        index: String(displayIndex),
       };
     }
   }
