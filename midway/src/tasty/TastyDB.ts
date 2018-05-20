@@ -48,7 +48,7 @@ import TastyQuery from './TastyQuery';
 import TastySchema from './TastySchema';
 import TastyTable from './TastyTable';
 
-abstract class TastyDB
+export abstract class TastyDB
 {
   /**
    * makes a database specific query from a TastyQuery
@@ -108,6 +108,36 @@ abstract class TastyDB
   public async abstract update(table: TastyTable, elements: object[]): Promise<object[]>;
 
   /**
+   * start a transaction
+   *
+   * @abstract
+   * @returns {Promise<object[]>}
+   *
+   * @memberof TastyDB
+   */
+  public async abstract startTransaction(isolationLevel: IsolationLevel, readOnly: boolean): Promise<object[]>;
+
+  /**
+   * commit a transaction
+   *
+   * @abstract
+   * @returns {Promise<object[]>}
+   *
+   * @memberof TastyDB
+   */
+  public async abstract commitTransaction(): Promise<object[]>;
+
+  /**
+   * rollback a transaction
+   *
+   * @abstract
+   * @returns {Promise<object[]>}
+   *
+   * @memberof TastyDB
+   */
+  public async abstract rollbackTransaction(): Promise<object[]>;
+
+  /**
    * returns schema information for a database
    *
    * @abstract
@@ -136,6 +166,15 @@ abstract class TastyDB
    * @memberof TastyDB
    */
   public async abstract putMapping(table: TastyTable): Promise<object>;
+}
+
+export enum IsolationLevel
+{
+  REPEATABLE_READ = 'REPEATABLE READ',
+  READ_COMMITTED = 'READ COMMITTED',
+  READ_UNCOMMITTED = 'READ UNCOMMITTED',
+  SERIALIZABLE = 'SERIALIZABLE',
+  DEFAULT = '',
 }
 
 export default TastyDB;

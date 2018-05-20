@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import DatabaseController from '../database/DatabaseController';
 import TastyColumn from './TastyColumn';
-import TastyDB from './TastyDB';
+import { IsolationLevel, TastyDB } from './TastyDB';
 import TastyNode from './TastyNode';
 import TastyQuery from './TastyQuery';
 import TastySchema from './TastySchema';
@@ -230,6 +230,21 @@ export class Tasty
     }
 
     return this.execute(query);
+  }
+
+  public async startTransaction(isolationLevel = IsolationLevel.DEFAULT, readOnly = false)
+  {
+    return this.db.startTransaction(isolationLevel, readOnly);
+  }
+
+  public async commitTransaction()
+  {
+    return this.db.commitTransaction();
+  }
+
+  public async rollbackTransaction()
+  {
+    return this.db.rollbackTransaction();
   }
 
   public async schema(): Promise<TastySchema>

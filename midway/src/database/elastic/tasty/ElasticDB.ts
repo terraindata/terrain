@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Elastic from 'elasticsearch';
 
 import util from '../../../../../shared/Util';
-import TastyDB from '../../../tasty/TastyDB';
+import { IsolationLevel, TastyDB } from '../../../tasty/TastyDB';
 import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
 import TastyTable from '../../../tasty/TastyTable';
@@ -184,6 +184,21 @@ export class ElasticDB implements TastyDB
       }
     }
     return results;
+  }
+
+  public async startTransaction(isolationLevel: IsolationLevel, readOnly: boolean): Promise<object[]>
+  {
+    throw new Error('startTransaction() is not supported');
+  }
+
+  public async commitTransaction(): Promise<object[]>
+  {
+    throw new Error('commitTransaction() is not supported');
+  }
+
+  public async rollbackTransaction(): Promise<object[]>
+  {
+    throw new Error('rollbackTransaction() is not supported');
   }
 
   /*

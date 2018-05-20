@@ -50,6 +50,7 @@ import PostgresConfig from '../../../../src/database/pg/PostgreSQLConfig';
 import PostgresController from '../../../../src/database/pg/PostgreSQLController';
 
 import * as Tasty from '../../../../src/tasty/Tasty';
+import { IsolationLevel } from '../../../../src/tasty/TastyDB';
 import PostgreSQLQueries from '../../../tasty/PostgreSQLQueries';
 import SQLQueries from '../../../tasty/SQLQueries';
 import * as Utils from '../../TestUtil';
@@ -110,6 +111,24 @@ for (let i = 0; i < tests.length; i++)
 {
   runTest(tests[i]);
 }
+
+test('Postgres: transactions', async (done) =>
+{
+  try
+  {
+    await tasty.startTransaction(IsolationLevel.REPEATABLE_READ, true);
+    await tasty.rollbackTransaction();
+    await tasty.startTransaction(IsolationLevel.SERIALIZABLE);
+    await tasty.commitTransaction();
+    await tasty.startTransaction();
+    await tasty.commitTransaction();
+  }
+  catch (e)
+  {
+    fail(e);
+  }
+  done();
+});
 
 afterAll(async () =>
 {

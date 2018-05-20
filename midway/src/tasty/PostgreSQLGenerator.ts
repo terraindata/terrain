@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import { IsolationLevel } from '../tasty/TastyDB';
 import TastyNode from '../tasty/TastyNode';
 import TastyQuery from '../tasty/TastyQuery';
 
@@ -77,7 +78,7 @@ export const TypeMap: Map<string, SQLGeneratorMapping> = new Map([
 
   ['filter', newSQLGeneratorMapping('WHERE', FixEnum.nullary)],
   ['select', newSQLGeneratorMapping('SELECT', FixEnum.nullary)],
-  ['upsert', newSQLGeneratorMapping('REPLACE', FixEnum.nullary)],
+  ['upsert', newSQLGeneratorMapping('INSERT', FixEnum.nullary)],
   ['insert', newSQLGeneratorMapping('INSERT', FixEnum.nullary)],
   ['delete', newSQLGeneratorMapping('DELETE', FixEnum.nullary)],
   ['skip', newSQLGeneratorMapping('OFFSET', FixEnum.nullary)],
@@ -239,7 +240,7 @@ export default class SQLGenerator
   public generateUpsertQuery(query: TastyQuery, upserts: object[], placeholder: boolean)
   {
     this.appendExpression(query.command);
-    this.queryString = 'INSERT INTO ';
+    this.queryString += ' INTO ';
 
     const tableName: string = this.escapeString(query.table.getTableName());
     this.queryString += tableName;
@@ -279,6 +280,36 @@ export default class SQLGenerator
 
     this.accumulateUpsert(definedColumnsList, primaryKeys, tableName, accumulatedUpdates, placeholder);
     this.queryString = '';
+  }
+
+  public generateStartTransactionQuery(isolationLevel: IsolationLevel, readOnly: boolean)
+  {
+    this.queryString = 'START TRANSACTION';
+    if (readOnly)
+    {
+      this.queryString += ' READ ONLY';
+    }
+    else
+    {
+      this.queryString += ' READ WRITE';
+    }
+    this.accumulateStatement(this.queryString);
+    if (isolationLevel !== IsolationLevel.DEFAULT)
+    {
+      this.accumulateStatement('SET TRANSACTION ISOLATION LEVEL ' + isolationLevel);
+    }
+  }
+
+  public generateCommitQuery()
+  {
+    this.queryString = 'COMMIT';
+    this.accumulateStatement(this.queryString);
+  }
+
+  public generateRollbackQuery()
+  {
+    this.queryString = 'ROLLBACK';
+    this.accumulateStatement(this.queryString);
   }
 
   public accumulateStatement(queryString: string): void

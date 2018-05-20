@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import util from '../../../../../shared/Util';
 import PostgreSQLGenerator from '../../../tasty/PostgreSQLGenerator';
-import TastyDB from '../../../tasty/TastyDB';
+import { IsolationLevel, TastyDB } from '../../../tasty/TastyDB';
 import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
 import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
@@ -152,6 +152,27 @@ export class PostgreSQLDB implements TastyDB
     }
 
     return results;
+  }
+
+  public async startTransaction(isolationLevel: IsolationLevel, readOnly: boolean): Promise<object[]>
+  {
+    const generator = new PostgreSQLGenerator();
+    generator.generateStartTransactionQuery(isolationLevel, readOnly);
+    return this.execute(generator.statements);
+  }
+
+  public async commitTransaction(): Promise<object[]>
+  {
+    const generator = new PostgreSQLGenerator();
+    generator.generateCommitQuery();
+    return this.execute(generator.statements);
+  }
+
+  public async rollbackTransaction(): Promise<object[]>
+  {
+    const generator = new PostgreSQLGenerator();
+    generator.generateRollbackQuery();
+    return this.execute(generator.statements);
   }
 
   public async destroy(): Promise<void>
