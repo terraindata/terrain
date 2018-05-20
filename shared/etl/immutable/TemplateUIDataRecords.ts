@@ -42,58 +42,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires import-spacing
-
-import * as classNames from 'classnames';
-import TerrainComponent from 'common/components/TerrainComponent';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
-import * as React from 'react';
-import { getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
+// Copyright 2017 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
 
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
+import { makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
-import { getTransformationForm } from 'etl/templates/components/transformations/TransformationForms';
-import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
-import { TransformationNode } from 'etl/templates/FieldTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { TransformationInfo } from 'shared/transformations/TransformationInfo';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 
-import './TransformationEditor.less';
+type FieldOrder = ReorderableSet<number>;
 
-export interface Props
+class TemplateUIDataC
 {
-  transformation?: TransformationNode;
-  onClose: () => void;
-  engine: TransformationEngine;
-  fieldID: number;
-  tryMutateEngine: (tryFn: (proxy: EngineProxy) => void) => void;
+  public engineFieldOrders: Immutable.Map<number, FieldOrder> = Immutable.Map<number, FieldOrder>({});
 }
-
-@Radium
-export class TransformationEditor extends TerrainComponent<Props>
-{
-  public render()
+export type TemplateUIData = WithIRecord<TemplateUIDataC>;
+export const _TemplateUIData = makeExtendedConstructor(TemplateUIDataC, true, {
+  engineFieldOrders: (orders) =>
   {
-    const CompClass = getTransformationForm(this.props.transformation.typeCode);
-    return (
-      <div className='transformation-editor'>
-        <div className='edit-transformation-container'>
-          <CompClass
-            isCreate={false}
-            engine={this.props.engine}
-            fieldId={this.props.fieldID}
-            onClose={this.props.onClose}
-            transformation={this.props.transformation}
-            tryMutateEngine={this.props.tryMutateEngine}
-          />
-        </div>
-      </div>
-    );
-  }
-}
+    return Map(orders).mapEntries<number, FieldOrder>(
+      ([key, obj]) => [Number(key), _ReorderableSet<number>(obj, true)],
+    ).toMap();
+  },
+});

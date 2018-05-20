@@ -59,7 +59,7 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 
 import GraphHelpers from 'etl/helpers/GraphHelpers';
 import TemplateList from 'etl/templates/components/TemplateList';
-import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
+import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';

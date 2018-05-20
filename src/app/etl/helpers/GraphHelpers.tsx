@@ -60,7 +60,7 @@ import ETLHelpers from './ETLHelpers';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
-import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
+import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
@@ -97,8 +97,16 @@ class GraphHelpers extends ETLHelpers
 
       this._try((templateProxy) =>
       {
+        const fieldOrderController = {
+          setOrder: (newOrdering) => templateProxy.setFieldOrdering(currentEdge, newOrdering),
+          getOrder: () => templateProxy.getFieldOrdering(currentEdge),
+        };
         const engine = templateProxy.value().getTransformationEngine(currentEdge);
-        tryFn(new EngineProxy(engine, handleRequestRebuild));
+        tryFn(new EngineProxy(engine, handleRequestRebuild, fieldOrderController));
+        if (structuralChanges)
+        {
+          templateProxy.cleanFieldOrdering(currentEdge);
+        }
       }).then(() =>
       {
         resolve(structuralChanges);

@@ -53,7 +53,9 @@ import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordFo
 
 import { _SinkConfig, _SourceConfig, ItemWithName, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'shared/etl/immutable/ETLProcessRecords';
+import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import { _TemplateSettings, TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
+import { _TemplateUIData, TemplateUIData } from 'shared/etl/immutable/TemplateUIDataRecords';
 import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
 import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
@@ -81,7 +83,7 @@ class ETLTemplateC implements ETLTemplateI
   public sinks = Map<string, SinkConfig>();
   public settings = _TemplateSettings();
   public meta = {};
-  public uiData = {};
+  public uiData = _TemplateUIData();
 
   // Returns true if and only if there is 1 sink and it is a database
   public isImport(): boolean
@@ -188,6 +190,11 @@ class ETLTemplateC implements ETLTemplateI
   public getTransformationEngine(edge: number)
   {
     return this.process.edges.getIn([edge, 'transformations']);
+  }
+
+  public getFieldOrdering(edgeId: number): ReorderableSet<number>
+  {
+    return this.uiData.getIn(['engineFieldOrders', edgeId]);
   }
 
   public getNode(id: number)
@@ -314,6 +321,7 @@ export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, true, {
     return typeof date === 'string' ? new Date(date) : date;
   },
   settings: _TemplateSettings,
+  uiData: _TemplateUIData,
 });
 
 // todo, please do this more efficiently
@@ -368,7 +376,7 @@ export function templateForBackend(template: ETLTemplate): TemplateBase
   obj.sources = recordForSave(obj.sources);
   obj.sinks = recordForSave(obj.sinks);
   obj.settings = recordForSave(obj.settings);
-
+  obj.uiData = recordForSave(obj.uiData);
   obj.process = obj.process.update('edges', (edges) => edges.map((edge, key) =>
   {
     return edge.set('transformations', JSON.stringify(edge.transformations.toJSON()));

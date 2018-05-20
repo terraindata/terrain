@@ -76,6 +76,7 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
     'meta',
     'uiData',
   ];
+
   Util.verifyParameters(template, requiredParams);
   ctx.body = await templates.create(template);
 });

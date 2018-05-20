@@ -60,7 +60,7 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { compareObjects, isVisiblyEqual, PropertyTracker, UpdateChecker } from 'etl/ETLUtil';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
-import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
+import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { EditorDisplayState, FieldMap, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
@@ -221,6 +221,8 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
           error: true,
         },
       });
+      // tslint:disable-next-line
+      console.error(err);
     };
   }
 

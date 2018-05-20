@@ -215,11 +215,11 @@ export default abstract class ETLHelpers
             error: true,
           },
         });
+        this._logError(ev);
       }
       else
       {
-        // tslint:disable-next-line
-        console.error(description, ev);
+        this._logError(ev);
       }
     };
   }
