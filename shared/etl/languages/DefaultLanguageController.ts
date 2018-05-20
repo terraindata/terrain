@@ -59,11 +59,6 @@ class DefaultController implements LanguageInterface
   {
     return;
   }
-
-  public autodetectFieldTypes(engine: TransformationEngine, documents: List<object>)
-  {
-    return;
-  }
 }
 
 export default new DefaultController();

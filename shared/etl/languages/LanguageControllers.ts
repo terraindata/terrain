@@ -57,7 +57,6 @@ export interface LanguageInterface
 {
   language: Languages;
   changeFieldTypeSideEffects: (engine: TransformationEngine, fieldId: number, newType: ETLFieldTypes) => void;
-  autodetectFieldTypes: (engine: TransformationEngine, documents: List<object>) => void;
 }
 
 export default class LanguageControllers

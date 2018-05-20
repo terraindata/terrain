@@ -102,8 +102,9 @@ export function parseKeys<T>(obj: T, keys: Array<(keyof T)>)
 export function destringifySavedTemplate(obj: TemplateInDatabase): TemplateConfig
 {
   const newObj: TemplateObject = _.extend({}, obj);
-  parseKeys(newObj, ['sources', 'sinks', 'process', 'settings', 'meta', 'uiData']);
-  return new TemplateConfig(newObj);
+  const template = new TemplateConfig(newObj);
+  parseKeys(template, ['sources', 'sinks', 'process', 'settings', 'meta', 'uiData']);
+  return template;
 }
 
 export function templateForSave(template: TemplateObject): TemplateInDatabase

@@ -236,7 +236,7 @@ export class TemplateProxy
 
   public getFieldOrdering(edgeId: number): ReorderableSet<number>
   {
-    return this.template.getIn(['uiData', 'engineFieldOrders', edgeId]);
+    return this.template.getFieldOrdering(edgeId);
   }
 
   public cleanFieldOrdering(edgeId: number)
@@ -269,12 +269,6 @@ export class TemplateProxy
 
     EngineUtil.interpretETLTypes(engine, documentConfig);
     EngineUtil.addInitialTypeCasts(engine);
-
-    const language = this.template.getEdgeLanguage(edgeId);
-    if (language !== Languages.JavaScript)
-    {
-      LanguageController.get(language).autodetectFieldTypes(engine, documentConfig.documents);
-    }
   }
 
   private createNode(node: ETLNode): number
@@ -295,6 +289,7 @@ export class TemplateProxy
     const id = this.process.uidEdge;
     this.edges = this.edges.set(id, edge.set('id', id));
     this.process = this.process.set('uidEdge', id + 1);
+    this.setFieldOrdering(id, _ReorderableSet<number>());
     return id;
   }
 

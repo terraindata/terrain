@@ -221,6 +221,8 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
           error: true,
         },
       });
+      // tslint:disable-next-line
+      console.error(err);
     };
   }
 

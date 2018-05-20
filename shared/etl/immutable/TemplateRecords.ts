@@ -59,6 +59,7 @@ import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, SourceOpt
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { TemplateUIData, _TemplateUIData } from 'shared/etl/immutable/TemplateUIDataRecords';
+import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 
 export type SourcesMap = Immutable.Map<string, SourceConfig>;
 export type SinksMap = Immutable.Map<string, SinkConfig>;
@@ -191,6 +192,11 @@ class ETLTemplateC implements ETLTemplateI
     return this.process.edges.getIn([edge, 'transformations']);
   }
 
+  public getFieldOrdering(edgeId: number): ReorderableSet<number>
+  {
+    return this.uiData.getIn(['engineFieldOrders', edgeId]);
+  }
+
   public getNode(id: number)
   {
     return this.process.nodes.get(id);
@@ -315,6 +321,7 @@ export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, true, {
     return typeof date === 'string' ? new Date(date) : date;
   },
   settings: _TemplateSettings,
+  uiData: _TemplateUIData,
 });
 
 // todo, please do this more efficiently
@@ -369,7 +376,7 @@ export function templateForBackend(template: ETLTemplate): TemplateBase
   obj.sources = recordForSave(obj.sources);
   obj.sinks = recordForSave(obj.sinks);
   obj.settings = recordForSave(obj.settings);
-
+  obj.uiData = recordForSave(obj.uiData);
   obj.process = obj.process.update('edges', (edges) => edges.map((edge, key) =>
   {
     return edge.set('transformations', JSON.stringify(edge.transformations.toJSON()));

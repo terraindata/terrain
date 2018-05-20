@@ -136,6 +136,8 @@ export class DuplicateTFF extends TransformationForm<DuplicateOptions, Transform
     const { outputName } = this.state;
     const currentKeyPath = engine.getOutputKeyPath(fieldId);
     const newKeyPath = currentKeyPath.set(currentKeyPath.size - 1, outputName);
-    proxy.duplicateField(fieldId, newKeyPath);
+    const { destinationId, newOriginalId } = proxy.duplicateField(fieldId, newKeyPath);
+    proxy.orderField(destinationId, fieldId);
+    proxy.orderField(newOriginalId, fieldId);
   }
 }

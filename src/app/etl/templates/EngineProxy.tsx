@@ -67,8 +67,11 @@ export class EngineProxy
 {
   constructor(
     private engine: TransformationEngine,
-    private requestRebuild?: (id?: number) => void,
-    private setFieldOrdering?: (newOrdering: ReorderableSet<number>) => void,
+    private requestRebuild: (id?: number) => void,
+    private orderController: {
+      setOrder: (newOrdering: ReorderableSet<number>) => void,
+      getOrder: () => ReorderableSet<number>,
+    }
   )
   {
 
@@ -199,7 +202,10 @@ export class EngineProxy
     return newFieldId;
   }
 
-  public duplicateField(sourceId: number, destKP: List<string>, despecify = false)
+  public duplicateField(sourceId: number, destKP: List<string>, despecify = false): {
+    newOriginalId: number,
+    destinationId: number,
+  }
   {
     const originalOKP = this.engine.getOutputKeyPath(sourceId);
     this.engine.setOutputKeyPath(sourceId, originalOKP.set(-1, '_' + originalOKP.last()));
@@ -212,6 +218,10 @@ export class EngineProxy
     this.engine.disableField(sourceId);
     this.setFieldHidden(sourceId, true);
     this.requestRebuild();
+    return {
+      newOriginalId: newOrigId,
+      destinationId: destId,
+    };
   }
 
   public addField(keypath: List<string>, type: ETLFieldTypes, valueType: ETLFieldTypes = ETLFieldTypes.String)
@@ -253,6 +263,12 @@ export class EngineProxy
       this.engine.disableField(fieldId);
     }
     this.requestRebuild(fieldId);
+  }
+
+  public orderField(fieldId: number, afterId: number)
+  {
+    const order = this.orderController.getOrder();
+    this.orderController.setOrder(order.insert(fieldId, afterId));
   }
 
   // this is not deterministic

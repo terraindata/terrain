@@ -59,6 +59,7 @@ import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords'
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 
 export type FieldMap = Immutable.Map<number, TemplateField>;
 
@@ -86,6 +87,12 @@ class TemplateEditorStateC
   {
     const currentEdge = this.getCurrentEdgeId();
     return this.template.getTransformationEngine(currentEdge);
+  }
+
+  public getCurrentFieldOrdering(): ReorderableSet<number>
+  {
+    const currentEdge = this.getCurrentEdgeId();
+    return this.template.getFieldOrdering(currentEdge);
   }
 
   public getCurrentEdgeId()

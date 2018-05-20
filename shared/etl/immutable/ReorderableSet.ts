@@ -137,7 +137,7 @@ class ReorderableSetC<T>
   }
 
   // costs O(n) time to create, comparison is O(1)
-  public getComparator(): (a: T, b: T) => number
+  public createComparator(): (a: T, b: T) => number
   {
     const lookup = this.computeOrderMap();
     return (a: T, b: T) => {
@@ -163,7 +163,7 @@ class ReorderableSetC<T>
 export type ReorderableSet<T> = WithIRecord<ReorderableSetC<T>>;
 
 const _RealReorderableSet = makeExtendedConstructor(ReorderableSetC, true, {
-  ordering: List,
+  ordering: (ordering) => List(ordering),
 });
 export function _ReorderableSet<T>(config?: ConfigType<ReorderableSetC<T>>, deep?: boolean): WithIRecord<ReorderableSetC<T>>
 {
