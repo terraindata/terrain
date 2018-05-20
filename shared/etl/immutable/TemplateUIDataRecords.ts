@@ -61,7 +61,8 @@ class TemplateUIDataC
 }
 export type TemplateUIData = WithIRecord<TemplateUIDataC>;
 export const _TemplateUIData = makeExtendedConstructor(TemplateUIDataC, true, {
-  engineFieldOrders: (orders) => {
+  engineFieldOrders: (orders) =>
+  {
     return Map(orders).mapEntries<number, FieldOrder>(
       ([key, obj]) => [Number(key), _ReorderableSet<number>(obj, true)],
     ).toMap();

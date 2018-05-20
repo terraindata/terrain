@@ -50,13 +50,13 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
 import { postorderForEach, preorderForEach } from 'etl/templates/SyncUtil';
+import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import { ETLFieldTypes, FieldTypes, getJSFromETL, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
-import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 
 /*
  *  Should this file in be /shared?
@@ -71,7 +71,7 @@ export class EngineProxy
     private orderController: {
       setOrder: (newOrdering: ReorderableSet<number>) => void,
       getOrder: () => ReorderableSet<number>,
-    }
+    },
   )
   {
 
@@ -202,10 +202,11 @@ export class EngineProxy
     return newFieldId;
   }
 
-  public duplicateField(sourceId: number, destKP: List<string>, despecify = false): {
-    newOriginalId: number,
-    destinationId: number,
-  }
+  public duplicateField(sourceId: number, destKP: List<string>, despecify = false):
+    {
+      newOriginalId: number,
+      destinationId: number,
+    }
   {
     const originalOKP = this.engine.getOutputKeyPath(sourceId);
     this.engine.setOutputKeyPath(sourceId, originalOKP.set(-1, '_' + originalOKP.last()));

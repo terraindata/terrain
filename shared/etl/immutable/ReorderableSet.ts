@@ -80,10 +80,10 @@ class ReorderableSetC<T>
       items = items.delete(existingPosition);
     }
 
-    let newPosition = items.size;
+    let newPosition: number = items.size;
     if (after !== undefined)
     {
-      const afterIndex = items.indexOf(after);
+      const afterIndex: number = items.indexOf(after);
       if (afterIndex !== -1)
       {
         newPosition = afterIndex + 1;
@@ -140,7 +140,8 @@ class ReorderableSetC<T>
   public createComparator(): (a: T, b: T) => number
   {
     const lookup = this.computeOrderMap();
-    return (a: T, b: T) => {
+    return (a: T, b: T) =>
+    {
       const aPos = lookup.get(a);
       const bPos = lookup.get(b);
       if (aPos === undefined || bPos === undefined)

@@ -65,8 +65,8 @@ import EditorFieldNode from 'etl/templates/components/field/EditorFieldNode';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { FieldMap, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 import EditorFieldPreview from './EditorFieldPreview';
 import EditorFieldSettings from './EditorFieldSettings';

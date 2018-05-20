@@ -55,11 +55,11 @@ import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordFo
 import { _HistoryStack, HistoryStack } from 'etl/common/HistoryStack';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 
 export type FieldMap = Immutable.Map<number, TemplateField>;
 
