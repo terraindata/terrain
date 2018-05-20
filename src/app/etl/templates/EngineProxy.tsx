@@ -110,7 +110,7 @@ export class EngineProxy
     rawOptions: {
       newFieldKeyPaths?: List<EnginePath>,
       [k: string]: any,
-    }
+    },
   )
   {
     let options = rawOptions;
@@ -121,7 +121,7 @@ export class EngineProxy
     {
       syntheticPaths = options.newFieldKeyPaths.map((kp) => this.getSyntheticInputPath(kp)).toList();
       options = _.extend({}, options, {
-        newFieldKeyPaths: syntheticPaths
+        newFieldKeyPaths: syntheticPaths,
       });
     }
 
@@ -135,7 +135,8 @@ export class EngineProxy
         sourceFieldId = this.engine.getInputFieldID(fields.get(0));
       }
 
-      syntheticPaths.forEach((path, index) => {
+      syntheticPaths.forEach((path, index) =>
+      {
         const synthId = this.engine.getInputFieldID(path);
         this.engine.setOutputKeyPath(synthId, rawOptions.newFieldKeyPaths.get(index));
         if (sourceFieldId !== undefined)
