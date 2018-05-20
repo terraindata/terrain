@@ -56,6 +56,8 @@ import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
+import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
+
 /*
  *  Should this file in be /shared?
  *  Proxy objects are generated synchronously and aren't meant to be persisted
@@ -66,6 +68,7 @@ export class EngineProxy
   constructor(
     private engine: TransformationEngine,
     private requestRebuild?: (id?: number) => void,
+    private setFieldOrdering?: (newOrdering: ReorderableSet<number>) => void,
   )
   {
 

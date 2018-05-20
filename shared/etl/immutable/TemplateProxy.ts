@@ -58,6 +58,7 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
+import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 
 import
 {
@@ -213,6 +214,7 @@ export class TemplateProxy
         documents,
         castStringsToPrimitives,
       });
+    this.cleanFieldOrdering(edgeId);
     return { warnings, softWarnings };
   }
 
@@ -224,6 +226,33 @@ export class TemplateProxy
   public setEdgeTo(edgeId: number, toNode: number)
   {
     this.edges = this.edges.update(edgeId, (edge) => edge.set('to', toNode));
+  }
+
+  public setFieldOrdering(edgeId: number, order: ReorderableSet<number>)
+  {
+    const newOrdering = this.template.uiData.engineFieldOrders.set(edgeId, order);
+    this.template = this.template.setIn(['uiData', 'engineFieldOrders'], newOrdering);
+  }
+
+  public getFieldOrdering(edgeId: number): ReorderableSet<number>
+  {
+    return this.template.getIn(['uiData', 'engineFieldOrders', edgeId]);
+  }
+
+  public cleanFieldOrdering(edgeId: number)
+  {
+    const engine = this.template.getTransformationEngine(edgeId);
+    let order = this.getFieldOrdering(edgeId);
+
+    if (order === undefined)
+    {
+      order = _ReorderableSet();
+    }
+
+    order = order.bulkAdd(engine.getAllFieldIDs());
+    order = order.intersect(engine.getAllFieldIDs().toSet());
+
+    this.setFieldOrdering(edgeId, order);
   }
 
   // Add automatic type casts to fields, and apply language specific type checking

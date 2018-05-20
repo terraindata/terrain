@@ -58,6 +58,7 @@ import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
 import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { TemplateUIData, _TemplateUIData } from 'shared/etl/immutable/TemplateUIDataRecords';
 
 export type SourcesMap = Immutable.Map<string, SourceConfig>;
 export type SinksMap = Immutable.Map<string, SinkConfig>;
@@ -81,7 +82,7 @@ class ETLTemplateC implements ETLTemplateI
   public sinks = Map<string, SinkConfig>();
   public settings = _TemplateSettings();
   public meta = {};
-  public uiData = {};
+  public uiData = _TemplateUIData();
 
   // Returns true if and only if there is 1 sink and it is a database
   public isImport(): boolean

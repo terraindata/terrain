@@ -69,7 +69,7 @@ class ReorderableSetC<T>
   public ordering: List<T> = List([]);
 
   // if after is not provided, then insert at the end
-  public insert(value: T, after?: T)
+  public insert(value: T, after?: T): ReorderableSet<T>
   {
     const rset: ReorderableSet<T> = this as any;
     let items = rset.ordering;
@@ -94,7 +94,17 @@ class ReorderableSetC<T>
     return rset.set('ordering', items);
   }
 
-  public remove(value: T)
+  public bulkAdd(values: List<T>): ReorderableSet<T>
+  {
+    const rset: ReorderableSet<T> = this as any;
+
+    const orderMap = this.computeOrderMap();
+    const newOrder = this.ordering.concat(values.filter((val) => !orderMap.has(val)));
+
+    return rset.set('ordering', newOrder);
+  }
+
+  public remove(value: T): ReorderableSet<T>
   {
     const rset: ReorderableSet<T> = this as any;
     let items = rset.ordering;
@@ -108,10 +118,28 @@ class ReorderableSetC<T>
     return rset.set('ordering', items);
   }
 
-  // costs O(n) time to create, comparison is O(1)
-  public comparator(): (a: T, b: T) => number
+  public bulkRemove(values: List<T>): ReorderableSet<T>
   {
-    const lookup: Immutable.Map<T, number> = Map(this.ordering.map((value, index) => [value, index]));
+    const rset: ReorderableSet<T> = this as any;
+
+    const removalSet = values.toSet();
+    const newOrder = this.ordering.filter((val) => !removalSet.has(val)).toList();
+
+    return rset.set('ordering', newOrder);
+  }
+
+  public intersect(values: Immutable.Set<T>): ReorderableSet<T>
+  {
+    const rset: ReorderableSet<T> = this as any;
+    const newOrder = this.ordering.filter((val) => values.has(val)).toList();
+
+    return rset.set('ordering', newOrder);
+  }
+
+  // costs O(n) time to create, comparison is O(1)
+  public getComparator(): (a: T, b: T) => number
+  {
+    const lookup = this.computeOrderMap();
     return (a: T, b: T) => {
       const aPos = lookup.get(a);
       const bPos = lookup.get(b);
@@ -125,6 +153,11 @@ class ReorderableSetC<T>
       }
     };
   }
+
+  public computeOrderMap(): Immutable.Map<T, number>
+  {
+    return Map(this.ordering.map((value, index) => [value, index]));
+  }
 }
 
 export type ReorderableSet<T> = WithIRecord<ReorderableSetC<T>>;
@@ -132,7 +165,6 @@ export type ReorderableSet<T> = WithIRecord<ReorderableSetC<T>>;
 const _RealReorderableSet = makeExtendedConstructor(ReorderableSetC, true, {
   ordering: List,
 });
-
 export function _ReorderableSet<T>(config?: ConfigType<ReorderableSetC<T>>, deep?: boolean): WithIRecord<ReorderableSetC<T>>
 {
   return _RealReorderableSet(config, deep) as any;

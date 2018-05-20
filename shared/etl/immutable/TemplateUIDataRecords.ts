@@ -67,4 +67,3 @@ export const _TemplateUIData = makeExtendedConstructor(TemplateUIDataC, true, {
     ).toMap();
   },
 });
-
