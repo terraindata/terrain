@@ -1054,28 +1054,31 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
       return content;
     }
   }
-  if (typeof value === 'object')
-  {
-    tooltipText = JSON.stringify(value, null, 2);
-    tooltipText = tooltipText.replace(/\"/g, '').replace(/\\/g, '').replace(/:/g, ': ').replace(/,/g, ', ');
-    let valueString = '';
-    value = Util.asJS(value);
-    for (const key in value)
-    {
-      if (value.hasOwnProperty(key))
-      {
-        valueString += key + ': ' + JSON.stringify(value[key]) + ', ';
-      }
-    }
-    value = valueString.slice(0, -2);
-  }
 
   if (format && !isTitle)
   {
     switch (format.type)
     {
       case 'image':
-        const url = format.template.replace(/\[value\]/g, value as string);
+        let url;
+        if (typeof value === 'object')
+        {
+          const path = format.template.match(/\[value(.*)\]/i);
+          if (path.length < 2)
+          {
+            break;
+          }
+          for (const p of path[1].split('.'))
+          {
+            if (p === '')
+            {
+              continue;
+            }
+            value = value.get(p);
+          }
+        }
+        url = format.template.replace(/\[value.*\]/g, value as string);
+
         if (bgUrlOnly)
         {
           return url;
@@ -1145,6 +1148,22 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
       case 'text':
         break;
     }
+  }
+
+  if (typeof value === 'object')
+  {
+    tooltipText = JSON.stringify(value, null, 2);
+    tooltipText = tooltipText.replace(/\"/g, '').replace(/\\/g, '').replace(/:/g, ': ').replace(/,/g, ', ');
+    let valueString = '';
+    value = Util.asJS(value);
+    for (const key in value)
+    {
+      if (value.hasOwnProperty(key))
+      {
+        valueString += key + ': ' + JSON.stringify(value[key]) + ', ';
+      }
+    }
+    value = valueString.slice(0, -2);
   }
 
   if (typeof value === 'number')
