@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
 import { EventEmitter } from 'events';
@@ -137,10 +137,14 @@ export class ElasticWriter extends Stream.Writable
 
   private upsert(body: object, callback: (err?: Error) => void): void
   {
-    const query: Elastic.IndexDocumentParams<object> = {
+    const query: Elastic.UpdateDocumentParams = {
       index: this.index,
       type: this.type,
-      body,
+      id: body[this.primaryKey],
+      body: {
+        doc: body,
+        doc_as_upsert: true,
+      },
     };
 
     if (this.primaryKey !== undefined && body[this.primaryKey] !== undefined)
@@ -148,7 +152,7 @@ export class ElasticWriter extends Stream.Writable
       query['id'] = body[this.primaryKey];
     }
 
-    this.client.index(query, callback);
+    this.client.update(query, callback);
   }
 
   private bulkUpsert(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
@@ -158,19 +162,24 @@ export class ElasticWriter extends Stream.Writable
     {
       const command =
         {
-          index: {
+          update: {
             _index: this.index,
             _type: this.type,
           },
         };
 
-      if (this.primaryKey !== undefined && chunk[this.primaryKey] !== undefined)
+      if (this.primaryKey !== undefined && chunk.chunk[this.primaryKey] !== undefined)
       {
-        command.index['_id'] = chunk[this.primaryKey];
+        command.update['_id'] = chunk.chunk[this.primaryKey];
       }
 
+      const newBody = {
+        doc: chunk.chunk,
+        doc_as_upsert: true,
+      };
+
       body.push(command);
-      body.push(chunk.chunk);
+      body.push(newBody);
     }
 
     this.client.bulk({ body }, callback);

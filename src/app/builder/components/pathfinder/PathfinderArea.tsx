@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
@@ -282,6 +282,7 @@ class PathfinderArea extends TerrainComponent<Props>
             {
               <PathfinderFilterSection
                 isSoftFilter={true}
+                path={path}
                 pathfinderContext={pathfinderContext}
                 filterGroup={path.softFilterGroup}
                 keyPath={this._ikeyPath(keyPath, 'softFilterGroup')}

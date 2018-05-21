@@ -529,7 +529,8 @@ export class TransformationEngine
     {
       if (keyPathPrefixMatch(field, oldKeyPath))
       {
-        this.IDToFieldNameMap = this.IDToFieldNameMap.set(id, updateKeyPath(field, oldKeyPath, newKeyPath));
+        this.IDToFieldNameMap = this.IDToFieldNameMap.set(id,
+          updateKeyPath(field, oldKeyPath, newKeyPath, this.fieldTypes.get(id) === 'array'));
       }
     });
 

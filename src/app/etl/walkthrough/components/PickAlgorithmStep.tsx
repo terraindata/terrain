@@ -58,7 +58,7 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormClasses';
+import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormLookups';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { getFileType } from 'shared/etl/FileUtil';

@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
@@ -157,6 +157,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
       mode: line.transformData.mode,
       dataDomain: line.transformData.dataDomain,
       closed: !line.expanded,
+      autoBound: line.transformData.autoBound,
     };
     return (
       <div

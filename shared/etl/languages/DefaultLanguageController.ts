@@ -55,12 +55,7 @@ class DefaultController implements LanguageInterface
 {
   public language = Languages.JavaScript;
 
-  public changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType: FieldTypes)
-  {
-    return;
-  }
-
-  public autodetectFieldTypes(engine: TransformationEngine, documents: List<object>)
+  public changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType)
   {
     return;
   }

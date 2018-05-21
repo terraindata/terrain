@@ -113,7 +113,14 @@ class TemplateEditor extends TerrainComponent<Props>
     }
     try
     {
-      return engine.transform(previewDocument);
+      // do this to show disabled fields
+      const resetEngine = TransformationEngine.load(JSON.stringify(engine.toJSON()));
+      resetEngine.getAllFieldIDs().forEach((id) =>
+      {
+        resetEngine.enableField(id);
+      });
+
+      return resetEngine.transform(previewDocument);
     }
     catch (e)
     {

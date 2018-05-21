@@ -58,10 +58,10 @@ import { DisplayState, DisplayType, InputDeclarationMap } from 'common/component
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { SchedulableSinks, SchedulableSources, Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { EndpointTypeNames, SchedulableSinks, SchedulableSources, Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
-import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormClasses';
+import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormLookups';
 
 import FadeInOut from 'app/common/components/FadeInOut';
 import IntegrationForm from 'etl/common/components/IntegrationForm';
@@ -98,6 +98,7 @@ class EndpointForm extends TerrainComponent<Props>
         options: {
           pickOptions: (s) => this.props.isSchedule ? List(SchedulableSinks) : sinkList,
           indexResolver: (value) => (this.props.isSchedule ? List(SchedulableSinks) : sinkList).indexOf(value),
+          displayNames: (s) => endpointTypeNames,
         },
       },
     };
@@ -110,6 +111,8 @@ class EndpointForm extends TerrainComponent<Props>
         options: {
           pickOptions: (s) => this.props.isSchedule ? List(SchedulableSources) : sourceList,
           indexResolver: (value) => (this.props.isSchedule ? List(SchedulableSources) : sourceList).indexOf(value),
+          displayNames: (s) => endpointTypeNames,
+
         },
       },
     };
@@ -201,6 +204,7 @@ class EndpointForm extends TerrainComponent<Props>
             onChange={this.handleIntegrationChange}
             hideType={true}
             hideName={!usingCustomIntegration}
+            debounceAll={true}
           />
         </FadeInOut>
         <FadeInOut
@@ -256,6 +260,7 @@ interface SourceFormState
 const sourceList = List(Object.keys(Sources));
 const sinkList = List(Object.keys(Sinks));
 const integrationList = List(Object.keys(Integrations));
+const endpointTypeNames: IMMap<any, string> = Map<any, string>(EndpointTypeNames);
 
 export default Util.createContainer(
   EndpointForm,

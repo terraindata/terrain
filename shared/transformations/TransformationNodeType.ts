@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable no-unused-expression
 import { List } from 'immutable';
+import { DateFormats } from 'shared/etl/types/ETLTypes';
 import { KeyPath } from 'shared/util/KeyPath';
 
 enum TransformationNodeType
@@ -116,6 +117,7 @@ interface TransformationOptionTypes
   };
   CastNode: {
     toTypename: string;
+    format?: DateFormats;
   };
   HashNode: {
     salt: string;

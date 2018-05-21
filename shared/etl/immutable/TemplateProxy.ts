@@ -50,6 +50,7 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
 import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import { ETLTemplate, SinksMap, SourcesMap } from 'shared/etl/immutable/TemplateRecords';
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
@@ -196,14 +197,14 @@ export class TemplateProxy
   {
     const { engine, warnings, softWarnings } = EngineUtil.createEngineFromDocuments(documents);
 
-    let interpretText = false;
+    let castStringsToPrimitives = false;
     const fromNode = this.template.getNode(this.template.getEdge(edgeId).from);
     if (fromNode.type === NodeTypes.Source)
     {
       const source = this.template.getSource(fromNode.endpoint);
-      if (source.fileConfig.fileType === FileTypes.Csv)
+      if (source.fileConfig.fileType === FileTypes.Csv || source.fileConfig.fileType === FileTypes.Tsv)
       {
-        interpretText = true;
+        castStringsToPrimitives = true;
       }
     }
 
@@ -211,8 +212,9 @@ export class TemplateProxy
     this.performTypeDetection(edgeId,
       {
         documents,
-        interpretText,
+        castStringsToPrimitives,
       });
+    this.cleanFieldOrdering(edgeId);
     return { warnings, softWarnings };
   }
 
@@ -226,37 +228,47 @@ export class TemplateProxy
     this.edges = this.edges.update(edgeId, (edge) => edge.set('to', toNode));
   }
 
+  public setFieldOrdering(edgeId: number, order: ReorderableSet<number>)
+  {
+    const newOrdering = this.template.uiData.engineFieldOrders.set(edgeId, order);
+    this.template = this.template.setIn(['uiData', 'engineFieldOrders'], newOrdering);
+  }
+
+  public getFieldOrdering(edgeId: number): ReorderableSet<number>
+  {
+    return this.template.getFieldOrdering(edgeId);
+  }
+
+  public cleanFieldOrdering(edgeId: number)
+  {
+    const engine = this.template.getTransformationEngine(edgeId);
+    let order = this.getFieldOrdering(edgeId);
+
+    if (order === undefined)
+    {
+      order = _ReorderableSet();
+    }
+
+    order = order.bulkAdd(engine.getAllFieldIDs());
+    order = order.intersect(engine.getAllFieldIDs().toSet());
+
+    this.setFieldOrdering(edgeId, order);
+  }
+
   // Add automatic type casts to fields, and apply language specific type checking
   // if documentConfig is provided, do additional type checking / inference
   private performTypeDetection(
     edgeId: number,
     documentConfig?: {
       documents: List<object>,
-      interpretText?: boolean,
+      castStringsToPrimitives?: boolean,
     },
   )
   {
     const engine = this.template.getTransformationEngine(edgeId);
 
-    if (documentConfig !== undefined)
-    {
-      if (documentConfig.interpretText === true)
-      {
-        EngineUtil.interpretTextFields(engine, documentConfig.documents);
-      }
-
-      EngineUtil.addInitialTypeCasts(engine);
-
-      const language = this.template.getEdgeLanguage(edgeId);
-      if (language !== Languages.JavaScript)
-      {
-        LanguageController.get(language).autodetectFieldTypes(engine, documentConfig.documents);
-      }
-    }
-    else
-    {
-      EngineUtil.addInitialTypeCasts(engine);
-    }
+    EngineUtil.interpretETLTypes(engine, documentConfig);
+    EngineUtil.addInitialTypeCasts(engine);
   }
 
   private createNode(node: ETLNode): number
@@ -277,6 +289,7 @@ export class TemplateProxy
     const id = this.process.uidEdge;
     this.edges = this.edges.set(id, edge.set('id', id));
     this.process = this.process.set('uidEdge', id + 1);
+    this.setFieldOrdering(id, _ReorderableSet<number>());
     return id;
   }
 

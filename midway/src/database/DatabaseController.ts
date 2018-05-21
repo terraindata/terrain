@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 import * as winston from 'winston';
 
@@ -79,7 +79,7 @@ abstract class DatabaseController
   public log(methodName: string, info?: any, moreInfo?: any)
   {
     const header = this.header + (++this.lsn).toString() + ':' + methodName;
-    winston.info(header);
+    winston.debug(header);
     if (info !== undefined)
     {
       winston.debug(header + ': ' + JSON.stringify(info, null, 1));

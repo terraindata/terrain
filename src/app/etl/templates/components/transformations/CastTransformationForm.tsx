@@ -54,9 +54,11 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
+import { DateFormats, ETLFieldTypes, etlFieldTypesNames } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import EngineUtil, { ETLTypeToCastString } from 'shared/transformations/util/EngineUtil';
 import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
 import { DynamicForm } from 'common/components/DynamicForm';
@@ -76,12 +78,28 @@ export class CastTFF extends TransformationForm<CastOptions, TransformationNodeT
       options: {
         pickOptions: (s) => typeOptions,
         indexResolver: (value) => typeOptions.indexOf(value),
+        displayNames: (s) => displayText,
+      },
+    },
+    format: {
+      type: DisplayType.Pick,
+      displayName: 'Date Format',
+      getDisplayState: this.formatDisplayState,
+      options: {
+        pickOptions: (s) => dateOptions,
+        indexResolver: (value) => dateOptions.indexOf(value),
       },
     },
   };
+
   protected readonly initialState = {
     toTypename: 'string',
-  };
+  }; // this should be overriden by computeInitialState
+
+  public formatDisplayState(state: CastOptions)
+  {
+    return state.toTypename === 'date' ? DisplayState.Active : DisplayState.Hidden;
+  }
 
   protected isStructuralChange()
   {
@@ -93,15 +111,45 @@ export class CastTFF extends TransformationForm<CastOptions, TransformationNodeT
     const { fieldId, isCreate, engine } = this.props;
     if (isCreate)
     {
-      return {
-        toTypename: engine.getFieldType(fieldId),
+      const etlType = EngineUtil.getETLFieldType(fieldId, engine);
+      const state: CastOptions = {
+        toTypename: ETLTypeToCastString[etlType],
       };
+      if (etlType === ETLFieldTypes.Date)
+      {
+        state.format = DateFormats.ISOstring;
+      }
+      return state;
     }
     else
     {
       return super.computeInitialState();
     }
   }
+
+  protected transformFormOnChange(state: CastOptions)
+  {
+    if (state.toTypename === 'date' && state.format === undefined)
+    {
+      return _.extend({}, state, {
+        format: DateFormats.ISOstring,
+      });
+    }
+    else
+    {
+      return state;
+    }
+  }
 }
 
-const typeOptions = List(['string', 'number', 'boolean', 'array', 'object']);
+const typeOptions = List(['string', 'number', 'boolean', 'array', 'object', 'date']);
+const displayText = Immutable.Map<string, string>({
+  string: 'Text',
+  number: 'Number',
+  array: 'Array',
+  object: 'Object',
+  date: 'Date',
+  boolean: 'Boolean',
+});
+
+const dateOptions: List<DateFormats> = List([DateFormats.ISOstring, DateFormats.MMDDYYYY]);

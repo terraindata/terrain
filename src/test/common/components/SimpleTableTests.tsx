@@ -163,6 +163,7 @@ describe('SimpleTable', () =>
       );
 
       const tableRows = tableComponent.find('.simple-table-body .simple-table-row');
+
       const firstRow = tableRows.at(0);
       const lastRow = tableRows.at(9);
 
@@ -183,7 +184,7 @@ describe('SimpleTable', () =>
       );
 
       const tableRows = tableComponent.find('.simple-table-body .simple-table-row');
-      const numRows = tableRows.length;
+      const numRows = Number(tableRows.length);
 
       const newTableData = tableData.set(99, new TableItem({
         id: 99,
@@ -198,6 +199,45 @@ describe('SimpleTable', () =>
 
       expect(newNumRows).toEqual(numRows + 1);
     });
+
+    it('should format a column value using the formatter if one was specified', () =>
+    {
+      const columnsConfigWithFormatter = [
+        {
+          columnKey: 'id',
+          columnLabel: 'Id',
+        },
+        {
+          columnKey: 'name',
+          columnLabel: 'Name',
+          columnRelativeSize: 4,
+          formatter: (item) => item.name.toUpperCase(),
+        },
+        {
+          columnKey: 'status',
+          columnLabel: 'Status',
+          columnRelativeSize: 0.5,
+        },
+      ];
+
+      const tableStateWithFormatter = {
+        ...tableState,
+        columnsConfig: columnsConfigWithFormatter,
+      };
+
+      tableComponent = shallow(
+        <SimpleTable
+          {...tableStateWithFormatter}
+        />,
+      );
+
+      const tableRows = tableComponent.find('.simple-table-body .simple-table-row');
+
+      expect(tableRows.at(0).find('.simple-table-cell').at(1).text())
+        .toEqual('ITEM 1');
+      expect(tableRows.at(1).find('.simple-table-cell').at(1).text())
+        .toEqual('ITEM 2');
+    });
   });
 
   describe('#handleShowMoreClick', () =>
@@ -211,23 +251,25 @@ describe('SimpleTable', () =>
         />,
       );
 
-      tableComponent.instance().handleShowMoreClick();
+      const showMoreButton = tableComponent.find('ShowMore');
+
+      showMoreButton.simulate('click');
       expect(tableComponent.find('.simple-table-body .simple-table-row')).toHaveLength(8);
       expect(tableComponent.find('ShowMore')).toHaveLength(1);
 
-      tableComponent.instance().handleShowMoreClick();
+      showMoreButton.simulate('click');
       expect(tableComponent.find('.simple-table-body .simple-table-row')).toHaveLength(10);
       expect(tableComponent.find('ShowMore')).toHaveLength(0);
     });
   });
 
-  describe('#calculateColumnWidhts', () =>
+  describe('#calculateColumnWidths', () =>
   {
     it('should balance column widths to fill 100% based on the defined columnRelativeSize', () =>
     {
       // take the columnRelativeSize (defaults to 1 if not defined), multiply by 100
       // and divide by the sum of all the columns columnRelativeSize.
-      expect(tableComponent.instance().calculateColumnWidhts()).toEqual(
+      expect(tableComponent.instance().calculateColumnWidths()).toEqual(
         {
           id: 18.18,
           name: 72.73,

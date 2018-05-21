@@ -9,6 +9,25 @@
 @large-font-size: 24px;
 @bold-font-weight: 500;
 
+.tiny-font {
+  font-size: @tiny-font-size;
+}
+.small-font {
+  font-size: @small-font-size;
+}
+.font {
+  font-size: @font-size;
+}
+.medium-font {
+  font-size: @medium-font-size;
+}
+.pretty-large-font {
+  font-size: @pretty-large-font-size;
+}
+.large-font {
+  font-size: @large-font-size;
+}
+
 
 /* Margin and Padding */
 
@@ -171,6 +190,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.flex-container-left {
+  display: flex;
+  text-align: left;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .flex-grow {

@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 // tslint:disable:strict-boolean-expressions
 
@@ -65,7 +65,11 @@ import FadeInOut from 'common/components/FadeInOut';
 import SingleRouteSelector from 'common/components/SingleRouteSelector';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
-import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
+import
+{
+  _FilterGroup, _FilterLine, _ScoreLine, FilterGroup, FilterLine, Path,
+  PathfinderContext, PathfinderSteps, Source,
+} from '../PathfinderTypes';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
 import './PathfinderFilterStyle.less';
@@ -83,6 +87,7 @@ export interface Props
   onUpdateScript?: (fieldName: string, name: string, lat?: any, lon?: any) => void;
   builderActions?: typeof BuilderActions;
   colorsActions?: typeof ColorsActions;
+  path?: Path;
 }
 
 class PathfinderFilterSection extends TerrainComponent<Props>
@@ -203,6 +208,42 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         canDrag: false,
         addingFilterLine: true,
       });
+
+      const { path, isSoftFilter } = this.props;
+      if (isSoftFilter && path !== undefined)
+      {
+        const hasMatchQuality = path.score.lines.some(
+          (line) => line.field === '_score',
+        );
+        if (!hasMatchQuality)
+        {
+          // create a match quality score
+          const newScoreLines = path.score.lines.push(_ScoreLine({
+            field: '_score',
+            transformData: {
+              autoBound: true,
+              scorePoints: [
+                {
+                  value: 0,
+                  score: 0,
+                  id: String(Math.random()),
+                },
+                {
+                  value: 10,
+                  score: 1,
+                  id: String(Math.random()),
+                },
+              ],
+              domain: [0, 10],
+              dataDomain: [0, 10],
+            },
+          }));
+          this.props.builderActions.changePath(
+            this.props.keyPath.butLast().toList().push('score').push('lines'),
+            newScoreLines,
+          );
+        }
+      }
     }
   }
 
@@ -246,6 +287,31 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     fieldChange?: boolean,
   )
   {
+    const { isSoftFilter, filterGroup } = this.props;
+    if (isSoftFilter)
+    {
+      if ((filter as any).boost !== undefined)
+      {
+        const skip: number = this.props.toSkip !== undefined ? this.props.toSkip : 3;
+        const filterLine = filter as FilterLine;
+        const oldFilterLine = filterGroup.getIn(keyPath.skip(skip).toList());
+        if (filterLine.boost > filterGroup.maxBoost)
+        {
+          this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'maxBoost'), filterLine.boost);
+        }
+        else if (oldFilterLine.boost === filterGroup.maxBoost && filterLine.boost !== oldFilterLine.boost)
+        {
+          // Gets the set of lines that filterLine is a part of, and updates filterLine to its changed value so
+          // that these lines can be used to calculate the maxBoost
+          const newFilterGroup = filterGroup.setIn(keyPath.skip(skip).toList(), filterLine);
+          const newBoost = findMaxBoost(newFilterGroup);
+          if (newBoost !== filterGroup.maxBoost)
+          {
+            this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'maxBoost'), newBoost);
+          }
+        }
+      }
+    }
     this.props.builderActions.changePath(keyPath, filter, notDirty, fieldChange);
   }
 
@@ -259,7 +325,20 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     const parentKeyPath = keyPath.butLast().toList();
     const parent = this.props.filterGroup.getIn(parentKeyPath.skip(skip).toList());
     const index = keyPath.last();
-    this.props.builderActions.changePath(parentKeyPath, parent.splice(index, 1));
+    const newLines = parent.splice(index, 1);
+    this.props.builderActions.changePath(parentKeyPath, newLines);
+    if (this.props.isSoftFilter && (!filter || (filter as any).boost === this.props.filterGroup.maxBoost))
+    {
+      const newBoost = findMaxBoost(
+        this.props.filterGroup.setIn(parentKeyPath.skip(skip).toList(),
+          newLines,
+        ),
+      );
+      if (newBoost !== this.props.filterGroup.maxBoost)
+      {
+        this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'maxBoost'), newBoost);
+      }
+    }
   }
 
   public renderFilterLine(filterLine, keyPath: List<string | number>)
@@ -288,6 +367,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         onAddScript={this.props.onAddScript}
         onDeleteScript={this.props.onDeleteScript}
         onUpdateScript={this.props.onUpdateScript}
+        maxBoost={Math.max(10, this.props.filterGroup.maxBoost)}
       />
     );
   }
@@ -569,6 +649,31 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       </div>
     );
   }
+}
+
+export function applyToAllFilters(filterGroup: FilterGroup, fn: (filter: FilterLine) => void)
+{
+  filterGroup.lines.map((line) =>
+  {
+    fn(line);
+    if (line.filterGroup !== null)
+    {
+      applyToAllFilters(line.filterGroup, fn);
+    }
+  });
+}
+
+export function findMaxBoost(filterGroup: FilterGroup): number
+{
+  let max = 0;
+  applyToAllFilters(filterGroup, (line) =>
+  {
+    if (line.boost > max)
+    {
+      max = line.boost;
+    }
+  });
+  return max;
 }
 
 export default Util.createTypedContainer(

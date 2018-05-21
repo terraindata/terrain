@@ -338,7 +338,7 @@ const topBarItemDisabledStyle = [
 ];
 
 const topBarIconStyle = [
-  fontColor(Colors().bg3, Colors().bg2),
+  fontColor(Colors().active, Colors().activeHover),
 ];
 const topBarIconDisabledStyle = [
   fontColor(Colors().darkerHighlight, Colors().darkerHighlight),

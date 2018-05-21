@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable no-var-requires
 
@@ -156,6 +156,7 @@ class FilterGroupC extends BaseClass
   public collapsed: boolean = false;
   // Only maintained on the top-level group, keeps track of what number group we are on to create names
   public groupCount: number = 1;
+  public maxBoost: number = 10; // This is used for the top-level soft filter section, in case of manual input of boosts
   public lines: List<FilterLine> = List<FilterLine>([]);
 }
 export type FilterGroup = FilterGroupC & IRecord<FilterGroupC>;
@@ -256,6 +257,7 @@ class TransformDataC extends BaseClass
   public dataDomain: List<number> = List([0, 10]);
   public hasCustomDomain: boolean = false;
   public mode: string = 'linear';
+  public autoBound: boolean = false;
 }
 
 export type TransformData = TransformDataC & IRecord<TransformDataC>;
@@ -265,7 +267,8 @@ export const _TransformData = (config?: { [key: string]: any }) =>
   transform = transform
     .set('scorePoints', List(transform['scorePoints'].map((p) => _ScorePoint(p))))
     .set('visiblePoints', List(transform['visiblePoints'].map((p) => _ScorePoint(p))))
-    .set('domain', List(transform['domain']));
+    .set('domain', List(transform['domain']))
+    .set('dataDomain', List(transform['dataDomain']));
   return transform;
 };
 

@@ -394,6 +394,31 @@ test('boolean cast tests', () =>
   expect(r['fb']).toEqual('0');
 });
 
+test('date cast tests', () =>
+{
+  const doc = {
+    foo: '5-18-2018',
+    bar: '5-19-2018',
+  };
+  const e: TransformationEngine = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.CastNode,
+    List<KeyPath>([KeyPath(['foo'])]),
+    {
+      toTypename: 'date',
+      format: 'ISOstring',
+    });
+  e.appendTransformation(
+    TransformationNodeType.CastNode,
+    List<KeyPath>([KeyPath(['bar'])]),
+    {
+      toTypename: 'date',
+      format: 'MMDDYYYY',
+    });
+  expect(e.transform(doc)['foo'].substr(0, 11)).toEqual('2018-05-18T');
+  expect(e.transform(doc)['bar']).toEqual('05/19/2018');
+});
+
 test('super deep transformation preserves arrays', () =>
 {
   const doc = {
@@ -881,4 +906,31 @@ test('Encrypt and decrypt a field', () =>
   );
   const r = e.transform(TestDocs.doc2);
   expect(r['name']).toBe('Bob');
+});
+
+test('Duplicate a nested field', () =>
+{
+  const wrap = (kp: string[]) =>
+  {
+    return List([List(kp)]);
+  };
+
+  const doc = {
+    field: {
+      subField: {
+        foo: 'bar',
+      },
+    },
+  };
+  const e = new TransformationEngine(doc);
+  e.appendTransformation(TransformationNodeType.DuplicateNode, wrap(['field']), {
+    newFieldKeyPaths: wrap(['copy1']),
+  });
+
+  const sub1 = e.addField(List(['copy1', 'subField']), 'object');
+  e.disableField(sub1);
+
+  const r = e.transform(doc);
+  expect(Object.keys(r['copy1']).length).toEqual(0);
+  expect(Object.keys(r['field']).length).toEqual(1);
 });

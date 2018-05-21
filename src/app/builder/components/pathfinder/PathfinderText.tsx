@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 // Centralized place for text used in Pathfinder
 
@@ -109,6 +109,8 @@ export const PathfinderText = {
     //   tooltip: 'The results will not be sorted in any way',
     // },
   },
+  autoBoundOn: 'The Score graph automatically fits the data\'s min & max.',
+  autoBoundOff: 'The Score graph will remain fixed.',
 
   // More section
   moreSectionTitle: 'More',

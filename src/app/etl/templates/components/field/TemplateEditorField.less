@@ -23,7 +23,7 @@
   .field-preview-label-group {
     flex: 0 0 200px;
     display: flex;
-    align-items: start;
+    align-items: center;
     min-width: 0;
   }
 
@@ -32,6 +32,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    cursor: pointer;
     
     .tef-big-text;
     &.field-preview-can-toggle {
@@ -40,6 +41,16 @@
 
     &.field-preview-array-label {
       .big-text;
+    }
+  }
+  
+  .field-type-icon {
+    svg {
+      width: 18px;
+      fill: currentColor;
+      stroke: currentColor;
+      stroke-width: 4px;
+      margin-right: 6px;
     }
   }
 
@@ -60,7 +71,7 @@
     opacity: 1;
     padding-left: @spacing;
     left: 14px;
-    top: 6px;
+    top: -12px;
     &.field-preview-menu-hidden {
       opacity: 0;
     }

@@ -57,9 +57,11 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
+import ObjectForm from 'common/components/ObjectForm';
 import DatabasePicker from 'etl/common/components/DatabasePicker';
 import FileConfigForm from 'etl/common/components/FileConfigForm';
 import UploadFileButton from 'etl/common/components/UploadFileButton';
+import { GoogleAnalyticsForm } from 'etl/endpoints/GoogleAnalyticsIntegration.tsx';
 import AlgorithmSelector from 'library/components/AlgorithmSelector';
 import { LibraryState } from 'library/LibraryTypes';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
@@ -82,7 +84,7 @@ export interface Props
 
 const fileTypeList = List([FileTypes.Json, FileTypes.Csv, FileTypes.Xml]);
 
-abstract class EndpointFormBase<State, P extends Props = Props> extends TerrainComponent<P>
+export abstract class EndpointFormBase<State, P extends Props = Props> extends TerrainComponent<P>
 {
   public abstract inputMap: InputDeclarationMap<State>;
   public showFileConfig = true; // override this to hide
@@ -128,22 +130,22 @@ abstract class EndpointFormBase<State, P extends Props = Props> extends TerrainC
     );
   }
 
-  private handleFileConfigChange(config: FileConfig, apply?: boolean)
-  {
-    const { onChange, endpoint } = this.props;
-    onChange(endpoint.set('fileConfig', config), apply);
-  }
-
-  private handleOptionsFormChange(formState: State, apply?: boolean)
+  public handleOptionsFormChange(formState: State, apply?: boolean)
   {
     const { onChange, endpoint } = this.props;
     const newOptions = this.formStateToOptions(formState);
     onChange(endpoint.set('options', newOptions), apply);
   }
+
+  private handleFileConfigChange(config: FileConfig, apply?: boolean)
+  {
+    const { onChange, endpoint } = this.props;
+    onChange(endpoint.set('fileConfig', config), apply);
+  }
 }
 
 type UploadState = SourceOptionsType<Sources.Upload>;
-class UploadEndpoint extends EndpointFormBase<UploadState>
+export class UploadEndpoint extends EndpointFormBase<UploadState>
 {
   public inputMap: InputDeclarationMap<UploadState> = {
     file: {
@@ -264,14 +266,14 @@ class AlgorithmEndpointC extends EndpointFormBase<AlgorithmState>
     onChange(endpoint.set('options', newOptions));
   }
 }
-const AlgorithmEndpoint = Util.createContainer(
+export const AlgorithmEndpoint = Util.createContainer(
   AlgorithmEndpointC,
   ['library'],
   {},
 );
 
 type SftpState = SftpOptions;
-class SftpEndpoint extends EndpointFormBase<SftpState>
+export class SftpEndpoint extends EndpointFormBase<SftpState>
 {
   public inputMap: InputDeclarationMap<SftpState> = {
     filepath: {
@@ -293,9 +295,9 @@ interface HttpState extends Partial<HttpOptions>
 
 const httpMethods = List(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']);
 
-class HttpEndpoint extends EndpointFormBase<HttpState>
+export class HttpEndpointForm extends EndpointFormBase<HttpOptions>
 {
-  public inputMap: InputDeclarationMap<HttpState> = {
+  public inputMap: InputDeclarationMap<HttpOptions> = {
     method: {
       type: DisplayType.Pick,
       displayName: 'Method',
@@ -304,42 +306,63 @@ class HttpEndpoint extends EndpointFormBase<HttpState>
         indexResolver: (value) => httpMethods.indexOf(value),
       },
     },
-    accept: {
-      type: DisplayType.TextBox,
-      displayName: 'Accept',
+    headers: {
+      type: DisplayType.Custom,
+      widthFactor: 7,
+      options: {
+        render: this.renderHeadersForm,
+      },
     },
-    contentType: {
-      type: DisplayType.TextBox,
-      displayName: 'Content Type',
+    params: {
+      type: DisplayType.Custom,
+      widthFactor: 7,
+      options: {
+        render: this.renderParamsForm,
+      },
     },
   };
 
-  public optionsToFormState(options: HttpOptions): HttpState
+  public renderHeadersForm(state: HttpOptions, disabled)
   {
-    const { method } = options;
-    const headers = _.get(options, 'headers', {});
-    return {
-      method,
-      accept: headers['accept'],
-      contentType: headers['contentType'],
-    };
+    return (
+      <ObjectForm
+        object={state.headers}
+        onChange={this.handleHeadersChange}
+        label='Headers'
+      />
+    );
   }
 
-  public formStateToOptions(newState: HttpState): HttpOptions
+  public handleHeadersChange(newHeaders, apply?: boolean)
   {
-    const { method, accept, contentType } = newState;
-    return {
-      method,
-      headers: {
-        accept,
-        contentType,
-      },
-    };
+    const { options } = this.props.endpoint;
+    const newFormState: HttpOptions = _.extend({}, options);
+    newFormState.headers = newHeaders;
+    this.handleOptionsFormChange(newFormState, apply);
+  }
+
+  public renderParamsForm(state: HttpOptions, disabled)
+  {
+    return (
+      <ObjectForm
+        object={state.params}
+        onChange={this.handleParamsChange}
+        label='Parameters'
+      />
+    );
+  }
+
+  public handleParamsChange(newParams, apply?: boolean)
+  {
+    const { options } = this.props.endpoint;
+    const newFormState: HttpOptions = _.extend({}, options);
+    newFormState.params = newParams;
+    this.handleOptionsFormChange(newFormState, apply);
   }
 }
 
 type DownloadState = SinkOptionsType<Sinks.Download>;
-class DownloadEndpoint extends EndpointFormBase<DownloadState>
+export class DownloadEndpoint extends EndpointFormBase<DownloadState>
 {
   public inputMap: InputDeclarationMap<DownloadState> = {
 
@@ -348,7 +371,7 @@ class DownloadEndpoint extends EndpointFormBase<DownloadState>
 
 type DatabaseState = SinkOptionsType<Sinks.Database>;
 
-class DatabaseEndpoint extends EndpointFormBase<DatabaseState>
+export class DatabaseEndpoint extends EndpointFormBase<DatabaseState>
 {
   public showFileConfig = false;
   public inputMap: InputDeclarationMap<DatabaseState> = {
@@ -386,18 +409,13 @@ class DatabaseEndpoint extends EndpointFormBase<DatabaseState>
 }
 
 type FsState = SinkOptionsType<Sinks.Fs>;
-class FsEndpoint extends EndpointFormBase<FsState>
+export class FsEndpoint extends EndpointFormBase<FsState>
 {
-  public inputMap: InputDeclarationMap<FsState> = {
-    path: {
-      type: DisplayType.TextBox,
-      displayName: 'File path',
-    },
-  };
+  public inputMap: InputDeclarationMap<FsState> = {};
 }
 
 type SQLState = SQLOptions;
-class SQLEndpoint extends EndpointFormBase<SQLState>
+export class SQLEndpoint extends EndpointFormBase<SQLState>
 {
   public inputMap: InputDeclarationMap<SQLState> = {
     query: {
@@ -406,29 +424,3 @@ class SQLEndpoint extends EndpointFormBase<SQLState>
     },
   };
 }
-
-// exports
-type FormLookupMap<E extends string> =
-  {
-    [k in E]: React.ComponentClass<Props>
-  };
-
-export const SourceFormMap: FormLookupMap<Sources> =
-  {
-    [Sources.Upload]: UploadEndpoint,
-    [Sources.Algorithm]: AlgorithmEndpoint,
-    [Sources.Sftp]: SftpEndpoint,
-    [Sources.Http]: HttpEndpoint,
-    [Sources.Fs]: FsEndpoint,
-    [Sources.Mysql]: SQLEndpoint,
-    [Sources.Postgresql]: SQLEndpoint,
-  };
-
-export const SinkFormMap: FormLookupMap<Sinks> =
-  {
-    [Sinks.Download]: DownloadEndpoint,
-    [Sinks.Database]: DatabaseEndpoint,
-    [Sinks.Sftp]: SftpEndpoint,
-    [Sinks.Http]: HttpEndpoint,
-    [Sinks.Fs]: FsEndpoint,
-  };

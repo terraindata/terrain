@@ -64,6 +64,7 @@ export interface SimpleTableColumn
   columnLabel: string;
   columnRelativeSize?: number; // works sort of as css flex property
   component?: JSX.Element; // a component to wrap the column value with
+  formatter?: (item: any) => string;
 }
 
 export interface Props
@@ -98,7 +99,7 @@ export class SimpleTable extends TerrainComponent<Props>
     defaultOrder: {},
   };
   public state: State = null;
-  public columnWidths = this.calculateColumnWidhts();
+  public columnWidths = this.calculateColumnWidths();
 
   public constructor(props)
   {
@@ -121,10 +122,10 @@ export class SimpleTable extends TerrainComponent<Props>
     const {
       displayRowCount,
       defaultOrder: nextDefaultOrder,
-      data,
+      data: nextData,
     } = nextProps;
 
-    const { defaultOrder } = this.props;
+    const { defaultOrder, data } = this.props;
 
     this.setState({
       visibleRowCount: displayRowCount,
@@ -132,11 +133,11 @@ export class SimpleTable extends TerrainComponent<Props>
 
     const defaultOrderChanged = nextDefaultOrder.columnKey !== defaultOrder.columnKey ||
       nextDefaultOrder.direction !== defaultOrder.direction;
-    if (defaultOrderChanged || data !== this.props.data)
+    if (defaultOrderChanged || nextData !== data)
     {
       this.setState({
         orderedData: this.orderData(
-          data,
+          nextData,
           defaultOrder.columnKey,
           defaultOrder.direction,
         ),
@@ -144,7 +145,7 @@ export class SimpleTable extends TerrainComponent<Props>
     }
   }
 
-  public calculateColumnWidhts()
+  public calculateColumnWidths()
   {
     const { columnsConfig } = this.props;
     // By default, each column takes an equal portion of the 100% width
@@ -189,9 +190,18 @@ export class SimpleTable extends TerrainComponent<Props>
     let processedValue = rowData[colKey];
 
     const column = columnsConfig.find((col) => col.columnKey === colKey);
-    if (column !== undefined && column.component !== undefined)
+
+    if (column !== undefined)
     {
-      processedValue = React.cloneElement(column.component, { colKey, rowData });
+      if (column.formatter !== undefined)
+      {
+        processedValue = column.formatter(rowData);
+      }
+
+      if (column.component !== undefined)
+      {
+        processedValue = React.cloneElement(column.component, { key: colKey, colKey, rowData });
+      }
     }
 
     return processedValue;
@@ -202,11 +212,11 @@ export class SimpleTable extends TerrainComponent<Props>
     let orderedData = data.toList();
     if (columnKey !== undefined)
     {
-      orderedData = orderedData.sortBy((entry) => entry[columnKey]);
+      orderedData = orderedData.sortBy((entry) => entry[columnKey]).toList();
 
       if (direction === 'desc')
       {
-        orderedData = orderedData.reverse();
+        orderedData = orderedData.reverse().toList();
       }
     }
 
@@ -244,10 +254,10 @@ export class SimpleTable extends TerrainComponent<Props>
         <tbody className='simple-table-body'>
           {
             visibleDataValues.count() > 0 ?
-              visibleDataValues.map((entry) =>
+              visibleDataValues.map((entry, key) =>
               {
                 return (
-                  <tr key={entry.id} className='simple-table-row'>
+                  <tr key={key} className='simple-table-row'>
                     {
                       columnsConfig.map((column) =>
                       {

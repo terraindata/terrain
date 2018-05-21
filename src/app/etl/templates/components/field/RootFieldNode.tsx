@@ -65,6 +65,7 @@ import EditorFieldNode from 'etl/templates/components/field/EditorFieldNode';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { FieldMap, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
+import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 import EditorFieldPreview from './EditorFieldPreview';
@@ -93,17 +94,24 @@ class RootFieldNode extends TerrainComponent<Props>
     fieldMap: FieldMap,
     engine: TransformationEngine,
     engineVersion: number,
+    ordering: ReorderableSet<number>,
   ): List<TemplateField>
   {
     if (engine == null || fieldMap == null)
     {
       return List([]);
     }
-    return fieldMap.filter((field, id) =>
+
+    const rootFields = fieldMap.filter((field, id) =>
     {
       const outputKP = engine.getOutputKeyPath(id);
       return outputKP !== undefined && outputKP.size === 1;
-    }).toList();
+    });
+    const comparator = ordering.createComparator();
+    return rootFields.sortBy(
+      (field, id) => id,
+      comparator,
+    ).toList();
   }
 
   public renderChildFields()
@@ -111,7 +119,9 @@ class RootFieldNode extends TerrainComponent<Props>
     const { templateEditor, preview, noInteract } = this.props;
     const engine = templateEditor.getCurrentEngine();
     const engineVersion = templateEditor.uiState.engineVersion;
-    const rootFields = this.computeRootFields(templateEditor.fieldMap, engine, engineVersion);
+
+    const ordering = templateEditor.getCurrentFieldOrdering();
+    const rootFields = this.computeRootFields(templateEditor.fieldMap, engine, engineVersion, ordering);
     return rootFields.map((childField, index) =>
     {
       const childPreview = preview != null ? preview[childField.name] : null;

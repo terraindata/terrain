@@ -99,7 +99,7 @@ export default class UploadFileButton extends TerrainComponent<Props>
         <FilePicker
           large={true}
           onChange={onChange}
-          accept={'.csv,.json,.xml'}
+          accept={'.csv,.json,.xml,.tsv'}
           customButton={button}
         />
         <span

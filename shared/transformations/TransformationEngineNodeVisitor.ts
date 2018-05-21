@@ -46,7 +46,9 @@ THE SOFTWARE.
 
 // import * as winston from 'winston';
 import aesjs = require('aes-js');
+import dateFormat = require('date-format');
 import * as Immutable from 'immutable';
+import isPrimitive = require('is-primitive');
 import { keccak256 } from 'js-sha3';
 
 import { diff } from 'semver';
@@ -137,7 +139,11 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     const opts = node.meta as NodeOptionsType<TransformationNodeType.DuplicateNode>;
     node.fields.forEach((field) =>
     {
-      const el: any = yadeep.get(doc, field);
+      let el: any = yadeep.get(doc, field);
+      if (!isPrimitive(el) && el.constructor !== Array)
+      {
+        el = Object.assign({}, el);
+      }
       if (opts.newFieldKeyPaths.get(0).contains('*'))
       {
         // assume el length is same as target length
@@ -545,6 +551,17 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
           }
           case 'array': {
             yadeep.set(doc, f, []);
+            break;
+          }
+          case 'date': {
+            if (opts.format === 'ISOstring')
+            {
+              yadeep.set(doc, f, new Date(el).toISOString());
+            }
+            else if (opts.format === 'MMDDYYYY')
+            {
+              yadeep.set(doc, f, dateFormat('MM/dd/yyyy', new Date(el)));
+            }
             break;
           }
           default: {

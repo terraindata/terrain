@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
@@ -216,6 +216,16 @@ export class Items
         }
 
         item = Util.updateObject(items[0], item);
+      }
+
+      if (item.name !== '')
+      {
+        const itemsWithSameName = await this.select([], { name: item.name, type: item.type });
+        const isNameTaken = itemsWithSameName.length !== 0 && (item.id === undefined || itemsWithSameName[0].id !== item.id);
+        if (isNameTaken)
+        {
+          return reject('Item name is taken');
+        }
       }
 
       resolve(await App.DB.upsert(this.itemTable, item) as ItemConfig);

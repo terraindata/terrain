@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 import * as http from 'http';
 import * as Koa from 'koa';
@@ -67,6 +67,7 @@ import { DatabaseConfig } from './database/DatabaseConfig';
 import { databases } from './database/DatabaseRouter';
 import { events } from './events/EventRouter';
 import { integrations } from './integrations/IntegrationRouter';
+import { JobLog } from './jobs/JobLog';
 import { JobQueue } from './jobs/JobQueue';
 import Middleware from './Middleware';
 import NotFoundRouter from './NotFoundRouter';
@@ -81,6 +82,7 @@ const CONN_RETRY_TIMEOUT = 1000;
 export let CFG: Config.Config;
 export let DB: Tasty.Tasty;
 export let HA: number;
+export let JobL: JobLog;
 export let JobQ: JobQueue;
 export let SKDR: Scheduler;
 
@@ -116,6 +118,7 @@ export class App
   }
 
   private DB: Tasty.Tasty;
+  private JobL: JobLog;
   private JobQ: JobQueue;
   private SKDR: Scheduler;
   private app: Koa;
@@ -135,6 +138,9 @@ export class App
     winston.debug('Using configuration: ' + JSON.stringify(config));
     this.config = config;
     CFG = this.config;
+
+    this.JobL = new JobLog();
+    JobL = this.JobL;
 
     this.JobQ = new JobQueue();
     JobQ = this.JobQ;
@@ -290,6 +296,11 @@ export class App
   public getConfig(): Config.Config
   {
     return this.config;
+  }
+
+  public getJobLog(): JobLog
+  {
+    return this.JobL;
   }
 
   public getJobQueue(): JobQueue

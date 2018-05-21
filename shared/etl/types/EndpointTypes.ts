@@ -46,6 +46,7 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file no-unused-expression
 
 import { FileTypes, Languages } from './ETLTypes';
+import { PostProcessConfig } from './PostProcessTypes';
 
 export interface FileConfig
 {
@@ -53,6 +54,7 @@ export interface FileConfig
   hasCsvHeader?: boolean;
   jsonNewlines?: boolean;
   xmlPath?: string;
+  jsonPath?: string;
 }
 
 export enum Sources
@@ -60,6 +62,7 @@ export enum Sources
   Upload = 'Upload', // from a browser
   Algorithm = 'Algorithm',
   Sftp = 'Sftp',
+  GoogleAnalytics = 'GoogleAnalytics',
   Http = 'Http',
   Fs = 'Fs',
   Mysql = 'Mysql',
@@ -75,11 +78,27 @@ export enum Sinks
   Fs = 'Fs',
 }
 
+export const EndpointTypeNames =
+  {
+    Upload: 'Upload',
+    Download: 'Download',
+    Algorithm: 'Algorithm',
+    Database: 'Database',
+    Sftp: 'SFTP',
+    Http: 'HTTP',
+    Fs: 'File System',
+    Mysql: 'MySQL',
+    Postgresql: 'PostgreSQL',
+    Magento: 'Magento',
+    GoogleAnalytics: 'Google Analytics',
+    Mailchimp: 'MailChimp',
+  };
+
 export const SchedulableSinks: Sinks[] =
   [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs];
 
 export const SchedulableSources: Sources[] =
-  [Sources.Algorithm, Sources.Sftp, Sources.Http, Sources.Fs];
+  [Sources.Algorithm, Sources.Sftp, Sources.GoogleAnalytics, Sources.Http, Sources.Fs, Sources.Mysql, Sources.Postgresql];
 
 export interface SourceConfig
 {
@@ -121,10 +140,9 @@ export interface SourceOptionsTypes // TODO check that these are right
     algorithmId: number;
   };
   Sftp: SftpOptions;
+  GoogleAnalytics: GoogleAnalyticsOptions;
   Http: HttpOptions;
-  Fs: {
-    path: string;
-  };
+  Fs: {};
   Mysql: SQLOptions;
   Postgresql: SQLOptions;
 }
@@ -141,16 +159,17 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
       filepath: 'filename.json',
       credentialId: -1,
     },
+    GoogleAnalytics: {
+      dayInterval: -1,
+    },
     Http: {
       method: 'GET',
       headers: {
-        accept: '',
         contentType: 'application/json',
       },
+      params: {},
     },
-    Fs: {
-      path: '',
-    },
+    Fs: {},
     Mysql: {
     },
     Postgresql: {
@@ -170,9 +189,7 @@ export interface SinkOptionsTypes
   };
   Sftp: SftpOptions;
   Http: HttpOptions;
-  Fs: {
-    path: string;
-  };
+  Fs: {};
 }
 
 export const SinkOptionsDefaults: SinkOptionsTypes =
@@ -193,13 +210,11 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
     Http: {
       method: 'POST',
       headers: {
-        accept: '',
         contentType: 'application/json',
       },
+      params: {},
     },
-    Fs: {
-      path: '',
-    },
+    Fs: {},
   };
 
 export interface SftpOptions
@@ -213,9 +228,19 @@ export interface HttpOptions
 {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   headers: {
-    accept: string;
-    contentType: string;
+    contentType?: string;
+    accept?: string;
+    [k: string]: any;
   };
+  params: {
+    [k: string]: any;
+  };
+}
+
+export interface GoogleAnalyticsOptions
+{
+  dayInterval: number;
+  transformations?: PostProcessConfig[];
 }
 
 export interface SQLOptions

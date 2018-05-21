@@ -47,6 +47,7 @@ THE SOFTWARE.
 import 'builder/components/pathfinder/filter/PathfinderFilter.less';
 import 'builder/components/pathfinder/Pathfinder.less';
 import { Colors } from 'colors/Colors';
+import Modal from 'common/components/Modal';
 import Section from 'common/components/Section';
 import SimpleTable, { BadgeColumn, ButtonColumn } from 'common/components/SimpleTable';
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -65,6 +66,9 @@ import './Jobs.less';
 const INTERVAL = 60000;
 
 class Jobs extends TerrainComponent<any> {
+
+  public interval;
+
   public constructor(props)
   {
     super(props);
@@ -77,10 +81,10 @@ class Jobs extends TerrainComponent<any> {
         pending: false,
         running: true,
       }),
+      logsModalOpen: false,
+      jobLogs: Immutable.Map({}),
     };
   }
-
-  public interval;
 
   public componentDidMount()
   {
@@ -107,9 +111,28 @@ class Jobs extends TerrainComponent<any> {
       });
   }
 
+  public calculateJobDuration(job)
+  {
+    let duration = '';
+    if (job.endTime !== null)
+    {
+      const startMoment = Util.moment(job.startTime);
+      const endMoment = Util.moment(job.endTime);
+
+      duration = endMoment.preciseDiff(startMoment);
+    }
+
+    return duration;
+  }
+
   public getStatusColor(status)
   {
     return Colors().statuses[status];
+  }
+
+  public getLogLevelColor(level)
+  {
+    return Colors().logLevels[level];
   }
 
   public expandSection(isExpanded, section)
@@ -120,7 +143,36 @@ class Jobs extends TerrainComponent<any> {
 
   public handleJobViewLog(colKey, rowData)
   {
-    console.error(rowData);
+    this.props.jobsActions({
+      actionType: 'getJobLogs',
+      jobId: rowData.id,
+    })
+      .then((jobLogs) =>
+      {
+        const parsedJobLogs = this.parseJobLogContents(jobLogs);
+
+        let logLines = Immutable.Map({});
+        parsedJobLogs.map((line) => logLines = logLines.set(line.timestamp, line));
+
+        this.setState({
+          logsModalOpen: true,
+          jobLogs: logLines,
+        });
+      });
+  }
+
+  public handleJobViewLogClose()
+  {
+    this.setState({
+      jobLogs: Immutable.Map(),
+      logsModalOpen: false,
+    });
+  }
+
+  public parseJobLogContents(jobLogs)
+  {
+    return jobLogs.contents !== '' && jobLogs.contents !== undefined ?
+      jobLogs.contents.split('\n').map((logLine) => JSON.parse(logLine)) : [];
   }
 
   public render()
@@ -130,7 +182,7 @@ class Jobs extends TerrainComponent<any> {
       pendingJobs,
       runningJobs,
     } = this.props;
-    const { id } = this.state;
+    const { id, logsModalOpen, jobLogs } = this.state;
 
     const jobsHeader = [
       {
@@ -146,8 +198,19 @@ class Jobs extends TerrainComponent<any> {
         />,
       },
       {
-        columnKey: 'createdAt',
+        columnKey: 'startTime',
         columnLabel: 'Start',
+        formatter: (job) => Util.formatDate(job.startTime, true),
+      },
+      {
+        columnKey: 'duration',
+        columnLabel: 'Duration',
+        formatter: (job) => this.calculateJobDuration(job),
+      },
+      {
+        columnKey: 'endTime',
+        columnLabel: 'End',
+        formatter: (job) => Util.formatDate(job.endTime, true),
       },
       {
         columnKey: 'viewlog',
@@ -207,6 +270,31 @@ class Jobs extends TerrainComponent<any> {
             defaultOrder={defaultOrder}
           />
         </Section>
+
+        {
+          logsModalOpen ?
+            (
+              <Modal
+                open={true}
+                onClose={this.handleJobViewLogClose}
+                wide={true}
+                title={'Job Log'}
+              >
+                <SimpleTable
+                  columnsConfig={[
+                    { columnKey: 'timestamp', columnLabel: 'Date' },
+                    {
+                      columnKey: 'level',
+                      columnLabel: 'Level',
+                      component: <BadgeColumn getColor={this.getLogLevelColor} />,
+                    },
+                    { columnKey: 'message', columnLabel: 'Message', columnRelativeSize: 3 },
+                  ]}
+                  data={jobLogs}
+                />
+              </Modal>
+            ) : null
+        }
       </div>
     );
   }
