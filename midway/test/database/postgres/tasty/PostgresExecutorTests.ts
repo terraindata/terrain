@@ -116,12 +116,22 @@ test('Postgres: transactions', async (done) =>
 {
   try
   {
-    await tasty.startTransaction(IsolationLevel.REPEATABLE_READ, true);
-    await tasty.rollbackTransaction();
-    await tasty.startTransaction(IsolationLevel.SERIALIZABLE);
-    await tasty.commitTransaction();
-    await tasty.startTransaction();
-    await tasty.commitTransaction();
+    const queries = ['SELECT * \n  FROM movies\n  LIMIT 10;'];
+    await tasty.executeTransaction(async (handle, commit, rollback) =>
+    {
+      await tasty.getDB().execute(queries, handle);
+      await commit();
+    }, IsolationLevel.REPEATABLE_READ, true);
+    await tasty.executeTransaction(async (handle, commit, rollback) =>
+    {
+      await tasty.getDB().execute(queries, handle);
+      await rollback();
+    }, IsolationLevel.SERIALIZABLE);
+    await tasty.executeTransaction(async (handle, commit, rollback) =>
+    {
+      await tasty.getDB().execute(queries, handle);
+      await commit();
+    });
   }
   catch (e)
   {

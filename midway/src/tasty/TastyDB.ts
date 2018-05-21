@@ -81,7 +81,7 @@ export abstract class TastyDB
    *
    * @memberof TastyDB
    */
-  public async abstract execute(queries: any[]): Promise<object[]>;
+  public async abstract execute(queries: any[], handle?: TransactionHandle): Promise<object[]>;
 
   /**
    * update or insert an array of objects in a TastyTable
@@ -93,7 +93,7 @@ export abstract class TastyDB
    *
    * @memberof TastyDB
    */
-  public async abstract upsert(table: TastyTable, elements: object[]): Promise<object[]>;
+  public async abstract upsert(table: TastyTable, elements: object[], handle?: TransactionHandle): Promise<object[]>;
 
   /**
    * update an array of objects in a TastyTable
@@ -105,7 +105,7 @@ export abstract class TastyDB
    *
    * @memberof TastyDB
    */
-  public async abstract update(table: TastyTable, elements: object[]): Promise<object[]>;
+  public async abstract update(table: TastyTable, elements: object[], handle?: TransactionHandle): Promise<object[]>;
 
   /**
    * start a transaction
@@ -115,7 +115,7 @@ export abstract class TastyDB
    *
    * @memberof TastyDB
    */
-  public async abstract startTransaction(isolationLevel: IsolationLevel, readOnly: boolean): Promise<object[]>;
+  public async abstract startTransaction(isolationLevel: IsolationLevel, readOnly: boolean): Promise<TransactionHandle>;
 
   /**
    * commit a transaction
@@ -125,7 +125,7 @@ export abstract class TastyDB
    *
    * @memberof TastyDB
    */
-  public async abstract commitTransaction(): Promise<object[]>;
+  public async abstract commitTransaction(handle: TransactionHandle): Promise<object[]>;
 
   /**
    * rollback a transaction
@@ -135,7 +135,7 @@ export abstract class TastyDB
    *
    * @memberof TastyDB
    */
-  public async abstract rollbackTransaction(): Promise<object[]>;
+  public async abstract rollbackTransaction(handle: TransactionHandle): Promise<object[]>;
 
   /**
    * returns schema information for a database
@@ -176,5 +176,7 @@ export enum IsolationLevel
   SERIALIZABLE = 'SERIALIZABLE',
   DEFAULT = '',
 }
+
+export type TransactionHandle = number;
 
 export default TastyDB;
