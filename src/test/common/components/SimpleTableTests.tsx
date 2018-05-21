@@ -173,6 +173,33 @@ describe('SimpleTable', () =>
       expect(lastRowName).toEqual('item 1');
     });
 
+    it('should re-render entries when data changes', () =>
+    {
+      tableComponent = shallow(
+        <SimpleTable
+          {...tableState}
+          displayRowCount={15}
+          defaultOrder={{ columnKey: 'name', direction: 'desc' }}
+        />,
+      );
+
+      const tableRows = tableComponent.find('.simple-table-body .simple-table-row');
+      const numRows = Number(tableRows.length);
+
+      const newTableData = tableData.set(99, new TableItem({
+        id: 99,
+        name: `item 99`,
+        status: 'success',
+      }));
+      tableComponent.setProps({
+        data: newTableData,
+      });
+      const newTableRows = tableComponent.find('.simple-table-body .simple-table-row');
+      const newNumRows = newTableRows.length;
+
+      expect(newNumRows).toEqual(numRows + 1);
+    });
+
     it('should format a column value using the formatter if one was specified', () =>
     {
       const columnsConfigWithFormatter = [
