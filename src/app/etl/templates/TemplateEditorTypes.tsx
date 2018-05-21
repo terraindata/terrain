@@ -95,6 +95,11 @@ class TemplateEditorStateC
     return this.template.getFieldOrdering(currentEdge);
   }
 
+  public getCurrentComparator(): (a: number, b: number) => number
+  {
+    return this.memoizedComparator(this.getCurrentFieldOrdering());
+  }
+
   public getCurrentEdgeId()
   {
     return this.uiState.currentEdge;
@@ -108,6 +113,16 @@ class TemplateEditorStateC
   public getSourceDocuments(id: string): List<object>
   {
     return this.uiState.mergeDocuments.get(id, List([]));
+  }
+
+  @instanceFnDecorator(memoizeOne)
+  private memoizedComparator(order: ReorderableSet<number>)
+  {
+    if (order === undefined)
+    {
+      return (a, b) => 0;
+    }
+    return order.createComparator();
   }
 }
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
