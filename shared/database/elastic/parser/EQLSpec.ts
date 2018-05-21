@@ -385,9 +385,9 @@ const EQLSpec: ESClause[] =
       'mergejoin_name',
       'body',
       {
-        path: ['groupjoin'],
-        name: 'groupJoin query',
-        desc: 'Create and name a groupJoin query.',
+        path: ['mergejoin'],
+        name: 'mergeJoin query',
+        desc: 'Create and name a mergeJoin query.',
         url: '',
       }),
     new ESMapClause('mergejoin_clause',
