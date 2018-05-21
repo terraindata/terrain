@@ -920,7 +920,8 @@ describe('Query route tests', () =>
               }
             },
             "mergeJoin": {
-              "joinKey": "movieid",
+              "leftJoinKey": "movieid",
+              "rightJoinKey": "movieid",
               "selfMergeJoin": {
                 "_source": ["movieid", "overview"],
                 "query" : {

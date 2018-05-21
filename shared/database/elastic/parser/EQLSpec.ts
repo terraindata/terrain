@@ -366,24 +366,33 @@ const EQLSpec: ESClause[] =
         desc: 'names this groupJoin subquery, must be alpha-numeric and can only contain \'_\' and \'-\'',
         url: '',
       }),
-    new ESVariantClause('groupjoin_body',
-      {
-        string: 'parentAlias',
-        number: 'dropIfLessThan',
-        object: 'body',
-      },
-      {
-        path: ['groupjoin'],
-      }),
     // merge join
-    new ESStringClause('joinKey',
+    new ESStringClause('leftJoinKey',
       {
         path: ['mergejoin'],
-        desc: 'Common key to join on for the merge join.',
+        desc: 'Left key to join on for the merge join.',
+      }),
+    new ESStringClause('rightJoinKey',
+      {
+        path: ['mergejoin'],
+        desc: 'Right key to join on for the merge join.',
+      }),
+    new ESWildcardStructureClause('merge_clause',
+      {
+        leftJoinKey: 'string',
+        rightJoinKey: 'string',
+      },
+      'mergejoin_name',
+      'body',
+      {
+        path: ['groupjoin'],
+        name: 'groupJoin query',
+        desc: 'Create and name a groupJoin query.',
+        url: '',
       }),
     new ESMapClause('mergejoin_clause',
       'mergejoin_name',
-      'mergejoin_body',
+      'body',
       {
         path: ['mergejoin'],
         name: 'mergeJoin query',
@@ -395,14 +404,6 @@ const EQLSpec: ESClause[] =
         path: ['mergejoin'],
         desc: 'names this mergeJoin subquery, must be alpha-numeric and can only contain \'_\' and \'-\'',
         url: '',
-      }),
-    new ESVariantClause('mergejoin_body',
-      {
-        string: 'joinKey',
-        object: 'body',
-      },
-      {
-        path: ['mergejoin'],
       }),
     // aggregation
     // AggregatorFactories.java
