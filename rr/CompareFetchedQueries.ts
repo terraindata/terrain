@@ -44,74 +44,87 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-import * as ip from 'ip';
-import * as winston from 'winston';
+// tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands max-line-length
 
-import * as puppeteer from 'puppeteer';
-import { makePromiseCallback } from '../../../shared/test/Utils';
-import { getChromeDebugAddress } from '../../FullstackUtils';
+import * as commandLineArgs from 'command-line-args';
+import * as getUsage from 'command-line-usage';
+import * as jsonfile from 'jsonfile';
 
-const USERNAME_SELECTOR = '#login-email';
+const optionDefinitions = [
+  { name: 'help', alias: 'h' },
+  { name: 'file', alias: 'f', type: String },
+];
 
-function getExpectedFile(): string
-{
-  return __filename.split('.')[0] + '.expected';
-}
-
-async function loadPage(page, url)
-{
-  await page.goto(url);
-}
-
-describe('Testing the card parser', () =>
-{
-  let expected;
-  let browser;
-  let page;
-
-  beforeAll(async () =>
+const usageSections = [
   {
-    // TODO: get rid of this monstrosity once @types/winston is updated.
-    const contents: any = await new Promise((resolve, reject) =>
-    {
-      fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
-    });
-
-    expected = JSON.parse(contents);
-    const wsAddress = await getChromeDebugAddress();
-    browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
-    winston.info('Connected to the Chrome ' + String(wsAddress));
-  });
-
-  it('parse card', async () =>
+    header: 'Compare fetched results of fetched queries.',
+    content: 'This application read the fetched-queries.json and compare results of top20 and newtop20.',
+  },
   {
-    page = await browser.newPage();
-    winston.info('Created a new browser page.');
-    await page.setViewport({ width: 1600, height: 1200 });
-    winston.info('Set the page view to 1600x1200.');
-    const url = `http://${ip.address()}:3000`;
-    winston.info('Get url:' + url);
-    await page.goto(url);
-    winston.info('Visited url:' + url);
-    await page.waitForSelector(USERNAME_SELECTOR);
-    winston.info('Loaded the page ' + url);
-    for (const testName of Object.keys(expected))
-    {
-      const testValue: any = expected[testName];
-      const request = JSON.stringify(testValue);
-      winston.info('Testing request ' + request);
-      const cardResult = await page.evaluate((theRequest, theValue) =>
+    header: 'Options',
+    optionList: [
       {
-        return window['TerrainTools'].terrainTests.testCardParser(theRequest, theValue);
-      }, request, testValue);
-      expect(cardResult).toMatchObject({ passed: true, message: 'The test is passed' });
-    }
-  }, 30000);
+        name: 'help',
+        description: 'Print this usage guide.',
+      },
+      {
+        name: 'file',
+        typeLabel: '[underline]{fetched-query.json}',
+        description: 'The path of the source, if not given, using ./fetched-query.json.',
+      },
+    ],
+  },
+];
 
-  afterAll(async () =>
+async function replayQueries()
+{
+  let path = './fetched-queries.json';
+  const options = commandLineArgs(optionDefinitions);
+  const usage = getUsage(usageSections);
+  if (options['help'] !== undefined)
   {
-    await page.close();
-    winston.info('The page is closed');
-  });
-});
+    console.log(usage);
+    return;
+  }
+  if (options['file'] !== undefined)
+  {
+    path = options['midway'];
+  }
+  const items = jsonfile.readFileSync(path);
+  items.map((item) =>
+  {
+    const meta = JSON.parse(item.meta);
+    console.log(item.name + ': db ' + meta.db.id);
+    if (item.newtop20 && item.top20)
+    {
+      if (item.newtop20.length === item.top20.length)
+      {
+        let same = true;
+        for (let i = 0; i < item.top20.length; i++)
+        {
+          if (item.newtop20[i]._id !== item.top20[i]._id)
+          {
+            console.log(i + 'diff\n==========\n' + JSON.stringify(item.top20[i]) + '\n===========\n' + JSON.stringify(item.newtop20[i]));
+            same = false;
+          }
+        }
+        if (same === true)
+        {
+          console.log(item.top20.length + ' results are same');
+        } else
+        {
+          console.log(item.top20.length + ' results are different.');
+        }
+      } else
+      {
+        console.log('Results have different size.');
+      }
+    } else
+    {
+      console.log('No results to compare.');
+    }
+  },
+  );
+}
+
+replayQueries().catch((err) => console.log('Error when executing the program: ' + err));

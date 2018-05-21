@@ -42,60 +42,76 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
 
-import { parsePath } from 'builder/components/pathfinder/PathfinderParser';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
-import ESJSONParser from '../../../shared/database/elastic/parser/ESJSONParser';
-import ESParserError from '../../../shared/database/elastic/parser/ESParserError';
-import CardsToElastic from '../../database/elastic/conversion/CardsToElastic';
-import { ElasticValueInfoToCards } from '../../database/elastic/conversion/ElasticToCards';
-import ESCardParser from '../../database/elastic/conversion/ESCardParser';
-import { _Query, default as Query } from '../../items/types/Query';
+import * as fs from 'fs';
+import * as ip from 'ip';
+import * as winston from 'winston';
 
-export default class TerrainTests
+import * as puppeteer from 'puppeteer';
+import { makePromiseCallback } from '../../../../shared/test/Utils';
+import { getChromeDebugAddress } from '../../../FullstackUtils';
+
+const USERNAME_SELECTOR = '#login-email';
+
+function getExpectedFile(): string
 {
-  public static testCardParser(
-    testString: string,
-    expectedValue: any,
-    expectedErrors: ESParserError[] = [])
-  {
-    const ret = { passed: true, message: 'The test is passed' };
-    const emptyCards = Immutable.List([]);
-    const interpreter: ESInterpreter = new ESInterpreter(testString);
-    const parser: ESJSONParser = interpreter.parser as ESJSONParser;
-    const rootValueInfo = parser.getValueInfo();
-    const rootCards = ElasticValueInfoToCards(rootValueInfo, Immutable.List([]), _Query());
-    // parse the card
-    const rootCard = rootCards.get(0);
-    if (rootCard['type'] !== 'eqlbody')
-    {
-      ret.passed = false;
-      ret.message = `The parsed root card is not eqlbody, but ${rootCard['type']}.`;
-      return ret;
-    }
-    const cardParser = new ESCardParser(rootCard);
-    // interpreting the parsed card
-    const cardInterpreter = new ESInterpreter(cardParser);
-    const newValue = CardsToElastic.blockToElastic(rootCard, {}, _Query());
-    if (_.isEqual(newValue, expectedValue) === true)
-    {
-      return ret;
-    } else
-    {
-      ret.passed = false;
-      ret.message = 'Parsed value is ' + JSON.stringify(newValue);
-      return ret;
-    }
-  }
-
-  public static PathFinderToQuery(queryConfig)
-  {
-    const query: Query = _Query(queryConfig);
-    const currentTql = query.tql;
-    const newTql = parsePath(query.path, query.inputs);
-    return newTql;
-  }
+  return __filename.split('.')[0] + '.expected';
 }
+
+async function loadPage(page, url)
+{
+  await page.goto(url);
+}
+
+describe('Testing the card parser', () =>
+{
+  let expected;
+  let browser;
+  let page;
+
+  beforeAll(async () =>
+  {
+    // TODO: get rid of this monstrosity once @types/winston is updated.
+    const contents: any = await new Promise((resolve, reject) =>
+    {
+      fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
+    });
+
+    expected = JSON.parse(contents);
+    const wsAddress = await getChromeDebugAddress();
+    browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
+    winston.info('Connected to the Chrome ' + String(wsAddress));
+  });
+
+  it('parse card', async () =>
+  {
+    page = await browser.newPage();
+    winston.info('Created a new browser page.');
+    await page.setViewport({ width: 1600, height: 1200 });
+    winston.info('Set the page view to 1600x1200.');
+    const url = `http://${ip.address()}:3000`;
+    winston.info('Get url:' + url);
+    await page.goto(url);
+    winston.info('Visited url:' + url);
+    await page.waitForSelector(USERNAME_SELECTOR);
+    winston.info('Loaded the page ' + url);
+    for (const testName of Object.keys(expected))
+    {
+      const testValue: any = expected[testName];
+      const request = JSON.stringify(testValue);
+      winston.info('Testing request ' + request);
+      const cardResult = await page.evaluate((theRequest, theValue) =>
+      {
+        return window['TerrainTools'].terrainTests.testCardParser(theRequest, theValue);
+      }, request, testValue);
+      expect(cardResult).toMatchObject({ passed: true, message: 'The test is passed' });
+    }
+  }, 30000);
+
+  afterAll(async () =>
+  {
+    await page.close();
+    winston.info('The page is closed');
+  });
+});

@@ -48,125 +48,118 @@ THE SOFTWARE.
 
 import TransformUtil, { NUM_CURVE_POINTS } from 'app/util/TransformUtil';
 import Util from 'app/util/Util';
+import { PathToCards } from 'builder/components/pathfinder/PathToCards';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
+import * as TerrainLog from 'loglevel';
 import { FieldType } from '../../../../../shared/builder/FieldTypes';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
+import ESJSONType from '../../../../../shared/database/elastic/parser/ESJSONType';
 import { isInput } from '../../../../blocks/types/Input';
 import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import { _FilterGroup, DistanceValue, FilterGroup, FilterLine, More, Path, Score, Script, Source } from './PathfinderTypes';
 
 export const PathFinderDefaultSize = 101;
 const NEGATIVES = ['notcontain', 'notequal', 'isnotin', 'notexists'];
+const FlipNegativeMap = {
+  notcontain: 'contain',
+  notequal: 'equal',
+  isnotin: 'isin',
+  notexists: 'exists',
+};
 
 export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
 {
-  let baseQuery: Map<string, any> = Map({
-    query: Map({
-      bool: Map({
-        filter: List([]),
-        must: List([]),
-        should: List([]),
-        must_not: List([]),
-        minimum_should_match: 0,
-      }),
-    }),
-    sort: Map({}),
-    aggs: Map({}),
+  const queryBody = {
+    query: {
+      bool: {
+        filter: [],
+        should: [],
+      },
+    },
     from: 0,
-    _source: true,
+    size: PathFinderDefaultSize,
     track_scores: path.more.trackScores,
-  });
+    _source: true,
+  };
+  const sourceBool = queryBody.query.bool;
 
   // Sources
   const sourceInfo = parseSource(path.source);
-  baseQuery = baseQuery.set('from', sourceInfo.from);
+  queryBody.from = sourceInfo.from;
   if (sourceInfo.size !== 'all')
   {
-    baseQuery = baseQuery.set('size', sourceInfo.size);
+    queryBody.size = sourceInfo.size;
   }
-  baseQuery = baseQuery.setIn(['query', 'bool', 'filter'], List([
-    Map({
-      term: Map({
-        _index: sourceInfo.index,
-      }),
-    }),
-  ]));
+  const indexQuery = {
+    term: {
+      _index: sourceInfo.index,
+    },
+  };
+  sourceBool.filter.push(indexQuery);
 
   // Filters
   const filterObj = parseFilters(path.filterGroup, inputs);
-
-  // filterObj = filterObj.updateIn(['bool', 'filter'],
-  // (originalFilter) => originalFilter.concat(baseQuery.getIn(['query', 'bool', 'filter'])));
-  baseQuery = baseQuery.updateIn(['query', 'bool', 'filter'],
-    (originalFilterArr) => originalFilterArr.push(filterObj),
-  );
-
+  sourceBool.filter.push(filterObj);
   const softFiltersObj = parseFilters(path.softFilterGroup, inputs, true);
-
-  baseQuery = baseQuery.updateIn(['query', 'bool', 'must'],
-    (originalMustArr) => originalMustArr.push(Map({
-      bool: Map({
-        should: softFiltersObj,
-        minimum_should_match: 0,
-      }),
-    })),
-  );
+  sourceBool.should.push(softFiltersObj);
 
   // filterObj = filterObj.setIn(['bool', 'should'], softFiltersObj);
   // (originalShould) => originalShould.concat(baseQuery.getIn(['query', 'bool', 'should'])));
 
   // Scores
+
   if ((path.score.type !== 'terrain' && path.score.type !== 'linear') || path.score.lines.size)
   {
     let sortObj = parseScore(path.score, true);
     if (path.score.type !== 'random')
     {
-      baseQuery = baseQuery.set('sort', sortObj);
+      queryBody['sort'] = sortObj;
     }
     else
     {
-      sortObj = sortObj.setIn(['function_score', 'query'], baseQuery.get('query'));
-      baseQuery = baseQuery.set('query', sortObj);
-      baseQuery = baseQuery.delete('sort');
+      sortObj = sortObj['function_score']['query'] = queryBody.query;
+      queryBody.query = sortObj;
+      delete queryBody['sort'];
     }
   }
 
-  // More
-  // const moreObj = parseAggregations(path.more);
-  // baseQuery = baseQuery.set('aggs', Map(moreObj));
   const collapse = path.more.collapse;
   if (collapse)
   {
-    baseQuery = baseQuery.set('collapse', { field: collapse });
+    queryBody['collapse'] = { field: collapse };
   }
   // _source
   if (path.more.customSource)
   {
-    baseQuery = baseQuery.set('_source', path.more.source.toJS());
+    queryBody._source = path.more.source.toJS();
   }
 
   // Scripts
   const scripts = parseScripts(path.more.scripts);
-  baseQuery = baseQuery.set('script_fields', scripts);
+  queryBody['script_fields'] = scripts;
 
   // Nested algorithms (groupjoins)
-  const groupJoin = parseNested(path.reference, path.nested, inputs);
+  const groupJoin = parseGroupJoin(path.reference, path.nested, inputs);
   if (groupJoin)
   {
-    baseQuery = baseQuery.set('groupJoin', groupJoin);
+    queryBody['groupJoin'] = groupJoin;
   }
 
   // Export, without inputs
   if (ignoreInputs)
   {
-    return baseQuery;
+    return queryBody;
   }
 
   // Export, with inputs
-  const text = stringifyWithParameters(baseQuery.toJS(), (name) => isInput(name, inputs));
+  const text = stringifyWithParameters(queryBody, (name) => isInput(name, inputs));
   const parser: ESJSONParser = new ESJSONParser(text, true);
   return ESParseTreeToCode(parser, {}, inputs);
+
+  // TODO
+  // const moreObj = parseAggregations(path.more);
+  // baseQuery = baseQuery.set('aggs', Map(moreObj));
 }
 
 function parseSource(source: Source): any
@@ -190,15 +183,15 @@ export function parseScore(score: Score, simpleParser: boolean = false): any
     case 'elastic':
       return { _score: { order: 'desc' } };
     case 'random':
-      return Map({
-        function_score: Map({
+      return {
+        function_score: {
           boost_mode: 'sum',
           random_score: {
             seed: score.seed,
           },
           query: {},
-        }),
-      });
+        },
+      };
     case 'none':
     default:
       return {};
@@ -308,434 +301,372 @@ function parseTerrainScore(score: Score, simpleParser: boolean = false)
   return simpleParser ? sortObj : factors || [];
 }
 
-function groupNestedFilters(filterGroup: FilterGroup): FilterGroup
+/*
+ * Generate a bool query from a filtergroup.
+ */
+function parseFilters(filterGroup: FilterGroup, inputs, isSoftGroup = false, ignoreNested = false): any
 {
-  const nestedLines = filterGroup.lines.filter((line) =>
+  const filterQuery = { bool: { filter: [], should: [] } };
+  const filterBool = filterQuery.bool;
+  let filterClause = filterBool.filter;
+  if (isSoftGroup === true)
   {
-    return ((line.field && line.field.indexOf('.') !== -1) || line.fieldType === FieldType.Nested)
-      && line.comparison !== 'notexists' && !line.filterGroup;
-  }).toList();
-  let nestedPathMap: Map<string, List<FilterLine>> = Map({});
-  nestedLines.forEach((line) =>
+    // make sure the bool is softbool
+    const dummyQuery = {
+      exists: {
+        field: '_id',
+      },
+    };
+    filterBool.filter.push(dummyQuery);
+  }
+  if (filterGroup.minMatches === 'any' || isSoftGroup === true)
   {
-    const nestedPath = line.field.split('.')[0];
-    if (nestedPathMap.get(nestedPath) !== undefined)
+    filterClause = filterBool.should;
+  }
+
+  const filterMap = PathToCards.MapFilterGroup(filterGroup, ignoreNested);
+  // normal filter lines first
+  filterMap.filter.map((line: FilterLine) =>
+  {
+    const q = filterLineToQuery(line);
+    if (q !== null)
     {
-      nestedPathMap = nestedPathMap.set(nestedPath, nestedPathMap.get(nestedPath).push(line));
+      filterClause.push(q);
+    }
+  });
+  // then inner groups
+  filterMap.group.map((line: FilterLine) =>
+  {
+    const boolQuery = parseFilters(line.filterGroup, inputs, isSoftGroup, ignoreNested);
+    filterClause.push(boolQuery);
+  });
+
+  const filterLinePathMap = {};
+  filterMap.nested.map((line: FilterLine) =>
+  {
+    const path = line.field.split('.')[0];
+    if (filterLinePathMap[path])
+    {
+      filterLinePathMap[path].push(line);
     }
     else
     {
-      nestedPathMap = nestedPathMap.set(nestedPath, List([line]));
+      filterLinePathMap[path] = [line];
     }
   });
-
-  let newLines: List<any> = filterGroup.lines.filter((line) => nestedLines.indexOf(line) === -1).toList();
-  _.keys(nestedPathMap.toJS()).forEach((key) =>
+  _.keys(filterLinePathMap).forEach((path, i) =>
   {
-    newLines = newLines.push(nestedPathMap.get(key));
-  });
-  return filterGroup.set('lines', newLines);
-}
-
-function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = false, ignoreNested = false): any
-{
-  // init must, mustNot, filter, should
-  // If the minMatches is all of the above
-  // For each line in the filter group
-  // If the line is not a filterGroup
-  // Parse the line and add it to must, mustNot or filter
-  // If the line is a filterGroup
-  // must.push ( parseFilters(filterGroup.lines)}, minimum_should_match: minMatches)
-  // If the minMatches is not all
-  // add all the filter conditions to should, set minimum_should_match on the outside of that bool
-  // By adding all the filter conditions to should, do same process as above
-  let filterObj = Map({
-    bool: Map({
-      filter: List([]),
-      must: List([]),
-      must_not: List([]),
-      should: List([]),
-    }),
-  });
-  let must = List([]);
-  let mustNot = List([]);
-  const filter = List([]);
-  let should = List([]);
-  let useShould = false;
-  if (filterGroup.minMatches !== 'all' || inMatchQualityContext)
-  {
-    useShould = true;
-  }
-  if (!ignoreNested)
-  {
-    filterGroup = groupNestedFilters(filterGroup);
-  }
-  filterGroup.lines.forEach((line) =>
-  {
-    if (line.filterGroup)
-    {
-      const nestedFilter = parseFilters(line.filterGroup, inputs, inMatchQualityContext);
-      if (useShould)
-      {
-        should = should.push(nestedFilter);
-      }
-      else
-      {
-        must = must.push(nestedFilter);
-      }
-    }
-    // Special case for a nested filter that is do not exist
-    else if (((line.field && line.field.indexOf('.') !== -1) ||
-      line.fieldType === FieldType.Nested)
-      && line.comparison === 'notexists'
-    )
-    {
-      const inner = parseFilterLine(List([line.set('comparison', 'exists')]), useShould, inputs, ignoreNested);
-      if (useShould)
-      {
-        should = should.push(Map({ bool: Map({ must_not: inner }) }));
-      }
-      else
-      {
-        mustNot = mustNot.push(inner);
-      }
-    }
-    else if ((!line.filterGroup && line.comparison) || List.isList(line))
-    {
-      const lineInfo = parseFilterLine(line, useShould, inputs, ignoreNested);
-
-      if (useShould)
-      {
-        should = should.push(lineInfo);
-      }
-      else if (NEGATIVES.indexOf(line.comparison) !== -1)
-      {
-        mustNot = mustNot.push(lineInfo);
-      }
-      else
-      {
-        must = must.push(lineInfo);
-      }
-    }
-  });
-  if (useShould)
-  {
-    filterObj = filterObj.updateIn(['bool', 'minimum_should_match'], (MSM) =>
-    {
-      if (inMatchQualityContext)
-      {
-        return 0; // forcing should for match quality
-      }
-      return 1;
-    });
-  }
-
-  filterObj = filterObj.setIn(['bool', 'must'], must);
-  if (inMatchQualityContext)
-  {
-    // need to add a useless Must check, so that the Should does not
-    // convert to a "must" because of the filter context
-    // https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html
-    filterObj = filterObj.updateIn(['bool', 'must'],
-      (m) =>
-      {
-        return m.push(Map({
-          exists: Map({
-            field: '_id',
-          }),
-        }));
-      });
-  }
-
-  filterObj = filterObj.setIn(['bool', 'must_not'], mustNot);
-  filterObj = filterObj.setIn(['bool', 'should'], should);
-  filterObj = filterObj.setIn(['bool', 'filter'], filter);
-  return filterObj;
-}
-
-function parseFilterLine(line: FilterLine | List<FilterLine>, useShould: boolean, inputs, ignoreNested = false)
-{
-  line = line as FilterLine;
-  let field;
-  const lineValue = String(line.value);
-  let value: any = String(line.value || '');
-  const boost = typeof line.boost === 'string' ? parseFloat(line.boost) : line.boost;
-  // Parse date
-  if (line.comparison === 'datebefore' || line.comparison === 'dateafter')
-  {
-    const date = Util.formatInputDate(new Date(value), 'elastic');
-    if (date)
-    {
-      value = date;
-    }
-  }
-  if (List.isList(line) && !ignoreNested)
-  {
-    // In this case it is a nested query, disguised as a normal filter line
-    const path = line.get(0).field.split('.')[0];
-    const inner = parseFilters(_FilterGroup({ lines: line, minMatches: 'all' }), inputs, false, true).toJS());
-    return Map({
+    const group = _FilterGroup({ lines: List(filterLinePathMap[path]), minMatches: filterGroup.minMatches });
+    const boolQuery = parseFilters(group, inputs, isSoftGroup, true);
+    // put the boolQuery in the wrapper
+    const nestedQuery = {
       nested: {
         path,
         score_mode: 'avg',
         ignore_unmapped: true,
-        query: inner,
+        query: boolQuery,
       },
+    };
+    filterClause.push(nestedQuery);
+  });
+
+  filterMap.negativeNested.map((line: FilterLine) =>
+  {
+    const q = nestedFilterLineToQuery(line);
+    if (q !== null)
+    {
+      filterClause.push(q);
+    }
+  });
+
+  return filterQuery;
+}
+
+/*
+ * Turn the filter line value to an array.
+ * If the value is an JSON string already, return the parsed array
+ * If the value is an input parameter, return the parameter value ('@name')
+ * Otherwise, try to produce one by spliting the value with ','
+ */
+export function PathFinderStringToJSONArray(value: string)
+{
+  const p = new ESJSONParser(value);
+  if (p.hasError())
+  {
+    // try to split it manualy
+    value = value.replace(/\[/g, '').replace(/\]/g, '');
+    let pieces: any = value.split(',');
+    pieces = pieces.map((piece) =>
+    {
+      piece = piece.trim();
+      const isNumberValue = !isNaN(piece as any) && (!isNaN(parseFloat(piece)));
+      if (isNumberValue)
+      {
+        return parseFloat(piece);
+      } else
+      {
+        return piece;
+      }
     });
+    return pieces;
+  } else
+  {
+    const rootValue = p.getValueInfo();
+    if (rootValue.jsonType === ESJSONType.parameter || rootValue.jsonType === ESJSONType.array)
+    {
+      return rootValue.value;
+    } else
+    {
+      return [rootValue.value];
+    }
   }
+}
+
+function nestedFilterLineToQuery(line: FilterLine)
+{
+  const path = line.field.split('.')[0];
+  const boost = typeof line.boost === 'string' ? parseFloat(line.boost) : line.boost;
+  let wrapper: any = {
+    nested: {
+      path,
+      score_mode: 'avg',
+      ignore_unmapped: true,
+      query: undefined,
+    },
+  };
+  const nestQuery = wrapper.nested;
+  if (NEGATIVES.indexOf(line.comparison) !== -1)
+  {
+    wrapper = {
+      bool: {
+        must_not: wrapper,
+        boost,
+      },
+    };
+    line = line.set('comparison', FlipNegativeMap[line.comparison]);
+  }
+  const query = filterLineToQuery(line);
+  if (query === null)
+  {
+    return null;
+  }
+  nestQuery.query = query;
+  return wrapper;
+}
+
+/*
+ * Generate an query object (in JS object) from the line.
+ * Return null if the line's comparison is unknow.
+ */
+function filterLineToQuery(line: FilterLine)
+{
+  // type priority: Date -> Number -> String
+  // for how these values are finally tuned to query string, see ParseElasticQuery::stringifyWithParameters.
+  let value: any = String(line.value || '');
+  const isDateValue = line.fieldType === FieldType.Date;
+  const isNumberValue = !isNaN(value) && (!isNaN(parseFloat(value))) && (!isDateValue);
+  if (isDateValue)
+  {
+    const newDate = Util.formatInputDate(value, 'elastic');
+    if (newDate)
+    {
+      value = newDate;
+    }
+  } else if (isNumberValue)
+  {
+    value = parseFloat(value);
+  }
+
+  // boost should be a number, but in case it is a string.
+  const boost = typeof line.boost === 'string' ? parseFloat(line.boost) : line.boost;
+  let query = {};
   switch (line.comparison)
   {
-    case 'exists':
-      return Map({
-        exists: Map({
-          field: line.field,
-          boost,
-        }),
-      });
     case 'notexists':
-      if (useShould)
-      {
-        return Map({
-          bool: Map({
-            must_not: Map({
-              exists: Map({
-                field: line.field,
-              }),
-            }),
-            boost,
-          }),
-        });
-      }
-      return Map({
-        exists: Map({
+      query = {
+        bool: {
+          must_not: {
+            exists: {
+              field: line.field,
+            },
+          },
+          boost,
+        },
+      };
+      break;
+    case 'notequal':
+      query = {
+        bool: {
+          must_not: {
+            term: {
+              [line.field]: {
+                value,
+              },
+            },
+          },
+          boost,
+        },
+      };
+      break;
+    case 'notcontain':
+      query = {
+        bool: {
+          must_not: {
+            match: {
+              [line.field]: {
+                query: value,
+              },
+            },
+          },
+          boost,
+        },
+      };
+      break;
+    case 'exists':
+      query = {
+        exists: {
           field: line.field,
           boost,
-        }),
-      });
+        },
+      };
+      break;
     case 'equal':
-      return Map({
-        term: Map({
-          [line.field]: Map({
-            value:
-              !isNaN(parseFloat(value)) && line.fieldType !== FieldType.Date ? parseFloat(value) : value,
+      query = {
+        term: {
+          [line.field]: {
+            value,
             boost,
-          }),
-        }),
-      });
+          },
+        },
+      };
+      break;
     case 'contains':
-      return Map({
-        match: Map({
-          [line.field]: Map({
-            query: String(line.value || ''),
+      query = {
+        match: {
+          [line.field]: {
+            query: value,
             boost,
-          }),
-        }),
-      });
-    case 'notequal':
-      if (useShould)
-      {
-        return Map({
-          bool: Map({
-            must_not: Map({
-              term: Map({
-                [line.field]: Map({
-                  value: !isNaN(parseFloat(value)) ? parseFloat(value) : value,
-                }),
-              }),
-            }),
-            boost,
-          }),
-        });
-      }
-      return Map({
-        term: Map({
-          [line.field]: Map({
-            value:
-              !isNaN(parseFloat(value)) && line.fieldType !== FieldType.Date ? parseFloat(value) : value,
-            boost,
-          }),
-        }),
-      });
-    case 'notcontain':
-      if (useShould)
-      {
-        return Map({
-          bool: Map({
-            must_not: Map({
-              match: Map({
-                [line.field]: Map({
-                  query: String(line.value || ''),
-                }),
-              }),
-            }),
-            boost,
-          }),
-        });
-      }
-      return Map({
-        match: Map({
-          [line.field]: Map({
-            query: String(line.value || ''),
-            boost,
-          }),
-        }),
-      });
+          },
+        },
+      };
+      break;
     case 'greater':
-      return Map({
-        range: Map({
+      query = {
+        range: {
           [line.field]:
-            Map({
-              gt: parseFloat(value),
+            {
+              gt: value,
               boost,
-            }),
-        }),
-      });
+            },
+        },
+      };
+      break;
     case 'alphaafter':
     case 'dateafter':
-      return Map({
-        range: Map({
+      query = {
+        range: {
           [line.field]:
-            Map({
+            {
               gte: value,
               boost,
-            }),
-        }),
-      });
+            },
+        },
+      };
+      break;
     case 'less':
-      return Map({
-        range: Map({
+      query = {
+        range: {
           [line.field]:
-            Map({
-              lt: parseFloat(value),
+            {
+              lt: value,
               boost,
-            }),
-        }),
-      });
+            },
+        },
+      };
+      break;
     case 'alphabefore':
     case 'datebefore':
-      return Map({
-        range: Map({
+      query = {
+        range: {
           [line.field]:
-            Map({
+            {
               lte: value,
               boost,
-            }),
-        }),
-      });
+            },
+        },
+      };
+      break;
     case 'greaterequal':
-      return Map({
-        range: Map({
+      query = {
+        range: {
           [line.field]:
-            Map({
-              gte: parseFloat(value),
+            {
+              gte: value,
               boost,
-            }),
-        }),
-      });
+            },
+        },
+      };
+      break;
     case 'lessequal':
-      return Map({
-        range: Map({
+      query = {
+        range: {
           [line.field]:
-            Map({
-              lte: parseFloat(value),
+            {
+              lte: value,
               boost,
-            }),
-        }),
-      });
+            },
+        },
+      };
+      break;
     case 'located':
       const distanceObj = line.value as DistanceValue;
       if (!line.value)
       {
-        return Map({
-          geo_distance: Map({
+        query = {
+          geo_distance: {
             distance: '10mi',
             [line.field]: '',
             boost,
-          }),
-        });
+          },
+        };
+      } else
+      {
+        query = {
+          geo_distance: {
+            distance: String(distanceObj.distance) + distanceObj.units,
+            [line.field]: distanceObj.location || distanceObj.address,
+            boost,
+          },
+        };
       }
-      return Map({
-        geo_distance: Map({
-          distance: String(distanceObj.distance) + distanceObj.units,
-          [line.field]: distanceObj.location || distanceObj.address,
-          boost,
-        }),
-      });
+      break;
     case 'isin':
-      field = line.analyzed && line.fieldType === FieldType.Text ? line.field + '.keyword' : line.field;
-      try
-      {
-        return Map({
-          terms: {
-            [field]: JSON.parse(String(value).toLowerCase()),
-            boost,
-          },
-        });
-      }
-      catch {
-        // Try to split it along commas and create own value
-        if (typeof value === 'string' && value[0] !== '@')
-        {
-          value = value.replace(/\[/g, '').replace(/\]/g, '');
-          let pieces = value.split(',');
-          pieces = pieces.map((piece) => piece.toLowerCase().trim());
-          return Map({
-            terms: {
-              [field]: pieces,
-              boost,
-            },
-          });
-        }
-        return Map({
-          terms: {
-            [field]: value,
-            boost,
-          },
-        });
-      }
-
+      value = PathFinderStringToJSONArray(String(value));
+      query = {
+        terms: {
+          [line.field]: value,
+          boost,
+        },
+      };
+      break;
     case 'isnotin':
-      let parsed = value;
-      field = line.analyzed && line.fieldType === FieldType.Text ? line.field + '.keyword' : line.field;
-      try
-      {
-        parsed = JSON.parse(String(value).toLowerCase());
-      }
-      catch {
-        // Try to split it along commas and create own value
-        if (typeof value === 'string' && value[0] !== '@')
-        {
-          value = value.replace(/\[/g, '').replace(/\]/g, '');
-          const pieces = value.split(',');
-          parsed = pieces.map((piece) => piece.toLowerCase().trim());
-        }
-      }
-      if (useShould)
-      {
-        return Map({
-          bool: {
-            must_not: {
-              terms: {
-                [field]: parsed,
-              },
+      value = PathFinderStringToJSONArray(String(value));
+      query = {
+        bool: {
+          must_not: {
+            terms: {
+              [line.field]: value,
             },
-            boost,
           },
-        });
-      }
-      else
-      {
-        return Map({
-          terms: {
-            [field]: parsed,
-            boost,
-          },
-        });
-      }
-
+          boost,
+        },
+      };
+      break;
     default:
-      return Map({});
+      query = null;
+      break;
   }
+  return query;
 }
 
 const unusedKeys = [
@@ -823,45 +754,49 @@ function parseAggregations(more: More): {}
 }
 
 // Put a nested path inside of a groupJoin
-function parseNested(reference: string, nested: List<Path>, inputs)
+function parseGroupJoin(reference: string, nested: List<Path>, inputs)
 {
   if (nested.size === 0)
   {
-    return undefined;
+    return null;
   }
-  let groupJoins = Map({});
-  if (nested.get(0) && nested.get(0).minMatches)
-  {
-    groupJoins = groupJoins.set('dropIfLessThan', parseFloat(String(nested.get(0).minMatches)));
-  }
-  groupJoins = groupJoins.set('parentAlias', reference);
+  const groupJoins = {};
   nested.forEach((n, i) =>
   {
-    if (n)
+    if (n && n.name)
     {
-      groupJoins = groupJoins.set(n.name, parsePath(n, inputs, true));
+      groupJoins[n.name] = parsePath(n, inputs, true);
     }
   });
+  if (_.isEmpty(groupJoins) === true)
+  {
+    return null;
+  }
+  if (nested.get(0) && nested.get(0).minMatches)
+  {
+    groupJoins['dropIfLessThan'] = parseFloat(String(nested.get(0).minMatches));
+  }
+  groupJoins['parentAlias'] = reference;
   return groupJoins;
 }
 
 function parseScripts(scripts: List<Script>)
 {
-  let scriptObj = Map({});
+  const scriptObj = {};
   scripts.forEach((script: Script) =>
   {
-    let params = Map({});
+    const params = {};
     script.params.forEach((param) =>
     {
-      params = params.set(param.name, param.value);
+      params[param.name] = param.value;
     });
-    const s = Map({
+    const s = {
       script: {
-        params: params.toJS(),
+        params,
         inline: script.script,
       },
-    });
-    scriptObj = scriptObj.set(script.name, s);
+    };
+    scriptObj[script.name] = s;
   });
   return scriptObj;
 }
