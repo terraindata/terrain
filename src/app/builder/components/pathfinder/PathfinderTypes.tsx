@@ -420,7 +420,7 @@ export const _FilterLine = (config?: { [key: string]: any }) =>
   {
     filterLine = filterLine.set('filterGroup', _FilterGroup(config.filterGroup));
   }
-  if (config && config.value !== null && typeof config.value !== 'string' && typeof config.value !== 'number')
+  if (config && config.value && typeof config.value !== 'string' && typeof config.value !== 'number')
   {
     filterLine = filterLine.set('value', _DistanceValue(config.value));
   }
