@@ -48,7 +48,7 @@ import TastyQuery from './TastyQuery';
 import TastySchema from './TastySchema';
 import TastyTable from './TastyTable';
 
-abstract class TastyDB
+export abstract class TastyDB
 {
   /**
    * makes a database specific query from a TastyQuery
@@ -81,7 +81,7 @@ abstract class TastyDB
    *
    * @memberof TastyDB
    */
-  public async abstract execute(queries: any[]): Promise<object[]>;
+  public async abstract execute(queries: any[], handle?: TransactionHandle): Promise<object[]>;
 
   /**
    * update or insert an array of objects in a TastyTable
@@ -93,7 +93,7 @@ abstract class TastyDB
    *
    * @memberof TastyDB
    */
-  public async abstract upsert(table: TastyTable, elements: object[]): Promise<object[]>;
+  public async abstract upsert(table: TastyTable, elements: object[], handle?: TransactionHandle): Promise<object[]>;
 
   /**
    * update an array of objects in a TastyTable
@@ -105,7 +105,37 @@ abstract class TastyDB
    *
    * @memberof TastyDB
    */
-  public async abstract update(table: TastyTable, elements: object[]): Promise<object[]>;
+  public async abstract update(table: TastyTable, elements: object[], handle?: TransactionHandle): Promise<object[]>;
+
+  /**
+   * start a transaction
+   *
+   * @abstract
+   * @returns {Promise<object[]>}
+   *
+   * @memberof TastyDB
+   */
+  public async abstract startTransaction(isolationLevel: IsolationLevel, readOnly: boolean): Promise<TransactionHandle>;
+
+  /**
+   * commit a transaction
+   *
+   * @abstract
+   * @returns {Promise<object[]>}
+   *
+   * @memberof TastyDB
+   */
+  public async abstract commitTransaction(handle: TransactionHandle): Promise<object[]>;
+
+  /**
+   * rollback a transaction
+   *
+   * @abstract
+   * @returns {Promise<object[]>}
+   *
+   * @memberof TastyDB
+   */
+  public async abstract rollbackTransaction(handle: TransactionHandle): Promise<object[]>;
 
   /**
    * returns schema information for a database
@@ -137,5 +167,16 @@ abstract class TastyDB
    */
   public async abstract putMapping(table: TastyTable): Promise<object>;
 }
+
+export enum IsolationLevel
+{
+  REPEATABLE_READ = 'REPEATABLE READ',
+  READ_COMMITTED = 'READ COMMITTED',
+  READ_UNCOMMITTED = 'READ UNCOMMITTED',
+  SERIALIZABLE = 'SERIALIZABLE',
+  DEFAULT = '',
+}
+
+export type TransactionHandle = number;
 
 export default TastyDB;

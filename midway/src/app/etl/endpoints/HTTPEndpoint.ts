@@ -63,7 +63,7 @@ export default class HTTPEndpoint extends AEndpointStream
   public async getSource(source: SourceConfig): Promise<Readable>
   {
     const config = await this.getIntegrationConfig(source.integrationId);
-    return this.getRequestStream(config) as Promise<Readable>;
+    return this.getRequestStream(config, source.options) as Promise<Readable>;
   }
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
@@ -72,19 +72,28 @@ export default class HTTPEndpoint extends AEndpointStream
     return this.getRequestStream(config) as Promise<Writable>;
   }
 
-  private async getRequestStream(httpConfig: object): Promise<Readable | Writable>
+  private async getRequestStream(httpConfig: object, options?: any): Promise<Readable | Writable>
   {
     return new Promise<Readable | Writable>((resolve, reject) =>
     {
-      request(httpConfig['url'], httpConfig['method'], httpConfig['headers'])
-        .on('error', (err) =>
+      const method = (options !== undefined && options.method !== undefined) ? options.method : undefined;
+      const headers = (options !== undefined && options.headers !== undefined) ? options.headers : undefined;
+      const params = (options !== undefined && options.params !== undefined) ? options.params : undefined;
+      const paramsKey = (method === 'GET') ? 'qs' : 'body';
+
+      request({
+        url: httpConfig['url'],
+        method,
+        headers,
+        [paramsKey]: params,
+      }).on('error', (err) =>
+      {
+        if (err !== null && err !== undefined)
         {
-          if (err !== null && err !== undefined)
-          {
-            const e = Error(`Error reading from HTTP endpoint ${httpConfig['url']} ${err.toString()}`);
-            return reject(e);
-          }
-        })
+          const e = Error(`Error reading from HTTP endpoint ${httpConfig['url']} ${err.toString()}`);
+          return reject(e);
+        }
+      })
         .on('response', (res) =>
         {
           if (res.statusCode !== 200)

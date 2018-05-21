@@ -48,7 +48,7 @@ import * as mysql from 'mysql';
 
 import util from '../../../../../shared/Util';
 import SQLGenerator from '../../../tasty/MySQLGenerator';
-import TastyDB from '../../../tasty/TastyDB';
+import { IsolationLevel, TastyDB, TransactionHandle } from '../../../tasty/TastyDB';
 import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
 import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
@@ -171,6 +171,21 @@ export class MySQLDB implements TastyDB
   public async update(table: TastyTable, elements: object[]): Promise<object[]>
   {
     throw new Error('update() is currently only supported for Elastic databases.');
+  }
+
+  public async startTransaction(isolationLevel: IsolationLevel, readOnly: boolean): Promise<TransactionHandle>
+  {
+    throw new Error('startTransaction() is not supported');
+  }
+
+  public async commitTransaction(handle: TransactionHandle): Promise<object[]>
+  {
+    throw new Error('commitTransaction() is not supported');
+  }
+
+  public async rollbackTransaction(handle: TransactionHandle): Promise<object[]>
+  {
+    throw new Error('rollbackTransaction() is not supported');
   }
 
   // tslint:disable-next-line:no-unused-variable

@@ -463,6 +463,7 @@ export default class EngineUtil
           const longField = EngineUtil.addFieldToEngine(engine, ikp.push('lon'), ETLFieldTypes.Number);
           engine.setOutputKeyPath(latField, okp.push('lat')); // refactor to use synthetic util?
           engine.setOutputKeyPath(longField, okp.push('lon'));
+
           EngineUtil.castField(engine, latField, ETLFieldTypes.Number);
           EngineUtil.castField(engine, longField, ETLFieldTypes.Number);
         }

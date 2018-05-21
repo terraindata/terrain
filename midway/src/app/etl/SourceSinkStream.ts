@@ -138,8 +138,11 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
       switch (source.fileConfig.fileType)
       {
         case 'json':
-          // const jsonPath: string | undefined = source.fileConfig.jsonNewlines ? '*' : undefined;
-          const jsonPath = '*';
+          let jsonPath: string | undefined = source.fileConfig.jsonPath;
+          if (source.fileConfig.jsonNewlines)
+          {
+            jsonPath = '*';
+          }
           importStream = sourceStream.pipe(JSONTransform.createImportStream(jsonPath));
           break;
         case 'csv':
@@ -180,9 +183,37 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
         switch (sink.fileConfig.fileType)
         {
           case 'json':
-            if (sink.fileConfig.jsonNewlines)
+            if (sink.fileConfig.jsonPath !== undefined)
             {
-              transformStream = JSONTransform.createExportStream('', ',\n', '');
+              let path = sink.fileConfig.jsonPath.split('.');
+              const wildcardIndex: number = path.indexOf('*');
+              if (wildcardIndex >= 0)
+              {
+                if (wildcardIndex < path.length - 1)
+                {
+                  winston.error('Ignoring invalid JSON path: ', sink.fileConfig.jsonPath);
+                  path = [];
+                }
+                else // wildCardIndex === path.length - 1
+                {
+                  path.pop();
+                }
+              }
+
+              let open = '';
+              let close = '';
+              for (const p of path)
+              {
+                open += '{\n\t"' + p + '": ';
+                close = '\n}' + close;
+              }
+              open += '[\n';
+              close = '\n]' + close;
+              transformStream = JSONTransform.createExportStream(open, ',\n', close);
+            }
+            else if (sink.fileConfig.jsonNewlines)
+            {
+              transformStream = JSONTransform.createExportStream('', '\n', '');
             }
             else
             {

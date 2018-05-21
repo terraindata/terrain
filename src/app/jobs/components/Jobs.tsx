@@ -63,7 +63,12 @@ import * as React from 'react';
 import Util from 'util/Util';
 import './Jobs.less';
 
+const INTERVAL = 60000;
+
 class Jobs extends TerrainComponent<any> {
+
+  public interval;
+
   public constructor(props)
   {
     super(props);
@@ -72,7 +77,7 @@ class Jobs extends TerrainComponent<any> {
       jobs: null,
       id: '',
       expanded: Immutable.Map({
-        completed: false,
+        completed: true,
         pending: false,
         running: true,
       }),
@@ -84,6 +89,12 @@ class Jobs extends TerrainComponent<any> {
   public componentDidMount()
   {
     this.getJobs();
+    this.interval = setInterval(this.getJobs, INTERVAL);
+  }
+
+  public componentWillUnmount()
+  {
+    clearInterval(this.interval);
   }
 
   public getJobs()
@@ -105,10 +116,21 @@ class Jobs extends TerrainComponent<any> {
     let duration = '';
     if (job.endTime !== null)
     {
-      const startMoment = Util.moment(job.startTime);
-      const endMoment = Util.moment(job.endTime);
+      const startMoment = Util.moment(job.startTime).startOf('minute');
+      const endMoment = Util.moment(job.endTime).startOf('minute');
 
-      duration = endMoment.preciseDiff(startMoment);
+      const durationUnits = endMoment.preciseDiff(startMoment, true);
+      // minute is the minimum granularity
+      duration = '< 1 minute';
+      const moreThanAMinute = durationUnits.minutes > 0 ||
+        durationUnits.hours > 0 ||
+        durationUnits.days > 0 ||
+        durationUnits.months > 0 ||
+        durationUnits.years > 0;
+      if (moreThanAMinute)
+      {
+        duration = endMoment.preciseDiff(startMoment);
+      }
     }
 
     return duration;
@@ -161,7 +183,7 @@ class Jobs extends TerrainComponent<any> {
   public parseJobLogContents(jobLogs)
   {
     return jobLogs.contents !== '' && jobLogs.contents !== undefined ?
-      jobLogs.contents.split("\n").map((logLine) => JSON.parse(logLine)) : [];
+      jobLogs.contents.split('\n').map((logLine) => JSON.parse(logLine)) : [];
   }
 
   public render()

@@ -119,11 +119,12 @@ class TemplateEditor extends TerrainComponent<Props>
       {
         resetEngine.enableField(id);
       });
-
       return resetEngine.transform(previewDocument);
     }
     catch (e)
     {
+      // tslint:disable-next-line
+      console.error(e);
       return {};
     }
   }
