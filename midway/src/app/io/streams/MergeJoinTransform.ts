@@ -125,6 +125,11 @@ export default class MergeJoinTransform extends SafeReadable
       }
     }
 
+    if (mergeJoinQuery['leftJoinKey'] === undefined && this.rightJoinKey !== undefined)
+    {
+      this.leftJoinKey = this.rightJoinKey;
+    }
+
     const innerQueries = Object.keys(mergeJoinQuery);
     if (innerQueries.length > 1)
     {
