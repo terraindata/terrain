@@ -178,7 +178,18 @@ export function getSampleRows(
   }
   else if (fileType === FileTypes.Xml)
   {
-    onError(`XML File Parsing not supported`);
+    const fileChunk = file.slice(0, ChunkSize);
+    const fr = new FileReader();
+    fr.onloadend = () =>
+    {
+      Util.xml.parseXMLFile(
+        fr.result,
+        options.xmlPath,
+        onLoad,
+        onError,
+      );
+    };
+    fr.readAsText(fileChunk);
   }
 }
 // TODO for json, use a streaming implementation
