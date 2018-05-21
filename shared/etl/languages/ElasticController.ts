@@ -75,11 +75,6 @@ class ElasticController implements LanguageInterface
       engine.setFieldProp(fieldId, List(['elastic']), newProps);
     }
   }
-
-  public autodetectFieldTypes(engine: TransformationEngine, documents: List<object>)
-  {
-
-  }
 }
 
 export default new ElasticController();

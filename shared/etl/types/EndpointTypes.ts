@@ -46,7 +46,7 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file no-unused-expression
 
 import { FileTypes, Languages } from './ETLTypes';
-import { PostProcessTransformConfig } from './PostProcessTypes';
+import { PostProcessConfig } from './PostProcessTypes';
 
 export interface FileConfig
 {
@@ -240,7 +240,7 @@ export interface HttpOptions
 export interface GoogleAnalyticsOptions
 {
   dayInterval: number;
-  transformations?: PostProcessTransformConfig[];
+  transformations?: PostProcessConfig[];
 }
 
 export interface SQLOptions

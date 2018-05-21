@@ -42,34 +42,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file no-unused-expression
+// Copyright 2017 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
 
-import { FileTypes, Languages } from './ETLTypes';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
+const { List, Map } = Immutable;
+import { makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
-export enum PostProcessAggregationTypes
+import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
+
+type FieldOrder = ReorderableSet<number>;
+
+class TemplateUIDataC
 {
-  Average = 'Average',
-  Merge = 'Merge',
-  Concat = 'Concat',
-  Sum = 'Sum',
+  public engineFieldOrders: Immutable.Map<number, FieldOrder> = Immutable.Map<number, FieldOrder>({});
 }
-
-export interface PostProcessConfig
-{
-  type: PostProcessTypes;
-  options: PostProcessOptionsType<PostProcessTypes>;
-}
-
-export interface PostProcessOptionsTypes
-{
-  Aggregate: {
-    fields: string[];
-    operation: PostProcessAggregationTypes;
-    pattern: string;
-    primaryKey: string;
-  };
-}
-
-export type PostProcessTypes = keyof PostProcessOptionsTypes;
-export type PostProcessOptionsType<key extends PostProcessTypes> = PostProcessOptionsTypes[key];
+export type TemplateUIData = WithIRecord<TemplateUIDataC>;
+export const _TemplateUIData = makeExtendedConstructor(TemplateUIDataC, true, {
+  engineFieldOrders: (orders) =>
+  {
+    return Map(orders).mapEntries<number, FieldOrder>(
+      ([key, obj]) => [Number(key), _ReorderableSet<number>(obj, true)],
+    ).toMap();
+  },
+});

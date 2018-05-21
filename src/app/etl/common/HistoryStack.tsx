@@ -58,8 +58,6 @@ import
   WithIRecord,
 } from 'shared/util/Classes';
 
-type ImmHistory<T> = WithIRecord<HistoryStackC<T>>;
-
 class HistoryStackC<T>
 {
   public maxSize: number = 50;
@@ -82,9 +80,9 @@ class HistoryStackC<T>
     return this.currentItem !== null && this.nextItems.size > 0;
   }
 
-  public clearHistory(): ImmHistory<T>
+  public clearHistory(): HistoryStack<T>
   {
-    let history: ImmHistory<T> = this as any;
+    let history: HistoryStack<T> = this as any;
     history = history
       .update('pastItems', (items) => items.clear())
       .update('nextItems', (items) => items.clear())
@@ -94,24 +92,24 @@ class HistoryStackC<T>
 
   // set the current item without mutating the history
   // be careful when using this
-  public setItem(item: T): ImmHistory<T>
+  public setItem(item: T): HistoryStack<T>
   {
-    const history: ImmHistory<T> = this as any;
+    const history: HistoryStack<T> = this as any;
     return history.set('currentItem', item);
   }
 
   // like setItem, but updates the item like with immutable update()
-  public updateItem(fn: (item: T) => T): ImmHistory<T>
+  public updateItem(fn: (item: T) => T): HistoryStack<T>
   {
-    let history: ImmHistory<T> = this as any;
+    let history: HistoryStack<T> = this as any;
     history = history.set('currentItem', fn(this.currentItem));
     return history;
   }
 
   // add a new item to the history. If there is a nextItems stack, then it will be cleared
-  public pushItem(item: T): ImmHistory<T>
+  public pushItem(item: T): HistoryStack<T>
   {
-    let history: ImmHistory<T> = this as any;
+    let history: HistoryStack<T> = this as any;
     history = history.update('nextItems', (nextItems) => nextItems.clear());
     if (history.currentItem !== null)
     {
@@ -125,9 +123,9 @@ class HistoryStackC<T>
     return history;
   }
 
-  public undoHistory(): ImmHistory<T>
+  public undoHistory(): HistoryStack<T>
   {
-    let history: ImmHistory<T> = this as any;
+    let history: HistoryStack<T> = this as any;
     if (this.canUndo())
     {
       history = history.update('nextItems', (nextItems) => nextItems.push(history.currentItem));
@@ -142,9 +140,9 @@ class HistoryStackC<T>
     }
   }
 
-  public redoHistory()
+  public redoHistory(): HistoryStack<T>
   {
-    let history: ImmHistory<T> = this as any;
+    let history: HistoryStack<T> = this as any;
     if (this.canRedo())
     {
       history = history.update('pastItems', (pastItems) => pastItems.push(history.currentItem));
