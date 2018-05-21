@@ -83,7 +83,8 @@ export default class MergeJoinTransform extends SafeReadable
   private rightEnded: boolean = false;
 
   private mergeJoinName: string;
-  private joinKey: string;
+  private leftJoinKey: string;
+  private rightJoinKey: string;
 
   constructor(client: ElasticClient, queryStr: string, type: MergeJoinType = MergeJoinType.LEFT_OUTER_JOIN)
   {
@@ -105,10 +106,23 @@ export default class MergeJoinTransform extends SafeReadable
     delete query['mergeJoin'];
 
     // read merge join options from the query
-    if (mergeJoinQuery['joinKey'] !== undefined)
+    if (mergeJoinQuery['leftJoinKey'] !== undefined)
     {
-      this.joinKey = mergeJoinQuery['joinKey'];
-      delete mergeJoinQuery['joinKey'];
+      this.leftJoinKey = mergeJoinQuery['leftJoinKey'];
+      delete mergeJoinQuery['leftJoinKey'];
+    }
+
+    if (mergeJoinQuery['rightJoinKey'] !== undefined)
+    {
+      this.rightJoinKey = mergeJoinQuery['rightJoinKey'];
+      delete mergeJoinQuery['rightJoinKey'];
+    }
+    else
+    {
+      if (this.leftJoinKey !== undefined)
+      {
+        this.rightJoinKey = this.leftJoinKey;
+      }
     }
 
     const innerQueries = Object.keys(mergeJoinQuery);
@@ -119,7 +133,7 @@ export default class MergeJoinTransform extends SafeReadable
     this.mergeJoinName = innerQueries[0];
 
     // set up the left source
-    const leftQuery = this.setSortClause(query);
+    const leftQuery = this.setSortClause(query, this.leftJoinKey);
     this.leftSource = new ElasticReader(client, leftQuery, true);
     this.leftSource.on('data', (buffer) =>
     {
@@ -130,7 +144,7 @@ export default class MergeJoinTransform extends SafeReadable
 
     // set up the right source
     delete mergeJoinQuery[this.mergeJoinName]['size'];
-    const rightQuery = this.setSortClause(mergeJoinQuery[this.mergeJoinName]);
+    const rightQuery = this.setSortClause(mergeJoinQuery[this.mergeJoinName], this.rightJoinKey);
     this.rightSource = new ElasticReader(client, rightQuery, true);
     this.rightSource.on('data', (buffer) =>
     {
@@ -230,15 +244,15 @@ export default class MergeJoinTransform extends SafeReadable
     while (this.leftPosition < left.length
       && this.rightPosition < right.length)
     {
-      let l = left[this.leftPosition]['_source'][this.joinKey];
-      let r = right[this.rightPosition]['_source'][this.joinKey];
+      let l = left[this.leftPosition]['_source'][this.leftJoinKey];
+      let r = right[this.rightPosition]['_source'][this.rightJoinKey];
 
       while (l !== r
         && this.leftPosition < left.length
         && this.rightPosition < right.length)
       {
-        l = left[this.leftPosition]['_source'][this.joinKey];
-        r = right[this.rightPosition]['_source'][this.joinKey];
+        l = left[this.leftPosition]['_source'][this.leftJoinKey];
+        r = right[this.rightPosition]['_source'][this.rightJoinKey];
 
         left[this.leftPosition][this.mergeJoinName] = [];
         if (l < r)
@@ -259,7 +273,7 @@ export default class MergeJoinTransform extends SafeReadable
       // start merging
       left[this.leftPosition][this.mergeJoinName] = [];
       let j = this.rightPosition;
-      while (j < right.length && l === right[j]['_source'][this.joinKey])
+      while (j < right.length && l === right[j]['_source'][this.rightJoinKey])
       {
         left[this.leftPosition][this.mergeJoinName].push(right[j]['_source']);
         j++;
@@ -283,9 +297,9 @@ export default class MergeJoinTransform extends SafeReadable
     }
   }
 
-  private setSortClause(query: object)
+  private setSortClause(query: object, joinKey: string)
   {
-    const joinClause = { [this.joinKey]: 'asc' };
+    const joinClause = { [joinKey]: 'asc' };
     if (query['sort'] === undefined)
     {
       query['sort'] = joinClause;
