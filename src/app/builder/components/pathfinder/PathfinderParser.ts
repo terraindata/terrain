@@ -398,7 +398,7 @@ export function PathFinderStringToJSONArray(value: string)
     let pieces: any = value.split(',');
     pieces = pieces.map((piece) =>
     {
-      piece = piece.toLowerCase().trim();
+      piece = piece.trim();
       const isNumberValue = !isNaN(piece as any) && (!isNaN(parseFloat(piece)));
       if (isNumberValue)
       {
@@ -467,8 +467,7 @@ function filterLineToQuery(line: FilterLine)
   const isNumberValue = !isNaN(value) && (!isNaN(parseFloat(value))) && (!isDateValue);
   if (isDateValue)
   {
-    const newDate = Util.formatInputDate(new Date(value), 'elastic');
-    // console.log('Date '+ value + " is formatted to " + newDate);
+    const newDate = Util.formatInputDate(value, 'elastic');
     if (newDate)
     {
       value = newDate;
@@ -642,7 +641,7 @@ function filterLineToQuery(line: FilterLine)
       }
       break;
     case 'isin':
-      value = PathFinderStringToJSONArray(value);
+      value = PathFinderStringToJSONArray(String(value));
       query = {
         terms: {
           [line.field]: value,
@@ -651,7 +650,7 @@ function filterLineToQuery(line: FilterLine)
       };
       break;
     case 'isnotin':
-      value = PathFinderStringToJSONArray(value);
+      value = PathFinderStringToJSONArray(String(value));
       query = {
         bool: {
           must_not: {
@@ -762,18 +761,22 @@ function parseGroupJoin(reference: string, nested: List<Path>, inputs)
     return null;
   }
   const groupJoins = {};
+  nested.forEach((n, i) =>
+  {
+    if (n && n.name)
+    {
+      groupJoins[n.name] = parsePath(n, inputs, true);
+    }
+  });
+  if (_.isEmpty(groupJoins) === true)
+  {
+    return null;
+  }
   if (nested.get(0) && nested.get(0).minMatches)
   {
     groupJoins['dropIfLessThan'] = parseFloat(String(nested.get(0).minMatches));
   }
   groupJoins['parentAlias'] = reference;
-  nested.forEach((n, i) =>
-  {
-    if (n)
-    {
-      groupJoins[n.name] = parsePath(n, inputs, true);
-    }
-  });
   return groupJoins;
 }
 

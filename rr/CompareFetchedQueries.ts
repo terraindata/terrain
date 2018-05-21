@@ -92,38 +92,38 @@ async function replayQueries()
   }
   const items = jsonfile.readFileSync(path);
   items.map((item) =>
+  {
+    const meta = JSON.parse(item.meta);
+    console.log(item.name + ': db ' + meta.db.id);
+    if (item.newtop20 && item.top20)
     {
-      const meta = JSON.parse(item.meta);
-      console.log(item.name + ': db ' + meta.db.id);
-      if (item.newtop20 && item.top20)
+      if (item.newtop20.length === item.top20.length)
       {
-        if (item.newtop20.length === item.top20.length)
+        let same = true;
+        for (let i = 0; i < item.top20.length; i++)
         {
-          let same = true;
-          for (let i = 0; i < item.top20.length; i++)
+          if (item.newtop20[i]._id !== item.top20[i]._id)
           {
-            if (item.newtop20[i]._id !== item.top20[i]._id)
-            {
-              console.log(i + 'diff\n==========\n' + JSON.stringify(item.top20[i]) + '\n===========\n' + JSON.stringify(item.newtop20[i]));
-              same = false;
-            }
+            console.log(i + 'diff\n==========\n' + JSON.stringify(item.top20[i]) + '\n===========\n' + JSON.stringify(item.newtop20[i]));
+            same = false;
           }
-          if (same === true)
-          {
-            console.log(item.top20.length + ' results are same');
-          } else
-          {
-            console.log(item.top20.length + ' results are different.');
-          }
+        }
+        if (same === true)
+        {
+          console.log(item.top20.length + ' results are same');
         } else
         {
-          console.log('Results have different size.');
+          console.log(item.top20.length + ' results are different.');
         }
       } else
       {
-        console.log('No results to compare.');
+        console.log('Results have different size.');
       }
-    },
+    } else
+    {
+      console.log('No results to compare.');
+    }
+  },
   );
 }
 

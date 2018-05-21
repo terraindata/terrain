@@ -98,7 +98,7 @@ export default class TerrainStoreLogger
         if (TerrainStoreLogger.printStateChange === true)
         {
           const stateAfterAction = store.getState();
-          TerrainLog.debug('State Before: ', stateBeforeAction, 'State After:', stateAfterAction);
+          TerrainLog.debug('State Before: ', stateBeforeAction, 'State After:', stateAfterAction, 'Action:', action);
         }
         return result;
       }

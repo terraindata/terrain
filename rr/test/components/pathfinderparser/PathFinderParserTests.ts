@@ -47,8 +47,8 @@ THE SOFTWARE.
 
 import * as fs from 'fs';
 import * as ip from 'ip';
-import * as winston from 'winston';
 import * as sleep from 'sleep';
+import * as winston from 'winston';
 
 import * as jsonfile from 'jsonfile';
 
@@ -81,9 +81,10 @@ describe('Testing the pathfinder parser', () =>
     const actionFileName = getExpectedActionFile();
     const actionFileData = jsonfile.readFileSync(actionFileName);
     actions = actionFileData.actions;
-    winston.info('Testing ' + actions.length + ' queries.');
+    winston.info('Testing ' + String(actions.length) + ' queries.');
     const wsAddress = await getChromeDebugAddress();
     browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
+    // browser = await puppeteer.launch({ headless: false });
     winston.info('Connected to the Chrome ' + String(wsAddress));
   });
 
@@ -101,12 +102,17 @@ describe('Testing the pathfinder parser', () =>
 
     for (let i = 0; i < actions.length; i++)
     {
+      const thisAction = JSON.parse(actions[i].action);
+      if (thisAction.payload.notDirty === true)
+      {
+        continue;
+      }
       const query = actions[i].query;
       const newTql = await page.evaluate((theQuery) =>
       {
         return window['TerrainTools'].terrainTests.PathFinderToQuery(theQuery);
       }, query);
-      winston.info('Parsing ' + JSON.stringify(query.path));
+      winston.info('Parsing item' + String(i) + ':' + JSON.stringify(actions[i]));
       expect(newTql).toBe(query.tql);
     }
   }, 30000);

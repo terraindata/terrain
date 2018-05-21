@@ -247,7 +247,7 @@ export default class ESInterpreter
       queryString = JSON.stringify(this.rootValueInfo.value);
     }
 
-    if (options.limit)
+    if (options.limit !== undefined)
     {
       const o = JSON.parse(queryString);
       if (o.size === undefined || o.size > options.limit)

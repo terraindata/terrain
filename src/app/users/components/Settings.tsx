@@ -106,8 +106,6 @@ class Settings extends TerrainComponent<Props>
       errorModal: false,
       advancedResultsEnabled: Number(TerrainTools.isFeatureEnabled(TerrainTools.ADVANCED_RESULTS)),
       analyticsEnabled: Number(TerrainTools.isFeatureEnabled(TerrainTools.ANALYTICS)),
-      simpleParser: Number(TerrainTools.isFeatureEnabled(TerrainTools.SIMPLE_PARSER)),
-      complexParser: Number(TerrainTools.isFeatureEnabled(TerrainTools.COMPLEX_PARSER)),
     };
   }
 
@@ -504,23 +502,6 @@ class Settings extends TerrainComponent<Props>
     }
   }
 
-  public handleComplexParserSwitch(selected)
-  {
-    this.setState((state) =>
-    {
-      return { complexParser: selected };
-    });
-
-    if (TerrainTools.isFeatureEnabled(TerrainTools.COMPLEX_PARSER))
-    {
-      TerrainTools.deactivate(TerrainTools.COMPLEX_PARSER);
-    }
-    else
-    {
-      TerrainTools.activate(TerrainTools.COMPLEX_PARSER);
-    }
-  }
-
   public renderTerrainSettingsContent()
   {
     const terrainSettingsAnalyticsContent = TerrainTools.isAdmin() ? (
@@ -558,24 +539,6 @@ class Settings extends TerrainComponent<Props>
 
     ) : undefined;
 
-    const terrainSettingsComplexParser = TerrainTools.isAdmin() ? (
-      <div>
-        <div className='settings-field-title'>
-          Complex Parser (Changes in the Pathfinder -> Builder -> Code.)
-        </div>
-        <div className='settings-row'>
-          <Switch
-            medium={true}
-            first='On'
-            second='Off'
-            selected={this.state.complexParser}
-            onChange={this.handleComplexParserSwitch}
-          />
-        </div>
-      </div>
-
-    ) : undefined;
-
     return (
       <div>
         <div className='settings-field-title'>
@@ -593,7 +556,6 @@ class Settings extends TerrainComponent<Props>
         <br />
         {terrainSettingsAnalyticsContent}
         {terrainSettingsAdvancedResultsContent}
-        {terrainSettingsComplexParser}
       </div>
     );
   }

@@ -410,6 +410,7 @@ const BuilderReducers =
         TerrainLog.debug('Cards and code not synchronized (from TQL mutation).');
         return state;
       }
+      // Let's turn on tql -> path after we fix the problem
       // we might have to update the path and the card
       // const { parser, path } = CardsToPath.updatePath(query, state.db.name);
       // state = state.setIn(['query', 'path'], path);
@@ -605,15 +606,12 @@ const BuilderReducersWrapper = (
       if (!action.payload.notDirty)
       {
         const path = state.query.path;
-        if (TerrainTools.isFeatureEnabled(TerrainTools.COMPLEX_PARSER))
-        {
-          state = state.setIn(['query', 'cards'], PathToCards.updateRootCard(state.query));
-        }
-        else
-        {
-          state = state.setIn(['query', 'tql'],
-            AllBackendsMap[state.query.language].pathToCode(path, state.query.inputs));
-        }
+        state = state.setIn(['query', 'tql'],
+          AllBackendsMap[state.query.language].pathToCode(path, state.query.inputs));
+        //        if (TerrainTools.isFeatureEnabled(TerrainTools.COMPLEX_PARSER))
+        //        {
+        //          state = state.setIn(['query', 'cards'], PathToCards.updateRootCard(state.query));
+        //        }
       }
     }
 

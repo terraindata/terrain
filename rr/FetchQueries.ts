@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands max-line-length
 
-import {MAX_HITS} from 'buildercomponents/results/ResultTypes';
+import { MAX_HITS } from 'buildercomponents/results/ResultTypes';
 import * as commandLineArgs from 'command-line-args';
 import * as getUsage from 'command-line-usage';
 import * as jsonfile from 'jsonfile';
@@ -55,14 +55,14 @@ import * as sleep from 'sleep';
 import * as request from 'supertest';
 import * as winston from 'winston';
 import ESInterpreter from '../shared/database/elastic/parser/ESInterpreter';
-import {loginToBuilder} from './FullstackUtils';
+import { loginToBuilder } from './FullstackUtils';
 
 const optionDefinitions = [
   { name: 'help', alias: 'h' },
   { name: 'midway', alias: 'm', type: String },
-  { name: 'credential', alias: 'u', type: String},
-  { name: 'output', alias: 'o', type: String},
-  { name: 'pathfinderparser', alias: 'p', type: Boolean},
+  { name: 'credential', alias: 'u', type: String },
+  { name: 'output', alias: 'o', type: String },
+  { name: 'pathfinderparser', alias: 'p', type: Boolean },
 ];
 
 const usageSections = [
@@ -105,7 +105,7 @@ async function getChromePage(browser)
 {
   const url = 'http://localhost:8080';
   const page = await browser.newPage();
-  await page.setViewport({width: 1600, height: 1200});
+  await page.setViewport({ width: 1600, height: 1200 });
   await loginToBuilder(page, url);
   sleep.sleep(3);
   return page;
@@ -157,7 +157,7 @@ async function sendQueryFromItem(url, token, queryString, inputs, dbid, name)
   {
     console.log('Item ' + name + ' has errros ' + JSON.stringify(queryTree.getErrors()));
   }
-  const finalQueryString = queryTree.toCode({replaceInputs: true, limit: 20});
+  const finalQueryString = queryTree.toCode({ replaceInputs: true, limit: 20 });
   return sendQuery(url, token, finalQueryString, dbid);
 }
 
@@ -268,7 +268,7 @@ async function fetch()
   }
   const cre = {
     email: 'admin@terraindata.com',
-      password: 'CnAATPys6tEB*ypTvqRRP5@2fUzTuY!C^LZP#tBQcJiC*5',
+    password: 'CnAATPys6tEB*ypTvqRRP5@2fUzTuY!C^LZP#tBQcJiC*5',
   };
   if (options['credential'] !== undefined)
   {
@@ -308,7 +308,7 @@ async function fetch()
 
   if (compareQuery === true)
   {
-    browser = await puppeteer.launch({headless: false});
+    browser = await puppeteer.launch({ headless: false });
     page = await getChromePage(browser);
   }
 
@@ -352,7 +352,7 @@ async function fetch()
           }
         } catch (e)
         {
-          console.log('Item ' + r.name + ' has error ' +  e);
+          console.log('Item ' + r.name + ' has error ' + e);
         }
       }
 
@@ -373,7 +373,7 @@ async function fetch()
             }
           } catch (e)
           {
-            console.log('Item ' + r.name + ' has error with new query' +  e);
+            console.log('Item ' + r.name + ' has error with new query' + e);
           }
         }
       }
