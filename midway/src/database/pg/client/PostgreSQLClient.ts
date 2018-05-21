@@ -51,6 +51,8 @@ import { DatabaseControllerStatus } from '../../DatabaseControllerStatus';
 import PostgreSQLConfig from '../PostgreSQLConfig';
 import PostgreSQLController from '../PostgreSQLController';
 
+import { IsolationLevel, TransactionHandle } from '../../../tasty/TastyDB';
+
 /**
  * An client which acts as a selective isomorphic wrapper around
  * the postgres js API
@@ -60,6 +62,8 @@ class PostgreSQLClient
   private controller: PostgreSQLController;
   private config: PostgreSQLConfig;
   private delegate: pg.Pool;
+  private transactionClients: { [k: number]: pg.PoolClient } = {};
+  private nextTransactionIndex = 0;
 
   constructor(controller: PostgreSQLController, config: PostgreSQLConfig)
   {
@@ -114,10 +118,35 @@ class PostgreSQLClient
     });
   }
 
-  public query(queryString: string, params?: any[], callback?: any): pg.Query
+  public query(queryString: string, handle?: TransactionHandle, params?: any[], callback?: any): pg.Query
   {
-    this.controller.log('PostgreSQLClient.query', queryString, params);
-    return this.delegate.query(queryString, params as any, callback);
+    if (handle !== undefined)
+    {
+      this.controller.log('PostgreSQLClient.query (transaction ' + handle.toString() + ')', queryString, params);
+      return this.transactionClients[handle].query(queryString, params as any, callback);
+    }
+    else
+    {
+      this.controller.log('PostgreSQLClient.query', queryString, params);
+      return this.delegate.query(queryString, params as any, callback);
+    }
+  }
+
+  public async startTransaction(): Promise<TransactionHandle>
+  {
+    const client = await this.delegate.connect();
+    const handle = this.nextTransactionIndex;
+    this.controller.log('PostgreSQLClient.startTransaction (transaction ' + handle.toString() + ')');
+    this.transactionClients[handle] = client;
+    this.nextTransactionIndex++;
+    return handle;
+  }
+
+  public async endTransaction(handle: TransactionHandle): Promise<void>
+  {
+    this.controller.log('PostgreSQLClient.endTransaction (transaction ' + handle.toString() + ')');
+    await this.transactionClients[handle].release();
+    delete this.transactionClients[handle];
   }
 
   public end(callback: () => void): void

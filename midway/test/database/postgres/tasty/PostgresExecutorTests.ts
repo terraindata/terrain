@@ -50,6 +50,7 @@ import PostgresConfig from '../../../../src/database/pg/PostgreSQLConfig';
 import PostgresController from '../../../../src/database/pg/PostgreSQLController';
 
 import * as Tasty from '../../../../src/tasty/Tasty';
+import { IsolationLevel } from '../../../../src/tasty/TastyDB';
 import PostgreSQLQueries from '../../../tasty/PostgreSQLQueries';
 import SQLQueries from '../../../tasty/SQLQueries';
 import * as Utils from '../../TestUtil';
@@ -110,6 +111,34 @@ for (let i = 0; i < tests.length; i++)
 {
   runTest(tests[i]);
 }
+
+test('Postgres: transactions', async (done) =>
+{
+  try
+  {
+    const queries = ['SELECT * \n  FROM movies\n  LIMIT 10;'];
+    await tasty.executeTransaction(async (handle, commit, rollback) =>
+    {
+      await tasty.getDB().execute(queries, handle);
+      await commit();
+    }, IsolationLevel.REPEATABLE_READ, true);
+    await tasty.executeTransaction(async (handle, commit, rollback) =>
+    {
+      await tasty.getDB().execute(queries, handle);
+      await rollback();
+    }, IsolationLevel.SERIALIZABLE);
+    await tasty.executeTransaction(async (handle, commit, rollback) =>
+    {
+      await tasty.getDB().execute(queries, handle);
+      await commit();
+    });
+  }
+  catch (e)
+  {
+    fail(e);
+  }
+  done();
+});
 
 afterAll(async () =>
 {
