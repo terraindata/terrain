@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 import * as fs from 'fs';
 import * as request from 'supertest';
@@ -363,6 +363,10 @@ describe('Version route tests', () =>
   {
     await request(server)
       .get('/midway/v1/versions')
+      .query({
+        id: 1,
+        accessToken: defaultUserAccessToken,
+      })
       .expect(200)
       .then((response) =>
       {
