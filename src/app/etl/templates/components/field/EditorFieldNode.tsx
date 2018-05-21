@@ -87,12 +87,21 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     }
   }
 
+  @instanceFnDecorator(memoizeOne)
+  public computeChildFields(
+    childFieldIds: List<number>,
+    comparator: (a, b) => number,
+  ): List<number>
+  {
+    return childFieldIds.sort(comparator).toList();
+  }
+
   public renderChildFields()
   {
     const { canEdit, preview, displayKeyPath } = this.props;
     const field = this._field();
 
-    const childFieldIds = field.childrenIds;
+    const childFieldIds = this.computeChildFields(field.childrenIds, this._currentComparator());
     return childFieldIds.map((childId, index) =>
     {
       const childField = this._field(childId);
