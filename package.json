@@ -231,6 +231,7 @@
     "winston": "^2.4.2",
     "xml-nodes": "^0.1.5",
     "xml2js": "^0.4.19",
+    "xml2json-light": "^1.0.6",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
