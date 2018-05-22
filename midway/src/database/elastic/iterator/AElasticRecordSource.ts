@@ -53,7 +53,6 @@ export default abstract class AElasticRecordSource implements RecordSource
 
   constructor(query: object)
   {
-    super();
     this.query = query;
   }
 
