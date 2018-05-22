@@ -78,7 +78,7 @@ export class JobLog
    * PARAMS: jobId, logStream (number, stream.Readable ==> number)
    *
    */
-  public async create(jobId: number, logStream: stream.Readable): Promise<JobLogConfig[]>
+  public async create(jobId: number, logStream: stream.Readable, jobStatus?: boolean): Promise<JobLogConfig[]>
   {
     return new Promise<JobLogConfig[]>(async (resolve, reject) =>
     {
@@ -103,7 +103,15 @@ export class JobLog
       {
         const accumulatedLog: string[] = await BufferTransform.toArray(logStream);
         updatedContentJobLog.contents = accumulatedLog.join('\n');
-        await App.JobQ.setJobStatus(jobId, false, 'SUCCESS');
+        if (jobStatus !== false)
+        {
+          jobStatus = 'SUCCESS';
+        }
+        else
+        {
+          jobStatus = 'FAILURE';
+        }
+        await App.JobQ.setJobStatus(jobId, false, jobStatus);
         await App.DB.upsert(this.jobLogTable, updatedContentJobLog);
       }
       catch (e)
@@ -138,7 +146,7 @@ export class JobLog
 
   private async _sendEmail(jobId: number): Promise<void>
   {
-    const emailIntegrations: IntegrationConfig[] = await integrations.get(null, undefined, 'email') as IntegrationConfig[];
+    const emailIntegrations: IntegrationConfig[] = await integrations.get(null, undefined, 'Email', true) as IntegrationConfig[];
     if (emailIntegrations.length !== 1)
     {
       winston.warn(`Invalid number of email integrations, found ${emailIntegrations.length}`);
@@ -158,12 +166,12 @@ export class JobLog
           const schedules: SchedulerConfig[] = await App.SKDR.get(jobs[0].scheduleId) as SchedulerConfig[];
           if (schedules.length !== 0)
           {
-            const connectionConfig = integrations[0].connectionConfig;
-            const authConfig = integrations[0].authConfig;
+            const connectionConfig = emailIntegrations[0].connectionConfig;
+            const authConfig = emailIntegrations[0].authConfig;
             const fullConfig = Object.assign(connectionConfig, authConfig);
             const subject: string = `[${fullConfig['customerName']}] Schedule "${schedules[0].name}" failed at job ${jobs[0].id}`;
-            const body: string = jobLogs[0].contents;
-            await App.EMAIL.send(fullConfig, subject, body);
+            const body: string = 'Check the job log table for details'; // should we include the log contents? jobLogs[0].contents;
+            await App.EMAIL.send(emailIntegrations[0].id, subject, body);
           }
         }
       }

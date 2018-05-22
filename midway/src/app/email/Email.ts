@@ -44,69 +44,71 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as stream from 'stream';
+import * as nodemailer from 'nodemailer';
 import * as winston from 'winston';
 
-import { TaskConfig } from 'shared/types/jobs/TaskConfig';
-import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
-import Templates from '../../etl/Templates';
-import LogStream from '../../io/streams/LogStream';
-import { Task } from '../Task';
+import * as App from '../App';
+import IntegrationConfig from '../integrations/IntegrationConfig';
+import Integrations from '../integrations/Integrations';
 
-const templates: Templates = new Templates();
+const integrations: Integrations = new Integrations();
 
-export class TaskETL extends Task
+export class Email
 {
-  constructor(taskConfig: TaskConfig)
+  private transports: Map<number, any>;
+
+  constructor()
   {
-    super(taskConfig);
+    this.transports = new Map<number, any>();
   }
 
-  public async run(): Promise<TaskOutputConfig>
+  public async send(integrationId: number, subject: string, body: string): Promise<boolean>
   {
-    return new Promise<TaskOutputConfig>(async (resolve, reject) =>
+    return new Promise<boolean>(async (resolve, reject) =>
     {
-      const taskOutputConfig: TaskOutputConfig =
+      const integrationConfigs: IntegrationConfig[] = await integrations.get(null, integrationId);
+      if (integrationConfigs.length !== 0)
+      {
+        const connectionConfig = integrationConfigs[0].connectionConfig;
+        const authConfig = integrationConfigs[0].authConfig;
+        const fullConfig: object = Object.assign(connectionConfig, authConfig);
+        if (!this.transports.has(integrationId))
         {
-          exit: false,
-          options: {
-            logStream: null,
-            outputStream: null,
-          },
-          status: true,
+          const transportOptions =
+          {
+            host: fullConfig['smtp'],
+            port: fullConfig['port'],
+            auth:
+            {
+              user: fullConfig['email'],
+              pass: fullConfig['password'],
+            },
+          };
+          this.transports.set(integrationId, nodemailer.createTransport(transportOptions));
+        }
+        const currTransport = this.transports.get(integrationId);
+        const emailContents: object =
+        {
+          from: fullConfig['email'],
+          to: fullConfig['recipient'],
+          subject,
+          text: body,
         };
-
-      try
-      {
-        const streams = await templates.executeETL(this.taskConfig['params']['options'],
-          this.taskConfig['params']['options']['inputStreams']);
-        taskOutputConfig['options']['outputStream'] = streams['outputStream'];
-        taskOutputConfig['options']['logStream'] = streams['logStream'];
-      }
-      catch (e)
-      {
-        taskOutputConfig.status = false;
-        winston.error('Error while running ETL task: ' + String(e.toString()));
-        const errLogStream = new LogStream();
-        errLogStream.error(e.toString());
-        // errLogStream.push(null);
-        taskOutputConfig['options']['logStream'] = errLogStream;
-      }
-      finally
-      {
-        taskOutputConfig['options']['logStream'].push(null);
-        resolve(taskOutputConfig);
+        currTransport.sendMail(emailContents, (err, info) =>
+          {
+            winston.info('Email send status: ' + JSON.stringify(info, null, 2));
+            if (err)
+            {
+              resolve(false);
+            }
+            else
+            {
+              resolve(true);
+            }
+          });
       }
     });
   }
-
-  public async printNode(): Promise<TaskOutputConfig>
-  {
-    winston.info('Printing ETL Task, params: ' + JSON.stringify(this.taskConfig.params as object));
-    return Promise.resolve(
-      {
-        exit: false,
-        status: true,
-      } as TaskOutputConfig);
-  }
 }
+
+export default Email;

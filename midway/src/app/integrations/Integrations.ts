@@ -109,7 +109,7 @@ export class Integrations
     });
   }
 
-  public async get(user: UserConfig, id?: number, type?: string): Promise<IntegrationConfig[]>
+  public async get(user: UserConfig, id?: number, type?: string, dontSanitize?: boolean): Promise<IntegrationConfig[]>
   {
     return new Promise<IntegrationConfig[]>(async (resolve, reject) =>
     {
@@ -121,7 +121,8 @@ export class Integrations
         {
           integration.authConfig = JSON.parse(await this._decrypt(integration.authConfig));
           // TODO refactor this for full email support
-          if (integration.type === 'email' && integration.name === 'Default Failure Email')
+          if (integration.type === 'email' && integration.name === 'Default Failure Email'
+            && dontSanitize !== true)
           {
             integration.authConfig['password'] = '*************************';
           }
