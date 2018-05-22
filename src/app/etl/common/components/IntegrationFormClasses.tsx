@@ -338,6 +338,45 @@ class GoogleAnalyticsForm extends IntegrationFormBase<GoogleAnalyticsAuthT, Goog
   };
 }
 
+type EmailAuthT = AuthConfigType<Integrations.Email>;
+type EmailConnectionT = ConnectionConfigType<Integrations.Email>;
+class EmailForm extends IntegrationFormBase<EmailAuthT, EmailConnectionT>
+{
+  public authMap: InputDeclarationMap<EmailAuthT> = {
+    password: {
+      type: DisplayType.TextBox,
+      displayName: 'Password',
+    },
+  };
+
+  public connectionMap: InputDeclarationMap<EmailConnectionT> = {
+    email: {
+      type: DisplayType.TextBox,
+      displayName: 'Email',
+    },
+    smtp: {
+      type: DisplayType.TextBox,
+      displayName: 'SMTP Server',
+      group: 'addr row',
+      widthFactor: 3,
+    },
+    port: {
+      type: DisplayType.NumberBox,
+      displayName: 'Port',
+      group: 'addr row',
+      widthFactor: 1,
+    },
+    recipient: {
+      type: DisplayType.TextBox,
+      displayName: 'To',
+    },
+    customerName: {
+      type: DisplayType.TextBox,
+      displayName: 'Instance name',
+    },
+  };
+}
+
 type MailchimpAuthT = AuthConfigType<Integrations.Mailchimp>;
 type MailchimpConnectionT = ConnectionConfigType<Integrations.Mailchimp>;
 class MailchimpForm extends IntegrationFormBase<MailchimpAuthT, MailchimpConnectionT>
@@ -367,6 +406,7 @@ export const IntegrationFormMap: FormLookupMap =
     [Integrations.Sftp]: SftpForm,
     [Integrations.Http]: HttpForm,
     [Integrations.Fs]: FsForm,
+    [Integrations.Email]: EmailForm,
     [Integrations.Mysql]: MysqlForm,
     [Integrations.Postgresql]: PostgresqlForm,
     [Integrations.Magento]: MagentoForm,

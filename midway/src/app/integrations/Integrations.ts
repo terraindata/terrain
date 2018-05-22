@@ -101,6 +101,10 @@ export class Integrations
         return reject('Integration does not exist.');
       }
       await App.DB.delete(this.integrationTable, { id });
+      deletedIntegrations.forEach((dI, i) =>
+      {
+        deletedIntegrations[i].authConfig = null;
+      });
       return resolve(deletedIntegrations);
     });
   }
@@ -116,6 +120,11 @@ export class Integrations
         if (integration.authConfig !== '')
         {
           integration.authConfig = JSON.parse(await this._decrypt(integration.authConfig));
+          // TODO refactor this for full email support
+          if (integration.type === 'email' && integration.name === 'Default Failure Email')
+          {
+            integration.authConfig['password'] = '*************************';
+          }
         }
 
         if (integration.connectionConfig !== '')

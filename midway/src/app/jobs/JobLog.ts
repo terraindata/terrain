@@ -50,7 +50,12 @@ import * as winston from 'winston';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import IntegrationConfig from '../integrations/IntegrationConfig';
 import BufferTransform from '../io/streams/BufferTransform';
+import SchedulerConfig from '../scheduler/SchedulerConfig';
+import { integrations } from '../scheduler/SchedulerRouter';
+import JobConfig from './JobConfig';
+
 import JobLogConfig from './JobLogConfig';
 
 export class JobLog
@@ -109,6 +114,7 @@ export class JobLog
           await App.DB.upsert(this.jobLogTable, updatedContentJobLog);
         }
         await App.JobQ.setJobStatus(jobId, false, 'FAILURE');
+        await this._sendEmail(jobId);
       }
     });
   }
@@ -128,6 +134,40 @@ export class JobLog
       const results: JobLogConfig[] = rawResults.map((result: object) => new JobLogConfig(result as JobLogConfig));
       resolve(results);
     });
+  }
+
+  private async _sendEmail(jobId: number): Promise<void>
+  {
+    const emailIntegrations: IntegrationConfig[] = await integrations.get(null, undefined, 'email') as IntegrationConfig[];
+    if (emailIntegrations.length !== 1)
+    {
+      winston.warn(`Invalid number of email integrations, found ${emailIntegrations.length}`);
+    }
+    else if (emailIntegrations.length === 1 && emailIntegrations[0].name !== 'Default Failure Email')
+    {
+      winston.warn('Invalid Email found.');
+    }
+    else
+    {
+      const jobs: JobConfig[] = await App.JobQ.get(jobId) as JobConfig[];
+      const jobLogs: JobLogConfig[] = await this.get(jobId) as JobLogConfig[];
+      if (jobs.length !== 0 && jobLogs.length !== 0)
+      {
+        if (jobs[0].scheduleId !== undefined)
+        {
+          const schedules: SchedulerConfig[] = await App.SKDR.get(jobs[0].scheduleId) as SchedulerConfig[];
+          if (schedules.length !== 0)
+          {
+            const connectionConfig = integrations[0].connectionConfig;
+            const authConfig = integrations[0].authConfig;
+            const fullConfig = Object.assign(connectionConfig, authConfig);
+            const subject: string = `[${fullConfig['customerName']}] Schedule "${schedules[0].name}" failed at job ${jobs[0].id}`;
+            const body: string = jobLogs[0].contents;
+            await App.EMAIL.send(fullConfig, subject, body);
+          }
+        }
+      }
+    }
   }
 }
 
