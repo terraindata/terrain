@@ -58,10 +58,11 @@ import { ElasticDB } from '../../../database/elastic/tasty/ElasticDB';
 import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
 import { databases } from '../../database/DatabaseRouter';
 import { QueryHandler } from '../../query/QueryHandler';
+import { SinkStreamConfig } from '../SourceSinkStream';
 
 export default class ElasticEndpoint extends AEndpointStream
 {
-  constructor()
+  constructor(private options: SinkStreamConfig = {})
   {
     super();
   }
@@ -95,7 +96,7 @@ export default class ElasticEndpoint extends AEndpointStream
     if (engine !== undefined)
     {
       const db: ElasticDB = controller.getTasty().getDB() as ElasticDB;
-      const elasticMapping = new ElasticMapping(engine);
+      const elasticMapping = new ElasticMapping(engine, this.options.isMerge);
       const pKey: string | null = elasticMapping.getPrimaryKey();
       if (pKey !== null)
       {

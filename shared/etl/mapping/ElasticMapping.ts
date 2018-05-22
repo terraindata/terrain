@@ -174,13 +174,15 @@ export class ElasticMapping
     analyzer: string,
   }> = {};
   private engine: TransformationEngine;
+  private isMerge: boolean;
   private mapping: MappingType = {};
   private primaryKey: string | null = null;
   private primaryKeyAttempts: string[] = [];
 
-  constructor(engine: TransformationEngine)
+  constructor(engine: TransformationEngine, isMerge: boolean = false)
   {
     this.engine = engine;
+    this.isMerge = isMerge;
     this.createElasticMapping();
     this.findPrimaryKeys();
   }
@@ -202,6 +204,21 @@ export class ElasticMapping
 
   protected getTextConfig(elasticProps: ElasticFieldProps): TypeConfig
   {
+    if (this.isMerge)
+    {
+      return {
+        type: 'keyword',
+        index: true,
+        fields: {
+          keyword: {
+            type: 'keyword',
+            index: true,
+            ignore_above: 256,
+          },
+        },
+      }
+    }
+
     const config: TypeConfig = {
       type: elasticProps.isAnalyzed ? 'text' : 'keyword',
       index: true,
