@@ -587,7 +587,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
           {
             filterGroup.lines.map((line, i) =>
               <div
-                key={line.id === -1 ? i : line.id /* dealing with id-less lines */}
+                key={this.isGroup(line) ? i : line.id === -1 ? i : line.id /* dealing with id-less lines */}
               >
                 {
                   !this.isGroup(line) ?
