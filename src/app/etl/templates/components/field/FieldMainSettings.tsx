@@ -47,18 +47,16 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { instanceFnDecorator } from 'shared/util/Classes';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
-import { instanceFnDecorator } from 'shared/util/Classes';
-import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import
@@ -67,7 +65,9 @@ import
   TemplateField,
 } from 'etl/templates/FieldTypes';
 import LanguageUI from 'etl/templates/languages/LanguageUI';
+import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ETLFieldTypes, etlFieldTypesList, etlFieldTypesNames, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './FieldSettings.less';
@@ -78,7 +78,6 @@ interface SettingsState
 {
   fieldName: string;
   isPrimaryKey: boolean;
-  // isIncluded: boolean;
   type: ETLFieldTypes;
 }
 
@@ -103,15 +102,11 @@ class FieldMainSettings extends TemplateEditorField<Props>
         displayNames: (s) => etlFieldTypesNames,
       },
     },
-    // isIncluded: {
-    //   type: DisplayType.CheckBox,
-    //   displayName: 'Include this field',
-    // },
     isPrimaryKey: {
       type: DisplayType.CheckBox,
       displayName: 'Primary Key',
-      getDisplayState: this.getPrimaryKeyDisplayState
-    }
+      getDisplayState: this.getPrimaryKeyDisplayState,
+    },
   };
 
   constructor(props)
@@ -152,7 +147,7 @@ class FieldMainSettings extends TemplateEditorField<Props>
     return {
       isPrimaryKey,
       canChangeKey,
-    }
+    };
   }
 
   public getPrimaryKeyInfo(props = this.props):
@@ -175,7 +170,6 @@ class FieldMainSettings extends TemplateEditorField<Props>
     const field = this._fieldMap(props).get(props.fieldId);
     return {
       fieldName: field.name,
-      // isIncluded: field.isIncluded,
       isPrimaryKey,
       type: field.etlType,
     };

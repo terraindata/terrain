@@ -85,7 +85,8 @@ class ElasticController extends DefaultController implements LanguageInterface
     engine.setFieldProp(fieldId, pkeyPath, value);
     if (value)
     {
-      engine.getAllFieldIDs().forEach((id) => {
+      engine.getAllFieldIDs().forEach((id) =>
+      {
         if (id !== fieldId && engine.getFieldProp(fieldId, pkeyPath) === true)
         {
           engine.setFieldProp(id, pkeyPath, false);
