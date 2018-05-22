@@ -96,6 +96,7 @@ class EndpointSection extends TerrainComponent<Props>
     newSourceModalOpen: boolean;
     newSourceModalName: string;
     newSource: SourceConfig;
+    sourceModalError: string;
   };
 
   constructor(props: Props)
@@ -107,6 +108,7 @@ class EndpointSection extends TerrainComponent<Props>
       newSourceModalOpen: false,
       newSourceModalName: '',
       newSource: _SourceConfig(),
+      sourceModalError: '',
     };
   }
 
@@ -168,6 +170,7 @@ class EndpointSection extends TerrainComponent<Props>
   {
     this.setState({
       newSourceModalOpen: true,
+      sourceModalError: '',
     });
   }
 
@@ -191,9 +194,10 @@ class EndpointSection extends TerrainComponent<Props>
     return (
       <Modal
         open={this.state.newSourceModalOpen}
+        onValidate={this.handleSourceValidation}
         onConfirm={this.handleAddNewSource}
         onClose={this.closeNewSourceModal}
-        confirmDisabled={confirmDisabled}
+        // confirmDisabled={confirmDisabled}
         title='Add New Source'
         showTextbox={true}
         confirm={true}
@@ -211,7 +215,7 @@ class EndpointSection extends TerrainComponent<Props>
   public render()
   {
     const { isSource, template } = this.props;
-    const { endpoints } = this.state;
+    const { endpoints, sourceModalError } = this.state;
     const buttonsDisabled = endpoints === (isSource ? template.getSources() : template.getSinks());
 
     return (
@@ -229,6 +233,16 @@ class EndpointSection extends TerrainComponent<Props>
         {(endpoints as LooseEndpointsType).map(this.renderEndpoint).toList()}
         {isSource ? this.renderNewSourceButton() : null}
         {isSource ? this.renderNewSourceModal() : null}
+        {
+          sourceModalError !== '' ?
+            <Modal
+              open={true}
+              title={'Validation Error'}
+              error={true}
+              message={sourceModalError}
+              onClose={() => this.setState({ sourceModalError: '' })}
+            /> : null
+        }
       </div>
     );
   }
@@ -244,6 +258,25 @@ class EndpointSection extends TerrainComponent<Props>
     {
       GraphHelpers.updateSinks(this.state.endpoints);
     }
+  }
+
+  public handleSourceValidation(): boolean
+  {
+    const { newSourceModalName, newSource } = this.state;
+    const source = newSource.set('name', newSourceModalName);
+    if (source.name === '')
+    {
+      this.setState({ sourceModalError: 'Please specify a Source Name' });
+      return false;
+    }
+
+    if (newSource.type == null)
+    {
+      this.setState({ sourceModalError: 'Please specify a Source Type' });
+      return false;
+    }
+
+    return true;
   }
 
   public handleAddNewSource()

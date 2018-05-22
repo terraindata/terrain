@@ -71,6 +71,7 @@ export interface Props
   confirm?: boolean;
   confirmButtonText?: string;
   confirmDisabled?: boolean; // if true, confirm button is disabled
+  onValidate?: () => boolean;
   onConfirm?: () => void;
   onClose: () => void;
   children?: any;
@@ -109,13 +110,22 @@ class Modal extends TerrainComponent<Props>
 
   public closeModalSuccess()
   {
-    if (this.props.closeOnConfirm !== undefined && !this.props.closeOnConfirm)
+    let isValid = true;
+    if (this.props.onValidate !== undefined)
     {
-      this.props.onConfirm ? this.props.onConfirm() : null;
-      return;
+      isValid = this.props.onValidate();
     }
-    this.props.onClose();
-    this.props.onConfirm ? this.props.onConfirm() : null;
+
+    if (isValid)
+    {
+      if (this.props.closeOnConfirm !== undefined && !this.props.closeOnConfirm)
+      {
+        this.props.onConfirm ? this.props.onConfirm() : null;
+        return;
+      }
+      this.props.onClose();
+      this.props.onConfirm ? this.props.onConfirm() : null;
+    }
   }
 
   public handleTextboxChange(evt)
