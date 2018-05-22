@@ -140,7 +140,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
       switch (source.fileConfig.fileType)
       {
         case 'json':
-          const jsonPath: string = (!source.fileConfig.jsonPath || source.fileConfig.jsonNewLines) ? '*' :
+          const jsonPath: string = (!source.fileConfig.jsonPath || source.fileConfig.jsonNewlines) ? '*' :
             source.fileConfig.jsonPath;
           importStream = sourceStream.pipe(JSONTransform.createImportStream(jsonPath));
           break;
