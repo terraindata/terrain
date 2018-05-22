@@ -123,7 +123,7 @@ class Autocomplete extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
-    if (!nextProps.debounce && nextProps.value !== this.props.value)
+    if (nextProps.value !== this.props.value)
     {
       this.setState({
         value: nextProps.value ? nextProps.value : '',
