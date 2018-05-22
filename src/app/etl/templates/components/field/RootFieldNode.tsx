@@ -94,7 +94,7 @@ class RootFieldNode extends TerrainComponent<Props>
     fieldMap: FieldMap,
     engine: TransformationEngine,
     engineVersion: number,
-    ordering: ReorderableSet<number>,
+    comparator: (a, b) => number,
   ): List<TemplateField>
   {
     if (engine == null || fieldMap == null)
@@ -107,7 +107,7 @@ class RootFieldNode extends TerrainComponent<Props>
       const outputKP = engine.getOutputKeyPath(id);
       return outputKP !== undefined && outputKP.size === 1;
     });
-    const comparator = ordering.createComparator();
+
     return rootFields.sortBy(
       (field, id) => id,
       comparator,
@@ -120,8 +120,12 @@ class RootFieldNode extends TerrainComponent<Props>
     const engine = templateEditor.getCurrentEngine();
     const engineVersion = templateEditor.uiState.engineVersion;
 
-    const ordering = templateEditor.getCurrentFieldOrdering();
-    const rootFields = this.computeRootFields(templateEditor.fieldMap, engine, engineVersion, ordering);
+    const rootFields = this.computeRootFields(
+      templateEditor.fieldMap,
+      engine,
+      engineVersion,
+      templateEditor.getCurrentComparator(),
+    );
     return rootFields.map((childField, index) =>
     {
       const childPreview = preview != null ? preview[childField.name] : null;

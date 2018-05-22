@@ -90,13 +90,15 @@ export default class TerrainStoreLogger
         }
         if (TerrainStoreLogger.serializeAction)
         {
-          TerrainStoreLogger.actionSerializationLog.push(RecordsSerializer.stringify(action));
+          const actionString = RecordsSerializer.stringify(action);
+          const queryJS = store.getState().get('builder').query.toJS();
+          TerrainStoreLogger.actionSerializationLog.push({ query: queryJS, action: actionString });
         }
         TerrainLog.debug(String(action.type) + ' takes ' + String(actionLatency) + 'ms');
         if (TerrainStoreLogger.printStateChange === true)
         {
           const stateAfterAction = store.getState();
-          TerrainLog.debug('State Before: ', stateBeforeAction, 'State After:', stateAfterAction);
+          TerrainLog.debug('State Before: ', stateBeforeAction, 'State After:', stateAfterAction, 'Action:', action);
         }
         return result;
       }

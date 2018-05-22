@@ -115,8 +115,8 @@ export class CardsToPath
   public static BodyCardToPath(path: Path, parser: ESCardParser, bodyValueInfo: ESValueInfo, dbName: string, groupJoinKey?: string)
   {
     // Redistribute the bools from the source bool to the soft and hard filter bools
-    this.distributeSourceBoolFilters(parser, bodyValueInfo);
-    parser.updateCard();
+    // this.distributeSourceBoolFilters(parser, bodyValueInfo);
+    // parser.updateCard();
     bodyValueInfo = parser.getValueInfo();
     if (groupJoinKey)
     {

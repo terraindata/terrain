@@ -149,7 +149,7 @@ export async function replayBuilderActions(page, url, actions, records, actionCa
   // replay the log
   for (let i = 0; i < actions.length; i = i + 1)
   {
-    let action = actions[i];
+    let action = actions[i].action;
     console.log('Replaying Action ' + typeof action + ':' + action);
 
     if (ignoreBuilderAction(action))
@@ -171,7 +171,30 @@ export async function replayBuilderActions(page, url, actions, records, actionCa
   }
 }
 
-export function filteringRecordBuilderActions(actions: string[])
+export function filteringRecordBuilderActions(actions: any[])
 {
-  return actions.filter((action) => ignoreBuilderAction(action) === false);
+  return actions.filter((record) => ignoreBuilderAction(record.action) === false);
+}
+
+const USERNAME_SELECTOR = '#login-email';
+const PASSWORD_SELECTOR = '#login-password';
+const BUTTON_SELECTOR = '#app > div > div.app-wrapper > div > div.login-container > div.login-submit-button-wrapper > div';
+async function loadPage(page, url)
+{
+  if (url)
+  {
+    await page.goto(url);
+    sleep.sleep(3);
+    await page.waitForSelector(USERNAME_SELECTOR);
+  }
+}
+
+export async function loginToBuilder(page, url?)
+{
+  await loadPage(page, url);
+  await page.click(USERNAME_SELECTOR);
+  await page.keyboard.type('admin@terraindata.com');
+  await page.click(PASSWORD_SELECTOR);
+  await page.keyboard.type('CnAATPys6tEB*ypTvqRRP5@2fUzTuY!C^LZP#tBQcJiC*5');
+  await page.click(BUTTON_SELECTOR);
 }

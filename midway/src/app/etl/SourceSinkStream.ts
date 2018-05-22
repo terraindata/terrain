@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
@@ -55,6 +56,7 @@ import
   SinkConfig,
   SourceConfig,
 } from 'shared/etl/types/EndpointTypes';
+import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import * as Util from '../AppUtil';
 import ExportTransform from './ExportTransform';
@@ -138,8 +140,11 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
       switch (source.fileConfig.fileType)
       {
         case 'json':
-          // const jsonPath: string | undefined = source.fileConfig.jsonNewlines ? '*' : undefined;
-          const jsonPath = '*';
+          let jsonPath: string | undefined = source.fileConfig.jsonPath;
+          if (source.fileConfig.jsonNewlines)
+          {
+            jsonPath = '*';
+          }
           importStream = sourceStream.pipe(JSONTransform.createImportStream(jsonPath));
           break;
         case 'csv':
@@ -164,7 +169,16 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
   });
 }
 
-export async function getSinkStream(sink: SinkConfig, engine: TransformationEngine): Promise<stream.Duplex>
+export interface SinkStreamConfig
+{
+  isMerge?: boolean;
+}
+
+export async function getSinkStream(
+  sink: SinkConfig,
+  engine: TransformationEngine,
+  options?: SinkStreamConfig,
+): Promise<stream.Duplex>
 {
   return new Promise<stream.Duplex>(async (resolve, reject) =>
   {
@@ -180,9 +194,37 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
         switch (sink.fileConfig.fileType)
         {
           case 'json':
-            if (sink.fileConfig.jsonNewlines)
+            if (sink.fileConfig.jsonPath !== undefined)
             {
-              transformStream = JSONTransform.createExportStream('', ',\n', '');
+              let path = sink.fileConfig.jsonPath.split('.');
+              const wildcardIndex: number = path.indexOf('*');
+              if (wildcardIndex >= 0)
+              {
+                if (wildcardIndex < path.length - 1)
+                {
+                  winston.error('Ignoring invalid JSON path: ', sink.fileConfig.jsonPath);
+                  path = [];
+                }
+                else // wildCardIndex === path.length - 1
+                {
+                  path.pop();
+                }
+              }
+
+              let open = '';
+              let close = '';
+              for (const p of path)
+              {
+                open += '{\n\t"' + p + '": ';
+                close = '\n}' + close;
+              }
+              open += '[\n';
+              close = '\n]' + close;
+              transformStream = JSONTransform.createExportStream(open, ',\n', close);
+            }
+            else if (sink.fileConfig.jsonNewlines)
+            {
+              transformStream = JSONTransform.createExportStream('', '\n', '');
             }
             else
             {
@@ -212,7 +254,7 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
           {
             throw new Error('Can only import into Elastic at the moment.');
           }
-          endpoint = new ElasticEndpoint();
+          endpoint = new ElasticEndpoint(options);
           break;
         case 'Sftp':
           endpoint = new SFTPEndpoint();
@@ -247,8 +289,21 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
   });
 }
 
-export async function getMergeJoinStream(serverId: string, indices: object[], options: object): Promise<stream.Readable>
+export interface IndexInfo
 {
+  index: string;
+  type: string;
+}
+
+export async function getMergeJoinStream(
+  serverId: string,
+  indices: IndexInfo[],
+  options: object,
+): Promise<stream.Readable>
+{
+  const leftJoinKey = options['leftJoinKey'] as string;
+  const rightJoinKey = options['rightJoinKey'] as string;
+
   const query = JSON.stringify({
     size: 2147483647,
     query: {
@@ -268,7 +323,8 @@ export async function getMergeJoinStream(serverId: string, indices: object[], op
       },
     },
     mergeJoin: {
-      joinKey: options['leftJoinKey'],
+      leftJoinKey,
+      rightJoinKey,
       [options['outputKey']]: {
         query: {
           bool: {
