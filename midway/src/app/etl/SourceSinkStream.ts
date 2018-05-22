@@ -66,6 +66,7 @@ import Templates from './Templates';
 import CSVTransform from '../io/streams/CSVTransform';
 import JSONTransform from '../io/streams/JSONTransform';
 import ProgressStream from '../io/streams/ProgressStream';
+import XLSXTransform from '../io/streams/XLSXTransform';
 import XMLTransform from '../io/streams/XMLTransform';
 
 import AEndpointStream from './endpoints/AEndpointStream';
@@ -150,12 +151,15 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
         case 'tsv':
           importStream = sourceStream.pipe(CSVTransform.createImportStream(true, '\t'));
           break;
+        case 'xlsx':
+          importStream = sourceStream.pipe(XLSXTransform.createImportStream());
+          break;
         case 'xml':
           const xmlPath: string | undefined = source.fileConfig.xmlPath;
           importStream = sourceStream.pipe(XMLTransform.createImportStream(xmlPath));
           break;
         default:
-          throw new Error('Download file type must be either CSV, TSV, JSON or XML.');
+          throw new Error('Download file type must be either CSV, TSV, JSON, XLSX or XML.');
       }
       resolve(importStream);
     }
