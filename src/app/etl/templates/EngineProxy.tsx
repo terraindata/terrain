@@ -51,13 +51,13 @@ const { List, Map } = Immutable;
 
 import { postorderForEach, preorderForEach } from 'etl/templates/SyncUtil';
 import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
+import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ETLFieldTypes, FieldTypes, getJSFromETL, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
-
 /*
  *  Should this file in be /shared?
  *  Proxy objects are generated synchronously and aren't meant to be persisted
@@ -417,6 +417,20 @@ export class FieldProxy
     EngineUtil.changeFieldTypeSideEffects(this.engine, this.fieldId, newType);
     EngineUtil.castField(this.engine, this.fieldId, newType);
     this.syncWithEngine(true);
+  }
+
+  public setPrimaryKey(value: boolean, language: Languages)
+  {
+    const controller = LanguageController.get(language);
+    if (!value || controller.canSetPrimaryKey(this.engine, this.fieldId))
+    {
+      const sideEffects = controller.setFieldPrimaryKey(this.engine, this.fieldId, value);
+      this.syncWithEngine(sideEffects);
+    }
+    else
+    {
+      throw new Error('Cannot change this field to be a primary key');
+    }
   }
 
   public setFieldProps(newFormState: object, language: Languages)

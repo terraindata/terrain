@@ -230,7 +230,7 @@ export class ElasticWriter extends Stream.Writable
       }
 
       body.push(command);
-      body.push(chunk.chunk);
+      body.push(chunk);
     }
 
     this.client.bulk({ body }, callback);

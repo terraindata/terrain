@@ -57,23 +57,57 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
+import { DefaultController } from './DefaultLanguageController';
 
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 
-class ElasticController implements LanguageInterface
+class ElasticController extends DefaultController implements LanguageInterface
 {
   public language = Languages.Elastic;
 
+  public isFieldPrimaryKey(engine: TransformationEngine, fieldId: number)
+  {
+    const fieldProps = engine.getFieldProps(fieldId);
+    return fieldProps !== undefined && _.get(fieldProps, [this.language, 'isPrimaryKey']) === true;
+  }
+
+  public canSetPrimaryKey(engine: TransformationEngine, fieldId: number)
+  {
+    const jsType = EngineUtil.getRepresentedType(fieldId, engine);
+    const isRootField = engine.getOutputKeyPath(fieldId).size === 1;
+    return (jsType === 'string' || jsType === 'number') && isRootField;
+  }
+
+  public setFieldPrimaryKey(engine: TransformationEngine, fieldId: number, value: boolean)
+  {
+    let sideEffects = false;
+    const pkeyPath = List([this.language, 'isPrimaryKey']);
+    engine.setFieldProp(fieldId, pkeyPath, value);
+    if (value)
+    {
+      engine.getAllFieldIDs().forEach((id) =>
+      {
+        if (id !== fieldId && engine.getFieldProp(fieldId, pkeyPath) === true)
+        {
+          engine.setFieldProp(id, pkeyPath, false);
+          sideEffects = true;
+        }
+      });
+    }
+    return sideEffects;
+  }
+
   public changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType)
   {
-    const elasticProps = engine.getFieldProp(fieldId, List(['elastic']));
+    const elasticProps = engine.getFieldProp(fieldId, List([this.language]));
     if (elasticProps !== undefined)
     {
       const newProps = _.extend({}, elasticProps, {
         elasticType: ElasticTypes.Auto,
       });
-      engine.setFieldProp(fieldId, List(['elastic']), newProps);
+      engine.setFieldProp(fieldId, List([this.language]), newProps);
     }
+    return false;
   }
 }
 
