@@ -449,7 +449,10 @@ export default class EngineUtil
       docs.forEach((doc) =>
       {
         const vals = yadeep.get(engine.transform(doc), okp);
-        values = values.concat(vals);
+        if (vals !== undefined)
+        {
+          values = values.concat(vals);
+        }
       });
       const repType = EngineUtil.getRepresentedType(id, engine);
       if (repType === 'string')
