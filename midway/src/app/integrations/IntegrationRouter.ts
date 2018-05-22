@@ -86,24 +86,6 @@ Router.post('/:id?', passport.authenticate('access-token-local'), async (ctx, ne
   {
     integration.id = ctx.params.id;
   }
-
-  // TODO refactor this for full email support
-  if (integration.type === 'email' && integration.name === 'Default Failure Email')
-  {
-    try
-    {
-      const authConfig = JSON.parse(integration.authConfig);
-      if (authConfig['password'] === '*************************')
-      {
-        delete authConfig['password'];
-      }
-      integration.authConfig = JSON.stringify(authConfig);
-    }
-    catch (e)
-    {
-      // do nothing
-    }
-  }
   ctx.body = await integrations.upsert(ctx.state.user, integration);
 });
 

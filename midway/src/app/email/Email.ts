@@ -53,59 +53,71 @@ import Integrations from '../integrations/Integrations';
 
 const integrations: Integrations = new Integrations();
 
+// currently a root level member of App: App.EMAIL
 export class Email
 {
   private transports: Map<number, any>;
 
   constructor()
   {
-    this.transports = new Map<number, any>();
+    this.transports = new Map<number, any>(); // transports for nodemailer
   }
 
+  /*
+   * Creates and sends an email.
+   * PARAMS: integration ID, subject, body (number, string, string ==> Promise<boolean>)
+   */
   public async send(integrationId: number, subject: string, body: string): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>
     {
-      const integrationConfigs: IntegrationConfig[] = await integrations.get(null, integrationId);
+      const integrationConfigs: IntegrationConfig[] = await integrations.get(null, integrationId, 'Email', true);
       if (integrationConfigs.length !== 0)
       {
         const connectionConfig = integrationConfigs[0].connectionConfig;
         const authConfig = integrationConfigs[0].authConfig;
         const fullConfig: object = Object.assign(connectionConfig, authConfig);
+
+        // if this integration hasn't been loaded into memory yet as a nodemailer transport
         if (!this.transports.has(integrationId))
         {
           const transportOptions =
-          {
-            host: fullConfig['smtp'],
-            port: fullConfig['port'],
-            auth:
             {
-              user: fullConfig['email'],
-              pass: fullConfig['password'],
-            },
-          };
+              host: fullConfig['smtp'],
+              port: fullConfig['port'],
+              auth:
+                {
+                  user: fullConfig['email'],
+                  pass: fullConfig['password'],
+                },
+            };
           this.transports.set(integrationId, nodemailer.createTransport(transportOptions));
         }
         const currTransport = this.transports.get(integrationId);
+
+        // set email parameters
         const emailContents: object =
-        {
-          from: fullConfig['email'],
-          to: fullConfig['recipient'],
-          subject,
-          text: body,
-        };
+          {
+            from: fullConfig['email'],
+            to: fullConfig['recipient'],
+            subject,
+            text: body,
+          };
+
+        // send the email
         currTransport.sendMail(emailContents, (err, info) =>
+        {
+          if (err)
+          {
+            winston.warn('Email send status: ' + JSON.stringify(err, null, 2));
+            resolve(false);
+          }
+          else
           {
             winston.info('Email send status: ' + JSON.stringify(info, null, 2));
-            if (err)
-            {
-              resolve(false);
-            }
-            else
-            {
-              resolve(true);
-            }
-          });
+            resolve(true);
+          }
+        });
       }
     });
   }

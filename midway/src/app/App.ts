@@ -262,6 +262,10 @@ export class App
     await users.initializeDefaultUser();
     winston.debug('Finished creating a default user...');
 
+    // create default integrations
+    await integrations.initializeDefaultIntegrations();
+    winston.debug('Finished creating default integrations...');
+
     // initialize job queue
     await this.JobQ.initializeJobQueue();
 

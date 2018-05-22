@@ -99,11 +99,11 @@ export class JobLog
       resolve(upsertedJobLogs);
 
       const updatedContentJobLog: JobLogConfig = upsertedJobLogs[0];
+      let jobStatusMsg: string = 'SUCCESS';
       try
       {
         const accumulatedLog: string[] = await BufferTransform.toArray(logStream);
         updatedContentJobLog.contents = accumulatedLog.join('\n');
-        let jobStatusMsg: string = 'SUCCESS';
         if (jobStatus === false)
         {
           jobStatusMsg = 'FAILURE';
@@ -172,7 +172,8 @@ export class JobLog
             const fullConfig = Object.assign(connectionConfig, authConfig);
             const subject: string = `[${fullConfig['customerName']}] Schedule "${schedules[0].name}" failed at job ${jobs[0].id}`;
             const body: string = 'Check the job log table for details'; // should we include the log contents? jobLogs[0].contents;
-            await App.EMAIL.send(emailIntegrations[0].id, subject, body);
+            const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body);
+            winston.info(`Email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
           }
         }
       }
