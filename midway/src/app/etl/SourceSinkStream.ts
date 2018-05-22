@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
+// tslint:disable:strict-boolean-expressions
 import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
@@ -140,11 +140,8 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
       switch (source.fileConfig.fileType)
       {
         case 'json':
-          let jsonPath: string | undefined = source.fileConfig.jsonPath;
-          if (source.fileConfig.jsonNewlines)
-          {
-            jsonPath = '*';
-          }
+          const jsonPath: string = (!source.fileConfig.jsonPath || source.fileConfig.jsonNewlines) ? '*' :
+            source.fileConfig.jsonPath;
           importStream = sourceStream.pipe(JSONTransform.createImportStream(jsonPath));
           break;
         case 'csv':
