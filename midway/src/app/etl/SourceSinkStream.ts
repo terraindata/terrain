@@ -140,7 +140,8 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
       switch (source.fileConfig.fileType)
       {
         case 'json':
-          let jsonPath = source.fileConfig.jsonPath ? source.fileConfig.jsonPath : '*';
+          let jsonPath: string = source.fileConfig.jsonPath !== undefined && source.fileConfig.jsonPath !== '' ?
+            source.fileConfig.jsonPath : '*';
           if (source.fileConfig.jsonNewlines)
           {
             jsonPath = '*';
