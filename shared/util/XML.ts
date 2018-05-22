@@ -69,7 +69,7 @@ export function parseXMLFile(file: string, path: string, onLoad, onError, numObj
     catch (e)
     {
       onError(e);
-      return;
+      return undefined;
     }
   }
   onLoad(items);
