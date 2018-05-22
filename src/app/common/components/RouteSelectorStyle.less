@@ -149,6 +149,10 @@
 		border-bottom-left-radius: @br;
 		border-bottom-right-radius: @br;
 		background: #fff;
+		
+		display: flex;
+		flex-direction: column;
+		width: 100%;
 
 		max-height: @picker-height;
 	    ::-webkit-scrollbar-track {
@@ -162,22 +166,18 @@
 	    	background: rgba(180, 182, 186, 0.5);
 	    }
 	    .routeselector-picker-footer {
-	    	position: absolute;
-	    	z-index: 600;
 	    	border-top: 1px solid;
 	    	font-size: 14px;
 	    	padding: 3px 0px;
-	    	background: white;
-	    	bottom: 0;
+	    	background: #fff;
 	    	width: 100%;
 	    }
 		.routeselector-picker-inner {
+			flex-grow: 1;
 			display: flex;
 			flex-wrap: nowrap;
 			align-items: top;
 			padding-right: (@close-width + 10);
-	   		min-height: @picker-height;
-	   		max-height: @picker-height;
 		}
 		
 		.routeselector-header {
