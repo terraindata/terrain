@@ -64,6 +64,7 @@ export enum FileTypes
   Json = 'json',
   Csv = 'csv',
   Tsv = 'tsv',
+  Xlsx = 'xlsx',
   Xml = 'xml',
 }
 
