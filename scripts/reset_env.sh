@@ -63,7 +63,7 @@ if [[ $1 = "--all" ]]; then
   dropOther;
   resetES;
 else
-  while getopts "iuedxo:" opt; do
+  while getopts "iuedx:o" opt; do
     case $opt in
       i)
         dropItems
