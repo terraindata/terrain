@@ -68,6 +68,20 @@ export interface ESQueryObject
   [key: string]: any;
 }
 
+function stringifyStringValue(str)
+{
+  if (str.search('"') !== -1)
+  {
+    const s = str.trim();
+    if (s.startsWith('"') && s.endsWith('"') && s.length > 1)
+    {
+      // we assume that the string is a JSON string already
+      return s;
+    }
+  }
+  return JSON.stringify(str);
+}
+
 export function stringifyWithParameters(
   obj: object | number | boolean | string | null,
   isInputFn: (string) => boolean)
@@ -82,7 +96,7 @@ export function stringifyWithParameters(
     {
       return obj;
     }
-    return '"' + obj + '"';
+    return stringifyStringValue(obj);
   }
   else if (Array.isArray(obj))
   {
@@ -104,7 +118,7 @@ export function stringifyWithParameters(
     const keys = Object.keys(obj);
     for (let i = 0; i < keys.length; i++)
     {
-      str += '"' + keys[i] + '": ';
+      str += stringifyStringValue(keys[i]) + ':';
       str += stringifyWithParameters(obj[keys[i]], isInputFn);
       if (i < keys.length - 1)
       {

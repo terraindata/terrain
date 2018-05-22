@@ -2120,7 +2120,7 @@ const EQLSpec: ESClause[] =
       }),
     new ESStructureClause('match_settings',
       {
-        query: 'string',
+        query: 'base',
         operator: 'match_operator',
         zero_terms_query: 'zero_terms_query',
         cutoff_frequency: 'cutoff_frequency',

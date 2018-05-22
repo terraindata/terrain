@@ -545,6 +545,45 @@ export class PathToCards
     });
   }
 
+  /*
+   * Group filterlines in the filterGroup to a map
+   * map.filter: a list of normal filterlines.
+   * map.group: a list of group filterlines.
+   * map.nested: a list of nested filterlines.
+   * map.negativeNested: a list of nested filterlines whose operators are negative (notexists, notequal, isnotin)
+   */
+  public static MapFilterGroup(filterGroup, ignoreNested): { filter: any[], nested: any[], negativeNested: any[], group: any[] }
+  {
+    const filterLineMap = { filter: [], nested: [], negativeNested: [], group: [] };
+    filterGroup.lines.map((line: FilterLine) =>
+    {
+      if (line && line.filterGroup)
+      {
+        filterLineMap.group.push(line);
+      }
+      else if (line && (
+        (line.field && line.field.indexOf('.') !== -1) ||
+        line.fieldType === FieldType.Nested)
+        && !ignoreNested)
+      {
+        if (line.comparison === 'notexists' ||
+          line.comparison === 'notequal' ||
+          line.comparison === 'isnotin')
+        {
+          filterLineMap.negativeNested.push(line);
+        } else
+        {
+          filterLineMap.nested.push(line);
+        }
+      }
+      else if (line)
+      {
+        filterLineMap.filter.push(line);
+      }
+    });
+    return filterLineMap;
+  }
+
   private static FilterGroupToBool(filterGroup: FilterGroup, parser: ESCardParser, boolValueInfo: ESValueInfo, filterSection: 'hard' | 'soft' = 'hard', ignoreNested = false)
   {
     TerrainLog.debug('P->B( start filtergroup -> bool) ', filterGroup, boolValueInfo);

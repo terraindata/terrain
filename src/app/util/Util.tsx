@@ -297,19 +297,28 @@ const Util = {
   },
 
   // for SQL
-  formatInputDate(date: Date, language: string = 'elastic'): string
+  formatInputDate(date: Date | string, language: string = 'elastic'): string
   {
+    let m;
+    if (typeof date === 'string')
+    {
+      // keep the timezone offset
+      m = moment.parseZone(date);
+    } else
+    {
+      m = moment(date);
+    }
     if (language === 'elastic')
     {
-      const day = moment(date).format('YYYY-MM-DD');
-      const time = moment(date).format('HH:mm:ssZ');
+      const day = m.format('YYYY-MM-DD');
+      const time = m.format('HH:mm:ssZ');
       if (day === 'Invalid date' || time === 'Invalid date')
       {
         return '';
       }
       return day + 'T' + time;
     }
-    return moment(date).format('YYYY-MM-DD HH:mm:ss');
+    return m.format('YYYY-MM-DD HH:mm:ss');
   },
 
   formatNumber(n: number): string
