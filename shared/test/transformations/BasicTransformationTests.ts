@@ -934,3 +934,42 @@ test('Duplicate a nested field', () =>
   expect(Object.keys(r['copy1']).length).toEqual(0);
   expect(Object.keys(r['field']).length).toEqual(1);
 });
+
+test('split a field that does not always exist', () =>
+{
+  const doc = {
+    id: 'blah',
+    size: '8.5\" x 11\"',
+  };
+
+  const doc2 = {
+    id: 'foo',
+  };
+
+  const e = new TransformationEngine(doc);
+
+  e.appendTransformation(
+    TransformationNodeType.SplitNode,
+    List([List(['size'])]),
+    {
+      newFieldKeyPaths: List([List(['w']), List(['h'])]),
+      preserveOldFields: true,
+      delimiter: ' x ',
+    },
+  );
+
+  expect(e.transform(doc)).toEqual(
+    {
+      id: 'blah',
+      size: '8.5\" x 11\"',
+      w: '8.5\"',
+      h: '11\"',
+    },
+  );
+
+  expect(e.transform(doc2)).toEqual(
+    {
+      id: 'foo',
+    },
+  );
+});

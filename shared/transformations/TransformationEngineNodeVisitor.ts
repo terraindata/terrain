@@ -302,6 +302,10 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     node.fields.forEach((field) =>
     {
       const el: any = yadeep.get(doc, field);
+      if (el === undefined)
+      {
+        return;
+      }
       let split: string[];
       if (el.constructor === Array)
       {

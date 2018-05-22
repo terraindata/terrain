@@ -250,7 +250,7 @@ export class EngineProxy
   public duplicateField(sourceId: number, destKP: List<string>, despecify = false)
   {
     const originalOKP = this.engine.getOutputKeyPath(sourceId);
-    this.engine.setOutputKeyPath(sourceId, originalOKP.set(-1, '_' + originalOKP.last()));
+    this.engine.setOutputKeyPath(sourceId, originalOKP.set(-1, `_${this.randomId()}${originalOKP.last()}`));
     const destId = this.copyField(sourceId, destKP, despecify);
     const newOrigId = this.copyField(sourceId, originalOKP, despecify);
     this.engine.disableField(sourceId);
