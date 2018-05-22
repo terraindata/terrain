@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:strict-boolean-expressions
 
-import * as xmlParser from 'xml2js';
+import * as xmlParser from 'xml2json-light';
 
 export function parseXMLFile(file: string, path: string, onLoad, onError, numObjects = 10)
 {
@@ -60,19 +60,17 @@ export function parseXMLFile(file: string, path: string, onLoad, onError, numObj
     {
       return items;
     }
-    xmlParser.parseString(file.substring(startPos, endPos), {
-      explicitRoot: false,
-      explicitArray: false,
-      mergeAttrs: true,
-    }, (err, obj) =>
+    try
     {
-      if (err !== null && err !== undefined)
-      {
-        onError(err);
-      }
-      items.push(obj);
+      const json = xmlParser.xml2json(file.substring(startPos, endPos));
+      items.push(json[path || 'root']);
       file = file.substring(endPos);
-    });
+    }
+    catch (e)
+    {
+      onError(e);
+      return;
+    }
   }
   onLoad(items);
 }
