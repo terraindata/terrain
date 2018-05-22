@@ -216,7 +216,7 @@ export class ElasticMapping
             ignore_above: 256,
           },
         },
-      }
+      };
     }
 
     const config: TypeConfig = {

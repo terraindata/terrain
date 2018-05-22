@@ -44,12 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
-import * as _ from 'lodash';
 
 import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
-import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import
 {
   DefaultSinkConfig,
@@ -57,6 +56,7 @@ import
   SinkConfig,
   SourceConfig,
 } from 'shared/etl/types/EndpointTypes';
+import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import * as Util from '../AppUtil';
 import ExportTransform from './ExportTransform';
@@ -302,6 +302,7 @@ export async function getMergeJoinStream(
 ): Promise<stream.Readable>
 {
   const leftJoinKey = options['leftJoinKey'] as string;
+  const rightJoinKey = options['rightJoinKey'] as string;
 
   const query = JSON.stringify({
     size: 2147483647,
@@ -322,7 +323,8 @@ export async function getMergeJoinStream(
       },
     },
     mergeJoin: {
-      joinKey: leftJoinKey,
+      leftJoinKey,
+      rightJoinKey,
       [options['outputKey']]: {
         query: {
           bool: {
