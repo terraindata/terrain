@@ -309,9 +309,6 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
         fieldId,
       });
     }
-    this.props.act({
-      actionType: 'updateEngineVersion',
-    });
   }
 
   public handleEditTransformationFactory(index: number)

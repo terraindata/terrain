@@ -56,6 +56,9 @@ import ElasticController from './ElasticController';
 export interface LanguageInterface
 {
   language: Languages;
+  isFieldPrimaryKey: (engine: TransformationEngine, fieldId: number) => boolean;
+  canChangePrimaryKey: (engine: TransformationEngine, fieldId: number) => boolean;
+  setFieldPrimaryKey: (engine: TransformationEngine, fieldId: number, value: boolean) => void;
   changeFieldTypeSideEffects: (engine: TransformationEngine, fieldId: number, newType: ETLFieldTypes) => void;
 }
 

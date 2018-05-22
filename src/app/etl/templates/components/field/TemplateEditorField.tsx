@@ -209,9 +209,6 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
           fieldId: this.props.fieldId,
         });
       }
-      this.props.act({
-        actionType: 'updateEngineVersion',
-      });
     }).catch(this._showError('Could not perform action'));
   }
 

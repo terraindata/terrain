@@ -109,6 +109,9 @@ class GraphHelpers extends ETLHelpers
         }
       }).then(() =>
       {
+        this.editorAct({
+          actionType: 'updateEngineVersion',
+        });
         resolve(structuralChanges);
       }).catch(reject);
     });

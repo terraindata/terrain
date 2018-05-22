@@ -51,9 +51,24 @@ import * as Immutable from 'immutable';
 import { LanguageInterface } from 'shared/etl/languages/LanguageControllers';
 const { List, Map } = Immutable;
 
-class DefaultController implements LanguageInterface
+export class DefaultController implements LanguageInterface
 {
   public language = Languages.JavaScript;
+
+  public isFieldPrimaryKey(engine, fieldId)
+  {
+    return false;
+  }
+
+  public canChangePrimaryKey(engine, fieldId)
+  {
+    return false;
+  }
+
+  public setFieldPrimaryKey(engine, fieldId, value)
+  {
+    return;
+  }
 
   public changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType)
   {
