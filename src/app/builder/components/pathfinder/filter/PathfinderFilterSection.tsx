@@ -603,6 +603,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
                       onDragStop={this._toggle('dragging')}
                       dropZoneStyle={dropZoneStyle}
                       canDrag={canEdit && this.state.canDrag}
+                      useCustomDragLayer={true}
                     />
                     :
                     <DragDropGroup
