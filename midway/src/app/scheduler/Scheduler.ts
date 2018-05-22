@@ -178,7 +178,7 @@ export class Scheduler
           id: null,
           logId: null,
           meta: '',
-          name: '', // TODO give this a name if you want
+          name: schedule.name, // TODO give this a name if you want
           pausedFilename: jobFilename,
           priority: 1,
           running: null,

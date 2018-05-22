@@ -52,7 +52,7 @@ export function parseXMLFile(file: string, path: string, onLoad, onError, numObj
   const start = path ? '<' + path + '>' : '<root>';
   const end = path ? '</' + path + '>' : '</root>';
   const items = [];
-  for (let i = 0; i < numObjects; i ++)
+  for (let i = 0; i < numObjects; i++)
   {
     const startPos = file.indexOf(start);
     const endPos = file.indexOf(end) + end.length;
