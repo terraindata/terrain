@@ -56,10 +56,14 @@ import ElasticController from './ElasticController';
 export interface LanguageInterface
 {
   language: Languages;
+  // is this field currently a primary key?
   isFieldPrimaryKey: (engine: TransformationEngine, fieldId: number) => boolean;
-  canChangePrimaryKey: (engine: TransformationEngine, fieldId: number) => boolean;
-  setFieldPrimaryKey: (engine: TransformationEngine, fieldId: number, value: boolean) => void;
-  changeFieldTypeSideEffects: (engine: TransformationEngine, fieldId: number, newType: ETLFieldTypes) => void;
+  // can this field be set to be a primary key?
+  canSetPrimaryKey: (engine: TransformationEngine, fieldId: number) => boolean;
+  // set the field to be a primary key or not. Return true if this operation affected any other fields
+  setFieldPrimaryKey: (engine: TransformationEngine, fieldId: number, value: boolean) => boolean;
+  // if the field changes ETL types, take care of side effects
+  changeFieldTypeSideEffects: (engine: TransformationEngine, fieldId: number, newType: ETLFieldTypes) => boolean;
 }
 
 export default class LanguageControllers

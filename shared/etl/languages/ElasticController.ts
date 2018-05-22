@@ -71,7 +71,7 @@ class ElasticController extends DefaultController implements LanguageInterface
     return fieldProps !== undefined && _.get(fieldProps, [this.language, 'isPrimaryKey']) === true;
   }
 
-  public canChangePrimaryKey(engine: TransformationEngine, fieldId: number)
+  public canSetPrimaryKey(engine: TransformationEngine, fieldId: number)
   {
     const jsType = EngineUtil.getRepresentedType(fieldId, engine);
     const isRootField = engine.getOutputKeyPath(fieldId).size === 1;
@@ -80,7 +80,20 @@ class ElasticController extends DefaultController implements LanguageInterface
 
   public setFieldPrimaryKey(engine: TransformationEngine, fieldId: number, value: boolean)
   {
-    engine.setFieldProp(fieldId, List([this.language, 'isPrimaryKey']), value);
+    let sideEffects = false;
+    const pkeyPath = List([this.language, 'isPrimaryKey']);
+    engine.setFieldProp(fieldId, pkeyPath, value);
+    if (value)
+    {
+      engine.getAllFieldIDs().forEach((id) => {
+        if (id !== fieldId && engine.getFieldProp(fieldId, pkeyPath) === true)
+        {
+          engine.setFieldProp(id, pkeyPath, false);
+          sideEffects = true;
+        }
+      });
+    }
+    return sideEffects;
   }
 
   public changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType)
@@ -93,6 +106,7 @@ class ElasticController extends DefaultController implements LanguageInterface
       });
       engine.setFieldProp(fieldId, List([this.language]), newProps);
     }
+    return false;
   }
 }
 

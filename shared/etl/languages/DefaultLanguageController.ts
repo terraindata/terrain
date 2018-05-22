@@ -60,19 +60,19 @@ export class DefaultController implements LanguageInterface
     return false;
   }
 
-  public canChangePrimaryKey(engine, fieldId)
+  public canSetPrimaryKey(engine, fieldId)
   {
     return false;
   }
 
   public setFieldPrimaryKey(engine, fieldId, value)
   {
-    return;
+    return false;
   }
 
   public changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType)
   {
-    return;
+    return false;
   }
 }
 
