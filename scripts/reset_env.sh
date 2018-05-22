@@ -2,8 +2,8 @@
 
 read -r -d '' HELPSTRING <<"EOF"
 Script to Reset Midway and Docker State
-Usage: reset_all~ [-all] | [-euid] [-x s]
-  --all equivalent to -euito
+Usage: reset_all~ [-all] | [-euido] [-x s]
+  --all equivalent to -euido
   -e    drop ETL tables
   -u    drop users table
   -i    drop items (groups, categories, algorithms)
