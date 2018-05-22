@@ -473,6 +473,14 @@ class ETLAjax
       }
     };
 
+    xhr.upload.addEventListener('progress', (e: ProgressEvent) => {
+      let progress = 0;
+      if (e.total !== 0) {
+        progress = (e.loaded / e.total) * 100;
+      }
+      console.log(progress);
+    }, false);
+
     xhr.open('post', MIDWAY_HOST + '/midway/v1/' + route);
     xhr.send(formData);
   }
