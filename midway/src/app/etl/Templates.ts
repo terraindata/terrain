@@ -418,6 +418,13 @@ export default class Templates
       logStream.push(null);
     });
 
+    outputStream.on('error', () =>
+    {
+      logStream.info(`Failed when executing ETL job for template ${template.templateName}`);
+      outputStream.destroy();
+      logStream.push(null);
+    });
+
     return {
       outputStream,
       logStream,
