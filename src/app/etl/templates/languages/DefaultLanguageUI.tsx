@@ -53,18 +53,13 @@ import { LanguageInterface } from 'etl/templates/languages/LanguageUI';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-class DefaultUI implements LanguageInterface
+export class DefaultUI implements LanguageInterface
 {
   public language = Languages.JavaScript;
 
   public getSettingsComponent()
   {
     return null;
-  }
-
-  public isFieldPrimaryKey(fieldProps: object)
-  {
-    return false;
   }
 }
 

@@ -60,7 +60,6 @@ export interface LanguageInterface
 {
   language: Languages;
   getSettingsComponent: () => React.ComponentClass<TemplateEditorFieldProps>;
-  isFieldPrimaryKey: (fieldProps: object) => boolean;
 }
 
 export default class LanguageUI

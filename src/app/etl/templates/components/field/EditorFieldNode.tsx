@@ -277,6 +277,9 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
           style={style}
           checked={this.getCheckboxState()}
           onCheckboxClicked={this.handleCheckboxClicked}
+          keyPath={this._ikeyPath(SEED_KEY_PATH, this.props.fieldId)}
+          onDrop={this.handleDropped}
+          canDrag={this._isRootField()}
         />
       );
     }
@@ -292,6 +295,9 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
           style={style}
           checked={this.getCheckboxState()}
           onCheckboxClicked={this.handleCheckboxClicked}
+          keyPath={this._ikeyPath(SEED_KEY_PATH, this.props.fieldId)}
+          onDrop={this.handleDropped}
+          canDrag={this._isRootField()}
         />
       );
     }
@@ -326,9 +332,22 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
       expandableViewOpen: !this.state.expandableViewOpen,
     });
   }
+
+  public handleDropped(dropIndex: List<number>, dragIndex: List<number>)
+  {
+    const draggedFieldId = dragIndex.get(0);
+    const droppedFieldId = dropIndex.get(0);
+    GraphHelpers.mutateEngine((proxy) =>
+    {
+      proxy.orderField(draggedFieldId, droppedFieldId);
+    })
+    .then(doNothing)
+    .catch(this._showError('Could not reorder these fields.'));
+  }
 }
 
 const doNothing = () => null;
+const SEED_KEY_PATH = List([]);
 
 const EditorFieldNode = Util.createTypedContainer(
   EditorFieldNodeC,

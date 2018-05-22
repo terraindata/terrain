@@ -60,7 +60,7 @@ const { List, Map } = Immutable;
 import Menu from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
-import LanguageUI from 'etl/templates/languages/LanguageUI';
+import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { instanceFnDecorator } from 'shared/util/Classes';
@@ -143,7 +143,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
   public isPrimaryKey()
   {
     const language = this._getCurrentLanguage();
-    return LanguageUI.get(language).isFieldPrimaryKey(this._field().fieldProps);
+    return LanguageController.get(language).isFieldPrimaryKey(this._currentEngine(), this.props.fieldId);
   }
 
   public render()
