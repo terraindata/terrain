@@ -24,7 +24,7 @@ before_script:
 stages:
   - style-and-compilation
   - standard-tests
-  - fullstack-tests
+  - screenshot-tests
   - deploy
 
 lint:
@@ -106,22 +106,22 @@ update-cache:
      - node_modules
     policy: pull-push
 
-# TODO reenable these tests when they're updated for the new system
-#fullstack-meta:
-#  script:
-#    - pkill node || true;
-#    - timeout 240 yarn test-fullstack-setup
-#    - yarn clean
-#    - MIDWAY_HOST=`hostname`:3000 yarn build
-#    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
-#    - sleep 10
+fullstack-meta:
+  script:
+    - pkill node || true;
+    - timeout 240 yarn test-fullstack-setup
+    - yarn clean
+    - MIDWAY_HOST=`hostname`:3000 yarn build
+    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
+    - sleep 10
+# TODO: enable this after update it to the ETL
 #    - yarn test-fullstack-import
-#    - yarn test-fullstack-component
-#  stage: fullstack-tests
-#  after_script:
-#    - tail -n20 ./midwayConsole.log || true
-#    - timeout 240 yarn test-fullstack-teardown
-#    - pkill node || true;
+    - yarn test-fullstack-component
+  stage: standard-tests
+  after_script:
+    - tail -n20 ./midwayConsole.log || true
+    - timeout 240 yarn test-fullstack-teardown
+    - pkill node || true;
 
 fullstack-screenshot:
   script:
@@ -133,8 +133,7 @@ fullstack-screenshot:
     - sleep 10
     - yarn test-fullstack-login
     - yarn test-rr-pathfinder
-    - yarn test-rr-builder
-  stage: fullstack-tests
+  stage: screenshot-tests
   allow_failure: true
   artifacts:
     when: on_failure

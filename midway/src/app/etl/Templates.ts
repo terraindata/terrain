@@ -65,7 +65,7 @@ import { TransformationEngine } from '../../../../shared/transformations/Transfo
 import DatabaseController from '../../database/DatabaseController';
 import ElasticDB from '../../database/elastic/tasty/ElasticDB';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import { getMergeJoinStream, getSinkStream, getSourceStream } from './SourceSinkStream';
+import { getMergeJoinStream, getSinkStream, getSourceStream, IndexInfo } from './SourceSinkStream';
 import { destringifySavedTemplate, recordToConfig, TemplateConfig, templateForSave, TemplateInDatabase } from './TemplateConfig';
 
 import { _SinkConfig, _SourceConfig, SinkConfig as SinkRecord, SourceConfig as SourceRecord } from 'shared/etl/immutable/EndpointRecords';
@@ -516,7 +516,7 @@ export default class Templates
 
             const done = new EventEmitter();
             let numPending = inEdges.length;
-            const tempIndices: object[] = [];
+            const tempIndices: IndexInfo[] = [];
             for (const e of inEdges)
             {
               const inputStream = streamMap[e.v][nodeId];
@@ -525,14 +525,15 @@ export default class Templates
               const tempIndex = 'temp_' + String(dag.node(e.v).endpoint) + '_' + String(e.v) + '_' + String(e.w);
               const tempSink = JSON.parse(JSON.stringify(template.sinks._default));
               tempSink['options']['database'] = tempIndex;
+              // and insert incoming streams into the temporary index
+              const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
+
               tempIndices.push({
                 index: tempIndex,
                 type: tempSink['options']['table'],
               });
 
-              // and insert incoming streams into the temporary index
-              const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
-              const tempSinkStream = await getSinkStream(tempSink, transformationEngine);
+              const tempSinkStream = await getSinkStream(tempSink, transformationEngine, { isMerge: true });
               inputStream.pipe(tempSinkStream);
 
               // wait for the stream to be completely written out to the sink by attaching the

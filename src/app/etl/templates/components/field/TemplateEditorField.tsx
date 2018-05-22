@@ -169,6 +169,12 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return getCurrentEngine(this.props);
   }
 
+  protected _currentComparator(): (a, b) => number
+  {
+    this.updateChecker.setChecker('currentComparator', getCurrentComparator);
+    return getCurrentComparator(this.props);
+  }
+
   protected _getArrayIndex(): number
   {
     const last = Number(this.props.displayKeyPath.last());
@@ -283,7 +289,12 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   }
 }
 
-function getCurrentEngine(props: TemplateEditorFieldProps)
+function getCurrentComparator(props: TemplateEditorFieldProps): (a, b) => number
+{
+  return (props as TemplateEditorFieldProps & Injected).templateEditor.getCurrentComparator();
+}
+
+function getCurrentEngine(props: TemplateEditorFieldProps): TransformationEngine
 {
   return (props as TemplateEditorFieldProps & Injected).templateEditor.getCurrentEngine();
 }

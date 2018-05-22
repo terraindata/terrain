@@ -42,20 +42,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
+// tslint:disable:strict-boolean-expressions
 
-import * as csv from './util/CSV';
-import * as elastic from './util/Elastic';
-import * as json from './util/JSON';
-import * as promise from './util/Promise';
-import * as xml from './util/XML';
-export const Util =
+import * as xmlParser from 'xml2json-light';
+
+export function parseXMLFile(file: string, path: string, onLoad, onError, numObjects = 10)
+{
+  const start = path ? '<' + path + '>' : '<root>';
+  const end = path ? '</' + path + '>' : '</root>';
+  const items = [];
+  for (let i = 0; i < numObjects; i ++)
   {
-    csv,
-    elastic,
-    json,
-    promise,
-    xml,
-  };
-
-export default Util;
+    const startPos = file.indexOf(start);
+    const endPos = file.indexOf(end) + end.length;
+    if (startPos === -1 || endPos === -1)
+    {
+      return items;
+    }
+    try
+    {
+      const json = xmlParser.xml2json(file.substring(startPos, endPos));
+      items.push(json[path || 'root']);
+      file = file.substring(endPos);
+    }
+    catch (e)
+    {
+      onError(e);
+      return undefined;
+    }
+  }
+  onLoad(items);
+}

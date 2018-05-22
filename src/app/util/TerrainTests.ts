@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import { parsePath } from 'builder/components/pathfinder/PathfinderParser';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
@@ -52,7 +53,7 @@ import ESParserError from '../../../shared/database/elastic/parser/ESParserError
 import CardsToElastic from '../../database/elastic/conversion/CardsToElastic';
 import { ElasticValueInfoToCards } from '../../database/elastic/conversion/ElasticToCards';
 import ESCardParser from '../../database/elastic/conversion/ESCardParser';
-import { _Query } from '../../items/types/Query';
+import { _Query, default as Query } from '../../items/types/Query';
 
 export default class TerrainTests
 {
@@ -88,5 +89,13 @@ export default class TerrainTests
       ret.message = 'Parsed value is ' + JSON.stringify(newValue);
       return ret;
     }
+  }
+
+  public static PathFinderToQuery(queryConfig)
+  {
+    const query: Query = _Query(queryConfig);
+    const currentTql = query.tql;
+    const newTql = parsePath(query.path, query.inputs);
+    return newTql;
   }
 }

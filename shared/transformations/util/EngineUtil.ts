@@ -449,7 +449,10 @@ export default class EngineUtil
       docs.forEach((doc) =>
       {
         const vals = yadeep.get(engine.transform(doc), okp);
-        values = values.concat(vals);
+        if (vals !== undefined)
+        {
+          values = values.concat(vals);
+        }
       });
       const repType = EngineUtil.getRepresentedType(id, engine);
       if (repType === 'string')
@@ -463,6 +466,7 @@ export default class EngineUtil
           const longField = EngineUtil.addFieldToEngine(engine, ikp.push('lon'), ETLFieldTypes.Number);
           engine.setOutputKeyPath(latField, okp.push('lat')); // refactor to use synthetic util?
           engine.setOutputKeyPath(longField, okp.push('lon'));
+
           EngineUtil.castField(engine, latField, ETLFieldTypes.Number);
           EngineUtil.castField(engine, longField, ETLFieldTypes.Number);
         }

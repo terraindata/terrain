@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Elastic from 'elasticsearch';
 
 import util from '../../../../../shared/Util';
-import TastyDB from '../../../tasty/TastyDB';
+import { IsolationLevel, TastyDB, TransactionHandle } from '../../../tasty/TastyDB';
 import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
 import TastyTable from '../../../tasty/TastyTable';
@@ -158,32 +158,32 @@ export class ElasticDB implements TastyDB
   /**
    * Upserts the given objects, based on primary key ('id' in elastic).
    */
-  public async upsert(table: TastyTable, elements: object[])
+  public async upsert(table: TastyTable, elements: object[], handle?: TransactionHandle)
   {
-    return this.update(table, elements, true);
+    return this.update_(table, elements, true);
   }
 
   /**
    * Updates the given objects, based on primary key ('id' in elastic).
    */
-  public async update(table: TastyTable, elements: object[], upsert: boolean = false)
+  public async update(table: TastyTable, elements: object[], handle?: TransactionHandle)
   {
-    const updated = await this.updateObjects(table, elements, upsert);
-    const primaryKeys = table.getPrimaryKeys();
-    const results = new Array(updated.length);
-    for (let i = 0; i < updated.length; i++)
-    {
-      results[i] = elements[i];
-      if (updated[i]['_id'] !== undefined)
-      {
-        if ((primaryKeys.length === 1) &&
-          (elements[i][primaryKeys[0]] === undefined))
-        {
-          results[i][primaryKeys[0]] = updated[i]['_id'];
-        }
-      }
-    }
-    return results;
+    return this.update_(table, elements, false);
+  }
+
+  public async startTransaction(isolationLevel: IsolationLevel, readOnly: boolean): Promise<TransactionHandle>
+  {
+    throw new Error('startTransaction() is not supported');
+  }
+
+  public async commitTransaction(handle: TransactionHandle): Promise<object[]>
+  {
+    throw new Error('commitTransaction() is not supported');
+  }
+
+  public async rollbackTransaction(handle: TransactionHandle): Promise<object[]>
+  {
+    throw new Error('rollbackTransaction() is not supported');
   }
 
   /*
@@ -291,6 +291,26 @@ export class ElasticDB implements TastyDB
         params,
         util.promise.makeCallback(resolve, reject));
     });
+  }
+
+  private async update_(table: TastyTable, elements: object[], upsert: boolean)
+  {
+    const updated = await this.updateObjects(table, elements, upsert);
+    const primaryKeys = table.getPrimaryKeys();
+    const results = new Array(updated.length);
+    for (let i = 0; i < updated.length; i++)
+    {
+      results[i] = elements[i];
+      if (updated[i]['_id'] !== undefined)
+      {
+        if ((primaryKeys.length === 1) &&
+          (elements[i][primaryKeys[0]] === undefined))
+        {
+          results[i][primaryKeys[0]] = updated[i]['_id'];
+        }
+      }
+    }
+    return results;
   }
 
   private async updateObjects(table: TastyTable, elements: object[], upsert: boolean)

@@ -238,16 +238,24 @@ export default class ESInterpreter
 
   public toCode(options: CardsToCodeOptions): string
   {
-    let query;
+    let queryString;
     if (options.replaceInputs === true)
     {
-      query = ESParameterFiller.generate(this.rootValueInfo, this.params);
-    }
-    else
+      queryString = ESParameterFiller.generate(this.rootValueInfo, this.params);
+    } else
     {
-      query = JSON.stringify(this.rootValueInfo.value);
+      queryString = JSON.stringify(this.rootValueInfo.value);
     }
 
-    return ESConverter.formatES(new ESJSONParser(query));
+    if (options.limit !== undefined)
+    {
+      const o = JSON.parse(queryString);
+      if (o.size === undefined || o.size > options.limit)
+      {
+        o['size'] = options.limit;
+        queryString = JSON.stringify(o);
+      }
+    }
+    return ESConverter.formatES(new ESJSONParser(queryString));
   }
 }

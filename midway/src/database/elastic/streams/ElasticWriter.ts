@@ -137,14 +137,32 @@ export class ElasticWriter extends Stream.Writable
 
   private upsert(body: object, callback: (err?: Error) => void): void
   {
-    const query: Elastic.UpdateDocumentParams = {
+    if (this.primaryKey == null || body[this.primaryKey] == null)
+    {
+      this.insert(body, callback);
+    }
+    else
+    {
+      const query: Elastic.UpdateDocumentParams = {
+        index: this.index,
+        type: this.type,
+        id: body[this.primaryKey],
+        body: {
+          doc: body,
+          doc_as_upsert: true,
+        },
+      };
+
+      this.client.update(query, callback);
+    }
+  }
+
+  private insert(body: object, callback: (err?: Error) => void): void
+  {
+    const query: Elastic.IndexDocumentParams<object> = {
       index: this.index,
       type: this.type,
-      id: body[this.primaryKey],
-      body: {
-        doc: body,
-        doc_as_upsert: true,
-      },
+      body,
     };
 
     if (this.primaryKey !== undefined && body[this.primaryKey] !== undefined)
@@ -152,38 +170,72 @@ export class ElasticWriter extends Stream.Writable
       query['id'] = body[this.primaryKey];
     }
 
-    this.client.update(query, callback);
+    this.client.index(query, callback);
   }
 
   private bulkUpsert(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
+  {
+    if (this.primaryKey == null)
+    {
+      this.bulkInsert(chunks, callback);
+    }
+    else
+    {
+      const body: any[] = [];
+      for (const chunk of chunks)
+      {
+        const command =
+          {
+            update: {
+              _index: this.index,
+              _type: this.type,
+            },
+          };
+
+        if (this.primaryKey !== undefined && chunk.chunk[this.primaryKey] !== undefined)
+        {
+          command.update['_id'] = chunk.chunk[this.primaryKey];
+        }
+
+        const newBody = {
+          doc: chunk.chunk,
+          doc_as_upsert: true,
+        };
+
+        body.push(command);
+        body.push(newBody);
+      }
+
+      this.client.bulk({ body }, callback);
+    }
+
+  }
+
+  private bulkInsert(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
   {
     const body: any[] = [];
     for (const chunk of chunks)
     {
       const command =
         {
-          update: {
+          index: {
             _index: this.index,
             _type: this.type,
           },
         };
 
-      if (this.primaryKey !== undefined && chunk.chunk[this.primaryKey] !== undefined)
+      if (this.primaryKey !== undefined && chunk[this.primaryKey] !== undefined)
       {
-        command.update['_id'] = chunk.chunk[this.primaryKey];
+        command.index['_id'] = chunk[this.primaryKey];
       }
 
-      const newBody = {
-        doc: chunk.chunk,
-        doc_as_upsert: true,
-      };
-
       body.push(command);
-      body.push(newBody);
+      body.push(chunk.chunk);
     }
 
     this.client.bulk({ body }, callback);
   }
+
 }
 
 export default ElasticWriter;

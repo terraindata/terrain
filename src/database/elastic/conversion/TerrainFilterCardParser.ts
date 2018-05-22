@@ -48,6 +48,7 @@ THE SOFTWARE.
 // Insert query blocks generated from the filter rows to a card
 // Please take care the order when pushing rows to cards
 // [Row1, Row2, ... block's child1, child2...]
+import { PathFinderStringToJSONArray } from 'builder/components/pathfinder/PathfinderParser';
 import * as Immutable from 'immutable';
 import { List } from 'immutable';
 import * as TerrainLog from 'loglevel';
@@ -92,7 +93,7 @@ export class TerrainFilterCardParser
       {
         if (boolValueInfo.objectChildren[boolOp] === undefined)
         {
-          // create boolOp query[], and insert the rows into the card
+          // create boolOp query[],  insert the rows into the card
           let opCard = BlockUtils.make(ElasticBlocks, 'eqlquery[]',
             {
               key: boolOp,
@@ -140,8 +141,10 @@ export class TerrainFilterCardParser
           return ':number';
         case ESJSONType.boolean:
           return ':boolean';
+        case ESJSONType.string:
+          return ':string';
         default:
-          TerrainLog.warn('valueType is neither a number nor a string, but a ' + valueParser.getValueInfo().jsonType);
+          TerrainLog.warn('valueType is not a number, boolean, string, but a ' + valueParser.getValueInfo().jsonType);
           return defaultType;
       }
     }
@@ -302,22 +305,12 @@ export class TerrainFilterCardParser
   {
     let queryCard;
     const boost = block['boost'];
-    let value = block['value'] || '';
+    const value = String(block['value'] || '');
     const valueParser = new ESJSONParser(value);
-    let cardValue = value;
+    const cardValue = PathFinderStringToJSONArray(value);
+    console.log('Terms: ', value, cardValue);
     // Try to split it along , to create list
-    try
-    {
-      cardValue = JSON.parse(value);
-    }
-    catch {
-      if (value[0] !== '@')
-      {
-        value = value.replace(/\[/g, '').replace(/\]/g, '');
-        const pieces = value.split(',');
-        cardValue = pieces.map((piece) => piece.toLowerCase().trim());
-      }
-    }
+
     if (boost !== '')
     {
       const valueField = block['field'] + ':base[]';
