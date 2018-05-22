@@ -118,7 +118,11 @@ export class JobLog
           updatedContentJobLog.contents = e['logs'].join('\n');
           await App.DB.upsert(this.jobLogTable, updatedContentJobLog);
         }
-        await App.JobQ.setJobStatus(jobId, false, 'FAILURE');
+        jobStatusMsg = 'FAILURE';
+        await App.JobQ.setJobStatus(jobId, false, jobStatusMsg);
+      }
+      if (jobStatusMsg === 'FAILURE')
+      {
         await this._sendEmail(jobId);
       }
     });
