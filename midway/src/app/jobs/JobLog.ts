@@ -103,15 +103,12 @@ export class JobLog
       {
         const accumulatedLog: string[] = await BufferTransform.toArray(logStream);
         updatedContentJobLog.contents = accumulatedLog.join('\n');
-        if (jobStatus !== false)
+        let jobStatusMsg: string = 'SUCCESS';
+        if (jobStatus === false)
         {
-          jobStatus = 'SUCCESS';
+          jobStatusMsg = 'FAILURE';
         }
-        else
-        {
-          jobStatus = 'FAILURE';
-        }
-        await App.JobQ.setJobStatus(jobId, false, jobStatus);
+        await App.JobQ.setJobStatus(jobId, false, jobStatusMsg);
         await App.DB.upsert(this.jobLogTable, updatedContentJobLog);
       }
       catch (e)
