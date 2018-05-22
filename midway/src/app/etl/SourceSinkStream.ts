@@ -195,7 +195,7 @@ export async function getSinkStream(
         switch (sink.fileConfig.fileType)
         {
           case 'json':
-            if (sink.fileConfig.jsonPath !== undefined)
+            if (sink.fileConfig.jsonPath !== null && sink.fileConfig.jsonPath !== undefined)
             {
               let path = sink.fileConfig.jsonPath.split('.');
               const wildcardIndex: number = path.indexOf('*');
