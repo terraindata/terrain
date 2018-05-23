@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions member-access no-var-requires no-console
 
 import Button from 'app/common/components/Button';
+import Modal from 'app/common/components/Modal';
 import Ajax from 'app/util/Ajax';
 import Hit from 'builder/components/results/Hit.tsx';
 import * as classNames from 'classnames';
@@ -68,6 +69,8 @@ import KeyboardFocus from './KeyboardFocus';
 import './RouteSelectorStyle.less';
 import SearchInput from './SearchInput';
 
+const { VelocityTransitionGroup, VelocityComponent } = require('velocity-react');
+
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 const InfoIcon = require('images/icon_info.svg');
 
@@ -77,9 +80,10 @@ export interface RouteSelectorOption
   displayName?: string | number | El;
   color?: string;
   sampleData?: List<any>;
-  extraContent?: string;
+  tooltip?: string;
   icon?: any;
   closeOnPick?: boolean; // close the picker when this option is picked
+  component?: El | string;
 }
 
 export interface RouteSelectorOptionSet
@@ -89,17 +93,19 @@ export interface RouteSelectorOptionSet
   hasOther?: boolean;
   focusOtherByDefault?: boolean;
   shortNameText?: string;
-  headerText?: string;
+  headerText?: string | El;
   forceFloat?: boolean;
   isButton?: boolean;
   onButtonClick?: () => void;
+  canUseButton?: boolean;
   icon?: El;
   hasSearch?: boolean; // NOTE not compatible with hasOther
   column?: boolean; // force a column layout
   hideSampleData?: boolean; // hide sample data, even if it's present
   getCustomDisplayName?: (value, setIndex: number) => string | undefined;
-
   getValueComponent?: (props: { value: any }) => React.ReactElement<any>;
+  headerBelowValueComponent?: boolean;
+  overrideWidthPercentage?: number; // If used for one optionSet, this should be set for all optionSets
 }
 
 export interface Props
@@ -122,8 +128,10 @@ export interface Props
   showWarning?: boolean;
   useTooltip?: boolean;
   warningMessage?: string;
-  onDelete?: () => void;
   onToggleOpen?: (open: boolean) => void;
+  onDelete?: () => void;
+  confirmDelete?: boolean;
+  itemName?: string; // used in confirm delete modal
 }
 
 export class RouteSelector extends TerrainComponent<Props>
@@ -135,11 +143,15 @@ export class RouteSelector extends TerrainComponent<Props>
     focusedSetIndex: this.props.defaultOpen ? 0 : -1,
     focusedOptionIndex: 0,
 
+    showBoxValues: false,
+
     columnRefs: Map<number, any>({}),
     pickerRef: null,
     resultsConfig: Map({}),
     optionSets: List<RouteSelectorOptionSet>([]),
     // optionRefs: Map({}), // not needed for now, but keeping some logic around
+
+    confirmDeleteModalOpen: false,
 
     // TODO re-add animation / picked logic
     // picked: false,
@@ -175,6 +187,11 @@ export class RouteSelector extends TerrainComponent<Props>
           this.getResultConfigs(this.state.optionSets.get(0).options);
         }
       });
+
+    // needed to be in a timeout, not in the above setState, for some reason.
+    setTimeout(() => this.setState({
+      showBoxValues: true,
+    }), 100);
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -183,12 +200,16 @@ export class RouteSelector extends TerrainComponent<Props>
     {
       this.setState({
         optionSets: this.props.getOptionSets(),
+        showBoxValues: true,
+        // in case React reuses same component after a neighbor has been deleted
       });
     }
     else if (this.props.optionSets !== nextProps.optionSets)
     {
       this.setState({
         optionSets: nextProps.optionSets,
+        showBoxValues: true,
+        // ditto
       });
     }
   }
@@ -224,6 +245,9 @@ export class RouteSelector extends TerrainComponent<Props>
             this.renderPicker()
           }
         </div>
+        {
+          this.renderModal()
+        }
       </div>
     );
   }
@@ -236,13 +260,13 @@ export class RouteSelector extends TerrainComponent<Props>
   private renderBoxValue()
   {
     const { props, state } = this;
-
     return (
       <div
         className={classNames({
           'routeselector-box-values': true,
           'routeselector-box-values-open': this.isOpen(),
           'routeselector-box-values-force-open': props.forceOpen,
+          'routeselector-box-values-showing': state.showBoxValues,
         })}
         style={getStyle('borderBottom', this.isOpen() ?
           '1px solid #eee' : props.hideLine ? 'none' : undefined)}
@@ -272,15 +296,17 @@ export class RouteSelector extends TerrainComponent<Props>
                 /* could try Mousedown to make it slightly snappier,
                 but this led to weird issues with closing it */
               }
-              style={getStyle('width', String(100 / state.optionSets.size + 3) + '%')}
+              style={getStyle('minWidth', optionSet.overrideWidthPercentage ?
+                String(optionSet.overrideWidthPercentage) + '%' :
+                String(100 / state.optionSets.size) + '%')}
             >
               {
                 optionSet.isButton ?
                   <Button
                     text={this.getDisplayName(index)}
                     onClick={optionSet.onButtonClick}
-                    disabled={!props.canEdit}
                     icon={optionSet.icon}
+                    disabled={!optionSet.canUseButton}
                   />
                   :
                   <FloatingInput
@@ -311,7 +337,7 @@ export class RouteSelector extends TerrainComponent<Props>
         {
           (this.props.canDelete && this.props.canEdit && !this.state.open) &&
           <div
-            onClick={this.props.onDelete}
+            onClick={this.handleDelete}
             className='routeselector-delete close'
           >
             <RemoveIcon />
@@ -467,21 +493,18 @@ export class RouteSelector extends TerrainComponent<Props>
         </div>
       );
     }
+    const headerText = <div className='routeselector-header'>{optionSet.headerText}</div>;
     return (
       <div
         className='routeselector-option-set'
         key={optionSet.key}
-        style={getStyle('width', String(100 / state.optionSets.size + 3) + '%')}
+        style={getStyle('minWidth', optionSet.overrideWidthPercentage ?
+          String(optionSet.overrideWidthPercentage) + '%' :
+          String(100 / state.optionSets.size) + '%')}
       >
         {
-          optionSet.headerText &&
-          <div
-            className='routeselector-header'
-          >
-            {
-              optionSet.headerText
-            }
-          </div>
+          (optionSet.headerText && !optionSet.headerBelowValueComponent) &&
+          headerText
         }
 
         {
@@ -501,8 +524,8 @@ export class RouteSelector extends TerrainComponent<Props>
             <KeyboardFocus
               index={0 /* we handle index manipulation internally in this class */}
               length={0}
-              onIndexChange={noop}
-              onSelect={noop}
+              onIndexChange={_.noop}
+              onSelect={_.noop}
               onKeyDown={this.handleInputKeyDown}
               onFocus={this._fn(this.handleOptionSearchFocus, index)}
               onFocusLost={this._fn(this.handleOptionSearchFocusLost, index)}
@@ -513,7 +536,10 @@ export class RouteSelector extends TerrainComponent<Props>
         {
           getValueComponentContent
         }
-
+        {
+          (optionSet.headerText && optionSet.headerBelowValueComponent) &&
+          headerText
+        }
         <div
           className={classNames({
             'routeselector-options': true,
@@ -817,8 +843,15 @@ export class RouteSelector extends TerrainComponent<Props>
                           option.displayName
                         }
                       </div>,
-                      option.extraContent,
+                      option.tooltip,
                     )}
+                  <FadeInOut
+                    open={isSelected}
+                  >
+                    {
+                      option.component
+                    }
+                  </FadeInOut>
                 </div>
               }
               {
@@ -1037,10 +1070,10 @@ export class RouteSelector extends TerrainComponent<Props>
         index={index}
         dataIndex={dataIndex}
         primaryKey={data._id}
-        onExpand={noop}
+        onExpand={_.noop}
         allowSpotlights={false}
-        onSpotlightAdded={noop}
-        onSpotlightRemoved={noop}
+        onSpotlightAdded={_.noop}
+        onSpotlightRemoved={_.noop}
         key={index}
         isVisible={true}
         hideNested={true}
@@ -1131,6 +1164,30 @@ export class RouteSelector extends TerrainComponent<Props>
     }
   }
 
+  private handleDelete()
+  {
+    if (this.props.confirmDelete)
+    {
+      this.setState({
+        confirmDeleteModalOpen: true,
+      });
+    }
+    else
+    {
+      this.executeDelete();
+    }
+  }
+
+  private executeDelete()
+  {
+    this.setState({
+      showBoxValues: false, // animate up
+      open: false, // just to be safe
+    });
+
+    setTimeout(this.props.onDelete, 500); // coordinate with LESS
+  }
+
   private handleValueRef(valueRef)
   {
     this.setState({
@@ -1143,6 +1200,21 @@ export class RouteSelector extends TerrainComponent<Props>
     this.setState({
       columnRefs: this.state.columnRefs.set(optionSetIndex, columnRef),
     });
+  }
+
+  private renderModal()
+  {
+    return (
+      <Modal
+        open={this.state.confirmDeleteModalOpen}
+        confirm={true}
+        title={'Confirm Delete'}
+        message={`Are you sure you want to delete this ${this.props.itemName || 'item'}?`}
+        confirmButtonText={'Yes'}
+        onConfirm={this.executeDelete}
+        onClose={this._toggle('confirmDeleteModalOpen')}
+      />
+    );
   }
 
   // private attachOptionRef(setIndex, optionIndex, optionRef)
@@ -1158,12 +1230,6 @@ export class RouteSelector extends TerrainComponent<Props>
   //     columnRefs: optionRefs.setIn([setIndex, optionIndex], optionRef),
   //   });
   // }
-}
-
-// lodash noop appears buggy, causes keyboard focus errors
-function noop()
-{
-
 }
 
 const OPTION_NAME_STYLE = {
