@@ -92,7 +92,7 @@ export class ArraySumTFF extends TransformationForm<ArraySumOptions, Transformat
     return true;
   }
 
-  protected createTransformation(proxy: EngineProxy)
+  protected computeArgs()
   {
     const { engine, fieldId } = this.props;
     const { outputName } = this.state;
@@ -103,9 +103,19 @@ export class ArraySumTFF extends TransformationForm<ArraySumOptions, Transformat
     ]);
 
     const inputFields = List([engine.getInputKeyPath(fieldId)]);
-    proxy.addTransformation(this.type, inputFields, { newFieldKeyPaths });
 
-    const newlyAdded = engine.getInputFieldID(newFieldKeyPaths.get(0));
-    EngineUtil.changeFieldType(engine, newlyAdded, ETLFieldTypes.Number);
+    return {
+      options: {
+        newFieldKeyPaths,
+      },
+      fields: inputFields,
+    };
+  }
+
+  protected computeNewFieldInfo()
+  {
+    return {
+      type: ETLFieldTypes.Number,
+    };
   }
 }

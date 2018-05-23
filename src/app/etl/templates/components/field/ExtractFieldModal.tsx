@@ -136,7 +136,7 @@ class ExtractFieldModal extends TerrainComponent<Props>
     }
     else
     {
-      if (this.isIndexExtract())
+      if (this.isIndexExtract(props))
       {
         const displayIndex = extractField.index !== -1 ? extractField.index : 0;
         return {
@@ -149,7 +149,7 @@ class ExtractFieldModal extends TerrainComponent<Props>
         return {
           name: `New Array`,
           index: '',
-        }
+        };
       }
     }
   }
@@ -289,7 +289,7 @@ class ExtractFieldModal extends TerrainComponent<Props>
       extractField.fieldId,
       keypath,
       this.state.index,
-      this.isIndexExtract()
+      this.isIndexExtract(),
     );
     return validateResult;
   }

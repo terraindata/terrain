@@ -349,12 +349,15 @@ export default class EngineUtil
     fieldId: number,
     etlType: ETLFieldTypes,
     type: ETLFieldTypes,
-    valueType: ETLFieldTypes,
+    valueType?: ETLFieldTypes,
   )
   {
     engine.setFieldProp(fieldId, etlTypeKeyPath, etlType);
     engine.setFieldType(fieldId, getJSFromETL(type));
-    engine.setFieldProp(fieldId, valueTypeKeyPath, getJSFromETL(valueType));
+    if (valueType !== undefined)
+    {
+      engine.setFieldProp(fieldId, valueTypeKeyPath, getJSFromETL(valueType));
+    }
   }
 
   public static changeFieldType(

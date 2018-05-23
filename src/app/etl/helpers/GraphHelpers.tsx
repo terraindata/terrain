@@ -97,15 +97,22 @@ class GraphHelpers extends ETLHelpers
 
       this._try((templateProxy) =>
       {
-        const fieldOrderController = {
-          setOrder: (newOrdering) => templateProxy.setFieldOrdering(currentEdge, newOrdering),
-          getOrder: () => templateProxy.getFieldOrdering(currentEdge),
-        };
-        const engine = templateProxy.value().getTransformationEngine(currentEdge);
-        tryFn(new EngineProxy(engine, handleRequestRebuild, fieldOrderController));
-        if (structuralChanges)
+        try
         {
-          templateProxy.cleanFieldOrdering(currentEdge);
+          const fieldOrderController = {
+            setOrder: (newOrdering) => templateProxy.setFieldOrdering(currentEdge, newOrdering),
+            getOrder: () => templateProxy.getFieldOrdering(currentEdge),
+          };
+          const engine = templateProxy.value().getTransformationEngine(currentEdge);
+          tryFn(new EngineProxy(engine, handleRequestRebuild, fieldOrderController));
+          if (structuralChanges)
+          {
+            templateProxy.cleanFieldOrdering(currentEdge);
+          }
+        }
+        catch (e)
+        {
+          console.error(e);
         }
       }).then(() =>
       {
