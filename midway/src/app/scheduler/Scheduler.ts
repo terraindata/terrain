@@ -144,14 +144,23 @@ export class Scheduler
 
   public async getByTemplate(templateId: string): Promise<SchedulerConfig[]>
   {
-    return (await this._select([], { shouldRunNext: true })).filter((schedule) =>
+    const schedules = await this._select([], { shouldRunNext: true });
+    return schedules.filter((schedule) =>
     {
-      const tasks: any[] = JSON.parse(schedule.tasks);
-      return tasks.some((task) =>
+      try
       {
-        return task.params && task.params.options && task.params.options.templateId &&
-          task.params.options.templateId.toString() === templateId;
-      });
+        const tasks: any[] = JSON.parse(schedule.tasks);
+        return tasks.some((task) =>
+        {
+          return task.params && task.params.options && task.params.options.templateId &&
+            task.params.options.templateId.toString() === templateId;
+        });
+      }
+      catch (e)
+      {
+        winston.warn(e.toString());
+        return false;
+      }
     });
   }
 
