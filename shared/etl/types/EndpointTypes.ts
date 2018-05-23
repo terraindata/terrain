@@ -55,6 +55,7 @@ export interface FileConfig
   jsonNewlines?: boolean;
   xmlPath?: string;
   jsonPath?: string;
+  fieldOrdering?: number[];
 }
 
 export enum Sources

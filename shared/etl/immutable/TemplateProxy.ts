@@ -232,6 +232,13 @@ export class TemplateProxy
   {
     const newOrdering = this.template.uiData.engineFieldOrders.set(edgeId, order);
     this.template = this.template.setIn(['uiData', 'engineFieldOrders'], newOrdering);
+    const toNode = this.template.getNode(this.template.getEdge(edgeId).to);
+    if (toNode.type === NodeTypes.Sink)
+    {
+      let sink = this.template.getSink(toNode.endpoint);
+      sink = sink.setIn(['fileConfig', 'fieldOrdering'], order.ordering.toArray());
+      this.template = this.template.setIn(['sinks', toNode.endpoint], sink);
+    }
   }
 
   public getFieldOrdering(edgeId: number): ReorderableSet<number>
