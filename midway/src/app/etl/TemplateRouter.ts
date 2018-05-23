@@ -91,6 +91,13 @@ Router.post('/delete', passport.authenticate('access-token-local'), async (ctx, 
     'templateId',
   ];
   Util.verifyParameters(params, requiredParams);
+
+  const schedules: SchedulerConfig[] = await App.SKDR.getByTemplate(parseInt(ctx.params.templateId, 10));
+  if (schedules.length !== 0)
+  {
+    throw new Error('Template is being used in an active schedule.');
+  }
+
   await templates.delete(params.templateId);
   ctx.body = {};
 });
