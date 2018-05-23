@@ -203,24 +203,26 @@ class EditorFieldSettings extends TemplateEditorField<Props>
           {this.renderTitleBar()}
         </div>
         <div className='field-settings-section'>
-          {
-            this.currentCategory() === ViewCategory.Settings ?
-              <FieldMainSettings
-                {...this._passProps()}
-              />
-              : null
-          }
-          {
-            this.currentCategory() === ViewCategory.Transformations ?
-              <FieldSettingsTransformations
-                {...this._passProps()}
-              /> : null
-          }
-          {
-            this.currentCategory() === ViewCategory.Language ?
-              this.renderLanguageCategory()
-              : null
-          }
+          <div className='field-settings-scrollable'>
+            {
+              this.currentCategory() === ViewCategory.Settings ?
+                <FieldMainSettings
+                  {...this._passProps()}
+                />
+                : null
+            }
+            {
+              this.currentCategory() === ViewCategory.Transformations ?
+                <FieldSettingsTransformations
+                  {...this._passProps()}
+                /> : null
+            }
+            {
+              this.currentCategory() === ViewCategory.Language ?
+                this.renderLanguageCategory()
+                : null
+            }
+          </div>
         </div>
       </div>
     );

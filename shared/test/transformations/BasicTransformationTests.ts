@@ -974,17 +974,18 @@ test('split a field that does not always exist', () =>
   );
 });
 
-test('Group By Transformation', () => {
+test('Group By Transformation', () =>
+{
 
   const doc =
-  {
-    items: [
-      {status: 'active', mlsId: 1},
-      {status: 'sold', mlsId: 2},
-      {status: 'active', mlsId: 3},
-      {status: 'some garbage', mlsId: 5},
-    ],
-  };
+    {
+      items: [
+        { status: 'active', mlsId: 1 },
+        { status: 'sold', mlsId: 2 },
+        { status: 'active', mlsId: 3 },
+        { status: 'some garbage', mlsId: 5 },
+      ],
+    };
 
   const wrap = (kp: string[]) => List([List(kp)]);
 
@@ -1000,17 +1001,17 @@ test('Group By Transformation', () => {
   expect(e.transform(doc)).toEqual(
     {
       items: [
-        {status: 'active', mlsId: 1},
-        {status: 'sold', mlsId: 2},
-        {status: 'active', mlsId: 3},
-        {status: 'some garbage', mlsId: 5},
+        { status: 'active', mlsId: 1 },
+        { status: 'sold', mlsId: 2 },
+        { status: 'active', mlsId: 3 },
+        { status: 'some garbage', mlsId: 5 },
       ],
       activeItems: [
-        {status: 'active', mlsId: 1},
-        {status: 'active', mlsId: 3},
+        { status: 'active', mlsId: 1 },
+        { status: 'active', mlsId: 3 },
       ],
       soldItems: [
-        {status: 'sold', mlsId: 2},
+        { status: 'sold', mlsId: 2 },
       ],
     },
   );

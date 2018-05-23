@@ -172,7 +172,7 @@ interface TransformationOptionTypes
   };
   GroupByNode: {
     newFieldKeyPaths: List<KeyPath>;
-    subkey?: string;
+    subkey: string;
     groupValues: any[];
   };
 }

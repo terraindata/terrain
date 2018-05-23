@@ -572,7 +572,7 @@ const TransformationNodeInfo: AllNodeInfoType =
           options: object) =>
           visitor.visitDecryptNode((transformationNode as DecryptTransformationNode), docCopy, options),
       },
-      [TransformationNodeType.GroupByNode]:
+    [TransformationNodeType.GroupByNode]:
       {
         humanName: 'Group Array Values',
         editable: false,

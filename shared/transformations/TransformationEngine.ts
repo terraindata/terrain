@@ -513,8 +513,9 @@ export class TransformationEngine
    * @param {number} fieldID     The ID of the field to rename
    * @param {KeyPath} newKeyPath The new path for the field
    * @param dest                 (Optional) Which sink this field is going to.
+   * @param prefixMatch          (Optional) Whether or not to attempt to automatically rename child fields
    */
-  public setOutputKeyPath(fieldID: number, newKeyPath: KeyPath, dest?: any): void
+  public setOutputKeyPath(fieldID: number, newKeyPath: KeyPath, dest?: any, prefixMatch: boolean = true): void
   {
     const oldKeyPath: KeyPath = this.IDToFieldNameMap.get(fieldID);
 
@@ -525,14 +526,21 @@ export class TransformationEngine
       return;
     }
 
-    this.IDToFieldNameMap.forEach((field: KeyPath, id: number) =>
+    if (prefixMatch === true)
     {
-      if (keyPathPrefixMatch(field, oldKeyPath))
+      this.IDToFieldNameMap.forEach((field: KeyPath, id: number) =>
       {
-        this.IDToFieldNameMap = this.IDToFieldNameMap.set(id,
-          updateKeyPath(field, oldKeyPath, newKeyPath, this.fieldTypes.get(id) === 'array'));
-      }
-    });
+        if (keyPathPrefixMatch(field, oldKeyPath))
+        {
+          this.IDToFieldNameMap = this.IDToFieldNameMap.set(id,
+            updateKeyPath(field, oldKeyPath, newKeyPath, this.fieldTypes.get(id) === 'array'));
+        }
+      });
+    }
+    else
+    {
+      this.IDToFieldNameMap = this.IDToFieldNameMap.set(fieldID, newKeyPath);
+    }
 
     _.each(this.dag.nodes(), (node) =>
     {

@@ -151,7 +151,8 @@ export class EngineProxy
         {
           EngineUtil.rawSetFieldType(
             this.engine,
-            synthId, newFieldInfo.type,
+            synthId,
+            newFieldInfo.type,
             newFieldInfo.type,
             newFieldInfo.valueType,
           );
@@ -262,6 +263,27 @@ export class EngineProxy
     this.requestRebuild();
   }
 
+  public copyNestedTypes(idToCopy, destKP: List<string>)
+  {
+    const rootOutputKP = this.engine.getOutputKeyPath(idToCopy);
+    preorderForEach(this.engine, idToCopy, (childId) =>
+    {
+      // do not copy root
+      if (childId !== idToCopy)
+      {
+        const toTransferKeypath = this.engine.getOutputKeyPath(childId);
+        const pathAfterRoot = toTransferKeypath.slice(rootOutputKP.size);
+
+        const newFieldKP = destKP.concat(pathAfterRoot).toList();
+        const newFieldSyntheticPath = this.getSyntheticInputPath(newFieldKP);
+        EngineUtil.transferField(childId, newFieldSyntheticPath, this.engine);
+        const newChildId = this.engine.getInputFieldID(newFieldSyntheticPath);
+        this.engine.setOutputKeyPath(newChildId, newFieldKP, undefined, false);
+      }
+    });
+    this.requestRebuild();
+  }
+
   public addField(keypath: List<string>, type: ETLFieldTypes, valueType: ETLFieldTypes = ETLFieldTypes.String)
   {
     let newId: number;
@@ -313,6 +335,19 @@ export class EngineProxy
       order = order.insert(afterId, fieldId); // swap so fieldId comes first
     }
     this.orderController.setOrder(order);
+  }
+
+  public debug()
+  {
+    // this.engine.getAllFieldIDs().forEach((id) =>
+    // {
+    //   console.log('--fieldId--', id);
+    //   console.log('paths', this.engine.getInputKeyPath(id).toJS(), this.engine.getOutputKeyPath(id).toJS());
+    //   console.log('types', this.engine.getFieldType(id),
+    //     this.engine.getFieldProps(id)['valueType'],
+    //     this.engine.getFieldProps(id)['etlType']
+    //   );
+    // });
   }
 
   // if despecify is true, then strip away specific indices
