@@ -149,7 +149,8 @@ export class Scheduler
       const tasks: any[] = JSON.parse(schedule.tasks);
       return tasks.some((task) =>
       {
-        return task.params && task.params.options && task.params.options.templateId.toString() === templateId;
+        return task.params && task.params.options && task.params.options.templateId &&
+          task.params.options.templateId.toString() === templateId;
       });
     });
   }
