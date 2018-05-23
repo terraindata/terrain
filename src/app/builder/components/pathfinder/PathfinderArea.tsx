@@ -288,6 +288,9 @@ class PathfinderArea extends TerrainComponent<Props>
                 keyPath={this._ikeyPath(keyPath, 'softFilterGroup')}
                 onStepChange={this.incrementStep}
                 toSkip={toSkip}
+                onAddScript={this.handleAddScript}
+                onDeleteScript={this.handleDeleteScript}
+                onUpdateScript={this.handleUpdateScript}
               />
             }
             {
