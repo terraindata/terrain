@@ -212,7 +212,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     node.fields.forEach((field) =>
     {
       const el: any = yadeep.get(doc, field);
-      if (typeof el !== 'string')
+      if (typeof el !== 'string' && el.constructor !== Array)
       {
         return {
           errors: [
@@ -229,7 +229,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         at = opts['at'];
         if (opts['at'] < 0)
         {
-          at += el.length + 1;
+          at += (el.length as number) + 1;
         }
       }
       else if (opts['at'] === undefined)
@@ -277,8 +277,26 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         } as TransformationVisitResult;
       }
 
-      // Currently assumes a single from and length for all fieldIDs
-      yadeep.set(doc, field, el.slice(0, at) + String(value) + el.slice(at), { create: true });
+        if (el.constructor === Array)
+        {
+            for (let i: number = 0; i < Object.keys(el).length; i++)
+            {
+                let kpi: KeyPath = field;
+                if (kpi.contains('*')) {
+                    kpi = kpi.set(kpi.indexOf('*'), i.toString());
+                }
+                else {
+                    kpi = kpi.push(i.toString());
+                }
+                const eli: any = yadeep.get(doc, kpi);
+                yadeep.set(doc, kpi, (eli.slice(0, at) as string) + String(value) + (eli.slice(at) as string), {create: true});
+            }
+        }
+        else
+        {
+            // Currently assumes a single from and length for all fieldIDs
+            yadeep.set(doc, field, (el.slice(0, at) as string) + String(value) + (el.slice(at) as string), {create: true});
+        }
     });
 
     return {
