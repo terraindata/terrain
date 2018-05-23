@@ -79,6 +79,25 @@ for (let h = 0; h < 24; h++)
 
 const HOUR_OPTIONS = Immutable.List(_hours);
 
+const DateParameterMap = {
+  'Monday This Week': '@TerrainDate.thisWeek.0',
+  'Monday Next Week': '@TerrainDate.nextWeek.0',
+  'Tuesday This Week': '@TerrainDate.thisWeek.1',
+  'Tuesday Next Week': '@TerrainDate.nextWeek.1',
+  'Wednesday This Week': '@TerrainDate.thisWeek.2',
+  'Wednesday Next Week': '@TerrainDate.nextWeek.2',
+  'Thursday This Week': '@TerrainDate.thisWeek.3',
+  'Thursday Next Week': '@TerrainDate.nextWeek.3',
+  'Friday This Week': '@TerrainDate.thisWeek.4',
+  'Friday Next Week': '@TerrainDate.nextWeek.4',
+  'Saturday  This Week': '@TerrainDate.thisWeek.5',
+  'Saturday Next Week': '@TerrainDate.nextWeek.5',
+  'Sunday This Week': '@TerrainDate.thisWeek.6',
+  'Sunday Next Week': '@TerrainDate.nextWeek.6',
+};
+
+const DateParameterOptions = Immutable.List(Object.keys(DateParameterMap));
+
 export interface Props
 {
   date: string;
@@ -190,6 +209,10 @@ class DatePicker extends TerrainComponent<Props>
     this.props.onChange(Util.formatInputDate(date, this.props.language));
   }
 
+  public handleDateParameterChange(dateParameterIndex)
+  {
+  }
+
   public dateToHourIndex(date)
   {
     return date.getHours() * (60 / MINUTE_INTERVAL) + (date.getMinutes() / MINUTE_INTERVAL);
@@ -205,6 +228,12 @@ class DatePicker extends TerrainComponent<Props>
           canEdit={this.props.canEdit}
           options={HOUR_OPTIONS}
           selectedIndex={this.dateToHourIndex(this.getDate())}
+          onChange={this.handleHourChange}
+        />
+        <Dropdown
+          canEdit={this.props.canEdit}
+          options={DateParameterOptions}
+          selectedIndex={0}
           onChange={this.handleHourChange}
         />
       </div>);

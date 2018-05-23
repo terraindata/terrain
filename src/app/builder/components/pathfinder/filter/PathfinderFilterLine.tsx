@@ -677,7 +677,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       if (t === FieldType.Date)
       {
         const valueString = String(value || '');
-        const date = Util.formatInputDate(new Date(valueString), 'elastic');
+        const date = Util.formatInputDate(valueString, 'elastic');
         if (date)
         {
           value = date;

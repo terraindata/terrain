@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import moment = require('moment');
 import ESParameterSubstituter from './ESParameterSubstituter';
 import ESValueInfo from './ESValueInfo';
 
@@ -64,6 +65,83 @@ import ESValueInfo from './ESValueInfo';
  */
 export default class ESParameterFiller
 {
+  public static fillParentParameter(source: ESValueInfo,
+    params: { [name: string]: any }): string
+  {
+    return ESParameterSubstituter.generate(source,
+      (param: string, runtimeParam?: string, inTerms?: boolean): string =>
+      {
+        // param in format [parentAlias]{.[fieldL1/index]}{.fieldL2}
+        // params is in format {[parentALias]: _source}, _source is in {fieldL1:val}, val: {fieldL2:val} or [{fieldL2:val}...]
+        const ps = param.split('.');
+        if (ps[0] !== runtimeParam)
+        {
+          throw new Error(param + ' is not a runtime parent parameter.');
+        }
+        const parentAlias = ps[0];
+        let parameterValue = params[parentAlias];
+        if (params[parentAlias] === undefined)
+        {
+          throw new Error('Params does not have the parameter ' + parentAlias);
+        }
+        for (let i = 1; i < ps.length; i += 1)
+        {
+          const fieldName = ps[i];
+          if (Array.isArray(parameterValue))
+          {
+            if (Number.isInteger(Number(fieldName)) === true && Number(fieldName) > 0)
+            {
+              const newValue = parameterValue[Number(fieldName)];
+              if (newValue === undefined)
+              {
+                throw new Error('Parameter array value ' + JSON.stringify(parameterValue) + ' does not have field ' + fieldName);
+              }
+              parameterValue = newValue;
+            } else
+            {
+              // merge [{field1:val1}, {field1:val1}] to [val1, val2]
+              parameterValue = parameterValue.map((val) => val[fieldName]).filter((val) => val !== undefined);
+              // Should we add this check or not, elements of nested field might not have the same shape?
+              // if (parameterValue.length === 0)
+              // {
+              // throw new Error('None of elements in parameter value ' + JSON.stringify(parameterValue) + ' has field ' + fieldName);
+              // }
+            }
+          } else if (typeof parameterValue === 'object')
+          {
+            const newValue = parameterValue[fieldName];
+            if (newValue === undefined)
+            {
+              throw new Error('Parameter object value ' + JSON.stringify(parameterValue) + ' does not have field ' + fieldName);
+            }
+            parameterValue = newValue;
+          } else
+          {
+            throw new Error('Parameter value ' + String(parameterValue) + ' does not have field ' + fieldName);
+          }
+        }
+
+        if (Array.isArray(parameterValue))
+        {
+          if (inTerms === true)
+          {
+            return JSON.stringify(parameterValue);
+          } else
+          {
+            return JSON.stringify(parameterValue.join(' '));
+          }
+        } else
+        {
+          if (inTerms === true)
+          {
+            return JSON.stringify([parameterValue]);
+          } else
+          {
+            return JSON.stringify(parameterValue);
+          }
+        }
+      });
+  }
   public static generate(source: ESValueInfo,
     params: { [name: string]: any }): string
   {
@@ -71,36 +149,64 @@ export default class ESParameterFiller
       (param: string, runtimeParam?: string, inTerms?: boolean): string =>
       {
         const ps = param.split('.');
+
+        // @parent parameter
         if (runtimeParam !== undefined && ps[0] === runtimeParam && params[runtimeParam] === undefined)
         {
           return JSON.stringify('@' + param);
         }
 
-        let value: any = params;
-        let joinArray: boolean = false;
-        for (const p of ps)
+        // TerrainDate parameter
+        if (ps[0] === 'TerrainDate' && params[runtimeParam] === undefined)
         {
-          // If value is an array, and p is not an index, look at inner objects of array
-          if (Array.isArray(value) && isNaN(parseFloat(p)))
-          {
-            value = value.map((val) => val[p]);
-            joinArray = inTerms !== true;
-          }
-          else
-          {
-            value = value[p];
-          }
+          return this.fillTerrainDateParameter(param);
         }
-        // If not in a terms query, but the value is an array, join it into a string
-        if (Array.isArray(value) && joinArray)
+
+        const value: any = params[param];
+        if (typeof value === 'string' && value.startsWith('@TerrainDate'))
         {
-          value = value.join(' ');
+          return this.fillTerrainDateParameter(value.slice(1));
         }
+
         if (value === undefined)
         {
           throw new Error('Undefined parameter ' + param + ' in ' + JSON.stringify(params, null, 2));
         }
         return JSON.stringify(value);
       });
+  }
+  /**
+   *
+   * @param {string} dateString in format 'TerrainDate.[ThisWeek/NextWeek].[0-6].{T00:00:00+00:00}'
+   * This function replace the parameter with the current time.
+   */
+  private static fillTerrainDateParameter(dateString: string)
+  {
+    const datePart = dateString.split('.');
+
+    if (datePart.length < 3 || datePart[0] !== 'TerrainDate' || (datePart[1] !== 'ThisWeek' && datePart[1] !== 'NextWeek') ||
+      Number.isInteger(Number(datePart[2])) === false ||
+      Number(datePart[2]) < 0 || Number(datePart[2]) > 6)
+    {
+      throw new Error('The TerrainDate parameter ' + dateString + ' is not in the right format:'
+        + 'TerrainDate.{ThisWeek/NextWeek}.[0-6]{T00:00:00+00:00}.');
+    }
+    const dayOffset = Number(datePart[2]);
+    const today = moment().startOf('week');
+    if (datePart[1] === 'NextWeek')
+    {
+      today.add(1, 'w');
+    }
+    today.add(dayOffset, 'd');
+    let dateStr = today.format('YYYY-MM-DD');
+    if (datePart.length > 3)
+    {
+      dateStr = dateStr + datePart[3];
+      if (moment.parseZone(dateStr).isValid() === false)
+      {
+        throw new Error('The generated time string is not valid: ' + dateString + ' -> ' + dateStr);
+      }
+    }
+    return JSON.stringify(dateStr);
   }
 }

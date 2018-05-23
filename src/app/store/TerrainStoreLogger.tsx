@@ -78,8 +78,12 @@ export default class TerrainStoreLogger
           TerrainLog.error('Builder Event caught an exception: ', action, err);
         }
         const actionEnd = performance.now();
-        // should we log this event
         const actionLatency = actionEnd - actionStart;
+        if (actionLatency > 100)
+        {
+          // print out the long latency actions
+          TerrainLog.debug(String(action.type) + ' takes ' + String(actionLatency) + ' ms');
+        }
         if (TerrainStoreLogger.recordingActionPercentileLatency)
         {
           if (TerrainStoreLogger.actionLatencyLog[action.type] === undefined)
@@ -90,15 +94,21 @@ export default class TerrainStoreLogger
         }
         if (TerrainStoreLogger.serializeAction)
         {
-          const actionString = RecordsSerializer.stringify(action);
-          const queryJS = store.getState().get('builder').query.toJS();
-          TerrainStoreLogger.actionSerializationLog.push({ query: queryJS, action: actionString });
+          // should we log this event?
+          if (TerrainStoreLogger.shouldLoggingBuilderAction(action))
+          {
+            const actionString = RecordsSerializer.stringify(action);
+            const queryJS = store.getState().get('builder').query.toJS();
+            TerrainStoreLogger.actionSerializationLog.push({ query: queryJS, action: actionString });
+          }
         }
-        TerrainLog.debug(String(action.type) + ' takes ' + String(actionLatency) + 'ms');
         if (TerrainStoreLogger.printStateChange === true)
         {
-          const stateAfterAction = store.getState();
-          TerrainLog.debug('State Before: ', stateBeforeAction, 'State After:', stateAfterAction, 'Action:', action);
+          if (TerrainStoreLogger.shouldPrintBuilderAction(action))
+          {
+            const stateAfterAction = store.getState();
+            TerrainLog.debug('State Before: ', stateBeforeAction, 'State After:', stateAfterAction, 'Action:', action);
+          }
         }
         return result;
       }
@@ -141,6 +151,24 @@ export default class TerrainStoreLogger
     {
       // resetting failed
       TerrainLog.warn('DeSerialization Record Name is not as same as serialization Record name: (DeSer)');
+      return false;
+    }
+    return true;
+  }
+
+  public static shouldLoggingBuilderAction(action)
+  {
+    if (action.type.startsWith('builderCards.hoverCard') || action.type.startsWith('colors.setStyle'))
+    {
+      return false;
+    }
+    return true;
+  }
+
+  public static shouldPrintBuilderAction(action)
+  {
+    if (action.type.startsWith('builderCards.hoverCard') || action.type.startsWith('colors.setStyle'))
+    {
       return false;
     }
     return true;

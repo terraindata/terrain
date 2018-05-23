@@ -301,6 +301,10 @@ const Util = {
     let m;
     if (typeof date === 'string')
     {
+      if (date.startsWith('@'))
+      {
+        return date;
+      }
       // keep the timezone offset
       m = moment.parseZone(date);
     } else
