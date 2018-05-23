@@ -156,7 +156,8 @@ class ItemComponent extends TerrainComponent<ItemProps>
 
   public render()
   {
-    const { children, isDragging, isOver, hoverHeader, neighborIsBeingDragged, canDrag } = this.props;
+    const { children, isDragging, isOver, hoverHeader, neighborIsBeingDragged,
+      canDrag, canDrop } = this.props;
     const el = (
       <div
         style={_.extend({},
@@ -184,8 +185,12 @@ class ItemComponent extends TerrainComponent<ItemProps>
               {hoverHeader}
             </div>
           }
-          {children}
-          {this.props.canDrop && this.renderItemDropZone()}
+          {
+            children
+          }
+          {
+            canDrop && neighborIsBeingDragged && this.renderItemDropZone()
+          }
         </div>
       </div>
     );

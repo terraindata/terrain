@@ -300,10 +300,15 @@ export class EngineProxy
   }
 
   // Reorder fieldId so that it appears after afterId
-  public orderField(fieldId: number, afterId?: number)
+  public orderField(fieldId: number, afterId?: number, insertBefore = false)
   {
-    const order = this.orderController.getOrder();
-    this.orderController.setOrder(order.insert(fieldId, afterId));
+    let order = this.orderController.getOrder();
+    order = order.insert(fieldId, afterId); // insert field after
+    if (insertBefore)
+    {
+      order = order.insert(afterId, fieldId); // swap so fieldId comes first
+    }
+    this.orderController.setOrder(order);
   }
 
   // this is not deterministic

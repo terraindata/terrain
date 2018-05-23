@@ -339,10 +339,10 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     const droppedFieldId = dropIndex.get(0);
     GraphHelpers.mutateEngine((proxy) =>
     {
-      proxy.orderField(draggedFieldId, droppedFieldId);
+      proxy.orderField(draggedFieldId, droppedFieldId, true);
     })
-    .then(doNothing)
-    .catch(this._showError('Could not reorder these fields.'));
+      .then(doNothing)
+      .catch(this._showError('Could not reorder these fields.'));
   }
 }
 
