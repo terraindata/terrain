@@ -237,7 +237,8 @@ export class TemplateProxy
     {
       let sink = this.template.getSink(toNode.endpoint);
       sink = sink.setIn(['fileConfig', 'fieldOrdering'], order.ordering.toArray());
-      this.template = this.template.setIn(['sinks', toNode.endpoint], sink);
+      this.setSink(toNode.endpoint, sink);
+      console.log(this.template.toJS());
     }
   }
 
