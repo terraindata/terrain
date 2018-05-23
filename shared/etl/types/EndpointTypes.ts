@@ -160,7 +160,7 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
       credentialId: -1,
     },
     GoogleAnalytics: {
-      dayInterval: -1,
+      dayInterval: 30,
     },
     Http: {
       method: 'GET',
