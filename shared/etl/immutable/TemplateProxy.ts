@@ -202,7 +202,11 @@ export class TemplateProxy
     if (fromNode.type === NodeTypes.Source)
     {
       const source = this.template.getSource(fromNode.endpoint);
-      if (source.fileConfig.fileType === FileTypes.Csv || source.fileConfig.fileType === FileTypes.Tsv)
+      if (
+        source.fileConfig.fileType === FileTypes.Csv
+        || source.fileConfig.fileType === FileTypes.Tsv
+        || source.fileConfig.fileType === FileTypes.Xml
+      )
       {
         castStringsToPrimitives = true;
       }

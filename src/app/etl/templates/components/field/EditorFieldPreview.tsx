@@ -89,51 +89,6 @@ class EditorFieldPreview extends TemplateEditorField<Props>
       menuOpen: false,
     };
 
-  // @instanceFnDecorator(memoizeOne)
-  // public _getMenuOptions(
-  //   canEdit: boolean,
-  //   canMove: boolean,
-  //   isNested: boolean,
-  //   isNamed: boolean,
-  //   canTransform: boolean,
-  // )
-  // {
-  //   const options = [];
-  //   if (canEdit || canTransform)
-  //   {
-  //     options.push({
-  //       text: `${canEdit ? 'Edit' : 'Transform'} this Field`,
-  //       onClick: this.openSettings,
-  //     });
-  //   }
-  //   if (isNested)
-  //   {
-  //     options.push({
-  //       text: 'Add a subfield',
-  //       onClick: this.requestAddField,
-  //     });
-  //   }
-  //   if (canMove)
-  //   {
-  //     options.push({
-  //       text: 'Move this Field',
-  //       onClick: this.requestMoveField,
-  //     });
-  //     options.push({
-  //       text: 'Delete this Field',
-  //       onClick: this.requestDeleteField,
-  //     });
-  //   }
-  //   if (!isNamed)
-  //   {
-  //     options.push({
-  //       text: 'Extract this array element',
-  //       onClick: this.requestExtractIndex,
-  //     });
-  //   }
-  //   return List(options);
-  // }
-
   @instanceFnDecorator(memoizeOne)
   public menuOptions(field: TemplateField)
   {
@@ -180,18 +135,6 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     }
     return List(options);
   }
-
-  // public getMenuOptions()
-  // {
-  //   const field = this._field();
-  //   return this._getMenuOptions(
-  //     field.canEditField(),
-  //     field.canMoveField(),
-  //     field.isNested(),
-  //     field.isNamedField(),
-  //     field.canTransformField(),
-  //   );
-  // }
 
   public isPrimaryKey()
   {

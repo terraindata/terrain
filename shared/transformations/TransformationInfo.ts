@@ -572,6 +572,28 @@ const TransformationNodeInfo: AllNodeInfoType =
           options: object) =>
           visitor.visitDecryptNode((transformationNode as DecryptTransformationNode), docCopy, options),
       },
+      [TransformationNodeType.GroupByNode]:
+      {
+        humanName: 'Group Array Values',
+        editable: false,
+        creatable: true,
+        description: `Group an array of objects by a value`,
+        type: ArrayCountTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+            EngineUtil.getValueType(fieldId, engine) === 'object' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitGroupByNode(transformationNode, docCopy, options),
+        newFieldType: 'array',
+      },
   };
 
 export type TNodeObject = Pick<TransformationNode, 'fields' | 'meta'>;

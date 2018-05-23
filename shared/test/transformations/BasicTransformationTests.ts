@@ -973,3 +973,45 @@ test('split a field that does not always exist', () =>
     },
   );
 });
+
+test('Group By Transformation', () => {
+
+  const doc =
+  {
+    items: [
+      {status: 'active', mlsId: 1},
+      {status: 'sold', mlsId: 2},
+      {status: 'active', mlsId: 3},
+      {status: 'some garbage', mlsId: 5},
+    ],
+  };
+
+  const wrap = (kp: string[]) => List([List(kp)]);
+
+  const e = new TransformationEngine(doc);
+  e.appendTransformation(TransformationNodeType.GroupByNode, wrap(['items']), {
+    newFieldKeyPaths: List([
+      List(['activeItems']),
+      List(['soldItems']),
+    ]),
+    subkey: 'status',
+    groupValues: ['active', 'sold'],
+  });
+  expect(e.transform(doc)).toEqual(
+    {
+      items: [
+        {status: 'active', mlsId: 1},
+        {status: 'sold', mlsId: 2},
+        {status: 'active', mlsId: 3},
+        {status: 'some garbage', mlsId: 5},
+      ],
+      activeItems: [
+        {status: 'active', mlsId: 1},
+        {status: 'active', mlsId: 3},
+      ],
+      soldItems: [
+        {status: 'sold', mlsId: 2},
+      ],
+    },
+  );
+});
