@@ -74,10 +74,6 @@ export default class ESParameterFiller
         // param in format [parentAlias]{.[fieldL1/index]}{.fieldL2}
         // params is in format {[parentALias]: _source}, _source is in {fieldL1:val}, val: {fieldL2:val} or [{fieldL2:val}...]
         const ps = param.split('.');
-        if (ps[0] !== runtimeParam)
-        {
-          throw new Error(param + ' is not a runtime parent parameter.');
-        }
         const parentAlias = ps[0];
         let parameterValue = params[parentAlias];
         if (params[parentAlias] === undefined)
