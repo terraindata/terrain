@@ -575,7 +575,6 @@ export default class Templates
             }
             const elasticDB: ElasticDB = controller.getTasty().getDB() as ElasticDB;
             const indices = tempIndices.map((i) => i['index']);
-            await elasticDB.refreshIndex(indices);
 
             logStream.info('Finished refreshing temporary indices; now ready for searching / sorting ...');
 

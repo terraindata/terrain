@@ -129,10 +129,7 @@ export class ElasticWriter extends Stream.Writable
   public _final(callback)
   {
     this.doneWriting = true;
-    if (callback !== undefined)
-    {
-      callback();
-    }
+    this.client.indices.refresh({ index: this.index }, callback);
   }
 
   private upsert(body: object, callback: (err?: Error) => void): void
