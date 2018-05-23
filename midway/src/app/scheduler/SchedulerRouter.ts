@@ -71,7 +71,7 @@ Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, nex
 Router.get('/byTemplate/:templateId', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.SchedulerPermissions.verifyGetByTemplateRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.SKDR.getByTemplate(ctx.params.templateId);
+  ctx.body = await App.SKDR.getByTemplate(parseInt(ctx.params.templateId, 10));
 });
 
 Router.post('/cancel/:id', passport.authenticate('access-token-local'), async (ctx, next) =>

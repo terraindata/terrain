@@ -142,7 +142,7 @@ export class Scheduler
     return this._select([], { id, running });
   }
 
-  public async getByTemplate(templateId: string): Promise<SchedulerConfig[]>
+  public async getByTemplate(templateId: number): Promise<SchedulerConfig[]>
   {
     const schedules = await this._select([], { shouldRunNext: true });
     return schedules.filter((schedule) =>
@@ -152,8 +152,7 @@ export class Scheduler
         const tasks: any[] = JSON.parse(schedule.tasks);
         return tasks.some((task) =>
         {
-          return task.params && task.params.options && task.params.options.templateId &&
-            task.params.options.templateId.toString() === templateId;
+          return task.params && task.params.options && task.params.options.templateId === templateId;
         });
       }
       catch (e)
