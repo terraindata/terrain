@@ -146,7 +146,7 @@ class ExpandableView extends TerrainComponent<Props>
     }
 
     return (
-       <div
+      <div
         className='nested-view-checkbox-column'
         key='drag-handle'
         style={{
@@ -196,6 +196,7 @@ class ExpandableView extends TerrainComponent<Props>
           canDrag={this.props.canDrag}
           canDrop={this.props.canDrag}
           onDrop={this.props.onDrop}
+          dropZoneStyle={DROP_ZONE_STYLE}
         >
           <div className={classNames({
             'nested-view-container': true,
@@ -271,6 +272,11 @@ const arrowStyle = {
   height: arrowSize,
   padding: `${arrowSpacing}px ${arrowSpacing}px ${arrowSpacing}px 0px`,
   margin: `-2px 0px`,
+};
+
+const DROP_ZONE_STYLE = {
+  height: '100%',
+  top: '0px',
 };
 
 export const leftColumnWidth = arrowSize + arrowSpacing + arrowColumnMargin + 3;
