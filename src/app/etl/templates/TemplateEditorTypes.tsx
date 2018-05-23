@@ -171,6 +171,7 @@ class EditorDisplayStateC
   public extractField: {
     fieldId: number,
     index: number,
+    isIndexExtract: boolean,
   } = null;
 }
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;

@@ -174,10 +174,9 @@ export class EngineProxy
   /*
    *  This is a rather complicated operation
    *  If the given keypath is [foo, *], then we need to create the specific field [foo, index]
-   *  If extracted field is still an array type, then we also need to create the wildcard for that field
    *  After creating the extracted field, we need to perform the duplication operation on the extracted field
    */
-  public extractArrayField(sourceId: number, index: number, destKP: List<string>)
+  public extractIndexedArrayField(sourceId: number, index: number, destKP: List<string>)
   {
     const sourceKP = this.engine.getOutputKeyPath(sourceId);
     if (sourceKP.size === 0)
@@ -203,12 +202,30 @@ export class EngineProxy
     {
       specifiedSourceId = this.addField(specifiedSourceKP, specifiedSourceType);
     }
-
-    this.requestRebuild();
     this.copyField(specifiedSourceId, destKP, true);
+    this.requestRebuild();
   }
 
-  public copyField(sourceId: number, destKP: List<string>, despecify = false): number
+  public extractSimpleArrayField(sourceId, destKP: List<string>)
+  {
+    const optionsNew: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
+      newFieldKeyPaths: List([destKP]),
+    };
+    this.addTransformation(
+      TransformationNodeType.DuplicateNode,
+      List([this.engine.getInputKeyPath(sourceId)]),
+      optionsNew,
+    );
+    const newFieldId = this.engine.getOutputFieldID(destKP);
+
+    const newFieldType = EngineUtil.getETLFieldType(sourceId, this.engine);
+    this.addFieldToEngine(destKP.push('*'), ETLFieldTypes.Array, newFieldType, true);
+    EngineUtil.rawSetFieldType(this.engine, newFieldId, ETLFieldTypes.Array, ETLFieldTypes.Array, newFieldType);
+    this.requestRebuild();
+  }
+
+  // if despecify is true, then strip away specific indices
+  private copyField(sourceId: number, destKP: List<string>, despecify = false): number
   {
     const optionsNew: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
       newFieldKeyPaths: List([destKP]),
@@ -264,7 +281,7 @@ export class EngineProxy
     if (type === ETLFieldTypes.Array)
     {
       newId = this.addFieldToEngine(keypath, type, valueType);
-      const wildId = this.addFieldToEngine(keypath.push('*'), ETLFieldTypes.Array, valueType);
+      const wildId = this.addFieldToEngine(keypath.push('*'), ETLFieldTypes.Array, valueType, true);
       EngineUtil.castField(this.engine, wildId, valueType);
     }
     else
@@ -326,9 +343,10 @@ export class EngineProxy
     keypath: List<string>,
     etlType: ETLFieldTypes,
     valueType?: ETLFieldTypes,
+    useValueType?: boolean,
   ): number
   {
-    return EngineUtil.addFieldToEngine(this.engine, keypath, etlType, valueType);
+    return EngineUtil.addFieldToEngine(this.engine, keypath, etlType, valueType, useValueType);
   }
 }
 

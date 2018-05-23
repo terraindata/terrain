@@ -89,25 +89,71 @@ class EditorFieldPreview extends TemplateEditorField<Props>
       menuOpen: false,
     };
 
+  // @instanceFnDecorator(memoizeOne)
+  // public _getMenuOptions(
+  //   canEdit: boolean,
+  //   canMove: boolean,
+  //   isNested: boolean,
+  //   isNamed: boolean,
+  //   canTransform: boolean,
+  // )
+  // {
+  //   const options = [];
+  //   if (canEdit || canTransform)
+  //   {
+  //     options.push({
+  //       text: `${canEdit ? 'Edit' : 'Transform'} this Field`,
+  //       onClick: this.openSettings,
+  //     });
+  //   }
+  //   if (isNested)
+  //   {
+  //     options.push({
+  //       text: 'Add a subfield',
+  //       onClick: this.requestAddField,
+  //     });
+  //   }
+  //   if (canMove)
+  //   {
+  //     options.push({
+  //       text: 'Move this Field',
+  //       onClick: this.requestMoveField,
+  //     });
+  //     options.push({
+  //       text: 'Delete this Field',
+  //       onClick: this.requestDeleteField,
+  //     });
+  //   }
+  //   if (!isNamed)
+  //   {
+  //     options.push({
+  //       text: 'Extract this array element',
+  //       onClick: this.requestExtractIndex,
+  //     });
+  //   }
+  //   return List(options);
+  // }
+
   @instanceFnDecorator(memoizeOne)
-  public _getMenuOptions(canEdit, canMove, isNested, isNamed, canTransform)
+  public menuOptions(field: TemplateField)
   {
     const options = [];
-    if (canEdit || canTransform)
+
+    if (field.canEditField() || field.canTransformField())
     {
       options.push({
-        text: `${canEdit ? 'Edit' : 'Transform'} this Field`,
+        text: `${field.canEditField() ? 'Edit' : 'Transform'} this Field`,
         onClick: this.openSettings,
       });
     }
-    if (isNested)
+    if (field.isNested())
     {
       options.push({
         text: 'Add a subfield',
         onClick: this.requestAddField,
       });
     }
-    if (canMove)
+    if (field.canMoveField())
     {
       options.push({
         text: 'Move this Field',
@@ -118,27 +164,34 @@ class EditorFieldPreview extends TemplateEditorField<Props>
         onClick: this.requestDeleteField,
       });
     }
-    if (!isNamed)
+    if (!field.isNamedField())
     {
       options.push({
         text: 'Extract this array element',
-        onClick: this.requestExtractElement,
+        onClick: this.requestExtractIndex,
+      });
+    }
+    if (field.isPrimitive() && !field.isLocalToRoot())
+    {
+      options.push({
+        text: 'Make array of these values',
+        onClick: this.requestExtractSimple,
       });
     }
     return List(options);
   }
 
-  public getMenuOptions()
-  {
-    const field = this._field();
-    return this._getMenuOptions(
-      field.canEditField(),
-      field.canMoveField(),
-      field.isNested(),
-      field.isNamedField(),
-      field.canTransformField(),
-    );
-  }
+  // public getMenuOptions()
+  // {
+  //   const field = this._field();
+  //   return this._getMenuOptions(
+  //     field.canEditField(),
+  //     field.canMoveField(),
+  //     field.isNested(),
+  //     field.isNamedField(),
+  //     field.canTransformField(),
+  //   );
+  // }
 
   public isPrimaryKey()
   {
@@ -173,7 +226,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     {
       previewText = previewText.slice(0, MAX_STRING_LENGTH) + '...';
     }
-    const menuOptions = this.getMenuOptions();
+    const menuOptions = this.menuOptions(this._field());
     const showMenu = menuOptions.size > 0 && (this.state.hovered || this.state.menuOpen);
     const hidePreviewValue = field.isArray() || field.isNested() || labelOnly;
 
@@ -314,7 +367,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     });
   }
 
-  public requestExtractElement()
+  public requestExtractIndex()
   {
     this.props.act({
       actionType: 'setDisplayState',
@@ -322,6 +375,21 @@ class EditorFieldPreview extends TemplateEditorField<Props>
         extractField: {
           fieldId: this.props.fieldId,
           index: this._getArrayIndex(),
+          isIndexExtract: true,
+        },
+      },
+    });
+  }
+
+  public requestExtractSimple()
+  {
+    this.props.act({
+      actionType: 'setDisplayState',
+      state: {
+        extractField: {
+          fieldId: this.props.fieldId,
+          index: null,
+          isIndexExtract: false,
         },
       },
     });

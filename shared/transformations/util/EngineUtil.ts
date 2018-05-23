@@ -162,7 +162,7 @@ export default class EngineUtil
     const jsType = EngineUtil.getRepresentedType(id, engine);
     if (ETLToJSType[etlType].indexOf(jsType) === -1)
     {
-      return [`Field JS Type and ETL Type are Incompatible. ${fieldType} is incompatible with ${etlType}`];
+      return [`Field JS Type and ETL Type are Incompatible. ${jsType} is incompatible with ${etlType}`];
     }
     return [];
   }
@@ -328,18 +328,33 @@ export default class EngineUtil
   public static addFieldToEngine(
     engine: TransformationEngine,
     keypath: List<string>,
-    etlType: ETLFieldTypes,
+    type: ETLFieldTypes,
     valueType?: ETLFieldTypes,
+    useValueType?: boolean,
   ): number
   {
     const cfg = {
-      etlType,
+      etlType: useValueType ? valueType : type,
     };
     if (valueType !== undefined)
     {
       cfg['valueType'] = getJSFromETL(valueType);
     }
-    return engine.addField(keypath, getJSFromETL(etlType), cfg);
+    return engine.addField(keypath, getJSFromETL(type), cfg);
+  }
+
+  // set the field type with no validation
+  public static rawSetFieldType(
+    engine: TransformationEngine,
+    fieldId: number,
+    etlType: ETLFieldTypes,
+    type: ETLFieldTypes,
+    valueType: ETLFieldTypes,
+  )
+  {
+    engine.setFieldProp(fieldId, etlTypeKeyPath, etlType);
+    engine.setFieldType(fieldId, getJSFromETL(type));
+    engine.setFieldProp(fieldId, valueTypeKeyPath, getJSFromETL(valueType));
   }
 
   public static changeFieldType(
@@ -356,6 +371,7 @@ export default class EngineUtil
     {
       engine.setFieldType(fieldId, getJSFromETL(newType));
     }
+
     engine.setFieldProp(fieldId, etlTypeKeyPath, newType);
   }
 
@@ -402,11 +418,9 @@ export default class EngineUtil
     });
     const outputKeyPathBase = List([outputKey, '*']);
     const valueTypePath = List(['valueType']);
-    const outputFieldId = EngineUtil.addFieldToEngine(newEngine, List([outputKey]), ETLFieldTypes.Array);
-    const outputFieldWildcardId = EngineUtil.addFieldToEngine(newEngine, outputKeyPathBase, ETLFieldTypes.Array);
+    const outputFieldId = EngineUtil.addFieldToEngine(newEngine, List([outputKey]), ETLFieldTypes.Array, ETLFieldTypes.Object);
+    const outputFieldWildcardId = EngineUtil.addFieldToEngine(newEngine, outputKeyPathBase, ETLFieldTypes.Object);
 
-    newEngine.setFieldProp(outputFieldId, valueTypePath, 'object');
-    newEngine.setFieldProp(outputFieldWildcardId, valueTypePath, 'object');
     rightEngine.getAllFieldIDs().forEach((id) =>
     {
       const newKeyPath = outputKeyPathBase.concat(rightEngine.getOutputKeyPath(id)).toList();
