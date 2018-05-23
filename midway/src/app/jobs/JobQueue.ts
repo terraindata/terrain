@@ -325,10 +325,13 @@ export class JobQueue
       const jobResult: TaskOutputConfig = await this.runningRunNowJobs.get(getJobs[0].id).run() as TaskOutputConfig;
       const jobsFromId: JobConfig[] = await this.get(getJobs[0].id);
       this.runningRunNowJobs.delete(getJobs[0].id);
-
       // log job result
-      const jobLogConfig: JobLogConfig[] = await App.JobL.create(getJobs[0].id, jobResult['options']['logStream']);
+      const jobLogConfig: JobLogConfig[] = await App.JobL.create(getJobs[0].id, jobResult['options']['logStream'], jobResult.status);
       await this._setJobLogId(getJobs[0].id, jobLogConfig[0].id);
+      if (jobResult.options.outputStream === null)
+      {
+        reject(new Error('Error while running job'));
+      }
       resolve(jobResult.options.outputStream as stream.Readable);
     });
   }
@@ -467,9 +470,9 @@ export class JobQueue
         await this.setJobStatus(jobsFromId[0].id, false, jobStatus);
         await App.SKDR.setRunning(jobsFromId[0].scheduleId, false);
         this.runningJobs.delete(jobId);
-        winston.info('Job result: ' + JSON.stringify(jobResult, null, 2));
+        winston.info(`Job result: ${jobResult.status}`);
 
-        const jobLogConfig: JobLogConfig[] = await App.JobL.create(jobId, jobResult['options']['logStream']);
+        const jobLogConfig: JobLogConfig[] = await App.JobL.create(jobId, jobResult['options']['logStream'], jobResult.status);
         await this._setJobLogId(jobId, jobLogConfig[0].id);
       });
 

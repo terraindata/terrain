@@ -98,14 +98,18 @@ export class Integrations
       const deletedIntegrations: IntegrationConfig[] = await this.get(user, id);
       if (deletedIntegrations.length === 0)
       {
-        return reject('Integration does not exist.');
+        return reject(new Error('Integration does not exist.'));
       }
       await App.DB.delete(this.integrationTable, { id });
+      deletedIntegrations.forEach((dI, i) =>
+      {
+        deletedIntegrations[i].authConfig = null;
+      });
       return resolve(deletedIntegrations);
     });
   }
 
-  public async get(user: UserConfig, id?: number, type?: string): Promise<IntegrationConfig[]>
+  public async get(user: UserConfig, id?: number, type?: string, dontSanitize?: boolean): Promise<IntegrationConfig[]>
   {
     return new Promise<IntegrationConfig[]>(async (resolve, reject) =>
     {
@@ -116,6 +120,12 @@ export class Integrations
         if (integration.authConfig !== '')
         {
           integration.authConfig = JSON.parse(await this._decrypt(integration.authConfig));
+          // TODO refactor this for full email support
+          if (integration.type === 'Email' && integration.name === 'Default Failure Email'
+            && dontSanitize !== true)
+          {
+            integration.authConfig['password'] = null;
+          }
         }
 
         if (integration.connectionConfig !== '')
@@ -132,6 +142,50 @@ export class Integrations
   {
     const rawIntegrations = await App.DB.select(this.integrationTable, [], { type });
     return rawIntegrations.map((result: object) => new IntegrationSimpleConfig(result));
+  }
+
+  public async initializeDefaultIntegrations(): Promise<void>
+  {
+    const userConfigs: UserConfig[] = await users.get() as UserConfig[];
+    if (userConfigs.length !== 0)
+    {
+      const integration: object =
+        {
+          authConfig:
+            {
+              password: 'S:p3_a:%D~M>mEvRxM$r;y{g"X{5,nA!',
+            },
+          connectionConfig:
+            {
+              customerName: '',
+              email: 'notifications@terraindata.com',
+              port: 465,
+              recipient: 'alerts@terraindata.com',
+              smtp: 'smtp.gmail.com',
+            },
+          createdBy: userConfigs[0].id,
+          meta: '',
+          name: 'Default Failure Email',
+          readPermission: IntegrationPermission.Admin,
+          type: 'Email',
+          lastModified: new Date(),
+          writePermission: IntegrationPermission.Admin,
+        };
+      const integrations: IntegrationSimpleConfig[] = await this.getSimple(null, 'Email');
+      if (integrations.length !== 0)
+      {
+        integrations.forEach((elem) =>
+        {
+          if (elem['name'] === 'Default Failure Email')
+          {
+            integration['id'] = elem['id'];
+          }
+        });
+      }
+      integration['authConfig'] = await this._encrypt(JSON.stringify(integration['authConfig'] as string)) as string;
+      integration['connectionConfig'] = JSON.stringify(integration['connectionConfig']);
+      await App.DB.upsert(this.integrationTable, integration);
+    }
   }
 
   public async upsert(user: UserConfig, integration: IntegrationConfig): Promise<IntegrationConfig>
@@ -151,13 +205,24 @@ export class Integrations
         if (integrations.length === 0)
         {
           // integration id specified but integration not found
-          return reject('Invalid integration id passed');
+          return reject(new Error('Invalid integration id passed'));
+        }
+
+        // special case for Default Failure Email:
+        // do not change the password if the integration already exists
+        if (integration.type === 'Email' && integration.name === 'Default Failure Email')
+        {
+          const emailIntegrations: IntegrationConfig[] = await this.get(null, undefined, 'Email', true);
+          if (emailIntegrations.length !== 0)
+          {
+            integration.authConfig = emailIntegrations[0].authConfig;
+          }
         }
 
         const id = integrations[0].id;
         if (id === undefined)
         {
-          return reject('Integration does not have an id');
+          return reject(new Error('Integration does not have an id'));
         }
 
         // insert a version to save the past state of this integration

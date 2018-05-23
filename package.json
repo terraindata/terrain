@@ -166,6 +166,7 @@
     "mysql": "^2.15.0",
     "node-libs-browser": "^2.1.0",
     "node-schedule": "^1.2.5",
+    "nodemailer": "^4.6.4",
     "object-assign": "^4.1.1",
     "papaparse": "^4.4.0",
     "passport-local": "^1.0.0",

@@ -86,7 +86,6 @@ Router.post('/:id?', passport.authenticate('access-token-local'), async (ctx, ne
   {
     integration.id = ctx.params.id;
   }
-
   ctx.body = await integrations.upsert(ctx.state.user, integration);
 });
 
