@@ -85,7 +85,7 @@ interface Props
 interface FormState
 {
   name: string;
-  index: string | number;
+  index?: string | number;
 }
 
 class ExtractFieldModal extends TerrainComponent<Props>
@@ -101,7 +101,9 @@ class ExtractFieldModal extends TerrainComponent<Props>
     index: {
       type: DisplayType.TextBox,
       displayName: 'Array Index',
+      widthFactor: 2,
       group: 'row 1',
+      getDisplayState: (s) => this.isIndexExtract() ? DisplayState.Active : DisplayState.Hidden,
     },
   };
 
@@ -109,6 +111,16 @@ class ExtractFieldModal extends TerrainComponent<Props>
   {
     super(props);
     this.state = this.computeStateFromProps(props);
+  }
+
+  public isIndexExtract(props = this.props): boolean
+  {
+    const { extractField } = props.templateEditor.uiState;
+    if (extractField !== null)
+    {
+      return extractField.isIndexExtract;
+    }
+    return false;
   }
 
   public computeStateFromProps(props): FormState
@@ -124,11 +136,21 @@ class ExtractFieldModal extends TerrainComponent<Props>
     }
     else
     {
-      const displayIndex = extractField.index !== -1 ? extractField.index : 0;
-      return {
-        name: `Item ${displayIndex}`,
-        index: String(displayIndex),
-      };
+      if (this.isIndexExtract(props))
+      {
+        const displayIndex = extractField.index !== -1 ? extractField.index : 0;
+        return {
+          name: `Item ${displayIndex}`,
+          index: String(displayIndex),
+        };
+      }
+      else
+      {
+        return {
+          name: `New Array`,
+          index: '',
+        };
+      }
     }
   }
 
@@ -165,11 +187,11 @@ class ExtractFieldModal extends TerrainComponent<Props>
   {
     const { extractField } = this.props.templateEditor.uiState;
     const { isValid, message } = this.validateState();
-
+    const modalTitle = this.isIndexExtract() ? 'Extract Array Element' : 'Create Simple Array';
     return (
       <Modal
         open={extractField !== null}
-        title='Extract Array Element'
+        title={modalTitle}
         confirm={true}
         confirmDisabled={!isValid}
         closeOnConfirm={true}
@@ -183,9 +205,9 @@ class ExtractFieldModal extends TerrainComponent<Props>
   }
 
   @instanceFnDecorator(memoizeOne)
-  public _computeKeyPath(fieldId: number, name: string): EnginePath
+  public _computeKeyPath(fieldId: number, name: string, isIndexExtract: boolean): EnginePath
   {
-    if (fieldId === -1)
+    if (fieldId === -1 || !isIndexExtract)
     {
       return List([name]);
     }
@@ -217,7 +239,11 @@ class ExtractFieldModal extends TerrainComponent<Props>
   public computeKeyPath(): EnginePath
   {
     const { extractField } = this.props.templateEditor.uiState;
-    return this._computeKeyPath(extractField !== null ? extractField.fieldId : -1, this.state.name);
+    return this._computeKeyPath(
+      extractField !== null ? extractField.fieldId : -1,
+      this.state.name,
+      this.isIndexExtract(),
+    );
   }
 
   @instanceFnDecorator(memoizeOne)
@@ -227,15 +253,19 @@ class ExtractFieldModal extends TerrainComponent<Props>
     fieldId: number,
     keypath: EnginePath,
     index: string | number,
+    isIndexExtract: boolean,
   ): { isValid: boolean, message: string }
   {
-    const asNum = Number(index);
-    if (!Number.isInteger(asNum) || asNum < 0)
+    if (isIndexExtract)
     {
-      return {
-        isValid: false,
-        message: 'Index is Invalid',
-      };
+      const asNum = Number(index);
+      if (!Number.isInteger(asNum) || asNum < 0)
+      {
+        return {
+          isValid: false,
+          message: 'Index is Invalid',
+        };
+      }
     }
     return validateNewFieldName(engine, -1, keypath);
   }
@@ -253,7 +283,15 @@ class ExtractFieldModal extends TerrainComponent<Props>
     }
     const engine = templateEditor.getCurrentEngine();
     const keypath = this.computeKeyPath();
-    return this._validateState(engine, engineVersion, extractField.fieldId, keypath, this.state.index);
+    const validateResult = this._validateState(
+      engine,
+      engineVersion,
+      extractField.fieldId,
+      keypath,
+      this.state.index,
+      this.isIndexExtract(),
+    );
+    return validateResult;
   }
 
   public handleFormChange(state)
@@ -275,15 +313,23 @@ class ExtractFieldModal extends TerrainComponent<Props>
   {
     const newKeypath = this.computeKeyPath();
     const { extractField } = this.props.templateEditor.uiState;
-    if (extractField === null)
+    if (extractField === null || extractField.fieldId == null)
     {
       return;
     }
+    const isIndexExtract = this.isIndexExtract();
+
     GraphHelpers.mutateEngine((proxy) =>
     {
-      let extractedKeypath = proxy.getEngine().getInputKeyPath(extractField.fieldId);
-      extractedKeypath = extractedKeypath.set(extractedKeypath.size - 1, String(this.state.index));
-      proxy.extractArrayField(extractField.fieldId, Number(this.state.index), newKeypath);
+      if (isIndexExtract)
+      {
+        proxy.extractIndexedArrayField(extractField.fieldId, Number(this.state.index), newKeypath);
+      }
+      else
+      {
+        proxy.extractSimpleArrayField(extractField.fieldId, newKeypath);
+      }
+
     }).then((isStructural) =>
     {
       this.props.editorAct({

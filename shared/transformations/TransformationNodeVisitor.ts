@@ -51,6 +51,7 @@ import DifferenceTransformationNode from 'shared/transformations/nodes/Differenc
 import DivideTransformationNode from 'shared/transformations/nodes/DivideTransformationNode';
 import EncryptTransformationNode from 'shared/transformations/nodes/EncryptTransformationNode';
 import FindReplaceTransformationNode from 'shared/transformations/nodes/FindReplaceTransformationNode';
+import GroupByTransformationNode from 'shared/transformations/nodes/GroupByTransformationNode';
 import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
 import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
 import ProductTransformationNode from 'shared/transformations/nodes/ProductTransformationNode';
@@ -185,6 +186,11 @@ export default abstract class TransformationNodeVisitor
   }
 
   public visitDecryptNode(node: DecryptTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitGroupByNode(node: GroupByTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }
