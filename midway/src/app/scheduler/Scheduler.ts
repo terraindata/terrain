@@ -142,6 +142,18 @@ export class Scheduler
     return this._select([], { id, running });
   }
 
+  public async getByTemplate(templateId: string): Promise<SchedulerConfig[]>
+  {
+    return (await this._select([], { shouldRunNext: true })).filter((schedule) =>
+    {
+      const tasks: any[] = JSON.parse(schedule.tasks);
+      return tasks.some((task) =>
+      {
+        return task.params && task.params.options && task.params.options.templateId.toString() === templateId;
+      });
+    });
+  }
+
   public async getLog(id?: number): Promise<object[]>
   {
     return new Promise<object[]>(async (resolve, reject) =>
