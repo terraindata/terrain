@@ -199,12 +199,30 @@ export function getSampleRows(
     const fr = new FileReader();
     fr.onloadend = () =>
     {
-      const workbook = xlsx.read(fr.result, { type: 'array' });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const json = xlsx.utils.sheet_to_json(sheet);
-      onLoad(json);
+      try {
+        const workbook = xlsx.read(fr.result, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        if (!sheet)
+        {
+          onError('XLSX Parse Failed: Workbook has no sheets');
+        }
+        // Set the range to be all of the columns and just 10 rows
+        const positions = sheet['!ref'].split(':');
+        // Separate starting row and column
+        const startCol: string = positions[0].match(/[A-Z][a-z]*/)[0];
+        const startRow = positions[0].match(/[0-9]/)[0];
+        const lastCol = positions[1].match(/[A-Z]/)[0];
+        const lastRow = parseFloat(startRow) + 9;
+        const range = startCol + startRow + ':' + lastCol + String(lastRow);
+        const json = xlsx.utils.sheet_to_json(sheet, {range});
+        onLoad(json);
+      }
+      catch (e)
+      {
+        onError(`XLSX Parse Failed: ${e}`);
+      }
     };
-    fr.readAsArrayBuffer(file.slice(0, ChunkSize));
+    fr.readAsArrayBuffer(file);
   }
 }
 // TODO for json, use a streaming implementation
