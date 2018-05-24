@@ -160,7 +160,7 @@ export class TemplateProxy
       options.outputKey,
     );
     this.setEdgeTransformations(newEdgeId, newEngine);
-    this.performTypeDetection(newEdgeId);
+    // this.performTypeDetection(newEdgeId);
   }
 
   // delete a source and its node

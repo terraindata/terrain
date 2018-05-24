@@ -74,6 +74,8 @@ import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/
 import EditorActionsSection from './EditorActionsSection';
 import EditorColumnActionsSection from './EditorColumnActionsSection';
 
+import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
+
 import './TemplateEditor.less';
 
 import Quarantine from 'util/RadiumQuarantine';
