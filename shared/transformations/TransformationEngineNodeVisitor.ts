@@ -373,18 +373,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
 
       split = TransformationEngineNodeVisitor.splitHelper(el, opts);
 
-      if (split.length !== opts.newFieldKeyPaths.size)
-      {
-        return {
-          errors: [
-            {
-              message: 'Number of split field names does not match number of split elements',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-
-      for (let i: number = 0; i < split.length; i++)
+      for (let i: number = 0; i < opts.newFieldKeyPaths.size; i++)
       {
         yadeep.set(doc, opts.newFieldKeyPaths.get(i), split[i], { create: true });
       }
