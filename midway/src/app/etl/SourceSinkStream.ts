@@ -236,10 +236,15 @@ export async function getSinkStream(
             }
             break;
           case 'csv':
-            transformStream = CSVTransform.createExportStream(sink.fileConfig.hasCsvHeader);
+            transformStream = CSVTransform.createExportStream(
+              sink.fileConfig.fieldOrdering !== null ? sink.fileConfig.fieldOrdering : sink.fileConfig.hasCsvHeader,
+            );
             break;
           case 'tsv':
-            transformStream = CSVTransform.createExportStream(sink.fileConfig.hasCsvHeader, '\t');
+            transformStream = CSVTransform.createExportStream(
+              sink.fileConfig.fieldOrdering !== null ? sink.fileConfig.fieldOrdering : sink.fileConfig.hasCsvHeader,
+              '\t',
+            );
             break;
           case 'xml':
             transformStream = XMLTransform.createExportStream();
