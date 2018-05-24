@@ -233,10 +233,10 @@ export async function getSinkStream(
             }
             break;
           case 'csv':
-            transformStream = CSVTransform.createExportStream();
+            transformStream = CSVTransform.createExportStream(sink.fileConfig.hasCsvHeader);
             break;
           case 'tsv':
-            transformStream = CSVTransform.createExportStream(true, '\t');
+            transformStream = CSVTransform.createExportStream(sink.fileConfig.hasCsvHeader, '\t');
             break;
           case 'xml':
             transformStream = XMLTransform.createExportStream();
