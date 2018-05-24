@@ -1017,7 +1017,7 @@ test('Group By Transformation', () =>
   );
 });
 
-test('transform a zipcode', async () =>
+test('transform a zipcode', () =>
 {
   const doc = {
     zip1: '10451',
@@ -1039,7 +1039,7 @@ test('transform a zipcode', async () =>
   e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip6'])]), { format: 'latlon'});
   e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip7'])]), { format: 'type'});
   e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip8'])]), { format: 'latlon'});
-  const r = await e.transform(doc);
+  const r = e.transform(doc);
   expect(r['zip1']).toEqual({ lat: 40.84, lon: -73.87 });
   expect(r['zip2']).toBe('BRONX');
   expect(r['zip3']).toBe('NY');
