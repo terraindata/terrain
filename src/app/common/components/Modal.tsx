@@ -96,6 +96,9 @@ export interface Props
 @Radium
 class Modal extends TerrainComponent<Props>
 {
+  public static defaultProps = {
+    errorMessage: '',
+  };
 
   public componentWillMount()
   {
