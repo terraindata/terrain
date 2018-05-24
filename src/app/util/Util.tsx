@@ -54,6 +54,7 @@ const moment = require('moment');
 import { SchemaState } from 'app/schema/SchemaTypes';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+import { Moment } from 'moment';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
@@ -296,7 +297,7 @@ const Util = {
   },
 
   // for SQL
-  formatInputDate(date: Date | string, language: string = 'elastic'): string
+  formatInputDate(date: Moment | string, language: string = 'elastic'): string
   {
     let m;
     if (typeof date === 'string')
@@ -313,12 +314,12 @@ const Util = {
     }
     if (language === 'elastic')
     {
-      const day = m.format('YYYY-MM-DD');
-      const time = m.format('HH:mm:ssZ');
-      if (day === 'Invalid date' || time === 'Invalid date')
+      if (m.isValid() === false)
       {
         return '';
       }
+      const day = m.format('YYYY-MM-DD');
+      const time = m.format('HH:mm:ssZ');
       return day + 'T' + time;
     }
     return m.format('YYYY-MM-DD HH:mm:ss');

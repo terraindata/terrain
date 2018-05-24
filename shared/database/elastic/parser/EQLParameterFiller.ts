@@ -47,6 +47,7 @@ THE SOFTWARE.
 import moment = require('moment');
 import ESParameterSubstituter from './ESParameterSubstituter';
 import ESValueInfo from './ESValueInfo';
+import TerrainDateParameter from './TerrainDateParameter';
 
 /**
  * Fills values in for parameters in a query using a given substitutionFunction,
@@ -155,13 +156,13 @@ export default class ESParameterFiller
         // TerrainDate parameter
         if (ps[0] === 'TerrainDate' && params[runtimeParam] === undefined)
         {
-          return this.fillTerrainDateParameter(param);
+          return TerrainDateParameter.fillTerrainDateParameter(param);
         }
 
         const value: any = params[param];
         if (typeof value === 'string' && value.startsWith('@TerrainDate'))
         {
-          return this.fillTerrainDateParameter(value.slice(1));
+          return TerrainDateParameter.fillTerrainDateParameter(value.slice(1));
         }
 
         if (value === undefined)
@@ -170,39 +171,5 @@ export default class ESParameterFiller
         }
         return JSON.stringify(value);
       });
-  }
-  /**
-   *
-   * @param {string} dateString in format 'TerrainDate.[ThisWeek/NextWeek].[0-6].{T00:00:00+00:00}'
-   * This function replace the parameter with the current time.
-   */
-  private static fillTerrainDateParameter(dateString: string)
-  {
-    const datePart = dateString.split('.');
-
-    if (datePart.length < 3 || datePart[0] !== 'TerrainDate' || (datePart[1] !== 'ThisWeek' && datePart[1] !== 'NextWeek') ||
-      Number.isInteger(Number(datePart[2])) === false ||
-      Number(datePart[2]) < 0 || Number(datePart[2]) > 6)
-    {
-      throw new Error('The TerrainDate parameter ' + dateString + ' is not in the right format:'
-        + 'TerrainDate.{ThisWeek/NextWeek}.[0-6]{T00:00:00+00:00}.');
-    }
-    const dayOffset = Number(datePart[2]);
-    const today = moment().startOf('week');
-    if (datePart[1] === 'NextWeek')
-    {
-      today.add(1, 'w');
-    }
-    today.add(dayOffset, 'd');
-    let dateStr = today.format('YYYY-MM-DD');
-    if (datePart.length > 3)
-    {
-      dateStr = dateStr + datePart[3];
-      if (moment.parseZone(dateStr).isValid() === false)
-      {
-        throw new Error('The generated time string is not valid: ' + dateString + ' -> ' + dateStr);
-      }
-    }
-    return JSON.stringify(dateStr);
   }
 }

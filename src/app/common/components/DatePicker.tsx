@@ -46,17 +46,19 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands
 
-import * as React from 'react';
-import './DatePicker.less';
-// import * as moment from 'moment';
-const moment = require('moment');
 import * as Immutable from 'immutable';
+import * as moment from 'moment';
+import * as React from 'react';
 import DayPicker from 'react-day-picker';
+import './DatePicker.less';
 const DateUtils = DayPicker.DateUtils;
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import Dropdown from './Dropdown';
 
+import _ = require('lodash');
+import { Moment } from 'moment';
+import TerrainDateParameter from '../../../../shared/database/elastic/parser/TerrainDateParameter';
 import { backgroundColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 
@@ -80,23 +82,38 @@ for (let h = 0; h < 24; h++)
 const HOUR_OPTIONS = Immutable.List(_hours);
 
 const DateParameterMap = {
-  'Monday This Week': '@TerrainDate.thisWeek.0',
-  'Monday Next Week': '@TerrainDate.nextWeek.0',
-  'Tuesday This Week': '@TerrainDate.thisWeek.1',
-  'Tuesday Next Week': '@TerrainDate.nextWeek.1',
-  'Wednesday This Week': '@TerrainDate.thisWeek.2',
-  'Wednesday Next Week': '@TerrainDate.nextWeek.2',
-  'Thursday This Week': '@TerrainDate.thisWeek.3',
-  'Thursday Next Week': '@TerrainDate.nextWeek.3',
-  'Friday This Week': '@TerrainDate.thisWeek.4',
-  'Friday Next Week': '@TerrainDate.nextWeek.4',
-  'Saturday  This Week': '@TerrainDate.thisWeek.5',
-  'Saturday Next Week': '@TerrainDate.nextWeek.5',
-  'Sunday This Week': '@TerrainDate.thisWeek.6',
-  'Sunday Next Week': '@TerrainDate.nextWeek.6',
+  'Monday This Week': '@TerrainDate.ThisWeek.0',
+  'Monday Next Week': '@TerrainDate.NextWeek.0',
+  'Tuesday This Week': '@TerrainDate.ThisWeek.1',
+  'Tuesday Next Week': '@TerrainDate.NextWeek.1',
+  'Wednesday This Week': '@TerrainDate.ThisWeek.2',
+  'Wednesday Next Week': '@TerrainDate.NextWeek.2',
+  'Thursday This Week': '@TerrainDate.ThisWeek.3',
+  'Thursday Next Week': '@TerrainDate.NextWeek.3',
+  'Friday This Week': '@TerrainDate.ThisWeek.4',
+  'Friday Next Week': '@TerrainDate.NextWeek.4',
+  'Saturday  This Week': '@TerrainDate.ThisWeek.5',
+  'Saturday Next Week': '@TerrainDate.NextWeek.5',
+  'Sunday This Week': '@TerrainDate.ThisWeek.6',
+  'Sunday Next Week': '@TerrainDate.NextWeek.6',
 };
-
-const DateParameterOptions = Immutable.List(Object.keys(DateParameterMap));
+const DateParameterArray = [
+  'Monday This Week',
+  'Monday Next Week',
+  'Tuesday This Week',
+  'Tuesday Next Week',
+  'Wednesday This Week',
+  'Wednesday Next Week',
+  'Thursday This Week',
+  'Thursday Next Week',
+  'Friday This Week',
+  'Friday Next Week',
+  'Saturday  This Week',
+  'Saturday Next Week',
+  'Sunday This Week',
+  'Sunday Next Week',
+];
+const DateParameterOptions = Immutable.List(DateParameterArray);
 
 export interface Props
 {
@@ -179,47 +196,97 @@ class DatePicker extends TerrainComponent<Props>
     }
   }
 
-  public getDate(): Date
+  public getDate(): Moment
   {
-    let date = new Date(this.props.date);
-    if (isNaN(date.getTime()))
+    let date;
+    if (TerrainDateParameter.isValidTerrainDateParameter(this.props.date))
     {
-      // not a valid date
-      date = new Date();
-      date.setMinutes(0);
+      const timeString = TerrainDateParameter.getTimePart(this.props.date);
+      if (timeString !== null)
+      {
+        date = moment.parseZone(timeString, ['HH:mm:ssT']);
+      } else
+      {
+        date = moment();
+      }
+    } else
+    {
+      date = moment.parseZone(this.props.date);
     }
-
+    if (date.isValid() === false)
+    {
+      date = moment();
+    }
     return date;
   }
 
   public handleDayClick(day: Date, modifiers, e)
   {
     const date = this.getDate();
-    date.setDate(day.getDate());
-    date.setMonth(day.getMonth());
-    date.setFullYear(day.getFullYear());
+    date.date(day.getDate());
+    date.month(day.getMonth());
+    date.year(day.getFullYear());
     this.props.onChange(Util.formatInputDate(date, this.props.language));
   }
 
   public handleHourChange(hourIndex)
   {
-    const date = this.getDate();
-    date.setHours(Math.floor(hourIndex / MINUTE_RATIO));
-    date.setMinutes((hourIndex % MINUTE_RATIO) * MINUTE_INTERVAL);
-    this.props.onChange(Util.formatInputDate(date, this.props.language));
+    if (this.props.date.startsWith('@TerrainDate') &&
+      TerrainDateParameter.isValidTerrainDateParameter(this.props.date))
+    {
+      const newHour = Math.floor(hourIndex / MINUTE_RATIO);
+      const newMinute = (hourIndex % MINUTE_RATIO) * MINUTE_INTERVAL;
+      const timeStr = moment().hour(newHour).minute(newMinute).format('HH:mm:ssZ');
+      const date = TerrainDateParameter.setTimePart(this.props.date, timeStr);
+      this.props.onChange(date);
+    } else
+    {
+      const date = this.getDate();
+      date.hour(Math.floor(hourIndex / MINUTE_RATIO));
+      date.minute((hourIndex % MINUTE_RATIO) * MINUTE_INTERVAL);
+      this.props.onChange(Util.formatInputDate(date, this.props.language));
+    }
   }
 
   public handleDateParameterChange(dateParameterIndex)
   {
+    const indexName = DateParameterArray[dateParameterIndex];
+    let date = DateParameterMap[indexName];
+    if (this.props.date.startsWith('@TerrainDate') &&
+      TerrainDateParameter.isValidTerrainDateParameter(this.props.date))
+    {
+      date = TerrainDateParameter.setDayPart(this.props.date, date);
+    } else
+    {
+      const now = this.getDate().format('HH:mm:ssZ');
+      date = date + '.T' + now;
+    }
+
+    this.props.onChange(date);
   }
 
-  public dateToHourIndex(date)
+  public dateToHourIndex(date: Moment)
   {
-    return date.getHours() * (60 / MINUTE_INTERVAL) + (date.getMinutes() / MINUTE_INTERVAL);
+    return date.hours() * (60 / MINUTE_INTERVAL) + Math.floor(date.minutes() / MINUTE_INTERVAL);
+  }
+
+  public dateToDateParameterMapIndex()
+  {
+    if (this.props.date.startsWith('@TerrainDate'))
+    {
+      if (TerrainDateParameter.isValidTerrainDateParameter(this.props.date))
+      {
+        const datePart = TerrainDateParameter.getDatePart(this.props.date);
+        const index = _.findIndex(DateParameterArray, (v) => DateParameterMap[v] === datePart);
+        return index;
+      }
+    }
+    return -1;
   }
 
   public renderTimePicker()
   {
+
     const date = this.getDate();
 
     return (
@@ -233,18 +300,29 @@ class DatePicker extends TerrainComponent<Props>
         <Dropdown
           canEdit={this.props.canEdit}
           options={DateParameterOptions}
-          selectedIndex={0}
-          onChange={this.handleHourChange}
+          selectedIndex={this.dateToDateParameterMapIndex()}
+          onChange={this.handleDateParameterChange}
         />
       </div>);
   }
 
   public render()
   {
+    if (this.props.date.startsWith('@TerrainDate'))
+    {
+      return (
+        <div
+          className='date-picker'
+        >
+          {this.renderTimePicker()}
+        </div>
+      );
+    }
+
     const date = this.getDate();
     const modifiers =
       {
-        selected: (day) => DateUtils.isSameDay(day, date),
+        selected: (day) => DateUtils.isSameDay(day, date.toDate()),
       };
 
     return (
@@ -254,7 +332,7 @@ class DatePicker extends TerrainComponent<Props>
         <DayPicker
           modifiers={modifiers}
           onDayClick={this.handleDayClick}
-          initialMonth={date}
+          initialMonth={date.toDate()}
         />
         {this.renderTimePicker()}
       </div>

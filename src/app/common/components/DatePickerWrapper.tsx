@@ -55,6 +55,8 @@ import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import Dropdown from './Dropdown';
 
+import { Moment } from 'moment';
+import TerrainDateParameter from '../../../../shared/database/elastic/parser/TerrainDateParameter';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import DatePicker from './DatePicker';
 import './DatePicker.less';
@@ -79,16 +81,27 @@ class DatePickerWrapper extends TerrainComponent<Props & InjectedOnClickOutProps
       expanded: false,
     };
 
-  public getDate(): Date
+  public getDate(): Moment
   {
-    let date = new Date(this.props.date);
-    if (isNaN(date.getTime()))
+    let date;
+    if (TerrainDateParameter.isValidTerrainDateParameter(this.props.date))
     {
-      // not a valid date
-      date = new Date();
-      date.setMinutes(0);
+      const timeString = TerrainDateParameter.getTimePart(this.props.date);
+      if (timeString !== null)
+      {
+        date = moment.parseZone(timeString, ['HH:mm:ssT']);
+      } else
+      {
+        date = moment();
+      }
+    } else
+    {
+      date = moment.parseZone(this.props.date);
     }
-
+    if (date.isValid() === false)
+    {
+      date = moment();
+    }
     return date;
   }
 
@@ -104,7 +117,7 @@ class DatePickerWrapper extends TerrainComponent<Props & InjectedOnClickOutProps
     const { language } = this.props;
     const date = this.getDate();
     const dateText = this.props.format === undefined ? Util.formatInputDate(date, language) :
-      moment(date).format(this.props.format);
+      date.format(this.props.format);
     const dateStyle = _.extend({}, fontColor(Colors().text1), backgroundColor(Colors().inputBg), borderColor(Colors().inputBorder));
     return (
       <div className='date-picker-wrapper'>
