@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 const webpack = require('webpack');
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const conf = require('./webpack.config');
 
 conf.plugins[0] =
@@ -53,7 +54,7 @@ conf.plugins[0] =
     'process.env.NODE_ENV': JSON.stringify('production'),
     'process.env.BABEL_ENV': JSON.stringify('production'),
     DEV: JSON.stringify(false),
-    MIDWAY_HOST: JSON.stringify('http://' + (process.env.MIDWAY_HOST || 'localhost:3000')),
+    MIDWAY_HOST: JSON.stringify('https://' + (process.env.MIDWAY_HOST || 'localhost:3000')),
   });
 
 conf.plugins[1] =
@@ -62,15 +63,16 @@ conf.plugins[1] =
     recordsPath: './.cache/hard-source/prod/[confighash]/records.json',
   });
 
-conf.plugins = conf.plugins.concat([
-  // Minify code.
-  new webpack.optimize.UglifyJsPlugin({
-    parallel: true,
-    uglifyOptions: {
-      ecma: 6,
-    }
-  }),
-  new webpack.optimize.AggressiveMergingPlugin(),
-]);
+conf.optimization.minimizer =
+  [
+    // Minify code.
+    new UglifyJsPlugin({
+      parallel: true,
+      uglifyOptions: {
+        ecma: 6,
+      }
+    }),
+    new webpack.optimize.AggressiveMergingPlugin(),
+  ];
 
 module.exports = conf;
