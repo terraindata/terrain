@@ -443,7 +443,6 @@ const TransformationNodeInfo: AllNodeInfoType =
         {
           return (
             EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
-            EngineUtil.getValueType(fieldId, engine) === 'number' &&
             EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
           );
         },

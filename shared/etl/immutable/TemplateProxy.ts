@@ -255,12 +255,15 @@ export class TemplateProxy
 
     order = order.bulkAdd(engine.getAllFieldIDs());
     order = order.intersect(engine.getAllFieldIDs().toSet());
+    this.setFieldOrdering(edgeId, order);
 
     const toNode = this.template.getNode(this.template.getEdge(edgeId).to);
-    this.setFieldOrdering(edgeId, order);
-    if (toNode.type === NodeTypes.Sink)
+    if (toNode !== undefined)
     {
-      this.setSinkFieldOrdering(toNode.endpoint);
+      if (toNode.type === NodeTypes.Sink)
+      {
+        this.setSinkFieldOrdering(toNode.endpoint);
+      }
     }
   }
 
