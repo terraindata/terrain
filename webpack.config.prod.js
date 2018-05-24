@@ -42,37 +42,126 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Production build configuration for webpack.
 
 const webpack = require('webpack');
+const path = require('path');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const conf = require('./webpack.config');
 
-conf.plugins[0] =
-  new webpack.DefinePlugin({
-    'process.env.NODE_ENV': JSON.stringify('production'),
-    'process.env.BABEL_ENV': JSON.stringify('production'),
-    DEV: JSON.stringify(false),
-    MIDWAY_HOST: JSON.stringify('https://' + (process.env.MIDWAY_HOST || 'localhost:3000')),
-  });
+module.exports =
+{
+  entry: './src/app/Root.tsx',
+  devtool: 'cheap-module-source-map',
 
-conf.plugins[1] =
-  new HardSourceWebpackPlugin({
-    cacheDirectory: './.cache/hard-source/prod/[confighash]',
-    recordsPath: './.cache/hard-source/prod/[confighash]/records.json',
-  });
+  output:
+  {
+    path: __dirname,
+    publicPath: '/assets/',
+    filename: 'bundle.js',
+  },
 
-conf.optimization.minimizer =
+  // NOTE: this should also be added to the production config
+  devServer: {
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    }
+  },
+
+  resolve:
+  {
+    // it is important that .tsx is before .less, so that it resolves first, so that files that share a name resolve correctly
+    extensions: [ '.js', '.tsx', '.jsx', '.ts', '.css', '.less', '.json', '.svg' ],
+    alias: {
+      auth: path.resolve(__dirname, 'src/app/auth'),
+      analytics: path.resolve(__dirname, 'src/app/analytics'),
+      app: path.resolve(__dirname, 'src/app'),
+      builder: path.resolve(__dirname, 'src/app/builder'),
+      charts: path.resolve(__dirname, 'src/app/charts'),
+      colors: path.resolve(__dirname, 'src/app/colors'),
+      common: path.resolve(__dirname, 'src/app/common'),
+      control: path.resolve(__dirname, 'src/app/control'),
+      database: path.resolve(__dirname, 'src/database'),
+      deploy: path.resolve(__dirname, 'src/app/deploy'),
+      etl: path.resolve(__dirname, 'src/app/etl'),
+      fileImport: path.resolve(__dirname, 'src/app/fileImport'),
+      images: path.resolve(__dirname, 'src/images'),
+      jobs: path.resolve(__dirname, 'src/app/jobs'),
+      library: path.resolve(__dirname, 'src/app/library'),
+      manual: path.resolve(__dirname, 'src/app/manual'),
+      roles: path.resolve(__dirname, 'src/app/roles'),
+      scheduler: path.resolve(__dirname, 'src/app/scheduler'),
+      schema: path.resolve(__dirname, 'src/app/schema'),
+      shared: path.resolve(__dirname, 'shared'),
+      src: path.resolve(__dirname, 'src'),
+      store: path.resolve(__dirname, 'src/app/store'),
+      tql: path.resolve(__dirname, 'src/app/tql'),
+      users: path.resolve(__dirname, 'src/app/users'),
+      util: path.resolve(__dirname, 'src/app/util'),
+      x: path.resolve(__dirname, 'src/app/x'),
+      'test-helpers': path.resolve(__dirname, 'src/test/test-helpers'),
+    },
+  },
+
+  module:
+  {
+    rules:
+    [
+      // note: this first loader string gets updated in webpack.config.prod.js
+      //  keep it first in this list
+      {
+        test: /\.ts(x?)$/,
+        exclude: [/midway/, /analytics.js/, /sigint/, /node_modules/],
+        loader:
+        'babel-loader!thread-loader!ts-loader?happyPackMode=true'
+        + JSON.stringify({
+          compilerOptions: {
+          },
+        }),
+      },
+      {
+        test: /\.js(x?)$/,
+        exclude: [/midway/, /analytics.js/, /node_modules/],
+        loader: 'babel-loader!thread-loader'
+      },
+      { test: /\.css$/, exclude: /midway/, loader: 'style-loader!css-loader' },
+      { test: /\.less$/, exclude: /midway/, loader: 'style-loader!css-loader!less-loader?strictMath&noIeCompat' }, /* Note: strictMath enabled; noIeCompat also */
+      { test: /\.woff(2?)$/, loader: 'url-loader?limit=10000&mimetype=application/font-woff' },
+      { test: /\.ttf$/, loader: 'file-loader' },
+      { test: /\.eot$/, loader: 'file-loader' },
+      { test: /\.jpg$/, loader: 'file-loader' },
+      { test: /\.gif$/, loader: 'url-loader?limit=4000000' },
+      { test: /\.png$/, loader: 'url-loader?limit=4000000' },
+      { test: require.resolve('jquery'), use: [{ loader: 'expose-loader', options: '$' }]},
+      {
+        test: /\.svg(\?name=[a-zA-Z]*)*$/,
+        exclude: [/midway/, /node_modules/],
+        loader: 'svg-react-loader',
+      },
+      { test: /\.txt$/, exclude: /midway/, loader: 'raw-loader' },
+    ],
+  },
+
+  plugins:
   [
-    // Minify code.
-    new UglifyJsPlugin({
-      parallel: true,
-      uglifyOptions: {
-        ecma: 6,
-      }
+    new webpack.DefinePlugin({
+      MIDWAY_HOST: JSON.stringify('https://' + (process.env.MIDWAY_HOST || 'localhost:3000')),
+      DEV: true,
     }),
-    new webpack.optimize.AggressiveMergingPlugin(),
-  ];
-
-module.exports = conf;
+    new HardSourceWebpackPlugin({
+      cacheDirectory: './.cache/hard-source/dev/[confighash]',
+    }),
+    new ForkTsCheckerWebpackPlugin(),
+  ],
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          test: /node_modules/,
+          chunks: "initial",
+          name: "vendor",
+          enforce: true
+        }
+      }
+    },
+  },
+};
