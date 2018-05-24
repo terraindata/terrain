@@ -103,10 +103,7 @@ class GraphHelpers extends ETLHelpers
         };
         const engine = templateProxy.value().getTransformationEngine(currentEdge);
         tryFn(new EngineProxy(engine, handleRequestRebuild, fieldOrderController));
-        if (structuralChanges)
-        {
-          templateProxy.cleanFieldOrdering(currentEdge);
-        }
+        templateProxy.cleanFieldOrdering(currentEdge);
       }).then(() =>
       {
         this.editorAct({
@@ -219,6 +216,7 @@ class GraphHelpers extends ETLHelpers
       differentKeys.forEach((key) =>
       {
         proxy.setSink(key, newSinks.get(key));
+        proxy.setSinkFieldOrdering(key);
       });
       deletedKeys.forEach((key) =>
       {

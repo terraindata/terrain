@@ -236,14 +236,6 @@ export class TemplateProxy
   {
     const newOrdering = this.template.uiData.engineFieldOrders.set(edgeId, order);
     this.template = this.template.setIn(['uiData', 'engineFieldOrders'], newOrdering);
-    const toNode = this.template.getNode(this.template.getEdge(edgeId).to);
-    if (toNode.type === NodeTypes.Sink)
-    {
-      let sink = this.template.getSink(toNode.endpoint);
-      sink = sink.setIn(['fileConfig', 'fieldOrdering'], order.ordering.toArray());
-      this.setSink(toNode.endpoint, sink);
-      console.log(this.template.toJS());
-    }
   }
 
   public getFieldOrdering(edgeId: number): ReorderableSet<number>
@@ -264,7 +256,40 @@ export class TemplateProxy
     order = order.bulkAdd(engine.getAllFieldIDs());
     order = order.intersect(engine.getAllFieldIDs().toSet());
 
+    const toNode = this.template.getNode(this.template.getEdge(edgeId).to);
     this.setFieldOrdering(edgeId, order);
+    if (toNode.type === NodeTypes.Sink)
+    {
+      this.setSinkFieldOrdering(toNode.endpoint);
+    }
+  }
+
+  public setSinkFieldOrdering(key: string)
+  {
+    const nodes = this.template.findNodes((n) => n.type === NodeTypes.Sink && n.endpoint === key);
+    if (nodes.size === 0)
+    {
+      throw new Error(`No node corresponds to sink ${key}`);
+    }
+    const nodeId = nodes.get(0);
+    const edges = this.template.findEdges((e) => e.to === nodeId);
+    if (edges.size === 0)
+    {
+      return;
+    }
+    const edgeId = edges.get(0);
+    const order = this.getFieldOrdering(edgeId);
+    const engine = this.template.getEdge(edgeId).transformations;
+    let sink = this.template.getSink(key);
+    if (sink === undefined)
+    {
+      throw new Error(`No sink exists with key ${key}`);
+    }
+    const rootNames = order.ordering
+      .filter((id) => engine.getOutputKeyPath(id).size === 1)
+      .map((id) => engine.getOutputKeyPath(id).last());
+    sink = sink.setIn(['fileConfig', 'fieldOrdering'], rootNames.toArray());
+    this.setSink(key, sink);
   }
 
   // Add automatic type casts to fields, and apply language specific type checking

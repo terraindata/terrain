@@ -65,7 +65,7 @@ export default class CSVTransform
   }
 
   public static createExportStream(
-    headers: boolean = true,
+    headers: boolean | string[] = true,
     delimiter: string = ',',
     rowDelimiter: string = '\r\n',
   ): Transform
