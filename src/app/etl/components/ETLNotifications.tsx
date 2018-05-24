@@ -67,23 +67,13 @@ const { List, Map } = Immutable;
 
 export interface Props
 {
-  children?: any;
-
   // injected props
   act?: typeof ETLActions;
   etl?: ETLState;
 }
 
-class ETLPage extends TerrainComponent<Props>
+class ETLNotifications extends TerrainComponent<Props>
 {
-  public componentDidMount()
-  {
-    this.props.act({
-      actionType: 'fetchTemplates',
-    });
-    // TODO lock UI until done?
-  }
-
   public setModalRequests(requests)
   {
     this.props.act({
@@ -136,9 +126,6 @@ class ETLPage extends TerrainComponent<Props>
     return (
       <div className='etl-page-root'>
         {
-          this.props.children
-        }
-        {
           this.renderRunningTemplateModal()
         }
         <MultiModal
@@ -165,7 +152,7 @@ class ETLPage extends TerrainComponent<Props>
 }
 
 export default Util.createContainer(
-  ETLPage,
+  ETLNotifications,
   ['etl'],
   { act: ETLActions },
 );

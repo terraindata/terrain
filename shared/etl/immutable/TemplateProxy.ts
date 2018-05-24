@@ -160,7 +160,7 @@ export class TemplateProxy
       options.outputKey,
     );
     this.setEdgeTransformations(newEdgeId, newEngine);
-    this.performTypeDetection(newEdgeId);
+    // this.performTypeDetection(newEdgeId);
   }
 
   // delete a source and its node
@@ -202,7 +202,11 @@ export class TemplateProxy
     if (fromNode.type === NodeTypes.Source)
     {
       const source = this.template.getSource(fromNode.endpoint);
-      if (source.fileConfig.fileType === FileTypes.Csv || source.fileConfig.fileType === FileTypes.Tsv)
+      if (
+        source.fileConfig.fileType === FileTypes.Csv
+        || source.fileConfig.fileType === FileTypes.Tsv
+        || source.fileConfig.fileType === FileTypes.Xml
+      )
       {
         castStringsToPrimitives = true;
       }

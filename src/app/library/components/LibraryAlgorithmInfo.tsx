@@ -76,6 +76,7 @@ const LANGUAGES = List(['elastic', 'mysql']);
 
 class LibraryInfoColumn extends TerrainComponent<Props>
 {
+  public mounted: boolean = false;
   public state: {
     algorithmStatus: string,
     algorithmStatusErrorModalOpen: boolean,
@@ -97,7 +98,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
       const xhr = this.state.algorithmStatusAjax.xhr;
       if (xhr)
       {
-        xhr.cancel();
+        xhr.abort();
       }
     }
   }
@@ -105,13 +106,14 @@ class LibraryInfoColumn extends TerrainComponent<Props>
   public componentWillUnmount()
   {
     this.killAlgorithmStatusAjax();
+    this.mounted = false;
   }
 
   public componentWillReceiveProps(nextProps)
   {
     const { selectedAlgorithm, changingStatusOf } = nextProps.library;
     if (selectedAlgorithm !== this.props.library.selectedAlgorithm ||
-      changingStatusOf)
+      changingStatusOf && this.mounted)
     {
       this.setState({
         selectedAlgorithm,
@@ -127,13 +129,17 @@ class LibraryInfoColumn extends TerrainComponent<Props>
 
   public toggleAlgorithmStatusError()
   {
-    this.setState({
-      algorithmStatusErrorModalOpen: !this.state.algorithmStatusErrorModalOpen,
-    });
+    if (this.mounted)
+    {
+      this.setState({
+        algorithmStatusErrorModalOpen: !this.state.algorithmStatusErrorModalOpen,
+      });
+    }
   }
 
   public componentDidMount()
   {
+    this.mounted = true;
     if (this.props.algorithm !== undefined)
     {
       this.fetchStatus(this.props.algorithm);
@@ -142,7 +148,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
 
   public fetchStatus(algorithm: Algorithm)
   {
-    if (algorithm !== undefined)
+    if (algorithm !== undefined && this.mounted)
     {
       this.setState({ algorithmStatus: 'Loading...' });
       this.killAlgorithmStatusAjax();
@@ -152,10 +158,13 @@ class LibraryInfoColumn extends TerrainComponent<Props>
         algorithm.deployedName,
         (response) =>
         {
-          this.setState({
-            algorithmStatus: response,
-            algorithmStatusAjax: null,
-          });
+          if (this.mounted)
+          {
+            this.setState({
+              algorithmStatus: response,
+              algorithmStatusAjax: null,
+            });
+          }
         },
         (error) =>
         {
@@ -167,10 +176,14 @@ class LibraryInfoColumn extends TerrainComponent<Props>
           catch {
             readable = error;
           }
-          this.setState({
-            errorModalMessage: readable,
-            algorithmStatusAjax: null,
-          });
+          if (this.mounted)
+          {
+            this.setState({
+              errorModalMessage: readable,
+              algorithmStatusAjax: null,
+            });
+          }
+
           this.toggleAlgorithmStatusError();
         },
       );

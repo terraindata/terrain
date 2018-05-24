@@ -52,11 +52,17 @@
   }
 
   .field-settings-section {
-    display: flex;
+    // display: flex;
     flex-grow: 1;
     position: relative;
     justify-content: center;
     height: ~"calc(100% - @{title-bar-height})";
+    overflow-y: auto;
+
+    .field-settings-scrollable {
+      display: flex;
+      justify-content: center;
+    }
   }
 
   .field-settings-row {
@@ -73,6 +79,7 @@
 
 .field-main-settings {
   min-width: 200px;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -80,6 +87,7 @@
 .field-advanced-settings {
   min-width: 200px;
   display: flex;
+  min-height: 100%;
 }
 
 // shared

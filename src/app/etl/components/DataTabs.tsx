@@ -47,6 +47,7 @@ import ETLRouteUtil from 'app/etl/ETLRouteUtil';
 import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 import TerrainComponent from 'common/components/TerrainComponent';
 import TerrainTabs from 'common/components/TerrainTabs';
+import ETLNotifications from 'etl/components/ETLNotifications';
 import { ETLActions } from 'etl/ETLRedux';
 import IntegrationList from 'etl/integrations/components/IntegrationList';
 import TemplateList from 'etl/templates/components/TemplateList';
@@ -65,7 +66,6 @@ interface DataTabsProps
   params: any;
   router: any;
   children: JSX.Element;
-  modalRequests: List<ModalProps>;
 }
 
 class DataTabs extends TerrainComponent<DataTabsProps>
@@ -100,17 +100,9 @@ class DataTabs extends TerrainComponent<DataTabsProps>
     // TODO lock UI until done?
   }
 
-  public setModalRequests(requests)
-  {
-    this.props.etlActions({
-      actionType: 'setModalRequests',
-      requests,
-    });
-  }
-
   public render()
   {
-    const { params, router, children, modalRequests } = this.props;
+    const { params, router, children } = this.props;
 
     return (
       <div className='etl'>
@@ -124,10 +116,7 @@ class DataTabs extends TerrainComponent<DataTabsProps>
               this.props.children
             }
           </TerrainTabs>
-          <MultiModal
-            requests={modalRequests}
-            setRequests={this.setModalRequests}
-          />
+          <ETLNotifications />
         </div>
       </div>
     );
@@ -136,6 +125,6 @@ class DataTabs extends TerrainComponent<DataTabsProps>
 
 export default Util.createContainer(
   DataTabs,
-  [['etl', 'modalRequests']],
+  [],
   { etlActions: ETLActions },
 );

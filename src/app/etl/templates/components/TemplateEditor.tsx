@@ -74,6 +74,8 @@ import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/
 import EditorActionsSection from './EditorActionsSection';
 import EditorColumnActionsSection from './EditorColumnActionsSection';
 
+import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
+
 import './TemplateEditor.less';
 
 import Quarantine from 'util/RadiumQuarantine';
@@ -116,6 +118,7 @@ class TemplateEditor extends TerrainComponent<Props>
     try
     {
       // do this to show disabled fields
+      previewDocument = _.cloneDeep(previewDocument);
       const resetEngine = TransformationEngine.load(JSON.stringify(engine.toJSON()));
       resetEngine.getAllFieldIDs().forEach((id) =>
       {

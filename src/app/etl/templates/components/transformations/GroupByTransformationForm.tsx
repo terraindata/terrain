@@ -54,6 +54,7 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import ObjectForm from 'common/components/ObjectForm';
 import { FieldPicker } from 'etl/common/components/FieldPicker.tsx';
 import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
 import { TransformationNode } from 'etl/templates/FieldTypes';
@@ -69,53 +70,84 @@ import { TransformationArgs, TransformationForm, TransformationFormProps } from 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-interface ArraySumOptions
+interface GroupByOptions
 {
-  outputName: string;
+  outputMapping: { [k: string]: string };
+  subkey: string;
 }
 
-export class ArraySumTFF extends TransformationForm<ArraySumOptions, TransformationNodeType.ArraySumNode>
+export class GroupByTFF extends TransformationForm<GroupByOptions, TransformationNodeType.GroupByNode>
 {
-  protected readonly inputMap: InputDeclarationMap<ArraySumOptions> = {
-    outputName: {
+  protected readonly inputMap: InputDeclarationMap<GroupByOptions> = {
+    subkey: {
       type: DisplayType.TextBox,
-      displayName: 'Output Field Name',
+      displayName: 'Field to Group On',
+    },
+    outputMapping: {
+      type: DisplayType.Custom,
+      widthFactor: -1,
+      options: {
+        render: this.renderMappingForm,
+      },
     },
   };
+
   protected readonly initialState = {
-    outputName: 'Field Sum',
+    subkey: '',
+    outputMapping: { value: 'new field name' },
   };
-  protected readonly type = TransformationNodeType.ArraySumNode;
+  protected readonly type = TransformationNodeType.GroupByNode;
+
+  public renderMappingForm(state: GroupByOptions, disabled)
+  {
+    return (
+      <ObjectForm
+        object={state.outputMapping}
+        onChange={this.handleMappingChange}
+        label='Value -> Output Name'
+      />
+    );
+  }
+
+  public handleMappingChange(newMapping, apply?: boolean)
+  {
+    const newState = _.extend({}, this.state, {
+      outputMapping: newMapping,
+    });
+    this.setState(newState);
+  }
 
   protected isStructuralChange()
   {
     return true;
   }
 
-  protected computeArgs()
+  protected createTransformation(proxy: EngineProxy)
   {
     const { engine, fieldId } = this.props;
-    const { outputName } = this.state;
+    const { outputMapping, subkey } = this.state;
 
-    const currentKeyPath = engine.getOutputKeyPath(fieldId);
-    const newFieldKeyPaths = List([
-      currentKeyPath.set(currentKeyPath.size - 1, outputName),
-    ]);
-
-    const inputFields = List([engine.getInputKeyPath(fieldId)]);
-
-    return {
-      options: {
-        newFieldKeyPaths,
-      },
-      fields: inputFields,
+    let newFieldKeyPaths = List([]);
+    const groupValues = [];
+    for (const key of Object.keys(outputMapping))
+    {
+      newFieldKeyPaths = newFieldKeyPaths.push(List([outputMapping[key]]));
+      groupValues.push(key);
+    }
+    const options: NodeOptionsType<TransformationNodeType.GroupByNode> = {
+      newFieldKeyPaths,
+      groupValues,
+      subkey,
     };
-  }
-
-  protected computeNewFieldInfo()
-  {
-    return {
-      type: ETLFieldTypes.Number,
-    };
+    const fields = List([engine.getInputKeyPath(fieldId)]);
+    proxy.addTransformation(this.type, fields, options, {
+      type: ETLFieldTypes.Array,
+      valueType: ETLFieldTypes.Object,
+    });
+    for (const key of Object.keys(outputMapping))
+    {
+      const newFieldKP = List([outputMapping[key]]);
+      proxy.copyNestedTypes(fieldId, newFieldKP);
+    }
   }
 }

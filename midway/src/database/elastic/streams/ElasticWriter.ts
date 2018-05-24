@@ -129,10 +129,7 @@ export class ElasticWriter extends Stream.Writable
   public _final(callback)
   {
     this.doneWriting = true;
-    if (callback !== undefined)
-    {
-      callback();
-    }
+    this.client.indices.refresh({ index: this.index }, callback);
   }
 
   private upsert(body: object, callback: (err?: Error) => void): void
@@ -224,13 +221,13 @@ export class ElasticWriter extends Stream.Writable
           },
         };
 
-      if (this.primaryKey !== undefined && chunk[this.primaryKey] !== undefined)
+      if (this.primaryKey !== undefined && chunk.chunk[this.primaryKey] !== undefined)
       {
-        command.index['_id'] = chunk[this.primaryKey];
+        command.index['_id'] = chunk.chunk[this.primaryKey];
       }
 
       body.push(command);
-      body.push(chunk);
+      body.push(chunk.chunk);
     }
 
     this.client.bulk({ body }, callback);

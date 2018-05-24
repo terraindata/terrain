@@ -141,8 +141,11 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
       switch (source.fileConfig.fileType)
       {
         case 'json':
-          const jsonPath: string = (!source.fileConfig.jsonPath || source.fileConfig.jsonNewlines) ? '*' :
-            source.fileConfig.jsonPath;
+          let jsonPath: string = (source.fileConfig.jsonNewlines) ? undefined : '*';
+          if (!!source.fileConfig.jsonPath)
+          {
+            jsonPath = source.fileConfig.jsonPath;
+          }
           importStream = sourceStream.pipe(JSONTransform.createImportStream(jsonPath));
           break;
         case 'csv':
@@ -233,10 +236,10 @@ export async function getSinkStream(
             }
             break;
           case 'csv':
-            transformStream = CSVTransform.createExportStream();
+            transformStream = CSVTransform.createExportStream(sink.fileConfig.hasCsvHeader);
             break;
           case 'tsv':
-            transformStream = CSVTransform.createExportStream(true, '\t');
+            transformStream = CSVTransform.createExportStream(sink.fileConfig.hasCsvHeader, '\t');
             break;
           case 'xml':
             transformStream = XMLTransform.createExportStream();

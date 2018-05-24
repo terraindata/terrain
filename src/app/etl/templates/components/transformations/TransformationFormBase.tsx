@@ -55,6 +55,7 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
 import { TransformationNode } from 'etl/templates/FieldTypes';
+import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -173,6 +174,12 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
     };
   }
 
+  // override this to customize the newFieldInfo object that gets passed to addTransformation
+  protected computeNewFieldInfo(): { type: ETLFieldTypes, valueType?: ETLFieldTypes }
+  {
+    return undefined;
+  }
+
   // override this to customize how initial state gets computed from existing args
   protected computeInitialState(): State
   {
@@ -191,7 +198,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   protected createTransformation(proxy: EngineProxy)
   {
     const args = this.computeArgs();
-    proxy.addTransformation(this.type, args.fields, args.options);
+    proxy.addTransformation(this.type, args.fields, args.options, this.computeNewFieldInfo());
   }
 
   // override this to customize how transformations are edited

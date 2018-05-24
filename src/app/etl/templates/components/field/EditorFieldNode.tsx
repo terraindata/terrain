@@ -202,7 +202,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     return (
       <div
         className='editor-field-node-settings-container'
-        style={showSettings ? { height: '300px' } : { height: '0px' }}
+        style={showSettings ? { height: '320px' } : { height: '0px' }}
       >
         {showSettings ?
           <div

@@ -74,6 +74,11 @@ export class SchedulerPermissions
     return PermissionUtil.defaultSuperUser(user, params);
   }
 
+  public async verifyGetByTemplateRoute(user: UserConfig, params: object): Promise<string>
+  {
+    return PermissionUtil.defaultSuperUser(user, params);
+  }
+
   public async verifyGetLogRoute(user: UserConfig, params: object): Promise<string>
   {
     return PermissionUtil.defaultSuperUser(user, params);
