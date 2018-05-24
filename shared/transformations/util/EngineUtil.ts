@@ -422,7 +422,8 @@ export default class EngineUtil
     const outputKeyPathBase = List([outputKey, '*']);
     const valueTypePath = List(['valueType']);
     const outputFieldId = EngineUtil.addFieldToEngine(newEngine, List([outputKey]), ETLFieldTypes.Array, ETLFieldTypes.Object);
-    const outputFieldWildcardId = EngineUtil.addFieldToEngine(newEngine, outputKeyPathBase, ETLFieldTypes.Object);
+    const outputFieldWildcardId = EngineUtil.addFieldToEngine(
+      newEngine, outputKeyPathBase, ETLFieldTypes.Array, ETLFieldTypes.Object, true);
 
     rightEngine.getAllFieldIDs().forEach((id) =>
     {

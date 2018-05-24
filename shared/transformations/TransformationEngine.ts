@@ -302,7 +302,6 @@ export class TransformationEngine
           // winston.error('Transformation encountered errors!:');
           transformationResult.errors.forEach((error: TransformationVisitError) =>
           {
-            // console.log('fail! ' + error.message);
             // winston.error(`\t -${error.message}`);
           });
           // TODO abort transforming if errors occur?
