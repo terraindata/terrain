@@ -69,6 +69,7 @@ import SplitTransformationNode from './nodes/SplitTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
 import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
+import ZipcodeTransformationNode from './nodes/ZipcodeTransformationNode';
 import TransformationVisitResult from './TransformationVisitResult';
 
 export default abstract class TransformationNodeVisitor
@@ -191,6 +192,11 @@ export default abstract class TransformationNodeVisitor
   }
 
   public visitGroupByNode(node: GroupByTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitZipcodeNode(node: ZipcodeTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }

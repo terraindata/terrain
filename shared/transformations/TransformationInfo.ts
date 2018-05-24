@@ -68,6 +68,7 @@ import SubtractTransformationNode from './nodes/SubtractTransformationNode';
 import SumTransformationNode from './nodes/SumTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
 import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
+import ZipcodeTransformationNode from './nodes/ZipcodeTransformationNode';
 import { TransformationEngine } from './TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from './TransformationNodeType';
 import TransformationNodeVisitor from './TransformationNodeVisitor';
@@ -593,6 +594,23 @@ const TransformationNodeInfo: AllNodeInfoType =
           options: object) =>
           visitor.visitGroupByNode(transformationNode, docCopy, options),
         newFieldType: 'array',
+      },
+      [TransformationNodeType.ZipcodeNode]:
+      {
+        humanName: 'Zipcode',
+        editable: true,
+        creatable: true,
+        description: 'Convert a zipcode into location data',
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+        },
+        type: ZipcodeTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitZipcodeNode(transformationNode, docCopy, options),
       },
   };
 

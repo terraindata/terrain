@@ -80,10 +80,13 @@ import SubtractTransformationNode from './nodes/SubtractTransformationNode';
 import SumTransformationNode from './nodes/SumTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
 import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
+import ZipcodeTransformationNode from './nodes/ZipcodeTransformationNode';
 import TransformationNodeType, { NodeOptionsType } from './TransformationNodeType';
 import TransformationNodeVisitor from './TransformationNodeVisitor';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
+
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 export default class TransformationEngineNodeVisitor extends TransformationNodeVisitor
 {
@@ -1319,6 +1322,50 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     } as TransformationVisitResult;
   }
 
+  public visitZipcodeNode(node: ZipcodeTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.ZipcodeNode>;
+
+    node.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        for (let i: number = 0; i < el.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+          yadeep.set(doc, kpi, this.zipcodeHelper(yadeep.get(doc, kpi), opts));
+        }
+      }
+      else if (typeof el !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to convert a non-string field into a zipcode (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      else
+      {
+        yadeep.set(doc, field, this.zipcodeHelper(el, opts));
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
+
   // use standard AES 128 decryption
   private decryptHelper(msg: string, key?: any): string
   {
@@ -1333,5 +1380,27 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
     const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
     return aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes));
+  }
+
+  private zipcodeHelper(zipcode: string, opts: NodeOptionsType<TransformationNodeType.ZipcodeNode>)
+  {
+    const data = TransformationEngine.datastore.get('zips')[zipcode];
+    if (!data)
+    {
+      return null;
+    }
+    switch (opts.format)
+    {
+      case 'city':
+        return data.city;
+      case 'state':
+        return data.state;
+      case 'citystate':
+        return (data.city as string) + ', ' + (data.state as string);
+      case 'type':
+        return data.type;
+      default:
+        return data.loc;
+    }
   }
 }

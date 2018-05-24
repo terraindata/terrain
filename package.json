@@ -97,7 +97,7 @@
     },
     "globals": {
       "DEV": true,
-      "MIDWAY_HOST": "http://localhost"
+      "MIDWAY_HOST": "http://localhost:3000"
     },
     "setupFiles": [
       "<rootDir>/src/test/__mocks__/browserMock.ts"
