@@ -384,7 +384,7 @@ export class EngineProxy
         const newFieldSyntheticPath = this.getSyntheticInputPath(newFieldKP);
         EngineUtil.transferField(childId, newFieldSyntheticPath, this.engine);
         const newChildId = this.engine.getInputFieldID(newFieldSyntheticPath);
-        this.engine.setOutputKeyPath(newChildId, newFieldKP);
+        this.engine.setOutputKeyPath(newChildId, newFieldKP, undefined, false);
       }
     });
     return newFieldId;
