@@ -51,7 +51,7 @@ import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/Endpoi
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import AEndpointStream from './AEndpointStream';
 
-export default class HTTPEndpoint extends AEndpointStream
+export default class FSEndpoint extends AEndpointStream
 {
   constructor()
   {

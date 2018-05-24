@@ -52,6 +52,7 @@ import { FileTypes } from './types/ETLTypes';
 
 import { FileConfig } from 'shared/etl/types/EndpointTypes';
 import Util from 'shared/Util';
+import * as xlsx from 'xlsx';
 
 export const mimeToFileType: { [k: string]: FileTypes } = {
   'text/csv': FileTypes.Csv,
@@ -60,6 +61,7 @@ export const mimeToFileType: { [k: string]: FileTypes } = {
   'text/xml': FileTypes.Xml,
   'text/tab-separated-values': FileTypes.Tsv,
   'text/tsv': FileTypes.Tsv,
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': FileTypes.Xlsx,
 };
 
 export const fileTypeToMime = {
@@ -67,6 +69,7 @@ export const fileTypeToMime = {
   [FileTypes.Json]: 'application/json',
   [FileTypes.Xml]: 'text/xml',
   [FileTypes.Tsv]: 'text/tab-separated-values',
+  [FileTypes.Xlsx]: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 };
 
 export function getFileType(file: File): FileTypes
@@ -189,7 +192,19 @@ export function getSampleRows(
         onError,
       );
     };
-    fr.readAsText(fileChunk);
+    fr.readAsText(file.slice(0, ChunkSize));
+  }
+  else if (fileType === FileTypes.Xlsx)
+  {
+    const fr = new FileReader();
+    fr.onloadend = () =>
+    {
+      const workbook = xlsx.read(fr.result, { type: 'array' });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const json = xlsx.utils.sheet_to_json(sheet);
+      onLoad(json);
+    };
+    fr.readAsArrayBuffer(file);
   }
 }
 // TODO for json, use a streaming implementation

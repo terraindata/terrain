@@ -203,4 +203,4 @@ export default class FileConfigForm extends TerrainComponent<Props>
   }
 }
 
-const fileTypeList = List([FileTypes.Json, FileTypes.Csv, FileTypes.Xml, FileTypes.Tsv]);
+const fileTypeList = List([FileTypes.Json, FileTypes.Csv, FileTypes.Xml, FileTypes.Tsv, FileTypes.Xlsx]);
