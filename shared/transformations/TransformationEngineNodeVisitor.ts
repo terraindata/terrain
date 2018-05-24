@@ -372,7 +372,10 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
 
       split = TransformationEngineNodeVisitor.splitHelper(el, opts);
-
+      if (split.length > opts.newFieldKeyPaths.size)
+      {
+        split[opts.newFieldKeyPaths.size - 1] = split.slice(opts.newFieldKeyPaths.size - 1).join(String(opts.delimiter));
+      }
       for (let i: number = 0; i < opts.newFieldKeyPaths.size; i++)
       {
         yadeep.set(doc, opts.newFieldKeyPaths.get(i), split[i], { create: true });
