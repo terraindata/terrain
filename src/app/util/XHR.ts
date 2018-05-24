@@ -53,7 +53,7 @@ class XHR
       {
         headers: {},
         data: {},
-        baseURL: 'http://localhost:3000/midway/v1',
+        baseURL: MIDWAY_HOST + '/midway/v1',
         timeout: 180000,
         withCredentials: false,
         params: {
