@@ -104,7 +104,7 @@ export default class TerrainDateParameter
 
   public static getTimePart(dateString: string): string
   {
-    const  datePart = dateString.split('.');
+    const datePart = dateString.split('.');
     if (datePart[3] !== undefined)
     {
       return datePart[3];
@@ -115,7 +115,7 @@ export default class TerrainDateParameter
   }
   public static setTimePart(dateString: string, timeStr: string): string
   {
-    const  datePart = dateString.split('.');
+    const datePart = dateString.split('.');
     if (timeStr.startsWith('T'))
     {
       datePart[3] = timeStr;
@@ -128,12 +128,12 @@ export default class TerrainDateParameter
 
   public static getDatePart(dateString: string): string
   {
-    const  datePart = dateString.split('.');
+    const datePart = dateString.split('.');
     return datePart.slice(0, 3).join('.');
   }
   public static setDayPart(dateString: string, dayStr: string): string
   {
-    const  datePart = dateString.split('.');
+    const datePart = dateString.split('.');
     if (datePart[3] === undefined)
     {
       return dayStr;
