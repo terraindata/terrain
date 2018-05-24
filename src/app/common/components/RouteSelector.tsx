@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions member-access no-var-requires no-console
+// tslint:disable:strict-boolean-expressions member-access no-var-requires no-console no-empty
 
 import Button from 'app/common/components/Button';
 import Modal from 'app/common/components/Modal';
@@ -524,8 +524,8 @@ export class RouteSelector extends TerrainComponent<Props>
             <KeyboardFocus
               index={0 /* we handle index manipulation internally in this class */}
               length={0}
-              onIndexChange={_.noop}
-              onSelect={_.noop}
+              onIndexChange={noop}
+              onSelect={noop}
               onKeyDown={this.handleInputKeyDown}
               onFocus={this._fn(this.handleOptionSearchFocus, index)}
               onFocusLost={this._fn(this.handleOptionSearchFocusLost, index)}
@@ -1070,10 +1070,10 @@ export class RouteSelector extends TerrainComponent<Props>
         index={index}
         dataIndex={dataIndex}
         primaryKey={data._id}
-        onExpand={_.noop}
+        onExpand={noop}
         allowSpotlights={false}
-        onSpotlightAdded={_.noop}
-        onSpotlightRemoved={_.noop}
+        onSpotlightAdded={noop}
+        onSpotlightRemoved={noop}
         key={index}
         isVisible={true}
         hideNested={true}
@@ -1231,6 +1231,8 @@ export class RouteSelector extends TerrainComponent<Props>
   //   });
   // }
 }
+
+function noop() { }
 
 const OPTION_NAME_STYLE = {
   color: Colors().fontColor2,

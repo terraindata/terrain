@@ -84,6 +84,7 @@ export default class TypeUtil
       return ETLFieldTypes.String;
     }
 
+    let allNull = true;
     let allDate = true;
     let allGeo = true;
 
@@ -91,6 +92,7 @@ export default class TypeUtil
     {
       if (!TypeUtil.isNullHelper(val))
       {
+        allNull = false;
         if (!TypeUtil.isDateHelper(val))
         {
           allDate = false;
@@ -102,11 +104,11 @@ export default class TypeUtil
       }
     }
 
-    if (allDate)
+    if (allDate && !allNull)
     {
       return ETLFieldTypes.Date;
     }
-    else if (allGeo)
+    else if (allGeo && !allNull)
     {
       return ETLFieldTypes.GeoPoint;
     }
@@ -124,11 +126,13 @@ export default class TypeUtil
     }
 
     let allIntegers = true;
+    let allNull = true;
 
     for (const val of values)
     {
       if (val != null && !Number.isNaN(val))
       {
+        allNull = false;
         if (!TypeUtil.numberIsInteger(val))
         {
           allIntegers = false;
@@ -136,7 +140,7 @@ export default class TypeUtil
       }
     }
 
-    if (allIntegers)
+    if (allIntegers && !allNull)
     {
       return ETLFieldTypes.Integer;
     }
@@ -228,6 +232,10 @@ export default class TypeUtil
 
   public static isDateHelper(value: string): boolean
   {
+    if (value == null || value === '')
+    {
+      return false;
+    }
     const MMDDYYYYRegex = new RegExp(/^((0?[1-9]|1[0,1,2])\/(0?[1-9]|[1,2][0-9]|3[0,1])\/([0-9]{4}))$/);
     const YYYYMMDDRegex = new RegExp(/([0-9]{4}-[0,1]{1}[0-9]{1}-[0-3]{1}[0-9]{1})/);
     const ISORegex = new RegExp(/^([0-9]{4})-([0,1]{1}[0-9]{1})-([0-3]{1}[0-9]{1})( |T){0,1}([0-2]{1}[0-9]{1}):{0,1}([0-5]{1}[0-9]{1}):{0,1}([0-9]{2})(\.([0-9]{3,6})|((-|\+)?[0-9]{2}:[0-9]{2}))?Z?$/);

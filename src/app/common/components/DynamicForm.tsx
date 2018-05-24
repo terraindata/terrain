@@ -251,12 +251,14 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
         <span style={{ marginLeft: '0px' }}>
           <Dropdown
             className='dynamic-form-pick'
+            openDown={true}
             selectedIndex={selectedIndex}
             onChange={onChange}
             options={pickOptions}
             canEdit={!disabled}
             optionsDisplayName={displayNames}
             textColor={options.textColor}
+            openDown={true}
           />
         </span>
       </div>
