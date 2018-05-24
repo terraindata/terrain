@@ -192,7 +192,7 @@ export function getSampleRows(
         onError,
       );
     };
-    fr.readAsText(file.slice(0, ChunkSize));
+    fr.readAsText(fileChunk);
   }
   else if (fileType === FileTypes.Xlsx)
   {
@@ -204,7 +204,7 @@ export function getSampleRows(
       const json = xlsx.utils.sheet_to_json(sheet);
       onLoad(json);
     };
-    fr.readAsArrayBuffer(file);
+    fr.readAsArrayBuffer(file.slice(0, ChunkSize));
   }
 }
 // TODO for json, use a streaming implementation
