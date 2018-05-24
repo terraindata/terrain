@@ -151,12 +151,16 @@ export default class ESInterpreter
           if (info.parameter !== undefined)
           {
             const ps = info.parameter.split('.');
-            if (alias !== null && ps[0] === alias)
+            const parameterName = ps[0];
+            // meta parameters
+            if (alias !== null && parameterName === alias)
             {
               // give a special value to parameterValue
               info.parameterValue = new ESJSONParser(info.value);
-            }
-            else
+            } else if (parameterName === 'TerrainDate')
+            {
+              info.parameterValue = new ESJSONParser(info.value);
+            } else
             {
               let value: any = this.params;
               for (const p of ps)

@@ -477,7 +477,7 @@ export class ESJSONParser extends ESParser
 
   private readParameter(): string
   {
-    let match: string | null = this.matchAndSetToken(/^@([a-zA-Z_\.?][a-zA-Z_0-9\.?]*)/);
+    let match: string | null = this.matchAndSetToken(/^@([a-zA-Z_\.?][a-zA-Z_0-9\.\:\+?]*)/);
     if (match === null || !this.allowParameters)
     {
       match = '';

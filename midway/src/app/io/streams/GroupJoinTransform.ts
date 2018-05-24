@@ -190,7 +190,7 @@ export default class GroupJoinTransform extends SafeReadable
 
           try
           {
-            const queryStr = ESParameterFiller.fillParentParameter(
+            const queryStr = ESParameterFiller.generate(
               vi,
               {
                 [this.parentAlias]: inputs[i]['_source'],
