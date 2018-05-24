@@ -97,12 +97,8 @@ export default class ESParameterFiller
             } else
             {
               // merge [{field1:val1}, {field1:val1}] to [val1, val2]
+              // parameterValue may be [] since not all elements have the same shape.
               parameterValue = parameterValue.map((val) => val[fieldName]).filter((val) => val !== undefined);
-              // Should we add this check or not, elements of nested field might not have the same shape?
-              // if (parameterValue.length === 0)
-              // {
-              // throw new Error('None of elements in parameter value ' + JSON.stringify(parameterValue) + ' has field ' + fieldName);
-              // }
             }
           } else if (typeof parameterValue === 'object')
           {
@@ -127,7 +123,7 @@ export default class ESParameterFiller
           {
             return JSON.stringify(parameterValue.join(' '));
           }
-        } else
+        } else if (parameterValue !== undefined)
         {
           if (inTerms === true)
           {
@@ -136,6 +132,9 @@ export default class ESParameterFiller
           {
             return JSON.stringify(parameterValue);
           }
+        } else
+        {
+          throw new Error('Undefined parameter ' + param + ' in ' + JSON.stringify(params, null, 2));
         }
       });
   }
@@ -165,11 +164,28 @@ export default class ESParameterFiller
           return TerrainDateParameter.fillTerrainDateParameter(value.slice(1));
         }
 
-        if (value === undefined)
+        if (Array.isArray(value))
+        {
+          if (inTerms === true)
+          {
+            return JSON.stringify(value);
+          } else
+          {
+            return JSON.stringify(value.join(' '));
+          }
+        } else if (value !== undefined)
+        {
+          if (inTerms === true)
+          {
+            return JSON.stringify([value]);
+          } else
+          {
+            return JSON.stringify(value);
+          }
+        } else
         {
           throw new Error('Undefined parameter ' + param + ' in ' + JSON.stringify(params, null, 2));
         }
-        return JSON.stringify(value);
       });
   }
 }
