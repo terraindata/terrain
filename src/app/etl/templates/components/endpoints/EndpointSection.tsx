@@ -177,6 +177,8 @@ class EndpointSection extends TerrainComponent<Props>
   public renderNewSourceModal()
   {
     const { template } = this.props;
+    const { sourceModalError } = this.state;
+
     const editForm = (
       <div className='new-source-modal'>
         <EndpointForm
@@ -206,6 +208,8 @@ class EndpointSection extends TerrainComponent<Props>
         textboxPlaceholderValue='Source Name'
         closeOnConfirm={true}
         allowOverflow={true}
+        errorMessage={sourceModalError}
+        onErrorClear={this.handleModalErrorClear}
       >
         {editForm}
       </Modal>
@@ -215,7 +219,7 @@ class EndpointSection extends TerrainComponent<Props>
   public render()
   {
     const { isSource, template } = this.props;
-    const { endpoints, sourceModalError } = this.state;
+    const { endpoints } = this.state;
     const buttonsDisabled = endpoints === (isSource ? template.getSources() : template.getSinks());
 
     return (
@@ -233,16 +237,6 @@ class EndpointSection extends TerrainComponent<Props>
         {(endpoints as LooseEndpointsType).map(this.renderEndpoint).toList()}
         {isSource ? this.renderNewSourceButton() : null}
         {isSource ? this.renderNewSourceModal() : null}
-        {
-          sourceModalError !== '' ?
-            <Modal
-              open={true}
-              title={'Validation Error'}
-              error={true}
-              message={sourceModalError}
-              onClose={() => this.setState({ sourceModalError: '' })}
-            /> : null
-        }
       </div>
     );
   }
@@ -286,6 +280,11 @@ class EndpointSection extends TerrainComponent<Props>
     this.setState({
       endpoints: (endpoints as LooseEndpointsType).set(newSourceModalName, source),
     }, this.handleApplyChanges);
+  }
+
+  public handleModalErrorClear()
+  {
+    this.setState({ sourceModalError: '' });
   }
 
   public isEndpointOpen(key: string)

@@ -64,6 +64,7 @@ export interface Props
   open: boolean;
   colorsActions: typeof ColorsActions;
   message?: string;
+  errorMessage?: string;
   title?: string;
   error?: boolean;
   fill?: boolean;
@@ -74,6 +75,7 @@ export interface Props
   onValidate?: () => boolean;
   onConfirm?: () => void;
   onClose: () => void;
+  onErrorClear: () => void;
   children?: any;
   childrenMessage?: string;
   thirdButtonText?: string;
@@ -242,6 +244,17 @@ class Modal extends TerrainComponent<Props>
                     />
                   }
                 </div>
+                {
+                  this.props.errorMessage !== '' ?
+                    <div className='modal-error'>
+                      {this.props.errorMessage}
+                      <CloseIcon
+                        className='modal-error-close-x'
+                        onClick={this.props.onErrorClear}
+                      />
+                    </div> : null
+                }
+
                 {
                   this.props.message &&
                   React.cloneElement(
