@@ -53,6 +53,7 @@ import objectify from '../util/deepObjectify';
 import { KeyPath, keyPathPrefixMatch, updateKeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 // import * as winston from 'winston'; // TODO what to do for error logging?
+import DataStore from './DataStore';
 import TransformationNode from './nodes/TransformationNode';
 import TransformationEngineNodeVisitor from './TransformationEngineNodeVisitor';
 import { TransformationInfo } from './TransformationInfo';
@@ -75,6 +76,8 @@ import TransformationVisitResult from './TransformationVisitResult';
  */
 export class TransformationEngine
 {
+  public static datastore = new DataStore();
+
   /**
    * Creates a TransformationEngine from a serialized representation
    * (either a JSON object or stringified JSON object).
