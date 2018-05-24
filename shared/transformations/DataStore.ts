@@ -43,42 +43,17 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import axios, { AxiosInstance } from 'axios';
 
-class XHR
+import zips from './data/zips';
+
+export default class DataStore
 {
-  public static getInstance(): AxiosInstance
+  public get(key: string)
   {
-    const terrainAxios = axios.create(
-      {
-        headers: {},
-        data: {},
-        baseURL: MIDWAY_HOST + '/midway/v1',
-        timeout: 180000,
-        withCredentials: false,
-        params: {
-          id: localStorage['id'],
-          accessToken: localStorage['accessToken'],
-          body: {},
-        },
-      });
-
-    terrainAxios.interceptors.response.use(
-      (response) => response,
-      (error) =>
-      {
-        let processedError = error;
-        if (processedError && processedError.response)
-        {
-          processedError = error.response.data.errors[0].detail;
-        }
-
-        return Promise.reject(processedError);
-      },
-    );
-
-    return terrainAxios;
+    if (key === 'zips')
+    {
+        return zips;
+    }
+    throw new Error('Dataset not found');
   }
 }
-
-export default XHR;

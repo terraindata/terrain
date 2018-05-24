@@ -96,6 +96,7 @@ class EndpointSection extends TerrainComponent<Props>
     newSourceModalOpen: boolean;
     newSourceModalName: string;
     newSource: SourceConfig;
+    sourceModalError: string;
   };
 
   constructor(props: Props)
@@ -107,6 +108,7 @@ class EndpointSection extends TerrainComponent<Props>
       newSourceModalOpen: false,
       newSourceModalName: '',
       newSource: _SourceConfig(),
+      sourceModalError: '',
     };
   }
 
@@ -168,12 +170,15 @@ class EndpointSection extends TerrainComponent<Props>
   {
     this.setState({
       newSourceModalOpen: true,
+      sourceModalError: '',
     });
   }
 
   public renderNewSourceModal()
   {
     const { template } = this.props;
+    const { sourceModalError } = this.state;
+
     const editForm = (
       <div className='new-source-modal'>
         <EndpointForm
@@ -191,9 +196,10 @@ class EndpointSection extends TerrainComponent<Props>
     return (
       <Modal
         open={this.state.newSourceModalOpen}
+        onValidate={this.handleSourceValidation}
         onConfirm={this.handleAddNewSource}
         onClose={this.closeNewSourceModal}
-        confirmDisabled={confirmDisabled}
+        // confirmDisabled={confirmDisabled}
         title='Add New Source'
         showTextbox={true}
         confirm={true}
@@ -202,6 +208,8 @@ class EndpointSection extends TerrainComponent<Props>
         textboxPlaceholderValue='Source Name'
         closeOnConfirm={true}
         allowOverflow={true}
+        errorMessage={sourceModalError}
+        onErrorClear={this.handleModalErrorClear}
       >
         {editForm}
       </Modal>
@@ -246,6 +254,25 @@ class EndpointSection extends TerrainComponent<Props>
     }
   }
 
+  public handleSourceValidation(): boolean
+  {
+    const { newSourceModalName, newSource } = this.state;
+    const source = newSource.set('name', newSourceModalName);
+    if (source.name === '')
+    {
+      this.setState({ sourceModalError: 'Please specify a Source Name' });
+      return false;
+    }
+
+    if (newSource.type == null)
+    {
+      this.setState({ sourceModalError: 'Please specify a Source Type' });
+      return false;
+    }
+
+    return true;
+  }
+
   public handleAddNewSource()
   {
     const { endpoints, newSourceModalName, newSource } = this.state;
@@ -253,6 +280,11 @@ class EndpointSection extends TerrainComponent<Props>
     this.setState({
       endpoints: (endpoints as LooseEndpointsType).set(newSourceModalName, source),
     }, this.handleApplyChanges);
+  }
+
+  public handleModalErrorClear()
+  {
+    this.setState({ sourceModalError: '' });
   }
 
   public isEndpointOpen(key: string)

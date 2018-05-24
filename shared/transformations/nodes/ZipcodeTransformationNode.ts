@@ -43,42 +43,20 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import axios, { AxiosInstance } from 'axios';
 
-class XHR
+import { List } from 'immutable';
+
+import { KeyPath } from '../../util/KeyPath';
+import TransformationNodeType from '../TransformationNodeType';
+import TransformationNode from './TransformationNode';
+
+export default class ZipcodeTransformationNode extends TransformationNode
 {
-  public static getInstance(): AxiosInstance
+  public constructor(id: number,
+    fields: List<KeyPath>,
+    options: object = {},
+    typeCode: TransformationNodeType = TransformationNodeType.ZipcodeNode)
   {
-    const terrainAxios = axios.create(
-      {
-        headers: {},
-        data: {},
-        baseURL: MIDWAY_HOST + '/midway/v1',
-        timeout: 180000,
-        withCredentials: false,
-        params: {
-          id: localStorage['id'],
-          accessToken: localStorage['accessToken'],
-          body: {},
-        },
-      });
-
-    terrainAxios.interceptors.response.use(
-      (response) => response,
-      (error) =>
-      {
-        let processedError = error;
-        if (processedError && processedError.response)
-        {
-          processedError = error.response.data.errors[0].detail;
-        }
-
-        return Promise.reject(processedError);
-      },
-    );
-
-    return terrainAxios;
+    super(id, fields, options, typeCode);
   }
 }
-
-export default XHR;

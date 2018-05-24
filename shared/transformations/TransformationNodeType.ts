@@ -74,6 +74,7 @@ enum TransformationNodeType
   EncryptNode = 'EncryptNode',
   DecryptNode = 'DecryptNode',
   GroupByNode = 'GroupByNode',
+  ZipcodeNode = 'ZipcodeNode',
 }
 
 // if this has errors, double check TransformationNodeType's keys are equal to its values
@@ -174,6 +175,9 @@ interface TransformationOptionTypes
     newFieldKeyPaths: List<KeyPath>;
     subkey: string;
     groupValues: any[];
+  };
+  ZipcodeNode: {
+    format: string;
   };
 }
 
