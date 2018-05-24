@@ -148,7 +148,10 @@ export default class MergeJoinTransform extends SafeReadable
     this.leftSource.on('end', () => { this.leftEnded = true; this.mergeJoin(); });
 
     // set up the right source
-    delete mergeJoinQuery[this.mergeJoinName]['size'];
+    if (mergeJoinQuery[this.mergeJoinName]['size'] !== undefined)
+    {
+      mergeJoinQuery[this.mergeJoinName]['size'] = 2147483647;
+    }
     const rightQuery = this.setSortClause(mergeJoinQuery[this.mergeJoinName], this.rightJoinKey);
     this.rightSource = new ElasticReader(client, rightQuery, true);
     this.rightSource.on('data', (buffer) =>
