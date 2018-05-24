@@ -653,7 +653,7 @@ function filterLineToQuery(line: FilterLine)
       break;
     case 'isnotin':
       value = PathFinderStringToJSONArray(String(value));
-      field = ine.fieldType === FieldType.Text && !line.analyzed ? field + '.keyword' : field;
+      field = line.fieldType === FieldType.Text && !line.analyzed ? field + '.keyword' : field;
        query = {
         bool: {
           must_not: {
