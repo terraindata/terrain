@@ -6,6 +6,7 @@
 
 .dropdown-wrapper {
  cursor: pointer;
+ z-index:99999;
 
  height: @dropdownHeight;
  &.dropdown-wrapper-larger {
@@ -21,7 +22,7 @@
 
  &:last-child {
   // if it's the last child in a row, we don't want to margin the right side
-  margin-right: 0px;
+  margin-left: 0px;
  }
  &:first-child {
   // same thing for the first/left

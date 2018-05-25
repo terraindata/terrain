@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import { List, Map, Set } from 'immutable';
 import * as Immutable from 'immutable';
+import * as TerrainLog from 'loglevel';
 
 import * as _ from 'lodash';
 import * as React from 'react';
@@ -535,10 +536,10 @@ export class ResultsManager extends TerrainComponent<Props>
         const processed: object = (new ESJSONParser(eql)).getValue();
         querySize = processed['size'];
         eql = this.postprocessEQL(processed, hitsPage, appendResults);
-        // console.log('post process ', eql);
       }
       catch (e)
       {
+        TerrainLog.debug('Error before sending out the query: ' + e.message);
         return;
       }
     }
@@ -561,6 +562,7 @@ export class ResultsManager extends TerrainComponent<Props>
     {
       this.state.query.xhr.abort();
     }
+    TerrainLog.debug('Issue query ' + eql);
     this.setState({
       lastQuery: query,
       queriedTql: eql,

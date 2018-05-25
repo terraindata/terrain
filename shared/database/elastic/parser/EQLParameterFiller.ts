@@ -44,8 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import moment = require('moment');
 import ESParameterSubstituter from './ESParameterSubstituter';
 import ESValueInfo from './ESValueInfo';
+import TerrainDateParameter from './TerrainDateParameter';
 
 /**
  * Fills values in for parameters in a query using a given substitutionFunction,
@@ -61,6 +63,17 @@ import ESValueInfo from './ESValueInfo';
  *  + traverse and replace
  * + Immutable Substitution -> must first identify mutation locations before copy
  *  + traverse and mark, copy on return
+ *
+ *  Parameters are in the format of `parameterName[.fieldL1][.fieldL2]`.
+ *  There are two types of parameters: 1) given parameters 2)meta parameters
+ *  A given parameter is a parameter whose value is given in the `params` (params[parameterName] exists). When handling a given parameter,
+ *  If there are nested fields followed by the parameter name, we try to search the final value in the given parameter value.
+ *
+ *  When the parameter's value is not given, then it could be a meta parameter:
+ *  @TerrainData is a date related meta parameter. We replace it with a date derived from `now`.
+ *  @[parentAlias] is a groupJoin meta parameter. We leave it as what it is until runtime, then it will become a given parameter.
+ *  NOTE: If the parameterValue of a given parameter is in the format of @TerrainDate meta parameter, we try to substitute the parameter
+ *  with  meta value as if the parameter is a @TerrainData parameter.
  */
 export default class ESParameterFiller
 {
@@ -71,36 +84,91 @@ export default class ESParameterFiller
       (param: string, runtimeParam?: string, inTerms?: boolean): string =>
       {
         const ps = param.split('.');
-        if (runtimeParam !== undefined && ps[0] === runtimeParam && params[runtimeParam] === undefined)
+        const parameterName = ps[0];
+        if (params[parameterName] !== undefined)
         {
-          return JSON.stringify('@' + param);
-        }
+          // given parameters
+          const parameterValue = params[parameterName];
+          // replace it eagerly for easy debugging.
+          if (typeof parameterValue === 'string' && TerrainDateParameter.isValidTerrainDateParameter(parameterValue))
+          {
+            return TerrainDateParameter.fillTerrainDateParameter(param);
+          }
+          return ESParameterFiller.handleGivenParameter(ps.slice(1), params[parameterName], inTerms);
+        } else
+        {
+          // TerrainData?
+          // TerrainDate parameter
+          if (parameterName === 'TerrainDate')
+          {
+            return TerrainDateParameter.fillTerrainDateParameter(param);
+          }
 
-        let value: any = params;
-        let joinArray: boolean = false;
-        for (const p of ps)
-        {
-          // If value is an array, and p is not an index, look at inner objects of array
-          if (Array.isArray(value) && isNaN(parseFloat(p)))
+          // @[parentAlias] parameter
+          if (runtimeParam !== undefined && parameterName === runtimeParam)
           {
-            value = value.map((val) => val[p]);
-            joinArray = inTerms !== true;
+            return JSON.stringify('@' + param);
           }
-          else
-          {
-            value = value[p];
-          }
-        }
-        // If not in a terms query, but the value is an array, join it into a string
-        if (Array.isArray(value) && joinArray)
-        {
-          value = value.join(' ');
-        }
-        if (value === undefined)
-        {
+
           throw new Error('Undefined parameter ' + param + ' in ' + JSON.stringify(params, null, 2));
         }
-        return JSON.stringify(value);
       });
+  }
+
+  public static handleGivenParameter(fields: string[], parameterValue: any, inTerms?): string
+  {
+    for (let i = 0; i < fields.length; i += 1)
+    {
+      const fieldName = fields[i];
+      if (Array.isArray(parameterValue))
+      {
+        if (Number.isInteger(Number(fieldName)) === true && Number(fieldName) > 0)
+        {
+          const newValue = parameterValue[Number(fieldName)];
+          if (newValue === undefined)
+          {
+            throw new Error('Parameter array value ' + JSON.stringify(parameterValue) + ' does not have field ' + fieldName);
+          }
+          parameterValue = newValue;
+        } else
+        {
+          // merge [{field1:val1}, {field1:val1}] to [val1, val2]
+          // parameterValue may be [] since not all elements have the same shape.
+          parameterValue = parameterValue.map((val) => val[fieldName]).filter((val) => val !== undefined);
+        }
+      } else if (typeof parameterValue === 'object')
+      {
+        const newValue = parameterValue[fieldName];
+        if (newValue === undefined)
+        {
+          throw new Error('Parameter object value ' + JSON.stringify(parameterValue) + ' does not have field ' + fieldName);
+        }
+        parameterValue = newValue;
+      } else
+      {
+        throw new Error('Parameter value ' + String(parameterValue) + ' does not have field ' + fieldName);
+      }
+    }
+
+    if (Array.isArray(parameterValue))
+    {
+      if (inTerms === true)
+      {
+        return JSON.stringify(parameterValue);
+      } else
+      {
+        return JSON.stringify(parameterValue.join(' '));
+      }
+    } else
+    {
+      // parameterValue must not be `undefined`.
+      if (inTerms === true)
+      {
+        return JSON.stringify([parameterValue]);
+      } else
+      {
+        return JSON.stringify(parameterValue);
+      }
+    }
   }
 }
