@@ -1181,9 +1181,9 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     }
   }
 
-  private visitHelper(fields: Immutable.List<Immutable.List<string>>, doc: object, defaultResult: TransformationVisitResult,
-    cb: (kp: Immutable.List<string>, el: any) => TransformationVisitResult | void,
-    shouldTransform: (kp: Immutable.List<string>, el: any) => boolean = (kp, el) => true): TransformationVisitResult
+  private visitHelper(fields: List<KeyPath>, doc: object, defaultResult: TransformationVisitResult,
+    cb: (kp: KeyPath, el: any) => TransformationVisitResult | void,
+    shouldTransform: (kp: KeyPath, el: any) => boolean = (kp, el) => true): TransformationVisitResult
   {
     const reducedResult = fields.reduce((accumulator, field) =>
     {
