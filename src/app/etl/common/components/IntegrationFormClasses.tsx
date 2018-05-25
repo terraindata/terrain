@@ -55,6 +55,7 @@ import Util from 'util/Util';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import ObjectForm from 'common/components/ObjectForm';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
@@ -64,7 +65,7 @@ const { List } = Immutable;
 export interface Props
 {
   integration: IntegrationConfig;
-  onChange: (newIntegration: IntegrationConfig) => void;
+  onChange: (newIntegration: IntegrationConfig, apply?: boolean) => void;
   debounceAll?: boolean;
 }
 
@@ -126,18 +127,18 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
     );
   }
 
-  private handleAuthFormChange(state: AuthState)
+  protected handleAuthFormChange(state: AuthState, apply?: boolean)
   {
     const { onChange, integration } = this.props;
     const newConfig = this.authStateToConfig(state);
-    onChange(integration.set('authConfig', newConfig));
+    onChange(integration.set('authConfig', newConfig), apply);
   }
 
-  private handleConnectionFormChange(state: ConnectionState)
+  protected handleConnectionFormChange(state: ConnectionState, apply?: boolean)
   {
     const { onChange, integration } = this.props;
     const newConfig = this.connectionStateToConfig(state);
-    onChange(integration.set('connectionConfig', newConfig));
+    onChange(integration.set('connectionConfig', newConfig), apply);
   }
 }
 
@@ -184,7 +185,69 @@ class HttpForm extends IntegrationFormBase<HttpAuthT, HttpConnectionT>
       type: DisplayType.TextBox,
       displayName: 'Url',
     },
+    headers: {
+      type: DisplayType.Custom,
+      widthFactor: -1,
+      options: {
+        render: this.renderHeadersForm,
+      },
+    },
+    params: {
+      type: DisplayType.Custom,
+      widthFactor: -1,
+      options: {
+        render: this.renderParamsForm,
+      },
+    },
+    gzip: {
+      type: DisplayType.CheckBox,
+      displayName: 'gzip',
+    },
   };
+
+  public defaultState = {
+    url: '',
+    headers: {},
+    params: {},
+  };
+
+  public renderHeadersForm(state: HttpConnectionT, disabled)
+  {
+    return (
+      <ObjectForm
+        object={state.headers != null ? state.headers : {}}
+        onChange={this.handleHeadersChange}
+        label='Headers'
+      />
+    );
+  }
+
+  public handleHeadersChange(newHeaders, apply?: boolean)
+  {
+    const options = this.props.integration.connectionConfig as HttpConnectionT;
+    const newFormState: HttpConnectionT = _.extend({}, options);
+    newFormState.headers = newHeaders;
+    this.handleConnectionFormChange(newFormState, apply);
+  }
+
+  public renderParamsForm(state: HttpConnectionT, disabled)
+  {
+    return (
+      <ObjectForm
+        object={state.params != null ? state.params : {}}
+        onChange={this.handleParamsChange}
+        label='Parameters'
+      />
+    );
+  }
+
+  public handleParamsChange(newParams, apply?: boolean)
+  {
+    const options = this.props.integration.connectionConfig as HttpConnectionT;
+    const newFormState: HttpConnectionT = _.extend({}, options);
+    newFormState.params = newParams;
+    this.handleConnectionFormChange(newFormState, apply);
+  }
 }
 
 type FsAuthT = AuthConfigType<Integrations.Fs>;

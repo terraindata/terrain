@@ -68,7 +68,7 @@ const { List, Map } = Immutable;
 export interface Props
 {
   integration: IntegrationConfig;
-  onChange: (newConfig: IntegrationConfig) => void;
+  onChange: (newConfig: IntegrationConfig, apply?: boolean) => void;
   hideType?: boolean;
   hideName?: boolean;
   debounceAll?: boolean;
@@ -82,7 +82,7 @@ export default class IntegrationForm extends TerrainComponent<Props>
       displayName: 'Type',
       options: {
         pickOptions: (s) => integrationList,
-        displayNames: (s) => integrationNames,
+        displayNames: (s) => integrationNames as Immutable.Map<string, string>,
         indexResolver: (value) => integrationList.indexOf(value),
       },
     },
@@ -172,9 +172,9 @@ export default class IntegrationForm extends TerrainComponent<Props>
     onChange(integration.set('name', state.name));
   }
 
-  public handleIntegrationChange(newIntegration: IntegrationConfig)
+  public handleIntegrationChange(newIntegration: IntegrationConfig, apply?: boolean)
   {
-    this.props.onChange(newIntegration);
+    this.props.onChange(newIntegration, apply);
   }
 }
 
