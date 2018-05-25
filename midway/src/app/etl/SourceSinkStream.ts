@@ -66,6 +66,7 @@ import Templates from './Templates';
 import CSVTransform from '../io/streams/CSVTransform';
 import JSONTransform from '../io/streams/JSONTransform';
 import ProgressStream from '../io/streams/ProgressStream';
+import XLSXTransform from '../io/streams/XLSXTransform';
 import XMLTransform from '../io/streams/XMLTransform';
 
 import AEndpointStream from './endpoints/AEndpointStream';
@@ -140,8 +141,11 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
       switch (source.fileConfig.fileType)
       {
         case 'json':
-          const jsonPath: string = (!source.fileConfig.jsonPath || source.fileConfig.jsonNewlines) ? '*' :
-            source.fileConfig.jsonPath;
+          let jsonPath: string = (source.fileConfig.jsonNewlines) ? undefined : '*';
+          if (!!source.fileConfig.jsonPath)
+          {
+            jsonPath = source.fileConfig.jsonPath;
+          }
           importStream = sourceStream.pipe(JSONTransform.createImportStream(jsonPath));
           break;
         case 'csv':
@@ -150,12 +154,15 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
         case 'tsv':
           importStream = sourceStream.pipe(CSVTransform.createImportStream(true, '\t'));
           break;
+        case 'xlsx':
+          importStream = sourceStream.pipe(XLSXTransform.createImportStream());
+          break;
         case 'xml':
           const xmlPath: string | undefined = source.fileConfig.xmlPath;
           importStream = sourceStream.pipe(XMLTransform.createImportStream(xmlPath));
           break;
         default:
-          throw new Error('Download file type must be either CSV, TSV, JSON or XML.');
+          throw new Error('Download file type must be either CSV, TSV, JSON, XLSX or XML.');
       }
       resolve(importStream);
     }
@@ -191,7 +198,7 @@ export async function getSinkStream(
         switch (sink.fileConfig.fileType)
         {
           case 'json':
-            if (sink.fileConfig.jsonPath !== undefined)
+            if (sink.fileConfig.jsonPath !== null && sink.fileConfig.jsonPath !== undefined)
             {
               let path = sink.fileConfig.jsonPath.split('.');
               const wildcardIndex: number = path.indexOf('*');
@@ -229,10 +236,15 @@ export async function getSinkStream(
             }
             break;
           case 'csv':
-            transformStream = CSVTransform.createExportStream();
+            transformStream = CSVTransform.createExportStream(
+              sink.fileConfig.fieldOrdering !== null ? sink.fileConfig.fieldOrdering : sink.fileConfig.hasCsvHeader,
+            );
             break;
           case 'tsv':
-            transformStream = CSVTransform.createExportStream(true, '\t');
+            transformStream = CSVTransform.createExportStream(
+              sink.fileConfig.fieldOrdering !== null ? sink.fileConfig.fieldOrdering : sink.fileConfig.hasCsvHeader,
+              '\t',
+            );
             break;
           case 'xml':
             transformStream = XMLTransform.createExportStream();

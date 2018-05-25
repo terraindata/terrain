@@ -193,9 +193,15 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
       const scopes: string[] = [];
       const hasPostProcessTransforms: boolean = Array.isArray(gaSource.options['transformations'])
         && gaSource.options['transformations'].length !== 0;
-      const gaConfigPrivateKey: string = '-----BEGIN PRIVATE KEY-----' + ((gaConfig['privateKey'] as string)
-        .replace('-----BEGIN PRIVATE KEY-----', '').replace('-----END PRIVATE KEY-----', '')
-        .replace(new RegExp('\\s', 'g'), '\n') as string) + '-----END PRIVATE KEY-----';
+      let gaConfigPrivateKey: string = '-----BEGIN RSA PRIVATE KEY-----' + ((gaConfig['privateKey'] as string)
+        .replace('-----BEGIN RSA PRIVATE KEY-----', '').replace('-----END RSA PRIVATE KEY-----', '')
+        .replace(new RegExp('\\s', 'g'), '\n').replace(new RegExp('\\n+', 'g'), '\n') as string) + '-----END RSA PRIVATE KEY-----';
+      if (gaConfig['privateKey'].indexOf('BEGIN PRIVATE KEY') !== -1 && gaConfig['privateKey'].indexOf('END PRIVATE KEY') !== -1)
+      {
+        gaConfigPrivateKey = '-----BEGIN PRIVATE KEY-----' + ((gaConfig['privateKey'] as string)
+          .replace('-----BEGIN PRIVATE KEY-----', '').replace('-----END PRIVATE KEY-----', '')
+          .replace(new RegExp('\\s', 'g'), '\n').replace(new RegExp('\\n+', 'g'), '\n') as string) + '-----END PRIVATE KEY-----';
+      }
 
       gaConfig['scopes'].forEach((gaConfigScope) =>
       {
@@ -230,6 +236,7 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
             if (err !== null && err !== undefined)
             {
               winston.warn(gaConfig['email']);
+              winston.warn(gaConfigPrivateKey);
               winston.warn('<redacted private key contents>');
               winston.warn(err);
             }

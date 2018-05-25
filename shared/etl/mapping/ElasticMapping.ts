@@ -298,6 +298,10 @@ export class ElasticMapping
     const ids = this.engine.getAllFieldIDs();
     ids.forEach((id, i) =>
     {
+      if (!this.engine.getFieldEnabled(id))
+      {
+        return;
+      }
       const etlType = this.getETLType(id);
       if (etlType !== ETLFieldTypes.GeoPoint)
       {

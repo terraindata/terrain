@@ -50,6 +50,7 @@ import dateFormat = require('date-format');
 import * as Immutable from 'immutable';
 import isPrimitive = require('is-primitive');
 import { keccak256 } from 'js-sha3';
+import * as _ from 'lodash';
 
 import { diff } from 'semver';
 import { KeyPath } from '../util/KeyPath';
@@ -65,6 +66,7 @@ import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import EncryptTransformationNode from './nodes/EncryptTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
 import FindReplaceTransformationNode from './nodes/FindReplaceTransformationNode';
+import GroupByTransformationNode from './nodes/GroupByTransformationNode';
 import HashTransformationNode from './nodes/HashTransformationNode';
 import InsertTransformationNode from './nodes/InsertTransformationNode';
 import JoinTransformationNode from './nodes/JoinTransformationNode';
@@ -78,10 +80,13 @@ import SubtractTransformationNode from './nodes/SubtractTransformationNode';
 import SumTransformationNode from './nodes/SumTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
 import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
+import ZipcodeTransformationNode from './nodes/ZipcodeTransformationNode';
 import TransformationNodeType, { NodeOptionsType } from './TransformationNodeType';
 import TransformationNodeVisitor from './TransformationNodeVisitor';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
+
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 export default class TransformationEngineNodeVisitor extends TransformationNodeVisitor
 {
@@ -210,7 +215,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     node.fields.forEach((field) =>
     {
       const el: any = yadeep.get(doc, field);
-      if (typeof el !== 'string')
+      if (typeof el !== 'string' && el.constructor !== Array)
       {
         return {
           errors: [
@@ -227,7 +232,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         at = opts['at'];
         if (opts['at'] < 0)
         {
-          at += el.length + 1;
+          at += (el.length as number) + 1;
         }
       }
       else if (opts['at'] === undefined)
@@ -275,8 +280,28 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         } as TransformationVisitResult;
       }
 
-      // Currently assumes a single from and length for all fieldIDs
-      yadeep.set(doc, field, el.slice(0, at) + String(value) + el.slice(at), { create: true });
+      if (el.constructor === Array)
+      {
+        for (let i: number = 0; i < Object.keys(el).length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+          const eli: any = yadeep.get(doc, kpi);
+          yadeep.set(doc, kpi, (eli.slice(0, at) as string) + String(value) + (eli.slice(at) as string), { create: true });
+        }
+      }
+      else
+      {
+        // Currently assumes a single from and length for all fieldIDs
+        yadeep.set(doc, field, (el.slice(0, at) as string) + String(value) + (el.slice(at) as string), { create: true });
+      }
     });
 
     return {
@@ -350,19 +375,11 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
 
       split = TransformationEngineNodeVisitor.splitHelper(el, opts);
-
-      if (split.length !== opts.newFieldKeyPaths.size)
+      if (split.length > opts.newFieldKeyPaths.size)
       {
-        return {
-          errors: [
-            {
-              message: 'Number of split field names does not match number of split elements',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
+        split[opts.newFieldKeyPaths.size - 1] = split.slice(opts.newFieldKeyPaths.size - 1).join(String(opts.delimiter));
       }
-
-      for (let i: number = 0; i < split.length; i++)
+      for (let i: number = 0; i < opts.newFieldKeyPaths.size; i++)
       {
         yadeep.set(doc, opts.newFieldKeyPaths.get(i), split[i], { create: true });
       }
@@ -986,21 +1003,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       const el = yadeep.get(doc, field);
       if (Array.isArray(el))
       {
-        let count: number = 0;
-        for (let i: number = 0; i < el.length; i++)
-        {
-          let kpi: KeyPath = field;
-          if (kpi.contains('*'))
-          {
-            kpi = kpi.set(kpi.indexOf('*'), i.toString());
-          }
-          else
-          {
-            kpi = kpi.push(i.toString());
-          }
-          count++;
-        }
-        yadeep.set(doc, opts.newFieldKeyPaths.get(0), count, { create: true });
+        yadeep.set(doc, opts.newFieldKeyPaths.get(0), el.length, { create: true });
       }
       else
       {
@@ -1262,6 +1265,107 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     } as TransformationVisitResult;
   }
 
+  public visitGroupByNode(node: GroupByTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.GroupByNode>;
+
+    const mapper: {
+      [k: string]: KeyPath,
+    } = {};
+
+    const outputs: {
+      [k: string]: object[],
+    } = {};
+
+    for (let i = 0; i < opts.groupValues.length; i++)
+    {
+      mapper[opts.groupValues[i]] = opts.newFieldKeyPaths.get(i);
+      outputs[opts.groupValues[i]] = [];
+    }
+
+    node.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        // let count: number = 0;
+        for (let i: number = 0; i < el.length; i++)
+        {
+          const objToGroup = el[i];
+          const groupValue = objToGroup[opts.subkey];
+          if (outputs[groupValue] !== undefined)
+          {
+            outputs[groupValue].push(_.cloneDeep(objToGroup));
+          }
+        }
+        for (const key of Object.keys(mapper))
+        {
+          const kpi = mapper[key];
+          const arr = outputs[key];
+          yadeep.set(doc, kpi, arr, { create: true });
+        }
+      }
+      else
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to group on a non-array (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
+
+  public visitZipcodeNode(node: ZipcodeTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.ZipcodeNode>;
+
+    node.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        for (let i: number = 0; i < el.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+          yadeep.set(doc, kpi, this.zipcodeHelper(yadeep.get(doc, kpi), opts));
+        }
+      }
+      else if (typeof el !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to convert a non-string field into a zipcode (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      else
+      {
+        yadeep.set(doc, field, this.zipcodeHelper(el, opts));
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
+
   // use standard AES 128 decryption
   private decryptHelper(msg: string, key?: any): string
   {
@@ -1276,5 +1380,27 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
     const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
     return aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes));
+  }
+
+  private zipcodeHelper(zipcode: string, opts: NodeOptionsType<TransformationNodeType.ZipcodeNode>)
+  {
+    const data = TransformationEngine.datastore.get('zips')[zipcode];
+    if (!data)
+    {
+      return null;
+    }
+    switch (opts.format)
+    {
+      case 'city':
+        return data.city;
+      case 'state':
+        return data.state;
+      case 'citystate':
+        return (data.city as string) + ', ' + (data.state as string);
+      case 'type':
+        return data.type;
+      default:
+        return data.loc;
+    }
   }
 }

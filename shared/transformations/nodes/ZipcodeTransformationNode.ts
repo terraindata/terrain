@@ -44,69 +44,19 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as stream from 'stream';
-import * as winston from 'winston';
+import { List } from 'immutable';
 
-import { TaskConfig } from 'shared/types/jobs/TaskConfig';
-import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
-import Templates from '../../etl/Templates';
-import LogStream from '../../io/streams/LogStream';
-import { Task } from '../Task';
+import { KeyPath } from '../../util/KeyPath';
+import TransformationNodeType from '../TransformationNodeType';
+import TransformationNode from './TransformationNode';
 
-const templates: Templates = new Templates();
-
-export class TaskETL extends Task
+export default class ZipcodeTransformationNode extends TransformationNode
 {
-  constructor(taskConfig: TaskConfig)
+  public constructor(id: number,
+    fields: List<KeyPath>,
+    options: object = {},
+    typeCode: TransformationNodeType = TransformationNodeType.ZipcodeNode)
   {
-    super(taskConfig);
-  }
-
-  public async run(): Promise<TaskOutputConfig>
-  {
-    return new Promise<TaskOutputConfig>(async (resolve, reject) =>
-    {
-      const taskOutputConfig: TaskOutputConfig =
-        {
-          exit: false,
-          options: {
-            logStream: null,
-            outputStream: null,
-          },
-          status: true,
-        };
-
-      try
-      {
-        const streams = await templates.executeETL(this.taskConfig['params']['options'],
-          this.taskConfig['params']['options']['inputStreams']);
-        taskOutputConfig['options']['outputStream'] = streams['outputStream'];
-        taskOutputConfig['options']['logStream'] = streams['logStream'];
-      }
-      catch (e)
-      {
-        taskOutputConfig.status = false;
-        winston.error('Error while running ETL task: ' + String(e.toString()));
-        const errLogStream = new LogStream();
-        errLogStream.error(e.toString());
-        // errLogStream.push(null);
-        taskOutputConfig['options']['logStream'] = errLogStream;
-      }
-      finally
-      {
-        taskOutputConfig['options']['logStream'].push(null);
-        resolve(taskOutputConfig);
-      }
-    });
-  }
-
-  public async printNode(): Promise<TaskOutputConfig>
-  {
-    winston.info('Printing ETL Task, params: ' + JSON.stringify(this.taskConfig.params as object));
-    return Promise.resolve(
-      {
-        exit: false,
-        status: true,
-      } as TaskOutputConfig);
+    super(id, fields, options, typeCode);
   }
 }

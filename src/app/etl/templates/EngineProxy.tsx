@@ -51,13 +51,13 @@ const { List, Map } = Immutable;
 
 import { postorderForEach, preorderForEach } from 'etl/templates/SyncUtil';
 import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
+import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ETLFieldTypes, FieldTypes, getJSFromETL, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
-
 /*
  *  Should this file in be /shared?
  *  Proxy objects are generated synchronously and aren't meant to be persisted
@@ -108,8 +108,12 @@ export class EngineProxy
     type: TransformationNodeType,
     fields: List<EnginePath>,
     rawOptions: {
-      newFieldKeyPaths?: List<EnginePath>,
-      [k: string]: any,
+      newFieldKeyPaths?: List<EnginePath>;
+      [k: string]: any;
+    },
+    newFieldInfo?: { // if not specified, addTransformation will attempt to guess new field types
+      type: ETLFieldTypes;
+      valueType?: ETLFieldTypes;
     },
   )
   {
@@ -143,6 +147,26 @@ export class EngineProxy
         {
           this.orderField(synthId, sourceFieldId);
         }
+        if (newFieldInfo !== undefined)
+        {
+          EngineUtil.rawSetFieldType(
+            this.engine,
+            synthId,
+            newFieldInfo.type,
+            newFieldInfo.type,
+            newFieldInfo.valueType,
+          );
+        }
+        else
+        {
+          const synthType = EngineUtil.getETLFieldType(sourceFieldId, this.engine);
+          EngineUtil.rawSetFieldType(
+            this.engine,
+            synthId,
+            synthType,
+            synthType,
+          );
+        }
       });
     }
 
@@ -174,12 +198,12 @@ export class EngineProxy
   /*
    *  This is a rather complicated operation
    *  If the given keypath is [foo, *], then we need to create the specific field [foo, index]
-   *  If extracted field is still an array type, then we also need to create the wildcard for that field
    *  After creating the extracted field, we need to perform the duplication operation on the extracted field
    */
-  public extractArrayField(sourceId: number, index: number, destKP: List<string>)
+  public extractIndexedArrayField(sourceId: number, index: number, destKP: List<string>)
   {
     const sourceKP = this.engine.getOutputKeyPath(sourceId);
+
     if (sourceKP.size === 0)
     {
       throw new Error('Cannot extract array field, source keypath is empty');
@@ -203,12 +227,14 @@ export class EngineProxy
     {
       specifiedSourceId = this.addField(specifiedSourceKP, specifiedSourceType);
     }
-
-    this.requestRebuild();
     this.copyField(specifiedSourceId, destKP, true);
+
+    const parentKP = sourceKP.slice(0, -1).toList();
+    this.orderField(this.engine.getOutputFieldID(destKP), this.engine.getOutputFieldID(parentKP));
+    this.requestRebuild();
   }
 
-  public copyField(sourceId: number, destKP: List<string>, despecify = false): number
+  public extractSimpleArrayField(sourceId, destKP: List<string>)
   {
     const optionsNew: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
       newFieldKeyPaths: List([destKP]),
@@ -219,32 +245,11 @@ export class EngineProxy
       optionsNew,
     );
     const newFieldId = this.engine.getOutputFieldID(destKP);
-    EngineUtil.transferFieldData(sourceId, newFieldId, this.engine, this.engine);
 
-    let idToCopy = sourceId;
-    if (despecify)
-    {
-      const kpToCopy = EngineUtil.turnIndicesIntoValue(this.engine.getInputKeyPath(sourceId));
-      idToCopy = this.engine.getInputFieldID(kpToCopy);
-    }
-
-    const rootOutputKP = this.engine.getOutputKeyPath(sourceId);
-    preorderForEach(this.engine, idToCopy, (childId) =>
-    {
-      // do not copy root
-      if (childId !== idToCopy)
-      {
-        const toTransferKeypath = this.engine.getOutputKeyPath(childId);
-        const pathAfterRoot = toTransferKeypath.slice(rootOutputKP.size);
-
-        const newFieldKP = destKP.concat(pathAfterRoot).toList();
-        const newFieldSyntheticPath = this.getSyntheticInputPath(newFieldKP);
-        EngineUtil.transferField(childId, newFieldSyntheticPath, this.engine);
-        const newChildId = this.engine.getInputFieldID(newFieldSyntheticPath);
-        this.engine.setOutputKeyPath(newChildId, newFieldKP);
-      }
-    });
-    return newFieldId;
+    const newFieldType = EngineUtil.getETLFieldType(sourceId, this.engine);
+    this.addFieldToEngine(destKP.push('*'), ETLFieldTypes.Array, newFieldType, true);
+    EngineUtil.rawSetFieldType(this.engine, newFieldId, ETLFieldTypes.Array, ETLFieldTypes.Array, newFieldType);
+    this.requestRebuild();
   }
 
   public duplicateField(sourceId: number, destKP: List<string>, despecify = false)
@@ -258,13 +263,34 @@ export class EngineProxy
     this.requestRebuild();
   }
 
+  public copyNestedTypes(idToCopy, destKP: List<string>)
+  {
+    const rootOutputKP = this.engine.getOutputKeyPath(idToCopy);
+    preorderForEach(this.engine, idToCopy, (childId) =>
+    {
+      // do not copy root
+      if (childId !== idToCopy)
+      {
+        const toTransferKeypath = this.engine.getOutputKeyPath(childId);
+        const pathAfterRoot = toTransferKeypath.slice(rootOutputKP.size);
+
+        const newFieldKP = destKP.concat(pathAfterRoot).toList();
+        const newFieldSyntheticPath = this.getSyntheticInputPath(newFieldKP);
+        EngineUtil.transferField(childId, newFieldSyntheticPath, this.engine);
+        const newChildId = this.engine.getInputFieldID(newFieldSyntheticPath);
+        this.engine.setOutputKeyPath(newChildId, newFieldKP, undefined, false);
+      }
+    });
+    this.requestRebuild();
+  }
+
   public addField(keypath: List<string>, type: ETLFieldTypes, valueType: ETLFieldTypes = ETLFieldTypes.String)
   {
     let newId: number;
     if (type === ETLFieldTypes.Array)
     {
       newId = this.addFieldToEngine(keypath, type, valueType);
-      const wildId = this.addFieldToEngine(keypath.push('*'), ETLFieldTypes.Array, valueType);
+      const wildId = this.addFieldToEngine(keypath.push('*'), ETLFieldTypes.Array, valueType, true);
       EngineUtil.castField(this.engine, wildId, valueType);
     }
     else
@@ -300,10 +326,68 @@ export class EngineProxy
   }
 
   // Reorder fieldId so that it appears after afterId
-  public orderField(fieldId: number, afterId?: number)
+  public orderField(fieldId: number, afterId?: number, insertBefore = false)
   {
-    const order = this.orderController.getOrder();
-    this.orderController.setOrder(order.insert(fieldId, afterId));
+    let order = this.orderController.getOrder();
+    order = order.insert(fieldId, afterId); // insert field after
+    if (insertBefore)
+    {
+      order = order.insert(afterId, fieldId); // swap so fieldId comes first
+    }
+    this.orderController.setOrder(order);
+  }
+
+  public debug()
+  {
+    // this.engine.getAllFieldIDs().forEach((id) =>
+    // {
+    //   console.log('--fieldId--', id);
+    //   console.log('paths', this.engine.getInputKeyPath(id).toJS(), this.engine.getOutputKeyPath(id).toJS());
+    //   console.log('types', this.engine.getFieldType(id),
+    //     this.engine.getFieldProps(id)['valueType'],
+    //     this.engine.getFieldProps(id)['etlType']
+    //   );
+    // });
+  }
+
+  // if despecify is true, then strip away specific indices
+  private copyField(sourceId: number, destKP: List<string>, despecify = false): number
+  {
+    const optionsNew: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
+      newFieldKeyPaths: List([destKP]),
+    };
+    this.addTransformation(
+      TransformationNodeType.DuplicateNode,
+      List([this.engine.getInputKeyPath(sourceId)]),
+      optionsNew,
+    );
+    const newFieldId = this.engine.getOutputFieldID(destKP);
+    EngineUtil.transferFieldData(sourceId, newFieldId, this.engine, this.engine);
+
+    let idToCopy = sourceId;
+    if (despecify)
+    {
+      const kpToCopy = EngineUtil.turnIndicesIntoValue(this.engine.getInputKeyPath(sourceId));
+      idToCopy = this.engine.getInputFieldID(kpToCopy);
+    }
+
+    const rootOutputKP = this.engine.getOutputKeyPath(sourceId);
+    preorderForEach(this.engine, idToCopy, (childId) =>
+    {
+      // do not copy root
+      if (childId !== idToCopy)
+      {
+        const toTransferKeypath = this.engine.getOutputKeyPath(childId);
+        const pathAfterRoot = toTransferKeypath.slice(rootOutputKP.size);
+
+        const newFieldKP = destKP.concat(pathAfterRoot).toList();
+        const newFieldSyntheticPath = this.getSyntheticInputPath(newFieldKP);
+        EngineUtil.transferField(childId, newFieldSyntheticPath, this.engine);
+        const newChildId = this.engine.getInputFieldID(newFieldSyntheticPath);
+        this.engine.setOutputKeyPath(newChildId, newFieldKP, undefined, false);
+      }
+    });
+    return newFieldId;
   }
 
   // this is not deterministic
@@ -321,9 +405,10 @@ export class EngineProxy
     keypath: List<string>,
     etlType: ETLFieldTypes,
     valueType?: ETLFieldTypes,
+    useValueType?: boolean,
   ): number
   {
-    return EngineUtil.addFieldToEngine(this.engine, keypath, etlType, valueType);
+    return EngineUtil.addFieldToEngine(this.engine, keypath, etlType, valueType, useValueType);
   }
 }
 
@@ -417,6 +502,20 @@ export class FieldProxy
     EngineUtil.changeFieldTypeSideEffects(this.engine, this.fieldId, newType);
     EngineUtil.castField(this.engine, this.fieldId, newType);
     this.syncWithEngine(true);
+  }
+
+  public setPrimaryKey(value: boolean, language: Languages)
+  {
+    const controller = LanguageController.get(language);
+    if (!value || controller.canSetPrimaryKey(this.engine, this.fieldId))
+    {
+      const sideEffects = controller.setFieldPrimaryKey(this.engine, this.fieldId, value);
+      this.syncWithEngine(sideEffects);
+    }
+    else
+    {
+      throw new Error('Cannot change this field to be a primary key');
+    }
   }
 
   public setFieldProps(newFormState: object, language: Languages)

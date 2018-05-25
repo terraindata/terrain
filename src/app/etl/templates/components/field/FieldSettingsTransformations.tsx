@@ -278,19 +278,7 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
   {
     GraphHelpers.mutateEngine(tryFn)
       .then(this.handleTransformationChange)
-      .catch(this.handleTransformationError);
-  }
-
-  public handleTransformationError(err: any)
-  {
-    this.props.act({
-      actionType: 'addModal',
-      props: {
-        title: 'Error',
-        message: `Could not edit or add transformation: ${String(err)}`,
-        error: true,
-      },
-    });
+      .catch(this._showError('Could not edit or add transformation'));
   }
 
   public handleTransformationChange(structuralChanges: boolean)
@@ -309,9 +297,6 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
         fieldId,
       });
     }
-    this.props.act({
-      actionType: 'updateEngineVersion',
-    });
   }
 
   public handleEditTransformationFactory(index: number)

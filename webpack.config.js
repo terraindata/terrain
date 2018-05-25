@@ -58,6 +58,7 @@ module.exports =
     path: __dirname,
     publicPath: '/assets/',
     filename: 'bundle.js',
+    chunkFilename: '[name].bundle.js'
   },
 
   // NOTE: this should also be added to the production config

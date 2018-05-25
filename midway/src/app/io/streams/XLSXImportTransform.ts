@@ -42,71 +42,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
 
-import * as stream from 'stream';
-import * as winston from 'winston';
+import { Transform } from 'stream';
+import * as XLSX from 'xlsx';
 
-import { TaskConfig } from 'shared/types/jobs/TaskConfig';
-import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
-import Templates from '../../etl/Templates';
-import LogStream from '../../io/streams/LogStream';
-import { Task } from '../Task';
-
-const templates: Templates = new Templates();
-
-export class TaskETL extends Task
+export default class XLSXImportTransform extends Transform
 {
-  constructor(taskConfig: TaskConfig)
-  {
-    super(taskConfig);
-  }
+  private buffers = [];
 
-  public async run(): Promise<TaskOutputConfig>
+  constructor()
   {
-    return new Promise<TaskOutputConfig>(async (resolve, reject) =>
-    {
-      const taskOutputConfig: TaskOutputConfig =
-        {
-          exit: false,
-          options: {
-            logStream: null,
-            outputStream: null,
-          },
-          status: true,
-        };
-
-      try
-      {
-        const streams = await templates.executeETL(this.taskConfig['params']['options'],
-          this.taskConfig['params']['options']['inputStreams']);
-        taskOutputConfig['options']['outputStream'] = streams['outputStream'];
-        taskOutputConfig['options']['logStream'] = streams['logStream'];
-      }
-      catch (e)
-      {
-        taskOutputConfig.status = false;
-        winston.error('Error while running ETL task: ' + String(e.toString()));
-        const errLogStream = new LogStream();
-        errLogStream.error(e.toString());
-        // errLogStream.push(null);
-        taskOutputConfig['options']['logStream'] = errLogStream;
-      }
-      finally
-      {
-        taskOutputConfig['options']['logStream'].push(null);
-        resolve(taskOutputConfig);
-      }
+    super({
+      writableObjectMode: false,
+      readableObjectMode: true,
     });
   }
 
-  public async printNode(): Promise<TaskOutputConfig>
+  public _write(chunk, encoding, callback)
   {
-    winston.info('Printing ETL Task, params: ' + JSON.stringify(this.taskConfig.params as object));
-    return Promise.resolve(
-      {
-        exit: false,
-        status: true,
-      } as TaskOutputConfig);
+    this.buffers.push(chunk);
+    callback();
+  }
+
+  public _flush(callback)
+  {
+    this.parseXLSX();
+    callback();
+  }
+
+  private parseXLSX(): void
+  {
+    const buffer = Buffer.concat(this.buffers);
+    const wb = XLSX.read(buffer, { type: 'buffer' });
+    const sheet = wb.Sheets[wb.SheetNames[0]];
+    XLSX.utils.sheet_to_json(sheet).forEach((obj) => this.push(obj));
   }
 }

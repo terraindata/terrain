@@ -54,9 +54,10 @@ import { TransformationFormProps } from './TransformationFormBase';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { ArraySumTFF } from './ArraySumTransformationForm';
+import { ArrayCountTFF, ArraySumTFF } from './ArrayStatTransformationForms';
 import { CastTFF } from './CastTransformationForm';
 import { DuplicateTFF } from './DuplicateTransformationForm';
+import { GroupByTFF } from './GroupByTransformationForm';
 import { InsertTFF } from './InsertTransformationForm';
 import { JoinTFF } from './JoinTransformationForm';
 import { DifferenceTFF, ProductTFF, QuotientTFF, SumTFF } from './NumericOperationForms';
@@ -88,6 +89,8 @@ export function getTransformationForm(type: TransformationNodeType): React.Compo
       return HashTFF;
     case TransformationNodeType.ArraySumNode:
       return ArraySumTFF;
+    case TransformationNodeType.ArrayCountNode:
+      return ArrayCountTFF;
     case TransformationNodeType.AddNode:
       return AddTFF;
     case TransformationNodeType.SubtractNode:
@@ -114,6 +117,8 @@ export function getTransformationForm(type: TransformationNodeType): React.Compo
       return EncryptTFF;
     case TransformationNodeType.DecryptNode:
       return DecryptTFF;
+    case TransformationNodeType.GroupByNode:
+      return GroupByTFF;
     default:
       return null;
   }

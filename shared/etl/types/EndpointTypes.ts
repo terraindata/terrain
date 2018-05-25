@@ -55,6 +55,7 @@ export interface FileConfig
   jsonNewlines?: boolean;
   xmlPath?: string;
   jsonPath?: string;
+  fieldOrdering?: string[];
 }
 
 export enum Sources
@@ -160,14 +161,10 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
       credentialId: -1,
     },
     GoogleAnalytics: {
-      dayInterval: -1,
+      dayInterval: 30,
     },
     Http: {
       method: 'GET',
-      headers: {
-        contentType: 'application/json',
-      },
-      params: {},
     },
     Fs: {},
     Mysql: {
@@ -209,10 +206,6 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
     },
     Http: {
       method: 'POST',
-      headers: {
-        contentType: 'application/json',
-      },
-      params: {},
     },
     Fs: {},
   };
@@ -227,14 +220,6 @@ export interface SftpOptions
 export interface HttpOptions
 {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-  headers: {
-    contentType?: string;
-    accept?: string;
-    [k: string]: any;
-  };
-  params: {
-    [k: string]: any;
-  };
 }
 
 export interface GoogleAnalyticsOptions

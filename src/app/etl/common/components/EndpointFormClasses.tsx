@@ -306,59 +306,7 @@ export class HttpEndpointForm extends EndpointFormBase<HttpOptions>
         indexResolver: (value) => httpMethods.indexOf(value),
       },
     },
-    headers: {
-      type: DisplayType.Custom,
-      widthFactor: 7,
-      options: {
-        render: this.renderHeadersForm,
-      },
-    },
-    params: {
-      type: DisplayType.Custom,
-      widthFactor: 7,
-      options: {
-        render: this.renderParamsForm,
-      },
-    },
   };
-
-  public renderHeadersForm(state: HttpOptions, disabled)
-  {
-    return (
-      <ObjectForm
-        object={state.headers}
-        onChange={this.handleHeadersChange}
-        label='Headers'
-      />
-    );
-  }
-
-  public handleHeadersChange(newHeaders, apply?: boolean)
-  {
-    const { options } = this.props.endpoint;
-    const newFormState: HttpOptions = _.extend({}, options);
-    newFormState.headers = newHeaders;
-    this.handleOptionsFormChange(newFormState, apply);
-  }
-
-  public renderParamsForm(state: HttpOptions, disabled)
-  {
-    return (
-      <ObjectForm
-        object={state.params}
-        onChange={this.handleParamsChange}
-        label='Parameters'
-      />
-    );
-  }
-
-  public handleParamsChange(newParams, apply?: boolean)
-  {
-    const { options } = this.props.endpoint;
-    const newFormState: HttpOptions = _.extend({}, options);
-    newFormState.params = newParams;
-    this.handleOptionsFormChange(newFormState, apply);
-  }
 }
 
 type DownloadState = SinkOptionsType<Sinks.Download>;

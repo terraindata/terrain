@@ -44,69 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as stream from 'stream';
-import * as winston from 'winston';
+import zips from './data/zips';
 
-import { TaskConfig } from 'shared/types/jobs/TaskConfig';
-import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
-import Templates from '../../etl/Templates';
-import LogStream from '../../io/streams/LogStream';
-import { Task } from '../Task';
-
-const templates: Templates = new Templates();
-
-export class TaskETL extends Task
+export default class DataStore
 {
-  constructor(taskConfig: TaskConfig)
+  public get(key: string)
   {
-    super(taskConfig);
-  }
-
-  public async run(): Promise<TaskOutputConfig>
-  {
-    return new Promise<TaskOutputConfig>(async (resolve, reject) =>
+    if (key === 'zips')
     {
-      const taskOutputConfig: TaskOutputConfig =
-        {
-          exit: false,
-          options: {
-            logStream: null,
-            outputStream: null,
-          },
-          status: true,
-        };
-
-      try
-      {
-        const streams = await templates.executeETL(this.taskConfig['params']['options'],
-          this.taskConfig['params']['options']['inputStreams']);
-        taskOutputConfig['options']['outputStream'] = streams['outputStream'];
-        taskOutputConfig['options']['logStream'] = streams['logStream'];
-      }
-      catch (e)
-      {
-        taskOutputConfig.status = false;
-        winston.error('Error while running ETL task: ' + String(e.toString()));
-        const errLogStream = new LogStream();
-        errLogStream.error(e.toString());
-        // errLogStream.push(null);
-        taskOutputConfig['options']['logStream'] = errLogStream;
-      }
-      finally
-      {
-        taskOutputConfig['options']['logStream'].push(null);
-        resolve(taskOutputConfig);
-      }
-    });
-  }
-
-  public async printNode(): Promise<TaskOutputConfig>
-  {
-    winston.info('Printing ETL Task, params: ' + JSON.stringify(this.taskConfig.params as object));
-    return Promise.resolve(
-      {
-        exit: false,
-        status: true,
-      } as TaskOutputConfig);
+      return zips;
+    }
+    throw new Error('Dataset not found');
   }
 }

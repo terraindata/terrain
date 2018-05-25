@@ -973,3 +973,79 @@ test('split a field that does not always exist', () =>
     },
   );
 });
+
+test('Group By Transformation', () =>
+{
+
+  const doc =
+    {
+      items: [
+        { status: 'active', mlsId: 1 },
+        { status: 'sold', mlsId: 2 },
+        { status: 'active', mlsId: 3 },
+        { status: 'some garbage', mlsId: 5 },
+      ],
+    };
+
+  const wrap = (kp: string[]) => List([List(kp)]);
+
+  const e = new TransformationEngine(doc);
+  e.appendTransformation(TransformationNodeType.GroupByNode, wrap(['items']), {
+    newFieldKeyPaths: List([
+      List(['activeItems']),
+      List(['soldItems']),
+    ]),
+    subkey: 'status',
+    groupValues: ['active', 'sold'],
+  });
+  expect(e.transform(doc)).toEqual(
+    {
+      items: [
+        { status: 'active', mlsId: 1 },
+        { status: 'sold', mlsId: 2 },
+        { status: 'active', mlsId: 3 },
+        { status: 'some garbage', mlsId: 5 },
+      ],
+      activeItems: [
+        { status: 'active', mlsId: 1 },
+        { status: 'active', mlsId: 3 },
+      ],
+      soldItems: [
+        { status: 'sold', mlsId: 2 },
+      ],
+    },
+  );
+});
+
+test('transform a zipcode', () =>
+{
+  const doc = {
+    zip1: '10451',
+    zip2: '10451',
+    zip3: '10451',
+    zip4: '10451',
+    zip5: '01234',
+    zip6: '01234',
+    zip7: '96400',
+    zip8: '96400',
+  };
+
+  const e: TransformationEngine = new TransformationEngine(doc);
+  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip1'])]), { format: 'latlon' });
+  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip2'])]), { format: 'city' });
+  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip3'])]), { format: 'state' });
+  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip4'])]), { format: 'citystate' });
+  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip5'])]), { format: 'city' });
+  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip6'])]), { format: 'latlon' });
+  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip7'])]), { format: 'type' });
+  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip8'])]), { format: 'latlon' });
+  const r = e.transform(doc);
+  expect(r['zip1']).toEqual({ lat: 40.84, lon: -73.87 });
+  expect(r['zip2']).toBe('BRONX');
+  expect(r['zip3']).toBe('NY');
+  expect(r['zip4']).toBe('BRONX, NY');
+  expect(r['zip5']).toBe(null);
+  expect(r['zip6']).toBe(null);
+  expect(r['zip7']).toBe('MILITARY');
+  expect(r['zip8']).toBe(null);
+});

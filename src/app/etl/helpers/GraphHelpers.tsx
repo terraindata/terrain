@@ -103,12 +103,12 @@ class GraphHelpers extends ETLHelpers
         };
         const engine = templateProxy.value().getTransformationEngine(currentEdge);
         tryFn(new EngineProxy(engine, handleRequestRebuild, fieldOrderController));
-        if (structuralChanges)
-        {
-          templateProxy.cleanFieldOrdering(currentEdge);
-        }
+        templateProxy.cleanFieldOrdering(currentEdge);
       }).then(() =>
       {
+        this.editorAct({
+          actionType: 'updateEngineVersion',
+        });
         resolve(structuralChanges);
       }).catch(reject);
     });
@@ -135,7 +135,7 @@ class GraphHelpers extends ETLHelpers
         rightJoinKey,
         outputKey,
       });
-    }).catch(this._logError);
+    }).catch(this._editorErrorHandler('Could Not Create Merge Join', true));
   }
 
   public createEngineForSourceEdge(edgeId: number)
@@ -157,8 +157,8 @@ class GraphHelpers extends ETLHelpers
           this.editorAct({
             actionType: 'rebuildFieldMap',
           });
-        }).catch(this._logError);
-      }).catch(this._logError);
+        }).catch(this._editorErrorHandler('Could Not Create Engine From Documents', true));
+      }).catch(this._editorErrorHandler('Could Not Fetch Documents', true));
     }
   }
 
@@ -199,7 +199,7 @@ class GraphHelpers extends ETLHelpers
         this.createEngineForSourceEdge(edgeId);
       });
       DocumentsHelpers.fetchSources(differentKeys);
-    }).catch(this._logError);
+    }).catch(this._editorErrorHandler('Could Not Edit Source', true));
   }
 
   public updateSinks(newSinks: SinksMap)
@@ -216,12 +216,13 @@ class GraphHelpers extends ETLHelpers
       differentKeys.forEach((key) =>
       {
         proxy.setSink(key, newSinks.get(key));
+        proxy.setSinkFieldOrdering(key);
       });
       deletedKeys.forEach((key) =>
       {
         proxy.deleteSink(key);
       });
-    }).catch(this._logError);
+    }).catch(this._editorErrorHandler('Could Not Edit Sink', true));
   }
 
   public switchEdge(edgeId: number)

@@ -64,6 +64,7 @@ export interface Props
   open: boolean;
   colorsActions: typeof ColorsActions;
   message?: string;
+  errorMessage?: string;
   title?: string;
   error?: boolean;
   fill?: boolean;
@@ -71,8 +72,10 @@ export interface Props
   confirm?: boolean;
   confirmButtonText?: string;
   confirmDisabled?: boolean; // if true, confirm button is disabled
+  onValidate?: () => boolean;
   onConfirm?: () => void;
   onClose: () => void;
+  onErrorClear: () => void;
   children?: any;
   childrenMessage?: string;
   thirdButtonText?: string;
@@ -93,6 +96,9 @@ export interface Props
 @Radium
 class Modal extends TerrainComponent<Props>
 {
+  public static defaultProps = {
+    errorMessage: '',
+  };
 
   public componentWillMount()
   {
@@ -109,13 +115,22 @@ class Modal extends TerrainComponent<Props>
 
   public closeModalSuccess()
   {
-    if (this.props.closeOnConfirm !== undefined && !this.props.closeOnConfirm)
+    let isValid = true;
+    if (this.props.onValidate !== undefined)
     {
-      this.props.onConfirm ? this.props.onConfirm() : null;
-      return;
+      isValid = this.props.onValidate();
     }
-    this.props.onClose();
-    this.props.onConfirm ? this.props.onConfirm() : null;
+
+    if (isValid)
+    {
+      if (this.props.closeOnConfirm !== undefined && !this.props.closeOnConfirm)
+      {
+        this.props.onConfirm ? this.props.onConfirm() : null;
+        return;
+      }
+      this.props.onClose();
+      this.props.onConfirm ? this.props.onConfirm() : null;
+    }
   }
 
   public handleTextboxChange(evt)
@@ -232,6 +247,17 @@ class Modal extends TerrainComponent<Props>
                     />
                   }
                 </div>
+                {
+                  this.props.errorMessage !== '' ?
+                    <div className='modal-error'>
+                      {this.props.errorMessage}
+                      <CloseIcon
+                        className='modal-error-close-x'
+                        onClick={this.props.onErrorClear}
+                      />
+                    </div> : null
+                }
+
                 {
                   this.props.message &&
                   React.cloneElement(

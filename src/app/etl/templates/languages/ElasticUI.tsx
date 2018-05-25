@@ -50,6 +50,7 @@ const { List, Map } = Immutable;
 import * as _ from 'lodash';
 
 import ElasticFieldSettings from 'etl/templates/components/field/ElasticFieldSettings';
+import { DefaultUI } from 'etl/templates/languages/DefaultLanguageUI';
 import { LanguageInterface } from 'etl/templates/languages/LanguageUI';
 import { defaultProps, ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
@@ -60,7 +61,7 @@ import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
-class ElasticUI implements LanguageInterface
+class ElasticUI extends DefaultUI implements LanguageInterface
 {
   public language = Languages.Elastic;
 
@@ -68,13 +69,6 @@ class ElasticUI implements LanguageInterface
   {
     return ElasticFieldSettings;
   }
-
-  public isFieldPrimaryKey(fieldProps: object)
-  {
-    return fieldProps !== undefined && _.get(fieldProps, ['elastic', 'isPrimaryKey']) === true;
-  }
 }
-
-const elasticKey = List(['elastic']);
 
 export default new ElasticUI();

@@ -68,6 +68,7 @@ import SubtractTransformationNode from './nodes/SubtractTransformationNode';
 import SumTransformationNode from './nodes/SumTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
 import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
+import ZipcodeTransformationNode from './nodes/ZipcodeTransformationNode';
 import { TransformationEngine } from './TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from './TransformationNodeType';
 import TransformationNodeVisitor from './TransformationNodeVisitor';
@@ -443,7 +444,6 @@ const TransformationNodeInfo: AllNodeInfoType =
         {
           return (
             EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
-            EngineUtil.getValueType(fieldId, engine) === 'number' &&
             EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
           );
         },
@@ -571,6 +571,45 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitDecryptNode((transformationNode as DecryptTransformationNode), docCopy, options),
+      },
+    [TransformationNodeType.GroupByNode]:
+      {
+        humanName: 'Group Array Values',
+        editable: false,
+        creatable: true,
+        description: `Group an array of objects by a value`,
+        type: ArrayCountTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+            EngineUtil.getValueType(fieldId, engine) === 'object' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitGroupByNode(transformationNode, docCopy, options),
+        newFieldType: 'array',
+      },
+    [TransformationNodeType.ZipcodeNode]:
+      {
+        humanName: 'Zipcode',
+        editable: true,
+        creatable: true,
+        description: 'Convert a zipcode into location data',
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+        },
+        type: ZipcodeTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitZipcodeNode(transformationNode, docCopy, options),
       },
   };
 

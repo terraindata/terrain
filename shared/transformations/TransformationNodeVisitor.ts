@@ -51,6 +51,7 @@ import DifferenceTransformationNode from 'shared/transformations/nodes/Differenc
 import DivideTransformationNode from 'shared/transformations/nodes/DivideTransformationNode';
 import EncryptTransformationNode from 'shared/transformations/nodes/EncryptTransformationNode';
 import FindReplaceTransformationNode from 'shared/transformations/nodes/FindReplaceTransformationNode';
+import GroupByTransformationNode from 'shared/transformations/nodes/GroupByTransformationNode';
 import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
 import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
 import ProductTransformationNode from 'shared/transformations/nodes/ProductTransformationNode';
@@ -68,6 +69,7 @@ import SplitTransformationNode from './nodes/SplitTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
 import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
+import ZipcodeTransformationNode from './nodes/ZipcodeTransformationNode';
 import TransformationVisitResult from './TransformationVisitResult';
 
 export default abstract class TransformationNodeVisitor
@@ -185,6 +187,16 @@ export default abstract class TransformationNodeVisitor
   }
 
   public visitDecryptNode(node: DecryptTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitGroupByNode(node: GroupByTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitZipcodeNode(node: ZipcodeTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }

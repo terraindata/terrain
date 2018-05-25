@@ -50,8 +50,10 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { DragDropContext } from 'react-dnd';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
+const HTML5Backend = require('react-dnd-html5-backend');
 
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import { ETLActions } from 'etl/ETLRedux';
@@ -71,6 +73,8 @@ import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/
 
 import EditorActionsSection from './EditorActionsSection';
 import EditorColumnActionsSection from './EditorColumnActionsSection';
+
+import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 
 import './TemplateEditor.less';
 
@@ -114,6 +118,7 @@ class TemplateEditor extends TerrainComponent<Props>
     try
     {
       // do this to show disabled fields
+      previewDocument = _.cloneDeep(previewDocument);
       const resetEngine = TransformationEngine.load(JSON.stringify(engine.toJSON()));
       resetEngine.getAllFieldIDs().forEach((id) =>
       {
@@ -258,7 +263,7 @@ class TemplateEditor extends TerrainComponent<Props>
 const emptyList = List([]);
 
 export default Util.createContainer(
-  TemplateEditor,
+  DragDropContext(HTML5Backend)(TemplateEditor),
   ['templateEditor'],
   {
     editorAct: TemplateEditorActions,

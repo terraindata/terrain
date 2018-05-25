@@ -73,6 +73,8 @@ enum TransformationNodeType
   DifferenceNode = 'DifferenceNode',
   EncryptNode = 'EncryptNode',
   DecryptNode = 'DecryptNode',
+  GroupByNode = 'GroupByNode',
+  ZipcodeNode = 'ZipcodeNode',
 }
 
 // if this has errors, double check TransformationNodeType's keys are equal to its values
@@ -168,6 +170,14 @@ interface TransformationOptionTypes
   EncryptNode: {
   };
   DecryptNode: {
+  };
+  GroupByNode: {
+    newFieldKeyPaths: List<KeyPath>;
+    subkey: string;
+    groupValues: any[];
+  };
+  ZipcodeNode: {
+    format: string;
   };
 }
 
