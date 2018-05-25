@@ -135,7 +135,7 @@ class GraphHelpers extends ETLHelpers
         rightJoinKey,
         outputKey,
       });
-    }).catch(this._logError);
+    }).catch(this._editorErrorHandler('Could Not Create Merge Join', true));
   }
 
   public createEngineForSourceEdge(edgeId: number)
@@ -157,8 +157,8 @@ class GraphHelpers extends ETLHelpers
           this.editorAct({
             actionType: 'rebuildFieldMap',
           });
-        }).catch(this._logError);
-      }).catch(this._logError);
+        }).catch(this._editorErrorHandler('Could Not Create Engine From Documents', true));
+      }).catch(this._editorErrorHandler('Could Not Fetch Documents', true));
     }
   }
 
@@ -199,7 +199,7 @@ class GraphHelpers extends ETLHelpers
         this.createEngineForSourceEdge(edgeId);
       });
       DocumentsHelpers.fetchSources(differentKeys);
-    }).catch(this._logError);
+    }).catch(this._editorErrorHandler('Could Not Edit Source', true));
   }
 
   public updateSinks(newSinks: SinksMap)
@@ -222,7 +222,7 @@ class GraphHelpers extends ETLHelpers
       {
         proxy.deleteSink(key);
       });
-    }).catch(this._logError);
+    }).catch(this._editorErrorHandler('Could Not Edit Sink', true));
   }
 
   public switchEdge(edgeId: number)

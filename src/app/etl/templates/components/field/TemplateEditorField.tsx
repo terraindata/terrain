@@ -241,6 +241,11 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return kp.size === 1;
   }
 
+  protected _fieldDepth(props = this.props)
+  {
+    return this._field(props.fieldId, props).outputKeyPath.size;
+  }
+
   protected _getCurrentLanguage(props = this.props): Languages
   {
     this.updateChecker.setChecker('currentLanguage', getCurrentLanguage);

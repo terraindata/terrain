@@ -54,7 +54,6 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import { FieldPicker } from 'etl/common/components/FieldPicker.tsx';
 import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
@@ -62,60 +61,65 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
-import { areFieldsLocal } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-interface ArraySumOptions
+interface SimpleOptions
 {
   outputName: string;
 }
 
-export class ArraySumTFF extends TransformationForm<ArraySumOptions, TransformationNodeType.ArraySumNode>
+function SimpleStatFactory<T extends TransformationNodeType>(type: T, startingName: string)
 {
-  protected readonly inputMap: InputDeclarationMap<ArraySumOptions> = {
-    outputName: {
-      type: DisplayType.TextBox,
-      displayName: 'Output Field Name',
-    },
-  };
-  protected readonly initialState = {
-    outputName: 'Field Sum',
-  };
-  protected readonly type = TransformationNodeType.ArraySumNode;
-
-  protected isStructuralChange()
+  return class StatForm extends TransformationForm<SimpleOptions, T>
   {
-    return true;
-  }
-
-  protected computeArgs()
-  {
-    const { engine, fieldId } = this.props;
-    const { outputName } = this.state;
-
-    const currentKeyPath = engine.getOutputKeyPath(fieldId);
-    const newFieldKeyPaths = List([
-      currentKeyPath.set(currentKeyPath.size - 1, outputName),
-    ]);
-
-    const inputFields = List([engine.getInputKeyPath(fieldId)]);
-
-    return {
-      options: {
-        newFieldKeyPaths,
+    protected readonly inputMap: InputDeclarationMap<SimpleOptions> = {
+      outputName: {
+        type: DisplayType.TextBox,
+        displayName: 'Output Field Name',
       },
-      fields: inputFields,
     };
-  }
+    protected readonly initialState = {
+      outputName: startingName,
+    };
+    protected readonly type = type;
 
-  protected computeNewFieldInfo()
-  {
-    return {
-      type: ETLFieldTypes.Number,
-    };
-  }
+    protected isStructuralChange()
+    {
+      return true;
+    }
+
+    protected computeArgs()
+    {
+      const { engine, fieldId } = this.props;
+      const { outputName } = this.state;
+
+      const currentKeyPath = engine.getOutputKeyPath(fieldId);
+      const newFieldKeyPaths = List([
+        currentKeyPath.set(currentKeyPath.size - 1, outputName),
+      ]);
+
+      const inputFields = List([engine.getInputKeyPath(fieldId)]);
+
+      return {
+        options: {
+          newFieldKeyPaths,
+        },
+        fields: inputFields,
+      };
+    }
+
+    protected computeNewFieldInfo()
+    {
+      return {
+        type: ETLFieldTypes.Number,
+      };
+    }
+  };
 }
+
+export const ArraySumTFF = SimpleStatFactory(TransformationNodeType.ArraySumNode, 'Sum of Array');
+export const ArrayCountTFF = SimpleStatFactory(TransformationNodeType.ArrayCountNode, 'Count of Array');
