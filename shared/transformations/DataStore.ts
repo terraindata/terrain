@@ -52,7 +52,7 @@ export default class DataStore
   {
     if (key === 'zips')
     {
-        return zips;
+      return zips;
     }
     throw new Error('Dataset not found');
   }

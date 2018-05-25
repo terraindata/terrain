@@ -594,7 +594,7 @@ const TransformationNodeInfo: AllNodeInfoType =
           visitor.visitGroupByNode(transformationNode, docCopy, options),
         newFieldType: 'array',
       },
-      [TransformationNodeType.ZipcodeNode]:
+    [TransformationNodeType.ZipcodeNode]:
       {
         humanName: 'Zipcode',
         editable: true,

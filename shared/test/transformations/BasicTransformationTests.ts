@@ -1031,14 +1031,14 @@ test('transform a zipcode', () =>
   };
 
   const e: TransformationEngine = new TransformationEngine(doc);
-  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip1'])]), { format: 'latlon'});
-  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip2'])]), { format: 'city'});
-  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip3'])]), { format: 'state'});
-  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip4'])]), { format: 'citystate'});
-  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip5'])]), { format: 'city'});
-  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip6'])]), { format: 'latlon'});
-  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip7'])]), { format: 'type'});
-  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip8'])]), { format: 'latlon'});
+  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip1'])]), { format: 'latlon' });
+  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip2'])]), { format: 'city' });
+  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip3'])]), { format: 'state' });
+  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip4'])]), { format: 'citystate' });
+  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip5'])]), { format: 'city' });
+  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip6'])]), { format: 'latlon' });
+  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip7'])]), { format: 'type' });
+  e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip8'])]), { format: 'latlon' });
   const r = e.transform(doc);
   expect(r['zip1']).toEqual({ lat: 40.84, lon: -73.87 });
   expect(r['zip2']).toBe('BRONX');
