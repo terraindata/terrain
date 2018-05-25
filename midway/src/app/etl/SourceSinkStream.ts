@@ -57,9 +57,11 @@ import
   SourceConfig,
 } from 'shared/etl/types/EndpointTypes';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
+import { PostProcessConfig } from 'shared/etl/types/PostProcessTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import * as Util from '../AppUtil';
 import ExportTransform from './ExportTransform';
+import { PostProcess } from './PostProcess';
 import { TemplateConfig } from './TemplateConfig';
 import Templates from './Templates';
 
@@ -78,6 +80,8 @@ import HTTPEndpoint from './endpoints/HTTPEndpoint';
 import MySQLEndpoint from './endpoints/MySQLEndpoint';
 import PostgreSQLEndpoint from './endpoints/PostgreSQLEndpoint';
 import SFTPEndpoint from './endpoints/SFTPEndpoint';
+
+export const postProcessTransform: PostProcess = new PostProcess();
 
 export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[]): Promise<stream.Readable>
 {
@@ -164,7 +168,23 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
         default:
           throw new Error('Download file type must be either CSV, TSV, JSON, XLSX or XML.');
       }
-      resolve(importStream);
+
+      if (Array.isArray(source.options['transformations']) && source.options['transformations'].length !== 0)
+      {
+        const writeStream = new stream.Readable({ objectMode: true });
+        const postProcessedRows: object[]
+          = await postProcessTransform.process(source.options['transformations'] as PostProcessConfig[], importStream);
+        resolve(writeStream);
+        postProcessedRows.forEach((pPR) =>
+        {
+          writeStream.push(pPR);
+        });
+        writeStream.push(null);
+      }
+      else
+      {
+        resolve(importStream);
+      }
     }
     catch (e)
     {

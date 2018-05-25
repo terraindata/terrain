@@ -62,10 +62,8 @@ import IntegrationConfig from '../../integrations/IntegrationConfig';
 import { integrations } from '../../integrations/IntegrationRouter';
 import JSONTransform from '../../io/streams/JSONTransform';
 import AEndpointStream from './AEndpointStream';
-import { PostProcess } from './PostProcess';
 
 const request = googleoauthjwt.requestWithJWT();
-export const postProcessTransform: PostProcess = new PostProcess();
 
 export interface GoogleAnalyticsConfig
 {
@@ -191,8 +189,6 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
       const writeStream = JSONTransform.createExportStream();
       const scopeURL: string = 'https://www.googleapis.com/auth/';
       const scopes: string[] = [];
-      const hasPostProcessTransforms: boolean = Array.isArray(gaSource.options['transformations'])
-        && gaSource.options['transformations'].length !== 0;
       let gaConfigPrivateKey: string = '-----BEGIN RSA PRIVATE KEY-----' + ((gaConfig['privateKey'] as string)
         .replace('-----BEGIN RSA PRIVATE KEY-----', '').replace('-----END RSA PRIVATE KEY-----', '')
         .replace(new RegExp('\\s', 'g'), '\n').replace(new RegExp('\\n+', 'g'), '\n') as string) + '-----END RSA PRIVATE KEY-----';
@@ -251,10 +247,7 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
                 {
                   colNames.push(entity['name']);
                 });
-                if (!hasPostProcessTransforms)
-                {
-                  resolve(writeStream);
-                }
+                resolve(writeStream);
               }
 
               // writeStream.write(colNames);
@@ -262,20 +255,10 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
 
               if (Array.isArray(rows))
               {
-                if (hasPostProcessTransforms)
+                rows.forEach((row) =>
                 {
-                  rows.forEach((row) =>
-                  {
-                    zippedRows.push(_.zipObject(colNames, [].concat(row['dimensions'], row['metrics'][0]['values'])));
-                  });
-                }
-                else
-                {
-                  rows.forEach((row) =>
-                  {
-                    writeStream.write(_.zipObject(colNames, [].concat(row['dimensions'], row['metrics'][0]['values'])));
-                  });
-                }
+                  writeStream.write(_.zipObject(colNames, [].concat(row['dimensions'], row['metrics'][0]['values'])));
+                });
               }
               constructedHeader = true;
               if (report['nextPageToken'] !== undefined)
@@ -286,24 +269,7 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
               }
               else // finish
               {
-                // unfortunately old import doesnt like streaming imports if you resolve immediately
-                // so you have to wait until everything is written
-                // go to postprocessing
-                if (hasPostProcessTransforms)
-                {
-                  const postProcessedRows: object[]
-                    = postProcessTransform.process(gaSource.options['transforms'] as PostProcessConfig[], zippedRows);
-                  resolve(writeStream);
-                  postProcessedRows.forEach((pPR) =>
-                  {
-                    writeStream.write(pPR);
-                  });
-                  writeStream.end();
-                }
-                else
-                {
-                  writeStream.end();
-                }
+                writeStream.end();
               }
             }
             catch (e)

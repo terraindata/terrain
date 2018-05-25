@@ -45,44 +45,64 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as _ from 'lodash';
+import * as stream from 'stream';
 import * as winston from 'winston';
 
 import { PostProcessAggregationTypes, PostProcessConfig, PostProcessOptionsTypes } from 'shared/etl/types/PostProcessTypes';
+
+import BufferTransform from '../io/streams/BufferTransform';
 
 export class PostProcess
 {
   constructor()
   {
-
+    // do nothing
   }
 
-  public process(transformConfigs: PostProcessConfig[], data: object[]): object[]
+  public async process(transformConfigs: PostProcessConfig[], dataStream: stream.Readable): Promise<object[]>
   {
-    // [{"name":"aggregate","pattern":"[0-9]{1,}-[0-9]{1,}","primaryKeyName":"ga:productSku","aggParams":["Item Quantity","Item Revenue"]}]
-    let processedData: object[] = _.cloneDeep(data);
-    if (!Array.isArray(transformConfigs))
+    // [{"name":"aggregate","pattern":"[0-9]{1,}-[0-9]{1,}","primaryKey":"ga:productSku","aggParams":["Item Quantity","Item Revenue"]}]
+    return new Promise<object[]>(async (resolve, reject) =>
     {
-      return data;
-    }
-    transformConfigs.forEach((transformConfig) =>
-    {
-      try
+      const data: object[] = [];
+      const accumulatedData: string[] = await BufferTransform.toArray(dataStream);
+      accumulatedData.forEach((chunk) =>
       {
-        switch (transformConfig.type)
+        try
         {
-          case 'Aggregate':
-            processedData = this._aggregate(transformConfig.options, processedData);
-            break;
-          default:
-            break;
+          data.push(chunk);
         }
-      }
-      catch (e)
+        catch (e)
+        {
+          winston.warn((e as any).toString() as string);
+        }
+      });
+      let processedData: object[] = _.cloneDeep(data);
+      if (!Array.isArray(transformConfigs))
       {
-        winston.warn(((e as any).toString() as string));
+        winston.warn('Transforms is not an array');
+        return resolve(data);
       }
+      transformConfigs.forEach((transformConfig) =>
+      {
+        try
+        {
+          switch (transformConfig.type)
+          {
+            case 'Aggregate':
+              processedData = this._aggregate(transformConfig.options, processedData);
+              break;
+            default:
+              break;
+          }
+        }
+        catch (e)
+        {
+          winston.warn(((e as any).toString() as string));
+        }
+      });
+      return resolve(processedData);
     });
-    return processedData;
   }
 
   private _aggregate(options: object, data: object[]): object[]
@@ -94,10 +114,10 @@ export class PostProcess
     // step 1
     data.forEach((row) =>
     {
-      if (patternRegExpFull.test(row[options['primaryKeyName']]))
+      if (patternRegExpFull.test(row[options['primaryKey']]))
       {
-        const extractedPrimaryKey: string = row[options['primaryKeyName']]
-          .replace(row[options['primaryKeyName']].replace(patternRegExp, ''), '');
+        const extractedPrimaryKey: string = row[options['primaryKey']]
+          .replace(row[options['primaryKey']].replace(patternRegExp, ''), '');
         if (newDataDict[extractedPrimaryKey] === undefined)
         {
           newDataDict[extractedPrimaryKey] = [];
@@ -110,7 +130,7 @@ export class PostProcess
     {
       newDataDict[nDDKey].sort((a, b) =>
       {
-        return a[options['primaryKeyName']] > b[options['primaryKeyName']];
+        return a[options['primaryKey']] > b[options['primaryKey']];
       });
     });
 
@@ -130,7 +150,7 @@ export class PostProcess
                 nDDValue[aggField] = parseFloat(nDDValue[aggField]) + parseFloat(newDataDict[nDDKey][i][aggField]);
               });
             }
-            nDDValue[options['primaryKeyName']] = nDDKey;
+            nDDValue[options['primaryKey']] = nDDKey;
             returnData.push(nDDValue);
           }
         });
@@ -155,7 +175,7 @@ export class PostProcess
                 nDDValue[aggField] = nDDValue[aggField] / newDataDict[nDDKey].length;
               });
             }
-            nDDValue[options['primaryKeyName']] = nDDKey;
+            nDDValue[options['primaryKey']] = nDDKey;
             returnData.push(nDDValue);
           }
         });
