@@ -212,18 +212,24 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   public visitInsertNode(node: InsertTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.InsertNode>;
+    let result: TransformationVisitResult;
     node.fields.forEach((field) =>
     {
       const el: any = yadeep.get(doc, field);
+      if (el === undefined || result !== undefined)
+      {
+        return;
+      }
       if (typeof el !== 'string' && el.constructor !== Array)
       {
-        return {
+        result = {
           errors: [
             {
               message: 'Attempted to insert in a non-string field (this is not supported)',
             } as TransformationVisitError,
           ],
         } as TransformationVisitResult;
+        return;
       }
 
       let at: number = 0;
@@ -241,13 +247,14 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
       else
       {
-        return {
+        result = {
           errors: [
             {
               message: 'Insert node: "at" property is invalid',
             } as TransformationVisitError,
           ],
         } as TransformationVisitResult;
+        return;
       }
 
       let value;
@@ -256,13 +263,14 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         value = yadeep.get(doc, opts['value'] as KeyPath);
         if (typeof value !== 'string')
         {
-          return {
+          result = {
             errors: [
               {
                 message: 'Insert: field denoted by "value" keypath is not a string',
               } as TransformationVisitError,
             ],
           } as TransformationVisitResult;
+          return;
         }
       }
       else if (typeof opts['value'] === 'string')
@@ -271,13 +279,14 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
       else
       {
-        return {
+        result = {
           errors: [
             {
               message: 'Insert: "value" property is missing or invalid',
             } as TransformationVisitError,
           ],
         } as TransformationVisitResult;
+        return;
       }
 
       if (el.constructor === Array)
@@ -303,6 +312,11 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         yadeep.set(doc, field, (el.slice(0, at) as string) + String(value) + (el.slice(at) as string), { create: true });
       }
     });
+
+    if (result !== undefined)
+    {
+      return result;
+    }
 
     return {
       document: doc,
