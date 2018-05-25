@@ -580,7 +580,7 @@ export default class SQLGenerator
           case '\"':
             return '\"';
           case '\'':
-            return '\'';
+            return '\'\'';
           case '\\':
           case '%':
             return '\\' + char;
