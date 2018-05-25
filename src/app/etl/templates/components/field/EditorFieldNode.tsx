@@ -56,6 +56,7 @@ import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle
 import Util from 'util/Util';
 
 import * as Immutable from 'immutable';
+import Quarantine from 'util/RadiumQuarantine';
 const { List, Map } = Immutable;
 import FadeInOut from 'common/components/FadeInOut';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
@@ -75,16 +76,23 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
 {
   public state: {
     expandableViewOpen: boolean;
+    limitShowArray: number;
   } = {
       expandableViewOpen: true,
+      limitShowArray: 3,
     };
   constructor(props)
   {
     super(props);
-    if (props.noInteract)
-    {
-      this.state.expandableViewOpen = false;
-    }
+    this.state = this.computeInitialState(props);
+  }
+
+  public computeInitialState(props: Props)
+  {
+    return {
+      expandableViewOpen: this._fieldDepth(props) < 2,
+      limitShowArray: 3,
+    };
   }
 
   @instanceFnDecorator(memoizeOne)
@@ -189,10 +197,52 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     {
       return this.renderArrayChild(null, -1, true);
     }
-    return List(preview.slice(0, 3).map((value, index) =>
+
+    if (this.state.limitShowArray === -1 || preview.length <= this.state.limitShowArray)
     {
-      return this.renderArrayChild(value, index);
-    }));
+      return preview.map((value, index) =>
+      {
+        return this.renderArrayChild(value, index);
+      });
+    }
+    else
+    {
+      const items = preview.slice(0, this.state.limitShowArray).map((value, index) =>
+      {
+        return this.renderArrayChild(value, index);
+      });
+      items.push(this.renderArrayLimitButton(preview.length));
+      return items;
+    }
+  }
+
+  public renderArrayLimitButton(totalLength: number)
+  {
+    const numMore = totalLength - this.state.limitShowArray;
+
+    return (
+      <Quarantine key='arr-limit'>
+        <div
+          className='editor-field-array-more'
+          style={arrayLimitButtonStyle}
+          onClick={this.showAllArrayElements}
+        >
+          <div className='editor-field-array-more-label'>
+            {numMore} More Items
+          </div>
+          <div className='editor-field-array-more-button'>
+            Show All
+          </div>
+        </div>
+      </Quarantine>
+    );
+  }
+
+  public showAllArrayElements()
+  {
+    this.setState({
+      limitShowArray: -1,
+    });
   }
 
   public renderSettings()
@@ -345,6 +395,11 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
       .catch(this._showError('Could not reorder these fields.'));
   }
 }
+
+const arrayLimitButtonStyle = [
+  getStyle('boxShadow', `inset 0 -1px 0 0 ${Colors().boxShadow}`, `inset 0 0 2px 0px ${Colors().active}`),
+  backgroundColor(Colors().bg3),
+];
 
 const doNothing = () => null;
 const SEED_KEY_PATH = List([]);
