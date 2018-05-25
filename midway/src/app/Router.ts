@@ -117,11 +117,6 @@ AppRouter.post('/', passport.authenticate('access-token-local'), async (ctx, nex
 const MidwayRouter = new KoaRouter();
 MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
 
-MidwayRouter.get('/favicon.ico', async (ctx, next) =>
-{
-  await send(ctx, '/midway/src/assets/favicon.ico');
-});
-
 MidwayRouter.get('/', async (ctx, next) =>
 {
   await send(ctx, '/src/app/index.html');
