@@ -229,7 +229,7 @@ beforeAll(async (done) =>
 
 afterAll(async (done) =>
 {
-  await DB.getDB().execute(['DROP TABLE IF EXISTS jobs;', 'DROP TABLE IF EXISTS schedules;']);
+  await DB.getDB().execute([['DROP TABLE IF EXISTS jobs;', 'DROP TABLE IF EXISTS schedules;'], undefined]);
 });
 
 describe('Status tests', () =>

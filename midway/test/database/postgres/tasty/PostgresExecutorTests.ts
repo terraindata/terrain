@@ -94,7 +94,7 @@ function runTest(testObj: object)
   {
     try
     {
-      const results = await tasty.getDB().execute(testObj[1]);
+      const results = await tasty.getDB().execute([testObj[1], undefined]);
       await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
     }
     catch (e)
@@ -119,17 +119,17 @@ test('Postgres: transactions', async (done) =>
     const queries = ['SELECT * \n  FROM movies\n  LIMIT 10;'];
     await tasty.executeTransaction(async (handle, commit, rollback) =>
     {
-      await tasty.getDB().execute(queries, handle);
+      await tasty.getDB().execute([queries, undefined], handle);
       await commit();
     }, IsolationLevel.REPEATABLE_READ, true);
     await tasty.executeTransaction(async (handle, commit, rollback) =>
     {
-      await tasty.getDB().execute(queries, handle);
+      await tasty.getDB().execute([queries, undefined], handle);
       await rollback();
     }, IsolationLevel.SERIALIZABLE);
     await tasty.executeTransaction(async (handle, commit, rollback) =>
     {
-      await tasty.getDB().execute(queries, handle);
+      await tasty.getDB().execute([queries, undefined], handle);
       await commit();
     });
   }
