@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as moment from 'moment';
+import { Moment } from 'moment';
 
 export default class TerrainDateParameter
 {
@@ -60,11 +61,21 @@ export default class TerrainDateParameter
       throw new Error('The TerrainDate parameter ' + dateString + ' is not in the right format:'
         + 'TerrainDate.{ThisWeek/NextWeek}.[0-6]{T00:00:00+00:00}.');
     }
+    const dateStr = TerrainDateParameter.getDateString(dateString);
+    return JSON.stringify(dateStr);
+  }
 
+  /**
+   *
+   * @param {string} dateString, the dateString should be validated before
+   * @returns {moment.Moment}
+   */
+  public static getDateString(dateString: string): string
+  {
     const datePart = dateString.split('.');
 
     const dayOffset = Number(datePart[2]);
-    const today = moment().startOf('week');
+    const today = moment().startOf('isoWeek');
     if (datePart[1] === 'NextWeek')
     {
       today.add(1, 'w');
@@ -79,7 +90,7 @@ export default class TerrainDateParameter
         throw new Error('The generated time string is not valid: ' + dateString + ' -> ' + dateStr);
       }
     }
-    return JSON.stringify(dateStr);
+    return dateStr;
   }
 
   public static isValidTerrainDateParameter(dateString: string): boolean

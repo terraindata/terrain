@@ -310,7 +310,7 @@ const Util = {
       m = moment.parseZone(date);
     } else
     {
-      m = moment(date);
+      m = date;
     }
     if (language === 'elastic')
     {

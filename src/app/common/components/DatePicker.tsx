@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands
 
 import * as Immutable from 'immutable';
+import * as TerrainLog from 'loglevel';
 import * as moment from 'moment';
 import * as React from 'react';
 import DayPicker from 'react-day-picker';
@@ -198,21 +199,18 @@ class DatePicker extends TerrainComponent<Props>
 
   public getDate(): Moment
   {
-    let date;
-    if (TerrainDateParameter.isValidTerrainDateParameter(this.props.date))
+    let dateStr = this.props.date;
+    if (TerrainDateParameter.isValidTerrainDateParameter(dateStr))
     {
-      const timeString = TerrainDateParameter.getTimePart(this.props.date);
-      if (timeString !== null)
+      try
       {
-        date = moment.parseZone(timeString, ['HH:mm:ssT']);
-      } else
+        dateStr = TerrainDateParameter.getDateString(dateStr);
+      } catch (err)
       {
-        date = moment();
+        TerrainLog.error('Error when parsing this.props.date:' + err.message);
       }
-    } else
-    {
-      date = moment.parseZone(this.props.date);
     }
+    let date = moment.parseZone(dateStr);
     if (date.isValid() === false)
     {
       date = moment();
@@ -252,8 +250,7 @@ class DatePicker extends TerrainComponent<Props>
   {
     const indexName = DateParameterArray[dateParameterIndex];
     let date = DateParameterMap[indexName];
-    if (this.props.date.startsWith('@TerrainDate') &&
-      TerrainDateParameter.isValidTerrainDateParameter(this.props.date))
+    if (TerrainDateParameter.isValidTerrainDateParameter(this.props.date))
     {
       date = TerrainDateParameter.setDayPart(this.props.date, date);
     } else
@@ -272,23 +269,17 @@ class DatePicker extends TerrainComponent<Props>
 
   public dateToDateParameterMapIndex()
   {
-    if (this.props.date.startsWith('@TerrainDate'))
+    if (TerrainDateParameter.isValidTerrainDateParameter(this.props.date))
     {
-      if (TerrainDateParameter.isValidTerrainDateParameter(this.props.date))
-      {
-        const datePart = TerrainDateParameter.getDatePart(this.props.date);
-        const index = _.findIndex(DateParameterArray, (v) => DateParameterMap[v] === datePart);
-        return index;
-      }
+      const datePart = TerrainDateParameter.getDatePart(this.props.date);
+      const index = _.findIndex(DateParameterArray, (v) => DateParameterMap[v] === datePart);
+      return index;
     }
     return -1;
   }
 
-  public renderTimePicker()
+  public renderTimePicker(date)
   {
-
-    const date = this.getDate();
-
     return (
       <div className='date-time-time'>
         <Dropdown
@@ -308,17 +299,6 @@ class DatePicker extends TerrainComponent<Props>
 
   public render()
   {
-    if (this.props.date.startsWith('@TerrainDate'))
-    {
-      return (
-        <div
-          className='date-picker'
-        >
-          {this.renderTimePicker()}
-        </div>
-      );
-    }
-
     const date = this.getDate();
     const modifiers =
       {
@@ -334,7 +314,7 @@ class DatePicker extends TerrainComponent<Props>
           onDayClick={this.handleDayClick}
           initialMonth={date.toDate()}
         />
-        {this.renderTimePicker()}
+        {this.renderTimePicker(date)}
       </div>
     );
   }
