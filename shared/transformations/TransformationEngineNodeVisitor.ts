@@ -124,6 +124,99 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     return keccak256.update(toHash + salt).hex();
   }
 
+  // use standard AES 128 decryption
+  private static decryptHelper(msg: string, key?: any): string
+  {
+    const msgBytes: any = aesjs.utils.hex.toBytes(msg);
+    const aesCtr: any = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+    return aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes));
+  }
+
+  // use standard AES 128 rencryption
+  private static encryptHelper(msg: string, key?: any): string
+  {
+    const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
+    const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+    return aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes));
+  }
+
+  private static zipcodeHelper(zipcode: string, opts: NodeOptionsType<TransformationNodeType.ZipcodeNode>)
+  {
+    const data = TransformationEngine.datastore.get('zips')[zipcode];
+    if (!data)
+    {
+      return null;
+    }
+    switch (opts.format)
+    {
+      case 'city':
+        return data.city;
+      case 'state':
+        return data.state;
+      case 'citystate':
+        return (data.city as string) + ', ' + (data.state as string);
+      case 'type':
+        return data.type;
+      default:
+        return data.loc;
+    }
+  }
+
+  private static visitHelper(fields: List<KeyPath>, doc: object, defaultResult: TransformationVisitResult,
+    cb: (kp: KeyPath, el: any) => TransformationVisitResult | void,
+    shouldTransform: (kp: KeyPath, el: any) => boolean = (kp, el) => true): TransformationVisitResult
+  {
+    const reducedResult = fields.reduce((accumulator, field) =>
+    {
+      if (accumulator)
+      {
+        return accumulator;
+      }
+      const el = yadeep.get(doc, field);
+      if (!shouldTransform(field, el))
+      {
+        return accumulator;
+      }
+      if (Array.isArray(el))
+      {
+        for (let i: number = 0; i < el.length; i++)
+        {
+          let kp: KeyPath = field;
+          if (kp.contains('*'))
+          {
+            kp = kp.set(kp.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kp = kp.push(i.toString());
+          }
+          const result = cb(kp, yadeep.get(doc, kp));
+          if (result !== undefined)
+          {
+            return result;
+          }
+        }
+      }
+      else
+      {
+        const result = cb(field, el);
+        if (result !== undefined)
+        {
+          return result;
+        }
+      }
+      return accumulator;
+    }, undefined);
+    if (reducedResult !== undefined)
+    {
+      return reducedResult;
+    }
+    else
+    {
+      return defaultResult;
+    }
+  }
+
   public applyTransformationNode(node: TransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     if (node === undefined)
@@ -437,7 +530,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
 
   public visitUppercaseNode(node: UppercaseTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
-    return this.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
+    return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
     {
       if (typeof el !== 'string')
       {
@@ -460,7 +553,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.CastNode>;
 
-    return this.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
+    return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
     {
       if (typeof el === opts.toTypename || el == null || (el.constructor === Array && opts.toTypename === 'array'))
       {
@@ -549,7 +642,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.HashNode>;
 
-    return this.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
+    return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
     {
       if (typeof el !== 'string')
       {
@@ -572,7 +665,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.AddNode>;
 
-    return this.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
+    return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
     {
       if (typeof el !== 'number')
       {
@@ -595,7 +688,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.SubtractNode>;
 
-    return this.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
+    return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
     {
       if (typeof el !== 'number')
       {
@@ -618,7 +711,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.MultiplyNode>;
 
-    return this.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
+    return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
     {
       if (typeof el !== 'number')
       {
@@ -641,7 +734,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.DivideNode>;
 
-    return this.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
+    return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
     {
       if (typeof el !== 'number')
       {
@@ -690,7 +783,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
 
     const opts = node.meta as NodeOptionsType<TransformationNodeType.SetIfNode>;
 
-    return this.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
+    return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
     {
       if (setIfHelper(opts, el))
       {
@@ -703,7 +796,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.FindReplaceNode>;
 
-    return this.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
+    return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
     {
       if (typeof el !== 'string')
       {
@@ -958,26 +1051,9 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.EncryptNode>;
 
-    node.fields.forEach((field) =>
+    return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
     {
-      const el = yadeep.get(doc, field);
-      if (Array.isArray(el))
-      {
-        for (let i: number = 0; i < el.length; i++)
-        {
-          let kpi: KeyPath = field;
-          if (kpi.contains('*'))
-          {
-            kpi = kpi.set(kpi.indexOf('*'), i.toString());
-          }
-          else
-          {
-            kpi = kpi.push(i.toString());
-          }
-          yadeep.set(doc, kpi, this.encryptHelper(yadeep.get(doc, kpi), node.key));
-        }
-      }
-      else if (typeof el !== 'string')
+      if (typeof el !== 'string')
       {
         return {
           errors: [
@@ -989,57 +1065,32 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
       else
       {
-        yadeep.set(doc, field, this.encryptHelper(el, node.key));
+        yadeep.set(doc, kp, TransformationEngineNodeVisitor.encryptHelper(el, node.key));
       }
     });
-
-    return {
-      document: doc,
-    } as TransformationVisitResult;
   }
 
   public visitDecryptNode(node: DecryptTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.DecryptNode>;
 
-    node.fields.forEach((field) =>
+    return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
     {
-      const el = yadeep.get(doc, field);
-      if (Array.isArray(el))
-      {
-        for (let i: number = 0; i < el.length; i++)
-        {
-          let kpi: KeyPath = field;
-          if (kpi.contains('*'))
-          {
-            kpi = kpi.set(kpi.indexOf('*'), i.toString());
-          }
-          else
-          {
-            kpi = kpi.push(i.toString());
-          }
-          yadeep.set(doc, kpi, this.decryptHelper(yadeep.get(doc, kpi), node.key));
-        }
-      }
-      else if (typeof el !== 'string')
+      if (typeof el !== 'string')
       {
         return {
           errors: [
             {
-              message: 'Attempted to decrypt a non-string (this is not supported)',
+              message: 'Attempted to encrypt a non-string (this is not supported)',
             } as TransformationVisitError,
           ],
         } as TransformationVisitResult;
       }
       else
       {
-        yadeep.set(doc, field, this.decryptHelper(el, node.key));
+        yadeep.set(doc, kp, TransformationEngineNodeVisitor.decryptHelper(el, node.key));
       }
     });
-
-    return {
-      document: doc,
-    } as TransformationVisitResult;
   }
 
   public visitGroupByNode(node: GroupByTransformationNode, doc: object, options: object = {}): TransformationVisitResult
@@ -1103,26 +1154,9 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.ZipcodeNode>;
 
-    node.fields.forEach((field) =>
+    return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
     {
-      const el = yadeep.get(doc, field);
-      if (Array.isArray(el))
-      {
-        for (let i: number = 0; i < el.length; i++)
-        {
-          let kpi: KeyPath = field;
-          if (kpi.contains('*'))
-          {
-            kpi = kpi.set(kpi.indexOf('*'), i.toString());
-          }
-          else
-          {
-            kpi = kpi.push(i.toString());
-          }
-          yadeep.set(doc, kpi, this.zipcodeHelper(yadeep.get(doc, kpi), opts));
-        }
-      }
-      else if (typeof el !== 'string')
+      if (typeof el !== 'string')
       {
         return {
           errors: [
@@ -1134,105 +1168,8 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
       else
       {
-        yadeep.set(doc, field, this.zipcodeHelper(el, opts));
+        yadeep.set(doc, kp, TransformationEngineNodeVisitor.zipcodeHelper(el, opts));
       }
     });
-
-    return {
-      document: doc,
-    } as TransformationVisitResult;
-  }
-
-  // use standard AES 128 decryption
-  private decryptHelper(msg: string, key?: any): string
-  {
-    const msgBytes: any = aesjs.utils.hex.toBytes(msg);
-    const aesCtr: any = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-    return aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes));
-  }
-
-  // use standard AES 128 rencryption
-  private encryptHelper(msg: string, key?: any): string
-  {
-    const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
-    const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-    return aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes));
-  }
-
-  private zipcodeHelper(zipcode: string, opts: NodeOptionsType<TransformationNodeType.ZipcodeNode>)
-  {
-    const data = TransformationEngine.datastore.get('zips')[zipcode];
-    if (!data)
-    {
-      return null;
-    }
-    switch (opts.format)
-    {
-      case 'city':
-        return data.city;
-      case 'state':
-        return data.state;
-      case 'citystate':
-        return (data.city as string) + ', ' + (data.state as string);
-      case 'type':
-        return data.type;
-      default:
-        return data.loc;
-    }
-  }
-
-  private visitHelper(fields: List<KeyPath>, doc: object, defaultResult: TransformationVisitResult,
-    cb: (kp: KeyPath, el: any) => TransformationVisitResult | void,
-    shouldTransform: (kp: KeyPath, el: any) => boolean = (kp, el) => true): TransformationVisitResult
-  {
-    const reducedResult = fields.reduce((accumulator, field) =>
-    {
-      if (accumulator)
-      {
-        return accumulator;
-      }
-      const el = yadeep.get(doc, field);
-      if (!shouldTransform(field, el))
-      {
-        return accumulator;
-      }
-      if (Array.isArray(el))
-      {
-        for (let i: number = 0; i < el.length; i++)
-        {
-          let kp: KeyPath = field;
-          if (kp.contains('*'))
-          {
-            kp = kp.set(kp.indexOf('*'), i.toString());
-          }
-          else
-          {
-            kp = kp.push(i.toString());
-          }
-          const result = cb(kp, yadeep.get(doc, kp));
-          if (result !== undefined)
-          {
-            return result;
-          }
-        }
-      }
-      else
-      {
-        const result = cb(field, el);
-        if (result !== undefined)
-        {
-          return result;
-        }
-      }
-      return accumulator;
-    }, undefined);
-    if (reducedResult !== undefined)
-    {
-      return reducedResult;
-    }
-    else
-    {
-      return defaultResult;
-    }
   }
 }
