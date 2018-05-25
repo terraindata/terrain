@@ -630,7 +630,6 @@ class ElasticDataSourceC extends DataSource
   {
     // TODO this function needs to be refactored
     const server = context.builderState.db.name;
-
     if (context.type === 'source')
     {
       // we need to make it clear what parts of Source are tracked
@@ -726,13 +725,14 @@ class ElasticDataSourceC extends DataSource
         }
 
         const { dataSource } = context.source;
-        const { server, index, types } = dataSource as ElasticDataSource;
+        const { index, types } = dataSource as ElasticDataSource;
         if (!index)
         {
           return defaultOptions;
         }
 
         const theDatabaseId = `${server}/${index}`;
+
         const acceptableCols = context.schemaState.columns.filter(
           (column) => column.serverId === String(server) &&
             column.databaseId === theDatabaseId &&
@@ -772,7 +772,7 @@ class ElasticDataSourceC extends DataSource
         });
       }));
       const { dataSource } = context.source;
-      const { server, index } = dataSource as any;
+      const { index } = dataSource as any;
       if (index)
       {
         const theDatabaseId = `${server}/${index}`;
