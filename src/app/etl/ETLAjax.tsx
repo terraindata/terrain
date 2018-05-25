@@ -473,9 +473,11 @@ class ETLAjax
       }
     };
 
-    xhr.upload.addEventListener('progress', (e: ProgressEvent) => {
+    xhr.upload.addEventListener('progress', (e: ProgressEvent) =>
+    {
       let progress = 0;
-      if (e.total !== 0) {
+      if (e.total !== 0)
+      {
         progress = (e.loaded / e.total) * 100;
       }
       console.log(progress);
