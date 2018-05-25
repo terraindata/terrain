@@ -1081,7 +1081,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         return {
           errors: [
             {
-              message: 'Attempted to encrypt a non-string (this is not supported)',
+              message: 'Attempted to decrypt a non-string (this is not supported)',
             } as TransformationVisitError,
           ],
         } as TransformationVisitResult;
