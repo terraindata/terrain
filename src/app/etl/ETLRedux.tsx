@@ -152,6 +152,10 @@ export interface ETLActionTypes
     templateId: number,
     value: boolean,
   };
+  setFileUploadProgress: {
+    actionType: 'setFileUploadProgress',
+    percent: number,
+  };
   // Integration Action Types
   getIntegrations: {
     actionType: 'getIntegrations',
@@ -272,6 +276,10 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         return state.update('acknowledgedRuns',
           (runs) => runs.set(action.payload.templateId, action.payload.value));
       },
+      setFileUploadProgress: (state, action) =>
+      {
+        return state.set('fileUploadProgress', action.payload.percent);
+      },
       // overriden reducers
       getIntegrations: (state, action) => state,
       getIntegration: (state, action) => state,
@@ -363,7 +371,16 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       key: name,
     });
 
-    ETLAjax.runExecuteJob(action.jobId, action.template, action.files, action.downloadName, action.mimeType)
+    const onProgress = (percent: number) =>
+    {
+      directDispatch({
+        actionType: 'setFileUploadProgress',
+        percent,
+      });
+    };
+
+    ETLAjax.runExecuteJob(action.jobId, action.template, action.files, action.downloadName,
+      action.mimeType, onProgress)
       .then(this.onLoadFactory([action.onLoad], directDispatch, name))
       .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
