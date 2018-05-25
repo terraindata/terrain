@@ -289,7 +289,7 @@ export class TemplateProxy
       throw new Error(`No sink exists with key ${key}`);
     }
     const rootNames = order.ordering
-      .filter((id) => engine.getOutputKeyPath(id).size === 1)
+      .filter((id) => engine.getOutputKeyPath(id).size === 1 && engine.getFieldEnabled(id))
       .map((id) => engine.getOutputKeyPath(id).last());
     sink = sink.setIn(['fileConfig', 'fieldOrdering'], rootNames.toArray());
     this.setSink(key, sink);

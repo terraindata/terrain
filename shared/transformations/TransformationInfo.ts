@@ -172,8 +172,10 @@ const TransformationNodeInfo: AllNodeInfoType =
         type: DuplicateTransformationNode,
         isAvailable: (engine, fieldId) =>
         {
+          const repType = EngineUtil.getRepresentedType(fieldId, engine);
           return (
-            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId)) &&
+            repType !== 'object' && repType !== 'array'
           );
         },
         targetedVisitor: (visitor: TransformationNodeVisitor,

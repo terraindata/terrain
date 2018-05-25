@@ -340,6 +340,7 @@ class ETLAjax
     files?: { [k: string]: File },
     downloadName?: string,
     mimeType?: string,
+    onProgress?: (percent: number) => void,
   ): Promise<any>
   {
     return new Promise((resolve, reject) =>
@@ -348,6 +349,7 @@ class ETLAjax
         onError: reject,
         downloadName,
         mimeType,
+        onProgress
       };
 
       const templateToRun = JSON.stringify(templateForBackend(template));
@@ -473,6 +475,20 @@ class ETLAjax
       }
     };
 
+    if (config.onProgress !== undefined)
+    {
+      xhr.upload.addEventListener('progress', (e: ProgressEvent) =>
+      {
+        let progress = 0;
+        if (e.total !== 0)
+        {
+          progress = (e.loaded / e.total) * 100;
+        }
+
+        config.onProgress(progress);
+      }, false);
+    }
+
     xhr.open('post', MIDWAY_HOST + '/midway/v1/' + route);
     xhr.send(formData);
   }
@@ -483,6 +499,7 @@ interface ReqConfig
   onError?: (response: any) => void;
   downloadName?: string;
   mimeType?: string;
+  onProgress?: (percent: number) => void;
 }
 
 export interface ExecuteConfig
