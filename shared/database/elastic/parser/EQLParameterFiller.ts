@@ -92,7 +92,7 @@ export default class ESParameterFiller
           // replace it eagerly for easy debugging.
           if (typeof parameterValue === 'string' && TerrainDateParameter.isValidTerrainDateParameter(parameterValue))
           {
-            return TerrainDateParameter.fillTerrainDateParameter(param);
+            return TerrainDateParameter.fillTerrainDateParameter(parameterValue);
           }
           return ESParameterFiller.handleGivenParameter(ps.slice(1), params[parameterName], inTerms);
         } else
