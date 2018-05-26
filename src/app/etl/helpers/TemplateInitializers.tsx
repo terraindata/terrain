@@ -192,7 +192,7 @@ class Initializers extends ETLHelpers
     return async (hits) =>
     {
       await this._logUpdate('Calculating Template From Documents');
-      const { template, sourceKey, fieldMap, initialEdge } = this.createInitialTemplate(hits, source, sink);
+      const { template, sourceKey, fieldMap, initialEdge } = await this.createInitialTemplate(hits, source, sink);
       if (initialEdge === -1)
       {
         throw new Error('Failed to create initial edge');
@@ -219,50 +219,55 @@ class Initializers extends ETLHelpers
     };
   }
 
-  private createInitialTemplate(documents: List<object>, source?: SourceConfig, sink?: SinkConfig):
-    {
-      template: ETLTemplate,
-      sourceKey: string,
-      fieldMap: FieldMap,
-      initialEdge: number,
-      warnings: string[],
-      softWarnings: string[],
-    }
+  private async createInitialTemplate(documents: List<object>, source?: SourceConfig, sink?: SinkConfig):
+    Promise<InitialTemplateInfo>
   {
-    if (documents == null || documents.size === 0)
-    {
-      return {
-        template: _ETLTemplate(),
-        sourceKey: '',
-        fieldMap: Map(),
-        warnings: ['No documents provided for initial Template construction'],
-        softWarnings: [],
-        initialEdge: 0,
-      };
-    }
+    return new Promise<InitialTemplateInfo>(async (resolve, reject) => {
+      if (documents == null || documents.size === 0)
+      {
+        return resolve({
+          template: _ETLTemplate(),
+          sourceKey: '',
+          fieldMap: Map(),
+          warnings: ['No documents provided for initial Template construction'],
+          softWarnings: [],
+          initialEdge: 0,
+        });
+      }
 
-    let template = _ETLTemplate({
-      id: -1,
-      templateName: name,
+      let template = _ETLTemplate({
+        id: -1,
+        templateName: name,
+      });
+      const sourceToAdd = source !== undefined ? source : _SourceConfig({ type: Sources.Upload });
+      const sinkToAdd = sink !== undefined ? sink : _SinkConfig({ type: Sinks.Download });
+      // default source and sink is upload and download
+      const proxy = new TemplateProxy(() => template, (t) => template = t, (log) => this._logUpdate(log));
+
+      const sourceIds = proxy.addSource(sourceToAdd);
+      const sinkIds = proxy.addSink(sinkToAdd);
+      const initialEdge = proxy.addEdge(sourceIds.nodeId, sinkIds.nodeId);
+      const { warnings, softWarnings } = await proxy.createInitialEdgeEngine(initialEdge, documents);
+      const fieldMap = createTreeFromEngine(template.getTransformationEngine(initialEdge));
+      return resolve({
+        template,
+        sourceKey: sourceIds.sourceKey,
+        fieldMap,
+        warnings,
+        softWarnings,
+        initialEdge,
+      });
     });
-    const sourceToAdd = source !== undefined ? source : _SourceConfig({ type: Sources.Upload });
-    const sinkToAdd = sink !== undefined ? sink : _SinkConfig({ type: Sinks.Download });
-    // default source and sink is upload and download
-    const proxy = new TemplateProxy(() => template, (t) => template = t);
-
-    const sourceIds = proxy.addSource(sourceToAdd);
-    const sinkIds = proxy.addSink(sinkToAdd);
-    const initialEdge = proxy.addEdge(sourceIds.nodeId, sinkIds.nodeId);
-    const { warnings, softWarnings } = proxy.createInitialEdgeEngine(initialEdge, documents);
-    const fieldMap = createTreeFromEngine(template.getTransformationEngine(initialEdge));
-    return {
-      template,
-      sourceKey: sourceIds.sourceKey,
-      fieldMap,
-      warnings,
-      softWarnings,
-      initialEdge,
-    };
   }
+}
+
+interface InitialTemplateInfo
+{
+  template: ETLTemplate;
+  sourceKey: string;
+  fieldMap: FieldMap;
+  initialEdge: number;
+  warnings: string[];
+  softWarnings: string[];
 }
 export default new Initializers(TerrainStore);

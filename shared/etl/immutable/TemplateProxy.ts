@@ -80,6 +80,7 @@ export class TemplateProxy
   constructor(
     private _template: (() => ETLTemplate),
     private onMutate: Mutator<ETLTemplate> = doNothing,
+    private logProgress?: (log: string) => Promise<void>,
   )
   {
 
@@ -193,10 +194,9 @@ export class TemplateProxy
     return this.createEdge(edge);
   }
 
-  public createInitialEdgeEngine(edgeId: number, documents: List<object>)
+  public async createInitialEdgeEngine(edgeId: number, documents: List<object>)
   {
     const { engine, warnings, softWarnings } = EngineUtil.createEngineFromDocuments(documents);
-
     let castStringsToPrimitives = false;
     const fromNode = this.template.getNode(this.template.getEdge(edgeId).from);
     if (fromNode.type === NodeTypes.Source)
@@ -211,9 +211,8 @@ export class TemplateProxy
         castStringsToPrimitives = true;
       }
     }
-
     this.setEdgeTransformations(edgeId, engine);
-    this.performTypeDetection(edgeId,
+    await this.performTypeDetection(edgeId,
       {
         documents,
         castStringsToPrimitives,
@@ -297,7 +296,7 @@ export class TemplateProxy
 
   // Add automatic type casts to fields, and apply language specific type checking
   // if documentConfig is provided, do additional type checking / inference
-  private performTypeDetection(
+  private async performTypeDetection(
     edgeId: number,
     documentConfig?: {
       documents: List<object>,
@@ -307,6 +306,7 @@ export class TemplateProxy
   {
     const engine = this.template.getTransformationEngine(edgeId);
 
+    await this.log('Performing Type Detection');
     EngineUtil.interpretETLTypes(engine, documentConfig);
     EngineUtil.addInitialTypeCasts(engine);
   }
@@ -438,6 +438,18 @@ export class TemplateProxy
   private set template(val: ETLTemplate)
   {
     this.onMutate(val);
+  }
+
+  private async log(log: string): Promise<void>
+  {
+    if (this.logProgress === undefined)
+    {
+      return await new Promise<void>((resolve) => resolve());
+    }
+    else
+    {
+      return await this.logProgress(log);
+    }
   }
 }
 

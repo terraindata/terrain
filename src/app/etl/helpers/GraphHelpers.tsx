@@ -150,9 +150,9 @@ class GraphHelpers extends ETLHelpers
       const source = template.getSource(fromNode.endpoint);
       DocumentsHelpers.fetchDocuments(source, fromNode.endpoint).then((documents) =>
       {
-        this._try((proxy) =>
+        this._try(async (proxy) =>
         {
-          proxy.createInitialEdgeEngine(edgeId, documents);
+          await proxy.createInitialEdgeEngine(edgeId, documents);
         }).then(() =>
         {
           this.editorAct({

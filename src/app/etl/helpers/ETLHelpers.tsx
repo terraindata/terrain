@@ -131,7 +131,7 @@ export default abstract class ETLHelpers
         template = newTemplate;
       };
       const accessor = () => template;
-      const proxy = new TemplateProxy(accessor, mutator);
+      const proxy = new TemplateProxy(accessor, mutator, (log) => this._logUpdate(log));
 
       try
       {
@@ -230,7 +230,7 @@ export default abstract class ETLHelpers
       actionType: 'updateBlockers',
       updater: (blockState) => blockState.addLog(update),
     });
-    await sleep(0);
+    await sleep(1);
   }
 
   protected _blockOn(title: string, fn: () => Promise<any>)
