@@ -51,13 +51,13 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 
-import memoizeOne from 'memoize-one';
-import { instanceFnDecorator } from 'shared/util/Classes';
 import FilePicker from 'common/components/FilePicker';
 import Loading from 'common/components/Loading';
 import Modal from 'common/components/Modal';
 import { MultiModal } from 'common/components/overlay/MultiModal';
+import memoizeOne from 'memoize-one';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { instanceFnDecorator } from 'shared/util/Classes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
@@ -182,7 +182,7 @@ class ETLNotifications extends TerrainComponent<Props>
           />
         </div>
       </Modal>
-    )
+    );
   }
 
   public render()

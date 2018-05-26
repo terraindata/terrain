@@ -219,10 +219,11 @@ class Initializers extends ETLHelpers
     };
   }
 
-  private async createInitialTemplate(documents: List<object>, source?: SourceConfig, sink?: SinkConfig):
+  private createInitialTemplate(documents: List<object>, source?: SourceConfig, sink?: SinkConfig):
     Promise<InitialTemplateInfo>
   {
-    return new Promise<InitialTemplateInfo>(async (resolve, reject) => {
+    return new Promise<InitialTemplateInfo>(async (resolve, reject) =>
+    {
       if (documents == null || documents.size === 0)
       {
         return resolve({
@@ -242,12 +243,13 @@ class Initializers extends ETLHelpers
       const sourceToAdd = source !== undefined ? source : _SourceConfig({ type: Sources.Upload });
       const sinkToAdd = sink !== undefined ? sink : _SinkConfig({ type: Sinks.Download });
       // default source and sink is upload and download
-      const proxy = new TemplateProxy(() => template, (t) => template = t, (log) => this._logUpdate(log));
+      const proxy = new TemplateProxy(() => template, (t) => template = t);
 
       const sourceIds = proxy.addSource(sourceToAdd);
       const sinkIds = proxy.addSink(sinkToAdd);
       const initialEdge = proxy.addEdge(sourceIds.nodeId, sinkIds.nodeId);
-      const { warnings, softWarnings } = await proxy.createInitialEdgeEngine(initialEdge, documents);
+      const { warnings, softWarnings } = proxy.createInitialEdgeEngine(initialEdge, documents);
+      await this._logUpdate('Finishing Up');
       const fieldMap = createTreeFromEngine(template.getTransformationEngine(initialEdge));
       return resolve({
         template,

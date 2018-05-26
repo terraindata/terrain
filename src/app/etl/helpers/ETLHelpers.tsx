@@ -131,7 +131,7 @@ export default abstract class ETLHelpers
         template = newTemplate;
       };
       const accessor = () => template;
-      const proxy = new TemplateProxy(accessor, mutator, (log) => this._logUpdate(log));
+      const proxy = new TemplateProxy(accessor, mutator);
 
       try
       {
@@ -249,8 +249,8 @@ export default abstract class ETLHelpers
       this.etlAct({
         actionType: 'updateBlockers',
         updater: (blockState) => blockState.addBlocker(title),
-      })
-    }
+      });
+    };
     const unblock = () =>
     {
       if (id === null)
@@ -262,13 +262,14 @@ export default abstract class ETLHelpers
         this.etlAct({
           actionType: 'updateBlockers',
           updater: (blockState) => blockState.removeBlocker(id),
-        })
+        });
       }
-    }
+    };
     return { block, unblock };
   }
 }
 
-function sleep(ms) {
+function sleep(ms)
+{
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

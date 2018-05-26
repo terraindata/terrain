@@ -647,9 +647,9 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         }
       }
     }, (kp, el) =>
-    {
-      return !(typeof el === opts.toTypename || el == null || (el.constructor === Array && opts.toTypename === 'array'));
-    });
+      {
+        return !(typeof el === opts.toTypename || el == null || (el.constructor === Array && opts.toTypename === 'array'));
+      });
   }
 
   public visitHashNode(node: HashTransformationNode, doc: object, options: object = {}): TransformationVisitResult

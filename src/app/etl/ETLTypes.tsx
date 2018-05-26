@@ -74,7 +74,7 @@ class NotificationStateC
 {
   public uidBlockers = 1;
   public blockLogs: List<string> = List([]);
-  public activeBlocks: List<{id: number, title: string}> = List([]);
+  public activeBlocks: List<{ id: number, title: string }> = List([]);
 
   public isBlocked(): boolean
   {
@@ -99,10 +99,15 @@ class NotificationStateC
 
   public addBlocker(title: string): NotificationState
   {
-    const notif: NotificationState = this as any;
+    let notif: NotificationState = this as any;
     const id = notif.uidBlockers;
-    return notif.update('activeBlocks', (blocks) => blocks.push({id, title}))
+    if (!notif.isBlocked())
+    {
+      notif = notif.set('blockLogs', List([]));
+    }
+    notif = notif.update('activeBlocks', (blocks) => blocks.push({ id, title }))
       .set('uidBlockers', id + 1);
+    return notif;
   }
 
   public removeBlocker(id: number): NotificationState

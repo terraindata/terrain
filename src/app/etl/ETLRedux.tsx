@@ -312,7 +312,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       updateBlockers: (state, action) =>
       {
         return state.update('blockState', action.payload.updater);
-      }
+      },
     };
 
   // TODO, add a thing to the state where we can log errors?

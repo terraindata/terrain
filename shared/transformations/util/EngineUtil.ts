@@ -674,19 +674,14 @@ export default class EngineUtil
   private static getValuesToAnalyze(
     docs: List<object>,
     okp: KeyPath,
-    limitPerDoc = 5,
   ): any[]
   {
     let values = [];
     docs.forEach((doc) =>
     {
-      let vals = yadeep.get(doc, okp);
+      const vals = yadeep.get(doc, okp);
       if (vals !== undefined)
       {
-        if (vals.length > limitPerDoc)
-        {
-          vals = vals.slice(0, limitPerDoc);
-        }
         values = values.concat(vals);
       }
     });

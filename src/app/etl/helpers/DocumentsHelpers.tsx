@@ -169,8 +169,7 @@ class DocumentsHelpers extends ETLHelpers
     keys.forEach((key) =>
     {
       const source = sources.get(key);
-      const title = `Fetching Source ${this._templateEditor.template.getSourceName(key)}`;
-      this._blockOn(title, () => this.fetchDocuments(source, key).catch(this._logError));
+      this.fetchDocuments(source, key).catch(this._logError);
     });
   }
 

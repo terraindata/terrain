@@ -148,18 +148,21 @@ class GraphHelpers extends ETLHelpers
     if (fromNode.type === NodeTypes.Source)
     {
       const source = template.getSource(fromNode.endpoint);
-      DocumentsHelpers.fetchDocuments(source, fromNode.endpoint).then((documents) =>
-      {
-        this._try(async (proxy) =>
+      const makePromise = () => DocumentsHelpers.fetchDocuments(source, fromNode.endpoint)
+        .then(async (documents) =>
         {
-          await proxy.createInitialEdgeEngine(edgeId, documents);
-        }).then(() =>
-        {
-          this.editorAct({
-            actionType: 'rebuildFieldMap',
-          });
-        }).catch(this._editorErrorHandler('Could Not Create Engine From Documents', true));
-      }).catch(this._editorErrorHandler('Could Not Fetch Documents', true));
+          await this._logUpdate('Calculating Template From Documents');
+          this._try((proxy) =>
+          {
+            proxy.createInitialEdgeEngine(edgeId, documents);
+          }).then(() =>
+          {
+            this.editorAct({
+              actionType: 'rebuildFieldMap',
+            });
+          }).catch(this._editorErrorHandler('Could Not Create Engine From Documents', true));
+        }).catch(this._editorErrorHandler('Could Not Fetch Documents', true));
+      this._blockOn('Initializing', makePromise);
     }
   }
 
