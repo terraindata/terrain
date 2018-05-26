@@ -65,6 +65,64 @@ class ETLStateC
   public runningTemplates: Immutable.Map<number, ETLTemplate> = Map();
   public acknowledgedRuns: Immutable.Map<number, boolean> = Map();
   public fileUploadProgress: number = 0;
+  public blockState: NotificationState = _NotificationState();
 }
 export type ETLState = WithIRecord<ETLStateC>;
 export const _ETLState = makeConstructor(ETLStateC);
+
+class NotificationStateC
+{
+  public uidBlockers = 1;
+  public blockLogs: List<string> = List([]);
+  public activeBlocks: List<{id: number, title: string}> = List([]);
+
+  public isBlocked(): boolean
+  {
+    return this.activeBlocks.size > 0;
+  }
+
+  public getCurrentBlocker(): { id: number, title: string }
+  {
+    return this.activeBlocks.first();
+  }
+
+  public nextBlockId(): number
+  {
+    return this.uidBlockers;
+  }
+
+  public addLog(log: string): NotificationState
+  {
+    const notif: NotificationState = this as any;
+    return notif.update('blockLogs', (logs) => logs.push(log));
+  }
+
+  public addBlocker(title: string): NotificationState
+  {
+    const notif: NotificationState = this as any;
+    const id = notif.uidBlockers;
+    return notif.update('activeBlocks', (blocks) => blocks.push({id, title}))
+      .set('uidBlockers', id + 1);
+  }
+
+  public removeBlocker(id: number): NotificationState
+  {
+    let notif: NotificationState = this as any;
+    const index = this.activeBlocks.findIndex((block) => block.id === id);
+    if (index !== -1)
+    {
+      notif = notif.update('activeBlocks', (blocks) => blocks.delete(index));
+      if (!notif.isBlocked())
+      {
+        notif = notif.set('blockLogs', List([]));
+      }
+      return notif;
+    }
+    else
+    {
+      return notif;
+    }
+  }
+}
+export type NotificationState = WithIRecord<NotificationStateC>;
+export const _NotificationState = makeExtendedConstructor(NotificationStateC, true);

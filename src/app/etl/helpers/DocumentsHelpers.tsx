@@ -169,7 +169,8 @@ class DocumentsHelpers extends ETLHelpers
     keys.forEach((key) =>
     {
       const source = sources.get(key);
-      this.fetchDocuments(source, key).catch(this._logError);
+      const title = `Fetching Source ${this._templateEditor.template.getSourceName(key)}`;
+      this._blockOn(title, () => this.fetchDocuments(source, key).catch(this._logError));
     });
   }
 
@@ -178,8 +179,9 @@ class DocumentsHelpers extends ETLHelpers
     key?: string,
   ): Promise<List<object>>
   {
-    return new Promise<List<object>>((resolve, reject) =>
+    return new Promise<List<object>>(async (resolve, reject) =>
     {
+      await this._logUpdate('Fetching Documents');
       const onFetchLoad = (documents: List<object>) =>
       {
         if (key !== undefined)

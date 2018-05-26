@@ -125,7 +125,7 @@ class GraphHelpers extends ETLHelpers
     // 1: create a merge node
     // 2: split the left edge using the merge node
     // 3: connect the right edge to the merge node
-    this._try((proxy) =>
+    const makePromise = () => this._try((proxy) =>
     {
       const leftEdgeId = proxy.value().findEdges((edge) => edge.from === leftId).first();
       const rightEdgeId = proxy.value().findEdges((edge) => edge.from === rightId).first();
@@ -136,6 +136,7 @@ class GraphHelpers extends ETLHelpers
         outputKey,
       });
     }).catch(this._editorErrorHandler('Could Not Create Merge Join', true));
+    this._blockOn('Calculating Merge Engine', makePromise);
   }
 
   public createEngineForSourceEdge(edgeId: number)

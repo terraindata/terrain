@@ -80,7 +80,7 @@ class Initializers extends ETLHelpers
 {
   public loadExistingTemplate(templateId: number)
   {
-    this._getTemplate(templateId)
+    const makePromise = () => this._getTemplate(templateId)
       .then((template: ETLTemplate) =>
       {
         this.editorAct({
@@ -107,6 +107,7 @@ class Initializers extends ETLHelpers
         ETLRouteUtil.gotoEditTemplate(template.id);
       })
       .catch(this._editorErrorHandler('Error while loading template', true));
+    this._blockOn('Loading Template', makePromise);
   }
 
   /*
@@ -130,7 +131,7 @@ class Initializers extends ETLHelpers
     {
       return errorHandler(`Current template has ${currentTemplate.getEdges().size} edges, but expected 1`);
     }
-    this._getTemplate(appliedId).then((otherTemplate) =>
+    const makePromise = () => this._getTemplate(appliedId).then((otherTemplate) =>
     {
       const otherType = otherTemplate.isImport() ? 'import' : 'export';
       if (otherTemplate.getSources().size !== 1)
@@ -152,6 +153,7 @@ class Initializers extends ETLHelpers
         proxy.setEdgeTransformations(currentEdge.id, edgeToApply.transformations);
       }).catch(errorHandler);
     }).catch(errorHandler);
+    this._blockOn('Apply Template', makePromise);
   }
 
   public initNewFromAlgorithm(algorithmId: number)
@@ -165,9 +167,10 @@ class Initializers extends ETLHelpers
         algorithmId,
       },
     });
-    DocumentsHelpers.fetchDocuments(source)
+    const makePromise = () => DocumentsHelpers.fetchDocuments(source)
       .then(this.createInitialTemplateFn(source))
       .catch(this._editorErrorHandler('Could Not Create Template', true));
+    this._blockOn('Initializing', makePromise);
   }
 
   public initNewFromWalkthrough(walkthrough: WalkthroughState = this._walkthrough)
@@ -175,9 +178,10 @@ class Initializers extends ETLHelpers
     const source = walkthrough.source;
     const sink = walkthrough.sink;
     const file = walkthrough.getFile();
-    DocumentsHelpers.fetchDocuments(source)
+    const makePromise = () => DocumentsHelpers.fetchDocuments(source)
       .then(this.createInitialTemplateFn(source, sink))
       .catch(this._editorErrorHandler('Could Not Create Template', true));
+    this._blockOn('Initializing', makePromise);
   }
 
   private createInitialTemplateFn(
@@ -185,8 +189,9 @@ class Initializers extends ETLHelpers
     sink?: SinkConfig,
   ): (hits: List<object>) => void
   {
-    return (hits) =>
+    return async (hits) =>
     {
+      await this._logUpdate('Calculating Template From Documents');
       const { template, sourceKey, fieldMap, initialEdge } = this.createInitialTemplate(hits, source, sink);
       if (initialEdge === -1)
       {
@@ -249,9 +254,7 @@ class Initializers extends ETLHelpers
     const sinkIds = proxy.addSink(sinkToAdd);
     const initialEdge = proxy.addEdge(sourceIds.nodeId, sinkIds.nodeId);
     const { warnings, softWarnings } = proxy.createInitialEdgeEngine(initialEdge, documents);
-
     const fieldMap = createTreeFromEngine(template.getTransformationEngine(initialEdge));
-
     return {
       template,
       sourceKey: sourceIds.sourceKey,

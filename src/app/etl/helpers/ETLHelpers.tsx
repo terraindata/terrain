@@ -223,4 +223,52 @@ export default abstract class ETLHelpers
       }
     };
   }
+
+  protected async _logUpdate(update: string)
+  {
+    this.etlAct({
+      actionType: 'updateBlockers',
+      updater: (blockState) => blockState.addLog(update),
+    });
+    await sleep(0);
+  }
+
+  protected _blockOn(title: string, fn: () => Promise<any>)
+  {
+    const { block, unblock } = this._createUIBlocker(title);
+    block();
+    setTimeout(() => (fn() as any).finally(unblock), 1);
+  }
+
+  protected _createUIBlocker(title: string): { block: () => void, unblock: () => void }
+  {
+    let id = null;
+    const block = () =>
+    {
+      id = this._etl.blockState.nextBlockId();
+      this.etlAct({
+        actionType: 'updateBlockers',
+        updater: (blockState) => blockState.addBlocker(title),
+      })
+    }
+    const unblock = () =>
+    {
+      if (id === null)
+      {
+        // error?
+      }
+      else
+      {
+        this.etlAct({
+          actionType: 'updateBlockers',
+          updater: (blockState) => blockState.removeBlocker(id),
+        })
+      }
+    }
+    return { block, unblock };
+  }
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

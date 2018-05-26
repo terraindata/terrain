@@ -60,7 +60,7 @@ import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/t
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { AuthConfigType, ConnectionConfigType } from 'shared/etl/types/IntegrationTypes';
-import { _ETLState, ETLState } from './ETLTypes';
+import { _ETLState, ETLState, NotificationState } from './ETLTypes';
 
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
@@ -197,6 +197,10 @@ export interface ETLActionTypes
     actionType: 'deleteIntegrationSuccess';
     integrationId: ID;
   };
+  updateBlockers: {
+    actionType: 'updateBlockers';
+    updater: (block: NotificationState) => NotificationState;
+  };
 }
 
 class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
@@ -305,6 +309,10 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         const integration = _IntegrationConfig(action.payload.integration);
         return state.setIn(['integrations', integration.id], integration);
       },
+      updateBlockers: (state, action) =>
+      {
+        return state.update('blockState', action.payload.updater);
+      }
     };
 
   // TODO, add a thing to the state where we can log errors?
