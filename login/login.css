@@ -1,0 +1,11 @@
+/* Copyright 2018 Terrain Data Inc. */
+
+html, body {
+	width: 100%;
+	min-height: 100%;
+	padding: 0px;
+	margin: 0px;
+	
+	background: #fff;
+	background-image: url('login-bg.png');
+}

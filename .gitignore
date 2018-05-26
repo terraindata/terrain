@@ -29,3 +29,5 @@ yarn-error.log
 postgres-data
 midway/test/routes/scheduler/test_scheduled_export.json
 midway/src/assets/*.woff
+midway/src/assets/index.html
+midway/src/assets/login*

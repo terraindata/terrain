@@ -44,14 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as KoaRouter from 'koa-router';
-import * as send from 'koa-send';
+console.log('Login');
 
-const NotFoundRouter = new KoaRouter();
-
-NotFoundRouter.get('*', async (ctx, next) =>
+function inject(path, token)
 {
-  await send(ctx, '/midway/src/assets/index.html');
-});
+	const script = document.createElement('script')
+	script.setAttribute('src', '/midway/v1/assets/' + path);
+	script.setAttribute('type', 'text/javascript');
+	document.body.appendChild(script);
+	console.log(path + ' injected');
+}
 
-export default NotFoundRouter;
+document.getElementById("login-submit").onclick = function()
+{
+	// TODO: authenticate with Midway, then pass accessToken into inject()
+	const token = '';
+	inject('vendor.bundle.js', token);
+	inject('bundle.js', token);
+}	

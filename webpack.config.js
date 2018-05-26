@@ -56,7 +56,7 @@ module.exports =
   output:
   {
     path: __dirname,
-    publicPath: '/assets/',
+    publicPath: '/midway/v1/assets/',
     filename: 'bundle.js',
     chunkFilename: '[name].bundle.js'
   },

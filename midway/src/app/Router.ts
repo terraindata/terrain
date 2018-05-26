@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as send from 'koa-send';
+import * as winston from 'winston';
 
 import * as Util from './AppUtil';
 import AuthRouter from './auth/AuthRouter';
@@ -122,28 +123,46 @@ MidwayRouter.get('/favicon.ico', async (ctx, next) =>
   await send(ctx, '/midway/src/assets/favicon.ico');
 });
 
-MidwayRouter.get('/', async (ctx, next) =>
-{
-  await send(ctx, '/src/app/index.html');
-});
+// MidwayRouter.get('/', async (ctx, next) =>
+// {
+//   await send(ctx, '/src/app/index.html');
+// });
 
-MidwayRouter.get('/assets/:asset', async (ctx, next) =>
+interface AllowedFileOptions
 {
-  // Allow these specific filenames
-  const allowedNames: string[] = [
-    'bundle.js',
-    'vendor.bundle.js',
-  ];
+  requiresAuth?: boolean;
+}
+
+// Allow these specific filenames
+const allowedFiles: { [name: string]: AllowedFileOptions } = {
+  'index.html': { },
+  'login.js': { },
+  'login.css': { },
+  'login-bg.png': { },
+  
+  'bundle.js': {
+    requiresAuth: true,
+  },
+  'vendor.bundle.js': {
+    requiresAuth: true,
+  }
+};
 
   // Allow any files matching these extensions
   const allowedExtensions: string[] = [
     '.woff',
   ];
 
+MidwayRouter.get('/assets/:asset', async (ctx, next) =>
+{
+    winston.info("************* free");
   let rejectRequest: boolean = false;
-  if (!allowedNames.includes(ctx.params['asset']))
+  const allowedFileOptions = allowedFiles[ctx.params['asset']];
+  
+  if (allowedFileOptions === undefined)
   {
     rejectRequest = true;
+    winston.info("************* failed 1");
     allowedExtensions.forEach((ext) =>
     {
       if (ctx.params['asset'].endsWith(ext))
@@ -152,9 +171,22 @@ MidwayRouter.get('/assets/:asset', async (ctx, next) =>
       }
     });
   }
+  else if(allowedFileOptions.requiresAuth)
+  {
+    let authenticated = true;
+    
+    // TODO authenticate
+    
+    if (!authenticated)
+    {
+      winston.info("************* failed 2");
+      rejectRequest = true;
+    }
+  }
 
   if (rejectRequest === true)
   {
+    winston.info("************* failed 33");
     return;
   }
 
@@ -164,7 +196,7 @@ MidwayRouter.get('/assets/:asset', async (ctx, next) =>
   }
   else
   {
-    ctx.body = await Util.doRequest(`http://localhost:8080/assets/${ctx.params['asset']}`);
+    ctx.body = await Util.doRequest(`http://localhost:8080/midway/v1/assets/${ctx.params['asset']}`);
   }
 });
 
