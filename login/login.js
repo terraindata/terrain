@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-console.log('Login');
-
 function inject(path, token)
 {
 	const script = document.createElement('script')

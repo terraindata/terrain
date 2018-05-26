@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as send from 'koa-send';
-import * as winston from 'winston';
+import * as winston from 'winston'; // TODO remove when not needed
 
 import * as Util from './AppUtil';
 import AuthRouter from './auth/AuthRouter';
@@ -123,11 +123,6 @@ MidwayRouter.get('/favicon.ico', async (ctx, next) =>
   await send(ctx, '/midway/src/assets/favicon.ico');
 });
 
-// MidwayRouter.get('/', async (ctx, next) =>
-// {
-//   await send(ctx, '/src/app/index.html');
-// });
-
 interface AllowedFileOptions
 {
   requiresAuth?: boolean;
@@ -155,14 +150,12 @@ const allowedFiles: { [name: string]: AllowedFileOptions } = {
 
 MidwayRouter.get('/assets/:asset', async (ctx, next) =>
 {
-    winston.info("************* free");
   let rejectRequest: boolean = false;
   const allowedFileOptions = allowedFiles[ctx.params['asset']];
   
   if (allowedFileOptions === undefined)
   {
     rejectRequest = true;
-    winston.info("************* failed 1");
     allowedExtensions.forEach((ext) =>
     {
       if (ctx.params['asset'].endsWith(ext))
@@ -179,14 +172,12 @@ MidwayRouter.get('/assets/:asset', async (ctx, next) =>
     
     if (!authenticated)
     {
-      winston.info("************* failed 2");
       rejectRequest = true;
     }
   }
 
   if (rejectRequest === true)
   {
-    winston.info("************* failed 33");
     return;
   }
 
