@@ -349,7 +349,7 @@ class ETLAjax
         onError: reject,
         downloadName,
         mimeType,
-        onProgress
+        onProgress,
       };
 
       const templateToRun = JSON.stringify(templateForBackend(template));
