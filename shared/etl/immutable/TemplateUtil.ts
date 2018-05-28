@@ -182,7 +182,7 @@ export default class TemplateUtil
   public static verifyExecutable(
     template: ETLTemplate,
     options?: {
-      mappings?: { [k: string]: object }, // existing mapping for default sink
+      mappings?: { [k: string]: object },
     },
   ): string[]
   {
