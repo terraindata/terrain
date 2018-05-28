@@ -51,6 +51,7 @@ const { List, Map } = Immutable;
 
 import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { ETLTemplate, SinksMap, SourcesMap } from 'shared/etl/immutable/TemplateRecords';
+import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
@@ -58,7 +59,6 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
-import LanguageController from 'shared/etl/languages/LanguageControllers';
 
 import
 {
@@ -206,8 +206,8 @@ export default class TemplateUtil
           const node = template.findNodes((n) => n.type === NodeTypes.Sink && n.endpoint === key).first();
           const edgeId = template.findEdges((e) => e.to === node).first();
           const edge = template.getEdge(edgeId);
-          const mappings = options !== undefined ? options.mappings : undefined;
-          const mappingErrors = LanguageController.get(sink.options.language).verifyMapping(edge.transformations, sink, mappings);
+          const mapping = options !== undefined ? _.get(options, ['mappings', key]) : undefined;
+          const mappingErrors = LanguageController.get(sink.options.language).verifyMapping(edge.transformations, sink, mapping);
           errors = errors.concat(mappingErrors);
           return mappingErrors.length > 0;
         });

@@ -53,6 +53,7 @@ import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import TerrainStore from 'src/app/store/TerrainStore';
 import Util from 'util/Util';
 
+import ETLAjax from 'etl/ETLAjax';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
@@ -62,7 +63,6 @@ import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords'
 import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
 import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
-import ETLAjax from 'etl/ETLAjax';
 import ETLHelpers from './ETLHelpers';
 
 import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
@@ -71,25 +71,18 @@ class ExecutionHelpers extends ETLHelpers
 {
   public canRunTemplate(template: ETLTemplate): Promise<{ canRun: boolean, message: string }>
   {
-    return new Promise(async (resolve, reject) => {
-      const { runningTemplates } = this._etl;
-
+    return new Promise(async (resolve, reject) =>
+    {
       const options: {
         mappings: { [k: string]: object };
       } = {
-        mappings: {},
-      };
-      // const sink = template.getDefaultSink();
-      // if (sink.type === Sinks.Database)
-      // {
-      //   // const lastEdge = template.getEdge(template.getLastEdgeId());
-      //   // console.log(new ElasticMapping(lastEdge.transformations));
-      //   const mapping = await ETLAjax.getMapping(sink.options.serverId, sink.options.database);
-      //   options.existingMapping = mapping;
-      // }
+          mappings: {},
+        };
+
       const promises = [];
       const indexMapping = [];
-      template.getSinks().forEach((sink, key) => {
+      template.getSinks().forEach((sink, key) =>
+      {
         if (sink.type === Sinks.Database)
         {
           indexMapping.push(key);
@@ -98,34 +91,32 @@ class ExecutionHelpers extends ETLHelpers
       });
       if (promises.length > 0)
       {
-        await Promise.all(promises).then((mappings) => {
-          mappings.forEach((mapping, index) => {
+        await Promise.all(promises).then((mappings) =>
+        {
+          mappings.forEach((mapping, index) =>
+          {
             const key = indexMapping[index];
             options.mappings[key] = mapping;
           });
-        }).catch((err) => {
+        }).catch((err) =>
+        {
           return resolve({
             canRun: false,
-            message: `Cannot run template "${template.templateName}". Error while fetching mappings: ${JSON.stringify(err)}`,
+            message: `Cannot run template "${template.templateName}". Error while fetching mappings: ${JSON.stringify(err, null, 2)}`,
           });
         });
       }
 
       const verifyErrors = TemplateUtil.verifyExecutable(template, options);
+
       if (verifyErrors.length > 0)
       {
         return resolve({
           canRun: false,
-          message: `Cannot run template "${template.templateName}": ${JSON.stringify(verifyErrors)}`,
+          message: `Cannot run template "${template.templateName}": ${JSON.stringify(verifyErrors, null, 2)}`,
         });
       }
-      else if (runningTemplates.has(template.id))
-      {
-        return resolve({
-          canRun: false,
-          message: `Cannot run template "${template.templateName}". This template is already running`,
-        });
-      }
+
       return resolve({
         canRun: true,
         message: '',
@@ -214,6 +205,56 @@ class ExecutionHelpers extends ETLHelpers
 
   public runInlineTemplate(template: ETLTemplate)
   {
+    const { runningTemplates } = this._etl;
+    if (runningTemplates.has(template.id))
+    {
+      this.etlAct({
+        actionType: 'addModal',
+        props: {
+          message: `Cannot run template "${template.templateName}". This template is already running`,
+          title: `Error`,
+          error: true,
+        },
+      });
+    }
+    else
+    {
+      this.beforeRunTemplate(template);
+      this.canRunTemplate(template).then(({ canRun, message }) =>
+      {
+        if (!canRun)
+        {
+          this.etlAct({
+            actionType: 'addModal',
+            props: {
+              message,
+              title: `Error`,
+              error: true,
+            },
+          });
+          this.afterRunTemplate(template);
+        }
+        else
+        {
+          this.runTemplate(template);
+        }
+      }).catch((err) =>
+      {
+        this.etlAct({
+          actionType: 'addModal',
+          props: {
+            message: 'Error while trying to run template',
+            title: `Error`,
+            error: true,
+          },
+        });
+        this.afterRunTemplate(template);
+      });
+    }
+  }
+
+  private runTemplate(template: ETLTemplate)
+  {
     const updateUIAfterSuccess = () =>
     {
       const templateName = (template !== null && template.id === -1) ?
@@ -243,29 +284,10 @@ class ExecutionHelpers extends ETLHelpers
         },
       });
     };
-
-    this.beforeRunTemplate(template);
-
-    // const { canRun, message } = this.canRunTemplate(template);
-    this.canRunTemplate(template).then(({ canRun, message }) => {
-      if (!canRun)
-      {
-        this.etlAct({
-          actionType: 'addModal',
-          props: {
-            message,
-            title: `Error`,
-            error: true,
-          },
-        });
-        return;
-      }
-
-      this.createExecuteJob(template.templateName)
-        .then(this.runExecuteJobFactory(template))
-        .then(updateUIAfterSuccess)
-        .catch(updateUIAfterError);
-    }).catch(updateUIAfterError); // update this
+    this.createExecuteJob(template.templateName)
+      .then(this.runExecuteJobFactory(template))
+      .then(updateUIAfterSuccess)
+      .catch(updateUIAfterError);
   }
 }
 

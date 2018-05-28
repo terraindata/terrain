@@ -421,8 +421,10 @@ class ETLAjax
     database: string,
   ): Promise<object>
   {
-    return new Promise((resolve, reject) => {
-      const handleResponse = (response: any) => {
+    return new Promise((resolve, reject) =>
+    {
+      const handleResponse = (response: any) =>
+      {
         resolve(response);
       };
       return Ajax.req(

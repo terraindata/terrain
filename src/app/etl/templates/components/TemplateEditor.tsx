@@ -55,7 +55,6 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 const HTML5Backend = require('react-dnd-html5-backend');
 
-import Quarantine from 'util/RadiumQuarantine';
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import { ETLActions } from 'etl/ETLRedux';
 import DocumentsPreviewColumn from 'etl/templates/components/columns/DocumentsPreviewColumn';
@@ -71,6 +70,7 @@ import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import Quarantine from 'util/RadiumQuarantine';
 
 import EditorActionsSection from './EditorActionsSection';
 import EditorColumnActionsSection from './EditorColumnActionsSection';

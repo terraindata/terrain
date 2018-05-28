@@ -50,6 +50,7 @@ const { List, Map } = Immutable;
 import * as _ from 'lodash';
 
 import { LanguageInterface } from 'shared/etl/languages/LanguageControllers';
+import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import TypeUtil from 'shared/etl/TypeUtil';
@@ -58,7 +59,6 @@ import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 import { DefaultController } from './DefaultTemplateController';
-import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 
 import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 
@@ -113,17 +113,26 @@ class ElasticController extends DefaultController implements LanguageInterface
     return false;
   }
 
-  public verifyMapping(engine: TransformationEngine, sink: SinkConfig, mappings?: { [k: string]: object }): string[]
+  public verifyMapping(engine: TransformationEngine, sink: SinkConfig, existingMapping?: object): string[]
   {
     const mapping = new ElasticMapping(engine);
+    let errors = [];
+
     if (mapping.getErrors().length > 0)
     {
-      return mapping.getErrors();
+      errors = errors.concat(mapping.getErrors());
     }
-    else
+    if (existingMapping !== undefined && existingMapping[sink.options.table] !== undefined)
     {
-      return [];
+      const mappingToCompare = { properties: existingMapping[sink.options.table] };
+      const { hasConflicts, conflicts } = ElasticMapping.compareMapping(mapping.getMapping(), mappingToCompare);
+      if (hasConflicts)
+      {
+        errors = errors.concat(conflicts);
+      }
     }
+
+    return errors;
   }
 }
 

@@ -66,7 +66,7 @@ export interface LanguageInterface
   // if the field changes ETL types, take care of side effects
   changeFieldTypeSideEffects: (engine: TransformationEngine, fieldId: number, newType: ETLFieldTypes) => boolean;
   // verify if the sink mapping is compatible. Returns an empty array if there are no issues
-  verifyMapping: (engine: TransformationEngine, sink: SinkConfig, mappings?: { [k: string]: object }) => string[];
+  verifyMapping: (engine: TransformationEngine, sink: SinkConfig, existingMapping?: object) => string[];
 }
 
 export default class LanguageControllers
