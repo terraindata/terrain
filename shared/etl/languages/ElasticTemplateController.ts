@@ -50,14 +50,17 @@ const { List, Map } = Immutable;
 import * as _ from 'lodash';
 
 import { LanguageInterface } from 'shared/etl/languages/LanguageControllers';
+import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
-import { DefaultController } from './DefaultLanguageController';
+import { DefaultController } from './DefaultTemplateController';
+
+import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 
@@ -108,6 +111,28 @@ class ElasticController extends DefaultController implements LanguageInterface
       engine.setFieldProp(fieldId, List([this.language]), newProps);
     }
     return false;
+  }
+
+  public verifyMapping(engine: TransformationEngine, sink: SinkConfig, existingMapping?: object): string[]
+  {
+    const mapping = new ElasticMapping(engine);
+    let errors = [];
+
+    if (mapping.getErrors().length > 0)
+    {
+      errors = errors.concat(mapping.getErrors());
+    }
+    if (existingMapping !== undefined && existingMapping[sink.options.table] !== undefined)
+    {
+      const mappingToCompare = { properties: existingMapping[sink.options.table] };
+      const { hasConflicts, conflicts } = ElasticMapping.compareMapping(mapping.getMapping(), mappingToCompare);
+      if (hasConflicts)
+      {
+        errors = errors.concat(conflicts);
+      }
+    }
+
+    return errors;
   }
 }
 

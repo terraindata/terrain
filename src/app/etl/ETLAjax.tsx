@@ -415,6 +415,30 @@ class ETLAjax
     });
   }
 
+  // should this be in schema?
+  public getMapping(
+    serverId: string,
+    database: string,
+  ): Promise<object>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const handleResponse = (response: any) =>
+      {
+        resolve(response);
+      };
+      return Ajax.req(
+        'get',
+        `schema/${serverId}/${database}`,
+        {},
+        handleResponse,
+        {
+          onError: reject,
+        },
+      );
+    });
+  }
+
   private reqFormData(
     route: string,
     data: {

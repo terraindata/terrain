@@ -70,15 +70,12 @@ import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import Quarantine from 'util/RadiumQuarantine';
 
 import EditorActionsSection from './EditorActionsSection';
 import EditorColumnActionsSection from './EditorColumnActionsSection';
 
-import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
-
 import './TemplateEditor.less';
-
-import Quarantine from 'util/RadiumQuarantine';
 
 const { List } = Immutable;
 

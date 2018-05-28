@@ -180,7 +180,7 @@ export interface SinkOptionsTypes
   };
   Database: {
     language: Languages;
-    serverId: number;
+    serverId: string;
     database: string;
     table: string;
   };
@@ -196,7 +196,7 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
     },
     Database: {
       language: Languages.Elastic,
-      serverId: -1,
+      serverId: '',
       database: '',
       table: '',
     },

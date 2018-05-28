@@ -51,6 +51,7 @@ const { List, Map } = Immutable;
 
 import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { ETLTemplate, SinksMap, SourcesMap } from 'shared/etl/immutable/TemplateRecords';
+import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
@@ -178,7 +179,12 @@ export default class TemplateUtil
    *  2: If the template has a database sink, the mapping is valid
    *  3: General integrity check
    */
-  public static verifyExecutable(template: ETLTemplate): string[]
+  public static verifyExecutable(
+    template: ETLTemplate,
+    options?: {
+      mappings?: { [k: string]: object },
+    },
+  ): string[]
   {
     let errors = [];
     try
@@ -197,22 +203,13 @@ export default class TemplateUtil
       const invalidSink = template.getSinks().filter((sink) => sink.type === Sinks.Database)
         .find((sink, key) =>
         {
-          const options = sink.options as SinkOptionsType<Sinks.Database>;
-          switch (options.language)
-          {
-            case Languages.Elastic:
-              const node = template.findNodes((n) => n.type === NodeTypes.Sink && n.endpoint === key).first();
-              const edge = template.findEdges((e) => e.to === node).first();
-              const mapping = new ElasticMapping(template.getEdge(edge).transformations);
-              if (mapping.getErrors().length > 0)
-              {
-                errors = errors.concat(mapping.getErrors());
-              }
-              break;
-            default:
-              break;
-          }
-          return false;
+          const node = template.findNodes((n) => n.type === NodeTypes.Sink && n.endpoint === key).first();
+          const edgeId = template.findEdges((e) => e.to === node).first();
+          const edge = template.getEdge(edgeId);
+          const mapping = options !== undefined ? _.get(options, ['mappings', key]) : undefined;
+          const mappingErrors = LanguageController.get(sink.options.language).verifyMapping(edge.transformations, sink, mapping);
+          errors = errors.concat(mappingErrors);
+          return mappingErrors.length > 0;
         });
       if (invalidSink !== undefined)
       {
