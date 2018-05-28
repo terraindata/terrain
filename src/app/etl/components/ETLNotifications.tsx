@@ -55,7 +55,9 @@ import FilePicker from 'common/components/FilePicker';
 import Loading from 'common/components/Loading';
 import Modal from 'common/components/Modal';
 import { MultiModal } from 'common/components/overlay/MultiModal';
+import memoizeOne from 'memoize-one';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { instanceFnDecorator } from 'shared/util/Classes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
@@ -125,6 +127,64 @@ class ETLNotifications extends TerrainComponent<Props>
     );
   }
 
+  public renderBlockLog(log: string, key)
+  {
+    if (log === '')
+    {
+      return (
+        <div
+          className='notif-block-log notif-block-log-waiting'
+          key={key}
+        >
+          {log}
+        </div>
+      );
+    }
+    else
+    {
+      return (
+        <div
+          className='notif-block-log'
+          key={key}
+        >
+          {log}
+        </div>
+      );
+    }
+  }
+
+  @instanceFnDecorator(memoizeOne)
+  public computeAnimationLogList(logs: List<string>)
+  {
+    return logs.push('');
+  }
+
+  public renderBlockModal()
+  {
+    const { blockState } = this.props.etl;
+    const currentBlock = blockState.getCurrentBlocker();
+    const title = currentBlock !== undefined ? currentBlock.title : '';
+
+    return (
+      <Modal
+        open={blockState.isBlocked()}
+        title={title}
+      >
+        <div className='etl-page-loading-modal-content'>
+          <div className='notif-block-logs'>
+            {this.computeAnimationLogList(blockState.blockLogs).map(this.renderBlockLog)}
+          </div>
+          <Loading
+            width={150}
+            height={150}
+            loading={true}
+            loaded={false}
+          />
+        </div>
+      </Modal>
+    );
+  }
+
   public render()
   {
     const { modalRequests } = this.props.etl;
@@ -133,6 +193,9 @@ class ETLNotifications extends TerrainComponent<Props>
       <div className='etl-page-root'>
         {
           this.renderRunningTemplateModal()
+        }
+        {
+          this.renderBlockModal()
         }
         <MultiModal
           requests={modalRequests}

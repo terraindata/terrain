@@ -457,28 +457,14 @@ export default class EngineUtil
       EngineUtil.interpretTextFields(engine, options.documents);
     }
 
-    const docs = EngineUtil.preprocessDocuments(options.documents);
+    const docs = EngineUtil.preprocessDocuments(options.documents, engine);
     engine.getAllFieldIDs().forEach((id) =>
     {
       const ikp = engine.getInputKeyPath(id);
       const okp = engine.getOutputKeyPath(id);
 
-      let values = [];
-      docs.forEach((doc) =>
-      {
-        try
-        {
-          const vals = yadeep.get(engine.transform(doc), okp);
-          if (vals !== undefined)
-          {
-            values = values.concat(vals);
-          }
-        }
-        catch (e)
-        {
-          // todo indicate invalid
-        }
-      });
+      const values = EngineUtil.getValuesToAnalyze(docs, okp);
+
       const repType = EngineUtil.getRepresentedType(id, engine);
       if (repType === 'string')
       {
@@ -659,9 +645,9 @@ export default class EngineUtil
     }
   }
 
-  private static preprocessDocuments(documents: List<object>): List<object>
+  private static preprocessDocuments(documents: List<object>, engine: TransformationEngine): List<object>
   {
-    return documents.map((doc) => objectify(doc)).toList();
+    return documents.map((doc) => engine.transform(doc)).toList();
   }
 
   // warning types get typed as strings, but should emit a warning
@@ -685,11 +671,28 @@ export default class EngineUtil
     }
   }
 
+  private static getValuesToAnalyze(
+    docs: List<object>,
+    okp: KeyPath,
+  ): any[]
+  {
+    let values = [];
+    docs.forEach((doc) =>
+    {
+      const vals = yadeep.get(doc, okp);
+      if (vals !== undefined)
+      {
+        values = values.concat(vals);
+      }
+    });
+    return values;
+  }
+
   // attempt to convert fields from text and guess if they should be numbers or booleans
   // adds type casts
   private static interpretTextFields(engine: TransformationEngine, documents: List<object>)
   {
-    const docs = EngineUtil.preprocessDocuments(documents);
+    const docs = EngineUtil.preprocessDocuments(documents, engine);
     engine.getAllFieldIDs().forEach((id) =>
     {
       if (EngineUtil.getRepresentedType(id, engine) !== 'string')
@@ -698,12 +701,7 @@ export default class EngineUtil
       }
       const okp = engine.getOutputKeyPath(id);
       const ikp = engine.getInputKeyPath(id);
-      let values = [];
-      docs.forEach((doc) =>
-      {
-        const vals = yadeep.get(engine.transform(doc), okp);
-        values = values.concat(vals);
-      });
+      const values = EngineUtil.getValuesToAnalyze(docs, okp);
       const bestType = TypeUtil.getCommonJsType(values);
       if (bestType !== EngineUtil.getRepresentedType(id, engine))
       {

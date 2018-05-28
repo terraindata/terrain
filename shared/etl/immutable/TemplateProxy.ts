@@ -196,7 +196,6 @@ export class TemplateProxy
   public createInitialEdgeEngine(edgeId: number, documents: List<object>)
   {
     const { engine, warnings, softWarnings } = EngineUtil.createEngineFromDocuments(documents);
-
     let castStringsToPrimitives = false;
     const fromNode = this.template.getNode(this.template.getEdge(edgeId).from);
     if (fromNode.type === NodeTypes.Source)
@@ -211,7 +210,6 @@ export class TemplateProxy
         castStringsToPrimitives = true;
       }
     }
-
     this.setEdgeTransformations(edgeId, engine);
     this.performTypeDetection(edgeId,
       {

@@ -199,7 +199,8 @@ export function getSampleRows(
     const fr = new FileReader();
     fr.onloadend = () =>
     {
-      try {
+      try
+      {
         const workbook = xlsx.read(fr.result, { type: 'array' });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         if (!sheet)
@@ -214,7 +215,7 @@ export function getSampleRows(
         const lastCol = positions[1].match(/[A-Z]/)[0];
         const lastRow = parseFloat(startRow) + 9;
         const range = startCol + startRow + ':' + lastCol + String(lastRow);
-        const json = xlsx.utils.sheet_to_json(sheet, {range});
+        const json = xlsx.utils.sheet_to_json(sheet, { range });
         onLoad(json);
       }
       catch (e)
