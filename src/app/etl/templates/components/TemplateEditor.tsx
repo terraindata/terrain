@@ -75,11 +75,7 @@ import Quarantine from 'util/RadiumQuarantine';
 import EditorActionsSection from './EditorActionsSection';
 import EditorColumnActionsSection from './EditorColumnActionsSection';
 
-import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
-
 import './TemplateEditor.less';
-
-import GraphHelpers from 'etl/helpers/GraphHelpers';
 
 const { List } = Immutable;
 
