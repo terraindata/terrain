@@ -73,6 +73,7 @@ import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { SchemaState } from 'src/app/schema/SchemaTypes';
 
 export default abstract class ETLHelpers
 {
@@ -103,6 +104,11 @@ export default abstract class ETLHelpers
   protected get _walkthrough(): WalkthroughState
   {
     return this._state.get('walkthrough');
+  }
+
+  public get _schema(): SchemaState
+  {
+    return this._state.get('schema');
   }
 
   constructor(protected store)

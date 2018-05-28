@@ -55,6 +55,7 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 const HTML5Backend = require('react-dnd-html5-backend');
 
+import Quarantine from 'util/RadiumQuarantine';
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import { ETLActions } from 'etl/ETLRedux';
 import DocumentsPreviewColumn from 'etl/templates/components/columns/DocumentsPreviewColumn';
@@ -78,7 +79,7 @@ import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 
 import './TemplateEditor.less';
 
-import Quarantine from 'util/RadiumQuarantine';
+import GraphHelpers from 'etl/helpers/GraphHelpers';
 
 const { List } = Immutable;
 

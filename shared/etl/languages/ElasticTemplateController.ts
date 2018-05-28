@@ -51,13 +51,16 @@ import * as _ from 'lodash';
 
 import { LanguageInterface } from 'shared/etl/languages/LanguageControllers';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
-import { DefaultController } from './DefaultLanguageController';
+import { DefaultController } from './DefaultTemplateController';
+import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
+
+import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 
@@ -108,6 +111,19 @@ class ElasticController extends DefaultController implements LanguageInterface
       engine.setFieldProp(fieldId, List([this.language]), newProps);
     }
     return false;
+  }
+
+  public verifyMapping(engine: TransformationEngine, sink: SinkConfig, mappings?: { [k: string]: object }): string[]
+  {
+    const mapping = new ElasticMapping(engine);
+    if (mapping.getErrors().length > 0)
+    {
+      return mapping.getErrors();
+    }
+    else
+    {
+      return [];
+    }
   }
 }
 

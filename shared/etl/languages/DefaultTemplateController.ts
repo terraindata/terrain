@@ -74,6 +74,11 @@ export class DefaultController implements LanguageInterface
   {
     return false;
   }
+
+  public verifyMapping(engine: TransformationEngine, sink, options?)
+  {
+    return [];
+  }
 }
 
 export default new DefaultController();

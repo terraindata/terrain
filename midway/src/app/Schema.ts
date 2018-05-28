@@ -245,17 +245,48 @@ export async function deleteElasticIndex(dbid: number, dbname: string): Promise<
   });
 }
 
-export async function getSchema(databaseID: number): Promise<string>
+export async function getSchema(databaseID: number | string): Promise<string>
 {
   return new Promise<string>(async (resolve, reject) =>
   {
-    const database: DatabaseController | undefined = DatabaseRegistry.get(databaseID);
+    const database: DatabaseController | undefined = typeof databaseID === 'number' ?
+      DatabaseRegistry.get(databaseID)
+      :
+      DatabaseRegistry.getByName(databaseID);
+
     if (database === undefined)
     {
       throw new Error('Database "' + databaseID.toString() + '" not found.');
     }
     const schema: Tasty.Schema = await database.getTasty().schema();
     return resolve(schema.toString());
+  });
+}
+
+export async function getTable(databaseID: number | string, table: string): Promise<object>
+{
+  return new Promise<object>(async (resolve, reject) =>
+  {
+    const database: DatabaseController | undefined = typeof databaseID === 'number' ?
+      DatabaseRegistry.get(databaseID)
+      :
+      DatabaseRegistry.getByName(databaseID);
+
+    if (database === undefined)
+    {
+      throw new Error('Database "' + databaseID.toString() + '" not found.');
+    }
+    const schema: Tasty.Schema = await database.getTasty().schema();
+
+    const tables = schema.tables(table);
+    if (tables !== undefined)
+    {
+      return resolve(tables);
+    }
+    else
+    {
+      return resolve({});
+    }
   });
 }
 
