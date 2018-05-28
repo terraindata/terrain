@@ -76,6 +76,7 @@ import MidwayRouter from './Router';
 import { Scheduler } from './scheduler/Scheduler';
 import * as Schema from './Schema';
 import { users } from './users/UserRouter';
+import { registerMidwayEncryption } from './encryption/MidwayEncryptionController';
 
 const MAX_CONN_RETRIES = 5;
 const CONN_RETRY_TIMEOUT = 1000;
@@ -257,6 +258,10 @@ export class App
     // process configuration options
     await Config.handleConfig(this.config);
     winston.debug('Finished processing configuration options...');
+
+    // initialize system encryption keys
+    registerMidwayEncryption();
+    winston.debug('Finished Registering System Private Keys');
 
     // create a default seed user
     await users.initializeDefaultUser();

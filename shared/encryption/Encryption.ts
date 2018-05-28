@@ -43,22 +43,68 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-
+// tslint:disable:max-classes-per-file no-unused-expression
 import aesjs = require('aes-js');
-import { List } from 'immutable';
 import sha1 = require('sha1');
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+export enum Keys {
+  Integrations = 'Integrations',
+  Transformations = 'Transformations',
+}
 
-export default class EncryptTransformationNode extends TransformationNode
+export interface EncryptionController {
+  encryptStatic: (msg: string, key: Keys) => string;
+  decryptStatic: (msg: string, key: Keys) => string;
+}
+
+let registeredController: EncryptionController = null;
+
+export function registerEncryptionController(controller: EncryptionController)
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.EncryptNode)
+  registeredController = controller;
+}
+
+class EncryptionProxy implements EncryptionController
+{
+  public encryptStatic(msg, key)
   {
-    super(id, fields, options, typeCode);
+    if (registeredController !== null)
+    {
+      return registeredController.encryptStatic(msg, key);
+    }
+    else
+    {
+      return '******';
+    }
+  }
+
+  public decryptStatic(msg, key)
+  {
+    if (registeredController !== null)
+    {
+      return registeredController.decryptStatic(msg, key);
+    }
+    else
+    {
+      return '*Sample Decrypted Text*';
+    }
+  }
+
+  public encryptAny(msg: string, privateKey: string): string
+  {
+    const key: any = privateKey;
+    const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
+    const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+    return aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes));
+  }
+
+  public decryptAny(msg: string, privateKey: string): string
+  {
+    const key: any = privateKey;
+    const msgBytes: any = aesjs.utils.hex.toBytes(msg);
+    const aesCtr: any = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+    return aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes));
   }
 }
+
+export default new EncryptionProxy();

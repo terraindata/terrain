@@ -52,6 +52,7 @@ import isPrimitive = require('is-primitive');
 import { keccak256 } from 'js-sha3';
 import * as _ from 'lodash';
 
+import Encryption, { Keys } from 'shared/encryption/Encryption';
 import { diff } from 'semver';
 import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
@@ -127,17 +128,13 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   // use standard AES 128 decryption
   private static decryptHelper(msg: string, key?: any): string
   {
-    const msgBytes: any = aesjs.utils.hex.toBytes(msg);
-    const aesCtr: any = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-    return aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes));
+    return Encryption.decryptStatic(msg, Keys.Transformations);
   }
 
   // use standard AES 128 rencryption
   private static encryptHelper(msg: string, key?: any): string
   {
-    const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
-    const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-    return aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes));
+    return Encryption.encryptStatic(msg, Keys.Transformations);
   }
 
   private static zipcodeHelper(zipcode: string, opts: NodeOptionsType<TransformationNodeType.ZipcodeNode>)
@@ -1079,7 +1076,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
       else
       {
-        yadeep.set(doc, kp, TransformationEngineNodeVisitor.encryptHelper(el, node.key));
+        yadeep.set(doc, kp, TransformationEngineNodeVisitor.encryptHelper(el));
       }
     });
   }
@@ -1102,7 +1099,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
       else
       {
-        yadeep.set(doc, kp, TransformationEngineNodeVisitor.decryptHelper(el, node.key));
+        yadeep.set(doc, kp, TransformationEngineNodeVisitor.decryptHelper(el));
       }
     });
   }

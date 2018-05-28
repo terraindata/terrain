@@ -57,12 +57,11 @@ import * as Util from '../AppUtil';
 import UserConfig from '../users/UserConfig';
 import { users } from '../users/UserRouter';
 import { versions } from '../versions/VersionRouter';
+import Encryption, { Keys } from 'shared/encryption/Encryption';
 
 export class Integrations
 {
   private integrationTable: Tasty.Table;
-  private key: any;
-  private privateKey: string;
 
   constructor()
   {
@@ -81,14 +80,6 @@ export class Integrations
         'writePermission',
       ],
     );
-
-    // AES 128 requires a key that is 16, 24, or 32 bytes
-    this.privateKey = sha1(`0VAtqVlzusw8nqA8TMoSfGHR3ik3dB-c9t4-gKUjD5iRbsWQWRzeL
-                       -6mBtRGWV4M2A7ZZryVT7-NZjTvzuY7qhjrZdJTv4iGPmcbta-3iL
-                       kgfEzY3QufFvm14dqtzfsCXhboiOC23idadrMNGlQwyJ783XlGwLB
-                       xDeGI01olmhg0oiNCeoGc_4zDrHq3wcgcwQ_mpZYAj9mJsv_OI_yD
-                       iN83Y_gDQCTzA9u3NdmmxquD2jSrR2fSKRokspxqBjb5`).substring(0, 16);
-    this.key = aesjs.utils.utf8.toBytes(this.privateKey);
   }
 
   public async delete(user: UserConfig, id: number): Promise<IntegrationConfig[] | string>
@@ -278,25 +269,32 @@ export class Integrations
   // use standard AES 128 decryption
   private async _decrypt(msg: string, privateKey?: string): Promise<string>
   {
-    return new Promise<string>(async (resolve, reject) =>
-    {
-      const key: any = privateKey !== undefined ? aesjs.utils.utf8.toBytes(privateKey) : this.key;
-      const msgBytes: any = aesjs.utils.hex.toBytes(msg);
-      const aesCtr: any = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-      return resolve(aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes)));
+    return new Promise<string>((resolve, reject) => {
+      if (privateKey === undefined)
+      {
+        return resolve(Encryption.decryptStatic(msg, Keys.Integrations));
+      }
+      else
+      {
+        return resolve(Encryption.decryptAny(msg, privateKey));
+      }
     });
   }
 
   // use standard AES 128 rencryption
   private async _encrypt(msg: string, privateKey?: string): Promise<string>
   {
-    return new Promise<string>(async (resolve, reject) =>
-    {
-      const key: any = privateKey !== undefined ? aesjs.utils.utf8.toBytes(privateKey) : this.key;
-      const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
-      const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-      return resolve(aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes)));
+    return new Promise<string>((resolve, reject) => {
+      if (privateKey === undefined)
+      {
+        return resolve(Encryption.encryptStatic(msg, Keys.Integrations));
+      }
+      else
+      {
+        return resolve(Encryption.encryptAny(msg, privateKey));
+      }
     });
+
   }
 }
 
