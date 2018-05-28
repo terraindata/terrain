@@ -47,12 +47,14 @@ THE SOFTWARE.
 import aesjs = require('aes-js');
 import sha1 = require('sha1');
 
-export enum Keys {
+export enum Keys
+{
   Integrations = 'Integrations',
   Transformations = 'Transformations',
 }
 
-export interface EncryptionController {
+export interface EncryptionController
+{
   encryptStatic: (msg: string, key: Keys) => string;
   decryptStatic: (msg: string, key: Keys) => string;
 }
@@ -74,7 +76,7 @@ class EncryptionProxy implements EncryptionController
     }
     else
     {
-      return '******';
+      return '********';
     }
   }
 

@@ -51,13 +51,13 @@ import IntegrationConfig from './IntegrationConfig';
 import { IntegrationPermission, IntegrationPermissionLevels } from './IntegrationPermissionLevels';
 import IntegrationSimpleConfig from './IntegrationSimpleConfig';
 
+import Encryption, { Keys } from 'shared/encryption/Encryption';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import * as Util from '../AppUtil';
 import UserConfig from '../users/UserConfig';
 import { users } from '../users/UserRouter';
 import { versions } from '../versions/VersionRouter';
-import Encryption, { Keys } from 'shared/encryption/Encryption';
 
 export class Integrations
 {
@@ -173,6 +173,7 @@ export class Integrations
           }
         });
       }
+
       integration['authConfig'] = await this._encrypt(JSON.stringify(integration['authConfig'] as string)) as string;
       integration['connectionConfig'] = JSON.stringify(integration['connectionConfig']);
       await App.DB.upsert(this.integrationTable, integration);
@@ -269,7 +270,8 @@ export class Integrations
   // use standard AES 128 decryption
   private async _decrypt(msg: string, privateKey?: string): Promise<string>
   {
-    return new Promise<string>((resolve, reject) => {
+    return new Promise<string>((resolve, reject) =>
+    {
       if (privateKey === undefined)
       {
         return resolve(Encryption.decryptStatic(msg, Keys.Integrations));
@@ -284,7 +286,8 @@ export class Integrations
   // use standard AES 128 rencryption
   private async _encrypt(msg: string, privateKey?: string): Promise<string>
   {
-    return new Promise<string>((resolve, reject) => {
+    return new Promise<string>((resolve, reject) =>
+    {
       if (privateKey === undefined)
       {
         return resolve(Encryption.encryptStatic(msg, Keys.Integrations));

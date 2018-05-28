@@ -52,8 +52,8 @@ import isPrimitive = require('is-primitive');
 import { keccak256 } from 'js-sha3';
 import * as _ from 'lodash';
 
-import Encryption, { Keys } from 'shared/encryption/Encryption';
 import { diff } from 'semver';
+import Encryption, { Keys } from 'shared/encryption/Encryption';
 import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 import AddTransformationNode from './nodes/AddTransformationNode';

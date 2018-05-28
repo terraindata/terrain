@@ -66,6 +66,7 @@ import * as Config from './Config';
 import { DatabaseConfig } from './database/DatabaseConfig';
 import { databases } from './database/DatabaseRouter';
 import { Email } from './email/Email';
+import { registerMidwayEncryption } from './encryption/MidwayEncryptionController';
 import { events } from './events/EventRouter';
 import { integrations } from './integrations/IntegrationRouter';
 import { JobLog } from './jobs/JobLog';
@@ -76,7 +77,6 @@ import MidwayRouter from './Router';
 import { Scheduler } from './scheduler/Scheduler';
 import * as Schema from './Schema';
 import { users } from './users/UserRouter';
-import { registerMidwayEncryption } from './encryption/MidwayEncryptionController';
 
 const MAX_CONN_RETRIES = 5;
 const CONN_RETRY_TIMEOUT = 1000;

@@ -125,7 +125,6 @@ class ETLEditorPage extends TerrainComponent<Props>
 
   public saveTemplate(template: ETLTemplate, isSaveAs: boolean, onSuccess?: () => void)
   {
-    console.log(template.toJS());
     const { etlAct, editorAct } = this.props;
 
     // important for user-uploaded files
