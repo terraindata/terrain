@@ -267,6 +267,7 @@ export default class SQLGenerator
           this.accumulateUpsert(definedColumnsList, primaryKeys, tableName, accumulatedUpdates);
 
           this.queryString = baseQuery;
+          this.values = [];
           definedColumnsList = this.getDefinedColumns(columns, obj);
           definedColumnsSet = new Set();
           for (const definedCol of definedColumnsList)
