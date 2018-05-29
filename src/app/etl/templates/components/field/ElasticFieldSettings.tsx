@@ -58,6 +58,7 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
+import { compareObjects } from 'etl/ETLUtil';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 
@@ -72,7 +73,10 @@ import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorField
 
 import './FieldSettings.less';
 
-export type Props = TemplateEditorFieldProps;
+export interface Props extends TemplateEditorFieldProps
+{
+  registerApply: (apply: () => void) => void;
+}
 
 class ElasticFieldSettings extends TemplateEditorField<Props>
 {
@@ -169,6 +173,11 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
     return 0;
   }
 
+  public componentDidMount()
+  {
+    this.props.registerApply(() => this.handleSettingsApplied());
+  }
+
   public componentWillReceiveProps(nextProps)
   {
     if (this._willFieldChange(nextProps))
@@ -218,10 +227,13 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
 
   public handleSettingsApplied()
   {
-    this._try((proxy) =>
+    if (!compareObjects(this.state, this.getFormState(this.props)))
     {
-      proxy.setFieldProps(this.state, Languages.Elastic);
-    });
+      this._try((proxy) =>
+      {
+        proxy.setFieldProps(this.state, Languages.Elastic);
+      });
+    }
   }
 
   public handleCloseSettings()

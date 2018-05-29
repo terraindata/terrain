@@ -65,6 +65,7 @@ import LanguageUI from 'etl/templates/languages/LanguageUI';
 import FieldMainSettings from './FieldMainSettings';
 import FieldSettingsTransformations from './FieldSettingsTransformations';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+import { TempCallback } from 'etl/templates/TemplateEditorTypes';
 
 import EditorFieldPreview from './EditorFieldPreview';
 import './FieldSettings.less';
@@ -88,14 +89,32 @@ class EditorFieldSettings extends TemplateEditorField<Props>
 {
   public state: {
     currentCategory: ViewCategory,
+    childApply: () => void,
   } = {
       currentCategory: ViewCategory.Settings,
+      childApply: null,
     };
+
+  public reduxCallback;
 
   constructor(props)
   {
     super(props);
     this.changeViewFactory = _.memoize(this.changeViewFactory);
+  }
+
+  public componentDidMount()
+  {
+    this.reduxCallback = new TempCallback(() => this.applyChanges());
+    this.props.act({
+      actionType: 'registerSettingsCallback',
+      callback: this.reduxCallback,
+    });
+  }
+
+  public componentWillUnmount()
+  {
+    this.reduxCallback.invalidate();
   }
 
   public currentCategory()
@@ -156,6 +175,7 @@ class EditorFieldSettings extends TemplateEditorField<Props>
     {
       return (
         <Component
+          registerApply={this._setStateWrapper('childApply')}
           {...this._passProps()}
         />
       );
@@ -207,6 +227,7 @@ class EditorFieldSettings extends TemplateEditorField<Props>
             {
               this.currentCategory() === ViewCategory.Settings ?
                 <FieldMainSettings
+                  registerApply={this._setStateWrapper('childApply')}
                   {...this._passProps()}
                 />
                 : null
@@ -214,6 +235,7 @@ class EditorFieldSettings extends TemplateEditorField<Props>
             {
               this.currentCategory() === ViewCategory.Transformations ?
                 <FieldSettingsTransformations
+                  registerApply={this._setStateWrapper('childApply')}
                   {...this._passProps()}
                 /> : null
             }
@@ -228,12 +250,22 @@ class EditorFieldSettings extends TemplateEditorField<Props>
     );
   }
 
+  public applyChanges()
+  {
+    if (this.state.childApply !== null && typeof this.state.childApply === 'function')
+    {
+      this.state.childApply();
+    }
+  }
+
   public changeViewFactory(category: ViewCategory)
   {
     return () =>
     {
+      this.reduxCallback.call();
       this.setState({
         currentCategory: category,
+        childApply: null,
       });
     };
   }

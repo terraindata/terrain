@@ -74,6 +74,7 @@ export interface TransformationFormProps
   fieldId: number;
   onClose: () => void;
   tryMutateEngine: (tryFn: (proxy: EngineProxy) => void) => void;
+  registerApply?: (apply: () => void) => void;
 }
 type TFProps = TransformationFormProps; // short alias
 
@@ -98,6 +99,14 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
     super(props);
     this.handleMainAction = this.handleMainAction.bind(this);
     this.handleFormChange = this.handleFormChange.bind(this);
+  }
+
+  public componentDidMount()
+  {
+    if (this.props.registerApply !== undefined)
+    {
+      this.props.registerApply(() => this.handleMainAction());
+    }
   }
 
   public componentWillMount()
