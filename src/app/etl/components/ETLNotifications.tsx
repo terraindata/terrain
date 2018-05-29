@@ -100,7 +100,7 @@ class ETLNotifications extends TerrainComponent<Props>
     let message = '';
     if (showTemplate)
     {
-      message = `"${runningTemplates.first().templateName}" is currently running`;
+      message = `"${runningTemplates.last().templateName}" is currently running`;
     }
 
     if (fileUploadProgress > 0 && fileUploadProgress < 100)
