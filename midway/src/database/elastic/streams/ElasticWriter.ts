@@ -50,9 +50,10 @@ import * as Stream from 'stream';
 import * as winston from 'winston';
 
 import { ElasticMapping } from '../../../../../shared/etl/mapping/ElasticMapping';
+import SafeWritable from '../../../app/io/streams/SafeWritable';
 import ElasticClient from '../client/ElasticClient';
 
-export class ElasticWriter extends Stream.Writable
+export class ElasticWriter extends SafeWritable
 {
   private client: ElasticClient;
   private primaryKey: string | undefined;
@@ -78,46 +79,60 @@ export class ElasticWriter extends Stream.Writable
 
   public _write(chunk: any, encoding: string, callback: (err?: Error) => void): void
   {
-    if (Array.isArray(chunk))
+    try
     {
-      const chunks = chunk.map((c) =>
+      if (Array.isArray(chunk))
       {
-        return { chunk: c, encoding };
-      });
-      return this._writev(chunks, callback);
-    }
+        const chunks = chunk.map((c) =>
+        {
+          return { chunk: c, encoding };
+        });
+        return this._writev(chunks, callback);
+      }
 
-    if (typeof chunk !== 'object')
+      if (typeof chunk !== 'object')
+      {
+        this.emit('error', 'expecting chunk to be an object');
+        return;
+      }
+
+      this.upsert(chunk, callback);
+    }
+    catch (e)
     {
-      this.emit('error', 'expecting chunk to be an object');
-      return;
+      this.emit('error', e);
     }
-
-    this.upsert(chunk, callback);
   }
 
   public _writev(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
   {
-    const numChunks = chunks.length;
-    if (numChunks < this.BULK_THRESHOLD)
+    try
     {
-      let numPending = numChunks;
-      const done = new EventEmitter();
-      done.on('done', callback);
-      for (const chunk of chunks)
+      const numChunks = chunks.length;
+      if (numChunks < this.BULK_THRESHOLD)
       {
-        this._write(chunk.chunk, chunk.encoding, (err?) =>
+        let numPending = numChunks;
+        const done = new EventEmitter();
+        done.on('done', callback);
+        for (const chunk of chunks)
         {
-          if (--numPending === 0)
+          this._write(chunk.chunk, chunk.encoding, (err?) =>
           {
-            done.emit('done', err);
-          }
-        });
+            if (--numPending === 0)
+            {
+              done.emit('done', err);
+            }
+          });
+        }
+      }
+      else
+      {
+        this.bulkUpsert(chunks, callback);
       }
     }
-    else
+    catch (e)
     {
-      this.bulkUpsert(chunks, callback);
+      this.emit('error', e);
     }
   }
 
