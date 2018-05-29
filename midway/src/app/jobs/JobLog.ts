@@ -78,7 +78,7 @@ export class JobLog
    * PARAMS: jobId, logStream (number, stream.Readable ==> number)
    *
    */
-  public async create(jobId: number, logStream: stream.Readable, jobStatus?: boolean): Promise<JobLogConfig[]>
+  public async create(jobId: number, logStream: stream.Readable, jobStatus?: boolean, runNow?: boolean): Promise<JobLogConfig[]>
   {
     return new Promise<JobLogConfig[]>(async (resolve, reject) =>
     {
@@ -121,6 +121,9 @@ export class JobLog
         jobStatusMsg = 'FAILURE';
         await App.JobQ.setJobStatus(jobId, false, jobStatusMsg);
       }
+
+      await App.JobQ.setScheduleStatus(jobId, false);
+      App.JobQ.deleteRunningJob(jobId, runNow);
       if (jobStatusMsg === 'FAILURE')
       {
         await this._sendEmail(jobId);

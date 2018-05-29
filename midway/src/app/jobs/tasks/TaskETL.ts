@@ -80,6 +80,7 @@ export class TaskETL extends Task
       {
         const streams = await templates.executeETL(this.taskConfig['params']['options'],
           this.taskConfig['params']['options']['inputStreams']);
+        winston.info('finished executing ETL');
         taskOutputConfig['options']['outputStream'] = streams['outputStream'];
         taskOutputConfig['options']['logStream'] = streams['logStream'];
       }
@@ -91,10 +92,10 @@ export class TaskETL extends Task
         errLogStream.error(e.toString());
         // errLogStream.push(null);
         taskOutputConfig['options']['logStream'] = errLogStream;
+        taskOutputConfig['options']['logStream'].push(null);
       }
       finally
       {
-        taskOutputConfig['options']['logStream'].push(null);
         resolve(taskOutputConfig);
       }
     });

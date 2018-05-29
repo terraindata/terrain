@@ -314,7 +314,7 @@ export class JobQueue
       }
 
       const jobCreationStatus: boolean | string = newJob.create(newJobTasks, 'some random filename');
-      winston.info('created job');
+      winston.info('created run now job');
       if (typeof jobCreationStatus === 'string' || (jobCreationStatus as boolean) !== true)
       {
         winston.warn('Error while creating job: ' + (jobCreationStatus as string));
@@ -324,9 +324,9 @@ export class JobQueue
       // actually run the job
       const jobResult: TaskOutputConfig = await this.runningRunNowJobs.get(getJobs[0].id).run() as TaskOutputConfig;
       const jobsFromId: JobConfig[] = await this.get(getJobs[0].id);
-      this.runningRunNowJobs.delete(getJobs[0].id);
+      // this.runningRunNowJobs.delete(getJobs[0].id);
       // log job result
-      const jobLogConfig: JobLogConfig[] = await App.JobL.create(getJobs[0].id, jobResult['options']['logStream'], jobResult.status);
+      const jobLogConfig: JobLogConfig[] = await App.JobL.create(getJobs[0].id, jobResult['options']['logStream'], jobResult.status, true);
       await this._setJobLogId(getJobs[0].id, jobLogConfig[0].id);
       if (jobResult.options.outputStream === null)
       {
@@ -336,12 +336,34 @@ export class JobQueue
     });
   }
 
+  public deleteRunningJob(id: number, runNow?: boolean): boolean
+  {
+    try
+    {
+      if (runNow === true)
+      {
+        this.runningRunNowJobs.delete(id);
+      }
+      else
+      {
+        this.runningJobs.delete(id);
+      }
+    }
+    catch (e)
+    {
+      winston.warn((e as any).toString() as string);
+      return false;
+    }
+    return true;
+  }
+
   // Status codes: PENDING SUCCESS FAILURE PAUSED CANCELED RUNNING ABORTED (PAUSED/RUNNING when midway was restarted)
   public async setJobStatus(id: number, running: boolean, status: string): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>
     {
       const jobs: JobConfig[] = await this._select([], { id }) as JobConfig[];
+      winston.info(`setting job status to ${running}, status ${status}`);
       if (jobs.length === 0)
       {
         return resolve(false);
@@ -365,6 +387,15 @@ export class JobQueue
       const doNothing: JobConfig[] = await App.DB.upsert(this.jobTable, jobs[0]) as JobConfig[];
       resolve(true);
     });
+  }
+
+  public async setScheduleStatus(id: number, status: boolean = false): Promise<void>
+  {
+    const jobs: JobConfig[] = await this.get(id);
+    if (!(status === false && jobs[0].scheduleId === null))
+    {
+      await App.SKDR.setRunning(jobs[0].scheduleId, status);
+    }
   }
 
   public async unpause(id: number): Promise<JobConfig[]>
@@ -444,6 +475,7 @@ export class JobQueue
 
           const jobCreationStatus: boolean | string = newJob.create(newJobTasks, 'some random filename');
           winston.info('created job');
+          console.log('newJobTasks: ', JSON.stringify(newJobTasks, null, 2));
           if (typeof jobCreationStatus === 'string' || (jobCreationStatus as boolean) !== true)
           {
             winston.warn('Error while creating job: ' + (jobCreationStatus as string));
@@ -464,15 +496,15 @@ export class JobQueue
       resolve();
       jobIdLst.forEach(async (jobId) =>
       {
+        winston.info('about to run job');
         const jobResult: TaskOutputConfig = await this.runningJobs.get(jobId).run() as TaskOutputConfig;
+        winston.info('finished running job');
         const jobsFromId: JobConfig[] = await this.get(jobId);
         const jobStatus: string = jobResult.status === true ? 'SUCCESS' : 'FAILURE';
-        await this.setJobStatus(jobsFromId[0].id, false, jobStatus);
-        await App.SKDR.setRunning(jobsFromId[0].scheduleId, false);
-        this.runningJobs.delete(jobId);
+        // await this.setJobStatus(jobsFromId[0].id, false, jobStatus);
         winston.info(`Job result: ${jobResult.status}`);
 
-        const jobLogConfig: JobLogConfig[] = await App.JobL.create(jobId, jobResult['options']['logStream'], jobResult.status);
+        const jobLogConfig: JobLogConfig[] = await App.JobL.create(jobId, jobResult['options']['logStream'], jobResult.status, false);
         await this._setJobLogId(jobId, jobLogConfig[0].id);
       });
 
