@@ -53,6 +53,7 @@ import { JobConfig } from 'shared/types/jobs/JobConfig';
 import { TaskConfig } from 'shared/types/jobs/TaskConfig';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 import * as Tasty from '../../tasty/Tasty';
+import { TransactionHandle } from '../../tasty/TastyDB';
 import * as App from '../App';
 import IntegrationConfig from '../integrations/IntegrationConfig';
 import Integrations from '../integrations/Integrations';
@@ -157,7 +158,7 @@ export class Scheduler
     return Promise.resolve(timezoneObj);
   }
 
-  public async runSchedule(id: number, runNow?: boolean, userId?: number): Promise<SchedulerConfig[] | string>
+  public async runSchedule(id: number, handle: TransactionHandle, runNow?: boolean, userId?: number): Promise<SchedulerConfig[] | string>
   {
     return new Promise<SchedulerConfig[] | string>(async (resolve, reject) =>
     {
@@ -195,7 +196,7 @@ export class Scheduler
           type: jobType,
           workerId: 1, // TODO change this for clustering support
         };
-      await this.setRunning(id, true);
+      await this.setRunning(id, true, handle);
       const jobCreateStatus: JobConfig[] | string = await App.JobQ.create(jobConfig, runNow, userId);
       if (typeof jobCreateStatus === 'string')
       {
@@ -216,7 +217,7 @@ export class Scheduler
     return Promise.reject(new Error('Schedule not found.'));
   }
 
-  public async setRunning(id: number, running: boolean): Promise<SchedulerConfig[]>
+  public async setRunning(id: number, running: boolean, handle: TransactionHandle): Promise<SchedulerConfig[]>
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
@@ -232,7 +233,7 @@ export class Scheduler
           // }
         }
         schedules[0].running = running;
-        return resolve(await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[]);
+        return resolve(await App.DB.upsert(this.schedulerTable, schedules[0], handle) as SchedulerConfig[]);
       }
     });
   }
@@ -312,32 +313,40 @@ export class Scheduler
   private async _checkSchedulerTable(): Promise<void>
   {
     // TODO check the scheduler for unlocked rows and detect which schedules should run next
-    const availableSchedules: number[] = await this._getAvailableSchedules();
-    availableSchedules.forEach((scheduleId) =>
+    await App.DB.executeTransaction(async (handle, commit, rollback) =>
     {
-      this._checkSchedulerTableHelper(scheduleId).catch((err) =>
+      const availableSchedules: number[] = await this._getAvailableSchedules(handle);
+      availableSchedules.forEach((scheduleId) =>
       {
-        winston.warn(err.toString() as string);
+        this._checkSchedulerTableHelper(scheduleId, handle).catch((err) =>
+        {
+          winston.warn(err.toString() as string);
+        });
       });
+      await commit();
     });
     setTimeout(this._checkSchedulerTable.bind(this), 60000 - new Date().getTime() % 60000);
   }
 
-  private async _checkSchedulerTableHelper(scheduleId: number): Promise<void>
+  private async _checkSchedulerTableHelper(scheduleId: number, handle: TransactionHandle): Promise<void>
   {
-    const result: SchedulerConfig[] | string = await this.runSchedule(scheduleId);
+    const result: SchedulerConfig[] | string = await this.runSchedule(scheduleId, handle);
     if (typeof result === 'string')
     {
       winston.info(result as string);
     }
   }
 
-  private async _getAvailableSchedules(): Promise<number[]>
+  private async _getAvailableSchedules(handle: TransactionHandle): Promise<number[]>
   {
     return new Promise<number[]>(async (resolve, reject) =>
     {
       const scheduleIds: number[] = [];
-      const schedules: SchedulerConfig[] = await this._select([], { running: false }) as SchedulerConfig[];
+      const result = await App.DB.getDB().execute(
+        ['SELECT * FROM ' + this.schedulerTable.getTableName() + ' WHERE running = false FOR UPDATE;'],
+        handle,
+      );
+      const schedules: SchedulerConfig[] = result as SchedulerConfig[];
       schedules.forEach((schedule) =>
       {
         try
