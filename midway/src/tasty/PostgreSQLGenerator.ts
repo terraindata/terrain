@@ -113,22 +113,23 @@ export const TypeMap: Map<string, SQLGeneratorMapping> = new Map([
 export default class SQLGenerator
 {
   public statements: string[];
-  public values: any[][];
+  public valuesArray: any[][];
   public queryString: string;
+  public values: any[];
   private indentation: number;
 
   constructor()
   {
     this.statements = [];
-    this.values = [];
+    this.valuesArray = [];
     this.queryString = '';
+    this.values = [];
     this.indentation = 0;
   }
 
   public generateSelectQuery(query: TastyQuery)
   {
-    const values: any[] = [];
-    this.appendExpression(query.command, values);
+    this.appendExpression(query.command);
     this.indent();
 
     if (query.isSelectingAll())
@@ -147,7 +148,7 @@ export default class SQLGenerator
           query.selected,
           (column) =>
           {
-            this.appendSubexpression(column, values);
+            this.appendSubexpression(column);
           },
           () =>
           {
@@ -162,7 +163,7 @@ export default class SQLGenerator
         query.aliases,
         (alias) =>
         {
-          this.appendSubexpression(alias.query, values);
+          this.appendSubexpression(alias.query);
           this.queryString += ' AS ';
           this.queryString += this.escapeString(alias.name);
         },
@@ -189,7 +190,7 @@ export default class SQLGenerator
         query.filters,
         (filter) =>
         {
-          this.appendSubexpression(filter, values);
+          this.appendSubexpression(filter);
         },
         () =>
         {
@@ -207,7 +208,7 @@ export default class SQLGenerator
         query.sorts,
         (sort) =>
         {
-          this.appendSubexpression(sort.node, values);
+          this.appendSubexpression(sort.node);
           this.queryString += ' ';
           this.queryString += (sort.order === 'asc' ? 'ASC' : 'DESC');
         },
@@ -235,7 +236,7 @@ export default class SQLGenerator
         this.queryString += 'OFFSET ' + query.numSkipped.toString();
       }
     }
-    this.accumulateStatement(this.queryString, values);
+    this.accumulateStatement(this.queryString, this.values);
   }
 
   public generateUpsertQuery(query: TastyQuery, upserts: object[])
@@ -319,7 +320,7 @@ export default class SQLGenerator
     {
       queryString += ';';
       this.statements.push(queryString);
-      this.values.push(values);
+      this.valuesArray.push(values);
     }
   }
 
@@ -337,7 +338,7 @@ export default class SQLGenerator
   }
 
   public accumulateUpsert(columns: string[], primaryKeys: string[],
-    tableName: string, accumulatedUpdates: object[], values: any[]): void
+    tableName: string, accumulatedUpdates: object[]): void
   {
     if (accumulatedUpdates.length <= 0)
     {
@@ -363,7 +364,7 @@ export default class SQLGenerator
       query += columns.map(
         (col: string) =>
         {
-          values.push(obj[col]);
+          this.values.push(obj[col]);
           currentColumn1++;
           return '$' + currentColumn1.toString();
         }).join(', ');
@@ -400,7 +401,7 @@ export default class SQLGenerator
       query += ' RETURNING ' + primaryKeys[0] + ' AS insertid';
     }
 
-    this.accumulateStatement(query, values);
+    this.accumulateStatement(query, this.values);
   }
 
   public newLine()
@@ -458,14 +459,14 @@ export default class SQLGenerator
     this.unindent();
   }
 
-  public appendSubexpression(node: TastyNode, values: any[])
+  public appendSubexpression(node: TastyNode)
   {
     this.indent();
-    this.appendExpression(node, values);
+    this.appendExpression(node);
     this.unindent();
   }
 
-  public appendExpression(node: TastyNode, values: any[])
+  public appendExpression(node: TastyNode)
   {
     // depth first in order
     const sqlTypeInfo = TypeMap.get(node.type);
@@ -483,7 +484,7 @@ export default class SQLGenerator
         throw new Error('Non-operator node that isn\'t nullary.');
       }
 
-      this.queryString += this.sqlName(node, values);
+      this.queryString += this.sqlName(node);
     }
     else
     {
@@ -496,9 +497,9 @@ export default class SQLGenerator
           throw new Error('Prefix operator of type "' + node.type + '" has the wrong number of operators.');
         }
 
-        this.queryString += this.sqlName(node, values);
+        this.queryString += this.sqlName(node);
         this.queryString += ' ';
-        this.appendExpression(node.lhs, values);
+        this.appendExpression(node.lhs);
       }
       else if (fix === FixEnum.postfix)
       {
@@ -507,9 +508,9 @@ export default class SQLGenerator
           throw new Error('Postfix operator of type "' + node.type + '" has the wrong number of operators.');
         }
 
-        this.appendExpression(node.lhs, values);
+        this.appendExpression(node.lhs);
         this.queryString += ' ';
-        this.queryString += this.sqlName(node, values);
+        this.queryString += this.sqlName(node);
       }
       else if (fix === FixEnum.infix)
       {
@@ -518,11 +519,11 @@ export default class SQLGenerator
           throw new Error('Infix operator of type "' + node.type + '" has the wrong number of operators.');
         }
 
-        this.appendExpression(node.value[0], values);
+        this.appendExpression(node.value[0]);
         this.queryString += ' ';
-        this.queryString += this.sqlName(node, values);
+        this.queryString += this.sqlName(node);
         this.queryString += ' ';
-        this.appendExpression(node.rhs, values);
+        this.appendExpression(node.rhs);
       }
       else if (fix === FixEnum.infixWithoutSpaces)
       {
@@ -532,9 +533,9 @@ export default class SQLGenerator
             + '" has the wrong number of operators.');
         }
 
-        this.appendExpression(node.lhs, values);
-        this.queryString += this.sqlName(node, values);
-        this.appendExpression(node.rhs, values);
+        this.appendExpression(node.lhs);
+        this.queryString += this.sqlName(node);
+        this.appendExpression(node.rhs);
       }
       else
       {
@@ -575,7 +576,7 @@ export default class SQLGenerator
       });
   }
 
-  private sqlName(node: TastyNode, values: any[]): string
+  private sqlName(node: TastyNode): string
   {
     const sqlTypeInfo = TypeMap.get(node.type);
     if (sqlTypeInfo === undefined)
@@ -594,8 +595,8 @@ export default class SQLGenerator
     }
     if (node.type === 'string')
     {
-      values.push(node.value);
-      return '$' + values.length.toString();
+      this.values.push(node.value);
+      return '$' + this.values.length.toString();
     }
     if (node.type === 'number')
     {

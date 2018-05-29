@@ -76,7 +76,7 @@ export class PostgreSQLDB implements TastyDB
     {
       generator.generateUpsertQuery(query, query.upserts);
     }
-    return [generator.statements, generator.values];
+    return [generator.statements, generator.valuesArray];
   }
 
   public async schema(): Promise<TastySchema>
