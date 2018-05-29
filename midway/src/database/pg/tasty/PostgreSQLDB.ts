@@ -88,13 +88,22 @@ export class PostgreSQLDB implements TastyDB
 
   /**
    * executes statements sequentially
-   * @param query
+   * @param query `[string array of statements, array of values arrays for each statement]`
+   * e.g. `[['SELECT a FROM b WHERE c = $1 AND d = $2'], [['qwe', 'rty']]]`
+   *
+   * Can also use undefined if there are no values e.g.
+   * `[[queryString1, queryString2], undefined]` instead of
+   * `[[queryString1, queryString2], [[], []]]]`
    * @returns {Promise<Array>} appended result objects
    */
   public async execute(query: [string[], any[][]], handle?: TransactionHandle): Promise<object[]>
   {
     let results: object[] = [];
     const [statements, values] = query;
+    if (values !== undefined && statements.length !== values.length)
+    {
+      throw new Error('statements and values have different lengths');
+    }
     for (let i = 0; i < statements.length; ++i)
     {
       const statement = statements[i];
