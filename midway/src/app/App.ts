@@ -66,6 +66,7 @@ import * as Config from './Config';
 import { DatabaseConfig } from './database/DatabaseConfig';
 import { databases } from './database/DatabaseRouter';
 import { Email } from './email/Email';
+import { registerMidwayEncryption } from './encryption/MidwayEncryptionController';
 import { events } from './events/EventRouter';
 import { integrations } from './integrations/IntegrationRouter';
 import { JobLog } from './jobs/JobLog';
@@ -257,6 +258,10 @@ export class App
     // process configuration options
     await Config.handleConfig(this.config);
     winston.debug('Finished processing configuration options...');
+
+    // initialize system encryption keys
+    registerMidwayEncryption();
+    winston.debug('Finished Registering System Private Keys');
 
     // create a default seed user
     await users.initializeDefaultUser();
