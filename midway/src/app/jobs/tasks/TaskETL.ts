@@ -83,20 +83,13 @@ export class TaskETL extends Task
         winston.info('finished executing ETL');
         taskOutputConfig['options']['outputStream'] = streams['outputStream'];
         taskOutputConfig['options']['logStream'] = streams['logStream'];
+        resolve(taskOutputConfig);
       }
       catch (e)
       {
         taskOutputConfig.status = false;
         winston.error('Error while running ETL task: ' + String(e.toString()));
-        const errLogStream = new LogStream();
-        errLogStream.error(e.toString());
-        // errLogStream.push(null);
-        taskOutputConfig['options']['logStream'] = errLogStream;
-        taskOutputConfig['options']['logStream'].push(null);
-      }
-      finally
-      {
-        resolve(taskOutputConfig);
+        reject(e);
       }
     });
   }
