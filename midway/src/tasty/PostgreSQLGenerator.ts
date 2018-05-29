@@ -241,7 +241,7 @@ export default class SQLGenerator
 
   public generateUpsertQuery(query: TastyQuery, upserts: object[])
   {
-    this.appendExpression(query.command, []);
+    this.appendExpression(query.command);
     this.queryString += ' INTO ';
 
     const tableName: string = this.escapeString(query.table.getTableName());
@@ -264,7 +264,7 @@ export default class SQLGenerator
         const isInDefined: boolean = definedColumnsSet.has(col);
         if (isInObj !== isInDefined)
         {
-          this.accumulateUpsert(definedColumnsList, primaryKeys, tableName, accumulatedUpdates, []);
+          this.accumulateUpsert(definedColumnsList, primaryKeys, tableName, accumulatedUpdates);
 
           this.queryString = baseQuery;
           definedColumnsList = this.getDefinedColumns(columns, obj);
@@ -280,7 +280,7 @@ export default class SQLGenerator
       accumulatedUpdates.push(obj);
     }
 
-    this.accumulateUpsert(definedColumnsList, primaryKeys, tableName, accumulatedUpdates, []);
+    this.accumulateUpsert(definedColumnsList, primaryKeys, tableName, accumulatedUpdates);
     this.queryString = '';
   }
 

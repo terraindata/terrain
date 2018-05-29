@@ -136,7 +136,7 @@ export class PostgreSQLDB implements TastyDB
     const handle = await this.client.startTransaction();
     const generator = new PostgreSQLGenerator();
     generator.generateStartTransactionQuery(isolationLevel, readOnly);
-    await this.execute([generator.statements, generator.values], handle);
+    await this.execute([generator.statements, generator.valuesArray], handle);
     return handle;
   }
 
@@ -144,7 +144,7 @@ export class PostgreSQLDB implements TastyDB
   {
     const generator = new PostgreSQLGenerator();
     generator.generateCommitQuery();
-    const result = this.execute([generator.statements, generator.values], handle);
+    const result = this.execute([generator.statements, generator.valuesArray], handle);
     await this.client.endTransaction(handle);
     return result;
   }
@@ -153,7 +153,7 @@ export class PostgreSQLDB implements TastyDB
   {
     const generator = new PostgreSQLGenerator();
     generator.generateRollbackQuery();
-    const result = this.execute([generator.statements, generator.values], handle);
+    const result = this.execute([generator.statements, generator.valuesArray], handle);
     await this.client.endTransaction(handle);
     return result;
   }
