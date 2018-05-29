@@ -103,7 +103,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
 
   public componentDidMount()
   {
-    if (this.props.registerApply !== undefined)
+    if (this.props.registerApply !== undefined && !this.props.isCreate)
     {
       this.props.registerApply(() => this.handleMainAction());
     }
@@ -140,6 +140,16 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
       );
     }
 
+    const mainButton = (this.props.registerApply === undefined || this.props.isCreate) ? {
+      name: isCreate ? 'Create' : 'Save',
+      onClicked: this.handleMainAction,
+    } : undefined;
+
+    const secondButton = (this.props.registerApply === undefined || this.props.isCreate) ? {
+      name: 'Cancel',
+      onClicked: this.props.onClose,
+    } : undefined;
+
     return (
       <DynamicForm
         inputMap={this.inputMap}
@@ -148,14 +158,8 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
         style={{
           flexGrow: '1',
         }}
-        mainButton={{ // TODO if there are no config options available change the buttons to match
-          name: isCreate ? 'Create' : 'Save',
-          onClicked: this.handleMainAction,
-        }}
-        secondButton={{
-          name: 'Cancel',
-          onClicked: this.props.onClose,
-        }}
+        mainButton={mainButton}
+        secondButton={secondButton}
         actionBarStyle={{
           justifyContent: 'center',
         }}

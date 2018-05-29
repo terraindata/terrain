@@ -191,18 +191,10 @@ class FieldMainSettings extends TemplateEditorField<Props>
           inputMap={this.settingsInputMap}
           inputState={this.state.formState}
           onStateChange={this._setStateWrapper('formState')}
-          centerForm={true}
-          mainButton={{
-            name: 'Apply',
-            onClicked: this.handleSettingsApplied,
-          }}
-          secondButton={{
-            name: 'Close',
-            onClicked: this.handleCloseSettings,
-          }}
           style={{
             flexGrow: 1,
             padding: '12px',
+            justifyContent: 'center',
           }}
           actionBarStyle={{
             justifyContent: 'center',
@@ -241,13 +233,6 @@ class FieldMainSettings extends TemplateEditorField<Props>
         }
       });
     }
-  }
-
-  public handleCloseSettings()
-  {
-    this.props.act({
-      actionType: 'closeSettings',
-    });
   }
 }
 

@@ -62,10 +62,10 @@ import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { Languages } from 'shared/etl/types/ETLTypes';
 
 import LanguageUI from 'etl/templates/languages/LanguageUI';
+import { TempCallback } from 'etl/templates/TemplateEditorTypes';
 import FieldMainSettings from './FieldMainSettings';
 import FieldSettingsTransformations from './FieldSettingsTransformations';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
-import { TempCallback } from 'etl/templates/TemplateEditorTypes';
 
 import EditorFieldPreview from './EditorFieldPreview';
 import './FieldSettings.less';

@@ -58,9 +58,9 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { compareObjects } from 'etl/ETLUtil';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { compareObjects } from 'etl/ETLUtil';
 
 import
 {
@@ -204,18 +204,10 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
           inputMap={this.inputMap}
           inputState={this.state}
           onStateChange={this.handleStateChange}
-          centerForm={true}
-          mainButton={{
-            name: 'Apply',
-            onClicked: this.handleSettingsApplied,
-          }}
-          secondButton={{
-            name: 'Close',
-            onClicked: this.handleCloseSettings,
-          }}
           style={{
             flexGrow: 1,
             padding: '12px',
+            justifyContent: 'center',
           }}
           actionBarStyle={{
             justifyContent: 'center',
@@ -234,13 +226,6 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
         proxy.setFieldProps(this.state, Languages.Elastic);
       });
     }
-  }
-
-  public handleCloseSettings()
-  {
-    this.props.act({
-      actionType: 'closeSettings',
-    });
   }
 
   public handleStateChange(state)

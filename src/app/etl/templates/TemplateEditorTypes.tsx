@@ -190,10 +190,10 @@ class EditorDisplayStateC
     dkp: KeyPath,
     closeCallback: TempCallback,
   } = {
-    fieldId: null,
-    dkp: null,
-    closeCallback: null,
-  };
+      fieldId: null,
+      dkp: null,
+      closeCallback: null,
+    };
 
   public currentEdge: number = -1;
   public engineVersion: number = 0;
