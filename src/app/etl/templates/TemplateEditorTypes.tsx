@@ -151,6 +151,30 @@ export enum FetchStatus
   Error,
 }
 
+export class TempCallback
+{
+  public valid: boolean = true;
+  public fn: () => void;
+
+  constructor(func: () => void)
+  {
+    this.fn = func;
+  }
+
+  public call()
+  {
+    if (this.valid)
+    {
+      this.fn();
+    }
+  }
+
+  public invalidate()
+  {
+    this.valid = false;
+  }
+}
+
 class EditorDisplayStateC
 {
   public documents: List<object> = List([]);
@@ -158,8 +182,19 @@ class EditorDisplayStateC
   public mergeDocuments: Immutable.Map<string, List<object>> = Map({});
   public modalRequests: List<ModalProps> = List([]);
   public previewIndex: number = 0; // which preview document we are looking at
-  public settingsFieldId: number = null; // which field are the settings open for
-  public settingsDisplayKeyPath: KeyPath = null;
+  // public settingsFieldId: number = null; // which field are the settings open for
+  // public settingsDisplayKeyPath: KeyPath = null;
+
+  public settingsState: {
+    fieldId: number,
+    dkp: KeyPath,
+    closeCallback: TempCallback,
+  } = {
+      fieldId: null,
+      dkp: null,
+      closeCallback: null,
+    };
+
   public currentEdge: number = -1;
   public engineVersion: number = 0;
   public columnState: ColumnOptions = ColumnOptions.Endpoints;

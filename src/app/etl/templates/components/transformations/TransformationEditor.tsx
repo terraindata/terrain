@@ -73,6 +73,7 @@ export interface Props
   engine: TransformationEngine;
   fieldID: number;
   tryMutateEngine: (tryFn: (proxy: EngineProxy) => void) => void;
+  registerApply: (apply: () => void) => void;
 }
 
 @Radium
@@ -91,6 +92,7 @@ export class TransformationEditor extends TerrainComponent<Props>
             onClose={this.props.onClose}
             transformation={this.props.transformation}
             tryMutateEngine={this.props.tryMutateEngine}
+            registerApply={this.props.registerApply}
           />
         </div>
       </div>

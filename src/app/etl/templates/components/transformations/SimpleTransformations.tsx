@@ -251,6 +251,7 @@ export class EncryptTFF extends TransformationForm<{}, TransformationNodeType.En
   protected readonly type = TransformationNodeType.EncryptNode;
   protected readonly inputMap = {};
   protected readonly initialState = {};
+  protected readonly noEditOptions = true;
 }
 
 export class DecryptTFF extends TransformationForm<{}, TransformationNodeType.DecryptNode>
@@ -258,4 +259,5 @@ export class DecryptTFF extends TransformationForm<{}, TransformationNodeType.De
   protected readonly type = TransformationNodeType.DecryptNode;
   protected readonly inputMap = {};
   protected readonly initialState = {};
+  protected readonly noEditOptions = true;
 }

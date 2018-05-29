@@ -341,11 +341,9 @@ class EditorFieldPreview extends TemplateEditorField<Props>
   public openSettings()
   {
     this.props.act({
-      actionType: 'setDisplayState',
-      state: {
-        settingsFieldId: this.props.fieldId,
-        settingsDisplayKeyPath: this.props.displayKeyPath,
-      },
+      actionType: 'openSettings',
+      fieldId: this.props.fieldId,
+      dkp: this.props.displayKeyPath,
     });
   }
 

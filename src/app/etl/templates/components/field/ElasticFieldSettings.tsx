@@ -60,6 +60,7 @@ const { List, Map } = Immutable;
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { compareObjects } from 'etl/ETLUtil';
 
 import
 {
@@ -72,7 +73,10 @@ import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorField
 
 import './FieldSettings.less';
 
-export type Props = TemplateEditorFieldProps;
+export interface Props extends TemplateEditorFieldProps
+{
+  registerApply: (apply: () => void) => void;
+}
 
 class ElasticFieldSettings extends TemplateEditorField<Props>
 {
@@ -169,6 +173,11 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
     return 0;
   }
 
+  public componentDidMount()
+  {
+    this.props.registerApply(() => this.handleSettingsApplied());
+  }
+
   public componentWillReceiveProps(nextProps)
   {
     if (this._willFieldChange(nextProps))
@@ -195,18 +204,10 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
           inputMap={this.inputMap}
           inputState={this.state}
           onStateChange={this.handleStateChange}
-          centerForm={true}
-          mainButton={{
-            name: 'Apply',
-            onClicked: this.handleSettingsApplied,
-          }}
-          secondButton={{
-            name: 'Close',
-            onClicked: this.handleCloseSettings,
-          }}
           style={{
             flexGrow: 1,
             padding: '12px',
+            justifyContent: 'center',
           }}
           actionBarStyle={{
             justifyContent: 'center',
@@ -218,17 +219,13 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
 
   public handleSettingsApplied()
   {
-    this._try((proxy) =>
+    if (!compareObjects(this.state, this.getFormState(this.props)))
     {
-      proxy.setFieldProps(this.state, Languages.Elastic);
-    });
-  }
-
-  public handleCloseSettings()
-  {
-    this.props.act({
-      actionType: 'closeSettings',
-    });
+      this._try((proxy) =>
+      {
+        proxy.setFieldProps(this.state, Languages.Elastic);
+      });
+    }
   }
 
   public handleStateChange(state)

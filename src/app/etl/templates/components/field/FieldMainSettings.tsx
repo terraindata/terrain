@@ -72,7 +72,10 @@ import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorField
 
 import './FieldSettings.less';
 
-export type Props = TemplateEditorFieldProps;
+export interface Props extends TemplateEditorFieldProps
+{
+  registerApply: (apply: () => void) => void;
+}
 
 interface SettingsState
 {
@@ -115,6 +118,11 @@ class FieldMainSettings extends TemplateEditorField<Props>
     this.state = {
       formState: this.getFormStateFromField(props),
     };
+  }
+
+  public componentDidMount()
+  {
+    this.props.registerApply(() => this.handleSettingsApplied());
   }
 
   public componentWillReceiveProps(nextProps)
@@ -183,18 +191,10 @@ class FieldMainSettings extends TemplateEditorField<Props>
           inputMap={this.settingsInputMap}
           inputState={this.state.formState}
           onStateChange={this._setStateWrapper('formState')}
-          centerForm={true}
-          mainButton={{
-            name: 'Apply',
-            onClicked: this.handleSettingsApplied,
-          }}
-          secondButton={{
-            name: 'Close',
-            onClicked: this.handleCloseSettings,
-          }}
           style={{
             flexGrow: 1,
             padding: '12px',
+            justifyContent: 'center',
           }}
           actionBarStyle={{
             justifyContent: 'center',
@@ -211,28 +211,28 @@ class FieldMainSettings extends TemplateEditorField<Props>
 
     const { isPrimaryKey, canChangeKey } = this.getPrimaryKeyInfo();
 
-    this._try((proxy) =>
+    const shouldChange =
+      (canChangeKey && formState.isPrimaryKey !== isPrimaryKey) ||
+      (field.name !== formState.fieldName) ||
+      (field.etlType !== formState.type);
+    if (shouldChange)
     {
-      if (canChangeKey && formState.isPrimaryKey !== isPrimaryKey)
+      this._try((proxy) =>
       {
-        proxy.setPrimaryKey(formState.isPrimaryKey, this._getCurrentLanguage());
-      }
-      if (field.name !== formState.fieldName)
-      {
-        proxy.changeName(formState.fieldName);
-      }
-      if (field.etlType !== formState.type)
-      {
-        proxy.changeType(formState.type);
-      }
-    });
-  }
-
-  public handleCloseSettings()
-  {
-    this.props.act({
-      actionType: 'closeSettings',
-    });
+        if (canChangeKey && formState.isPrimaryKey !== isPrimaryKey)
+        {
+          proxy.setPrimaryKey(formState.isPrimaryKey, this._getCurrentLanguage());
+        }
+        if (field.name !== formState.fieldName)
+        {
+          proxy.changeName(formState.fieldName);
+        }
+        if (field.etlType !== formState.type)
+        {
+          proxy.changeType(formState.type);
+        }
+      });
+    }
   }
 }
 
