@@ -322,20 +322,31 @@ export class JobQueue
       {
         winston.warn('Error while creating job: ' + (jobCreationStatus as string));
       }
-      // update the table to running = true
-      this.runningRunNowJobs.set(getJobs[0].id, newJob);
-      // actually run the job
-      const jobResult: TaskOutputConfig = await this.runningRunNowJobs.get(getJobs[0].id).run() as TaskOutputConfig;
-      const jobsFromId: JobConfig[] = await this.get(getJobs[0].id);
-      // this.runningRunNowJobs.delete(getJobs[0].id);
-      // log job result
-      const jobLogConfig: JobLogConfig[] = await App.JobL.create(getJobs[0].id, jobResult['options']['logStream'], jobResult.status, true);
-      await this._setJobLogId(getJobs[0].id, jobLogConfig[0].id);
-      if (jobResult.options.outputStream === null)
+
+      try
       {
+        // update the table to running = true
+        this.runningRunNowJobs.set(getJobs[0].id, newJob);
+        // actually run the job
+        const jobResult: TaskOutputConfig = await this.runningRunNowJobs.get(getJobs[0].id).run() as TaskOutputConfig;
+        const jobsFromId: JobConfig[] = await this.get(getJobs[0].id);
+        // this.runningRunNowJobs.delete(getJobs[0].id);
+        // log job result
+        const jobLogConfig: JobLogConfig[] = await App.JobL.create(getJobs[0].id, jobResult['options']['logStream'],
+          jobResult.status, true);
+        await this._setJobLogId(getJobs[0].id, jobLogConfig[0].id);
+        if (jobResult.options.outputStream === null)
+        {
+          await App.JobQ.setJobStatus(getJobs[0].id, false, 'FAILURE');
+          reject(new Error('Error while running job'));
+        }
+        resolve(jobResult.options.outputStream as stream.Readable);
+      }
+      catch (e)
+      {
+        await App.JobQ.setJobStatus(getJobs[0].id, false, 'FAILURE');
         reject(new Error('Error while running job'));
       }
-      resolve(jobResult.options.outputStream as stream.Readable);
     });
   }
 
