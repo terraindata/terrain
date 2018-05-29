@@ -466,6 +466,7 @@ export default class EngineUtil
       const values = EngineUtil.getValuesToAnalyze(docs, okp);
 
       const repType = EngineUtil.getRepresentedType(id, engine);
+
       if (repType === 'string')
       {
         const type = TypeUtil.getCommonETLStringType(values);
@@ -597,6 +598,11 @@ export default class EngineUtil
             }
             pathTypes[path] = 'string';
             pathValueTypes[path] = undefined;
+          }
+          else if (existingType === null && newType !== null)
+          {
+            pathTypes[path] = newType;
+            pathValueTypes[path] = e.getFieldProp(id, valueTypeKeyPath);
           }
         }
         else

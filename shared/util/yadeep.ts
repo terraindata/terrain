@@ -83,7 +83,7 @@ import { KeyPath, WayPoint } from './KeyPath';
  */
 export function find(obj: object, path: KeyPath, next: (found) => any, options: object = {}): void
 {
-  if (path.size === 0 || obj === undefined)
+  if (path.size === 0 || obj === null || obj === undefined)
   {
     // In all these kinds of statements, if next returns void, obj isn't modified
     obj = next(obj);

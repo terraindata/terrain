@@ -294,6 +294,7 @@ Terrain Version 2.0 Created By:
 - Jonas Lamis
 - Juan-Pablo Mansor
 - Justin Kirk
+- Kearnie Lin
 - Laura Brouckman
 - Leslie Kurt
 - Luke Knepper
