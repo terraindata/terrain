@@ -74,6 +74,7 @@ export interface TransformationFormProps
   fieldId: number;
   onClose: () => void;
   tryMutateEngine: (tryFn: (proxy: EngineProxy) => void) => void;
+  registerApply?: (apply: () => void) => void;
 }
 type TFProps = TransformationFormProps; // short alias
 
@@ -91,13 +92,21 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   protected readonly abstract inputMap: InputDeclarationMap<State>;
   protected readonly abstract initialState: State;
   protected readonly abstract type: Type;
-  protected readonly noEditOptions = false;
+  protected readonly noEditOptions: boolean = false;
 
   constructor(props)
   {
     super(props);
     this.handleMainAction = this.handleMainAction.bind(this);
     this.handleFormChange = this.handleFormChange.bind(this);
+  }
+
+  public componentDidMount()
+  {
+    if (this.props.registerApply !== undefined && !this.props.isCreate)
+    {
+      this.props.registerApply(() => this.handleMainAction());
+    }
   }
 
   public componentWillMount()
@@ -131,6 +140,16 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
       );
     }
 
+    const mainButton = (this.props.registerApply === undefined || this.props.isCreate) ? {
+      name: isCreate ? 'Create' : 'Save',
+      onClicked: this.handleMainAction,
+    } : undefined;
+
+    const secondButton = (this.props.registerApply === undefined || this.props.isCreate) ? {
+      name: 'Cancel',
+      onClicked: this.props.onClose,
+    } : undefined;
+
     return (
       <DynamicForm
         inputMap={this.inputMap}
@@ -139,14 +158,8 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
         style={{
           flexGrow: '1',
         }}
-        mainButton={{ // TODO if there are no config options available change the buttons to match
-          name: isCreate ? 'Create' : 'Save',
-          onClicked: this.handleMainAction,
-        }}
-        secondButton={{
-          name: 'Cancel',
-          onClicked: this.props.onClose,
-        }}
+        mainButton={mainButton}
+        secondButton={secondButton}
         actionBarStyle={{
           justifyContent: 'center',
         }}

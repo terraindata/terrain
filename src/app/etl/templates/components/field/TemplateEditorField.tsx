@@ -327,8 +327,8 @@ function settingsAreOpen(props: TemplateEditorFieldProps)
   }
   else
   {
-    const uiState = (props as TemplateEditorFieldProps & Injected).templateEditor.uiState;
-    return fieldId === uiState.settingsFieldId &&
-      displayKeyPath.equals(uiState.settingsDisplayKeyPath);
+    const { settingsState } = (props as TemplateEditorFieldProps & Injected).templateEditor.uiState;
+    return fieldId === settingsState.fieldId &&
+      displayKeyPath.equals(settingsState.dkp);
   }
 }

@@ -292,7 +292,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
 
   public render()
   {
-    const { canEdit, preview, displayKeyPath, previewLabel } = this.props;
+    const { canEdit, preview, displayKeyPath, previewLabel, noInteract } = this.props;
     const field = this._field();
 
     if (field.isHidden === true)
@@ -329,7 +329,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
           onCheckboxClicked={this.handleCheckboxClicked}
           keyPath={this._ikeyPath(SEED_KEY_PATH, this.props.fieldId)}
           onDrop={this.handleDropped}
-          canDrag={this._isRootField()}
+          canDrag={this._isRootField() && !noInteract}
         />
       );
     }
@@ -347,7 +347,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
           onCheckboxClicked={this.handleCheckboxClicked}
           keyPath={this._ikeyPath(SEED_KEY_PATH, this.props.fieldId)}
           onDrop={this.handleDropped}
-          canDrag={this._isRootField()}
+          canDrag={this._isRootField() && !noInteract}
         />
       );
     }
