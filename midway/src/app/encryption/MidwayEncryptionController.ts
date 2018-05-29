@@ -55,18 +55,8 @@ class MidwayEncryptionController implements EncryptionController
 
   constructor()
   {
-    const integrationKey = sha1(
-      '0VAtqVlzusw8nqA8TMoSfGHR3ik3dB-c9t4-gKUjD5iRbsWQWRzeL-6mBtRGWV4M' +
-      '2A7ZZryVT7-NZjTvzuY7qhjrZdJTv4iGPmcbta-3iLkgfEzY3QufFvm14dqtzfsC' +
-      'XhboiOC23idadrMNGlQwyJ783XlGwLBxDeGI01olmhg0oiNCeoGc_4zDrHq3wcgc' +
-      'wQ_mpZYAj9mJsv_OI_yDiN83Y_gDQCTzA9u3NdmmxquD2jSrR2fSKRokspxqBjb5',
-    ).substring(0, 16);
-    const transformationKey = sha1(
-      '4Qp7avGH3fsAebV18JOKAWEhQzuex8ipDJskxLx6AorB7CZKJCPij0EfqaTUooG9' +
-      '8g2Bu8np-QqhcWWY10-HT8vkwm3zTyI8kgfnpCbEPKYIUpNo3DQrkm1JNbRjcfhB' +
-      '2kyW04QZOf6U10rzjMz5CcdxELkv1GgbW-rzl8OHC9P3kpnq1t0XSThNug9hFiZs' +
-      'sKvESwKzrW58TrMlMf9rqoOn076Y8BAKCOJsg7NXnNyjKqDIdk0aU0v9musILc_g',
-    ).substring(0, 16);
+    const integrationKey = 'b8e4cd8acca7a5bb';
+    const transformationKey = 'a66b88600d2b01b9';
     this.keymap = {
       [Keys.Integrations]: aesjs.utils.utf8.toBytes(integrationKey),
       [Keys.Transformations]: aesjs.utils.utf8.toBytes(transformationKey),
