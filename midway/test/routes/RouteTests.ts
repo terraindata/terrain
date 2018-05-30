@@ -208,10 +208,6 @@ beforeAll(async (done) =>
         timezone: 'UTC',
       },
     })
-    .then((response) =>
-    {
-      done();
-    })
     .catch((error) =>
     {
       winston.warn('Error while creating test user: ' + String(error));
@@ -225,11 +221,12 @@ beforeAll(async (done) =>
   {
     // do nothing
   }
+  done();
 });
 
-afterAll(async (done) =>
+afterAll(async () =>
 {
-  await DB.getDB().execute(['DROP TABLE IF EXISTS jobs;', 'DROP TABLE IF EXISTS schedules;']);
+  await DB.getDB().execute([['DROP TABLE IF EXISTS jobs;', 'DROP TABLE IF EXISTS schedules;'], undefined]);
 });
 
 describe('Status tests', () =>

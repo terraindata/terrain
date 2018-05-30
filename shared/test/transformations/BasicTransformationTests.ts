@@ -55,18 +55,30 @@ test('add fields manually', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
   e.addField(KeyPath(['meta', 'school']), 'string');
-  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]), { format: 'uppercase' });
   const r = e.transform(TestDocs.doc1);
   expect(yadeep.get(r, KeyPath(['meta', 'school']))).toBe('STANFORD');
 });
 
-test('make a field uppercase', () =>
+test('change text field case', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc1);
-  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['name'])]));
-  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
-  const r = e.transform(TestDocs.doc1);
-  expect(r['name']).toBe('BOB');
+  const doc = Object.assign({}, TestDocs.doc1);
+  doc['t1'] = 'camel case me bro';
+  doc['t2'] = 'pascal case me bro';
+  doc['t3'] = 'title case me bro';
+
+  const e: TransformationEngine = new TransformationEngine(doc);
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['t1'])]), { format: 'camelcase' });
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['t2'])]), { format: 'pascalcase' });
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['t3'])]), { format: 'titlecase' });
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['name'])]), { format: 'uppercase' });
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['name'])]), { format: 'lowercase' });
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]), { format: 'uppercase' });
+  const r = e.transform(doc);
+  expect(r['name']).toBe('bob');
+  expect(r['t1']).toBe('camelCaseMeBro');
+  expect(r['t2']).toBe('PascalCaseMeBro');
+  expect(r['t3']).toBe('Title Case Me Bro');
   expect(yadeep.get(r, KeyPath(['meta', 'school']))).toBe('STANFORD');
 });
 
@@ -107,7 +119,7 @@ test('transform doc with null value(s)', () =>
 test('linear chain of transformations', () =>
 {
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc1);
-  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['name'])]));
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['name'])]), { format: 'uppercase' });
   e.appendTransformation(TransformationNodeType.SubstringNode, List<KeyPath>([KeyPath(['name'])]), { from: 0, length: 2 });
   const t = e.transform(TestDocs.doc1);
   expect(t['name']).toBe('BO');
@@ -118,9 +130,9 @@ test('get transformations for a field', () =>
   const e: TransformationEngine = new TransformationEngine();
   const id1: number = e.addField(KeyPath(['name']), 'string');
   e.addField(KeyPath(['meta', 'school']), 'string');
-  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['name'])]));
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['name'])]), { format: 'uppercase' });
   e.appendTransformation(TransformationNodeType.SubstringNode, List<KeyPath>([KeyPath(['name'])]), { from: 0, length: 2 });
-  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]), { format: 'uppercase' });
   expect(e.getTransformations(id1)).toEqual(List<number>([0, 1]));
 });
 
@@ -133,7 +145,7 @@ test('array in array in object: identity transformation', () =>
 test('transform of deeply nested value', () =>
 {
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc3);
-  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['hardarr', '1', '1', '0'])]));
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['hardarr', '1', '1', '0'])]), { format: 'uppercase' });
   expect(e.transform(TestDocs.doc3)).toEqual(
     {
       name: 'Bob',
@@ -167,7 +179,7 @@ test('transform of deeply nested value', () =>
 test('nested transform with wildcard', () =>
 {
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc3);
-  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['arr', '1', '*', 'a'])]));
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['arr', '1', '*', 'a'])]), { format: 'uppercase' });
   expect(e.transform(TestDocs.doc3)).toEqual(
     {
       name: 'Bob',
@@ -202,7 +214,7 @@ test('proper wildcard behavior across multiple docs', () =>
 {
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc4);
   e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['car']));
-  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['arr', '*'])]));
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['arr', '*'])]), { format: 'uppercase' });
   expect(e.transform(TestDocs.doc5)).toEqual(
     {
       car: ['A', 'B', 'C', 'D'],
@@ -214,7 +226,7 @@ test('(deep) clone a TransformationEngine', () =>
 {
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc4);
   e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['car']));
-  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['arr', '*'])]));
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['arr', '*'])]), { format: 'uppercase' });
   const clone: TransformationEngine = e.clone();
   expect(clone.equals(e)).toBe(true);
   e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['dog']));

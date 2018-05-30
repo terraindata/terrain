@@ -56,6 +56,7 @@ import { notificationManager } from 'common/components/InAppNotification';
 import Modal from 'common/components/Modal';
 import Switch from 'common/components/Switch';
 import TerrainComponent from 'common/components/TerrainComponent';
+import * as momentZon from 'moment-timezone';
 import { MidwayError } from 'shared/error/MidwayError';
 import Util from 'util/Util';
 import { Colors, OldThemesArray } from '../../colors/Colors';
@@ -391,21 +392,11 @@ class Settings extends TerrainComponent<Props>
 
   public renderTimeZoneDescription()
   {
-    let timeZone: number;
-
-    if (this.props.users.currentUser)
-    {
-      timeZone = this.props.users.currentUser.timeZone || 158;
-    }
-    else
-    {
-      timeZone = 158;
-    }
-
+    const localZone = momentZon.tz.guess();
     return (
       <div>
         Terrain uses your time zone to send summary and notification emails, for times in your activity feeds, and for reminders.
-        Your time zone is currently set to: <b>{TimeZones[timeZone].DisplayName}</b>.
+        Your time zone is currently set to: <b>{localZone}</b>.
       </div>
     );
   }

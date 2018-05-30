@@ -395,6 +395,7 @@ class Schedule extends TerrainComponent<Props>
         onDelete={this._fn(this.props.onDelete, schedule.id)}
         onChange={this.handleScheduleChange}
         useTooltip={true}
+        disableScroll={true}
         footer={this.renderFooter()}
         confirmDelete={true}
         itemName={'schedule'}

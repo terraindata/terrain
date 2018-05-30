@@ -65,8 +65,8 @@ import { DifferenceTFF, ProductTFF, QuotientTFF, SumTFF } from './NumericOperati
 import { SetIfTFF } from './SetIfTransformationForm';
 import
 {
-  AddTFF, DecryptTFF, DivideTFF, EncryptTFF, FindReplaceTFF, HashTFF,
-  MultiplyTFF, SubstringTFF, SubtractTFF, UppercaseTFF,
+  AddTFF, CaseTFF, DecryptTFF, DivideTFF, EncryptTFF, FindReplaceTFF,
+  HashTFF, MultiplyTFF, SubstringTFF, SubtractTFF,
 } from './SimpleTransformations';
 import { SplitTFF } from './SplitTransformationForm';
 
@@ -74,8 +74,8 @@ export function getTransformationForm(type: TransformationNodeType): React.Compo
 {
   switch (type)
   {
-    case TransformationNodeType.UppercaseNode:
-      return UppercaseTFF;
+    case TransformationNodeType.CaseNode:
+      return CaseTFF;
     case TransformationNodeType.SubstringNode:
       return SubstringTFF;
     case TransformationNodeType.DuplicateNode:

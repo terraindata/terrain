@@ -127,6 +127,7 @@ export interface Props
   canDelete?: boolean;
   showWarning?: boolean;
   useTooltip?: boolean;
+  disableScroll?: boolean;
   warningMessage?: string;
   onToggleOpen?: (open: boolean) => void;
   onDelete?: () => void;
@@ -409,6 +410,7 @@ export class RouteSelector extends TerrainComponent<Props>
       <DrawerAnimation
         open={this.isOpen()}
         maxHeight={props.large ? 300 : 350 /* coordinate this with LESS */}
+        disableScroll={this.props.disableScroll}
       >
         <div
           className={classNames({
@@ -561,9 +563,12 @@ export class RouteSelector extends TerrainComponent<Props>
             ]
           }
           {
-            <div
-              className='routeselector-options-gradient'
-            />
+            optionSet.options.size !== 0 ?
+              <div
+                className='routeselector-options-gradient'
+              />
+              :
+              null
           }
         </div>
       </div>
@@ -736,7 +741,7 @@ export class RouteSelector extends TerrainComponent<Props>
     {
       const el = document.getElementsByClassName('routeselector-option-focused')[0];
 
-      if (el)
+      if (el && !this.props.disableScroll)
       {
         el.scrollIntoView({
           behavior: 'smooth',

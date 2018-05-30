@@ -252,11 +252,6 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return getCurrentLanguage(props);
   }
 
-  protected _inputDisabled(): boolean
-  {
-    return !this._field().isIncluded || !this.props.canEdit;
-  }
-
   protected _settingsAreOpen(props = this.props): boolean
   {
     this.updateChecker.setChecker('settingsOpen', settingsAreOpen);
@@ -273,12 +268,6 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   {
     return this._field(this.props.fieldId, this.props)
       !== this._field(nextProps.fieldId, nextProps);
-  }
-
-  // Returns the given function if input is not disabled. Otherwise returns undefined.
-  protected _noopIfDisabled<F>(fn: F): F | undefined
-  {
-    return this._inputDisabled() ? undefined : fn;
   }
 
   @instanceFnDecorator(memoizeOne)
