@@ -59,6 +59,7 @@ import * as yadeep from '../util/yadeep';
 import AddTransformationNode from './nodes/AddTransformationNode';
 import ArrayCountTransformationNode from './nodes/ArrayCountTransformationNode';
 import ArraySumTransformationNode from './nodes/ArraySumTransformationNode';
+import CaseTransformationNode from './nodes/CaseTransformationNode';
 import CastTransformationNode from './nodes/CastTransformationNode';
 import DecryptTransformationNode from './nodes/DecryptTransformationNode';
 import DifferenceTransformationNode from './nodes/DifferenceTransformationNode';
@@ -81,7 +82,6 @@ import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import SubtractTransformationNode from './nodes/SubtractTransformationNode';
 import SumTransformationNode from './nodes/SumTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
-import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
 import ZipcodeTransformationNode from './nodes/ZipcodeTransformationNode';
 import TransformationNodeType, { NodeOptionsType } from './TransformationNodeType';
 import TransformationNodeVisitor from './TransformationNodeVisitor';
@@ -540,8 +540,10 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     } as TransformationVisitResult;
   }
 
-  public visitUppercaseNode(node: UppercaseTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  public visitCaseNode(node: CaseTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.CaseNode>;
+
     return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
     {
       if (typeof el !== 'string')
@@ -549,14 +551,41 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         return {
           errors: [
             {
-              message: 'Attempted to capitalize a non-string field (this is not supported)',
+              message: 'Attempted to change the case of a non-string field (this is not supported)',
             } as TransformationVisitError,
           ],
         } as TransformationVisitResult;
       }
       else
       {
-        yadeep.set(doc, kp, el.toUpperCase());
+        switch (opts.format)
+        {
+          case 'uppercase':
+            yadeep.set(doc, kp, el.toUpperCase());
+            break;
+          case 'lowercase':
+            yadeep.set(doc, kp, el.toLowerCase());
+            break;
+          case 'titlecase':
+            yadeep.set(doc, kp, el.toLowerCase().replace(/[^\s_\-/]*/g, (word) =>
+              word.replace(/./, (ch) => ch.toUpperCase()),
+            ));
+            break;
+          case 'camelcase':
+            yadeep.set(doc, kp, _.camelCase(el));
+            break;
+          case 'pascalcase':
+            yadeep.set(doc, kp, _.upperFirst(_.camelCase(el)));
+            break;
+          default:
+            return {
+              errors: [
+                {
+                  message: 'Unknown case format specified',
+                } as TransformationVisitError,
+              ],
+            } as TransformationVisitResult;
+        }
       }
     });
   }

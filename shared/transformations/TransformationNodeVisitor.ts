@@ -60,6 +60,7 @@ import SetIfTransformationNode from 'shared/transformations/nodes/SetIfTransform
 import SubtractTransformationNode from 'shared/transformations/nodes/SubtractTransformationNode';
 import SumTransformationNode from 'shared/transformations/nodes/SumTransformationNode';
 import ArrayCountTransformationNode from './nodes/ArrayCountTransformationNode';
+import CaseTransformationNode from './nodes/CaseTransformationNode';
 import CastTransformationNode from './nodes/CastTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterArrayTransformationNode from './nodes/FilterArrayTransformationNode';
@@ -69,7 +70,6 @@ import JoinTransformationNode from './nodes/JoinTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
-import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
 import ZipcodeTransformationNode from './nodes/ZipcodeTransformationNode';
 import TransformationVisitResult from './TransformationVisitResult';
 
@@ -117,7 +117,7 @@ export default abstract class TransformationNodeVisitor
     return this.visitDefault(node, doc, options);
   }
 
-  public visitUppercaseNode(node: UppercaseTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  public visitCaseNode(node: CaseTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }

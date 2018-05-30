@@ -55,7 +55,7 @@ enum TransformationNodeType
   FilterNode = 'FilterNode',
   DuplicateNode = 'DuplicateNode',
   InsertNode = 'InsertNode',
-  UppercaseNode = 'UppercaseNode',
+  CaseNode = 'CaseNode',
   SubstringNode = 'SubstringNode',
   CastNode = 'CastNode',
   HashNode = 'HashNode',
@@ -112,7 +112,8 @@ interface TransformationOptionTypes
     at?: number;
     value: string | KeyPath;
   };
-  UppercaseNode: {
+  CaseNode: {
+    format: string;
   };
   SubstringNode: {
     from: number;
