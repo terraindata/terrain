@@ -44,20 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import aesjs = require('aes-js');
 import { List } from 'immutable';
-import sha1 = require('sha1');
 
 import { KeyPath } from '../../util/KeyPath';
 import TransformationNodeType from '../TransformationNodeType';
 import TransformationNode from './TransformationNode';
 
-export default class EncryptTransformationNode extends TransformationNode
+export default class FilterArrayTransformationNode extends TransformationNode
 {
   public constructor(id: number,
     fields: List<KeyPath>,
     options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.EncryptNode)
+    typeCode: TransformationNodeType = TransformationNodeType.FilterArrayNode)
   {
     super(id, fields, options, typeCode);
   }

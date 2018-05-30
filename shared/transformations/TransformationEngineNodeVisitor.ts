@@ -53,6 +53,7 @@ import { keccak256 } from 'js-sha3';
 import * as _ from 'lodash';
 
 import { diff } from 'semver';
+import Encryption, { Keys } from 'shared/encryption/Encryption';
 import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 import AddTransformationNode from './nodes/AddTransformationNode';
@@ -64,6 +65,7 @@ import DifferenceTransformationNode from './nodes/DifferenceTransformationNode';
 import DivideTransformationNode from './nodes/DivideTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import EncryptTransformationNode from './nodes/EncryptTransformationNode';
+import FilterArrayTransformationNode from './nodes/FilterArrayTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
 import FindReplaceTransformationNode from './nodes/FindReplaceTransformationNode';
 import GroupByTransformationNode from './nodes/GroupByTransformationNode';
@@ -127,17 +129,13 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   // use standard AES 128 decryption
   private static decryptHelper(msg: string, key?: any): string
   {
-    const msgBytes: any = aesjs.utils.hex.toBytes(msg);
-    const aesCtr: any = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-    return aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes));
+    return Encryption.decryptStatic(msg, Keys.Transformations);
   }
 
   // use standard AES 128 rencryption
   private static encryptHelper(msg: string, key?: any): string
   {
-    const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
-    const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-    return aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes));
+    return Encryption.encryptStatic(msg, Keys.Transformations);
   }
 
   private static zipcodeHelper(zipcode: string, opts: NodeOptionsType<TransformationNodeType.ZipcodeNode>)
@@ -1079,7 +1077,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
       else
       {
-        yadeep.set(doc, kp, TransformationEngineNodeVisitor.encryptHelper(el, node.key));
+        yadeep.set(doc, kp, TransformationEngineNodeVisitor.encryptHelper(el));
       }
     });
   }
@@ -1102,7 +1100,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
       else
       {
-        yadeep.set(doc, kp, TransformationEngineNodeVisitor.decryptHelper(el, node.key));
+        yadeep.set(doc, kp, TransformationEngineNodeVisitor.decryptHelper(el));
       }
     });
   }
@@ -1153,6 +1151,51 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
           errors: [
             {
               message: 'Attempted to group on a non-array (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
+
+  public visitFilterArrayNode(node: FilterArrayTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.FilterArrayNode>;
+
+    node.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        const newArray = [];
+        for (let i = 0; i < el.length; i++)
+        {
+          let drop = false;
+          if (opts.filterNull && el[i] === null)
+          {
+            drop = true;
+          }
+          if (opts.filterUndefined && el[i] === undefined)
+          {
+            drop = true;
+          }
+          if (!drop)
+          {
+            newArray.push(el[i]);
+          }
+        }
+        yadeep.set(doc, field, newArray, { create: true });
+      }
+      else
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to count a non-array (this is not supported)',
             } as TransformationVisitError,
           ],
         } as TransformationVisitResult;

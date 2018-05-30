@@ -57,6 +57,7 @@ const { List, Map } = Immutable;
 import { ArrayCountTFF, ArraySumTFF } from './ArrayStatTransformationForms';
 import { CastTFF } from './CastTransformationForm';
 import { DuplicateTFF } from './DuplicateTransformationForm';
+import { FilterArrayTFF } from './FilterArrayTransformationForm';
 import { GroupByTFF } from './GroupByTransformationForm';
 import { InsertTFF } from './InsertTransformationForm';
 import { JoinTFF } from './JoinTransformationForm';
@@ -119,6 +120,8 @@ export function getTransformationForm(type: TransformationNodeType): React.Compo
       return DecryptTFF;
     case TransformationNodeType.GroupByNode:
       return GroupByTFF;
+    case TransformationNodeType.FilterArrayNode:
+      return FilterArrayTFF;
     default:
       return null;
   }

@@ -74,6 +74,7 @@ enum TransformationNodeType
   EncryptNode = 'EncryptNode',
   DecryptNode = 'DecryptNode',
   GroupByNode = 'GroupByNode',
+  FilterArrayNode = 'FilterArrayNode',
   ZipcodeNode = 'ZipcodeNode',
 }
 
@@ -175,6 +176,10 @@ interface TransformationOptionTypes
     newFieldKeyPaths: List<KeyPath>;
     subkey: string;
     groupValues: any[];
+  };
+  FilterArrayNode: {
+    filterNull: boolean;
+    filterUndefined: boolean;
   };
   ZipcodeNode: {
     format: string;

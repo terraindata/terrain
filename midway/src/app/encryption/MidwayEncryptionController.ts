@@ -45,20 +45,51 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import aesjs = require('aes-js');
-import { List } from 'immutable';
 import sha1 = require('sha1');
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+import { EncryptionController, Keys, registerEncryptionController } from 'shared/encryption/Encryption';
 
-export default class EncryptTransformationNode extends TransformationNode
+class MidwayEncryptionController implements EncryptionController
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.EncryptNode)
+  private keymap: { [k in Keys]: string };
+
+  constructor()
   {
-    super(id, fields, options, typeCode);
+    const integrationKey = 'b8e4cd8acca7a5bb';
+    const transformationKey = 'a66b88600d2b01b9';
+    this.keymap = {
+      [Keys.Integrations]: aesjs.utils.utf8.toBytes(integrationKey),
+      [Keys.Transformations]: aesjs.utils.utf8.toBytes(transformationKey),
+    };
   }
+
+  public encryptStatic(msg: string, namedKey: Keys): string
+  {
+    const key = this.keymap[namedKey];
+    if (key === undefined)
+    {
+      throw new Error('Could not find key in keymap');
+    }
+    const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
+    const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+    return aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes));
+  }
+
+  public decryptStatic(msg: string, namedKey: Keys): string
+  {
+    const key = this.keymap[namedKey];
+    if (key === undefined)
+    {
+      throw new Error('Could not find key in keymap');
+    }
+    const msgBytes: any = aesjs.utils.hex.toBytes(msg);
+    const aesCtr: any = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+    return aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes));
+  }
+}
+
+export function registerMidwayEncryption()
+{
+  const controller = new MidwayEncryptionController();
+  registerEncryptionController(controller);
 }

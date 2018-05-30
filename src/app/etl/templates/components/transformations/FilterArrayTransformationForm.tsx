@@ -43,22 +43,50 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:no-var-requires no-empty-interface max-classes-per-file
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
+import * as React from 'react';
 
-import aesjs = require('aes-js');
-import { List } from 'immutable';
-import sha1 = require('sha1');
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { instanceFnDecorator } from 'shared/util/Classes';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { TransformationNode } from 'etl/templates/FieldTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
-export default class EncryptTransformationNode extends TransformationNode
+import { DynamicForm } from 'common/components/DynamicForm';
+import { KeyPath as EnginePath } from 'shared/util/KeyPath';
+
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
+
+type FilterOptions = NodeOptionsType<TransformationNodeType.FilterArrayNode>;
+export class FilterArrayTFF extends TransformationForm<FilterOptions, TransformationNodeType.FilterArrayNode>
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.EncryptNode)
-  {
-    super(id, fields, options, typeCode);
-  }
+  protected readonly type = TransformationNodeType.FilterArrayNode;
+  protected readonly inputMap: InputDeclarationMap<FilterOptions> = {
+    filterNull: {
+      type: DisplayType.CheckBox,
+      displayName: 'Drop If Null',
+      group: 'checkboxes',
+      widthFactor: 2,
+    },
+    filterUndefined: {
+      type: DisplayType.CheckBox,
+      displayName: 'Drop If Undefined',
+      group: 'checkboxes',
+      widthFactor: 2,
+    },
+  };
+
+  protected readonly initialState = {
+    filterNull: false,
+    filterUndefined: false,
+  };
 }

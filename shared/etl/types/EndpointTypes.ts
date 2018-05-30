@@ -83,11 +83,11 @@ export const EndpointTypeNames =
   {
     Upload: 'Upload',
     Download: 'Download',
-    Algorithm: 'Algorithm',
+    Algorithm: 'Terrain Algorithm',
     Database: 'Database',
     Sftp: 'SFTP',
     Http: 'HTTP',
-    Fs: 'File System',
+    Fs: 'Local Filesystem',
     Mysql: 'MySQL',
     Postgresql: 'PostgreSQL',
     Magento: 'Magento',
