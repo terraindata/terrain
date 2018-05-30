@@ -72,6 +72,7 @@ export interface Props
   confirm?: boolean;
   confirmButtonText?: string;
   confirmDisabled?: boolean; // if true, confirm button is disabled
+  cancelButtonText?: string;
   onValidate?: () => boolean;
   onConfirm?: () => void;
   onClose: () => void;
@@ -349,8 +350,10 @@ class Modal extends TerrainComponent<Props>
                       onClick={this.props.onClose}
                       key='modal-close-button'
                     >
-                      Cancel
-                      </div>
+                      {
+                        this.props.cancelButtonText ? this.props.cancelButtonText : 'Cancel'
+                      }
+                    </div>
                   </div>
                 }
               </div>
