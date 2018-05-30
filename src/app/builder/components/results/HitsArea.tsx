@@ -207,7 +207,7 @@ class HitsArea extends TerrainComponent<Props>
     {
       const type = ElasticBlockHelpers.getTypeOfField(
         schema,
-        builder.query ? builder : builder.set('query', props.query),
+        builder && builder.query ? builder : builder.set('query', props.query),
         field,
         true,
       );

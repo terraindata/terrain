@@ -62,7 +62,7 @@ import HitsArea from '../../builder/components/results/HitsArea';
 import { ResultsManager } from '../../builder/components/results/ResultsManager';
 import { _ResultsState, ResultsState } from '../../builder/components/results/ResultTypes';
 import InfoArea from '../../common/components/InfoArea';
-
+import { _Path } from 'app/builder/components/pathfinder/PathfinderTypes';
 export interface Props
 {
   servers: SchemaTypes.ServerMap;
@@ -127,6 +127,7 @@ class SchemaResults extends TerrainComponent<Props>
             && this.props.servers.get(selectedItem['serverId']);
 
         let queryString: string = '';
+        let path = _Path();
         switch (selectedItem.type)
         {
           case 'server':
@@ -146,6 +147,7 @@ class SchemaResults extends TerrainComponent<Props>
                 .size(100)
                 .build(),
             );
+             path = path.setIn(['source, dataSource', 'index'], selectedItem['name']);
             break;
           case 'table':
             queryString = JSON.stringify(
@@ -156,6 +158,8 @@ class SchemaResults extends TerrainComponent<Props>
                 .size(100)
                 .build(),
             );
+            path = path.setIn(['source, dataSource', 'index'],
+              selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', ''));
             break;
           case 'column':
           case 'fieldProperty':
@@ -167,6 +171,8 @@ class SchemaResults extends TerrainComponent<Props>
                 .size(100)
                 .build(),
             );
+            path = path.setIn(['source, dataSource', 'index'],
+              selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', ''));
             break;
         }
 
