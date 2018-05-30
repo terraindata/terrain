@@ -50,7 +50,7 @@ import { KeyPath } from '../../util/KeyPath';
 import TransformationNodeType from '../TransformationNodeType';
 import TransformationNode from './TransformationNode';
 
-export default class UppercaseTransformationNode extends TransformationNode
+export default class CaseTransformationNode extends TransformationNode
 {
   public constructor(id: number,
     fields: List<KeyPath>,
