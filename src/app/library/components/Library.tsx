@@ -340,15 +340,15 @@ class Library extends TerrainComponent<any>
     const datasets = this.getDatasets();
 
     const categoryId = params.categoryId ? +params.categoryId : null;
+    const category: LibraryTypes.Category = categoryId !== null ? categories.get(categoryId) : undefined;
     let groupId = params.groupId ? +params.groupId : null;
-    if (groupId === null)
+    if (groupId === null && !singleColumn)
     {
-      groupId = categories.get(categoryId).groupsOrder.first() ?
-        +categories.get(categoryId).groupsOrder.first() : null;
+      groupId = (category && category.groupsOrder && category.groupsOrder.first()) ?
+        +category.groupsOrder.first() : null;
       params['groupId'] = groupId;
     }
     const algorithmId = params.algorithmId ? +params.algorithmId : null;
-    const category: LibraryTypes.Category = categoryId !== null ? categories.get(categoryId) : undefined;
     const group: LibraryTypes.Group = groupId !== null ? groups.get(groupId) : undefined;
     const algorithm: LibraryTypes.Algorithm = algorithmId !== null ? algorithms.get(algorithmId) : undefined;
     const groupsOrder: List<ID> = category !== undefined ? category.groupsOrder : undefined;
