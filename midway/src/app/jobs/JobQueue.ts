@@ -53,6 +53,9 @@ import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 import { TaskTreeConfig } from 'shared/types/jobs/TaskTreeConfig';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import IntegrationConfig from '../integrations/IntegrationConfig';
+import SchedulerConfig from '../scheduler/SchedulerConfig';
+import { integrations } from '../scheduler/SchedulerRouter';
 import { Job } from './Job';
 import JobConfig from './JobConfig';
 import JobLogConfig from './JobLogConfig';
@@ -314,23 +317,58 @@ export class JobQueue
       }
 
       const jobCreationStatus: boolean | string = newJob.create(newJobTasks, 'some random filename');
-      winston.info('created job');
+      winston.info('created run now job');
       if (typeof jobCreationStatus === 'string' || (jobCreationStatus as boolean) !== true)
       {
         winston.warn('Error while creating job: ' + (jobCreationStatus as string));
       }
-      // update the table to running = true
-      this.runningRunNowJobs.set(getJobs[0].id, newJob);
-      // actually run the job
-      const jobResult: TaskOutputConfig = await this.runningRunNowJobs.get(getJobs[0].id).run() as TaskOutputConfig;
-      const jobsFromId: JobConfig[] = await this.get(getJobs[0].id);
-      this.runningRunNowJobs.delete(getJobs[0].id);
 
-      // log job result
-      const jobLogConfig: JobLogConfig[] = await App.JobL.create(getJobs[0].id, jobResult['options']['logStream']);
-      await this._setJobLogId(getJobs[0].id, jobLogConfig[0].id);
-      resolve(jobResult.options.outputStream as stream.Readable);
+      try
+      {
+        // update the table to running = true
+        this.runningRunNowJobs.set(getJobs[0].id, newJob);
+        // actually run the job
+        const jobResult: TaskOutputConfig = await this.runningRunNowJobs.get(getJobs[0].id).run() as TaskOutputConfig;
+        const jobsFromId: JobConfig[] = await this.get(getJobs[0].id);
+        // this.runningRunNowJobs.delete(getJobs[0].id);
+        // log job result
+        const jobLogConfig: JobLogConfig[] = await App.JobL.create(getJobs[0].id, jobResult['options']['logStream'],
+          jobResult.status, true);
+        await this._setJobLogId(getJobs[0].id, jobLogConfig[0].id);
+        if (jobResult.options.outputStream === null)
+        {
+          await App.JobQ.setJobStatus(getJobs[0].id, false, 'FAILURE');
+          reject(new Error('Error while running job'));
+        }
+        resolve(jobResult.options.outputStream as stream.Readable);
+      }
+      catch (e)
+      {
+        await App.JobQ.setJobStatus(getJobs[0].id, false, 'FAILURE');
+        reject(new Error('Error while running job'));
+      }
     });
+  }
+
+  public deleteRunningJob(id: number, runNow?: boolean): boolean
+  {
+    try
+    {
+      if (runNow === true)
+      {
+        this.runningRunNowJobs.delete(id);
+      }
+      else
+      {
+        this.runningJobs.delete(id);
+      }
+    }
+    catch (e)
+    {
+      winston.warn((e as any).toString() as string);
+      return false;
+    }
+    return true;
   }
 
   // Status codes: PENDING SUCCESS FAILURE PAUSED CANCELED RUNNING ABORTED (PAUSED/RUNNING when midway was restarted)
@@ -339,6 +377,7 @@ export class JobQueue
     return new Promise<boolean>(async (resolve, reject) =>
     {
       const jobs: JobConfig[] = await this._select([], { id }) as JobConfig[];
+      winston.info(`setting job status to ${running}, status ${status}`);
       if (jobs.length === 0)
       {
         return resolve(false);
@@ -360,8 +399,23 @@ export class JobQueue
       jobs[0].running = running;
       jobs[0].status = status;
       const doNothing: JobConfig[] = await App.DB.upsert(this.jobTable, jobs[0]) as JobConfig[];
+
+      if (status === 'FAILURE')
+      {
+        await this._sendEmail(id);
+      }
+
       resolve(true);
     });
+  }
+
+  public async setScheduleStatus(id: number, status: boolean = false): Promise<void>
+  {
+    const jobs: JobConfig[] = await this.get(id);
+    if (!(status === false && jobs[0].scheduleId === null))
+    {
+      await App.SKDR.setRunning(jobs[0].scheduleId, status);
+    }
   }
 
   public async unpause(id: number): Promise<JobConfig[]>
@@ -413,8 +467,8 @@ export class JobQueue
         .filter(this.jobTable['priority'].greaterThan(-1))
         .filter(this.jobTable['running'].equals(false)).sort(this.jobTable['priority'], 'asc')
         .sort(this.jobTable['runNowPriority'], 'desc').sort(this.jobTable['createdAt'], 'asc').take(newJobSlots);
-      const queryStr: string = App.DB.getDB().generateString(query);
-      const rawResults = await App.DB.getDB().execute([queryStr]);
+      const generatedQuery = App.DB.getDB().generate(query);
+      const rawResults = await App.DB.getDB().execute(generatedQuery);
       const jobs: JobConfig[] = rawResults.map((result) => new JobConfig(result as JobConfig));
 
       let i = 0;
@@ -461,15 +515,15 @@ export class JobQueue
       resolve();
       jobIdLst.forEach(async (jobId) =>
       {
+        winston.info('about to run job');
         const jobResult: TaskOutputConfig = await this.runningJobs.get(jobId).run() as TaskOutputConfig;
+        winston.info('finished running job');
         const jobsFromId: JobConfig[] = await this.get(jobId);
         const jobStatus: string = jobResult.status === true ? 'SUCCESS' : 'FAILURE';
-        await this.setJobStatus(jobsFromId[0].id, false, jobStatus);
-        await App.SKDR.setRunning(jobsFromId[0].scheduleId, false);
-        this.runningJobs.delete(jobId);
-        winston.info('Job result: ' + JSON.stringify(jobResult, null, 2));
+        // await this.setJobStatus(jobsFromId[0].id, false, jobStatus);
+        winston.info(`Job result: ${jobResult.status}`);
 
-        const jobLogConfig: JobLogConfig[] = await App.JobL.create(jobId, jobResult['options']['logStream']);
+        const jobLogConfig: JobLogConfig[] = await App.JobL.create(jobId, jobResult['options']['logStream'], jobResult.status, false);
         await this._setJobLogId(jobId, jobLogConfig[0].id);
       });
 
@@ -524,6 +578,41 @@ export class JobQueue
     });
   }
 
+  private async _sendEmail(jobId: number): Promise<void>
+  {
+    const emailIntegrations: IntegrationConfig[] = await integrations.get(null, undefined, 'Email', true) as IntegrationConfig[];
+    if (emailIntegrations.length !== 1)
+    {
+      winston.warn(`Invalid number of email integrations, found ${emailIntegrations.length}`);
+    }
+    else if (emailIntegrations.length === 1 && emailIntegrations[0].name !== 'Default Failure Email')
+    {
+      winston.warn('Invalid Email found.');
+    }
+    else
+    {
+      const jobs: JobConfig[] = await App.JobQ.get(jobId) as JobConfig[];
+      const jobLogs: JobLogConfig[] = await App.JobL.get(jobId) as JobLogConfig[];
+      if (jobs.length !== 0 && jobLogs.length !== 0)
+      {
+        if (jobs[0].scheduleId !== undefined)
+        {
+          const schedules: SchedulerConfig[] = await App.SKDR.get(jobs[0].scheduleId) as SchedulerConfig[];
+          if (schedules.length !== 0)
+          {
+            const connectionConfig = emailIntegrations[0].connectionConfig;
+            const authConfig = emailIntegrations[0].authConfig;
+            const fullConfig = Object.assign(connectionConfig, authConfig);
+            const subject: string = `[${fullConfig['customerName']}] Schedule "${schedules[0].name}" failed at job ${jobs[0].id}`;
+            const body: string = 'Check the job log table for details'; // should we include the log contents? jobLogs[0].contents;
+            const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body);
+            winston.info(`Email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
+          }
+        }
+      }
+    }
+  }
+
   private async _setJobLogId(id: number, jobLogId: number): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>
@@ -549,8 +638,8 @@ export class JobQueue
       const query = new Tasty.Query(this.jobTable).filter(this.jobTable['status'].equals('PENDING'))
         .filter(this.jobTable['running'].equals(false)).filter(this.jobTable['priority'].equals(0))
         .sort(this.jobTable['runNowPriority'], 'desc').take(1);
-      const queryStr: string = App.DB.getDB().generateString(query);
-      const rawResults = await App.DB.getDB().execute([queryStr]);
+      const generatedQuery = App.DB.getDB().generate(query);
+      const rawResults = await App.DB.getDB().execute(generatedQuery);
 
       const jobs: JobConfig[] = rawResults.map((result: object) => new JobConfig(result as JobConfig));
       if (jobs.length !== 0)

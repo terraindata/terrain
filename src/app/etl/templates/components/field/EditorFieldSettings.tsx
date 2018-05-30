@@ -62,6 +62,7 @@ import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { Languages } from 'shared/etl/types/ETLTypes';
 
 import LanguageUI from 'etl/templates/languages/LanguageUI';
+import { TempCallback } from 'etl/templates/TemplateEditorTypes';
 import FieldMainSettings from './FieldMainSettings';
 import FieldSettingsTransformations from './FieldSettingsTransformations';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
@@ -88,14 +89,32 @@ class EditorFieldSettings extends TemplateEditorField<Props>
 {
   public state: {
     currentCategory: ViewCategory,
+    childApply: () => void,
   } = {
       currentCategory: ViewCategory.Settings,
+      childApply: null,
     };
+
+  public reduxCallback;
 
   constructor(props)
   {
     super(props);
     this.changeViewFactory = _.memoize(this.changeViewFactory);
+  }
+
+  public componentDidMount()
+  {
+    this.reduxCallback = new TempCallback(() => this.applyChanges());
+    this.props.act({
+      actionType: 'registerSettingsCallback',
+      callback: this.reduxCallback,
+    });
+  }
+
+  public componentWillUnmount()
+  {
+    this.reduxCallback.invalidate();
   }
 
   public currentCategory()
@@ -156,6 +175,7 @@ class EditorFieldSettings extends TemplateEditorField<Props>
     {
       return (
         <Component
+          registerApply={this._setStateWrapper('childApply')}
           {...this._passProps()}
         />
       );
@@ -203,35 +223,49 @@ class EditorFieldSettings extends TemplateEditorField<Props>
           {this.renderTitleBar()}
         </div>
         <div className='field-settings-section'>
-          {
-            this.currentCategory() === ViewCategory.Settings ?
-              <FieldMainSettings
-                {...this._passProps()}
-              />
-              : null
-          }
-          {
-            this.currentCategory() === ViewCategory.Transformations ?
-              <FieldSettingsTransformations
-                {...this._passProps()}
-              /> : null
-          }
-          {
-            this.currentCategory() === ViewCategory.Language ?
-              this.renderLanguageCategory()
-              : null
-          }
+          <div className='field-settings-scrollable'>
+            {
+              this.currentCategory() === ViewCategory.Settings ?
+                <FieldMainSettings
+                  registerApply={this._setStateWrapper('childApply')}
+                  {...this._passProps()}
+                />
+                : null
+            }
+            {
+              this.currentCategory() === ViewCategory.Transformations ?
+                <FieldSettingsTransformations
+                  registerApply={this._setStateWrapper('childApply')}
+                  {...this._passProps()}
+                /> : null
+            }
+            {
+              this.currentCategory() === ViewCategory.Language ?
+                this.renderLanguageCategory()
+                : null
+            }
+          </div>
         </div>
       </div>
     );
+  }
+
+  public applyChanges()
+  {
+    if (this.state.childApply !== null && typeof this.state.childApply === 'function')
+    {
+      this.state.childApply();
+    }
   }
 
   public changeViewFactory(category: ViewCategory)
   {
     return () =>
     {
+      this.reduxCallback.call();
       this.setState({
         currentCategory: category,
+        childApply: null,
       });
     };
   }

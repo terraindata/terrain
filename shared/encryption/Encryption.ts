@@ -42,23 +42,71 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires import-spacing strict-boolean-expressions
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+// Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file no-unused-expression
+import aesjs = require('aes-js');
+import sha1 = require('sha1');
 
-import * as Immutable from 'immutable';
-import { LanguageInterface } from 'shared/etl/languages/LanguageControllers';
-const { List, Map } = Immutable;
-
-class DefaultController implements LanguageInterface
+export enum Keys
 {
-  public language = Languages.JavaScript;
+  Integrations = 'Integrations',
+  Transformations = 'Transformations',
+}
 
-  public changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType)
+export interface EncryptionController
+{
+  encryptStatic: (msg: string, key: Keys) => string;
+  decryptStatic: (msg: string, key: Keys) => string;
+}
+
+let registeredController: EncryptionController = null;
+
+export function registerEncryptionController(controller: EncryptionController)
+{
+  registeredController = controller;
+}
+
+class EncryptionProxy implements EncryptionController
+{
+  public encryptStatic(msg, key)
   {
-    return;
+    if (registeredController !== null)
+    {
+      return registeredController.encryptStatic(msg, key);
+    }
+    else
+    {
+      return '********';
+    }
+  }
+
+  public decryptStatic(msg, key)
+  {
+    if (registeredController !== null)
+    {
+      return registeredController.decryptStatic(msg, key);
+    }
+    else
+    {
+      return '*Sample Decrypted Text*';
+    }
+  }
+
+  public encryptAny(msg: string, privateKey: string): string
+  {
+    const key: any = privateKey;
+    const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
+    const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+    return aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes));
+  }
+
+  public decryptAny(msg: string, privateKey: string): string
+  {
+    const key: any = privateKey;
+    const msgBytes: any = aesjs.utils.hex.toBytes(msg);
+    const aesCtr: any = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+    return aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes));
   }
 }
 
-export default new DefaultController();
+export default new EncryptionProxy();

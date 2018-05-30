@@ -178,8 +178,9 @@ class DocumentsHelpers extends ETLHelpers
     key?: string,
   ): Promise<List<object>>
   {
-    return new Promise<List<object>>((resolve, reject) =>
+    return new Promise<List<object>>(async (resolve, reject) =>
     {
+      await this._logUpdate('Fetching Documents');
       const onFetchLoad = (documents: List<object>) =>
       {
         if (key !== undefined)

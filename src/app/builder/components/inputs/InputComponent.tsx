@@ -141,11 +141,7 @@ class InputComponent extends TerrainComponent<Props>
 
     if (inputType === InputType.DATE)
     {
-      let date = new Date(this.props.input.value);
-      if (date.toString() === 'Invalid Date')
-      {
-        date = new Date();
-      }
+      const date = String(this.props.input.value || '');
       const value = Util.formatInputDate(date, this.props.language);
 
       this.props.action(this.getKeyPath('value'), value);

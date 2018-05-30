@@ -480,6 +480,7 @@ function filterLineToQuery(line: FilterLine)
   // boost should be a number, but in case it is a string.
   const boost = typeof line.boost === 'string' ? parseFloat(line.boost) : line.boost;
   let query = {};
+  let field = line.field;
   switch (line.comparison)
   {
     case 'notexists':
@@ -642,15 +643,17 @@ function filterLineToQuery(line: FilterLine)
       break;
     case 'isin':
       value = PathFinderStringToJSONArray(String(value));
+      field = line.fieldType === FieldType.Text && !line.analyzed ? field + '.keyword' : field;
       query = {
         terms: {
-          [line.field]: value,
+          [field]: value,
           boost,
         },
       };
       break;
     case 'isnotin':
       value = PathFinderStringToJSONArray(String(value));
+      field = line.fieldType === FieldType.Text && !line.analyzed ? field + '.keyword' : field;
       query = {
         bool: {
           must_not: {

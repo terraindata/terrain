@@ -55,7 +55,7 @@ enum TransformationNodeType
   FilterNode = 'FilterNode',
   DuplicateNode = 'DuplicateNode',
   InsertNode = 'InsertNode',
-  UppercaseNode = 'UppercaseNode',
+  CaseNode = 'CaseNode',
   SubstringNode = 'SubstringNode',
   CastNode = 'CastNode',
   HashNode = 'HashNode',
@@ -73,6 +73,9 @@ enum TransformationNodeType
   DifferenceNode = 'DifferenceNode',
   EncryptNode = 'EncryptNode',
   DecryptNode = 'DecryptNode',
+  GroupByNode = 'GroupByNode',
+  FilterArrayNode = 'FilterArrayNode',
+  ZipcodeNode = 'ZipcodeNode',
 }
 
 // if this has errors, double check TransformationNodeType's keys are equal to its values
@@ -109,7 +112,8 @@ interface TransformationOptionTypes
     at?: number;
     value: string | KeyPath;
   };
-  UppercaseNode: {
+  CaseNode: {
+    format: string;
   };
   SubstringNode: {
     from: number;
@@ -168,6 +172,18 @@ interface TransformationOptionTypes
   EncryptNode: {
   };
   DecryptNode: {
+  };
+  GroupByNode: {
+    newFieldKeyPaths: List<KeyPath>;
+    subkey: string;
+    groupValues: any[];
+  };
+  FilterArrayNode: {
+    filterNull: boolean;
+    filterUndefined: boolean;
+  };
+  ZipcodeNode: {
+    format: string;
   };
 }
 

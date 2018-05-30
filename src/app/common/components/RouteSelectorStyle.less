@@ -17,25 +17,25 @@
 	min-width: 125px; // arbitrary, can change
 	width: 100%;
 	position: relative;
-	
+
 	*, *:before, *:after {
 		box-sizing: border-box;
 	}
-	
+
 	&.routeselector-open {
 		z-index: 1000;
 		box-shadow: 0 6px 23px 0 rgba(0,0,0,0.16);
 	}
-	
+
 	.routeselector-box-values {
 		position: relative;
 		overflow: hidden;
-		
+
 		max-height: 0;
 		&.routeselector-box-values-showing {
 			max-height: 100;
 		}
-		
+
 		padding-right: (@close-width + 10);
 
 		&:hover {
@@ -46,34 +46,34 @@
 	  &.routeselector-box-value-open {
 	    z-index: 1;
 		}
-			
+
 	  .transition(~"all 0.5s");
-	    
+
 		display: flex;
 		align-items: center;
 		width: 100%;
 		background: #fff;
-		
+
 		padding-left: 18px;
 		border-bottom: 1px solid #eee;
-		
+
 		cursor: pointer;
-		
-		
+
+
 		&.routeselector-box-values-open {
 			z-index: 1004;
 		}
-		
+
 		&:hover:not(.routeselector-box-values-open) {
 			// background: #f4f5f7;
 		}
-		
+
     &.routeselector-box-values-open:not(.routeselector-box-values-force-open) {
     	border-top-left-radius: @br;
     	border-top-right-radius: @br;
     }
 	}
-	
+
 	.routeselector-warning-icon {
 		height: 16px;
 		width: 16px;
@@ -89,19 +89,19 @@
 		padding: 12px 0px 12px 18px;
 		padding-left: 0px;
 		box-sizing: border-box;
-		
+
 		position: relative;
 		&.routeselector-box-value-open {
 	    z-index: 1;
 		}
-		
+
     .transition;
-    
+
     display: flex;
     align-items: center;
 		border-radius: 0px;
 	}
-	
+
 	.routeselector-close {
   	flex-shrink: 1;
   	font-size: 12px;
@@ -127,22 +127,22 @@
 		  }
   		.transition;
   	}
-  
+
 	.routeselector-box-values-open:not(.routeselector-box-values-force-open),
 	.routeselector-box-value-open:not(.routeselector-box-value-force-open) {
   	.routeselector-close {
   		opacity: 1;
-  		
+
   	}
-  	
+
 		&:hover {
 	  	.routeselector-close {
 	  		color: #1eb4f7;
   		}
   	}
 	}
-    
-	
+
+
 	.routeselector-picker {
 		box-sizing: border-box;
 		padding: 0px;
@@ -179,18 +179,18 @@
 	   		min-height: @picker-height;
 	   		max-height: @picker-height;
 		}
-		
+
 		.routeselector-header {
 			margin: 18px 18px;
 			margin-bottom: 0px;
 			font-size: 16px;
 		}
-		
+
 		.routeselector-search {
 			padding: 0px 12px;
 			margin-bottom: 12px;
 		}
-		
+
 		.routeselector-option-set {
 	    flex-grow: 1;
 	    flex-basis: 0px;
@@ -200,17 +200,18 @@
 	    height: 100%;
 	    max-height: @picker-height;
 		}
-		
+
 		.routeselector-util-row {
 			padding-top: 12px;
 			min-height: 55px;
 		}
-		
+
 		.routeselector-value-component {
 			margin-top: 12px;
 			max-height: 330px;
+      overflow: auto;
 		}
-		
+
 		.routeselector-options {
 			display: flex;
 			flex-wrap: wrap;
@@ -224,7 +225,7 @@
 				flex-wrap: nowrap;
 				overflow-x: hidden;
 			}
-			
+
 			.routeselector-option-wrapper {
 				flex-grow: 1;
 		    flex-basis: 30%;
@@ -238,24 +239,24 @@
     			bottom: 0px;
     			pointer-events: none;
 			}
-			
+
 			.routeselector-option {
 				.common-list-option-style;
-				
+
 				max-height: @option-max-height;
-				
+
 				margin-right: 6px; // TODO remove when scorebars are removed
-				
+
 				// used in original, may still be needed for Sources
 		    //  max-width: @option-max-width;
 				// margin: 6px;
 				// border: 2px solid #eee;
-				
+
 				position: relative;
-				
+
 				display: flex;
 				flex-direction: column;
-				
+
 				&.routeselector-option-focused {
 					border-color: #e3e3e3;
 				}
@@ -270,7 +271,7 @@
 				}
 			}
 		}
-		
+
 		.routeselector-data {
 			background: #eee;
 			padding: 6px;
@@ -303,23 +304,23 @@
 				}
 			}
 		}
-		
+
 		.routeselector-data-piece {
 			background: #fff;
 			margin-bottom: 6px;
 			border-radius: 3px;
 	    box-sizing: border-box;
 	    width: 100%;
-	    
+
 			display: table;
 	    table-layout: fixed;
-			
-			
+
+
 			.routeselector-data-row {
 				border-bottom: 1px solid #eee;
 				margin: 2px;
 				display: table-row;
-				
+
 				.routeselector-data-field,
 				.routeselector-data-value {
 					border-bottom: 1px solid #eee;
@@ -332,7 +333,7 @@
 					  height: 9px;
 					}
 				}
-				
+
 				.routeselector-data-value {
 					font-weight: 600;
 				}
@@ -345,12 +346,12 @@
 			// there is already padding in FloatingInput
 			padding-left: 0px;
 		}
-		
+
 		.routeselector-header {
 			font-size: 24px;
 			margin: 18px 32px;
 		}
-		
+
 		.routeselector-picker .routeselector-options .routeselector-option-wrapper {
 			min-width: 150px;
 		}
@@ -375,18 +376,18 @@
 			display: flex;
 			align-items: center;
 			flex-shrink: 0; // don't actually want this to shrink, so set low priority
-			
+
 			.routeselector-option-icon {
 				margin-right: 12px;
 				text-align: right;
 				width: 20px;
-				
+
 				svg {
 					max-width: 20px;
 					max-height: 20px;
 				}
 			}
-			
+
 			.routeselector-option-name-inner {
 				flex-grow: 1;
 				max-height: 31px;
@@ -400,7 +401,7 @@
 
 .routeselector-option-name {
 	.common-option-name-style;
-	
+
   // overflow: hidden; // TODO figure out how to make this work without making the name smaller
   //  current turning this on will clip the name
   text-overflow: ellipsis;
@@ -414,7 +415,7 @@
 	height: 100%;
 	width: 100%;
 	z-index: 999;
-	
+
 	// left: -5000px;
 	// top: -5000px;
 	// height: 10000px;
@@ -461,30 +462,30 @@
 // }
 
 .routeselector.routeselector-picked {
-	
+
 	.routeselector-picker {
-		
+
 		.routeselector-picker-inner {
 			opacity: 0;
 			.transition(~"all 0.5s");
 		}
-		
+
 		padding: 0px;
 		max-height: 0px;
 		.transition(~"all 1s");
 	}
-	
+
 	.routeselector-box-value-open:not(.routeselector-box-value-force-open) {
   	border-bottom-left-radius: @br;
   	border-bottom-right-radius: @br;
   }
-	
+
 	// .routeselector-picker {
 	// 	top: 0px;
 	// 	background: rgba(255,255,255,0);
 	// 	.transition;
 	// }
-	
+
 	// .routeselector-header,
 	// .routeselector-close,
 	// .routeselector-option,
@@ -495,11 +496,11 @@
 	// 	padding: 0px !important;
 	// 	margin: 0px !important;
 	// }
-	
+
 	// .routeselector-option:not(.routeselector-option-picked) {
 	// 	.collapse-option;
 	// }
-	
+
 	// .routeselector-option.routeselector-option-picked {
 	// 	opacity: 1;
 	// 	.routeselector-data {
@@ -509,5 +510,5 @@
 	// 		padding: 0px;
 	// 	}
 	// }
-	
+
 }

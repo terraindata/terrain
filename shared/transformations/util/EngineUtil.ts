@@ -162,7 +162,7 @@ export default class EngineUtil
     const jsType = EngineUtil.getRepresentedType(id, engine);
     if (ETLToJSType[etlType].indexOf(jsType) === -1)
     {
-      return [`Field JS Type and ETL Type are Incompatible. ${fieldType} is incompatible with ${etlType}`];
+      return [`Field JS Type and ETL Type are Incompatible. ${jsType} is incompatible with ${etlType}`];
     }
     return [];
   }
@@ -305,6 +305,11 @@ export default class EngineUtil
       if (EngineUtil.isAValidField(unhashedPath, pathTypes))
       {
         let fieldType = pathTypes[hashedPath];
+        if (fieldType === null)
+        {
+          fieldType = 'string';
+        }
+
         let valueType = pathValueTypes[hashedPath];
         if (valueType !== undefined)
         {
@@ -328,18 +333,36 @@ export default class EngineUtil
   public static addFieldToEngine(
     engine: TransformationEngine,
     keypath: List<string>,
-    etlType: ETLFieldTypes,
+    type: ETLFieldTypes,
     valueType?: ETLFieldTypes,
+    useValueType?: boolean,
   ): number
   {
     const cfg = {
-      etlType,
+      etlType: useValueType ? valueType : type,
     };
     if (valueType !== undefined)
     {
       cfg['valueType'] = getJSFromETL(valueType);
     }
-    return engine.addField(keypath, getJSFromETL(etlType), cfg);
+    return engine.addField(keypath, getJSFromETL(type), cfg);
+  }
+
+  // set the field type with no validation
+  public static rawSetFieldType(
+    engine: TransformationEngine,
+    fieldId: number,
+    etlType: ETLFieldTypes,
+    type: ETLFieldTypes,
+    valueType?: ETLFieldTypes,
+  )
+  {
+    engine.setFieldProp(fieldId, etlTypeKeyPath, etlType);
+    engine.setFieldType(fieldId, getJSFromETL(type));
+    if (valueType !== undefined)
+    {
+      engine.setFieldProp(fieldId, valueTypeKeyPath, getJSFromETL(valueType));
+    }
   }
 
   public static changeFieldType(
@@ -356,6 +379,7 @@ export default class EngineUtil
     {
       engine.setFieldType(fieldId, getJSFromETL(newType));
     }
+
     engine.setFieldProp(fieldId, etlTypeKeyPath, newType);
   }
 
@@ -402,11 +426,10 @@ export default class EngineUtil
     });
     const outputKeyPathBase = List([outputKey, '*']);
     const valueTypePath = List(['valueType']);
-    const outputFieldId = EngineUtil.addFieldToEngine(newEngine, List([outputKey]), ETLFieldTypes.Array);
-    const outputFieldWildcardId = EngineUtil.addFieldToEngine(newEngine, outputKeyPathBase, ETLFieldTypes.Array);
+    const outputFieldId = EngineUtil.addFieldToEngine(newEngine, List([outputKey]), ETLFieldTypes.Array, ETLFieldTypes.Object);
+    const outputFieldWildcardId = EngineUtil.addFieldToEngine(
+      newEngine, outputKeyPathBase, ETLFieldTypes.Array, ETLFieldTypes.Object, true);
 
-    newEngine.setFieldProp(outputFieldId, valueTypePath, 'object');
-    newEngine.setFieldProp(outputFieldWildcardId, valueTypePath, 'object');
     rightEngine.getAllFieldIDs().forEach((id) =>
     {
       const newKeyPath = outputKeyPathBase.concat(rightEngine.getOutputKeyPath(id)).toList();
@@ -439,29 +462,27 @@ export default class EngineUtil
       EngineUtil.interpretTextFields(engine, options.documents);
     }
 
-    const docs = EngineUtil.preprocessDocuments(options.documents);
+    const ignoreFields: { [k: number]: boolean } = {};
+    const docs = EngineUtil.preprocessDocuments(options.documents, engine);
     engine.getAllFieldIDs().forEach((id) =>
     {
+      if (ignoreFields[id])
+      {
+        return;
+      }
       const ikp = engine.getInputKeyPath(id);
       const okp = engine.getOutputKeyPath(id);
 
-      let values = [];
-      docs.forEach((doc) =>
-      {
-        const vals = yadeep.get(engine.transform(doc), okp);
-        if (vals !== undefined)
-        {
-          values = values.concat(vals);
-        }
-      });
       const repType = EngineUtil.getRepresentedType(id, engine);
+
       if (repType === 'string')
       {
+        const values = EngineUtil.getValuesToAnalyze(docs, okp);
         const type = TypeUtil.getCommonETLStringType(values);
         EngineUtil.changeFieldType(engine, id, type);
         if (type === ETLFieldTypes.GeoPoint)
         {
-          EngineUtil.castField(engine, id, ETLFieldTypes.Object);
+          EngineUtil.castField(engine, id, ETLFieldTypes.GeoPoint);
           const latField = EngineUtil.addFieldToEngine(engine, ikp.push('lat'), ETLFieldTypes.Number);
           const longField = EngineUtil.addFieldToEngine(engine, ikp.push('lon'), ETLFieldTypes.Number);
           engine.setOutputKeyPath(latField, okp.push('lat')); // refactor to use synthetic util?
@@ -477,8 +498,26 @@ export default class EngineUtil
       }
       else if (repType === 'number')
       {
+        const values = EngineUtil.getValuesToAnalyze(docs, okp);
         const type = TypeUtil.getCommonETLNumberType(values);
         EngineUtil.changeFieldType(engine, id, type);
+      }
+      else if (repType === 'object')
+      {
+        const values = EngineUtil.getValuesToAnalyze(docs, okp);
+        if (TypeUtil.areValuesGeoPoints(values))
+        {
+          EngineUtil.changeFieldType(engine, id, ETLFieldTypes.GeoPoint);
+          EngineUtil.castField(engine, id, ETLFieldTypes.GeoPoint);
+          const latId = engine.getOutputFieldID(okp.push('lat'));
+          const lonId = engine.getOutputFieldID(okp.push('lon'));
+          EngineUtil.changeFieldType(engine, latId, ETLFieldTypes.Number);
+          EngineUtil.changeFieldType(engine, lonId, ETLFieldTypes.Number);
+          EngineUtil.castField(engine, latId, ETLFieldTypes.Number);
+          EngineUtil.castField(engine, lonId, ETLFieldTypes.Number);
+          ignoreFields[latId] = true;
+          ignoreFields[lonId] = true;
+        }
       }
       else
       {
@@ -552,6 +591,7 @@ export default class EngineUtil
     documents.forEach((doc, i) =>
     {
       const e: TransformationEngine = new TransformationEngine(doc);
+      EngineUtil.stripMalformedFields(e, doc, pathTypes); // is pretty slow, any better ways?
       const fieldIds = e.getAllFieldIDs();
 
       fieldIds.forEach((id, j) =>
@@ -586,6 +626,11 @@ export default class EngineUtil
             }
             pathTypes[path] = 'string';
             pathValueTypes[path] = undefined;
+          }
+          else if (existingType === null && newType !== null)
+          {
+            pathTypes[path] = newType;
+            pathValueTypes[path] = e.getFieldProp(id, valueTypeKeyPath);
           }
         }
         else
@@ -634,9 +679,9 @@ export default class EngineUtil
     }
   }
 
-  private static preprocessDocuments(documents: List<object>): List<object>
+  private static preprocessDocuments(documents: List<object>, engine: TransformationEngine): List<object>
   {
-    return documents.map((doc) => objectify(doc)).toList();
+    return documents.map((doc) => engine.transform(doc)).toList();
   }
 
   // warning types get typed as strings, but should emit a warning
@@ -660,11 +705,74 @@ export default class EngineUtil
     }
   }
 
+  private static getValuesToAnalyze(
+    docs: List<object>,
+    okp: KeyPath,
+  ): any[]
+  {
+    let values = [];
+    docs.forEach((doc) =>
+    {
+      const vals = yadeep.get(doc, okp);
+      if (vals !== undefined)
+      {
+        values = values.concat(vals);
+      }
+    });
+    return values;
+  }
+
+  // remove fields that the engine thinks are object but are actually null
+  private static stripMalformedFields(
+    engine: TransformationEngine,
+    doc: object,
+    pathTypes: PathHashMap<FieldTypes>)
+  {
+    const fieldsToDelete = [];
+    engine.getAllFieldIDs().forEach((id) =>
+    {
+      if (EngineUtil.getRepresentedType(id, engine) !== 'object')
+      {
+        return;
+      }
+      const value = yadeep.get(doc, engine.getOutputKeyPath(id));
+      if (Array.isArray(value))
+      {
+        let allNull = true;
+        for (const val of value)
+        {
+          if (val !== null && value !== undefined)
+          {
+            allNull = false;
+          }
+        }
+        if (allNull)
+        {
+          fieldsToDelete.push(id);
+        }
+      }
+      else if (value === null || value === undefined)
+      {
+        fieldsToDelete.push(id);
+      }
+    });
+    _.forEach(fieldsToDelete, (id) =>
+    {
+      const deIndexedPath = EngineUtil.turnIndicesIntoValue(engine.getOutputKeyPath(id), '*');
+      const path = EngineUtil.hashPath(deIndexedPath);
+      engine.deleteField(id);
+      if (pathTypes[path] === undefined)
+      {
+        pathTypes[path] = null;
+      }
+    });
+  }
+
   // attempt to convert fields from text and guess if they should be numbers or booleans
   // adds type casts
   private static interpretTextFields(engine: TransformationEngine, documents: List<object>)
   {
-    const docs = EngineUtil.preprocessDocuments(documents);
+    const docs = EngineUtil.preprocessDocuments(documents, engine);
     engine.getAllFieldIDs().forEach((id) =>
     {
       if (EngineUtil.getRepresentedType(id, engine) !== 'string')
@@ -673,12 +781,7 @@ export default class EngineUtil
       }
       const okp = engine.getOutputKeyPath(id);
       const ikp = engine.getInputKeyPath(id);
-      let values = [];
-      docs.forEach((doc) =>
-      {
-        const vals = yadeep.get(engine.transform(doc), okp);
-        values = values.concat(vals);
-      });
+      const values = EngineUtil.getValuesToAnalyze(docs, okp);
       const bestType = TypeUtil.getCommonJsType(values);
       if (bestType !== EngineUtil.getRepresentedType(id, engine))
       {

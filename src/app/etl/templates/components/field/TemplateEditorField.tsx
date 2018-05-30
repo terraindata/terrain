@@ -163,10 +163,10 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return this.uiStateTracker;
   }
 
-  protected _currentEngine(): TransformationEngine
+  protected _currentEngine(props = this.props): TransformationEngine
   {
     this.updateChecker.setChecker('currentEngine', getCurrentEngine);
-    return getCurrentEngine(this.props);
+    return getCurrentEngine(props);
   }
 
   protected _currentComparator(): (a, b) => number
@@ -209,9 +209,6 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
           fieldId: this.props.fieldId,
         });
       }
-      this.props.act({
-        actionType: 'updateEngineVersion',
-      });
     }).catch(this._showError('Could not perform action'));
   }
 
@@ -244,33 +241,33 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return kp.size === 1;
   }
 
-  protected _getCurrentLanguage(): Languages
+  protected _fieldDepth(props = this.props)
+  {
+    return this._field(props.fieldId, props).outputKeyPath.size;
+  }
+
+  protected _getCurrentLanguage(props = this.props): Languages
   {
     this.updateChecker.setChecker('currentLanguage', getCurrentLanguage);
-    return getCurrentLanguage(this.props);
+    return getCurrentLanguage(props);
   }
 
-  protected _inputDisabled(): boolean
-  {
-    return !this._field().isIncluded || !this.props.canEdit;
-  }
-
-  protected _settingsAreOpen(): boolean
+  protected _settingsAreOpen(props = this.props): boolean
   {
     this.updateChecker.setChecker('settingsOpen', settingsAreOpen);
-    return settingsAreOpen(this.props);
+    return settingsAreOpen(props);
+  }
+
+  protected _engineVersion(props = this.props): number
+  {
+    this.updateChecker.setChecker('engineVersion', getEngineVersion);
+    return getEngineVersion(props);
   }
 
   protected _willFieldChange(nextProps)
   {
     return this._field(this.props.fieldId, this.props)
       !== this._field(nextProps.fieldId, nextProps);
-  }
-
-  // Returns the given function if input is not disabled. Otherwise returns undefined.
-  protected _noopIfDisabled<F>(fn: F): F | undefined
-  {
-    return this._inputDisabled() ? undefined : fn;
   }
 
   @instanceFnDecorator(memoizeOne)
@@ -287,6 +284,11 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   {
     return (this.props as Props & Injected).templateEditor.uiState;
   }
+}
+
+function getEngineVersion(props: TemplateEditorFieldProps): number
+{
+  return (props as TemplateEditorFieldProps & Injected).templateEditor.uiState.engineVersion;
 }
 
 function getCurrentComparator(props: TemplateEditorFieldProps): (a, b) => number
@@ -314,8 +316,8 @@ function settingsAreOpen(props: TemplateEditorFieldProps)
   }
   else
   {
-    const uiState = (props as TemplateEditorFieldProps & Injected).templateEditor.uiState;
-    return fieldId === uiState.settingsFieldId &&
-      displayKeyPath.equals(uiState.settingsDisplayKeyPath);
+    const { settingsState } = (props as TemplateEditorFieldProps & Injected).templateEditor.uiState;
+    return fieldId === settingsState.fieldId &&
+      displayKeyPath.equals(settingsState.dkp);
   }
 }

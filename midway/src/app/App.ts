@@ -65,6 +65,8 @@ import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
 import { DatabaseConfig } from './database/DatabaseConfig';
 import { databases } from './database/DatabaseRouter';
+import { Email } from './email/Email';
+import { registerMidwayEncryption } from './encryption/MidwayEncryptionController';
 import { events } from './events/EventRouter';
 import { integrations } from './integrations/IntegrationRouter';
 import { JobLog } from './jobs/JobLog';
@@ -81,6 +83,7 @@ const CONN_RETRY_TIMEOUT = 1000;
 
 export let CFG: Config.Config;
 export let DB: Tasty.Tasty;
+export let EMAIL: Email;
 export let HA: number;
 export let JobL: JobLog;
 export let JobQ: JobQueue;
@@ -118,6 +121,7 @@ export class App
   }
 
   private DB: Tasty.Tasty;
+  private EMAIL: Email;
   private JobL: JobLog;
   private JobQ: JobQueue;
   private SKDR: Scheduler;
@@ -138,6 +142,9 @@ export class App
     winston.debug('Using configuration: ' + JSON.stringify(config));
     this.config = config;
     CFG = this.config;
+
+    this.EMAIL = new Email();
+    EMAIL = this.EMAIL;
 
     this.JobL = new JobLog();
     JobL = this.JobL;
@@ -252,9 +259,17 @@ export class App
     await Config.handleConfig(this.config);
     winston.debug('Finished processing configuration options...');
 
+    // initialize system encryption keys
+    registerMidwayEncryption();
+    winston.debug('Finished Registering System Private Keys');
+
     // create a default seed user
     await users.initializeDefaultUser();
     winston.debug('Finished creating a default user...');
+
+    // create default integrations
+    await integrations.initializeDefaultIntegrations();
+    winston.debug('Finished creating default integrations...');
 
     // initialize job queue
     await this.JobQ.initializeJobQueue();

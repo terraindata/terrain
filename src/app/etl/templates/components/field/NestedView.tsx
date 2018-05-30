@@ -53,6 +53,8 @@ import * as Radium from 'radium';
 import * as React from 'react';
 
 import CheckBox from 'common/components/CheckBox';
+import DragDropItem from 'common/components/DragDropItem';
+import DragHandle from 'common/components/DragHandle';
 import FadeInOut from 'common/components/FadeInOut';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 
@@ -65,6 +67,9 @@ export interface Props
   content: any; // the content that is inline with the arrow and the checkbox
   open: boolean;
   onToggle: (ev?) => void;
+  canDrag: boolean;
+  keyPath: KeyPath;
+  onDrop: (dropIndex: List<number>, dragIndex: List<number>) => void;
   style?: any;
   children?: any; // the expandable content rendered beneath the content
   injectedContent?: any;
@@ -81,6 +86,7 @@ class ExpandableView extends TerrainComponent<Props>
     return (
       <div
         className='nested-view-arrow-column'
+        key='arrow'
         style={{
           color: Colors().text3,
           marginLeft: `${arrowColumnMargin}px`,
@@ -116,6 +122,7 @@ class ExpandableView extends TerrainComponent<Props>
     return (
       <div
         className='nested-view-checkbox-column'
+        key='checkbox'
         style={{
           width: `${checkboxSize}px`,
           height: `${checkboxSize}px`,
@@ -126,6 +133,29 @@ class ExpandableView extends TerrainComponent<Props>
           checked={this.props.checked}
           className='nested-view-checkbox'
           onChange={this.props.onCheckboxClicked}
+        />
+      </div>
+    );
+  }
+
+  public renderDragHandleSection()
+  {
+    if (!this.props.canDrag)
+    {
+      return null;
+    }
+
+    return (
+      <div
+        className='nested-view-checkbox-column'
+        key='drag-handle'
+        style={{
+          width: `${checkboxSize}px`,
+          height: `${checkboxSize}px`,
+          marginLeft: `${checkboxMargin}px`,
+        }}
+      >
+        <DragHandle
         />
       </div>
     );
@@ -156,45 +186,56 @@ class ExpandableView extends TerrainComponent<Props>
 
   public render()
   {
-    const rootStyle = this.getStyle(this.props.children != null, this.props.open);
+    const rootStyle = this.getNestedStyle(this.props.children != null, this.props.open);
     const style = this.props.style !== undefined ? _.extend({}, rootStyle, this.props.style) : rootStyle;
 
     return (
-      <div className={classNames({
-        'nested-view-container': true,
-      })}
-        style={style}
-      >
-        <div
-          className='nested-view-content-row'
-          style={{
-            paddingTop: '0px',
-            paddingBottom: '0px',
-          }}
+      <div style={getStyle('position', 'relative')}>
+        <DragDropItem
+          keyPath={this.props.keyPath}
+          canDrag={this.props.canDrag}
+          canDrop={this.props.canDrag}
+          onDrop={this.props.onDrop}
+          dropZoneStyle={DROP_ZONE_STYLE}
         >
-          {
-            this.props.hideControls ? null : this.renderArrowSection()
-          }
-          {
-            this.props.hideControls ? null : this.renderCheckboxSection()
-          }
-          <div
-            className='nested-view-content'
-            style={{
-              padding: this.props.children == null ? '0px' : '0px',
-            }}
+          <div className={classNames({
+            'nested-view-container': true,
+          })}
+            style={style}
           >
-            {this.props.content}
+            <div
+              className='nested-view-content-row'
+              style={{
+                paddingTop: '0px',
+                paddingBottom: '0px',
+              }}
+            >
+              {
+                this.props.hideControls ? null : [
+                  this.renderDragHandleSection(),
+                  this.renderArrowSection(),
+                  this.renderCheckboxSection(),
+                ]
+              }
+              <div
+                className='nested-view-content'
+                style={{
+                  padding: this.props.children == null ? '0px' : '0px',
+                }}
+              >
+                {this.props.content}
+              </div>
+            </div>
+            {
+              this.renderChildren()
+            }
           </div>
-        </div>
-        {
-          this.renderChildren()
-        }
+        </DragDropItem>
       </div>
     );
   }
 
-  public getStyle(hasChildren: boolean, isOpen: boolean)
+  public getNestedStyle(hasChildren: boolean, isOpen: boolean)
   {
     if (hasChildren)
     {
@@ -231,6 +272,11 @@ const arrowStyle = {
   height: arrowSize,
   padding: `${arrowSpacing}px ${arrowSpacing}px ${arrowSpacing}px 0px`,
   margin: `-2px 0px`,
+};
+
+const DROP_ZONE_STYLE = {
+  height: '100%',
+  top: '0px',
 };
 
 export const leftColumnWidth = arrowSize + arrowSpacing + arrowColumnMargin + 3;

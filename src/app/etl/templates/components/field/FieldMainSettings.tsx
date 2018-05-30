@@ -47,14 +47,14 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { instanceFnDecorator } from 'shared/util/Classes';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
-
-import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
 import { DynamicForm } from 'common/components/DynamicForm';
@@ -65,21 +65,25 @@ import
   TemplateField,
 } from 'etl/templates/FieldTypes';
 import LanguageUI from 'etl/templates/languages/LanguageUI';
-import { ETLFieldTypes, etlFieldTypesList, etlFieldTypesNames, FieldTypes } from 'shared/etl/types/ETLTypes';
+import LanguageController from 'shared/etl/languages/LanguageControllers';
+import { ETLFieldTypes, etlFieldTypesList, etlFieldTypesNames, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './FieldSettings.less';
 
-export type Props = TemplateEditorFieldProps;
+export interface Props extends TemplateEditorFieldProps
+{
+  registerApply: (apply: () => void) => void;
+}
 
 interface SettingsState
 {
   fieldName: string;
-  isIncluded: boolean;
+  isPrimaryKey: boolean;
   type: ETLFieldTypes;
 }
 
-@Radium
 class FieldMainSettings extends TemplateEditorField<Props>
 {
   public state: {
@@ -101,9 +105,10 @@ class FieldMainSettings extends TemplateEditorField<Props>
         displayNames: (s) => etlFieldTypesNames,
       },
     },
-    isIncluded: {
+    isPrimaryKey: {
       type: DisplayType.CheckBox,
-      displayName: 'Include this field',
+      displayName: 'Primary Key',
+      getDisplayState: this.getPrimaryKeyDisplayState,
     },
   };
 
@@ -113,6 +118,11 @@ class FieldMainSettings extends TemplateEditorField<Props>
     this.state = {
       formState: this.getFormStateFromField(props),
     };
+  }
+
+  public componentDidMount()
+  {
+    this.props.registerApply(() => this.handleSettingsApplied());
   }
 
   public componentWillReceiveProps(nextProps)
@@ -130,12 +140,45 @@ class FieldMainSettings extends TemplateEditorField<Props>
     return this._field().canEditName() ? DisplayState.Active : DisplayState.Hidden;
   }
 
+  public getPrimaryKeyDisplayState(s: SettingsState)
+  {
+    const { canChangeKey } = this.getPrimaryKeyInfo();
+    return canChangeKey ? DisplayState.Active : DisplayState.Hidden;
+  }
+
+  @instanceFnDecorator(memoizeOne)
+  public _getPrimaryKeyInfo(currentLanguage: Languages, engine: TransformationEngine, fieldId: number, engineVersion: number)
+  {
+    const controller = LanguageController.get(currentLanguage);
+    const isPrimaryKey = controller.isFieldPrimaryKey(engine, fieldId);
+    const canChangeKey = controller.canSetPrimaryKey(engine, fieldId);
+    return {
+      isPrimaryKey,
+      canChangeKey,
+    };
+  }
+
+  public getPrimaryKeyInfo(props = this.props):
+    {
+      isPrimaryKey: boolean,
+      canChangeKey: boolean,
+    }
+  {
+    const fieldId = props.fieldId;
+    const engine = this._currentEngine(props);
+    const engineVersion = this._engineVersion(props);
+    const language = this._getCurrentLanguage(props);
+    return this._getPrimaryKeyInfo(language, engine, fieldId, engineVersion);
+  }
+
   public getFormStateFromField(props)
   {
+    const fieldId = props.fieldId;
+    const { isPrimaryKey } = this.getPrimaryKeyInfo(props);
     const field = this._fieldMap(props).get(props.fieldId);
     return {
       fieldName: field.name,
-      isIncluded: field.isIncluded,
+      isPrimaryKey,
       type: field.etlType,
     };
   }
@@ -148,18 +191,10 @@ class FieldMainSettings extends TemplateEditorField<Props>
           inputMap={this.settingsInputMap}
           inputState={this.state.formState}
           onStateChange={this._setStateWrapper('formState')}
-          centerForm={true}
-          mainButton={{
-            name: 'Apply',
-            onClicked: this.handleSettingsApplied,
-          }}
-          secondButton={{
-            name: 'Close',
-            onClicked: this.handleCloseSettings,
-          }}
           style={{
             flexGrow: 1,
             padding: '12px',
+            justifyContent: 'center',
           }}
           actionBarStyle={{
             justifyContent: 'center',
@@ -174,28 +209,30 @@ class FieldMainSettings extends TemplateEditorField<Props>
     const field = this._field();
     const { formState } = this.state;
 
-    this._try((proxy) =>
-    {
-      if (field.isIncluded !== formState.isIncluded)
-      {
-        proxy.setFieldEnabled(formState.isIncluded);
-      }
-      if (field.name !== formState.fieldName)
-      {
-        proxy.changeName(formState.fieldName);
-      }
-      if (field.etlType !== formState.type)
-      {
-        proxy.changeType(formState.type);
-      }
-    });
-  }
+    const { isPrimaryKey, canChangeKey } = this.getPrimaryKeyInfo();
 
-  public handleCloseSettings()
-  {
-    this.props.act({
-      actionType: 'closeSettings',
-    });
+    const shouldChange =
+      (canChangeKey && formState.isPrimaryKey !== isPrimaryKey) ||
+      (field.name !== formState.fieldName) ||
+      (field.etlType !== formState.type);
+    if (shouldChange)
+    {
+      this._try((proxy) =>
+      {
+        if (canChangeKey && formState.isPrimaryKey !== isPrimaryKey)
+        {
+          proxy.setPrimaryKey(formState.isPrimaryKey, this._getCurrentLanguage());
+        }
+        if (field.name !== formState.fieldName)
+        {
+          proxy.changeName(formState.fieldName);
+        }
+        if (field.etlType !== formState.type)
+        {
+          proxy.changeType(formState.type);
+        }
+      });
+    }
   }
 }
 

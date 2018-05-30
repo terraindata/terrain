@@ -84,6 +84,7 @@ export default class TypeUtil
       return ETLFieldTypes.String;
     }
 
+    let allNull = true;
     let allDate = true;
     let allGeo = true;
 
@@ -91,6 +92,7 @@ export default class TypeUtil
     {
       if (!TypeUtil.isNullHelper(val))
       {
+        allNull = false;
         if (!TypeUtil.isDateHelper(val))
         {
           allDate = false;
@@ -102,11 +104,11 @@ export default class TypeUtil
       }
     }
 
-    if (allDate)
+    if (allDate && !allNull)
     {
       return ETLFieldTypes.Date;
     }
-    else if (allGeo)
+    else if (allGeo && !allNull)
     {
       return ETLFieldTypes.GeoPoint;
     }
@@ -124,11 +126,13 @@ export default class TypeUtil
     }
 
     let allIntegers = true;
+    let allNull = true;
 
     for (const val of values)
     {
       if (val != null && !Number.isNaN(val))
       {
+        allNull = false;
         if (!TypeUtil.numberIsInteger(val))
         {
           allIntegers = false;
@@ -136,7 +140,7 @@ export default class TypeUtil
       }
     }
 
-    if (allIntegers)
+    if (allIntegers && !allNull)
     {
       return ETLFieldTypes.Integer;
     }
@@ -146,45 +150,50 @@ export default class TypeUtil
     }
   }
 
-  public static getCommonElasticType(values: string[]): ElasticTypes
+  public static areValuesGeoPoints(values: any[]): boolean
   {
-    let type: ElasticTypes = null;
+    if (values.length === 0)
+    {
+      return false;
+    }
+
+    let allGeopoints = true;
+    let someGeopoints = false;
 
     for (const val of values)
     {
-      if (TypeUtil.isNullHelper(val))
+      if (val === null || val === undefined)
       {
-        // do nothing
+        // ignore
       }
-      else if (TypeUtil.isDateHelper(val))
+      else if ((typeof val === 'object' || typeof val === 'string') && TypeUtil.isGeoHelper(val))
       {
-        type = (type === null || type === ElasticTypes.Date) ? ElasticTypes.Date : ElasticTypes.Auto;
+        someGeopoints = true;
       }
-      else if (TypeUtil.isGeoHelper(val))
+      else
       {
-        type = (type === null || type === ElasticTypes.GeoPoint) ? ElasticTypes.GeoPoint : ElasticTypes.Auto;
-      }
-    }
-    return type === null ? ElasticTypes.Auto : type;
-  }
-
-  public static getCommonElasticNumberType(values: number[]): ElasticTypes
-  {
-    let type: ElasticTypes = null;
-
-    for (const val of values)
-    {
-      if (val == null || Number.isNaN(val))
-      {
-        // do nothing
-      }
-      else if (TypeUtil.numberIsInteger(val))
-      {
-        type = (type === null || type === ElasticTypes.Integer) ? ElasticTypes.Integer : ElasticTypes.Auto;
+        allGeopoints = false;
       }
     }
-    return type === null ? ElasticTypes.Auto : type;
+    return allGeopoints && someGeopoints;
   }
+
+  // public static areValuesNull(values: any[]): boolean
+  // {
+  //   if (values.length === 0)
+  //   {
+  //     return false;
+  //   }
+
+  //   let allNull = true;
+  //   for (const val of values)
+  //   {
+  //     if (val !== null)
+  //     {
+  //       allNull
+  //     }
+  //   }
+  // }
 
   public static numberIsInteger(value: number): boolean
   {
@@ -228,6 +237,10 @@ export default class TypeUtil
 
   public static isDateHelper(value: string): boolean
   {
+    if (value == null || value === '')
+    {
+      return false;
+    }
     const MMDDYYYYRegex = new RegExp(/^((0?[1-9]|1[0,1,2])\/(0?[1-9]|[1,2][0-9]|3[0,1])\/([0-9]{4}))$/);
     const YYYYMMDDRegex = new RegExp(/([0-9]{4}-[0,1]{1}[0-9]{1}-[0-3]{1}[0-9]{1})/);
     const ISORegex = new RegExp(/^([0-9]{4})-([0,1]{1}[0-9]{1})-([0-3]{1}[0-9]{1})( |T){0,1}([0-2]{1}[0-9]{1}):{0,1}([0-5]{1}[0-9]{1}):{0,1}([0-9]{2})(\.([0-9]{3,6})|((-|\+)?[0-9]{2}:[0-9]{2}))?Z?$/);

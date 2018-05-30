@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import { List, Map, Set } from 'immutable';
 import * as Immutable from 'immutable';
+import * as TerrainLog from 'loglevel';
 
 import * as _ from 'lodash';
 import * as React from 'react';
@@ -533,10 +534,10 @@ export class ResultsManager extends TerrainComponent<Props>
         const processed: object = (new ESJSONParser(eql)).getValue();
         querySize = processed['size'];
         eql = this.postprocessEQL(processed, hitsPage, appendResults);
-        // console.log('post process ', eql);
       }
       catch (e)
       {
+        TerrainLog.debug('Error before sending out the query: ' + e.message);
         return;
       }
     }
@@ -559,6 +560,7 @@ export class ResultsManager extends TerrainComponent<Props>
     {
       this.state.query.xhr.cancel();
     }
+    TerrainLog.debug('Issue query ' + eql);
     this.setState({
       lastQuery: query,
       queriedTql: eql,
@@ -674,6 +676,17 @@ export class ResultsManager extends TerrainComponent<Props>
     {
       hits = this.props.resultsState.hits.concat(hits).toList();
     }
+    // Filter out duplicates
+    const hitIds = [];
+    hits = hits.filter((hit) =>
+    {
+      if (hitIds.indexOf(hit.primaryKey) !== -1)
+      {
+        return false;
+      }
+      hitIds.push(hit.primaryKey);
+      return true;
+    }).toList();
     const changes: any = {
       hits,
       fields: fieldsSet.toList(),
@@ -689,10 +702,17 @@ export class ResultsManager extends TerrainComponent<Props>
 
     if (!resultsState.hasLoadedCount)
     {
-      changes['count'] = Math.min(resultsData.rawResult.hits.total, MAX_HITS);
-      if (querySize !== undefined)
+      if (hits.size < SCROLL_SIZE * this.props.hitsPage)
       {
-        changes['count'] = Math.min(changes['count'], querySize);
+        changes['count'] = hits.size;
+      }
+      else
+      {
+        changes['count'] = Math.min(resultsData.rawResult.hits.total, MAX_HITS);
+        if (querySize !== undefined)
+        {
+          changes['count'] = Math.min(changes['count'], querySize);
+        }
       }
     }
 

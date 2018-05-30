@@ -52,6 +52,7 @@ import { FileTypes } from './types/ETLTypes';
 
 import { FileConfig } from 'shared/etl/types/EndpointTypes';
 import Util from 'shared/Util';
+import * as xlsx from 'xlsx';
 
 export const mimeToFileType: { [k: string]: FileTypes } = {
   'text/csv': FileTypes.Csv,
@@ -60,6 +61,7 @@ export const mimeToFileType: { [k: string]: FileTypes } = {
   'text/xml': FileTypes.Xml,
   'text/tab-separated-values': FileTypes.Tsv,
   'text/tsv': FileTypes.Tsv,
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': FileTypes.Xlsx,
 };
 
 export const fileTypeToMime = {
@@ -67,6 +69,7 @@ export const fileTypeToMime = {
   [FileTypes.Json]: 'application/json',
   [FileTypes.Xml]: 'text/xml',
   [FileTypes.Tsv]: 'text/tab-separated-values',
+  [FileTypes.Xlsx]: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 };
 
 export function getFileType(file: File): FileTypes
@@ -190,6 +193,37 @@ export function getSampleRows(
       );
     };
     fr.readAsText(fileChunk);
+  }
+  else if (fileType === FileTypes.Xlsx)
+  {
+    const fr = new FileReader();
+    fr.onloadend = () =>
+    {
+      try
+      {
+        const workbook = xlsx.read(fr.result, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        if (!sheet)
+        {
+          onError('XLSX Parse Failed: Workbook has no sheets');
+        }
+        // Set the range to be all of the columns and just 10 rows
+        const positions = sheet['!ref'].split(':');
+        // Separate starting row and column
+        const startCol: string = positions[0].match(/[A-Z][a-z]*/)[0];
+        const startRow = positions[0].match(/[0-9]/)[0];
+        const lastCol = positions[1].match(/[A-Z]/)[0];
+        const lastRow = parseFloat(startRow) + 9;
+        const range = startCol + startRow + ':' + lastCol + String(lastRow);
+        const json = xlsx.utils.sheet_to_json(sheet, { range });
+        onLoad(json);
+      }
+      catch (e)
+      {
+        onError(`XLSX Parse Failed: ${e}`);
+      }
+    };
+    fr.readAsArrayBuffer(file);
   }
 }
 // TODO for json, use a streaming implementation

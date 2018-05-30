@@ -39,6 +39,7 @@ dropETL() {
   dropSpecific 'schedules';
   dropSpecific 'schedulerLogs';
   dropSpecific 'jobs';
+  dropSpecific 'jobLogs';
   dropSpecific 'integrations';
 }
 

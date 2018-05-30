@@ -457,29 +457,32 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         dropKeyPath.concat(List(['filterGroup', 'lines', lineSize]).toList()), true);
       return;
     }
-    let group;
+    let newItem;
     // If they were both single filters, create a new group
     if (!this.isGroup(dropped) && !this.isGroup(droppedInto))
     {
       const { groupCount } = this.props.filterGroup;
       const groupNumber: string = groupCount < 10 ? '0' + String(groupCount) : String(groupCount);
-      group = _FilterGroup({
-        lines: List([droppedInto, dropped]),
-        name: 'Group ' + groupNumber,
+      newItem = _FilterLine({
+        filterGroup: {
+          lines: [droppedInto, dropped],
+          name: 'Group ' + groupNumber,
+        },
       });
       this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'groupCount'), groupCount + 1, true);
     }
     // If the dropped item was already a group, keep it's name and minMatches and append the line it was dropped onto
     else
     {
-      group = _FilterGroup({
+      newItem = _FilterGroup({
         lines: dropped.filterGroup.lines.insert(0, droppedInto),
         minMatches: dropped.filterGroup.minMatches,
         name: dropped.filterGroup.name,
       });
+      // only update the group, not the line
+      dropKeyPath = dropKeyPath.push('filterGroup');
     }
-    dropKeyPath = dropKeyPath.push('filterGroup');
-    lines = this.updateLines(lines, dragKeyPath, dropKeyPath, group);
+    lines = this.updateLines(lines, dragKeyPath, dropKeyPath, newItem);
     // Look for the thing that you dropped, if it is somewhere other than keyPath, remove it
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'lines'), lines);
   }
@@ -563,6 +566,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       title = PathfinderText.softFilterSectionTitle;
       tooltip = PathfinderText.softFilterSectionSubtitle;
     }
+
     return (
       <div
         className='pf-section pf-filter-section'
@@ -603,6 +607,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
                       onDragStop={this._toggle('dragging')}
                       dropZoneStyle={dropZoneStyle}
                       canDrag={canEdit && this.state.canDrag}
+                      useCustomDragLayer={true}
                     />
                     :
                     <DragDropGroup

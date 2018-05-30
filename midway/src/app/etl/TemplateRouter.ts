@@ -47,7 +47,9 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 
+import * as App from '../App';
 import * as Util from '../AppUtil';
+import { SchedulerConfig } from '../scheduler/SchedulerConfig';
 import UserConfig from '../users/UserConfig';
 import { TemplateConfig } from './TemplateConfig';
 import Templates from './Templates';
@@ -89,6 +91,13 @@ Router.post('/delete', passport.authenticate('access-token-local'), async (ctx, 
     'templateId',
   ];
   Util.verifyParameters(params, requiredParams);
+
+  const schedules: SchedulerConfig[] = await App.SKDR.getByTemplate(parseInt(ctx.params.templateId, 10));
+  if (schedules.length !== 0)
+  {
+    throw new Error('Template is being used in an active schedule.');
+  }
+
   await templates.delete(params.templateId);
   ctx.body = {};
 });
@@ -111,6 +120,13 @@ Router.post('/update/:id', passport.authenticate('access-token-local'), async (c
     throw new Error('Template ID does not match the supplied id in the URL');
   }
   Util.verifyParameters(template, requiredParams);
+
+  const schedules: SchedulerConfig[] = await App.SKDR.getByTemplate(parseInt(ctx.params.id, 10));
+  if (schedules.length !== 0)
+  {
+    throw new Error('Template is being used in an active schedule.');
+  }
+
   ctx.body = await templates.update(template);
 });
 

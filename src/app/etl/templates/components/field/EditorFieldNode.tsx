@@ -56,6 +56,7 @@ import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle
 import Util from 'util/Util';
 
 import * as Immutable from 'immutable';
+import Quarantine from 'util/RadiumQuarantine';
 const { List, Map } = Immutable;
 import FadeInOut from 'common/components/FadeInOut';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
@@ -75,16 +76,23 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
 {
   public state: {
     expandableViewOpen: boolean;
+    limitShowArray: number;
   } = {
       expandableViewOpen: true,
+      limitShowArray: 3,
     };
   constructor(props)
   {
     super(props);
-    if (props.noInteract)
-    {
-      this.state.expandableViewOpen = false;
-    }
+    this.state = this.computeInitialState(props);
+  }
+
+  public computeInitialState(props: Props)
+  {
+    return {
+      expandableViewOpen: this._fieldDepth(props) < 2,
+      limitShowArray: 3,
+    };
   }
 
   @instanceFnDecorator(memoizeOne)
@@ -189,10 +197,52 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     {
       return this.renderArrayChild(null, -1, true);
     }
-    return List(preview.slice(0, 3).map((value, index) =>
+
+    if (this.state.limitShowArray === -1 || preview.length <= this.state.limitShowArray)
     {
-      return this.renderArrayChild(value, index);
-    }));
+      return preview.map((value, index) =>
+      {
+        return this.renderArrayChild(value, index);
+      });
+    }
+    else
+    {
+      const items = preview.slice(0, this.state.limitShowArray).map((value, index) =>
+      {
+        return this.renderArrayChild(value, index);
+      });
+      items.push(this.renderArrayLimitButton(preview.length));
+      return items;
+    }
+  }
+
+  public renderArrayLimitButton(totalLength: number)
+  {
+    const numMore = totalLength - this.state.limitShowArray;
+
+    return (
+      <Quarantine key='arr-limit'>
+        <div
+          className='editor-field-array-more'
+          style={arrayLimitButtonStyle}
+          onClick={this.showAllArrayElements}
+        >
+          <div className='editor-field-array-more-label'>
+            {numMore} More Items
+          </div>
+          <div className='editor-field-array-more-button'>
+            Show All
+          </div>
+        </div>
+      </Quarantine>
+    );
+  }
+
+  public showAllArrayElements()
+  {
+    this.setState({
+      limitShowArray: -1,
+    });
   }
 
   public renderSettings()
@@ -202,7 +252,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     return (
       <div
         className='editor-field-node-settings-container'
-        style={showSettings ? { height: '300px' } : { height: '0px' }}
+        style={showSettings ? { height: '320px' } : { height: '0px' }}
       >
         {showSettings ?
           <div
@@ -242,7 +292,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
 
   public render()
   {
-    const { canEdit, preview, displayKeyPath, previewLabel } = this.props;
+    const { canEdit, preview, displayKeyPath, previewLabel, noInteract } = this.props;
     const field = this._field();
 
     if (field.isHidden === true)
@@ -250,8 +300,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
       return null;
     }
 
-    const style = (canEdit === true && field.isIncluded === false) ?
-      getStyle('opacity', '0.5') : {};
+    const style = {};
 
     const content = this.renderRow();
     const showSettings = this._settingsAreOpen();
@@ -277,6 +326,9 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
           style={style}
           checked={this.getCheckboxState()}
           onCheckboxClicked={this.handleCheckboxClicked}
+          keyPath={this._ikeyPath(SEED_KEY_PATH, this.props.fieldId)}
+          onDrop={this.handleDropped}
+          canDrag={this._isRootField() && !noInteract}
         />
       );
     }
@@ -292,6 +344,9 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
           style={style}
           checked={this.getCheckboxState()}
           onCheckboxClicked={this.handleCheckboxClicked}
+          keyPath={this._ikeyPath(SEED_KEY_PATH, this.props.fieldId)}
+          onDrop={this.handleDropped}
+          canDrag={this._isRootField() && !noInteract}
         />
       );
     }
@@ -326,9 +381,27 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
       expandableViewOpen: !this.state.expandableViewOpen,
     });
   }
+
+  public handleDropped(dropIndex: List<number>, dragIndex: List<number>)
+  {
+    const draggedFieldId = dragIndex.get(0);
+    const droppedFieldId = dropIndex.get(0);
+    GraphHelpers.mutateEngine((proxy) =>
+    {
+      proxy.orderField(draggedFieldId, droppedFieldId, true);
+    })
+      .then(doNothing)
+      .catch(this._showError('Could not reorder these fields.'));
+  }
 }
 
+const arrayLimitButtonStyle = [
+  getStyle('boxShadow', `inset 0 -1px 0 0 ${Colors().boxShadow}`, `inset 0 0 2px 0px ${Colors().active}`),
+  backgroundColor(Colors().bg3),
+];
+
 const doNothing = () => null;
+const SEED_KEY_PATH = List([]);
 
 const EditorFieldNode = Util.createTypedContainer(
   EditorFieldNodeC,

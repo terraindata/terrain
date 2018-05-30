@@ -94,7 +94,7 @@ function runTest(testObj: object)
   {
     try
     {
-      const results = await tasty.getDB().execute(testObj[1]);
+      const results = await tasty.getDB().execute([testObj[1], undefined]);
       await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
     }
     catch (e)
@@ -119,17 +119,17 @@ test('Postgres: transactions', async (done) =>
     const queries = ['SELECT * \n  FROM movies\n  LIMIT 10;'];
     await tasty.executeTransaction(async (handle, commit, rollback) =>
     {
-      await tasty.getDB().execute(queries, handle);
+      await tasty.getDB().execute([queries, undefined], handle);
       await commit();
     }, IsolationLevel.REPEATABLE_READ, true);
     await tasty.executeTransaction(async (handle, commit, rollback) =>
     {
-      await tasty.getDB().execute(queries, handle);
+      await tasty.getDB().execute([queries, undefined], handle);
       await rollback();
     }, IsolationLevel.SERIALIZABLE);
     await tasty.executeTransaction(async (handle, commit, rollback) =>
     {
-      await tasty.getDB().execute(queries, handle);
+      await tasty.getDB().execute([queries, undefined], handle);
       await commit();
     });
   }
@@ -137,6 +137,23 @@ test('Postgres: transactions', async (done) =>
   {
     fail(e);
   }
+  done();
+});
+
+test('Postgres: parameterized', async (done) =>
+{
+  expect(
+    (await tasty.getDB().execute([['SELECT * FROM movies WHERE title LIKE $1 AND votecount > $2 AND $3;'], [['Bad%', 20, true]]])).length,
+  ).toBe(23);
+  expect(
+    (await tasty.getDB().execute([['SELECT * FROM movies WHERE title LIKE $1 AND votecount > $2 AND $3;'], [['Bad%', 20, false]]])).length,
+  ).toBe(0);
+  await expect(tasty.getDB().execute([['SELECT * FROM movies WHERE title LIKE $1 AND votecount > $2;'], [['Bad%', 20, 21]]]))
+    .rejects.toThrow();
+  await expect(tasty.getDB().execute([['SELECT * FROM movies WHERE title LIKE $1 AND votecount > $2;'], [['Bad%']]]))
+    .rejects.toThrow();
+  await expect(tasty.getDB().execute([['SELECT * FROM movies WHERE title LIKE $1 AND votecount > $2;'], [['Bad%', 20], []]]))
+    .rejects.toThrow();
   done();
 });
 

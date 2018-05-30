@@ -456,8 +456,8 @@ export default class Templates
       {
         case 'Source':
           {
-            logStream.info(`Processing source node: ${JSON.stringify(node, null, 2)}`);
             const source = template.sources[node.endpoint];
+            logStream.info(`Processing source: ${JSON.stringify(source, null, 2)}`);
             const sourceStream = await getSourceStream(node.endpoint, source, files);
 
             // apply transformations to all of the outgoing edges of the "Source" node and store
@@ -481,7 +481,6 @@ export default class Templates
 
         case 'Sink':
           {
-            logStream.info(`Processing sink node: ${JSON.stringify(node, null, 2)}`);
             const inEdges: any[] = dag.inEdges(nodeId);
             if (inEdges.length > 1)
             {
@@ -491,6 +490,7 @@ export default class Templates
             const e = inEdges[0];
             const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
             const sink = template.sinks[node.endpoint];
+            logStream.info(`Processing sink: ${JSON.stringify(sink, null, 2)}`);
             const sinkStream = await getSinkStream(sink, transformationEngine);
             streamMap[nodeId][nodeId] = streamMap[e.v][nodeId].pipe(sinkStream);
 
@@ -568,7 +568,6 @@ export default class Templates
             }
             const elasticDB: ElasticDB = controller.getTasty().getDB() as ElasticDB;
             const indices = tempIndices.map((i) => i['index']);
-            await elasticDB.refreshIndex(indices);
 
             logStream.info('Finished refreshing temporary indices; now ready for searching / sorting ...');
 

@@ -220,7 +220,7 @@ export class Items
 
       if (item.name !== '')
       {
-        const itemsWithSameName = await this.select([], { name: item.name, type: item.type });
+        const itemsWithSameName = await this.select([], { name: item.name, type: item.type, parent: item.parent });
         const isNameTaken = itemsWithSameName.length !== 0 && (item.id === undefined || itemsWithSameName[0].id !== item.id);
         if (isNameTaken)
         {

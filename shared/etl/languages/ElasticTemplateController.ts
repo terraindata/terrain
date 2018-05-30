@@ -50,30 +50,89 @@ const { List, Map } = Immutable;
 import * as _ from 'lodash';
 
 import { LanguageInterface } from 'shared/etl/languages/LanguageControllers';
+import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
+import { DefaultController } from './DefaultTemplateController';
+
+import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 
-class ElasticController implements LanguageInterface
+class ElasticController extends DefaultController implements LanguageInterface
 {
   public language = Languages.Elastic;
 
+  public isFieldPrimaryKey(engine: TransformationEngine, fieldId: number)
+  {
+    const fieldProps = engine.getFieldProps(fieldId);
+    return fieldProps !== undefined && _.get(fieldProps, [this.language, 'isPrimaryKey']) === true;
+  }
+
+  public canSetPrimaryKey(engine: TransformationEngine, fieldId: number)
+  {
+    const jsType = EngineUtil.getRepresentedType(fieldId, engine);
+    const isRootField = engine.getOutputKeyPath(fieldId).size === 1;
+    return (jsType === 'string' || jsType === 'number') && isRootField;
+  }
+
+  public setFieldPrimaryKey(engine: TransformationEngine, fieldId: number, value: boolean)
+  {
+    let sideEffects = false;
+    const pkeyPath = List([this.language, 'isPrimaryKey']);
+    engine.setFieldProp(fieldId, pkeyPath, value);
+    if (value)
+    {
+      engine.getAllFieldIDs().forEach((id) =>
+      {
+        if (id !== fieldId && engine.getFieldProp(fieldId, pkeyPath) === true)
+        {
+          engine.setFieldProp(id, pkeyPath, false);
+          sideEffects = true;
+        }
+      });
+    }
+    return sideEffects;
+  }
+
   public changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType)
   {
-    const elasticProps = engine.getFieldProp(fieldId, List(['elastic']));
+    const elasticProps = engine.getFieldProp(fieldId, List([this.language]));
     if (elasticProps !== undefined)
     {
       const newProps = _.extend({}, elasticProps, {
         elasticType: ElasticTypes.Auto,
       });
-      engine.setFieldProp(fieldId, List(['elastic']), newProps);
+      engine.setFieldProp(fieldId, List([this.language]), newProps);
     }
+    return false;
+  }
+
+  public verifyMapping(engine: TransformationEngine, sink: SinkConfig, existingMapping?: object): string[]
+  {
+    const mapping = new ElasticMapping(engine);
+    let errors = [];
+
+    if (mapping.getErrors().length > 0)
+    {
+      errors = errors.concat(mapping.getErrors());
+    }
+    if (existingMapping !== undefined && existingMapping[sink.options.table] !== undefined)
+    {
+      const mappingToCompare = { properties: existingMapping[sink.options.table] };
+      const { hasConflicts, conflicts } = ElasticMapping.compareMapping(mapping.getMapping(), mappingToCompare);
+      if (hasConflicts)
+      {
+        errors = errors.concat(conflicts);
+      }
+    }
+
+    return errors;
   }
 }
 

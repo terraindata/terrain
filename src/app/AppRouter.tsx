@@ -59,7 +59,6 @@ import Redirect from './common/components/Redirect';
 import TerrainComponent from './common/components/TerrainComponent';
 import UIComponentsPage from './common/UIComponentsPage';
 import ETLEditorPage from './etl/components/ETLEditorPage';
-import ETLPage from './etl/components/ETLPage';
 import ETLWalkthrough from './etl/walkthrough/components/ETLWalkthrough';
 import FileImport from './fileImport/components/FileImport';
 import Library from './library/components/LibraryDnd';

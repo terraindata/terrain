@@ -157,7 +157,7 @@ class HitsArea extends TerrainComponent<Props>
     this.getNestedFields(this.props);
     this.listenToKeyPath('builder', [['query', 'path', 'source', 'dataSource'],
     ['db', 'name']]);
-    this.listenToKeyPath('query', ['tql', 'inputs', 'resultsConfig', 'algorithmId']);
+    this.listenToKeyPath('query', ['resultsConfig', 'algorithmId']);
   }
 
   public handleConfigChange(config: ResultsConfig, builderActions)

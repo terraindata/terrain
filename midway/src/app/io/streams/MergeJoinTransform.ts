@@ -124,7 +124,6 @@ export default class MergeJoinTransform extends SafeReadable
         this.rightJoinKey = this.leftJoinKey;
       }
     }
-
     if (mergeJoinQuery['leftJoinKey'] === undefined && this.rightJoinKey !== undefined)
     {
       this.leftJoinKey = this.rightJoinKey;
@@ -136,7 +135,6 @@ export default class MergeJoinTransform extends SafeReadable
       throw Error('Only one inner query currently supported for merge joins.');
     }
     this.mergeJoinName = innerQueries[0];
-
     // set up the left source
     const leftQuery = this.setSortClause(query, this.leftJoinKey);
     this.leftSource = new ElasticReader(client, leftQuery, true);
@@ -148,7 +146,10 @@ export default class MergeJoinTransform extends SafeReadable
     this.leftSource.on('end', () => { this.leftEnded = true; this.mergeJoin(); });
 
     // set up the right source
-    delete mergeJoinQuery[this.mergeJoinName]['size'];
+    if (mergeJoinQuery[this.mergeJoinName]['size'] === undefined)
+    {
+      mergeJoinQuery[this.mergeJoinName]['size'] = 2147483647;
+    }
     const rightQuery = this.setSortClause(mergeJoinQuery[this.mergeJoinName], this.rightJoinKey);
     this.rightSource = new ElasticReader(client, rightQuery, true);
     this.rightSource.on('data', (buffer) =>

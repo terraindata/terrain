@@ -160,7 +160,7 @@ export class TemplateProxy
       options.outputKey,
     );
     this.setEdgeTransformations(newEdgeId, newEngine);
-    this.performTypeDetection(newEdgeId);
+    // this.performTypeDetection(newEdgeId);
   }
 
   // delete a source and its node
@@ -196,18 +196,20 @@ export class TemplateProxy
   public createInitialEdgeEngine(edgeId: number, documents: List<object>)
   {
     const { engine, warnings, softWarnings } = EngineUtil.createEngineFromDocuments(documents);
-
     let castStringsToPrimitives = false;
     const fromNode = this.template.getNode(this.template.getEdge(edgeId).from);
     if (fromNode.type === NodeTypes.Source)
     {
       const source = this.template.getSource(fromNode.endpoint);
-      if (source.fileConfig.fileType === FileTypes.Csv || source.fileConfig.fileType === FileTypes.Tsv)
+      if (
+        source.fileConfig.fileType === FileTypes.Csv
+        || source.fileConfig.fileType === FileTypes.Tsv
+        || source.fileConfig.fileType === FileTypes.Xml
+      )
       {
         castStringsToPrimitives = true;
       }
     }
-
     this.setEdgeTransformations(edgeId, engine);
     this.performTypeDetection(edgeId,
       {
@@ -251,8 +253,44 @@ export class TemplateProxy
 
     order = order.bulkAdd(engine.getAllFieldIDs());
     order = order.intersect(engine.getAllFieldIDs().toSet());
-
     this.setFieldOrdering(edgeId, order);
+
+    const toNode = this.template.getNode(this.template.getEdge(edgeId).to);
+    if (toNode !== undefined)
+    {
+      if (toNode.type === NodeTypes.Sink)
+      {
+        this.setSinkFieldOrdering(toNode.endpoint);
+      }
+    }
+  }
+
+  public setSinkFieldOrdering(key: string)
+  {
+    const nodes = this.template.findNodes((n) => n.type === NodeTypes.Sink && n.endpoint === key);
+    if (nodes.size === 0)
+    {
+      throw new Error(`No node corresponds to sink ${key}`);
+    }
+    const nodeId = nodes.get(0);
+    const edges = this.template.findEdges((e) => e.to === nodeId);
+    if (edges.size === 0)
+    {
+      return;
+    }
+    const edgeId = edges.get(0);
+    const order = this.getFieldOrdering(edgeId);
+    const engine = this.template.getEdge(edgeId).transformations;
+    let sink = this.template.getSink(key);
+    if (sink === undefined)
+    {
+      throw new Error(`No sink exists with key ${key}`);
+    }
+    const rootNames = order.ordering
+      .filter((id) => engine.getOutputKeyPath(id).size === 1 && engine.getFieldEnabled(id))
+      .map((id) => engine.getOutputKeyPath(id).last());
+    sink = sink.setIn(['fileConfig', 'fieldOrdering'], rootNames.toArray());
+    this.setSink(key, sink);
   }
 
   // Add automatic type casts to fields, and apply language specific type checking

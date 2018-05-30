@@ -142,6 +142,27 @@ export class Scheduler
     return this._select([], { id, running });
   }
 
+  public async getByTemplate(templateId: number): Promise<SchedulerConfig[]>
+  {
+    const schedules = await this._select([], { shouldRunNext: true });
+    return schedules.filter((schedule) =>
+    {
+      try
+      {
+        const tasks: any[] = JSON.parse(schedule.tasks);
+        return tasks.some((task) =>
+        {
+          return task.params && task.params.options && task.params.options.templateId === templateId;
+        });
+      }
+      catch (e)
+      {
+        winston.warn(e.toString());
+        return false;
+      }
+    });
+  }
+
   public async getLog(id?: number): Promise<object[]>
   {
     return new Promise<object[]>(async (resolve, reject) =>
@@ -178,7 +199,7 @@ export class Scheduler
           id: null,
           logId: null,
           meta: '',
-          name: '', // TODO give this a name if you want
+          name: schedule.name,
           pausedFilename: jobFilename,
           priority: 1,
           running: null,

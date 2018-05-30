@@ -50,13 +50,23 @@ const { List, Map } = Immutable;
 import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-import DefaultLanguageController from './DefaultLanguageController';
-import ElasticController from './ElasticController';
+import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import DefaultTemplateController from './DefaultTemplateController';
+import ElasticTemplateController from './ElasticTemplateController';
 
 export interface LanguageInterface
 {
   language: Languages;
-  changeFieldTypeSideEffects: (engine: TransformationEngine, fieldId: number, newType: ETLFieldTypes) => void;
+  // is this field currently a primary key?
+  isFieldPrimaryKey: (engine: TransformationEngine, fieldId: number) => boolean;
+  // can this field be set to be a primary key?
+  canSetPrimaryKey: (engine: TransformationEngine, fieldId: number) => boolean;
+  // set the field to be a primary key or not. Return true if this operation affected any other fields
+  setFieldPrimaryKey: (engine: TransformationEngine, fieldId: number, value: boolean) => boolean;
+  // if the field changes ETL types, take care of side effects
+  changeFieldTypeSideEffects: (engine: TransformationEngine, fieldId: number, newType: ETLFieldTypes) => boolean;
+  // verify if the sink mapping is compatible. Returns an empty array if there are no issues
+  verifyMapping: (engine: TransformationEngine, sink: SinkConfig, existingMapping?: object) => string[];
 }
 
 export default class LanguageControllers
@@ -66,9 +76,9 @@ export default class LanguageControllers
     switch (language)
     {
       case Languages.Elastic:
-        return ElasticController;
+        return ElasticTemplateController;
       default:
-        return DefaultLanguageController;
+        return DefaultTemplateController;
     }
   }
 }

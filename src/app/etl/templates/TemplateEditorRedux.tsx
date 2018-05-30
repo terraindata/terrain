@@ -59,6 +59,7 @@ import
   EditorDisplayState,
   FetchStatus,
   FieldMap,
+  TempCallback,
   TemplateEditorHistory,
   TemplateEditorState,
 } from 'etl/templates/TemplateEditorTypes';
@@ -131,17 +132,26 @@ export interface TemplateEditorActionTypes
     }>;
   };
   changeLoadingDocuments: {
-    actionType: 'changeLoadingDocuments',
-    increment: boolean,
+    actionType: 'changeLoadingDocuments';
+    increment: boolean;
   };
   setInMergeDocuments: {
-    actionType: 'setInMergeDocuments',
-    key: string,
-    documents: List<object>,
+    actionType: 'setInMergeDocuments';
+    key: string;
+    documents: List<object>;
   };
   deleteInMergeDocuments: {
-    actionType: 'deleteInMergeDocuments',
-    key: string,
+    actionType: 'deleteInMergeDocuments';
+    key: string;
+  };
+  openSettings: {
+    actionType: 'openSettings';
+    fieldId: number;
+    dkp: KeyPath;
+  };
+  registerSettingsCallback: {
+    actionType: 'registerSettingsCallback';
+    callback: TempCallback;
   };
   closeSettings: {
     actionType: 'closeSettings';
@@ -343,7 +353,27 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       },
       closeSettings: (state, action) =>
       {
-        return state.setIn(['uiState', 'settingsFieldId'], null).setIn(['uiState', 'settingsDisplayKeyPath'], null);
+        const newSettingsState = {
+          fieldId: null,
+          dkp: null,
+          closeCallback: null,
+        };
+        return state.setIn(['uiState', 'settingsState'], newSettingsState);
+      },
+      openSettings: (state, action) =>
+      {
+        const settingsState = {
+          fieldId: action.payload.fieldId,
+          dkp: action.payload.dkp,
+        };
+        return state.setIn(['uiState', 'settingsState'], settingsState);
+      },
+      registerSettingsCallback: (state, action) =>
+      {
+        const settingsState = _.extend({}, state.uiState.settingsState, {
+          closeCallback: action.payload.callback,
+        });
+        return state.setIn(['uiState', 'settingsState'], settingsState);
       },
       updateEngineVersion: (state, action) =>
       {
@@ -391,6 +421,31 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
     });
   }
 
+  public openSettings(action: TemplateEditorActionType<'openSettings'>, dispatch, getState)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    this.closeSettings({ actionType: 'closeSettings' }, dispatch, getState);
+
+    directDispatch({
+      actionType: 'openSettings',
+      fieldId: action.fieldId,
+      dkp: action.dkp,
+    });
+  }
+
+  public closeSettings(action: TemplateEditorActionType<'closeSettings'>, dispatch, getState)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const { settingsState } = this._getState(getState).uiState;
+    if (settingsState.closeCallback != null)
+    {
+      settingsState.closeCallback.call();
+    }
+    directDispatch({
+      actionType: 'closeSettings',
+    });
+  }
+
   public overrideAct(action: Unroll<TemplateEditorActionTypes>)
   {
     switch (action.actionType)
@@ -399,6 +454,10 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
         return this.undoHistory.bind(this, action);
       case 'redoHistory':
         return this.redoHistory.bind(this, action);
+      case 'closeSettings':
+        return this.closeSettings.bind(this, action);
+      case 'openSettings':
+        return this.openSettings.bind(this, action);
       default:
         return undefined;
     }

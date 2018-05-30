@@ -78,7 +78,10 @@ import 'etl/templates/components/transformations/TransformationEditor.less';
 const EditIcon = require('images/icon_edit.svg');
 const DeleteIcon = require('images/icon_close.svg');
 
-export type Props = TemplateEditorFieldProps;
+export interface Props extends TemplateEditorFieldProps
+{
+  registerApply: (apply: () => void) => void;
+}
 
 const enum ViewState
 {
@@ -120,6 +123,7 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
           fieldID={this._field().fieldId}
           onClose={this.handleUIClose}
           tryMutateEngine={this.mutateEngine}
+          registerApply={this.props.registerApply}
         />
       );
     }
@@ -278,19 +282,7 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
   {
     GraphHelpers.mutateEngine(tryFn)
       .then(this.handleTransformationChange)
-      .catch(this.handleTransformationError);
-  }
-
-  public handleTransformationError(err: any)
-  {
-    this.props.act({
-      actionType: 'addModal',
-      props: {
-        title: 'Error',
-        message: `Could not edit or add transformation: ${String(err)}`,
-        error: true,
-      },
-    });
+      .catch(this._showError('Could not edit or add transformation'));
   }
 
   public handleTransformationChange(structuralChanges: boolean)
@@ -309,9 +301,6 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
         fieldId,
       });
     }
-    this.props.act({
-      actionType: 'updateEngineVersion',
-    });
   }
 
   public handleEditTransformationFactory(index: number)

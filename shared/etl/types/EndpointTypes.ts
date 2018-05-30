@@ -55,6 +55,7 @@ export interface FileConfig
   jsonNewlines?: boolean;
   xmlPath?: string;
   jsonPath?: string;
+  fieldOrdering?: string[];
 }
 
 export enum Sources
@@ -82,11 +83,11 @@ export const EndpointTypeNames =
   {
     Upload: 'Upload',
     Download: 'Download',
-    Algorithm: 'Algorithm',
+    Algorithm: 'Terrain Algorithm',
     Database: 'Database',
     Sftp: 'SFTP',
     Http: 'HTTP',
-    Fs: 'File System',
+    Fs: 'Local Filesystem',
     Mysql: 'MySQL',
     Postgresql: 'PostgreSQL',
     Magento: 'Magento',
@@ -160,14 +161,10 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
       credentialId: -1,
     },
     GoogleAnalytics: {
-      dayInterval: -1,
+      dayInterval: 30,
     },
     Http: {
       method: 'GET',
-      headers: {
-        contentType: 'application/json',
-      },
-      params: {},
     },
     Fs: {},
     Mysql: {
@@ -183,7 +180,7 @@ export interface SinkOptionsTypes
   };
   Database: {
     language: Languages;
-    serverId: number;
+    serverId: string;
     database: string;
     table: string;
   };
@@ -199,7 +196,7 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
     },
     Database: {
       language: Languages.Elastic,
-      serverId: -1,
+      serverId: '',
       database: '',
       table: '',
     },
@@ -209,10 +206,6 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
     },
     Http: {
       method: 'POST',
-      headers: {
-        contentType: 'application/json',
-      },
-      params: {},
     },
     Fs: {},
   };
@@ -227,14 +220,6 @@ export interface SftpOptions
 export interface HttpOptions
 {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-  headers: {
-    contentType?: string;
-    accept?: string;
-    [k: string]: any;
-  };
-  params: {
-    [k: string]: any;
-  };
 }
 
 export interface GoogleAnalyticsOptions

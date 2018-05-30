@@ -51,6 +51,7 @@ import IntegrationConfig from './IntegrationConfig';
 import { IntegrationPermission, IntegrationPermissionLevels } from './IntegrationPermissionLevels';
 import IntegrationSimpleConfig from './IntegrationSimpleConfig';
 
+import Encryption, { Keys } from 'shared/encryption/Encryption';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import * as Util from '../AppUtil';
@@ -61,8 +62,6 @@ import { versions } from '../versions/VersionRouter';
 export class Integrations
 {
   private integrationTable: Tasty.Table;
-  private key: any;
-  private privateKey: string;
 
   constructor()
   {
@@ -81,14 +80,6 @@ export class Integrations
         'writePermission',
       ],
     );
-
-    // AES 128 requires a key that is 16, 24, or 32 bytes
-    this.privateKey = sha1(`0VAtqVlzusw8nqA8TMoSfGHR3ik3dB-c9t4-gKUjD5iRbsWQWRzeL
-                       -6mBtRGWV4M2A7ZZryVT7-NZjTvzuY7qhjrZdJTv4iGPmcbta-3iL
-                       kgfEzY3QufFvm14dqtzfsCXhboiOC23idadrMNGlQwyJ783XlGwLB
-                       xDeGI01olmhg0oiNCeoGc_4zDrHq3wcgcwQ_mpZYAj9mJsv_OI_yD
-                       iN83Y_gDQCTzA9u3NdmmxquD2jSrR2fSKRokspxqBjb5`).substring(0, 16);
-    this.key = aesjs.utils.utf8.toBytes(this.privateKey);
   }
 
   public async delete(user: UserConfig, id: number): Promise<IntegrationConfig[] | string>
@@ -98,14 +89,18 @@ export class Integrations
       const deletedIntegrations: IntegrationConfig[] = await this.get(user, id);
       if (deletedIntegrations.length === 0)
       {
-        return reject('Integration does not exist.');
+        return reject(new Error('Integration does not exist.'));
       }
       await App.DB.delete(this.integrationTable, { id });
+      deletedIntegrations.forEach((dI, i) =>
+      {
+        deletedIntegrations[i].authConfig = null;
+      });
       return resolve(deletedIntegrations);
     });
   }
 
-  public async get(user: UserConfig, id?: number, type?: string): Promise<IntegrationConfig[]>
+  public async get(user: UserConfig, id?: number, type?: string, dontSanitize?: boolean): Promise<IntegrationConfig[]>
   {
     return new Promise<IntegrationConfig[]>(async (resolve, reject) =>
     {
@@ -116,6 +111,12 @@ export class Integrations
         if (integration.authConfig !== '')
         {
           integration.authConfig = JSON.parse(await this._decrypt(integration.authConfig));
+          // TODO refactor this for full email support
+          if (integration.type === 'Email' && integration.name === 'Default Failure Email'
+            && dontSanitize !== true)
+          {
+            integration.authConfig['password'] = null;
+          }
         }
 
         if (integration.connectionConfig !== '')
@@ -132,6 +133,51 @@ export class Integrations
   {
     const rawIntegrations = await App.DB.select(this.integrationTable, [], { type });
     return rawIntegrations.map((result: object) => new IntegrationSimpleConfig(result));
+  }
+
+  public async initializeDefaultIntegrations(): Promise<void>
+  {
+    const userConfigs: UserConfig[] = await users.get() as UserConfig[];
+    if (userConfigs.length !== 0)
+    {
+      const integration: object =
+        {
+          authConfig:
+            {
+              password: 'S:p3_a:%D~M>mEvRxM$r;y{g"X{5,nA!',
+            },
+          connectionConfig:
+            {
+              customerName: '',
+              email: 'notifications@terraindata.com',
+              port: 465,
+              recipient: 'alerts@terraindata.com',
+              smtp: 'smtp.gmail.com',
+            },
+          createdBy: userConfigs[0].id,
+          meta: '',
+          name: 'Default Failure Email',
+          readPermission: IntegrationPermission.Admin,
+          type: 'Email',
+          lastModified: new Date(),
+          writePermission: IntegrationPermission.Admin,
+        };
+      const integrations: IntegrationSimpleConfig[] = await this.getSimple(null, 'Email');
+      if (integrations.length !== 0)
+      {
+        integrations.forEach((elem) =>
+        {
+          if (elem['name'] === 'Default Failure Email')
+          {
+            integration['id'] = elem['id'];
+          }
+        });
+      }
+
+      integration['authConfig'] = await this._encrypt(JSON.stringify(integration['authConfig'] as string)) as string;
+      integration['connectionConfig'] = JSON.stringify(integration['connectionConfig']);
+      await App.DB.upsert(this.integrationTable, integration);
+    }
   }
 
   public async upsert(user: UserConfig, integration: IntegrationConfig): Promise<IntegrationConfig>
@@ -151,13 +197,24 @@ export class Integrations
         if (integrations.length === 0)
         {
           // integration id specified but integration not found
-          return reject('Invalid integration id passed');
+          return reject(new Error('Invalid integration id passed'));
+        }
+
+        // special case for Default Failure Email:
+        // do not change the password if the integration already exists
+        if (integration.type === 'Email' && integration.name === 'Default Failure Email')
+        {
+          const emailIntegrations: IntegrationConfig[] = await this.get(null, undefined, 'Email', true);
+          if (emailIntegrations.length !== 0)
+          {
+            integration.authConfig = emailIntegrations[0].authConfig;
+          }
         }
 
         const id = integrations[0].id;
         if (id === undefined)
         {
-          return reject('Integration does not have an id');
+          return reject(new Error('Integration does not have an id'));
         }
 
         // insert a version to save the past state of this integration
@@ -213,25 +270,34 @@ export class Integrations
   // use standard AES 128 decryption
   private async _decrypt(msg: string, privateKey?: string): Promise<string>
   {
-    return new Promise<string>(async (resolve, reject) =>
+    return new Promise<string>((resolve, reject) =>
     {
-      const key: any = privateKey !== undefined ? aesjs.utils.utf8.toBytes(privateKey) : this.key;
-      const msgBytes: any = aesjs.utils.hex.toBytes(msg);
-      const aesCtr: any = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-      return resolve(aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes)));
+      if (privateKey === undefined)
+      {
+        return resolve(Encryption.decryptStatic(msg, Keys.Integrations));
+      }
+      else
+      {
+        return resolve(Encryption.decryptAny(msg, privateKey));
+      }
     });
   }
 
   // use standard AES 128 rencryption
   private async _encrypt(msg: string, privateKey?: string): Promise<string>
   {
-    return new Promise<string>(async (resolve, reject) =>
+    return new Promise<string>((resolve, reject) =>
     {
-      const key: any = privateKey !== undefined ? aesjs.utils.utf8.toBytes(privateKey) : this.key;
-      const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
-      const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-      return resolve(aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes)));
+      if (privateKey === undefined)
+      {
+        return resolve(Encryption.encryptStatic(msg, Keys.Integrations));
+      }
+      else
+      {
+        return resolve(Encryption.encryptAny(msg, privateKey));
+      }
     });
+
   }
 }
 

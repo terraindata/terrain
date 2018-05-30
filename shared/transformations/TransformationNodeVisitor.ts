@@ -51,6 +51,7 @@ import DifferenceTransformationNode from 'shared/transformations/nodes/Differenc
 import DivideTransformationNode from 'shared/transformations/nodes/DivideTransformationNode';
 import EncryptTransformationNode from 'shared/transformations/nodes/EncryptTransformationNode';
 import FindReplaceTransformationNode from 'shared/transformations/nodes/FindReplaceTransformationNode';
+import GroupByTransformationNode from 'shared/transformations/nodes/GroupByTransformationNode';
 import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
 import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
 import ProductTransformationNode from 'shared/transformations/nodes/ProductTransformationNode';
@@ -59,15 +60,17 @@ import SetIfTransformationNode from 'shared/transformations/nodes/SetIfTransform
 import SubtractTransformationNode from 'shared/transformations/nodes/SubtractTransformationNode';
 import SumTransformationNode from 'shared/transformations/nodes/SumTransformationNode';
 import ArrayCountTransformationNode from './nodes/ArrayCountTransformationNode';
+import CaseTransformationNode from './nodes/CaseTransformationNode';
 import CastTransformationNode from './nodes/CastTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
+import FilterArrayTransformationNode from './nodes/FilterArrayTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
 import InsertTransformationNode from './nodes/InsertTransformationNode';
 import JoinTransformationNode from './nodes/JoinTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
-import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
+import ZipcodeTransformationNode from './nodes/ZipcodeTransformationNode';
 import TransformationVisitResult from './TransformationVisitResult';
 
 export default abstract class TransformationNodeVisitor
@@ -114,7 +117,7 @@ export default abstract class TransformationNodeVisitor
     return this.visitDefault(node, doc, options);
   }
 
-  public visitUppercaseNode(node: UppercaseTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  public visitCaseNode(node: CaseTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }
@@ -185,6 +188,21 @@ export default abstract class TransformationNodeVisitor
   }
 
   public visitDecryptNode(node: DecryptTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitGroupByNode(node: GroupByTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitFilterArrayNode(node: FilterArrayTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitZipcodeNode(node: ZipcodeTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }

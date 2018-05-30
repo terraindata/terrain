@@ -60,7 +60,7 @@ import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/t
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { AuthConfigType, ConnectionConfigType } from 'shared/etl/types/IntegrationTypes';
-import { _ETLState, ETLState } from './ETLTypes';
+import { _ETLState, ETLState, NotificationState } from './ETLTypes';
 
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
@@ -152,6 +152,10 @@ export interface ETLActionTypes
     templateId: number,
     value: boolean,
   };
+  setFileUploadProgress: {
+    actionType: 'setFileUploadProgress',
+    percent: number,
+  };
   // Integration Action Types
   getIntegrations: {
     actionType: 'getIntegrations',
@@ -192,6 +196,10 @@ export interface ETLActionTypes
   deleteIntegrationSuccess: {
     actionType: 'deleteIntegrationSuccess';
     integrationId: ID;
+  };
+  updateBlockers: {
+    actionType: 'updateBlockers';
+    updater: (block: NotificationState) => NotificationState;
   };
 }
 
@@ -272,6 +280,10 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         return state.update('acknowledgedRuns',
           (runs) => runs.set(action.payload.templateId, action.payload.value));
       },
+      setFileUploadProgress: (state, action) =>
+      {
+        return state.set('fileUploadProgress', action.payload.percent);
+      },
       // overriden reducers
       getIntegrations: (state, action) => state,
       getIntegration: (state, action) => state,
@@ -296,6 +308,10 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       {
         const integration = _IntegrationConfig(action.payload.integration);
         return state.setIn(['integrations', integration.id], integration);
+      },
+      updateBlockers: (state, action) =>
+      {
+        return state.update('blockState', action.payload.updater);
       },
     };
 
@@ -363,7 +379,16 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       key: name,
     });
 
-    ETLAjax.runExecuteJob(action.jobId, action.template, action.files, action.downloadName, action.mimeType)
+    const onProgress = (percent: number) =>
+    {
+      directDispatch({
+        actionType: 'setFileUploadProgress',
+        percent,
+      });
+    };
+
+    ETLAjax.runExecuteJob(action.jobId, action.template, action.files, action.downloadName,
+      action.mimeType, onProgress)
       .then(this.onLoadFactory([action.onLoad], directDispatch, name))
       .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
