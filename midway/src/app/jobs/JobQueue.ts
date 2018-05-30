@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as _ from 'lodash';
 import * as stream from 'stream';
+import * as consume from 'stream-consume';
 import * as winston from 'winston';
 
 import { TaskConfig } from 'shared/types/jobs/TaskConfig';
@@ -515,16 +516,26 @@ export class JobQueue
       resolve();
       jobIdLst.forEach(async (jobId) =>
       {
-        winston.info('about to run job');
-        const jobResult: TaskOutputConfig = await this.runningJobs.get(jobId).run() as TaskOutputConfig;
-        winston.info('finished running job');
-        const jobsFromId: JobConfig[] = await this.get(jobId);
-        const jobStatus: string = jobResult.status === true ? 'SUCCESS' : 'FAILURE';
-        // await this.setJobStatus(jobsFromId[0].id, false, jobStatus);
-        winston.info(`Job result: ${jobResult.status}`);
+        try
+        {
+          const jobResult: TaskOutputConfig = await this.runningJobs.get(jobId).run() as TaskOutputConfig;
+          const jobsFromId: JobConfig[] = await this.get(jobId);
+          const jobStatus: string = jobResult.status === true ? 'SUCCESS' : 'FAILURE';
 
-        const jobLogConfig: JobLogConfig[] = await App.JobL.create(jobId, jobResult['options']['logStream'], jobResult.status, false);
-        await this._setJobLogId(jobId, jobLogConfig[0].id);
+          const jobLogConfig: JobLogConfig[] = await App.JobL.create(jobId, jobResult['options']['logStream'], jobResult.status, false);
+          await this._setJobLogId(jobId, jobLogConfig[0].id);
+          if (jobResult.options.outputStream === null)
+          {
+            await App.JobQ.setJobStatus(jobId, false, 'FAILURE');
+            reject(new Error('Error while running job'));
+          }
+          consume(jobResult.options.outputStream as stream.Readable);
+        }
+        catch (e)
+        {
+          await App.JobQ.setJobStatus(jobId, false, 'FAILURE');
+          reject(new Error('Error while running job'));
+        }
       });
 
     });

@@ -484,14 +484,19 @@
 
 // Nested results styling (can move later)
 .hit-nested-content {
-    position: relative;
-    border-top-right-radius: 4px;
-    border-top-left-radius: 4px;
-    border: 1px solid;
-    ::-webkit-scrollbar {
-        width: 0px;  /* remove scrollbar space */
-        background: transparent;  /* optional: just make scrollbar invisible */
-    }
+  position: relative;
+  border-top-right-radius: 4px;
+  border-top-left-radius: 4px;
+  border: 1px solid;
+  ::-webkit-scrollbar {
+      width: 0px;  /* remove scrollbar space */
+      background: transparent;  /* optional: just make scrollbar invisible */
+  }
+  
+  .expand-icon {
+    top: -7px;
+  }
+  
   .result .result-name .result-name-inner .result-name-label {
     max-width: 167;
     font-size: 12px;
