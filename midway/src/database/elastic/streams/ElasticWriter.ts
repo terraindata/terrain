@@ -220,7 +220,6 @@ export class ElasticWriter extends SafeWritable
 
       this.client.bulk({ body }, callback);
     }
-
   }
 
   private bulkInsert(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
@@ -247,7 +246,6 @@ export class ElasticWriter extends SafeWritable
 
     this.client.bulk({ body }, callback);
   }
-
 }
 
 export default ElasticWriter;
