@@ -457,7 +457,7 @@ export default class EngineUtil
       EngineUtil.interpretTextFields(engine, options.documents);
     }
 
-    const ignoreFields: {[k: number]: boolean} = {};
+    const ignoreFields: { [k: number]: boolean } = {};
     const docs = EngineUtil.preprocessDocuments(options.documents, engine);
     engine.getAllFieldIDs().forEach((id) =>
     {
@@ -721,7 +721,8 @@ export default class EngineUtil
   private static stripMalformedFields(engine: TransformationEngine, doc: object)
   {
     const fieldsToDelete = [];
-    engine.getAllFieldIDs().forEach((id) => {
+    engine.getAllFieldIDs().forEach((id) =>
+    {
       if (EngineUtil.getRepresentedType(id, engine) !== 'object')
       {
         return;
@@ -747,7 +748,8 @@ export default class EngineUtil
         fieldsToDelete.push(id);
       }
     });
-    _.forEach(fieldsToDelete, (id) => {
+    _.forEach(fieldsToDelete, (id) =>
+    {
       engine.deleteField(id);
     });
   }

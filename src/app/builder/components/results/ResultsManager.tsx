@@ -676,6 +676,17 @@ export class ResultsManager extends TerrainComponent<Props>
     {
       hits = this.props.resultsState.hits.concat(hits).toList();
     }
+    // Filter out duplicates
+    const hitIds = [];
+    hits = hits.filter((hit) =>
+    {
+      if (hitIds.indexOf(hit.primaryKey) !== -1)
+      {
+        return false;
+      }
+      hitIds.push(hit.primaryKey);
+      return true;
+    }).toList();
     const changes: any = {
       hits,
       fields: fieldsSet.toList(),
@@ -691,10 +702,17 @@ export class ResultsManager extends TerrainComponent<Props>
 
     if (!resultsState.hasLoadedCount)
     {
-      changes['count'] = Math.min(resultsData.rawResult.hits.total, MAX_HITS);
-      if (querySize !== undefined)
+      if (hits.size < SCROLL_SIZE * this.props.hitsPage)
       {
-        changes['count'] = Math.min(changes['count'], querySize);
+        changes['count'] = hits.size;
+      }
+      else
+      {
+        changes['count'] = Math.min(resultsData.rawResult.hits.total, MAX_HITS);
+        if (querySize !== undefined)
+        {
+          changes['count'] = Math.min(changes['count'], querySize);
+        }
       }
     }
 
