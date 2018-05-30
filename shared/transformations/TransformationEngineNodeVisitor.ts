@@ -65,6 +65,7 @@ import DifferenceTransformationNode from './nodes/DifferenceTransformationNode';
 import DivideTransformationNode from './nodes/DivideTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import EncryptTransformationNode from './nodes/EncryptTransformationNode';
+import FilterArrayTransformationNode from './nodes/FilterArrayTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
 import FindReplaceTransformationNode from './nodes/FindReplaceTransformationNode';
 import GroupByTransformationNode from './nodes/GroupByTransformationNode';
@@ -1159,6 +1160,84 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     return {
       document: doc,
     } as TransformationVisitResult;
+  }
+
+  public visitFilterArrayNode(node: FilterArrayTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.FilterArrayNode>;
+
+    node.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        const newArray = [];
+        for (let i = 0; i < el.length; i++)
+        {
+          let drop = false;
+          if (opts.filterNull && el[i] === null)
+          {
+            drop = true;
+          }
+          if (opts.filterUndefined && el[i] === undefined)
+          {
+            drop = true;
+          }
+          if (!drop)
+          {
+            newArray.push(el[i]);
+          }
+        }
+        yadeep.set(doc, field, newArray, { create: true });
+      }
+      else
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to count a non-array (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+
+    //     node.fields.forEach((field) =>
+    // {
+    //   const el = yadeep.get(doc, field);
+    //   if (Array.isArray(el))
+    //   {
+    //     let sum: number = 0;
+    //     for (let i: number = 0; i < el.length; i++)
+    //     {
+    //       let kpi: KeyPath = field;
+    //       if (kpi.contains('*'))
+    //       {
+    //         kpi = kpi.set(kpi.indexOf('*'), i.toString());
+    //       }
+    //       else
+    //       {
+    //         kpi = kpi.push(i.toString());
+    //       }
+    //       sum += yadeep.get(doc, kpi);
+    //     }
+    //     yadeep.set(doc, opts.newFieldKeyPaths.get(0), sum, { create: true });
+    //   }
+    //   else
+    //   {
+    //     return {
+    //       errors: [
+    //         {
+    //           message: 'Attempted to sum a non-array (this is not supported)',
+    //         } as TransformationVisitError,
+    //       ],
+    //     } as TransformationVisitResult;
+    //   }
+    // });
   }
 
   public visitZipcodeNode(node: ZipcodeTransformationNode, doc: object, options: object = {}): TransformationVisitResult

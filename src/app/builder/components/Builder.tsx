@@ -202,7 +202,7 @@ class Builder extends TerrainComponent<Props>
   {
     for (const key in nextProps)
     {
-     if (this.props[key] !== nextProps[key])
+      if (this.props[key] !== nextProps[key])
       {
         return true;
       }

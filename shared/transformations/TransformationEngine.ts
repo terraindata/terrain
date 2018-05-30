@@ -702,7 +702,15 @@ export class TransformationEngine
     // const arrayKey: any = [key.toString()];
     // const arrayID: number = this.addField(currentKeyPath.push(arrayKey), 'array');
     // console.log('x2 ' + currentKeyPath.push(key.toString()));
-    let arrayType = arrayTypeOfValues(obj[key]);
+    let arrayType;
+    try
+    {
+      arrayType = arrayTypeOfValues(obj[key]);
+    }
+    catch (e)
+    {
+      // todo log?
+    }
     if (arrayType === undefined)
     {
       arrayType = null;

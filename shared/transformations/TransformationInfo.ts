@@ -53,6 +53,7 @@ import DifferenceTransformationNode from './nodes/DifferenceTransformationNode';
 import DivideTransformationNode from './nodes/DivideTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import EncryptTransformationNode from './nodes/EncryptTransformationNode';
+import FilterArrayTransformationNode from './nodes/FilterArrayTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
 import FindReplaceTransformationNode from './nodes/FindReplaceTransformationNode';
 import HashTransformationNode from './nodes/HashTransformationNode';
@@ -594,6 +595,27 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitGroupByNode(transformationNode, docCopy, options),
+        newFieldType: 'array',
+      },
+    [TransformationNodeType.FilterArrayNode]:
+      {
+        humanName: 'Filter Array',
+        editable: true,
+        creatable: true,
+        description: `Filter an array on its values`,
+        type: ArrayCountTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitFilterArrayNode(transformationNode, docCopy, options),
         newFieldType: 'array',
       },
     [TransformationNodeType.ZipcodeNode]:
