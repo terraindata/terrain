@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+//tslint:disable:strict-boolean-expressions
 
 import AnalyticsSelector from 'analytics/components/AnalyticsSelector';
 import Loading from 'common/components/Loading';
