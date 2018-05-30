@@ -561,9 +561,12 @@ export class RouteSelector extends TerrainComponent<Props>
             ]
           }
           {
-            <div
-              className='routeselector-options-gradient'
-            />
+            optionSet.options.size !== 0 ?
+              <div
+                className='routeselector-options-gradient'
+              />
+              :
+              null
           }
         </div>
       </div>

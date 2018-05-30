@@ -678,7 +678,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       if (t === FieldType.Date)
       {
         const valueString = String(value || '');
-        const date = Util.formatInputDate(new Date(valueString), 'elastic');
+        const date = Util.formatInputDate(valueString, 'elastic');
         if (date)
         {
           value = date;
@@ -738,7 +738,7 @@ export function getCustomValueDisplayName(filterLine: FilterLine, value, setInde
       {
         return '';
       }
-      return Util.formatDate(value, true);
+      return value;
     case FieldType.Geopoint:
       value = _DistanceValue(Util.asJS(value));
       return value.distance + ' ' + units[value.units] + ' of ' + value.address;
