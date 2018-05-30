@@ -75,7 +75,7 @@ class ElasticClient
     // https://github.com/elasticsearch/elasticsearch-js/issues/33
     this.config = JSON.parse(JSON.stringify(config));
     this.controller.setStatus(DatabaseControllerStatus.CONNECTING);
-    this.delegate = new Elastic.Client(_.extend(this.config, { apiVersion: '5.5' }));
+    this.delegate = new Elastic.Client(_.extend(this.config));
 
     this.cluster = new ElasticCluster(controller, this.delegate);
     this.indices = new ElasticIndices(controller, this.delegate);
