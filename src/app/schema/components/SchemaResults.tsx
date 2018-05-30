@@ -52,6 +52,7 @@ import BackendInstance from '../../../database/types/BackendInstance';
 import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
+import { _Path } from 'app/builder/components/pathfinder/PathfinderTypes';
 import bodybuilder = require('bodybuilder');
 import * as PropTypes from 'prop-types';
 import Util from 'util/Util';
@@ -62,7 +63,6 @@ import HitsArea from '../../builder/components/results/HitsArea';
 import { ResultsManager } from '../../builder/components/results/ResultsManager';
 import { _ResultsState, ResultsState } from '../../builder/components/results/ResultTypes';
 import InfoArea from '../../common/components/InfoArea';
-import { _Path } from 'app/builder/components/pathfinder/PathfinderTypes';
 export interface Props
 {
   servers: SchemaTypes.ServerMap;
@@ -147,7 +147,7 @@ class SchemaResults extends TerrainComponent<Props>
                 .size(100)
                 .build(),
             );
-             path = path.setIn(['source, dataSource', 'index'], selectedItem['name']);
+            path = path.setIn(['source', 'dataSource', 'index'], selectedItem['name']);
             break;
           case 'table':
             queryString = JSON.stringify(
@@ -158,7 +158,7 @@ class SchemaResults extends TerrainComponent<Props>
                 .size(100)
                 .build(),
             );
-            path = path.setIn(['source, dataSource', 'index'],
+            path = path.setIn(['source', 'dataSource', 'index'],
               selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', ''));
             break;
           case 'column':
@@ -171,7 +171,7 @@ class SchemaResults extends TerrainComponent<Props>
                 .size(100)
                 .build(),
             );
-            path = path.setIn(['source, dataSource', 'index'],
+            path = path.setIn(['source', 'dataSource', 'index'],
               selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', ''));
             break;
         }
@@ -198,7 +198,7 @@ class SchemaResults extends TerrainComponent<Props>
           source: 'm2',
           type: 'elastic',
         });
-        resultsQuery = resultsQuery.set('tql', queryString);
+        resultsQuery = resultsQuery.set('tql', queryString).set('path', path);
         resultsQuery = resultsQuery.set('parseTree', AllBackendsMap['elastic'].parseQuery(resultsQuery));
 
         const resultsErrorMessage = null;

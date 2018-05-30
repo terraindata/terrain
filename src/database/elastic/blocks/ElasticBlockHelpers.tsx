@@ -232,7 +232,6 @@ export const ElasticBlockHelpers = {
     }
     if (!builderState.query && !overrideIndex)
     {
-      console.log('no query!');
       return '';
     }
     const { source } = builderState.query.path;
@@ -243,10 +242,10 @@ export const ElasticBlockHelpers = {
     {
       return undefined;
     }
-    const server = builderState.db.name;
     if (index !== null)
     {
-      const indexId = `${builderState.db.name}/${String(index)}`;
+      const server = builderState.db.name || builderState.query.db.name;
+      const indexId = `${server}/${String(index)}`;
       const fields = schemaState.columns.filter(
         (column) => column.serverId === String(server) &&
           column.databaseId === String(indexId),
