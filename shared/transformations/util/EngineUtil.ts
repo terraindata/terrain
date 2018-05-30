@@ -305,6 +305,11 @@ export default class EngineUtil
       if (EngineUtil.isAValidField(unhashedPath, pathTypes))
       {
         let fieldType = pathTypes[hashedPath];
+        if (fieldType === null)
+        {
+          fieldType = 'string';
+        }
+
         let valueType = pathValueTypes[hashedPath];
         if (valueType !== undefined)
         {
@@ -586,7 +591,7 @@ export default class EngineUtil
     documents.forEach((doc, i) =>
     {
       const e: TransformationEngine = new TransformationEngine(doc);
-      // EngineUtil.stripMalformedFields(e, doc); // is pretty slow, any better ways?
+      EngineUtil.stripMalformedFields(e, doc, pathTypes); // is pretty slow, any better ways?
       const fieldIds = e.getAllFieldIDs();
 
       fieldIds.forEach((id, j) =>
@@ -718,7 +723,10 @@ export default class EngineUtil
   }
 
   // remove fields that the engine thinks are object but are actually null
-  private static stripMalformedFields(engine: TransformationEngine, doc: object)
+  private static stripMalformedFields(
+    engine: TransformationEngine,
+    doc: object,
+    pathTypes: PathHashMap<FieldTypes>)
   {
     const fieldsToDelete = [];
     engine.getAllFieldIDs().forEach((id) => {
@@ -748,7 +756,13 @@ export default class EngineUtil
       }
     });
     _.forEach(fieldsToDelete, (id) => {
+      const deIndexedPath = EngineUtil.turnIndicesIntoValue(engine.getOutputKeyPath(id), '*');
+      const path = EngineUtil.hashPath(deIndexedPath);
       engine.deleteField(id);
+      if (pathTypes[path] === undefined)
+      {
+        pathTypes[path] = null;
+      }
     });
   }
 
