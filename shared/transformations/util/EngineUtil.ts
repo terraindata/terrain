@@ -564,6 +564,7 @@ export default class EngineUtil
     documents.forEach((doc, i) =>
     {
       const e: TransformationEngine = new TransformationEngine(doc);
+      EngineUtil.stripMalformedFields(e, doc); // is pretty slow, any better ways?
       const fieldIds = e.getAllFieldIDs();
 
       fieldIds.forEach((id, j) =>
@@ -692,6 +693,22 @@ export default class EngineUtil
       }
     });
     return values;
+  }
+
+  // remove nulls and undefineds
+  private static stripMalformedFields(engine: TransformationEngine, doc: object)
+  {
+    const fieldsToDelete = [];
+    engine.getAllFieldIDs().forEach((id) => {
+      const value = yadeep.get(doc, engine.getOutputKeyPath(id));
+      if (value === null || value === undefined)
+      {
+        fieldsToDelete.push(id);
+      }
+    });
+    _.forEach(fieldsToDelete, (id) => {
+      engine.deleteField(id);
+    });
   }
 
   // attempt to convert fields from text and guess if they should be numbers or booleans
