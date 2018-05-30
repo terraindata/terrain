@@ -59,6 +59,7 @@ import * as yadeep from '../util/yadeep';
 import AddTransformationNode from './nodes/AddTransformationNode';
 import ArrayCountTransformationNode from './nodes/ArrayCountTransformationNode';
 import ArraySumTransformationNode from './nodes/ArraySumTransformationNode';
+import CaseTransformationNode from './nodes/CaseTransformationNode';
 import CastTransformationNode from './nodes/CastTransformationNode';
 import DecryptTransformationNode from './nodes/DecryptTransformationNode';
 import DifferenceTransformationNode from './nodes/DifferenceTransformationNode';
@@ -81,7 +82,6 @@ import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import SubtractTransformationNode from './nodes/SubtractTransformationNode';
 import SumTransformationNode from './nodes/SumTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
-import CaseTransformationNode from './nodes/CaseTransformationNode';
 import ZipcodeTransformationNode from './nodes/ZipcodeTransformationNode';
 import TransformationNodeType, { NodeOptionsType } from './TransformationNodeType';
 import TransformationNodeVisitor from './TransformationNodeVisitor';
@@ -558,7 +558,8 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
       else
       {
-        switch (opts.format) {
+        switch (opts.format)
+        {
           case 'uppercase':
             yadeep.set(doc, kp, el.toUpperCase());
             break;
@@ -567,7 +568,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
             break;
           case 'titlecase':
             yadeep.set(doc, kp, el.toLowerCase().replace(/[^\s_\-/]*/g, (word) =>
-              word.replace(/./, (ch) => ch.toUpperCase())
+              word.replace(/./, (ch) => ch.toUpperCase()),
             ));
             break;
           case 'camelcase':
