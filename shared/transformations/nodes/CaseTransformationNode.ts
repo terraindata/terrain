@@ -55,7 +55,7 @@ export default class CaseTransformationNode extends TransformationNode
   public constructor(id: number,
     fields: List<KeyPath>,
     options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.UppercaseNode)
+    typeCode: TransformationNodeType = TransformationNodeType.CaseNode)
   {
     super(id, fields, options, typeCode);
   }
