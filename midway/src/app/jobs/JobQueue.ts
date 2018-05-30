@@ -495,7 +495,6 @@ export class JobQueue
 
           const jobCreationStatus: boolean | string = newJob.create(newJobTasks, 'some random filename');
           winston.info('created job');
-          console.log('newJobTasks: ', JSON.stringify(newJobTasks, null, 2));
           if (typeof jobCreationStatus === 'string' || (jobCreationStatus as boolean) !== true)
           {
             winston.warn('Error while creating job: ' + (jobCreationStatus as string));
