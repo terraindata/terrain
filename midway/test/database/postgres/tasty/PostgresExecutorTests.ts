@@ -140,6 +140,23 @@ test('Postgres: transactions', async (done) =>
   done();
 });
 
+test('Postgres: parameterized', async (done) =>
+{
+  expect(
+    (await tasty.getDB().execute([['SELECT * FROM movies WHERE title LIKE $1 AND votecount > $2 AND $3;'], [['Bad%', 20, true]]])).length,
+  ).toBe(23);
+  expect(
+    (await tasty.getDB().execute([['SELECT * FROM movies WHERE title LIKE $1 AND votecount > $2 AND $3;'], [['Bad%', 20, false]]])).length,
+  ).toBe(0);
+  await expect(tasty.getDB().execute([['SELECT * FROM movies WHERE title LIKE $1 AND votecount > $2;'], [['Bad%', 20, 21]]]))
+    .rejects.toThrow();
+  await expect(tasty.getDB().execute([['SELECT * FROM movies WHERE title LIKE $1 AND votecount > $2;'], [['Bad%']]]))
+    .rejects.toThrow();
+  await expect(tasty.getDB().execute([['SELECT * FROM movies WHERE title LIKE $1 AND votecount > $2;'], [['Bad%', 20], []]]))
+    .rejects.toThrow();
+  done();
+});
+
 afterAll(async () =>
 {
   try

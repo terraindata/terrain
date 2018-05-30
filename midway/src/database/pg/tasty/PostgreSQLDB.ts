@@ -93,7 +93,7 @@ export class PostgreSQLDB implements TastyDB
    *
    * Can also use undefined if there are no values e.g.
    * `[[queryString1, queryString2], undefined]` instead of
-   * `[[queryString1, queryString2], [[], []]]]`
+   * `[[queryString1, queryString2], [[], []]]`
    * @returns {Promise<Array>} appended result objects
    */
   public async execute(query: [string[], any[][]], handle?: TransactionHandle): Promise<object[]>
