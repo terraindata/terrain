@@ -94,7 +94,6 @@ export class JobLog
 
       const upsertedJobLogs: JobLogConfig[] = await App.DB.upsert(this.jobLogTable, newJobLog) as JobLogConfig[];
       resolve(upsertedJobLogs);
-
       const updatedContentJobLog: JobLogConfig = upsertedJobLogs[0];
       let jobStatusMsg: string = 'SUCCESS';
       try
@@ -113,8 +112,12 @@ export class JobLog
         if (Array.isArray(e['logs']))
         {
           updatedContentJobLog.contents = e['logs'].join('\n');
-          await App.DB.upsert(this.jobLogTable, updatedContentJobLog);
         }
+        else
+        {
+          updatedContentJobLog.contents = e.toString();
+        }
+        await App.DB.upsert(this.jobLogTable, updatedContentJobLog);
         jobStatusMsg = 'FAILURE';
         await App.JobQ.setJobStatus(jobId, false, jobStatusMsg);
       }

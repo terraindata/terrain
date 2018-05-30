@@ -67,6 +67,7 @@ export default class ProgressStream extends Transform
       allowHalfOpen: true,
       readableObjectMode: false,
       writableObjectMode: true,
+      highWaterMark: writer.writableHighWaterMark,
     });
 
     this.frequency = frequency;
@@ -103,11 +104,13 @@ export default class ProgressStream extends Transform
     const done = new EventEmitter();
     done.on('done', callback);
 
+    // this.writer.cork();
     chunks.forEach((c) => this._write(c.chunk, c.encoding, (err?: Error) =>
     {
       if (--numChunks === 0)
       {
-        done.emit('done', err);
+        // this.writer.uncork();
+        done.emit('done');
       }
     }));
   }
