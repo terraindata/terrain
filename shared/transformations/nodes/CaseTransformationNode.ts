@@ -50,12 +50,12 @@ import { KeyPath } from '../../util/KeyPath';
 import TransformationNodeType from '../TransformationNodeType';
 import TransformationNode from './TransformationNode';
 
-export default class UppercaseTransformationNode extends TransformationNode
+export default class CaseTransformationNode extends TransformationNode
 {
   public constructor(id: number,
     fields: List<KeyPath>,
     options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.UppercaseNode)
+    typeCode: TransformationNodeType = TransformationNodeType.CaseNode)
   {
     super(id, fields, options, typeCode);
   }

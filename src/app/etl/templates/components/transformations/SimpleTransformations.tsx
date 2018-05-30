@@ -63,6 +63,7 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 import * as Immutable from 'immutable';
+import { CaseFormats } from '../../../../../../shared/etl/types/ETLTypes';
 const { List, Map } = Immutable;
 
 type SubstringOptions = NodeOptionsType<TransformationNodeType.SubstringNode>;
@@ -94,12 +95,24 @@ export class SubstringTFF extends TransformationForm<SubstringOptions, Transform
   }
 }
 
-type UppercaseOptions = NodeOptionsType<TransformationNodeType.UppercaseNode>;
-export class UppercaseTFF extends TransformationForm<UppercaseOptions, TransformationNodeType.UppercaseNode>
+type CaseOptions = NodeOptionsType<TransformationNodeType.CaseNode>;
+export class CaseTFF extends TransformationForm<CaseOptions, TransformationNodeType.CaseNode>
 {
-  protected readonly type = TransformationNodeType.UppercaseNode;
-  protected readonly inputMap: InputDeclarationMap<UppercaseOptions> = {};
-  protected readonly initialState = {};
+  protected readonly type = TransformationNodeType.CaseNode;
+  protected readonly inputMap: InputDeclarationMap<CaseOptions> = {
+    format: {
+      type: DisplayType.Pick,
+      displayName: 'Format',
+      options: {
+        pickOptions: (s) => List<string>(Object.keys(CaseFormats)),
+        indexResolver: (value) => List<string>(Object.keys(CaseFormats)).indexOf(value),
+        displayNames: (s) => Map<string, string>(_.zipObject(Object.keys(CaseFormats), _.values(CaseFormats))),
+      },
+    },
+  };
+  protected readonly initialState = {
+    format: 'uppercase',
+  };
 }
 
 type HashOptions = NodeOptionsType<TransformationNodeType.HashNode>;

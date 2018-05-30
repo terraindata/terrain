@@ -47,6 +47,7 @@ THE SOFTWARE.
 import AddTransformationNode from './nodes/AddTransformationNode';
 import ArrayCountTransformationNode from './nodes/ArrayCountTransformationNode';
 import ArraySumTransformationNode from './nodes/ArraySumTransformationNode';
+import CaseTransformationNode from './nodes/CaseTransformationNode';
 import CastTransformationNode from './nodes/CastTransformationNode';
 import DecryptTransformationNode from './nodes/DecryptTransformationNode';
 import DifferenceTransformationNode from './nodes/DifferenceTransformationNode';
@@ -68,7 +69,6 @@ import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import SubtractTransformationNode from './nodes/SubtractTransformationNode';
 import SumTransformationNode from './nodes/SumTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
-import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
 import ZipcodeTransformationNode from './nodes/ZipcodeTransformationNode';
 import { TransformationEngine } from './TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from './TransformationNodeType';
@@ -218,22 +218,22 @@ const TransformationNodeInfo: AllNodeInfoType =
           options: object) =>
           visitor.visitInsertNode(transformationNode, docCopy, options),
       },
-    [TransformationNodeType.UppercaseNode]:
+    [TransformationNodeType.CaseNode]:
       {
-        humanName: 'Uppercase',
+        humanName: 'Change Case',
         editable: true,
         creatable: true,
-        description: 'Make all the text in this field uppercase',
+        description: 'Change case for text fields (e.g. lowercase, uppercase)',
         isAvailable: (engine, fieldId) =>
         {
           return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
         },
-        type: UppercaseTransformationNode,
+        type: CaseTransformationNode,
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,
           options: object) =>
-          visitor.visitUppercaseNode(transformationNode, docCopy, options),
+          visitor.visitCaseNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.SubstringNode]:
       {
