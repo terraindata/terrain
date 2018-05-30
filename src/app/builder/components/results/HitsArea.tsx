@@ -200,18 +200,21 @@ class HitsArea extends TerrainComponent<Props>
 
   public getNestedFields(props: Props, overrideConfig?)
   {
+    console.log('get nested fields!!!');
     // Get the fields that are nested
     const { builder, schema, resultsState } = props;
     let nestedFields = resultsState.fields.filter((field) =>
     {
       const type = ElasticBlockHelpers.getTypeOfField(
         schema,
-        builder,
+        builder.query ? builder : builder.set('query', props.query),
         field,
         true,
       );
+      console.log('Field: ', field, 'Type', type);
       return type === 'nested' || type === '';
     }).toList();
+    console.log('nested fields are', nestedFields.toJS());
     // Filter out anything that it is a single object, not a list of objects
     if (resultsState.hits && resultsState.hits.size)
     {

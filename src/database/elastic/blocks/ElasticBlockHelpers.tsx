@@ -230,8 +230,9 @@ export const ElasticBlockHelpers = {
       }
       return FieldType.Text;
     }
-    if (!builderState.query)
+    if (!builderState.query && !overrideIndex)
     {
+      console.log('no query!');
       return '';
     }
     const { source } = builderState.query.path;
