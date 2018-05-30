@@ -457,23 +457,27 @@ export default class EngineUtil
       EngineUtil.interpretTextFields(engine, options.documents);
     }
 
+    const ignoreFields: {[k: number]: boolean} = {};
     const docs = EngineUtil.preprocessDocuments(options.documents, engine);
     engine.getAllFieldIDs().forEach((id) =>
     {
+      if (ignoreFields[id])
+      {
+        return;
+      }
       const ikp = engine.getInputKeyPath(id);
       const okp = engine.getOutputKeyPath(id);
-
-      const values = EngineUtil.getValuesToAnalyze(docs, okp);
 
       const repType = EngineUtil.getRepresentedType(id, engine);
 
       if (repType === 'string')
       {
+        const values = EngineUtil.getValuesToAnalyze(docs, okp);
         const type = TypeUtil.getCommonETLStringType(values);
         EngineUtil.changeFieldType(engine, id, type);
         if (type === ETLFieldTypes.GeoPoint)
         {
-          EngineUtil.castField(engine, id, ETLFieldTypes.Object);
+          EngineUtil.castField(engine, id, ETLFieldTypes.GeoPoint);
           const latField = EngineUtil.addFieldToEngine(engine, ikp.push('lat'), ETLFieldTypes.Number);
           const longField = EngineUtil.addFieldToEngine(engine, ikp.push('lon'), ETLFieldTypes.Number);
           engine.setOutputKeyPath(latField, okp.push('lat')); // refactor to use synthetic util?
@@ -489,8 +493,26 @@ export default class EngineUtil
       }
       else if (repType === 'number')
       {
+        const values = EngineUtil.getValuesToAnalyze(docs, okp);
         const type = TypeUtil.getCommonETLNumberType(values);
         EngineUtil.changeFieldType(engine, id, type);
+      }
+      else if (repType === 'object')
+      {
+        const values = EngineUtil.getValuesToAnalyze(docs, okp);
+        if (TypeUtil.areValuesGeoPoints(values))
+        {
+          EngineUtil.changeFieldType(engine, id, ETLFieldTypes.GeoPoint);
+          EngineUtil.castField(engine, id, ETLFieldTypes.GeoPoint);
+          const latId = engine.getOutputFieldID(okp.push('lat'));
+          const lonId = engine.getOutputFieldID(okp.push('lon'));
+          EngineUtil.changeFieldType(engine, latId, ETLFieldTypes.Number);
+          EngineUtil.changeFieldType(engine, lonId, ETLFieldTypes.Number);
+          EngineUtil.castField(engine, latId, ETLFieldTypes.Number);
+          EngineUtil.castField(engine, lonId, ETLFieldTypes.Number);
+          ignoreFields[latId] = true;
+          ignoreFields[lonId] = true;
+        }
       }
       else
       {
@@ -563,6 +585,17 @@ export default class EngineUtil
     const pathValueTypes: PathHashMap<FieldTypes> = {};
     documents.forEach((doc, i) =>
     {
+      // if (doc['searchHistory'])
+      // {
+      //   if (Array.isArray(doc['searchHistory']))
+      //   {
+      //     for (const history of doc['searchHistory'])
+      //     {
+      //       console.log(history['searchMinBedrooms']);
+      //     }
+      //   }
+      // }
+
       const e: TransformationEngine = new TransformationEngine(doc);
       EngineUtil.stripMalformedFields(e, doc); // is pretty slow, any better ways?
       const fieldIds = e.getAllFieldIDs();
@@ -695,13 +728,32 @@ export default class EngineUtil
     return values;
   }
 
-  // remove nulls and undefineds
+  // remove fields that the engine thinks are object but are actually null
   private static stripMalformedFields(engine: TransformationEngine, doc: object)
   {
     const fieldsToDelete = [];
     engine.getAllFieldIDs().forEach((id) => {
+      if (EngineUtil.getRepresentedType(id, engine) !== 'object')
+      {
+        return;
+      }
       const value = yadeep.get(doc, engine.getOutputKeyPath(id));
-      if (value === null || value === undefined)
+      if (Array.isArray(value))
+      {
+        let allNull = true;
+        for (const val of value)
+        {
+          if (val !== null && value !== undefined)
+          {
+            allNull = false;
+          }
+        }
+        if (allNull)
+        {
+          fieldsToDelete.push(id);
+        }
+      }
+      else if (value === null || value === undefined)
       {
         fieldsToDelete.push(id);
       }
