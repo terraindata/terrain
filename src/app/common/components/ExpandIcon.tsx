@@ -43,8 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import Colors, { backgroundColor } from 'app/colors/Colors';
+import Colors, { fontColor } from 'app/colors/Colors';
 import * as classNames from 'classnames';
+import * as Radium from 'radium';
 import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './ExpandIcon.less';
@@ -53,33 +54,37 @@ export interface Props
 {
   open: boolean;
   onClick: () => void;
+  small?: boolean;
 }
 
+@Radium
 class ExpandIcon extends TerrainComponent<Props>
 {
   public render()
   {
-    const barStyle = backgroundColor(Colors().active);
     return (
       <div
         className={classNames({
           'expand-icon': true,
-          'expand-icon-open': this.props.open,
+          'expand-icon-small': this.props.small,
         })}
         onClick={this.props.onClick}
       >
         <div
-          className='expand-icon-line'
-          style={barStyle}
-        />
-        <div
-          className='expand-icon-line expand-icon-line-middle'
-          style={barStyle}
-        />
-        <div
-          className='expand-icon-line'
-          style={barStyle}
-        />
+          className={classNames({
+            'expand-icon-inner': true,
+            'expand-icon-inner-open': this.props.open,
+          })}
+          onClick={this.props.onClick}
+          style={fontColor(Colors().active, Colors().activeHover)}
+        >
+          <div
+            className='expand-icon-line expand-icon-line-first'
+          />
+          <div
+            className='expand-icon-line expand-icon-line-second'
+          />
+        </div>
       </div>
     );
   }

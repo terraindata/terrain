@@ -1,17 +1,61 @@
+@import "../../common/Common.less";
+
 .expand-icon {
   cursor: pointer;
-  .expand-icon-line {
-    width: 14px;
-    height: 1px;
-    transition: margin .2s ease-in-out;
-    &.expand-icon-line-middle {
-      margin-top: 3px;
-      margin-bottom: 3px;
+  
+  @outer-width: 28px;
+  width: @outer-width;
+  height: @outer-width;
+  position: relative;
+  
+  .expand-icon-inner {
+    position: absolute;
+    
+    // center within container
+    top: 5px;
+    left: 2px;
+    
+    @w: 16px;
+    @h: 2px;
+    width: @w;
+    height: @w;
+    
+    .rotate(-45deg);
+    
+    .transition;
+    
+    .expand-icon-line {
+      position: absolute;
+      background: currentColor;
+    }
+    
+    .expand-icon-line-first {
+      // .rotate(45deg);
+      top: 0px;
+      right: 0px;    
+      width: @h;
+      height: @w;
+    }
+    
+    .expand-icon-line-second {
+      // .rotate(135deg);
+      bottom: 0px;
+      right: 0px; 
+      width: @w;
+      height: @h;
+    }
+
+    &.expand-icon-inner-open {
+      .rotate(45deg);
+      
+      // center within container
+      top: 0px;
+      left: 6px;
+    
     }
   }
-  &.expand-icon-open {.expand-icon-line-middle {
-      margin-top: 6px;
-      margin-bottom: 6px;
-    }
+  
+  &.expand-icon-small {
+    transform: scale(0.7);
   }
 }
