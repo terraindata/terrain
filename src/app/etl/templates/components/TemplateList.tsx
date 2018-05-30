@@ -252,10 +252,11 @@ class TemplateList extends TerrainComponent<Props>
     this.props.etlAct({
       actionType: 'addModal',
       props: {
-        title: 'Confirm Action',
+        title: 'Delete Template',
         message: 'Are you sure you want to delete this template?',
         closeOnConfirm: true,
         confirm: true,
+        confirmButtonText: 'Delete',
         onConfirm,
       },
     });
