@@ -248,6 +248,7 @@ class HitComponent extends TerrainComponent<Props> {
                 NestedState.Expanded : NestedState.Normal,
               field,
             )}
+            small={true}
           />
           <div
             className='hit-nested-content-title'
