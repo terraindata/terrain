@@ -585,19 +585,8 @@ export default class EngineUtil
     const pathValueTypes: PathHashMap<FieldTypes> = {};
     documents.forEach((doc, i) =>
     {
-      // if (doc['searchHistory'])
-      // {
-      //   if (Array.isArray(doc['searchHistory']))
-      //   {
-      //     for (const history of doc['searchHistory'])
-      //     {
-      //       console.log(history['searchMinBedrooms']);
-      //     }
-      //   }
-      // }
-
       const e: TransformationEngine = new TransformationEngine(doc);
-      EngineUtil.stripMalformedFields(e, doc); // is pretty slow, any better ways?
+      // EngineUtil.stripMalformedFields(e, doc); // is pretty slow, any better ways?
       const fieldIds = e.getAllFieldIDs();
 
       fieldIds.forEach((id, j) =>
