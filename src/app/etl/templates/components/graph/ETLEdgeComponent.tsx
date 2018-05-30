@@ -196,6 +196,10 @@ class ETLEdgeComponent extends TerrainComponent<Props>
   {
     const onConfirm = () =>
     {
+      this.props.act({
+        actionType: 'setFieldMap',
+        fieldMap: Map(),
+      });
       GraphHelpers.createEngineForSourceEdge(this.props.edgeId);
     };
     this.props.act({
