@@ -337,19 +337,22 @@ class Library extends TerrainComponent<any>
 
     const hasPinnedAlgorithms = pinnedAlgorithms.valueSeq().includes(true);
     const { params } = router;
-
     const datasets = this.getDatasets();
 
     const categoryId = params.categoryId ? +params.categoryId : null;
-    const groupId = params.groupId ? +params.groupId : null;
+    let groupId = params.groupId ? +params.groupId : null;
+    if (groupId === null)
+    {
+      groupId = categories.get(categoryId).groupsOrder.first() ?
+        +categories.get(categoryId).groupsOrder.first() : null;
+      params['groupId'] = groupId;
+    }
     const algorithmId = params.algorithmId ? +params.algorithmId : null;
-
     const category: LibraryTypes.Category = categoryId !== null ? categories.get(categoryId) : undefined;
     const group: LibraryTypes.Group = groupId !== null ? groups.get(groupId) : undefined;
     const algorithm: LibraryTypes.Algorithm = algorithmId !== null ? algorithms.get(algorithmId) : undefined;
     const groupsOrder: List<ID> = category !== undefined ? category.groupsOrder : undefined;
     const algorithmsOrder: List<ID> = group !== undefined ? group.algorithmsOrder : undefined;
-
     if (!!this.props.location.pathname)
     {
       saveLastRoute(basePath, this.props.location);
