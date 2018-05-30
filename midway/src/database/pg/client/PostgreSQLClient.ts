@@ -136,9 +136,9 @@ class PostgreSQLClient
   {
     const client = await this.delegate.connect();
     const handle = this.nextTransactionIndex;
+    this.nextTransactionIndex++;
     this.controller.log('PostgreSQLClient.startTransaction (transaction ' + handle.toString() + ')');
     this.transactionClients[handle] = client;
-    this.nextTransactionIndex++;
     return handle;
   }
 
