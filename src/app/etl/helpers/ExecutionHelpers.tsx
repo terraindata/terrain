@@ -266,6 +266,10 @@ class ExecutionHelpers extends ETLHelpers
         props: {
           message: `"${templateName}" finished running`,
           title: 'Task Complete',
+          cancelButtonText: 'OK',
+          confirm: true,
+          confirmButtonText: 'View Jobs',
+          onConfirm: ETLRouteUtil.gotoJobs,
         },
       });
       this.schemaAct({

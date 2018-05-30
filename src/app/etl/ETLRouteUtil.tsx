@@ -70,6 +70,11 @@ export default class ETLRouteUtil
     browserHistory.push(`/data/templates/edit/templateId=${templateId}`);
   }
 
+  public static gotoJobs()
+  {
+    browserHistory.push(`/data/jobs/`);
+  }
+
   public static isRouteNewTemplate(location)
   {
     return location.pathname === '/data/templates/edit/new';
