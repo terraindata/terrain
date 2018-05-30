@@ -202,15 +202,7 @@ class Builder extends TerrainComponent<Props>
   {
     for (const key in nextProps)
     {
-      if (key === 'builder')
-      {
-        // TODO: Look into why === causes unnecessary rerenders
-        if (!_.isEqual(this.props.builder, nextProps.builder))
-        {
-          return true;
-        }
-      }
-      else if (this.props[key] !== nextProps[key])
+     if (this.props[key] !== nextProps[key])
       {
         return true;
       }
