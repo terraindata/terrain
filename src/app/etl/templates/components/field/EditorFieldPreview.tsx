@@ -142,14 +142,11 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     return LanguageController.get(language).isFieldPrimaryKey(this._currentEngine(), this.props.fieldId);
   }
 
-  public render()
+  @instanceFnDecorator(memoizeOne)
+  public getLabelStyle(settingsOpen: boolean, canEdit: boolean, isWildcard: boolean)
   {
-    const { canEdit, preview, labelOverride, labelOnly } = this.props;
-    const field = this._field();
-    const settingsOpen = this._settingsAreOpen();
-
-    let labelStyle;
-    if (field.isWildcardField())
+    let labelStyle = {};
+    if (isWildcard)
     {
       labelStyle = settingsOpen ?
         fontColor(Colors().active, Colors().active)
@@ -163,7 +160,22 @@ class EditorFieldPreview extends TemplateEditorField<Props>
         :
         fontColor(Colors().text2, Colors().text1);
     }
+    if (!canEdit)
+    {
+      labelStyle = _.extend({}, labelStyle, {
+        opacity: 0.5,
+      });
+    }
+    return labelStyle;
+  }
 
+  public render()
+  {
+    const { canEdit, preview, labelOverride, labelOnly } = this.props;
+    const field = this._field();
+    const settingsOpen = this._settingsAreOpen();
+
+    const labelStyle = this.getLabelStyle(settingsOpen, canEdit && this._field().isIncluded, field.isWildcardField());
     let previewText: string = preview == null ? 'N/A' : preview.toString();
     if (previewText.length >= MAX_STRING_LENGTH)
     {

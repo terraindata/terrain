@@ -300,8 +300,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
       return null;
     }
 
-    const style = (canEdit === true && field.isIncluded === false) ?
-      getStyle('opacity', '0.5') : {};
+    const style = {};
 
     const content = this.renderRow();
     const showSettings = this._settingsAreOpen();
