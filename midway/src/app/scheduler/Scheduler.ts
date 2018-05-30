@@ -286,7 +286,7 @@ export class Scheduler
         {
           return reject(new Error('Schedule name and cron must be provided.'));
         }
-        const currIntervalCronDate = cronParser.parseExpression(schedule.cron);
+        const currIntervalCronDate = cronParser.parseExpression(schedule.cron, { tz: 'America/Los_Angeles' });
 
         schedule.createdAt = creationDate;
         schedule.createdBy = user !== undefined ? user.id : -1;
@@ -359,7 +359,7 @@ export class Scheduler
         {
           const lastRun = new Date(schedule.lastRun);
           const currTime = new Date(new Date().valueOf() + 1000);
-          const currIntervalCronDate = cronParser.parseExpression(schedule.cron);
+          const currIntervalCronDate = cronParser.parseExpression(schedule.cron, { tz: 'America/Los_Angeles' });
           const prevInterval = currIntervalCronDate.prev().toDate();
 
           if (prevInterval.valueOf() > lastRun.valueOf() && currTime.valueOf() > lastRun.valueOf()

@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as classNames from 'classnames';
+import * as cronParser from 'cron-parser';
 import { List } from 'immutable';
 import { noop } from 'lodash';
 import * as React from 'react';
@@ -60,6 +61,7 @@ import
   canParseCRONSchedule, parseCRONDaySchedule, parseCRONHourSchedule, setCRONDays,
   setCRONHours, setCRONType,
 } from 'shared/util/CRONParser';
+import Util from 'util/Util';
 import { borderColor, Colors, getStyle } from './../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './CRONEditorStyle.less';
@@ -91,6 +93,22 @@ class CRONEditor extends TerrainComponent<Props>
         {
           this.renderCustom()
         }
+        <div className='note'>
+          Note: All times are PDT
+        </div>
+        <div className='note'>
+          Schedule will next be executed:
+        </div>
+        <div className='note cron-editor-bottom-note'>
+          <b>
+            {
+              Util.formatDate(
+                cronParser.parseExpression(this.props.cron, { tz: 'America/Los_Angeles' }).next().toString(),
+                true,
+              )
+            }
+          </b>
+        </div>
       </div>
     );
   }
