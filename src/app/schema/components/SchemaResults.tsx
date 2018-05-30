@@ -135,7 +135,7 @@ class SchemaResults extends TerrainComponent<Props>
               bodybuilder()
                 .rawOption('query', { bool: {} })
                 .from(0)
-                .size(100)
+                .size(20)
                 .build(),
             );
             break;
@@ -144,7 +144,7 @@ class SchemaResults extends TerrainComponent<Props>
               bodybuilder()
                 .filter('term', '_index', selectedItem['name'])
                 .from(0)
-                .size(100)
+                .size(20)
                 .build(),
             );
             path = path.setIn(['source', 'dataSource', 'index'], selectedItem['name']);
@@ -155,7 +155,7 @@ class SchemaResults extends TerrainComponent<Props>
                 .filter('term', '_index', selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', ''))
                 .filter('term', '_type', selectedItem['name'])
                 .from(0)
-                .size(100)
+                .size(20)
                 .build(),
             );
             path = path.setIn(['source', 'dataSource', 'index'],
@@ -168,7 +168,7 @@ class SchemaResults extends TerrainComponent<Props>
                 .filter('term', '_index', selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', ''))
                 .filter('term', '_type', selectedItem['tableId'].replace(selectedItem['databaseId'] + '.', ''))
                 .from(0)
-                .size(100)
+                .size(20)
                 .build(),
             );
             path = path.setIn(['source', 'dataSource', 'index'],
