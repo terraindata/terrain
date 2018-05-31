@@ -53,6 +53,7 @@ import { List } from 'immutable';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
+import Pagination from 'react-js-pagination';
 
 import './SimpleTable.less';
 
@@ -77,20 +78,9 @@ export interface Props
 
 export interface State
 {
-  visibleRowCount: number;
+  activePage: number;
   orderedData: Immutable.List<any>;
 }
-
-const ShowMore = (props) =>
-{
-  return (
-    <tr>
-      <td style={{ textAlign: 'center' }} colSpan={props.colSpan}>
-        <Button text='+ Show More' onClick={props.onClick} />
-      </td>
-    </tr>
-  );
-};
 
 export class SimpleTable extends TerrainComponent<Props>
 {
@@ -105,10 +95,10 @@ export class SimpleTable extends TerrainComponent<Props>
   {
     super(props);
 
-    const { displayRowCount, data, defaultOrder } = props;
+    const { data, defaultOrder } = props;
 
     this.state = {
-      visibleRowCount: displayRowCount,
+      activePage: 1,
       orderedData: this.orderData(
         data,
         defaultOrder.columnKey,
@@ -126,10 +116,6 @@ export class SimpleTable extends TerrainComponent<Props>
     } = nextProps;
 
     const { defaultOrder, data } = this.props;
-
-    this.setState({
-      visibleRowCount: displayRowCount,
-    });
 
     const defaultOrderChanged = nextDefaultOrder.columnKey !== defaultOrder.columnKey ||
       nextDefaultOrder.direction !== defaultOrder.direction;
@@ -169,18 +155,11 @@ export class SimpleTable extends TerrainComponent<Props>
     return columnWidths;
   }
 
-  public handleShowMoreClick()
+  public handlePageChange(pageNumber: number)
   {
     const { displayRowCount, data } = this.props;
-    const { visibleRowCount } = this.state;
     const dataValuesCount = data.valueSeq().count();
-
-    if (visibleRowCount < dataValuesCount)
-    {
-      this.setState((state: State) =>
-        ({ visibleRowCount: state.visibleRowCount + displayRowCount }),
-      );
-    }
+    this.setState({ activePage: pageNumber });
   }
 
   public renderValue(colKey, rowData)
@@ -225,11 +204,11 @@ export class SimpleTable extends TerrainComponent<Props>
 
   public render()
   {
-    const { columnsConfig } = this.props;
-    const { visibleRowCount, orderedData } = this.state;
+    const { displayRowCount, columnsConfig } = this.props;
+    const { activePage, orderedData } = this.state;
 
     const columnKeys = columnsConfig.map((config) => config.columnKey);
-    const visibleDataValues = orderedData.take(visibleRowCount);
+    const visibleDataValues = orderedData.slice((activePage - 1) * displayRowCount, activePage * displayRowCount);
 
     return (
       <table className='simple-table'>
@@ -284,11 +263,22 @@ export class SimpleTable extends TerrainComponent<Props>
               )
           }
           {
-            orderedData.count() > visibleRowCount ?
-              <ShowMore
-                colSpan={columnKeys.length}
-                onClick={this.handleShowMoreClick}
-              /> : null
+            orderedData.count() > displayRowCount ?
+              <tr style={{ align: 'right' }} className='simple-table-row'>
+                <td colSpan={columnKeys.length} className='simple-table-cell'>
+                  <Pagination
+                    prevPageText='prev'
+                    nextPageText='next'
+                    firstPageText='first'
+                    lastPageText='last'
+                    activePage={this.state.activePage}
+                    itemsCountPerPage={displayRowCount}
+                    totalItemsCount={orderedData.count()}
+                    pageRangeDisplayed={5}
+                    onChange={this.handlePageChange}
+                  />
+                </td>
+              </tr> : null
           }
         </tbody>
       </table>
