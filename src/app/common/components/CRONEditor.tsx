@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as classNames from 'classnames';
+import * as cronParser from 'cron-parser';
 import { List } from 'immutable';
 import { noop } from 'lodash';
 import * as React from 'react';
@@ -60,6 +61,7 @@ import
   canParseCRONSchedule, parseCRONDaySchedule, parseCRONHourSchedule, setCRONDays,
   setCRONHours, setCRONType,
 } from 'shared/util/CRONParser';
+import Util from 'util/Util';
 import { borderColor, Colors, getStyle } from './../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './CRONEditorStyle.less';
@@ -76,6 +78,8 @@ export interface Props
   onChange: (cron: string) => void;
 }
 
+const timezoneOffsetHours = (new Date()).getTimezoneOffset() / 60 - 420 / 60;
+
 class CRONEditor extends TerrainComponent<Props>
 {
   public render()
@@ -91,6 +95,27 @@ class CRONEditor extends TerrainComponent<Props>
         {
           this.renderCustom()
         }
+        <div className='note'>
+          Note: All times are in Pacific (Los Angeles)
+        </div>
+        {
+          timezoneOffsetHours !== 0 &&
+          <div className='note'>
+            Tip: Your local time is {Math.abs(timezoneOffsetHours)}
+            {timezoneOffsetHours < 0 ? ' ahead ' : ' behind '}
+            of Pacific time, so adjust your local time by {timezoneOffsetHours} hours.
+            </div>
+        }
+        <div className='note'>
+          Schedule will next be executed:
+        </div>
+        <div className='note cron-editor-bottom-note'>
+          <b>
+            {
+              cronParser.parseExpression(this.props.cron, { tz: 'America/Los_Angeles' }).next().toDate().toString()
+            }
+          </b>
+        </div>
       </div>
     );
   }
