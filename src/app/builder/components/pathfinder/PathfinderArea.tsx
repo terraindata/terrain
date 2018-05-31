@@ -58,12 +58,12 @@ import BuilderActions from 'app/builder/data/BuilderActions';
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { ColorsState } from 'app/colors/data/ColorsTypes';
 import FadeInOut from 'app/common/components/FadeInOut';
-import TerrainTools from 'util/TerrainTools';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import { BuilderState } from 'builder/data/BuilderState';
 import * as TerrainLog from 'loglevel';
 import withScrolling, { createHorizontalStrength, createVerticalStrength } from 'react-dnd-scrollzone';
 import { SchemaState } from 'schema/SchemaTypes';
+import TerrainTools from 'util/TerrainTools';
 import Util from 'util/Util';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
@@ -340,12 +340,12 @@ class PathfinderArea extends TerrainComponent<Props>
           </FadeInOut>
           {
             TerrainTools.isFeatureEnabled(TerrainTools.PATHFINDER_COPY) &&
-              <input
-                type='text'
-                className='path-copy-paste-inputarea'
-                value={pathString}
-                onChange={this.handlePastePathString as any}
-              />
+            <input
+              type='text'
+              className='path-copy-paste-inputarea'
+              value={pathString}
+              onChange={this.handlePastePathString as any}
+            />
           }
         </div>
       </ScrollingComponent>
