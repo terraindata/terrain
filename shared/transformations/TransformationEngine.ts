@@ -892,7 +892,7 @@ export class TransformationEngine
           const x = yadeep.get(output, value);
           if (x === null)
           {
-            yadeep.set(output, value, [], {create: true});
+            yadeep.set(output, value, [], { create: true });
           }
           else
           {
