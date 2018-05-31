@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:strict-boolean-expressions
 
 import AnalyticsSelector from 'analytics/components/AnalyticsSelector';
 import Loading from 'common/components/Loading';
@@ -337,19 +338,22 @@ class Library extends TerrainComponent<any>
 
     const hasPinnedAlgorithms = pinnedAlgorithms.valueSeq().includes(true);
     const { params } = router;
-
     const datasets = this.getDatasets();
 
     const categoryId = params.categoryId ? +params.categoryId : null;
-    const groupId = params.groupId ? +params.groupId : null;
-    const algorithmId = params.algorithmId ? +params.algorithmId : null;
-
     const category: LibraryTypes.Category = categoryId !== null ? categories.get(categoryId) : undefined;
+    let groupId = params.groupId ? +params.groupId : null;
+    if (groupId === null && !singleColumn)
+    {
+      groupId = (category && category.groupsOrder && category.groupsOrder.first()) ?
+        +category.groupsOrder.first() : null;
+      params['groupId'] = groupId;
+    }
+    const algorithmId = params.algorithmId ? +params.algorithmId : null;
     const group: LibraryTypes.Group = groupId !== null ? groups.get(groupId) : undefined;
     const algorithm: LibraryTypes.Algorithm = algorithmId !== null ? algorithms.get(algorithmId) : undefined;
     const groupsOrder: List<ID> = category !== undefined ? category.groupsOrder : undefined;
     const algorithmsOrder: List<ID> = group !== undefined ? group.algorithmsOrder : undefined;
-
     if (!!this.props.location.pathname)
     {
       saveLastRoute(basePath, this.props.location);
