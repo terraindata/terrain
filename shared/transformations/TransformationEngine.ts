@@ -890,8 +890,15 @@ export class TransformationEngine
         if (this.fieldTypes.get(key) === 'array' && !value.includes('*'))
         {
           const x = yadeep.get(output, value);
-          x['length'] = Object.keys(x).length;
-          yadeep.set(output, value, Array.prototype.slice.call(x), { create: true });
+          if (x === null)
+          {
+            yadeep.set(output, value, [], {create: true});
+          }
+          else
+          {
+            x['length'] = Object.keys(x).length;
+            yadeep.set(output, value, Array.prototype.slice.call(x), { create: true });
+          }
         }
       }
     });
