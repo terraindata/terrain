@@ -222,9 +222,11 @@ class AccountDropdown extends TerrainComponent<Props>
     const user = users.users.get(users.currentUser.id);
     const src: string = UserTypes.profileUrlFor(user);
     let displayName;
-    if (user.name === '' || user.name == undefined) {
+    if (user.name === '' || user.name === undefined)
+    {
       displayName = user.email;
-    } else {
+    } else
+    {
       displayName = user.name;
     }
     return (

@@ -52,7 +52,6 @@ import ElasticDB from '../database/elastic/tasty/ElasticDB';
 import DatabaseRegistry from '../databaseRegistry/DatabaseRegistry';
 
 const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeName: string, primaryKeyType: string) => [
-  `DROP TABLE schedules;`,
   `CREATE TABLE IF NOT EXISTS versions
     (id ` + primaryKeyType + ` PRIMARY KEY,
      objectType text NOT NULL,
