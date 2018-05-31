@@ -76,6 +76,7 @@ class TerrainTools
   public static ANALYTICS = 'analytics';
   public static ADVANCED_RESULTS = 'advanced_results';
   public static OPERATORS = 'operators';
+  public static PATHFINDER_COPY = 'pathfinder_copy';
 
   public static terrainStoreLogger = TerrainStoreLogger;
   public static terrainStore = TerrainStore;
