@@ -60,7 +60,6 @@ import TerrainComponent from './common/components/TerrainComponent';
 import UIComponentsPage from './common/UIComponentsPage';
 import ETLEditorPage from './etl/components/ETLEditorPage';
 import ETLWalkthrough from './etl/walkthrough/components/ETLWalkthrough';
-import FileImport from './fileImport/components/FileImport';
 import Library from './library/components/LibraryDnd';
 import ManualWrapper from './manual/components/ManualWrapper';
 import SchemaPage from './schema/components/SchemaPage';
@@ -139,8 +138,6 @@ class AppRouter extends TerrainComponent<{}> {
           <Route path='/browser/:a/:b/:c' component={Redirect} />
 
           <Route path='/schema' component={SchemaPage} />
-
-          <Route path='/import' component={FileImport /*TODO get rid of this once ETL is merged*/} />
 
           <Route path='/data' component={DataTabs}>
             <IndexRedirect to='/data/templates' />

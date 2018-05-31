@@ -50,7 +50,6 @@ import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import { applyMiddleware, createStore } from 'redux';
 import logger from 'redux-logger';
-import { _FileImportState, FileImportState } from '../../fileImport/FileImportTypes';
 import { CardItem } from '../components/cards/CardComponent';
 import { _ResultsState, ResultsState } from '../components/results/ResultTypes';
 import { BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes } from './BuilderActionTypes';
@@ -60,7 +59,6 @@ import { Cards } from '../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import BackendInstance from '../../../database/types/BackendInstance';
 import Query from '../../../items/types/Query';
-import { Template, Transform } from '../../fileImport/FileImportTypes';
 
 export class BuilderStateClass
 {
@@ -93,7 +91,6 @@ export class BuilderStateClass
   public isDirty: boolean = false;
 
   public resultsState: ResultsState = _ResultsState();
-  public exportState: FileImportState = _FileImportState();
 
   public modelVersion = 3;
 }

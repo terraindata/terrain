@@ -63,7 +63,6 @@ import Query from '../../../../items/types/Query';
 import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import InfoArea from '../../../common/components/InfoArea';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import { FileImportState } from '../../../fileImport/FileImportTypes';
 import AggregationsArea from './AggregationsArea';
 import HitsArea from './HitsArea';
 import { MAX_HITS, ResultsState } from './ResultTypes';
