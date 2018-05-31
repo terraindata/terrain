@@ -342,7 +342,8 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     };
 
     const shouldShowValue = this.shouldShowValue();
-    const valueOptions = shouldShowValue ? this.props.valueOptions : List<RouteSelectorOption>();
+    const valueOptions = shouldShowValue && COMPARISONS_WITHOUT_OPTIONS.indexOf(filterLine.comparison) === -1
+      ? this.props.valueOptions : List<RouteSelectorOption>();
     let valueHeader = '';
 
     if (filterLine.field && !filterLine.comparison)
@@ -725,6 +726,12 @@ export const COMPARISONS_WITHOUT_VALUES = [
   'notexists',
 ];
 
+export const COMPARISONS_WITHOUT_OPTIONS = [
+  'datebefore',
+  'dateafter',
+  'located',
+];
+
 export function getCustomValueDisplayName(filterLine: FilterLine, value, setIndex: number)
 {
   if (COMPARISONS_WITHOUT_VALUES.indexOf(filterLine.comparison) !== -1)
@@ -738,7 +745,7 @@ export function getCustomValueDisplayName(filterLine: FilterLine, value, setInde
       {
         return '';
       }
-      return value;
+      return Util.formatDate(value, true);
     case FieldType.Geopoint:
       value = _DistanceValue(Util.asJS(value));
       return value.distance + ' ' + units[value.units] + ' of ' + value.address;
