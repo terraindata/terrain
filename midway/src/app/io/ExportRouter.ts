@@ -60,6 +60,7 @@ const Router = new KoaRouter();
 // export const exprt: Export = new Export();
 export const exprtTypes: ExportTypes = new ExportTypes();
 const perm: Permissions = new Permissions();
+export const initialize = () => {};
 
 Router.use('/templates', ExportTemplateRouter.routes(), ExportTemplateRouter.allowedMethods());
 

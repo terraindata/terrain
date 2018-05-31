@@ -54,6 +54,7 @@ export default class TastyTableState
   public tableName: string;
   public columns: Map<string, TastyColumn>;
   public primaryKeys: string[];
+  public columnNamesUnsorted: string[];
   public columnNames: string[]; // sorted list of columns
   public columnMapping: object; // ES mapping format
   public primaryKeyDelimiter: string;
@@ -67,7 +68,8 @@ export default class TastyTableState
     this.tableName = name;
     this.columns = new Map();
     this.primaryKeys = primaryKeys;
-    this.columnNames = columns.concat(primaryKeys).sort();
+    this.columnNamesUnsorted = primaryKeys.concat(columns);
+    this.columnNames = primaryKeys.concat(columns).sort();
     this.columnMapping = columnMapping;
     this.primaryKeyDelimiter = primaryKeyDelimiter;
   }

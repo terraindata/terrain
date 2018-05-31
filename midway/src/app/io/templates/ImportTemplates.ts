@@ -59,23 +59,6 @@ export class ImportTemplates
 
   constructor()
   {
-    this.importTemplateTable = new Tasty.Table(
-      'importTemplates',
-      ['id'],
-      [
-        'columnTypes',
-        'dbid',
-        'dbname',
-        'name',
-        'originalNames',
-        'persistentAccessToken',
-        'primaryKeyDelimiter',
-        'primaryKeys',
-        'requireJSONHaveAllFields',
-        'tablename',
-        'transformations',
-      ],
-    );
   }
 
   public async delete(user: UserConfig, id: number): Promise<ImportTemplateConfig[]>

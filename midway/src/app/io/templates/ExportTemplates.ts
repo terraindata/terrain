@@ -60,24 +60,6 @@ export class ExportTemplates
 
   constructor()
   {
-    this.exportTemplateTable = new Tasty.Table(
-      'exportTemplates',
-      ['id'],
-      [
-        'columnTypes',
-        'dbid',
-        'dbname',
-        'name',
-        'objectKey',
-        'originalNames',
-        'persistentAccessToken',
-        'primaryKeyDelimiter',
-        'primaryKeys',
-        'rank',
-        'tablename',
-        'transformations',
-      ],
-    );
   }
 
   public async delete(user: UserConfig, id: number): Promise<ExportTemplateConfig[]>

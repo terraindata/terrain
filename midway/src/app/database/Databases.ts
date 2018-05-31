@@ -60,21 +60,9 @@ export class Databases
 {
   private databaseTable: Tasty.Table;
 
-  constructor()
+  public initialize()
   {
-    this.databaseTable = new Tasty.Table(
-      'databases',
-      ['id'],
-      [
-        'name',
-        'type',
-        'dsn',
-        'host',
-        'isAnalytics',
-        'analyticsIndex',
-        'analyticsType',
-      ],
-    );
+    this.databaseTable = App.TBLS.databases;
   }
 
   public async delete(user: UserConfig, id: number): Promise<object>

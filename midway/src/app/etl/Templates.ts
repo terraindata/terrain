@@ -78,24 +78,9 @@ export default class Templates
 {
   private templateTable: Tasty.Table;
 
-  constructor()
+  public initialize()
   {
-    this.templateTable = new Tasty.Table(
-      'templates',
-      ['id'],
-      [
-        'createdAt',
-        'lastModified',
-        'archived',
-        'templateName',
-        'process',
-        'sources',
-        'sinks',
-        'settings',
-        'meta',
-        'uiData',
-      ],
-    );
+    this.templateTable = App.TBLS.templates;
   }
 
   public async get(id?: number): Promise<TemplateConfig[]>

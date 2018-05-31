@@ -56,6 +56,7 @@ import ResultsConfigConfig from './ResultsConfigConfig';
 
 const Router = new KoaRouter();
 export const resultsConfig = new ResultsConfig();
+export const initialize = () => resultsConfig.initialize();
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {

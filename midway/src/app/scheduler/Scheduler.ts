@@ -69,27 +69,10 @@ export class Scheduler
   private runningSchedules: Map<number, Job>;
   private schedulerTable: Tasty.Table;
 
-  constructor()
+  public initialize()
   {
     this.runningSchedules = new Map<number, Job>();
-    this.schedulerTable = new Tasty.Table(
-      'schedules',
-      ['id'],
-      [
-        'createdAt',
-        'createdBy',
-        'cron',
-        'lastModified',
-        'lastRun',
-        'meta',
-        'name',
-        'priority',
-        'running',
-        'shouldRunNext',
-        'tasks',
-        'workerId',
-      ],
-    );
+    this.schedulerTable = App.TBLS.schedules;
   }
 
   public async initializeScheduler(): Promise<void>

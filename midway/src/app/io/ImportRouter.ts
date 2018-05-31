@@ -61,6 +61,7 @@ const Router = new KoaRouter();
 export const imprt: Import = new Import();
 const perm: Permissions = new Permissions();
 const sources = new Sources();
+export const initialize = () => {};
 
 Router.use('/templates', ImportTemplateRouter.routes(), ImportTemplateRouter.allowedMethods());
 
