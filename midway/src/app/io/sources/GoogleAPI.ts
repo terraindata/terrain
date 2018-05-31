@@ -51,7 +51,7 @@ import * as winston from 'winston';
 
 import { CredentialConfig } from '../../credentials/CredentialConfig';
 import Credentials from '../../credentials/Credentials';
-import CSVExportTransform from '../streams/CSVExportTransform';
+import CSVTransform from '../streams/CSVTransform';
 
 export const credentials: Credentials = new Credentials();
 export const request = googleoauthjwt.requestWithJWT();
@@ -114,7 +114,18 @@ export class GoogleAPI
       }
       const currDate: any = new Date(Date.now() - 1000 * 3600 * 24);
       // @ts-ignore
-      const padDate = (str: string): string => str.padStart(2, '0');
+      const padDate = (str: string): string =>
+      {
+        const fullLength: number = 2;
+        if (str.length < fullLength)
+        {
+          for (let i = 0; i < fullLength - str.length; ++i)
+          {
+            str = '0' + str;
+          }
+        }
+        return str;
+      };
       const startDate: any = new Date(currDate - 1000 * 3600 * 24 * dayInterval);
       const currDateStr = (currDate.getFullYear().toString() as string) + '-'
         + (padDate((currDate.getMonth() as number + 1).toString()) as string) + '-'
@@ -168,8 +179,10 @@ export class GoogleAPI
                 {
                   colNames.push(entity['name']);
                 });
-                writeStream = new CSVExportTransform(colNames);
+                writeStream = CSVTransform.createExportStream();
               }
+
+              writeStream.write(colNames);
               const rows: object[] = report['data']['rows'];
               // Add a full streaming implementation instead of dumping rows to an array
               if (Array.isArray(rows))
@@ -256,10 +269,10 @@ export class GoogleAPI
   {
     return new Promise<stream.Readable>(async (resolve, reject) =>
     {
-      const writer = new CSVExportTransform(values[0]);
+      const writer = CSVTransform.createExportStream();
       if (values.length > 0)
       {
-        for (let i = 1; i < values.length; ++i)
+        for (let i = 0; i < values.length; ++i)
         {
           writer.write(_.zipObject(values[0], values[i]));
         }

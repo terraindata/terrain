@@ -44,53 +44,146 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable no-unused-expression
+import { List } from 'immutable';
+import { DateFormats } from 'shared/etl/types/ETLTypes';
+import { KeyPath } from 'shared/util/KeyPath';
+
 enum TransformationNodeType
 {
-  LoadNode = 'LoadNode',
-  StoreNode = 'StoreNode',
-  PutNode = 'PutNode',
-  GetNode = 'GetNode',
   SplitNode = 'SplitNode',
   JoinNode = 'JoinNode',
   FilterNode = 'FilterNode',
   DuplicateNode = 'DuplicateNode',
-  PlusNode = 'PlusNode',
-  PrependNode = 'PrependNode',
-  AppendNode = 'AppendNode',
-  UppercaseNode = 'UppercaseNode',
+  InsertNode = 'InsertNode',
+  CaseNode = 'CaseNode',
   SubstringNode = 'SubstringNode',
+  CastNode = 'CastNode',
+  HashNode = 'HashNode',
+  AddNode = 'AddNode',
+  SubtractNode = 'SubtractNode',
+  MultiplyNode = 'MultiplyNode',
+  DivideNode = 'DivideNode',
+  SetIfNode = 'SetIfNode',
+  FindReplaceNode = 'FindReplaceNode',
+  ArraySumNode = 'ArraySumNode',
+  ArrayCountNode = 'ArrayCountNode',
+  ProductNode = 'ProductNode',
+  QuotientNode = 'QuotientNode',
+  SumNode = 'SumNode',
+  DifferenceNode = 'DifferenceNode',
+  EncryptNode = 'EncryptNode',
+  DecryptNode = 'DecryptNode',
+  GroupByNode = 'GroupByNode',
+  FilterArrayNode = 'FilterArrayNode',
+  ZipcodeNode = 'ZipcodeNode',
 }
 
 // if this has errors, double check TransformationNodeType's keys are equal to its values
 type AssertEnumValuesEqualKeys = {
   [K in keyof typeof TransformationNodeType]: K
 };
+// noinspection BadExpressionStatementJS
 TransformationNodeType as AssertEnumValuesEqualKeys;
 
 // if this has errors, double check TransformationOptionTypes has a key for every TransformationNodeType
+// noinspection JSUnusedLocalSymbols
 type AssertOptionTypesExhaustive = {
   [K in TransformationNodeType]: TransformationOptionTypes[K]
 };
 
 interface TransformationOptionTypes
 {
-  LoadNode: any;
-  StoreNode: any;
-  PutNode: any;
-  GetNode: any;
-  SplitNode: any;
-  JoinNode: any;
+  SplitNode: {
+    newFieldKeyPaths: List<KeyPath>;
+    preserveOldFields: boolean;
+    delimiter: string | number;
+    regex: boolean;
+  };
+  JoinNode: {
+    newFieldKeyPaths: List<KeyPath>;
+    preserveOldFields: boolean;
+    delimiter: string;
+  };
   FilterNode: any;
-  DuplicateNode: any;
-  PlusNode: any;
-  PrependNode: any;
-  AppendNode: any;
-  UppercaseNode: {
-
+  DuplicateNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  InsertNode: {
+    at?: number;
+    value: string | KeyPath;
+  };
+  CaseNode: {
+    format: string;
   };
   SubstringNode: {
     from: number;
     length: number;
+  };
+  CastNode: {
+    toTypename: string;
+    format?: DateFormats;
+  };
+  HashNode: {
+    salt: string;
+  };
+  AddNode: {
+    shift: number;
+  };
+  SubtractNode: {
+    shift: number;
+  };
+  MultiplyNode: {
+    factor: number;
+  };
+  DivideNode: {
+    factor: number;
+  };
+  SetIfNode: {
+    filterNull: boolean;
+    filterNaN: boolean;
+    filterStringNull: boolean;
+    filterUndefined: boolean;
+    filterValue: any | undefined;
+    newValue: any;
+  };
+  FindReplaceNode: {
+    find: string;
+    replace: string;
+    regex: boolean;
+  };
+  ArraySumNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  ArrayCountNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  ProductNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  QuotientNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  SumNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  DifferenceNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  EncryptNode: {
+  };
+  DecryptNode: {
+  };
+  GroupByNode: {
+    newFieldKeyPaths: List<KeyPath>;
+    subkey: string;
+    groupValues: any[];
+  };
+  FilterArrayNode: {
+    filterNull: boolean;
+    filterUndefined: boolean;
+  };
+  ZipcodeNode: {
+    format: string;
   };
 }
 

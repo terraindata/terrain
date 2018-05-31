@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import Export from '../Export';
+import { Export, ExportConfig } from '../Export';
 import ADocumentTransform from './ADocumentTransform';
 
 /**
@@ -53,13 +53,30 @@ import ADocumentTransform from './ADocumentTransform';
 export default class ExportTransform extends ADocumentTransform
 {
   private exportt: Export;
-  private configuration: object;
+  private config: ExportConfig;
+  private rank: number;
+  private mapping: object;
 
-  constructor(exportt: Export, configuration: object)
+  constructor(exportt: Export, config: ExportConfig)
   {
     super();
+    this.rank = 1;
     this.exportt = exportt;
-    this.configuration = configuration;
+
+    if (config.rank === true)
+    {
+      config.columnTypes['TERRAINRANK'] = { type: 'long' };
+    }
+
+    config.transformations.forEach((transformation) =>
+    {
+      if (transformation['name'] === 'rename')
+      {
+        config.columnTypes[transformation['colName']] = config.columnTypes[transformation['args']['newName']];
+      }
+    });
+
+    this.config = config;
   }
 
   protected transform(input: object, chunkNumber: number): object | object[]
@@ -69,15 +86,34 @@ export default class ExportTransform extends ADocumentTransform
       return input;
     }
 
-    const hits = input['hits'].hits;
-    try
+    return input['hits'].hits.map((hit) => this.process(hit['_source']));
+  }
+
+  private process(doc: object): object
+  {
+    if (this.config.rank === true && doc['TERRAINRANK'] === undefined)
     {
-      return hits.map((hit) => this.exportt._postProcessDoc(hit, this.configuration));
+      doc['TERRAINRANK'] = this.rank++;
     }
-    catch (e)
+
+    // fields in document not in mapping
+    for (const field of Object.keys(doc))
     {
-      this.emit('error', e);
+      if (this.config.columnTypes[field] === undefined)
+      {
+        delete doc[field];
+      }
     }
-    return {};
+
+    // fields in mapping not in document
+    for (const field of Object.keys(this.config.columnTypes))
+    {
+      if (doc[field] === undefined)
+      {
+        doc[field] = null;
+      }
+    }
+
+    return this.exportt._postProcessDoc(doc, this.config);
   }
 }

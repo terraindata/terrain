@@ -48,7 +48,7 @@ import * as srs from 'secure-random-string';
 import * as Tasty from '../../../tasty/Tasty';
 import * as App from '../../App';
 
-import * as Util from '../../Util';
+import * as Util from '../../AppUtil';
 
 import UserConfig from '../../users/UserConfig';
 import ExportTemplateBaseStringified from './ExportTemplateBaseStringified';
@@ -122,13 +122,13 @@ export class ExportTemplates
     });
   }
 
-  public async updateAccessToken(user: UserConfig, templateID: number): Promise<ExportTemplateConfig>
+  public async updateAccessToken(user: UserConfig, templateId: number): Promise<ExportTemplateConfig>
   {
     return new Promise<ExportTemplateConfig>(async (resolve, reject) =>
     {
-      if (templateID !== undefined)
+      if (templateId !== undefined)
       {
-        const results: ExportTemplateConfig[] = await this.get(templateID);
+        const results: ExportTemplateConfig[] = await this.get(templateId);
         // template id specified but template not found
         if (results.length === 0)
         {

@@ -109,6 +109,8 @@ export const PathfinderText = {
     //   tooltip: 'The results will not be sorted in any way',
     // },
   },
+  autoBoundOn: 'The Score graph automatically fits the data\'s min & max.',
+  autoBoundOff: 'The Score graph will remain fixed.',
 
   // More section
   moreSectionTitle: 'More',

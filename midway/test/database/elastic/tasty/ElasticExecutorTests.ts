@@ -51,7 +51,7 @@ import ElasticController from '../../../../src/database/elastic/ElasticControlle
 import ElasticDB from '../../../../src/database/elastic/tasty/ElasticDB';
 
 import * as Tasty from '../../../../src/tasty/Tasty';
-import * as Utils from '../../../Utils';
+import * as Utils from '../../TestUtil';
 
 function getExpectedFile(): string
 {

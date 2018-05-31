@@ -161,7 +161,6 @@ class Builder extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
-
     this._subscribe(FileImportStore, {
       stateKey: 'exportState',
     });
@@ -203,15 +202,7 @@ class Builder extends TerrainComponent<Props>
   {
     for (const key in nextProps)
     {
-      if (key === 'builder')
-      {
-        // TODO: Look into why === causes unnecessary rerenders
-        if (!_.isEqual(this.props.builder, nextProps.builder))
-        {
-          return true;
-        }
-      }
-      else if (this.props[key] !== nextProps[key])
+      if (this.props[key] !== nextProps[key])
       {
         return true;
       }
@@ -888,7 +879,8 @@ class Builder extends TerrainComponent<Props>
   {
     let algorithm = LibraryTypes.touchAlgorithm(this.getAlgorithm());
     algorithm = algorithm.set('query', this.getQuery());
-    this.props.algorithmActions.duplicateAs(algorithm, algorithm.get('index'), this.state.saveAsTextboxValue,
+
+    this.props.algorithmActions.duplicateAs(algorithm, this.state.saveAsTextboxValue,
       (response, newAlgorithm) =>
       {
         this.onSaveSuccess(newAlgorithm);

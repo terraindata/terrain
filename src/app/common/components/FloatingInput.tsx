@@ -292,7 +292,10 @@ export class FloatingInput extends TerrainComponent<Props>
 
   private handleClick()
   {
-    this.props.onClick(this.props.id);
+    if (this.props.onClick)
+    {
+      this.props.onClick(this.props.id);
+    }
   }
 
   private handleChange(e)

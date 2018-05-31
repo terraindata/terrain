@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 // import Bottleneck = require('bottleneck');
+// TODO change credentials to integrations
 import jsonStream = require('JSONStream');
 import soap = require('strong-soap');
 
@@ -53,9 +54,9 @@ import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import { getValueFromDocPath } from '../../../../../shared/Util';
+import * as yadeep from '../../../../../shared/util/yadeep';
 import { Credentials } from '../../credentials/Credentials';
-import JSONExportTransform from '../streams/JSONExportTransform';
+import JSONTransform from '../streams/JSONTransform';
 import { ExportSourceConfig } from './Sources';
 
 export const credentials: Credentials = new Credentials();
@@ -140,7 +141,7 @@ export class Magento
   {
     return new Promise<stream.Readable>(async (resolve, reject) =>
     {
-      const writer = new JSONExportTransform();
+      const writer = JSONTransform.createExportStream();
       if (values.length > 0)
       {
         for (let i = 0; i < values.length; ++i)
@@ -653,7 +654,8 @@ export class Magento
                       {
                         if (result !== undefined && magentoSourceConfig.url[0]['path'] !== undefined)
                         {
-                          const extractedDoc: object = getValueFromDocPath(result, magentoSourceConfig.url[0]['path']);
+                          // FIXME: make sure the path is in the format we expect
+                          const extractedDoc: object = yadeep.get(result, magentoSourceConfig.url[0]['path']);
                           resultArr.push({ args: sanitizedRequestArgs, status: extractedDoc, mappedKey });
                         }
                         else
@@ -724,7 +726,8 @@ export class Magento
                       {
                         if (result !== undefined && magentoSourceConfig.url[0]['path'] !== undefined)
                         {
-                          const extractedDoc: object = getValueFromDocPath(result, magentoSourceConfig.url[0]['path']);
+                          // FIXME: make sure the path is in the format we expect
+                          const extractedDoc: object = yadeep.get(result, magentoSourceConfig.url[0]['path']);
                           resultArr.push({ args: sanitizedRequestArgs, status: extractedDoc, mappedKey });
                         }
                         else if (result && result['result'] !== undefined)

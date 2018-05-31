@@ -54,21 +54,27 @@ import serve = require('koa-static-server');
 import srs = require('secure-random-string');
 import v8 = require('v8');
 
-import * as DBUtil from '../database/Util';
+import './auth/Passport';
+import './Logging';
+
+import DatabaseControllerConfig from '../database/DatabaseControllerConfig';
 import RouteError from '../error/RouteError';
 import * as Tasty from '../tasty/Tasty';
 import appStats from './AppStats';
-import './auth/Passport';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
-import { credentials } from './credentials/CredentialRouter';
+import { DatabaseConfig } from './database/DatabaseConfig';
 import { databases } from './database/DatabaseRouter';
+import { Email } from './email/Email';
+import { registerMidwayEncryption } from './encryption/MidwayEncryptionController';
 import { events } from './events/EventRouter';
-import './Logging';
+import { integrations } from './integrations/IntegrationRouter';
+import { JobLog } from './jobs/JobLog';
+import { JobQueue } from './jobs/JobQueue';
 import Middleware from './Middleware';
 import NotFoundRouter from './NotFoundRouter';
 import MidwayRouter from './Router';
-import { scheduler } from './scheduler/SchedulerRouter';
+import { Scheduler } from './scheduler/Scheduler';
 import * as Schema from './Schema';
 import { users } from './users/UserRouter';
 
@@ -77,14 +83,26 @@ const CONN_RETRY_TIMEOUT = 1000;
 
 export let CFG: Config.Config;
 export let DB: Tasty.Tasty;
+export let EMAIL: Email;
 export let HA: number;
+export let JobL: JobLog;
+export let JobQ: JobQueue;
+export let SKDR: Scheduler;
 
 export class App
 {
   private static initializeDB(type: string, dsn: string): Tasty.Tasty
   {
+    const dbConfig: DatabaseConfig = {
+      id: 0,
+      name: '[system]',
+      type,
+      dsn,
+      host: '',
+      isAnalytics: false,
+    };
     winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
-    const controller = DBUtil.makeDatabaseController(type, 0, dsn);
+    const controller = DatabaseControllerConfig.makeDatabaseController(dbConfig);
     return controller.getTasty();
   }
 
@@ -103,6 +121,10 @@ export class App
   }
 
   private DB: Tasty.Tasty;
+  private EMAIL: Email;
+  private JobL: JobLog;
+  private JobQ: JobQueue;
+  private SKDR: Scheduler;
   private app: Koa;
   private config: Config.Config;
   private heapAvail: number;
@@ -120,6 +142,18 @@ export class App
     winston.debug('Using configuration: ' + JSON.stringify(config));
     this.config = config;
     CFG = this.config;
+
+    this.EMAIL = new Email();
+    EMAIL = this.EMAIL;
+
+    this.JobL = new JobLog();
+    JobL = this.JobL;
+
+    this.JobQ = new JobQueue();
+    JobQ = this.JobQ;
+
+    this.SKDR = new Scheduler();
+    SKDR = this.SKDR;
 
     this.app = new Koa();
     this.app.proxy = true;
@@ -225,18 +259,33 @@ export class App
     await Config.handleConfig(this.config);
     winston.debug('Finished processing configuration options...');
 
+    // initialize system encryption keys
+    registerMidwayEncryption();
+    winston.debug('Finished Registering System Private Keys');
+
     // create a default seed user
     await users.initializeDefaultUser();
     winston.debug('Finished creating a default user...');
 
-    // add local filesystem credential config
-    await credentials.initializeLocalFilesystemCredential();
-    winston.debug('Finished adding local filesystem credentials...');
+    // create default integrations
+    await integrations.initializeDefaultIntegrations();
+    winston.debug('Finished creating default integrations...');
+
+    // initialize job queue
+    await this.JobQ.initializeJobQueue();
+
+    // initialize scheduler
+    await this.SKDR.initializeScheduler();
 
     // connect to configured databases
     const dbs = await databases.select(['id'], {});
     for (const db of dbs)
     {
+      if (db.id === undefined)
+      {
+        continue;
+      }
+
       await databases.connect({} as any, db.id);
 
       if (db.analyticsIndex !== undefined && db.analyticsType !== undefined)
@@ -247,8 +296,8 @@ export class App
     winston.debug('Finished connecting to configured databases...');
 
     // setup stored users
-    await scheduler.initializeJobs();
-    await scheduler.initializeSchedules();
+    // await scheduler.initializeJobs();
+    // await scheduler.initializeSchedules();
     winston.debug('Finished initializing scheduler jobs and schedules...');
 
     const heapStats: object = v8.getHeapStatistics();
@@ -262,6 +311,16 @@ export class App
   public getConfig(): Config.Config
   {
     return this.config;
+  }
+
+  public getJobLog(): JobLog
+  {
+    return this.JobL;
+  }
+
+  public getJobQueue(): JobQueue
+  {
+    return this.JobQ;
   }
 }
 

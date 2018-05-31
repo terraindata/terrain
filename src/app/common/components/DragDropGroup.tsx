@@ -174,6 +174,7 @@ class GroupComponent extends TerrainComponent<GroupProps>
                     onDrop={onDrop}
                     canDrop={true}
                     data={item}
+                    useCustomDragLayer={true}
                   />
                   :
                   <DragDropGroup

@@ -90,9 +90,9 @@ import { _Hit, Hit } from 'builder/components/results/ResultTypes';
 import { BuilderState } from 'builder/data/BuilderState';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
+import { BaseClass, New } from 'shared/util/Classes';
 import { FieldType, FieldTypeMapping, ReverseFieldTypeMapping } from '../../../../../shared/builder/FieldTypes';
 import ElasticBlockHelpers, { AutocompleteMatchType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
-import { BaseClass, New } from '../../../Classes';
 import PathfinderText from './PathfinderText';
 
 export enum PathfinderSteps
@@ -162,6 +162,7 @@ class FilterGroupC extends BaseClass
 export type FilterGroup = FilterGroupC & IRecord<FilterGroupC>;
 export const _FilterGroup = (config?: { [key: string]: any }) =>
 {
+  config = Util.extendId(config);
   let filterGroup = New<FilterGroup>(new FilterGroupC(config), config);
   filterGroup = filterGroup.set('lines',
     List(filterGroup.lines.map((line) => _FilterLine(line))));
@@ -256,6 +257,7 @@ class TransformDataC extends BaseClass
   public dataDomain: List<number> = List([0, 10]);
   public hasCustomDomain: boolean = false;
   public mode: string = 'linear';
+  public autoBound: boolean = false;
 }
 
 export type TransformData = TransformDataC & IRecord<TransformDataC>;
@@ -265,7 +267,8 @@ export const _TransformData = (config?: { [key: string]: any }) =>
   transform = transform
     .set('scorePoints', List(transform['scorePoints'].map((p) => _ScorePoint(p))))
     .set('visiblePoints', List(transform['visiblePoints'].map((p) => _ScorePoint(p))))
-    .set('domain', List(transform['domain']));
+    .set('domain', List(transform['domain']))
+    .set('dataDomain', List(transform['dataDomain']));
   return transform;
 };
 
@@ -411,12 +414,13 @@ class FilterLineC extends LineC
 export type FilterLine = FilterLineC & IRecord<FilterLineC>;
 export const _FilterLine = (config?: { [key: string]: any }) =>
 {
+  config = Util.extendId(Util.asJS(config));
   let filterLine = New<FilterLine>(new FilterLineC(Util.asJS(config)), Util.asJS(config));
   if (config && config.filterGroup !== null && config.filterGroup !== undefined)
   {
     filterLine = filterLine.set('filterGroup', _FilterGroup(config.filterGroup));
   }
-  if (config && config.value !== null && typeof config.value !== 'string' && typeof config.value !== 'number')
+  if (config && config.value && typeof config.value !== 'string' && typeof config.value !== 'number')
   {
     filterLine = filterLine.set('value', _DistanceValue(config.value));
   }
@@ -626,7 +630,6 @@ class ElasticDataSourceC extends DataSource
   {
     // TODO this function needs to be refactored
     const server = context.builderState.db.name;
-
     if (context.type === 'source')
     {
       // we need to make it clear what parts of Source are tracked
@@ -722,13 +725,14 @@ class ElasticDataSourceC extends DataSource
         }
 
         const { dataSource } = context.source;
-        const { server, index, types } = dataSource as ElasticDataSource;
+        const { index, types } = dataSource as ElasticDataSource;
         if (!index)
         {
           return defaultOptions;
         }
 
         const theDatabaseId = `${server}/${index}`;
+
         const acceptableCols = context.schemaState.columns.filter(
           (column) => column.serverId === String(server) &&
             column.databaseId === theDatabaseId &&
@@ -768,7 +772,7 @@ class ElasticDataSourceC extends DataSource
         });
       }));
       const { dataSource } = context.source;
-      const { server, index } = dataSource as any;
+      const { index } = dataSource as any;
       if (index)
       {
         const theDatabaseId = `${server}/${index}`;

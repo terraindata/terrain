@@ -48,7 +48,7 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
-import * as Util from '../../Util';
+import * as Util from '../../AppUtil';
 import ExportTemplateConfig from './ExportTemplateConfig';
 import { ExportTemplates } from './ExportTemplates';
 

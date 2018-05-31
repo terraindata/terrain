@@ -274,6 +274,15 @@ available, and `import [ClassName] = require('[package_name]');` if not. e.g.
 `import * as TheForce from 'the-force';`
 `import UnpopularLibrary = require('unpopular-library');`
 
+### Git submodules
+
+Git submodules should be avoided if possible since they complicate git commands like pulling, syncing, etc.  However,
+we currently depend on the submodule at
+[https://github.com/DABH/monorepo.gitlab](https://github.com/DABH/monorepo.gitlab).  This is strictly for the CI boxes;
+developer boxes do not need to install this.  The submodule helps CI pipelines run more efficiently by skipping tests
+for sub-projects that weren't modified by a commit.  The submodule is maintained by David, so ask him with any
+questions; ideally it shouldn't need to be modified.
+
 ## Testing
 
 ### Back-end

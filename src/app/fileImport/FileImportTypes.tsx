@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
 
 import { List, Map, Record } from 'immutable';
-import { BaseClass, createRecordType, New } from '../Classes';
+import { BaseClass, createRecordType, New } from 'shared/util/Classes';
 
 // This type represents the state of the FileImportStore
 class FileImportStateC extends BaseClass

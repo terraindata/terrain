@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as stream from 'stream';
 
+/*
 import { GoogleAnalyticsConfig, GoogleAPI, GoogleSpreadsheetConfig } from './GoogleAPI';
 import { Magento, MagentoSourceConfig } from './Magento';
 import { Mailchimp } from './Mailchimp';
@@ -55,6 +56,7 @@ export const googleAPI: GoogleAPI = new GoogleAPI();
 export const magento: Magento = new Magento();
 export const mailchimp: Mailchimp = new Mailchimp();
 export const mySQL: MySQL = new MySQL();
+*/
 
 export interface SourceConfig
 {
@@ -148,6 +150,7 @@ export class Sources
   {
     return new Promise<ImportSourceConfig>(async (resolve, reject) =>
     {
+      /*
       if (templateId !== undefined)
       {
         body['templateId'] = Number(parseInt(templateId, 10));
@@ -163,6 +166,8 @@ export class Sources
           stream: writeStream,
         };
       return resolve(imprtSourceConfig);
+      */
+      return resolve(null);
     });
   }
 
@@ -170,6 +175,7 @@ export class Sources
   {
     return new Promise<ImportSourceConfig>(async (resolve, reject) =>
     {
+      /*
       if (templateId !== undefined)
       {
         body['templateId'] = Number(parseInt(templateId, 10));
@@ -186,6 +192,8 @@ export class Sources
           stream: writeStream,
         };
       return resolve(imprtSourceConfig);
+      */
+      return resolve(null);
     });
   }
 
@@ -193,6 +201,7 @@ export class Sources
   {
     return new Promise<ImportSourceConfig | string>(async (resolve, reject) =>
     {
+      /*
       if (templateId !== undefined)
       {
         body['templateId'] = Number(parseInt(templateId, 10));
@@ -209,6 +218,8 @@ export class Sources
           stream: writeStream as stream.Readable,
         };
       return resolve(imprtSourceConfig);
+      */
+      return null;
     });
   }
 
@@ -216,6 +227,7 @@ export class Sources
   {
     return new Promise<ImportSourceConfig | string>(async (resolve, reject) =>
     {
+      /*
       if (templateId !== undefined)
       {
         body['templateId'] = Number(parseInt(templateId, 10));
@@ -236,6 +248,8 @@ export class Sources
           stream: writeStream as stream.Readable,
         };
       return resolve(imprtSourceConfig);
+      */
+      return resolve(null);
     });
   }
 
@@ -243,8 +257,11 @@ export class Sources
   {
     return new Promise<string>(async (resolve, reject) =>
     {
+      /*
       resolve(await magento.runQuery(await magento.getJSONStreamAsMagentoSourceConfig(
         exprtSourceConfig) as MagentoSourceConfig[]) as string);
+        */
+      resolve(null);
     });
   }
 
@@ -252,7 +269,10 @@ export class Sources
   {
     return new Promise<string>(async (resolve, reject) =>
     {
+      /*
       resolve(await mailchimp.getJSONStreamAsMailchimpSourceConfig(exprtSourceConfig));
+      */
+      resolve(null);
     });
   }
 }

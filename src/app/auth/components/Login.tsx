@@ -185,7 +185,7 @@ class Login extends TerrainComponent<Props>
       return;
     }
 
-    this.state.xhr && this.state.xhr.abort();
+    this.state.xhr && this.state.xhr.cancel();
 
     this.setState({
       loggingIn: true,

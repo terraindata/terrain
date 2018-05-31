@@ -46,7 +46,7 @@ THE SOFTWARE.
 import { pathFinderTypeLoader } from 'builder/components/pathfinder/PathfinderTypes';
 import * as hdr from 'hdr-histogram-js';
 import * as TerrainLog from 'loglevel';
-import { AllRecordNameArray, RecordsSerializer, resetRecordNameArray } from '../Classes';
+import { AllRecordNameArray, RecordsSerializer, resetRecordNameArray } from 'shared/util/Classes';
 
 export default class TerrainStoreLogger
 {

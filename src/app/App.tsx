@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires no-reference no-unused-expression strict-boolean-expressions max-line-length no-console
 
-/// <reference path="../typings/tsd.d.ts" />
+/// <reference path="../../shared/typings/tsd.d.ts" />
 
 require('babel-polyfill');
 
@@ -186,19 +186,14 @@ const links =
     },
     {
       icon: <ImportIcon />,
-      text: 'Import',
-      route: '/import',
+      text: 'Data',
+      route: '/data',
     },
     {
       icon: <ReportingIcon />,
       text: 'Analytics',
       route: '/analytics',
       enabled: TerrainTools.isFeatureEnabled(TerrainTools.ANALYTICS),
-    },
-    {
-      icon: <ControlIcon />,
-      text: 'Control',
-      route: '/control',
     },
     // {
     //   icon: <ManualIcon />,

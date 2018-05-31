@@ -48,11 +48,11 @@ THE SOFTWARE.
 
 import { List, Map, Record } from 'immutable';
 
+import { BaseClass, createRecordType, New } from 'shared/util/Classes';
 import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
 import { _ResultsConfig } from '../../../shared/results/types/ResultsConfig';
 import { _Path, Path } from '../../app/builder/components/pathfinder/PathfinderTypes';
 import { Aggregation } from '../../app/builder/components/results/ResultTypes';
-import { BaseClass, createRecordType, New } from '../../app/Classes';
 import * as BlockUtils from '../../blocks/BlockUtils';
 import { Cards } from '../../blocks/types/Card';
 import { AllBackendsMap } from '../../database/AllBackends';

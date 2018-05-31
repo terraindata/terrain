@@ -46,9 +46,9 @@ THE SOFTWARE.
 
 import * as fs from 'fs';
 import * as request from 'supertest';
+import { promisify } from 'util';
 import * as winston from 'winston';
 
-// import { App, Credentials, DB, Scheduler } from '../../src/app/App';
 import { App, DB } from '../../src/app/App';
 import ElasticConfig from '../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../src/database/elastic/ElasticController';
@@ -59,13 +59,15 @@ let elasticDB: ElasticDB;
 let server;
 
 let defaultUserAccessToken: string = '';
-let exportTemplateID: number = -1;
-let persistentExportAccessToken: string = '';
+const exportTemplateID: number = -1;
+const persistentExportAccessToken: string = '';
 
-let mySQLImportTemplateID: number = -1;
-let persistentImportMySQLAccessToken: string = '';
+let templateId: number = -1; // ETL
 
-let schedulerExportId = -1;
+const mySQLImportTemplateID: number = -1;
+const persistentImportMySQLAccessToken: string = '';
+
+let schedulerExportId = '';
 
 // tslint:disable:max-line-length
 
@@ -78,7 +80,7 @@ beforeAll(async (done) =>
         debug: true,
         db: 'postgres',
         dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:65432/moviesdb',
-        port: 3000,
+        port: 63000,
         databases: [
           {
             name: 'My ElasticSearch Instance',
@@ -101,11 +103,6 @@ beforeAll(async (done) =>
 
     const app = new App(options);
     server = await app.start();
-
-    // await Credentials.initializeLocalFilesystemCredential();
-
-    // await Scheduler.initializeJobs();
-    // await Scheduler.initializeSchedules();
 
     const config: ElasticConfig = {
       hosts: ['http://localhost:9200'],
@@ -211,10 +208,6 @@ beforeAll(async (done) =>
         timezone: 'UTC',
       },
     })
-    .then((response) =>
-    {
-      done();
-    })
     .catch((error) =>
     {
       winston.warn('Error while creating test user: ' + String(error));
@@ -228,6 +221,12 @@ beforeAll(async (done) =>
   {
     // do nothing
   }
+  done();
+});
+
+afterAll(async () =>
+{
+  await DB.getDB().execute([['DROP TABLE IF EXISTS jobs;', 'DROP TABLE IF EXISTS schedules;'], undefined]);
 });
 
 describe('Status tests', () =>
@@ -764,6 +763,11 @@ describe('Query route tests', () =>
         }).expect(200).then((response) =>
         {
           winston.info(response.text);
+          const respData = JSON.parse(response.text);
+          expect(respData['result']).toMatchObject(
+            {
+              acknowledged: true,
+            });
         });
 
       await request(server)
@@ -913,7 +917,8 @@ describe('Query route tests', () =>
               }
             },
             "mergeJoin": {
-              "joinKey": "movieid",
+              "leftJoinKey": "movieid",
+              "rightJoinKey": "movieid",
               "selfMergeJoin": {
                 "_source": ["movieid", "overview"],
                 "query" : {
@@ -947,8 +952,8 @@ describe('Query route tests', () =>
         expect(respData['result'].hits.hits.length).toEqual(5);
         for (let i = 0; i < respData['result'].hits.hits.length; ++i)
         {
-          expect(respData['result'].hits.hits[i]._id === respData['result'].hits.hits[i].selfMergeJoin[0]._id);
-          expect(respData['result'].hits.hits[i]._source.movieid === respData['result'].hits.hits[i].selfMergeJoin[0]._source.movieid);
+          expect(respData['result'].hits.hits[i].movieid === respData['result'].hits.hits[i].selfMergeJoin[0].movieid);
+          expect(respData['result'].hits.hits[i]._source.movieid === respData['result'].hits.hits[i].selfMergeJoin[0].movieid);
         }
       })
       .catch((error) =>
@@ -958,6 +963,7 @@ describe('Query route tests', () =>
   });
 });
 
+/*
 describe('File import route tests', () =>
 {
   test('Import JSON: POST /midway/v1/import/', async () =>
@@ -973,7 +979,7 @@ describe('File import route tests', () =>
       }))
       .field('dbid', '1')
       .field('dbname', 'test_elastic_db')
-      .attach('file', './midway/test/routes/fileImport/test_file.json')
+      .attach('file', './midway/test/etl/test_file.json')
       .field('filetype', 'json')
       .field('id', '1')
       .field('originalNames', JSON.stringify(['pkey', 'column1', 'col2', 'col3', 'col4']))
@@ -1036,7 +1042,7 @@ describe('File import route tests', () =>
       }))
       .field('dbid', '1')
       .field('dbname', 'test_elastic_db')
-      .attach('file', './midway/test/routes/fileImport/test_file.csv')
+      .attach('file', './midway/test/etl/test_file.csv')
       .field('filetype', 'csv')
       .field('hasCsvHeader', 'true')
       .field('id', '1')
@@ -1051,7 +1057,7 @@ describe('File import route tests', () =>
         },
         {
           name: 'rename',
-          colName: 'column3',
+          colName: 'sillyname',
           args: { newName: 'col3' },
         },
         {
@@ -1118,7 +1124,7 @@ describe('File import route tests', () =>
       }))
       .field('dbid', '1')
       .field('dbname', 'test_elastic_db')
-      .attach('file', './midway/test/routes/fileImport/test_file_bad.json')
+      .attach('file', './midway/test/etl/test_file_bad.json')
       .field('filetype', 'json')
       .field('id', '1')
       .field('originalNames', JSON.stringify(['pkey', 'column1', 'col2', 'col3', 'col4']))
@@ -1142,7 +1148,6 @@ describe('File import route tests', () =>
         fail('POST /midway/v1/import/ request returned an error: ' + String(error));
       });
   });
-
 });
 
 describe('File io templates route tests', () =>
@@ -1387,105 +1392,105 @@ describe('File io templates route tests', () =>
       });
   });
 
-  test('Headless import via MySQL: POST /midway/v1/import/headless', async () =>
-  {
-    await request(server)
-      .post('/midway/v1/import/headless')
-      .send({
-        templateId: mySQLImportTemplateID,
-        persistentAccessToken: persistentImportMySQLAccessToken,
-        body: {
-          source: {
-            type: 'mysql',
-            params: {
-              id: 2,
-              tablename: 'movies',
-              query: 'SELECT * FROM movies LIMIT 10;',
-            },
-          },
-          filetype: 'csv',
-        },
-      })
-      .expect(200)
-      .then(async (response) =>
-      {
-        expect(response.text).not.toBe('Unauthorized');
-        try
-        {
-          await elasticDB.refresh('mysqlimport');
-          const result: object = await elasticDB.query([
-            {
-              index: 'mysqlimport',
-              type: 'data',
-              body: {
-                sort: [{ movieid: 'asc' }],
-              },
-            },
-          ]);
-          expect(result['hits']['hits'].length).toBeGreaterThan(0);
-          expect(result['hits']['hits'][0]['_source'])
-            .toMatchObject({
-              movieid: 1,
-              title: 'Toy Story (1995)',
-              genres: 'Adventure|Animation|Children|Comedy|Fantasy',
-              backdroppath: '/dji4Fm0gCDVb9DQQMRvAI8YNnTz.jpg',
-              overview: 'Woody the cowboy is young Andy’s favorite toy. Yet this changes when Andy get the new super toy Buzz Lightyear for his birthday. Now that Woody is no longer number one he plans his revenge on Buzz. Toy Story is a milestone in film history for being the first feature film to use entirely computer animation.',
-              posterpath: '/uMZqKhT4YA6mqo2yczoznv7IDmv.jpg',
-              status: 'Released',
-              tagline: 'The adventure takes off!',
-              releasedate: '1995-10-30T08:00:00.000Z',
-              budget: 30000000,
-              revenue: 361958736,
-              votecount: 3022,
-              popularity: 2.45948,
-              voteaverage: 7.5,
-              homepage: 'http://toystory.disney.com/toy-story',
-              language: 'en',
-              runtime: 81,
-            });
-        }
-        catch (e)
-        {
-          fail(e);
-        }
-      })
-      .catch((error) =>
-      {
-        fail('POST /midway/v1/import/headless request returned an error: ' + String(error));
-      });
-  });
+  // test('Headless import via MySQL: POST /midway/v1/import/headless', async () =>
+  // {
+  //   await request(server)
+  //     .post('/midway/v1/import/headless')
+  //     .send({
+  //       templateId: mySQLImportTemplateID,
+  //       persistentAccessToken: persistentImportMySQLAccessToken,
+  //       body: {
+  //         source: {
+  //           type: 'mysql',
+  //           params: {
+  //             id: 2,
+  //             tablename: 'movies',
+  //             query: 'SELECT * FROM movies LIMIT 10;',
+  //           },
+  //         },
+  //         filetype: 'csv',
+  //       },
+  //     })
+  //     .expect(200)
+  //     .then(async (response) =>
+  //     {
+  //       expect(response.text).not.toBe('Unauthorized');
+  //       try
+  //       {
+  //         await elasticDB.refresh('mysqlimport');
+  //         const result: object = await elasticDB.query([
+  //           {
+  //             index: 'mysqlimport',
+  //             type: 'data',
+  //             body: {
+  //               sort: [{ movieid: 'asc' }],
+  //             },
+  //           },
+  //         ]);
+  //         expect(result['hits']['hits'].length).toBeGreaterThan(0);
+  //         expect(result['hits']['hits'][0]['_source'])
+  //           .toMatchObject({
+  //             movieid: 1,
+  //             title: 'Toy Story (1995)',
+  //             genres: 'Adventure|Animation|Children|Comedy|Fantasy',
+  //             backdroppath: '/dji4Fm0gCDVb9DQQMRvAI8YNnTz.jpg',
+  //             overview: 'Woody the cowboy is young Andy’s favorite toy. Yet this changes when Andy get the new super toy Buzz Lightyear for his birthday. Now that Woody is no longer number one he plans his revenge on Buzz. Toy Story is a milestone in film history for being the first feature film to use entirely computer animation.',
+  //             posterpath: '/uMZqKhT4YA6mqo2yczoznv7IDmv.jpg',
+  //             status: 'Released',
+  //             tagline: 'The adventure takes off!',
+  //             releasedate: '1995-10-30T08:00:00.000Z',
+  //             budget: 30000000,
+  //             revenue: 361958736,
+  //             votecount: 3022,
+  //             popularity: 2.45948,
+  //             voteaverage: 7.5,
+  //             homepage: 'http://toystory.disney.com/toy-story',
+  //             language: 'en',
+  //             runtime: 81,
+  //           });
+  //       }
+  //       catch (e)
+  //       {
+  //         fail(e);
+  //       }
+  //     })
+  //     .catch((error) =>
+  //     {
+  //       fail('POST /midway/v1/import/headless request returned an error: ' + String(error));
+  //     });
+  // });
 
-  test('Headless import via MySQL with bad SQL: POST /midway/v1/import/headless', async () =>
-  {
-    await request(server)
-      .post('/midway/v1/import/headless')
-      .send({
-        templateId: mySQLImportTemplateID,
-        persistentAccessToken: persistentImportMySQLAccessToken,
-        body: {
-          source: {
-            type: 'mysql',
-            params: {
-              id: 2,
-              tablename: 'movies',
-              query: 'SELECT * FROM moviesss LIMIT 10;',
-            },
-          },
-          filetype: 'csv',
-        },
-      })
-      .expect(400)
-      .then((response) =>
-      {
-        expect(response.text).not.toBe('Unauthorized');
-        const respData = JSON.parse(response.text);
-        expect(respData['errors'].length).toBeGreaterThan(0);
-      })
-      .catch((error) =>
-      {
-        fail('POST /midway/v1/import/headless request returned an error: ' + String(error));
-      });
-  });
+  // test('Headless import via MySQL with bad SQL: POST /midway/v1/import/headless', async () =>
+  // {
+  //   await request(server)
+  //     .post('/midway/v1/import/headless')
+  //     .send({
+  //       templateId: mySQLImportTemplateID,
+  //       persistentAccessToken: persistentImportMySQLAccessToken,
+  //       body: {
+  //         source: {
+  //           type: 'mysql',
+  //           params: {
+  //             id: 2,
+  //             tablename: 'movies',
+  //             query: 'SELECT * FROM moviesss LIMIT 10;',
+  //           },
+  //         },
+  //         filetype: 'csv',
+  //       },
+  //     })
+  //     .expect(400)
+  //     .then((response) =>
+  //     {
+  //       expect(response.text).not.toBe('Unauthorized');
+  //       const respData = JSON.parse(response.text);
+  //       expect(respData['errors'].length).toBeGreaterThan(0);
+  //     })
+  //     .catch((error) =>
+  //     {
+  //       fail('POST /midway/v1/import/headless request returned an error: ' + String(error));
+  //     });
+  // });
 
   test('Post headless export: POST /midway/v1/export/headless', async () =>
   {
@@ -1521,7 +1526,7 @@ describe('File io templates route tests', () =>
           numLines++;
           indexOfDelim = respBuffer.indexOf(delim); // don't include header
         }
-        expect(numLines).toEqual(15 + 1);
+        expect(numLines).toEqual(15);
       })
       .catch((error) =>
       {
@@ -1563,7 +1568,7 @@ describe('File io templates route tests', () =>
           numLines++;
           indexOfDelim = respBuffer.indexOf(delim);
         }
-        expect(numLines).toEqual(11000 + 1); // don't include header
+        expect(numLines).toEqual(11000);
       })
       .catch((error) =>
       {
@@ -1571,48 +1576,60 @@ describe('File io templates route tests', () =>
       });
   });
 });
+*/
 
-describe('Credentials tests', () =>
+describe('Integration tests', () =>
 {
-  test('POST /midway/v1/credentials', async () =>
+  let integrationId = 0;
+  const integration = {
+    authConfig: {
+      username: 'testuser',
+      password: 'Terrain123!',
+    },
+    connectionConfig: {
+      host: '10.1.1.103',
+      port: 22,
+    },
+    createdBy: 1,
+    lastModified: new Date(),
+    meta: '',
+    readPermission: '',
+    writePermission: '',
+    type: 'sftp',
+    name: 'My SFTP Integration',
+  };
+
+  test('POST /midway/v1/integrations', async () =>
   {
     await request(server)
-      .post('/midway/v1/credentials')
+      .post('/midway/v1/integrations')
       .send({
         id: 1,
         accessToken: defaultUserAccessToken,
-        body: {
-          createdBy: 1,
-          meta: '"{\"host\":\"10.1.1.103\", \"port\":22, \"username\":\"testuser\", \"password\":\"Terrain123!\"}"',
-          name: 'SFTP Test 1',
-          type: 'sftp',
-          permissions: 1,
-        },
+        body: integration,
       })
       .expect(200)
       .then((response) =>
       {
-        const result: object = JSON.parse(response.text);
-        expect(Array.isArray(result)).toBe(true);
-        const resultAsArray: object[] = result as object[];
-        expect(resultAsArray[0]).toMatchObject({
-          createdBy: 1,
-          meta: '',
-          name: 'SFTP Test 1',
-          type: 'sftp',
-          permissions: 1,
-        });
+        const result = JSON.parse(response.text);
+        const expected = JSON.parse(JSON.stringify(integration));
+        expected.authConfig = null;
+        delete result.lastModified;
+        delete expected.lastModified;
+        expect(result).toMatchObject(expected);
+        integrationId = result['id'];
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/credentials request returned an error: ' + String(error));
+        fail('POST /midway/v1/integrations request returned an error: ' + String(error));
       });
   });
 
-  test('GET /midway/v1/credentials', async () =>
+  test('GET /midway/v1/integrations', async () =>
   {
+    expect(integrationId).toBeGreaterThan(0);
     await request(server)
-      .get('/midway/v1/credentials')
+      .get('/midway/v1/integrations/' + String(integrationId))
       .query({
         id: 1,
         accessToken: defaultUserAccessToken,
@@ -1621,149 +1638,37 @@ describe('Credentials tests', () =>
       .then((response) =>
       {
         const result = JSON.parse(response.text);
-        expect(result.length).toBeGreaterThanOrEqual(2);
-        expect(result).toEqual(expect.arrayContaining([
-          {
-            createdBy: 1,
-            id: 1,
-            meta: '',
-            name: 'Local Filesystem Config',
-            permissions: 0,
-            type: 'local',
-          },
-          {
-            createdBy: 1,
-            id: 2,
-            meta: '"{\"host\":\"10.1.1.103\", \"port\":22, \"username\":\"testuser\", \"password\":\"Terrain123!\"}"',
-            name: 'SFTP Test 1',
-            permissions: 1,
-            type: 'sftp',
-          },
-        ]));
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toEqual(1);
+        const expected = JSON.parse(JSON.stringify(integration));
+        delete expected.lastModified;
+        expect(result[0]).toMatchObject(expected);
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/credentials request returned an error: ' + String(error));
-      });
-  });
-});
-
-describe('Scheduler tests', () =>
-{
-  test('POST /midway/v1/scheduler/create scheduled export', async () =>
-  {
-    await request(server)
-      .post('/midway/v1/scheduler/create')
-      .send({
-        id: 1,
-        accessToken: defaultUserAccessToken,
-        body: {
-          jobType: 'export',
-          schedule: '* * * * *', // next run on some leap year date
-          sort: 'asc',
-          transport:
-            {
-              type: 'local',
-              filename: process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json',
-            },
-          name: 'Test Local Export',
-          paramsJob:
-            {
-              dbid: 1,
-              dbname: 'movies',
-              templateId: exportTemplateID,
-              filetype: 'csv',
-              query: '{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
-                + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}',
-            },
-          filetype: 'json',
-        },
-      })
-      .expect(200)
-      .then(async (response) =>
-      {
-        expect(response.text).not.toBe('');
-        if (response.text === '')
-        {
-          fail('POST /scheduler/create request returned empty response body');
-        }
-        const result = JSON.parse(response.text);
-        expect(Object.keys(result).lastIndexOf('errors')).toEqual(-1);
-        schedulerExportId = result['id'];
-        expect(await new Promise<boolean>(async (resolve, reject) =>
-        {
-          function verifyFileWritten()
-          {
-            resolve(fs.existsSync(process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json'));
-          }
-          setTimeout(verifyFileWritten, (60 - (Math.floor(Date.now() / 1000) % 60) + 3) * 1000);
-        })).toBe(true);
-      });
-  }, 70000);
-
-  test('POST /midway/v1/scheduler/run/<scheduled export ID> run now', async () =>
-  {
-    await request(server)
-      .post('/midway/v1/scheduler/run/' + schedulerExportId.toString())
-      .send({
-        id: 1,
-        accessToken: defaultUserAccessToken,
-        body: {
-        },
-      })
-      .expect(200)
-      .then(async (responseRun) =>
-      {
-        expect(await new Promise<boolean>(async (resolve, reject) =>
-        {
-          function verifyFileWritten()
-          {
-            resolve(fs.existsSync(process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json'));
-          }
-          setTimeout(verifyFileWritten, 3000);
-        })).toBe(true);
+        fail('POST /midway/v1/integrations request returned an error: ' + String(error));
       });
   });
 
-  test('POST /midway/v1/scheduler/create INVALID scheduled export', async () =>
+  test('Delete an integration: POST /midway/v1/integrations/delete', async () =>
   {
+    expect(integrationId).toBeGreaterThan(0);
     await request(server)
-      .post('/midway/v1/scheduler/create')
+      .post('/midway/v1/integrations/delete/' + String(integrationId))
       .send({
         id: 1,
         accessToken: defaultUserAccessToken,
-        body: {
-          jobTypeInvalidParam: 'export',
-          schedule: '* * * * *', // next run on some leap year date
-          sort: 'asc',
-          transport:
-            {
-              type: 'local',
-              filename: process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json',
-            },
-          name: 'Test Local Export',
-          paramsJob:
-            {
-              dbid: 1,
-              dbname: 'movies',
-              templateId: exportTemplateID,
-              filetype: 'csv',
-              query: '{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
-                + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}',
-            },
-          filetype: 'json',
-        },
       })
-      .expect(400)
-      .then(async (response) =>
+      .expect(200)
+      .then((res) =>
       {
-        expect(response.text).not.toBe('');
-        if (response.text === '')
-        {
-          fail('POST /scheduler/create request returned empty response body');
-        }
-        const result = JSON.parse(response.text);
-        expect(Object.keys(result).lastIndexOf('errors')).not.toEqual(-1);
+        expect(res.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(res.text);
+        expect(respData).toMatchObject({});
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/integrations/1 request returned an error: ' + String(error));
       });
   });
 });
@@ -1910,6 +1815,245 @@ describe('Analytics route tests', () =>
       .catch((error) =>
       {
         fail('POST /midway/v1/items/ request returned an error: ' + String(error));
+      });
+  });
+});
+
+describe('ETL Template Tests', () =>
+{
+  test('Create a template: POST /midway/v1/etl/templates/create', async () =>
+  {
+    const template = await promisify(fs.readFile)('./midway/test/etl/movies_template.json', 'utf8');
+    await request(server)
+      .post('/midway/v1/etl/templates/create')
+      .send({
+        id: 1,
+        accessToken: defaultUserAccessToken,
+        body: JSON.parse(template),
+      })
+      .expect(200)
+      .then((res) =>
+      {
+        expect(res.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(res.text);
+        const response = respData[0];
+        expect(response.id).toBeGreaterThanOrEqual(1);
+        templateId = response.id;
+        expect(Date.parse(response.createdAt)).toBeLessThanOrEqual(Date.now());
+        expect(Date.parse(response.lastModified)).toBeLessThanOrEqual(Date.now());
+        expect(response.archived).toBeFalsy();
+        expect(response.templateName).toBeDefined();
+        expect(response.process).toBeDefined();
+        expect(response.sources).toBeDefined();
+        expect(response.sinks).toBeDefined();
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/etl/templates/create request returned an error: ' + String(error));
+      });
+  });
+
+  test('Get a template: GET /midway/v1/etl/templates/:id', async () =>
+  {
+    expect(templateId).toBeGreaterThan(0);
+    await request(server)
+      .get('/midway/v1/etl/templates/' + String(templateId))
+      .query({
+        id: 1,
+        accessToken: defaultUserAccessToken,
+      })
+      .expect(200)
+      .then((res) =>
+      {
+        expect(res.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(res.text);
+        const response = respData[0];
+        expect(response.id).toEqual(templateId);
+        expect(Date.parse(response.createdAt)).toBeLessThanOrEqual(Date.now());
+        expect(Date.parse(response.lastModified)).toBeLessThanOrEqual(Date.now());
+        expect(response.archived).toBeFalsy();
+        expect(response.templateName).toBeDefined();
+        expect(response.process).toBeDefined();
+        expect(response.sources).toBeDefined();
+        expect(response.sinks).toBeDefined();
+      })
+      .catch((error) =>
+      {
+        fail('GET /midway/v1/etl/templates/1 request returned an error: ' + String(error));
+      });
+  });
+
+  test('Delete a template: POST /midway/v1/etl/templates/delete', async () =>
+  {
+    expect(templateId).toBeGreaterThan(0);
+    await request(server)
+      .post('/midway/v1/etl/templates/delete')
+      .send({
+        id: 1,
+        accessToken: defaultUserAccessToken,
+        body: {
+          templateId,
+        },
+      })
+      .expect(200)
+      .then((res) =>
+      {
+        expect(res.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(res.text);
+        expect(respData).toMatchObject({});
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/etl/templates/1 request returned an error: ' + String(error));
+      });
+  });
+});
+
+describe('ETL Execute Tests', () =>
+{
+  // TODO: Add more tests
+});
+
+describe('ETL Preview Tests', () =>
+{
+  // TODO Need to add an integration and then set the integration ID on the source (instead of using options.path)
+  // test('Source preview: POST /midway/v1/etl/preview', async () =>
+  // {
+  //   await request(server)
+  //     .post('/midway/v1/etl/preview')
+  //     .send({
+  //       id: 1,
+  //       accessToken: defaultUserAccessToken,
+  //       body: {
+  //         source: {
+  //           type: 'Fs',
+  //           name: 'Default Source',
+  //           fileConfig: {
+  //             fileType: 'json',
+  //             hasCsvHeader: true,
+  //             jsonNewlines: false,
+  //           },
+  //           options: {
+  //             path: './midway/test/etl/movies.json',
+  //           },
+  //         },
+  //       },
+  //     })
+  //     .expect(200)
+  //     .then((res) =>
+  //     {
+  //       expect(res.text).not.toBe('Unauthorized');
+  //       const response = JSON.parse(res.text);
+  //       expect(response.length).toEqual(5);
+  //       expect(response[2].genres).toEqual('Documentary');
+  //     })
+  //     .catch((error) =>
+  //     {
+  //       fail('POST /midway/v1/etl/preview request returned an error: ' + String(error));
+  //     });
+  // });
+});
+
+describe('Scheduler tests', () =>
+{
+  test('POST /midway/v1/scheduler/ create scheduled ETL export', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/scheduler/')
+      .send({
+        id: 1,
+        accessToken: defaultUserAccessToken,
+        body: {
+          cron: '0 2 28 2 0', // some absurd leap year date at 2 AM
+          name: 'test ETL',
+          priority: 1,
+          shouldRunNext: true,
+          tasks:
+            [
+              {
+                id: 1,
+                taskId: 2,
+                params:
+                  {
+                    templateId, // ETL template ID
+                  },
+              },
+            ],
+        },
+      })
+      .expect(200)
+      .then(async (response) =>
+      {
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('POST /scheduler/create request returned empty response body');
+        }
+        const result = JSON.parse(response.text);
+        expect(result.length).not.toEqual(0);
+        expect(Object.keys(result).lastIndexOf('errors')).toEqual(-1);
+        schedulerExportId = result[0]['id'];
+      });
+  }, 70000);
+
+  /*
+    TODO: Add this test case back when we add ETL execute tests
+    test('POST /midway/v1/scheduler/run/<schedule ID> run now', async () =>
+    {
+      await request(server)
+        .post('/midway/v1/scheduler/run/' + schedulerExportId.toString())
+        .send({
+          id: 1,
+          accessToken: defaultUserAccessToken,
+          body: {
+          },
+        })
+        .expect(200)
+        .then(async (responseRun) =>
+        {
+          expect(await new Promise<boolean>(async (resolve, reject) =>
+          {
+            function verifyFileWritten()
+            {
+              resolve(fs.existsSync(process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json'));
+            }
+            setTimeout(verifyFileWritten, 3000);
+          })).toBe(true);
+        });
+    });
+    */
+
+  test('POST /midway/v1/scheduler/ create INVALID scheduled export', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/scheduler/')
+      .send({
+        id: 1,
+        accessToken: defaultUserAccessToken,
+        body: {
+          invalidCronName: '0 2 29 2 0', // some absurd leap year date at 2 AM
+          name: 'invalid test ETL',
+          priority: 1,
+          shouldRunNext: true,
+          tasks:
+            [
+              {
+                id: 1,
+                taskId: 0,
+              },
+            ],
+        },
+      })
+      .expect(400)
+      .then(async (response) =>
+      {
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('POST /scheduler/ create INVALID scheduled export request returned empty response body');
+        }
+        const result = JSON.parse(response.text);
+        expect(Object.keys(result).lastIndexOf('errors')).not.toEqual(-1);
       });
   });
 });

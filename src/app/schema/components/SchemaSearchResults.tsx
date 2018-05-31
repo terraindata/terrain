@@ -107,7 +107,7 @@ class SchemaSearchResults extends TerrainComponent<Props>
     let { items, prevItems } = this.state;
     items.map((v, storeKey) =>
     {
-      const storeValue = storeState.get(storeKey);
+      const storeValue = storeState.get(storeKey as any);
       if (prevItems.get(storeKey) !== storeValue)
       {
         // reference changed

@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file strict-boolean-expressions restrict-plus-operands
 
 import * as Immutable from 'immutable';
-import { BaseClass, New } from '../Classes';
+import { BaseClass, New } from 'shared/util/Classes';
 
 class UserC extends BaseClass
 {

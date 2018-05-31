@@ -115,28 +115,68 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      transformations text NOT NULL);`,
   `CREATE TABLE IF NOT EXISTS schedules
     (id ` + primaryKeyType + ` PRIMARY KEY,
-     active bool NOT NULL,
-     archived bool NOT NULL,
-     currentlyRunning bool NOT NULL,
+     createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     createdBy integer,
+     cron text NOT NULL,
+     lastModified date NOT NULL,
+     lastRun ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     meta text NOT NULL,
      name text NOT NULL,
-     jobId integer NOT NULL,
-     jobType text NOT NULL,
-     paramsScheduleStr text,
-     schedule text NOT NULL,
-     sort text NOT NULL,
-     transportStr text);`,
-  `CREATE TABLE IF NOT EXISTS credentials
+     priority integer NOT NULL,
+     running bool NOT NULL,
+     shouldRunNext bool NOT NULL,
+     tasks text NOT NULL,
+     workerId integer NOT NULL);`,
+  `CREATE TABLE IF NOT EXISTS jobs
     (id ` + primaryKeyType + ` PRIMARY KEY,
+     createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     createdBy integer,
+     endTime ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     logId integer,
+     meta text NOT NULL,
+     name text NOT NULL,
+     pausedFilename text NOT NULL,
+     priority integer NOT NULL,
+     running bool NOT NULL,
+     runNowPriority integer NOT NULL,
+     scheduleId integer,
+     startTime ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     status text NOT NULL,
+     tasks text NOT NULL,
+     type text NOT NULL,
+     workerId integer NOT NULL);`,
+  `CREATE TABLE IF NOT EXISTS jobLogs
+    (id integer PRIMARY KEY,
+     createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     contents text);`,
+  `CREATE TABLE IF NOT EXISTS integrations
+    (id ` + primaryKeyType + ` PRIMARY KEY,
+     authConfig text NOT NULL,
+     connectionConfig text NOT NULL,
      createdBy integer NOT NULL,
      meta text NOT NULL,
      name text NOT NULL,
-     permissions integer,
-     type text NOT NULL); `,
+     readPermission text NOT NULL,
+     type text NOT NULL,
+     lastModified ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     writePermission text NOT NULL); `,
   `CREATE TABLE IF NOT EXISTS metrics
     (id ` + primaryKeyType + ` PRIMARY KEY,
      database integer NOT NULL,
      label text NOT NULL,
      events text NOT NULL); `,
+  `CREATE TABLE IF NOT EXISTS templates
+    (id ` + primaryKeyType + ` PRIMARY KEY,
+     createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     lastModified ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     archived bool NOT NULL,
+     templateName text NOT NULL,
+     process text NOT NULL,
+     sources text NOT NULL,
+     sinks text NOT NULL,
+     settings text NOT NULL,
+     meta text NOT NULL,
+     uiData text NOT NULL); `,
   `CREATE TABLE IF NOT EXISTS schemaMetadata
        (id ` + primaryKeyType + ` PRIMARY KEY,
        columnId text NOT NULL,
@@ -155,9 +195,9 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
   ,
   `CREATE TABLE IF NOT EXISTS schedulerLogs
     (id ` + primaryKeyType + ` PRIMARY KEY,
-     lastFailure date,
-     lastRun date,
-     lastSuccess date,
+     lastFailure ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     lastRun ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     lastSuccess ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
      meta text NOT NULL,
      numberOfRuns integer NOT NULL,
      scheduleId integer NOT NULL,
@@ -179,7 +219,7 @@ export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)
   }
   else if (dbtype === 'postgres')
   {
-    return tasty.getDB().execute(appSchemaSQL('timestamp with time zone', 'false', 'varchar(255)', 'serial'));
+    return tasty.getDB().execute([appSchemaSQL('timestamp with time zone', 'false', 'varchar(255)', 'serial'), undefined]);
   }
   else
   {
@@ -205,17 +245,48 @@ export async function deleteElasticIndex(dbid: number, dbname: string): Promise<
   });
 }
 
-export async function getSchema(databaseID: number): Promise<string>
+export async function getSchema(databaseID: number | string): Promise<string>
 {
   return new Promise<string>(async (resolve, reject) =>
   {
-    const database: DatabaseController | undefined = DatabaseRegistry.get(databaseID);
+    const database: DatabaseController | undefined = typeof databaseID === 'number' ?
+      DatabaseRegistry.get(databaseID)
+      :
+      DatabaseRegistry.getByName(databaseID);
+
     if (database === undefined)
     {
       throw new Error('Database "' + databaseID.toString() + '" not found.');
     }
     const schema: Tasty.Schema = await database.getTasty().schema();
     return resolve(schema.toString());
+  });
+}
+
+export async function getTable(databaseID: number | string, table: string): Promise<object>
+{
+  return new Promise<object>(async (resolve, reject) =>
+  {
+    const database: DatabaseController | undefined = typeof databaseID === 'number' ?
+      DatabaseRegistry.get(databaseID)
+      :
+      DatabaseRegistry.getByName(databaseID);
+
+    if (database === undefined)
+    {
+      throw new Error('Database "' + databaseID.toString() + '" not found.');
+    }
+    const schema: Tasty.Schema = await database.getTasty().schema();
+
+    const tables = schema.tables(table);
+    if (tables !== undefined)
+    {
+      return resolve(tables);
+    }
+    else
+    {
+      return resolve({});
+    }
   });
 }
 

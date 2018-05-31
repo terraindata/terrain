@@ -44,13 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import util from '../../../../../shared/Util';
 import PostgreSQLGenerator from '../../../tasty/PostgreSQLGenerator';
-import TastyDB from '../../../tasty/TastyDB';
+import { IsolationLevel, TastyDB, TransactionHandle } from '../../../tasty/TastyDB';
 import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
 import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
 import TastyTable from '../../../tasty/TastyTable';
-import { makePromiseCallback } from '../../../tasty/Utils';
 import PostgreSQLClient from '../client/PostgreSQLClient';
 
 export class PostgreSQLDB implements TastyDB
@@ -65,30 +65,18 @@ export class PostgreSQLDB implements TastyDB
   /**
    * Generates PostgreSQL queries from TastyQuery objects.
    */
-  public generateQuery(query: TastyQuery, placeholder: boolean): [string[], any[][]]
+  public generate(query: TastyQuery): [string[], any[][]]
   {
     const generator = new PostgreSQLGenerator();
     if (query.command.tastyType === TastyNodeTypes.select || query.command.tastyType === TastyNodeTypes.delete)
     {
-      generator.generateSelectQuery(query, placeholder);
+      generator.generateSelectQuery(query);
     }
     else if (query.command.tastyType === TastyNodeTypes.upsert && query.upserts.length > 0)
     {
-      generator.generateUpsertQuery(query, query.upserts, placeholder);
+      generator.generateUpsertQuery(query, query.upserts);
     }
-    return [generator.statements, generator.values];
-  }
-
-  public generate(query: TastyQuery): string[]
-  {
-    // tslint:disable-next-line:no-unused-variable
-    const [statements, values] = this.generateQuery(query, false);
-    return statements;
-  }
-
-  public generateString(query: TastyQuery): string
-  {
-    return this.generate(query).join('\n');
+    return [generator.statements, generator.valuesArray];
   }
 
   public async schema(): Promise<TastySchema>
@@ -100,45 +88,43 @@ export class PostgreSQLDB implements TastyDB
 
   /**
    * executes statements sequentially
-   * @param statements
+   * @param query `[string array of statements, array of values arrays for each statement]`
+   * e.g. `[['SELECT a FROM b WHERE c = $1 AND d = $2'], [['qwe', 'rty']]]`
+   *
+   * Can also use undefined if there are no values e.g.
+   * `[[queryString1, queryString2], undefined]` instead of
+   * `[[queryString1, queryString2], [[], []]]`
    * @returns {Promise<Array>} appended result objects
    */
-  public async execute(statements: string[]): Promise<object[]>
+  public async execute(query: [string[], any[][]], handle?: TransactionHandle): Promise<object[]>
   {
     let results: object[] = [];
-    for (const statement of statements)
+    const [statements, values] = query;
+    if (values !== undefined && statements.length !== values.length)
     {
+      throw new Error('statements and values have different lengths');
+    }
+    for (let i = 0; i < statements.length; ++i)
+    {
+      const statement = statements[i];
+      const value = values !== undefined ? values[i] : [];
       const result: object[] = await new Promise<object[]>((resolve, reject) =>
       {
-        this.client.query(statement, [], makePromiseCallback(resolve, reject));
+        this.client.query(statement, handle, value, util.promise.makeCallback(resolve, reject));
       });
 
-      if (result !== undefined && result['rows'] !== undefined)
-      {
-        results = results.concat(result['rows']);
-      }
+      results = results.concat(result['rows']);
     }
     return results;
   }
 
-  public async upsert(table: TastyTable, elements: object[]): Promise<object[]>
+  public async upsert(table: TastyTable, elements: object[], handle?: TransactionHandle): Promise<object[]>
   {
     const query = new TastyQuery(table).upsert(elements);
-    const [statements, values] = this.generateQuery(query, true);
+    const generated = this.generate(query);
     const primaryKeys = table.getPrimaryKeys();
 
-    let upserted: object[] = [];
-    for (let i = 0; i < statements.length; ++i)
-    {
-      const statement = statements[i];
-      const value = values[i];
-      const result = await new Promise<object[]>((resolve, reject) =>
-      {
-        this.client.query(statement, value, makePromiseCallback(resolve, reject));
-      });
-
-      upserted = upserted.concat(result['rows']);
-    }
+    const upserted: object[] = await this.execute(generated, handle);
 
     const results = new Array(upserted.length);
     for (let i = 0; i < results.length; i++)
@@ -152,6 +138,33 @@ export class PostgreSQLDB implements TastyDB
     }
 
     return results;
+  }
+
+  public async startTransaction(isolationLevel: IsolationLevel, readOnly: boolean): Promise<TransactionHandle>
+  {
+    const handle = await this.client.startTransaction();
+    const generator = new PostgreSQLGenerator();
+    generator.generateStartTransactionQuery(isolationLevel, readOnly);
+    await this.execute([generator.statements, generator.valuesArray], handle);
+    return handle;
+  }
+
+  public async commitTransaction(handle: TransactionHandle): Promise<object[]>
+  {
+    const generator = new PostgreSQLGenerator();
+    generator.generateCommitQuery();
+    const result = this.execute([generator.statements, generator.valuesArray], handle);
+    await this.client.endTransaction(handle);
+    return result;
+  }
+
+  public async rollbackTransaction(handle: TransactionHandle): Promise<object[]>
+  {
+    const generator = new PostgreSQLGenerator();
+    generator.generateRollbackQuery();
+    const result = this.execute([generator.statements, generator.valuesArray], handle);
+    await this.client.endTransaction(handle);
+    return result;
   }
 
   public async destroy(): Promise<void>

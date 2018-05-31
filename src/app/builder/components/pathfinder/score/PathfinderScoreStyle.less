@@ -73,17 +73,26 @@
 	}
 	
 	.pf-score-line-transform {
-        margin-top: 32px;
-	    position: relative;
-	    width: calc(~"100% - 51x");
-	    border-radius: 4px;
-	    padding-left: 24px;
-	    left: -10px;
-	    padding-right: 26px;
+		margin-top: 32px;
+		position: relative;
+		width: calc(~"100% - 51x");
+		border-radius: 4px;
+		padding-left: 24px;
+		left: -10px;
+		padding-right: 26px;
+		
 		.transform-card-inner {
 			margin-left: -17px;
 			width: 100%;
 		}
+		
+		.transform-card-options {
+			padding-bottom: 6px;
+			.switch {
+				margin-right: 12px;
+			}
+		}
+		
 		.yLeftAxis, .bottomAxis {
 			font-size: @small-font-size;
 		}

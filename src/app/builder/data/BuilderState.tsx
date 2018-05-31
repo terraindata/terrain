@@ -55,6 +55,7 @@ import { CardItem } from '../components/cards/CardComponent';
 import { _ResultsState, ResultsState } from '../components/results/ResultTypes';
 import { BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes } from './BuilderActionTypes';
 
+import { AjaxResponse } from 'util/Ajax';
 import { Cards } from '../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import BackendInstance from '../../../database/types/BackendInstance';
@@ -74,7 +75,7 @@ export class BuilderStateClass
   public lastActionTime: number = 0;
 
   public loading: boolean = false;
-  public loadingXhr: XMLHttpRequest = null;
+  public loadingXhr: AjaxResponse = null;
   public loadingAlgorithmId: ID = '';
 
   public selectedCardIds = Map<ID, boolean>({});

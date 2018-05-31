@@ -48,12 +48,11 @@ import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 
 import DatabaseController from '../../database/DatabaseController';
-import * as DBUtil from '../../database/Util';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Scripts from '../../scripts/Scripts';
+import * as Util from '../AppUtil';
 import { metrics } from '../events/EventRouter';
 import UserConfig from '../users/UserConfig';
-import * as Util from '../Util';
 import ResultsConfigConfig from './ResultsConfigConfig';
 
 export class ResultsConfig

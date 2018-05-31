@@ -44,12 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
 import * as ip from 'ip';
-import * as winston from 'winston';
-
+import * as jsonfile from 'jsonfile';
 import * as puppeteer from 'puppeteer';
-import { makePromiseCallback } from '../../../../shared/test/Utils';
+import * as winston from 'winston';
 import { getChromeDebugAddress } from '../../../FullstackUtils';
 
 const USERNAME_SELECTOR = '#login-email';
@@ -72,13 +70,7 @@ describe('Testing the card parser', () =>
 
   beforeAll(async () =>
   {
-    // TODO: get rid of this monstrosity once @types/winston is updated.
-    const contents: any = await new Promise((resolve, reject) =>
-    {
-      fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
-    });
-
-    expected = JSON.parse(contents);
+    expected = jsonfile.readFileSync(getExpectedFile());
     const wsAddress = await getChromeDebugAddress();
     browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
     winston.info('Connected to the Chrome ' + String(wsAddress));

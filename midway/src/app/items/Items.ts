@@ -49,9 +49,9 @@ import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import * as Util from '../AppUtil';
 import StatusHistory from '../statusHistory/StatusHistory';
 import UserConfig from '../users/UserConfig';
-import * as Util from '../Util';
 import { versions } from '../versions/VersionRouter';
 import ItemConfig from './ItemConfig';
 
@@ -220,7 +220,7 @@ export class Items
 
       if (item.name !== '')
       {
-        const itemsWithSameName = await this.select([], { name: item.name, type: item.type });
+        const itemsWithSameName = await this.select([], { name: item.name, type: item.type, parent: item.parent });
         const isNameTaken = itemsWithSameName.length !== 0 && (item.id === undefined || itemsWithSameName[0].id !== item.id);
         if (isNameTaken)
         {

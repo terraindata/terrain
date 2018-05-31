@@ -82,6 +82,9 @@ export interface Props
   id?: ID;
   vertical?: boolean;
   openRight?: boolean; // menu will open to the right
+  registerButton?: (ref) => void;
+  onChangeState?: (open: boolean) => void;
+  overrideMultiplier?: number;
   title?: string;
   expanded?: boolean; // Force the menu to be expanded
 }
@@ -148,9 +151,21 @@ class Menu extends TerrainComponent<Props & InjectedOnClickOutProps>
 
   public handleClickOutside()
   {
+    if (this.props.onChangeState)
+    {
+      this.props.onChangeState(false);
+    }
     this.setState({
       open: false,
     });
+  }
+
+  public registerMenuButton(button)
+  {
+    if (this.props.registerButton !== undefined)
+    {
+      this.props.registerButton(button);
+    }
   }
 
   public componentWillMount()
@@ -167,6 +182,13 @@ class Menu extends TerrainComponent<Props & InjectedOnClickOutProps>
 
   public toggleOpen(e)
   {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (this.props.onChangeState)
+    {
+      this.props.onChangeState(!this.state.open);
+    }
     this.setState({
       open: !this.state.open,
     });
@@ -174,7 +196,7 @@ class Menu extends TerrainComponent<Props & InjectedOnClickOutProps>
 
   public render()
   {
-    const { options } = this.props;
+    const { options, overrideMultiplier } = this.props;
     if (!options || !options.size)
     {
       return null;
@@ -185,6 +207,8 @@ class Menu extends TerrainComponent<Props & InjectedOnClickOutProps>
     {
       multiplier = 14;
     }
+    multiplier = overrideMultiplier === undefined ? multiplier : overrideMultiplier;
+
     const width = multiplier * options.reduce((max, option) =>
       option.text && (option.text.length > max) ? option.text.length : max, 1);
 
@@ -220,6 +244,7 @@ class Menu extends TerrainComponent<Props & InjectedOnClickOutProps>
             className='menu-icon-wrapper'
             onClick={this.toggleOpen}
             style={fontColor(this.state.open ? Colors().active : Colors().iconColor, Colors().active)}
+            ref={this.registerMenuButton}
           >
             <MoreIcon className='menu-icon' />
           </div>}

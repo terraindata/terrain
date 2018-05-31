@@ -53,7 +53,6 @@ import * as winston from 'winston';
 import * as jsonfile from 'jsonfile';
 
 import * as puppeteer from 'puppeteer';
-import { makePromiseCallback } from '../../../../shared/test/Utils';
 import { getChromeDebugAddress } from '../../../FullstackUtils';
 
 const USERNAME_SELECTOR = '#login-email';

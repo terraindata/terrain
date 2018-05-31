@@ -9,6 +9,25 @@
 @large-font-size: 24px;
 @bold-font-weight: 500;
 
+.tiny-font {
+  font-size: @tiny-font-size;
+}
+.small-font {
+  font-size: @small-font-size;
+}
+.font {
+  font-size: @font-size;
+}
+.medium-font {
+  font-size: @medium-font-size;
+}
+.pretty-large-font {
+  font-size: @pretty-large-font-size;
+}
+.large-font {
+  font-size: @large-font-size;
+}
+
 
 /* Margin and Padding */
 
@@ -22,6 +41,28 @@
 
 @fadedOutBg: rgba(0,0,0,0.75);
 
+.common-list-option-style {
+  border: 1px solid rgba(255,255,255,0);
+  border-radius: 4px;
+  padding: 3px;
+  cursor: pointer;
+  font-size: @font-size;
+  
+  .transition;
+}
+
+.common-option-name-style {
+  padding: 6px 12px;
+  font-size: 14px;
+  max-width: 100%;
+}
+
+.common-label-style {
+  margin-top: 12px;
+  padding: 6px 16px;
+  font-size: @small-font-size;
+  text-transform: uppercase;
+}
 
 
 /**** OLD REMOVE ***/
@@ -149,6 +190,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.flex-container-left {
+  display: flex;
+  text-align: left;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .flex-grow {

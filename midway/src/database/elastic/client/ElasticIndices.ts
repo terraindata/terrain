@@ -111,6 +111,7 @@ class ElasticIndices
    */
   public refresh(params: Elastic.IndicesRefreshParams, callback: (err: any, response: any) => void): void
   {
+    this.log('refresh', params);
     return this.delegate.indices.refresh(params, callback);
   }
 

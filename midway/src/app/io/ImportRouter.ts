@@ -48,9 +48,9 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
+import * as Util from '../AppUtil';
 import { Permissions } from '../permissions/Permissions';
 import UserConfig from '../users/UserConfig';
-import * as Util from '../Util';
 import { Import } from './Import';
 import { ImportSourceConfig, Sources } from './sources/Sources';
 import * as Auth from './templates/Authenticate';
@@ -110,8 +110,8 @@ Router.post('/mysqlheadless', async (ctx, next) =>
     return;
   }
   Util.verifyParameters(authStream['fields'], ['filetype', 'templateId']);
-  ctx.body = await imprt.upsert(
-    await fieldTypes.getJSONFromMySQLFormatStream(authStream['files'], authStream['fields']), authStream['fields'], true);
+  // ctx.body = await imprt.upsert(
+  //   await fieldTypes.getJSONFromMySQLFormatStream(authStream['files'], authStream['fields']), authStream['fields'], true);
 });
 
 Router.post('/headless', async (ctx, next) =>

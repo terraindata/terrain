@@ -50,9 +50,10 @@ import * as Stream from 'stream';
 import * as winston from 'winston';
 
 import { ElasticMapping } from '../../../../../shared/etl/mapping/ElasticMapping';
+import SafeWritable from '../../../app/io/streams/SafeWritable';
 import ElasticClient from '../client/ElasticClient';
 
-export class ElasticWriter extends Stream.Duplex
+export class ElasticWriter extends SafeWritable
 {
   private client: ElasticClient;
   private primaryKey: string | undefined;
@@ -60,15 +61,13 @@ export class ElasticWriter extends Stream.Duplex
   private type: string;
 
   private doneWriting: boolean = false;
-  private docsUpserted: number = 0;
-  private numErrors: number = 0;
 
   private BULK_THRESHOLD: number = 10;
 
   constructor(client: ElasticClient, index: string, type: string, primaryKey?: string)
   {
     super({
-      writableObjectMode: true,
+      objectMode: true,
       highWaterMark: 1024 * 128,
     });
 
@@ -80,46 +79,60 @@ export class ElasticWriter extends Stream.Duplex
 
   public _write(chunk: any, encoding: string, callback: (err?: Error) => void): void
   {
-    if (Array.isArray(chunk))
+    try
     {
-      const chunks = chunk.map((c) =>
+      if (Array.isArray(chunk))
       {
-        return { chunk: c, encoding };
-      });
-      return this._writev(chunks, callback);
-    }
+        const chunks = chunk.map((c) =>
+        {
+          return { chunk: c, encoding };
+        });
+        return this._writev(chunks, callback);
+      }
 
-    if (typeof chunk !== 'object')
+      if (typeof chunk !== 'object')
+      {
+        this.emit('error', 'expecting chunk to be an object');
+        return;
+      }
+
+      this.upsert(chunk, callback);
+    }
+    catch (e)
     {
-      this.emit('error', 'expecting chunk to be an object');
-      return;
+      this.emit('error', e);
     }
-
-    this.upsert(chunk, callback);
   }
 
   public _writev(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
   {
-    const numChunks = chunks.length;
-    if (numChunks < this.BULK_THRESHOLD)
+    try
     {
-      let numPending = numChunks;
-      const done = new EventEmitter();
-      done.on('done', callback);
-      for (const chunk of chunks)
+      const numChunks = chunks.length;
+      if (numChunks < this.BULK_THRESHOLD)
       {
-        this._write(chunk.chunk, chunk.encoding, (err?) =>
+        let numPending = numChunks;
+        const done = new EventEmitter();
+        done.on('done', callback);
+        for (const chunk of chunks)
         {
-          if (--numPending === 0)
+          this._write(chunk.chunk, chunk.encoding, (err?) =>
           {
-            done.emit('done', err);
-          }
-        });
+            if (--numPending === 0)
+            {
+              done.emit('done', err);
+            }
+          });
+        }
+      }
+      else
+      {
+        this.bulkUpsert(chunks, callback);
       }
     }
-    else
+    catch (e)
     {
-      this.bulkUpsert(chunks, callback);
+      this.emit('error', e);
     }
   }
 
@@ -131,31 +144,32 @@ export class ElasticWriter extends Stream.Duplex
   public _final(callback)
   {
     this.doneWriting = true;
-    if (callback !== undefined)
-    {
-      callback();
-    }
-  }
-
-  public _read(size: number = 1024)
-  {
-    if (this.doneWriting)
-    {
-      this.push(null);
-      return;
-    }
-    setTimeout((() => this.push(JSON.stringify(this.progress()))).bind(this), 500);
-  }
-
-  public progress(): object
-  {
-    return {
-      successful: this.docsUpserted,
-      failed: this.numErrors,
-    };
+    this.client.indices.refresh({ index: this.index }, callback);
   }
 
   private upsert(body: object, callback: (err?: Error) => void): void
+  {
+    if (this.primaryKey == null || body[this.primaryKey] == null)
+    {
+      this.insert(body, callback);
+    }
+    else
+    {
+      const query: Elastic.UpdateDocumentParams = {
+        index: this.index,
+        type: this.type,
+        id: body[this.primaryKey],
+        body: {
+          doc: body,
+          doc_as_upsert: true,
+        },
+      };
+
+      this.client.update(query, callback);
+    }
+  }
+
+  private insert(body: object, callback: (err?: Error) => void): void
   {
     const query: Elastic.IndexDocumentParams<object> = {
       index: this.index,
@@ -168,21 +182,47 @@ export class ElasticWriter extends Stream.Duplex
       query['id'] = body[this.primaryKey];
     }
 
-    this.client.index(query, ((err: Error, response: any) =>
-    {
-      if (err !== null && err !== undefined)
-      {
-        this.numErrors++;
-      }
-      else
-      {
-        this.docsUpserted++;
-      }
-      callback(err);
-    }).bind(this));
+    this.client.index(query, callback);
   }
 
   private bulkUpsert(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
+  {
+    if (this.primaryKey == null)
+    {
+      this.bulkInsert(chunks, callback);
+    }
+    else
+    {
+      const body: any[] = [];
+      for (const chunk of chunks)
+      {
+        const command =
+          {
+            update: {
+              _index: this.index,
+              _type: this.type,
+            },
+          };
+
+        if (this.primaryKey !== undefined && chunk.chunk[this.primaryKey] !== undefined)
+        {
+          command.update['_id'] = chunk.chunk[this.primaryKey];
+        }
+
+        const newBody = {
+          doc: chunk.chunk,
+          doc_as_upsert: true,
+        };
+
+        body.push(command);
+        body.push(newBody);
+      }
+
+      this.client.bulk({ body }, callback);
+    }
+  }
+
+  private bulkInsert(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
   {
     const body: any[] = [];
     for (const chunk of chunks)
@@ -195,28 +235,16 @@ export class ElasticWriter extends Stream.Duplex
           },
         };
 
-      if (this.primaryKey !== undefined && chunk[this.primaryKey] !== undefined)
+      if (this.primaryKey !== undefined && chunk.chunk[this.primaryKey] !== undefined)
       {
-        command.index['_id'] = chunk[this.primaryKey];
+        command.index['_id'] = chunk.chunk[this.primaryKey];
       }
 
       body.push(command);
       body.push(chunk.chunk);
     }
 
-    this.client.bulk({ body }, ((err: Error, response: any) =>
-    {
-      if (err !== null && err !== undefined)
-      {
-        // TODO: better error counting
-        this.numErrors += chunks.length;
-      }
-      else
-      {
-        this.docsUpserted += chunks.length;
-      }
-      callback(err);
-    }).bind(this));
+    this.client.bulk({ body }, callback);
   }
 }
 

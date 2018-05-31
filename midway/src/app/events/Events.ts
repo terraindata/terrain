@@ -48,10 +48,10 @@ import bodybuilder = require('bodybuilder');
 import * as Elastic from 'elasticsearch';
 import * as winston from 'winston';
 
+import util from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticController from '../../database/elastic/ElasticController';
 import * as Tasty from '../../tasty/Tasty';
-import * as Util from '../Util';
 import EventConfig from './EventConfig';
 
 export interface AggregationRequest
@@ -377,7 +377,7 @@ export class Events
 
   private runQuery(controller: ElasticController, query: Elastic.SearchParams, resolve: (T) => void, reject: (Error) => void): void
   {
-    controller.getClient().search(query, Util.makePromiseCallback(resolve, reject));
+    controller.getClient().search(query, util.promise.makeCallback(resolve, reject));
   }
 }
 

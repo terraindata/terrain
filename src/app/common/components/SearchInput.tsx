@@ -78,8 +78,9 @@ export class SearchInput extends TerrainComponent<Props>
   state = {
     isFocused: false,
     myId: String(Math.random()) + '-searchinput',
-    valueRef: null,
   };
+
+  valueRef = null;
 
   public componentWillReceiveProps(nextProps: Props)
   {
@@ -92,12 +93,13 @@ export class SearchInput extends TerrainComponent<Props>
 
   public componentDidMount()
   {
-    //
-  }
-
-  public componentDidUpdate(prevProps: Props, prevState)
-  {
-    //
+    // strategy recommended by https://stackoverflow.com/questions/28889826/react-set-focus-on-input-after-render
+    // (read the comments for why -- autoFocus prop is unreliable)
+    if (this.props.autoFocus)
+    {
+      this.autoFocus();
+      setTimeout(this.autoFocus.bind(this), 100);
+    }
   }
 
   public render()
@@ -124,7 +126,6 @@ export class SearchInput extends TerrainComponent<Props>
           type='text'
           value={value === null || value === undefined ? '' : value}
           onChange={this.handleChange}
-          autoFocus={props.autoFocus}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}
           id={state.myId}
@@ -168,9 +169,7 @@ export class SearchInput extends TerrainComponent<Props>
 
   private getValueRef(ref)
   {
-    this.setState({
-      valueRef: ref,
-    });
+    this.valueRef = ref;
 
     if (this.props.getValueRef)
     {
@@ -184,7 +183,7 @@ export class SearchInput extends TerrainComponent<Props>
     {
       case 9: // tab
       case 13: // enter
-        ReactDOM.findDOMNode(this.state.valueRef)['blur']();
+        ReactDOM.findDOMNode(this.valueRef)['blur']();
         break;
       default:
         break;
@@ -198,7 +197,7 @@ export class SearchInput extends TerrainComponent<Props>
   private autoFocus()
   {
     // force focus, needed if component has mounted and autoFocus flag changes
-    const { valueRef } = this.state;
+    const { valueRef } = this;
     if (valueRef)
     {
       const valueEl = ReactDOM.findDOMNode(valueRef);

@@ -1,0 +1,24 @@
+@import "~common/Common.less";
+
+.engine-field-picker {
+  display: flex;
+  flex-direction: column;
+
+  .engine-field-picker-title {
+    padding-top: @quarter-spacing;
+    .normal-text;
+  }
+
+  .field-options-section {
+    display: flex;
+  }
+
+  .field-picker-field {
+    margin-bottom: @half-spacing;
+    flex-grow: 1;
+    padding-right: @quarter-spacing;
+    &:last-child {
+      padding-right: 0px;
+    }
+  }
+}

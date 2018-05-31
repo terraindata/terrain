@@ -48,12 +48,12 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
+import { createRecordType } from 'shared/util/Classes';
 import Ajax from 'util/Ajax';
 import Util from 'util/Util';
 import BackendInstance from '../../database/types/BackendInstance';
 import { Item, ItemC, ItemStatus, ItemType } from '../../items/types/Item';
 import { _Query, Query, queryForSave } from '../../items/types/Query';
-import { createRecordType } from '../Classes';
 
 class LibraryStateC
 {

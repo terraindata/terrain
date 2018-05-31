@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:restrict-plus-operands radix strict-boolean-expressions no-var-requires no-unused-expression forin no-shadowed-variable max-line-length
-import { List } from 'immutable';
+import { List, Map } from 'immutable';
 import * as $ from 'jquery';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -57,6 +57,7 @@ import * as _ from 'lodash';
 import { Moment } from 'moment';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+const momentPreciseRangePlugin = require('moment-precise-range-plugin');
 
 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 const suffixes = ['', ' k', ' M', ' B'];
@@ -402,13 +403,22 @@ const Util = {
     return Math.random();
   },
 
-  extendId(obj: object, isString?: boolean): object
+  extendId(obj: object = {}, isString?: boolean): object
   {
-    if (obj['id'])
+    if (obj === null)
+    {
+      obj = {};
+    }
+    if (obj['id'] && obj['id'] !== -1)
     {
       return obj;
     }
-    return _.extend({}, { id: Util.getId(isString) }, _.omitBy(obj, (value) => value === undefined));
+    return _.extend({},
+      _.omitBy(obj, (value) => value === undefined),
+      {
+        id: Util.getId(isString),
+      },
+    );
   },
 
   moveIndexOffset(index: number, newIndex: number): number
@@ -721,18 +731,38 @@ const Util = {
     const mapStateToProps = (state) =>
     {
       const stateToProps = {};
-      stateToPropsKeys.forEach((key) =>
+
+      if (_.isArray(stateToPropsKeys))
       {
-        if (_.isArray(key))
+        stateToPropsKeys.forEach((key) =>
         {
-          const stateKey = _.last(key);
-          stateToProps[stateKey] = state.getIn(key);
-        }
-        else
+          if (_.isArray(key))
+          {
+            const stateKey = _.last(key);
+            stateToProps[stateKey] = state.getIn(key);
+          }
+          else
+          {
+            stateToProps[key] = state.get(key);
+          }
+        });
+      }
+
+      if (_.isPlainObject(stateToPropsKeys))
+      {
+        Object.keys(stateToPropsKeys).map((key, index) =>
         {
-          stateToProps[key] = state.get(key);
-        }
-      });
+          const value = stateToPropsKeys[key];
+          if (_.isFunction(value))
+          {
+            stateToProps[key] = value(state);
+          }
+          else
+          {
+            stateToProps[key] = value;
+          }
+        });
+      }
 
       return stateToProps;
     };
@@ -836,6 +866,45 @@ const Util = {
       }
     }
     return false;
+  },
+
+  arrayToImmutableMap(arrayToConvert: any[], idAttribute: string, itemConstructor = null)
+  {
+    const immutableMap = arrayToConvert.reduce((imap, item) =>
+    {
+      let transformedItem = Object.assign({}, item);
+      if (itemConstructor !== null)
+      {
+        transformedItem = itemConstructor(item);
+      }
+      return imap.set(item[idAttribute], transformedItem);
+    }, Immutable.Map());
+
+    return immutableMap;
+  },
+
+  arrayToImmutableList(arrayToConvert: any[], itemConstructor = null)
+  {
+    const immutableList = arrayToConvert.map((item) =>
+    {
+      if (itemConstructor !== null)
+      {
+        return itemConstructor(item);
+      }
+      return item;
+    });
+
+    return List(immutableList);
+  },
+
+  objectToImmutableMap(objectToConvert: any, itemConstructor = null)
+  {
+    let immutableMap = Map({});
+    for (const key in objectToConvert)
+    {
+      immutableMap = immutableMap.set(key, itemConstructor ? itemConstructor(objectToConvert[key]) : objectToConvert[key]);
+    }
+    return immutableMap;
   },
 };
 

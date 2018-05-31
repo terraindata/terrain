@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:variable-name max-classes-per-file member-access strict-boolean-expressions
 
-import { createRecordType } from 'app/Classes';
 import * as Immutable from 'immutable';
+import { createRecordType } from 'shared/util/Classes';
 const { List, Map } = Immutable;
 import Util from 'app/util/Util';
 

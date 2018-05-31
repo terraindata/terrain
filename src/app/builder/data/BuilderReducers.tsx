@@ -60,7 +60,7 @@ import Query from '../../../items/types/Query';
 import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import TerrainTools from '../../util/TerrainTools';
 import Util from '../../util/Util';
-import Ajax from './../../util/Ajax';
+import Ajax, { AjaxResponse } from './../../util/Ajax';
 import ActionTypes from './BuilderActionTypes';
 import
 {
@@ -102,10 +102,10 @@ const BuilderReducers =
         }
 
         // abort the previous request
-        state.loadingXhr.abort();
+        state.loadingXhr.cancel();
       }
 
-      const xhr: XMLHttpRequest = Ajax.getQuery(
+      const xhr: any = Ajax.getQuery(
         algorithmId,
         (query: Query) =>
         {
@@ -137,7 +137,7 @@ const BuilderReducers =
       action: Action<{
         query: Query,
         algorithmId: ID,
-        xhr: XMLHttpRequest,
+        xhr: AjaxResponse,
         db: BackendInstance,
         dispatch: any,
         changeQuery: any,

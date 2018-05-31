@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as ReduxActions from 'redux-actions';
-import { BaseClass, createRecordType, New } from '../../Classes';
+import { BaseClass, createRecordType, New } from 'shared/util/Classes';
 const Redux = require('redux');
 
 export class BuilderScrollStateClass extends BaseClass

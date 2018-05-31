@@ -1,0 +1,153 @@
+@import "~common/Common.less";
+@import "~etl/templates/components/TemplateEditor.less";
+// template editor field node
+.template-editor-children-container {
+  display: flex;
+  flex-direction: column;
+
+  .editor-field-array-more {
+    .transition;
+    margin: 1px @half-spacing;
+    padding: @quarter-spacing;
+    padding-left: @double-spacing;
+    display: flex;
+    border-radius: 4px;
+    .editor-field-array-more-label {
+      padding: 0px @spacing;
+    }
+    .editor-field-array-more-button {
+      cursor: pointer;
+      padding: 0px @spacing;
+    }
+  }
+}
+
+.add-another-field-button {
+  padding: @spacing;
+  margin-left: @spacing;
+  .big-text;
+  .transition;
+  cursor: pointer;
+}
+
+// EditorFieldPreview
+.template-editor-field-block {
+  display: flex;
+  flex-direction: column;
+  padding: @half-spacing;
+
+  .field-preview-label-group {
+    flex: 0 0 200px;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .field-preview-label {
+    padding: @half-spacing;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;
+    
+    .tef-big-text;
+    &.field-preview-can-toggle {
+      cursor: pointer;
+    }
+
+    &.field-preview-array-label {
+      .big-text;
+    }
+  }
+  
+  .field-type-icon {
+    svg {
+      width: 18px;
+      fill: currentColor;
+      stroke: currentColor;
+      stroke-width: 4px;
+      margin-right: 6px;
+    }
+  }
+
+  .primary-key-icon {
+    padding: @half-spacing;
+    padding-left: 0px;
+    align-self: flex-end;
+    svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+    }
+  }
+
+  .field-preview-menu {
+    position: relative;
+    .transition;
+    opacity: 1;
+    padding-left: @spacing;
+    left: 14px;
+    top: -12px;
+    &.field-preview-menu-hidden {
+      opacity: 0;
+    }
+  }
+
+  .field-preview-value {
+    padding: @half-spacing;
+    padding-left: @spacing;
+  }
+
+  .field-preview-row {
+    display: flex;
+    min-width: 0;
+    padding: @half-spacing;
+  }
+}
+
+.editor-field-main-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+@settings-height: 340px;
+@settings-margin-size: (2 * @double-spacing - 4px);
+@settings-extra-space: (2 * @settings-margin-size);
+.editor-field-node-settings-container {
+  height: (@settings-height + @spacing);
+  position: relative;
+  left: -1px;
+  .transition;
+
+  .editor-field-node-settings-content {
+    border-radius: 4px;
+    box-sizing: border-box;
+    width: ~"calc(100% + 2px)";
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 2px 3px 10px rgba(0,0,0,0.25);
+  }
+}
+
+.template-editor-close-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0px @spacing @half-spacing @spacing;
+
+  .settings-drawer-close-line {
+    flex: 1;
+    height: 1px;
+    border-bottom: 1px solid;
+    border-color: inherit;
+    opacity: 0.2;
+  }
+
+  .settings-drawer-close-icon {
+    fill: currentColor;
+    transform: rotate(-90deg);
+  }
+}

@@ -65,7 +65,11 @@ import FadeInOut from 'common/components/FadeInOut';
 import SingleRouteSelector from 'common/components/SingleRouteSelector';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
-import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
+import
+{
+  _FilterGroup, _FilterLine, _ScoreLine, FilterGroup, FilterLine, Path,
+  PathfinderContext, PathfinderSteps, Source,
+} from '../PathfinderTypes';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
 import './PathfinderFilterStyle.less';
@@ -83,6 +87,7 @@ export interface Props
   onUpdateScript?: (fieldName: string, name: string, lat?: any, lon?: any) => void;
   builderActions?: typeof BuilderActions;
   colorsActions?: typeof ColorsActions;
+  path?: Path;
 }
 
 class PathfinderFilterSection extends TerrainComponent<Props>
@@ -203,6 +208,42 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         canDrag: false,
         addingFilterLine: true,
       });
+
+      const { path, isSoftFilter } = this.props;
+      if (isSoftFilter && path !== undefined)
+      {
+        const hasMatchQuality = path.score.lines.some(
+          (line) => line.field === '_score',
+        );
+        if (!hasMatchQuality)
+        {
+          // create a match quality score
+          const newScoreLines = path.score.lines.push(_ScoreLine({
+            field: '_score',
+            transformData: {
+              autoBound: true,
+              scorePoints: [
+                {
+                  value: 0,
+                  score: 0,
+                  id: String(Math.random()),
+                },
+                {
+                  value: 10,
+                  score: 1,
+                  id: String(Math.random()),
+                },
+              ],
+              domain: [0, 10],
+              dataDomain: [0, 10],
+            },
+          }));
+          this.props.builderActions.changePath(
+            this.props.keyPath.butLast().toList().push('score').push('lines'),
+            newScoreLines,
+          );
+        }
+      }
     }
   }
 
@@ -416,29 +457,32 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         dropKeyPath.concat(List(['filterGroup', 'lines', lineSize]).toList()), true);
       return;
     }
-    let group;
+    let newItem;
     // If they were both single filters, create a new group
     if (!this.isGroup(dropped) && !this.isGroup(droppedInto))
     {
       const { groupCount } = this.props.filterGroup;
       const groupNumber: string = groupCount < 10 ? '0' + String(groupCount) : String(groupCount);
-      group = _FilterGroup({
-        lines: List([droppedInto, dropped]),
-        name: 'Group ' + groupNumber,
+      newItem = _FilterLine({
+        filterGroup: {
+          lines: [droppedInto, dropped],
+          name: 'Group ' + groupNumber,
+        },
       });
       this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'groupCount'), groupCount + 1, true);
     }
     // If the dropped item was already a group, keep it's name and minMatches and append the line it was dropped onto
     else
     {
-      group = _FilterGroup({
+      newItem = _FilterGroup({
         lines: dropped.filterGroup.lines.insert(0, droppedInto),
         minMatches: dropped.filterGroup.minMatches,
         name: dropped.filterGroup.name,
       });
+      // only update the group, not the line
+      dropKeyPath = dropKeyPath.push('filterGroup');
     }
-    dropKeyPath = dropKeyPath.push('filterGroup');
-    lines = this.updateLines(lines, dragKeyPath, dropKeyPath, group);
+    lines = this.updateLines(lines, dragKeyPath, dropKeyPath, newItem);
     // Look for the thing that you dropped, if it is somewhere other than keyPath, remove it
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'lines'), lines);
   }
@@ -522,6 +566,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       title = PathfinderText.softFilterSectionTitle;
       tooltip = PathfinderText.softFilterSectionSubtitle;
     }
+
     return (
       <div
         className='pf-section pf-filter-section'
@@ -545,7 +590,9 @@ class PathfinderFilterSection extends TerrainComponent<Props>
           />
           {
             filterGroup.lines.map((line, i) =>
-              <div key={i}>
+              <div
+                key={line.id === -1 ? i : line.id /* dealing with id-less lines */}
+              >
                 {
                   !this.isGroup(line) ?
                     <DragDropItem
@@ -560,6 +607,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
                       onDragStop={this._toggle('dragging')}
                       dropZoneStyle={dropZoneStyle}
                       canDrag={canEdit && this.state.canDrag}
+                      useCustomDragLayer={true}
                     />
                     :
                     <DragDropGroup
@@ -595,9 +643,9 @@ class PathfinderFilterSection extends TerrainComponent<Props>
             )
           }
           {
-            !this.state.addingFilterLine && canEdit &&
+            canEdit &&
             <PathfinderCreateLine
-              canEdit={pathfinderContext.canEdit}
+              canEdit={pathfinderContext.canEdit && !this.state.addingFilterLine}
               text={isSoftFilter ? PathfinderText.softFilterAdd : PathfinderText.hardFilterAdd}
               onCreate={this.handleAddFilter}
             />

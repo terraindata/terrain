@@ -45,7 +45,12 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 import * as React from 'react';
 import { browserHistory } from 'react-router';
-import { IndexRoute, Route, Router } from 'react-router';
+import { IndexRedirect, IndexRoute, Route, Router } from 'react-router';
+
+import DataTabs from 'etl/components/DataTabs';
+import TemplateList from 'etl/templates/components/TemplateList';
+import Jobs from 'jobs/components/Jobs';
+import ScheduleList from 'scheduler/components/ScheduleList';
 import App from './App';
 import Builder from './builder/components/Builder';
 import Logout from './common/components/Logout';
@@ -53,7 +58,8 @@ import Placeholder from './common/components/Placeholder';
 import Redirect from './common/components/Redirect';
 import TerrainComponent from './common/components/TerrainComponent';
 import UIComponentsPage from './common/UIComponentsPage';
-import ControlPage from './control/components/ControlPage';
+import ETLEditorPage from './etl/components/ETLEditorPage';
+import ETLWalkthrough from './etl/walkthrough/components/ETLWalkthrough';
 import FileImport from './fileImport/components/FileImport';
 import Library from './library/components/LibraryDnd';
 import ManualWrapper from './manual/components/ManualWrapper';
@@ -66,6 +72,9 @@ import Profile from './users/components/Profile';
 import Settings from './users/components/Settings';
 import Team from './users/components/Team';
 import X from './x/components/X';
+
+import IntegrationEditorPage from './etl/integrations/components/IntegrationEditorPage';
+import IntegrationList from './etl/integrations/components/IntegrationList';
 
 class AppRouter extends TerrainComponent<{}> {
   public render()
@@ -131,9 +140,23 @@ class AppRouter extends TerrainComponent<{}> {
 
           <Route path='/schema' component={SchemaPage} />
 
-          <Route path='/control' component={ControlPage} />
+          <Route path='/import' component={FileImport /*TODO get rid of this once ETL is merged*/} />
 
-          <Route path='/import' component={FileImport} />
+          <Route path='/data' component={DataTabs}>
+            <IndexRedirect to='/data/templates' />
+            <Route path='templates' component={TemplateList} />
+            <Route path='newtemplate(/:step)' component={ETLWalkthrough} />
+            <Route path='templates/edit/new' component={ETLEditorPage} />
+            <Route path='templates/edit/algorithmId=:algorithmId' component={ETLEditorPage} />
+            <Route path='templates/edit/templateId=:templateId' component={ETLEditorPage} />
+
+            <Route path='integrations' component={IntegrationList} />
+            <Route path='integrations/edit/integrationId=:integrationId' component={IntegrationEditorPage} />
+
+            <Route path='schedules' component={ScheduleList} />
+            <Route path='jobs' component={Jobs} />
+          </Route>
+
           <Route path='/analytics'>
             <IndexRoute component={analyticsLibrary} />
             <Route path=':categoryId' component={analyticsLibrary}>
@@ -146,6 +169,7 @@ class AppRouter extends TerrainComponent<{}> {
               </Route>
             </Route>
           </Route>
+
         </Route>
       </Router>
     );

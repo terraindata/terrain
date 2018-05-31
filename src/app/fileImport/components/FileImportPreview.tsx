@@ -60,7 +60,6 @@ import Util from 'util/Util';
 import { SchemaActions } from 'schema/data/SchemaRedux';
 import { backgroundColor, buttonColors, Colors, fontColor } from '../../colors/Colors';
 import TemplateList from '../../common/components/TemplateList';
-import { getTemplateId, getTemplateName } from './../../../../shared/Util';
 import { ESParseTreeToCode } from './../../../database/elastic/conversion/ParseElasticQuery';
 import Query from './../../../items/types/Query';
 import Autocomplete from './../../common/components/Autocomplete';
@@ -80,7 +79,6 @@ import FileImportPreviewColumn from './FileImportPreviewColumn';
 import TransformModal from './TransformModal';
 
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
-import { getRootFieldFromDocPath } from '../../../../shared/Util';
 
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
 
@@ -449,6 +447,32 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
+  // full template name is of the form - 'id: name'
+  public getTemplateName(template: string): string
+  {
+    return template.substring(template.indexOf(':') + 2);
+  }
+
+  public getTemplateId(template: string): number
+  {
+    return Number(template.substring(0, template.indexOf(':')));
+  }
+
+  public getRootFieldFromDocPath(path: string): string | undefined
+  {
+    try
+    {
+      let pathAsArr: string[] = [];
+      path.split(/(\.)/g).forEach((elem) => pathAsArr = pathAsArr.concat(elem.split(/(\[\d+\])/g)));
+      pathAsArr = pathAsArr.filter((elem) => elem.length !== 0);
+      return pathAsArr[0];
+    }
+    catch (e)
+    {
+      return undefined;
+    }
+  }
+
   public onSaveTemplateNameChange(saveTemplateName: string)
   {
     this.setState({
@@ -469,7 +493,7 @@ class FileImportPreview extends TerrainComponent<Props>
       this.setPreviewErrorMsg('Please enter a template name');
       return;
     }
-    if (this.state.templateOptions.find((option) => getTemplateName(option) === saveTemplateName))
+    if (this.state.templateOptions.find((option) => this.getTemplateName(option) === saveTemplateName))
     {
       this.showUpdateTemplate();
       return;
@@ -553,7 +577,7 @@ class FileImportPreview extends TerrainComponent<Props>
   public handleUpdateTemplate()
   {
     const { saveTemplateName } = this.state;
-    const id = getTemplateId(this.state.templateOptions.find((option) => getTemplateName(option) === saveTemplateName));
+    const id = this.getTemplateId(this.state.templateOptions.find((option) => this.getTemplateName(option) === saveTemplateName));
     Actions.updateTemplate(id, this.props.exporting, this.handleUpdateTemplateSuccess, this.handleUpdateTemplateError, saveTemplateName);
     this.setState({
       showingSaveTemplate: false,
@@ -580,7 +604,7 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     const templateName = this.state.templateOptions.get(itemIndex);
     Actions.deleteTemplate(
-      getTemplateId(templateName),
+      this.getTemplateId(templateName),
       this.props.exporting,
       this.handleDeleteTemplateSuccess,
       this.handleDeleteTemplateError,
@@ -621,11 +645,11 @@ class FileImportPreview extends TerrainComponent<Props>
       return;
     }
 
-    Actions.applyTemplate(getTemplateId(templateName), List(Array.from(unmatchedTemplateCols)));
+    Actions.applyTemplate(this.getTemplateId(templateName), List(Array.from(unmatchedTemplateCols)));
     this.setState({
       showingApplyTemplate: false,
-      appliedTemplateName: getTemplateName(templateName),
-      saveTemplateName: getTemplateName(templateName),
+      appliedTemplateName: this.getTemplateName(templateName),
+      saveTemplateName: this.getTemplateName(templateName),
     });
   }
 
@@ -799,7 +823,7 @@ class FileImportPreview extends TerrainComponent<Props>
     const transform: Transform = FileImportTypes._Transform(
       {
         name: 'extract',
-        colName: getRootFieldFromDocPath(this.state.addExportColumnPath),
+        colName: this.getRootFieldFromDocPath(this.state.addExportColumnPath),
         args: FileImportTypes._TransformArgs({
           newName: this.state.addExportColumnName,
           path: this.state.addExportColumnPath,
@@ -868,7 +892,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public renderUpdateTemplate()
   {
-    const overwriteName: string = this.state.templateOptions.find((option) => getTemplateName(option) === this.state.saveTemplateName);
+    const overwriteName: string = this.state.templateOptions.find((option) => this.getTemplateName(option) === this.state.saveTemplateName);
     return (
       <Modal
         open={this.state.showingUpdateTemplate}

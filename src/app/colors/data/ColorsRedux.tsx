@@ -44,10 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires
-
-// Copyright 2017 Terrain Data, Inc.
-
 // tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
 import * as Immutable from 'immutable';
 import { Map } from 'immutable';
@@ -57,7 +53,7 @@ const Redux = require('redux');
 import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
 import Util from 'app/util/Util';
 import thunk from 'redux-thunk';
-import { BaseClass, New } from '../../Classes';
+import { BaseClass, New } from 'shared/util/Classes';
 import { _ColorsState, ColorsState } from './ColorsTypes';
 
 export interface ColorsActionTypes

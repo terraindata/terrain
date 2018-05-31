@@ -57,6 +57,7 @@ export interface Props
   open: boolean;
   children?: any;
   maxHeight: number;
+  disableScroll?: boolean;
 
   // TODO could consider a prop here to force shouldRender, which you could trigger
   //  on hover, to try to improve responsiveness of opening the drawer
@@ -169,7 +170,7 @@ class DrawerAnimation extends TerrainComponent<Props>
           setTimeout(() =>
           {
             const el = ReactDOM.findDOMNode(this.state.contentRef) as Element;
-            if (el !== undefined)
+            if (el !== undefined && !this.props.disableScroll)
             {
               el.scrollIntoView({
                 behavior: 'smooth',

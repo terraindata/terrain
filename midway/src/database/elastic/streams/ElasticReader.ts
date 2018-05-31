@@ -73,16 +73,24 @@ export class ElasticReader extends SafeReadable
 
   private numRequested: number = 0;
 
-  constructor(client: ElasticClient, query: any, streaming: boolean = false)
+  constructor(client: ElasticClient, query: string | object, streaming: boolean = false)
   {
     super({ objectMode: true, highWaterMark: 1024 * 8 });
 
     this.client = client;
-    this.query = query;
+    if (typeof query === 'string')
+    {
+      this.query = JSON.parse(query);
+    }
+    else
+    {
+      this.query = query;
+    }
     this.streaming = streaming;
 
     this.size = (query['size'] !== undefined) ? query['size'] as number : this.DEFAULT_SEARCH_SIZE;
     this.scroll = (query['scroll'] !== undefined) ? query['scroll'] : this.DEFAULT_SCROLL_TIMEOUT;
+    this.numRequested = this.size;
 
     this.numRequested = this.size;
     this.scrolling = streaming && (this.size > this.DEFAULT_SEARCH_SIZE);
@@ -164,7 +172,11 @@ export class ElasticReader extends SafeReadable
     this.rowsProcessed += length;
     this.numRequested = Math.max(0, this.numRequested - length);
 
-    this.push(response);
+    const shouldContinue = this.push(response);
+    if (!shouldContinue)
+    {
+      this.numRequested = 0;
+    }
 
     this.querying = false;
     this.doneReading = this.doneReading

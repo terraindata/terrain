@@ -94,7 +94,8 @@ class LibraryStateMock
       userIds: Immutable.List([]),
       defaultLanguage: 'elastic',
       parent: 0,
-    }));
+      modelVersion: 5,
+    });
 
     this.state = this.state.set(
       'categories',
@@ -114,6 +115,8 @@ class LibraryStateMock
       userIds: Immutable.List([]),
       defaultLanguage: 'elastic',
       parent: 0,
+      modelVersion: 5,
+      categoryId,
     });
 
     this.state = this.state
@@ -131,6 +134,8 @@ class LibraryStateMock
     const algorithm = _Algorithm({
       id: algorithmId,
       name: algorithmName,
+      modelVersion: 5,
+      groupId,
     });
 
     this.state = this.state

@@ -67,9 +67,8 @@ import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database
 import BackendInstance from '../../../../database/types/BackendInstance';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import Query from '../../../../items/types/Query';
-import Actions from '../../../fileImport/data/FileImportActions';
 import * as FileImportTypes from '../../../fileImport/FileImportTypes';
-import { Ajax } from '../../../util/Ajax';
+import { Ajax, AjaxResponse } from '../../../util/Ajax';
 import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
 import { SpotlightActions } from '../../data/SpotlightRedux';
@@ -97,7 +96,7 @@ export interface Props
 
 interface ResultsQuery
 {
-  xhr: XMLHttpRequest;
+  xhr: AjaxResponse;
   queryId: string;
 }
 
@@ -193,7 +192,7 @@ export class ResultsManager extends TerrainComponent<Props>
         {
           AjaxM1.killQuery(query.queryId);
         }
-        query.xhr.abort();
+        query.xhr.cancel();
       },
     );
   }
@@ -390,13 +389,12 @@ export class ResultsManager extends TerrainComponent<Props>
     let { resultsState } = this.props;
     _.map(changes,
       (value: any, key: string) =>
-        resultsState = resultsState.set(key, value),
+        resultsState = resultsState.set(key as any, value),
     );
 
     if (exportChanges)
     {
       const { filetype, filesize, preview, originalNames } = exportChanges;
-      Actions.chooseFile(filetype, filesize, preview, originalNames);
     }
     this.props.onResultsStateChange(resultsState);
   }
@@ -560,7 +558,7 @@ export class ResultsManager extends TerrainComponent<Props>
     }
     if (this.state.query && this.state.query.xhr)
     {
-      this.state.query.xhr.abort();
+      this.state.query.xhr.cancel();
     }
     TerrainLog.debug('Issue query ' + eql);
     this.setState({
@@ -678,6 +676,17 @@ export class ResultsManager extends TerrainComponent<Props>
     {
       hits = this.props.resultsState.hits.concat(hits).toList();
     }
+    // Filter out duplicates
+    const hitIds = [];
+    hits = hits.filter((hit) =>
+    {
+      if (hitIds.indexOf(hit.primaryKey) !== -1)
+      {
+        return false;
+      }
+      hitIds.push(hit.primaryKey);
+      return true;
+    }).toList();
     const changes: any = {
       hits,
       fields: fieldsSet.toList(),
@@ -693,10 +702,17 @@ export class ResultsManager extends TerrainComponent<Props>
 
     if (!resultsState.hasLoadedCount)
     {
-      changes['count'] = Math.min(resultsData.rawResult.hits.total, MAX_HITS);
-      if (querySize !== undefined)
+      if (hits.size < SCROLL_SIZE * this.props.hitsPage)
       {
-        changes['count'] = Math.min(changes['count'], querySize);
+        changes['count'] = hits.size;
+      }
+      else
+      {
+        changes['count'] = Math.min(resultsData.rawResult.hits.total, MAX_HITS);
+        if (querySize !== undefined)
+        {
+          changes['count'] = Math.min(changes['count'], querySize);
+        }
       }
     }
 

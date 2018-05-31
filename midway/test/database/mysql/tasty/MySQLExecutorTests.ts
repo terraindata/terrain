@@ -52,7 +52,7 @@ import MySQLController from '../../../../src/database/mysql/MySQLController';
 import * as Tasty from '../../../../src/tasty/Tasty';
 import MySQLQueries from '../../../tasty/MySQLQueries';
 import SQLQueries from '../../../tasty/SQLQueries';
-import * as Utils from '../../../Utils';
+import * as Utils from '../../TestUtil';
 
 function getExpectedFile(): string
 {
@@ -64,7 +64,6 @@ let mysqlController: MySQLController;
 
 beforeAll(async () =>
 {
-  // TODO: get rid of this monstrosity once @types/winston is updated.
   (winston as any).level = 'debug';
   const config: MySQLConfig =
     {

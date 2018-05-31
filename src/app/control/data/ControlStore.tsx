@@ -53,8 +53,8 @@ import thunk from 'redux-thunk';
 
 import { CredentialConfig, SchedulerConfig } from 'control/ControlTypes';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
+import { createRecordType } from 'shared/util/Classes';
 import Util from 'util/Util';
-import { createRecordType } from '../../Classes';
 import ControlReducers from './ControlReducers';
 
 type Template = FileImportTypes.Template;

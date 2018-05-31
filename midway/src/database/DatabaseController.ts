@@ -53,7 +53,7 @@ import DatabaseControllerStatus from './DatabaseControllerStatus';
 
 /**
  * An client which acts as a selective isomorphic wrapper around
- * the sqlite3 API
+ * midway databases
  */
 abstract class DatabaseController
 {
@@ -79,7 +79,7 @@ abstract class DatabaseController
   public log(methodName: string, info?: any, moreInfo?: any)
   {
     const header = this.header + (++this.lsn).toString() + ':' + methodName;
-    winston.info(header);
+    winston.debug(header);
     if (info !== undefined)
     {
       winston.debug(header + ': ' + JSON.stringify(info, null, 1));

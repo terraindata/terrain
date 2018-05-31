@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 // tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands max-line-length
 
-import { MAX_HITS } from 'buildercomponents/results/ResultTypes';
 import * as commandLineArgs from 'command-line-args';
 import * as getUsage from 'command-line-usage';
 import * as jsonfile from 'jsonfile';

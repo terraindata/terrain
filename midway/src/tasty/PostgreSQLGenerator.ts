@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import { IsolationLevel } from '../tasty/TastyDB';
 import TastyNode from '../tasty/TastyNode';
 import TastyQuery from '../tasty/TastyQuery';
 
@@ -77,7 +78,7 @@ export const TypeMap: Map<string, SQLGeneratorMapping> = new Map([
 
   ['filter', newSQLGeneratorMapping('WHERE', FixEnum.nullary)],
   ['select', newSQLGeneratorMapping('SELECT', FixEnum.nullary)],
-  ['upsert', newSQLGeneratorMapping('REPLACE', FixEnum.nullary)],
+  ['upsert', newSQLGeneratorMapping('INSERT', FixEnum.nullary)],
   ['insert', newSQLGeneratorMapping('INSERT', FixEnum.nullary)],
   ['delete', newSQLGeneratorMapping('DELETE', FixEnum.nullary)],
   ['skip', newSQLGeneratorMapping('OFFSET', FixEnum.nullary)],
@@ -112,19 +113,21 @@ export const TypeMap: Map<string, SQLGeneratorMapping> = new Map([
 export default class SQLGenerator
 {
   public statements: string[];
-  public values: any[][];
+  public valuesArray: any[][];
   public queryString: string;
+  public values: any[];
   private indentation: number;
 
   constructor()
   {
     this.statements = [];
-    this.values = [];
+    this.valuesArray = [];
     this.queryString = '';
+    this.values = [];
     this.indentation = 0;
   }
 
-  public generateSelectQuery(query: TastyQuery, placeholder: boolean)
+  public generateSelectQuery(query: TastyQuery)
   {
     this.appendExpression(query.command);
     this.indent();
@@ -233,13 +236,13 @@ export default class SQLGenerator
         this.queryString += 'OFFSET ' + query.numSkipped.toString();
       }
     }
-    this.accumulateStatement(this.queryString);
+    this.accumulateStatement(this.queryString, this.values);
   }
 
-  public generateUpsertQuery(query: TastyQuery, upserts: object[], placeholder: boolean)
+  public generateUpsertQuery(query: TastyQuery, upserts: object[])
   {
     this.appendExpression(query.command);
-    this.queryString = 'INSERT INTO ';
+    this.queryString += ' INTO ';
 
     const tableName: string = this.escapeString(query.table.getTableName());
     this.queryString += tableName;
@@ -261,9 +264,10 @@ export default class SQLGenerator
         const isInDefined: boolean = definedColumnsSet.has(col);
         if (isInObj !== isInDefined)
         {
-          this.accumulateUpsert(definedColumnsList, primaryKeys, tableName, accumulatedUpdates, placeholder);
+          this.accumulateUpsert(definedColumnsList, primaryKeys, tableName, accumulatedUpdates);
 
           this.queryString = baseQuery;
+          this.values = [];
           definedColumnsList = this.getDefinedColumns(columns, obj);
           definedColumnsSet = new Set();
           for (const definedCol of definedColumnsList)
@@ -277,16 +281,47 @@ export default class SQLGenerator
       accumulatedUpdates.push(obj);
     }
 
-    this.accumulateUpsert(definedColumnsList, primaryKeys, tableName, accumulatedUpdates, placeholder);
+    this.accumulateUpsert(definedColumnsList, primaryKeys, tableName, accumulatedUpdates);
     this.queryString = '';
   }
 
-  public accumulateStatement(queryString: string): void
+  public generateStartTransactionQuery(isolationLevel: IsolationLevel, readOnly: boolean)
+  {
+    this.queryString = 'START TRANSACTION';
+    if (readOnly)
+    {
+      this.queryString += ' READ ONLY';
+    }
+    else
+    {
+      this.queryString += ' READ WRITE';
+    }
+    this.accumulateStatement(this.queryString, []);
+    if (isolationLevel !== IsolationLevel.DEFAULT)
+    {
+      this.accumulateStatement('SET TRANSACTION ISOLATION LEVEL ' + isolationLevel, []);
+    }
+  }
+
+  public generateCommitQuery()
+  {
+    this.queryString = 'COMMIT';
+    this.accumulateStatement(this.queryString, []);
+  }
+
+  public generateRollbackQuery()
+  {
+    this.queryString = 'ROLLBACK';
+    this.accumulateStatement(this.queryString, []);
+  }
+
+  public accumulateStatement(queryString: string, values: any[]): void
   {
     if (queryString !== '')
     {
       queryString += ';';
       this.statements.push(queryString);
+      this.valuesArray.push(values);
     }
   }
 
@@ -304,21 +339,20 @@ export default class SQLGenerator
   }
 
   public accumulateUpsert(columns: string[], primaryKeys: string[],
-    tableName: string, accumulatedUpdates: object[],
-    placeholder: boolean): void
+    tableName: string, accumulatedUpdates: object[]): void
   {
     if (accumulatedUpdates.length <= 0)
     {
       return;
     }
 
-    const values: any[] = [];
     let query = this.queryString;
     const joinedColumnNames = ' (' + columns.join(', ') + ')';
     query += joinedColumnNames;
     query += ' VALUES ';
 
     let first: boolean = true;
+    let currentColumn1: number = 0;
     for (const obj of accumulatedUpdates)
     {
       if (!first)
@@ -328,20 +362,12 @@ export default class SQLGenerator
       first = false;
 
       query += '(';
-      let currentColumn1: number = 0;
       query += columns.map(
         (col: string) =>
         {
-          if (placeholder === true)
-          {
-            values.push(obj[col]);
-            currentColumn1++;
-            return '$' + currentColumn1.toString();
-          }
-          else
-          {
-            return this.sqlName(TastyNode.make(obj[col]));
-          }
+          this.values.push(obj[col]);
+          currentColumn1++;
+          return '$' + currentColumn1.toString();
         }).join(', ');
       query += ')';
     }
@@ -359,15 +385,8 @@ export default class SQLGenerator
       query += columns.map(
         (col: string) =>
         {
-          if (placeholder === true)
-          {
-            currentColumn++;
-            return '$' + currentColumn.toString();
-          }
-          else
-          {
-            return this.sqlName(TastyNode.make(accumulatedUpdates[0][col]));
-          }
+          currentColumn++;
+          return '$' + currentColumn.toString();
         }).join(', ');
       query += ')';
       query += ' WHERE (' + primaryKeys.map((col: string) => tableName + '.' + col).join(', ') + ') = (' + primaryKeys.map(
@@ -383,8 +402,7 @@ export default class SQLGenerator
       query += ' RETURNING ' + primaryKeys[0] + ' AS insertid';
     }
 
-    this.values.push(values);
-    this.accumulateStatement(query);
+    this.accumulateStatement(query, this.values);
   }
 
   public newLine()
@@ -549,7 +567,7 @@ export default class SQLGenerator
           case '\"':
             return '\"';
           case '\'':
-            return '\'';
+            return '\'\'';
           case '\\':
           case '%':
             return '\\' + char;
@@ -578,7 +596,8 @@ export default class SQLGenerator
     }
     if (node.type === 'string')
     {
-      return '\'' + this.escapeString(node.value) + '\'';
+      this.values.push(node.value);
+      return '$' + this.values.length.toString();
     }
     if (node.type === 'number')
     {

@@ -72,7 +72,7 @@ export function keyPathPrefixMatch(toCheck: KeyPath, toMatch: KeyPath): boolean
 
   for (let i: number = 0; i < toMatch.size; i++)
   {
-    if (toMatch.get(i) !== toCheck.get(i))
+    if (toMatch.get(i) !== toCheck.get(i) && toCheck.get(i) !== '*' && toMatch.get(i) !== '*') // match * regardless
     {
       return false;
     }
@@ -93,12 +93,23 @@ export function keyPathPrefixMatch(toCheck: KeyPath, toMatch: KeyPath): boolean
  * @param {KeyPath} replaceWith What to replace `toReplace` with
  * @returns {KeyPath} The updated `KeyPath`
  */
-export function updateKeyPath(toUpdate: KeyPath, toReplace: KeyPath, replaceWith: KeyPath): KeyPath
+export function updateKeyPath(toUpdate: KeyPath, toReplace: KeyPath, replaceWith: KeyPath, isArray: boolean = false): KeyPath
 {
   let updated: KeyPath = replaceWith;
   for (let i: number = toReplace.size; i < toUpdate.size; i++)
   {
     updated = updated.push(toUpdate.get(i));
+  }
+
+  if (!isArray)
+  {
+    for (let i: number = 0; i < updated.size; i++)
+    {
+      if (updated.get(i) === '*' && toUpdate.get(i) !== '*')
+      {
+        updated = updated.set(i, toUpdate.get(i));
+      }
+    }
   }
 
   return updated;

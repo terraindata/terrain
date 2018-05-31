@@ -2,11 +2,11 @@
 
 .algorithm-selector-wrapper {
 	display: flex;
+	flex-direction: column;
 	vertical-align: top;
 	justify-content: space-between;
 
 	.algorithm-selector-column {
-		padding: 0px @half-spacing;
 		position: relative;
 
 		.algorithm-selector-label {
@@ -14,8 +14,11 @@
 		}
 
 		.algorithm-selector-input {
-			padding: 0px @half-spacing;
 			position: relative;
 		}
+	}
+
+	.alg-selector-grow-to-fit {
+		flex-grow: 1;
 	}
 }

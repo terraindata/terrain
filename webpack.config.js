@@ -58,6 +58,7 @@ module.exports =
     path: __dirname,
     publicPath: '/assets/',
     filename: 'bundle.js',
+    chunkFilename: '[name].bundle.js'
   },
 
   // NOTE: this should also be added to the production config
@@ -85,9 +86,11 @@ module.exports =
       etl: path.resolve(__dirname, 'src/app/etl'),
       fileImport: path.resolve(__dirname, 'src/app/fileImport'),
       images: path.resolve(__dirname, 'src/images'),
+      jobs: path.resolve(__dirname, 'src/app/jobs'),
       library: path.resolve(__dirname, 'src/app/library'),
       manual: path.resolve(__dirname, 'src/app/manual'),
       roles: path.resolve(__dirname, 'src/app/roles'),
+      scheduler: path.resolve(__dirname, 'src/app/scheduler'),
       schema: path.resolve(__dirname, 'src/app/schema'),
       shared: path.resolve(__dirname, 'shared'),
       src: path.resolve(__dirname, 'src'),

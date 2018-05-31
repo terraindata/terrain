@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires no-reference no-console
 
-/// <reference path="../../typings/tsd.d.ts" />
+/// <reference path="../../../shared/typings/tsd.d.ts" />
 
 import * as test from 'tape';
 // import * as TestUtils from 'react-addons-test-utils';

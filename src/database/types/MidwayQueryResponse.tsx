@@ -66,11 +66,6 @@ export default class MidwayQueryResponse extends QueryResponse
     return new MidwayQueryResponse(obj.result, obj.errors, obj.request);
   }
 
-  public static formatElasticResult(result: QueryResult): any
-  {
-    return result;
-  }
-
   public constructor(result: QueryResult, errors: MidwayErrorItem[] = [], request: QueryRequest)
   {
     super(result, errors, request);
@@ -78,16 +73,6 @@ export default class MidwayQueryResponse extends QueryResponse
 
   public getResultsData(): any
   {
-    let result;
-    switch (this.request.databasetype)
-    {
-      case 'elastic':
-        result = MidwayQueryResponse.formatElasticResult(this.result);
-        break;
-      default:
-        result = [];
-        console.log('Unknown request type when extracting results from midway query response ' + this.request.type);
-    }
-    return result;
+    return this.result;
   }
 }

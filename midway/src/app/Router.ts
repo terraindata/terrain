@@ -48,13 +48,16 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as send from 'koa-send';
 
+import * as Util from './AppUtil';
 import AuthRouter from './auth/AuthRouter';
-import CredentialRouter from './credentials/CredentialRouter';
 import DatabaseRouter from './database/DatabaseRouter';
+import ETLRouter from './etl/ETLRouter';
 import EventRouter from './events/EventRouter';
+import IntegrationRouter from './integrations/IntegrationRouter';
 import ExportRouter from './io/ExportRouter';
 import ImportRouter from './io/ImportRouter';
 import ItemRouter from './items/ItemRouter';
+import JobRouter from './jobs/JobRouter';
 import QueryRouter from './query/QueryRouter';
 import ResultsConfigRouter from './resultsConfig/ResultsConfigRouter';
 import SchedulerRouter from './scheduler/SchedulerRouter';
@@ -62,7 +65,6 @@ import SchemaRouter from './schema/SchemaRouter';
 import SchemaMetadataRouter from './schemaMetadata/SchemaMetadataRouter';
 import StatusRouter from './status/StatusRouter';
 import UserRouter from './users/UserRouter';
-import * as Util from './Util';
 import VersionRouter from './versions/VersionRouter';
 
 const AppRouter = new KoaRouter();
@@ -74,12 +76,14 @@ AppRouter.use('/items', ItemRouter.routes(), ItemRouter.allowedMethods());
 AppRouter.use('/versions', VersionRouter.routes(), VersionRouter.allowedMethods());
 AppRouter.use('/database', DatabaseRouter.routes(), DatabaseRouter.allowedMethods());
 AppRouter.use('/scheduler', SchedulerRouter.routes(), SchedulerRouter.allowedMethods());
+AppRouter.use('/jobs', JobRouter.routes(), JobRouter.allowedMethods());
 AppRouter.use('/schema', SchemaRouter.routes(), SchemaRouter.allowedMethods());
 AppRouter.use('/status', StatusRouter.routes(), StatusRouter.allowedMethods());
 AppRouter.use('/query', QueryRouter.routes(), QueryRouter.allowedMethods());
 AppRouter.use('/import', ImportRouter.routes(), ImportRouter.allowedMethods());
 AppRouter.use('/export', ExportRouter.routes(), ExportRouter.allowedMethods());
-AppRouter.use('/credentials', CredentialRouter.routes(), CredentialRouter.allowedMethods());
+AppRouter.use('/integrations', IntegrationRouter.routes(), IntegrationRouter.allowedMethods());
+AppRouter.use('/etl', ETLRouter.routes(), ETLRouter.allowedMethods());
 AppRouter.use('/schemametadata', SchemaMetadataRouter.routes(), SchemaMetadataRouter.allowedMethods());
 AppRouter.use('/resultsconfig', ResultsConfigRouter.routes(), ResultsConfigRouter.allowedMethods());
 // Add future routes here.
@@ -112,11 +116,6 @@ AppRouter.post('/', passport.authenticate('access-token-local'), async (ctx, nex
 
 const MidwayRouter = new KoaRouter();
 MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
-
-MidwayRouter.get('/favicon.ico', async (ctx, next) =>
-{
-  await send(ctx, '/midway/src/assets/favicon.ico');
-});
 
 MidwayRouter.get('/', async (ctx, next) =>
 {
@@ -162,6 +161,11 @@ MidwayRouter.get('/assets/:asset', async (ctx, next) =>
   {
     ctx.body = await Util.doRequest(`http://localhost:8080/assets/${ctx.params['asset']}`);
   }
+});
+
+MidwayRouter.get('/robots.txt', async (ctx, next) =>
+{
+  await send(ctx, '/src/app/robots.txt');
 });
 
 export default MidwayRouter;

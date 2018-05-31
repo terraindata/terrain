@@ -100,6 +100,13 @@ const TransformChart = {
       .attr('x', xMargin)
       .attr('y', yMargin);
 
+    // points can extend beyond the overflow: hidden of the inner-svg
+    // so they need their own special svg to match
+    const innerSvgPoints = svg.append('svg')
+      .attr('class', 'inner-svg-points')
+      .attr('x', xMargin)
+      .attr('y', yMargin);
+
     // need a transparent filling background so that the touchmove events on inner-svg register as expected
     innerSvg.append('rect')
       .attr('x', 0)
@@ -120,7 +127,7 @@ const TransformChart = {
       .attr('class', 'lines')
       .attr('style', 'stroke: ' + state.colors[0]);
 
-    innerSvg.append('g')
+    innerSvgPoints.append('g')
       .attr('class', 'points');
 
     innerSvg.append('g')

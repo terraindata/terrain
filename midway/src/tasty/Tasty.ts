@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import DatabaseController from '../database/DatabaseController';
 import TastyColumn from './TastyColumn';
-import TastyDB from './TastyDB';
+import { IsolationLevel, TastyDB, TransactionHandle } from './TastyDB';
 import TastyNode from './TastyNode';
 import TastyQuery from './TastyQuery';
 import TastySchema from './TastySchema';
@@ -105,10 +105,10 @@ export class Tasty
    *
    * @memberOf TastyInterface
    */
-  public async execute(query: TastyQuery): Promise<object[]>
+  public async execute(query: TastyQuery, handle?: TransactionHandle): Promise<object[]>
   {
     const queryString = this.db.generate(query);
-    return this.db.execute(queryString);
+    return this.db.execute(queryString, handle);
   }
 
   /**
@@ -135,7 +135,7 @@ export class Tasty
    *
    * @memberOf TastyInterface
    */
-  public async select(table: TastyTable, columns?: string[], filter?: object): Promise<object[]>
+  public async select(table: TastyTable, columns?: string[], filter?: object, handle?: TransactionHandle): Promise<object[]>
   {
     const query: TastyQuery = new TastyQuery(table);
     if (columns === undefined || columns.length === 0)
@@ -152,7 +152,7 @@ export class Tasty
       query.filter(node);
     }
 
-    return this.execute(query);
+    return this.execute(query, handle);
   }
 
   /**
@@ -160,15 +160,15 @@ export class Tasty
    * @param {TastyTable} table The table to upsert the objects in.
    * @param {object | object[]} objs An object or an array of objects to upsert.
    */
-  public async upsert(table: TastyTable, objs: object | object[]): Promise<object | object[]>
+  public async upsert(table: TastyTable, objs: object | object[], handle?: TransactionHandle): Promise<object | object[]>
   {
     if (objs instanceof Array)
     {
-      return this.db.upsert(table, objs);
+      return this.db.upsert(table, objs, handle);
     }
     else if (typeof objs === 'object')
     {
-      return this.db.upsert(table, [objs]);
+      return this.db.upsert(table, [objs], handle);
     }
     throw new Error('Invalid object type');
   }
@@ -178,15 +178,15 @@ export class Tasty
    * @param {TastyTable} table The table to update the objects in.
    * @param {object | object[]} objs An object or an array of objects to update.
    */
-  public async update(table: TastyTable, objs: object | object[]): Promise<object | object[]>
+  public async update(table: TastyTable, objs: object | object[], handle?: TransactionHandle): Promise<object | object[]>
   {
     if (objs instanceof Array)
     {
-      return this.db.update(table, objs);
+      return this.db.update(table, objs, handle);
     }
     else if (typeof objs === 'object')
     {
-      return this.db.update(table, [objs]);
+      return this.db.update(table, [objs], handle);
     }
     throw new Error('Invalid object type');
   }
@@ -202,7 +202,7 @@ export class Tasty
    *
    * @memberOf TastyInterface
    */
-  public async delete(table: TastyTable, obj: object | object[] | string): Promise<object[]>
+  public async delete(table: TastyTable, obj: object | object[] | string, handle?: TransactionHandle): Promise<object[]>
   {
     const query = new TastyQuery(table);
     if (typeof obj === 'string' && obj === '*')
@@ -229,7 +229,52 @@ export class Tasty
       query.delete();
     }
 
-    return this.execute(query);
+    return this.execute(query, handle);
+  }
+
+  public async executeTransaction(handler: (handle: TransactionHandle, commit: () => Promise<void>, rollback: () => Promise<void>)
+    => Promise<void>, isolationLevel = IsolationLevel.DEFAULT, readOnly = false)
+  {
+    const handle = await this.db.startTransaction(isolationLevel, readOnly);
+    let live = true;
+    const commit = async () =>
+    {
+      if (live)
+      {
+        await this.db.commitTransaction(handle);
+        live = false;
+      }
+      else
+      {
+        throw new Error('Transaction is not live');
+      }
+    };
+    const rollback = async () =>
+    {
+      if (live)
+      {
+        await this.db.rollbackTransaction(handle);
+        live = false;
+      }
+      else
+      {
+        throw new Error('Transaction is not live');
+      }
+    };
+    try
+    {
+      await handler(handle, commit, rollback);
+    }
+    catch (error)
+    {
+      await rollback();
+      throw error;
+    }
+    if (live)
+    {
+      await rollback();
+      throw new Error('Transaction was not ended');
+    }
   }
 
   public async schema(): Promise<TastySchema>

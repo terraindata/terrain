@@ -302,11 +302,15 @@ class PathfinderArea extends TerrainComponent<Props>
             {
               <PathfinderFilterSection
                 isSoftFilter={true}
+                path={path}
                 pathfinderContext={pathfinderContext}
                 filterGroup={path.softFilterGroup}
                 keyPath={this._ikeyPath(keyPath, 'softFilterGroup')}
                 onStepChange={this.incrementStep}
                 toSkip={toSkip}
+                onAddScript={this.handleAddScript}
+                onDeleteScript={this.handleDeleteScript}
+                onUpdateScript={this.handleUpdateScript}
               />
             }
             {
@@ -341,7 +345,6 @@ class PathfinderArea extends TerrainComponent<Props>
                 className='path-copy-paste-inputarea'
                 value={pathString}
                 onChange={this.handlePastePathString as any}
-                autoFocus
               />
           }
         </div>

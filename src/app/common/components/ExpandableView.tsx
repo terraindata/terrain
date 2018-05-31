@@ -52,6 +52,7 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 
+import CheckBox from 'common/components/CheckBox';
 import FadeInOut from 'common/components/FadeInOut';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import './ExpandableView.less';
@@ -60,16 +61,21 @@ const ArrowIcon = require('images/icon_arrow.svg');
 
 export interface Props
 {
-  content: any;
+  content: any; // the content that is inline with the arrow and the checkbox
   open: boolean;
   onToggle: (ev?) => void;
   style?: any;
-  children?: any;
+  children?: any; // the expandable content rendered beneath the content
   injectedContent?: any;
   hideContent?: boolean;
   hideArrow?: boolean;
+  showCheckbox?: boolean;
+  checked?: boolean;
+  onCheckboxClicked?: () => void;
 }
 
+const checkboxSize = 18;
+const checkboxMargin = 6;
 const arrowSize = 12;
 const arrowPadding = 2;
 const containerLeftPadding = arrowPadding + arrowSize / 2;
@@ -119,6 +125,43 @@ class ExpandableView extends TerrainComponent<Props>
     );
   }
 
+  public renderCheckboxSection()
+  {
+    if (!this.props.showCheckbox)
+    {
+      return (
+        <div
+          className='expandable-view-checkbox-column expandable-view-checkbox-hidden'
+          style={{
+            width: '0px',
+            height: '0px',
+            paddingLeft: '0px',
+          }}
+        >
+        </div>
+      );
+    }
+    else
+    {
+      return (
+        <div
+          className='expandable-view-checkbox-column'
+          style={{
+            width: `${checkboxSize}px`,
+            height: `${checkboxSize}px`,
+            marginLeft: `${checkboxMargin}px`,
+          }}
+        >
+          <CheckBox
+            checked={this.props.checked}
+            className='expandable-view-checkbox'
+            onChange={this.props.onCheckboxClicked}
+          />
+        </div>
+      );
+    }
+  }
+
   public renderChildren()
   {
     const leftBorderColor = this.getBorderColor();
@@ -131,7 +174,7 @@ class ExpandableView extends TerrainComponent<Props>
             'expandable-view-open': this.props.open,
           })}
           style={{
-            marginLeft: this.props.hideArrow ? '' : containerLeftMargin,
+            marginLeft: this.props.hideArrow ? '' : `${containerLeftMargin}px`,
             paddingLeft: this.props.hideArrow ? '' : containerLeftPadding,
             borderLeft: this.props.hideArrow ? '0px solid' : `1px solid ${leftBorderColor}`,
           }}
@@ -186,6 +229,9 @@ class ExpandableView extends TerrainComponent<Props>
             <div className='expandable-view-content-row'>
               {
                 this.renderArrowSection()
+              }
+              {
+                this.renderCheckboxSection()
               }
               <div className='expandable-view-content'>
                 {this.props.content}

@@ -50,7 +50,7 @@ import * as winston from 'winston';
 import srs = require('secure-random-string');
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
-import * as Util from '../Util';
+import * as Util from '../AppUtil';
 import UserConfig from './UserConfig';
 
 export class Users
@@ -205,13 +205,13 @@ export class Users
 
   public async loginWithEmail(email: string, password: string): Promise<UserConfig | null>
   {
-    winston.info('logging in with email ' + email + ' and password ' + password);
+    winston.info('Logging in with email ' + email);
     return new Promise<UserConfig | null>(async (resolve, reject) =>
     {
       const results = await this.select([], { email });
       if (results.length === 0)
       {
-        winston.info('none');
+        winston.info('None');
         return resolve(null);
       }
       else
@@ -219,13 +219,13 @@ export class Users
         const user: UserConfig = results[0];
         if (user.accessToken === undefined)
         {
-          winston.info('no access token');
+          winston.info('No access token');
           return resolve(null);
         }
         const passwordsMatch: boolean = await this.comparePassword(password, user.password);
         if (passwordsMatch)
         {
-          if (user.accessToken.length === 0)
+          if (user.accessToken.length === 0 || user.accessToken === 'ImAnAdmin')
           {
             user.accessToken = srs(
               {
@@ -233,12 +233,12 @@ export class Users
               });
             await this.upsert(user);
           }
-          winston.info('user');
+          winston.info('User');
           resolve(user);
         }
         else
         {
-          winston.info('wrong pass');
+          winston.info('Wrong password');
           resolve(null);
         }
       }

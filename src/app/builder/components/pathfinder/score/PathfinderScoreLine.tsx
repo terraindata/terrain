@@ -157,6 +157,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
       mode: line.transformData.mode,
       dataDomain: line.transformData.dataDomain,
       closed: !line.expanded,
+      autoBound: line.transformData.autoBound,
     };
     return (
       <div

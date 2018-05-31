@@ -1,0 +1,18 @@
+@import "../Common.less";
+
+.file-picker {
+  padding: @half-spacing @spacing;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 3px;
+
+  &.file-picker-disabled {
+    cursor: default;
+  }
+  
+  &.file-picker-large {
+    font-size: @pretty-large-font-size;
+  }
+}

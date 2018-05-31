@@ -52,7 +52,7 @@ import * as _ from 'lodash';
 import { Block, BlockConfig } from './types/Block';
 import { Card, Cards } from './types/Card';
 
-import { createRecordType } from '../app/Classes';
+import { createRecordType } from 'shared/util/Classes';
 import { DisplayType } from './displays/Display';
 // import { AllBackendsMap } from '../database/AllBackends';
 

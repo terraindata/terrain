@@ -60,6 +60,7 @@ export interface Props
   small?: boolean;
   medium?: boolean;
   darker?: boolean;
+  longer?: boolean;
 }
 
 @Radium
@@ -78,6 +79,7 @@ class Switch extends TerrainComponent<Props>
       'switch-on-second': this.props.selected !== 1,
       'switch-small': this.props.small,
       'switch-medium': this.props.medium,
+      'switch-longer': this.props.longer,
       'noselect': true,
     });
 

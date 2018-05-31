@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import arrayTypeOfValues = require('array-typeof-values');
-import GraphLib = require('graphlib');
+import * as GraphLib from 'graphlib';
 import { List, Map } from 'immutable';
 import isPrimitive = require('is-primitive');
 import * as _ from 'lodash';
@@ -53,14 +53,13 @@ import objectify from '../util/deepObjectify';
 import { KeyPath, keyPathPrefixMatch, updateKeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 // import * as winston from 'winston'; // TODO what to do for error logging?
+import DataStore from './DataStore';
 import TransformationNode from './nodes/TransformationNode';
 import TransformationEngineNodeVisitor from './TransformationEngineNodeVisitor';
 import { TransformationInfo } from './TransformationInfo';
 import TransformationNodeType from './TransformationNodeType';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
-
-const Graph = GraphLib.Graph;
 
 /**
  * A TransformationEngine performs transformations on complex JSON documents.
@@ -77,6 +76,8 @@ const Graph = GraphLib.Graph;
  */
 export class TransformationEngine
 {
+  public static datastore = new DataStore();
+
   /**
    * Creates a TransformationEngine from a serialized representation
    * (either a JSON object or stringified JSON object).
@@ -89,8 +90,7 @@ export class TransformationEngine
   {
     const parsedJSON: object = typeof json === 'string' ? TransformationEngine.parseSerializedString(json as string) : json as object;
     const e: TransformationEngine = new TransformationEngine();
-    const dag: any = GraphLib.json.read(parsedJSON['dag']);
-    e.dag = dag;
+    e.dag = GraphLib.json.read(parsedJSON['dag']);
     e.doc = parsedJSON['doc'];
     e.uidField = parsedJSON['uidField'];
     e.uidNode = parsedJSON['uidNode'];
@@ -100,6 +100,30 @@ export class TransformationEngine
     e.fieldEnabled = Map<number, boolean>(parsedJSON['fieldEnabled']);
     e.fieldProps = Map<number, object>(parsedJSON['fieldProps']);
     return e;
+  }
+
+  /**
+   * A helper function to process a Transformation Node's meta object
+   * from a raw JS object into an object whose newFieldKeyPaths field
+   * is properly turned into an immutable list of keypaths
+   *
+   * @param {object} meta The deserialized meta object
+   * @returns {object} The converted meta object
+   */
+  private static makeMetaImmutable(meta: object): object
+  {
+    if (meta['newFieldKeyPaths'] !== undefined)
+    {
+      const newFieldKeyPaths = List(meta['newFieldKeyPaths'])
+        .map((val: string[]) => KeyPath(val)).toList();
+      return _.extend({}, meta, {
+        newFieldKeyPaths,
+      });
+    }
+    else
+    {
+      return meta;
+    }
   }
 
   /**
@@ -124,15 +148,15 @@ export class TransformationEngine
       parsed['dag']['nodes'][i]['value'] =
         new (TransformationInfo.getType(raw['typeCode']))(
           raw['id'],
-          List<number>(raw['fieldIDs']),
-          raw['options'],
+          List<KeyPath>(raw['fields'].map((item) => KeyPath(item))),
+          TransformationEngine.makeMetaImmutable(raw['meta']),
           raw['typeCode'],
         ) as TransformationNode;
     }
     return parsed;
   }
 
-  private dag: any = new Graph({ directed: true });
+  private dag: GraphLib.Graph = new GraphLib.Graph({ directed: true });
   private doc: object = {};
   private uidField: number = 0;
   private uidNode: number = 0;
@@ -158,6 +182,11 @@ export class TransformationEngine
       // initial field nodes can be implicit, DAG should only represent actual transformations
     }
     // allow construction without example doc (manually add fields)
+  }
+
+  public clone(): TransformationEngine
+  {
+    return TransformationEngine.load(this.toJSON());
   }
 
   /**
@@ -196,23 +225,56 @@ export class TransformationEngine
    * after adding the relevant fields to the engine.  The transformation is
    * appended to the engine's transformation DAG in the appropriate place.
    *
-   * @param {TransformationNodeType} nodeType The type of transformation to create
-   * @param {Immutable.List<KeyPath> | Immutable.List<number>} fieldNamesOrIDs A
-   *                                          list of field names (or IDs, but not mixed)
-   *                                          on which to apply the new transformation
-   * @param {object} options                  Any options for the transformation;
-   *                                          different transformation types have
-   *                                          various specialized options available
-   * @param {string[]} tags                   Any special tags for the node in the DAG
-   * @param {number} weight                   A weight for new edges in the DAG
-   * @returns {number}                        The ID of the newly-created transformation
+   * @param {TransformationNodeType} nodeType    The type of transformation to create
+   * @param {Immutable.List<KeyPath>} fieldNames A list of field names (not IDs)
+   *                                             on which to apply the new transformation
+   * @param {object} options                     Any options for the transformation;
+   *                                             different transformation types have
+   *                                             various specialized options available
+   * @param {string[]} tags                      Any special tags for the node in the DAG
+   * @param {number} weight                      A weight for new edges in the DAG
+   * @returns {number}                           The ID of the newly-created transformation
    */
-  public appendTransformation(nodeType: TransformationNodeType, fieldNamesOrIDs: List<KeyPath> | List<number>,
+  public appendTransformation(nodeType: TransformationNodeType, fieldNames: List<KeyPath>,
     options?: object, tags?: string[], weight?: number): number
   {
-    const fieldIDs: List<number> = this.parseFieldIDs(fieldNamesOrIDs);
+    // const fieldIDs: List<number> = this.parseFieldIDs(fieldNamesOrIDs);
     const node: TransformationNode =
-      new (TransformationInfo.getType(nodeType))(this.uidNode, fieldIDs, options, nodeType);
+      new (TransformationInfo.getType(nodeType))(this.uidNode, fieldNames, options, nodeType);
+
+    // Process fields created/disabled by this transformation
+    if (options !== undefined)
+    {
+      if (options['newFieldKeyPaths'] !== undefined)
+      {
+        for (let i: number = 0; i < options['newFieldKeyPaths'].size; i++)
+        {
+          let inferredTypeNameOfNewFields: string;
+          if (TransformationInfo.getNewFieldType(nodeType) === 'same' && fieldNames.size > 0)
+          {
+            inferredTypeNameOfNewFields = this.getFieldType(this.getInputFieldID(fieldNames.get(0)));
+          }
+          else if (TransformationInfo.getNewFieldType(nodeType))
+          {
+            inferredTypeNameOfNewFields = TransformationInfo.getNewFieldType(nodeType);
+          }
+          else
+          {
+            // TODO add warning here
+            inferredTypeNameOfNewFields = 'string'; // for lack of a better guess...
+          }
+          this.addField(options['newFieldKeyPaths'].get(i), inferredTypeNameOfNewFields);
+        }
+      }
+      if (options['preserveOldFields'] === false)
+      {
+        for (let i: number = 0; i < fieldNames.size; i++)
+        {
+          this.disableField(this.getInputFieldID(fieldNames.get(i)));
+        }
+      }
+    }
+
     this.dag.setNode(this.uidNode.toString(), node);
     this.uidNode++;
     return this.uidNode - 1;
@@ -226,15 +288,18 @@ export class TransformationEngine
    */
   public transform(doc: object): object
   {
-    let output: object = this.flatten(doc);
+    let output: object = this.rename(doc);
+    this.restoreArrays(output);
+
     for (const nodeKey of this.dag.sources())
     {
-      const toTraverse: string[] = GraphLib.alg.preorder(this.dag, nodeKey);
+      const toTraverse: string[] = GraphLib.alg.preorder(this.dag, [nodeKey]);
       for (let i = 0; i < toTraverse.length; i++)
       {
+        const preprocessedNode: TransformationNode = this.preprocessNode(this.dag.node(toTraverse[i]), output);
         const visitor: TransformationEngineNodeVisitor = new TransformationEngineNodeVisitor();
         const transformationResult: TransformationVisitResult =
-          visitor.applyTransformationNode(this.dag.node(toTraverse[i]), output);
+          visitor.applyTransformationNode(preprocessedNode, output);
         if (transformationResult.errors !== undefined)
         {
           // winston.error('Transformation encountered errors!:');
@@ -247,7 +312,17 @@ export class TransformationEngine
         output = transformationResult.document;
       }
     }
-    return this.unflatten(output);
+
+    // Exclude disabled fields (must do this as a postprocess, because e.g. join node)
+    this.fieldEnabled.map((enabled: boolean, fieldID: number) =>
+    {
+      if (!enabled)
+      {
+        yadeep.remove(output, this.getOutputKeyPath(fieldID));
+      }
+    });
+
+    return output;
   }
 
   /**
@@ -274,23 +349,46 @@ export class TransformationEngine
 
   /**
    * Register a field with the current engine.  This enables adding
-   * transformations to the field.
+   * transformations to the field. If the field already exists, returns
+   * the associated id.
    *
    * @param {KeyPath} fullKeyPath The path of the field to add
    * @param {string} typeName     The JS type of the field
    * @param {object} options      Any field options (e.g., Elastic analyzers)
    * @returns {number}            The ID of the newly-added field
    */
-  public addField(fullKeyPath: KeyPath, typeName: string, options: object = {}): number
+  public addField(fullKeyPath: KeyPath, typeName: string = null, options: object = {}): number
   {
+    if (this.fieldNameToIDMap.has(fullKeyPath))
+    {
+      return this.fieldNameToIDMap.get(fullKeyPath);
+    }
+
     this.fieldNameToIDMap = this.fieldNameToIDMap.set(fullKeyPath, this.uidField);
     this.IDToFieldNameMap = this.IDToFieldNameMap.set(this.uidField, fullKeyPath);
+    if (typeName === null)
+    {
+      typeName = 'object';
+    }
     this.fieldTypes = this.fieldTypes.set(this.uidField, typeName);
     this.fieldEnabled = this.fieldEnabled.set(this.uidField, true);
     this.fieldProps = this.fieldProps.set(this.uidField, options);
 
     this.uidField++;
     return this.uidField - 1;
+  }
+
+  public deleteField(id: number): void
+  {
+    // Order matters!  Must do this first, else getTransformations can't work because
+    // it relies on the entry in fieldNameToIDMap.
+    this.getTransformations(id).forEach((t: number) => this.deleteTransformation(t));
+
+    this.fieldNameToIDMap = this.fieldNameToIDMap.delete(this.fieldNameToIDMap.keyOf(id));
+    this.fieldProps = this.fieldProps.delete(id);
+    this.fieldEnabled = this.fieldEnabled.delete(id);
+    this.IDToFieldNameMap = this.IDToFieldNameMap.delete(id);
+    this.fieldTypes = this.fieldTypes.delete(id);
   }
 
   /**
@@ -305,11 +403,11 @@ export class TransformationEngine
     // could be adding a map e.g. (field ID => List<transformation ID>)
     // to make this function O(1), if it's ever a performance issue.
 
-    const target: number = typeof field === 'number' ? field : this.fieldNameToIDMap.get(field);
+    const target: KeyPath = typeof field === 'number' ? this.fieldNameToIDMap.keyOf(field) : field;
     const nodes: TransformationNode[] = [];
     _.each(this.dag.nodes(), (node) =>
     {
-      if ((this.dag.node(node) as TransformationNode).fieldIDs.includes(target))
+      if ((this.dag.node(node) as TransformationNode).fields.includes(target))
       {
         nodes.push(this.dag.node(node) as TransformationNode);
       }
@@ -346,10 +444,10 @@ export class TransformationEngine
    * This method allows editing of any/all transformation node properties.
    *
    * @param {number} transformationID Which transformation to update
-   * @param {Immutable.List<KeyPath> | Immutable.List<number>} fieldNamesOrIDs New field names/IDs
+   * @param {Immutable.List<KeyPath>} fieldNames New field names
    * @param {object} options New options
    */
-  public editTransformation(transformationID: number, fieldNamesOrIDs?: List<KeyPath> | List<number>,
+  public editTransformation(transformationID: number, fieldNames?: List<KeyPath>,
     options?: object): void
   {
     if (!this.dag.nodes().includes(transformationID.toString()))
@@ -357,14 +455,14 @@ export class TransformationEngine
       return;
     }
 
-    if (fieldNamesOrIDs !== undefined)
+    if (fieldNames !== undefined)
     {
-      (this.dag.node(transformationID) as TransformationNode).fieldIDs = this.parseFieldIDs(fieldNamesOrIDs);
+      (this.dag.node(transformationID.toString()) as TransformationNode).fields = fieldNames;
     }
 
     if (options !== undefined)
     {
-      (this.dag.node(transformationID) as TransformationNode).meta = options;
+      (this.dag.node(transformationID.toString()) as TransformationNode).meta = options;
     }
   }
 
@@ -375,8 +473,19 @@ export class TransformationEngine
    */
   public deleteTransformation(transformationID: number): void
   {
-    this.dag.removeNode(transformationID);
-    // TODO need to handle case where transformation is not at the top of the stack (add new edges etc.)
+    const inEdges: void | GraphLib.Edge[] = this.dag.inEdges(transformationID.toString());
+    const outEdges: void | GraphLib.Edge[] = this.dag.outEdges(transformationID.toString());
+
+    if (typeof inEdges !== 'undefined' && typeof outEdges !== 'undefined')
+    {
+      if (inEdges.length === 1 && outEdges.length === 1)
+      {
+        // re-link in node with out node
+        this.dag.setEdge(inEdges[0].v, outEdges[0].w);
+      } // else not supported yet
+    }
+
+    this.dag.removeNode(transformationID.toString());
   }
 
   /**
@@ -406,15 +515,47 @@ export class TransformationEngine
    * @param {number} fieldID     The ID of the field to rename
    * @param {KeyPath} newKeyPath The new path for the field
    * @param dest                 (Optional) Which sink this field is going to.
+   * @param prefixMatch          (Optional) Whether or not to attempt to automatically rename child fields
    */
-  public setOutputKeyPath(fieldID: number, newKeyPath: KeyPath, dest?: any): void
+  public setOutputKeyPath(fieldID: number, newKeyPath: KeyPath, dest?: any, prefixMatch: boolean = true): void
   {
-    const oldName: KeyPath = this.IDToFieldNameMap.get(fieldID);
-    this.IDToFieldNameMap.forEach((field: KeyPath, id: number) =>
+    const oldKeyPath: KeyPath = this.IDToFieldNameMap.get(fieldID);
+
+    // Short-circuit: do nothing if this isn't really a change, and also return immediately
+    // if this is an invalid rename (because there's already a field named `newKeyPath`)
+    if (oldKeyPath === newKeyPath || this.IDToFieldNameMap.valueSeq().contains(newKeyPath))
     {
-      if (keyPathPrefixMatch(field, oldName))
+      return;
+    }
+
+    if (prefixMatch === true)
+    {
+      this.IDToFieldNameMap.forEach((field: KeyPath, id: number) =>
       {
-        this.IDToFieldNameMap = this.IDToFieldNameMap.set(id, updateKeyPath(field, oldName, newKeyPath));
+        if (keyPathPrefixMatch(field, oldKeyPath))
+        {
+          this.IDToFieldNameMap = this.IDToFieldNameMap.set(id,
+            updateKeyPath(field, oldKeyPath, newKeyPath, this.fieldTypes.get(id) === 'array'));
+        }
+      });
+    }
+    else
+    {
+      this.IDToFieldNameMap = this.IDToFieldNameMap.set(fieldID, newKeyPath);
+    }
+
+    _.each(this.dag.nodes(), (node) =>
+    {
+      const nfkp: List<KeyPath> | undefined = (this.dag.node(node) as TransformationNode).meta['newFieldKeyPaths'];
+      if (nfkp !== undefined)
+      {
+        for (let i: number = 0; i < nfkp.size; i++)
+        {
+          if (keyPathPrefixMatch(nfkp.get(i), oldKeyPath))
+          {
+            this.dag.node(node)['meta']['newFieldKeyPaths'] = nfkp.set(i, updateKeyPath(nfkp.get(i), oldKeyPath, newKeyPath));
+          }
+        }
       }
     });
   }
@@ -424,9 +565,19 @@ export class TransformationEngine
     return this.fieldNameToIDMap.keyOf(fieldID);
   }
 
+  public getInputFieldID(path: KeyPath): number
+  {
+    return this.fieldNameToIDMap.get(path);
+  }
+
   public getOutputKeyPath(fieldID: number): KeyPath
   {
     return this.IDToFieldNameMap.get(fieldID);
+  }
+
+  public getOutputFieldID(path: KeyPath): number
+  {
+    return this.IDToFieldNameMap.keyOf(path);
   }
 
   public getFieldType(fieldID: number): string
@@ -511,23 +662,27 @@ export class TransformationEngine
           // Replace wildcards with explicit field IDs
           if (name.contains('*'))
           {
-            const upto: KeyPath = name.slice(0, name.indexOf('*')).toList();
-            if (this.fieldNameToIDMap.has(upto))
+            // const upto: KeyPath = name.slice(0, name.indexOf('*')).toList();
+            // ids = ids.push(this.fieldNameToIDMap.get(upto.push('*')));
+            /*if (this.fieldNameToIDMap.has(upto))
             {
-              for (let i: number = 0; i <= this.getFieldProp(this.fieldNameToIDMap.get(upto), KeyPath(['arrayLength'])); i++)
+              // Add extra fields we might know about from the example doc
+              if (this.doc !== undefined && yadeep.get(this.doc, upto) !== undefined)
               {
-                ids = ids.concat(this.parseFieldIDs(List<KeyPath>([name.set(name.indexOf('*'), i.toString())]))).toList();
+                for (let i: number = 0; i <= yadeep.get(this.doc, upto).length; i++) {
+                  ids = ids.concat(this.parseFieldIDs(List<KeyPath>([name.set(name.indexOf('*'), i.toString())]))).toList();
+                }
               }
-            }
+            }*/
           }
-          else
+          // else
+          // {
+          // Fully explicit KeyPath now (no *'s)
+          if (this.fieldNameToIDMap.has(name))
           {
-            // Fully explicit KeyPath now (no *'s)
-            if (this.fieldNameToIDMap.has(name))
-            {
-              ids = ids.push(this.fieldNameToIDMap.get(name));
-            }
+            ids = ids.push(this.fieldNameToIDMap.get(name));
           }
+          // }
         });
       }
     }
@@ -537,17 +692,44 @@ export class TransformationEngine
 
   private addPrimitiveField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any): List<number>
   {
+    // console.log('x3 ' + currentKeyPath.push(key.toString()));
     return ids.push(this.addField(currentKeyPath.push(key.toString()), typeof obj[key]));
   }
 
-  private addArrayField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any): List<number>
+  private addArrayField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any, depth: number = 1): List<number>
   {
+    // console.log('cpk = ' + currentKeyPath);
     // const arrayKey: any = [key.toString()];
     // const arrayID: number = this.addField(currentKeyPath.push(arrayKey), 'array');
+    // console.log('x2 ' + currentKeyPath.push(key.toString()));
+    let arrayType;
+    try
+    {
+      arrayType = arrayTypeOfValues(obj[key]);
+    }
+    catch (e)
+    {
+      // todo log?
+    }
+    if (arrayType === undefined)
+    {
+      arrayType = null;
+    }
     const arrayID: number = this.addField(currentKeyPath.push(key.toString()), 'array');
     ids = ids.push(arrayID);
-    this.setFieldProp(arrayID, KeyPath(['valueType']), arrayTypeOfValues(obj[key]));
-    this.setFieldProp(arrayID, KeyPath(['arrayLength']), obj[key].length);
+    this.setFieldProp(arrayID, KeyPath(['valueType']), arrayType);
+    // console.log('adding awid ' + currentKeyPath.push(key.toString()).push('*'));
+    let awkp: KeyPath = currentKeyPath.push(key.toString());
+    awkp = awkp.slice(0, awkp.size - depth + 1).toList();
+    for (let i: number = 0; i < depth; i++)
+    {
+      awkp = awkp.push('*');
+    }
+    // console.log('x4 ' + awkp);
+    const arrayWildcardID: number = this.addField(awkp, 'array');
+    this.setFieldProp(arrayWildcardID, KeyPath(['valueType']), arrayType);
+    ids = ids.push(arrayWildcardID);
+    // this.setFieldProp(arrayID, KeyPath(['arrayLength']), obj[key].length);
     for (let i: number = 0; i < obj[key].length; i++)
     {
       // const arrayKey_i: any = arrayKey.push(i.toString());
@@ -557,29 +739,49 @@ export class TransformationEngine
         // ids = ids.push(this.addField(currentKeyPath.push(arrayKey_i), typeof obj[key]));
       } else if (Array.isArray(obj[key][i]))
       {
-        ids = this.addArrayField(ids, obj[key], currentKeyPath.push(key.toString()), i);
+        // console.log('cpk2 ' + currentKeyPath.push(key.toString()) + ' ' + JSON.stringify(obj[key][i]));
+        ids = this.addArrayField(ids, obj[key], currentKeyPath.push(key.toString()), i, depth + 1);
       } else
       {
-        ids = ids.push(this.addField(currentKeyPath.push(key).push(i.toString()), typeof obj[key][i]));
-        ids = this.addObjectField(ids, obj[key][i], currentKeyPath.push(key.toString()).push(i.toString()));
+        // console.log('x1 ' + currentKeyPath.push(key.toString()).push(i.toString()));
+        ids = ids.push(this.addField(currentKeyPath.push(key.toString()).push(i.toString()), typeof obj[key][i]));
+        // console.log('foo ' + currentKeyPath.push(key.toString()).push(i.toString()));
+        ids = this.addObjectField(ids, obj[key][i], awkp, true);
+        ids = this.addObjectField(ids, obj[key][i], currentKeyPath.push(key.toString()).push(i.toString()), true);
       }
     }
     return ids;
   }
 
-  private addObjectField(ids: List<number>, obj: object, currentKeyPath: KeyPath): List<number>
+  private addObjectField(ids: List<number>, obj: object, currentKeyPath: KeyPath, prevArray: boolean = false): List<number>
   {
     for (const key of Object.keys(obj))
     {
       if (isPrimitive(obj[key]))
       {
+        if (prevArray && !this.fieldNameToIDMap.has(currentKeyPath.butLast().toList().push('*').push(key)))
+        {
+          ids = this.addPrimitiveField(ids, obj, currentKeyPath.butLast().toList().push('*'), key);
+        }
         ids = this.addPrimitiveField(ids, obj, currentKeyPath, key);
       } else if (obj[key].constructor === Array)
       {
+        if (prevArray && !this.fieldNameToIDMap.has(currentKeyPath.butLast().toList().push('*').push(key)))
+        {
+          ids = this.addArrayField(ids, obj, currentKeyPath.butLast().toList().push('*'), key);
+        }
         ids = this.addArrayField(ids, obj, currentKeyPath, key);
       } else
       {
+        if (prevArray && !this.fieldNameToIDMap.has(currentKeyPath.butLast().toList().push('*').push(key)))
+        {
+          // current children
+          ids = ids.push(this.addField(currentKeyPath.butLast().toList().push('*').push(key), typeof obj[key]));
+          // recursive call with wildcard
+          ids = this.addObjectField(ids, obj[key], currentKeyPath.butLast().toList().push('*').push(key));
+        }
         ids = ids.push(this.addField(currentKeyPath.push(key), typeof obj[key]));
+        // recursive call without wildcard
         ids = this.addObjectField(ids, obj[key], currentKeyPath.push(key));
       }
     }
@@ -601,64 +803,91 @@ export class TransformationEngine
     return ids;
   }
 
-  /**
-   * Takes a deeply nested object and flattens it into a map of
-   * field names/IDs to values.  This makes it convenient for
-   * the engine to perform transformations without worrying about
-   * nesting etc. -- nesting and complicated hierarchical document
-   * structures only exist at the fringes of the `TransformationEngine`.
-   * Within the engine documents enjoy serene flatness.
-   *
-   * @param {object} obj The document to flatten
-   * @returns {object} The flattened document
-   */
-  private flatten(obj: object): object
+  private preprocessNode(rawNode: TransformationNode, ftDoc: object): TransformationNode
   {
-    const objectified: object = objectify(obj);
-    const output: object = {};
-    this.fieldNameToIDMap.map((value: number, keyPath: KeyPath) =>
+    const node: TransformationNode = _.cloneDeep(rawNode);
+    node.fields = node.fields.clear();
+    rawNode.fields.forEach((item) =>
     {
-      const ref: any = yadeep.get(objectified, keyPath);
-      if (ref !== undefined)
-      {
-        if (isPrimitive(ref))
-        {
-          output[value] = ref;
-        }
-        else
-        {
-          output[value] = Object.assign({}, ref);
-        }
-      }
+      node.fields = node.fields.push(this.IDToFieldNameMap.get(this.fieldNameToIDMap.get(item)));
     });
-    return output;
+    return node;
   }
 
-  /**
-   * The inverse of `flatten` (above).  Using engine knowledge, take
-   * a flattened document and restore it to the correct deeply nested
-   * structure that the document should have.
-   *
-   * @param {object} obj A flattened document
-   * @returns {object}   The unflattened, maybe deeply nested, result
-   */
-  private unflatten(obj: object): object
+  private rename(doc: object): object
   {
-    const output: object = {};
-    this.IDToFieldNameMap.map((value: KeyPath, key: number) =>
+    const r: object = {};
+    const o: object = doc; // objectify(doc);
+    this.fieldNameToIDMap.forEach((value: number, key: KeyPath) =>
     {
-      if (obj !== undefined && obj.hasOwnProperty(key) && this.fieldEnabled.get(key) === true)
-      {
-        yadeep.set(output, value, obj[key], { create: true });
-      }
+      // console.log('rn key = ' + key);
+      this.renameHelper(r, o, key, value);
     });
-    // If a field is supposed to be arary but is an object in its flattened
+
+    return r;
+  }
+
+  private renameHelper(r: object, o: object, key: KeyPath, value?: number, oldKey?: KeyPath)
+  {
+    // console.log('rh key = ' + key + ' val = ' + value);
+    if (value === undefined)
+    {
+      // console.log(JSON.stringify(o));
+      // console.log(oldKey);
+      // console.log(yadeep.get(o, oldKey));
+
+      // setting new array element
+      yadeep.set(r, key, yadeep.get(o, oldKey), { create: true });
+    }
+    else // if (this.fieldEnabled.has(value) === false || this.fieldEnabled.get(value) === true)
+    {
+      const el: any = yadeep.get(o, key);
+      // console.log('el = ' + el + ' for key ' + key);
+      if (el !== undefined)
+      {
+        if (isPrimitive(el))
+        {
+          yadeep.set(r, this.IDToFieldNameMap.get(value), el, { create: true });
+        }
+        else if (el.constructor === Array)
+        {
+          if (key.contains('*'))
+          {
+            const newKey: KeyPath = this.IDToFieldNameMap.get(value);
+            const upto: KeyPath = key.slice(0, key.indexOf('*')).toList();
+            for (let j: number = 0; j < Object.keys(yadeep.get(o, upto)).length; j++)
+            {
+              const newKeyReplaced: KeyPath = newKey.set(newKey.indexOf('*'), j.toString());
+              const oldKeyReplaced: KeyPath = key.set(key.indexOf('*'), j.toString());
+              // console.log('r here1');
+              this.renameHelper(r, o, newKeyReplaced, this.fieldNameToIDMap.get(newKeyReplaced), oldKeyReplaced);
+            }
+          }
+          /*else
+          {
+            for (let i: number = 0; i < Object.keys(el).length; i++)
+            {
+              const kpi: KeyPath = key.push(i.toString());
+              console.log('r here2 ' + kpi);
+              this.renameHelper(r, o, kpi);
+            }
+          }*/
+        }
+      }
+    }
+  }
+
+  private restoreArrays(output: object)
+  {
+    // If a field is supposed to be an array but is an object in its flattened
     // representation, convert it back to an array
     this.IDToFieldNameMap.map((value: KeyPath, key: number) =>
     {
-      if (obj !== undefined && obj.hasOwnProperty(key) && this.fieldEnabled.get(key) === true)
+      // Need to do this regardless of whether the field is enabled, e.g. in case we're
+      // duplicating a disabled array
+      if (yadeep.get(output, value) !== undefined)
       {
-        if (this.fieldTypes.get(key) === 'array')
+        if (this.fieldTypes.get(key) === 'array' && !value.includes('*'))
         {
           const x = yadeep.get(output, value);
           x['length'] = Object.keys(x).length;
@@ -666,6 +895,5 @@ export class TransformationEngine
         }
       }
     });
-    return output;
   }
 }

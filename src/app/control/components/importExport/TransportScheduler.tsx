@@ -505,7 +505,6 @@ class TransportScheduler extends TerrainComponent<Props>
         {
           !!template.export &&
           <AlgorithmSelector
-            libraryState={this.props.library}
             onChangeSelection={this._setStateWrapperPath('selectedIds')}
             ids={this.state.selectedIds}
             dropdownWidth={inputElementWidth}

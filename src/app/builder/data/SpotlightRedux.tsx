@@ -57,7 +57,7 @@ const Redux = require('redux');
 import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
 import Util from 'app/util/Util';
 import thunk from 'redux-thunk';
-import { BaseClass, New } from '../../Classes';
+import { BaseClass, New } from 'shared/util/Classes';
 import { _SpotlightState, SpotlightState } from './SpotlightTypes';
 
 export interface SpotlightActionTypes

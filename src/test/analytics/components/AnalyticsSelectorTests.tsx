@@ -118,9 +118,9 @@ describe('AnalyticsSelector', () =>
 
       expect(connectionDropdown).toHaveLength(1);
       expect(multiswitchs).toHaveLength(3);
-      expect(multiswitchs.nodes[0].props.onChange).toEqual(onMetricSelect);
-      expect(multiswitchs.nodes[1].props.onChange).toEqual(onIntervalSelect);
-      expect(multiswitchs.nodes[2].props.onChange).toEqual(onDateRangeSelect);
+      expect(multiswitchs.getElements()[0].props.onChange).toEqual(onMetricSelect);
+      expect(multiswitchs.getElements()[1].props.onChange).toEqual(onIntervalSelect);
+      expect(multiswitchs.getElements()[2].props.onChange).toEqual(onDateRangeSelect);
     });
   });
 

@@ -43,87 +43,62 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
-import AppendTransformationNode from 'shared/transformations/nodes/AppendTransformationNode';
-import DuplicateTransformationNode from 'shared/transformations/nodes/DuplicateTransformationNode';
-import FilterTransformationNode from 'shared/transformations/nodes/FilterTransformationNode';
-import GetTransformationNode from 'shared/transformations/nodes/GetTransformationNode';
-import JoinTransformationNode from 'shared/transformations/nodes/JoinTransformationNode';
-import LoadTransformationNode from 'shared/transformations/nodes/LoadTransformationNode';
-import PlusTransformationNode from 'shared/transformations/nodes/PlusTransformationNode';
-import PrependTransformationNode from 'shared/transformations/nodes/PrependTransformationNode';
-import PutTransformationNode from 'shared/transformations/nodes/PutTransformationNode';
-import SplitTransformationNode from 'shared/transformations/nodes/SplitTransformationNode';
-import StoreTransformationNode from 'shared/transformations/nodes/StoreTransformationNode';
-import SubstringTransformationNode from 'shared/transformations/nodes/SubstringTransformationNode';
-import TransformationNode from 'shared/transformations/nodes/TransformationNode';
-import UppercaseTransformationNode from 'shared/transformations/nodes/UppercaseTransformationNode';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import TransformationNodeVisitor from 'shared/transformations/TransformationNodeVisitor';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+
+import AddTransformationNode from './nodes/AddTransformationNode';
+import ArrayCountTransformationNode from './nodes/ArrayCountTransformationNode';
+import ArraySumTransformationNode from './nodes/ArraySumTransformationNode';
+import CaseTransformationNode from './nodes/CaseTransformationNode';
+import CastTransformationNode from './nodes/CastTransformationNode';
+import DecryptTransformationNode from './nodes/DecryptTransformationNode';
+import DifferenceTransformationNode from './nodes/DifferenceTransformationNode';
+import DivideTransformationNode from './nodes/DivideTransformationNode';
+import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
+import EncryptTransformationNode from './nodes/EncryptTransformationNode';
+import FilterArrayTransformationNode from './nodes/FilterArrayTransformationNode';
+import FilterTransformationNode from './nodes/FilterTransformationNode';
+import FindReplaceTransformationNode from './nodes/FindReplaceTransformationNode';
+import HashTransformationNode from './nodes/HashTransformationNode';
+import InsertTransformationNode from './nodes/InsertTransformationNode';
+import JoinTransformationNode from './nodes/JoinTransformationNode';
+import MultiplyTransformationNode from './nodes/MultiplyTransformationNode';
+import ProductTransformationNode from './nodes/ProductTransformationNode';
+import QuotientTransformationNode from './nodes/QuotientTransformationNode';
+import SetIfTransformationNode from './nodes/SetIfTransformationNode';
+import SplitTransformationNode from './nodes/SplitTransformationNode';
+import SubstringTransformationNode from './nodes/SubstringTransformationNode';
+import SubtractTransformationNode from './nodes/SubtractTransformationNode';
+import SumTransformationNode from './nodes/SumTransformationNode';
+import TransformationNode from './nodes/TransformationNode';
+import ZipcodeTransformationNode from './nodes/ZipcodeTransformationNode';
+import { TransformationEngine } from './TransformationEngine';
+import TransformationNodeType, { NodeOptionsType } from './TransformationNodeType';
+import TransformationNodeVisitor from './TransformationNodeVisitor';
+import TransformationVisitResult from './TransformationVisitResult';
+import EngineUtil from './util/EngineUtil';
 
 type AllNodeInfoType =
   {
-    [K in TransformationNodeType]: InfoType
+    [K in TransformationNodeType]: InfoType<K>
   };
 
-export interface InfoType
+export interface InfoType<T extends TransformationNodeType = any>
 {
   humanName: string; // something we can read
   editable?: boolean; // is it editable after creation
   creatable?: boolean; // can it created by the user?
   description?: string; // description of what the transformation does
   isAvailable?: (engine: TransformationEngine, fieldId: number) => boolean;
+  shortSummary?: (meta: NodeOptionsType<T>) => string;
   type?: any;
   targetedVisitor: (visitor: TransformationNodeVisitor,
     transformationNode: TransformationNode,
     docCopy: object,
     options: object) => TransformationVisitResult;
+  newFieldType?: string;
 }
 
 const TransformationNodeInfo: AllNodeInfoType =
   {
-    [TransformationNodeType.LoadNode]:
-      {
-        humanName: 'Load',
-        type: LoadTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitLoadNode(transformationNode, docCopy, options),
-      },
-    [TransformationNodeType.StoreNode]:
-      {
-        humanName: 'Store',
-        type: StoreTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitStoreNode(transformationNode, docCopy, options),
-      },
-    [TransformationNodeType.PutNode]:
-      {
-        humanName: 'Put',
-        type: PutTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitPutNode(transformationNode, docCopy, options),
-      },
-    [TransformationNodeType.GetNode]:
-      {
-        humanName: 'Get',
-        type: GetTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitGetNode(transformationNode, docCopy, options),
-      },
     [TransformationNodeType.SplitNode]:
       {
         humanName: 'Split Field',
@@ -131,11 +106,24 @@ const TransformationNodeInfo: AllNodeInfoType =
         creatable: true,
         description: 'Split this field into 2 or more fields',
         type: SplitTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'string' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        shortSummary: (meta) =>
+        {
+          const names = meta.newFieldKeyPaths.map((value) => value.last());
+          return `Split on ${meta.delimiter} into ${names.toJS()}`;
+        },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,
           options: object) =>
           visitor.visitSplitNode(transformationNode, docCopy, options),
+        newFieldType: 'string',
       },
     [TransformationNodeType.JoinNode]:
       {
@@ -144,12 +132,24 @@ const TransformationNodeInfo: AllNodeInfoType =
         creatable: true,
         description: 'Join this field with another field',
         type: JoinTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'string' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        shortSummary: (meta) =>
+        {
+          const names = meta.newFieldKeyPaths.map((value) => value.last());
+          return `Join on ${meta.delimiter} from ${names.toJS()}`;
+        },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,
           options: object) =>
           visitor.visitJoinNode(transformationNode, docCopy, options),
-
+        newFieldType: 'string',
       },
     [TransformationNodeType.FilterNode]: // what does this do?
       {
@@ -171,67 +171,69 @@ const TransformationNodeInfo: AllNodeInfoType =
         creatable: true,
         description: 'Duplicate this field',
         type: DuplicateTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          const repType = EngineUtil.getRepresentedType(fieldId, engine);
+          return (
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId)) &&
+            repType !== 'object' && repType !== 'array'
+          );
+        },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,
           options: object) =>
           visitor.visitDuplicateNode(transformationNode, docCopy, options),
+        newFieldType: 'same',
       },
-    [TransformationNodeType.PlusNode]:
+    [TransformationNodeType.InsertNode]:
       {
-        humanName: 'Add',
+        humanName: 'Append / Prepend',
         editable: true,
         creatable: true,
-        description: `Add a value to this field's value`,
-        type: PlusTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitPlusNode(transformationNode, docCopy, options),
-      },
-    [TransformationNodeType.PrependNode]:
-      {
-        humanName: 'Prepend',
-        editable: true,
-        creatable: true,
-        description: `Add text before this field's value`,
-        type: PrependTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitPrependNode(transformationNode, docCopy, options),
-      },
-    [TransformationNodeType.AppendNode]:
-      {
-        humanName: 'Append',
-        editable: true,
-        creatable: true,
-        description: `Add text after this field's value`,
-        type: AppendTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitAppendNode(transformationNode, docCopy, options),
-      },
-    [TransformationNodeType.UppercaseNode]:
-      {
-        humanName: 'Uppercase',
-        editable: true,
-        creatable: true,
-        description: 'Make all the text in this field uppercase',
+        description: `Append, Prepend, or Insert Text`,
+        type: InsertTransformationNode,
         isAvailable: (engine, fieldId) =>
         {
-          return engine.getFieldType(fieldId) === 'string';
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
         },
-        type: UppercaseTransformationNode,
+        shortSummary: (meta) =>
+        {
+          if (meta.at === -1)
+          {
+            return 'Append Text';
+          }
+          else if (meta.at === 0)
+          {
+            return 'Prepend Text';
+          }
+          else
+          {
+            return `Insert Text at Position ${meta.at}`;
+          }
+        },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,
           options: object) =>
-          visitor.visitUppercaseNode(transformationNode, docCopy, options),
+          visitor.visitInsertNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.CaseNode]:
+      {
+        humanName: 'Change Case',
+        editable: true,
+        creatable: true,
+        description: 'Change case for text fields (e.g. lowercase, uppercase)',
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+        },
+        type: CaseTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitCaseNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.SubstringNode]:
       {
@@ -241,7 +243,11 @@ const TransformationNodeInfo: AllNodeInfoType =
         description: `Extract a piece from this field's text`,
         isAvailable: (engine, fieldId) =>
         {
-          return engine.getFieldType(fieldId) === 'string';
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+        },
+        shortSummary: (meta) =>
+        {
+          return `Substring from ${meta.from} to ${meta.from + meta.length}`;
         },
         type: SubstringTransformationNode,
         targetedVisitor: (visitor: TransformationNodeVisitor,
@@ -250,13 +256,414 @@ const TransformationNodeInfo: AllNodeInfoType =
           options: object) =>
           visitor.visitSubstringNode(transformationNode, docCopy, options),
       },
+    [TransformationNodeType.CastNode]:
+      {
+        humanName: 'Cast',
+        editable: true,
+        creatable: true,
+        description: `Convert this field to a different type`,
+        type: CastTransformationNode,
+        shortSummary: (meta) =>
+        {
+          return `Cast to ${meta.toTypename}`;
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitCastNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.HashNode]:
+      {
+        humanName: 'Hash',
+        editable: true,
+        creatable: true,
+        description: `Hash this field using SHA3/Keccak256`,
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+        },
+        shortSummary: (meta) =>
+        {
+          return `Hash with salt "${meta.salt}`;
+        },
+        type: HashTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitHashNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.AddNode]:
+      {
+        humanName: 'Add',
+        editable: true,
+        creatable: true,
+        description: 'Add a constant number to this field',
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'number';
+        },
+        shortSummary: (meta) =>
+        {
+          return `Add ${meta.shift}`;
+        },
+        type: AddTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitAddNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.SubtractNode]:
+      {
+        humanName: 'Subtract',
+        editable: true,
+        creatable: true,
+        description: 'Subtract a constant number from this field',
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'number';
+        },
+        shortSummary: (meta) =>
+        {
+          return `Subtract ${meta.shift}`;
+        },
+        type: SubtractTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitSubtractNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.MultiplyNode]:
+      {
+        humanName: 'Multiply',
+        editable: true,
+        creatable: true,
+        description: 'Multiply this field by a constant factor',
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'number';
+        },
+        shortSummary: (meta) =>
+        {
+          return `Multiply by ${meta.factor}`;
+        },
+        type: MultiplyTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitMultiplyNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.DivideNode]:
+      {
+        humanName: 'Divide',
+        editable: true,
+        creatable: true,
+        description: 'Divide this field by a constant number',
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'number';
+        },
+        shortSummary: (meta) =>
+        {
+          return `Divide by ${meta.factor}`;
+        },
+        type: DivideTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitDivideNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.SetIfNode]:
+      {
+        humanName: 'Set If',
+        editable: true,
+        creatable: true,
+        description: 'Checks if a field matches a certain special value, and if so, replaces that value',
+        isAvailable: (engine, fieldId) =>
+        {
+          const type = EngineUtil.getRepresentedType(fieldId, engine);
+          return type === 'number' || type === 'string' || type === 'boolean';
+        },
+        type: SetIfTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitSetIfNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.FindReplaceNode]:
+      {
+        humanName: 'Find/Replace',
+        editable: true,
+        creatable: true,
+        description: 'Finds and replaces certain patterns of characters in a string',
+        isAvailable: (engine, fieldId) =>
+        {
+          const type = EngineUtil.getRepresentedType(fieldId, engine);
+          return type === 'string';
+        },
+        type: FindReplaceTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitFindReplaceNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.ArraySumNode]:
+      {
+        humanName: 'Array Sum',
+        editable: false,
+        creatable: true,
+        description: `Sum the entries of an array`,
+        type: ArraySumTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+            EngineUtil.getValueType(fieldId, engine) === 'number' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitArraySumNode(transformationNode, docCopy, options),
+        newFieldType: 'number',
+      },
+    [TransformationNodeType.ArrayCountNode]:
+      {
+        humanName: 'Array Count',
+        editable: false,
+        creatable: true,
+        description: `Counts how many elements are in an array`,
+        type: ArrayCountTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitArrayCountNode(transformationNode, docCopy, options),
+        newFieldType: 'number',
+      },
+    [TransformationNodeType.ProductNode]:
+      {
+        humanName: 'Product of Fields',
+        editable: false,
+        creatable: true,
+        description: `Multiplies two or more fields together and puts the result in a new field`,
+        type: ProductTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitProductNode(transformationNode, docCopy, options),
+        newFieldType: 'number',
+      },
+    [TransformationNodeType.QuotientNode]:
+      {
+        humanName: 'Quotient of Fields',
+        editable: false,
+        creatable: true,
+        description: `Divides two fields and puts the result in a new field`,
+        type: QuotientTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitQuotientNode(transformationNode, docCopy, options),
+        newFieldType: 'number',
+      },
+    [TransformationNodeType.SumNode]:
+      {
+        humanName: 'Sum of Fields',
+        editable: false,
+        creatable: true,
+        description: `Sums two or more fields and puts the result in a new field`,
+        type: SumTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitSumNode(transformationNode, docCopy, options),
+        newFieldType: 'number',
+      },
+    [TransformationNodeType.DifferenceNode]:
+      {
+        humanName: 'Difference of Fields',
+        editable: false,
+        creatable: true,
+        description: `Subtracts one field from another and puts the result in a new field`,
+        type: DifferenceTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitDifferenceNode(transformationNode, docCopy, options),
+        newFieldType: 'number',
+      },
+    [TransformationNodeType.EncryptNode]:
+      {
+        humanName: 'Encrypt',
+        editable: true,
+        creatable: true,
+        description: `Encrypt a field using the secure AES algorithm`,
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+        },
+        type: EncryptTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitEncryptNode((transformationNode as EncryptTransformationNode), docCopy, options),
+      },
+    [TransformationNodeType.DecryptNode]:
+      {
+        humanName: 'Decrypt',
+        editable: true,
+        creatable: true,
+        description: `Decrypt a field that was previously encrypted with an Encrypt transformation`,
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+        },
+        type: DecryptTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitDecryptNode((transformationNode as DecryptTransformationNode), docCopy, options),
+      },
+    [TransformationNodeType.GroupByNode]:
+      {
+        humanName: 'Group Array Values',
+        editable: false,
+        creatable: true,
+        description: `Group an array of objects by a value`,
+        type: ArrayCountTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+            EngineUtil.getValueType(fieldId, engine) === 'object' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitGroupByNode(transformationNode, docCopy, options),
+        newFieldType: 'array',
+      },
+    [TransformationNodeType.FilterArrayNode]:
+      {
+        humanName: 'Filter Array',
+        editable: true,
+        creatable: true,
+        description: `Filter an array on its values`,
+        type: ArrayCountTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitFilterArrayNode(transformationNode, docCopy, options),
+        newFieldType: 'array',
+      },
+    [TransformationNodeType.ZipcodeNode]:
+      {
+        humanName: 'Zipcode',
+        editable: true,
+        creatable: true,
+        description: 'Convert a zipcode into location data',
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+        },
+        type: ZipcodeTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitZipcodeNode(transformationNode, docCopy, options),
+      },
   };
+
+export type TNodeObject = Pick<TransformationNode, 'fields' | 'meta'>;
 
 export abstract class TransformationInfo
 {
   public static getReadableName(type: TransformationNodeType)
   {
     return TransformationNodeInfo[type].humanName;
+  }
+
+  public static getReadableSummary(type: TransformationNodeType, transformation: TNodeObject): string
+  {
+    const getSummary = TransformationNodeInfo[type].shortSummary;
+    if (getSummary !== undefined)
+    {
+      try
+      {
+        return (getSummary as any)(transformation.meta);
+      }
+      catch (e)
+      {
+        return TransformationInfo.getReadableName(type);
+      }
+    }
+    else
+    {
+      return TransformationInfo.getReadableName(type);
+    }
   }
 
   public static getDescription(type: TransformationNodeType)
@@ -269,9 +676,37 @@ export abstract class TransformationInfo
     return TransformationNodeInfo[type];
   }
 
+  public static isAvailable(type: TransformationNodeType, engine: TransformationEngine, field: number)
+  {
+    const info = TransformationNodeInfo[type];
+    if (info.isAvailable === undefined)
+    {
+      return true;
+    }
+    else
+    {
+      return info.isAvailable(engine, field);
+    }
+  }
+
+  public static canCreate(type: TransformationNodeType): boolean
+  {
+    return TransformationNodeInfo[type].creatable;
+  }
+
+  public static canEdit(type: TransformationNodeType): boolean
+  {
+    return TransformationNodeInfo[type].editable;
+  }
+
   public static getType(type: TransformationNodeType): any
   {
     return TransformationNodeInfo[type].type;
+  }
+
+  public static getNewFieldType(type: TransformationNodeType): any
+  {
+    return TransformationNodeInfo[type].newFieldType;
   }
 
   public static applyTargetedVisitor(visitor: TransformationNodeVisitor,

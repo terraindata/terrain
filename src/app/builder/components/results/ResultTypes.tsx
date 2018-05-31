@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file
 
 import { List, Map } from 'immutable';
-import { BaseClass, New } from '../../../Classes';
+import { BaseClass, New } from 'shared/util/Classes';
 import { DISPLAY_TYPES } from './Aggregation';
 
 export const MAX_HITS = 200;

@@ -1,0 +1,79 @@
+@import "../../common/Common.less";
+
+.schedule-list-wrapper {
+	padding: 2px;
+	border-radius: 4px;
+	margin: 20px;
+	.schedule-list-header {
+		height: 25px;
+	    overflow: hidden;
+	    padding-bottom: 6px;
+	    padding-left: 6px;
+		.schedule-list-title {
+			font-size: @pretty-large-font-size;
+		}
+		.schedule-list-refresh-wrapper {
+			position: relative;
+			float: right;
+			left: -2px;
+			top: 3px;
+			.schedule-list-refresh {
+				height: 20px;
+				width: 20px;
+				cursor: pointer;
+			}
+		}
+	}
+	.schedule-list-schedules-wrapper {
+		border-radius: 4px;
+		.schedule-footer {
+			padding-left: 8px;
+			font-size: 12px;
+		}
+	}
+	.routeselector-picker {
+		.routeselector-value-component {
+			overflow-y: auto;
+			min-height: 48px;
+			.floating-input-container {
+				margin-left: 12px;
+				width: calc(~"100% - 12px");
+			}
+		}
+	}
+	.routeselector {
+		.routeselector-box-values {
+			.button {
+				max-width: 100%;
+			}
+		}
+		.routeselector-picker {
+			.routeselector-option-set {
+				.routeselector-option {
+					max-height: 100%;
+				}
+			}
+			.routeselector-value-component {
+				.floating-input-container {
+					margin-left: 12px;
+					width: calc(~"100% - 12px");
+				}
+			}
+		}
+		.dynamic-form {
+			max-width: 100%;
+			.dynamic-form-cell {
+				max-width: 100%;
+				.dropdown-option {
+					height: auto;
+				}
+			}
+			.dynamic-form-errors {
+				max-width: 100%;
+			}
+			.dropdown-value {
+				overflow: hidden;
+			}
+		}
+	}
+}
