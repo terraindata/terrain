@@ -95,16 +95,19 @@ class TemplateList extends TerrainComponent<Props>
 {
   public displayConfig: HeaderConfig<ETLTemplate> = [
     {
-      name: 'Name',
-      render: (template, index) => template.templateName,
-    },
-    {
       name: 'ID',
       render: (template, index) => template.id,
+      style: { width: `5%`}
+    },
+    {
+      name: 'Name',
+      render: (template, index) => template.templateName,
+      style: { width: `35%`}
     },
     {
       name: 'Description',
       render: (template, index) => template.getDescription(this.props.algorithms as any),
+      style: { width: `60%`}
     },
   ];
 
@@ -252,10 +255,11 @@ class TemplateList extends TerrainComponent<Props>
     this.props.etlAct({
       actionType: 'addModal',
       props: {
-        title: 'Confirm Action',
+        title: 'Delete Template',
         message: 'Are you sure you want to delete this template?',
         closeOnConfirm: true,
         confirm: true,
+        confirmButtonText: 'Delete',
         onConfirm,
       },
     });

@@ -163,4 +163,9 @@ MidwayRouter.get('/assets/:asset', async (ctx, next) =>
   }
 });
 
+MidwayRouter.get('/robots.txt', async (ctx, next) =>
+{
+  await send(ctx, '/src/app/robots.txt');
+});
+
 export default MidwayRouter;

@@ -129,6 +129,7 @@ class EditorActionsSection extends TerrainComponent<Props>
           title={this.state.isSaveAs ? 'Save As' : 'Save Template'}
           open={this.state.saveTemplateModalOpen}
           showTextbox={true}
+          confirmButtonText='Save'
           onConfirm={this.handleSaveConfirm}
           onClose={this.handleCloseSave}
           confirmDisabled={this.state.newTemplateName === ''}
