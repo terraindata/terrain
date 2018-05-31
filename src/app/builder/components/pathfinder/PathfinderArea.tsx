@@ -58,6 +58,7 @@ import BuilderActions from 'app/builder/data/BuilderActions';
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { ColorsState } from 'app/colors/data/ColorsTypes';
 import FadeInOut from 'app/common/components/FadeInOut';
+import TerrainTools from 'util/TerrainTools';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import { BuilderState } from 'builder/data/BuilderState';
 import * as TerrainLog from 'loglevel';
@@ -270,80 +271,81 @@ class PathfinderArea extends TerrainComponent<Props>
     const { pathfinderContext } = this.state;
     const pathString = JSON.stringify(path.toJS());
     return (
-      <div>
-        <ScrollingComponent
-          className='pf-area'
-          horizontalStrength={this.hStrength}
-          verticalStrength={this.vStrength}
-        >
-          <div className='pathfinder-column-content'>
-            <PathfinderSourceSection
+      <ScrollingComponent
+        className='pf-area'
+        horizontalStrength={this.hStrength}
+        verticalStrength={this.vStrength}
+      >
+        <div className='pathfinder-column-content'>
+          <PathfinderSourceSection
+            pathfinderContext={pathfinderContext}
+            keyPath={this._ikeyPath(keyPath, 'source')}
+            onStepChange={this.incrementStep}
+            source={path.source}
+            onSourceChange={this.props.onSourceChange}
+          />
+          <FadeInOut
+            open={path.step >= PathfinderSteps.Filter}
+          >
+            {
+              <PathfinderFilterSection
+                pathfinderContext={pathfinderContext}
+                filterGroup={path.filterGroup}
+                keyPath={this._ikeyPath(keyPath, 'filterGroup')}
+                onStepChange={this.incrementStep}
+                toSkip={toSkip}
+                onAddScript={this.handleAddScript}
+                onDeleteScript={this.handleDeleteScript}
+                onUpdateScript={this.handleUpdateScript}
+              />
+            }
+            {
+              <PathfinderFilterSection
+                isSoftFilter={true}
+                pathfinderContext={pathfinderContext}
+                filterGroup={path.softFilterGroup}
+                keyPath={this._ikeyPath(keyPath, 'softFilterGroup')}
+                onStepChange={this.incrementStep}
+                toSkip={toSkip}
+              />
+            }
+            {
+              <PathfinderScoreSection
+                pathfinderContext={pathfinderContext}
+                score={path.score}
+                keyPath={this._ikeyPath(keyPath, 'score')}
+                onStepChange={this.incrementStep}
+              />
+            }
+            <PathfinderMoreSection
               pathfinderContext={pathfinderContext}
-              keyPath={this._ikeyPath(keyPath, 'source')}
-              onStepChange={this.incrementStep}
-              source={path.source}
-              onSourceChange={this.props.onSourceChange}
+              more={path.more}
+              count={path.source.count}
+              scoreType={path.score.type}
+              minMatches={path.minMatches}
+              keyPath={this._ikeyPath(keyPath, 'more')}
+              toSkip={toSkip !== undefined ? toSkip : 3}
             />
-            <FadeInOut
-              open={path.step >= PathfinderSteps.Filter}
-            >
-              {
-                <PathfinderFilterSection
-                  pathfinderContext={pathfinderContext}
-                  filterGroup={path.filterGroup}
-                  keyPath={this._ikeyPath(keyPath, 'filterGroup')}
-                  onStepChange={this.incrementStep}
-                  toSkip={toSkip}
-                  onAddScript={this.handleAddScript}
-                  onDeleteScript={this.handleDeleteScript}
-                  onUpdateScript={this.handleUpdateScript}
-                />
-              }
-              {
-                <PathfinderFilterSection
-                  isSoftFilter={true}
-                  pathfinderContext={pathfinderContext}
-                  filterGroup={path.softFilterGroup}
-                  keyPath={this._ikeyPath(keyPath, 'softFilterGroup')}
-                  onStepChange={this.incrementStep}
-                  toSkip={toSkip}
-                />
-              }
-              {
-                <PathfinderScoreSection
-                  pathfinderContext={pathfinderContext}
-                  score={path.score}
-                  keyPath={this._ikeyPath(keyPath, 'score')}
-                  onStepChange={this.incrementStep}
-                />
-              }
-              <PathfinderMoreSection
-                pathfinderContext={pathfinderContext}
-                more={path.more}
-                count={path.source.count}
-                scoreType={path.score.type}
-                minMatches={path.minMatches}
-                keyPath={this._ikeyPath(keyPath, 'more')}
-                toSkip={toSkip !== undefined ? toSkip : 3}
+            <PathfinderNestedSection
+              pathfinderContext={pathfinderContext}
+              nested={path.nested}
+              reference={path.reference}
+              keyPath={this._ikeyPath(keyPath, 'nested')}
+              toSkip={toSkip !== undefined ? toSkip : 3}
+            />
+          </FadeInOut>
+          {
+            TerrainTools.isFeatureEnabled(TerrainTools.PATHFINDER_COPY) &&
+              <input
+                type='text'
+                className='path-copy-paste-inputarea'
+                value={pathString}
+                onChange={this.handlePastePathString as any}
+                autoFocus
               />
-              <PathfinderNestedSection
-                pathfinderContext={pathfinderContext}
-                nested={path.nested}
-                reference={path.reference}
-                keyPath={this._ikeyPath(keyPath, 'nested')}
-                toSkip={toSkip !== undefined ? toSkip : 3}
-              />
-            </FadeInOut>
-          </div>
-        </ScrollingComponent>
-        <input
-          type='text'
-          className='path-copy-paste-inputarea'
-          value={pathString}
-          onChange={this.handlePastePathString as any}
-          autoFocus
-        />
-      </div>
+          }
+        </div>
+      </ScrollingComponent>
     );
   }
 }
