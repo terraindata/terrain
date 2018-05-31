@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as cronParser from 'cron-parser';
+import * as momentZone from 'moment-timezone';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
@@ -163,13 +164,16 @@ export class Scheduler
     });
   }
 
-  public async getLog(id?: number): Promise<object[]>
+  public async getTimezone(): Promise<object>
   {
-    return new Promise<object[]>(async (resolve, reject) =>
-    {
-      // TODO add extensive logging support
-      resolve([{}]);
-    });
+    const timezone: string = momentZone.tz.guess();
+    const name: string = momentZone.tz(timezone).zoneName();
+    const timezoneObj: object =
+      {
+        timezone,
+        name,
+      };
+    return Promise.resolve(timezoneObj);
   }
 
   public async runSchedule(id: number, runNow?: boolean, userId?: number): Promise<SchedulerConfig[] | string>

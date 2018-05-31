@@ -58,13 +58,6 @@ import { users } from '../users/UserRouter';
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
 
-// Get job by search parameter, or all if none provided
-Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  await perm.JobQueuePermissions.verifyGetRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.JobQ.get(ctx.params.id);
-});
-
 Router.post('/cancel/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.JobQueuePermissions.verifyCancelRoute(ctx.state.user as UserConfig, ctx.req);
@@ -120,6 +113,13 @@ Router.post('/unpause/:id', passport.authenticate('access-token-local'), async (
 {
   await perm.JobQueuePermissions.verifyUnpauseRoute(ctx.state.user as UserConfig, ctx.req);
   ctx.body = await App.JobQ.unpause(ctx.params.id);
+});
+
+// Get job by search parameter, or all if none provided
+Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  await perm.JobQueuePermissions.verifyGetRoute(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await App.JobQ.get(ctx.params.id);
 });
 
 // Create job

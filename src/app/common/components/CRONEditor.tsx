@@ -96,7 +96,7 @@ class CRONEditor extends TerrainComponent<Props>
           this.renderCustom()
         }
         <div className='note'>
-          Note: All times are PDT
+          Note: All times are in Pacific (Los Angeles)
         </div>
         {
           timezoneOffsetHours !== 0 &&
