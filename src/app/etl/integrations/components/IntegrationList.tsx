@@ -114,10 +114,11 @@ export class IntegrationListUncontained extends TerrainComponent<Props>
     this.props.etlActions({
       actionType: 'addModal',
       props: {
-        title: 'Confirm Action',
+        title: 'Delete Integration',
         message: 'Are you sure you want to delete this integration?',
         closeOnConfirm: true,
         confirm: true,
+        confirmButtonText: 'Delete',
         onConfirm,
       },
     });
