@@ -548,7 +548,7 @@ export class RouteSelector extends TerrainComponent<Props>
             'routeselector-options-column': optionSet.column,
           })}
           ref={this._fn(this.attachColumnRef, index)}
-          style={this.props.footer ? {paddingBottom: 27} : {}}
+          style={this.props.footer ? { paddingBottom: 27 } : {}}
         >
           {
             optionSet.options.map(this._fn(this.renderOption, index, visibleOptionCounter, incrementVisibleOptions))
