@@ -185,22 +185,22 @@ export class IntegrationListUncontained extends TerrainComponent<Props>
               {
                 name: 'id',
                 render: this._fn(this.renderProperty, 'id'),
-                style: { width: `5%`}
+                style: { width: `5%` },
               },
               {
                 name: 'name',
                 render: this._fn(this.renderProperty, 'name'),
-                style: { width: `40%`}
+                style: { width: `40%` },
               },
               {
                 name: 'type',
                 render: this._fn(this.renderProperty, 'type'),
-                style: { width: `10%`}
+                style: { width: `10%` },
               },
               {
                 name: 'created By',
                 render: this._fn(this.renderProperty, 'createdBy'),
-                style: { width: `25%`}
+                style: { width: `25%` },
               },
               {
                 name: 'last Modified',

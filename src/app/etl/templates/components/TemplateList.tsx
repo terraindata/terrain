@@ -97,17 +97,17 @@ class TemplateList extends TerrainComponent<Props>
     {
       name: 'ID',
       render: (template, index) => template.id,
-      style: { width: `5%`}
+      style: { width: `5%` },
     },
     {
       name: 'Name',
       render: (template, index) => template.templateName,
-      style: { width: `35%`}
+      style: { width: `35%` },
     },
     {
       name: 'Description',
       render: (template, index) => template.getDescription(this.props.algorithms as any),
-      style: { width: `60%`}
+      style: { width: `60%` },
     },
   ];
 
