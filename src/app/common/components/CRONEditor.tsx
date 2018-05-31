@@ -78,6 +78,8 @@ export interface Props
   onChange: (cron: string) => void;
 }
 
+const timezoneOffsetHours = (new Date()).getTimezoneOffset() / 60 - 420 / 60;
+
 class CRONEditor extends TerrainComponent<Props>
 {
   public render()
@@ -96,16 +98,21 @@ class CRONEditor extends TerrainComponent<Props>
         <div className='note'>
           Note: All times are PDT
         </div>
+        {
+          timezoneOffsetHours !== 0 &&
+          <div className='note'>
+            Tip: Your local time is {Math.abs(timezoneOffsetHours)}
+            {timezoneOffsetHours < 0 ? ' ahead ' : ' behind '}
+            of Pacific time, so adjust your local time by {timezoneOffsetHours} hours.
+            </div>
+        }
         <div className='note'>
           Schedule will next be executed:
         </div>
         <div className='note cron-editor-bottom-note'>
           <b>
             {
-              Util.formatDate(
-                cronParser.parseExpression(this.props.cron, { tz: 'America/Los_Angeles' }).next().toString(),
-                true,
-              )
+              cronParser.parseExpression(this.props.cron, { tz: 'America/Los_Angeles' }).next().toDate().toString()
             }
           </b>
         </div>
