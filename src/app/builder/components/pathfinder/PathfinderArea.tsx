@@ -60,6 +60,7 @@ import { ColorsState } from 'app/colors/data/ColorsTypes';
 import FadeInOut from 'app/common/components/FadeInOut';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import { BuilderState } from 'builder/data/BuilderState';
+import * as TerrainLog from 'loglevel';
 import withScrolling, { createHorizontalStrength, createVerticalStrength } from 'react-dnd-scrollzone';
 import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
@@ -67,7 +68,7 @@ import PathfinderFilterSection from './filter/PathfinderFilterSection';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
 import PathfinderNestedSection from './more/PathfinderNestedSection';
 import './Pathfinder.less';
-import { _PathfinderContext, _Script, Path, PathfinderSteps, Source } from './PathfinderTypes';
+import { _Path, _PathfinderContext, _Script, Path, PathfinderSteps, Source } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
 
@@ -113,6 +114,23 @@ class PathfinderArea extends TerrainComponent<Props>
         pathfinderContext: Util.reconcileContext(this.state.pathfinderContext,
           this.getPathfinderContext(nextProps)),
       });
+    }
+  }
+
+  public handlePastePathString(evt)
+  {
+    const newString = evt.target.value;
+    if (this.props.canEdit === true)
+    {
+      try
+      {
+        const pathConfig = JSON.parse(newString);
+        const path = _Path(pathConfig);
+        this.props.builderActions.changePath(this.getKeyPath(), path);
+      } catch (e)
+      {
+        TerrainLog.debug('Pasted pathfinder config is not a valid string: ' + newString);
+      }
     }
   }
 
@@ -250,72 +268,82 @@ class PathfinderArea extends TerrainComponent<Props>
     const { path, toSkip } = this.props;
     const keyPath = this.getKeyPath();
     const { pathfinderContext } = this.state;
+    const pathString = JSON.stringify(path.toJS());
     return (
-      <ScrollingComponent
-        className='pf-area'
-        horizontalStrength={this.hStrength}
-        verticalStrength={this.vStrength}
-      >
-        <div className='pathfinder-column-content'>
-          <PathfinderSourceSection
-            pathfinderContext={pathfinderContext}
-            keyPath={this._ikeyPath(keyPath, 'source')}
-            onStepChange={this.incrementStep}
-            source={path.source}
-            onSourceChange={this.props.onSourceChange}
-          />
-          <FadeInOut
-            open={path.step >= PathfinderSteps.Filter}
-          >
-            {
-              <PathfinderFilterSection
-                pathfinderContext={pathfinderContext}
-                filterGroup={path.filterGroup}
-                keyPath={this._ikeyPath(keyPath, 'filterGroup')}
-                onStepChange={this.incrementStep}
-                toSkip={toSkip}
-                onAddScript={this.handleAddScript}
-                onDeleteScript={this.handleDeleteScript}
-                onUpdateScript={this.handleUpdateScript}
-              />
-            }
-            {
-              <PathfinderFilterSection
-                isSoftFilter={true}
-                pathfinderContext={pathfinderContext}
-                filterGroup={path.softFilterGroup}
-                keyPath={this._ikeyPath(keyPath, 'softFilterGroup')}
-                onStepChange={this.incrementStep}
-                toSkip={toSkip}
-              />
-            }
-            {
-              <PathfinderScoreSection
-                pathfinderContext={pathfinderContext}
-                score={path.score}
-                keyPath={this._ikeyPath(keyPath, 'score')}
-                onStepChange={this.incrementStep}
-              />
-            }
-            <PathfinderMoreSection
+      <div>
+        <ScrollingComponent
+          className='pf-area'
+          horizontalStrength={this.hStrength}
+          verticalStrength={this.vStrength}
+        >
+          <div className='pathfinder-column-content'>
+            <PathfinderSourceSection
               pathfinderContext={pathfinderContext}
-              more={path.more}
-              count={path.source.count}
-              scoreType={path.score.type}
-              minMatches={path.minMatches}
-              keyPath={this._ikeyPath(keyPath, 'more')}
-              toSkip={toSkip !== undefined ? toSkip : 3}
+              keyPath={this._ikeyPath(keyPath, 'source')}
+              onStepChange={this.incrementStep}
+              source={path.source}
+              onSourceChange={this.props.onSourceChange}
             />
-            <PathfinderNestedSection
-              pathfinderContext={pathfinderContext}
-              nested={path.nested}
-              reference={path.reference}
-              keyPath={this._ikeyPath(keyPath, 'nested')}
-              toSkip={toSkip !== undefined ? toSkip : 3}
-            />
-          </FadeInOut>
-        </div>
-      </ScrollingComponent>
+            <FadeInOut
+              open={path.step >= PathfinderSteps.Filter}
+            >
+              {
+                <PathfinderFilterSection
+                  pathfinderContext={pathfinderContext}
+                  filterGroup={path.filterGroup}
+                  keyPath={this._ikeyPath(keyPath, 'filterGroup')}
+                  onStepChange={this.incrementStep}
+                  toSkip={toSkip}
+                  onAddScript={this.handleAddScript}
+                  onDeleteScript={this.handleDeleteScript}
+                  onUpdateScript={this.handleUpdateScript}
+                />
+              }
+              {
+                <PathfinderFilterSection
+                  isSoftFilter={true}
+                  pathfinderContext={pathfinderContext}
+                  filterGroup={path.softFilterGroup}
+                  keyPath={this._ikeyPath(keyPath, 'softFilterGroup')}
+                  onStepChange={this.incrementStep}
+                  toSkip={toSkip}
+                />
+              }
+              {
+                <PathfinderScoreSection
+                  pathfinderContext={pathfinderContext}
+                  score={path.score}
+                  keyPath={this._ikeyPath(keyPath, 'score')}
+                  onStepChange={this.incrementStep}
+                />
+              }
+              <PathfinderMoreSection
+                pathfinderContext={pathfinderContext}
+                more={path.more}
+                count={path.source.count}
+                scoreType={path.score.type}
+                minMatches={path.minMatches}
+                keyPath={this._ikeyPath(keyPath, 'more')}
+                toSkip={toSkip !== undefined ? toSkip : 3}
+              />
+              <PathfinderNestedSection
+                pathfinderContext={pathfinderContext}
+                nested={path.nested}
+                reference={path.reference}
+                keyPath={this._ikeyPath(keyPath, 'nested')}
+                toSkip={toSkip !== undefined ? toSkip : 3}
+              />
+            </FadeInOut>
+          </div>
+        </ScrollingComponent>
+        <input
+          type='text'
+          className='path-copy-paste-inputarea'
+          value={pathString}
+          onChange={this.handlePastePathString as any}
+          autoFocus
+        />
+      </div>
     );
   }
 }
