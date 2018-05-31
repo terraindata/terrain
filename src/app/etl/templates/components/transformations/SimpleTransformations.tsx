@@ -274,3 +274,11 @@ export class DecryptTFF extends TransformationForm<{}, TransformationNodeType.De
   protected readonly initialState = {};
   protected readonly noEditOptions = true;
 }
+
+export class RemoveDuplicatesTFF extends TransformationForm<{}, TransformationNodeType.RemoveDuplicatesNode>
+{
+  protected readonly type = TransformationNodeType.RemoveDuplicatesNode;
+  protected readonly inputMap = {};
+  protected readonly initialState = {};
+  protected readonly noEditOptions = true;
+}

@@ -76,6 +76,7 @@ import JoinTransformationNode from './nodes/JoinTransformationNode';
 import MultiplyTransformationNode from './nodes/MultiplyTransformationNode';
 import ProductTransformationNode from './nodes/ProductTransformationNode';
 import QuotientTransformationNode from './nodes/QuotientTransformationNode';
+import RemoveDuplicatesTransformationNode from './nodes/RemoveDuplicatesTransformationNode';
 import SetIfTransformationNode from './nodes/SetIfTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
@@ -1225,6 +1226,46 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
           errors: [
             {
               message: 'Attempted to count a non-array (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
+
+  public visitRemoveDuplicatesNode(node: RemoveDuplicatesTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.RemoveDuplicatesNode>;
+
+    node.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        const newArray = [];
+        const seen = {};
+        for (let i = 0; i < el.length; i++)
+        {
+          const item = el[i];
+          const hash = String(item);
+          if (seen[hash] === undefined)
+          {
+            newArray.push(item);
+            seen[hash] = true;
+          }
+        }
+        yadeep.set(doc, field, newArray, { create: true });
+      }
+      else
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to remove duplicates on a non-array (this is not supported)',
             } as TransformationVisitError,
           ],
         } as TransformationVisitResult;
