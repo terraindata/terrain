@@ -192,7 +192,6 @@ class EditorFieldPreview extends TemplateEditorField<Props>
             className='field-preview-label-group'
             onMouseEnter={this.handleMouseEnter}
             onMouseLeave={this.handleMouseLeave}
-            style={labelStyle}
           >
             {
               this.renderTypeIcon()
@@ -204,7 +203,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
                 'field-preview-can-toggle': this.props.toggleOpen !== undefined,
               })}
               onClick={this.handleLabelClicked}
-              style={fontColor(Colors().text1, Colors().active)}
+              style={labelStyle}
               key='label'
             >
               {labelOverride != null ? labelOverride : field.name}

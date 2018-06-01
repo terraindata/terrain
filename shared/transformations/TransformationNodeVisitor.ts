@@ -56,6 +56,7 @@ import HashTransformationNode from 'shared/transformations/nodes/HashTransformat
 import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
 import ProductTransformationNode from 'shared/transformations/nodes/ProductTransformationNode';
 import QuotientTransformationNode from 'shared/transformations/nodes/QuotientTransformationNode';
+import RemoveDuplicatesNode from 'shared/transformations/nodes/RemoveDuplicatesTransformationNode';
 import SetIfTransformationNode from 'shared/transformations/nodes/SetIfTransformationNode';
 import SubtractTransformationNode from 'shared/transformations/nodes/SubtractTransformationNode';
 import SumTransformationNode from 'shared/transformations/nodes/SumTransformationNode';
@@ -193,6 +194,11 @@ export default abstract class TransformationNodeVisitor
   }
 
   public visitGroupByNode(node: GroupByTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitRemoveDuplicatesNode(node: RemoveDuplicatesNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }

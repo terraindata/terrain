@@ -818,12 +818,15 @@ export class TransformationEngine
   {
     const r: object = {};
     const o: object = doc; // objectify(doc);
-    this.fieldNameToIDMap.forEach((value: number, key: KeyPath) =>
+    // sort the field map so that parent renames don't cause weird issues with children renames
+    const fieldToIDMap = this.fieldNameToIDMap.sortBy((value: number, key: KeyPath) =>
     {
-      // console.log('rn key = ' + key);
+      return this.getOutputKeyPath(value).size;
+    });
+    fieldToIDMap.forEach((value: number, key: KeyPath) =>
+    {
       this.renameHelper(r, o, key, value);
     });
-
     return r;
   }
 

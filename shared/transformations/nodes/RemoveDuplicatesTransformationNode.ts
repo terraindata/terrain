@@ -44,22 +44,19 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import ConfigType from '../../ConfigType';
-import { TemplateBase } from './TemplateBase';
+import { List } from 'immutable';
 
-export class ExportTemplateConfig extends TemplateBase
+import { KeyPath } from '../../util/KeyPath';
+import TransformationNodeType from '../TransformationNodeType';
+import TransformationNode from './TransformationNode';
+
+export default class RemoveDuplicatesTransformationNode extends TransformationNode
 {
-  public objectKey?: string = undefined;
-  public query?: string = undefined;
-  public rank?: boolean = false;
-  public templateId?: number = undefined;
-  public algorithmId?: number = undefined;
-
-  constructor(props: object)
+  public constructor(id: number,
+    fields: List<KeyPath>,
+    options: object = {},
+    typeCode: TransformationNodeType = TransformationNodeType.RemoveDuplicatesNode)
   {
-    super(props);
-    ConfigType.initialize(this, props);
+    super(id, fields, options, typeCode);
   }
 }
-
-export default ExportTemplateConfig;

@@ -54,8 +54,6 @@ import * as DatabaseRouter from './database/DatabaseRouter';
 import * as ETLRouter from './etl/ETLRouter';
 import * as EventRouter from './events/EventRouter';
 import * as IntegrationRouter from './integrations/IntegrationRouter';
-import * as ExportRouter from './io/ExportRouter';
-import * as ImportRouter from './io/ImportRouter';
 import * as ItemRouter from './items/ItemRouter';
 import * as JobRouter from './jobs/JobRouter';
 import * as QueryRouter from './query/QueryRouter';
@@ -82,8 +80,6 @@ export function getRouter()
   SchemaRouter.initialize();
   StatusRouter.initialize();
   QueryRouter.initialize();
-  ImportRouter.initialize();
-  ExportRouter.initialize();
   IntegrationRouter.initialize();
   ETLRouter.initialize();
   SchemaMetadataRouter.initialize();
@@ -99,8 +95,6 @@ export function getRouter()
   AppRouter.use('/schema', SchemaRouter.default.routes(), SchemaRouter.default.allowedMethods());
   AppRouter.use('/status', StatusRouter.default.routes(), StatusRouter.default.allowedMethods());
   AppRouter.use('/query', QueryRouter.default.routes(), QueryRouter.default.allowedMethods());
-  AppRouter.use('/import', ImportRouter.default.routes(), ImportRouter.default.allowedMethods());
-  AppRouter.use('/export', ExportRouter.default.routes(), ExportRouter.default.allowedMethods());
   AppRouter.use('/integrations', IntegrationRouter.default.routes(), IntegrationRouter.default.allowedMethods());
   AppRouter.use('/etl', ETLRouter.default.routes(), ETLRouter.default.allowedMethods());
   AppRouter.use('/schemametadata', SchemaMetadataRouter.default.routes(), SchemaMetadataRouter.default.allowedMethods());
