@@ -70,10 +70,10 @@ import TerrainDateParameter from './TerrainDateParameter';
  *  If there are nested fields followed by the parameter name, we try to search the final value in the given parameter value.
  *
  *  When the parameter's value is not given, then it could be a meta parameter:
- *  @TerrainData is a date related meta parameter. We replace it with a date derived from `now`.
+ *  @TerrainDate is a date related meta parameter. We replace it with a date derived from `now`.
  *  @[parentAlias] is a groupJoin meta parameter. We leave it as what it is until runtime, then it will become a given parameter.
  *  NOTE: If the parameterValue of a given parameter is in the format of @TerrainDate meta parameter, we try to substitute the parameter
- *  with  meta value as if the parameter is a @TerrainData parameter.
+ *  with  meta value as if the parameter is a @TerrainDate parameter.
  */
 export default class ESParameterFiller
 {
@@ -97,7 +97,6 @@ export default class ESParameterFiller
           return ESParameterFiller.handleGivenParameter(ps.slice(1), params[parameterName], inTerms);
         } else
         {
-          // TerrainData?
           // TerrainDate parameter
           if (parameterName === 'TerrainDate')
           {
