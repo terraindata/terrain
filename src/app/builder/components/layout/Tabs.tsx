@@ -179,6 +179,7 @@ export interface TabAction
   icon: any;
   style?: any;
   enabled?: boolean;
+  html?: El;
   onClick();
 }
 
@@ -344,6 +345,9 @@ class Tabs extends TerrainComponent<TabsProps> {
                 title: action.tooltip,
                 distance: 24,
                 key: index,
+                html: action.html,
+                distance: action.html ? 50 : 30,
+                interactive: action.html !== undefined,
               },
             ),
           )
