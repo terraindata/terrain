@@ -340,7 +340,7 @@ class ETLAjax
     files?: { [k: string]: File },
     downloadName?: string,
     mimeType?: string,
-    onProgress?: (percent: number) => void,
+    onProgress?: (progress: string) => void,
   ): Promise<any>
   {
     return new Promise((resolve, reject) =>
@@ -475,6 +475,7 @@ class ETLAjax
       const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
       config.onError(routeError);
     };
+
     xhr.onload = (ev: Event) =>
     {
       if (xhr.status === 401)
@@ -503,14 +504,28 @@ class ETLAjax
     {
       xhr.upload.addEventListener('progress', (e: ProgressEvent) =>
       {
-        let progress = 0;
+        let percent = 0;
         if (e.total !== 0)
         {
-          progress = (e.loaded / e.total) * 100;
+          percent = (e.loaded / e.total) * 100;
+          const progress = `Uploading file...${Math.round(percent)}%`
+          config.onProgress(progress);
         }
-
-        config.onProgress(progress);
       }, false);
+
+      xhr.onprogress = (ev: Event) =>
+      {
+        try
+        {
+          const responseText = xhr.responseText.slice(xhr.responseText.lastIndexOf('{'), xhr.responseText.lastIndexOf('}') + 1);
+          const response = JSON.parse(responseText);
+          config.onProgress(`Documents processed...${response.successful}`);
+        }
+        catch (e)
+        {
+          // do nothing
+        }
+      }
     }
 
     xhr.open('post', MIDWAY_HOST + '/midway/v1/' + route);
@@ -523,7 +538,7 @@ interface ReqConfig
   onError?: (response: any) => void;
   downloadName?: string;
   mimeType?: string;
-  onProgress?: (percent: number) => void;
+  onProgress?: (progress: string) => void;
 }
 
 export interface ExecuteConfig

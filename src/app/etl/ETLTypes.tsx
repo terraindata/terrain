@@ -64,7 +64,7 @@ class ETLStateC
   // TODO the way we track what is running and how the ui deals with it is suboptimal
   public runningTemplates: Immutable.Map<number, ETLTemplate> = Map();
   public acknowledgedRuns: Immutable.Map<number, boolean> = Map();
-  public fileUploadProgress: number = 0;
+  public ETLProgress: string = '';
   public blockState: NotificationState = _NotificationState();
 }
 export type ETLState = WithIRecord<ETLStateC>;

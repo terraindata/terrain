@@ -108,17 +108,17 @@ Router.post('/runnow/:id', async (ctx, next) =>
   const responseStream = await App.JobQ.runNow(ctx.params.id, fields, files);
   // await perm.JobQueuePermissions.verifyRunNowRoute(ctx.state.user as UserConfig, ctx.req);
   responseStream.on('error', ctx.onerror);
-  ctx.set('Cache-Control', 'no-cache');
-  if (ctx.response.type !== 'blob')
-  {
-    responseStream.resume();
-    ctx.body = new stream.Readable();
-    ctx.body.push(null);
-  }
-  else
-  {
-    ctx.body = responseStream;
-  }
+  ctx.body = responseStream.pipe(new stream.PassThrough());
+  // if (ctx.response.type !== 'blob')
+  // {
+  //   responseStream.resume();
+  //   ctx.body = new stream.Readable();
+  //   ctx.body.push(null);
+  // }
+  // else
+  // {
+  //   ctx.body = responseStream;
+  // }
 });
 
 // unpause paused job by id
