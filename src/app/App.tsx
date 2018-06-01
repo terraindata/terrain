@@ -287,8 +287,9 @@ class App extends TerrainComponent<Props>
     }
   }
 
-  public specifyTitle(location) {
-    const base: string = 'Terrain';
+  public specifyTitle(location)
+  {
+    const base = 'Terrain';
     let customerTitle: string;
     if (location.includes('localhost'))
     {
