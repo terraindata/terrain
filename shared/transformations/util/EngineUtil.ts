@@ -750,28 +750,36 @@ export default class EngineUtil
     }
   }
 
-  private static * postorder(tree: Immutable.Map<number, List<number>>, id: number)
+  public static * postorder(
+    tree: Immutable.Map<number, List<number>>,
+    id: number,
+    shouldExplore: (id) => boolean = () => true,
+  )
   {
     const children = tree.get(id);
     if (children !== undefined)
     {
       for (let i = 0; i < children.size; i++)
       {
-        yield* EngineUtil.postorder(tree, children.get(i));
+        yield* EngineUtil.postorder(tree, children.get(i), shouldExplore);
       }
       yield id;
     }
   }
 
-  private static * preorder(tree: Immutable.Map<number, List<number>>, id: number)
+  public static * preorder(
+    tree: Immutable.Map<number, List<number>>,
+    id: number,
+    shouldExplore: (id) => boolean = () => true,
+  )
   {
     const children = tree.get(id);
-    if (children !== undefined)
+    if (children !== undefined && shouldExplore(id))
     {
       yield id;
       for (let i = 0; i < children.size; i++)
       {
-        yield* EngineUtil.preorder(tree, children.get(i));
+        yield* EngineUtil.preorder(tree, children.get(i), shouldExplore);
       }
     }
   }
