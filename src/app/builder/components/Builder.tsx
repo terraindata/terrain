@@ -465,9 +465,12 @@ class Builder extends TerrainComponent<Props>
             <div
               onClick={this.makeAlgorithmLive}
               className={'link'}
-              style={{ textAlign: 'center' }}
             >
-              Make Algorithm Live
+              <span
+                style={{ margin: 'auto' }}
+              >
+                Make Algorithm Live
+              </span>
             </div>
           </div>
           : null,
