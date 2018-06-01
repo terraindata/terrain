@@ -997,4 +997,4 @@ const BuilderContainer = Util.createTypedContainer(
     builderActions: BuilderActions,
   },
 );
-export default withRouter(DragDropContext(HTML5Backend)(BuilderContainer));
+export default withRouter(DragDropContext(HTML5Backend)(BuilderContainer) as any);
