@@ -49,7 +49,6 @@ THE SOFTWARE.
 /**
  * This is an extension of React.Component that adds extra
  * commonly needed functionality:
- * - shouldComponentUpdate with shallowCompare
  * - helper method for calling instance functions with arguments
  * - helper method for toggling a boolean state value
  * - helper method for subscribing to a Redux state
@@ -58,7 +57,6 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 import * as React from 'react';
 import Util from '../../util/Util';
-const shallowCompare = require('react-addons-shallow-compare');
 
 // Defines the configuration options for a Redux subscription
 interface SubscriptionConfig

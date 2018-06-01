@@ -58,12 +58,8 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
-const Perf = require('react-addons-perf');
-
 require('velocity-animate');
 require('velocity-animate/velocity.ui');
-window['PerfStart'] = Perf.start;
-window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.getLastMeasurements()), 250); };
 
 // Components
 import { generateThemeStyles } from 'common/components/tooltip/Tooltips';

@@ -49,7 +49,6 @@ THE SOFTWARE.
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import './panel.less';
-const shallowCompare = require('react-addons-shallow-compare');
 import * as ReactDOM from 'react-dom';
 import Util from '../../../util/Util';
 const $ = require('jquery');

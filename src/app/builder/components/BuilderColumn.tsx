@@ -58,7 +58,7 @@ import Menu from '../../common/components/Menu';
 import { MenuOption } from '../../common/components/Menu';
 import RolesStore from '../../roles/data/RolesStore';
 import PanelMixin from './layout/PanelMixin';
-const shallowCompare = require('react-addons-shallow-compare');
+const shallowCompare = require('shallow-compare');
 import Query from '../../../items/types/Query';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
