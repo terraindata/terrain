@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import moment = require('moment');
+import { ESParameterType } from 'shared/database/elastic/parser/ESParameter';
 import ESParameterSubstituter from './ESParameterSubstituter';
 import ESValueInfo from './ESValueInfo';
 import TerrainDateParameter from './TerrainDateParameter';
@@ -74,17 +75,23 @@ import TerrainDateParameter from './TerrainDateParameter';
  *  @[parentAlias] is a groupJoin meta parameter. We leave it as what it is until runtime, then it will become a given parameter.
  *  NOTE: If the parameterValue of a given parameter is in the format of @TerrainDate meta parameter, we try to substitute the parameter
  *  with  meta value as if the parameter is a @TerrainDate parameter.
+ *
+ *  Callers can use monitor to capture and control the process. If the monitor returns true, the filling process keeps going even there
+ *  is any error.
  */
 export default class ESParameterFiller
 {
   public static generate(source: ESValueInfo,
-    params: { [name: string]: any }): string
+    params: { [name: string]: any },
+    monitor?: (source: ESValueInfo, type: ESParameterType, value: string | Error) => boolean): string
   {
     return ESParameterSubstituter.generate(source,
-      (param: string, runtimeParam?: string, inTerms?: boolean): string =>
+      (paramValueInfo: ESValueInfo, runtimeParam?: string, inTerms?: boolean): string =>
       {
+        const param = paramValueInfo.parameter as string;
         const ps = param.split('.');
         const parameterName = ps[0];
+        let finalString;
         if (params[parameterName] !== undefined)
         {
           // given parameters
@@ -92,24 +99,67 @@ export default class ESParameterFiller
           // replace it eagerly for easy debugging.
           if (typeof parameterValue === 'string' && TerrainDateParameter.isValidTerrainDateParameter(parameterValue))
           {
-            return TerrainDateParameter.fillTerrainDateParameter(parameterValue);
+            finalString = TerrainDateParameter.fillTerrainDateParameter(parameterValue);
+            if (monitor !== undefined)
+            {
+              monitor(paramValueInfo, ESParameterType.MetaDate, finalString);
+            }
+            return finalString;
           }
-          return ESParameterFiller.handleGivenParameter(ps.slice(1), params[parameterName], inTerms);
+          try
+          {
+            finalString = ESParameterFiller.handleGivenParameter(ps.slice(1), params[parameterName], inTerms);
+          } catch (e)
+          {
+            if (monitor !== undefined)
+            {
+              const keepGoing = monitor(paramValueInfo, ESParameterType.Unknown, e);
+              if (keepGoing === true)
+              {
+                return e.message;
+              }
+            }
+            throw e;
+          }
+          if (monitor !== undefined)
+          {
+            monitor(paramValueInfo, ESParameterType.GivenName, finalString);
+          }
+          return finalString;
         } else
         {
           // TerrainDate parameter
           if (parameterName === 'TerrainDate')
           {
-            return TerrainDateParameter.fillTerrainDateParameter(param);
+            finalString = TerrainDateParameter.fillTerrainDateParameter(param);
+            if (monitor !== undefined)
+            {
+              monitor(paramValueInfo, ESParameterType.MetaDate, finalString);
+            }
+            return finalString;
           }
 
           // @[parentAlias] parameter
           if (runtimeParam !== undefined && parameterName === runtimeParam)
           {
-            return JSON.stringify('@' + param);
+            finalString = JSON.stringify('@' + param);
+            if (monitor !== undefined)
+            {
+              monitor(paramValueInfo, ESParameterType.MetaParent, finalString);
+            }
+            return finalString;
           }
 
-          throw new Error('Undefined parameter ' + param + ' in ' + JSON.stringify(params, null, 2));
+          const errorMessage = 'Undefined parameter ' + param + ' in ' + JSON.stringify(params, null, 2);
+          if (monitor !== undefined)
+          {
+            const keepGoing = monitor(paramValueInfo, ESParameterType.Unknown, new Error(errorMessage));
+            if (keepGoing === true)
+            {
+              return errorMessage;
+            }
+          }
+          throw new Error(errorMessage);
         }
       });
   }
