@@ -56,13 +56,11 @@ import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import IntegrationConfig from '../integrations/IntegrationConfig';
 import Integrations from '../integrations/Integrations';
-import { Sources } from '../io/sources/Sources';
 import { Job } from '../jobs/Job';
 import { UserConfig } from '../users/UserConfig';
 import SchedulerConfig from './SchedulerConfig';
 
 export const integrations: Integrations = new Integrations();
-const sources = new Sources();
 
 export class Scheduler
 {
