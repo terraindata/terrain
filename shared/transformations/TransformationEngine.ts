@@ -819,7 +819,8 @@ export class TransformationEngine
     const r: object = {};
     const o: object = doc; // objectify(doc);
     // sort the field map so that parent renames don't cause weird issues with children renames
-    const fieldToIDMap = this.fieldNameToIDMap.sortBy((value: number, key: KeyPath) => {
+    const fieldToIDMap = this.fieldNameToIDMap.sortBy((value: number, key: KeyPath) =>
+    {
       return this.getOutputKeyPath(value).size;
     });
     fieldToIDMap.forEach((value: number, key: KeyPath) =>

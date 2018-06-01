@@ -193,6 +193,7 @@
     "react-dom": "15.6.2",
     "react-draggable": "^3.0.5",
     "react-highlighter": "^0.4.2",
+    "react-js-pagination": "^3.0.2",
     "react-leaflet": "^1.7.8",
     "react-modal": "^1.4.0",
     "react-onclickoutside": "^6.7.1",

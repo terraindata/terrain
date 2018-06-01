@@ -66,7 +66,7 @@ import { SetIfTFF } from './SetIfTransformationForm';
 import
 {
   AddTFF, CaseTFF, DecryptTFF, DivideTFF, EncryptTFF, FindReplaceTFF,
-  HashTFF, MultiplyTFF, SubstringTFF, SubtractTFF,
+  HashTFF, MultiplyTFF, RemoveDuplicatesTFF, SubstringTFF, SubtractTFF,
 } from './SimpleTransformations';
 import { SplitTFF } from './SplitTransformationForm';
 
@@ -122,6 +122,8 @@ export function getTransformationForm(type: TransformationNodeType): React.Compo
       return GroupByTFF;
     case TransformationNodeType.FilterArrayNode:
       return FilterArrayTFF;
+    case TransformationNodeType.RemoveDuplicatesNode:
+      return RemoveDuplicatesTFF;
     default:
       return null;
   }

@@ -46,6 +46,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires import-spacing
 
 import TerrainComponent from 'common/components/TerrainComponent';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
@@ -144,6 +145,34 @@ class EditorActionsSection extends TerrainComponent<Props>
     return modals;
   }
 
+  public renderIcon(iconComponent, options:
+    {
+      key: string,
+      onClick: () => void,
+      style?: any,
+      tip?: string,
+    })
+  {
+    const content = (
+      <div
+        className='editor-top-bar-icon'
+        style={options.style}
+        onClick={options.onClick}
+        key={options.key}
+      >
+        {iconComponent}
+      </div>
+    );
+    if (options.tip !== undefined)
+    {
+      return tooltip(content, options.tip);
+    }
+    else
+    {
+      return content;
+    }
+  }
+
   public render()
   {
     const { history, template, isDirty } = this.props.templateEditor;
@@ -164,30 +193,30 @@ class EditorActionsSection extends TerrainComponent<Props>
         >
           {titleName}
         </div>
-        <div
-          className='editor-top-bar-icon'
-          style={history.canRedo() ? topBarIconStyle : topBarIconDisabledStyle}
-          onClick={this.handleRedo}
-          key='redo'
-        >
-          <RedoIcon />
-        </div>
-        <div
-          className='editor-top-bar-icon'
-          style={history.canUndo() ? topBarIconStyle : topBarIconDisabledStyle}
-          onClick={this.handleUndo}
-          key='undo'
-        >
-          <UndoIcon />
-        </div>
-        <div
-          className='editor-top-bar-icon'
-          style={topBarIconStyle}
-          onClick={this.handleSaveAsClicked}
-          key='save as'
-        >
-          <SaveAsIcon />
-        </div>
+        {
+          this.renderIcon(<RedoIcon />, {
+            key: 'redo',
+            onClick: this.handleRedo,
+            style: history.canRedo() ? topBarIconStyle : topBarIconDisabledStyle,
+            tip: 'Redo',
+          })
+        }
+        {
+          this.renderIcon(<UndoIcon />, {
+            key: 'undo',
+            onClick: this.handleUndo,
+            style: history.canUndo() ? topBarIconStyle : topBarIconDisabledStyle,
+            tip: 'Undo',
+          })
+        }
+        {
+          this.renderIcon(<SaveAsIcon />, {
+            key: 'save as',
+            onClick: this.handleSaveAsClicked,
+            style: topBarIconStyle,
+            tip: 'Save As',
+          })
+        }
         <div
           className='editor-top-bar-item'
           style={topBarItemStyle}
