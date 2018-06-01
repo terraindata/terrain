@@ -290,14 +290,13 @@ class App extends TerrainComponent<Props>
   public specifyTitle(location) {
     const base: string = 'Terrain Data';
     let customerTitle: string;
-    const parser = document.createElement('a');
-    parser.href = location;
-    if (parser.hostname === 'localhost') {
+    if (location.includes('localhost')) {
       customerTitle = '';
     } else {
-      const hostName = parser.hostname;
+      const parsedUrl = location.split('://');
+      const hostName = parsedUrl[1];
       const segments = hostName.split('.');
-      const customerName = segments[0];
+      const customerName: string = segments[0];
       const capitalizeCustomer: string = customerName.charAt(0).toUpperCase() + customerName.slice(1);
       customerTitle = ' | ' + capitalizeCustomer;
     }
