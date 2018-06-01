@@ -44,12 +44,27 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import * as assert from 'assert';
 import * as winston from 'winston';
 import * as Tasty from '../tasty/Tasty';
 
 import DatabaseController from '../database/DatabaseController';
 import ElasticDB from '../database/elastic/tasty/ElasticDB';
 import DatabaseRegistry from '../databaseRegistry/DatabaseRegistry';
+
+import { DatabaseConfig } from './database/DatabaseConfig';
+import { TemplateConfig } from './etl/TemplateConfig';
+import { MetricConfig } from './events/MetricConfig';
+import { IntegrationConfig } from './integrations/IntegrationConfig';
+import { ItemConfig } from './items/ItemConfig';
+import { JobConfig } from './jobs/JobConfig';
+import { JobLogConfig } from './jobs/JobLogConfig';
+import { ResultsConfigConfig } from './resultsConfig/ResultsConfigConfig';
+import { SchedulerConfig } from './scheduler/SchedulerConfig';
+import { SchemaMetadataConfig } from './schemaMetadata/SchemaMetadataConfig';
+import { StatusHistoryConfig } from './statusHistory/StatusHistoryConfig';
+import { UserConfig } from './users/UserConfig';
+import { VersionConfig } from './versions/VersionConfig';
 
 export class Tables
 {
@@ -68,9 +83,22 @@ export class Tables
   public statusHistory: Tasty.Table;
 }
 
+function verifyTableWithConfig(table: Tasty.Table, configClass: object)
+{
+  assert.strictEqual(Object.keys(table.getMapping()).sort().toString(), Object.keys(configClass).sort().toString());
+}
+
 const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringTypeName: string, primaryKeyType: string): Tables => {
-  return {
-    versions: new Tasty.Table(
+  const tables = {};
+
+  const addTable = (table: Tasty.Table, configObject: object) =>
+  {
+    verifyTableWithConfig(table, configObject);
+    tables[table.getTableName()] = table;
+  };
+
+  addTable(
+    new Tasty.Table(
       'versions',
       ['id'],
       [
@@ -90,7 +118,10 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
         createdByUserId: 'integer NOT NULL',
       },
     ),
-    items: new Tasty.Table(
+    new VersionConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
       'items',
       ['id'],
       [
@@ -110,7 +141,10 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
         type: 'text',
       },
     ),
-    databases: new Tasty.Table(
+    new ItemConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
       'databases',
       ['id'],
       [
@@ -134,7 +168,10 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
         analyticsType: 'text',
       },
     ),
-    users: new Tasty.Table(
+    new DatabaseConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
       'users',
       ['id'],
       [
@@ -162,7 +199,10 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
         meta: 'text',
       },
     ),
-    metrics: new Tasty.Table(
+    new UserConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
       'metrics',
       ['id'],
       [
@@ -178,7 +218,10 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
         events: 'text NOT NULL',
       },
     ),
-    integrations: new Tasty.Table(
+    new MetricConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
       'integrations',
       ['id'],
       [
@@ -206,7 +249,10 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
         writePermission: 'text NOT NULL',
       },
     ),
-    schemaMetadata: new Tasty.Table(
+    new IntegrationConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
       'schemaMetadata',
       ['id'],
       [
@@ -224,7 +270,10 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
         countByAlgorithm: 'text',
       },
     ),
-    resultsConfig: new Tasty.Table(
+    new SchemaMetadataConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
       'resultsConfig',
       ['id'],
       [
@@ -248,7 +297,10 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
         primaryKeys: 'text',
       },
     ),
-    templates: new Tasty.Table(
+    new ResultsConfigConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
       'templates',
       ['id'],
       [
@@ -278,7 +330,10 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
         uiData: 'text NOT NULL',
       },
     ),
-    schedules: new Tasty.Table(
+    new TemplateConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
       'schedules',
       ['id'],
       [
@@ -312,7 +367,10 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
         workerId: 'integer NOT NULL',
       },
     ),
-    jobLogs: new Tasty.Table(
+    new SchedulerConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
       'jobLogs',
       ['id'],
       [
@@ -326,7 +384,10 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
         contents: 'text',
       },
     ),
-    jobs: new Tasty.Table(
+    new JobLogConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
       'jobs',
       ['id'],
       [
@@ -368,7 +429,10 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
         workerId: 'integer NOT NULL',
       },
     ),
-    statusHistory: new Tasty.Table(
+    new JobConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
       'statusHistory',
       ['id'],
       [
@@ -388,7 +452,10 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
         toStatus: 'text NOT NULL',
       },
     ),
-  };
+    new StatusHistoryConfig({}),
+  );
+
+  return tables as Tables;
 };
 
 export function setupTables(dbtype: string): Tables
