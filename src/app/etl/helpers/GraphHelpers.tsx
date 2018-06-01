@@ -62,7 +62,6 @@ import ETLRouteUtil from 'etl/ETLRouteUtil';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import

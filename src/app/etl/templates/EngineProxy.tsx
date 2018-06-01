@@ -49,7 +49,6 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
-import { postorderForEach, preorderForEach } from 'etl/templates/SyncUtil';
 import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ETLFieldTypes, FieldTypes, getJSFromETL, Languages } from 'shared/etl/types/ETLTypes';
@@ -266,7 +265,7 @@ export class EngineProxy
   public copyNestedTypes(idToCopy, destKP: List<string>)
   {
     const rootOutputKP = this.engine.getOutputKeyPath(idToCopy);
-    preorderForEach(this.engine, idToCopy, (childId) =>
+    EngineUtil.preorderForEach(this.engine, idToCopy, (childId) =>
     {
       // do not copy root
       if (childId !== idToCopy)
@@ -372,7 +371,7 @@ export class EngineProxy
     }
 
     const rootOutputKP = this.engine.getOutputKeyPath(sourceId);
-    preorderForEach(this.engine, idToCopy, (childId) =>
+    EngineUtil.preorderForEach(this.engine, idToCopy, (childId) =>
     {
       // do not copy root
       if (childId !== idToCopy)
@@ -432,7 +431,7 @@ export class FieldProxy
   // delete this field and all child fields
   public deleteField(rootId: number)
   {
-    postorderForEach(this.engine, rootId, (fieldId) =>
+    EngineUtil.postorderForEach(this.engine, rootId, (fieldId) =>
     {
       const dependents: List<number> = EngineUtil.getFieldDependents(this.engine, fieldId);
       if (dependents.size > 0)
