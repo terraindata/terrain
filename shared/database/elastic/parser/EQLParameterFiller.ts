@@ -83,7 +83,8 @@ export default class ESParameterFiller
 {
   public static generate(source: ESValueInfo,
     params: { [name: string]: any },
-    monitor?: (source: ESValueInfo, type: ESParameterType, value: string | Error) => boolean): string
+    monitor: (source: ESValueInfo, type: ESParameterType, value: string | Error) => boolean
+      = (sv, type, value) => false): string
   {
     return ESParameterSubstituter.generate(source,
       (paramValueInfo: ESValueInfo, runtimeParam?: string, inTerms?: boolean): string =>
@@ -100,10 +101,7 @@ export default class ESParameterFiller
           if (typeof parameterValue === 'string' && TerrainDateParameter.isValidTerrainDateParameter(parameterValue))
           {
             finalString = TerrainDateParameter.fillTerrainDateParameter(parameterValue);
-            if (monitor !== undefined)
-            {
-              monitor(paramValueInfo, ESParameterType.MetaDate, finalString);
-            }
+            monitor(paramValueInfo, ESParameterType.MetaDate, finalString);
             return finalString;
           }
           try
@@ -111,20 +109,14 @@ export default class ESParameterFiller
             finalString = ESParameterFiller.handleGivenParameter(ps.slice(1), params[parameterName], inTerms);
           } catch (e)
           {
-            if (monitor !== undefined)
+            const keepGoing = monitor(paramValueInfo, ESParameterType.Unknown, e);
+            if (keepGoing === true)
             {
-              const keepGoing = monitor(paramValueInfo, ESParameterType.Unknown, e);
-              if (keepGoing === true)
-              {
-                return e.message;
-              }
+              return e.message;
             }
             throw e;
           }
-          if (monitor !== undefined)
-          {
-            monitor(paramValueInfo, ESParameterType.GivenName, finalString);
-          }
+          monitor(paramValueInfo, ESParameterType.GivenName, finalString);
           return finalString;
         } else
         {
@@ -132,10 +124,7 @@ export default class ESParameterFiller
           if (parameterName === 'TerrainDate')
           {
             finalString = TerrainDateParameter.fillTerrainDateParameter(param);
-            if (monitor !== undefined)
-            {
-              monitor(paramValueInfo, ESParameterType.MetaDate, finalString);
-            }
+            monitor(paramValueInfo, ESParameterType.MetaDate, finalString);
             return finalString;
           }
 
@@ -143,21 +132,15 @@ export default class ESParameterFiller
           if (runtimeParam !== undefined && parameterName === runtimeParam)
           {
             finalString = JSON.stringify('@' + param);
-            if (monitor !== undefined)
-            {
-              monitor(paramValueInfo, ESParameterType.MetaParent, finalString);
-            }
+            monitor(paramValueInfo, ESParameterType.MetaParent, finalString);
             return finalString;
           }
 
           const errorMessage = 'Undefined parameter ' + param + ' in ' + JSON.stringify(params, null, 2);
-          if (monitor !== undefined)
+          const keepGoing = monitor(paramValueInfo, ESParameterType.Unknown, new Error(errorMessage));
+          if (keepGoing === true)
           {
-            const keepGoing = monitor(paramValueInfo, ESParameterType.Unknown, new Error(errorMessage));
-            if (keepGoing === true)
-            {
-              return errorMessage;
-            }
+            return errorMessage;
           }
           throw new Error(errorMessage);
         }
