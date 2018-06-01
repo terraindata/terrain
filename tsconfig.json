@@ -26,7 +26,6 @@
             "database/*": ["src/database/*"],
             "deploy/*": ["src/app/deploy/*"],
             "etl/*": ["src/app/etl/*"],
-            "fileImport/*": ["src/app/fileImport/*"],
             "images/*": ["src/images/*"],
             "jobs/*": ["src/app/jobs/*"],
             "manual/*": ["src/app/manual/*"],

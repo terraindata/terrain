@@ -84,7 +84,6 @@ module.exports =
       database: path.resolve(__dirname, 'src/database'),
       deploy: path.resolve(__dirname, 'src/app/deploy'),
       etl: path.resolve(__dirname, 'src/app/etl'),
-      fileImport: path.resolve(__dirname, 'src/app/fileImport'),
       images: path.resolve(__dirname, 'src/images'),
       jobs: path.resolve(__dirname, 'src/app/jobs'),
       library: path.resolve(__dirname, 'src/app/library'),
