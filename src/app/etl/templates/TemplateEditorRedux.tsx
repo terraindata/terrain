@@ -72,7 +72,7 @@ import { MidwayError } from 'shared/error/MidwayError';
 import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 
-import { createTreeFromEngine, updateFieldFromEngine } from 'etl/templates/SyncUtil';
+import { createFieldMap, updateFieldFromEngine } from 'etl/templates/SyncUtil';
 import Ajax from 'util/Ajax';
 
 const { List, Map } = Immutable;
@@ -285,7 +285,7 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       rebuildFieldMap: (state, action) =>
       {
         const engine = state.getCurrentEngine();
-        const newFieldMap = createTreeFromEngine(engine);
+        const newFieldMap = createFieldMap(engine);
         return state.set('fieldMap', newFieldMap);
       },
       rebuildField: (state, action) =>
