@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as asyncBusboy from 'async-busboy';
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
+import * as stream from 'stream';
 
 import { JobConfig } from 'shared/types/jobs/JobConfig';
 import * as App from '../App';
@@ -103,9 +104,21 @@ Router.post('/runnow/:id', async (ctx, next) =>
     ctx.status = 400;
     return;
   }
-  // await perm.JobQueuePermissions.verifyRunNowRoute(ctx.state.user as UserConfig, ctx.req);
 
-  ctx.body = await App.JobQ.runNow(ctx.params.id, fields, files);
+  const responseStream = await App.JobQ.runNow(ctx.params.id, fields, files);
+  // await perm.JobQueuePermissions.verifyRunNowRoute(ctx.state.user as UserConfig, ctx.req);
+  responseStream.on('error', ctx.onerror);
+  ctx.set('Cache-Control', 'no-cache');
+  if (ctx.response.type !== 'blob')
+  {
+    responseStream.resume();
+    ctx.body = new stream.Readable();
+    ctx.body.push(null);
+  }
+  else
+  {
+    ctx.body = responseStream;
+  }
 });
 
 // unpause paused job by id
