@@ -288,9 +288,9 @@ class App extends TerrainComponent<Props>
   }
 
   public specifyTitle(location) {
-    const base = 'Terrain Data';
-    let customerTitle;
-    let parser = document.createElement('a');
+    const base: string = 'Terrain Data';
+    let customerTitle: string;
+    const parser = document.createElement('a');
     parser.href = location;
     if (parser.hostname === 'localhost') {
       customerTitle = '';
@@ -298,8 +298,8 @@ class App extends TerrainComponent<Props>
       const hostName = parser.hostname;
       const segments = hostName.split('.');
       const customerName = segments[0];
-      const capitalizeCustomer = customerName.charAt(0).toUpperCase() + customerName.slice(1);
-      customerTitle = ' | ' + capitalizeCustomer; 
+      const capitalizeCustomer: string = customerName.charAt(0).toUpperCase() + customerName.slice(1);
+      customerTitle = ' | ' + capitalizeCustomer;
     }
     return base + customerTitle;
   }
