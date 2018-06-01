@@ -76,8 +76,6 @@ import MapComponent from '../../../common/components/MapComponent';
 import Modal from '../../../common/components/Modal';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import FileImportPreview from '../../../fileImport/components/FileImportPreview';
-import { FileImportState } from '../../../fileImport/FileImportTypes';
 import MapUtil from '../../../util/MapUtil';
 
 import Hit from '../results/Hit';

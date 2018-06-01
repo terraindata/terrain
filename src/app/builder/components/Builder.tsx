@@ -59,8 +59,6 @@ import { withRouter } from 'react-router';
 // Data
 import { ItemStatus } from '../../../items/types/Item';
 import Query from '../../../items/types/Query';
-import FileImportStore from '../../fileImport/data/FileImportStore';
-import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import LibraryActions from '../../library/data/LibraryActions';
 import * as LibraryTypes from '../../library/LibraryTypes';
 import RolesStore from '../../roles/data/RolesStore';
@@ -76,7 +74,6 @@ import { UserState } from 'users/UserTypes';
 import { backgroundColor, Colors } from '../../colors/Colors';
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
-import FileImportPreviewColumn from '../../fileImport/components/FileImportPreviewColumn';
 import { notificationManager } from './../../common/components/InAppNotification';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import BuilderColumn from './BuilderColumn';
@@ -108,7 +105,6 @@ export interface Props
 class Builder extends TerrainComponent<Props>
 {
   public state: {
-    exportState: FileImportTypes.FileImportState,
     algorithms: IMMap<ID, Algorithm>,
 
     colKeys: List<number>;
@@ -132,7 +128,6 @@ class Builder extends TerrainComponent<Props>
     hitsPage: number;
 
   } = {
-      exportState: FileImportStore.getState(),
       algorithms: this.props.library.algorithms,
 
       colKeys: null,
@@ -161,9 +156,6 @@ class Builder extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
-    this._subscribe(FileImportStore, {
-      stateKey: 'exportState',
-    });
 
     let colKeys: List<number>;
 
@@ -671,7 +663,6 @@ class Builder extends TerrainComponent<Props>
       content: query && <BuilderColumn
         query={query}
         resultsState={this.props.builder.resultsState}
-        exportState={this.state.exportState}
         index={index}
         colKey={key}
         algorithm={algorithm}
