@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import { ESParameterType } from 'shared/database/elastic/parser/ESParameter';
 import EQLConfig from '../EQLConfig';
 import ESClauseSettings from '../ESClauseSettings';
 import ESClauseType from '../ESClauseType';
@@ -79,24 +80,20 @@ export default class ESVariantClause extends ESClause
     let valueType: string = ESJSONType[valueInfo.jsonType];
     if (valueType === 'parameter')
     {
-      if (valueInfo.parameterValue !== null && valueInfo.parameterValue.getValueInfo() !== null)
+      if (valueInfo.parameterType === ESParameterType.Unknown)
       {
-        const parameterType = ESJSONType[valueInfo.parameterValue.getValueInfo().jsonType];
-        if (parameterType === 'parameter' || parameterType === 'array')
-        {
-          // this is a runtime parameter or a magic array parameter
-          for (const t of ['string', 'number', 'boolean', 'base', 'null'])
-          {
-            if (this.subtypes[t] !== undefined)
-            {
-              valueType = t;
-              break;
-            }
-          }
-        } else
-        {
-          valueType = parameterType;
-        }
+        interpreter.accumulateError(valueInfo,
+          'Unknown clause type of the parameter value. Expected one of these types: ' +
+          JSON.stringify(Object.keys(this.subtypes), null, 2));
+        return;
+      } else if (valueInfo.parameterType === ESParameterType.MetaParent)
+      {
+        // metaParent can be anything, so avoid keep digging
+        return;
+      } else
+      {
+        // keep digging with the parameterValue type
+        valueType = ESJSONType[valueInfo.parameterValue.getValueInfo().jsonType];
       }
     }
     const refinedValueType: string = this.refineType(valueType, valueInfo);

@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { ESJSONParser } from 'shared/database/elastic/parser/ESJSONParser';
+import { ESParameterType } from 'shared/database/elastic/parser/ESParameter';
 import ESClause from './clauses/ESClause';
 import ESJSONType from './ESJSONType';
 import ESParserError from './ESParserError';
@@ -79,6 +80,7 @@ export default class ESValueInfo
    * this is set to the name of that parameter.
    */
   public parameter: undefined | string;
+  public parameterType: ESParameterType;
   public parameterValue: ESJSONParser;
 
   /**
@@ -113,6 +115,7 @@ export default class ESValueInfo
     this.tokens = [];
     this._errors = [];
     this.parameterValue = null;
+    this.parameterType = ESParameterType.Unknown;
   }
 
   /**

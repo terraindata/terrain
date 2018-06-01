@@ -47,6 +47,8 @@ THE SOFTWARE.
 import ESConverter from 'shared/database/elastic/formatter/ESConverter';
 import ESParameterFiller from 'shared/database/elastic/parser/EQLParameterFiller';
 import CardsToCodeOptions from 'shared/database/types/CardsToCodeOptions';
+import ESJSONType from 'shareddatabase/elastic/parser/ESJSONType';
+import { ESParameterType } from 'shareddatabase/elastic/parser/ESParameter';
 import ESClause from './clauses/ESClause';
 import EQLConfig from './EQLConfig';
 import ESJSONParser from './ESJSONParser';
@@ -87,6 +89,7 @@ export default class ESInterpreter
   public params: { [name: string]: null | ESClause }; // input parameter clause types
   public parser: ESParser | null; // source parser
   public rootValueInfo: ESValueInfo;
+  public finalQuery: string;
   public errors: ESParserError[];
   /**
    * Runs the interpreter on the given query string. Read needed data by calling the
@@ -107,6 +110,7 @@ export default class ESInterpreter
     this.config = config;
     this.params = params;
     this.errors = [];
+    this.finalQuery = null;
 
     if (typeof query === 'string')
     {
@@ -136,57 +140,35 @@ export default class ESInterpreter
         root.clause = this.config.getClause('body');
       }
 
-      let alias: string | null = null;
-      if (root.value && root.value.groupJoin)
-      {
-        alias = 'parent';
-      }
-      if (root.value && root.value.groupJoin && root.value.groupJoin.parentAlias)
-      {
-        alias = root.value.groupJoin.parentAlias;
-      }
+      // generate the final query string while marking the parameter value.
+      this.finalQuery = ESParameterFiller.generate(root, params,
+        (source: ESValueInfo, type: ESParameterType, value: string | Error) =>
+        {
+          if (value instanceof Error)
+          {
+            this.accumulateError(source, value.message);
+          } else
+          {
+            const parsedValue = new ESJSONParser(value);
+            if (parsedValue.hasError())
+            {
+              this.accumulateError(source, 'Failed to parse the parameter value ' + value);
+            } else
+            {
+              source.parameterType = type;
+              source.parameterValue = new ESJSONParser(value);
+            }
+          }
+          return true;
+        });
+
       root.recursivelyVisit(
         (info: ESValueInfo): boolean =>
         {
-          if (info.parameter !== undefined)
-          {
-            const ps = info.parameter.split('.');
-            const parameterName = ps[0];
-            // meta parameters
-            if (alias !== null && parameterName === alias)
-            {
-              // give a special value to parameterValue
-              info.parameterValue = new ESJSONParser(info.value);
-            } else if (parameterName === 'TerrainDate')
-            {
-              info.parameterValue = new ESJSONParser(info.value);
-            } else
-            {
-              let value: any = this.params;
-              for (const p of ps)
-              {
-                value = value[p];
-
-                if (value === undefined)
-                {
-                  this.accumulateError(info, 'Undefined parameter: ' + info.parameter);
-                  return true;
-                }
-              }
-
-              info.parameterValue = new ESJSONParser(JSON.stringify(value));
-              if (info.parameterValue.hasError())
-              {
-                this.accumulateError(info, 'Unable to parse parameter (' + info.parameter + ':' + JSON.stringify(value) + ')');
-              }
-            }
-          }
-
           if (info.clause !== undefined)
           {
             info.clause.mark(this, info);
           }
-
           return true;
         },
       );

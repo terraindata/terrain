@@ -42,20 +42,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
 
-import ESParameterSubstituter from './ESParameterSubstituter';
-import ESValueInfo from './ESValueInfo';
+import ESJSONParser from 'shareddatabase/elastic/parser/ESJSONParser';
+import ESValueInfo from 'shareddatabase/elastic/parser/ESValueInfo';
 
-export default class EQLTemplateGenerator
+export enum ESParameterType
 {
-  public static generate(source: ESValueInfo): string
-  {
-    return ESParameterSubstituter.generate(source,
-      (paramValueInfo: ESValueInfo): string =>
-      {
-        const param = paramValueInfo.parameter;
-        return ' {{#toJson}}' + param + '{{/toJson}} ';
-      });
-  }
+  Unknown,
+  // meta parameter
+  MetaParent,
+  MetaDate,
+  // given parameter
+  GivenName,
 }
