@@ -287,8 +287,26 @@ class App extends TerrainComponent<Props>
     }
   }
 
+  public specifyTitle(location) {
+    const base = 'Terrain Data';
+    let customerTitle;
+    let parser = document.createElement('a');
+    parser.href = location;
+    if (parser.hostname === 'localhost') {
+      customerTitle = '';
+    } else {
+      const hostName = parser.hostname;
+      const segments = hostName.split('.');
+      const customerName = segments[0];
+      const capitalizeCustomer = customerName.charAt(0).toUpperCase() + customerName.slice(1);
+      customerTitle = ' | ' + capitalizeCustomer; 
+    }
+    return base + customerTitle;
+  }
+
   public componentWillMount()
   {
+    document.title = this.specifyTitle(MIDWAY_HOST);
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: 'input',
