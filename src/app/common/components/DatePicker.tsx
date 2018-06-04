@@ -223,6 +223,21 @@ class DatePicker extends TerrainComponent<Props>
         selector: '.DayPicker-Day--today',
         style: { 'color': Colors().active, 'background-color': Colors().todayHighlight },
       });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.date-view-label',
+        style: { 'color': Colors().text3, 'background-color': Colors().bg },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.selected-date-type',
+        style: { 'color': Colors().active, 'border-color': Colors().activeHover },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.unselected-date-type',
+        style: { 'color': Colors().text3, 'background-color': Colors().bg },
+      });
     }
   }
 
@@ -311,7 +326,7 @@ class DatePicker extends TerrainComponent<Props>
   {
     return (
       <div className='date-time-time'>
-        <p className='dateViewLabel'>Time</p>
+        <p className='date-view-label'>Time</p>
         <Dropdown
           canEdit={this.props.canEdit}
           options={HOUR_OPTIONS}
@@ -326,7 +341,7 @@ class DatePicker extends TerrainComponent<Props>
   {
     return (
       <div className='date-time-time'>
-        <p className='dateViewLabel'>One Week Scope</p>
+        <p className='date-view-label'>One Week Scope</p>
         <Dropdown
           canEdit={this.props.canEdit}
           options={DateParameterOptions}
@@ -365,17 +380,17 @@ class DatePicker extends TerrainComponent<Props>
   {
     return (
       <div className='date-time-time'>
-        <p className='dateViewLabel'>Period</p>
+        <p className='date-view-label'>Period</p>
         <Dropdown
           canEdit={this.props.canEdit}
           options={DateTenseOptions}
         />
-        <p className='dateViewLabel'>Unit of Time</p>
+        <p className='date-view-label'>Unit of Time</p>
         <Dropdown
           canEdit={this.props.canEdit}
           options={DateUnitOptions}
         />
-        <p className='dateViewLabel'>Amount</p>
+        <p className='date-view-label'>Amount</p>
       </div>
     );
   }
@@ -393,21 +408,21 @@ class DatePicker extends TerrainComponent<Props>
       <div
         className='date-picker'
       >
-        <p className='dateViewLabel'>View type</p>
+        <p className='date-view-label'>VIEW TYPE</p>
         <div
-          className={this.props.dateViewType === 'calendar' ? 'selectedDateType' : 'unselectedDateType'}
+          className={this.props.dateViewType === 'calendar' ? 'selected-date-type' : 'unselected-date-type'}
           onClick={this._fn(this.props.onDateViewTypeChange, 'calendar')}
         >
           calendar
         </div>
         <div
-          className={this.props.dateViewType === 'relative' ? 'selectedDateType' : 'unselectedDateType'}
+          className={this.props.dateViewType === 'relative' ? 'selected-date-type' : 'unselected-date-type'}
           onClick={this._fn(this.props.onDateViewTypeChange, 'relative')}
         >
           relative
         </div>
         <div
-          className={this.props.dateViewType === 'specific' ? 'selectedDateType' : 'unselectedDateType'}
+          className={this.props.dateViewType === 'specific' ? 'selected-date-type' : 'unselected-date-type'}
           onClick={this._fn(this.props.onDateViewTypeChange, 'specific')}
         >
           specific
