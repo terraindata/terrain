@@ -52,6 +52,7 @@ import * as stream from 'stream';
 import { JobConfig } from 'shared/types/jobs/JobConfig';
 import * as App from '../App';
 import * as AppUtil from '../AppUtil';
+import ProgressStream from '../io/streams/ProgressStream';
 import { Permissions } from '../permissions/Permissions';
 import UserConfig from '../users/UserConfig';
 import { users } from '../users/UserRouter';
@@ -108,17 +109,16 @@ Router.post('/runnow/:id', async (ctx, next) =>
   const responseStream = await App.JobQ.runNow(ctx.params.id, fields, files);
   // await perm.JobQueuePermissions.verifyRunNowRoute(ctx.state.user as UserConfig, ctx.req);
   responseStream.on('error', ctx.onerror);
-  ctx.body = responseStream.pipe(new stream.PassThrough());
-  // if (ctx.response.type !== 'blob')
-  // {
-  //   responseStream.resume();
-  //   ctx.body = new stream.Readable();
-  //   ctx.body.push(null);
-  // }
-  // else
-  // {
-  //   ctx.body = responseStream;
-  // }
+  if (ctx.response.type !== 'blob' || (responseStream instanceof ProgressStream))
+  {
+    responseStream.resume();
+    ctx.body = new stream.Readable();
+    ctx.body.push(null);
+  }
+  else
+  {
+    ctx.body = responseStream.pipe(new stream.PassThrough());
+  }
 });
 
 // unpause paused job by id
