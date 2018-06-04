@@ -116,6 +116,28 @@ const DateParameterArray = [
 ];
 const DateParameterOptions = Immutable.List(DateParameterArray);
 
+const DateTenseMap = {
+
+};
+const DateTenseArray = [
+  'Past (Ago)',
+  'Future (From Now)',
+];
+const DateTenseOptions = Immutable.List(DateTenseArray);
+
+const DateUnitMap = {
+
+};
+const DateUnitArray = [
+  'Minute(s)',
+  'Hour(s)',
+  'Day(s)',
+  'Week(s)',
+  'Month(s)',
+  'Year(s)',
+];
+const DateUnitOptions = Immutable.List(DateUnitArray);
+
 export interface Props
 {
   date: string;
@@ -123,6 +145,8 @@ export interface Props
   canEdit: boolean;
   language: string;
   colorsActions: typeof ColorsActions;
+  dateViewType?: string;
+  onDateViewTypeChange?: (viewType: string) => void;
 }
 
 let COLORS_ACTIONS_SET = false;
@@ -137,7 +161,7 @@ class DatePicker extends TerrainComponent<Props>
       this.props.colorsActions({
         actionType: 'setStyle',
         selector: '.date-picker',
-        style: { background: Colors().bg1, color: Colors().text2 },
+        style: { background: Colors().bg, color: Colors().text2 },
       });
       this.props.colorsActions({
         actionType: 'setStyle',
@@ -287,23 +311,78 @@ class DatePicker extends TerrainComponent<Props>
   {
     return (
       <div className='date-time-time'>
+        <p className='dateViewLabel'>Time</p>
         <Dropdown
           canEdit={this.props.canEdit}
           options={HOUR_OPTIONS}
           selectedIndex={this.dateToHourIndex(this.getDate())}
           onChange={this.handleHourChange}
         />
+      </div>
+    );
+  }
+
+  public renderRelativeTimePicker(date)
+  {
+    return (
+      <div className='date-time-time'>
+        <p className='dateViewLabel'>One Week Scope</p>
         <Dropdown
           canEdit={this.props.canEdit}
           options={DateParameterOptions}
           selectedIndex={this.dateToDateParameterMapIndex()}
           onChange={this.handleDateParameterChange}
         />
-      </div>);
+      </div>
+    );
+  }
+
+  public renderCalendar(dateArg,modifiersArg)
+  {
+    return (
+      <div>
+        <DayPicker
+          modifiers={modifiersArg}
+          onDayClick={this.handleDayClick}
+          initialMonth={dateArg.toDate()}
+        />
+        {this.renderTimePicker(dateArg)}
+      </div>
+    )
+  } 
+
+  public renderRelative(dateArg) 
+  {
+    return (
+      <div className='date-time-time'>
+        {this.renderRelativeTimePicker(dateArg)}
+        {this.renderTimePicker(dateArg)}
+      </div>
+    )
+  }
+
+  public renderSpecific()
+  {
+    return (
+      <div className='date-time-time'>
+        <p className='dateViewLabel'>Period</p>
+        <Dropdown
+          canEdit={this.props.canEdit}
+          options={DateTenseOptions}
+        />
+        <p className='dateViewLabel'>Unit of Time</p>
+        <Dropdown
+          canEdit={this.props.canEdit}
+          options={DateUnitOptions}
+        />
+        <p className='dateViewLabel'>Amount</p>
+      </div>
+    )
   }
 
   public render()
   {
+    console.log(this.props.dateViewType);
     const date = this.getDate();
     const modifiers =
       {
@@ -315,12 +394,28 @@ class DatePicker extends TerrainComponent<Props>
       <div
         className='date-picker'
       >
-        <DayPicker
-          modifiers={modifiers}
-          onDayClick={this.handleDayClick}
-          initialMonth={date.toDate()}
-        />
-        {this.renderTimePicker(date)}
+        <p className='dateViewLabel'>View type</p>
+        <div 
+          className={this.props.dateViewType==='calendar' ? 'selectedDateType' : 'unselectedDateType'}
+          onClick={this._fn(this.props.onDateViewTypeChange,'calendar')}
+        >
+          calendar
+        </div>
+        <div 
+          className={this.props.dateViewType==='relative' ? 'selectedDateType' : 'unselectedDateType'}
+          onClick={this._fn(this.props.onDateViewTypeChange,'relative')}
+        >
+          relative
+        </div>
+        <div 
+          className={this.props.dateViewType==='specific' ? 'selectedDateType' : 'unselectedDateType'}
+          onClick={this._fn(this.props.onDateViewTypeChange,'specific')}
+        >
+          specific
+        </div>
+        {this.props.dateViewType==='calendar' && this.renderCalendar(date,modifiers)}
+        {this.props.dateViewType==='relative' && this.renderRelative(date)}
+        {this.props.dateViewType==='specific' && this.renderSpecific()}
       </div>
     );
   }

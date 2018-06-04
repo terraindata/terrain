@@ -115,6 +115,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 {
   public state = {
     boost: this.props.filterLine.boost,
+    dateViewType: 'calendar',
   };
 
   public componentWillReceiveProps(nextProps: Props)
@@ -205,6 +206,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           fieldValue,
           comparisonValue,
           fieldType: props.filterLine.fieldType,
+          dateViewType: this.state.dateViewType,
         }}
         // optionSets={this.getOptionSets() /* TODO store in state? */}
         values={values}
@@ -510,6 +512,8 @@ class PathfinderFilterLine extends TerrainComponent<Props>
               format='MM/DD/YYYY h:mma'
               date={String(props.value)}
               onChange={this._fn(this.handleChange, 'value')}
+              dateViewType={this.state.dateViewType}
+              onDateViewTypeChange={this.handleDateViewTypeChange}
             />
         );
 
@@ -717,6 +721,13 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     }
     this.props.onChange(this.props.keyPath, filterLine, false, fieldChange);
   }
+
+  private handleDateViewTypeChange(viewType: string)
+  {
+    console.log('callllll');
+    this.setState({ dateViewType: viewType, })
+  }
+
 }
 
 export const COMPARISONS_WITHOUT_VALUES = [
