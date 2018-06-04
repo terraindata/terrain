@@ -107,7 +107,7 @@ function SimpleStatFactory<T extends TransformationNodeType>(type: T, startingNa
       };
     }
 
-    protected computeNewFieldInfo()
+    protected overrideTransformationConfig()
     {
       return {
         type: ETLFieldTypes.Number,

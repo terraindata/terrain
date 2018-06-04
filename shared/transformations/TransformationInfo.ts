@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 
 import AddTransformationNode from './nodes/AddTransformationNode';
 import ArrayCountTransformationNode from './nodes/ArrayCountTransformationNode';
@@ -174,10 +175,10 @@ const TransformationNodeInfo: AllNodeInfoType =
         type: DuplicateTransformationNode,
         isAvailable: (engine, fieldId) =>
         {
-          const repType = EngineUtil.getRepresentedType(fieldId, engine);
+          const etlType = EngineUtil.getETLFieldType(fieldId, engine);
           return (
             EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId)) &&
-            repType !== 'object' && repType !== 'array'
+            etlType !== ETLFieldTypes.Object && etlType !== ETLFieldTypes.Array
           );
         },
         targetedVisitor: (visitor: TransformationNodeVisitor,

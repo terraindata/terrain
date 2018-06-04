@@ -55,8 +55,8 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import * as Immutable from 'immutable';
+import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import Quarantine from 'util/RadiumQuarantine';
 const { List, Map } = Immutable;
 import FadeInOut from 'common/components/FadeInOut';
