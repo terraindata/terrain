@@ -79,7 +79,7 @@ class ETLAjax
         {},
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         });
     });
   }
@@ -98,7 +98,7 @@ class ETLAjax
         {},
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         });
     });
   }
@@ -117,7 +117,7 @@ class ETLAjax
         integration,
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         });
     });
   }
@@ -136,7 +136,7 @@ class ETLAjax
         integration,
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         });
     });
   }
@@ -155,7 +155,7 @@ class ETLAjax
         {},
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         });
     });
   }
@@ -191,7 +191,7 @@ class ETLAjax
         {},
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         },
       );
     });
@@ -211,7 +211,7 @@ class ETLAjax
         {},
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         },
       );
     });
@@ -233,7 +233,7 @@ class ETLAjax
         },
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         },
       );
     });
@@ -254,7 +254,7 @@ class ETLAjax
         templateToSave,
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         },
       );
     });
@@ -280,7 +280,7 @@ class ETLAjax
         templateToSave,
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         },
       );
     });
@@ -328,7 +328,7 @@ class ETLAjax
           return reject('No Job Id Returned.');
         },
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         },
       );
     });
@@ -399,17 +399,7 @@ class ETLAjax
         payload,
         handleResponse,
         {
-          onError: (ev) =>
-          {
-            if (ev === undefined)
-            {
-              reject('Unknown Error Trying to Retrieve Preview Documents');
-            }
-            else
-            {
-              reject(ev);
-            }
-          },
+          onError: handlerFactory(reject),
         },
       );
     });
@@ -433,7 +423,7 @@ class ETLAjax
         {},
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         },
       );
     });
@@ -535,6 +525,66 @@ export interface ExecuteConfig
     downloadFilename?: string;
     mimeType?: string;
   };
+}
+
+export function errorToReadable(err: any, defaultMsg: string = 'Unknown Error Occurred')
+{
+  try
+  {
+    if (err == null)
+    {
+      return defaultMsg;
+    }
+    else if (typeof err.getDetail === 'function') // if the error is already a midway error
+    {
+      return err.getDetail();
+    }
+    try
+    {
+      try
+      { // attempt to see if the midway error was created from an already wrapped error
+        const detailError = _.get(err, ['response', 'data', 'errors', 0, 'detail']);
+        if (detailError !== undefined && detailError !== null)
+        {
+          if (typeof detailError === 'object')
+          {
+            return JSON.stringify(detailError);
+          }
+          else
+          {
+            return detailError;
+          }
+        }
+      }
+      catch (e)
+      {
+        // do nothing
+      }
+      const readable = MidwayError.fromJSON(err).getDetail();
+      return readable;
+    }
+    catch (e)
+    {
+      if (typeof err === 'object')
+      {
+        return JSON.stringify(err);
+      }
+      else if (typeof err === 'string')
+      {
+        return err;
+      }
+    }
+  }
+  catch (e)
+  {
+    return defaultMsg;
+  }
+  return defaultMsg;
+}
+
+function handlerFactory(reject)
+{
+  return (err) => reject(errorToReadable(err));
 }
 
 export default new ETLAjax();
