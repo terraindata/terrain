@@ -43,7 +43,10 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import { browserHistory } from 'react-router';
+
+import createHistory from 'history/createBrowserHistory';
+
+const browserHistory = createHistory();
 
 interface LibraryRouteComponents
 {

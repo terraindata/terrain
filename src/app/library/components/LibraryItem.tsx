@@ -55,7 +55,7 @@ import Util from '../../util/Util';
 import './LibraryItem.less';
 
 import { DragSource, DropTarget } from 'react-dnd';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import './LibraryItem.less';
 
 import { backgroundColor, Colors, fontColor } from '../../colors/Colors';

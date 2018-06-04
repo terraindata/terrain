@@ -54,6 +54,7 @@ THE SOFTWARE.
  * - helper method for subscribing to a Redux state
 */
 
+import createHistory from 'history/createBrowserHistory';
 import * as _ from 'lodash';
 import * as React from 'react';
 import Util from '../../util/Util';
@@ -75,6 +76,8 @@ interface Store
 
 class TerrainComponent<T> extends React.Component<T, any>
 {
+  protected browserHistory = createHistory();
+
   public props: T;
 
   // this is an anti-pattern

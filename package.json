@@ -136,6 +136,7 @@
     "google-oauth-jwt": "^0.2.0",
     "graphlib": "^2.1.5",
     "hdr-histogram-js": "^1.1.4",
+    "history": "^4.7.2",
     "immutable": "^3.8.2",
     "ip": "^1.1.5",
     "is-primitive": "^3.0.0",
@@ -333,5 +334,8 @@
     "webpack-cli": "^2.1.5",
     "webpack-dev-server": "^3.1.4",
     "yarn-run-all": "^3.1.1"
+  },
+  "resolutions": {
+    "@types/react": "16.0.34"
   }
 }

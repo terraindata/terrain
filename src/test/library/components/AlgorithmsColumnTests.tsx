@@ -50,8 +50,11 @@ import { AlgorithmsColumn } from 'library/components/AlgorithmsColumn';
 import { _LibraryState, LibraryState } from 'library/LibraryTypes';
 import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 import configureStore from 'redux-mock-store';
+
+import createHistory from 'history/createBrowserHistory';
+
+const browserHistory = createHistory();
 
 describe('AlgorithmsColumn', () =>
 {

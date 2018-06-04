@@ -49,7 +49,6 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 
 import FilePicker from 'common/components/FilePicker';
 import Loading from 'common/components/Loading';

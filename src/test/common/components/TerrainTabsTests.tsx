@@ -48,7 +48,10 @@ THE SOFTWARE.
 import TerrainTabs from 'common/components/TerrainTabs';
 import { shallow } from 'enzyme';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
+
+import createHistory from 'history/createBrowserHistory';
+
+const browserHistory = createHistory();
 
 describe('TerrainTabs', () =>
 {

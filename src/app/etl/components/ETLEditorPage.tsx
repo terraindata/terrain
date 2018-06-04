@@ -52,7 +52,6 @@ import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { withRouter } from 'react-router';
-import { browserHistory } from 'react-router';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
@@ -363,7 +362,7 @@ class ETLEditorPage extends TerrainComponent<Props>
   public handleModalDontSave()
   {
     this.confirmedLeave = true;
-    browserHistory.push(this.state.nextLocation);
+    this.browserHistory.push(this.state.nextLocation);
     this.setState({
       leaving: false,
       switchingTemplate: false,
@@ -381,7 +380,7 @@ class ETLEditorPage extends TerrainComponent<Props>
         leaving: false,
         switchingTemplate: false,
       });
-      browserHistory.push(this.state.nextLocation);
+      this.browserHistory.push(this.state.nextLocation);
     };
 
     if (template.id !== -1)

@@ -56,7 +56,6 @@ import * as _ from 'lodash';
 import { AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { replaceRoute } from 'library/helpers/LibraryRoutesHelper';
-import { browserHistory } from 'react-router';
 import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
 import { Colors, fontColor } from '../../colors/Colors';
@@ -443,7 +442,7 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
 
     if (!canPinItems)
     {
-      browserHistory.push(`/builder/?o=${id}`);
+      this.browserHistory.push(`/builder/?o=${id}`);
     }
   }
 

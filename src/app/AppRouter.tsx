@@ -43,9 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+import createHistory from 'history/createBrowserHistory';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
-import { IndexRedirect, IndexRoute, Route, Router } from 'react-router';
+import { Redirect as RRedirect, Route, Router } from 'react-router';
 
 import DataTabs from 'etl/components/DataTabs';
 import TemplateList from 'etl/templates/components/TemplateList';
@@ -87,29 +87,29 @@ class AppRouter extends TerrainComponent<{}> {
     />);
 
     return (
-      <Router history={browserHistory}>
+      <Router history={this.browserHistory}>
         <Route path='/' component={App}>
-          <IndexRoute component={Redirect} />
+          <Route exact path='/' component={Redirect} />
 
           <Route path='/builder' component={Builder} />
           <Route path='/builder/:config' component={Builder} />
           <Route path='/builder/:config/:splitConfig' component={Builder} />
 
           <Route path='/library'>
-            <IndexRoute component={libraryLibrary} />
+            <Route exact path='/' component={libraryLibrary} />
             <Route path=':categoryId' component={libraryLibrary}>
-              <IndexRoute component={libraryLibrary} />
+              <Route exact path='/' component={libraryLibrary} />
               <Route path=':groupId' component={libraryLibrary}>
-                <IndexRoute component={libraryLibrary} />
+                <Route exact path='/' component={libraryLibrary} />
                 <Route path=':algorithmId' component={libraryLibrary}>
-                  <IndexRoute component={libraryLibrary} />
+                  <Route exact path='/' component={libraryLibrary} />
                 </Route>
               </Route>
             </Route>
           </Route>
 
           <Route path='/account' component={Account}>
-            <IndexRoute component={Profile} />
+            <Route exact path='/' component={Profile} />
             <Route path='/account/profile' component={Profile} />
             <Route path='/account/profile/edit' component={EditProfile} />
             <Route path='/account/settings' component={Settings} />
@@ -140,7 +140,7 @@ class AppRouter extends TerrainComponent<{}> {
           <Route path='/schema' component={SchemaPage} />
 
           <Route path='/data' component={DataTabs}>
-            <IndexRedirect to='/data/templates' />
+            <Route exact path='/' component={() => <RRedirect to='/data/templates' />} />
             <Route path='templates' component={TemplateList} />
             <Route path='newtemplate(/:step)' component={ETLWalkthrough} />
             <Route path='templates/edit/new' component={ETLEditorPage} />
@@ -155,13 +155,13 @@ class AppRouter extends TerrainComponent<{}> {
           </Route>
 
           <Route path='/analytics'>
-            <IndexRoute component={analyticsLibrary} />
+            <Route exact path='/' component={analyticsLibrary} />
             <Route path=':categoryId' component={analyticsLibrary}>
-              <IndexRoute component={analyticsLibrary} />
+              <Route exact path='/' component={analyticsLibrary} />
               <Route path=':groupId' component={analyticsLibrary}>
-                <IndexRoute component={analyticsLibrary} />
+                <Route exact path='/' component={analyticsLibrary} />
                 <Route path=':algorithmId' component={analyticsLibrary}>
-                  <IndexRoute component={analyticsLibrary} />
+                  <Route exact path='/' component={analyticsLibrary} />
                 </Route>
               </Route>
             </Route>

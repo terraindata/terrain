@@ -48,9 +48,9 @@ THE SOFTWARE.
 
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
-import './panel.less';
 import * as ReactDOM from 'react-dom';
 import Util from '../../../util/Util';
+import './panel.less';
 const $ = require('jquery');
 
 const Panel = {

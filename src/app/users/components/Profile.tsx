@@ -49,7 +49,7 @@ THE SOFTWARE.
 import { AuthState } from 'auth/AuthTypes';
 import * as classNames from 'classnames';
 import * as React from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { UserState } from 'users/UserTypes';
 import Util from 'util/Util';
 import InfoArea from './../../common/components/InfoArea';

@@ -49,7 +49,6 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 import { Colors } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import TerrainComponent from '../../common/components/TerrainComponent';
@@ -139,7 +138,7 @@ class AccountDropdown extends TerrainComponent<Props>
 
   public go(url: string)
   {
-    browserHistory.push(url);
+    this.browserHistory.push(url);
   }
 
   public handleLogout()

@@ -46,7 +46,6 @@ THE SOFTWARE.
 import TerrainComponent from 'common/components/TerrainComponent';
 import 'common/components/TerrainTabs.less';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
 interface TabConfig
@@ -77,7 +76,7 @@ class TerrainTabs extends TerrainComponent<TabsProps>
     if (tabToRouteMap !== undefined)
     {
       const tabKey = tabs[tabIndex].key;
-      browserHistory.replace(tabToRouteMap[tabKey]);
+      this.browserHistory.replace(tabToRouteMap[tabKey]);
     }
   }
 

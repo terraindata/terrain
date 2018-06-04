@@ -56,7 +56,6 @@ import * as UserTypes from './../UserTypes';
 const CameraIcon = require('./../../../images/icon_camera.svg');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg');
 import { AuthState } from 'auth/AuthTypes';
-import { browserHistory } from 'react-router';
 import { UserState } from 'users/UserTypes';
 import Util from 'util/Util';
 
@@ -180,7 +179,7 @@ class Profile extends TerrainComponent<Props>
       saving: false,
       savingReq: null,
     });
-    browserHistory.push('/account/profile');
+    this.browserHistory.push('/account/profile');
   }
 
   public onSaveError(response)

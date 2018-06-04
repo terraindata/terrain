@@ -53,7 +53,6 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 const HTML5Backend = require('react-dnd-html5-backend');
-import { browserHistory } from 'react-router';
 import { withRouter } from 'react-router';
 
 // Data
@@ -358,7 +357,7 @@ class Builder extends TerrainComponent<Props>
       && (props.params.config !== undefined || newConfig.length)
     )
     {
-      browserHistory.replace(`/builder/${newConfig}`);
+      this.browserHistory.replace(`/builder/${newConfig}`);
     }
     localStorage.setItem('config', newConfig || '');
 
@@ -395,7 +394,7 @@ class Builder extends TerrainComponent<Props>
 
       const newConfig = newConfigArr.join(',');
       localStorage.setItem('config', newConfig); // so that empty configs don't cause a freak out
-      browserHistory.replace(`/builder/${newConfig}`);
+      this.browserHistory.replace(`/builder/${newConfig}`);
     }
   }
 
@@ -603,7 +602,7 @@ class Builder extends TerrainComponent<Props>
       const newConfig = configArr.join(',');
       if (newConfig !== this.props.params.config)
       {
-        browserHistory.replace(`/builder/${newConfig}`);
+        this.browserHistory.replace(`/builder/${newConfig}`);
       }
     }
   }
@@ -830,7 +829,7 @@ class Builder extends TerrainComponent<Props>
 
   public goToLibrary()
   {
-    browserHistory.push('/library');
+    this.browserHistory.push('/library');
   }
 
   public handleModalCancel()
@@ -846,7 +845,7 @@ class Builder extends TerrainComponent<Props>
     this.setState({
       leaving: false,
     });
-    browserHistory.push(this.state.nextLocation);
+    this.browserHistory.push(this.state.nextLocation);
   }
 
   public handleModalSave()
@@ -856,7 +855,7 @@ class Builder extends TerrainComponent<Props>
     this.setState({
       leaving: false,
     });
-    browserHistory.push(this.state.nextLocation);
+    this.browserHistory.push(this.state.nextLocation);
   }
 
   public handleSaveAsTextboxChange(newValue: string): void
@@ -903,7 +902,7 @@ class Builder extends TerrainComponent<Props>
         const newConfig = configArr.join(',');
         if (newConfig !== this.props.params.config)
         {
-          browserHistory.replace(`/builder/${newConfig}`);
+          this.browserHistory.replace(`/builder/${newConfig}`);
         }
       });
   }

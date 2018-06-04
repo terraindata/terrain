@@ -56,7 +56,6 @@ import { LibraryState } from 'library/LibraryTypes';
 import * as _ from 'lodash';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import LibraryActions from '../../../library/data/LibraryActions';
 import Util from '../../../util/Util';
@@ -290,7 +289,7 @@ class Tabs extends TerrainComponent<TabsProps> {
     const newTabs = JSON.parse(JSON.stringify(this.state.tabs));
     const tab = newTabs.splice(index, 1)[0];
     newTabs.splice(destination, 0, tab);
-    browserHistory.push('/builder/' +
+    this.browserHistory.push('/builder/' +
       newTabs.map(
         (tab) => (tab.selected ? '!' : '') + tab.id,
       ).join(','),
@@ -368,12 +367,12 @@ class Tabs extends TerrainComponent<TabsProps> {
 
   public handleClick(id: ID)
   {
-    browserHistory.push(this.getTo(id));
+    this.browserHistory.push(this.getTo(id));
   }
 
   public handleClose(id: ID)
   {
-    browserHistory.push(this.getCloseTo(id));
+    this.browserHistory.push(this.getCloseTo(id));
   }
 
   public getTo(id)

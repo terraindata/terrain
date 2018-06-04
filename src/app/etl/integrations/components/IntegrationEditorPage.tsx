@@ -55,7 +55,6 @@ import { List, Map } from 'immutable';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 
 export interface Props
@@ -130,13 +129,13 @@ class IntegrationEditorPage extends TerrainComponent<Props>
       integration,
     });
     // Update route to go back
-    browserHistory.push('/data/integrations');
+    this.browserHistory.push('/data/integrations');
   }
 
   public cancel()
   {
     // Go back don't save
-    browserHistory.push('/data/integrations');
+    this.browserHistory.push('/data/integrations');
   }
 
   public render()
