@@ -70,6 +70,7 @@ type Algorithm = LibraryTypes.Algorithm;
 
 // Components
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { UserState } from 'users/UserTypes';
 import { backgroundColor, Colors } from '../../colors/Colors';
 import InfoArea from '../../common/components/InfoArea';
@@ -126,7 +127,7 @@ class Builder extends TerrainComponent<Props>
     savingAs?: boolean;
 
     hitsPage: number;
-
+    showingExportErrorModal: boolean;
   } = {
       algorithms: this.props.library.algorithms,
 
@@ -146,6 +147,7 @@ class Builder extends TerrainComponent<Props>
 
       saveAsTextboxValue: '',
       hitsPage: 1,
+      showingExportErrorModal: false,
 
     };
 
@@ -303,10 +305,9 @@ class Builder extends TerrainComponent<Props>
     )
     {
       this.setState({
-        tabActions: this.getTabActions(nextProps.builder),
+        tabActions: this.getTabActions(nextProps.builder, nextProps),
       });
     }
-
     if (
       nextProps.params.config !== this.props.params.config
       || currentOpen !== nextOpen
@@ -318,6 +319,16 @@ class Builder extends TerrainComponent<Props>
         this.unregisterLeaveHook2 = this.props.router.setRouteLeaveHook(nextProps.route, this.routerWillLeave);
       }
       this.checkConfig(nextProps);
+    }
+    const oldAlgorithm = this.getAlgorithm();
+    const newAlgorithm = this.getAlgorithm(nextProps);
+    const oldStatus = oldAlgorithm ? oldAlgorithm.status : null;
+    const newStatus = newAlgorithm ? newAlgorithm.status : null;
+    if (oldStatus !== newStatus)
+    {
+      this.setState({
+        tabActions: this.getTabActions(nextProps.builder, nextProps),
+      });
     }
   }
 
@@ -422,13 +433,13 @@ class Builder extends TerrainComponent<Props>
     {
       return null;
     }
-
+    props = props || this.props;
     const algorithmId = this.getSelectedId(props);
-    const algorithm = this.props.library.algorithms &&
-      this.props.library.algorithms.get(+algorithmId);
+    const algorithm = props.library.algorithms &&
+      props.library.algorithms.get(+algorithmId);
     if (algorithmId && !algorithm)
     {
-      this.props.algorithmActions.fetchVersion(algorithmId, () =>
+      props.algorithmActions.fetchVersion(algorithmId, () =>
       {
         // no version available
         this.handleNoAlgorithm(algorithmId);
@@ -437,9 +448,33 @@ class Builder extends TerrainComponent<Props>
     return algorithm; // || this.loadingAlgorithm;
   }
 
-  public getTabActions(builderState: BuilderState): List<TabAction>
+  public getTabActions(builderState: BuilderState, props?: Props): List<TabAction>
   {
+    const algorithm = this.getAlgorithm(props);
+    const isLive = algorithm &&
+      (algorithm.status === ItemStatus.Live || algorithm.status === ItemStatus.Deployed);
     return Immutable.List([
+      {
+        text: 'Export',
+        icon: null,
+        onClick: this.handleExport,
+        enabled: isLive,
+        html: !isLive ?
+          <div>
+            Algorithms must be live or deployed to export.
+            <div
+              onClick={this.makeAlgorithmLive}
+              className={'link'}
+            >
+              <span
+                style={{ margin: 'auto' }}
+              >
+                Make Algorithm Live
+              </span>
+            </div>
+          </div>
+          : null,
+      },
       {
         tooltip: 'Undo',
         icon: <UndoIcon />,
@@ -476,6 +511,40 @@ class Builder extends TerrainComponent<Props>
       //     onClick: this.loadGroup,
       //   },
     ]);
+  }
+
+  public makeAlgorithmLive()
+  {
+    let algorithm = this.getAlgorithm();
+    algorithm = algorithm.set('status', ItemStatus.Live);
+    this.props.algorithmActions.change(algorithm);
+  }
+
+  public canExportQuery()
+  {
+    if (this.props.builder.query)
+    {
+      const { path } = this.props.builder.query;
+      return !(path.source.count > 500 && path.more.collapse !== undefined);
+    }
+    return true;
+  }
+
+  public handleExport()
+  {
+    // Check if exporting is possible (Cannot export if size > 500 and using collapse)
+    if (this.canExportQuery())
+    {
+      const algorithm = this.getAlgorithm();
+      ETLRouteUtil.gotoEditAlgorithm(algorithm ? algorithm.id : '');
+    }
+    else
+    {
+      // Show error modal explaining why export is not possible
+      this.setState({
+        showingExportErrorModal: true,
+      });
+    }
   }
 
   public handleUndo()
@@ -915,6 +984,21 @@ class Builder extends TerrainComponent<Props>
     });
   }
 
+  public renderErrorModal()
+  {
+    return (
+      <Modal
+        open={this.state.showingExportErrorModal}
+        onClose={this._toggle('showingExportErrorModal')}
+        title={'Cannot Export'}
+        children={`
+          Group By is not supported when exporting over 500 results.
+          Reduce the size or remove the group by field to export.`}
+        error={true}
+      />
+    );
+  }
+
   public render()
   {
     const config = this.props.params.config;
@@ -985,6 +1069,9 @@ class Builder extends TerrainComponent<Props>
           onResultsStateChange={this.props.builderActions.results}
           hitsPage={this.state.hitsPage}
         />
+        {
+          this.renderErrorModal()
+        }
       </div>
     );
   }
