@@ -164,7 +164,14 @@ class ETLEditorPage extends TerrainComponent<Props>
     };
     const handleError = (ev) =>
     {
-      // TODO
+      this.props.editorAct({
+        actionType: 'addModal',
+        props: {
+          title: 'Error',
+          message: String(ev),
+          error: true,
+        },
+      });
     };
 
     if (isSaveAs)
