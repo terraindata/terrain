@@ -175,7 +175,7 @@
     "pg-query-stream": "^1.1.1",
     "promise-queue": "^2.2.3",
     "prop-types": "^15.6.1",
-    "radium": "^0.24.0",
+    "radium": "0.19.6",
     "rc-slider": "^8.6.1",
     "react": "16.2.0",
     "react-beautiful-dnd": "^6.0.0",
