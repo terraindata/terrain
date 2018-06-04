@@ -137,11 +137,6 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
     ).toList();
   }
 
-  protected isStructuralChange()
-  {
-    return true;
-  }
-
   protected computeArgs()
   {
     const { engine, fieldId } = this.props;

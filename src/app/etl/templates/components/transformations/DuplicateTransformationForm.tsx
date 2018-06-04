@@ -108,11 +108,6 @@ export class DuplicateTFF extends TransformationForm<DuplicateOptions, Transform
     }
   }
 
-  protected isStructuralChange()
-  {
-    return true;
-  }
-
   // this shouldn't be called since duplicate transformations cannot be edited.. todo remove it?
   protected computeArgs()
   {

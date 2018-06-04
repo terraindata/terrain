@@ -87,11 +87,6 @@ function SimpleStatFactory<T extends TransformationNodeType>(type: T, startingNa
     };
     protected readonly type = type;
 
-    protected isStructuralChange()
-    {
-      return true;
-    }
-
     protected computeArgs()
     {
       const { engine, fieldId } = this.props;

@@ -167,12 +167,6 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
     );
   }
 
-  // override this to specify if editing / creating the transformation will cause structural changes
-  protected isStructuralChange(): boolean
-  {
-    return undefined;
-  }
-
   // override this to specify transformation args if they need to be computed from state
   protected computeArgs(): TransformationArgs<Type>
   {
@@ -237,7 +231,6 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   protected handleMainAction()
   {
     const { isCreate, engine, fieldId, onClose } = this.props;
-    const overrideStructuralChange = this.isStructuralChange();
     if (isCreate)
     {
       this.props.tryMutateEngine((proxy) =>

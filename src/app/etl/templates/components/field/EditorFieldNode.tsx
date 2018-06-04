@@ -55,6 +55,7 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import * as Immutable from 'immutable';
 import Quarantine from 'util/RadiumQuarantine';
 const { List, Map } = Immutable;
@@ -307,12 +308,12 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     const content = this.renderRow();
     const showSettings = this._settingsAreOpen();
 
-    if (field.isArray() || field.isNested())
+    if (field.etlType === ETLFieldTypes.Array || field.etlType === ETLFieldTypes.Object)
     {
       const childrenComponent = (
         <div className='template-editor-children-container'>
           {
-            field.isArray() ?
+            field.etlType === ETLFieldTypes.Array ?
               this.renderArrayChildren() :
               this.renderChildFields()
           }
