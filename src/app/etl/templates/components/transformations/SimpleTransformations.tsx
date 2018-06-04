@@ -282,3 +282,30 @@ export class RemoveDuplicatesTFF extends TransformationForm<{}, TransformationNo
   protected readonly initialState = {};
   protected readonly noEditOptions = true;
 }
+
+export class ZipcodeTFF extends TransformationForm<{}, TransformationNodeType.ZipcodeNode>
+{
+  protected readonly type = TransformationNodeType.ZipcodeNode;
+  protected readonly inputMap = {
+    format: {
+      type: DisplayType.Pick,
+      displayName: 'Convert Zipcode To',
+      options: {
+        pickOptions: (s) => zipcodeFormats,
+        displayNames: (s) => Map({
+          loc: 'Location',
+          city: 'City',
+          state: 'State',
+          citystate: 'City and State',
+          type: 'Zipcode Type',
+        }),
+        indexResolver: (value) => zipcodeFormats.indexOf(value),
+      },
+    },
+  };
+  protected readonly initialState = {
+    format: 'loc',
+  };
+}
+
+const zipcodeFormats = List(['loc', 'city', 'state', 'citystate', 'type']);
