@@ -47,30 +47,8 @@ import createHistory from 'history/createBrowserHistory';
 import * as React from 'react';
 import { Redirect as RRedirect, Route, Router } from 'react-router';
 
-import DataTabs from 'etl/components/DataTabs';
-import TemplateList from 'etl/templates/components/TemplateList';
-import Jobs from 'jobs/components/Jobs';
-import ScheduleList from 'scheduler/components/ScheduleList';
 import App from './App';
-import Builder from './builder/components/Builder';
-import Logout from './common/components/Logout';
-import Placeholder from './common/components/Placeholder';
-import Redirect from './common/components/Redirect';
 import TerrainComponent from './common/components/TerrainComponent';
-import UIComponentsPage from './common/UIComponentsPage';
-import ETLEditorPage from './etl/components/ETLEditorPage';
-import ETLWalkthrough from './etl/walkthrough/components/ETLWalkthrough';
-import Library from './library/components/LibraryDnd';
-import ManualWrapper from './manual/components/ManualWrapper';
-import SchemaPage from './schema/components/SchemaPage';
-import Account from './users/components/Account';
-import Connections from './users/components/Connections';
-import EditProfile from './users/components/EditProfile';
-import Notifications from './users/components/Notifications';
-import Profile from './users/components/Profile';
-import Settings from './users/components/Settings';
-import Team from './users/components/Team';
-import X from './x/components/X';
 
 import IntegrationEditorPage from './etl/integrations/components/IntegrationEditorPage';
 import IntegrationList from './etl/integrations/components/IntegrationList';
@@ -78,16 +56,18 @@ import IntegrationList from './etl/integrations/components/IntegrationList';
 class AppRouter extends TerrainComponent<{}> {
   public render()
   {
-    const libraryLibrary = (props) => <Library basePath={'library'} {...props} />;
-    const analyticsLibrary = (props) => (<Library
-      basePath={'analytics'}
-      canPinAlgorithms={true}
-      singleColumn={true}
-      {...props}
-    />);
-
     return (
       <Router history={this.browserHistory}>
+        <Route path='/' component={App} />
+      </Router>
+    );
+  }
+}
+
+export default AppRouter;
+
+/*
+<Router history={this.browserHistory}>
         <Route path='/' component={App}>
           <Route exact path='/' component={Redirect} />
 
@@ -169,8 +149,4 @@ class AppRouter extends TerrainComponent<{}> {
 
         </Route>
       </Router>
-    );
-  }
-}
-
-export default AppRouter;
+      */

@@ -92,6 +92,7 @@ export interface Props
 {
   params?: any;
   location?: any;
+  match?: any;
   router?: any;
   route?: any;
   users?: UserState;
@@ -235,7 +236,8 @@ class Builder extends TerrainComponent<Props>
       }
     };
 
-    this.unregisterLeaveHook1 = this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+    console.log(this.props);
+    // this.unregisterLeaveHook1 = this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
   }
 
   public componentWillUnmount()
@@ -306,15 +308,16 @@ class Builder extends TerrainComponent<Props>
       });
     }
 
+    console.log(nextProps);
     if (
-      nextProps.params.config !== this.props.params.config
+      nextProps.match.params.config !== this.props.match.params.config
       || currentOpen !== nextOpen
     )
     {
       this.confirmedLeave = false;
       if (!nextProps.location.query || !nextProps.location.query.o)
       {
-        this.unregisterLeaveHook2 = this.props.router.setRouteLeaveHook(nextProps.route, this.routerWillLeave);
+        // this.unregisterLeaveHook2 = this.props.router.setRouteLeaveHook(nextProps.route, this.routerWillLeave);
       }
       this.checkConfig(nextProps);
     }
@@ -324,7 +327,7 @@ class Builder extends TerrainComponent<Props>
   {
     const storedConfig = localStorage.getItem('config') || '';
     const open = props.location.query && props.location.query.o;
-    const originalConfig = props.params.config || storedConfig;
+    const originalConfig = props.match.params.config || storedConfig;
     let newConfig = originalConfig;
 
     if (open)
@@ -353,8 +356,8 @@ class Builder extends TerrainComponent<Props>
     {
       newConfig = '!' + newConfig;
     }
-    if (newConfig !== props.params.config
-      && (props.params.config !== undefined || newConfig.length)
+    if (newConfig !== props.match.params.config
+      && (props.match.params.config !== undefined || newConfig.length)
     )
     {
       this.browserHistory.replace(`/builder/${newConfig}`);
@@ -379,7 +382,7 @@ class Builder extends TerrainComponent<Props>
 
   public handleNoAlgorithm(algorithmId: ID)
   {
-    if (this.props.params.config && this.state.nonexistentAlgorithmIds.indexOf(algorithmId) === -1)
+    if (this.props.match.params.config && this.state.nonexistentAlgorithmIds.indexOf(algorithmId) === -1)
     {
       this.setState({
         nonexistentAlgorithmIds: this.state.nonexistentAlgorithmIds.push(algorithmId),
@@ -401,7 +404,7 @@ class Builder extends TerrainComponent<Props>
   public getSelectedId(props?: Props)
   {
     props = props || this.props;
-    const selected = props.params.config && props.params.config.split(',').find((id) => id.indexOf('!') === 0);
+    const selected = props.match.params.config && props.match.params.config.split(',').find((id) => id.indexOf('!') === 0);
     return selected && selected.substr(1);
   }
 
@@ -539,7 +542,7 @@ class Builder extends TerrainComponent<Props>
   public shouldSave(overrideState?: BuilderState): boolean
   {
     // empty builder or un-saveable, should never have to save
-    if (!this.props.params.config || !this.canEdit())
+    if (!this.props.match.params.config || !this.canEdit())
     {
       return false;
     }
@@ -600,7 +603,7 @@ class Builder extends TerrainComponent<Props>
         }
       }
       const newConfig = configArr.join(',');
-      if (newConfig !== this.props.params.config)
+      if (newConfig !== this.props.match.params.config)
       {
         this.browserHistory.replace(`/builder/${newConfig}`);
       }
@@ -900,7 +903,7 @@ class Builder extends TerrainComponent<Props>
           savingAs: false,
         });
         const newConfig = configArr.join(',');
-        if (newConfig !== this.props.params.config)
+        if (newConfig !== this.props.match.params.config)
         {
           this.browserHistory.replace(`/builder/${newConfig}`);
         }
@@ -916,7 +919,7 @@ class Builder extends TerrainComponent<Props>
 
   public render()
   {
-    const config = this.props.params.config;
+    const config = this.props.match.params.config;
     const algorithm = this.getAlgorithm();
     const query = this.getQuery();
     const algorithmIdentifier = algorithm === undefined ? '' :
@@ -996,4 +999,4 @@ const BuilderContainer = Util.createTypedContainer(
     builderActions: BuilderActions,
   },
 );
-export default withRouter(DragDropContext(HTML5Backend)(BuilderContainer) as any);
+export default DragDropContext(HTML5Backend)(BuilderContainer) as any;

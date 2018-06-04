@@ -63,6 +63,7 @@ export interface Props
 {
   params?: any;
   history?: any;
+  match?: any;
   children?: any;
   auth?: AuthState;
   users?: UserState;
@@ -105,7 +106,7 @@ class Profile extends TerrainComponent<Props>
     const userState: UserTypes.UserState = props.users;
     const authState = this.props.auth;
     let userId = authState.id;
-    const routeUserId = +this.props.params.userId;
+    const routeUserId = +this.props.match.params.userId;
     let isLoggedInUser = true;
     let routeIsDirect = false;
 

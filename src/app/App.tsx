@@ -57,6 +57,25 @@ import './App.less';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
+import { Route } from 'react-router';
+
+import DataTabs from 'etl/components/DataTabs';
+import TemplateList from 'etl/templates/components/TemplateList';
+import Jobs from 'jobs/components/Jobs';
+import ScheduleList from 'scheduler/components/ScheduleList';
+import Builder from './builder/components/Builder';
+import Logout from './common/components/Logout';
+import Placeholder from './common/components/Placeholder';
+import Redirect from './common/components/Redirect';
+import UIComponentsPage from './common/UIComponentsPage';
+import ETLEditorPage from './etl/components/ETLEditorPage';
+import ETLWalkthrough from './etl/walkthrough/components/ETLWalkthrough';
+import Library from './library/components/LibraryDnd';
+import ManualWrapper from './manual/components/ManualWrapper';
+import SchemaPage from './schema/components/SchemaPage';
+import Account from './users/components/Account';
+import Profile from './users/components/Profile';
+import X from './x/components/X';
 
 require('velocity-animate');
 require('velocity-animate/velocity.ui');
@@ -450,6 +469,15 @@ class App extends TerrainComponent<Props>
     const style = {
       backgroundImage: `url(${BackgroundImage})`,
     };
+
+    const libraryLibrary = (props) => <Library basePath={'library'} {...props} />;
+    const analyticsLibrary = (props) => (<Library
+      basePath={'analytics'}
+      canPinAlgorithms={true}
+      singleColumn={true}
+      {...props}
+    />);
+
     const layout =
       {
         fullHeight: true,
@@ -472,9 +500,36 @@ class App extends TerrainComponent<Props>
                   className='app-inner'
                   style={style}
                 >
-                  {
-                    this.props.children
-                  }
+                  <Route exact path='/' component={Redirect} />
+
+                  <Route path='/builder' component={Builder} />
+                  <Route path='/builder/:config' component={Builder} />
+                  <Route path='/builder/:config/:splitConfig' component={Builder} />
+
+                  <Route path='/account' component={Account} />
+
+                  <Route path='/manual' component={ManualWrapper} />
+                  <Route path='/manual/:term' component={ManualWrapper} />
+
+                  <Route path='/users/:userId' component={Profile} />
+
+                  <Route path='/reporting' component={Placeholder} />
+
+                  <Route path='/logout' component={Logout} />
+
+                  <Route path='/x' component={X} />
+                  <Route path='/x/:x' component={X} />
+
+                  <Route path='/ui' component={UIComponentsPage} />
+
+                  <Route path='/browser' component={Redirect} />
+                  <Route path='/browser/:a' component={Redirect} />
+                  <Route path='/browser/:a/:b' component={Redirect} />
+                  <Route path='/browser/:a/:b/:c' component={Redirect} />
+
+                  <Route path='/schema' component={SchemaPage} />
+
+                  <Route path='/data' component={DataTabs} />
                 </div>
               ,
             },
