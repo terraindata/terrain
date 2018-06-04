@@ -503,19 +503,20 @@ class ETLAjax
         }
       }, false);
 
-      xhr.onprogress = (ev: Event) =>
-      {
-        try
-        {
-          const responseText = xhr.responseText.slice(xhr.responseText.lastIndexOf('{'), xhr.responseText.lastIndexOf('}') + 1);
-          const response = JSON.parse(responseText);
-          config.onProgress(`Documents processed...${response.successful}`);
-        }
-        catch (e)
-        {
-          // do nothing
-        }
-      }
+      // TODO: Think of a better way to show this progress
+      // xhr.onprogress = (ev: Event) =>
+      // {
+      //   try
+      //   {
+      //     const responseText = xhr.responseText.slice(xhr.responseText.lastIndexOf('{'), xhr.responseText.lastIndexOf('}') + 1);
+      //     const response = JSON.parse(responseText);
+      //     config.onProgress(`Documents processed...${response.successful}`);
+      //   }
+      //   catch (e)
+      //   {
+      //     // do nothing
+      //   }
+      // }
     }
 
     xhr.open('post', MIDWAY_HOST + '/midway/v1/' + route);
