@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires restrict-plus-operands
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
 import * as Immutable from 'immutable';
 import * as TerrainLog from 'loglevel';
@@ -337,7 +337,7 @@ class DatePicker extends TerrainComponent<Props>
     );
   }
 
-  public renderCalendar(dateArg,modifiersArg)
+  public renderCalendar(dateArg, modifiersArg)
   {
     return (
       <div>
@@ -348,17 +348,17 @@ class DatePicker extends TerrainComponent<Props>
         />
         {this.renderTimePicker(dateArg)}
       </div>
-    )
-  } 
+    );
+  }
 
-  public renderRelative(dateArg) 
+  public renderRelative(dateArg)
   {
     return (
       <div className='date-time-time'>
         {this.renderRelativeTimePicker(dateArg)}
         {this.renderTimePicker(dateArg)}
       </div>
-    )
+    );
   }
 
   public renderSpecific()
@@ -377,12 +377,11 @@ class DatePicker extends TerrainComponent<Props>
         />
         <p className='dateViewLabel'>Amount</p>
       </div>
-    )
+    );
   }
 
   public render()
   {
-    console.log(this.props.dateViewType);
     const date = this.getDate();
     const modifiers =
       {
@@ -395,27 +394,27 @@ class DatePicker extends TerrainComponent<Props>
         className='date-picker'
       >
         <p className='dateViewLabel'>View type</p>
-        <div 
-          className={this.props.dateViewType==='calendar' ? 'selectedDateType' : 'unselectedDateType'}
-          onClick={this._fn(this.props.onDateViewTypeChange,'calendar')}
+        <div
+          className={this.props.dateViewType === 'calendar' ? 'selectedDateType' : 'unselectedDateType'}
+          onClick={this._fn(this.props.onDateViewTypeChange, 'calendar')}
         >
           calendar
         </div>
-        <div 
-          className={this.props.dateViewType==='relative' ? 'selectedDateType' : 'unselectedDateType'}
-          onClick={this._fn(this.props.onDateViewTypeChange,'relative')}
+        <div
+          className={this.props.dateViewType === 'relative' ? 'selectedDateType' : 'unselectedDateType'}
+          onClick={this._fn(this.props.onDateViewTypeChange, 'relative')}
         >
           relative
         </div>
-        <div 
-          className={this.props.dateViewType==='specific' ? 'selectedDateType' : 'unselectedDateType'}
-          onClick={this._fn(this.props.onDateViewTypeChange,'specific')}
+        <div
+          className={this.props.dateViewType === 'specific' ? 'selectedDateType' : 'unselectedDateType'}
+          onClick={this._fn(this.props.onDateViewTypeChange, 'specific')}
         >
           specific
         </div>
-        {this.props.dateViewType==='calendar' && this.renderCalendar(date,modifiers)}
-        {this.props.dateViewType==='relative' && this.renderRelative(date)}
-        {this.props.dateViewType==='specific' && this.renderSpecific()}
+        {this.props.dateViewType === 'calendar' && this.renderCalendar(date, modifiers)}
+        {this.props.dateViewType === 'relative' && this.renderRelative(date)}
+        {this.props.dateViewType === 'specific' && this.renderSpecific()}
       </div>
     );
   }
