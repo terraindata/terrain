@@ -77,6 +77,7 @@ export enum Sinks
   Sftp = 'Sftp',
   Http = 'Http',
   Fs = 'Fs',
+  FollowUpBoss = 'FollowUpBoss',
 }
 
 export const EndpointTypeNames =
@@ -93,10 +94,11 @@ export const EndpointTypeNames =
     Magento: 'Magento',
     GoogleAnalytics: 'Google Analytics',
     Mailchimp: 'MailChimp',
+    FollowUpBoss: 'Follow Up Boss',
   };
 
 export const SchedulableSinks: Sinks[] =
-  [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs];
+  [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs, Sinks.FollowUpBoss];
 
 export const SchedulableSources: Sources[] =
   [Sources.Algorithm, Sources.Sftp, Sources.GoogleAnalytics, Sources.Http, Sources.Fs, Sources.Mysql, Sources.Postgresql];
@@ -187,6 +189,7 @@ export interface SinkOptionsTypes
   Sftp: SftpOptions;
   Http: HttpOptions;
   Fs: {};
+  FollowUpBoss: FollowUpBossOptions;
 }
 
 export const SinkOptionsDefaults: SinkOptionsTypes =
@@ -208,6 +211,9 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
       method: 'POST',
     },
     Fs: {},
+    FollowUpBoss: {
+      apiKey: '',
+    },
   };
 
 export interface SftpOptions
@@ -220,6 +226,11 @@ export interface SftpOptions
 export interface HttpOptions
 {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+}
+
+export interface FollowUpBossOptions
+{
+  apiKey: string;
 }
 
 export interface GoogleAnalyticsOptions
