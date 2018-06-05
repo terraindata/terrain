@@ -724,8 +724,8 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   private handleDateViewTypeChange(viewType: string)
   {
-    this.setState({ 
-      dateViewType: viewType, 
+    this.setState({
+      dateViewType: viewType,
     });
   }
 

@@ -326,7 +326,7 @@ class DatePicker extends TerrainComponent<Props>
   {
     return (
       <div className='date-time-time'>
-        <p className='date-view-label'>Time</p>
+        <p className='date-view-label'>TIME</p>
         <Dropdown
           canEdit={this.props.canEdit}
           options={HOUR_OPTIONS}
@@ -341,7 +341,7 @@ class DatePicker extends TerrainComponent<Props>
   {
     return (
       <div className='date-time-time'>
-        <p className='date-view-label'>One Week Scope</p>
+        <p className='date-view-label'>ONE WEEK SCOPE</p>
         <Dropdown
           canEdit={this.props.canEdit}
           options={DateParameterOptions}
@@ -380,17 +380,18 @@ class DatePicker extends TerrainComponent<Props>
   {
     return (
       <div className='date-time-time'>
-        <p className='date-view-label'>Period</p>
+        <p className='date-view-label'>PERIOD</p>
         <Dropdown
           canEdit={this.props.canEdit}
           options={DateTenseOptions}
         />
-        <p className='date-view-label'>Unit of Time</p>
+        <p className='date-view-label'>UNIT OF TIME</p>
         <Dropdown
           canEdit={this.props.canEdit}
           options={DateUnitOptions}
         />
-        <p className='date-view-label'>Amount</p>
+        <p className='date-view-label'>AMOUNT</p>
+        <input className='specific-time-amount' type='number'/>
       </div>
     );
   }
