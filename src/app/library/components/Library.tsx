@@ -123,13 +123,12 @@ class Library extends TerrainComponent<any>
 
     if ((!this.props.match.params || !this.props.match.params.categoryId))
     {
-      //loadLastRoute(basePath);
+      loadLastRoute(basePath);
     }
   }
 
   public componentDidMount()
   {
-    console.log("ABC");
     this.props.roleActions.fetch();
     this.props.userActions({
       actionType: 'fetch',
@@ -353,7 +352,7 @@ class Library extends TerrainComponent<any>
 
     if (!!this.props.location.pathname)
     {
-      //saveLastRoute(basePath, this.props.location);
+      saveLastRoute(basePath, this.props.location);
     }
 
     const groupsReferrer = singleColumn && category !== undefined ?
@@ -372,11 +371,11 @@ class Library extends TerrainComponent<any>
     {
       return metric.events === selectedMetric;
     });
-    console.log("LIB RENDER");
+
     return (
       <div className='library library-layout-horizontal'>
         <div className='library-top'>
-          {/*this.isColumnVisible(Library.CATEGORIES__COLUMN) ?
+          {this.isColumnVisible(Library.CATEGORIES__COLUMN) ?
             <CategoriesColumn
               {...{
                 categories,
@@ -389,8 +388,8 @@ class Library extends TerrainComponent<any>
               }}
               isFocused={group === undefined}
             /> : null
-            */}
-          {/*this.isColumnVisible(Library.GROUPS_COLUMN) ?
+          }
+          {this.isColumnVisible(Library.GROUPS_COLUMN) ?
             <GroupsColumn
               {...{
                 dbs,
@@ -407,8 +406,8 @@ class Library extends TerrainComponent<any>
               }}
               isFocused={algorithmId === null}
             /> : null
-            */}
-          {/*this.isColumnVisible(Library.ALGORITHMS_COLUMN) ?
+          }
+          {this.isColumnVisible(Library.ALGORITHMS_COLUMN) ?
             <AlgorithmsColumn
               {...{
                 algorithms,
@@ -426,9 +425,9 @@ class Library extends TerrainComponent<any>
                 groups,
                 referrer: algorithmsReferrer,
               }}
-            /> : null*/
-            }
-          {/*!canPinAlgorithms ?
+            /> : null
+          }
+          {!canPinAlgorithms ?
             <LibraryInfoColumn
               {...{
                 dbs,
@@ -441,9 +440,9 @@ class Library extends TerrainComponent<any>
                 libraryActions: this.props.libraryActions,
                 roleActions: this.props.roleActions,
               }}
-            /> : null*/}
+            /> : null}
         </div>
-        {/*canPinAlgorithms && (selectedAlgorithm !== null || hasPinnedAlgorithms) ?
+        {canPinAlgorithms && (selectedAlgorithm !== null || hasPinnedAlgorithms) ?
           <div className='library-bottom'>
             <div className='library-analytics-chart-wrapper'>
               {analytics.loaded ?
@@ -487,7 +486,7 @@ class Library extends TerrainComponent<any>
                 onConnectionChange={this.handleConnectionChange}
               />
             </div>
-          </div> : null*/
+          </div> : null
         }
       </div>
     );

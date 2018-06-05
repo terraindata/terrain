@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 import createHistory from 'history/createBrowserHistory';
 import * as React from 'react';
-import { Redirect as RRedirect, Route, Router } from 'react-router';
+import { Redirect as RRedirect, Route, Router } from 'react-router-dom';
 
 import App from './App';
 import TerrainComponent from './common/components/TerrainComponent';

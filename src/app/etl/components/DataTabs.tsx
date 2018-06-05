@@ -55,7 +55,7 @@ import TemplateList from 'etl/templates/components/TemplateList';
 import ETLWalkthrough from 'etl/walkthrough/components/ETLWalkthrough';
 import Jobs from 'jobs/components/Jobs';
 import * as React from 'react';
-import { Redirect, Route, Switch } from 'react-router';
+import { Redirect, Route, Switch } from 'react-router-dom';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import ScheduleList from 'scheduler/components/ScheduleList';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
@@ -115,18 +115,19 @@ class DataTabs extends TerrainComponent<DataTabsProps>
             tabToRouteMap={this.tabToRouteMap}
             location={location}
           >
-            <Route exact path='/data/' component={() => <Redirect to='/data/templates' />} />
-            <Route path='/data/templates' component={TemplateList} />
-            <Route path='/data/newtemplate(/:step)' component={ETLWalkthrough} />
-            <Route path='/data/templates/edit/new' component={ETLEditorPage} />
-            <Route path='/data/templates/edit/algorithmId=:algorithmId' component={ETLEditorPage} />
-            <Route path='/data/templates/edit/templateId=:templateId' component={ETLEditorPage} />
+            <Switch>
+              <Route exact path='/data/templates' component={TemplateList} />
+              <Route exact path='/data/newtemplate/:step?' component={ETLWalkthrough} />
+              <Route exact path='/data/templates/edit/new' component={ETLEditorPage} />
+              <Route exact path='/data/templates/edit/algorithmId=:algorithmId' component={ETLEditorPage} />
+              <Route exact path='/data/templates/edit/templateId=:templateId' component={ETLEditorPage} />
 
-            <Route path='/data/integrations' component={IntegrationList} />
-            <Route path='/data/integrations/edit/integrationId=:integrationId' component={IntegrationEditorPage} />
+              <Route exact path='/data/integrations' component={IntegrationList} />
+              <Route exact path='/data/integrations/edit/integrationId=:integrationId' component={IntegrationEditorPage} />
 
-            <Route path='/data/schedules' component={ScheduleList} />
-            <Route path='/data/jobs' component={Jobs} />
+              <Route exact path='/data/schedules' component={ScheduleList} />
+              <Route exact path='/data/jobs' component={Jobs} />
+            </Switch>
           </TerrainTabs>
           <ETLNotifications />
         </div>

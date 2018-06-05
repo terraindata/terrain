@@ -57,7 +57,7 @@ import './App.less';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { Route, Switch } from 'react-router';
+import { Redirect as RRedirect, Route, Switch } from 'react-router-dom';
 
 import DataTabs from 'etl/components/DataTabs';
 import TemplateList from 'etl/templates/components/TemplateList';
@@ -132,6 +132,14 @@ const ControlIcon = require('./../images/icon-control.svg');
 const TQLIcon = require('./../images/icon_tql_17x14.svg?name=TQLIcon');
 const ManualIcon = require('./../images/icon_info.svg');
 const BackgroundImage = require('./../images/background.png');
+
+const libraryLibrary = (props) => <Library basePath={'library'} {...props} />;
+const analyticsLibrary = (props) => (<Library
+  basePath={'analytics'}
+  canPinAlgorithms={true}
+  singleColumn={true}
+  {...props}
+/>);
 
 injectGlobal`
   @font-face {
@@ -470,14 +478,6 @@ class App extends TerrainComponent<Props>
       backgroundImage: `url(${BackgroundImage})`,
     };
 
-    const libraryLibrary = (props) => <Library basePath={'library'} {...props} />;
-    const analyticsLibrary = (props) => (<Library
-      basePath={'analytics'}
-      canPinAlgorithms={true}
-      singleColumn={true}
-      {...props}
-    />);
-
     const layout =
       {
         fullHeight: true,
@@ -503,9 +503,9 @@ class App extends TerrainComponent<Props>
                   <Switch>
                     <Route exact path='/' component={Redirect} />
 
-                    <Route path='/builder' component={Builder} />
-                    <Route path='/builder/:config' component={Builder} />
-                    <Route path='/builder/:config/:splitConfig' component={Builder} />
+                    <Route exact path='/builder' component={Builder} />
+                    <Route exact path='/builder/:config' component={Builder} />
+                    <Route exact path='/builder/:config/:splitConfig' component={Builder} />
 
                     <Route exact path='/library' component={libraryLibrary} />
                     {/* <Route exact path='/library/:categoryId' component={libraryLibrary} />
@@ -514,33 +514,34 @@ class App extends TerrainComponent<Props>
 
                     <Route path='/account' component={Account} />
 
-                    <Route path='/manual' component={ManualWrapper} />
-                    <Route path='/manual/:term' component={ManualWrapper} />
+                    <Route exact path='/manual' component={ManualWrapper} />
+                    <Route exact path='/manual/:term' component={ManualWrapper} />
 
-                    <Route path='/users/:userId' component={Profile} />
+                    <Route exact path='/users/:userId' component={Profile} />
 
                     <Route path='/reporting' component={Placeholder} />
 
                     <Route path='/logout' component={Logout} />
 
-                    <Route path='/x' component={X} />
-                    <Route path='/x/:x' component={X} />
+                    <Route exact path='/x' component={X} />
+                    <Route exact path='/x/:x' component={X} />
 
                     <Route path='/ui' component={UIComponentsPage} />
 
-                    <Route path='/browser' component={Redirect} />
-                    <Route path='/browser/:a' component={Redirect} />
-                    <Route path='/browser/:a/:b' component={Redirect} />
-                    <Route path='/browser/:a/:b/:c' component={Redirect} />
+                    <Route exact path='/browser' component={Redirect} />
+                    <Route exact path='/browser/:a' component={Redirect} />
+                    <Route exact path='/browser/:a/:b' component={Redirect} />
+                    <Route exact path='/browser/:a/:b/:c' component={Redirect} />
 
                     <Route path='/schema' component={SchemaPage} />
 
+                    <Route exact path='/data' component={() => <RRedirect to='/data/templates' />} />
                     <Route path='/data' component={DataTabs} />
 
-                    <Route path='/analytics' component={analyticsLibrary} />
-                    <Route path='/analytics/:categoryId' component={analyticsLibrary} />
-                    <Route path='/analytics/:categoryId/:groupId' component={analyticsLibrary} />
-                    <Route path='/analytics/:categoryId/:groupId/:algorithmId' component={analyticsLibrary} />
+                    <Route exact path='/analytics' component={analyticsLibrary} />
+                    <Route exact path='/analytics/:categoryId' component={analyticsLibrary} />
+                    <Route exact path='/analytics/:categoryId/:groupId' component={analyticsLibrary} />
+                    <Route exact path='/analytics/:categoryId/:groupId/:algorithmId' component={analyticsLibrary} />
                   </Switch>
                 </div>
               ,

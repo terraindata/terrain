@@ -76,7 +76,6 @@ class TerrainTabs extends TerrainComponent<TabsProps>
     if (tabToRouteMap !== undefined)
     {
       const tabKey = tabs[tabIndex].key;
-      console.log(this.props);
       this.browserHistory.replace(tabToRouteMap[tabKey]);
     }
   }
@@ -94,7 +93,6 @@ class TerrainTabs extends TerrainComponent<TabsProps>
 
   public render()
   {
-    console.log(this.props);
     const { tabs, children, tabToRouteMap, location } = this.props;
     const tabIndex = this.getActiveTabIndex();
 

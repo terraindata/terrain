@@ -60,11 +60,11 @@ import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/Inte
 export interface Props
 {
   location?: any;
-  params?: {
-    integrationId?: number;
+  match?: {
+    params?: {
+      integrationId?: number;
+    };
   };
-  router?: any;
-  route?: any;
   integrations?: Map<ID, IntegrationConfig>;
   etlActions?: typeof ETLActions;
 }
@@ -88,7 +88,8 @@ class IntegrationEditorPage extends TerrainComponent<Props>
 
   public componentDidMount()
   {
-    const { integrations, params } = this.props;
+    const { integrations, match } = this.props;
+    const { params } = match;
     this.setState({
       integration: integrations.get(getIntegrationId(params)),
     });
@@ -99,8 +100,8 @@ class IntegrationEditorPage extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    const { params } = this.props;
-    const nextParams = nextProps.params;
+    const { params } = this.props.match;
+    const nextParams = nextProps.match.params;
     const oldIntegrationId = getIntegrationId(params);
     const integrationId = getIntegrationId(nextParams);
     if (integrationId !== -1 &&
