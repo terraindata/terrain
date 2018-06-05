@@ -160,19 +160,21 @@ export class Scheduler
 
   public async runScheduleNow(id: number): Promise<SchedulerConfig[] | string>
   {
-    return App.DB.executeTransaction(async (handle, commit, rollback) =>
+    let result: SchedulerConfig[] | string;
+
+    await App.DB.executeTransaction(async (handle, commit, rollback) =>
     {
       await App.DB.getDB().execute(
         [['SELECT * FROM ' + this.schedulerTable.getTableName() + ` WHERE id = ${id} FOR UPDATE;`], undefined],
         handle,
       );
 
-      const result = await this.runSchedule(id, handle, true);
+      result = await this.runSchedule(id, handle, true);
 
       await commit();
-
-      return result;
     });
+
+    return result;
   }
 
   public async runSchedule(id: number, handle: TransactionHandle, runNow?: boolean, userId?: number): Promise<SchedulerConfig[] | string>
