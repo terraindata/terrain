@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 read -r -d '' HELPSTRING <<"EOF"
@@ -67,7 +68,7 @@ ssh terrain@${ADDRESS} << EOF
 cd src/Search
 screen -S runmidway -X quit;
 screen -d -m -S runmidway;
-screen -S runmidway -X stuff "yarn; MIDWAY_HOST=${MIDWAYHOSTNAME} yarn build-prod; NODE_ENV=production yarn start-midway > >(tee -a ~/var/log/midway.log) 2> >(tee -a ~/var/log/midway_error.log >&2)^M";
+screen -S runmidway -X stuff "yarn; MIDWAY_HOST=${MIDWAYHOSTNAME} yarn build-prod; NODE_ENV=production yarn start-midway > >(tee -a /var/log/midway.log) 2> >(tee -a /var/log/midway_error.log >&2)^M";
 EOF
 
 echo "End of Update Script";
