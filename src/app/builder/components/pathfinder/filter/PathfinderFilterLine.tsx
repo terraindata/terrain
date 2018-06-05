@@ -512,8 +512,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
               format='MM/DD/YYYY h:mma'
               date={String(props.value)}
               onChange={this._fn(this.handleChange, 'value')}
-              dateViewType={this.state.dateViewType}
-              onDateViewTypeChange={this.handleDateViewTypeChange}
             />
         );
 
@@ -722,13 +720,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     this.props.onChange(this.props.keyPath, filterLine, false, fieldChange);
   }
 
-  private handleDateViewTypeChange(viewType: string)
-  {
-    this.setState({
-      dateViewType: viewType,
-    });
-  }
-
 }
 
 export const COMPARISONS_WITHOUT_VALUES = [
@@ -743,7 +734,7 @@ export function getCustomValueDisplayName(filterLine: FilterLine, value, setInde
     return '--';
   }
   switch (filterLine.fieldType)
-  {
+  { // kearnie TO DO
     case FieldType.Date:
       if (!value)
       {
