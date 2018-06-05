@@ -149,9 +149,9 @@ module.exports =
       MIDWAY_HOST: JSON.stringify('http://' + (process.env.MIDWAY_HOST || 'localhost:3000')),
       DEV: true,
     }),
-    /*new HardSourceWebpackPlugin({
+    new HardSourceWebpackPlugin({
       cacheDirectory: './.cache/hard-source/dev/[confighash]',
-    }),*/
+    }),
     new ForkTsCheckerWebpackPlugin(),
   ],
   optimization: {
@@ -168,7 +168,7 @@ module.exports =
 
     minimizer: [
       new UglifyJSPlugin({
-        sourceMap: true,
+        // sourceMap: true,
         cache: true,
         parallel: true,
         uglifyOptions: {
