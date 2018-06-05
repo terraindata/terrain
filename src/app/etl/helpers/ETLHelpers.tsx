@@ -97,19 +97,19 @@ export default abstract class ETLHelpers
       const eventLoop = () =>
       {
         makeCall(lastValue)
-        .then((value) =>
-        {
-          lastValue = value;
-          if (isFinished(lastValue))
+          .then((value) =>
           {
-            return resolve(lastValue);
-          }
-          else
-          {
-            setTimeout(eventLoop, timeBetweenCalls);
-          }
-        })
-        .catch(reject);
+            lastValue = value;
+            if (isFinished(lastValue))
+            {
+              return resolve(lastValue);
+            }
+            else
+            {
+              setTimeout(eventLoop, timeBetweenCalls);
+            }
+          })
+          .catch(reject);
       };
 
       if (trailing)

@@ -58,6 +58,7 @@ import ETLAjax from 'etl/ETLAjax';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+import { _JobConfig, JobConfig } from 'jobs/JobsTypes';
 import { getMimeType } from 'shared/etl/FileUtil';
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
@@ -254,55 +255,24 @@ class ExecutionHelpers extends ETLHelpers
     }
   }
 
-  private pollForJobToFinish(jobId: number, template: ETLTemplate)
+  // Wait for a job to finish. Returns a promise that resolves when the job is finished or paused
+  public pollOnJob(jobId: number, addNotifications?: boolean): Promise<JobConfig>
   {
-    const onFinish = () =>
+    const checkJob = async () =>
     {
-      this.schemaAct({
-        actionType: 'fetch',
-      });
-      this.afterRunTemplate(template);
-
-      let message = '';
-      let notificationType = 'info';
-      const job = this._jobsState.jobs.get(jobId);
-
-      if (job === undefined)
-      {
-        notificationType = 'error';
-        message = `Error occurred while checking status for job ${jobId}`;
-      }
-      else if (job.status === 'PAUSED')
-      {
-        message = ``;
-      }
-      else if (job.status === 'SUCCESS')
-      {
-        message = `Job ${jobId} Has Successfully Finished Running`;
-      }
-      else
-      {
-        notificationType = 'error';
-        message = `Job ${jobId} Had an Error`;
-      }
-      notificationManager.addNotification(message, '', notificationType, 4);
-    };
-
-    const onPollError = () =>
-    {
-      this.afterRunTemplate(template);
-      notificationManager.addNotification(`Error occurred while checking status for job ${jobId}`, '', 'error', 4);
-    };
-
-    const checkJob = () =>
-      this.jobsAct({
+      const jobs = await this.jobsAct({
         actionType: 'getJob',
         jobId,
       });
+      if (jobs == null || jobs.length === 0)
+      {
+        throw new Error('Job could not be found');
+      }
+      return _JobConfig(jobs[0]);
+    };
 
-    const isJobComplete = () =>
+    const isJobComplete = (job: JobConfig) =>
     {
-      const job = this._jobsState.jobs.get(jobId);
       if (job === undefined)
       {
         throw new Error(`Job with ID ${String(jobId)} not found`);
@@ -313,9 +283,7 @@ class ExecutionHelpers extends ETLHelpers
       }
     };
 
-    ETLHelpers.asyncPoll(checkJob, isJobComplete, undefined)
-      .then(onFinish)
-      .catch(onPollError);
+    return ETLHelpers.asyncPoll(checkJob, isJobComplete);
   }
 
   private runTemplate(template: ETLTemplate)
@@ -344,11 +312,11 @@ class ExecutionHelpers extends ETLHelpers
       }
       else
       {
-        const message = `This ${template.isImport() ? 'Import' : 'Export'} is now running with Job ID ${jobId}`;
+        const modalMessage = `This ${template.isImport() ? 'Import' : 'Export'} is now running with Job ID ${jobId}`;
         this.etlAct({
           actionType: 'addModal',
           props: {
-            message,
+            message: modalMessage,
             title: `Job Now Running`,
             cancelButtonText: 'OK',
             confirm: true,
@@ -356,7 +324,41 @@ class ExecutionHelpers extends ETLHelpers
             onConfirm: ETLRouteUtil.gotoJobs,
           },
         });
-        this.pollForJobToFinish(jobId, template);
+        this.pollOnJob(jobId)
+          .then((job: JobConfig) =>
+          {
+            this.afterRunTemplate(template);
+            this.schemaAct({
+              actionType: 'fetch',
+            });
+
+            let message = '';
+            let notificationType = 'info';
+
+            if (job === undefined)
+            {
+              throw new Error('Job is undefined');
+            }
+            else if (job.status === 'PAUSED')
+            {
+              message = `Job ${jobId} Has Been Paused`;
+            }
+            else if (job.status === 'SUCCESS')
+            {
+              message = `Job ${jobId} Has Successfully Finished Running`;
+            }
+            else
+            {
+              notificationType = 'error';
+              message = `Job ${jobId} Had an Error`;
+            }
+            notificationManager.addNotification(message, '', notificationType, 4);
+          })
+          .catch((err) =>
+          {
+            this.afterRunTemplate(template);
+            notificationManager.addNotification(`Error occurred while checking status for job ${jobId}`, '', 'error', 4);
+          });
       }
     };
     const updateUIAfterError = (ev) =>
