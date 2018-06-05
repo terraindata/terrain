@@ -391,7 +391,7 @@ class DatePicker extends TerrainComponent<Props>
           options={DateUnitOptions}
         />
         <p className='date-view-label'>AMOUNT</p>
-        <input className='specific-time-amount' type='number'/>
+        <input className='specific-time-amount' type='number' />
       </div>
     );
   }
