@@ -88,6 +88,7 @@ export let HA: number;
 export let JobL: JobLog;
 export let JobQ: JobQueue;
 export let SKDR: Scheduler;
+export let TBLS: Schema.Tables;
 
 export class App
 {
@@ -136,24 +137,29 @@ export class App
 
     // first, load config from a config file, if one is specified
     config = Config.loadConfigFromFile(config);
-    this.DB = App.initializeDB(config.db as string, config.dsn as string);
-    DB = this.DB;
-
     winston.debug('Using configuration: ' + JSON.stringify(config));
     this.config = config;
     CFG = this.config;
+
+    TBLS = Schema.setupTables(config.db as string);
+
+    this.DB = App.initializeDB(config.db as string, config.dsn as string);
+    DB = this.DB;
 
     this.EMAIL = new Email();
     EMAIL = this.EMAIL;
 
     this.JobL = new JobLog();
     JobL = this.JobL;
+    JobL.initialize();
 
     this.JobQ = new JobQueue();
     JobQ = this.JobQ;
+    JobQ.initialize();
 
     this.SKDR = new Scheduler();
     SKDR = this.SKDR;
+    SKDR.initialize();
 
     this.app = new Koa();
     this.app.proxy = true;
@@ -226,7 +232,7 @@ export class App
 
     // make sure we insert the RouteErrorHandler first
     this.app.use(RouteError.RouteErrorHandler);
-    this.app.use(MidwayRouter.routes());
+    this.app.use(MidwayRouter().routes());
     this.app.use(serve({ rootDir: './midway/src/assets', rootPath: '/midway/v1/assets' }));
     this.app.use(NotFoundRouter.routes());
   }
@@ -252,7 +258,10 @@ export class App
     }
 
     // create application schema
-    await Schema.createAppSchema(this.config.db as string, this.DB);
+    for (const key of Object.keys(TBLS))
+    {
+      await DB.getDB().putMapping(TBLS[key]);
+    }
     winston.info('Finished creating application schema...');
 
     // process configuration options

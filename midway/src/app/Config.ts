@@ -119,7 +119,6 @@ export async function handleConfig(config: Config): Promise<void>
         db.id = foundDB[0].id;
       }
 
-      db.status = 'DISCONNECTED';
       winston.info('Registering new database item: ', db);
       await databases.upsert({} as UserConfig, db);
     }
