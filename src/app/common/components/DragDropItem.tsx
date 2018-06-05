@@ -156,8 +156,17 @@ class ItemComponent extends TerrainComponent<ItemProps>
 
   public render()
   {
-    const { children, isDragging, isOver, hoverHeader, neighborIsBeingDragged,
+    const { isDragging, isOver, hoverHeader, neighborIsBeingDragged,
       canDrag, canDrop } = this.props;
+
+    let { children, connectDragSource } = this.props;
+
+    if (typeof children === 'function')
+    {
+      console.log(isDragging);
+      children = children(canDrag ? connectDragSource : IDENTITY_FUNCTION);
+    }
+
     const el = (
       <div
         style={_.extend({},
@@ -194,9 +203,11 @@ class ItemComponent extends TerrainComponent<ItemProps>
         </div>
       </div>
     );
-    return canDrag ? this.props.connectDragSource(el) : el;
+    return el; // canDrag ? this.props.connectDragSource(el) : el;
   }
 }
+
+const IDENTITY_FUNCTION = (v) => v;
 
 const DragDropItem = DropTarget(['ITEM', 'GROUP'], itemDropTarget, itemDropCollect)(
   DragSource('ITEM', itemSource, itemDragCollect)
