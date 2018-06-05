@@ -49,6 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
+import { withRouter } from 'react-router';
 import { Colors } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import TerrainComponent from '../../common/components/TerrainComponent';
@@ -69,11 +70,16 @@ const ConnectionsIcon = require('./../../../images/icon_gear.svg?name=Connection
 const InfoIcon = require('../../../images/icon_info.svg?name=InfoIcon');
 const CreditsIcon = require('../../../images/icon_group.svg?name=CreditsIcon');
 
+import createHistory from 'history/createBrowserHistory';
+
+const browserHistory = createHistory();
+
 export interface Props
 {
   colorsActions?: typeof ColorsActions;
   users?: UserTypes.UserState;
-  small?: boolean;
+  small: boolean;
+  history: typeof browserHistory;
 }
 
 export interface State
@@ -138,7 +144,7 @@ class AccountDropdown extends TerrainComponent<Props>
 
   public go(url: string)
   {
-    this.browserHistory.push(url);
+    this.props.history.push(url);
   }
 
   public handleLogout()
@@ -309,10 +315,10 @@ Terrain Version 1.0 Created By:
 - The Pine Marten
 `;
 
-export default Util.createTypedContainer(
+export default withRouter(Util.createTypedContainer(
   AccountDropdown,
   ['users'],
   {
     colorsActions: ColorsActions,
   },
-);
+) as any);

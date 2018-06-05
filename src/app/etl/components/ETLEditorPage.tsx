@@ -395,7 +395,7 @@ class ETLEditorPage extends TerrainComponent<Props>
   }
 }
 
-export default withRouter(Util.createContainer(
+export default Util.createContainer(
   ETLEditorPage,
   [
     ['walkthrough'],
@@ -404,4 +404,4 @@ export default withRouter(Util.createContainer(
     ['templateEditor', 'template'],
   ],
   { editorAct: TemplateEditorActions, etlAct: ETLActions, schemaAct: SchemaActions },
-));
+);
