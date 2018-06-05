@@ -54,6 +54,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import Modal from 'common/components/Modal';
 
@@ -61,10 +62,12 @@ import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateL
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import TerrainTools from 'app/util/TerrainTools';
 
 const UndoIcon = require('images/icon_undo.svg');
 const RedoIcon = require('images/icon_redo.svg');
 const SaveAsIcon = require('images/icon_save_as.svg');
+const CopyIcon = require('images/icon_clipboard.svg');
 
 import './EditorActionsSection.less';
 
@@ -148,7 +151,7 @@ class EditorActionsSection extends TerrainComponent<Props>
   public renderIcon(iconComponent, options:
     {
       key: string,
-      onClick: () => void,
+      onClick?: () => void,
       style?: any,
       tip?: string,
     })
@@ -208,6 +211,24 @@ class EditorActionsSection extends TerrainComponent<Props>
             style: history.canUndo() ? topBarIconStyle : topBarIconDisabledStyle,
             tip: 'Undo',
           })
+        }
+        {
+          TerrainTools.TEMPLATE_COPY ?
+          tooltip(
+            <CopyToClipboard
+              text={JSON.stringify(this.props.templateEditor.template.toJS())}
+            >
+              {
+                this.renderIcon(<CopyIcon/>, {
+                  key: 'copy',
+                  style: topBarIconStyle,
+                })
+              }
+            </CopyToClipboard>
+          ,
+          'Copy to Clipboard'
+          )
+          : null
         }
         {
           this.renderIcon(<SaveAsIcon />, {
