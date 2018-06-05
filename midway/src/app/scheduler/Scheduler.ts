@@ -343,7 +343,7 @@ export class Scheduler
     {
       const scheduleIds: number[] = [];
       const result = await App.DB.getDB().execute(
-        ['SELECT * FROM ' + this.schedulerTable.getTableName() + ' WHERE running = false FOR UPDATE;'],
+        [['SELECT * FROM ' + this.schedulerTable.getTableName() + ' WHERE running = false FOR UPDATE;'], undefined],
         handle,
       );
       const schedules: SchedulerConfig[] = result as SchedulerConfig[];
