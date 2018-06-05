@@ -99,6 +99,13 @@ class ETLTemplateC implements ETLTemplateI
     return false;
   }
 
+  public isUpload(): boolean
+  {
+    const uploadSource = this.getSources()
+      .find((source) => source.type === Sources.Upload && (source.options as any).file == null);
+    return uploadSource !== undefined;
+  }
+
   public canSchedule(
     overrideSources?: Immutable.Map<string, SourceConfig>,
     overrideSinks?: Immutable.Map<string, SinkConfig>,
