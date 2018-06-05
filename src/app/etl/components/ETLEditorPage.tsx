@@ -79,12 +79,12 @@ export interface Props
 {
   // injected
   location?: any;
-  params?: {
-    algorithmId?: number,
-    templateId?: number;
+  match: {
+    params?: {
+      algorithmId?: number,
+      templateId?: number;
+    };
   };
-  router?: any;
-  route?: any;
   walkthrough?: WalkthroughState;
   etl?: ETLState;
   editorAct?: typeof TemplateEditorActions;
@@ -214,7 +214,7 @@ class ETLEditorPage extends TerrainComponent<Props>
   // is there a better pattern for this?
   public componentWillReceiveProps(nextProps)
   {
-    const { params } = this.props;
+    const { match: { params } } = this.props;
     const nextParams = nextProps.params;
 
     if (params == null || nextParams == null)
@@ -260,7 +260,7 @@ class ETLEditorPage extends TerrainComponent<Props>
 
   public initFromRoute(props: Props)
   {
-    const { params, editorAct, walkthrough } = props;
+    const { match: { params }, editorAct, walkthrough } = props;
     editorAct({
       actionType: 'resetState',
     });
@@ -288,7 +288,8 @@ class ETLEditorPage extends TerrainComponent<Props>
   public componentDidMount()
   {
     this.initFromRoute(this.props);
-    this.unregisterHook = this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+    console.log("ZZZ");
+    //this.unregisterHook = this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
   }
 
   public componentWillUnmount()

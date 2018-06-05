@@ -93,7 +93,6 @@ export interface Props
   categoryId: ID;
   groupId: ID;
   canPinItems: boolean;
-  params?: any;
   algorithmActions?: any;
   analytics: any;
   analyticsActions?: any;
@@ -196,7 +195,8 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
     }
 
     const { canPinItems, selectedAlgorithm, basePath, analytics } = this.props;
-    const { params, analytics: nextAnalytics } = nextProps;
+    const { match, analytics: nextAnalytics } = nextProps;
+    const { params } = match;
     const { categoryId, groupId } = params;
     const nextSelectedAlgorithm = nextProps.selectedAlgorithm;
     const pinnedAlgorithms = nextAnalytics
@@ -505,11 +505,12 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
   {
     const {
       canPinItems,
-      params,
+      match,
       basePath,
       analytics,
       users,
     } = this.props;
+    const { params } = match;
     const { currentUser: me } = users;
     const currentAlgorithmId = params.algorithmId;
     const algorithm = this.props.algorithms.get(id);
@@ -703,9 +704,9 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
         title='Algorithms'
         referrer={referrer}
       >
-        {/*this.renderDuplicateModal()*/}
+        {this.renderDuplicateModal()}
         {
-          /*this.props.algorithmsOrder ?
+          this.props.algorithmsOrder ?
             (
               this.props.algorithmsOrder.size ?
                 (
@@ -725,7 +726,7 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
                   onClick={this.handleCreate}
                 />
             )
-            : null*/
+            : null
         }
       </LibraryColumn>
     );

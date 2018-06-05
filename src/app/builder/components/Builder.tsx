@@ -90,10 +90,8 @@ const { Map, List } = Immutable;
 
 export interface Props
 {
-  params?: any;
   location?: any;
   match?: any;
-  router?: any;
   route?: any;
   users?: UserState;
   library?: LibraryTypes.LibraryState;
@@ -315,7 +313,7 @@ class Builder extends TerrainComponent<Props>
     )
     {
       this.confirmedLeave = false;
-      if (!nextProps.location.query || !nextProps.location.query.o)
+      if (!nextProps.location.search || !new URLSearchParams(nextProps.location.search).get('o'))
       {
         // this.unregisterLeaveHook2 = this.props.router.setRouteLeaveHook(nextProps.route, this.routerWillLeave);
       }
@@ -326,7 +324,7 @@ class Builder extends TerrainComponent<Props>
   public checkConfig(props: Props)
   {
     const storedConfig = localStorage.getItem('config') || '';
-    const open = props.location.query && props.location.query.o;
+    const open = props.location.search && new URLSearchParams(props.location.search).get('o');
     const originalConfig = props.match.params.config || storedConfig;
     let newConfig = originalConfig;
 

@@ -504,8 +504,8 @@ class App extends TerrainComponent<Props>
                     <Route exact path='/' component={Redirect} />
 
                     <Route exact path='/builder' component={Builder} />
-                    <Route exact path='/builder/:config' component={Builder} />
-                    <Route exact path='/builder/:config/:splitConfig' component={Builder} />
+                    <Route path='/builder/:config' component={Builder} />
+                    <Route path='/builder/:config/:splitConfig' component={Builder} />
 
                     <Route exact path='/library' render={libraryLibrary} />
                     <Route exact path='/library/:categoryId' render={libraryLibrary} />
