@@ -99,7 +99,7 @@ Router.post('/pause/:id', passport.authenticate('access-token-local'), async (ct
 Router.post('/run/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.SchedulerPermissions.verifyRunRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.SKDR.runSchedule(ctx.params.id);
+  ctx.body = await App.SKDR.runScheduleNow(ctx.params.id);
 });
 
 // unpause paused schedule by id

@@ -89,14 +89,7 @@ export class TaskETL extends Task
       {
         taskOutputConfig.status = false;
         winston.error('Error while running ETL task: ' + String(e.toString()));
-        const outputStream = new stream.Readable();
-        outputStream.push(null);
-        const logStream = new LogStream();
-        logStream.log('Error while running ETL task: ' + String(e.toString()), 'error');
-        logStream.push(null);
-        taskOutputConfig['options']['logStream'] = logStream;
-        taskOutputConfig['options']['outputStream'] = outputStream;
-        resolve(taskOutputConfig);
+        reject(e);
       }
     });
   }

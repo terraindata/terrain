@@ -233,7 +233,7 @@ export class Tasty
   }
 
   public async executeTransaction(handler: (handle: TransactionHandle, commit: () => Promise<void>, rollback: () => Promise<void>)
-    => Promise<void>, isolationLevel = IsolationLevel.DEFAULT, readOnly = false)
+    => Promise<any>, isolationLevel = IsolationLevel.DEFAULT, readOnly = false)
   {
     const handle = await this.db.startTransaction(isolationLevel, readOnly);
     let live = true;
@@ -261,9 +261,10 @@ export class Tasty
         throw new Error('Transaction is not live');
       }
     };
+    let result;
     try
     {
-      await handler(handle, commit, rollback);
+      result = await handler(handle, commit, rollback);
     }
     catch (error)
     {
@@ -275,6 +276,7 @@ export class Tasty
       await rollback();
       throw new Error('Transaction was not ended');
     }
+    return result;
   }
 
   public async schema(): Promise<TastySchema>
