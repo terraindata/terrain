@@ -117,11 +117,6 @@ export class GroupByTFF extends TransformationForm<GroupByOptions, Transformatio
     this.setState(newState);
   }
 
-  protected isStructuralChange()
-  {
-    return true;
-  }
-
   protected createTransformation(proxy: EngineProxy)
   {
     const { engine, fieldId } = this.props;
