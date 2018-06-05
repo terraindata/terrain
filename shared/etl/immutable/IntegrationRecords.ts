@@ -49,6 +49,8 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
+import { FileConfig } from 'shared/etl/types/EndpointTypes';
+import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import
 {
@@ -70,6 +72,31 @@ class IntegrationConfigC implements IntegrationConfigBase
   public readPermission = null;
   public writePermission = null;
   public meta = null;
+
+  public guessFileOptions(): Partial<FileConfig>
+  {
+    const config = this.connectionConfig;
+    switch (this.type)
+    {
+      case Integrations.Http:
+        return guessFileOptionsHelper(config.url);
+      case Integrations.Fs:
+        return guessFileOptionsHelper(config.path);
+      case Integrations.Magento:
+      case Integrations.Postgresql:
+      case Integrations.GoogleAnalytics:
+      case Integrations.Mysql:
+        return {
+          fileType: FileTypes.Json,
+        };
+      case Integrations.Mailchimp:
+        return {
+          fileType: FileTypes.Csv,
+        };
+      default:
+        return null;
+    }
+  }
 }
 export type IntegrationConfig = WithIRecord<IntegrationConfigC>;
 export const _IntegrationConfig = makeExtendedConstructor(IntegrationConfigC, true, {
@@ -78,3 +105,41 @@ export const _IntegrationConfig = makeExtendedConstructor(IntegrationConfigC, tr
     return typeof date === 'string' ? new Date(date) : date;
   },
 });
+
+function guessFileOptionsHelper(path: string): Partial<FileConfig>
+{
+  if (typeof path !== 'string')
+  {
+    return null;
+  }
+  const parts = path.split('.');
+  if (parts.length !== 0)
+  {
+    const extension = parts[parts.length - 1];
+    const fileType = extensionToFileType[extension];
+    if (fileType === undefined)
+    {
+      return null;
+    }
+    else
+    {
+      return {
+        fileType,
+      };
+    }
+  }
+  else
+  {
+    return null;
+  }
+}
+
+const extensionToFileType: {
+  [k: string]: FileTypes,
+} = {
+  json: FileTypes.Json,
+  csv: FileTypes.Csv,
+  tsv: FileTypes.Tsv,
+  xlsx: FileTypes.Xlsx,
+  xml: FileTypes.Xml,
+};

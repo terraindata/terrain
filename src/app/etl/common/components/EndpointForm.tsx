@@ -176,7 +176,7 @@ class EndpointForm extends TerrainComponent<Props>
       (endpoint.type != null && endpoint.type !== '' && integrationList.indexOf(endpoint.type) === -1);
     return (
       <div className='endpoint-block'>
-        {
+        { // type picker
           hideTypePicker === true ? null :
             <DynamicForm
               inputMap={mapToUse}
@@ -184,7 +184,7 @@ class EndpointForm extends TerrainComponent<Props>
               onStateChange={this.handleTypeChange}
             />
         }
-        {
+        { // integration form
           isIntegrationType ?
             <IntegrationPicker
               integrationType={endpoint.type}
