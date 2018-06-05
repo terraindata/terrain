@@ -103,7 +103,7 @@ class ETLNotifications extends TerrainComponent<Props>
       message = `"${runningTemplates.last().templateName}" is currently running`;
     }
 
-    if (ETLProgress !== '')
+    if (ETLProgress !== '' && template !== undefined && template.isUpload())
     {
       title = ETLProgress;
     }

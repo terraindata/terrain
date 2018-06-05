@@ -498,7 +498,7 @@ class ETLAjax
         if (e.total !== 0)
         {
           percent = (e.loaded / e.total) * 100;
-          const progress = `Uploading file...${Math.round(percent)}%`
+          const progress = `Uploading file...${Math.round(percent)}%`;
           config.onProgress(progress);
         }
       }, false);
