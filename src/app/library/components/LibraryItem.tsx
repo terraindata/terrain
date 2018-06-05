@@ -477,7 +477,7 @@ class LibraryItem extends TerrainComponent<Props>
         <Link
           to={this.props.to}
           className='library-item-link'
-          activeClassName='library-item-active'
+          activeclassname='library-item-active'
           onDoubleClick={this.handleDoubleClick}
           onClick={this.handleClick}
         >

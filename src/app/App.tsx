@@ -507,10 +507,10 @@ class App extends TerrainComponent<Props>
                     <Route exact path='/builder/:config' component={Builder} />
                     <Route exact path='/builder/:config/:splitConfig' component={Builder} />
 
-                    <Route exact path='/library' component={libraryLibrary} />
-                    {/* <Route exact path='/library/:categoryId' component={libraryLibrary} />
-                    <Route exact path='/library/:categoryId/:groupId' component={libraryLibrary} />
-                    <Route exact path='/library/:categoryId/:groupId/:algorithmId' component={libraryLibrary} /> */}
+                    <Route exact path='/library' render={libraryLibrary} />
+                    <Route exact path='/library/:categoryId' render={libraryLibrary} />
+                    <Route exact path='/library/:categoryId/:groupId' render={libraryLibrary} />
+                    <Route exact path='/library/:categoryId/:groupId/:algorithmId' render={libraryLibrary} />
 
                     <Route path='/account' component={Account} />
 
@@ -535,13 +535,13 @@ class App extends TerrainComponent<Props>
 
                     <Route path='/schema' component={SchemaPage} />
 
-                    <Route exact path='/data' component={() => <RRedirect to='/data/templates' />} />
+                    <Route exact path='/data' render={(props) => <RRedirect to='/data/templates' />} />
                     <Route path='/data' component={DataTabs} />
 
-                    <Route exact path='/analytics' component={analyticsLibrary} />
-                    <Route exact path='/analytics/:categoryId' component={analyticsLibrary} />
-                    <Route exact path='/analytics/:categoryId/:groupId' component={analyticsLibrary} />
-                    <Route exact path='/analytics/:categoryId/:groupId/:algorithmId' component={analyticsLibrary} />
+                    <Route exact path='/analytics' render={analyticsLibrary} />
+                    <Route exact path='/analytics/:categoryId' render={analyticsLibrary} />
+                    <Route exact path='/analytics/:categoryId/:groupId' render={analyticsLibrary} />
+                    <Route exact path='/analytics/:categoryId/:groupId/:algorithmId' render={analyticsLibrary} />
                   </Switch>
                 </div>
               ,
