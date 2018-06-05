@@ -72,14 +72,11 @@ const CreditsIcon = require('../../../images/icon_group.svg?name=CreditsIcon');
 
 import createHistory from 'history/createBrowserHistory';
 
-const browserHistory = createHistory();
-
 export interface Props
 {
   colorsActions?: typeof ColorsActions;
   users?: UserTypes.UserState;
   small: boolean;
-  history: typeof browserHistory;
 }
 
 export interface State
@@ -144,7 +141,7 @@ class AccountDropdown extends TerrainComponent<Props>
 
   public go(url: string)
   {
-    this.props.history.push(url);
+    this.browserHistory.push(url);
   }
 
   public handleLogout()
@@ -315,10 +312,10 @@ Terrain Version 1.0 Created By:
 - The Pine Marten
 `;
 
-export default withRouter(Util.createTypedContainer(
+export default Util.createTypedContainer(
   AccountDropdown,
   ['users'],
   {
     colorsActions: ColorsActions,
   },
-) as any);
+);

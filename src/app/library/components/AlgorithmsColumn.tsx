@@ -97,7 +97,7 @@ export interface Props
   algorithmActions?: any;
   analytics: any;
   analyticsActions?: any;
-  router?: any;
+  match?: any;
   referrer?: { label: string, path: string };
   users?: UserTypes.UserState;
 }
@@ -133,8 +133,8 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    const { canPinItems, router, analytics } = this.props;
-    const { params, location } = router;
+    const { canPinItems, match, analytics } = this.props;
+    const { params, location } = match;
     const algorithmIds = [];
 
     if (params && params.algorithmId !== null && params.algorithmId !== undefined)
@@ -703,9 +703,9 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
         title='Algorithms'
         referrer={referrer}
       >
-        {this.renderDuplicateModal()}
+        {/*this.renderDuplicateModal()*/}
         {
-          this.props.algorithmsOrder ?
+          /*this.props.algorithmsOrder ?
             (
               this.props.algorithmsOrder.size ?
                 (
@@ -725,7 +725,7 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
                   onClick={this.handleCreate}
                 />
             )
-            : null
+            : null*/
         }
       </LibraryColumn>
     );

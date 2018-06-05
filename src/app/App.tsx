@@ -57,7 +57,7 @@ import './App.less';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { Route } from 'react-router';
+import { Route, Switch } from 'react-router';
 
 import DataTabs from 'etl/components/DataTabs';
 import TemplateList from 'etl/templates/components/TemplateList';
@@ -500,36 +500,48 @@ class App extends TerrainComponent<Props>
                   className='app-inner'
                   style={style}
                 >
-                  <Route exact path='/' component={Redirect} />
+                  <Switch>
+                    <Route exact path='/' component={Redirect} />
 
-                  <Route path='/builder' component={Builder} />
-                  <Route path='/builder/:config' component={Builder} />
-                  <Route path='/builder/:config/:splitConfig' component={Builder} />
+                    <Route path='/builder' component={Builder} />
+                    <Route path='/builder/:config' component={Builder} />
+                    <Route path='/builder/:config/:splitConfig' component={Builder} />
 
-                  <Route path='/account' component={Account} />
+                    <Route exact path='/library' component={libraryLibrary} />
+                    {/* <Route exact path='/library/:categoryId' component={libraryLibrary} />
+                    <Route exact path='/library/:categoryId/:groupId' component={libraryLibrary} />
+                    <Route exact path='/library/:categoryId/:groupId/:algorithmId' component={libraryLibrary} /> */}
 
-                  <Route path='/manual' component={ManualWrapper} />
-                  <Route path='/manual/:term' component={ManualWrapper} />
+                    <Route path='/account' component={Account} />
 
-                  <Route path='/users/:userId' component={Profile} />
+                    <Route path='/manual' component={ManualWrapper} />
+                    <Route path='/manual/:term' component={ManualWrapper} />
 
-                  <Route path='/reporting' component={Placeholder} />
+                    <Route path='/users/:userId' component={Profile} />
 
-                  <Route path='/logout' component={Logout} />
+                    <Route path='/reporting' component={Placeholder} />
 
-                  <Route path='/x' component={X} />
-                  <Route path='/x/:x' component={X} />
+                    <Route path='/logout' component={Logout} />
 
-                  <Route path='/ui' component={UIComponentsPage} />
+                    <Route path='/x' component={X} />
+                    <Route path='/x/:x' component={X} />
 
-                  <Route path='/browser' component={Redirect} />
-                  <Route path='/browser/:a' component={Redirect} />
-                  <Route path='/browser/:a/:b' component={Redirect} />
-                  <Route path='/browser/:a/:b/:c' component={Redirect} />
+                    <Route path='/ui' component={UIComponentsPage} />
 
-                  <Route path='/schema' component={SchemaPage} />
+                    <Route path='/browser' component={Redirect} />
+                    <Route path='/browser/:a' component={Redirect} />
+                    <Route path='/browser/:a/:b' component={Redirect} />
+                    <Route path='/browser/:a/:b/:c' component={Redirect} />
 
-                  <Route path='/data' component={DataTabs} />
+                    <Route path='/schema' component={SchemaPage} />
+
+                    <Route path='/data' component={DataTabs} />
+
+                    <Route path='/analytics' component={analyticsLibrary} />
+                    <Route path='/analytics/:categoryId' component={analyticsLibrary} />
+                    <Route path='/analytics/:categoryId/:groupId' component={analyticsLibrary} />
+                    <Route path='/analytics/:categoryId/:groupId/:algorithmId' component={analyticsLibrary} />
+                  </Switch>
                 </div>
               ,
             },

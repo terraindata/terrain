@@ -159,7 +159,7 @@ export class Sidebar extends TerrainComponent<Props>
               className='sidebar-logo-small'
             />
         }
-        <AccountDropdown small={!this.props.expanded} history={this.browserHistory} />
+        <AccountDropdown small={!this.props.expanded} />
         {
           // <div
           //        className={classNames({

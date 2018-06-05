@@ -74,9 +74,11 @@ interface Store
   getState: () => any;
 }
 
+const browserHistory = createHistory();
+
 class TerrainComponent<T> extends React.Component<T, any>
 {
-  protected browserHistory = createHistory();
+  protected browserHistory = browserHistory;
 
   public props: T;
 

@@ -64,7 +64,7 @@ import LibraryInfoColumn from './LibraryInfoColumn';
 
 export interface Props
 {
-  params?: any;
+  match?: any;
   location?: any;
   router?: any;
   route?: any;
@@ -81,7 +81,7 @@ class Library extends TerrainComponent<any>
   public static ALGORITHMS_COLUMN = 'algorithms';
 
   public static defaultProps: Partial<Props> = {
-    params: {},
+    match: {},
     location: {},
     router: {},
     route: {},
@@ -121,14 +121,15 @@ class Library extends TerrainComponent<any>
       }
     }
 
-    if ((!this.props.params || !this.props.params.categoryId))
+    if ((!this.props.match.params || !this.props.match.params.categoryId))
     {
-      loadLastRoute(basePath);
+      //loadLastRoute(basePath);
     }
   }
 
   public componentDidMount()
   {
+    console.log("ABC");
     this.props.roleActions.fetch();
     this.props.userActions({
       actionType: 'fetch',
@@ -285,8 +286,8 @@ class Library extends TerrainComponent<any>
 
   public isColumnVisible(columnName)
   {
-    const { singleColumn, router } = this.props;
-    const params = router !== undefined && router.params !== undefined ? router.params : {};
+    const { singleColumn, match } = this.props;
+    const params = match !== undefined && match.params !== undefined ? match.params : {};
     const { categoryId, groupId, algorithmId } = params;
 
     return !singleColumn ||
@@ -312,7 +313,7 @@ class Library extends TerrainComponent<any>
       library: libraryState,
       analytics,
       schema,
-      router,
+      match,
       basePath,
       canPinAlgorithms,
       singleColumn,
@@ -336,7 +337,7 @@ class Library extends TerrainComponent<any>
     } = analytics;
 
     const hasPinnedAlgorithms = pinnedAlgorithms.valueSeq().includes(true);
-    const { params } = router;
+    const { params } = match;
 
     const datasets = this.getDatasets();
 
@@ -352,7 +353,7 @@ class Library extends TerrainComponent<any>
 
     if (!!this.props.location.pathname)
     {
-      saveLastRoute(basePath, this.props.location);
+      //saveLastRoute(basePath, this.props.location);
     }
 
     const groupsReferrer = singleColumn && category !== undefined ?
@@ -371,11 +372,11 @@ class Library extends TerrainComponent<any>
     {
       return metric.events === selectedMetric;
     });
-
+    console.log("LIB RENDER");
     return (
       <div className='library library-layout-horizontal'>
         <div className='library-top'>
-          {this.isColumnVisible(Library.CATEGORIES__COLUMN) ?
+          {/*this.isColumnVisible(Library.CATEGORIES__COLUMN) ?
             <CategoriesColumn
               {...{
                 categories,
@@ -388,8 +389,8 @@ class Library extends TerrainComponent<any>
               }}
               isFocused={group === undefined}
             /> : null
-          }
-          {this.isColumnVisible(Library.GROUPS_COLUMN) ?
+            */}
+          {/*this.isColumnVisible(Library.GROUPS_COLUMN) ?
             <GroupsColumn
               {...{
                 dbs,
@@ -406,8 +407,8 @@ class Library extends TerrainComponent<any>
               }}
               isFocused={algorithmId === null}
             /> : null
-          }
-          {this.isColumnVisible(Library.ALGORITHMS_COLUMN) ?
+            */}
+          {/*this.isColumnVisible(Library.ALGORITHMS_COLUMN) ?
             <AlgorithmsColumn
               {...{
                 algorithms,
@@ -418,16 +419,16 @@ class Library extends TerrainComponent<any>
                 params,
                 canPinItems: canPinAlgorithms,
                 basePath,
-                router,
+                match,
                 algorithmActions: this.props.libraryAlgorithmActions,
                 analytics,
                 analyticsActions: this.props.analyticsActions,
                 groups,
                 referrer: algorithmsReferrer,
               }}
-            /> : null
-          }
-          {!canPinAlgorithms ?
+            /> : null*/
+            }
+          {/*!canPinAlgorithms ?
             <LibraryInfoColumn
               {...{
                 dbs,
@@ -440,9 +441,9 @@ class Library extends TerrainComponent<any>
                 libraryActions: this.props.libraryActions,
                 roleActions: this.props.roleActions,
               }}
-            /> : null}
+            /> : null*/}
         </div>
-        {canPinAlgorithms && (selectedAlgorithm !== null || hasPinnedAlgorithms) ?
+        {/*canPinAlgorithms && (selectedAlgorithm !== null || hasPinnedAlgorithms) ?
           <div className='library-bottom'>
             <div className='library-analytics-chart-wrapper'>
               {analytics.loaded ?
@@ -486,7 +487,7 @@ class Library extends TerrainComponent<any>
                 onConnectionChange={this.handleConnectionChange}
               />
             </div>
-          </div> : null
+          </div> : null*/
         }
       </div>
     );
