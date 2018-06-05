@@ -44,9 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import createHistory from 'history/createBrowserHistory';
-
-const browserHistory = createHistory();
+import { browserHistory } from 'common/components/TerrainComponent';
 
 interface LibraryRouteComponents
 {
