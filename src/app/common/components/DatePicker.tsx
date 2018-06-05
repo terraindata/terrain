@@ -409,7 +409,7 @@ class DatePicker extends TerrainComponent<Props>
   {
     return (
       <div className='date-time-time'>
-        <p className='date-view-label'>TIME</p>
+        <p className='date-view-label'>Time</p>
         <Dropdown
           canEdit={this.props.canEdit}
           options={HOUR_OPTIONS}
@@ -424,7 +424,7 @@ class DatePicker extends TerrainComponent<Props>
   {
     return (
       <div className='date-time-time-top'>
-        <p className='date-view-label'>ONE WEEK SCOPE</p>
+        <p className='date-view-label'>One Week Scope</p>
         <Dropdown
           canEdit={this.props.canEdit}
           options={DateParameterOptions}
@@ -463,7 +463,7 @@ class DatePicker extends TerrainComponent<Props>
   {
     return (
       <div className='date-time-time-top'>
-        <p className='date-view-label'>PERIOD</p>
+        <p className='date-view-label'>Period</p>
         <Dropdown
           canEdit={this.props.canEdit}
           options={DateTenseOptions}
@@ -471,7 +471,7 @@ class DatePicker extends TerrainComponent<Props>
           selectedIndex={DateTenseOptions.indexOf(this.state.sign)}
           onChange={this.handleTenseChange}
         />
-        <p className='date-view-label'>UNIT OF TIME</p>
+        <p className='date-view-label'>Unit of Time</p>
         <Dropdown
           canEdit={this.props.canEdit}
           options={DateUnitOptions}
@@ -479,7 +479,7 @@ class DatePicker extends TerrainComponent<Props>
           selectedIndex={DateUnitOptions.indexOf(this.state.unit)}
           onChange={this.handleUnitChange}
         />
-        <p className='date-view-label'>AMOUNT</p>
+        <p className='date-view-label'>Amount</p>
         <input
           className='specific-time-amount'
           type='number'
@@ -512,7 +512,7 @@ class DatePicker extends TerrainComponent<Props>
       <div
         className='date-picker'
       >
-        <p className='date-view-title'>VIEW TYPE</p>
+        <p className='date-view-title'>View Type</p>
         <div
           className={this.state.dateViewType === 'calendar' ? 'selected-date-type' : 'unselected-date-type'}
           onClick={this._fn(this.onDateViewChange, 'calendar')}

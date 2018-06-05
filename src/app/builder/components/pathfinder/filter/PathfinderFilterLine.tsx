@@ -115,7 +115,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 {
   public state = {
     boost: this.props.filterLine.boost,
-    dateViewType: 'calendar',
   };
 
   public componentWillReceiveProps(nextProps: Props)
@@ -206,7 +205,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           fieldValue,
           comparisonValue,
           fieldType: props.filterLine.fieldType,
-          dateViewType: this.state.dateViewType,
         }}
         // optionSets={this.getOptionSets() /* TODO store in state? */}
         values={values}
@@ -733,8 +731,8 @@ export function getCustomValueDisplayName(filterLine: FilterLine, value, setInde
   {
     return '--';
   }
-  switch (filterLine.fieldType)
-  { // kearnie TO DO
+  switch (filterLine.fieldType) 
+  { // kearnie TO DO 
     case FieldType.Date:
       if (!value)
       {
