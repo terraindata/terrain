@@ -149,7 +149,7 @@ export default class ESInterpreter
       this.query = ESParameterSubstituter.generate(root,
         (paramValueInfo: ESValueInfo, runtimeParam?: string, inTerms?: boolean): string =>
         {
-          return '@' + paramValueInfo.parameter as string;
+          return '@' + String(paramValueInfo.parameter);
         });
 
       // generate the final query string while marking the parameter value.

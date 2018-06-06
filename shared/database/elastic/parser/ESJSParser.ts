@@ -112,6 +112,12 @@ export class ESJSParser extends ESParser
       const keys = Object.keys(obj);
       for (let i = 0; i < keys.length; i++)
       {
+        // a special feature for add annotations for the query object
+        if (keys[i] === '_annotation')
+        {
+          objectValueInfo.annotation = obj[keys[i]];
+          continue;
+        }
         const keyJsonName = this.stringifyStringValue(keys[i]);
         const keyValueInfo = this.parseToken(keyJsonName);
         const childValueInfo = this.JSValueToValueInfo(obj[keys[i]]);
