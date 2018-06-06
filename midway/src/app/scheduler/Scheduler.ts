@@ -164,10 +164,7 @@ export class Scheduler
 
     await App.DB.executeTransaction(async (handle, commit, rollback) =>
     {
-      await App.DB.getDB().execute(
-        [['SELECT * FROM ' + this.schedulerTable.getTableName() + ` WHERE id = ${id} FOR UPDATE;`], undefined],
-        handle,
-      );
+      await this._select([], { id }, true, false, handle);
 
       result = await this.runSchedule(id, handle, true);
 
@@ -332,18 +329,24 @@ export class Scheduler
   private async _checkSchedulerTable(): Promise<void>
   {
     // TODO check the scheduler for unlocked rows and detect which schedules should run next
-    await App.DB.executeTransaction(async (handle, commit, rollback) =>
+    const availableSchedules: number[] = await this._getAvailableSchedules();
+    for (const scheduleId of availableSchedules)
     {
-      const availableSchedules: number[] = await this._getAvailableSchedules(handle);
-      availableSchedules.forEach((scheduleId) =>
+      await App.DB.executeTransaction(async (handle, commit, rollback) =>
       {
-        this._checkSchedulerTableHelper(scheduleId, handle).catch((err) =>
+        const schedules = await this._select([], { id: scheduleId }, true, true, handle);
+
+        if (schedules.length === 1 && !schedules[0].running && this._shouldScheduleRun(schedules[0]))
         {
-          winston.warn(err.toString() as string);
-        });
+          this._checkSchedulerTableHelper(scheduleId, handle).catch((err) =>
+          {
+            winston.warn(err.toString() as string);
+          });
+        }
+
+        await commit();
       });
-      await commit();
-    });
+    }
     setTimeout(this._checkSchedulerTable.bind(this), 60000 - new Date().getTime() % 60000);
   }
 
@@ -356,34 +359,39 @@ export class Scheduler
     }
   }
 
-  private async _getAvailableSchedules(handle: TransactionHandle): Promise<number[]>
+  private _shouldScheduleRun(schedule: SchedulerConfig): boolean
+  {
+    try
+    {
+      const lastRun = new Date(schedule.lastRun);
+      const currTime = new Date(new Date().valueOf() + 1000);
+      const currIntervalCronDate = cronParser.parseExpression(schedule.cron, { tz: 'America/Los_Angeles' });
+      const prevInterval = currIntervalCronDate.prev().toDate();
+
+      if (prevInterval.valueOf() > lastRun.valueOf() && currTime.valueOf() > lastRun.valueOf()
+        && schedule.shouldRunNext === true)
+      {
+        return true;
+      }
+    }
+    catch (e)
+    {
+      winston.warn('Error while trying to parse scheduler cron: ' + ((e as any).toString() as string));
+    }
+    return false;
+  }
+
+  private async _getAvailableSchedules(): Promise<number[]>
   {
     return new Promise<number[]>(async (resolve, reject) =>
     {
       const scheduleIds: number[] = [];
-      const result = await App.DB.getDB().execute(
-        [['SELECT * FROM ' + this.schedulerTable.getTableName() + ' WHERE running = false FOR UPDATE;'], undefined],
-        handle,
-      );
-      const schedules: SchedulerConfig[] = result as SchedulerConfig[];
+      const schedules: SchedulerConfig[] = await this._select([], { running: false }) as SchedulerConfig[];
       schedules.forEach((schedule) =>
       {
-        try
+        if (this._shouldScheduleRun(schedule))
         {
-          const lastRun = new Date(schedule.lastRun);
-          const currTime = new Date(new Date().valueOf() + 1000);
-          const currIntervalCronDate = cronParser.parseExpression(schedule.cron, { tz: 'America/Los_Angeles' });
-          const prevInterval = currIntervalCronDate.prev().toDate();
-
-          if (prevInterval.valueOf() > lastRun.valueOf() && currTime.valueOf() > lastRun.valueOf()
-            && schedule.shouldRunNext === true)
-          {
-            scheduleIds.push(schedule.id);
-          }
-        }
-        catch (e)
-        {
-          winston.warn('Error while trying to parse scheduler cron: ' + ((e as any).toString() as string));
+          scheduleIds.push(schedule.id);
         }
       });
       resolve(scheduleIds);
@@ -404,23 +412,12 @@ export class Scheduler
     });
   }
 
-  private async _select(columns: string[], filter: object, locked?: boolean): Promise<SchedulerConfig[]>
+  private async _select(columns: string[], filter: object,
+    forUpdate?: boolean, noWait?: boolean, handle?: TransactionHandle): Promise<SchedulerConfig[]>
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
-      let rawResults: object[] = [];
-      if (locked === undefined) // all
-      {
-        rawResults = await App.DB.select(this.schedulerTable, columns, filter);
-      }
-      else if (locked === true) // currently running
-      {
-        // TODO
-      }
-      else // currently not running
-      {
-        // TODO
-      }
+      const rawResults: object[] = await App.DB.select(this.schedulerTable, columns, filter, forUpdate, noWait, handle);
 
       const results: SchedulerConfig[] = rawResults.map((result: object) => new SchedulerConfig(result as SchedulerConfig));
       resolve(results);

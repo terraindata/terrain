@@ -135,7 +135,8 @@ export class Tasty
    *
    * @memberOf TastyInterface
    */
-  public async select(table: TastyTable, columns?: string[], filter?: object, handle?: TransactionHandle): Promise<object[]>
+  public async select(table: TastyTable, columns?: string[], filter?: object,
+    forUpdate?: boolean, noWait?: boolean, handle?: TransactionHandle): Promise<object[]>
   {
     const query: TastyQuery = new TastyQuery(table);
     if (columns === undefined || columns.length === 0)
@@ -150,6 +151,16 @@ export class Tasty
     if (node !== null)
     {
       query.filter(node);
+    }
+
+    if (forUpdate === true)
+    {
+      query.forUpdate();
+    }
+
+    if (noWait === true)
+    {
+      query.noWait();
     }
 
     return this.execute(query, handle);
