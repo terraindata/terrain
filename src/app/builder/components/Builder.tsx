@@ -234,8 +234,7 @@ class Builder extends TerrainComponent<Props>
       }
     };
 
-    console.log(this.props);
-    // this.unregisterLeaveHook1 = this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+    this.unregisterLeaveHook1 = this.browserHistory.block(this.routerWillLeave as any);
   }
 
   public componentWillUnmount()
@@ -306,7 +305,6 @@ class Builder extends TerrainComponent<Props>
       });
     }
 
-    console.log(nextProps);
     if (
       nextProps.match.params.config !== this.props.match.params.config
       || currentOpen !== nextOpen
@@ -315,7 +313,7 @@ class Builder extends TerrainComponent<Props>
       this.confirmedLeave = false;
       if (!nextProps.location.search || !new URLSearchParams(nextProps.location.search).get('o'))
       {
-        // this.unregisterLeaveHook2 = this.props.router.setRouteLeaveHook(nextProps.route, this.routerWillLeave);
+        this.unregisterLeaveHook2 = this.browserHistory.block(this.routerWillLeave as any);
       }
       this.checkConfig(nextProps);
     }

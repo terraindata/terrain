@@ -288,8 +288,7 @@ class ETLEditorPage extends TerrainComponent<Props>
   public componentDidMount()
   {
     this.initFromRoute(this.props);
-    console.log("ZZZ");
-    //this.unregisterHook = this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+    this.unregisterHook = this.browserHistory.block(this.routerWillLeave as any);
   }
 
   public componentWillUnmount()
