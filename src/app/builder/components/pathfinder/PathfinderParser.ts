@@ -53,9 +53,11 @@ import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as TerrainLog from 'loglevel';
 import { FieldType } from '../../../../../shared/builder/FieldTypes';
+import ESInterpreter from '../../../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESJSONType from '../../../../../shared/database/elastic/parser/ESJSONType';
-import { isInput } from '../../../../blocks/types/Input';
+import { ESJSParser } from '../../../../../shared/database/elastic/parser/ESJSParser';
+import { isInput, toInputMap } from '../../../../blocks/types/Input';
 import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import { _FilterGroup, DistanceValue, FilterGroup, FilterLine, More, Path, Score, Script, Source } from './PathfinderTypes';
 
@@ -153,9 +155,14 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   }
 
   // Export, with inputs
-  const text = stringifyWithParameters(queryBody, (name) => isInput(name, inputs));
-  const parser: ESJSONParser = new ESJSONParser(text, true);
-  return ESParseTreeToCode(parser, {}, inputs);
+  const qt = new ESJSParser(queryBody);
+  const params = toInputMap(inputs);
+  const interpreter: ESInterpreter = new ESInterpreter(qt, params);
+  if (interpreter.hasError())
+  {
+    TerrainLog.debug('Interpreter has error: ' + interpreter.getErrors());
+  }
+  return interpreter.query;
 
   // TODO
   // const moreObj = parseAggregations(path.more);

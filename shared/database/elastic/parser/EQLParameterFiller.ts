@@ -142,7 +142,7 @@ export default class ESParameterFiller
           // @[parentAlias] parameter
           if (runtimeParam !== undefined && parameterName === runtimeParam)
           {
-            finalString = JSON.stringify('@' + param);
+            finalString = '@' + param;
             if (monitor !== undefined)
             {
               monitor(paramValueInfo, ESParameterType.MetaParent, finalString);

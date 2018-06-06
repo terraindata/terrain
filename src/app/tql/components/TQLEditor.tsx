@@ -273,10 +273,15 @@ class TQLEditor extends TerrainComponent<Props>
     }
 
     let CM: any;
+    let queryString = this.autoFormatQuery(this.props.tql || '');
+    if (queryString === null)
+    {
+      queryString = this.props.tql || '';
+    }
 
     if (this.props.isDiff)
     {
-      options['value'] = this.props.tql || '';
+      options['value'] = queryString;
       CM = (
         <CodeMirror
           ref='cm2'
@@ -292,7 +297,7 @@ class TQLEditor extends TerrainComponent<Props>
       <CodeMirror
         ref='cm'
         className='codemirror-text'
-        value={this.props.tql || ''}
+        value={queryString}
         options={options}
 
         highlightedLine={this.props.highlightedLine}
