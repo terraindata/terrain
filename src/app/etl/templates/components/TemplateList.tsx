@@ -68,7 +68,7 @@ import { MidwayError } from 'shared/error/MidwayError';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import './TemplateList.less';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
@@ -93,6 +93,12 @@ export interface Props
 
 class TemplateList extends TerrainComponent<Props>
 {
+  public state: {
+    rawTemplate: string,
+  } = {
+    rawTemplate: '',
+  }
+
   public displayConfig: HeaderConfig<ETLTemplate> = [
     {
       name: 'ID',
@@ -183,6 +189,21 @@ class TemplateList extends TerrainComponent<Props>
     );
   }
 
+  public handleCreateTemplate()
+  {
+    try {
+      const templateConfig = JSON.parse(this.state.rawTemplate);
+      const newTemplate = _ETLTemplate(templateConfig, true);
+      this.props.etlAct({
+        actionType: 'createTemplate',
+        template: newTemplate.set('id', undefined),
+      });
+    }
+    catch (e)
+    {
+    }
+  }
+
   public render()
   {
     const computeOptions = this.computeMenuOptionsFactory(this.props.allowedActions);
@@ -200,6 +221,22 @@ class TemplateList extends TerrainComponent<Props>
           canCreate={TerrainTools.isAdmin()}
           onCreate={() => ETLRouteUtil.gotoWalkthroughStep(0)}
         />
+        {
+          TerrainTools.isFeatureEnabled(TerrainTools.TEMPLATE_COPY) ?
+          <div>
+            Or Create Template by Pasting it Here
+            <textarea
+              value={this.state.rawTemplate}
+              onChange={this._setStateWrapperPath('rawTemplate', 'target', 'value')}
+            />
+            <div
+              onClick={this.handleCreateTemplate}
+            >
+               CREATE 
+            </div>
+          </div>
+          : null
+        }
       </div>
     );
   }
