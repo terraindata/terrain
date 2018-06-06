@@ -419,6 +419,7 @@ class Library extends TerrainComponent<any>
                 canPinItems: canPinAlgorithms,
                 basePath,
                 match,
+                location,
                 algorithmActions: this.props.libraryAlgorithmActions,
                 analytics,
                 analyticsActions: this.props.analyticsActions,

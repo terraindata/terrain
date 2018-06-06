@@ -97,6 +97,7 @@ export interface Props
   analytics: any;
   analyticsActions?: any;
   match?: any;
+  location?: any;
   referrer?: { label: string, path: string };
   users?: UserTypes.UserState;
 }
@@ -132,8 +133,8 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    const { canPinItems, match, analytics } = this.props;
-    const { params, location } = match;
+    const { canPinItems, match, location, analytics } = this.props;
+    const { params } = match;
     const algorithmIds = [];
 
     if (params && params.algorithmId !== null && params.algorithmId !== undefined)
@@ -142,17 +143,21 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
       algorithmIds.push(parseInt(params.algorithmId, 10));
     }
 
-    if (canPinItems && location.query && location.query.pinned !== undefined)
+    if (canPinItems && location.search)
     {
-      const pinnedAlgorithmIds = location.query.pinned.split(',');
-
-      pinnedAlgorithmIds.forEach((id) =>
+      const pinned = new URLSearchParams(location.search).get('pinned');
+      if (pinned !== undefined)
       {
-        const numericId = parseInt(id, 10);
+        const pinnedAlgorithmIds = pinned.split(',');
 
-        this.props.analyticsActions.pinAlgorithm(numericId);
-        algorithmIds.push(numericId);
-      });
+        pinnedAlgorithmIds.forEach((id) =>
+        {
+          const numericId = parseInt(id, 10);
+
+          this.props.analyticsActions.pinAlgorithm(numericId);
+          algorithmIds.push(numericId);
+        });
+      }
     }
 
     if (algorithmIds.length > 0)
