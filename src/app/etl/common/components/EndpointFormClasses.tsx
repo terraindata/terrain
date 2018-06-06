@@ -356,6 +356,12 @@ export class DatabaseEndpoint extends EndpointFormBase<DatabaseState>
   }
 }
 
+type FollowUpBossState = SinkOptionsType<Sinks.FollowUpBoss>;
+export class FollowUpBossEndpoint extends EndpointFormBase<FollowUpBossState>
+{
+  public inputMap: InputDeclarationMap<FollowUpBossState> = {};
+}
+
 type FsState = SinkOptionsType<Sinks.Fs>;
 export class FsEndpoint extends EndpointFormBase<FsState>
 {

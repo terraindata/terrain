@@ -56,6 +56,7 @@ export enum Integrations
   GoogleAnalytics = 'GoogleAnalytics',
   Email = 'Email',
   Mailchimp = 'Mailchimp',
+  FollowUpBoss = 'FollowUpBoss',
 }
 
 export const IntegrationNames =
@@ -69,6 +70,7 @@ export const IntegrationNames =
     GoogleAnalytics: 'Google Analytics',
     Email: 'Email',
     Mailchimp: 'MailChimp',
+    FollowUpBoss: 'Follow Up Boss',
   };
 
 export interface IntegrationConfigBase
@@ -110,6 +112,9 @@ export interface AuthConfigTypes
     password: string;
   };
   Mailchimp: {
+    apiKey: string;
+  };
+  FollowUpBoss: {
     apiKey: string;
   };
 }
@@ -164,6 +169,8 @@ export interface ConnectionConfigTypes
   };
   Mailchimp: {
     host: string;
+  };
+  FollowUpBoss: {
   };
 }
 
