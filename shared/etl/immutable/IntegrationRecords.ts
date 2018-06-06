@@ -48,9 +48,10 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
+import { guessFileOptionsHelper } from 'shared/etl/FileUtil';
 import { FileConfig } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
+import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
 import
 {
@@ -75,7 +76,7 @@ class IntegrationConfigC implements IntegrationConfigBase
 
   public guessFileOptions(): Partial<FileConfig>
   {
-    const config = this.connectionConfig;
+    const config: any = this.connectionConfig;
     switch (this.type)
     {
       case Integrations.Http:
@@ -105,41 +106,3 @@ export const _IntegrationConfig = makeExtendedConstructor(IntegrationConfigC, tr
     return typeof date === 'string' ? new Date(date) : date;
   },
 });
-
-function guessFileOptionsHelper(path: string): Partial<FileConfig>
-{
-  if (typeof path !== 'string')
-  {
-    return null;
-  }
-  const parts = path.split('.');
-  if (parts.length !== 0)
-  {
-    const extension = parts[parts.length - 1];
-    const fileType = extensionToFileType[extension];
-    if (fileType === undefined)
-    {
-      return null;
-    }
-    else
-    {
-      return {
-        fileType,
-      };
-    }
-  }
-  else
-  {
-    return null;
-  }
-}
-
-const extensionToFileType: {
-  [k: string]: FileTypes,
-} = {
-  json: FileTypes.Json,
-  csv: FileTypes.Csv,
-  tsv: FileTypes.Tsv,
-  xlsx: FileTypes.Xlsx,
-  xml: FileTypes.Xml,
-};
