@@ -338,10 +338,14 @@ export class Scheduler
 
         if (schedules.length === 1 && !schedules[0].running && this._shouldScheduleRun(schedules[0]))
         {
-          this._checkSchedulerTableHelper(scheduleId, handle).catch((err) =>
+          try
+          {
+            await this._checkSchedulerTableHelper(scheduleId, handle);
+          }
+          catch (err)
           {
             winston.warn(err.toString() as string);
-          });
+          }
         }
 
         await commit();
