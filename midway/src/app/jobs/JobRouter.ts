@@ -109,7 +109,7 @@ Router.post('/runnow/:id', async (ctx, next) =>
   const responseStream = await App.JobQ.runNow(ctx.params.id, fields, files);
   // await perm.JobQueuePermissions.verifyRunNowRoute(ctx.state.user as UserConfig, ctx.req);
   responseStream.on('error', ctx.onerror);
-  if (ctx.response.type !== 'blob' || (responseStream instanceof ProgressStream))
+  if (responseStream instanceof ProgressStream)
   {
     responseStream.resume();
     ctx.body = new stream.Readable();
