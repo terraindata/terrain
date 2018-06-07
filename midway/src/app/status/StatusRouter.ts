@@ -50,8 +50,8 @@ import * as os from 'os';
 import * as process from 'process';
 import * as v8 from 'v8';
 
-import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import appStats from '../AppStats';
+import { databases } from '../database/DatabaseRouter';
 
 const Router = new KoaRouter();
 export const initialize = () => {};
@@ -69,16 +69,7 @@ Router.get('/', async (ctx, next) =>
  */
 Router.get('/stats', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const databases = {};
-  for (const entry of DatabaseRegistry.getAll())
-  {
-    const id = entry[0];
-    const controller = entry[1];
-    await controller.getClient().isConnected();
-    const config = controller.getConfig();
-    config['status'] = controller.getStatus();
-    databases[id] = config;
-  }
+  const dbs = await databases.status();
 
   ctx.body = {
     startTime: appStats.startTime,
@@ -120,7 +111,7 @@ Router.get('/stats', passport.authenticate('access-token-local'), async (ctx, ne
         // ppid: process.ppid,
       },
 
-    databases,
+    databases: dbs,
   };
 });
 

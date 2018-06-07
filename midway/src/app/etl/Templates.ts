@@ -341,7 +341,6 @@ export default class Templates
     const numSources = Object.keys(template.sources).length;
     const numSinks = Object.keys(template.sinks).length;
     const numEdges = Object.keys(template.process.edges).length;
-
     // TODO: multi-source export
     if (numSinks > 1 || template.sinks._default === undefined)
     {

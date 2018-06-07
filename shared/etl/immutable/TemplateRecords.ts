@@ -102,7 +102,7 @@ class ETLTemplateC implements ETLTemplateI
   public isUpload(): boolean
   {
     const uploadSource = this.getSources()
-      .find((source) => source.type === Sources.Upload && (source.options as any).file == null);
+      .find((source) => source.type === Sources.Upload);
     return uploadSource !== undefined;
   }
 

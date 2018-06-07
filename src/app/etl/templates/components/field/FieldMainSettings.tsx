@@ -103,6 +103,7 @@ class FieldMainSettings extends TemplateEditorField<Props>
         pickOptions: (s) => etlFieldTypesList,
         indexResolver: (value) => etlFieldTypesList.indexOf(value),
         displayNames: (s) => etlFieldTypesNames,
+        wrapperHeight: '120px',
       },
     },
     isPrimaryKey: {
@@ -192,7 +193,6 @@ class FieldMainSettings extends TemplateEditorField<Props>
           inputState={this.state.formState}
           onStateChange={this._setStateWrapper('formState')}
           style={{
-            flexGrow: 1,
             padding: '12px',
             justifyContent: 'center',
           }}
