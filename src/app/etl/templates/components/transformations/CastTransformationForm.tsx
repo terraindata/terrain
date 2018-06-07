@@ -101,11 +101,6 @@ export class CastTFF extends TransformationForm<CastOptions, TransformationNodeT
     return state.toTypename === 'date' ? DisplayState.Active : DisplayState.Hidden;
   }
 
-  protected isStructuralChange()
-  {
-    return true;
-  }
-
   protected computeInitialState()
   {
     const { fieldId, isCreate, engine } = this.props;

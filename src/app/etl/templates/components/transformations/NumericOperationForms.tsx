@@ -134,11 +134,6 @@ export class NumericFormBase<NodeType extends TransformationNodeType>
     ).toList();
   }
 
-  protected isStructuralChange()
-  {
-    return true;
-  }
-
   protected computeArgs()
   {
     const { engine, fieldId } = this.props;

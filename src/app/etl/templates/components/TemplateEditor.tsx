@@ -77,6 +77,8 @@ import EditorColumnActionsSection from './EditorColumnActionsSection';
 
 import './TemplateEditor.less';
 
+import * as yadeep from 'shared/util/yadeep';
+
 const { List } = Immutable;
 
 export interface Props

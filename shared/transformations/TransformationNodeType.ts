@@ -75,6 +75,7 @@ enum TransformationNodeType
   DecryptNode = 'DecryptNode',
   GroupByNode = 'GroupByNode',
   FilterArrayNode = 'FilterArrayNode',
+  RemoveDuplicatesNode = 'RemoveDuplicatesNode',
   ZipcodeNode = 'ZipcodeNode',
 }
 
@@ -181,6 +182,8 @@ interface TransformationOptionTypes
   FilterArrayNode: {
     filterNull: boolean;
     filterUndefined: boolean;
+  };
+  RemoveDuplicatesNode: {
   };
   ZipcodeNode: {
     format: string;

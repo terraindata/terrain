@@ -93,7 +93,7 @@ class ETLNotifications extends TerrainComponent<Props>
 
   public renderRunningTemplateModal()
   {
-    const { runningTemplates, acknowledgedRuns, fileUploadProgress } = this.props.etl;
+    const { runningTemplates, acknowledgedRuns, ETLProgress } = this.props.etl;
     const template = this.getRunningTemplate();
     const showTemplate = template !== undefined && !acknowledgedRuns.get(template.id);
     let title = 'Task In Progress';
@@ -103,9 +103,9 @@ class ETLNotifications extends TerrainComponent<Props>
       message = `"${runningTemplates.last().templateName}" is currently running`;
     }
 
-    if (fileUploadProgress > 0 && fileUploadProgress < 100)
+    if (ETLProgress !== '' && template !== undefined && template.isUpload())
     {
-      title = `Uploading file...${Math.round(fileUploadProgress)}%`;
+      title = ETLProgress;
     }
 
     return (

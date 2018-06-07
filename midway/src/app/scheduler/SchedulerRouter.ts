@@ -60,13 +60,6 @@ const perm: Permissions = new Permissions();
 
 export const integrations: Integrations = new Integrations();
 
-// Get schedule by search parameter, or all if none provided
-Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  await perm.SchedulerPermissions.verifyGetRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.SKDR.get(ctx.params.id);
-});
-
 // Get schedules by template id
 Router.get('/byTemplate/:templateId', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
@@ -92,13 +85,6 @@ Router.post('/duplicate/:id', passport.authenticate('access-token-local'), async
 {
   await perm.SchedulerPermissions.verifyDuplicateRoute(ctx.state.user as UserConfig, ctx.req);
   ctx.body = await App.SKDR.duplicate(ctx.params.id);
-});
-
-// Retrieve schedule log by id
-Router.get('/log/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  await perm.SchedulerPermissions.verifyGetLogRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.SKDR.getLog(ctx.params.id);
 });
 
 // pause schedule by id
@@ -127,6 +113,19 @@ Router.post('/status/:id', passport.authenticate('access-token-local'), async (c
 {
   await perm.SchedulerPermissions.verifyStatusRoute(ctx.state.user as UserConfig, ctx.req);
   ctx.body = await App.SKDR.setStatus(ctx.params.id, ctx.request.body.body.status);
+});
+
+// returns current timezone that Midway is using
+Router.get('/timezone', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  ctx.body = await App.SKDR.getTimezone();
+});
+
+// Get schedule by search parameter, or all if none provided
+Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  await perm.SchedulerPermissions.verifyGetRoute(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await App.SKDR.get(ctx.params.id);
 });
 
 // Create schedule

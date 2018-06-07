@@ -43,8 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import { List, Map } from 'immutable';
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+const { List, Map } = Immutable;
 
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
@@ -464,7 +465,7 @@ export default class EngineUtil
 
     const ignoreFields: { [k: number]: boolean } = {};
     const docs = EngineUtil.preprocessDocuments(options.documents, engine);
-    engine.getAllFieldIDs().forEach((id) =>
+    engine.getAllFieldIDs().sortBy((id) => engine.getOutputKeyPath(id).size).forEach((id) =>
     {
       if (ignoreFields[id])
       {
@@ -483,13 +484,6 @@ export default class EngineUtil
         if (type === ETLFieldTypes.GeoPoint)
         {
           EngineUtil.castField(engine, id, ETLFieldTypes.GeoPoint);
-          const latField = EngineUtil.addFieldToEngine(engine, ikp.push('lat'), ETLFieldTypes.Number);
-          const longField = EngineUtil.addFieldToEngine(engine, ikp.push('lon'), ETLFieldTypes.Number);
-          engine.setOutputKeyPath(latField, okp.push('lat')); // refactor to use synthetic util?
-          engine.setOutputKeyPath(longField, okp.push('lon'));
-
-          EngineUtil.castField(engine, latField, ETLFieldTypes.Number);
-          EngineUtil.castField(engine, longField, ETLFieldTypes.Number);
         }
         else if (type === ETLFieldTypes.Date)
         {
@@ -676,6 +670,110 @@ export default class EngineUtil
     else
     {
       e2.disableField(id2);
+    }
+  }
+
+  public static createTreeFromEngine(engine: TransformationEngine): Immutable.Map<number, List<number>>
+  {
+    const ids = engine.getAllFieldIDs();
+    // sort the paths to ensure we visit parents before children
+    const sortedIds = ids.sort((a, b) => engine.getOutputKeyPath(a).size - engine.getOutputKeyPath(b).size);
+
+    const enginePathToField: {
+      [kp: string]: List<number>,
+    } = {};
+
+    sortedIds.forEach((id, index) =>
+    {
+      const enginePath = engine.getOutputKeyPath(id).toJS();
+      if (enginePath.length === 0)
+      {
+        return;
+      }
+      const parentPath = enginePath.slice(0, -1);
+      const parentHash = JSON.stringify(parentPath);
+      const parentField: List<number> = enginePathToField[parentHash];
+      const newField = List([]);
+
+      if (parentField != null)
+      {
+        enginePathToField[parentHash] = parentField.push(id);
+      }
+      enginePathToField[JSON.stringify(enginePath)] = newField;
+    });
+
+    const fieldMap: { [k: number]: List<number> } = {};
+    sortedIds.forEach((id, index) =>
+    {
+      const enginePath = engine.getOutputKeyPath(id).toJS();
+      const field = enginePathToField[JSON.stringify(enginePath)];
+      if (field != null)
+      {
+        fieldMap[id] = field;
+      }
+    });
+    return Immutable.Map<number, List<number>>(fieldMap)
+      .mapKeys((key) => Number(key))
+      .toMap();
+  }
+
+  public static postorderForEach(
+    engine: TransformationEngine,
+    fromId: number,
+    fn: (id: number) => void,
+  )
+  {
+    const tree = EngineUtil.createTreeFromEngine(engine);
+    for (const id of EngineUtil.postorder(tree, fromId))
+    {
+      fn(id);
+    }
+  }
+
+  public static preorderForEach(
+    engine: TransformationEngine,
+    fromId: number,
+    fn: (id: number) => void,
+  )
+  {
+    const tree = EngineUtil.createTreeFromEngine(engine);
+    for (const id of EngineUtil.preorder(tree, fromId))
+    {
+      fn(id);
+    }
+  }
+
+  public static * postorder(
+    tree: Immutable.Map<number, List<number>>,
+    id: number,
+    shouldExplore: (id) => boolean = () => true,
+  )
+  {
+    const children = tree.get(id);
+    if (children !== undefined)
+    {
+      for (let i = 0; i < children.size; i++)
+      {
+        yield* EngineUtil.postorder(tree, children.get(i), shouldExplore);
+      }
+      yield id;
+    }
+  }
+
+  public static * preorder(
+    tree: Immutable.Map<number, List<number>>,
+    id: number,
+    shouldExplore: (id) => boolean = () => true,
+  )
+  {
+    const children = tree.get(id);
+    if (children !== undefined && shouldExplore(id))
+    {
+      yield id;
+      for (let i = 0; i < children.size; i++)
+      {
+        yield* EngineUtil.preorder(tree, children.get(i), shouldExplore);
+      }
     }
   }
 

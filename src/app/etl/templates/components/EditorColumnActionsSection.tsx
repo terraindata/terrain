@@ -93,7 +93,7 @@ class EditorColumnActionsSection extends TerrainComponent<Props>
           style={backgroundColor('rgba(0,0,0,0)', Colors().highlight)}
           onClick={this.handleSelectAll}
         >
-          Select All
+          Include All
         </div>
         <div
           key='none'
@@ -101,14 +101,14 @@ class EditorColumnActionsSection extends TerrainComponent<Props>
           style={backgroundColor('rgba(0,0,0,0)', Colors().highlight)}
           onClick={this.handleSelectNone}
         >
-          Select None
+          Include None
         </div>
         <div
           key='num-selected'
           className='title-bar-action'
           style={{ cursor: 'default' }}
         >
-          {`${this.numFieldsSelected()} fields selected`}
+          {`${this.numFieldsSelected()} fields included`}
         </div>
       </div>
     );

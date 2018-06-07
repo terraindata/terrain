@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as cronParser from 'cron-parser';
+import * as momentZone from 'moment-timezone';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
@@ -55,13 +56,11 @@ import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import IntegrationConfig from '../integrations/IntegrationConfig';
 import Integrations from '../integrations/Integrations';
-import { Sources } from '../io/sources/Sources';
 import { Job } from '../jobs/Job';
 import { UserConfig } from '../users/UserConfig';
 import SchedulerConfig from './SchedulerConfig';
 
 export const integrations: Integrations = new Integrations();
-const sources = new Sources();
 
 export class Scheduler
 {
@@ -163,13 +162,16 @@ export class Scheduler
     });
   }
 
-  public async getLog(id?: number): Promise<object[]>
+  public async getTimezone(): Promise<object>
   {
-    return new Promise<object[]>(async (resolve, reject) =>
-    {
-      // TODO add extensive logging support
-      resolve([{}]);
-    });
+    const timezone: string = momentZone.tz.guess();
+    const name: string = momentZone.tz(timezone).zoneName();
+    const timezoneObj: object =
+      {
+        timezone,
+        name,
+      };
+    return Promise.resolve(timezoneObj);
   }
 
   public async runSchedule(id: number, runNow?: boolean, userId?: number): Promise<SchedulerConfig[] | string>
@@ -286,7 +288,7 @@ export class Scheduler
         {
           return reject(new Error('Schedule name and cron must be provided.'));
         }
-        const currIntervalCronDate = cronParser.parseExpression(schedule.cron);
+        const currIntervalCronDate = cronParser.parseExpression(schedule.cron, { tz: 'America/Los_Angeles' });
 
         schedule.createdAt = creationDate;
         schedule.createdBy = user !== undefined ? user.id : -1;
@@ -359,7 +361,7 @@ export class Scheduler
         {
           const lastRun = new Date(schedule.lastRun);
           const currTime = new Date(new Date().valueOf() + 1000);
-          const currIntervalCronDate = cronParser.parseExpression(schedule.cron);
+          const currIntervalCronDate = cronParser.parseExpression(schedule.cron, { tz: 'America/Los_Angeles' });
           const prevInterval = currIntervalCronDate.prev().toDate();
 
           if (prevInterval.valueOf() > lastRun.valueOf() && currTime.valueOf() > lastRun.valueOf()

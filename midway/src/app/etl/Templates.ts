@@ -73,6 +73,7 @@ import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords'
 import { ETLProcess, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import LogStream from '../io/streams/LogStream';
 import ProgressStream from '../io/streams/ProgressStream';
+import { deleteElasticIndex } from '../Schema';
 
 export default class Templates
 {
@@ -355,7 +356,6 @@ export default class Templates
     const numSources = Object.keys(template.sources).length;
     const numSinks = Object.keys(template.sinks).length;
     const numEdges = Object.keys(template.process.edges).length;
-
     // TODO: multi-source export
     if (numSinks > 1 || template.sinks._default === undefined)
     {
@@ -536,6 +536,19 @@ export default class Templates
               const tempSinkStream = await getSinkStream(tempSink, transformationEngine, { isMerge: true });
               inputStream.pipe(tempSinkStream);
 
+              const deleteIndex = (index) =>
+              {
+                return async (e) =>
+                {
+                  winston.error(e);
+                  await elasticDB.deleteIndex(index);
+                  logStream.info(`Deleted temporary indices: ${JSON.stringify(index)}`);
+                };
+              };
+
+              inputStream.on('error', deleteIndex(tempIndex));
+              tempSinkStream.on('error', deleteIndex(tempIndex));
+
               // wait for the stream to be completely written out to the sink by attaching the
               // "finish" event handler; when all the incoming streams have finished, throw a "done"
               // event to proceed...
@@ -571,32 +584,41 @@ export default class Templates
 
             logStream.info('Finished refreshing temporary indices; now ready for searching / sorting ...');
 
-            // pipe the merge stream to all outgoing edges
-            const outEdges: any[] = dag.outEdges(nodeId);
-            numPending = outEdges.length;
-            for (const e of outEdges)
+            try
             {
-              const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
-              const transformStream = new TransformationEngineTransform([], transformationEngine);
-              const mergeJoinStream = await getMergeJoinStream(dbName, tempIndices, node.options);
-              streamMap[nodeId][e.w] = mergeJoinStream.pipe(transformStream);
-              streamMap[nodeId][e.w].on('end', async () =>
+              // pipe the merge stream to all outgoing edges
+              const outEdges: any[] = dag.outEdges(nodeId);
+              numPending = outEdges.length;
+              for (const e of outEdges)
               {
-                if (--numPending === 0)
+                const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
+                const transformStream = new TransformationEngineTransform([], transformationEngine);
+                const mergeJoinStream = await getMergeJoinStream(dbName, tempIndices, node.options);
+                streamMap[nodeId][e.w] = mergeJoinStream.pipe(transformStream);
+                streamMap[nodeId][e.w].on('end', async () =>
                 {
-                  // delete the temporary indices once the merge stream has been piped
-                  // out to all outgoing edges
-                  await elasticDB.deleteIndex(indices);
-                  logStream.info(`Deleted temporary indices: ${JSON.stringify(indices)}`);
-                }
-              });
+                  if (--numPending === 0)
+                  {
+                    // delete the temporary indices once the merge stream has been piped
+                    // out to all outgoing edges
+                    await elasticDB.deleteIndex(indices);
+                    logStream.info(`Deleted temporary indices: ${JSON.stringify(indices)}`);
+                  }
+                });
 
-              // log all errors to the log stream
-              streamMap['log'].addStreams(
-                transformStream,
-                mergeJoinStream,
-                streamMap[nodeId][e.w],
-              );
+                // log all errors to the log stream
+                streamMap['log'].addStreams(
+                  transformStream,
+                  mergeJoinStream,
+                  streamMap[nodeId][e.w],
+                );
+              }
+            }
+            catch (e)
+            {
+              winston.error(e);
+              await elasticDB.deleteIndex(indices);
+              logStream.info(`Deleted temporary indices: ${JSON.stringify(indices)}`);
             }
 
             return this.executeGraph(template, dag, nodes, files, streamMap);

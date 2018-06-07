@@ -50,6 +50,7 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
+import { getFileType, guessFileOptionsHelper } from 'shared/etl/FileUtil';
 import
 {
   FileConfig as FileConfigI,
@@ -96,6 +97,29 @@ class SourceConfigC implements SourceConfigI
     return true;
   }
 
+  public guessFileOptions(): Partial<FileConfig>
+  {
+    const options = this.options;
+    switch (this.type)
+    {
+      case Sources.Upload:
+        if (options.file != null)
+        {
+          return {
+            fileType: getFileType(options.file),
+          };
+        }
+        else
+        {
+          return null;
+        }
+      case Sources.Sftp:
+        return guessFileOptionsHelper(options.filepath);
+      default:
+        return null;
+    }
+  }
+
   public description(algorithms?: Map<ID, ItemWithName>): string
   {
     return getEndpointDescription(this as any, algorithms);
@@ -136,6 +160,20 @@ class SinkConfigC implements SinkConfigI
       return false;
     }
     return true;
+  }
+
+  public guessFileOptions(): Partial<FileConfig>
+  {
+    const options: any = this.options;
+    switch (this.type)
+    {
+      case Sinks.Download:
+        return guessFileOptionsHelper(options.filename);
+      case Sinks.Sftp:
+        return guessFileOptionsHelper(options.filepath);
+      default:
+        return null;
+    }
   }
 
   public description()
