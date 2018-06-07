@@ -720,6 +720,196 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
 }
 
+function formatTime(rawTime)
+{
+  let unit;
+  const parsedTime = rawTime.split(':');
+  let hour = parsedTime[0];
+  const hourNumber = parseInt(hour, 10);
+  const minutes = parsedTime[1];
+  if (hourNumber < 12)
+  {
+    unit = 'am';
+    hour = (hourNumber - 0).toString();
+    if (hourNumber === 0)
+    {
+      hour = '12';
+    }
+  }
+  else
+  {
+    unit = 'pm';
+    if (hourNumber !== 12)
+    {
+      hour = (hourNumber - 12).toString();
+    }
+  }
+  return hour + ':' + minutes + unit;
+}
+
+function formatCalendarDate(date)
+{
+  const parsedDate = date.split('T');
+  const time = formatTime(parsedDate[1]);
+  const parsedCalendarDate = (parsedDate[0]).split('-');
+  const year = parsedCalendarDate[0];
+  const monthNumber = parsedCalendarDate[1];
+  const day = parsedCalendarDate[2];
+  let month;
+  switch (monthNumber)
+  {
+    case '01':
+      month = 'January';
+      break;
+    case '02':
+      month = 'February';
+      break;
+    case '03':
+      month = 'March';
+      break;
+    case '04':
+      month = 'April';
+      break;
+    case '05':
+      month = 'May';
+      break;
+    case '06':
+      month = 'June';
+      break;
+    case '07':
+      month = 'July';
+      break;
+    case '08':
+      month = 'August';
+      break;
+    case '09':
+      month = 'September';
+      break;
+    case '10':
+      month = 'October';
+      break;
+    case '11':
+      month = 'November';
+      break;
+    case '12':
+      month = 'December';
+      break;
+    default:
+      month = '';
+      break;
+  }
+  return month + ' ' + day + ', ' + year + ' ' + time;
+}
+
+function formatRelativeDate(date)
+{
+  const parsedDate = date.split('.');
+  const oneWeekScope = parsedDate[1];
+  const rawDay = parsedDate[2];
+  const rawTime = parsedDate[3];
+  const time = formatTime(rawTime.slice(1));
+  let day;
+  switch (rawDay)
+  {
+    case '0':
+      day = 'Monday';
+      break;
+    case '1':
+      day = 'Tuesday';
+      break;
+    case '2':
+      day = 'Wednesday';
+      break;
+    case '3':
+      day = 'Thursday';
+      break;
+    case '4':
+      day = 'Friday';
+      break;
+    case '5':
+      day = 'Saturday';
+      break;
+    case '6':
+      day = 'Sunday';
+      break;
+    default:
+      day = '';
+      break;
+  }
+  return day + ' ' + oneWeekScope.slice(0, 4) + ' ' + oneWeekScope.slice(4) + ', ' + time;
+}
+
+function formatSpecificDate(date)
+{
+  let tense;
+  let unit;
+  let dateParser;
+  let plural;
+  const elasticUnit = date.slice(-1);
+  if (date.includes('+'))
+  {
+    tense = 'from now';
+    dateParser = '+';
+  }
+  else
+  {
+    tense = 'ago';
+    dateParser = '-';
+  }
+  const parsedDate = date.split(dateParser);
+  const dateDetails = parsedDate[1];
+  const amount = dateDetails.slice(0, -1);
+  switch (elasticUnit)
+  {
+    case 'm':
+      unit = 'minute';
+      break;
+    case 'h':
+      unit = 'hour';
+      break;
+    case 'd':
+      unit = 'day';
+      break;
+    case 'w':
+      unit = 'week';
+      break;
+    case 'M':
+      unit = 'month';
+      break;
+    case 'y':
+      unit = 'year';
+      break;
+    default:
+      unit = '';
+      break;
+  }
+  if (amount !== '1')
+  {
+    plural = 's';
+  }
+  else
+  {
+    plural = '';
+  }
+  return amount + ' ' + unit + plural + ' ' + tense;
+}
+
+function formatDateValue(date)
+{
+  if (date.includes('@TerrainDate'))
+  {
+    return formatRelativeDate(date);
+  }
+  else if (date.includes('Now'))
+  {
+    return formatSpecificDate(date);
+  }
+  else
+  {
+    return formatCalendarDate(date);
+  }
+}
+
 export const COMPARISONS_WITHOUT_VALUES = [
   'exists',
   'notexists',
@@ -731,14 +921,14 @@ export function getCustomValueDisplayName(filterLine: FilterLine, value, setInde
   {
     return '--';
   }
-  switch (filterLine.fieldType) 
-  { // kearnie TO DO 
+  switch (filterLine.fieldType)
+  {
     case FieldType.Date:
       if (!value)
       {
         return '';
       }
-      return value;
+      return (value !== undefined && formatDateValue(value));
     case FieldType.Geopoint:
       value = _DistanceValue(Util.asJS(value));
       return value.distance + ' ' + units[value.units] + ' of ' + value.address;

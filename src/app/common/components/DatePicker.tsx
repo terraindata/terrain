@@ -161,8 +161,8 @@ class DatePicker extends TerrainComponent<Props>
 {
   public state = {
     dateViewType: 'calendar',
-    sign: '',
-    unit: '',
+    sign: '-',
+    unit: 'M',
     amount: 0,
   };
   public componentDidMount()
@@ -279,12 +279,11 @@ class DatePicker extends TerrainComponent<Props>
   public getDateViewType(dateProp: string): string
   {
     let dateViewType;
-    // if this.props.date.startsWith('@TerrainData') then 'relative' ?
-    if (dateProp.includes('TerrainDate'))
+    if (dateProp.startsWith('@TerrainDate'))
     {
       dateViewType = 'relative';
     }
-    else if (dateProp.includes('Now'))
+    else if (dateProp.startsWith('Now'))
     {
       dateViewType = 'specific';
     }
@@ -368,6 +367,7 @@ class DatePicker extends TerrainComponent<Props>
         sign,
       },
     );
+    this.props.onChange(this.formatElasticQuery(sign, this.state.unit, this.state.amount));
   }
 
   public handleUnitChange(unitIndex)
@@ -378,6 +378,7 @@ class DatePicker extends TerrainComponent<Props>
         unit,
       },
     );
+    this.props.onChange(this.formatElasticQuery(this.state.sign, unit, this.state.amount));
   }
 
   public handleAmountChange(e)
@@ -387,6 +388,12 @@ class DatePicker extends TerrainComponent<Props>
         amount: e.target.value,
       },
     );
+    this.props.onChange(this.formatElasticQuery(this.state.sign, this.state.unit, e.target.value));
+  }
+
+  public formatElasticQuery(sign: string, unit: string, amount: number): string
+  {
+    return 'Now' + sign + amount.toString() + unit;
   }
 
   public dateToHourIndex(date: Moment)
