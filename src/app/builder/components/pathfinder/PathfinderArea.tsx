@@ -51,7 +51,7 @@ import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors, fontColor } from '../../../colors/Colors';
+import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 const { List } = Immutable;
 import BuilderActions from 'app/builder/data/BuilderActions';
@@ -71,6 +71,7 @@ import './Pathfinder.less';
 import { _PathfinderContext, _Script, Path, PathfinderSteps, Source } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
+const InfoIcon = require('images/icon_info.svg');
 
 const ScrollingComponent = withScrolling('div');
 
@@ -267,6 +268,13 @@ class PathfinderArea extends TerrainComponent<Props>
         verticalStrength={this.vStrength}
       >
         <div className='pathfinder-column-content'>
+          {errors &&
+            tooltip(<InfoIcon
+              className='pf-warning-icon'
+              style={getStyle('fill', Colors().error)}
+            />,
+              JSON.stringify(errors))
+          }
           <PathfinderSourceSection
             pathfinderContext={pathfinderContext}
             keyPath={this._ikeyPath(keyPath, 'source')}
