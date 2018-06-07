@@ -96,7 +96,7 @@ export interface Props
   algorithmActions?: any;
   analytics: any;
   analyticsActions?: any;
-  match?: any;
+  match: any;
   location?: any;
   referrer?: { label: string, path: string };
   users?: UserTypes.UserState;

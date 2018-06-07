@@ -110,7 +110,8 @@ describe('AlgorithmsColumn', () =>
         analytics={analytics}
         analyticsActions={analyticsActions}
         canPinItems={false}
-        router={{ params: { categoryId: '1' }, location: { query: '' } }}
+        match={{ params: { categoryId: '1' }, location: { query: '' } }}
+        location={{}}
       />,
     );
   });
@@ -124,8 +125,8 @@ describe('AlgorithmsColumn', () =>
         browserHistory.push = jest.fn();
         algorithmsColumnComponent.instance().handleDoubleClick(algorithmId);
 
-        expect(browserHistory.push).toHaveBeenCalledTimes(1);
-        expect(browserHistory.push).toHaveBeenCalledWith(`/builder/?o=${algorithmId}`);
+        expect(algorithmsColumnComponent.instance().browserHistory.push).toHaveBeenCalledTimes(1);
+        expect(algorithmsColumnComponent.instance().browserHistory.push).toHaveBeenCalledWith(`/builder/?o=${algorithmId}`);
       });
     });
 
@@ -145,14 +146,15 @@ describe('AlgorithmsColumn', () =>
             analytics={analytics}
             analyticsActions={analyticsActions}
             canPinItems={true}
-            router={{ params: { categoryId: '1' }, location: { query: '' } }}
+            match={{ params: { categoryId: '1' }, location: { query: '' } }}
+            location={{}}
           />,
         );
 
         browserHistory.push = jest.fn();
         algorithmsColumnComponent.instance().handleDoubleClick(algorithmId);
 
-        expect(browserHistory.push).not.toHaveBeenCalled();
+        expect(algorithmsColumnComponent.instance().browserHistory.push).not.toHaveBeenCalled();
       });
     });
   });
