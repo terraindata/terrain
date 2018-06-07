@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
 import { DateUnitMap } from 'app/common/components/DatePicker';
+const moment = require('moment');
 
 const DateUtil =
   {
@@ -79,34 +80,7 @@ const DateUtil =
 
     formatCalendarDate(date)
     {
-      const parsedDate = date.split('T');
-      const time = DateUtil.formatTime(parsedDate[1]);
-      const parsedCalendarDate = (parsedDate[0]).split('-');
-      const year = parsedCalendarDate[0];
-      const monthNumber = parsedCalendarDate[1];
-      const rawDay = parsedCalendarDate[2];
-      const monthDict =
-        {
-          '01': 'January',
-          '02': 'February',
-          '03': 'March',
-          '04': 'April',
-          '05': 'May',
-          '06': 'June',
-          '07': 'July',
-          '08': 'August',
-          '09': 'September',
-          '10': 'October',
-          '11': 'November',
-          '12': 'December',
-        };
-      const month = monthDict[monthNumber];
-      let day = rawDay;
-      if (parseInt(rawDay, 10) < 10)
-      {
-        day = rawDay.slice(1);
-      }
-      return month + ' ' + day + ' ' + year + ', ' + time;
+      return moment(date).format('MMMM D YYYY, h:mm a');
     },
 
     formatRelativeDate(date)
