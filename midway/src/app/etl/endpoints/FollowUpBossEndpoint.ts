@@ -94,4 +94,12 @@ public _write(chunk: any, encoding: string, callback: (err?: Error) => void): vo
     console.dir(chunk, {depth: null});
     callback(err);
 }
+
+
+  public _final(callback: any)
+  {
+    // TODO post partial batch at the end of the stream
+
+    callback();
+  }
 }
