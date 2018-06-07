@@ -142,12 +142,14 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     // If inputs changes, or parent query data source changes, update value possibilities
     if (nextProps.pathfinderContext.builderState.query &&
       this.props.pathfinderContext.builderState.query &&
-      nextProps.pathfinderContext.builderState.query.inputs !==
-      this.props.pathfinderContext.builderState.query.inputs ||
-      !_.isEqual(nextProps.pathfinderContext.parentSource,
-        this.props.pathfinderContext.parentSource) ||
-      nextProps.pathfinderContext.parentName !==
-      this.props.pathfinderContext.parentName
+      (
+        nextProps.pathfinderContext.builderState.query.inputs !==
+        this.props.pathfinderContext.builderState.query.inputs ||
+        !_.isEqual(nextProps.pathfinderContext.parentSource,
+          this.props.pathfinderContext.parentSource) ||
+        nextProps.pathfinderContext.parentName !==
+        this.props.pathfinderContext.parentName
+      )
     )
     {
       this.setState({
