@@ -55,8 +55,9 @@ import SafeWritable from '../../io/streams/SafeWritable';
 import AEndpointStream from './AEndpointStream';
 import JSONTransform from '../../io/streams/JSONTransform';
 import AExportTransform from '../../io/streams/AExportTransform';
+import * as Elastic from 'elasticsearch';
 
-export default class FSEndpoint extends AEndpointStream
+export default class FollowUpBossEndpoint extends AEndpointStream
 {
   constructor()
   {
@@ -71,38 +72,26 @@ export default class FSEndpoint extends AEndpointStream
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<stream.Writable>
   {
     const config = await this.getIntegrationConfig(sink.integrationId);
-    //throw new Error('need to return stream');
     return new FollowUpBossStream();
-    //return Promise.resolve(JSONTransform.createExportStream().pipe(new FollowUpBossStream()));
-    //return new FollowUpBossStream();
-    //return fs.createWriteStream(config['path']);
   }
 }
 
 // noinspection TsLint
-class FollowUpBossStream extends AExportTransform
+class FollowUpBossStream extends stream.Writable
 {
-
-  private batch: string;
 
   constructor()
   {
-    super();
+    super({
+      objectMode: true,
+      highWaterMark: 1024 * 128,
+    });
   }
 
-
-  protected transform(input: object, chunkNumber: number): string
-  {
-    // if (input === null) {
-    //   this.push(null);
-    // }
-
-    // batch.push(input);
-    // if(batch.count === 1000)
-    //   http.post(batch);
-    //
-    console.log('GOT INPUT');
-    console.log(input);
-    return JSON.stringify(input);
-  }
+public _write(chunk: any, encoding: string, callback: (err?: Error) => void): void
+{
+    console.log('CHUNK');
+    console.dir(chunk, {depth: null});
+    callback(err);
+}
 }
