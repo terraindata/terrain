@@ -262,6 +262,18 @@ export class App
     {
       await DB.getDB().putMapping(TBLS[key]);
     }
+    const query = [
+      [
+        'ALTER TABLE items ADD CONSTRAINT unique_item_names EXCLUDE (name WITH =, parent WITH =) WHERE (name != \'\');',
+      ],
+      undefined,
+    ];
+    try
+    {
+      await DB.getDB().execute(query);
+    } catch (e)
+    {
+    }
     winston.info('Finished creating application schema...');
 
     // process configuration options
