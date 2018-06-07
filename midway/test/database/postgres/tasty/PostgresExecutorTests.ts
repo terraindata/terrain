@@ -133,6 +133,10 @@ test('Postgres: transactions', async (done) =>
     await tasty.getDB().execute([queries, undefined], handle);
     await commit();
   });
+  await expect(tasty.executeTransaction(async (handle, commit, rollback) =>
+  {
+    throw new Error('ABC');
+  })).rejects.toThrow('ABC');
   let poolClient;
   await expect(tasty.executeTransaction(async (handle, commit, rollback) =>
   {
@@ -142,7 +146,7 @@ test('Postgres: transactions', async (done) =>
   })).rejects.toThrow('Transaction was not ended');
   expect(poolClient.release).toThrow('Release called on client which has already been released to the pool.');
   expect(client['transactionClients']).toEqual({});
-  expect(client['nextTransactionIndex']).toBe(transactionIndex + 4);
+  expect(client['nextTransactionIndex']).toBeGreaterThanOrEqual(transactionIndex + 5);
   done();
 });
 
