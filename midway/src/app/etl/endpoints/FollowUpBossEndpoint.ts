@@ -92,7 +92,7 @@ public _write(chunk: any, encoding: string, callback: (err?: Error) => void): vo
 {
     console.log('CHUNK');
     console.dir(chunk, {depth: null});
-    callback(err);
+    callback();
 }
 
 
