@@ -63,6 +63,7 @@ import Autocomplete from 'app/common/components/Autocomplete';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import CheckBox from 'app/common/components/CheckBox';
 import DatePicker from 'app/common/components/DatePicker';
+import { DateUnitMap } from 'app/common/components/DatePicker';
 import Dropdown from 'app/common/components/Dropdown';
 import { units } from 'app/common/components/MapComponent';
 import { RouteSelector, RouteSelectorOption, RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
@@ -744,7 +745,7 @@ function formatTime(rawTime)
       hour = (hourNumber - 12).toString();
     }
   }
-  return hour + ':' + minutes + unit;
+  return hour + ':' + minutes + ' ' + unit;
 }
 
 function formatCalendarDate(date)
@@ -754,51 +755,29 @@ function formatCalendarDate(date)
   const parsedCalendarDate = (parsedDate[0]).split('-');
   const year = parsedCalendarDate[0];
   const monthNumber = parsedCalendarDate[1];
-  const day = parsedCalendarDate[2];
-  let month;
-  switch (monthNumber)
+  const rawDay = parsedCalendarDate[2];
+  const monthDict =
+    {
+      '01': 'January',
+      '02': 'February',
+      '03': 'March',
+      '04': 'April',
+      '05': 'May',
+      '06': 'June',
+      '07': 'July',
+      '08': 'August',
+      '09': 'September',
+      '10': 'October',
+      '11': 'November',
+      '12': 'December',
+    };
+  const month = monthDict[monthNumber];
+  let day = rawDay;
+  if (parseInt(rawDay, 10) < 10)
   {
-    case '01':
-      month = 'January';
-      break;
-    case '02':
-      month = 'February';
-      break;
-    case '03':
-      month = 'March';
-      break;
-    case '04':
-      month = 'April';
-      break;
-    case '05':
-      month = 'May';
-      break;
-    case '06':
-      month = 'June';
-      break;
-    case '07':
-      month = 'July';
-      break;
-    case '08':
-      month = 'August';
-      break;
-    case '09':
-      month = 'September';
-      break;
-    case '10':
-      month = 'October';
-      break;
-    case '11':
-      month = 'November';
-      break;
-    case '12':
-      month = 'December';
-      break;
-    default:
-      month = '';
-      break;
+    day = rawDay.slice(1);
   }
-  return month + ' ' + day + ', ' + year + ' ' + time;
+  return month + ' ' + day + ' ' + year + ', ' + time;
 }
 
 function formatRelativeDate(date)
@@ -808,41 +787,23 @@ function formatRelativeDate(date)
   const rawDay = parsedDate[2];
   const rawTime = parsedDate[3];
   const time = formatTime(rawTime.slice(1));
-  let day;
-  switch (rawDay)
-  {
-    case '0':
-      day = 'Monday';
-      break;
-    case '1':
-      day = 'Tuesday';
-      break;
-    case '2':
-      day = 'Wednesday';
-      break;
-    case '3':
-      day = 'Thursday';
-      break;
-    case '4':
-      day = 'Friday';
-      break;
-    case '5':
-      day = 'Saturday';
-      break;
-    case '6':
-      day = 'Sunday';
-      break;
-    default:
-      day = '';
-      break;
-  }
-  return day + ' ' + oneWeekScope.slice(0, 4) + ' ' + oneWeekScope.slice(4) + ', ' + time;
+  const dayDict =
+    {
+      0: 'Monday',
+      1: 'Tuesday',
+      2: 'Wednesday',
+      3: 'Thursday',
+      4: 'Friday',
+      5: 'Saturday',
+      6: 'Sunday',
+    };
+  const day = dayDict[rawDay];
+  return oneWeekScope.slice(0, 4) + ' ' + day + ', ' + time;
 }
 
 function formatSpecificDate(date)
 {
   let tense;
-  let unit;
   let dateParser;
   let plural;
   const elasticUnit = date.slice(-1);
@@ -859,30 +820,7 @@ function formatSpecificDate(date)
   const parsedDate = date.split(dateParser);
   const dateDetails = parsedDate[1];
   const amount = dateDetails.slice(0, -1);
-  switch (elasticUnit)
-  {
-    case 'm':
-      unit = 'minute';
-      break;
-    case 'h':
-      unit = 'hour';
-      break;
-    case 'd':
-      unit = 'day';
-      break;
-    case 'w':
-      unit = 'week';
-      break;
-    case 'M':
-      unit = 'month';
-      break;
-    case 'y':
-      unit = 'year';
-      break;
-    default:
-      unit = '';
-      break;
-  }
+  const unit = (DateUnitMap[elasticUnit].slice(0, -3)).toLowerCase();
   if (amount !== '1')
   {
     plural = 's';

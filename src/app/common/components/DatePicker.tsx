@@ -127,7 +127,7 @@ const DateTenseArray = [
 ];
 const DateTenseOptions = Immutable.List(DateTenseArray);
 
-const DateUnitMap = {
+export const DateUnitMap = {
   m: 'Minute(s)',
   h: 'Hour(s)',
   d: 'Day(s)',
