@@ -72,7 +72,7 @@ import CardHelpTooltip from './CardHelpTooltip';
 
 const CDA = CardDropArea as any;
 import { BuilderCardsState } from 'builder/data/BuilderCardsState';
-import * as shallowCompare from 'shallow-compare';
+import * as shallowCompare from 'react-addons-shallow-compare';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { borderColor, cardStyle, Colors, fontColor, getStyle } from '../../../colors/Colors';
