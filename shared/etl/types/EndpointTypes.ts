@@ -212,7 +212,6 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
     },
     Fs: {},
     FollowUpBoss: {
-      apiKey: '',
     },
   };
 
@@ -230,7 +229,6 @@ export interface HttpOptions
 
 export interface FollowUpBossOptions
 {
-  apiKey: string;
 }
 
 export interface GoogleAnalyticsOptions
