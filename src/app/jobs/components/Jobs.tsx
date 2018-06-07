@@ -163,7 +163,7 @@ class Jobs extends TerrainComponent<any> {
         const parsedJobLogs = this.parseJobLogContents(jobLogs);
 
         let logLines = Immutable.Map({});
-        parsedJobLogs.map((line) => logLines = logLines.set(line.timestamp, line));
+        parsedJobLogs.map((line, index) => logLines = logLines.set(index, line));
 
         this.setState({
           logsModalOpen: true,
