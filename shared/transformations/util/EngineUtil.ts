@@ -465,7 +465,7 @@ export default class EngineUtil
 
     const ignoreFields: { [k: number]: boolean } = {};
     const docs = EngineUtil.preprocessDocuments(options.documents, engine);
-    engine.getAllFieldIDs().forEach((id) =>
+    engine.getAllFieldIDs().sortBy((id) => engine.getOutputKeyPath(id).size).forEach((id) =>
     {
       if (ignoreFields[id])
       {
@@ -484,13 +484,6 @@ export default class EngineUtil
         if (type === ETLFieldTypes.GeoPoint)
         {
           EngineUtil.castField(engine, id, ETLFieldTypes.GeoPoint);
-          const latField = EngineUtil.addFieldToEngine(engine, ikp.push('lat'), ETLFieldTypes.Number);
-          const longField = EngineUtil.addFieldToEngine(engine, ikp.push('lon'), ETLFieldTypes.Number);
-          engine.setOutputKeyPath(latField, okp.push('lat')); // refactor to use synthetic util?
-          engine.setOutputKeyPath(longField, okp.push('lon'));
-
-          EngineUtil.castField(engine, latField, ETLFieldTypes.Number);
-          EngineUtil.castField(engine, longField, ETLFieldTypes.Number);
         }
         else if (type === ETLFieldTypes.Date)
         {

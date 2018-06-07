@@ -293,6 +293,7 @@ class Login extends TerrainComponent<Props>
                 placeholder=''
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}
+                autoFocus
               />
               <label
                 htmlFor='login-email'

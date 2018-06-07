@@ -52,17 +52,9 @@ export class Metrics
 {
   private metricsTable: Tasty.Table;
 
-  constructor()
+  public initialize_()
   {
-    this.metricsTable = new Tasty.Table(
-      'metrics',
-      ['id'],
-      [
-        'database',
-        'label',
-        'events',
-      ],
-    );
+    this.metricsTable = App.TBLS.metrics;
   }
 
   public async initialize(database: number): Promise<any>

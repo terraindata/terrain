@@ -59,16 +59,9 @@ export class JobLog
 {
   private jobLogTable: Tasty.Table;
 
-  constructor()
+  public initialize()
   {
-    this.jobLogTable = new Tasty.Table(
-      'jobLogs',
-      ['id'],
-      [
-        'contents',
-        'createdAt',
-      ],
-    );
+    this.jobLogTable = App.TBLS.jobLogs;
   }
 
   /*

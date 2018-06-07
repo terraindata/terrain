@@ -95,6 +95,15 @@ export default class TastyTable
     return this.___tastyTableState___.columnNames;
   }
 
+  /**
+   * Returns an unsorted list of all column names
+   * @returns {string[]}
+   */
+  public getColumnNamesUnsorted(): string[]
+  {
+    return this.___tastyTableState___.columnNamesUnsorted;
+  }
+
   public getMapping(): object
   {
     return this.___tastyTableState___.columnMapping;

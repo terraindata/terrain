@@ -72,6 +72,44 @@ export const fileTypeToMime = {
   [FileTypes.Xlsx]: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 };
 
+export function guessFileOptionsHelper(path: string): Partial<FileConfig>
+{
+  if (typeof path !== 'string')
+  {
+    return null;
+  }
+  const parts = path.split('.');
+  if (parts.length !== 0)
+  {
+    const extension = parts[parts.length - 1];
+    const fileType = extensionToFileType[extension];
+    if (fileType === undefined)
+    {
+      return null;
+    }
+    else
+    {
+      return {
+        fileType,
+      };
+    }
+  }
+  else
+  {
+    return null;
+  }
+}
+
+const extensionToFileType: {
+  [k: string]: FileTypes,
+} = {
+    json: FileTypes.Json,
+    csv: FileTypes.Csv,
+    tsv: FileTypes.Tsv,
+    xlsx: FileTypes.Xlsx,
+    xml: FileTypes.Xml,
+  };
+
 export function getFileType(file: File): FileTypes
 {
   const type = mimeToFileType[file.type];

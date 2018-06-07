@@ -52,6 +52,7 @@ import { UserConfig } from '../users/UserConfig';
 import { users } from '../users/UserRouter';
 
 const Router = new KoaRouter();
+export const initialize = () => {};
 
 Router.post('/login', passport.authenticate('local'), async (ctx, next) =>
 {

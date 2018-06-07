@@ -49,6 +49,7 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import * as _ from 'lodash';
 
+import { notificationManager } from 'common/components/InAppNotification';
 import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import TerrainStore from 'src/app/store/TerrainStore';
 import Util from 'util/Util';
@@ -57,6 +58,7 @@ import ETLAjax from 'etl/ETLAjax';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+import { _JobConfig, JobConfig } from 'jobs/JobsTypes';
 import { getMimeType } from 'shared/etl/FileUtil';
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
@@ -137,7 +139,7 @@ class ExecutionHelpers extends ETLHelpers
     });
   }
 
-  public runExecuteJobFactory(template: ETLTemplate): (id: number) => Promise<void>
+  public runExecuteJobFactory(template: ETLTemplate): (id: number) => Promise<number>
   {
     return (jobId: number) =>
     {
@@ -160,7 +162,7 @@ class ExecutionHelpers extends ETLHelpers
           files[key] = (source.options as SourceOptionsType<Sources.Upload>).file;
         }
       });
-      return new Promise<void>((resolve, reject) =>
+      return new Promise<number>((resolve, reject) =>
       {
         this.etlAct({
           actionType: 'runExecuteJob',
@@ -169,7 +171,7 @@ class ExecutionHelpers extends ETLHelpers
           files,
           downloadName,
           mimeType,
-          onLoad: resolve,
+          onLoad: () => resolve(jobId),
           onError: reject,
         });
       });
@@ -253,28 +255,111 @@ class ExecutionHelpers extends ETLHelpers
     }
   }
 
+  // Wait for a job to finish. Returns a promise that resolves when the job is finished or paused
+  public pollOnJob(jobId: number, addNotifications?: boolean): Promise<JobConfig>
+  {
+    const checkJob = async () =>
+    {
+      const jobs = await this.jobsAct({
+        actionType: 'getJob',
+        jobId,
+      });
+      if (jobs == null || jobs.length === 0)
+      {
+        throw new Error('Job could not be found');
+      }
+      return _JobConfig(jobs[0]);
+    };
+
+    const isJobComplete = (job: JobConfig) =>
+    {
+      if (job === undefined)
+      {
+        throw new Error(`Job with ID ${String(jobId)} not found`);
+      }
+      else
+      {
+        return !job.running && job.status !== 'PENDING';
+      }
+    };
+
+    return ETLHelpers.asyncPoll(checkJob, isJobComplete);
+  }
+
   private runTemplate(template: ETLTemplate)
   {
-    const updateUIAfterSuccess = () =>
+    const templateName = (template !== null && template.id === -1) ?
+      'Unsaved Template' :
+      template.templateName;
+
+    const updateUIAfterRunResponse = (jobId: number) =>
     {
-      const templateName = (template !== null && template.id === -1) ?
-        'Unsaved Template' :
-        template.templateName;
-      this.afterRunTemplate(template);
-      this.etlAct({
-        actionType: 'addModal',
-        props: {
-          message: `"${templateName}" finished running`,
-          title: 'Task Complete',
-          cancelButtonText: 'OK',
-          confirm: true,
-          confirmButtonText: 'View Jobs',
-          onConfirm: ETLRouteUtil.gotoJobs,
-        },
-      });
-      this.schemaAct({
-        actionType: 'fetch',
-      });
+      const defaultSink = template.getDefaultSink();
+      if (defaultSink.type === Sinks.Download)
+      {
+        this.afterRunTemplate(template);
+        this.etlAct({
+          actionType: 'addModal',
+          props: {
+            message: `"${templateName}" finished running`,
+            title: 'Task Complete',
+            cancelButtonText: 'OK',
+            confirm: true,
+            confirmButtonText: 'View Jobs',
+            onConfirm: ETLRouteUtil.gotoJobs,
+          },
+        });
+      }
+      else
+      {
+        const modalMessage = `This ${template.isImport() ? 'Import' : 'Export'} is now running with Job ID ${jobId}`;
+        this.etlAct({
+          actionType: 'addModal',
+          props: {
+            message: modalMessage,
+            title: `Job Now Running`,
+            cancelButtonText: 'OK',
+            confirm: true,
+            confirmButtonText: 'View Jobs',
+            onConfirm: ETLRouteUtil.gotoJobs,
+          },
+        });
+        this.pollOnJob(jobId)
+          .then((job: JobConfig) =>
+          {
+            this.afterRunTemplate(template);
+            this.schemaAct({
+              actionType: 'fetch',
+            });
+
+            let message = '';
+            let notificationType = 'info';
+
+            if (job === undefined)
+            {
+              throw new Error('Job is undefined');
+            }
+            else if (job.status === 'PAUSED')
+            {
+              message = `Job ${jobId} Has Been Paused`;
+            }
+            else if (job.status === 'SUCCESS')
+            {
+              message = `Job ${jobId} Has Successfully Finished Running`;
+            }
+            else
+            {
+              notificationType = 'error';
+              message = `Job ${jobId} Had an Error`;
+            }
+            notificationManager.addNotification(message, '', notificationType, 4);
+          })
+          .catch((err) =>
+          {
+            this.afterRunTemplate(template);
+            notificationManager.addNotification(`Error occurred while checking status for job ${jobId}`, '', 'error', 4);
+          });
+      }
     };
     const updateUIAfterError = (ev) =>
     {
@@ -282,7 +367,7 @@ class ExecutionHelpers extends ETLHelpers
       this.etlAct({
         actionType: 'addModal',
         props: {
-          message: `Error while running: ${String(ev)}`,
+          message: `Error while running ${templateName}: ${String(ev)}`,
           title: `Error`,
           error: true,
         },
@@ -290,7 +375,7 @@ class ExecutionHelpers extends ETLHelpers
     };
     this.createExecuteJob(template.templateName)
       .then(this.runExecuteJobFactory(template))
-      .then(updateUIAfterSuccess)
+      .then(updateUIAfterRunResponse)
       .catch(updateUIAfterError);
   }
 }

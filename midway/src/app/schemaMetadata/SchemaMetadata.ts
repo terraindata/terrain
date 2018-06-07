@@ -59,18 +59,9 @@ export class SchemaMetadata
 {
   private schemaMetadataTable: Tasty.Table;
 
-  constructor()
+  public initialize()
   {
-    this.schemaMetadataTable = new Tasty.Table(
-      'schemaMetadata',
-      ['id'],
-      [
-        'columnId',
-        'starred',
-        'count',
-        'countByAlgorithm',
-      ],
-    );
+    this.schemaMetadataTable = App.TBLS.schemaMetadata;
   }
 
   public async select(columns: string[], filter: object): Promise<SchemaMetadataConfig[]>

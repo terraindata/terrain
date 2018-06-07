@@ -56,6 +56,7 @@ import SchemaMetadataConfig from './SchemaMetadataConfig';
 
 const Router = new KoaRouter();
 export const schemaMetadata = new SchemaMetadata();
+export const initialize = () => schemaMetadata.initialize();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {

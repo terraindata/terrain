@@ -136,7 +136,7 @@ class Connections extends TerrainComponent<Props>
   {
     this.xhr = Ajax.req(
       'get',
-      'database',
+      'database/status',
       {},
       (servers: Server[]) =>
       {

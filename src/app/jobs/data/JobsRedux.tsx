@@ -70,12 +70,16 @@ export interface JobActionTypes
   getJobsSuccess: {
     actionType: 'getJobsSuccess';
     jobs: JobConfig[];
+    jobId?: number; // if it's a get for a particular job
   };
   getJobsFailed: {
     actionType: 'getJobsFailed';
     error: string;
   };
-
+  getJob?: {
+    actionType: 'getJob';
+    jobId: number;
+  };
   getJobLogs?: {
     actionType: 'getJobLogs';
     jobId: ID;
@@ -102,10 +106,20 @@ class JobRedux extends TerrainRedux<JobActionTypes, JobsState>
           'id',
           _JobConfig,
         );
+        const jobId = action.payload.jobId;
 
-        return state
-          .set('loading', false)
-          .set('jobs', jobs);
+        if (jobId === undefined)
+        {
+          return state
+            .set('loading', false)
+            .set('jobs', jobs);
+        }
+        else
+        {
+          return state
+            .set('loading', false)
+            .update('jobs', (oldJobs) => oldJobs.set(jobId, jobs.get(jobId)));
+        }
       },
 
       getJobsFailed: (state, action) =>
@@ -137,6 +151,28 @@ class JobRedux extends TerrainRedux<JobActionTypes, JobsState>
       });
   }
 
+  public getJob(action: JobActionType<'getJob'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'getJobsStart',
+    });
+
+    return this.api.getJob(action.jobId)
+      .then((response) =>
+      {
+        const jobs = response.data;
+
+        directDispatch({
+          actionType: 'getJobsSuccess',
+          jobs,
+          jobId: action.jobId,
+        });
+
+        return Promise.resolve(jobs);
+      });
+  }
+
   public getJobLogs(action, dispatch)
   {
     return this.api.getJobLogs(action.jobId)
@@ -152,6 +188,7 @@ class JobRedux extends TerrainRedux<JobActionTypes, JobsState>
   {
     const asyncActions = [
       'getJobs',
+      'getJob',
       'getJobLogs',
     ];
 

@@ -59,12 +59,13 @@ import { Permissions } from '../permissions/Permissions';
 import UserConfig from '../users/UserConfig';
 import { users } from '../users/UserRouter';
 import { getSourceStream } from './SourceSinkStream';
-import TemplateRouter, { templates } from './TemplateRouter';
+import * as TemplateRouter from './TemplateRouter';
 
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
+export const initialize = () => TemplateRouter.initialize();
 
-Router.use('/templates', TemplateRouter.routes(), TemplateRouter.allowedMethods());
+Router.use('/templates', TemplateRouter.default.routes(), TemplateRouter.default.allowedMethods());
 
 interface ETLUIPreviewConfig
 {

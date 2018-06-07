@@ -118,11 +118,6 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
   };
   protected readonly type = TransformationNodeType.SplitNode; // lack of type safety here
 
-  protected isStructuralChange()
-  {
-    return true;
-  }
-
   protected computeInitialState()
   {
     const { isCreate, transformation } = this.props;

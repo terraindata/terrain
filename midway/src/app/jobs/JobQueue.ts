@@ -73,34 +73,13 @@ export class JobQueue
   private runningJobs: Map<number, Job>;
   private runningRunNowJobs: Map<number, Job>;
 
-  constructor()
+  public initialize()
   {
     this.maxConcurrentJobs = 1;
     this.maxConcurrentRunNowJobs = 50; // if we hit this limit something went very, very wrong (which means it'll happen someday)
     this.runningJobs = new Map<number, Job>();
     this.runningRunNowJobs = new Map<number, Job>();
-    this.jobTable = new Tasty.Table(
-      'jobs',
-      ['id'],
-      [
-        'createdAt',
-        'createdBy',
-        'endTime',
-        'logId',
-        'meta',
-        'name',
-        'pausedFilename',
-        'priority',
-        'running',
-        'runNowPriority',
-        'scheduleId',
-        'startTime',
-        'status',
-        'tasks',
-        'type',
-        'workerId',
-      ],
-    );
+    this.jobTable = App.TBLS.jobs;
   }
 
   public cancel(id: number): Promise<JobConfig[]>

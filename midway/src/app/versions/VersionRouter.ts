@@ -52,6 +52,7 @@ export * from './Versions';
 
 const Router = new KoaRouter();
 export const versions: Versions = new Versions();
+export const initialize = () => versions.initialize();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
