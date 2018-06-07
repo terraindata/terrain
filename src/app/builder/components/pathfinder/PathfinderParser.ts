@@ -55,6 +55,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as TerrainLog from 'loglevel';
 import { FieldType } from '../../../../../shared/builder/FieldTypes';
+import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
 import ESInterpreter from '../../../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESJSONType from '../../../../../shared/database/elastic/parser/ESJSONType';
@@ -145,11 +146,8 @@ export function parsePath(path: Path, inputs, nestedPath: boolean = false, index
 
   // Scripts
   const scripts = parseScripts(path.more.scripts);
-  if (Object.keys(scripts).length > 0)
-  {
-    scripts['_annotation'] = indexPath.concat(['more', 'scripts']);
-    queryBody['script_fields'] = scripts;
-  }
+  scripts['_annotation'] = indexPath.concat(['more', 'scripts']);
+  queryBody['script_fields'] = scripts;
 
   // Nested algorithms (groupjoins)
   const groupJoin = parseGroupJoin(path.reference, path.nested, inputs, indexPath.concat('nested'));
@@ -202,7 +200,9 @@ export function parsePath(path: Path, inputs, nestedPath: boolean = false, index
 
     TerrainLog.debug('PathfinderParser found errors: ' + interpreter.getErrors());
   }
-  return { tql: interpreter.query, pathErrorMap: Immutable.fromJS(errorMap) };
+  // TODO: format the query when interpreting.
+  const formatedTql = ESConverter.formatES(new ESJSONParser(interpreter.query));
+  return { tql: formatedTql, pathErrorMap: Immutable.fromJS(errorMap) };
 
   // TODO
   // const moreObj = parseAggregations(path.more);
@@ -473,8 +473,15 @@ function parseFilters(filterGroup: FilterGroup, inputs,
   });
   _.keys(filterLinePathMap).forEach((path, i) =>
   {
-    const group = _FilterGroup({ lines: List(filterLinePathMap[path]), minMatches: filterGroup.minMatches });
-    const boolQuery = parseFilters(group, inputs, indexPath, isSoftGroup, true);
+    const nestLines = [];
+    const nestLineIndexPathes = [];
+    filterLinePathMap[path].map((e: FilterLineMapElement) =>
+    {
+      nestLines.push(e.line);
+      nestLineIndexPathes.push(e.indexPath);
+    });
+    const group = _FilterGroup({ lines: List(nestLines), minMatches: filterGroup.minMatches });
+    const boolQuery = parseFilters(group, inputs, nestLineIndexPathes, isSoftGroup, true);
     // put the boolQuery in the wrapper
     const nestedQuery = {
       nested: {

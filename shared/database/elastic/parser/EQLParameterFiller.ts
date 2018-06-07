@@ -132,10 +132,8 @@ export default class ESParameterFiller
           if (runtimeParam !== undefined && parameterName === runtimeParam)
           {
             finalString = '@' + param;
-            if (monitor !== undefined)
-            {
-              monitor(paramValueInfo, ESParameterType.MetaParent, finalString);
-            }
+            monitor(paramValueInfo, ESParameterType.MetaParent, finalString);
+
             return finalString;
           }
 

@@ -273,11 +273,7 @@ class TQLEditor extends TerrainComponent<Props>
     }
 
     let CM: any;
-    let queryString = this.autoFormatQuery(this.props.tql || '');
-    if (queryString === null)
-    {
-      queryString = this.props.tql || '';
-    }
+    const queryString = this.props.tql || '';
 
     if (this.props.isDiff)
     {
