@@ -79,6 +79,7 @@ export interface InputDeclarationOptionTypes<S = any>
     indexResolver?: (option) => number;
     displayNames?: (state: S) => Immutable.Map<any, string>;
     textColor?: (index: number) => string;
+    wrapperHeight?: string;
   };
   TagsBox: {
     acOptions?: (state: S) => List<string>;
