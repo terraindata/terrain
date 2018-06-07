@@ -59,7 +59,6 @@ import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { ColorsState } from 'app/colors/data/ColorsTypes';
 import FadeInOut from 'app/common/components/FadeInOut';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
-import { tooltip, TooltipProps } from 'app/common/components/tooltip/Tooltips';
 import { BuilderState } from 'builder/data/BuilderState';
 import * as TerrainLog from 'loglevel';
 import withScrolling, { createHorizontalStrength, createVerticalStrength } from 'react-dnd-scrollzone';
