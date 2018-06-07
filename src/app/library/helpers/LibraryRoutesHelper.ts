@@ -99,5 +99,8 @@ export function loadLastRoute(basePath: string)
   // no path given, redirect to last library path
   const lastPath = localStorage.getItem(lastPathKey);
 
-  browserHistory.replace({ pathname: lastPath });
+  if (lastPath != null)
+  {
+    browserHistory.replace({ pathname: lastPath });
+  }
 }

@@ -121,7 +121,7 @@ class Library extends TerrainComponent<any>
       }
     }
 
-    if ((!this.props.match.params || !this.props.match.params.categoryId))
+    if (!this.props.match.params.categoryId)
     {
       loadLastRoute(basePath);
     }
