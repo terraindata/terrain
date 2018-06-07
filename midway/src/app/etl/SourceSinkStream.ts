@@ -72,6 +72,7 @@ import XMLTransform from '../io/streams/XMLTransform';
 import AEndpointStream from './endpoints/AEndpointStream';
 import AlgorithmEndpoint from './endpoints/AlgorithmEndpoint';
 import ElasticEndpoint from './endpoints/ElasticEndpoint';
+import FollowUpBossEndpoint from './endpoints/FollowUpBossEndpoint';
 import FSEndpoint from './endpoints/FSEndpoint';
 import GoogleAnalyticsEndpoint from './endpoints/GoogleAnalyticsEndpoint';
 import HTTPEndpoint from './endpoints/HTTPEndpoint';
@@ -130,7 +131,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
           sourceStream = await endpoint.getSource(source);
           return resolve(sourceStream);
         default:
-          throw new Error('not implemented.');
+          throw new Error('Source type not implemented.');
       }
 
       if (sourceStream === undefined)
@@ -274,8 +275,11 @@ export async function getSinkStream(
         case 'Fs':
           endpoint = new FSEndpoint();
           break;
+        case 'FollowUpBoss':
+          endpoint = new FollowUpBossEndpoint();
+          break;
         default:
-          throw new Error('not implemented.');
+          throw new Error('Sink type not implemented.');
       }
 
       const sinkStream = await endpoint.getSink(sink, engine);
