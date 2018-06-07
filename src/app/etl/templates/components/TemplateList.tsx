@@ -199,11 +199,19 @@ class TemplateList extends TerrainComponent<Props>
       this.props.etlAct({
         actionType: 'createTemplate',
         template: newTemplate.set('id', undefined),
+        onLoad: undefined,
       });
     }
     catch (e)
     {
-
+      this.props.etlAct({
+        actionType: 'addModal',
+        props: {
+          title: 'Error',
+          message: String(e),
+          error: true,
+        },
+      });
     }
   }
 
