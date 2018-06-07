@@ -67,8 +67,9 @@ import TerrainComponent from './../../../common/components/TerrainComponent';
 // const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
 
-const Tab = createReactClass<any, any>({
+const Tab = createReactClass({
   mixins: [PanelMixin],
+  wrapperDiv: null,
 
   propTypes:
     {
@@ -86,7 +87,6 @@ const Tab = createReactClass<any, any>({
       drag_x: true,
       reorderOnDrag: true,
       dragInsideOnly: true,
-      onClick: this.handleClick,
     };
   },
 
@@ -153,7 +153,7 @@ const Tab = createReactClass<any, any>({
         style={{
           zIndex: this.zIndexStyle(),
         }}
-        ref={this.props.name}
+        ref={(div) => this.wrapperDiv = div}
       >
         <div
           className='tab-inner'
@@ -198,6 +198,8 @@ class Tabs extends TerrainComponent<TabsProps> {
     selectorWidth: 0,
   };
 
+  public tabRefs = {};
+
   public cancel = null;
 
   public setSelectedPosition()
@@ -208,12 +210,16 @@ class Tabs extends TerrainComponent<TabsProps> {
     }
     const selected = this.state.tabs.filter((tab) => tab.selected)[0];
     const key = selected.name;
-    const cr = this.refs[key]['refs'][key]['getBoundingClientRect']();
-    const parentCr = this.refs['all-tabs']['getBoundingClientRect']();
-    this.setState({
-      selectorLeft: cr.left - parentCr.left,
-      selectorWidth: cr.width,
-    });
+    if (this.tabRefs[key] !== undefined)
+    {
+      const cr = this.tabRefs[key].wrapperDiv['getBoundingClientRect']();
+      const parentCr = this.refs['all-tabs']['getBoundingClientRect']();
+
+      this.setState({
+        selectorLeft: cr.left - parentCr.left,
+        selectorWidth: cr.width,
+      });
+    }
   }
 
   public componentWillMount()
@@ -246,6 +252,16 @@ class Tabs extends TerrainComponent<TabsProps> {
     }
   }
 
+  public componentDidMount()
+  {
+    this.setSelectedPosition();
+  }
+
+  public componentDidUpdate()
+  {
+    this.setSelectedPosition();
+  }
+
   public computeTabs(config, props)
   {
     const { library } = props;
@@ -276,13 +292,8 @@ class Tabs extends TerrainComponent<TabsProps> {
 
     this.setState({
       tabs,
-    }, () => { this.setSelectedPosition(); });
+    });
   }
-
-  // shouldComponentUpdate(nextProps, nextState)
-  // {
-  //   return !_.isEqual(nextState.tabs, this.state.tabs);
-  // }
 
   public moveTabs(index: number, destination: number)
   {
@@ -399,12 +410,13 @@ class Tabs extends TerrainComponent<TabsProps> {
 
   public render()
   {
+
     const { tabs } = this.state;
 
     const tabsLayout =
       {
         compact: true,
-        columns: tabs ? tabs.slice(-4).map((tab, index) => (
+        columns: tabs ? tabs.map((tab, index) => (
           {
             key: tab.id,
             content:
@@ -415,7 +427,7 @@ class Tabs extends TerrainComponent<TabsProps> {
                 index={index}
                 onClick={this.handleClick}
                 onClose={this.handleClose}
-                ref={tab.name}
+                ref={(tabElement) => { this.tabRefs[tab.name] = tabElement; }}
               />
             ,
           }))
@@ -434,7 +446,7 @@ class Tabs extends TerrainComponent<TabsProps> {
           >
             <div
               className='tabs-inner-wrapper'
-              ref={'all-tabs'}
+              ref='all-tabs'
             >
               <div
                 className='tabs-selected-marker'
