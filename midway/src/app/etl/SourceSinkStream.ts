@@ -194,7 +194,7 @@ export async function getSinkStream(
 
     try
     {
-      if (sink.type !== 'Database')
+      if (sink.type !== 'Database' && sink.type !== 'FollowUpBoss')
       {
         switch (sink.fileConfig.fileType)
         {
@@ -285,13 +285,14 @@ export async function getSinkStream(
       const sinkStream = await endpoint.getSink(sink, engine);
       if (transformStream !== undefined)
       {
-        const writableStream = transformStream.pipe(sinkStream);
+        transformStream.pipe(sinkStream);
         const progressStream = new ProgressStream(transformStream);
         resolve(progressStream);
       }
       else
       {
         const progressStream = new ProgressStream(sinkStream);
+        //sinkStream.on('end', () => console.log('PROGRESS STREAM HAD ENDED'));
         resolve(progressStream);
       }
     }
