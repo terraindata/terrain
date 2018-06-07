@@ -62,6 +62,7 @@ import DatabasePicker from 'etl/common/components/DatabasePicker';
 import FileConfigForm from 'etl/common/components/FileConfigForm';
 import UploadFileButton from 'etl/common/components/UploadFileButton';
 import { GoogleAnalyticsForm } from 'etl/endpoints/GoogleAnalyticsIntegration.tsx';
+import { SftpForm } from 'etl/endpoints/SftpIntegration';
 import AlgorithmSelector from 'library/components/AlgorithmSelector';
 import { LibraryState } from 'library/LibraryTypes';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';

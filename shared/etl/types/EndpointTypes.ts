@@ -46,6 +46,7 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file no-unused-expression
 
 import { FileTypes, Languages } from './ETLTypes';
+import { InputConfig, InputTypes } from './InputTypes';
 import { PostProcessConfig } from './PostProcessTypes';
 
 export interface FileConfig
@@ -215,6 +216,7 @@ export interface SftpOptions
   filepath: string;
   credentialId: number; // get rid of this when integration ui / backend support is created
   meta?: any;
+  inputs?: InputConfig[];
 }
 
 export interface HttpOptions

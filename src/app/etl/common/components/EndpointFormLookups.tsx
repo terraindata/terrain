@@ -56,6 +56,8 @@ import Util from 'util/Util';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 
 import { GoogleAnalyticsForm } from 'etl/endpoints/GoogleAnalyticsIntegration';
+import { SftpForm } from 'etl/endpoints/SftpIntegration';
+
 import
 {
   AlgorithmEndpoint,
@@ -73,7 +75,7 @@ export const SourceFormMap: FormLookupMap<Sources> =
   {
     [Sources.Upload]: UploadEndpoint,
     [Sources.Algorithm]: AlgorithmEndpoint,
-    [Sources.Sftp]: SftpEndpoint,
+    [Sources.Sftp]: SftpForm,
     [Sources.GoogleAnalytics]: GoogleAnalyticsForm,
     [Sources.Http]: HttpEndpointForm,
     [Sources.Fs]: FsEndpoint,
