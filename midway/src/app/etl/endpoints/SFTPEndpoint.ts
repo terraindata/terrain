@@ -49,9 +49,12 @@ import { Readable, Writable } from 'stream';
 
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
+import { Inputs } from '../../../../../shared/util/Inputs';
 import IntegrationConfig from '../../integrations/IntegrationConfig';
 import { integrations } from '../../integrations/IntegrationRouter';
 import AEndpointStream from './AEndpointStream';
+
+export const inputs: Inputs = new Inputs();
 
 export default class SFTPEndpoint extends AEndpointStream
 {
@@ -60,11 +63,11 @@ export default class SFTPEndpoint extends AEndpointStream
     super();
   }
 
-  public async getSource(source: SourceConfig): Promise<Readable>
+  public async getSource(source: SourceConfig): Promise<Readable[]>
   {
     const config: SSH.ConnectConfig = await this.getIntegrationConfig(source.integrationId);
     const sftp: SSH.SFTPWrapper = await this.getSFTPClient(config);
-    return sftp.createReadStream(source.options['filepath']);
+    return this.getSFTPList(source, sftp);
   }
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
@@ -94,6 +97,28 @@ export default class SFTPEndpoint extends AEndpointStream
         });
       }).on('error', reject)
         .connect(sftpConfig);
+    });
+  }
+
+  private async getSFTPList(source: SourceConfig, sftp: SSH.SFTPWrapper): Promise<Readable[]>
+  {
+    return new Promise<Readable[]>(async (resolve, reject) =>
+    {
+      const readStreams: Readable[] = [];
+
+      if (Array.isArray(source.options['inputs']))
+      {
+        const filenames: string[] = inputs.parseFilename(source.options['filename'], source.options['inputs']);
+        filenames.forEach(async (filename) =>
+        {
+          readStreams.push(sftp.createReadStream(filename));
+        });
+      }
+      else
+      {
+        readStreams.push(sftp.createReadStream(source.options['filepath']));
+      }
+      resolve(readStreams);
     });
   }
 }
