@@ -52,17 +52,17 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import Modal from 'common/components/Modal';
 
+import TerrainTools from 'app/util/TerrainTools';
 import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateList';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
-import TerrainTools from 'app/util/TerrainTools';
 
 const UndoIcon = require('images/icon_undo.svg');
 const RedoIcon = require('images/icon_redo.svg');
@@ -213,28 +213,28 @@ class EditorActionsSection extends TerrainComponent<Props>
           })
         }
         {
-          TerrainTools.TEMPLATE_COPY ?
-          tooltip(
-            <CopyToClipboard
-              text={JSON.stringify(this.props.templateEditor.template.toJS())}
-            >
-              {
-                this.renderIcon(<CopyIcon/>, {
-                  key: 'copy',
-                  style: topBarIconStyle,
-                })
-              }
-            </CopyToClipboard>
-          ,
-          'Copy to Clipboard'
-          )
-          : null
+          TerrainTools.isFeatureEnabled(TerrainTools.TEMPLATE_COPY) ?
+            tooltip(
+              <CopyToClipboard
+                text={JSON.stringify(this.props.templateEditor.template.toJS())}
+              >
+                {
+                  this.renderIcon(<CopyIcon />, {
+                    key: 'copy',
+                    style: topBarIconStyle,
+                  })
+                }
+              </CopyToClipboard>
+              ,
+              'Copy Template to Clipboard',
+            )
+            : null
         }
         {
           this.renderIcon(<SaveAsIcon />, {
             key: 'save as',
             onClick: this.handleSaveAsClicked,
-            style: topBarIconStyle,
+            style: [...topBarIconStyle, { top: 2 }],
             tip: 'Save As',
           })
         }

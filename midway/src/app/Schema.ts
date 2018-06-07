@@ -88,7 +88,8 @@ function verifyTableWithConfig(table: Tasty.Table, configClass: object)
   assert.strictEqual(Object.keys(table.getMapping()).sort().toString(), Object.keys(configClass).sort().toString());
 }
 
-const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringTypeName: string, primaryKeyType: string): Tables => {
+const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringTypeName: string, primaryKeyType: string): Tables =>
+{
   const tables = {};
 
   const addTable = (table: Tasty.Table, configObject: object) =>
@@ -134,7 +135,7 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
       undefined,
       {
         id: primaryKeyType + ' PRIMARY KEY',
-        meta:  'text',
+        meta: 'text',
         name: 'text NOT NULL',
         parent: 'integer',
         status: 'text',
@@ -187,7 +188,7 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
       ],
       undefined,
       {
-        id : primaryKeyType + ' PRIMARY KEY',
+        id: primaryKeyType + ' PRIMARY KEY',
         accessToken: 'text NOT NULL',
         email: 'text NOT NULL',
         isDisabled: 'bool NOT NULL DEFAULT false',

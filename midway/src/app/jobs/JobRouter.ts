@@ -59,7 +59,7 @@ import { users } from '../users/UserRouter';
 
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
-export const initialize = () => {};
+export const initialize = () => { };
 
 Router.post('/cancel/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {

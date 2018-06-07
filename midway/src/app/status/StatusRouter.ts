@@ -54,7 +54,7 @@ import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import appStats from '../AppStats';
 
 const Router = new KoaRouter();
-export const initialize = () => {};
+export const initialize = () => { };
 
 /**
  * Simple ping style status check
