@@ -63,7 +63,7 @@ import Autocomplete from 'app/common/components/Autocomplete';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import CheckBox from 'app/common/components/CheckBox';
 import DatePicker from 'app/common/components/DatePicker';
-import { DateUnitMap } from 'app/common/components/DatePicker';
+import DateUtil from 'app/common/components/DateUtil';
 import Dropdown from 'app/common/components/Dropdown';
 import { units } from 'app/common/components/MapComponent';
 import { RouteSelector, RouteSelectorOption, RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
@@ -721,133 +721,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
 }
 
-function formatTime(rawTime)
-{
-  let unit;
-  const parsedTime = rawTime.split(':');
-  let hour = parsedTime[0];
-  const hourNumber = parseInt(hour, 10);
-  const minutes = parsedTime[1];
-  if (hourNumber < 12)
-  {
-    unit = 'am';
-    hour = (hourNumber - 0).toString();
-    if (hourNumber === 0)
-    {
-      hour = '12';
-    }
-  }
-  else
-  {
-    unit = 'pm';
-    if (hourNumber !== 12)
-    {
-      hour = (hourNumber - 12).toString();
-    }
-  }
-  return hour + ':' + minutes + ' ' + unit;
-}
-
-function formatCalendarDate(date)
-{
-  const parsedDate = date.split('T');
-  const time = formatTime(parsedDate[1]);
-  const parsedCalendarDate = (parsedDate[0]).split('-');
-  const year = parsedCalendarDate[0];
-  const monthNumber = parsedCalendarDate[1];
-  const rawDay = parsedCalendarDate[2];
-  const monthDict =
-    {
-      '01': 'January',
-      '02': 'February',
-      '03': 'March',
-      '04': 'April',
-      '05': 'May',
-      '06': 'June',
-      '07': 'July',
-      '08': 'August',
-      '09': 'September',
-      '10': 'October',
-      '11': 'November',
-      '12': 'December',
-    };
-  const month = monthDict[monthNumber];
-  let day = rawDay;
-  if (parseInt(rawDay, 10) < 10)
-  {
-    day = rawDay.slice(1);
-  }
-  return month + ' ' + day + ' ' + year + ', ' + time;
-}
-
-function formatRelativeDate(date)
-{
-  const parsedDate = date.split('.');
-  const oneWeekScope = parsedDate[1];
-  const rawDay = parsedDate[2];
-  const rawTime = parsedDate[3];
-  const time = formatTime(rawTime.slice(1));
-  const dayDict =
-    {
-      0: 'Monday',
-      1: 'Tuesday',
-      2: 'Wednesday',
-      3: 'Thursday',
-      4: 'Friday',
-      5: 'Saturday',
-      6: 'Sunday',
-    };
-  const day = dayDict[rawDay];
-  return oneWeekScope.slice(0, 4) + ' ' + day + ', ' + time;
-}
-
-function formatSpecificDate(date)
-{
-  let tense;
-  let dateParser;
-  let plural;
-  const elasticUnit = date.slice(-1);
-  if (date.includes('+'))
-  {
-    tense = 'from now';
-    dateParser = '+';
-  }
-  else
-  {
-    tense = 'ago';
-    dateParser = '-';
-  }
-  const parsedDate = date.split(dateParser);
-  const dateDetails = parsedDate[1];
-  const amount = dateDetails.slice(0, -1);
-  const unit = (DateUnitMap[elasticUnit].slice(0, -3)).toLowerCase();
-  if (amount !== '1')
-  {
-    plural = 's';
-  }
-  else
-  {
-    plural = '';
-  }
-  return amount + ' ' + unit + plural + ' ' + tense;
-}
-
-function formatDateValue(date)
-{
-  if (date.includes('@TerrainDate'))
-  {
-    return formatRelativeDate(date);
-  }
-  else if (date.includes('Now'))
-  {
-    return formatSpecificDate(date);
-  }
-  else
-  {
-    return formatCalendarDate(date);
-  }
-}
-
 export const COMPARISONS_WITHOUT_VALUES = [
   'exists',
   'notexists',
@@ -866,7 +739,7 @@ export function getCustomValueDisplayName(filterLine: FilterLine, value, setInde
       {
         return '';
       }
-      return (value !== undefined && formatDateValue(value));
+      return (value !== undefined && DateUtil.formatDateValue(value));
     case FieldType.Geopoint:
       value = _DistanceValue(Util.asJS(value));
       return value.distance + ' ' + units[value.units] + ' of ' + value.address;
