@@ -150,6 +150,41 @@ test('Postgres: transactions', async (done) =>
   done();
 });
 
+test('Postgres: transaction locking', async (done) =>
+{
+  const table = new Tasty.Table(
+    'movies',
+    ['movieid'],
+    ['title', 'votecount'],
+  );
+
+  expect(await tasty.executeTransaction(async (handle, commit, rollback) =>
+  {
+    const movies = await tasty.select(table, ['movieid'], { votecount: 541 }, true, false, handle);
+    expect(movies.length).toBe(2);
+    expect(await tasty.select(table, ['movieid'], { votecount: 541 })).toEqual(movies);
+
+    await expect(tasty.executeTransaction(async (handle2, commit2, rollback2) =>
+    {
+      await tasty.select(table, ['movieid'], { movieid: movies[0]['movieid'] }, true, true, handle2);
+    })).rejects.toThrow('could not obtain lock on row in relation "movies"');
+
+    const start = new Date().getTime();
+    setTimeout(commit, 2000);
+
+    await tasty.executeTransaction(async (handle2, commit2, rollback2) =>
+    {
+      await tasty.select(table, ['movieid'], { movieid: movies[0]['movieid'] }, true, false, handle2);
+      await commit2();
+    });
+
+    expect(new Date().getTime() - start).toBeGreaterThan(1900);
+
+    return 3;
+  })).toBe(3);
+  done();
+});
+
 test('Postgres: parameterized', async (done) =>
 {
   expect(

@@ -252,8 +252,8 @@ export class Tasty
     {
       if (live)
       {
-        await this.db.commitTransaction(handle);
         live = false;
+        await this.db.commitTransaction(handle);
       }
       else
       {
@@ -264,8 +264,8 @@ export class Tasty
     {
       if (live)
       {
-        await this.db.rollbackTransaction(handle);
         live = false;
+        await this.db.rollbackTransaction(handle);
       }
       else
       {
@@ -279,7 +279,13 @@ export class Tasty
     }
     catch (error)
     {
-      await rollback();
+      try
+      {
+        await rollback();
+      }
+      catch (e)
+      {
+      }
       throw error;
     }
     if (live)

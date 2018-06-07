@@ -334,18 +334,24 @@ export class Scheduler
     {
       await App.DB.executeTransaction(async (handle, commit, rollback) =>
       {
-        const schedules = await this._select([], { id: scheduleId }, true, true, handle);
-
-        if (schedules.length === 1 && !schedules[0].running && this._shouldScheduleRun(schedules[0]))
+        try
         {
-          try
+          const schedules = await this._select([], { id: scheduleId }, true, true, handle);
+
+          if (schedules.length === 1 && !schedules[0].running && this._shouldScheduleRun(schedules[0]))
           {
-            await this._checkSchedulerTableHelper(scheduleId, handle);
+            try
+            {
+              await this._checkSchedulerTableHelper(scheduleId, handle);
+            }
+            catch (err)
+            {
+              winston.warn(err.toString() as string);
+            }
           }
-          catch (err)
-          {
-            winston.warn(err.toString() as string);
-          }
+        }
+        catch (e)
+        {
         }
 
         await commit();
