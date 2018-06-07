@@ -130,7 +130,7 @@ class PathfinderNestedSection extends TerrainComponent<Props>
     }
     const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested');
     this.props.builderActions.changePath(nestedKeyPath,
-      this.props.nested.push(_Path({ name: undefined, step: 0 })), true);
+      this.props.nested.push(_Path({ name: undefined, step: 0, source: { count: 3 } })), true);
   }
 
   public handleDeleteNested(i)

@@ -195,16 +195,20 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
   public renderTransformChartPreview()
   {
+    const { line } = this.props;
     return (
       <div className='pf-score-line-expand'>
-        <div className='pf-score-line-transform-preview'>
+        <div
+          className='pf-score-line-transform-preview'
+          onClick={this._fn(this.handleExpandedChange, !line.expanded)}
+        >
           <TransformChartPreviewWrapper
-            points={this.props.line.transformData.scorePoints}
-            domain={this.props.line.transformData.domain}
+            points={line.transformData.scorePoints}
+            domain={line.transformData.domain}
             range={List([0, 1])}
             height={25}
             width={33}
-            mode={this.props.line.transformData.mode}
+            mode={line.transformData.mode}
           />
         </div>
       </div>
