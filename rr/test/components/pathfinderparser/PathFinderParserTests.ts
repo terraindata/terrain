@@ -53,12 +53,9 @@ import * as winston from 'winston';
 import * as jsonfile from 'jsonfile';
 
 import * as puppeteer from 'puppeteer';
-import { makePromiseCallback } from '../../../../shared/test/Utils';
 import { getChromeDebugAddress } from '../../../FullstackUtils';
 
 const USERNAME_SELECTOR = '#login-email';
-const PASSWORD_SELECTOR = '#login-password';
-const BUTTON_SELECTOR = '#app > div > div.app-wrapper > div > div.login-container > div.login-submit-button-wrapper > div';
 
 function getExpectedActionFile(): string
 {
@@ -108,12 +105,12 @@ describe('Testing the pathfinder parser', () =>
         continue;
       }
       const query = actions[i].query;
-      const newTql = await page.evaluate((theQuery) =>
+      const { tql, pathErrorMap } = await page.evaluate((theQuery) =>
       {
         return window['TerrainTools'].terrainTests.PathFinderToQuery(theQuery);
       }, query);
       winston.info('Parsing item' + String(i) + ':' + JSON.stringify(actions[i]));
-      expect(newTql).toBe(query.tql);
+      expect(tql).toBe(query.tql);
     }
   }, 30000);
 

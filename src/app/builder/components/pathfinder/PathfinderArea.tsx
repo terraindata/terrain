@@ -60,6 +60,7 @@ import { ColorsState } from 'app/colors/data/ColorsTypes';
 import FadeInOut from 'app/common/components/FadeInOut';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import { BuilderState } from 'builder/data/BuilderState';
+import * as TerrainLog from 'loglevel';
 import withScrolling, { createHorizontalStrength, createVerticalStrength } from 'react-dnd-scrollzone';
 import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
@@ -106,7 +107,8 @@ class PathfinderArea extends TerrainComponent<Props>
       pathfinderContext.schemaState !== nextProps.schema ||
       pathfinderContext.builderState.db !== nextProps.builder.db ||
       pathfinderContext.parentSource !== nextProps.parentSource ||
-      pathfinderContext.parentName !== nextProps.parentName
+      pathfinderContext.parentName !== nextProps.parentName ||
+      pathfinderContext.pathErrorMap !== nextProps.builder.query.pathErrorMap as any
     )
     {
       this.setState({
@@ -126,6 +128,7 @@ class PathfinderArea extends TerrainComponent<Props>
       builderState: props.builder,
       parentSource: props.parentSource,
       parentName: props.parentName,
+      pathErrorMap: props.builder.query.pathErrorMap,
     };
   }
 
@@ -249,7 +252,14 @@ class PathfinderArea extends TerrainComponent<Props>
   {
     const { path, toSkip } = this.props;
     const keyPath = this.getKeyPath();
+    const keyPathString = JSON.stringify(keyPath);
+
     const { pathfinderContext } = this.state;
+    const errors = pathfinderContext.pathErrorMap.get(keyPathString);
+    if (errors)
+    {
+      TerrainLog.debug('Path ' + keyPathString + ' has Errors: ' + JSON.stringify(errors));
+    }
     return (
       <ScrollingComponent
         className='pf-area'

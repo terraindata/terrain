@@ -69,6 +69,7 @@ import { RouteSelector, RouteSelectorOption, RouteSelectorOptionSet } from 'app/
 import MapUtil from 'app/util/MapUtil';
 import Util from 'app/util/Util';
 import ElasticBlockHelpers from 'database/elastic/blocks/ElasticBlockHelpers';
+import * as TerrainLog from 'loglevel';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
 import
@@ -162,7 +163,14 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   public render()
   {
     const { filterLine, canEdit, pathfinderContext } = this.props;
-    const { source } = pathfinderContext;
+    const { source, pathErrorMap } = pathfinderContext;
+
+    const errorKey = JSON.stringify(this.props.keyPath);
+    if (pathErrorMap.get(errorKey))
+    {
+      TerrainLog.debug('PathFilterLine: ' + JSON.stringify(this.props.keyPath) + ' has errors: ' + pathErrorMap.get(errorKey);
+    }
+
     return (
       <div
         className={classNames({
