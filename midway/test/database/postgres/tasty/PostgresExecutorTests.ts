@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as winston from 'winston';
 
+import PostgreSQLClient from '../../../../src/database/pg/client/PostgreSQLClient';
 import PostgresConfig from '../../../../src/database/pg/PostgreSQLConfig';
 import PostgresController from '../../../../src/database/pg/PostgreSQLController';
 
@@ -114,29 +115,34 @@ for (let i = 0; i < tests.length; i++)
 
 test('Postgres: transactions', async (done) =>
 {
-  try
+  const queries = ['SELECT * \n  FROM movies\n  LIMIT 10;'];
+  const client: PostgreSQLClient = tasty.getDB()['client'];
+  const transactionIndex = client['nextTransactionIndex'];
+  await tasty.executeTransaction(async (handle, commit, rollback) =>
   {
-    const queries = ['SELECT * \n  FROM movies\n  LIMIT 10;'];
-    await tasty.executeTransaction(async (handle, commit, rollback) =>
-    {
-      await tasty.getDB().execute([queries, undefined], handle);
-      await commit();
-    }, IsolationLevel.REPEATABLE_READ, true);
-    await tasty.executeTransaction(async (handle, commit, rollback) =>
-    {
-      await tasty.getDB().execute([queries, undefined], handle);
-      await rollback();
-    }, IsolationLevel.SERIALIZABLE);
-    await tasty.executeTransaction(async (handle, commit, rollback) =>
-    {
-      await tasty.getDB().execute([queries, undefined], handle);
-      await commit();
-    });
-  }
-  catch (e)
+    await tasty.getDB().execute([queries, undefined], handle);
+    await commit();
+  }, IsolationLevel.REPEATABLE_READ, true);
+  await tasty.executeTransaction(async (handle, commit, rollback) =>
   {
-    fail(e);
-  }
+    await tasty.getDB().execute([queries, undefined], handle);
+    await rollback();
+  }, IsolationLevel.SERIALIZABLE);
+  await tasty.executeTransaction(async (handle, commit, rollback) =>
+  {
+    await tasty.getDB().execute([queries, undefined], handle);
+    await commit();
+  });
+  let poolClient;
+  await expect(tasty.executeTransaction(async (handle, commit, rollback) =>
+  {
+    expect((await tasty.getDB().execute([queries, undefined], handle)).length).toBe(10);
+    expect(client['transactionClients'][handle]).toBeTruthy();
+    poolClient = client['transactionClients'][handle];
+  })).rejects.toThrow('Transaction was not ended');
+  expect(poolClient.release).toThrow('Release called on client which has already been released to the pool.');
+  expect(client['transactionClients']).toEqual({});
+  expect(client['nextTransactionIndex']).toBe(transactionIndex + 4);
   done();
 });
 
