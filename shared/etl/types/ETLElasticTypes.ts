@@ -67,6 +67,15 @@ export enum ElasticTypes
   GeoPoint = 'geo_point',
 }
 
+export const ElasticAnalyzers =
+  {
+    standard: 0,
+    simple: 1,
+    whitespace: 2,
+    stop: 3,
+    keyword: 4,
+  };
+
 // field props for each transformation engine field
 export interface ElasticFieldProps
 {
