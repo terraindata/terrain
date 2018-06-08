@@ -189,6 +189,11 @@ class PathfinderNestedSection extends TerrainComponent<Props>
       this.state.childNames[childName] < 2;
   }
 
+  public isValidParentName(parentName)
+  {
+    return parentName.indexOf('-') === -1 && parentName.indexOf(' ') === -1;
+  }
+
   public getChildNames(props)
   {
     const childNames = {};
@@ -251,6 +256,8 @@ class PathfinderNestedSection extends TerrainComponent<Props>
                         forceFloat={true}
                         noBorder={false}
                         showEllipsis={true}
+                        showWarning={!this.isValidParentName(reference)}
+                        warningText={'Parent alias cannot contain dashes or spaces'}
                       />,
                       PathfinderText.referenceExplanation,
                     )
