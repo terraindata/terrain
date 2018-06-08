@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 // string values for this enum are how elastic expects them
@@ -68,13 +69,13 @@ export enum ElasticTypes
 }
 
 export const ElasticAnalyzers =
-  {
-    standard: 0,
-    simple: 1,
-    whitespace: 2,
-    stop: 3,
-    keyword: 4,
-  };
+  List([
+    'standard',
+    'simple',
+    'whitespace',
+    'stop',
+    'keyword',
+  ]);
 
 // field props for each transformation engine field
 export interface ElasticFieldProps

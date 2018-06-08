@@ -165,12 +165,12 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
   @instanceFnDecorator(memoizeOne)
   public getAnalyzerOptions()
   {
-    return List(Object.keys(ElasticAnalyzers));
+    return ElasticAnalyzers;
   }
 
   public resolveAnalyzerIndex(option)
   {
-    return ElasticAnalyzers[option];
+    return ElasticAnalyzers.indexOf(option);
   }
 
   public componentDidMount()
