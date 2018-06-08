@@ -273,6 +273,10 @@ export class App
       await DB.getDB().execute(query);
     } catch (e)
     {
+      if (e.message !== 'relation "unique_item_names" already exists')
+      {
+        throw e;
+      }
     }
     winston.info('Finished creating application schema...');
 
