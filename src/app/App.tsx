@@ -381,7 +381,7 @@ class App extends TerrainComponent<Props>
     });
   }
 
-  public componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (this.props.auth !== nextProps.auth)
     {
@@ -397,6 +397,15 @@ class App extends TerrainComponent<Props>
       if (token !== null)
       {
         this.fetchData();
+      }
+    }
+    
+    if (this.props.location.pathname !== nextProps.location.pathname)
+    {
+      console.log('p');
+      if (window['dataLayer'] !== undefined)
+      {
+        window['dataLayer'].push({event: 'pageview'});
       }
     }
   }
