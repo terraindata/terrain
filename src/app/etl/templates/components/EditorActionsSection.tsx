@@ -62,7 +62,7 @@ import TerrainTools from 'app/util/TerrainTools';
 import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateList';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
 
 const UndoIcon = require('images/icon_undo.svg');
 const RedoIcon = require('images/icon_redo.svg');
@@ -216,7 +216,7 @@ class EditorActionsSection extends TerrainComponent<Props>
           TerrainTools.isFeatureEnabled(TerrainTools.TEMPLATE_COPY) ?
             tooltip(
               <CopyToClipboard
-                text={JSON.stringify(this.props.templateEditor.template.toJS())}
+                text={JSON.stringify(templateForBackend(this.props.templateEditor.template))}
               >
                 {
                   this.renderIcon(<CopyIcon />, {
