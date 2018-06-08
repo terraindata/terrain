@@ -62,6 +62,10 @@ export default class FSEndpoint extends AEndpointStream
   {
     const config = await this.getIntegrationConfig(source.integrationId);
     // TODO: sanitize path here to allow reading only from whitelisted locations
+    if (!fs.existsSync(config['path']))
+    {
+      throw new Error(`The file path ${config['path']} does not exist`);
+    }
     return fs.createReadStream(config['path']);
   }
 
