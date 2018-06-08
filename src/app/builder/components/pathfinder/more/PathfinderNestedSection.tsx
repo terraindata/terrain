@@ -191,7 +191,7 @@ class PathfinderNestedSection extends TerrainComponent<Props>
 
   public isValidParentName(parentName)
   {
-    return parentName.indexOf('-') === -1 && parentName.indexOf(' ') === -1;
+    return !/[\@\-\s]/g.test(parentName);
   }
 
   public getChildNames(props)
