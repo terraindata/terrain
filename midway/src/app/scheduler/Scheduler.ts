@@ -164,7 +164,7 @@ export class Scheduler
 
     await App.DB.executeTransaction(async (handle, commit, rollback) =>
     {
-      await this._select([], { id }, true, false, handle);
+      await this._select([], { id }, true, false, false, handle);
 
       result = await this.runSchedule(id, handle, true);
 
@@ -334,24 +334,18 @@ export class Scheduler
     {
       await App.DB.executeTransaction(async (handle, commit, rollback) =>
       {
-        try
-        {
-          const schedules = await this._select([], { id: scheduleId }, true, true, handle);
+        const schedules = await this._select([], { id: scheduleId }, true, false, true, handle);
 
-          if (schedules.length === 1 && !schedules[0].running && this._shouldScheduleRun(schedules[0]))
-          {
-            try
-            {
-              await this._checkSchedulerTableHelper(scheduleId, handle);
-            }
-            catch (err)
-            {
-              winston.warn(err.toString() as string);
-            }
-          }
-        }
-        catch (e)
+        if (schedules.length === 1 && !schedules[0].running && this._shouldScheduleRun(schedules[0]))
         {
+          try
+          {
+            await this._checkSchedulerTableHelper(scheduleId, handle);
+          }
+          catch (err)
+          {
+            winston.warn(err.toString() as string);
+          }
         }
 
         await commit();
@@ -423,11 +417,11 @@ export class Scheduler
   }
 
   private async _select(columns: string[], filter: object,
-    forUpdate?: boolean, noWait?: boolean, handle?: TransactionHandle): Promise<SchedulerConfig[]>
+    forUpdate?: boolean, noWait?: boolean, skipLocked?: boolean, handle?: TransactionHandle): Promise<SchedulerConfig[]>
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
-      const rawResults: object[] = await App.DB.select(this.schedulerTable, columns, filter, forUpdate, noWait, handle);
+      const rawResults: object[] = await App.DB.select(this.schedulerTable, columns, filter, forUpdate, noWait, skipLocked, handle);
 
       const results: SchedulerConfig[] = rawResults.map((result: object) => new SchedulerConfig(result as SchedulerConfig));
       resolve(results);

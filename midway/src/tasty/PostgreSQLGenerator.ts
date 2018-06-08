@@ -249,6 +249,12 @@ export default class SQLGenerator
       this.queryString += 'NOWAIT';
     }
 
+    if (query.isSkipLocked)
+    {
+      this.newLine();
+      this.queryString += 'SKIP LOCKED';
+    }
+
     this.accumulateStatement(this.queryString, this.values);
   }
 

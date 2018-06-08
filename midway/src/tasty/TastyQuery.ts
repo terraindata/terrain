@@ -63,6 +63,7 @@ export class TastyQuery
   public numSkipped: number;
   public isForUpdate: boolean;
   public isNoWait: boolean;
+  public isSkipLocked: boolean;
 
   constructor(table: TastyTable)
   {
@@ -77,6 +78,7 @@ export class TastyQuery
     this.numSkipped = 0;
     this.isForUpdate = false;
     this.isNoWait = false;
+    this.isSkipLocked = false;
 
     this.command = new TastyNode('select', null);
   }
@@ -188,6 +190,12 @@ export class TastyQuery
   public noWait(): TastyQuery
   {
     this.isNoWait = true;
+    return this;
+  }
+
+  public skipLocked(): TastyQuery
+  {
+    this.isSkipLocked = true;
     return this;
   }
 

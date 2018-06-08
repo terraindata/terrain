@@ -136,7 +136,7 @@ export class Tasty
    * @memberOf TastyInterface
    */
   public async select(table: TastyTable, columns?: string[], filter?: object,
-    forUpdate?: boolean, noWait?: boolean, handle?: TransactionHandle): Promise<object[]>
+    forUpdate?: boolean, noWait?: boolean, skipLocked?: boolean, handle?: TransactionHandle): Promise<object[]>
   {
     const query: TastyQuery = new TastyQuery(table);
     if (columns === undefined || columns.length === 0)
@@ -161,6 +161,11 @@ export class Tasty
     if (noWait === true)
     {
       query.noWait();
+    }
+
+    if (skipLocked)
+    {
+      query.skipLocked();
     }
 
     return this.execute(query, handle);
