@@ -54,6 +54,8 @@ import * as React from 'react';
 import Util from 'util/Util';
 
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'app/colors/Colors';
+import Button from 'app/common/components/Button';
+import FloatingInput from 'app/common/components/FloatingInput';
 import TerrainTools from 'app/util/TerrainTools';
 import { notificationManager } from 'common/components/InAppNotification';
 import { Menu, MenuOption } from 'common/components/Menu';
@@ -64,11 +66,10 @@ import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import Initializers from 'etl/helpers/TemplateInitializers';
-import { MidwayError } from 'shared/error/MidwayError';
-import { instanceFnDecorator } from 'shared/util/Classes';
-
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { MidwayError } from 'shared/error/MidwayError';
+import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { instanceFnDecorator } from 'shared/util/Classes';
 import './TemplateList.less';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
@@ -93,6 +94,12 @@ export interface Props
 
 class TemplateList extends TerrainComponent<Props>
 {
+  public state: {
+    rawTemplate: string,
+  } = {
+      rawTemplate: '',
+    };
+
   public displayConfig: HeaderConfig<ETLTemplate> = [
     {
       name: 'ID',
@@ -183,6 +190,31 @@ class TemplateList extends TerrainComponent<Props>
     );
   }
 
+  public handleCreateTemplate()
+  {
+    try
+    {
+      const templateConfig = JSON.parse(this.state.rawTemplate);
+      const newTemplate = _ETLTemplate(templateConfig, true);
+      this.props.etlAct({
+        actionType: 'createTemplate',
+        template: newTemplate.set('id', undefined),
+        onLoad: undefined,
+      });
+    }
+    catch (e)
+    {
+      this.props.etlAct({
+        actionType: 'addModal',
+        props: {
+          title: 'Error',
+          message: String(e),
+          error: true,
+        },
+      });
+    }
+  }
+
   public render()
   {
     const computeOptions = this.computeMenuOptionsFactory(this.props.allowedActions);
@@ -200,6 +232,26 @@ class TemplateList extends TerrainComponent<Props>
           canCreate={TerrainTools.isAdmin()}
           onCreate={() => ETLRouteUtil.gotoWalkthroughStep(0)}
         />
+        {
+          TerrainTools.isFeatureEnabled(TerrainTools.TEMPLATE_COPY) ?
+            <div
+              className='template-list-raw-input'
+            >
+              <FloatingInput
+                label={'Paste Raw Template Here'}
+                value={this.state.rawTemplate}
+                onChange={this._setStateWrapper('rawTemplate')}
+                isTextInput={true}
+                canEdit={true}
+                forceFloat={true}
+              />
+              <Button
+                text={'Create'}
+                onClick={this.handleCreateTemplate}
+              />
+            </div>
+            : null
+        }
       </div>
     );
   }

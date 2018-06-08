@@ -59,7 +59,7 @@ import { deleteElasticIndex, getSchema, getTable } from '../Schema';
 
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
-export const initialize = () => {};
+export const initialize = () => { };
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
