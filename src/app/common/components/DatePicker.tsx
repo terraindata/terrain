@@ -157,7 +157,7 @@ export interface Props
 
 let COLORS_ACTIONS_SET = false;
 
-class DatePicker extends TerrainComponent<Props>
+export class DatePickerUncontained extends TerrainComponent<Props>
 {
   public state = {
     dateViewType: 'calendar',
@@ -173,6 +173,16 @@ class DatePicker extends TerrainComponent<Props>
         dateViewType: currentDateViewType,
       },
     );
+    if (this.props.date === 'specific')
+    {
+      this.setState(
+        {
+          sign: this.updateElasticState(this.props.date)[0],
+          unit: this.updateElasticState(this.props.date)[1],
+          amount: this.updateElasticState(this.props.date)[2],
+        },
+      );
+    }
     if (!COLORS_ACTIONS_SET)
     {
       COLORS_ACTIONS_SET = true;
@@ -259,6 +269,14 @@ class DatePicker extends TerrainComponent<Props>
     }
   }
 
+  public updateElasticState(nextDate)
+  {
+    const nextSign = nextDate[3];
+    const nextUnit = nextDate.slice(-1);
+    const nextAmount = parseInt(nextDate.slice(4, -1), 10);
+    return [nextSign, nextUnit, nextAmount];
+  }
+
   public componentWillReceiveProps(nextProps)
   {
     let nextDateViewType;
@@ -271,6 +289,16 @@ class DatePicker extends TerrainComponent<Props>
       this.setState(
         {
           dateViewType: nextDateViewType,
+        },
+      );
+    }
+    if (nextDateViewType === 'specific')
+    {
+      this.setState(
+        {
+          sign: this.updateElasticState(nextProps.date)[0],
+          unit: this.updateElasticState(nextProps.date)[1],
+          amount: this.updateElasticState(nextProps.date)[2],
         },
       );
     }
@@ -362,32 +390,17 @@ class DatePicker extends TerrainComponent<Props>
   public handleTenseChange(tenseIndex)
   {
     const sign = DateTenseArray[tenseIndex];
-    this.setState(
-      {
-        sign,
-      },
-    );
     this.props.onChange(this.formatElasticQuery(sign, this.state.unit, this.state.amount));
   }
 
   public handleUnitChange(unitIndex)
   {
     const unit = DateUnitArray[unitIndex];
-    this.setState(
-      {
-        unit,
-      },
-    );
     this.props.onChange(this.formatElasticQuery(this.state.sign, unit, this.state.amount));
   }
 
   public handleAmountChange(e)
   {
-    this.setState(
-      {
-        amount: e.target.value,
-      },
-    );
     this.props.onChange(this.formatElasticQuery(this.state.sign, this.state.unit, e.target.value));
   }
 
@@ -546,10 +559,11 @@ class DatePicker extends TerrainComponent<Props>
   }
 }
 
-export default Util.createContainer(
-  DatePicker,
+const DatePicker = Util.createContainer(
+  DatePickerUncontained,
   [],
   {
     colorsActions: ColorsActions,
   },
 );
+export default DatePicker;
