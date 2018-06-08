@@ -175,11 +175,12 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     );
     if (this.props.date === 'specific')
     {
+      const updatedState = this.updateElasticState(this.props.date);
       this.setState(
         {
-          sign: this.updateElasticState(this.props.date)[0],
-          unit: this.updateElasticState(this.props.date)[1],
-          amount: this.updateElasticState(this.props.date)[2],
+          sign: updatedState[0];
+          unit: updatedState[1],
+          amount: updatedState[2],
         },
       );
     }
@@ -271,10 +272,37 @@ export class DatePickerUncontained extends TerrainComponent<Props>
 
   public updateElasticState(nextDate)
   {
+    let newSign;
+    let newUnit;
+    let newAmount;
     const nextSign = nextDate[3];
+    if (nextSign === '+' || nextSign === '-')
+    {
+      newSign = nextSign;
+    }
+    else
+    {
+      newSign = '-';
+    }
     const nextUnit = nextDate.slice(-1);
+    if (DateUnitArray.includes(nextUnit))
+    {
+      newUnit = nextUnit;
+    }
+    else
+    {
+      newUnit = 'M';
+    }
     const nextAmount = parseInt(nextDate.slice(4, -1), 10);
-    return [nextSign, nextUnit, nextAmount];
+    if (nextAmount >= 0)
+    {
+      newAmount = nextAmount;
+    }
+    else
+    {
+      newAmount = 0;
+    }
+    return [newSign, newUnit, newAmount];
   }
 
   public componentWillReceiveProps(nextProps)
@@ -294,11 +322,12 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     }
     if (nextDateViewType === 'specific')
     {
+      const updatedState = this.updateElasticState(nextProps.date);
       this.setState(
         {
-          sign: this.updateElasticState(nextProps.date)[0],
-          unit: this.updateElasticState(nextProps.date)[1],
-          amount: this.updateElasticState(nextProps.date)[2],
+          sign: updatedState[0],
+          unit: updatedState[1],
+          amount: updatedState[2],
         },
       );
     }
