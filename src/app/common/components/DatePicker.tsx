@@ -275,7 +275,8 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     let newSign;
     let newUnit;
     let newAmount;
-    const nextSign = nextDate[3];
+    const newDate = nextDate.replace(/ /g, '');
+    const nextSign = newDate[3];
     if (nextSign === '+' || nextSign === '-')
     {
       newSign = nextSign;
@@ -284,7 +285,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     {
       newSign = '-';
     }
-    const nextUnit = nextDate.slice(-1);
+    const nextUnit = newDate.slice(-1);
     if (DateUnitArray.includes(nextUnit))
     {
       newUnit = nextUnit;
@@ -293,7 +294,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     {
       newUnit = 'M';
     }
-    const nextAmount = parseInt(nextDate.slice(4, -1), 10);
+    const nextAmount = parseInt(newDate.slice(4, -1), 10);
     if (nextAmount >= 0)
     {
       newAmount = nextAmount;
@@ -340,7 +341,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     {
       dateViewType = 'relative';
     }
-    else if (dateProp.startsWith('Now'))
+    else if ((dateProp.startsWith('Now')) || (dateProp.startsWith('now')))
     {
       dateViewType = 'specific';
     }

@@ -115,7 +115,7 @@ describe('DatePicker', () =>
 
     it('should render specific elastic type divs and info', () =>
     {
-      datePickerComponent.setProps({ date: 'Now+24w' });
+      datePickerComponent.setProps({ date: 'now+24w' });
       expect(datePickerComponent.find('.date-view-title')).toHaveLength(1);
       expect(datePickerComponent.find('.date-view-label')).toHaveLength(3);
       expect(datePickerComponent.find('.unselected-date-type')).toHaveLength(2);
@@ -126,7 +126,7 @@ describe('DatePicker', () =>
       expect(datePickerComponent.state()['amount']).toEqual(24);
       expect(datePickerComponent.find(Dropdown)).toHaveLength(2);
 
-      datePickerComponent.setProps({ date: 'Now-1M' });
+      datePickerComponent.setProps({ date: 'Now - 1M' });
       expect(datePickerComponent.find('.date-view-title')).toHaveLength(1);
       expect(datePickerComponent.find('.date-view-label')).toHaveLength(3);
       expect(datePickerComponent.find('.unselected-date-type')).toHaveLength(2);
@@ -137,7 +137,7 @@ describe('DatePicker', () =>
       expect(datePickerComponent.state()['amount']).toEqual(1);
       expect(datePickerComponent.find(Dropdown)).toHaveLength(2);
 
-      datePickerComponent.setProps({ date: 'Now+21342y' });
+      datePickerComponent.setProps({ date: 'now +21342y' });
       expect(datePickerComponent.find('.date-view-title')).toHaveLength(1);
       expect(datePickerComponent.find('.date-view-label')).toHaveLength(3);
       expect(datePickerComponent.find('.unselected-date-type')).toHaveLength(2);
@@ -148,7 +148,7 @@ describe('DatePicker', () =>
       expect(datePickerComponent.state()['amount']).toEqual(21342);
       expect(datePickerComponent.find(Dropdown)).toHaveLength(2);
 
-      datePickerComponent.setProps({ date: 'Now-0m' });
+      datePickerComponent.setProps({ date: 'Now- 0m' });
       expect(datePickerComponent.find('.date-view-title')).toHaveLength(1);
       expect(datePickerComponent.find('.date-view-label')).toHaveLength(3);
       expect(datePickerComponent.find('.unselected-date-type')).toHaveLength(2);
