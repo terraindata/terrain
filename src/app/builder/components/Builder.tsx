@@ -185,8 +185,7 @@ class Builder extends TerrainComponent<Props>
     this.initialColSizes = colSizes;
   }
 
-  public unregisterLeaveHook1: any = () => undefined;
-  public unregisterLeaveHook2: any = () => undefined;
+  public unregisterLeaveHook: any = () => undefined;
 
   public shouldComponentUpdate(nextProps: Props, nextState)
   {
@@ -234,13 +233,12 @@ class Builder extends TerrainComponent<Props>
       }
     };
 
-    this.unregisterLeaveHook1 = this.browserHistory.block(this.routerWillLeave as any);
+    this.unregisterLeaveHook = this.browserHistory.block(this.routerWillLeave as any);
   }
 
   public componentWillUnmount()
   {
-    this.unregisterLeaveHook1();
-    this.unregisterLeaveHook2();
+    this.unregisterLeaveHook();
     window.onbeforeunload = null;
   }
 
@@ -313,7 +311,7 @@ class Builder extends TerrainComponent<Props>
       this.confirmedLeave = false;
       if (!nextProps.location.search || !new URLSearchParams(nextProps.location.search).get('o'))
       {
-        this.unregisterLeaveHook2 = this.browserHistory.block(this.routerWillLeave as any);
+        this.unregisterLeaveHook = this.unregisterLeaveHook || this.browserHistory.block(this.routerWillLeave as any);
       }
       this.checkConfig(nextProps);
     }
