@@ -77,7 +77,6 @@ import Modal from '../../../common/components/Modal';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import MapUtil from '../../../util/MapUtil';
-
 import Hit from '../results/Hit';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
@@ -733,8 +732,9 @@ class HitsArea extends TerrainComponent<Props>
     }
     else if (resultsState.hits)
     {
-      const { count } = resultsState;
+      const { count, estimatedTotal } = resultsState;
       text = `${count || 'No'}${count === MAX_HITS ? '+' : ''} hit${count === 1 ? '' : 's'}`;
+      text += ` (Estimated Total: ${estimatedTotal})`;
     }
     else
     {
