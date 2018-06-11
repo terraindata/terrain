@@ -42,47 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+import { DragDropContext } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 
-// tslint:disable:no-var-requires
-
-import * as React from 'react';
-import TerrainComponent from './../../common/components/TerrainComponent';
-const HTML5Backend = require('react-dnd-html5-backend');
-import TerrainDndContext from 'common/components/TerrainDndContext';
-
-import SchemaView from './SchemaView';
-
-export interface Props
-{
-  params?: any;
-  location?: {
-    pathname: string;
-  };
-}
-
-class SchemaPage extends TerrainComponent<Props>
-{
-  public state: {
-    on: boolean;
-    name?: string;
-  } = {
-      on: false,
-    };
-
-  public render()
-  {
-    return (
-      <SchemaView
-        fullPage={true}
-        showSearch={true}
-        showResults={true}
-      />
-    );
-  }
-}
-
-// ReactRouter does not like the output of DragDropContext, hence the `any` cast
-const SchemaExport = TerrainDndContext(SchemaPage) as any;
-
-export default SchemaExport;
+export default DragDropContext(HTML5Backend);

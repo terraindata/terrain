@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2018 Terrain Data, Inc.
 export default function() {
   return {
     replace: jest.fn(),

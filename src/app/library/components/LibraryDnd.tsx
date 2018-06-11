@@ -43,12 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import { DragDropContext } from 'react-dnd';
+import TerrainDndContext from 'common/components/TerrainDndContext';
 import Library from '../containers/LibraryContainer';
 
 import HTML5Backend = require('react-dnd-html5-backend');
 
 // ReactRouter does not like the output of DragDropContext, hence the `any` cast
-const ExportLibrary = DragDropContext(HTML5Backend)(Library) as any;
+const ExportLibrary = TerrainDndContext(Library) as any;
 
 export default ExportLibrary;

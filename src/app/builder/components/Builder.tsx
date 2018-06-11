@@ -48,10 +48,10 @@ THE SOFTWARE.
 
 // Libraries
 import * as classNames from 'classnames';
+import TerrainDndContext from 'common/components/TerrainDndContext';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { DragDropContext } from 'react-dnd';
 const HTML5Backend = require('react-dnd-html5-backend');
 import { withRouter } from 'react-router';
 
@@ -995,4 +995,4 @@ const BuilderContainer = Util.createTypedContainer(
     builderActions: BuilderActions,
   },
 );
-export default DragDropContext(HTML5Backend)(BuilderContainer) as any;
+export default TerrainDndContext(BuilderContainer) as any;
