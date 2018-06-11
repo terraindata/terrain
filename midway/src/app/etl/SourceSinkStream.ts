@@ -75,6 +75,7 @@ import ElasticEndpoint from './endpoints/ElasticEndpoint';
 import FSEndpoint from './endpoints/FSEndpoint';
 import GoogleAnalyticsEndpoint from './endpoints/GoogleAnalyticsEndpoint';
 import HTTPEndpoint from './endpoints/HTTPEndpoint';
+import MailChimpEndpoint from './endpoints/MailChimpEndpoint';
 import MySQLEndpoint from './endpoints/MySQLEndpoint';
 import PostgreSQLEndpoint from './endpoints/PostgreSQLEndpoint';
 import SFTPEndpoint from './endpoints/SFTPEndpoint';
@@ -193,7 +194,7 @@ export async function getSinkStream(
 
     try
     {
-      if (sink.type !== 'Database')
+      if (sink.type !== 'Database' && sink.type !== 'MailChimp')
       {
         switch (sink.fileConfig.fileType)
         {
@@ -273,6 +274,9 @@ export async function getSinkStream(
           break;
         case 'Fs':
           endpoint = new FSEndpoint();
+          break;
+        case 'MailChimp':
+          endpoint = new MailChimpEndpoint();
           break;
         default:
           throw new Error('not implemented.');
