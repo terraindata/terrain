@@ -457,18 +457,18 @@ class EmailForm extends IntegrationFormBase<EmailAuthT, EmailConnectionT>
   };
 }
 
-type MailchimpAuthT = AuthConfigType<Integrations.Mailchimp>;
-type MailchimpConnectionT = ConnectionConfigType<Integrations.Mailchimp>;
-class MailchimpForm extends IntegrationFormBase<MailchimpAuthT, MailchimpConnectionT>
+type MailChimpAuthT = AuthConfigType<Integrations.MailChimp>;
+type MailChimpConnectionT = ConnectionConfigType<Integrations.MailChimp>;
+class MailChimpForm extends IntegrationFormBase<MailChimpAuthT, MailChimpConnectionT>
 {
-  public authMap: InputDeclarationMap<MailchimpAuthT> = {
+  public authMap: InputDeclarationMap<MailChimpAuthT> = {
     apiKey: {
       type: DisplayType.TextBox,
       displayName: 'API Key',
     },
   };
 
-  public connectionMap: InputDeclarationMap<MailchimpConnectionT> = {
+  public connectionMap: InputDeclarationMap<MailChimpConnectionT> = {
     host: {
       type: DisplayType.TextBox,
       displayName: 'Host',
@@ -491,5 +491,5 @@ export const IntegrationFormMap: FormLookupMap =
     [Integrations.Postgresql]: PostgresqlForm,
     [Integrations.Magento]: MagentoForm,
     [Integrations.GoogleAnalytics]: GoogleAnalyticsForm,
-    [Integrations.Mailchimp]: MailchimpForm,
+    [Integrations.MailChimp]: MailChimpForm,
   };

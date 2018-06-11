@@ -710,6 +710,18 @@ export class ResultsManager extends TerrainComponent<Props>
         }
       }
     }
+    changes['estimatedTotal'] = querySize === undefined ? resultsData.rawResult.hits.total :
+      Math.min(querySize, resultsData.rawResult.hits.total);
+    // Need to take into account drop if less than group joins
+    if (this.props.query.path &&
+      this.props.query.path.nested &&
+      this.props.query.path.nested.get(0) &&
+      this.props.query.path.nested.get(0).minMatches
+    )
+    {
+      const ratio = Math.min(1, hits.size / (SCROLL_SIZE * this.props.hitsPage));
+      changes['estimatedTotal'] = Math.round(changes['estimatedTotal'] * ratio);
+    }
 
     const filteredFields = List(_.filter(fieldsSet.toArray(), (val) => !(val.charAt(0) === '_')));
     this.changeResults(changes);
@@ -730,7 +742,7 @@ export class ResultsManager extends TerrainComponent<Props>
     // how is the data formatted?
     const hits = resultsData.hits.hits.map((hit) =>
     {
-      const sort = hit.sort !== undefined ? { _sort: hit.sort[0] } : {};
+      const sort = hit.sort !== undefined ? { TerrainScore: hit.sort[0] } : {};
       return _.extend({}, hit._source, sort, {
         _index: hit._index,
         _type: hit._type,

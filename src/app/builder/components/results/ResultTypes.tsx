@@ -87,6 +87,7 @@ class ResultsStateC extends BaseClass
   public aggregations: any = {};
   public fields: List<string> = List();
   public count: number = 0;
+  public estimatedTotal: number = 0;
   public rawResult: string = '';
 
   public primaryKeyToIndex: IMMap<string, number> = Map<string, number>();

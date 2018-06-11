@@ -312,7 +312,7 @@ class Tabs extends TerrainComponent<TabsProps> {
                   'tabs-action-enabled': action.enabled || action.enabled === undefined,
                 })}
                 key={index}
-                onClick={action.onClick}
+                onClick={action.enabled ? action.onClick : null}
                 style={_.extend({},
                   action.text ? backgroundColor(action.enabled ? Colors().sidebarBg : Colors().blockBg) : {},
                   action.style,

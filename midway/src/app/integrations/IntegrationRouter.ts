@@ -58,6 +58,7 @@ import Integrations from './Integrations';
 const Router = new KoaRouter();
 export const integrations: Integrations = new Integrations();
 const perm: Permissions = new Permissions();
+export const initialize = () => integrations.initialize();
 
 Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {

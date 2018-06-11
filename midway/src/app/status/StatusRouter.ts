@@ -54,6 +54,7 @@ import appStats from '../AppStats';
 import { databases } from '../database/DatabaseRouter';
 
 const Router = new KoaRouter();
+export const initialize = () => { };
 
 /**
  * Simple ping style status check

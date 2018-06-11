@@ -58,6 +58,7 @@ export const events: Events = new Events();
 export const metrics: Metrics = new Metrics();
 
 const Router = new KoaRouter();
+export const initialize = () => metrics.initialize_();
 
 // * eventname: the source event(s) to use for aggregation (view / impression, click / add-to-cart, transaction)
 // * algorithmid: list of algorithmids

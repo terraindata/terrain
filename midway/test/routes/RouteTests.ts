@@ -513,6 +513,27 @@ describe('Item route tests', () =>
       });
   });
 
+  test('Update item duplicate name: POST /midway/v1/items/', async () =>
+  {
+    const insertObject = { id: 2, name: 'Al Gore', status: 'LIVE' };
+    await request(server)
+      .post('/midway/v1/items/2')
+      .send({
+        id: 1,
+        accessToken: defaultUserAccessToken,
+        body: insertObject,
+      })
+      .expect(400)
+      .then((response) =>
+      {
+        expect(JSON.parse(response.text).errors[0].detail).toBe('Duplicate item name');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/items/ request returned an error: ' + String(error));
+      });
+  });
+
   test('Invalid update: POST /midway/v1/items/', async () =>
   {
     await request(server)

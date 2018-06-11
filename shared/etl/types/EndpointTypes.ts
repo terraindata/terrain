@@ -78,6 +78,7 @@ export enum Sinks
   Sftp = 'Sftp',
   Http = 'Http',
   Fs = 'Fs',
+  MailChimp = 'MailChimp',
 }
 
 export const EndpointTypeNames =
@@ -93,11 +94,11 @@ export const EndpointTypeNames =
     Postgresql: 'PostgreSQL',
     Magento: 'Magento',
     GoogleAnalytics: 'Google Analytics',
-    Mailchimp: 'MailChimp',
+    MailChimp: 'MailChimp',
   };
 
 export const SchedulableSinks: Sinks[] =
-  [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs];
+  [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs, Sinks.MailChimp];
 
 export const SchedulableSources: Sources[] =
   [Sources.Algorithm, Sources.Sftp, Sources.GoogleAnalytics, Sources.Http, Sources.Fs, Sources.Mysql, Sources.Postgresql];
@@ -190,6 +191,7 @@ export interface SinkOptionsTypes
   Sftp: SftpOptions;
   Http: HttpOptions;
   Fs: {};
+  MailChimp: {};
 }
 
 export const SinkOptionsDefaults: SinkOptionsTypes =
@@ -211,6 +213,7 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
       method: 'POST',
     },
     Fs: {},
+    MailChimp: {},
   };
 
 export interface SftpOptions
