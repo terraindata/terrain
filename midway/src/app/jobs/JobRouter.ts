@@ -47,16 +47,19 @@ THE SOFTWARE.
 import * as asyncBusboy from 'async-busboy';
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
+import * as stream from 'stream';
 
 import { JobConfig } from 'shared/types/jobs/JobConfig';
 import * as App from '../App';
 import * as AppUtil from '../AppUtil';
+import ProgressStream from '../io/streams/ProgressStream';
 import { Permissions } from '../permissions/Permissions';
 import UserConfig from '../users/UserConfig';
 import { users } from '../users/UserRouter';
 
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
+export const initialize = () => { };
 
 Router.post('/cancel/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
@@ -103,9 +106,20 @@ Router.post('/runnow/:id', async (ctx, next) =>
     ctx.status = 400;
     return;
   }
-  // await perm.JobQueuePermissions.verifyRunNowRoute(ctx.state.user as UserConfig, ctx.req);
 
-  ctx.body = await App.JobQ.runNow(ctx.params.id, fields, files);
+  const responseStream = await App.JobQ.runNow(ctx.params.id, fields, files);
+  // await perm.JobQueuePermissions.verifyRunNowRoute(ctx.state.user as UserConfig, ctx.req);
+  responseStream.on('error', ctx.onerror);
+  if (responseStream instanceof ProgressStream)
+  {
+    responseStream.resume();
+    ctx.body = new stream.Readable();
+    ctx.body.push(null);
+  }
+  else
+  {
+    ctx.body = responseStream.pipe(new stream.PassThrough());
+  }
 });
 
 // unpause paused job by id

@@ -57,6 +57,7 @@ import Templates from './Templates';
 const Router = new KoaRouter();
 
 export const templates: Templates = new Templates();
+export const initialize = () => templates.initialize();
 
 // return all templates
 Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>

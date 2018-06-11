@@ -167,12 +167,6 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
     );
   }
 
-  // override this to specify if editing / creating the transformation will cause structural changes
-  protected isStructuralChange(): boolean
-  {
-    return undefined;
-  }
-
   // override this to specify transformation args if they need to be computed from state
   protected computeArgs(): TransformationArgs<Type>
   {
@@ -188,7 +182,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   }
 
   // override this to customize the newFieldInfo object that gets passed to addTransformation
-  protected computeNewFieldInfo(): { type: ETLFieldTypes, valueType?: ETLFieldTypes }
+  protected overrideTransformationConfig(): { type?: ETLFieldTypes, valueType?: ETLFieldTypes, newSourceType?: ETLFieldTypes }
   {
     return undefined;
   }
@@ -211,7 +205,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   protected createTransformation(proxy: EngineProxy)
   {
     const args = this.computeArgs();
-    proxy.addTransformation(this.type, args.fields, args.options, this.computeNewFieldInfo());
+    proxy.addTransformation(this.type, args.fields, args.options, this.overrideTransformationConfig());
   }
 
   // override this to customize how transformations are edited
@@ -219,7 +213,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   {
     const { transformation } = this.props;
     const args = this.computeArgs();
-    proxy.editTransformation(transformation.id, args.fields, args.options);
+    proxy.editTransformation(transformation.id, args.fields, args.options, this.overrideTransformationConfig());
   }
 
   // override this to customize how the state object changes when a form element changes
@@ -237,7 +231,6 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   protected handleMainAction()
   {
     const { isCreate, engine, fieldId, onClose } = this.props;
-    const overrideStructuralChange = this.isStructuralChange();
     if (isCreate)
     {
       this.props.tryMutateEngine((proxy) =>

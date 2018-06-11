@@ -58,23 +58,9 @@ export class Users
   private readonly saltRounds = 10;
   private userTable: Tasty.Table;
 
-  constructor()
+  public initialize()
   {
-    this.userTable = new Tasty.Table(
-      'users',
-      ['id'],
-      [
-        'accessToken',
-        'email',
-        'isDisabled',
-        'isSuperUser',
-        'name',
-        'oldPassword',
-        'password',
-        'timezone',
-        'meta',
-      ],
-    );
+    this.userTable = App.TBLS.users;
   }
 
   public async initializeDefaultUser(): Promise<void>

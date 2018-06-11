@@ -57,6 +57,14 @@ import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
+
+export interface TransformationConfig
+{
+  type?: ETLFieldTypes; // specify new field type
+  valueType?: ETLFieldTypes; // specify new field value type
+  newSourceType?: ETLFieldTypes; // if the source field changes types due to transformation
+}
+
 /*
  *  Should this file in be /shared?
  *  Proxy objects are generated synchronously and aren't meant to be persisted
@@ -110,10 +118,7 @@ export class EngineProxy
       newFieldKeyPaths?: List<EnginePath>;
       [k: string]: any;
     },
-    newFieldInfo?: { // if not specified, addTransformation will attempt to guess new field types
-      type: ETLFieldTypes;
-      valueType?: ETLFieldTypes;
-    },
+    config?: TransformationConfig, // if not specified, any new fields will have the same type as source field
   )
   {
     let options = rawOptions;
@@ -129,6 +134,15 @@ export class EngineProxy
     }
 
     this.engine.appendTransformation(type, fields, options);
+
+    if (config !== undefined && config.newSourceType !== undefined)
+    {
+      fields.forEach((kp: EnginePath) =>
+      {
+        const fieldId = this.engine.getInputFieldID(kp);
+        EngineUtil.changeFieldType(this.engine, fieldId, config.newSourceType);
+      });
+    }
 
     if (isSynthetic)
     {
@@ -146,14 +160,14 @@ export class EngineProxy
         {
           this.orderField(synthId, sourceFieldId);
         }
-        if (newFieldInfo !== undefined)
+        if (config !== undefined && config.type !== undefined)
         {
           EngineUtil.rawSetFieldType(
             this.engine,
             synthId,
-            newFieldInfo.type,
-            newFieldInfo.type,
-            newFieldInfo.valueType,
+            config.type,
+            config.type,
+            config.valueType,
           );
         }
         else
@@ -172,9 +186,22 @@ export class EngineProxy
     this.requestRebuild();
   }
 
-  public editTransformation(id: number, fields: List<EnginePath>, options)
+  public editTransformation(
+    id: number,
+    fields: List<EnginePath>,
+    options,
+    config?: TransformationConfig,
+  )
   {
     this.engine.editTransformation(id, fields, options);
+    if (config !== undefined && config.newSourceType !== undefined)
+    {
+      fields.forEach((kp: EnginePath) =>
+      {
+        const fieldId = this.engine.getInputFieldID(kp);
+        EngineUtil.changeFieldType(this.engine, fieldId, config.newSourceType);
+      });
+    }
     this.requestRebuild(id);
   }
 

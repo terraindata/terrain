@@ -52,13 +52,22 @@ import * as Util from '../AppUtil';
 import DatabaseConfig from './DatabaseConfig';
 import Databases from './Databases';
 
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+
 export const Router = new KoaRouter();
 export const databases = new Databases();
+export const initialize = () => databases.initialize();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting all databases');
   ctx.body = await databases.select(['id', 'name', 'type', 'host', 'isAnalytics', 'analyticsIndex', 'analyticsType']);
+});
+
+Router.get('/status/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting all databases (with their statuses)');
+  ctx.body = await databases.status(ctx.params.id);
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>

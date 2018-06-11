@@ -175,6 +175,7 @@ export const Ajax =
       }
 
       const axiosInstance = axios.create();
+      let alreadyErrored = false;
 
       axiosInstance.interceptors.response.use(
         (response) => response,
@@ -187,9 +188,10 @@ export const Ajax =
               Ajax.reduxStoreDispatch(Actions({ actionType: 'logout' }));
             }
 
-            if (error.response.status !== 200)
+            if (error.response.status !== 200 && !alreadyErrored)
             {
-              config && config.onError && config.onError(error.data);
+              alreadyErrored = true;
+              config && config.onError && config.onError(error.data !== undefined ? error.data : error);
             }
           }
 
@@ -233,8 +235,13 @@ export const Ajax =
             console.error('isCanceled', err.message);
           } else
           {
-            const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
-            config && config.onError && config.onError(routeError);
+            if (!alreadyErrored)
+            {
+              alreadyErrored = true;
+              const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
+              config && config.onError && config.onError(routeError);
+            }
+
           }
 
           return Promise.reject(err);

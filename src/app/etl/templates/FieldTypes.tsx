@@ -71,11 +71,6 @@ class TemplateFieldC
   public readonly transformations: List<TransformationNode> = List([]);
   public readonly outputKeyPath: List<string> = List([]);
 
-  public isArray(): boolean
-  {
-    return this.representedType() === 'array';
-  }
-
   public isWildcardField(): boolean
   {
     return EngineUtil.isWildcardField(this.inputKeyPath);
@@ -141,11 +136,6 @@ class TemplateFieldC
   public isNamedField()
   {
     return this.name !== '*' && Number.isNaN(Number(this.name));
-  }
-
-  public isNested(): boolean
-  {
-    return this.representedType() === 'object';
   }
 }
 export type TemplateField = WithIRecord<TemplateFieldC>;

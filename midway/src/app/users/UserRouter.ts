@@ -55,6 +55,7 @@ export * from './Users';
 
 const Router = new KoaRouter();
 export const users = new Users();
+export const initialize = () => users.initialize();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
