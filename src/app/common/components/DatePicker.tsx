@@ -157,7 +157,7 @@ export interface Props
 
 let COLORS_ACTIONS_SET = false;
 
-class DatePicker extends TerrainComponent<Props>
+export class DatePickerUncontained extends TerrainComponent<Props>
 {
   public state = {
     dateViewType: 'calendar',
@@ -173,6 +173,17 @@ class DatePicker extends TerrainComponent<Props>
         dateViewType: currentDateViewType,
       },
     );
+    if (this.props.date === 'specific')
+    {
+      const updatedState = this.updateElasticState(this.props.date);
+      this.setState(
+        {
+          sign: updatedState[0];
+          unit: updatedState[1],
+          amount: updatedState[2],
+        },
+      );
+    }
     if (!COLORS_ACTIONS_SET)
     {
       COLORS_ACTIONS_SET = true;
@@ -259,6 +270,42 @@ class DatePicker extends TerrainComponent<Props>
     }
   }
 
+  public updateElasticState(nextDate)
+  {
+    let newSign;
+    let newUnit;
+    let newAmount;
+    const newDate = nextDate.replace(/ /g, '');
+    const nextSign = newDate[3];
+    if (nextSign === '+' || nextSign === '-')
+    {
+      newSign = nextSign;
+    }
+    else
+    {
+      newSign = '-';
+    }
+    const nextUnit = newDate.slice(-1);
+    if (DateUnitArray.includes(nextUnit))
+    {
+      newUnit = nextUnit;
+    }
+    else
+    {
+      newUnit = 'M';
+    }
+    const nextAmount = parseInt(newDate.slice(4, -1), 10);
+    if (nextAmount >= 0)
+    {
+      newAmount = nextAmount;
+    }
+    else
+    {
+      newAmount = 0;
+    }
+    return [newSign, newUnit, newAmount];
+  }
+
   public componentWillReceiveProps(nextProps)
   {
     let nextDateViewType;
@@ -274,6 +321,17 @@ class DatePicker extends TerrainComponent<Props>
         },
       );
     }
+    if (nextDateViewType === 'specific')
+    {
+      const updatedState = this.updateElasticState(nextProps.date);
+      this.setState(
+        {
+          sign: updatedState[0],
+          unit: updatedState[1],
+          amount: updatedState[2],
+        },
+      );
+    }
   }
 
   public getDateViewType(dateProp: string): string
@@ -283,7 +341,7 @@ class DatePicker extends TerrainComponent<Props>
     {
       dateViewType = 'relative';
     }
-    else if (dateProp.startsWith('Now'))
+    else if ((dateProp.startsWith('Now')) || (dateProp.startsWith('now')))
     {
       dateViewType = 'specific';
     }
@@ -362,32 +420,17 @@ class DatePicker extends TerrainComponent<Props>
   public handleTenseChange(tenseIndex)
   {
     const sign = DateTenseArray[tenseIndex];
-    this.setState(
-      {
-        sign,
-      },
-    );
     this.props.onChange(this.formatElasticQuery(sign, this.state.unit, this.state.amount));
   }
 
   public handleUnitChange(unitIndex)
   {
     const unit = DateUnitArray[unitIndex];
-    this.setState(
-      {
-        unit,
-      },
-    );
     this.props.onChange(this.formatElasticQuery(this.state.sign, unit, this.state.amount));
   }
 
   public handleAmountChange(e)
   {
-    this.setState(
-      {
-        amount: e.target.value,
-      },
-    );
     this.props.onChange(this.formatElasticQuery(this.state.sign, this.state.unit, e.target.value));
   }
 
@@ -546,10 +589,11 @@ class DatePicker extends TerrainComponent<Props>
   }
 }
 
-export default Util.createContainer(
-  DatePicker,
+const DatePicker = Util.createContainer(
+  DatePickerUncontained,
   [],
   {
     colorsActions: ColorsActions,
   },
 );
+export default DatePicker;

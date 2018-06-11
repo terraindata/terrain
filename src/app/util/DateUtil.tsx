@@ -141,7 +141,7 @@ const DateUtil =
       {
         return DateUtil.formatRelativeDate(date);
       }
-      else if (date.includes('Now'))
+      else if (date.includes('Now') || date.includes('now'))
       {
         return DateUtil.formatSpecificDate(date);
       }
