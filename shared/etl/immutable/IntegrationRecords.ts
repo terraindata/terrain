@@ -86,13 +86,10 @@ class IntegrationConfigC implements IntegrationConfigBase
       case Integrations.Magento:
       case Integrations.Postgresql:
       case Integrations.GoogleAnalytics:
+      case Integrations.MailChimp:
       case Integrations.Mysql:
         return {
           fileType: FileTypes.Json,
-        };
-      case Integrations.Mailchimp:
-        return {
-          fileType: FileTypes.Csv,
         };
       default:
         return null;
