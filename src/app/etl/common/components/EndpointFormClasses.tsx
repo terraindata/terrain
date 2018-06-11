@@ -362,6 +362,17 @@ export class FsEndpoint extends EndpointFormBase<FsState>
   public inputMap: InputDeclarationMap<FsState> = {};
 }
 
+type MailChimpState = SinkOptionsType<Sinks.MailChimp>;
+export class MailChimpEndpoint extends EndpointFormBase<MailChimpState>
+{
+  public inputMap: InputDeclarationMap<MailChimpState> = {
+    listId: {
+      type: DisplayType.TextBox,
+      displayName: 'List Id',
+    },
+  };
+}
+
 type SQLState = SQLOptions;
 export class SQLEndpoint extends EndpointFormBase<SQLState>
 {
