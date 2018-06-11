@@ -61,7 +61,9 @@ import
   SourceOptionsDefaults, SourceOptionsType,
   Sources,
 } from 'shared/etl/types/EndpointTypes';
+
 import { FileTypes } from 'shared/etl/types/ETLTypes';
+import { PostProcessConfig, RootPostProcessConfig as RootPostProcessConfigI } from 'shared/etl/types/PostProcessTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 class FileConfigC implements FileConfigI
@@ -73,8 +75,16 @@ class FileConfigC implements FileConfigI
   public jsonPath = null;
   public fieldOrdering = null;
 }
+
+class RootPostProcessConfigC implements RootPostProcessConfigI
+{
+  public transformations: PostProcessConfig[] = null;
+}
+
 export type FileConfig = WithIRecord<FileConfigC>;
+export type RootPostProcessConfig = WithIRecord<RootPostProcessConfigC>;
 export const _FileConfig = makeConstructor(FileConfigC);
+export const _RootPostProcessConfig = makeConstructor(RootPostProcessConfigC);
 
 class SourceConfigC implements SourceConfigI
 {
@@ -83,6 +93,7 @@ class SourceConfigC implements SourceConfigI
   public fileConfig = _FileConfig();
   public options = {} as any;
   public integrationId = -1;
+  public rootPostProcessConfig = _RootPostProcessConfig();
 
   public verifyIntegrity(): boolean
   {
@@ -127,7 +138,7 @@ class SourceConfigC implements SourceConfigI
 }
 export type SourceConfig = WithIRecord<SourceConfigC>;
 export const _SourceConfig = makeExtendedConstructor(SourceConfigC, true, {
-  fileConfig: _FileConfig,
+  fileConfig: _FileConfig, rootPostProcessConfig: _RootPostProcessConfig,
 },
   (cfg?, deep?) =>
   {
@@ -148,6 +159,7 @@ class SinkConfigC implements SinkConfigI
   public fileConfig = _FileConfig();
   public options = {} as any;
   public integrationId = -1;
+  public rootPostProcessConfig = _RootPostProcessConfig();
 
   public verifyIntegrity(): boolean
   {
@@ -183,7 +195,7 @@ class SinkConfigC implements SinkConfigI
 }
 export type SinkConfig = WithIRecord<SinkConfigC>;
 export const _SinkConfig = makeExtendedConstructor(SinkConfigC, true, {
-  fileConfig: _FileConfig,
+  fileConfig: _FileConfig, rootPostProcessConfig: _RootPostProcessConfig,
 },
   (cfg?, deep?) =>
   {

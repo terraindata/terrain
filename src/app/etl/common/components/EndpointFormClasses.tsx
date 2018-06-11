@@ -65,7 +65,16 @@ import { GoogleAnalyticsForm } from 'etl/endpoints/GoogleAnalyticsIntegration.ts
 import { SftpForm } from 'etl/endpoints/SftpIntegration';
 import AlgorithmSelector from 'library/components/AlgorithmSelector';
 import { LibraryState } from 'library/LibraryTypes';
-import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import
+{
+  _FileConfig,
+  _RootPostProcessConfig,
+  _SourceConfig,
+  FileConfig,
+  RootPostProcessConfig,
+  SinkConfig,
+  SourceConfig,
+} from 'shared/etl/immutable/EndpointRecords';
 import
 {
   FileConfig as FileConfigI, HttpOptions,
@@ -73,6 +82,16 @@ import
   Sources, SQLOptions,
 } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
+import
+{
+  PostProcessAggregationTypes as AggregationTypes,
+  PostProcessConfig,
+  PostProcessOptionsType,
+  PostProcessTypes,
+  RootPostProcessConfig as RootPostProcessConfigI,
+} from 'shared/etl/types/PostProcessTypes';
+
+import { PostProcessForm, TransformForm } from '../../endpoints/PostProcessForm';
 
 const { List } = Immutable;
 
@@ -95,6 +114,7 @@ export abstract class EndpointFormBase<State, P extends Props = Props> extends T
     super(props);
     this.handleFileConfigChange = this.handleFileConfigChange.bind(this);
     this.handleOptionsFormChange = this.handleOptionsFormChange.bind(this);
+    this.handlePostProcessConfigChange = this.handlePostProcessConfigChange.bind(this);
   }
 
   // By default, options state is indentical form to the endpoint options object
@@ -111,7 +131,7 @@ export abstract class EndpointFormBase<State, P extends Props = Props> extends T
 
   public render()
   {
-    const { fileConfig, options } = this.props.endpoint;
+    const { fileConfig, options, rootPostProcessConfig } = this.props.endpoint;
     const inputState = this.optionsToFormState(options);
     return (
       <div>
@@ -127,6 +147,10 @@ export abstract class EndpointFormBase<State, P extends Props = Props> extends T
               onChange={this.handleFileConfigChange}
             /> : null
         }
+        <PostProcessForm
+          rootPostProcessConfig={rootPostProcessConfig}
+          onChange={this.handlePostProcessConfigChange}
+        />
       </div>
     );
   }
@@ -142,6 +166,12 @@ export abstract class EndpointFormBase<State, P extends Props = Props> extends T
   {
     const { onChange, endpoint } = this.props;
     onChange(endpoint.set('fileConfig', config), apply);
+  }
+
+  private handlePostProcessConfigChange(config: RootPostProcessConfig, apply?: boolean)
+  {
+    const { onChange, endpoint } = this.props;
+    onChange(endpoint.set('rootPostProcessConfig', config), apply);
   }
 }
 

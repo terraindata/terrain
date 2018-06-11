@@ -169,6 +169,12 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
         + (padDate((startDate.getMonth() as number + 1).toString()) as string) + '-'
         + (padDate(startDate.getDate().toString()) as string);
       const dateRange: object[] = [{ startDate: startDateStr, endDate: currDateStr }];
+      const parsedGAMetrics: GoogleAnalyticsMetricConfig[] = [];
+
+      Object.keys(gaConfig['metrics']).forEach((gaMetricKey) =>
+      {
+        parsedGAMetrics.push({ alias: gaMetricKey, expression: gaConfig['metrics'][gaMetricKey] });
+      });
 
       const analyticsBody: object =
         {
@@ -176,7 +182,7 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
             {
               dateRanges: dateRange,
               dimensions: gaConfig['dimensions'],
-              metrics: gaConfig['metrics'],
+              metrics: parsedGAMetrics,
               viewId: gaConfig['viewId'].toString(),
             },
           ],
