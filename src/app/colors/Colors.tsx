@@ -96,6 +96,8 @@ const NewTheme =
     textboxBg: NTColors.light1,
 
     todayHighlight: NTColors.blue5,
+
+    dateViewLabel: NTColors.blue4,
   };
 
 // Will be deprecated

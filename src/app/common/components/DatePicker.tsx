@@ -255,7 +255,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
       this.props.colorsActions({
         actionType: 'setStyle',
         selector: '.date-view-label',
-        style: { 'color': Colors().text3, 'background-color': Colors().bg },
+        style: { 'color': Colors().dateViewLabel, 'background-color': Colors().bg },
       });
       this.props.colorsActions({
         actionType: 'setStyle',
@@ -458,7 +458,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
   public renderTimePicker(date)
   {
     return (
-      <div className='date-time-time'>
+      <div className='labeled-row'>
         <p className='date-view-label'>Time</p>
         <Dropdown
           canEdit={this.props.canEdit}
@@ -473,8 +473,8 @@ export class DatePickerUncontained extends TerrainComponent<Props>
   public renderRelativeTimePicker(date)
   {
     return (
-      <div className='date-time-time-top'>
-        <p className='date-view-label'>One Week Scope</p>
+      <div className='labeled-row'>
+        <p className='date-view-label'>Scope</p>
         <Dropdown
           canEdit={this.props.canEdit}
           options={DateParameterOptions}
@@ -488,7 +488,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
   public renderCalendar(dateArg, modifiersArg)
   {
     return (
-      <div>
+      <div className='date-time-time'>
         <DayPicker
           modifiers={modifiersArg}
           onDayClick={this.handleDayClick}
@@ -513,29 +513,35 @@ export class DatePickerUncontained extends TerrainComponent<Props>
   {
     return (
       <div className='date-time-time-top'>
-        <p className='date-view-label'>Period</p>
-        <Dropdown
-          canEdit={this.props.canEdit}
-          options={DateTenseOptions}
-          optionsDisplayName={DateTenseMapImmu}
-          selectedIndex={DateTenseOptions.indexOf(this.state.sign)}
-          onChange={this.handleTenseChange}
-        />
-        <p className='date-view-label'>Unit of Time</p>
-        <Dropdown
-          canEdit={this.props.canEdit}
-          options={DateUnitOptions}
-          optionsDisplayName={DateUnitMapImmu}
-          selectedIndex={DateUnitOptions.indexOf(this.state.unit)}
-          onChange={this.handleUnitChange}
-        />
-        <p className='date-view-label'>Amount</p>
-        <input
-          className='specific-time-amount'
-          type='number'
-          min='0'
-          onChange={this.handleAmountChange}
-        />
+        <div className='labeled-row'>
+          <p className='date-view-label'>Period</p>
+          <Dropdown
+            canEdit={this.props.canEdit}
+            options={DateTenseOptions}
+            optionsDisplayName={DateTenseMapImmu}
+            selectedIndex={DateTenseOptions.indexOf(this.state.sign)}
+            onChange={this.handleTenseChange}
+          />
+        </div>
+        <div className='labeled-row'>
+          <p className='date-view-label'>Unit of Time</p>
+          <Dropdown
+            canEdit={this.props.canEdit}
+            options={DateUnitOptions}
+            optionsDisplayName={DateUnitMapImmu}
+            selectedIndex={DateUnitOptions.indexOf(this.state.unit)}
+            onChange={this.handleUnitChange}
+          />
+        </div>
+        <div className='labeled-row'>
+          <p className='date-view-label'>Amount</p>
+          <input
+            className='specific-time-amount'
+            type='number'
+            min='0'
+            onChange={this.handleAmountChange}
+          />
+        </div>
       </div>
     );
   }
