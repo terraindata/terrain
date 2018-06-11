@@ -173,7 +173,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
         dateViewType: currentDateViewType,
       },
     );
-    if (this.props.date === 'specific')
+    if (currentDateViewType === 'specific')
     {
       const updatedState = this.updateElasticState(this.props.date);
       this.setState(
