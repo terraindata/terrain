@@ -209,13 +209,14 @@ class ItemComponent extends TerrainComponent<ItemProps>
         </div>
       </div>
     );
-    
+
     if (connectsOwnDragHandle)
     {
       // No need to connect drag source, as parent will do that.
-      return el;
+      return this.props.connectDragPreview(el, {});
+
     }
-    
+
     return canDrag ? this.props.connectDragSource(el) : el;
   }
 }
