@@ -55,7 +55,7 @@ import Util from '../../util/Util';
 import './LibraryItem.less';
 
 import { DragSource, DropTarget } from 'react-dnd';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import './LibraryItem.less';
 
 import { backgroundColor, Colors, fontColor } from '../../colors/Colors';
@@ -477,7 +477,7 @@ class LibraryItem extends TerrainComponent<Props>
         <Link
           to={this.props.to}
           className='library-item-link'
-          activeClassName='library-item-active'
+          activeclassname='library-item-active'
           onDoubleClick={this.handleDoubleClick}
           onClick={this.handleClick}
         >

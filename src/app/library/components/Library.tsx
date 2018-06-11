@@ -64,7 +64,7 @@ import LibraryInfoColumn from './LibraryInfoColumn';
 
 export interface Props
 {
-  params?: any;
+  match?: any;
   location?: any;
   router?: any;
   route?: any;
@@ -81,7 +81,7 @@ class Library extends TerrainComponent<any>
   public static ALGORITHMS_COLUMN = 'algorithms';
 
   public static defaultProps: Partial<Props> = {
-    params: {},
+    match: {},
     location: {},
     router: {},
     route: {},
@@ -121,7 +121,7 @@ class Library extends TerrainComponent<any>
       }
     }
 
-    if ((!this.props.params || !this.props.params.categoryId))
+    if (!this.props.match.params.categoryId)
     {
       loadLastRoute(basePath);
     }
@@ -285,8 +285,8 @@ class Library extends TerrainComponent<any>
 
   public isColumnVisible(columnName)
   {
-    const { singleColumn, router } = this.props;
-    const params = router !== undefined && router.params !== undefined ? router.params : {};
+    const { singleColumn, match } = this.props;
+    const params = match !== undefined && match.params !== undefined ? match.params : {};
     const { categoryId, groupId, algorithmId } = params;
 
     return !singleColumn ||
@@ -312,7 +312,7 @@ class Library extends TerrainComponent<any>
       library: libraryState,
       analytics,
       schema,
-      router,
+      match,
       basePath,
       canPinAlgorithms,
       singleColumn,
@@ -336,7 +336,7 @@ class Library extends TerrainComponent<any>
     } = analytics;
 
     const hasPinnedAlgorithms = pinnedAlgorithms.valueSeq().includes(true);
-    const { params } = router;
+    const { params } = match;
 
     const datasets = this.getDatasets();
 
@@ -418,7 +418,8 @@ class Library extends TerrainComponent<any>
                 params,
                 canPinItems: canPinAlgorithms,
                 basePath,
-                router,
+                match,
+                location,
                 algorithmActions: this.props.libraryAlgorithmActions,
                 analytics,
                 analyticsActions: this.props.analyticsActions,

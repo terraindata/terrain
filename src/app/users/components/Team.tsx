@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import { AuthState } from 'auth/AuthTypes';
 import * as React from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import Util from 'util/Util';
 import CreateItem from '../../common/components/CreateItem';
 import Ajax from '../../util/Ajax';

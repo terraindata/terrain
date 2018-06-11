@@ -78,8 +78,10 @@ const { List } = Immutable;
 
 export interface Props
 {
-  params: {
-    step: number;
+  match: {
+    params: {
+      step: number;
+    };
   };
   // injected props
   act?: typeof WalkthroughActions;
@@ -148,7 +150,8 @@ class ETLWalkthrough extends TerrainComponent<Props>
   // if the step is invalid or doesn't exist then return 0 and move the route
   public getStepFromRoute(fixBadRoute = false)
   {
-    const { params, walkthrough } = this.props;
+    const { match, walkthrough } = this.props;
+    const { params } = match;
     if (params != null && params.step != null)
     {
       const val = Number(params.step);
