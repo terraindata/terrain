@@ -108,6 +108,7 @@ export abstract class EndpointFormBase<State, P extends Props = Props> extends T
 {
   public abstract inputMap: InputDeclarationMap<State>;
   public showFileConfig = true; // override this to hide
+  public showPostProcessConfig = true; // override this to hide
 
   constructor(props)
   {
@@ -147,10 +148,13 @@ export abstract class EndpointFormBase<State, P extends Props = Props> extends T
               onChange={this.handleFileConfigChange}
             /> : null
         }
-        <PostProcessForm
-          rootPostProcessConfig={rootPostProcessConfig}
-          onChange={this.handlePostProcessConfigChange}
-        />
+        {
+          this.showPostProcessConfig ?
+            <PostProcessForm
+              rootPostProcessConfig={rootPostProcessConfig}
+              onChange={this.handlePostProcessConfigChange}
+            /> : null
+        }
       </div>
     );
   }
@@ -178,6 +182,8 @@ export abstract class EndpointFormBase<State, P extends Props = Props> extends T
 type UploadState = SourceOptionsType<Sources.Upload>;
 export class UploadEndpoint extends EndpointFormBase<UploadState>
 {
+  public showPostProcessConfig = false;
+
   public inputMap: InputDeclarationMap<UploadState> = {
     file: {
       type: DisplayType.Custom,
@@ -210,6 +216,8 @@ type AlgorithmState = SourceOptionsType<Sources.Algorithm>;
 class AlgorithmEndpointC extends EndpointFormBase<AlgorithmState>
 {
   public showFileConfig = false;
+  public showPostProcessConfig = false;
+
   public state: {
     ids: List<number>,
   };
@@ -328,6 +336,8 @@ const httpMethods = List(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']);
 
 export class HttpEndpointForm extends EndpointFormBase<HttpOptions>
 {
+  public showPostProcessConfig = false;
+
   public inputMap: InputDeclarationMap<HttpOptions> = {
     method: {
       type: DisplayType.Pick,
@@ -343,6 +353,8 @@ export class HttpEndpointForm extends EndpointFormBase<HttpOptions>
 type DownloadState = SinkOptionsType<Sinks.Download>;
 export class DownloadEndpoint extends EndpointFormBase<DownloadState>
 {
+  public showPostProcessConfig = false;
+
   public inputMap: InputDeclarationMap<DownloadState> = {
 
   };
@@ -353,6 +365,8 @@ type DatabaseState = SinkOptionsType<Sinks.Database>;
 export class DatabaseEndpoint extends EndpointFormBase<DatabaseState>
 {
   public showFileConfig = false;
+  public showPostProcessConfig = false;
+
   public inputMap: InputDeclarationMap<DatabaseState> = {
     serverId: {
       type: DisplayType.Custom,
@@ -390,12 +404,16 @@ export class DatabaseEndpoint extends EndpointFormBase<DatabaseState>
 type FsState = SinkOptionsType<Sinks.Fs>;
 export class FsEndpoint extends EndpointFormBase<FsState>
 {
+  public showPostProcessConfig = false;
+
   public inputMap: InputDeclarationMap<FsState> = {};
 }
 
 type SQLState = SQLOptions;
 export class SQLEndpoint extends EndpointFormBase<SQLState>
 {
+  public showPostProcessConfig = false;
+
   public inputMap: InputDeclarationMap<SQLState> = {
     query: {
       type: DisplayType.TextBox,

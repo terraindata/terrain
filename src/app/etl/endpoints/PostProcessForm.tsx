@@ -56,7 +56,8 @@ import Util from 'util/Util';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import {
+import
+{
   _RootPostProcessConfig,
   RootPostProcessConfig,
   SinkConfig,
