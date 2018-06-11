@@ -59,21 +59,9 @@ export class ResultsConfig
 {
   private resultsConfigTable: Tasty.Table;
 
-  constructor()
+  public initialize()
   {
-    this.resultsConfigTable = new Tasty.Table(
-      'resultsConfig',
-      ['id'],
-      [
-        'index',
-        'thumbnail',
-        'name',
-        'score',
-        'fields',
-        'formats',
-        'primaryKeys',
-      ],
-    );
+    this.resultsConfigTable = App.TBLS.resultsConfig;
   }
 
   public async select(columns: string[], filter: object): Promise<ResultsConfigConfig[]>

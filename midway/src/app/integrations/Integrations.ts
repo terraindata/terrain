@@ -63,23 +63,9 @@ export class Integrations
 {
   private integrationTable: Tasty.Table;
 
-  constructor()
+  public initialize()
   {
-    this.integrationTable = new Tasty.Table(
-      'integrations',
-      ['id'],
-      [
-        'authConfig',
-        'connectionConfig',
-        'createdBy',
-        'meta',
-        'name',
-        'readPermission',
-        'type',
-        'lastModified',
-        'writePermission',
-      ],
-    );
+    this.integrationTable = App.TBLS.integrations;
   }
 
   public async delete(user: UserConfig, id: number): Promise<IntegrationConfig[] | string>

@@ -59,6 +59,7 @@ const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
 
 export const integrations: Integrations = new Integrations();
+export const initialize = () => integrations.initialize();
 
 // Get schedules by template id
 Router.get('/byTemplate/:templateId', passport.authenticate('access-token-local'), async (ctx, next) =>

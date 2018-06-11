@@ -53,19 +53,9 @@ export class Versions
 {
   private versionTable: Tasty.Table;
 
-  constructor()
+  public initialize()
   {
-    this.versionTable = new Tasty.Table(
-      'versions',
-      ['id'],
-      [
-        'createdAt',
-        'createdByUserId',
-        'object',
-        'objectId',
-        'objectType',
-      ],
-    );
+    this.versionTable = App.TBLS.versions;
   }
 
   public async create(user: UserConfig, type: string, id: number, obj: object): Promise<VersionConfig>

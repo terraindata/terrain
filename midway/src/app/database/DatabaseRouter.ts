@@ -56,6 +56,7 @@ import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 
 export const Router = new KoaRouter();
 export const databases = new Databases();
+export const initialize = () => databases.initialize();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {

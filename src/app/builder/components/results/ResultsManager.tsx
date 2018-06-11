@@ -730,7 +730,7 @@ export class ResultsManager extends TerrainComponent<Props>
     // how is the data formatted?
     const hits = resultsData.hits.hits.map((hit) =>
     {
-      const sort = hit.sort !== undefined ? { _sort: hit.sort[0] } : {};
+      const sort = hit.sort !== undefined ? { TerrainScore: hit.sort[0] } : {};
       return _.extend({}, hit._source, sort, {
         _index: hit._index,
         _type: hit._type,
