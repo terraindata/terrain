@@ -210,6 +210,7 @@ class ExpandableView extends TerrainComponent<Props>
           dropZoneStyle={DROP_ZONE_STYLE}
           onDragStart={this.handleDragStart}
           onDragStop={this.handleDragStop}
+          connectsOwnDragHandle={true}
         >
           {
             (connectDragSource, isDragging) => (

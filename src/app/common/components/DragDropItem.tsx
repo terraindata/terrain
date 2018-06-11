@@ -65,7 +65,10 @@ interface ItemProps
   canDrop?: boolean;
   canDrag?: boolean;
   hoverHeader?: El;
-  children?: El | string;
+  children?: El | string | ((connectDragSource: (e: El) => El) => El);
+  connectsOwnDragHandle?: boolean;
+  // ^ if this is true, pass in the function ((connectDragSource: (e: El) => El) => El)
+  // to children, and connect the drag source yourself.
   data?: any;
   onDrop: (dropIndex: List<number>, dragIndex: List<number>) => void;
   onDragStart?: () => void;
@@ -157,13 +160,16 @@ class ItemComponent extends TerrainComponent<ItemProps>
   public render()
   {
     const { isDragging, isOver, hoverHeader, neighborIsBeingDragged,
-      canDrag, canDrop } = this.props;
+      canDrag, canDrop, connectsOwnDragHandle } = this.props;
 
     let { children, connectDragSource } = this.props;
 
-    if (typeof children === 'function')
+    if (connectsOwnDragHandle)
     {
-      console.log(isDragging);
+      if (typeof children !== 'function')
+      {
+        throw new Error("Child function not provided to DragDropItem, even though connectsOwnDragHandle was set")
+      }
       children = children(canDrag ? connectDragSource : IDENTITY_FUNCTION);
     }
 
@@ -203,7 +209,14 @@ class ItemComponent extends TerrainComponent<ItemProps>
         </div>
       </div>
     );
-    return el; // canDrag ? this.props.connectDragSource(el) : el;
+    
+    if (connectsOwnDragHandle)
+    {
+      // No need to connect drag source, as parent will do that.
+      return el;
+    }
+    
+    return canDrag ? this.props.connectDragSource(el) : el;
   }
 }
 
