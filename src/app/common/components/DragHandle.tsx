@@ -64,7 +64,7 @@ export interface Props
   useAltColor?: boolean;
   connectDragSource?: (el: El) => El;
   isDragging?: boolean;
-  
+
   colorsActions: typeof ColorsActions;
 }
 
@@ -100,7 +100,6 @@ class DragHandle extends TerrainComponent<Props>
   public renderHandle()
   {
     const { isDragging } = this.props;
-    console.log(isDragging);
     return (
       <div
         key={this.props.id}
@@ -122,12 +121,12 @@ class DragHandle extends TerrainComponent<Props>
   {
     const handle = this.renderHandle();
     const { connectDragSource } = this.props;
-    
+
     if (connectDragSource !== undefined)
     {
       return connectDragSource(handle);
     }
-    
+
     return handle;
   }
 }

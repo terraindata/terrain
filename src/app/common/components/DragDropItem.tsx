@@ -159,16 +159,16 @@ class ItemComponent extends TerrainComponent<ItemProps>
 
   public render()
   {
-    const { isDragging, isOver, hoverHeader, neighborIsBeingDragged,
+    const { connectDragSource, isDragging, isOver, hoverHeader, neighborIsBeingDragged,
       canDrag, canDrop, connectsOwnDragHandle } = this.props;
 
-    let { children, connectDragSource } = this.props;
+    let { children } = this.props;
 
     if (connectsOwnDragHandle)
     {
       if (typeof children !== 'function')
       {
-        throw new Error("Child function not provided to DragDropItem, even though connectsOwnDragHandle was set")
+        throw new Error('Child function not provided to DragDropItem, even though connectsOwnDragHandle was set');
       }
       children = children(canDrag ? connectDragSource : IDENTITY_FUNCTION);
     }

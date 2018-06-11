@@ -80,15 +80,15 @@ export interface Props
 
 class ExpandableView extends TerrainComponent<Props>
 {
-  state = {
+  public state = {
     isDragging: false,
     // ^ for some reason, using the props.isDragging that is passed in to
     // DragHandle does not work -- I think because we need the
     // position: relative, and zIndex: 9 properties on the dragging item
     // for that to kick in. So, we need a different method to get those
     // styles to kick in inside the DragHandle.
-  }
-  
+  };
+
   public renderArrowSection()
   {
     const hasChildren = this.props.children !== undefined && this.props.children !== null;
@@ -246,7 +246,7 @@ class ExpandableView extends TerrainComponent<Props>
                   this.renderChildren()
                 }
               </div>
-              )
+            )
           }
         </DragDropItem>
       </div>
@@ -276,14 +276,14 @@ class ExpandableView extends TerrainComponent<Props>
       };
     }
   }
-  
+
   private handleDragStart()
   {
     this.setState({
       isDragging: true,
     });
   }
-  
+
   private handleDragStop()
   {
     this.setState({
