@@ -104,17 +104,18 @@ class AuthRedux extends TerrainRedux<AuthActionTypes, AuthState>
 function setGTMUserId(id)
 {
   // for Google Tag Manager
+  const userId = String(id) + '-' + window.location.host;
   const dataLayer = window['dataLayer'] !== undefined ? window['dataLayer'] : [];
   const dataLayerIndex = dataLayer.findIndex(
     (obj) => obj.userId !== undefined,
   );
   if (dataLayerIndex === -1)
   {
-    dataLayer.push({ userId: id });
+    dataLayer.push({ userId });
   }
   else
   {
-    dataLayer[dataLayerIndex].userId = id;
+    dataLayer[dataLayerIndex].userId = userId;
   }
   window['dataLayer'] = dataLayer;
 }
