@@ -45,39 +45,21 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import crypto = require('crypto');
-import { EventEmitter } from 'events';
-import * as fs from 'fs';
-import jsonStream = require('JSONStream');
 import * as stream from 'stream';
 
 import * as winston from 'winston';
 
-import * as _ from 'lodash';
 import * as request from 'request';
-import { PassThrough, Readable, Writable } from 'stream';
-import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { Readable, Writable } from 'stream';
 import { Integrations } from '../../integrations/Integrations';
 import AEndpointStream from './AEndpointStream';
 
 import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
-import
-{
-  PostProcessConfig,
-  PostProcessOptionsTypes,
-  PostProcessTypes,
-} from 'shared/etl/types/PostProcessTypes';
 
 /* tslint:disable:max-classes-per-file */
 
 export const integrations: Integrations = new Integrations();
-
-export interface MailChimpSourceConfig
-{
-  data: object[];
-  key: string;
-  host: string;
-  listID: string;
-}
 
 export default class MailChimpEndpoint extends AEndpointStream
 {
