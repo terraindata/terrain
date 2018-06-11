@@ -99,19 +99,48 @@
   .date-time-time {
     padding: 0px 15px;
     margin-bottom: 25px;
-    margin-top: -16px;
+    margin-top: 2px;
+
+    .labeled-row {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .dropdown-wrapper {
+      flex-grow: 1;
+      min-width: 100px;
+      width: auto;
+    }
 
     .dropdown-options-wrapper {
-      max-height: 92px;
+      max-height: 88px;
     }
   }
   
   .date-time-time-top {
     padding: 0px 15px;
     margin-bottom: 25px;
+    margin-top: 25px;
+
+    .labeled-row {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .specific-time-amount {
+      flex-grow: 1;
+      height: 33px;
+      width: auto;
+    }
+
+    .dropdown-wrapper {
+      flex-grow: 1;
+      min-width: 100px;
+      width: auto;
+    }
 
     .dropdown-options-wrapper {
-      max-height: 92px;
+      max-height: 88px;
     }
   }
 }
@@ -122,9 +151,12 @@
 }
 
 .date-view-label {
-  font-size: 10px;
-  padding-top: 10px;
+  font-size: 11px;
+  padding-top: 6px;
+  margin-right: 20px;
   text-transform: uppercase;
+  width: 100px;
+  text-align: right;
 }
 
 .selected-date-type {
