@@ -52,7 +52,6 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 module.exports =
 {
   entry: './src/app/Root.tsx',
-  devtool: 'source-map',
 
   output:
   {
@@ -146,8 +145,8 @@ module.exports =
   plugins:
   [
     new webpack.DefinePlugin({
-      MIDWAY_HOST: JSON.stringify('http://' + (process.env.MIDWAY_HOST || 'localhost:3000')),
-      DEV: true,
+      MIDWAY_HOST: JSON.stringify(process.env.MIDWAY_HOST || 'http://localhost:3000'),
+      DEV: false,
     }),
     new HardSourceWebpackPlugin({
       cacheDirectory: './.cache/hard-source/dev/[confighash]',
