@@ -399,12 +399,12 @@ class App extends TerrainComponent<Props>
         this.fetchData();
       }
     }
-    
+
     if (this.props.location.pathname !== nextProps.location.pathname)
     {
-      console.log('p');
       if (window['dataLayer'] !== undefined)
       {
+        // track new pageview event, as the URL changed
         window['dataLayer'].push({event: 'pageview'});
       }
     }
