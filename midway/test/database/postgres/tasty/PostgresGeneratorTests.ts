@@ -99,7 +99,7 @@ test('Postgres Generator: mixedCase', async (done) =>
     'INSERT INTO movies ("movieID", "releaseDate")' +
     ' VALUES ($1, $2)' +
     ' ON CONFLICT ("movieID") DO UPDATE SET ("movieID", "releaseDate") = ($1, $2)' +
-    ' WHERE ("movies.movieID") = (13371337) RETURNING "movieID" AS insertid;',
+    ' WHERE ("movies"."movieID") = (13371337) RETURNING "movieID" AS insertid;',
   ]);
 
   query = new Tasty.Query(DBMovies)
@@ -111,7 +111,7 @@ test('Postgres Generator: mixedCase', async (done) =>
   expect(qstr).toBeInstanceOf(Array);
   expect(qstr.length).toBeGreaterThan(0);
   expect(qstr[0]).toEqual([
-    'SELECT "movies.movieID" FROM movies\n  WHERE "movies.releaseDate" <> $1\n  ORDER BY "movies.movieID" ASC;',
+    'SELECT "movies"."movieID" FROM movies\n  WHERE "movies"."releaseDate" <> $1\n  ORDER BY "movies"."movieID" ASC;',
   ]);
 
   done();
