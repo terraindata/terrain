@@ -77,6 +77,7 @@ import MultiplyTransformationNode from './nodes/MultiplyTransformationNode';
 import ProductTransformationNode from './nodes/ProductTransformationNode';
 import QuotientTransformationNode from './nodes/QuotientTransformationNode';
 import RemoveDuplicatesTransformationNode from './nodes/RemoveDuplicatesTransformationNode';
+import RoundTransformationNode from './nodes/RoundTransformationNode';
 import SetIfTransformationNode from './nodes/SetIfTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
@@ -90,6 +91,10 @@ import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+
+//const requirejs = require('requirejs');
+//const math = require('mathjs');
+import * as math from 'mathjs';
 
 export default class TransformationEngineNodeVisitor extends TransformationNodeVisitor
 {
@@ -214,6 +219,13 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     {
       return defaultResult;
     }
+  }
+
+  private static roundHelper(float: number, decimal: number) // WILL UPDATE AND FIX THIS TO-DO
+  {
+    const floatString = float.toString();
+    const decimalString = decimal.toString();
+    return 2;
   }
 
   public applyTransformationNode(node: TransformationNode, doc: object, options: object = {}): TransformationVisitResult
@@ -699,6 +711,29 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       else
       {
         yadeep.set(doc, kp, TransformationEngineNodeVisitor.hashHelper(el, opts.salt));
+      }
+    });
+  }
+
+  public visitRoundNode(node: RoundTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.RoundNode>;
+
+    return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp,el) =>
+    {
+      if (typeof el !== 'number')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to round a non-numeric field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      else
+      {
+        yadeep.set(doc, kp, math.round(el, opts.shift)); // CHECK THIS PARTTTT
       }
     });
   }

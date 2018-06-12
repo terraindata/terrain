@@ -704,6 +704,15 @@ test('suite of numeric transformations', () =>
       {
         bar: [3, 2, 1],
       },
+      {
+        bar: [13.45, 16.5, 131.98],
+      },
+      {
+        bar: [0.8, 17.5, 13.3,
+      },
+      {
+        bar: [1.340294, 32.2942305, 4.129320]
+      },
     ],
   };
 
@@ -737,6 +746,34 @@ test('suite of numeric transformations', () =>
       factor: 2,
     },
   );
+  e.appendTransformation(
+    TransformationNodeType.RoundNode,
+    List<KeyPath>([KeyPath(['foo', '2', 'bar', -1])]),
+    {
+      shift: 1,
+    },
+  );
+  e.appendTransformation(
+    TransformationNodeType.RoundNode,
+    List<KeyPath>([KeyPath(['foo', '3', 'bar', -1])]),
+    {
+      shift: 0,
+    },
+  );
+  e.appendTransformation(
+    TransformationNodeType.RoundNode,
+    List<KeyPath>([KeyPath(['foo', '4', 'bar', -1])]),
+    {
+      shift: 4,
+    },
+  );
+  e.appendTransformation(
+    TransformationNodeType.RoundNode,
+    List<KeyPath>([KeyPath(['foo', '4', 'bar', -1])]),
+    {
+      shift: 2,
+    },
+  );
 
   expect(e.transform(doc)).toEqual(
     {
@@ -746,6 +783,15 @@ test('suite of numeric transformations', () =>
         },
         {
           bar: [1, 0.5, 0],
+        },
+        {
+          bar: [13.5, 16.5, 132.0],
+        },
+        {
+          bar: [1, 18, 13],
+        },
+        {
+          bar: [1.34, 32.29, 4.13],
         },
       ],
     },
