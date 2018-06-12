@@ -585,7 +585,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
           className={this.state.dateViewType === 'specific' ? 'selected-date-type' : 'unselected-date-type'}
           onClick={this._fn(this.onDateViewChange, 'specific')}
         >
-          specific
+          custom
         </div>
         {this.state.dateViewType === 'calendar' && this.renderCalendar(date, modifiers)}
         {this.state.dateViewType === 'relative' && this.renderRelative(date)}
