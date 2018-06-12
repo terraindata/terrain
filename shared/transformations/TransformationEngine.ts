@@ -868,7 +868,8 @@ export class TransformationEngine
             {
               const newKeyReplaced: KeyPath = newKey.set(newKey.indexOf(-1), j.toString());
               const oldKeyReplaced: KeyPath = key.set(key.indexOf(-1), j.toString());
-              if (Object.keys(yadeep.get(o, oldKeyReplaced.slice(0, -1).toList()))
+              if (oldKeyReplaced.get(oldKeyReplaced.size - 1) === -1 ||
+                Object.keys(yadeep.get(o, oldKeyReplaced.slice(0, -1).toList()))
                 .indexOf(oldKeyReplaced.get(oldKeyReplaced.size - 1).toString()) !== -1)
               {
                 // console.log('r here1');
