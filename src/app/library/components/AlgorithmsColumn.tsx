@@ -56,7 +56,6 @@ import * as _ from 'lodash';
 import { AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { replaceRoute } from 'library/helpers/LibraryRoutesHelper';
-import { browserHistory } from 'react-router';
 import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
 import { Colors, fontColor } from '../../colors/Colors';
@@ -94,11 +93,11 @@ export interface Props
   categoryId: ID;
   groupId: ID;
   canPinItems: boolean;
-  params?: any;
   algorithmActions?: any;
   analytics: any;
   analyticsActions?: any;
-  router?: any;
+  match: any;
+  location?: any;
   referrer?: { label: string, path: string };
   users?: UserTypes.UserState;
 }
@@ -134,8 +133,8 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    const { canPinItems, router, analytics } = this.props;
-    const { params, location } = router;
+    const { canPinItems, match, location, analytics } = this.props;
+    const { params } = match;
     const algorithmIds = [];
 
     if (params && params.algorithmId !== null && params.algorithmId !== undefined)
@@ -144,17 +143,21 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
       algorithmIds.push(parseInt(params.algorithmId, 10));
     }
 
-    if (canPinItems && location.query && location.query.pinned !== undefined)
+    if (canPinItems && location.search)
     {
-      const pinnedAlgorithmIds = location.query.pinned.split(',');
-
-      pinnedAlgorithmIds.forEach((id) =>
+      const pinned = new URLSearchParams(location.search).get('pinned');
+      if (pinned !== undefined)
       {
-        const numericId = parseInt(id, 10);
+        const pinnedAlgorithmIds = pinned.split(',');
 
-        this.props.analyticsActions.pinAlgorithm(numericId);
-        algorithmIds.push(numericId);
-      });
+        pinnedAlgorithmIds.forEach((id) =>
+        {
+          const numericId = parseInt(id, 10);
+
+          this.props.analyticsActions.pinAlgorithm(numericId);
+          algorithmIds.push(numericId);
+        });
+      }
     }
 
     if (algorithmIds.length > 0)
@@ -197,7 +200,8 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
     }
 
     const { canPinItems, selectedAlgorithm, basePath, analytics } = this.props;
-    const { params, analytics: nextAnalytics } = nextProps;
+    const { match, analytics: nextAnalytics } = nextProps;
+    const { params } = match;
     const { categoryId, groupId } = params;
     const nextSelectedAlgorithm = nextProps.selectedAlgorithm;
     const pinnedAlgorithms = nextAnalytics
@@ -443,7 +447,7 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
 
     if (!canPinItems)
     {
-      browserHistory.push(`/builder/?o=${id}`);
+      this.browserHistory.push(`/builder/?o=${id}`);
     }
   }
 
@@ -506,11 +510,12 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
   {
     const {
       canPinItems,
-      params,
+      match,
       basePath,
       analytics,
       users,
     } = this.props;
+    const { params } = match;
     const { currentUser: me } = users;
     const currentAlgorithmId = params.algorithmId;
     const algorithm = this.props.algorithms.get(id);

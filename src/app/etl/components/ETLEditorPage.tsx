@@ -52,7 +52,6 @@ import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { withRouter } from 'react-router';
-import { browserHistory } from 'react-router';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
@@ -80,12 +79,12 @@ export interface Props
 {
   // injected
   location?: any;
-  params?: {
-    algorithmId?: number,
-    templateId?: number;
+  match: {
+    params?: {
+      algorithmId?: number,
+      templateId?: number;
+    };
   };
-  router?: any;
-  route?: any;
   walkthrough?: WalkthroughState;
   etl?: ETLState;
   editorAct?: typeof TemplateEditorActions;
@@ -222,7 +221,7 @@ class ETLEditorPage extends TerrainComponent<Props>
   // is there a better pattern for this?
   public componentWillReceiveProps(nextProps)
   {
-    const { params } = this.props;
+    const { match: { params } } = this.props;
     const nextParams = nextProps.params;
 
     if (params == null || nextParams == null)
@@ -268,7 +267,7 @@ class ETLEditorPage extends TerrainComponent<Props>
 
   public initFromRoute(props: Props)
   {
-    const { params, editorAct, walkthrough } = props;
+    const { match: { params }, editorAct, walkthrough } = props;
     editorAct({
       actionType: 'resetState',
     });
@@ -296,7 +295,7 @@ class ETLEditorPage extends TerrainComponent<Props>
   public componentDidMount()
   {
     this.initFromRoute(this.props);
-    this.unregisterHook = this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+    this.unregisterHook = this.browserHistory.block(this.routerWillLeave as any);
   }
 
   public componentWillUnmount()
@@ -370,7 +369,7 @@ class ETLEditorPage extends TerrainComponent<Props>
   public handleModalDontSave()
   {
     this.confirmedLeave = true;
-    browserHistory.push(this.state.nextLocation);
+    this.browserHistory.push(this.state.nextLocation);
     this.setState({
       leaving: false,
       switchingTemplate: false,
@@ -388,7 +387,7 @@ class ETLEditorPage extends TerrainComponent<Props>
         leaving: false,
         switchingTemplate: false,
       });
-      browserHistory.push(this.state.nextLocation);
+      this.browserHistory.push(this.state.nextLocation);
     };
 
     if (template.id !== -1)
@@ -403,7 +402,7 @@ class ETLEditorPage extends TerrainComponent<Props>
   }
 }
 
-export default withRouter(Util.createContainer(
+export default Util.createContainer(
   ETLEditorPage,
   [
     ['walkthrough'],
@@ -412,4 +411,4 @@ export default withRouter(Util.createContainer(
     ['templateEditor', 'template'],
   ],
   { editorAct: TemplateEditorActions, etlAct: ETLActions, schemaAct: SchemaActions },
-));
+);

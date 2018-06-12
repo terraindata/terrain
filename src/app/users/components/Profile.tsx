@@ -49,7 +49,7 @@ THE SOFTWARE.
 import { AuthState } from 'auth/AuthTypes';
 import * as classNames from 'classnames';
 import * as React from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { UserState } from 'users/UserTypes';
 import Util from 'util/Util';
 import InfoArea from './../../common/components/InfoArea';
@@ -63,6 +63,7 @@ export interface Props
 {
   params?: any;
   history?: any;
+  match?: any;
   children?: any;
   auth?: AuthState;
   users?: UserState;
@@ -105,7 +106,7 @@ class Profile extends TerrainComponent<Props>
     const userState: UserTypes.UserState = props.users;
     const authState = this.props.auth;
     let userId = authState.id;
-    const routeUserId = +this.props.params.userId;
+    const routeUserId = +this.props.match.params.userId;
     let isLoggedInUser = true;
     let routeIsDirect = false;
 

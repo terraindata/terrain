@@ -56,7 +56,6 @@ import { LibraryState } from 'library/LibraryTypes';
 import * as _ from 'lodash';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import LibraryActions from '../../../library/data/LibraryActions';
 import Util from '../../../util/Util';
@@ -68,8 +67,9 @@ import TerrainComponent from './../../../common/components/TerrainComponent';
 // const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
 
-const Tab = createReactClass<any, any>({
+const Tab = createReactClass({
   mixins: [PanelMixin],
+  wrapperDiv: null,
 
   propTypes:
     {
@@ -87,7 +87,6 @@ const Tab = createReactClass<any, any>({
       drag_x: true,
       reorderOnDrag: true,
       dragInsideOnly: true,
-      onClick: this.handleClick,
     };
   },
 
@@ -154,7 +153,7 @@ const Tab = createReactClass<any, any>({
         style={{
           zIndex: this.zIndexStyle(),
         }}
-        ref={this.props.name}
+        ref={(div) => this.wrapperDiv = div}
       >
         <div
           className='tab-inner'
@@ -200,6 +199,8 @@ class Tabs extends TerrainComponent<TabsProps> {
     selectorWidth: 0,
   };
 
+  public tabRefs = {};
+
   public cancel = null;
 
   public setSelectedPosition()
@@ -210,12 +211,16 @@ class Tabs extends TerrainComponent<TabsProps> {
     }
     const selected = this.state.tabs.filter((tab) => tab.selected)[0];
     const key = selected.name;
-    const cr = this.refs[key]['refs'][key]['getBoundingClientRect']();
-    const parentCr = this.refs['all-tabs']['getBoundingClientRect']();
-    this.setState({
-      selectorLeft: cr.left - parentCr.left,
-      selectorWidth: cr.width,
-    });
+    if (this.tabRefs[key] !== undefined)
+    {
+      const cr = this.tabRefs[key].wrapperDiv['getBoundingClientRect']();
+      const parentCr = this.refs['all-tabs']['getBoundingClientRect']();
+
+      this.setState({
+        selectorLeft: cr.left - parentCr.left,
+        selectorWidth: cr.width,
+      });
+    }
   }
 
   public componentWillMount()
@@ -248,6 +253,16 @@ class Tabs extends TerrainComponent<TabsProps> {
     }
   }
 
+  public componentDidMount()
+  {
+    this.setSelectedPosition();
+  }
+
+  public componentDidUpdate()
+  {
+    this.setSelectedPosition();
+  }
+
   public computeTabs(config, props)
   {
     const { library } = props;
@@ -278,20 +293,15 @@ class Tabs extends TerrainComponent<TabsProps> {
 
     this.setState({
       tabs,
-    }, () => { this.setSelectedPosition(); });
+    });
   }
-
-  // shouldComponentUpdate(nextProps, nextState)
-  // {
-  //   return !_.isEqual(nextState.tabs, this.state.tabs);
-  // }
 
   public moveTabs(index: number, destination: number)
   {
     const newTabs = JSON.parse(JSON.stringify(this.state.tabs));
     const tab = newTabs.splice(index, 1)[0];
     newTabs.splice(destination, 0, tab);
-    browserHistory.push('/builder/' +
+    this.browserHistory.push('/builder/' +
       newTabs.map(
         (tab) => (tab.selected ? '!' : '') + tab.id,
       ).join(','),
@@ -312,7 +322,7 @@ class Tabs extends TerrainComponent<TabsProps> {
                   'tabs-action-enabled': action.enabled || action.enabled === undefined,
                 })}
                 key={index}
-                onClick={action.onClick}
+                onClick={action.enabled ? action.onClick : null}
                 style={_.extend({},
                   action.text ? backgroundColor(action.enabled ? Colors().sidebarBg : Colors().blockBg) : {},
                   action.style,
@@ -371,12 +381,12 @@ class Tabs extends TerrainComponent<TabsProps> {
 
   public handleClick(id: ID)
   {
-    browserHistory.push(this.getTo(id));
+    this.browserHistory.push(this.getTo(id));
   }
 
   public handleClose(id: ID)
   {
-    browserHistory.push(this.getCloseTo(id));
+    this.browserHistory.push(this.getCloseTo(id));
   }
 
   public getTo(id)
@@ -403,12 +413,13 @@ class Tabs extends TerrainComponent<TabsProps> {
 
   public render()
   {
+
     const { tabs } = this.state;
 
     const tabsLayout =
       {
         compact: true,
-        columns: tabs ? tabs.slice(-4).map((tab, index) => (
+        columns: tabs ? tabs.map((tab, index) => (
           {
             key: tab.id,
             content:
@@ -419,7 +430,7 @@ class Tabs extends TerrainComponent<TabsProps> {
                 index={index}
                 onClick={this.handleClick}
                 onClose={this.handleClose}
-                ref={tab.name}
+                ref={(tabElement) => { this.tabRefs[tab.name] = tabElement; }}
               />
             ,
           }))
@@ -438,7 +449,7 @@ class Tabs extends TerrainComponent<TabsProps> {
           >
             <div
               className='tabs-inner-wrapper'
-              ref={'all-tabs'}
+              ref='all-tabs'
             >
               <div
                 className='tabs-selected-marker'

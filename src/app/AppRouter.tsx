@@ -43,34 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+import createHistory from 'history/createBrowserHistory';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
-import { IndexRedirect, IndexRoute, Route, Router } from 'react-router';
+import { Redirect as RRedirect, Route, Router } from 'react-router-dom';
 
-import DataTabs from 'etl/components/DataTabs';
-import TemplateList from 'etl/templates/components/TemplateList';
-import Jobs from 'jobs/components/Jobs';
-import ScheduleList from 'scheduler/components/ScheduleList';
 import App from './App';
-import Builder from './builder/components/Builder';
-import Logout from './common/components/Logout';
-import Placeholder from './common/components/Placeholder';
-import Redirect from './common/components/Redirect';
 import TerrainComponent from './common/components/TerrainComponent';
-import UIComponentsPage from './common/UIComponentsPage';
-import ETLEditorPage from './etl/components/ETLEditorPage';
-import ETLWalkthrough from './etl/walkthrough/components/ETLWalkthrough';
-import Library from './library/components/LibraryDnd';
-import ManualWrapper from './manual/components/ManualWrapper';
-import SchemaPage from './schema/components/SchemaPage';
-import Account from './users/components/Account';
-import Connections from './users/components/Connections';
-import EditProfile from './users/components/EditProfile';
-import Notifications from './users/components/Notifications';
-import Profile from './users/components/Profile';
-import Settings from './users/components/Settings';
-import Team from './users/components/Team';
-import X from './x/components/X';
 
 import IntegrationEditorPage from './etl/integrations/components/IntegrationEditorPage';
 import IntegrationList from './etl/integrations/components/IntegrationList';
@@ -78,96 +56,9 @@ import IntegrationList from './etl/integrations/components/IntegrationList';
 class AppRouter extends TerrainComponent<{}> {
   public render()
   {
-    const libraryLibrary = (props) => <Library basePath={'library'} {...props} />;
-    const analyticsLibrary = (props) => (<Library
-      basePath={'analytics'}
-      canPinAlgorithms={true}
-      singleColumn={true}
-      {...props}
-    />);
-
     return (
-      <Router history={browserHistory}>
-        <Route path='/' component={App}>
-          <IndexRoute component={Redirect} />
-
-          <Route path='/builder' component={Builder} />
-          <Route path='/builder/:config' component={Builder} />
-          <Route path='/builder/:config/:splitConfig' component={Builder} />
-
-          <Route path='/library'>
-            <IndexRoute component={libraryLibrary} />
-            <Route path=':categoryId' component={libraryLibrary}>
-              <IndexRoute component={libraryLibrary} />
-              <Route path=':groupId' component={libraryLibrary}>
-                <IndexRoute component={libraryLibrary} />
-                <Route path=':algorithmId' component={libraryLibrary}>
-                  <IndexRoute component={libraryLibrary} />
-                </Route>
-              </Route>
-            </Route>
-          </Route>
-
-          <Route path='/account' component={Account}>
-            <IndexRoute component={Profile} />
-            <Route path='/account/profile' component={Profile} />
-            <Route path='/account/profile/edit' component={EditProfile} />
-            <Route path='/account/settings' component={Settings} />
-            <Route path='/account/notifications' component={Notifications} />
-            <Route path='/account/connections' component={Connections} />
-            <Route path='/account/team' component={Team} />
-          </Route>
-
-          <Route path='/manual' component={ManualWrapper} />
-          <Route path='/manual/:term' component={ManualWrapper} />
-
-          <Route path='/users/:userId' component={Profile} />
-
-          <Route path='/reporting' component={Placeholder} />
-
-          <Route path='/logout' component={Logout} />
-
-          <Route path='/x' component={X} />
-          <Route path='/x/:x' component={X} />
-
-          <Route path='/ui' component={UIComponentsPage} />
-
-          <Route path='/browser' component={Redirect} />
-          <Route path='/browser/:a' component={Redirect} />
-          <Route path='/browser/:a/:b' component={Redirect} />
-          <Route path='/browser/:a/:b/:c' component={Redirect} />
-
-          <Route path='/schema' component={SchemaPage} />
-
-          <Route path='/data' component={DataTabs}>
-            <IndexRedirect to='/data/templates' />
-            <Route path='templates' component={TemplateList} />
-            <Route path='newtemplate(/:step)' component={ETLWalkthrough} />
-            <Route path='templates/edit/new' component={ETLEditorPage} />
-            <Route path='templates/edit/algorithmId=:algorithmId' component={ETLEditorPage} />
-            <Route path='templates/edit/templateId=:templateId' component={ETLEditorPage} />
-
-            <Route path='integrations' component={IntegrationList} />
-            <Route path='integrations/edit/integrationId=:integrationId' component={IntegrationEditorPage} />
-
-            <Route path='schedules' component={ScheduleList} />
-            <Route path='jobs' component={Jobs} />
-          </Route>
-
-          <Route path='/analytics'>
-            <IndexRoute component={analyticsLibrary} />
-            <Route path=':categoryId' component={analyticsLibrary}>
-              <IndexRoute component={analyticsLibrary} />
-              <Route path=':groupId' component={analyticsLibrary}>
-                <IndexRoute component={analyticsLibrary} />
-                <Route path=':algorithmId' component={analyticsLibrary}>
-                  <IndexRoute component={analyticsLibrary} />
-                </Route>
-              </Route>
-            </Route>
-          </Route>
-
-        </Route>
+      <Router history={this.browserHistory}>
+        <Route path='/' component={App} />
       </Router>
     );
   }

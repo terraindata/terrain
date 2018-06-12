@@ -8,5 +8,6 @@ echo "${defaultUserAccessToken}"
 PGPASSWORD="r3curs1v3$" psql -U "t3rr41n-demo" -d midway -h localhost -c 'DROP TABLE IF EXISTS schedules; ' -p 5432
 PGPASSWORD="r3curs1v3$" psql -U "t3rr41n-demo" -d midway -h localhost -c 'DROP TABLE IF EXISTS schedulerLogs; ' -p 5432
 PGPASSWORD="r3curs1v3$" psql -U "t3rr41n-demo" -d midway -h localhost -c 'DROP TABLE IF EXISTS jobs; ' -p 5432
+PGPASSWORD="r3curs1v3$" psql -U "t3rr41n-demo" -d midway -h localhost -c 'DROP TABLE IF EXISTS jobLogs; ' -p 5432
 PGPASSWORD="r3curs1v3$" psql -U "t3rr41n-demo" -d midway -h localhost -c 'DROP TABLE IF EXISTS integrations; ' -p 5432
 

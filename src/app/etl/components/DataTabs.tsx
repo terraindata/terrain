@@ -49,23 +49,26 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import TerrainTabs from 'common/components/TerrainTabs';
 import ETLNotifications from 'etl/components/ETLNotifications';
 import { ETLActions } from 'etl/ETLRedux';
+import IntegrationEditorPage from 'etl/integrations/components/IntegrationEditorPage';
 import IntegrationList from 'etl/integrations/components/IntegrationList';
 import TemplateList from 'etl/templates/components/TemplateList';
+import ETLWalkthrough from 'etl/walkthrough/components/ETLWalkthrough';
 import Jobs from 'jobs/components/Jobs';
 import * as React from 'react';
+import { Redirect, Route, Switch } from 'react-router-dom';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import ScheduleList from 'scheduler/components/ScheduleList';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import Util from 'util/Util';
 import './DataTabs.less';
+import ETLEditorPage from './ETLEditorPage';
 
 interface DataTabsProps
 {
   templates: List<ETLTemplate>;
   etlActions?: typeof ETLActions;
-  params: any;
-  router: any;
   children: JSX.Element;
+  location: any;
 }
 
 class DataTabs extends TerrainComponent<DataTabsProps>
@@ -102,7 +105,7 @@ class DataTabs extends TerrainComponent<DataTabsProps>
 
   public render()
   {
-    const { params, router, children } = this.props;
+    const { children, location } = this.props;
 
     return (
       <div className='etl'>
@@ -110,11 +113,21 @@ class DataTabs extends TerrainComponent<DataTabsProps>
           <TerrainTabs
             tabs={this.tabs}
             tabToRouteMap={this.tabToRouteMap}
-            router={router}
+            location={location}
           >
-            {
-              this.props.children
-            }
+            <Switch>
+              <Route exact path='/data/templates' component={TemplateList} />
+              <Route exact path='/data/newtemplate/:step?' component={ETLWalkthrough} />
+              <Route exact path='/data/templates/edit/new' component={ETLEditorPage} />
+              <Route exact path='/data/templates/edit/algorithmId=:algorithmId' component={ETLEditorPage} />
+              <Route exact path='/data/templates/edit/templateId=:templateId' component={ETLEditorPage} />
+
+              <Route exact path='/data/integrations' component={IntegrationList} />
+              <Route exact path='/data/integrations/edit/integrationId=:integrationId' component={IntegrationEditorPage} />
+
+              <Route exact path='/data/schedules' component={ScheduleList} />
+              <Route exact path='/data/jobs' component={Jobs} />
+            </Switch>
           </TerrainTabs>
           <ETLNotifications />
         </div>

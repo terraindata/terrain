@@ -51,7 +51,7 @@ import './LibraryColumn.less';
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');

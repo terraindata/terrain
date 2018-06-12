@@ -43,7 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import { browserHistory } from 'react-router';
+
+import { browserHistory } from 'common/components/TerrainComponent';
 
 interface LibraryRouteComponents
 {
@@ -98,5 +99,8 @@ export function loadLastRoute(basePath: string)
   // no path given, redirect to last library path
   const lastPath = localStorage.getItem(lastPathKey);
 
-  browserHistory.replace({ pathname: lastPath });
+  if (lastPath != null)
+  {
+    browserHistory.replace({ pathname: lastPath });
+  }
 }

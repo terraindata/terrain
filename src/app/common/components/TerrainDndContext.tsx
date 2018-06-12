@@ -42,38 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-import * as React from 'react';
-import Util from 'util/Util';
-import { AuthActions } from '../../auth/data/AuthRedux';
-import TerrainComponent from '../../common/components/TerrainComponent';
-import InfoArea from './InfoArea';
+// Copyright 2018 Terrain Data, Inc.
+import { DragDropContext } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 
-export interface Props
-{
-  history?: any;
-  authActions: typeof AuthActions;
-}
-
-class Logout extends TerrainComponent<Props>
-{
-  public componentWillMount()
-  {
-    this.props.authActions({
-      actionType: 'logout',
-    });
-    this.browserHistory.replace('/');
-  }
-
-  public render()
-  {
-    return (
-      <InfoArea large='Logging out...' />
-    );
-  }
-}
-export default Util.createTypedContainer(
-  Logout,
-  [],
-  { authActions: AuthActions },
-);
+export default DragDropContext(HTML5Backend);

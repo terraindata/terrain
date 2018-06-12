@@ -50,7 +50,6 @@ import * as classNames from 'classnames';
 import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 import Autocomplete from './../../common/components/Autocomplete';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Manual.less';
@@ -299,7 +298,7 @@ class Manual extends TerrainComponent<Props>
 
     if (this.props.manualTab)
     {
-      browserHistory.push('/manual/' + encodeURIComponent(value));
+      this.browserHistory.push('/manual/' + encodeURIComponent(value));
     }
 
     this.props.changeCardName && this.props.changeCardName(value);
@@ -354,7 +353,7 @@ class Manual extends TerrainComponent<Props>
       value: '',
       expandTqlCards: this.state.selectedKey === 'TQL Cards' ? !this.state.expandTqlCards : true,
     });
-    browserHistory.push('/manual/TQL%20Cards');
+    this.browserHistory.push('/manual/TQL%20Cards');
   }
 
   public showPhraseTypes()
@@ -367,7 +366,7 @@ class Manual extends TerrainComponent<Props>
       value: '',
       expandPhraseTypes: this.state.selectedKey === 'Phrase Types' ? !this.state.expandPhraseTypes : true,
     });
-    browserHistory.push('/manual/Phrase%20Types');
+    this.browserHistory.push('/manual/Phrase%20Types');
   }
 
   public toggleTqlCardList()
