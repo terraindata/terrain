@@ -125,7 +125,6 @@ const DefaultMoveState: IMoveState =
     movedTo: null,
   };
 
-const shallowCompare = require('react-addons-shallow-compare');
 // TODO consider adding state to the template
 @Radium
 class CardField extends TerrainComponent<Props>

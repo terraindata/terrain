@@ -48,6 +48,9 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
+import { guessFileOptionsHelper } from 'shared/etl/FileUtil';
+import { FileConfig } from 'shared/etl/types/EndpointTypes';
+import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
 import
@@ -70,6 +73,28 @@ class IntegrationConfigC implements IntegrationConfigBase
   public readPermission = null;
   public writePermission = null;
   public meta = null;
+
+  public guessFileOptions(): Partial<FileConfig>
+  {
+    const config: any = this.connectionConfig;
+    switch (this.type)
+    {
+      case Integrations.Http:
+        return guessFileOptionsHelper(config.url);
+      case Integrations.Fs:
+        return guessFileOptionsHelper(config.path);
+      case Integrations.Magento:
+      case Integrations.Postgresql:
+      case Integrations.GoogleAnalytics:
+      case Integrations.MailChimp:
+      case Integrations.Mysql:
+        return {
+          fileType: FileTypes.Json,
+        };
+      default:
+        return null;
+    }
+  }
 }
 export type IntegrationConfig = WithIRecord<IntegrationConfigC>;
 export const _IntegrationConfig = makeExtendedConstructor(IntegrationConfigC, true, {

@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 
 import AddTransformationNode from './nodes/AddTransformationNode';
 import ArrayCountTransformationNode from './nodes/ArrayCountTransformationNode';
@@ -63,6 +64,7 @@ import JoinTransformationNode from './nodes/JoinTransformationNode';
 import MultiplyTransformationNode from './nodes/MultiplyTransformationNode';
 import ProductTransformationNode from './nodes/ProductTransformationNode';
 import QuotientTransformationNode from './nodes/QuotientTransformationNode';
+import RemoveDuplicatesTransformationNode from './nodes/RemoveDuplicatesTransformationNode';
 import SetIfTransformationNode from './nodes/SetIfTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
@@ -89,7 +91,7 @@ export interface InfoType<T extends TransformationNodeType = any>
   description?: string; // description of what the transformation does
   isAvailable?: (engine: TransformationEngine, fieldId: number) => boolean;
   shortSummary?: (meta: NodeOptionsType<T>) => string;
-  type?: any;
+  type: any;
   targetedVisitor: (visitor: TransformationNodeVisitor,
     transformationNode: TransformationNode,
     docCopy: object,
@@ -173,10 +175,10 @@ const TransformationNodeInfo: AllNodeInfoType =
         type: DuplicateTransformationNode,
         isAvailable: (engine, fieldId) =>
         {
-          const repType = EngineUtil.getRepresentedType(fieldId, engine);
+          const etlType = EngineUtil.getETLFieldType(fieldId, engine);
           return (
             EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId)) &&
-            repType !== 'object' && repType !== 'array'
+            etlType !== ETLFieldTypes.Object && etlType !== ETLFieldTypes.Array
           );
         },
         targetedVisitor: (visitor: TransformationNodeVisitor,
@@ -603,7 +605,7 @@ const TransformationNodeInfo: AllNodeInfoType =
         editable: true,
         creatable: true,
         description: `Filter an array on its values`,
-        type: ArrayCountTransformationNode,
+        type: FilterArrayTransformationNode,
         isAvailable: (engine, fieldId) =>
         {
           return (
@@ -617,6 +619,28 @@ const TransformationNodeInfo: AllNodeInfoType =
           options: object) =>
           visitor.visitFilterArrayNode(transformationNode, docCopy, options),
         newFieldType: 'array',
+      },
+    [TransformationNodeType.RemoveDuplicatesNode]:
+      {
+        humanName: 'Remove Duplicates',
+        editable: true,
+        creatable: true,
+        description: 'Remove Duplicate Values from an Array',
+        type: RemoveDuplicatesTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          const valueType = EngineUtil.getValueType(fieldId, engine);
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+            (valueType === 'number' || valueType === 'string') &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitRemoveDuplicatesNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.ZipcodeNode]:
       {

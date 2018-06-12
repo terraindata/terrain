@@ -49,118 +49,139 @@ import * as KoaRouter from 'koa-router';
 import * as send from 'koa-send';
 
 import * as Util from './AppUtil';
-import AuthRouter from './auth/AuthRouter';
-import DatabaseRouter from './database/DatabaseRouter';
-import ETLRouter from './etl/ETLRouter';
-import EventRouter from './events/EventRouter';
-import IntegrationRouter from './integrations/IntegrationRouter';
-import ExportRouter from './io/ExportRouter';
-import ImportRouter from './io/ImportRouter';
-import ItemRouter from './items/ItemRouter';
-import JobRouter from './jobs/JobRouter';
-import QueryRouter from './query/QueryRouter';
-import ResultsConfigRouter from './resultsConfig/ResultsConfigRouter';
-import SchedulerRouter from './scheduler/SchedulerRouter';
-import SchemaRouter from './schema/SchemaRouter';
-import SchemaMetadataRouter from './schemaMetadata/SchemaMetadataRouter';
-import StatusRouter from './status/StatusRouter';
-import UserRouter from './users/UserRouter';
-import VersionRouter from './versions/VersionRouter';
+import * as AuthRouter from './auth/AuthRouter';
+import * as DatabaseRouter from './database/DatabaseRouter';
+import * as ETLRouter from './etl/ETLRouter';
+import * as EventRouter from './events/EventRouter';
+import * as IntegrationRouter from './integrations/IntegrationRouter';
+import * as ItemRouter from './items/ItemRouter';
+import * as JobRouter from './jobs/JobRouter';
+import * as QueryRouter from './query/QueryRouter';
+import * as ResultsConfigRouter from './resultsConfig/ResultsConfigRouter';
+import * as SchedulerRouter from './scheduler/SchedulerRouter';
+import * as SchemaRouter from './schema/SchemaRouter';
+import * as SchemaMetadataRouter from './schemaMetadata/SchemaMetadataRouter';
+import * as StatusRouter from './status/StatusRouter';
+import * as UserRouter from './users/UserRouter';
+import * as VersionRouter from './versions/VersionRouter';
 
-const AppRouter = new KoaRouter();
-
-AppRouter.use('/auth', AuthRouter.routes(), AuthRouter.allowedMethods());
-AppRouter.use('/events', EventRouter.routes(), EventRouter.allowedMethods());
-AppRouter.use('/users', UserRouter.routes(), UserRouter.allowedMethods());
-AppRouter.use('/items', ItemRouter.routes(), ItemRouter.allowedMethods());
-AppRouter.use('/versions', VersionRouter.routes(), VersionRouter.allowedMethods());
-AppRouter.use('/database', DatabaseRouter.routes(), DatabaseRouter.allowedMethods());
-AppRouter.use('/scheduler', SchedulerRouter.routes(), SchedulerRouter.allowedMethods());
-AppRouter.use('/jobs', JobRouter.routes(), JobRouter.allowedMethods());
-AppRouter.use('/schema', SchemaRouter.routes(), SchemaRouter.allowedMethods());
-AppRouter.use('/status', StatusRouter.routes(), StatusRouter.allowedMethods());
-AppRouter.use('/query', QueryRouter.routes(), QueryRouter.allowedMethods());
-AppRouter.use('/import', ImportRouter.routes(), ImportRouter.allowedMethods());
-AppRouter.use('/export', ExportRouter.routes(), ExportRouter.allowedMethods());
-AppRouter.use('/integrations', IntegrationRouter.routes(), IntegrationRouter.allowedMethods());
-AppRouter.use('/etl', ETLRouter.routes(), ETLRouter.allowedMethods());
-AppRouter.use('/schemametadata', SchemaMetadataRouter.routes(), SchemaMetadataRouter.allowedMethods());
-AppRouter.use('/resultsconfig', ResultsConfigRouter.routes(), ResultsConfigRouter.allowedMethods());
-// Add future routes here.
-
-AppRouter.get('/time', (ctx, next) =>
+export function getRouter()
 {
-  ctx.body = { serverTime: new Date().toJSON() };
-});
+  const AppRouter = new KoaRouter();
 
-// Prefix all routes with /midway
-//  This is so that we can allow the front-end to use all other routes.
-//  Any route not prefixed with /midway will just serve the front-end.
+  AuthRouter.initialize();
+  EventRouter.initialize();
+  UserRouter.initialize();
+  ItemRouter.initialize();
+  VersionRouter.initialize();
+  DatabaseRouter.initialize();
+  SchedulerRouter.initialize();
+  JobRouter.initialize();
+  SchemaRouter.initialize();
+  StatusRouter.initialize();
+  QueryRouter.initialize();
+  IntegrationRouter.initialize();
+  ETLRouter.initialize();
+  SchemaMetadataRouter.initialize();
+  ResultsConfigRouter.initialize();
+  AppRouter.use('/auth', AuthRouter.default.routes(), AuthRouter.default.allowedMethods());
+  AppRouter.use('/events', EventRouter.default.routes(), EventRouter.default.allowedMethods());
+  AppRouter.use('/users', UserRouter.default.routes(), UserRouter.default.allowedMethods());
+  AppRouter.use('/items', ItemRouter.default.routes(), ItemRouter.default.allowedMethods());
+  AppRouter.use('/versions', VersionRouter.default.routes(), VersionRouter.default.allowedMethods());
+  AppRouter.use('/database', DatabaseRouter.default.routes(), DatabaseRouter.default.allowedMethods());
+  AppRouter.use('/scheduler', SchedulerRouter.default.routes(), SchedulerRouter.default.allowedMethods());
+  AppRouter.use('/jobs', JobRouter.default.routes(), JobRouter.default.allowedMethods());
+  AppRouter.use('/schema', SchemaRouter.default.routes(), SchemaRouter.default.allowedMethods());
+  AppRouter.use('/status', StatusRouter.default.routes(), StatusRouter.default.allowedMethods());
+  AppRouter.use('/query', QueryRouter.default.routes(), QueryRouter.default.allowedMethods());
+  AppRouter.use('/integrations', IntegrationRouter.default.routes(), IntegrationRouter.default.allowedMethods());
+  AppRouter.use('/etl', ETLRouter.default.routes(), ETLRouter.default.allowedMethods());
+  AppRouter.use('/schemametadata', SchemaMetadataRouter.default.routes(), SchemaMetadataRouter.default.allowedMethods());
+  AppRouter.use('/resultsconfig', ResultsConfigRouter.default.routes(), ResultsConfigRouter.default.allowedMethods());
+  // Add future routes here.
 
-AppRouter.get('/', async (ctx, next) =>
-{
-  if (ctx.state.user !== undefined && ctx.state.user[0] !== undefined)
+  AppRouter.get('/time', (ctx, next) =>
+  {
+    ctx.body = { serverTime: new Date().toJSON() };
+  });
+
+  // Prefix all routes with /midway
+  //  This is so that we can allow the front-end to use all other routes.
+  //  Any route not prefixed with /midway will just serve the front-end.
+
+  AppRouter.get('/', async (ctx, next) =>
+  {
+    if (ctx.state.user !== undefined && ctx.state.user[0] !== undefined)
+    {
+      ctx.body = 'authenticated as ' + (ctx.state.user[0].email as string);
+    }
+    else
+    {
+      ctx.body = 'not authenticated';
+    }
+  });
+
+  AppRouter.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
   {
     ctx.body = 'authenticated as ' + (ctx.state.user[0].email as string);
-  }
-  else
+  });
+
+  const MidwayRouter = new KoaRouter();
+  MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
+
+  MidwayRouter.get('/', async (ctx, next) =>
   {
-    ctx.body = 'not authenticated';
-  }
-});
+    await send(ctx, '/src/app/index.html');
+  });
 
-AppRouter.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  ctx.body = 'authenticated as ' + (ctx.state.user[0].email as string);
-});
-
-const MidwayRouter = new KoaRouter();
-MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
-
-MidwayRouter.get('/', async (ctx, next) =>
-{
-  await send(ctx, '/src/app/index.html');
-});
-
-MidwayRouter.get('/assets/:asset', async (ctx, next) =>
-{
-  // Allow these specific filenames
-  const allowedNames: string[] = [
-    'bundle.js',
-    'vendor.bundle.js',
-  ];
-
-  // Allow any files matching these extensions
-  const allowedExtensions: string[] = [
-    '.woff',
-  ];
-
-  let rejectRequest: boolean = false;
-  if (!allowedNames.includes(ctx.params['asset']))
+  MidwayRouter.get('/assets/:asset', async (ctx, next) =>
   {
-    rejectRequest = true;
-    allowedExtensions.forEach((ext) =>
+    // Allow these specific filenames
+    const allowedNames: string[] = [
+      'bundle.js',
+      'vendor.bundle.js',
+    ];
+
+    // Allow any files matching these extensions
+    const allowedExtensions: string[] = [
+      '.woff',
+    ];
+
+    let rejectRequest: boolean = false;
+    if (!allowedNames.includes(ctx.params['asset']))
     {
-      if (ctx.params['asset'].endsWith(ext))
+      rejectRequest = true;
+      allowedExtensions.forEach((ext) =>
       {
-        rejectRequest = false;
-      }
-    });
-  }
+        if (ctx.params['asset'].endsWith(ext))
+        {
+          rejectRequest = false;
+        }
+      });
+    }
 
-  if (rejectRequest === true)
-  {
-    return;
-  }
+    if (rejectRequest === true)
+    {
+      return;
+    }
 
-  if (process.env.NODE_ENV === 'production')
-  {
-    await send(ctx, `/midway/src/assets/${ctx.params['asset']}`);
-  }
-  else
-  {
-    ctx.body = await Util.doRequest(`http://localhost:8080/assets/${ctx.params['asset']}`);
-  }
-});
+    if (process.env.NODE_ENV === 'production')
+    {
+      await send(ctx, `/midway/src/assets/${ctx.params['asset']}`);
+    }
+    else
+    {
+      ctx.body = await Util.doRequest(`http://localhost:8080/assets/${ctx.params['asset']}`);
+    }
+  });
 
-export default MidwayRouter;
+  MidwayRouter.get('/robots.txt', async (ctx, next) =>
+  {
+    await send(ctx, '/src/app/robots.txt');
+  });
+
+  return MidwayRouter;
+}
+
+export default getRouter;

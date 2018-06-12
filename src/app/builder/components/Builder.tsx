@@ -48,19 +48,16 @@ THE SOFTWARE.
 
 // Libraries
 import * as classNames from 'classnames';
+import TerrainDndContext from 'common/components/TerrainDndContext';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { DragDropContext } from 'react-dnd';
 const HTML5Backend = require('react-dnd-html5-backend');
-import { browserHistory } from 'react-router';
 import { withRouter } from 'react-router';
 
 // Data
 import { ItemStatus } from '../../../items/types/Item';
 import Query from '../../../items/types/Query';
-import FileImportStore from '../../fileImport/data/FileImportStore';
-import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import LibraryActions from '../../library/data/LibraryActions';
 import * as LibraryTypes from '../../library/LibraryTypes';
 import RolesStore from '../../roles/data/RolesStore';
@@ -72,11 +69,11 @@ type Algorithm = LibraryTypes.Algorithm;
 
 // Components
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { UserState } from 'users/UserTypes';
 import { backgroundColor, Colors } from '../../colors/Colors';
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
-import FileImportPreviewColumn from '../../fileImport/components/FileImportPreviewColumn';
 import { notificationManager } from './../../common/components/InAppNotification';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import BuilderColumn from './BuilderColumn';
@@ -94,9 +91,8 @@ const { Map, List } = Immutable;
 
 export interface Props
 {
-  params?: any;
   location?: any;
-  router?: any;
+  match?: any;
   route?: any;
   users?: UserState;
   library?: LibraryTypes.LibraryState;
@@ -108,7 +104,6 @@ export interface Props
 class Builder extends TerrainComponent<Props>
 {
   public state: {
-    exportState: FileImportTypes.FileImportState,
     algorithms: IMMap<ID, Algorithm>,
 
     colKeys: List<number>;
@@ -130,9 +125,8 @@ class Builder extends TerrainComponent<Props>
     savingAs?: boolean;
 
     hitsPage: number;
-
+    showingExportErrorModal: boolean;
   } = {
-      exportState: FileImportStore.getState(),
       algorithms: this.props.library.algorithms,
 
       colKeys: null,
@@ -151,6 +145,7 @@ class Builder extends TerrainComponent<Props>
 
       saveAsTextboxValue: '',
       hitsPage: 1,
+      showingExportErrorModal: false,
 
     };
 
@@ -161,9 +156,6 @@ class Builder extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
-    this._subscribe(FileImportStore, {
-      stateKey: 'exportState',
-    });
 
     let colKeys: List<number>;
 
@@ -195,8 +187,7 @@ class Builder extends TerrainComponent<Props>
     this.initialColSizes = colSizes;
   }
 
-  public unregisterLeaveHook1: any = () => undefined;
-  public unregisterLeaveHook2: any = () => undefined;
+  public unregisterLeaveHook: any = () => undefined;
 
   public shouldComponentUpdate(nextProps: Props, nextState)
   {
@@ -244,13 +235,12 @@ class Builder extends TerrainComponent<Props>
       }
     };
 
-    this.unregisterLeaveHook1 = this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+    this.unregisterLeaveHook = this.browserHistory.block(this.routerWillLeave as any);
   }
 
   public componentWillUnmount()
   {
-    this.unregisterLeaveHook1();
-    this.unregisterLeaveHook2();
+    this.unregisterLeaveHook();
     window.onbeforeunload = null;
   }
 
@@ -311,29 +301,38 @@ class Builder extends TerrainComponent<Props>
     )
     {
       this.setState({
-        tabActions: this.getTabActions(nextProps.builder),
+        tabActions: this.getTabActions(nextProps.builder, nextProps),
       });
     }
-
     if (
-      nextProps.params.config !== this.props.params.config
+      nextProps.match.params.config !== this.props.match.params.config
       || currentOpen !== nextOpen
     )
     {
       this.confirmedLeave = false;
-      if (!nextProps.location.query || !nextProps.location.query.o)
+      if (!nextProps.location.search || !new URLSearchParams(nextProps.location.search).get('o'))
       {
-        this.unregisterLeaveHook2 = this.props.router.setRouteLeaveHook(nextProps.route, this.routerWillLeave);
+        this.unregisterLeaveHook = this.unregisterLeaveHook || this.browserHistory.block(this.routerWillLeave as any);
       }
       this.checkConfig(nextProps);
+    }
+    const oldAlgorithm = this.getAlgorithm();
+    const newAlgorithm = this.getAlgorithm(nextProps);
+    const oldStatus = oldAlgorithm ? oldAlgorithm.status : null;
+    const newStatus = newAlgorithm ? newAlgorithm.status : null;
+    if (oldStatus !== newStatus)
+    {
+      this.setState({
+        tabActions: this.getTabActions(nextProps.builder, nextProps),
+      });
     }
   }
 
   public checkConfig(props: Props)
   {
     const storedConfig = localStorage.getItem('config') || '';
-    const open = props.location.query && props.location.query.o;
-    const originalConfig = props.params.config || storedConfig;
+    const open = props.location.search && new URLSearchParams(props.location.search).get('o');
+    const originalConfig = props.match.params.config || storedConfig;
     let newConfig = originalConfig;
 
     if (open)
@@ -362,11 +361,11 @@ class Builder extends TerrainComponent<Props>
     {
       newConfig = '!' + newConfig;
     }
-    if (newConfig !== props.params.config
-      && (props.params.config !== undefined || newConfig.length)
+    if (newConfig !== props.match.params.config
+      && (props.match.params.config !== undefined || newConfig.length)
     )
     {
-      browserHistory.replace(`/builder/${newConfig}`);
+      this.browserHistory.replace(`/builder/${newConfig}`);
     }
     localStorage.setItem('config', newConfig || '');
 
@@ -388,7 +387,7 @@ class Builder extends TerrainComponent<Props>
 
   public handleNoAlgorithm(algorithmId: ID)
   {
-    if (this.props.params.config && this.state.nonexistentAlgorithmIds.indexOf(algorithmId) === -1)
+    if (this.props.match.params.config && this.state.nonexistentAlgorithmIds.indexOf(algorithmId) === -1)
     {
       this.setState({
         nonexistentAlgorithmIds: this.state.nonexistentAlgorithmIds.push(algorithmId),
@@ -403,14 +402,14 @@ class Builder extends TerrainComponent<Props>
 
       const newConfig = newConfigArr.join(',');
       localStorage.setItem('config', newConfig); // so that empty configs don't cause a freak out
-      browserHistory.replace(`/builder/${newConfig}`);
+      this.browserHistory.replace(`/builder/${newConfig}`);
     }
   }
 
   public getSelectedId(props?: Props)
   {
     props = props || this.props;
-    const selected = props.params.config && props.params.config.split(',').find((id) => id.indexOf('!') === 0);
+    const selected = props.match.params.config && props.match.params.config.split(',').find((id) => id.indexOf('!') === 0);
     return selected && selected.substr(1);
   }
 
@@ -430,13 +429,13 @@ class Builder extends TerrainComponent<Props>
     {
       return null;
     }
-
+    props = props || this.props;
     const algorithmId = this.getSelectedId(props);
-    const algorithm = this.props.library.algorithms &&
-      this.props.library.algorithms.get(+algorithmId);
+    const algorithm = props.library.algorithms &&
+      props.library.algorithms.get(+algorithmId);
     if (algorithmId && !algorithm)
     {
-      this.props.algorithmActions.fetchVersion(algorithmId, () =>
+      props.algorithmActions.fetchVersion(algorithmId, () =>
       {
         // no version available
         this.handleNoAlgorithm(algorithmId);
@@ -445,9 +444,33 @@ class Builder extends TerrainComponent<Props>
     return algorithm; // || this.loadingAlgorithm;
   }
 
-  public getTabActions(builderState: BuilderState): List<TabAction>
+  public getTabActions(builderState: BuilderState, props?: Props): List<TabAction>
   {
+    const algorithm = this.getAlgorithm(props);
+    const isLive = algorithm &&
+      (algorithm.status === ItemStatus.Live || algorithm.status === ItemStatus.Deployed);
     return Immutable.List([
+      {
+        text: 'Export',
+        icon: null,
+        onClick: this.handleExport,
+        enabled: isLive,
+        html: !isLive ?
+          <div>
+            Algorithms must be live or deployed to export.
+            <div
+              onClick={this.makeAlgorithmLive}
+              className={'link'}
+            >
+              <span
+                style={{ margin: 'auto' }}
+              >
+                Make Algorithm Live
+              </span>
+            </div>
+          </div>
+          : null,
+      },
       {
         tooltip: 'Undo',
         icon: <UndoIcon />,
@@ -484,6 +507,40 @@ class Builder extends TerrainComponent<Props>
       //     onClick: this.loadGroup,
       //   },
     ]);
+  }
+
+  public makeAlgorithmLive()
+  {
+    let algorithm = this.getAlgorithm();
+    algorithm = algorithm.set('status', ItemStatus.Live);
+    this.props.algorithmActions.change(algorithm);
+  }
+
+  public canExportQuery()
+  {
+    if (this.props.builder.query)
+    {
+      const { path } = this.props.builder.query;
+      return !(path.source.count > 500 && path.more.collapse !== undefined);
+    }
+    return true;
+  }
+
+  public handleExport()
+  {
+    // Check if exporting is possible (Cannot export if size > 500 and using collapse)
+    if (this.canExportQuery())
+    {
+      const algorithm = this.getAlgorithm();
+      ETLRouteUtil.gotoEditAlgorithm(algorithm ? algorithm.id : '');
+    }
+    else
+    {
+      // Show error modal explaining why export is not possible
+      this.setState({
+        showingExportErrorModal: true,
+      });
+    }
   }
 
   public handleUndo()
@@ -548,7 +605,7 @@ class Builder extends TerrainComponent<Props>
   public shouldSave(overrideState?: BuilderState): boolean
   {
     // empty builder or un-saveable, should never have to save
-    if (!this.props.params.config || !this.canEdit())
+    if (!this.props.match.params.config || !this.canEdit())
     {
       return false;
     }
@@ -609,9 +666,9 @@ class Builder extends TerrainComponent<Props>
         }
       }
       const newConfig = configArr.join(',');
-      if (newConfig !== this.props.params.config)
+      if (newConfig !== this.props.match.params.config)
       {
-        browserHistory.replace(`/builder/${newConfig}`);
+        this.browserHistory.replace(`/builder/${newConfig}`);
       }
     }
   }
@@ -671,7 +728,6 @@ class Builder extends TerrainComponent<Props>
       content: query && <BuilderColumn
         query={query}
         resultsState={this.props.builder.resultsState}
-        exportState={this.state.exportState}
         index={index}
         colKey={key}
         algorithm={algorithm}
@@ -839,7 +895,7 @@ class Builder extends TerrainComponent<Props>
 
   public goToLibrary()
   {
-    browserHistory.push('/library');
+    this.browserHistory.push('/library');
   }
 
   public handleModalCancel()
@@ -855,7 +911,7 @@ class Builder extends TerrainComponent<Props>
     this.setState({
       leaving: false,
     });
-    browserHistory.push(this.state.nextLocation);
+    this.browserHistory.push(this.state.nextLocation);
   }
 
   public handleModalSave()
@@ -865,7 +921,7 @@ class Builder extends TerrainComponent<Props>
     this.setState({
       leaving: false,
     });
-    browserHistory.push(this.state.nextLocation);
+    this.browserHistory.push(this.state.nextLocation);
   }
 
   public handleSaveAsTextboxChange(newValue: string): void
@@ -910,9 +966,9 @@ class Builder extends TerrainComponent<Props>
           savingAs: false,
         });
         const newConfig = configArr.join(',');
-        if (newConfig !== this.props.params.config)
+        if (newConfig !== this.props.match.params.config)
         {
-          browserHistory.replace(`/builder/${newConfig}`);
+          this.browserHistory.replace(`/builder/${newConfig}`);
         }
       });
   }
@@ -924,9 +980,24 @@ class Builder extends TerrainComponent<Props>
     });
   }
 
+  public renderErrorModal()
+  {
+    return (
+      <Modal
+        open={this.state.showingExportErrorModal}
+        onClose={this._toggle('showingExportErrorModal')}
+        title={'Cannot Export'}
+        children={`
+          Group By is not supported when exporting over 500 results.
+          Reduce the size or remove the group by field to export.`}
+        error={true}
+      />
+    );
+  }
+
   public render()
   {
-    const config = this.props.params.config;
+    const config = this.props.match.params.config;
     const algorithm = this.getAlgorithm();
     const query = this.getQuery();
     const algorithmIdentifier = algorithm === undefined ? '' :
@@ -994,6 +1065,9 @@ class Builder extends TerrainComponent<Props>
           onResultsStateChange={this.props.builderActions.results}
           hitsPage={this.state.hitsPage}
         />
+        {
+          this.renderErrorModal()
+        }
       </div>
     );
   }
@@ -1006,4 +1080,4 @@ const BuilderContainer = Util.createTypedContainer(
     builderActions: BuilderActions,
   },
 );
-export default withRouter(DragDropContext(HTML5Backend)(BuilderContainer));
+export default TerrainDndContext(BuilderContainer) as any;

@@ -80,7 +80,7 @@ export interface MappingType
 
 // generator that iterates over each field in mapping
 // e.g. ['properties', 'foo'], ['properties', 'foo', 'properties', 'bar'], ...
-function* getKeyPathsForComparison(mapping: MappingType): IterableIterator<List<string>>
+function* getKeyPathsForComparison(mapping: MappingType): IterableIterator<KeyPath>
 {
   if (_.has(mapping, 'properties'))
   {
@@ -177,14 +177,16 @@ export class ElasticMapping
   private isMerge: boolean;
   private mapping: MappingType = {};
   private primaryKey: string | null = null;
-  private primaryKeyAttempts: string[] = [];
+  private primaryKeyAttempts: any[] = [];
 
   constructor(engine: TransformationEngine, isMerge: boolean = false)
   {
     this.engine = engine;
     this.isMerge = isMerge;
-    this.createElasticMapping();
-    this.findPrimaryKeys();
+
+    const disabledMap = this.computeDisabledFields();
+    this.createElasticMapping(disabledMap);
+    this.findPrimaryKeys(disabledMap);
   }
 
   public getMapping(): MappingType
@@ -293,12 +295,12 @@ export class ElasticMapping
     return defaultProps(props);
   }
 
-  protected clearGeopointMappings()
+  protected clearGeopointMappings(disabledFields: { [k: number]: boolean })
   {
     const ids = this.engine.getAllFieldIDs();
     ids.forEach((id, i) =>
     {
-      if (!this.engine.getFieldEnabled(id))
+      if (disabledFields[id])
       {
         return;
       }
@@ -355,14 +357,32 @@ export class ElasticMapping
     }
   }
 
-  protected createElasticMapping()
+  protected computeDisabledFields()
   {
     const ids = this.engine.getAllFieldIDs();
+    const disabledMap: { [k: number]: boolean } = {};
+    const tree = EngineUtil.createTreeFromEngine(this.engine);
+    const disabledFields = ids.filter((id) => !this.engine.getFieldEnabled(id)).toSet();
+    const shouldExplore = (id) => disabledMap[id] === undefined;
+    disabledFields.forEach((id) =>
+    {
+      for (const childId of EngineUtil.preorder(tree, id, shouldExplore))
+      {
+        disabledMap[childId] = true;
+      }
+    });
+    return disabledMap;
+  }
+
+  protected createElasticMapping(disabledMap: { [k: number]: boolean })
+  {
+    const ids = this.engine.getAllFieldIDs();
+
     ids.forEach((id, i) =>
     {
       try
       {
-        if (this.engine.getFieldEnabled(id))
+        if (!disabledMap[id])
         {
           this.addFieldToMapping(id);
         }
@@ -376,7 +396,7 @@ export class ElasticMapping
     });
     try
     {
-      this.clearGeopointMappings();
+      this.clearGeopointMappings(disabledMap);
     }
     catch (e)
     {
@@ -441,7 +461,7 @@ export class ElasticMapping
     }
   }
 
-  protected findPrimaryKeys()
+  protected findPrimaryKeys(disabledMap: { [k: number]: boolean })
   {
     const ids = this.engine.getAllFieldIDs();
 
@@ -449,7 +469,7 @@ export class ElasticMapping
     {
       try
       {
-        if (this.engine.getFieldEnabled(id))
+        if (!disabledMap[id])
         {
           const elasticProps = this.getElasticProps(id);
           if (elasticProps.isPrimaryKey)

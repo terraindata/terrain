@@ -64,47 +64,12 @@ import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
 const hiddenPath = List(['uiState', 'hidden']);
-export function createTreeFromEngine(engine: TransformationEngine): FieldMap
+export function createFieldMap(engine: TransformationEngine): FieldMap
 {
-  const ids = engine.getAllFieldIDs();
-  // sort the paths to ensure we visit parents before children
-  const sortedIds = ids.sort((a, b) => engine.getOutputKeyPath(a).size - engine.getOutputKeyPath(b).size);
-
-  const enginePathToField: {
-    [kp: string]: TemplateField,
-  } = {};
-
-  sortedIds.forEach((id, index) =>
-  {
-    const enginePath = engine.getOutputKeyPath(id).toJS();
-    if (enginePath.length === 0)
-    {
-      return;
-    }
-    const parentPath = enginePath.slice(0, -1);
-    const parentHash = JSON.stringify(parentPath);
-    const parentField: TemplateField = enginePathToField[parentHash];
-    const newField = createFieldFromEngine(engine, id);
-
-    if (parentField != null)
-    {
-      const newParentField = parentField.update('childrenIds', (childIds): List<number> => childIds.push(id));
-      enginePathToField[parentHash] = newParentField;
-    }
-    enginePathToField[JSON.stringify(enginePath)] = newField;
-  });
-
-  let fieldMap = Map() as FieldMap;
-  sortedIds.forEach((id, index) =>
-  {
-    const enginePath = engine.getOutputKeyPath(id).toJS();
-    const field = enginePathToField[JSON.stringify(enginePath)];
-    if (field != null)
-    {
-      fieldMap = fieldMap.set(id, field);
-    }
-  });
-  return fieldMap;
+  const treeMap = EngineUtil.createTreeFromEngine(engine)
+    .map((children, id) => createFieldFromEngine(engine, id).set('childrenIds', children))
+    .toMap();
+  return treeMap;
 }
 
 // takes a field id and and engine and constructs a TemplateField object (does not construct children)
@@ -137,7 +102,7 @@ export function createFieldFromEngine(
     type: engine.getFieldType(id) as FieldTypes,
     etlType: EngineUtil.getETLFieldType(id, engine),
     transformations,
-    name: enginePath.last(),
+    name: enginePath.last().toString(),
   });
 }
 
@@ -149,58 +114,4 @@ export function updateFieldFromEngine(
 {
   const updatedField = createFieldFromEngine(engine, id);
   return updatedField.set('childrenIds', oldField.childrenIds);
-}
-
-export function postorderForEach(
-  engine: TransformationEngine,
-  fromId: number,
-  fn: (id: number) => void,
-)
-{
-  const fieldMap = createTreeFromEngine(engine);
-  for (const id of postorder(fieldMap, fromId))
-  {
-    fn(id);
-  }
-}
-
-function* postorder(fieldMap: FieldMap, id: number)
-{
-  const field = fieldMap.get(id);
-  if (field !== undefined)
-  {
-    const ids = field.childrenIds;
-    for (let i = 0; i < ids.size; i++)
-    {
-      yield* postorder(fieldMap, ids.get(i));
-    }
-    yield id;
-  }
-}
-
-export function preorderForEach(
-  engine: TransformationEngine,
-  fromId: number,
-  fn: (id: number) => void,
-)
-{
-  const fieldMap = createTreeFromEngine(engine);
-  for (const id of preorder(fieldMap, fromId))
-  {
-    fn(id);
-  }
-}
-
-function* preorder(fieldMap: FieldMap, id: number)
-{
-  const field = fieldMap.get(id);
-  if (field !== undefined)
-  {
-    const ids = field.childrenIds;
-    yield id;
-    for (let i = 0; i < ids.size; i++)
-    {
-      yield* preorder(fieldMap, ids.get(i));
-    }
-  }
 }

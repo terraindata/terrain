@@ -49,7 +49,6 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
-import { postorderForEach, preorderForEach } from 'etl/templates/SyncUtil';
 import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ETLFieldTypes, FieldTypes, getJSFromETL, Languages } from 'shared/etl/types/ETLTypes';
@@ -58,6 +57,14 @@ import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
+
+export interface TransformationConfig
+{
+  type?: ETLFieldTypes; // specify new field type
+  valueType?: ETLFieldTypes; // specify new field value type
+  newSourceType?: ETLFieldTypes; // if the source field changes types due to transformation
+}
+
 /*
  *  Should this file in be /shared?
  *  Proxy objects are generated synchronously and aren't meant to be persisted
@@ -111,10 +118,7 @@ export class EngineProxy
       newFieldKeyPaths?: List<EnginePath>;
       [k: string]: any;
     },
-    newFieldInfo?: { // if not specified, addTransformation will attempt to guess new field types
-      type: ETLFieldTypes;
-      valueType?: ETLFieldTypes;
-    },
+    config?: TransformationConfig, // if not specified, any new fields will have the same type as source field
   )
   {
     let options = rawOptions;
@@ -130,6 +134,15 @@ export class EngineProxy
     }
 
     this.engine.appendTransformation(type, fields, options);
+
+    if (config !== undefined && config.newSourceType !== undefined)
+    {
+      fields.forEach((kp: EnginePath) =>
+      {
+        const fieldId = this.engine.getInputFieldID(kp);
+        EngineUtil.changeFieldType(this.engine, fieldId, config.newSourceType);
+      });
+    }
 
     if (isSynthetic)
     {
@@ -147,14 +160,14 @@ export class EngineProxy
         {
           this.orderField(synthId, sourceFieldId);
         }
-        if (newFieldInfo !== undefined)
+        if (config !== undefined && config.type !== undefined)
         {
           EngineUtil.rawSetFieldType(
             this.engine,
             synthId,
-            newFieldInfo.type,
-            newFieldInfo.type,
-            newFieldInfo.valueType,
+            config.type,
+            config.type,
+            config.valueType,
           );
         }
         else
@@ -173,9 +186,22 @@ export class EngineProxy
     this.requestRebuild();
   }
 
-  public editTransformation(id: number, fields: List<EnginePath>, options)
+  public editTransformation(
+    id: number,
+    fields: List<EnginePath>,
+    options,
+    config?: TransformationConfig,
+  )
   {
     this.engine.editTransformation(id, fields, options);
+    if (config !== undefined && config.newSourceType !== undefined)
+    {
+      fields.forEach((kp: EnginePath) =>
+      {
+        const fieldId = this.engine.getInputFieldID(kp);
+        EngineUtil.changeFieldType(this.engine, fieldId, config.newSourceType);
+      });
+    }
     this.requestRebuild(id);
   }
 
@@ -200,7 +226,7 @@ export class EngineProxy
    *  If the given keypath is [foo, *], then we need to create the specific field [foo, index]
    *  After creating the extracted field, we need to perform the duplication operation on the extracted field
    */
-  public extractIndexedArrayField(sourceId: number, index: number, destKP: List<string>)
+  public extractIndexedArrayField(sourceId: number, index: number, destKP: KeyPath)
   {
     const sourceKP = this.engine.getOutputKeyPath(sourceId);
 
@@ -234,7 +260,7 @@ export class EngineProxy
     this.requestRebuild();
   }
 
-  public extractSimpleArrayField(sourceId, destKP: List<string>)
+  public extractSimpleArrayField(sourceId, destKP: KeyPath)
   {
     const optionsNew: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
       newFieldKeyPaths: List([destKP]),
@@ -247,12 +273,12 @@ export class EngineProxy
     const newFieldId = this.engine.getOutputFieldID(destKP);
 
     const newFieldType = EngineUtil.getETLFieldType(sourceId, this.engine);
-    this.addFieldToEngine(destKP.push('*'), ETLFieldTypes.Array, newFieldType, true);
+    this.addFieldToEngine(destKP.push(-1), ETLFieldTypes.Array, newFieldType, true);
     EngineUtil.rawSetFieldType(this.engine, newFieldId, ETLFieldTypes.Array, ETLFieldTypes.Array, newFieldType);
     this.requestRebuild();
   }
 
-  public duplicateField(sourceId: number, destKP: List<string>, despecify = false)
+  public duplicateField(sourceId: number, destKP: KeyPath, despecify = false)
   {
     const originalOKP = this.engine.getOutputKeyPath(sourceId);
     this.engine.setOutputKeyPath(sourceId, originalOKP.set(-1, `_${this.randomId()}${originalOKP.last()}`));
@@ -263,10 +289,10 @@ export class EngineProxy
     this.requestRebuild();
   }
 
-  public copyNestedTypes(idToCopy, destKP: List<string>)
+  public copyNestedTypes(idToCopy, destKP: KeyPath)
   {
     const rootOutputKP = this.engine.getOutputKeyPath(idToCopy);
-    preorderForEach(this.engine, idToCopy, (childId) =>
+    EngineUtil.preorderForEach(this.engine, idToCopy, (childId) =>
     {
       // do not copy root
       if (childId !== idToCopy)
@@ -284,13 +310,13 @@ export class EngineProxy
     this.requestRebuild();
   }
 
-  public addField(keypath: List<string>, type: ETLFieldTypes, valueType: ETLFieldTypes = ETLFieldTypes.String)
+  public addField(keypath: KeyPath, type: ETLFieldTypes, valueType: ETLFieldTypes = ETLFieldTypes.String)
   {
     let newId: number;
     if (type === ETLFieldTypes.Array)
     {
       newId = this.addFieldToEngine(keypath, type, valueType);
-      const wildId = this.addFieldToEngine(keypath.push('*'), ETLFieldTypes.Array, valueType, true);
+      const wildId = this.addFieldToEngine(keypath.push(-1), ETLFieldTypes.Array, valueType, true);
       EngineUtil.castField(this.engine, wildId, valueType);
     }
     else
@@ -351,7 +377,7 @@ export class EngineProxy
   }
 
   // if despecify is true, then strip away specific indices
-  private copyField(sourceId: number, destKP: List<string>, despecify = false): number
+  private copyField(sourceId: number, destKP: KeyPath, despecify = false): number
   {
     const optionsNew: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
       newFieldKeyPaths: List([destKP]),
@@ -372,7 +398,7 @@ export class EngineProxy
     }
 
     const rootOutputKP = this.engine.getOutputKeyPath(sourceId);
-    preorderForEach(this.engine, idToCopy, (childId) =>
+    EngineUtil.preorderForEach(this.engine, idToCopy, (childId) =>
     {
       // do not copy root
       if (childId !== idToCopy)
@@ -391,7 +417,7 @@ export class EngineProxy
   }
 
   // this is not deterministic
-  private getSyntheticInputPath(keypath: List<string>): List<string>
+  private getSyntheticInputPath(keypath: KeyPath): KeyPath
   {
     return keypath.unshift(`_synthetic_${this.randomId()}`);
   }
@@ -402,7 +428,7 @@ export class EngineProxy
   }
 
   private addFieldToEngine(
-    keypath: List<string>,
+    keypath: KeyPath,
     etlType: ETLFieldTypes,
     valueType?: ETLFieldTypes,
     useValueType?: boolean,
@@ -432,7 +458,7 @@ export class FieldProxy
   // delete this field and all child fields
   public deleteField(rootId: number)
   {
-    postorderForEach(this.engine, rootId, (fieldId) =>
+    EngineUtil.postorderForEach(this.engine, rootId, (fieldId) =>
     {
       const dependents: List<number> = EngineUtil.getFieldDependents(this.engine, fieldId);
       if (dependents.size > 0)

@@ -67,7 +67,6 @@ import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database
 import BackendInstance from '../../../../database/types/BackendInstance';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import Query from '../../../../items/types/Query';
-import * as FileImportTypes from '../../../fileImport/FileImportTypes';
 import { Ajax, AjaxResponse } from '../../../util/Ajax';
 import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
@@ -384,7 +383,7 @@ export class ResultsManager extends TerrainComponent<Props>
     // );
   }
 
-  public changeResults(changes: { [key: string]: any }, exportChanges?: { [key: string]: any })
+  public changeResults(changes: { [key: string]: any })
   {
     let { resultsState } = this.props;
     _.map(changes,
@@ -392,10 +391,6 @@ export class ResultsManager extends TerrainComponent<Props>
         resultsState = resultsState.set(key as any, value),
     );
 
-    if (exportChanges)
-    {
-      const { filetype, filesize, preview, originalNames } = exportChanges;
-    }
     this.props.onResultsStateChange(resultsState);
   }
 
@@ -715,21 +710,21 @@ export class ResultsManager extends TerrainComponent<Props>
         }
       }
     }
+    changes['estimatedTotal'] = querySize === undefined ? resultsData.rawResult.hits.total :
+      Math.min(querySize, resultsData.rawResult.hits.total);
+    // Need to take into account drop if less than group joins
+    if (this.props.query.path &&
+      this.props.query.path.nested &&
+      this.props.query.path.nested.get(0) &&
+      this.props.query.path.nested.get(0).minMatches
+    )
+    {
+      const ratio = Math.min(1, hits.size / (SCROLL_SIZE * this.props.hitsPage));
+      changes['estimatedTotal'] = Math.round(changes['estimatedTotal'] * ratio);
+    }
 
     const filteredFields = List(_.filter(fieldsSet.toArray(), (val) => !(val.charAt(0) === '_')));
-    const exportChanges: any = {
-      filetype: 'csv',
-      originalNames: filteredFields,
-      preview: List(filteredFields.map((field) =>
-      {
-        return hits.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((hit) =>
-        {
-          const value = hit.fields.get(String(field));
-          return Array.isArray(value) || typeof (value) === 'boolean' ? JSON.stringify(value) : value;
-        });
-      })),
-    };
-    this.changeResults(changes, exportChanges);
+    this.changeResults(changes);
   }
 
   private handleM1QueryResponse(response: M1QueryResponse, isAllFields: boolean)
@@ -747,7 +742,7 @@ export class ResultsManager extends TerrainComponent<Props>
     // how is the data formatted?
     const hits = resultsData.hits.hits.map((hit) =>
     {
-      const sort = hit.sort !== undefined ? { _sort: hit.sort[0] } : {};
+      const sort = hit.sort !== undefined ? { TerrainScore: hit.sort[0] } : {};
       return _.extend({}, hit._source, sort, {
         _index: hit._index,
         _type: hit._type,

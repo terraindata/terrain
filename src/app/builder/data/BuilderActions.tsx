@@ -46,7 +46,6 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 import BackendInstance from '../../../database/types/BackendInstance';
 import Query from '../../../items/types/Query';
-import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import { CardItem } from '../components/cards/CardComponent';
 import ActionTypes from './BuilderActionTypes';
 import BuilderCardsActionTypes from './BuilderCardsActionTypes';

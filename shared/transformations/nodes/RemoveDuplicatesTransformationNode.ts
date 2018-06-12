@@ -42,44 +42,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires strict-boolean-expressions variable-name
+import { List } from 'immutable';
 
-import { List, Record } from 'immutable';
-import * as Redux from 'redux';
-import * as ReduxActions from 'redux-actions';
-import thunk from 'redux-thunk';
+import { KeyPath } from '../../util/KeyPath';
+import TransformationNodeType from '../TransformationNodeType';
+import TransformationNode from './TransformationNode';
 
-import { CredentialConfig, SchedulerConfig } from 'control/ControlTypes';
-import * as FileImportTypes from 'fileImport/FileImportTypes';
-import { createRecordType } from 'shared/util/Classes';
-import Util from 'util/Util';
-import ControlReducers from './ControlReducers';
-
-type Template = FileImportTypes.Template;
-
-class ControlStateC
+export default class RemoveDuplicatesTransformationNode extends TransformationNode
 {
-  public importTemplates: List<Template> = List([]);
-  public exportTemplates: List<Template> = List([]);
-  public importExportScheduledJobs: List<SchedulerConfig> = List([]);
-  public importExportCredentials: List<CredentialConfig> = List([]);
+  public constructor(id: number,
+    fields: List<KeyPath>,
+    options: object = {},
+    typeCode: TransformationNodeType = TransformationNodeType.RemoveDuplicatesNode)
+  {
+    super(id, fields, options, typeCode);
+  }
 }
-
-const ControlState_Record = createRecordType(new ControlStateC(), 'ControlStateC');
-export interface ControlState extends ControlStateC, IRecord<ControlState> { }
-export const _ControlState = (config?: any) =>
-{
-  return new ControlState_Record(Util.extendId(config || {})) as any as ControlState;
-};
-
-const DefaultState = _ControlState();
-
-export const ControlStore = Redux.createStore(
-  ControlReducers,
-  DefaultState,
-  Redux.applyMiddleware(thunk),
-);
-
-export default ControlStore;

@@ -60,10 +60,10 @@ import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
 import { DynamicForm } from 'common/components/DynamicForm';
+import { CaseFormats, ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 import * as Immutable from 'immutable';
-import { CaseFormats } from '../../../../../../shared/etl/types/ETLTypes';
 const { List, Map } = Immutable;
 
 type SubstringOptions = NodeOptionsType<TransformationNodeType.SubstringNode>;
@@ -274,3 +274,55 @@ export class DecryptTFF extends TransformationForm<{}, TransformationNodeType.De
   protected readonly initialState = {};
   protected readonly noEditOptions = true;
 }
+
+export class RemoveDuplicatesTFF extends TransformationForm<{}, TransformationNodeType.RemoveDuplicatesNode>
+{
+  protected readonly type = TransformationNodeType.RemoveDuplicatesNode;
+  protected readonly inputMap = {};
+  protected readonly initialState = {};
+  protected readonly noEditOptions = true;
+}
+
+type ZipcodeOptions = NodeOptionsType<TransformationNodeType.ZipcodeNode>;
+export class ZipcodeTFF extends TransformationForm<ZipcodeOptions, TransformationNodeType.ZipcodeNode>
+{
+  protected readonly type = TransformationNodeType.ZipcodeNode;
+  protected readonly inputMap: InputDeclarationMap<ZipcodeOptions> = {
+    format: {
+      type: DisplayType.Pick,
+      displayName: 'Convert Zipcode To',
+      options: {
+        pickOptions: (s) => zipcodeFormats,
+        displayNames: (s) => Map({
+          loc: 'Location',
+          city: 'City',
+          state: 'State',
+          citystate: 'City and State',
+          type: 'Zipcode Type',
+        }),
+        indexResolver: (value) => zipcodeFormats.indexOf(value),
+      },
+    },
+  };
+  protected readonly initialState = {
+    format: 'loc',
+  };
+
+  protected overrideTransformationConfig()
+  {
+    if (this.state.format === 'loc')
+    {
+      return {
+        newSourceType: ETLFieldTypes.GeoPoint,
+      };
+    }
+    else
+    {
+      return {
+        newSourceType: ETLFieldTypes.String,
+      };
+    }
+  }
+}
+
+const zipcodeFormats = List(['loc', 'city', 'state', 'citystate', 'type']);

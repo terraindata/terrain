@@ -58,7 +58,6 @@ import MapUtil from '../../../util/MapUtil';
 import Util from '../../../util/Util';
 import BuilderActions from '../../data/BuilderActions';
 import './InputStyle.less';
-const shallowCompare = require('react-addons-shallow-compare');
 
 import { cardStyle, Colors, fontColor, getCardColors } from '../../../colors/Colors';
 import MapComponent from '../../../common/components/MapComponent';

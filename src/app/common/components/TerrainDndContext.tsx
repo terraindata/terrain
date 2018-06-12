@@ -43,19 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+import { DragDropContext } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 
-import ConfigType from '../../ConfigType';
-import { TemplateBase } from './TemplateBase';
-import { TemplateBaseStringified } from './TemplateBaseStringified';
-
-export default class ExportTemplateBaseStringified extends TemplateBaseStringified
-{
-  public objectKey?: string = '';
-  public rank?: boolean = false;
-
-  constructor(props: object)
-  {
-    super(props as TemplateBase);
-    ConfigType.initialize(this, props);
-  }
-}
+export default DragDropContext(HTML5Backend);

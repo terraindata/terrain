@@ -56,6 +56,7 @@ import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle
 import Util from 'util/Util';
 
 import * as Immutable from 'immutable';
+import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import Quarantine from 'util/RadiumQuarantine';
 const { List, Map } = Immutable;
 import FadeInOut from 'common/components/FadeInOut';
@@ -295,6 +296,8 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     const { canEdit, preview, displayKeyPath, previewLabel, noInteract } = this.props;
     const field = this._field();
 
+    const canDrag = this._isRootField() && !noInteract && !this._settingsAreOpen();
+
     if (field.isHidden === true)
     {
       return null;
@@ -305,12 +308,12 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     const content = this.renderRow();
     const showSettings = this._settingsAreOpen();
 
-    if (field.isArray() || field.isNested())
+    if (field.etlType === ETLFieldTypes.Array || field.etlType === ETLFieldTypes.Object)
     {
       const childrenComponent = (
         <div className='template-editor-children-container'>
           {
-            field.isArray() ?
+            field.etlType === ETLFieldTypes.Array ?
               this.renderArrayChildren() :
               this.renderChildFields()
           }
@@ -328,7 +331,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
           onCheckboxClicked={this.handleCheckboxClicked}
           keyPath={this._ikeyPath(SEED_KEY_PATH, this.props.fieldId)}
           onDrop={this.handleDropped}
-          canDrag={this._isRootField() && !noInteract}
+          canDrag={canDrag}
         />
       );
     }
@@ -346,7 +349,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
           onCheckboxClicked={this.handleCheckboxClicked}
           keyPath={this._ikeyPath(SEED_KEY_PATH, this.props.fieldId)}
           onDrop={this.handleDropped}
-          canDrag={this._isRootField() && !noInteract}
+          canDrag={canDrag}
         />
       );
     }

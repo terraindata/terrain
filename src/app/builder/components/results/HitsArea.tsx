@@ -76,10 +76,7 @@ import MapComponent from '../../../common/components/MapComponent';
 import Modal from '../../../common/components/Modal';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import FileImportPreview from '../../../fileImport/components/FileImportPreview';
-import { FileImportState } from '../../../fileImport/FileImportTypes';
 import MapUtil from '../../../util/MapUtil';
-
 import Hit from '../results/Hit';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
@@ -97,7 +94,6 @@ export interface Props
   query: Query;
   canEdit: boolean;
   algorithmId: ID;
-  showExport: boolean;
   showCustomizeView: boolean;
   allowSpotlights: boolean;
   onNavigationException: () => void;
@@ -208,7 +204,7 @@ class HitsArea extends TerrainComponent<Props>
     {
       const type = ElasticBlockHelpers.getTypeOfField(
         schema,
-        builder,
+        builder && builder.query ? builder : builder.set('query', props.query),
         field,
         true,
       );
@@ -736,8 +732,9 @@ class HitsArea extends TerrainComponent<Props>
     }
     else if (resultsState.hits)
     {
-      const { count } = resultsState;
+      const { count, estimatedTotal } = resultsState;
       text = `${count || 'No'}${count === MAX_HITS ? '+' : ''} hit${count === 1 ? '' : 's'}`;
+      text += ` (Estimated Total: ${estimatedTotal})`;
     }
     else
     {
@@ -754,17 +751,6 @@ class HitsArea extends TerrainComponent<Props>
             text
           }
         </div>
-
-        {this.props.showExport &&
-          <div
-            className='results-top-config'
-            onClick={this.showExport}
-            key='results-area-export'
-            style={link()}
-          >
-            Export
-          </div>
-        }
 
         {this.props.showCustomizeView &&
           <div
@@ -809,28 +795,6 @@ class HitsArea extends TerrainComponent<Props>
     });
   }
 
-  public canExport()
-  {
-    const { path } = this.props.builder.query;
-    return !(path.source.count > 500 && path.more.collapse !== undefined);
-  }
-
-  public showExport()
-  {
-    // Check if exporting is possible (Cannot export if size > 500 and using collapse)
-    if (this.canExport())
-    {
-      ETLRouteUtil.gotoEditAlgorithm(this.props.algorithmId);
-    }
-    else
-    {
-      // Show error modal explaining why export is not possible
-      this.setState({
-        showingErrorModal: true,
-      });
-    }
-  }
-
   public hidePopup(key)
   {
     this.setState({
@@ -859,21 +823,6 @@ class HitsArea extends TerrainComponent<Props>
         );
       });
     }
-  }
-
-  public renderErrorModal()
-  {
-    return (
-      <Modal
-        open={this.state.showingErrorModal}
-        onClose={this._fn(this.hidePopup, 'showingErrorModal')}
-        title={'Cannot Export'}
-        children={`
-          Group By is not supported when exporting over 500 results.
-          Reduce the size or remove the group by field to export.`}
-        error={true}
-      />
-    );
   }
 
   public renderConfig()
@@ -915,7 +864,6 @@ class HitsArea extends TerrainComponent<Props>
         {this.renderHitsMap()}
         {this.renderExpandedHit()}
         {this.props.showCustomizeView && this.renderConfig()}
-        {this.renderErrorModal()}
       </div>
     );
   }

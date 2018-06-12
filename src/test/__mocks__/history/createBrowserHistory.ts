@@ -43,23 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-
-import ConfigType from '../../ConfigType';
-import { TemplateBase } from './TemplateBase';
-
-export class ExportTemplateConfig extends TemplateBase
-{
-  public objectKey?: string = undefined;
-  public query?: string = undefined;
-  public rank?: boolean = false;
-  public templateId?: number = undefined;
-  public algorithmId?: number = undefined;
-
-  constructor(props: object)
-  {
-    super(props);
-    ConfigType.initialize(this, props);
-  }
+export default function() {
+  return {
+    replace: jest.fn(),
+    push: jest.fn(),
+  };
 }
-
-export default ExportTemplateConfig;

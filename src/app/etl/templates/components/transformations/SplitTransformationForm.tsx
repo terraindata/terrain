@@ -118,11 +118,6 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
   };
   protected readonly type = TransformationNodeType.SplitNode; // lack of type safety here
 
-  protected isStructuralChange()
-  {
-    return true;
-  }
-
   protected computeInitialState()
   {
     const { isCreate, transformation } = this.props;
@@ -134,8 +129,8 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
     {
       const meta = transformation.meta as NodeOptionsType<TransformationNodeType.SplitNode>;
       return {
-        leftName: meta.newFieldKeyPaths.size > 0 ? meta.newFieldKeyPaths.get(0).last() : '',
-        rightName: meta.newFieldKeyPaths.size > 1 ? meta.newFieldKeyPaths.get(1).last() : '',
+        leftName: meta.newFieldKeyPaths.size > 0 ? meta.newFieldKeyPaths.get(0).last().toString() : '',
+        rightName: meta.newFieldKeyPaths.size > 1 ? meta.newFieldKeyPaths.get(1).last().toString() : '',
         preserveOldFields: meta.preserveOldFields,
         delimiter: meta.delimiter,
         regex: meta.regex,

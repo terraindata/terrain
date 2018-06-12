@@ -84,7 +84,6 @@ module.exports =
       database: path.resolve(__dirname, 'src/database'),
       deploy: path.resolve(__dirname, 'src/app/deploy'),
       etl: path.resolve(__dirname, 'src/app/etl'),
-      fileImport: path.resolve(__dirname, 'src/app/fileImport'),
       images: path.resolve(__dirname, 'src/images'),
       jobs: path.resolve(__dirname, 'src/app/jobs'),
       library: path.resolve(__dirname, 'src/app/library'),
@@ -100,6 +99,7 @@ module.exports =
       util: path.resolve(__dirname, 'src/app/util'),
       x: path.resolve(__dirname, 'src/app/x'),
       'test-helpers': path.resolve(__dirname, 'src/test/test-helpers'),
+      radium: 'radium/index',
     },
   },
 

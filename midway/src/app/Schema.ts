@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import * as assert from 'assert';
 import * as winston from 'winston';
 import * as Tasty from '../tasty/Tasty';
 
@@ -51,175 +52,422 @@ import DatabaseController from '../database/DatabaseController';
 import ElasticDB from '../database/elastic/tasty/ElasticDB';
 import DatabaseRegistry from '../databaseRegistry/DatabaseRegistry';
 
-const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeName: string, primaryKeyType: string) => [
-  `CREATE TABLE IF NOT EXISTS versions
-    (id ` + primaryKeyType + ` PRIMARY KEY,
-     objectType text NOT NULL,
-     objectId integer NOT NULL,
-     object text NOT NULL,
-     createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
-     createdByUserId integer NOT NULL);`,
-  `CREATE TABLE IF NOT EXISTS items
-    (id ` + primaryKeyType + ` PRIMARY KEY,
-     meta text,
-     name text NOT NULL,
-     parent integer,
-     status text,
-     type text);`,
-  `CREATE TABLE IF NOT EXISTS databases
-    (id ` + primaryKeyType + ` PRIMARY KEY,
-     name text NOT NULL,
-     type text NOT NULL,
-     dsn text NOT NULL,
-     host text NOT NULL,
-     isAnalytics bool DEFAULT ` + falseValue + `,
-     analyticsIndex text,
-     analyticsType text);`,
-  `CREATE TABLE IF NOT EXISTS users
-    (id ` + primaryKeyType + ` PRIMARY KEY,
-     accessToken text NOT NULL,
-     email text NOT NULL,
-     isDisabled bool NOT NULL DEFAULT false,
-     isSuperUser bool NOT NULL DEFAULT false,
-     name text NOT NULL,
-     oldPassword text,
-     password text NOT NULL,
-     timezone ` + stringTypeName + `,
-     meta text);`,
-  `CREATE TABLE IF NOT EXISTS exportTemplates
-    (id ` + primaryKeyType + ` PRIMARY KEY,
-     name text,
-     dbid integer NOT NULL,
-     dbname text NOT NULL,
-     tablename text NOT NULL,
-     objectKey ` + stringTypeName + ` NOT NULL,
-     originalNames text NOT NULL,
-     columnTypes text NOT NULL,
-     persistentAccessToken text NOT NULL,
-     primaryKeyDelimiter text,
-     primaryKeys text NOT NULL,
-     rank bool NOT NULL,
-     transformations text NOT NULL);`,
-  `CREATE TABLE IF NOT EXISTS importTemplates
-    (id ` + primaryKeyType + ` PRIMARY KEY,
-     name text,
-     dbid integer NOT NULL,
-     dbname text NOT NULL,
-     tablename text NOT NULL,
-     originalNames text NOT NULL,
-     columnTypes text NOT NULL,
-     persistentAccessToken text NOT NULL,
-     primaryKeyDelimiter text,
-     primaryKeys text NOT NULL,
-     requireJSONHaveAllFields bool NOT NULL DEFAULT true,
-     transformations text NOT NULL);`,
-  `CREATE TABLE IF NOT EXISTS schedules
-    (id ` + primaryKeyType + ` PRIMARY KEY,
-     createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
-     createdBy integer,
-     cron text NOT NULL,
-     lastModified date NOT NULL,
-     lastRun ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
-     meta text NOT NULL,
-     name text NOT NULL,
-     priority integer NOT NULL,
-     running bool NOT NULL,
-     shouldRunNext bool NOT NULL,
-     tasks text NOT NULL,
-     workerId integer NOT NULL);`,
-  `CREATE TABLE IF NOT EXISTS jobs
-    (id ` + primaryKeyType + ` PRIMARY KEY,
-     createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
-     createdBy integer,
-     endTime ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
-     logId integer,
-     meta text NOT NULL,
-     name text NOT NULL,
-     pausedFilename text NOT NULL,
-     priority integer NOT NULL,
-     running bool NOT NULL,
-     runNowPriority integer NOT NULL,
-     scheduleId integer,
-     startTime ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
-     status text NOT NULL,
-     tasks text NOT NULL,
-     type text NOT NULL,
-     workerId integer NOT NULL);`,
-  `CREATE TABLE IF NOT EXISTS jobLogs
-    (id integer PRIMARY KEY,
-     createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
-     contents text);`,
-  `CREATE TABLE IF NOT EXISTS integrations
-    (id ` + primaryKeyType + ` PRIMARY KEY,
-     authConfig text NOT NULL,
-     connectionConfig text NOT NULL,
-     createdBy integer NOT NULL,
-     meta text NOT NULL,
-     name text NOT NULL,
-     readPermission text NOT NULL,
-     type text NOT NULL,
-     lastModified ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
-     writePermission text NOT NULL); `,
-  `CREATE TABLE IF NOT EXISTS metrics
-    (id ` + primaryKeyType + ` PRIMARY KEY,
-     database integer NOT NULL,
-     label text NOT NULL,
-     events text NOT NULL); `,
-  `CREATE TABLE IF NOT EXISTS templates
-    (id ` + primaryKeyType + ` PRIMARY KEY,
-     createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
-     lastModified ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
-     archived bool NOT NULL,
-     templateName text NOT NULL,
-     process text NOT NULL,
-     sources text NOT NULL,
-     sinks text NOT NULL,
-     settings text NOT NULL,
-     meta text NOT NULL,
-     uiData text NOT NULL); `,
-  `CREATE TABLE IF NOT EXISTS schemaMetadata
-       (id ` + primaryKeyType + ` PRIMARY KEY,
-       columnId text NOT NULL,
-       count integer NOT NULL,
-       starred bool NOT NULL,
-       countByAlgorithm text); `,
-  `CREATE TABLE IF NOT EXISTS resultsConfig
-       (id ` + primaryKeyType + ` PRIMARY KEY,
-       index text NOT NULL,
-       thumbnail text,
-       name text,
-       score text,
-       fields text,
-       formats text,
-       primaryKeys text); `
-  ,
-  `CREATE TABLE IF NOT EXISTS schedulerLogs
-    (id ` + primaryKeyType + ` PRIMARY KEY,
-     lastFailure ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
-     lastRun ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
-     lastSuccess ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
-     meta text NOT NULL,
-     numberOfRuns integer NOT NULL,
-     scheduleId integer NOT NULL,
-     status text NOT NULL); `,
-  `CREATE TABLE IF NOT EXISTS statusHistory
-    (id ` + primaryKeyType + ` PRIMARY KEY,
-     createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
-     userId integer NOT NULL,
-     algorithmId integer NOT NULL,
-     fromStatus text NOT NULL,
-     toStatus text NOT NULL); `,
-];
+import { DatabaseConfig } from './database/DatabaseConfig';
+import { TemplateConfig } from './etl/TemplateConfig';
+import { MetricConfig } from './events/MetricConfig';
+import { IntegrationConfig } from './integrations/IntegrationConfig';
+import { ItemConfig } from './items/ItemConfig';
+import { JobConfig } from './jobs/JobConfig';
+import { JobLogConfig } from './jobs/JobLogConfig';
+import { ResultsConfigConfig } from './resultsConfig/ResultsConfigConfig';
+import { SchedulerConfig } from './scheduler/SchedulerConfig';
+import { SchemaMetadataConfig } from './schemaMetadata/SchemaMetadataConfig';
+import { StatusHistoryConfig } from './statusHistory/StatusHistoryConfig';
+import { UserConfig } from './users/UserConfig';
+import { VersionConfig } from './versions/VersionConfig';
 
-export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)
+export class Tables
+{
+  public versions: Tasty.Table;
+  public items: Tasty.Table;
+  public databases: Tasty.Table;
+  public users: Tasty.Table;
+  public metrics: Tasty.Table;
+  public integrations: Tasty.Table;
+  public schemaMetadata: Tasty.Table;
+  public resultsConfig: Tasty.Table;
+  public templates: Tasty.Table;
+  public schedules: Tasty.Table;
+  public jobLogs: Tasty.Table;
+  public jobs: Tasty.Table;
+  public statusHistory: Tasty.Table;
+}
+
+function verifyTableWithConfig(table: Tasty.Table, configClass: object)
+{
+  assert.strictEqual(Object.keys(table.getMapping()).sort().toString(), Object.keys(configClass).sort().toString());
+}
+
+const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringTypeName: string, primaryKeyType: string): Tables =>
+{
+  const tables = {};
+
+  const addTable = (table: Tasty.Table, configObject: object) =>
+  {
+    verifyTableWithConfig(table, configObject);
+    tables[table.getTableName()] = table;
+  };
+
+  addTable(
+    new Tasty.Table(
+      'versions',
+      ['id'],
+      [
+        'objectType',
+        'objectId',
+        'object',
+        'createdAt',
+        'createdByUserId',
+      ],
+      undefined,
+      {
+        id: primaryKeyType + ' PRIMARY KEY',
+        objectType: 'text NOT NULL',
+        objectId: 'integer NOT NULL',
+        object: 'text NOT NULL',
+        createdAt: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+        createdByUserId: 'integer NOT NULL',
+      },
+    ),
+    new VersionConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
+      'items',
+      ['id'],
+      [
+        'meta',
+        'name',
+        'parent',
+        'status',
+        'type',
+      ],
+      undefined,
+      {
+        id: primaryKeyType + ' PRIMARY KEY',
+        meta: 'text',
+        name: 'text NOT NULL',
+        parent: 'integer',
+        status: 'text',
+        type: 'text',
+      },
+    ),
+    new ItemConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
+      'databases',
+      ['id'],
+      [
+        'name',
+        'type',
+        'dsn',
+        'host',
+        'isAnalytics',
+        'analyticsIndex',
+        'analyticsType',
+      ],
+      undefined,
+      {
+        id: primaryKeyType + ' PRIMARY KEY',
+        name: 'text NOT NULL',
+        type: 'text NOT NULL',
+        dsn: 'text NOT NULL',
+        host: 'text NOT NULL',
+        isAnalytics: 'bool DEFAULT ' + falseValue,
+        analyticsIndex: 'text',
+        analyticsType: 'text',
+      },
+    ),
+    new DatabaseConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
+      'users',
+      ['id'],
+      [
+        'accessToken',
+        'email',
+        'isDisabled',
+        'isSuperUser',
+        'name',
+        'oldPassword',
+        'password',
+        'timezone',
+        'meta',
+      ],
+      undefined,
+      {
+        id: primaryKeyType + ' PRIMARY KEY',
+        accessToken: 'text NOT NULL',
+        email: 'text NOT NULL',
+        isDisabled: 'bool NOT NULL DEFAULT false',
+        isSuperUser: 'bool NOT NULL DEFAULT false',
+        name: 'text NOT NULL',
+        oldPassword: 'text',
+        password: 'text NOT NULL',
+        timezone: stringTypeName,
+        meta: 'text',
+      },
+    ),
+    new UserConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
+      'metrics',
+      ['id'],
+      [
+        'database',
+        'label',
+        'events',
+      ],
+      undefined,
+      {
+        id: primaryKeyType + ' PRIMARY KEY',
+        database: 'integer NOT NULL',
+        label: 'text NOT NULL',
+        events: 'text NOT NULL',
+      },
+    ),
+    new MetricConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
+      'integrations',
+      ['id'],
+      [
+        'authConfig',
+        'connectionConfig',
+        'createdBy',
+        'meta',
+        'name',
+        'readPermission',
+        'type',
+        'lastModified',
+        'writePermission',
+      ],
+      undefined,
+      {
+        id: primaryKeyType + ' PRIMARY KEY',
+        authConfig: 'text NOT NULL',
+        connectionConfig: 'text NOT NULL',
+        createdBy: 'integer NOT NULL',
+        meta: 'text NOT NULL',
+        name: 'text NOT NULL',
+        readPermission: 'text NOT NULL',
+        type: 'text NOT NULL',
+        lastModified: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+        writePermission: 'text NOT NULL',
+      },
+    ),
+    new IntegrationConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
+      'schemaMetadata',
+      ['id'],
+      [
+        'columnId',
+        'starred',
+        'count',
+        'countByAlgorithm',
+      ],
+      undefined,
+      {
+        id: primaryKeyType + ' PRIMARY KEY',
+        columnId: 'text NOT NULL',
+        count: 'integer NOT NULL',
+        starred: 'bool NOT NULL',
+        countByAlgorithm: 'text',
+      },
+    ),
+    new SchemaMetadataConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
+      'resultsConfig',
+      ['id'],
+      [
+        'index',
+        'thumbnail',
+        'name',
+        'score',
+        'fields',
+        'formats',
+        'primaryKeys',
+      ],
+      undefined,
+      {
+        id: primaryKeyType + ' PRIMARY KEY',
+        index: 'text NOT NULL',
+        thumbnail: 'text',
+        name: 'text',
+        score: 'text',
+        fields: 'text',
+        formats: 'text',
+        primaryKeys: 'text',
+      },
+    ),
+    new ResultsConfigConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
+      'templates',
+      ['id'],
+      [
+        'createdAt',
+        'lastModified',
+        'archived',
+        'templateName',
+        'process',
+        'sources',
+        'sinks',
+        'settings',
+        'meta',
+        'uiData',
+      ],
+      undefined,
+      {
+        id: primaryKeyType + ' PRIMARY KEY',
+        createdAt: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+        lastModified: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+        archived: 'bool NOT NULL',
+        templateName: 'text NOT NULL',
+        process: 'text NOT NULL',
+        sources: 'text NOT NULL',
+        sinks: 'text NOT NULL',
+        settings: 'text NOT NULL',
+        meta: 'text NOT NULL',
+        uiData: 'text NOT NULL',
+      },
+    ),
+    new TemplateConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
+      'schedules',
+      ['id'],
+      [
+        'createdAt',
+        'createdBy',
+        'cron',
+        'lastModified',
+        'lastRun',
+        'meta',
+        'name',
+        'priority',
+        'running',
+        'shouldRunNext',
+        'tasks',
+        'workerId',
+      ],
+      undefined,
+      {
+        id: primaryKeyType + ' PRIMARY KEY',
+        createdAt: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+        createdBy: 'integer',
+        cron: 'text NOT NULL',
+        lastModified: 'date NOT NULL',
+        lastRun: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+        meta: 'text NOT NULL',
+        name: 'text NOT NULL',
+        priority: 'integer NOT NULL',
+        running: 'bool NOT NULL',
+        shouldRunNext: 'bool NOT NULL',
+        tasks: 'text NOT NULL',
+        workerId: 'integer NOT NULL',
+      },
+    ),
+    new SchedulerConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
+      'jobLogs',
+      ['id'],
+      [
+        'contents',
+        'createdAt',
+      ],
+      undefined,
+      {
+        id: 'integer PRIMARY KEY',
+        createdAt: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+        contents: 'text',
+      },
+    ),
+    new JobLogConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
+      'jobs',
+      ['id'],
+      [
+        'createdAt',
+        'createdBy',
+        'endTime',
+        'logId',
+        'meta',
+        'name',
+        'pausedFilename',
+        'priority',
+        'running',
+        'runNowPriority',
+        'scheduleId',
+        'startTime',
+        'status',
+        'tasks',
+        'type',
+        'workerId',
+      ],
+      undefined,
+      {
+        id: primaryKeyType + ' PRIMARY KEY',
+        createdAt: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+        createdBy: 'integer',
+        endTime: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+        logId: 'integer',
+        meta: 'text NOT NULL',
+        name: 'text NOT NULL',
+        pausedFilename: 'text NOT NULL',
+        priority: 'integer NOT NULL',
+        running: 'bool NOT NULL',
+        runNowPriority: 'integer NOT NULL',
+        scheduleId: 'integer',
+        startTime: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+        status: 'text NOT NULL',
+        tasks: 'text NOT NULL',
+        type: 'text NOT NULL',
+        workerId: 'integer NOT NULL',
+      },
+    ),
+    new JobConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
+      'statusHistory',
+      ['id'],
+      [
+        'createdAt',
+        'userId',
+        'algorithmId',
+        'fromStatus',
+        'toStatus',
+      ],
+      undefined,
+      {
+        id: primaryKeyType + ' PRIMARY KEY',
+        createdAt: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+        userId: 'integer NOT NULL',
+        algorithmId: 'integer NOT NULL',
+        fromStatus: 'text NOT NULL',
+        toStatus: 'text NOT NULL',
+      },
+    ),
+    new StatusHistoryConfig({}),
+  );
+
+  return tables as Tables;
+};
+
+export function setupTables(dbtype: string): Tables
 {
   if (dbtype === 'sqlite' || dbtype === 'mysql')
   {
-    return tasty.getDB().execute(appSchemaSQL('datetime', '0', 'string', 'integer'));
+    return setupTablesHelper('datetime', '0', 'string', 'integer');
   }
   else if (dbtype === 'postgres')
   {
-    return tasty.getDB().execute([appSchemaSQL('timestamp with time zone', 'false', 'varchar(255)', 'serial'), undefined]);
+    return setupTablesHelper('timestamp with time zone', 'false', 'varchar(255)', 'serial');
   }
   else
   {
@@ -289,5 +537,3 @@ export async function getTable(databaseID: number | string, table: string): Prom
     }
   });
 }
-
-export default createAppSchema;

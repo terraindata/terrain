@@ -43,8 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import { List, Map } from 'immutable';
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+const { List, Map } = Immutable;
 
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
@@ -123,11 +124,11 @@ export default class EngineUtil
             errors.push(`Field ${okp.toJS()} has a parent that is not an array or object`);
           }
         }
-        if (okp.last() === '*')
+        if (okp.last() === -1)
         {
           if (engine.getFieldType(id) !== 'array')
           {
-            errors.push(`Field ${okp.toJS()} is not of type array, but has name '*'. This is not allowed`);
+            errors.push(`Field ${okp.toJS()} is not of type array, but has name -1. This is not allowed`);
           }
         }
         const fieldTypeErrors = EngineUtil.fieldHasValidType(engine, id);
@@ -174,7 +175,7 @@ export default class EngineUtil
     const asSet = transformations.flatMap((id) =>
     {
       const transformation = engine.getTransformationInfo(id);
-      const nfkp: List<List<string>> = _.get(transformation, ['meta', 'newFieldKeyPaths']);
+      const nfkp: List<KeyPath> = _.get(transformation, ['meta', 'newFieldKeyPaths']);
       if (nfkp === undefined)
       {
         return undefined;
@@ -196,7 +197,7 @@ export default class EngineUtil
   ): boolean
   {
     const last = index === undefined ? keypath.last() : keypath.get(index);
-    return last !== '*' && Number.isNaN(Number(last));
+    return last !== -1 && Number.isNaN(Number(last));
   }
 
   public static isWildcardField(
@@ -205,7 +206,7 @@ export default class EngineUtil
   ): boolean
   {
     const last = index === undefined ? keypath.last() : keypath.get(index);
-    return last === '*';
+    return last === -1;
   }
 
   // document merge logic
@@ -228,7 +229,7 @@ export default class EngineUtil
   // an existing engine that has fields with indices in them
   public static turnIndicesIntoValue(
     keypath: KeyPath,
-    value = '*',
+    value = -1,
   ): KeyPath
   {
     if (keypath.size === 0)
@@ -332,7 +333,7 @@ export default class EngineUtil
 
   public static addFieldToEngine(
     engine: TransformationEngine,
-    keypath: List<string>,
+    keypath: KeyPath,
     type: ETLFieldTypes,
     valueType?: ETLFieldTypes,
     useValueType?: boolean,
@@ -424,7 +425,7 @@ export default class EngineUtil
       const keypath = leftEngine.getOutputKeyPath(id);
       const newId = EngineUtil.transferField(id, keypath, leftEngine, newEngine);
     });
-    const outputKeyPathBase = List([outputKey, '*']);
+    const outputKeyPathBase = List([outputKey, -1]);
     const valueTypePath = List(['valueType']);
     const outputFieldId = EngineUtil.addFieldToEngine(newEngine, List([outputKey]), ETLFieldTypes.Array, ETLFieldTypes.Object);
     const outputFieldWildcardId = EngineUtil.addFieldToEngine(
@@ -464,7 +465,7 @@ export default class EngineUtil
 
     const ignoreFields: { [k: number]: boolean } = {};
     const docs = EngineUtil.preprocessDocuments(options.documents, engine);
-    engine.getAllFieldIDs().forEach((id) =>
+    engine.getAllFieldIDs().sortBy((id) => engine.getOutputKeyPath(id).size).forEach((id) =>
     {
       if (ignoreFields[id])
       {
@@ -483,13 +484,6 @@ export default class EngineUtil
         if (type === ETLFieldTypes.GeoPoint)
         {
           EngineUtil.castField(engine, id, ETLFieldTypes.GeoPoint);
-          const latField = EngineUtil.addFieldToEngine(engine, ikp.push('lat'), ETLFieldTypes.Number);
-          const longField = EngineUtil.addFieldToEngine(engine, ikp.push('lon'), ETLFieldTypes.Number);
-          engine.setOutputKeyPath(latField, okp.push('lat')); // refactor to use synthetic util?
-          engine.setOutputKeyPath(longField, okp.push('lon'));
-
-          EngineUtil.castField(engine, latField, ETLFieldTypes.Number);
-          EngineUtil.castField(engine, longField, ETLFieldTypes.Number);
         }
         else if (type === ETLFieldTypes.Date)
         {
@@ -597,7 +591,7 @@ export default class EngineUtil
       fieldIds.forEach((id, j) =>
       {
         const currentType: FieldTypes = EngineUtil.getRepresentedType(id, e);
-        const deIndexedPath = EngineUtil.turnIndicesIntoValue(e.getOutputKeyPath(id), '*');
+        const deIndexedPath = EngineUtil.turnIndicesIntoValue(e.getOutputKeyPath(id), -1);
         const path = EngineUtil.hashPath(deIndexedPath);
 
         if (pathTypes[path] !== undefined)
@@ -676,6 +670,110 @@ export default class EngineUtil
     else
     {
       e2.disableField(id2);
+    }
+  }
+
+  public static createTreeFromEngine(engine: TransformationEngine): Immutable.Map<number, List<number>>
+  {
+    const ids = engine.getAllFieldIDs();
+    // sort the paths to ensure we visit parents before children
+    const sortedIds = ids.sort((a, b) => engine.getOutputKeyPath(a).size - engine.getOutputKeyPath(b).size);
+
+    const enginePathToField: {
+      [kp: string]: List<number>,
+    } = {};
+
+    sortedIds.forEach((id, index) =>
+    {
+      const enginePath = engine.getOutputKeyPath(id).toJS();
+      if (enginePath.length === 0)
+      {
+        return;
+      }
+      const parentPath = enginePath.slice(0, -1);
+      const parentHash = JSON.stringify(parentPath);
+      const parentField: List<number> = enginePathToField[parentHash];
+      const newField = List([]);
+
+      if (parentField != null)
+      {
+        enginePathToField[parentHash] = parentField.push(id);
+      }
+      enginePathToField[JSON.stringify(enginePath)] = newField;
+    });
+
+    const fieldMap: { [k: number]: List<number> } = {};
+    sortedIds.forEach((id, index) =>
+    {
+      const enginePath = engine.getOutputKeyPath(id).toJS();
+      const field = enginePathToField[JSON.stringify(enginePath)];
+      if (field != null)
+      {
+        fieldMap[id] = field;
+      }
+    });
+    return Immutable.Map<number, List<number>>(fieldMap)
+      .mapKeys((key) => Number(key))
+      .toMap();
+  }
+
+  public static postorderForEach(
+    engine: TransformationEngine,
+    fromId: number,
+    fn: (id: number) => void,
+  )
+  {
+    const tree = EngineUtil.createTreeFromEngine(engine);
+    for (const id of EngineUtil.postorder(tree, fromId))
+    {
+      fn(id);
+    }
+  }
+
+  public static preorderForEach(
+    engine: TransformationEngine,
+    fromId: number,
+    fn: (id: number) => void,
+  )
+  {
+    const tree = EngineUtil.createTreeFromEngine(engine);
+    for (const id of EngineUtil.preorder(tree, fromId))
+    {
+      fn(id);
+    }
+  }
+
+  public static * postorder(
+    tree: Immutable.Map<number, List<number>>,
+    id: number,
+    shouldExplore: (id) => boolean = () => true,
+  )
+  {
+    const children = tree.get(id);
+    if (children !== undefined)
+    {
+      for (let i = 0; i < children.size; i++)
+      {
+        yield* EngineUtil.postorder(tree, children.get(i), shouldExplore);
+      }
+      yield id;
+    }
+  }
+
+  public static * preorder(
+    tree: Immutable.Map<number, List<number>>,
+    id: number,
+    shouldExplore: (id) => boolean = () => true,
+  )
+  {
+    const children = tree.get(id);
+    if (children !== undefined && shouldExplore(id))
+    {
+      yield id;
+      for (let i = 0; i < children.size; i++)
+      {
+        yield* EngineUtil.preorder(tree, children.get(i), shouldExplore);
+      }
     }
   }
 
@@ -758,7 +856,7 @@ export default class EngineUtil
     });
     _.forEach(fieldsToDelete, (id) =>
     {
-      const deIndexedPath = EngineUtil.turnIndicesIntoValue(engine.getOutputKeyPath(id), '*');
+      const deIndexedPath = EngineUtil.turnIndicesIntoValue(engine.getOutputKeyPath(id), -1);
       const path = EngineUtil.hashPath(deIndexedPath);
       engine.deleteField(id);
       if (pathTypes[path] === undefined)

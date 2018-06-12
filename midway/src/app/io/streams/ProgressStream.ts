@@ -61,7 +61,7 @@ export default class ProgressStream extends Transform
   private count: number = 0;
   private errors: number = 0;
 
-  constructor(writer: Writable, frequency: number = 500)
+  constructor(writer: Writable, frequency: number = 3000)
   {
     super({
       allowHalfOpen: true,
@@ -121,9 +121,9 @@ export default class ProgressStream extends Transform
       {
         if (!this.doneWriting)
         {
+          this.asyncRead = null;
           this.push(this.progress());
         }
-        this.asyncRead = null;
       },
         this.frequency);
     }

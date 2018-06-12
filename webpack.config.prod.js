@@ -47,17 +47,18 @@ const webpack = require('webpack');
 const path = require('path');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports =
 {
   entry: './src/app/Root.tsx',
-  devtool: 'cheap-module-source-map',
 
   output:
   {
     path: __dirname,
     publicPath: '/assets/',
     filename: 'bundle.js',
+    chunkFilename: '[name].bundle.js'
   },
 
   // NOTE: this should also be added to the production config
@@ -83,7 +84,6 @@ module.exports =
       database: path.resolve(__dirname, 'src/database'),
       deploy: path.resolve(__dirname, 'src/app/deploy'),
       etl: path.resolve(__dirname, 'src/app/etl'),
-      fileImport: path.resolve(__dirname, 'src/app/fileImport'),
       images: path.resolve(__dirname, 'src/images'),
       jobs: path.resolve(__dirname, 'src/app/jobs'),
       library: path.resolve(__dirname, 'src/app/library'),
@@ -99,6 +99,7 @@ module.exports =
       util: path.resolve(__dirname, 'src/app/util'),
       x: path.resolve(__dirname, 'src/app/x'),
       'test-helpers': path.resolve(__dirname, 'src/test/test-helpers'),
+      radium: require.resolve('radium/index'),
     },
   },
 
@@ -144,8 +145,8 @@ module.exports =
   plugins:
   [
     new webpack.DefinePlugin({
-      MIDWAY_HOST: JSON.stringify('https://' + (process.env.MIDWAY_HOST || 'localhost:3000')),
-      DEV: true,
+      MIDWAY_HOST: JSON.stringify(process.env.MIDWAY_HOST || 'http://localhost:3000'),
+      DEV: false,
     }),
     new HardSourceWebpackPlugin({
       cacheDirectory: './.cache/hard-source/dev/[confighash]',
@@ -163,5 +164,16 @@ module.exports =
         }
       }
     },
+
+    minimizer: [
+      new UglifyJSPlugin({
+        // sourceMap: true,
+        cache: true,
+        parallel: true,
+        uglifyOptions: {
+          keep_fnames: true,
+        }
+      })
+    ],
   },
 };

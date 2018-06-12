@@ -56,7 +56,6 @@ import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { ETLState } from 'etl/ETLTypes';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import
 {
@@ -73,12 +72,61 @@ import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { JobsActions } from 'src/app/jobs/data/JobsRedux';
+import { JobsState } from 'src/app/jobs/JobsTypes';
 
 export default abstract class ETLHelpers
 {
+  /*
+   *  makeCall should kick off the async poll call that returns a promise.
+   *  makeCall gets called with the last result of its own resolved value
+   *  each time makeCall resolves, isFinished will be called on its resolved value.
+   *  isFinished and makeCall can throw errors which will be rejected by the returned promise
+   *  If isFinished returns true, then the promise with resolve with the last resolved value of the poll function.
+   */
+  public static asyncPoll<T>(
+    makeCall: (promiseValue?: T) => Promise<T>,
+    isFinished: (promiseValue?: T) => boolean,
+    timeBetweenCalls: number = 5000,
+    trailing = false,
+  ): Promise<T>
+  {
+    return new Promise<T>((resolve, reject) =>
+    {
+      let lastValue;
+      const eventLoop = () =>
+      {
+        makeCall(lastValue)
+          .then((value) =>
+          {
+            lastValue = value;
+            if (isFinished(lastValue))
+            {
+              return resolve(lastValue);
+            }
+            else
+            {
+              setTimeout(eventLoop, timeBetweenCalls);
+            }
+          })
+          .catch(reject);
+      };
+
+      if (trailing)
+      {
+        setTimeout(eventLoop, timeBetweenCalls);
+      }
+      else
+      {
+        eventLoop();
+      }
+    });
+  }
+
   protected editorAct: typeof TemplateEditorActions;
   protected etlAct: typeof ETLActions;
   protected schemaAct: typeof SchemaActions;
+  protected jobsAct: typeof JobsActions;
 
   protected get _state(): Immutable.Map<string, any>
   {
@@ -105,19 +153,28 @@ export default abstract class ETLHelpers
     return this._state.get('walkthrough');
   }
 
+  protected get _jobsState(): JobsState
+  {
+    return this._state.get('jobs');
+  }
+
   constructor(protected store)
   {
     this.editorAct = (action) =>
     {
-      this.store.dispatch(TemplateEditorActions(action));
+      return this.store.dispatch(TemplateEditorActions(action));
     };
     this.etlAct = (action) =>
     {
-      this.store.dispatch(ETLActions(action));
+      return this.store.dispatch(ETLActions(action));
     };
     this.schemaAct = (action) =>
     {
-      this.store.dispatch(SchemaActions(action));
+      return this.store.dispatch(SchemaActions(action));
+    };
+    this.jobsAct = (action) =>
+    {
+      return this.store.dispatch(JobsActions(action));
     };
   }
 

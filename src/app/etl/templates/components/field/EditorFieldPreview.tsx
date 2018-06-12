@@ -101,7 +101,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
         onClick: this.openSettings,
       });
     }
-    if (field.isNested())
+    if (field.etlType === ETLFieldTypes.Object)
     {
       options.push({
         text: 'Add a subfield',
@@ -169,21 +169,97 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     return labelStyle;
   }
 
+  public renderPreviewValue()
+  {
+    const { preview, labelOnly } = this.props;
+    const field = this._field();
+
+    const hidePreviewValue =
+      field.etlType === ETLFieldTypes.Array ||
+      field.etlType === ETLFieldTypes.Object ||
+      labelOnly;
+
+    if (hidePreviewValue)
+    {
+      return null;
+    }
+    else
+    {
+      let previewText: string;
+      switch (field.etlType)
+      {
+        case ETLFieldTypes.GeoPoint:
+          if (preview == null)
+          {
+            previewText = 'N/A';
+          }
+          else if (typeof preview !== 'object')
+          {
+            previewText = 'INVALID GEOPOINT';
+          }
+          else
+          {
+            previewText = `Lat: ${preview.lat}, Lon: ${preview.lon}`;
+          }
+          break;
+        default:
+          previewText = preview == null ? 'N/A' : preview.toString();
+          if (previewText.length >= MAX_STRING_LENGTH)
+          {
+            previewText = previewText.slice(0, MAX_STRING_LENGTH) + '...';
+          }
+          break;
+      }
+
+      return (
+        <div
+          className={classNames({
+            'field-preview-value': true,
+          })}
+          style={fontColor(Colors().text2)}
+        >
+          {previewText}
+        </div>
+      );
+    }
+  }
+
+  public renderMenu()
+  {
+    if (this.props.labelOnly)
+    {
+      return null;
+    }
+    else
+    {
+      const menuOptions = this.menuOptions(this._field());
+      const showMenu = menuOptions.size > 0 && (this.state.hovered || this.state.menuOpen);
+      return (
+        <div
+          className={classNames({
+            'field-preview-menu': true,
+            'field-preview-menu-hidden': !showMenu,
+          })}
+        >
+          <Menu
+            options={menuOptions}
+            small={true}
+            openRight={true}
+            onChangeState={this.handleMenuStateChange}
+            overrideMultiplier={7}
+          />
+        </div>
+      );
+    }
+  }
+
   public render()
   {
-    const { canEdit, preview, labelOverride, labelOnly } = this.props;
+    const { canEdit, labelOverride } = this.props;
     const field = this._field();
     const settingsOpen = this._settingsAreOpen();
 
     const labelStyle = this.getLabelStyle(settingsOpen, canEdit && this._field().isIncluded, field.isWildcardField());
-    let previewText: string = preview == null ? 'N/A' : preview.toString();
-    if (previewText.length >= MAX_STRING_LENGTH)
-    {
-      previewText = previewText.slice(0, MAX_STRING_LENGTH) + '...';
-    }
-    const menuOptions = this.menuOptions(this._field());
-    const showMenu = menuOptions.size > 0 && (this.state.hovered || this.state.menuOpen);
-    const hidePreviewValue = field.isArray() || field.isNested() || labelOnly;
 
     return (
       <div className='template-editor-field-block'>
@@ -192,7 +268,6 @@ class EditorFieldPreview extends TemplateEditorField<Props>
             className='field-preview-label-group'
             onMouseEnter={this.handleMouseEnter}
             onMouseLeave={this.handleMouseLeave}
-            style={labelStyle}
           >
             {
               this.renderTypeIcon()
@@ -204,7 +279,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
                 'field-preview-can-toggle': this.props.toggleOpen !== undefined,
               })}
               onClick={this.handleLabelClicked}
-              style={fontColor(Colors().text1, Colors().active)}
+              style={labelStyle}
               key='label'
             >
               {labelOverride != null ? labelOverride : field.name}
@@ -221,33 +296,11 @@ class EditorFieldPreview extends TemplateEditorField<Props>
                 null
             }
             {
-              labelOnly ? null :
-                <div
-                  className={classNames({
-                    'field-preview-menu': true,
-                    'field-preview-menu-hidden': !showMenu,
-                  })}
-                >
-                  <Menu
-                    options={menuOptions}
-                    small={true}
-                    openRight={true}
-                    onChangeState={this.handleMenuStateChange}
-                    overrideMultiplier={7}
-                  />
-                </div>
+              this.renderMenu()
             }
           </div>
           {
-            !hidePreviewValue &&
-            <div
-              className={classNames({
-                'field-preview-value': true,
-              })}
-              style={fontColor(Colors().text2)}
-            >
-              {previewText}
-            </div>
+            this.renderPreviewValue()
           }
         </div>
       </div>

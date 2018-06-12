@@ -50,7 +50,6 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as shallowCompare from 'react-addons-shallow-compare';
 import Util from 'util/Util';
 
 import * as Immutable from 'immutable';
