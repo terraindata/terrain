@@ -147,7 +147,7 @@ export function validateNewFieldName(
       message: 'Invalid Name. Names cannot be empty',
     };
   }
-  if (newKeyPath.last() === '*')
+  if (newKeyPath.last() === -1)
   {
     return {
       isValid: false,
@@ -200,7 +200,7 @@ export function validateRename(
       message: 'Invalid Rename. Names cannot be empty',
     };
   }
-  if (newKeyPath.last() === '*')
+  if (newKeyPath.last() === -1)
   {
     return {
       isValid: false,

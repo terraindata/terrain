@@ -124,11 +124,11 @@ export default class EngineUtil
             errors.push(`Field ${okp.toJS()} has a parent that is not an array or object`);
           }
         }
-        if (okp.last() === '*')
+        if (okp.last() === -1)
         {
           if (engine.getFieldType(id) !== 'array')
           {
-            errors.push(`Field ${okp.toJS()} is not of type array, but has name '*'. This is not allowed`);
+            errors.push(`Field ${okp.toJS()} is not of type array, but has name -1. This is not allowed`);
           }
         }
         const fieldTypeErrors = EngineUtil.fieldHasValidType(engine, id);
@@ -197,7 +197,7 @@ export default class EngineUtil
   ): boolean
   {
     const last = index === undefined ? keypath.last() : keypath.get(index);
-    return last !== '*' && Number.isNaN(Number(last));
+    return last !== -1 && Number.isNaN(Number(last));
   }
 
   public static isWildcardField(
@@ -206,7 +206,7 @@ export default class EngineUtil
   ): boolean
   {
     const last = index === undefined ? keypath.last() : keypath.get(index);
-    return last === '*';
+    return last === -1;
   }
 
   // document merge logic
@@ -229,7 +229,7 @@ export default class EngineUtil
   // an existing engine that has fields with indices in them
   public static turnIndicesIntoValue(
     keypath: KeyPath,
-    value = '*',
+    value = -1,
   ): KeyPath
   {
     if (keypath.size === 0)
@@ -425,7 +425,7 @@ export default class EngineUtil
       const keypath = leftEngine.getOutputKeyPath(id);
       const newId = EngineUtil.transferField(id, keypath, leftEngine, newEngine);
     });
-    const outputKeyPathBase = List([outputKey, '*']);
+    const outputKeyPathBase = List([outputKey, -1]);
     const valueTypePath = List(['valueType']);
     const outputFieldId = EngineUtil.addFieldToEngine(newEngine, List([outputKey]), ETLFieldTypes.Array, ETLFieldTypes.Object);
     const outputFieldWildcardId = EngineUtil.addFieldToEngine(
@@ -591,7 +591,7 @@ export default class EngineUtil
       fieldIds.forEach((id, j) =>
       {
         const currentType: FieldTypes = EngineUtil.getRepresentedType(id, e);
-        const deIndexedPath = EngineUtil.turnIndicesIntoValue(e.getOutputKeyPath(id), '*');
+        const deIndexedPath = EngineUtil.turnIndicesIntoValue(e.getOutputKeyPath(id), -1);
         const path = EngineUtil.hashPath(deIndexedPath);
 
         if (pathTypes[path] !== undefined)
@@ -856,7 +856,7 @@ export default class EngineUtil
     });
     _.forEach(fieldsToDelete, (id) =>
     {
-      const deIndexedPath = EngineUtil.turnIndicesIntoValue(engine.getOutputKeyPath(id), '*');
+      const deIndexedPath = EngineUtil.turnIndicesIntoValue(engine.getOutputKeyPath(id), -1);
       const path = EngineUtil.hashPath(deIndexedPath);
       engine.deleteField(id);
       if (pathTypes[path] === undefined)

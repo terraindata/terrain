@@ -260,7 +260,7 @@ export class EngineProxy
     this.requestRebuild();
   }
 
-  public extractSimpleArrayField(sourceId, destKP: List<string>)
+  public extractSimpleArrayField(sourceId, destKP: KeyPath)
   {
     const optionsNew: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
       newFieldKeyPaths: List([destKP]),
@@ -273,7 +273,7 @@ export class EngineProxy
     const newFieldId = this.engine.getOutputFieldID(destKP);
 
     const newFieldType = EngineUtil.getETLFieldType(sourceId, this.engine);
-    this.addFieldToEngine(destKP.push('*'), ETLFieldTypes.Array, newFieldType, true);
+    this.addFieldToEngine(destKP.push(-1), ETLFieldTypes.Array, newFieldType, true);
     EngineUtil.rawSetFieldType(this.engine, newFieldId, ETLFieldTypes.Array, ETLFieldTypes.Array, newFieldType);
     this.requestRebuild();
   }
@@ -310,13 +310,13 @@ export class EngineProxy
     this.requestRebuild();
   }
 
-  public addField(keypath: List<string>, type: ETLFieldTypes, valueType: ETLFieldTypes = ETLFieldTypes.String)
+  public addField(keypath: KeyPath, type: ETLFieldTypes, valueType: ETLFieldTypes = ETLFieldTypes.String)
   {
     let newId: number;
     if (type === ETLFieldTypes.Array)
     {
       newId = this.addFieldToEngine(keypath, type, valueType);
-      const wildId = this.addFieldToEngine(keypath.push('*'), ETLFieldTypes.Array, valueType, true);
+      const wildId = this.addFieldToEngine(keypath.push(-1), ETLFieldTypes.Array, valueType, true);
       EngineUtil.castField(this.engine, wildId, valueType);
     }
     else
@@ -428,7 +428,7 @@ export class EngineProxy
   }
 
   private addFieldToEngine(
-    keypath: List<string>,
+    keypath: KeyPath,
     etlType: ETLFieldTypes,
     valueType?: ETLFieldTypes,
     useValueType?: boolean,

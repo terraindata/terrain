@@ -181,9 +181,9 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         for (let i: number = 0; i < el.length; i++)
         {
           let kp: KeyPath = field;
-          if (kp.contains('*'))
+          if (kp.contains(-1))
           {
-            kp = kp.set(kp.indexOf('*'), i.toString());
+            kp = kp.set(kp.indexOf(-1), i.toString());
           }
           else
           {
@@ -241,13 +241,13 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       {
         el = Object.assign({}, el);
       }
-      if (opts.newFieldKeyPaths.get(0).contains('*'))
+      if (opts.newFieldKeyPaths.get(0).contains(-1))
       {
         // assume el length is same as target length
         for (let i: number = 0; i < el.length; i++)
         {
           const kpi: KeyPath = opts.newFieldKeyPaths.get(0).set(
-            opts.newFieldKeyPaths.get(0).indexOf('*'), i.toString());
+            opts.newFieldKeyPaths.get(0).indexOf(-1), i.toString());
           yadeep.set(doc, kpi, el[i], { create: true });
         }
       } else
@@ -386,9 +386,9 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         for (let i: number = 0; i < Object.keys(el).length; i++)
         {
           let kpi: KeyPath = field;
-          if (kpi.contains('*'))
+          if (kpi.contains(-1))
           {
-            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+            kpi = kpi.set(kpi.indexOf(-1), i.toString());
           }
           else
           {
@@ -443,9 +443,9 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         for (let i: number = 0; i < Object.keys(el).length; i++)
         {
           let kpi: KeyPath = field;
-          if (kpi.contains('*'))
+          if (kpi.contains(-1))
           {
-            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+            kpi = kpi.set(kpi.indexOf(-1), i.toString());
           }
           else
           {
@@ -457,9 +457,9 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
           for (let j: number = 0; j < split.length; j++)
           {
             let newkpi: KeyPath = opts.newFieldKeyPaths.get(j);
-            if (newkpi.contains('*'))
+            if (newkpi.contains(-1))
             {
-              newkpi = newkpi.set(newkpi.indexOf('*'), i.toString());
+              newkpi = newkpi.set(newkpi.indexOf(-1), i.toString());
             }
             else
             {
@@ -877,9 +877,9 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         for (let i: number = 0; i < el.length; i++)
         {
           let kpi: KeyPath = field;
-          if (kpi.contains('*'))
+          if (kpi.contains(-1))
           {
-            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+            kpi = kpi.set(kpi.indexOf(-1), i.toString());
           }
           else
           {
