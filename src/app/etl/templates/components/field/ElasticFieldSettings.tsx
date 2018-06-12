@@ -67,7 +67,7 @@ import
   _TemplateField,
   TemplateField,
 } from 'etl/templates/FieldTypes';
-import { defaultProps, ElasticFieldProps, ElasticTypes, ETLToElasticOptions } from 'shared/etl/types/ETLElasticTypes';
+import { defaultProps, ElasticAnalyzers, ElasticFieldProps, ElasticTypes, ETLToElasticOptions } from 'shared/etl/types/ETLElasticTypes';
 import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
@@ -165,12 +165,12 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
   @instanceFnDecorator(memoizeOne)
   public getAnalyzerOptions()
   {
-    return List(['standard']);
+    return ElasticAnalyzers;
   }
 
-  public resolveAnalyzerIndex()
+  public resolveAnalyzerIndex(option)
   {
-    return 0;
+    return ElasticAnalyzers.indexOf(option);
   }
 
   public componentDidMount()

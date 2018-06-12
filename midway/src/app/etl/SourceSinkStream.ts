@@ -76,6 +76,7 @@ import FollowUpBossEndpoint from './endpoints/FollowUpBossEndpoint';
 import FSEndpoint from './endpoints/FSEndpoint';
 import GoogleAnalyticsEndpoint from './endpoints/GoogleAnalyticsEndpoint';
 import HTTPEndpoint from './endpoints/HTTPEndpoint';
+import MailChimpEndpoint from './endpoints/MailChimpEndpoint';
 import MySQLEndpoint from './endpoints/MySQLEndpoint';
 import PostgreSQLEndpoint from './endpoints/PostgreSQLEndpoint';
 import SFTPEndpoint from './endpoints/SFTPEndpoint';
@@ -194,7 +195,7 @@ export async function getSinkStream(
 
     try
     {
-      if (sink.type !== 'Database' && sink.type !== 'FollowUpBoss')
+      if (sink.type !== 'Database' && sink.type !== 'FollowUpBoss' && sink.type !== 'MailChimp')
       {
         switch (sink.fileConfig.fileType)
         {
@@ -277,6 +278,9 @@ export async function getSinkStream(
           break;
         case 'FollowUpBoss':
           endpoint = new FollowUpBossEndpoint();
+          break;
+        case 'MailChimp':
+          endpoint = new MailChimpEndpoint();
           break;
         default:
           throw new Error('Sink type not implemented.');

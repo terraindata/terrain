@@ -63,6 +63,8 @@ export interface Props
   showWhenHoveringClassName?: string;
   useAltColor?: boolean;
   connectDragSource?: (el: El) => El;
+  isDragging?: boolean;
+
   colorsActions: typeof ColorsActions;
 }
 
@@ -97,6 +99,7 @@ class DragHandle extends TerrainComponent<Props>
 
   public renderHandle()
   {
+    const { isDragging } = this.props;
     return (
       <div
         key={this.props.id}
@@ -105,6 +108,8 @@ class DragHandle extends TerrainComponent<Props>
           ':hover': {
             opacity: 0.85,
           },
+          'position': isDragging ? 'relative' : undefined,
+          'zIndex': isDragging ? 9 : undefined,
         }}
       >
         <Handle className='drag-icon' />
@@ -114,13 +119,15 @@ class DragHandle extends TerrainComponent<Props>
 
   public render()
   {
-    return (
-      (
-        this.props.connectDragSource !== undefined ?
-          this.props.connectDragSource(this.renderHandle()) :
-          this.renderHandle()
-      )
-    );
+    const handle = this.renderHandle();
+    const { connectDragSource } = this.props;
+
+    if (connectDragSource !== undefined)
+    {
+      return connectDragSource(handle);
+    }
+
+    return handle;
   }
 }
 

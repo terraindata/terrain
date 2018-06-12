@@ -61,7 +61,7 @@ import
   AlgorithmEndpoint,
   DatabaseEndpoint, DownloadEndpoint,
   FollowUpBossEndpoint, FsEndpoint,
-  HttpEndpointForm, Props, SftpEndpoint,
+  HttpEndpointForm, MailChimpEndpoint, Props, SftpEndpoint,
   SQLEndpoint, UploadEndpoint,
 } from './EndpointFormClasses';
 
@@ -90,4 +90,5 @@ export const SinkFormMap: FormLookupMap<Sinks> =
     [Sinks.Http]: HttpEndpointForm,
     [Sinks.Fs]: FsEndpoint,
     [Sinks.FollowUpBoss]: FollowUpBossEndpoint,
+    [Sinks.MailChimp]: MailChimpEndpoint,
   };

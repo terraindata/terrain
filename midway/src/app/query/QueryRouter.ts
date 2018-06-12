@@ -59,7 +59,7 @@ import * as Util from '../AppUtil';
 import { QueryHandler } from './QueryHandler';
 
 const QueryRouter = new KoaRouter();
-export const initialize = () => {};
+export const initialize = () => { };
 
 QueryRouter.post(
   '/',

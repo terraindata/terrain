@@ -73,5 +73,13 @@ export function mergeDocument(doc: object): object
       });
     }
   }
+  if (doc['sort'] != null)
+  {
+    doc['_source']['TerrainScore'] = doc['sort'][0];
+  }
+  else
+  {
+    doc['_source']['TerrainScore'] = 0;
+  }
   return doc;
 }

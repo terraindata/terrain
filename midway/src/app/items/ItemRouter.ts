@@ -146,7 +146,21 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
     }
   }
 
-  ctx.body = await items.upsert(ctx.state.user, item);
+  try
+  {
+    ctx.body = await items.upsert(ctx.state.user, item);
+  }
+  catch (e)
+  {
+    if (e.toString() === 'error: conflicting key value violates exclusion constraint "unique_item_names"')
+    {
+      ctx.throw(400, 'Duplicate item name');
+    }
+    else
+    {
+      throw e;
+    }
+  }
 });
 
 export default Router;

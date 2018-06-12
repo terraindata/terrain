@@ -184,6 +184,7 @@ class Modal extends TerrainComponent<Props>
       >
         <div>
           <ReactModal
+            appElement={document.getElementById('app')}
             contentLabel={''}
             isOpen={true}
             overlayClassName='modal-overlay'

@@ -49,16 +49,15 @@ THE SOFTWARE.
 /**
  * This is an extension of React.Component that adds extra
  * commonly needed functionality:
- * - shouldComponentUpdate with shallowCompare
  * - helper method for calling instance functions with arguments
  * - helper method for toggling a boolean state value
  * - helper method for subscribing to a Redux state
 */
 
+import createHistory from 'history/createBrowserHistory';
 import * as _ from 'lodash';
 import * as React from 'react';
 import Util from '../../util/Util';
-const shallowCompare = require('react-addons-shallow-compare');
 
 // Defines the configuration options for a Redux subscription
 interface SubscriptionConfig
@@ -75,8 +74,12 @@ interface Store
   getState: () => any;
 }
 
+export const browserHistory = createHistory();
+
 class TerrainComponent<T> extends React.Component<T, any>
 {
+  protected browserHistory = browserHistory;
+
   public props: T;
 
   // this is an anti-pattern

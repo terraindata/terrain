@@ -77,7 +77,7 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
         'Next';
 
       const buttonComponent = (
-        <Quarantine>
+        <Quarantine key={'WalkthroughOptionsQuarantine'}>
           <div
             key={index}
             style={buttonStyle}
@@ -96,7 +96,7 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
         const ComponentClass = option.component;
         const extraProps = option.extraProps !== undefined ? option.extraProps : {};
         const customComponent = (
-          <div>
+          <div key={'WalkthroughOptions'}>
             <ComponentClass
               key={index}
               {...extraProps}
