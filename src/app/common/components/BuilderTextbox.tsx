@@ -70,7 +70,6 @@ import { ColorsActions } from '../../colors/data/ColorsRedux';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Autocomplete from './Autocomplete';
 
-const shallowCompare = require('react-addons-shallow-compare');
 const AddCardIcon = require('./../../../images/icon_addCard_22x17.svg?name=AddCardIcon');
 const TextIcon = require('./../../../images/icon_text_12x18.svg?name=TextIcon');
 const CloseIcon = require('./../../../images/icon_close.svg');

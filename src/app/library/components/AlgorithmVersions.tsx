@@ -59,7 +59,6 @@ import Util from './../../util/Util';
 import * as LibraryTypes from './../LibraryTypes';
 // import * as moment from 'moment';
 const moment = require('moment');
-import { browserHistory } from 'react-router';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
 
@@ -140,7 +139,7 @@ class AlgorithmVersions extends TerrainComponent<Props>
     {
       url += '@' + versionID;
     }
-    browserHistory.push(url);
+    this.browserHistory.push(url);
   }
 
   public renderVersion(version, i)
