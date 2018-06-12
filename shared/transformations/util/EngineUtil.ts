@@ -175,7 +175,7 @@ export default class EngineUtil
     const asSet = transformations.flatMap((id) =>
     {
       const transformation = engine.getTransformationInfo(id);
-      const nfkp: List<List<string>> = _.get(transformation, ['meta', 'newFieldKeyPaths']);
+      const nfkp: List<KeyPath> = _.get(transformation, ['meta', 'newFieldKeyPaths']);
       if (nfkp === undefined)
       {
         return undefined;
@@ -333,7 +333,7 @@ export default class EngineUtil
 
   public static addFieldToEngine(
     engine: TransformationEngine,
-    keypath: List<string>,
+    keypath: KeyPath,
     type: ETLFieldTypes,
     valueType?: ETLFieldTypes,
     useValueType?: boolean,
