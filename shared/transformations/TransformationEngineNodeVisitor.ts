@@ -682,7 +682,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
       catch (ex)
       {
-        return undefined;
+        yadeep.set(doc, kp, null);
       }
     }, (kp, el) =>
       {
