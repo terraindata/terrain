@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import InfoArea from './InfoArea';
 
@@ -57,7 +56,7 @@ class Placeholder extends TerrainComponent<Props>
 {
   public componentWillMount()
   {
-    browserHistory.replace('/library');
+    this.browserHistory.replace('/library');
   }
 
   public render()

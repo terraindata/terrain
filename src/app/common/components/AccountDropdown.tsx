@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
+import { withRouter } from 'react-router';
 import { Colors } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import TerrainComponent from '../../common/components/TerrainComponent';
@@ -70,11 +70,13 @@ const ConnectionsIcon = require('./../../../images/icon_gear.svg?name=Connection
 const InfoIcon = require('../../../images/icon_info.svg?name=InfoIcon');
 const CreditsIcon = require('../../../images/icon_group.svg?name=CreditsIcon');
 
+import createHistory from 'history/createBrowserHistory';
+
 export interface Props
 {
   colorsActions?: typeof ColorsActions;
   users?: UserTypes.UserState;
-  small?: boolean;
+  small: boolean;
 }
 
 export interface State
@@ -139,7 +141,7 @@ class AccountDropdown extends TerrainComponent<Props>
 
   public go(url: string)
   {
-    browserHistory.push(url);
+    this.browserHistory.push(url);
   }
 
   public handleLogout()

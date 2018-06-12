@@ -55,7 +55,7 @@ const Dimensions = require('react-dimensions');
 import createReactClass = require('create-react-class');
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
-const shallowCompare = require('react-addons-shallow-compare');
+import * as shallowCompare from 'react-addons-shallow-compare';
 const $ = require('jquery');
 import * as _ from 'lodash';
 

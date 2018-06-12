@@ -109,9 +109,9 @@ class PathfinderNestedSection extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
-    this.state = {
+    this.setState({
       childNames: this.getChildNames(nextProps),
-    };
+    });
   }
 
   public handleReferenceChange(value)

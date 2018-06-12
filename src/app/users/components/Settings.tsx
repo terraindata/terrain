@@ -70,7 +70,7 @@ import PasswordStrengthInput from './PasswordStrengthInput';
 import './Settings.less';
 type User = UserTypes.User;
 
-const Select = require('react-select');
+const Select = require('react-select').default;
 const TimeZones = require('./timezones.json');
 const LogoutIcon = require('./../../../images/icon_logout.svg');
 

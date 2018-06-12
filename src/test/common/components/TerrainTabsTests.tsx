@@ -48,7 +48,6 @@ THE SOFTWARE.
 import TerrainTabs from 'common/components/TerrainTabs';
 import { shallow } from 'enzyme';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 
 describe('TerrainTabs', () =>
 {
@@ -74,7 +73,7 @@ describe('TerrainTabs', () =>
       <TerrainTabs
         tabs={tabs}
         tabToRouteMap={{ tab1: '/path/to/tab1', tab2: '/path/to/tab2' }}
-        router={{ location: { pathname: '/path/to/tab2' } }}
+        location={{ pathname: '/path/to/tab2' }}
       >
         <div id='tab-content-2' />
       </TerrainTabs>,
@@ -116,7 +115,7 @@ describe('TerrainTabs', () =>
       tabsComponent.instance().handleSelect(1);
 
       expect(tabsComponent.instance().getActiveTabIndex()).toEqual(1);
-      expect(browserHistory.replace).toHaveBeenCalledTimes(1);
+      expect(tabsComponent.instance().browserHistory.replace).toHaveBeenCalledTimes(1);
     });
   });
 });

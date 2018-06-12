@@ -80,6 +80,15 @@ export interface Props
 
 class ExpandableView extends TerrainComponent<Props>
 {
+  public state = {
+    isDragging: false,
+    // ^ for some reason, using the props.isDragging that is passed in to
+    // DragHandle does not work -- I think because we need the
+    // position: relative, and zIndex: 9 properties on the dragging item
+    // for that to kick in. So, we need a different method to get those
+    // styles to kick in inside the DragHandle.
+  };
+
   public renderArrowSection()
   {
     const hasChildren = this.props.children !== undefined && this.props.children !== null;
@@ -138,7 +147,7 @@ class ExpandableView extends TerrainComponent<Props>
     );
   }
 
-  public renderDragHandleSection()
+  public renderDragHandleSection(connectDragSource)
   {
     if (!this.props.canDrag)
     {
@@ -156,6 +165,8 @@ class ExpandableView extends TerrainComponent<Props>
         }}
       >
         <DragHandle
+          connectDragSource={connectDragSource}
+          isDragging={this.state.isDragging}
         />
       </div>
     );
@@ -197,39 +208,46 @@ class ExpandableView extends TerrainComponent<Props>
           canDrop={this.props.canDrag}
           onDrop={this.props.onDrop}
           dropZoneStyle={DROP_ZONE_STYLE}
+          onDragStart={this.handleDragStart}
+          onDragStop={this.handleDragStop}
+          connectsOwnDragHandle={true}
         >
-          <div className={classNames({
-            'nested-view-container': true,
-          })}
-            style={style}
-          >
-            <div
-              className='nested-view-content-row'
-              style={{
-                paddingTop: '0px',
-                paddingBottom: '0px',
-              }}
-            >
-              {
-                this.props.hideControls ? null : [
-                  this.renderDragHandleSection(),
-                  this.renderArrowSection(),
-                  this.renderCheckboxSection(),
-                ]
-              }
-              <div
-                className='nested-view-content'
-                style={{
-                  padding: this.props.children == null ? '0px' : '0px',
-                }}
+          {
+            (connectDragSource, isDragging) => (
+              <div className={classNames({
+                'nested-view-container': true,
+              })}
+                style={style}
               >
-                {this.props.content}
+                <div
+                  className='nested-view-content-row'
+                  style={{
+                    paddingTop: '0px',
+                    paddingBottom: '0px',
+                  }}
+                >
+                  {
+                    this.props.hideControls ? null : [
+                      this.renderDragHandleSection(connectDragSource),
+                      this.renderArrowSection(),
+                      this.renderCheckboxSection(),
+                    ]
+                  }
+                  <div
+                    className='nested-view-content'
+                    style={{
+                      padding: this.props.children == null ? '0px' : '0px',
+                    }}
+                  >
+                    {this.props.content}
+                  </div>
+                </div>
+                {
+                  this.renderChildren()
+                }
               </div>
-            </div>
-            {
-              this.renderChildren()
-            }
-          </div>
+            )
+          }
         </DragDropItem>
       </div>
     );
@@ -257,6 +275,20 @@ class ExpandableView extends TerrainComponent<Props>
         backgroundColor: Colors().bg3,
       };
     }
+  }
+
+  private handleDragStart()
+  {
+    this.setState({
+      isDragging: true,
+    });
+  }
+
+  private handleDragStop()
+  {
+    this.setState({
+      isDragging: false,
+    });
   }
 }
 export default ExpandableView;
