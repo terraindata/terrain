@@ -59,6 +59,7 @@ import CheckBox from 'common/components/CheckBox';
 import ExpandableView from 'common/components/ExpandableView';
 import FadeInOut from 'common/components/FadeInOut';
 import Modal from 'common/components/Modal';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import Util from 'util/Util';
 
 const DeleteIcon = require('images/icon_trash');
@@ -115,12 +116,19 @@ class SchemaTreeContextActions extends TerrainComponent<Props>
               onClick={this.requestDeleteIndex}
               style={fontColor(Colors().text3, Colors().text2)}
               className='schema-context-icon-wrapper'
+              key={'schema-context-icon-delete'}
             >
-              <DeleteIcon />
+            {
+              tooltip(
+                <DeleteIcon />,
+                'Delete'
+              )
+            }
             </div>
             <Modal
               open={this.state.deleteIndexModalOpen}
-              message={`Are you sure you want to delete Elastic Index '${db.name}'? This action cannot be undone.`}
+              title={`Delete Index`}
+              message={`Are you sure you want to delete Elastic index '${db.name}'? This action cannot be undone.`}
               confirm={true}
               onConfirm={this.handleConfirmDeleteIndex}
               confirmButtonText={'Delete'}
@@ -132,12 +140,13 @@ class SchemaTreeContextActions extends TerrainComponent<Props>
                 <div className='confirm-delete-checkbox-spacer'>
                   <CheckBox
                     checked={this.state.canConfirm}
-                    onChange={this.handleCanConfirmCheckboxChange}
+                    onChange={this.handleCanConfirmChange}
                   />
                 </div>
                 <div
                   className='confirm-delete-index-label'
                   style={fontColor(Colors().text2)}
+                  onClick={this.handleCanConfirmChange}
                 >
                   I Understand
                 </div>
@@ -196,7 +205,7 @@ class SchemaTreeContextActions extends TerrainComponent<Props>
     });
   }
 
-  public handleCanConfirmCheckboxChange()
+  public handleCanConfirmChange()
   {
     this.setState({
       canConfirm: !this.state.canConfirm,
