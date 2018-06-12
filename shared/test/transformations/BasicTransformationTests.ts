@@ -699,10 +699,10 @@ test('suite of numeric transformations', () =>
   const doc = {
     foo: [
       {
-        bar: [1, 2, 3],
+        bar: [1, 2, 3, 4],
       },
       {
-        bar: [3, 2, 1],
+        bar: [3, 2, 1, 0],
       },
       {
         bar: [13.45, 16.5, 131.98],
@@ -779,10 +779,10 @@ test('suite of numeric transformations', () =>
     {
       foo: [
         {
-          bar: [6, 9, 12],
+          bar: [6, 9, 12, 15],
         },
         {
-          bar: [1, 0.5, 0],
+          bar: [1, 0.5, 0, -0.5],
         },
         {
           bar: [13.5, 16.5, 132.0],
