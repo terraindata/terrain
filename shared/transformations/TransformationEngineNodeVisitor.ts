@@ -92,8 +92,8 @@ import TransformationVisitResult from './TransformationVisitResult';
 
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-//const requirejs = require('requirejs');
-//const math = require('mathjs');
+// const requirejs = require('requirejs');
+// const math = require('mathjs');
 import * as math from 'mathjs';
 
 export default class TransformationEngineNodeVisitor extends TransformationNodeVisitor
@@ -719,7 +719,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.RoundNode>;
 
-    return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp,el) =>
+    return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
     {
       if (typeof el !== 'number')
       {

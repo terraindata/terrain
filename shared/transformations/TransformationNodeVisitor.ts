@@ -57,6 +57,7 @@ import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTra
 import ProductTransformationNode from 'shared/transformations/nodes/ProductTransformationNode';
 import QuotientTransformationNode from 'shared/transformations/nodes/QuotientTransformationNode';
 import RemoveDuplicatesNode from 'shared/transformations/nodes/RemoveDuplicatesTransformationNode';
+import RoundTransformationNode from 'shared/transformations/nodes/RoundTransformationNode';
 import SetIfTransformationNode from 'shared/transformations/nodes/SetIfTransformationNode';
 import SubtractTransformationNode from 'shared/transformations/nodes/SubtractTransformationNode';
 import SumTransformationNode from 'shared/transformations/nodes/SumTransformationNode';
@@ -119,6 +120,11 @@ export default abstract class TransformationNodeVisitor
   }
 
   public visitCaseNode(node: CaseTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitRoundNode(node: RoundTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }
