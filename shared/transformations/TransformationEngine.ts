@@ -854,7 +854,7 @@ export class TransformationEngine
       // console.log('el = ' + el + ' for key ' + key);
       if (el !== undefined)
       {
-        if (isPrimitive(el))
+        if (isPrimitive(el) || Object.keys(el).length === 0)
         {
           yadeep.set(r, this.IDToFieldNameMap.get(value), el, { create: true });
         }
@@ -868,8 +868,12 @@ export class TransformationEngine
             {
               const newKeyReplaced: KeyPath = newKey.set(newKey.indexOf(-1), j.toString());
               const oldKeyReplaced: KeyPath = key.set(key.indexOf(-1), j.toString());
-              // console.log('r here1');
-              this.renameHelper(r, o, newKeyReplaced, this.fieldNameToIDMap.get(newKeyReplaced), oldKeyReplaced);
+              if (Object.keys(yadeep.get(o, oldKeyReplaced.slice(0, -1).toList()))
+                .indexOf(oldKeyReplaced.get(oldKeyReplaced.size - 1).toString()) !== -1)
+              {
+                // console.log('r here1');
+                this.renameHelper(r, o, newKeyReplaced, this.fieldNameToIDMap.get(newKeyReplaced), oldKeyReplaced);
+              }
             }
           }
           /*else

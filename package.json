@@ -215,7 +215,6 @@
     "redux-thunk": "^2.3.0",
     "remotedev-serialize": "^0.1.1",
     "request": "^2.87.0",
-    "requirejs": "^2.3.5",
     "reselect": "^3.0.1",
     "secure-random-string": "^1.1.0",
     "sha1": "^1.1.1",

@@ -92,8 +92,6 @@ import TransformationVisitResult from './TransformationVisitResult';
 
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-// const requirejs = require('requirejs');
-// const math = require('mathjs');
 import * as math from 'mathjs';
 
 export default class TransformationEngineNodeVisitor extends TransformationNodeVisitor
@@ -219,13 +217,6 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     {
       return defaultResult;
     }
-  }
-
-  private static roundHelper(float: number, decimal: number) // WILL UPDATE AND FIX THIS TO-DO
-  {
-    const floatString = float.toString();
-    const decimalString = decimal.toString();
-    return 2;
   }
 
   public applyTransformationNode(node: TransformationNode, doc: object, options: object = {}): TransformationVisitResult
