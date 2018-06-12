@@ -191,7 +191,7 @@ export const Ajax =
             if (error.response.status !== 200 && !alreadyErrored)
             {
               alreadyErrored = true;
-              config && config.onError && config.onError(error.data !== undefined ? error.data : error);
+              config && config.onError && config.onError(error.response.data !== undefined ? error.response.data : error);
             }
           }
 
@@ -233,7 +233,8 @@ export const Ajax =
           {
             // Added for testing, can be removed.
             console.error('isCanceled', err.message);
-          } else
+          }
+          else
           {
             if (!alreadyErrored)
             {
