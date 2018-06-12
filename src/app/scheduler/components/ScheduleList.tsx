@@ -44,9 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console strict-boolean-expressions no-var-requires
+import cronstrue from 'cronstrue';
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import Colors, { backgroundColor, borderColor, fontColor, getStyle } from 'app/colors/Colors';
 import { ETLActions } from 'app/etl/ETLRedux';
+import EtlRouteUtil from 'app/etl/ETLRouteUtil';
 import { ETLState } from 'app/etl/ETLTypes';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
 import { _SchedulerConfig, scheduleForDatabase, SchedulerConfig, SchedulerState } from 'app/scheduler/SchedulerTypes';
@@ -62,6 +64,7 @@ import SchedulerApi from 'scheduler/SchedulerApi';
 import XHR from 'util/XHR';
 import Schedule from './Schedule';
 import './Schedule.less';
+import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
 const RefreshIcon = require('images/icon_refresh.svg?name=RefreshIcon');
 
 export interface Props
@@ -77,6 +80,24 @@ const INTERVAL = 60000;
 
 class ScheduleList extends TerrainComponent<Props>
 {
+  public displayConfig: HeaderConfig<SchedulerConfig> = [
+    {
+      name: 'ID',
+      render: (schedule, index) => schedule.id,
+      style: { width: `5%` },
+    },
+    {
+      name: 'Name',
+      render: (schedule, index) => schedule.name,
+      style: { width: `35%` },
+    },
+    {
+      name: 'Interval',
+      render: (schedule, index) => this.getIntervalDisplayName(schedule.cron),
+      style: { width: `60%` },
+    },
+  ];
+
   public interval;
 
   public state: {
@@ -104,6 +125,18 @@ class ScheduleList extends TerrainComponent<Props>
     this.props.schedulerActions({
       actionType: 'getSchedules',
     });
+  }
+
+  public getIntervalDisplayName(value)
+  {
+    try
+    {
+      return cronstrue.toString(value);
+    }
+    catch
+    {
+      return value;
+    }
   }
 
   public handleScheduleChange(schedule: SchedulerConfig)
@@ -143,59 +176,51 @@ class ScheduleList extends TerrainComponent<Props>
     });
   }
 
+  public handleOnClick(index: number)
+  {
+    const { schedules } = this.props;
+    const keys = schedules.keySeq().toList().sort();
+    EtlRouteUtil.gotoEditSchedule(keys.get(index));
+  }
+
+  public getMenuActions()
+  {
+    return List([
+    {
+      text: 'Disable',
+      onClick: undefined,
+    },
+    {
+      text: 'Run Now',
+      onClick: undefined,
+    },
+    {
+      text: 'Delete',
+      onClick: undefined,
+    }
+    ]);
+  }
+
   public render()
   {
     const { schedules } = this.props;
     const keys = schedules.keySeq().toList().sort();
-    const scheduleList = keys.map((id) => schedules.get(id));
+    const scheduleList = keys.map((id) => schedules.get(id)).toList();
 
     return (
       <div
         className='schedule-list-wrapper'
         style={backgroundColor(Colors().blockBg)}
       >
-        <div
-          className='schedule-list-header'
-        >
-          <div
-            className='schedule-list-refresh-wrapper'
-          >
-            {
-              tooltip(
-                <RefreshIcon
-                  className='schedule-list-refresh'
-                  style={getStyle('fill', Colors().iconColor)}
-                  onClick={this.getSchedules}
-                />,
-                'Refresh',
-              )
-            }
-          </div>
-        </div>
-        <div className='schedule-list-schedules-wrapper'>
-          {
-            scheduleList.map((schedule, i) =>
-              <Schedule
-                key={schedule.id}
-                schedule={schedule}
-                onDelete={this._fn(this.performAction, 'deleteSchedule')}
-                onRun={this._fn(this.performAction, 'runSchedule')}
-                onPause={this._fn(this.performAction, 'pauseSchedule')}
-                onUnpause={this._fn(this.performAction, 'unpauseSchedule')}
-                onDisable={this._fn(this.performAction, 'disableSchedule')}
-                onEnable={this._fn(this.performAction, 'enableSchedule')}
-                onChange={this.handleScheduleChange}
-                templates={this.props.templates}
-                algorithms={this.props.algorithms}
-              />,
-            )
-          }
-        </div>
-        <PathfinderCreateLine
-          text='Add Schedule'
-          canEdit={TerrainTools.isAdmin()}
+        <ItemList
+          items={scheduleList}
+          columnConfig={this.displayConfig}
+          onRowClicked={this.handleOnClick}
+          getMenuOptions={this.getMenuActions}
+          itemsName='schedule'
+          getActions={undefined}
+          canCreate={TerrainTools.isAdmin()}
           onCreate={this.createSchedule}
-          showText={true}
         />
       </div>
     );

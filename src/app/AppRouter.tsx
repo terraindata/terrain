@@ -51,6 +51,7 @@ import DataTabs from 'etl/components/DataTabs';
 import TemplateList from 'etl/templates/components/TemplateList';
 import Jobs from 'jobs/components/Jobs';
 import ScheduleList from 'scheduler/components/ScheduleList';
+import ScheduleEditor from 'scheduler/components/ScheduleEditor';
 import App from './App';
 import Builder from './builder/components/Builder';
 import Logout from './common/components/Logout';
@@ -151,6 +152,7 @@ class AppRouter extends TerrainComponent<{}> {
             <Route path='integrations/edit/integrationId=:integrationId' component={IntegrationEditorPage} />
 
             <Route path='schedules' component={ScheduleList} />
+            <Route path='schedules/edit/scheduleId=:scheduleId' component={ScheduleEditor} />
             <Route path='jobs' component={Jobs} />
           </Route>
 
