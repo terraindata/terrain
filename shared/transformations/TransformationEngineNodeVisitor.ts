@@ -600,82 +600,89 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
 
     return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
     {
-      if (typeof el === opts.toTypename || el == null || (el.constructor === Array && opts.toTypename === 'array'))
+      try
       {
-        return undefined;
-      }
+        if (typeof el === opts.toTypename || el == null || (el.constructor === Array && opts.toTypename === 'array'))
+        {
+          return undefined;
+        }
 
-      switch (opts.toTypename)
-      {
-        case 'string': {
-          if (typeof el === 'object')
-          {
-            yadeep.set(doc, kp, JSON.stringify(el));
-          }
-          else
-          {
-            yadeep.set(doc, kp, el.toString());
-          }
-          break;
-        }
-        case 'number': {
-          yadeep.set(doc, kp, Number(el));
-          break;
-        }
-        case 'boolean': {
-          if (typeof el === 'string')
-          {
-            yadeep.set(doc, kp, el.toLowerCase() === 'true');
-          }
-          else
-          {
-            yadeep.set(doc, kp, Boolean(el));
-          }
-          break;
-        }
-        case 'object': {
-          if (typeof el === 'string')
-          {
-            try
+        switch (opts.toTypename)
+        {
+          case 'string': {
+            if (typeof el === 'object')
             {
-              const parsed = JSON.parse(el);
-              yadeep.set(doc, kp, parsed);
+              yadeep.set(doc, kp, JSON.stringify(el));
             }
-            catch (e)
+            else
+            {
+              yadeep.set(doc, kp, el.toString());
+            }
+            break;
+          }
+          case 'number': {
+            yadeep.set(doc, kp, Number(el));
+            break;
+          }
+          case 'boolean': {
+            if (typeof el === 'string')
+            {
+              yadeep.set(doc, kp, el.toLowerCase() === 'true');
+            }
+            else
+            {
+              yadeep.set(doc, kp, Boolean(el));
+            }
+            break;
+          }
+          case 'object': {
+            if (typeof el === 'string')
+            {
+              try
+              {
+                const parsed = JSON.parse(el);
+                yadeep.set(doc, kp, parsed);
+              }
+              catch (e)
+              {
+                yadeep.set(doc, kp, {});
+              }
+            }
+            else
             {
               yadeep.set(doc, kp, {});
             }
+            break;
           }
-          else
-          {
-            yadeep.set(doc, kp, {});
+          case 'array': {
+            yadeep.set(doc, kp, []);
+            break;
           }
-          break;
-        }
-        case 'array': {
-          yadeep.set(doc, kp, []);
-          break;
-        }
-        case 'date': {
-          if (opts.format === 'ISOstring')
-          {
-            yadeep.set(doc, kp, new Date(el).toISOString());
+          case 'date': {
+            if (opts.format === 'ISOstring')
+            {
+              yadeep.set(doc, kp, new Date(el).toISOString());
+            }
+            else if (opts.format === 'MMDDYYYY')
+            {
+              yadeep.set(doc, kp, dateFormat('MM/dd/yyyy', new Date(el)));
+            }
+            break;
           }
-          else if (opts.format === 'MMDDYYYY')
-          {
-            yadeep.set(doc, kp, dateFormat('MM/dd/yyyy', new Date(el)));
+          default: {
+            return {
+              errors: [
+                {
+                  message: `Attempted to cast to an unsupported type ${opts.toTypename}`,
+                } as TransformationVisitError,
+              ],
+            } as TransformationVisitResult;
           }
-          break;
         }
-        default: {
-          return {
-            errors: [
-              {
-                message: `Attempted to cast to an unsupported type ${opts.toTypename}`,
-              } as TransformationVisitError,
-            ],
-          } as TransformationVisitResult;
-        }
+      }
+      catch (ex)
+      {
+        return undefined;
       }
     }, (kp, el) =>
       {
