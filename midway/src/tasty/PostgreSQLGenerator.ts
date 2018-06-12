@@ -346,8 +346,11 @@ export default class SQLGenerator
       return;
     }
 
+    const quotedColumns = columns.map((c) => '"' + c + '"');
+    const quotedPrimaryKeys = primaryKeys.map((c) => '"' + c + '"');
+
     let query = this.queryString;
-    const joinedColumnNames = ' (' + columns.join(', ') + ')';
+    const joinedColumnNames = ' (' + quotedColumns.join(', ') + ')';
     query += joinedColumnNames;
     query += ' VALUES ';
 
@@ -376,7 +379,7 @@ export default class SQLGenerator
       accumulatedUpdates[0][primaryKeys[0]] !== undefined)
     {
       query += ' ON CONFLICT (';
-      query += primaryKeys.join(', ');
+      query += quotedPrimaryKeys.join(', ');
       query += ') DO UPDATE SET';
       query += joinedColumnNames;
       query += ' = ';
@@ -389,17 +392,18 @@ export default class SQLGenerator
           return '$' + currentColumn.toString();
         }).join(', ');
       query += ')';
-      query += ' WHERE (' + primaryKeys.map((col: string) => tableName + '.' + col).join(', ') + ') = (' + primaryKeys.map(
-        (col: string) =>
-        {
-          return JSON.stringify(accumulatedUpdates[0][col]);
-        }).join(', ');
+      query += ' WHERE (' + primaryKeys.map((col: string) => '"' + tableName + '".' + '"' + col + '"')
+        .join(', ') + ') = (' + primaryKeys.map(
+          (col: string) =>
+          {
+            return JSON.stringify(accumulatedUpdates[0][col]);
+          }).join(', ');
       query += ')';
     }
 
     if (primaryKeys !== undefined && primaryKeys.length > 0)
     {
-      query += ' RETURNING ' + primaryKeys[0] + ' AS insertid';
+      query += ' RETURNING "' + primaryKeys[0] + '" AS insertid';
     }
 
     this.accumulateStatement(query, this.values);
@@ -592,7 +596,7 @@ export default class SQLGenerator
 
     if (node.type === 'reference')
     {
-      return this.escapeString(node.value);
+      return '"' + this.escapeString(node.value) + '"';
     }
     if (node.type === 'string')
     {

@@ -108,17 +108,17 @@ test('rename a field (deeply nested property in array)', () =>
   }
 
   {
-    const doc = {d: [[{b: 2}, {b: 3}]]};
+    const doc = { d: [[{ b: 2 }, { b: 3 }]] };
     const e: TransformationEngine = new TransformationEngine(doc);
     e.setOutputKeyPath(e.getInputFieldID(KeyPath(['d', '0', '*', 'b'])), KeyPath(['d', '0', '*', 'c']));
-    expect(e.transform(doc)).toEqual({d: [[{c: 2}, {c: 3}]]});
+    expect(e.transform(doc)).toEqual({ d: [[{ c: 2 }, { c: 3 }]] });
   }
 
   {
-    const doc = {a: [[{b: 2}, {b: 3}]]};
+    const doc = { a: [[{ b: 2 }, { b: 3 }]] };
     const e: TransformationEngine = new TransformationEngine(doc);
     e.setOutputKeyPath(e.getInputFieldID(KeyPath(['a', '0', '*', 'b'])), KeyPath(['a', '0', '*', 'c']));
-    expect(e.transform(doc)).toEqual({a: [[{c: 2}, {c: 3}]]});
+    expect(e.transform(doc)).toEqual({ a: [[{ c: 2 }, { c: 3 }]] });
   }
 });
 

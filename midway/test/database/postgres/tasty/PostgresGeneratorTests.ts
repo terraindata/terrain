@@ -44,69 +44,75 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as Tasty from '../../tasty/Tasty';
-import * as App from '../App';
+import * as winston from 'winston';
 
-import DatabaseController from '../../database/DatabaseController';
-import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import * as Scripts from '../../scripts/Scripts';
-import * as Util from '../AppUtil';
-import { metrics } from '../events/EventRouter';
-import UserConfig from '../users/UserConfig';
-import ResultsConfigConfig from './ResultsConfigConfig';
+import PostgresConfig from '../../../../src/database/pg/PostgreSQLConfig';
+import PostgresController from '../../../../src/database/pg/PostgreSQLController';
+import PostgresDB from '../../../../src/database/pg/tasty/PostgreSQLDB';
 
-export class ResultsConfig
+import * as Tasty from '../../../../src/tasty/Tasty';
+import TastyNodeTypes from '../../../../src/tasty/TastyNodeTypes';
+
+const DBMovies: Tasty.Table = new Tasty.Table('movies', ['movieID'], ['title', 'releaseDate'], 'movies');
+
+let tasty: Tasty.Tasty;
+let pgController: PostgresController;
+let pgDB: PostgresDB;
+
+beforeAll(async () =>
 {
-  private resultsConfigTable: Tasty.Table;
-
-  public initialize()
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
+  const config: PostgresConfig =
   {
-    this.resultsConfigTable = App.TBLS.resultsConfig;
-  }
+    database: 'moviesdb',
+    host: 'localhost',
+    port: 65432,
+    password: 'r3curs1v3$',
+    user: 't3rr41n-demo',
+  };
 
-  public async select(columns: string[], filter: object): Promise<ResultsConfigConfig[]>
+  try
   {
-    return App.DB.select(this.resultsConfigTable, columns, filter) as Promise<ResultsConfigConfig[]>;
+    pgController = new PostgresController(config, 0, 'PostgresGeneratorTests');
+    tasty = pgController.getTasty();
+    pgDB = pgController.getTasty().getDB() as PostgresDB;
   }
-
-  public async get(id?: number, index?: string): Promise<ResultsConfigConfig[]>
+  catch (e)
   {
-    if (id !== undefined)
-    {
-      return this.select([], { id });
-    }
-    else if (index !== undefined)
-    {
-      return this.select([], { index });
-    }
-    return this.select([], {});
+    fail(e);
   }
+});
 
-  public async upsert(user: UserConfig, index: string, resultsConfig: ResultsConfigConfig): Promise<ResultsConfigConfig>
-  {
-    return new Promise<ResultsConfigConfig>(async (resolve, reject) =>
-    {
-      let toUpsert: ResultsConfigConfig = {
-        index,
-        thumbnail: resultsConfig.thumbnail,
-        name: resultsConfig.name,
-        score: resultsConfig.score,
-        fields: JSON.stringify(resultsConfig.fields),
-        formats: JSON.stringify(resultsConfig.formats),
-        primaryKeys: JSON.stringify(resultsConfig.primaryKeys),
-      };
-      if (index !== undefined)
-      {
-        const results: ResultsConfigConfig[] = await this.get(undefined, index);
-        if (results.length > 0)
-        {
-          // update the existing results config
-          toUpsert = Util.updateObject(results[0], toUpsert);
-        }
-      }
-      resolve(await App.DB.upsert(this.resultsConfigTable, toUpsert) as ResultsConfigConfig);
-    });
-  }
-}
+test('Postgres Generator: mixedCase', async (done) =>
+{
+  const movie = {
+    movieID: 13371337,
+    releaseDate: new Date('01/01/17').toISOString().substring(0, 10),
+    myTitle: 'My New Movie',
+  };
+  let query = new Tasty.Query(DBMovies).upsert(movie);
+  let qstr = pgDB.generate(query);
+  expect(qstr).toBeInstanceOf(Array);
+  expect(qstr.length).toBeGreaterThan(0);
+  expect(qstr[0]).toEqual([
+    'INSERT INTO movies ("movieID", "releaseDate")' +
+    ' VALUES ($1, $2)' +
+    ' ON CONFLICT ("movieID") DO UPDATE SET ("movieID", "releaseDate") = ($1, $2)' +
+    ' WHERE ("movies.movieID") = (13371337) RETURNING "movieID" AS insertid;',
+  ]);
 
-export default ResultsConfig;
+  query = new Tasty.Query(DBMovies)
+    .select([DBMovies['movieID']])
+    .filter(DBMovies['releaseDate']
+    .doesNotEqual('01/01/2017'))
+    .sort(DBMovies['movieID'], 'asc');
+  qstr = pgDB.generate(query);
+  expect(qstr).toBeInstanceOf(Array);
+  expect(qstr.length).toBeGreaterThan(0);
+  expect(qstr[0]).toEqual([
+    'SELECT "movies.movieID" FROM movies\n  WHERE "movies.releaseDate" <> $1\n  ORDER BY "movies.movieID" ASC;',
+  ]);
+
+  done();
+});

@@ -378,25 +378,22 @@ export class Scheduler
 
   private async _select(columns: string[], filter: object, locked?: boolean): Promise<SchedulerConfig[]>
   {
-    return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
+    if (locked === undefined) // all
     {
-      let rawResults: object[] = [];
-      if (locked === undefined) // all
-      {
-        rawResults = await App.DB.select(this.schedulerTable, columns, filter);
-      }
-      else if (locked === true) // currently running
-      {
-        // TODO
-      }
-      else // currently not running
-      {
-        // TODO
-      }
-
-      const results: SchedulerConfig[] = rawResults.map((result: object) => new SchedulerConfig(result as SchedulerConfig));
-      resolve(results);
-    });
+      return App.DB.select(this.schedulerTable, columns, filter) as Promise<SchedulerConfig[]>;
+    }
+    else if (locked === true) // currently running
+    {
+      // TODO
+      winston.info('not implemented');
+      return [];
+    }
+    else // currently not running
+    {
+      // TODO
+      winston.info('not implemented');
+      return [];
+    }
   }
 
   private async _setStatus(id: number, status: boolean): Promise<SchedulerConfig[]>
