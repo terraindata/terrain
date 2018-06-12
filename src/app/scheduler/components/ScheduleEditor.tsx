@@ -46,10 +46,19 @@ THE SOFTWARE.
 // tslint:disable:no-console strict-boolean-expressions no-var-requires
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import Colors, { backgroundColor, borderColor, fontColor, getStyle } from 'app/colors/Colors';
+import CRONEditor from 'app/common/components/CRONEditor';
+import FloatingInput from 'app/common/components/FloatingInput';
 import { ETLActions } from 'app/etl/ETLRedux';
 import { ETLState } from 'app/etl/ETLTypes';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
-import { _SchedulerConfig, _TaskConfig, scheduleForDatabase, SchedulerConfig, SchedulerState, TaskConfig } from 'app/scheduler/SchedulerTypes';
+import {
+  _SchedulerConfig,
+  _TaskConfig,
+  scheduleForDatabase,
+  SchedulerConfig,
+  SchedulerState,
+  TaskConfig,
+} from 'app/scheduler/SchedulerTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -60,8 +69,6 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import SchedulerApi from 'scheduler/SchedulerApi';
 import XHR from 'util/XHR';
-import CRONEditor from 'app/common/components/CRONEditor';
-import FloatingInput from 'app/common/components/FloatingInput';
 
 export interface Props
 {
@@ -87,43 +94,42 @@ function getScheduleId(params): number
 }
 
 const testTasks: List<TaskConfig> = List([
-_TaskConfig({
-  id: 0,
-  onFailure: 1,
-  onSuccess: 2,
-}),
-_TaskConfig({
-  id: 1,
-  onFailure: 4,
-  onSuccess: 3,
-}),_TaskConfig({
-  id: 2,
-  onFailure: undefined,
-  onSuccess: undefined,
-}),
-_TaskConfig({
-  id: 3,
-  onFailure: 5,
-  onSuccess: 7,
-}),_TaskConfig({
-  id: 4,
-  onFailure: 6,
-  onSuccess: undefined,
-}),_TaskConfig({
-  id: 5,
-  onFailure: undefined,
-  onSuccess: undefined,
-}),_TaskConfig({
-  id: 6,
-  onFailure: undefined,
-  onSuccess: undefined,
-}),_TaskConfig({
-  id: 7,
-  onFailure: undefined,
-  onSuccess: undefined,
-})
+  _TaskConfig({
+    id: 0,
+    onFailure: 1,
+    onSuccess: 2,
+  }),
+  _TaskConfig({
+    id: 1,
+    onFailure: 4,
+    onSuccess: 3,
+  }), _TaskConfig({
+    id: 2,
+    onFailure: undefined,
+    onSuccess: undefined,
+  }),
+  _TaskConfig({
+    id: 3,
+    onFailure: 5,
+    onSuccess: 7,
+  }), _TaskConfig({
+    id: 4,
+    onFailure: 6,
+    onSuccess: undefined,
+  }), _TaskConfig({
+    id: 5,
+    onFailure: undefined,
+    onSuccess: undefined,
+  }), _TaskConfig({
+    id: 6,
+    onFailure: undefined,
+    onSuccess: undefined,
+  }), _TaskConfig({
+    id: 7,
+    onFailure: undefined,
+    onSuccess: undefined,
+  }),
 ]);
-
 
 class ScheduleEditor extends TerrainComponent<Props>
 {
@@ -168,7 +174,7 @@ class ScheduleEditor extends TerrainComponent<Props>
 
   public orderTasks(tasks: List<TaskConfig>)
   {
-    let orderedTasks: TaskConfig[] = [];
+    const orderedTasks: TaskConfig[] = [];
     orderedTasks[0] = tasks.get(0);
     for (let i = 0; i < tasks.size; i++)
     {
@@ -280,22 +286,22 @@ class ScheduleEditor extends TerrainComponent<Props>
     }
     return (
       <div>
-      {
-        children.map((level, i) =>
-          <div
-            key={i}
-            style={{display: 'flex'}}
-          >
-            <span
-              style={{margin: 'auto'}}
+        {
+          children.map((level, index) =>
+            <div
+              key={index}
+              style={{ display: 'flex' }}
             >
-            {
-              level.map((item) => item)
-            }
-            </span>
-          </div>
-        )
-      }
+              <span
+                style={{ margin: 'auto' }}
+              >
+                {
+                  level.map((item) => item)
+                }
+              </span>
+            </div>,
+          )
+        }
       </div>
     );
   }

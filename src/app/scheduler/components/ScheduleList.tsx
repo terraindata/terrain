@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console strict-boolean-expressions no-var-requires
-import cronstrue from 'cronstrue';
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import Colors, { backgroundColor, borderColor, fontColor, getStyle } from 'app/colors/Colors';
 import { ETLActions } from 'app/etl/ETLRedux';
@@ -56,6 +55,8 @@ import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import cronstrue from 'cronstrue';
+import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
@@ -64,7 +65,6 @@ import SchedulerApi from 'scheduler/SchedulerApi';
 import XHR from 'util/XHR';
 import Schedule from './Schedule';
 import './Schedule.less';
-import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
 const RefreshIcon = require('images/icon_refresh.svg?name=RefreshIcon');
 
 export interface Props
@@ -186,18 +186,18 @@ class ScheduleList extends TerrainComponent<Props>
   public getMenuActions()
   {
     return List([
-    {
-      text: 'Disable',
-      onClick: undefined,
-    },
-    {
-      text: 'Run Now',
-      onClick: undefined,
-    },
-    {
-      text: 'Delete',
-      onClick: undefined,
-    }
+      {
+        text: 'Disable',
+        onClick: undefined,
+      },
+      {
+        text: 'Run Now',
+        onClick: undefined,
+      },
+      {
+        text: 'Delete',
+        onClick: undefined,
+      },
     ]);
   }
 
