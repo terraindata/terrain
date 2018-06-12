@@ -78,5 +78,10 @@ export interface InputOptionsTypes
   };
 }
 
+export interface RootInputConfig
+{
+  inputs: InputConfig[];
+}
+
 export type InputTypes = keyof InputOptionsTypes;
 export type InputOptionsType<key extends InputTypes> = InputOptionsTypes[key];

@@ -61,8 +61,6 @@ import ObjectForm from 'common/components/ObjectForm';
 import DatabasePicker from 'etl/common/components/DatabasePicker';
 import FileConfigForm from 'etl/common/components/FileConfigForm';
 import UploadFileButton from 'etl/common/components/UploadFileButton';
-import { GoogleAnalyticsForm } from 'etl/endpoints/GoogleAnalyticsIntegration.tsx';
-import { SftpForm } from 'etl/endpoints/SftpIntegration';
 import AlgorithmSelector from 'library/components/AlgorithmSelector';
 import { LibraryState } from 'library/LibraryTypes';
 import
@@ -71,26 +69,20 @@ import
   _RootPostProcessConfig,
   _SourceConfig,
   FileConfig,
+  RootInputConfig,
   RootPostProcessConfig,
   SinkConfig,
   SourceConfig,
 } from 'shared/etl/immutable/EndpointRecords';
 import
 {
-  FileConfig as FileConfigI, HttpOptions,
+  FileConfig as FileConfigI, GoogleAnalyticsOptions, HttpOptions,
   SftpOptions, SinkOptionsType, Sinks, SourceOptionsType,
   Sources, SQLOptions,
 } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
-import
-{
-  PostProcessAggregationTypes as AggregationTypes,
-  PostProcessConfig,
-  PostProcessOptionsType,
-  PostProcessTypes,
-  RootPostProcessConfig as RootPostProcessConfigI,
-} from 'shared/etl/types/PostProcessTypes';
 
+import { InputForm, InputsForm } from '../../endpoints/InputForm';
 import { PostProcessForm, TransformForm } from '../../endpoints/PostProcessForm';
 
 const { List } = Immutable;
@@ -108,6 +100,7 @@ export abstract class EndpointFormBase<State, P extends Props = Props> extends T
 {
   public abstract inputMap: InputDeclarationMap<State>;
   public showFileConfig = true; // override this to hide
+  public showInputConfig = true; // override this to hide
   public showPostProcessConfig = true; // override this to hide
 
   constructor(props)
@@ -115,6 +108,7 @@ export abstract class EndpointFormBase<State, P extends Props = Props> extends T
     super(props);
     this.handleFileConfigChange = this.handleFileConfigChange.bind(this);
     this.handleOptionsFormChange = this.handleOptionsFormChange.bind(this);
+    this.handleInputConfigChange = this.handleInputConfigChange.bind(this);
     this.handlePostProcessConfigChange = this.handlePostProcessConfigChange.bind(this);
   }
 
@@ -132,7 +126,7 @@ export abstract class EndpointFormBase<State, P extends Props = Props> extends T
 
   public render()
   {
-    const { fileConfig, options, rootPostProcessConfig } = this.props.endpoint;
+    const { fileConfig, options, rootInputConfig, rootPostProcessConfig } = this.props.endpoint;
     const inputState = this.optionsToFormState(options);
     return (
       <div>
@@ -141,6 +135,13 @@ export abstract class EndpointFormBase<State, P extends Props = Props> extends T
           inputState={inputState}
           onStateChange={this.handleOptionsFormChange}
         />
+        {
+          this.showInputConfig ?
+            <InputsForm
+              rootInputConfig={rootInputConfig}
+              onChange={this.handleInputConfigChange}
+            /> : null
+        }
         {
           this.showFileConfig ?
             <FileConfigForm
@@ -172,6 +173,12 @@ export abstract class EndpointFormBase<State, P extends Props = Props> extends T
     onChange(endpoint.set('fileConfig', config), apply);
   }
 
+  private handleInputConfigChange(config: RootInputConfig, apply?: boolean)
+  {
+    const { onChange, endpoint } = this.props;
+    onChange(endpoint.set('rootInputConfig', config), apply);
+  }
+
   private handlePostProcessConfigChange(config: RootPostProcessConfig, apply?: boolean)
   {
     const { onChange, endpoint } = this.props;
@@ -182,6 +189,7 @@ export abstract class EndpointFormBase<State, P extends Props = Props> extends T
 type UploadState = SourceOptionsType<Sources.Upload>;
 export class UploadEndpoint extends EndpointFormBase<UploadState>
 {
+  public showInputConfig = false;
   public showPostProcessConfig = false;
 
   public inputMap: InputDeclarationMap<UploadState> = {
@@ -216,6 +224,7 @@ type AlgorithmState = SourceOptionsType<Sources.Algorithm>;
 class AlgorithmEndpointC extends EndpointFormBase<AlgorithmState>
 {
   public showFileConfig = false;
+  public showInputConfig = false;
   public showPostProcessConfig = false;
 
   public state: {
@@ -326,6 +335,19 @@ export class SftpEndpoint extends EndpointFormBase<SftpState>
   };
 }
 
+type GoogleAnalyticsState = GoogleAnalyticsOptions;
+export class GoogleAnalyticsEndpoint extends EndpointFormBase<GoogleAnalyticsState>
+{
+  public showInputConfig = false;
+
+  public inputMap: InputDeclarationMap<GoogleAnalyticsState> = {
+    dayInterval: {
+      type: DisplayType.NumberBox,
+      displayName: 'Day Interval',
+    },
+  };
+}
+
 interface HttpState extends Partial<HttpOptions>
 {
   accept: string;
@@ -336,6 +358,7 @@ const httpMethods = List(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']);
 
 export class HttpEndpointForm extends EndpointFormBase<HttpOptions>
 {
+  public showInputConfig = false;
   public showPostProcessConfig = false;
 
   public inputMap: InputDeclarationMap<HttpOptions> = {
@@ -353,6 +376,7 @@ export class HttpEndpointForm extends EndpointFormBase<HttpOptions>
 type DownloadState = SinkOptionsType<Sinks.Download>;
 export class DownloadEndpoint extends EndpointFormBase<DownloadState>
 {
+  public showInputConfig = false;
   public showPostProcessConfig = false;
 
   public inputMap: InputDeclarationMap<DownloadState> = {
@@ -365,6 +389,7 @@ type DatabaseState = SinkOptionsType<Sinks.Database>;
 export class DatabaseEndpoint extends EndpointFormBase<DatabaseState>
 {
   public showFileConfig = false;
+  public showInputConfig = false;
   public showPostProcessConfig = false;
 
   public inputMap: InputDeclarationMap<DatabaseState> = {
@@ -404,6 +429,7 @@ export class DatabaseEndpoint extends EndpointFormBase<DatabaseState>
 type FsState = SinkOptionsType<Sinks.Fs>;
 export class FsEndpoint extends EndpointFormBase<FsState>
 {
+  public showInputConfig = false;
   public showPostProcessConfig = false;
 
   public inputMap: InputDeclarationMap<FsState> = {};
@@ -423,6 +449,7 @@ export class MailChimpEndpoint extends EndpointFormBase<MailChimpState>
 type SQLState = SQLOptions;
 export class SQLEndpoint extends EndpointFormBase<SQLState>
 {
+  public showInputConfig = false;
   public showPostProcessConfig = false;
 
   public inputMap: InputDeclarationMap<SQLState> = {

@@ -58,7 +58,6 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import
 {
-  _RootPostProcessConfig,
   RootPostProcessConfig,
   SinkConfig,
   SourceConfig,
@@ -88,7 +87,6 @@ const { List } = Immutable;
 
 export interface Props
 {
-  // endpoint: SinkConfig | SourceConfig;
   rootPostProcessConfig: RootPostProcessConfig;
   onChange: (config: RootPostProcessConfig, isBlur?: boolean) => void;
   style?: any;

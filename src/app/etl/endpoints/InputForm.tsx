@@ -61,7 +61,15 @@ import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCr
 import ListForm from 'common/components/ListForm';
 import ObjectForm from 'common/components/ObjectForm';
 import { EndpointFormBase } from 'etl/common/components/EndpointFormClasses.tsx';
-import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import
+{
+  _FileConfig,
+  _SourceConfig,
+  FileConfig,
+  RootInputConfig,
+  SinkConfig,
+  SourceConfig,
+} from 'shared/etl/immutable/EndpointRecords';
 import
 {
   FileConfig as InputFileConfig,
@@ -75,6 +83,7 @@ import
   InputFileTypes as InputFileTypes,
   InputOptionsType,
   InputTypes,
+  RootInputConfig as RootInputConfigI,
 } from 'shared/etl/types/InputTypes';
 import Quarantine from 'util/RadiumQuarantine';
 
@@ -83,8 +92,15 @@ import 'common/components/ObjectForm.less';
 
 const { List } = Immutable;
 
-type FormState = SourceOptionsType<Sources.Sftp>;
-export class SftpForm extends EndpointFormBase<FormState>
+export interface Props
+{
+  rootInputConfig: RootInputConfig;
+  onChange: (config: RootInputConfig, isBlur?: boolean) => void;
+  style?: any;
+}
+
+type FormState = RootInputConfigI;
+export class InputsForm extends TerrainComponent<Props>
 {
   public inputMap: InputDeclarationMap<FormState> = {
     inputs: {
@@ -137,14 +153,11 @@ export class SftpForm extends EndpointFormBase<FormState>
   {
     return (cfg: InputConfig, apply?: boolean) =>
     {
-      const { endpoint, onChange } = this.props;
-      const options: FormState = endpoint.options;
-      const newList = options.inputs.slice();
+      const { rootInputConfig, onChange } = this.props;
+      const inputs: InputConfig[] = rootInputConfig.inputs;
+      const newList = inputs.slice();
       newList[index] = cfg;
-      const newOptions = _.extend({}, options, {
-        inputs: newList,
-      });
-      onChange(endpoint.set('options', newOptions), apply);
+      onChange(rootInputConfig.set('inputs', newList), apply);
     };
   }
 
@@ -163,6 +176,18 @@ export class SftpForm extends EndpointFormBase<FormState>
     );
   }
 
+  public render()
+  {
+    return (
+      <DynamicForm
+        inputMap={this.inputMap}
+        inputState={this.props.rootInputConfig}
+        onStateChange={this.props.onChange}
+        style={this.props.style}
+      />
+    );
+  }
+
   public renderAddNewRow()
   {
     return (
@@ -178,21 +203,23 @@ export class SftpForm extends EndpointFormBase<FormState>
 
   public addRow()
   {
-    const { endpoint, onChange } = this.props;
-    const inputs = endpoint.options.inputs !== undefined ?
-      endpoint.options.inputs :
+    const { rootInputConfig, onChange } = this.props;
+    const inputs = rootInputConfig.inputs != null ?
+      rootInputConfig.inputs :
       [];
 
     const newItems = inputs.slice();
     newItems.push({
       type: 'File',
-      options: {},
+      options: {
+        dayInterval: null,
+        format: null,
+        name: null,
+        type: null,
+      },
     });
 
-    const newOptions = _.extend({}, endpoint.options, {
-      inputs: newItems,
-    });
-    onChange(endpoint.set('options', newOptions), true);
+    onChange(rootInputConfig.set('inputs', newItems), true);
   }
 
   @instanceFnDecorator(_.memoize)
@@ -200,18 +227,15 @@ export class SftpForm extends EndpointFormBase<FormState>
   {
     return () =>
     {
-      const { endpoint, onChange } = this.props;
-      const inputs = endpoint.options.inputs !== undefined ?
-        endpoint.options.inputs :
+      const { rootInputConfig, onChange } = this.props;
+      const inputs = rootInputConfig.inputs != null ?
+        rootInputConfig.inputs :
         [];
 
       const newItems = inputs.slice();
       newItems.splice(index, 1);
 
-      const newOptions = _.extend({}, endpoint.options, {
-        inputs: newItems,
-      });
-      onChange(endpoint.set('options', newOptions), true);
+      onChange(rootInputConfig.set('inputs', newItems), true);
     };
   }
 }
@@ -274,7 +298,7 @@ export class InputForm extends TerrainComponent<InProps>
   public getCurrentOptions()
   {
     const { input } = this.props;
-    return input.options !== undefined ? input.options : {};
+    return input.options != null ? input.options : {};
   }
 
   public handleOptionsChange(options, apply?: boolean)
