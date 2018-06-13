@@ -116,7 +116,7 @@ test('Postgres Generator: mixedCase', async (done) =>
   expect(qstr[0]).toEqual([
     'SELECT "movies"."movieID" FROM movies\n  WHERE "movies"."releaseDate" <> $1\n  ORDER BY "movies"."movieID" ASC;',
   ]);
-
+  done();
 });
 
 test('Postgres: generator', async (done) =>
@@ -131,7 +131,8 @@ test('Postgres: generator', async (done) =>
     .filter(table.getColumns().get('lname').gt(TastyNode.make('A')))
     .noWait().forUpdate();
   expect(pgDB.generate(query)).toEqual(
-    [['SELECT test.lname FROM test\n  WHERE test.lname < $1\n     AND test.lname > $2\n  FOR UPDATE\n  NOWAIT;'], [['ABC', 'A']]],
+    [['SELECT "test"."lname" FROM test\n  WHERE "test"."lname" < $1\n     AND "test"."lname" > $2\n  FOR UPDATE\n  NOWAIT;'],
+    [['ABC', 'A']]],
   );
   done();
 });
