@@ -854,7 +854,7 @@ export class TransformationEngine
       // console.log('el = ' + el + ' for key ' + key);
       if (el !== undefined)
       {
-        if (isPrimitive(el) || Object.keys(el).length === 0)
+        if (isPrimitive(el) || el == null || Object.keys(el).length === 0)
         {
           yadeep.set(r, this.IDToFieldNameMap.get(value), el, { create: true });
         }
