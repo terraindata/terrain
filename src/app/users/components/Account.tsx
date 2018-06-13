@@ -176,12 +176,12 @@ class Account extends TerrainComponent<Props>
           <div className='account-inner'>
             <Switch>
               <Route exact path='/' component={Profile} />
-              <Route path='/account/profile' component={Profile} />
-              <Route path='/account/profile/edit' component={EditProfile} />
-              <Route path='/account/settings' component={Settings} />
-              <Route path='/account/notifications' component={Notifications} />
-              <Route path='/account/connections' component={Connections} />
-              <Route path='/account/team' component={Team} />
+              <Route exact path='/account/profile' component={Profile} />
+              <Route exact path='/account/profile/edit' component={EditProfile} />
+              <Route exact path='/account/settings' component={Settings} />
+              <Route exact path='/account/notifications' component={Notifications} />
+              <Route exact path='/account/connections' component={Connections} />
+              <Route exact path='/account/team' component={Team} />
             </Switch>
           </div>
         </div>
