@@ -569,9 +569,9 @@ export default class SQLGenerator
           case '\r':
             return '\\r';
           case '\"':
-            return '\"';
+            return '\"\"';
           case '\'':
-            return '\'\'';
+            return '\'';
           case '\\':
           case '%':
             return '\\' + char;
