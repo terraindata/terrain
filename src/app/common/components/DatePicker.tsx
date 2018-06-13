@@ -136,7 +136,7 @@ export const DateUnitMap = {
   y: 'Year(s)',
 };
 const DateUnitMapImmu = Immutable.Map(DateUnitMap);
-const DateUnitArray = [
+export const DateUnitArray = [
   'm',
   'h',
   'd',

@@ -46,7 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import { DateUnitMap } from 'app/common/components/DatePicker';
+import { DateUnitArray, DateUnitMap } from 'app/common/components/DatePicker';
+import TerrainDateParameter from 'shared/database/elastic/parser/TerrainDateParameter';
 const moment = require('moment');
 
 const DateUtil =
@@ -135,13 +136,28 @@ const DateUtil =
       return amount + ' ' + unit + plural + ' ' + tense;
     },
 
+    isValidElasticDateParameter(date)
+    {
+      const properNow = date.slice(0, 3);
+      const properSign = date[3];
+      const properUnit = date.slice(-1);
+      const properAmount = date.slice(4);
+      const properNumber = date.slice(4, -1);
+      return ((properNow === 'Now' || properNow === 'now') &&
+        (properSign === '+' || properSign === '-') &&
+        (!properAmount.includes('+') && !properAmount.includes('-'))
+        && (!isNaN((Number(properNumber))))
+        && (DateUnitArray.includes(properUnit))
+      );
+    }
+
     formatDateValue(date)
     {
-      if (date.includes('@TerrainDate'))
+      if (date.includes('@TerrainDate') && TerrainDateParameter.isValidTerrainDateParameter(date))
       {
         return DateUtil.formatRelativeDate(date);
       }
-      else if (date.includes('Now') || date.includes('now'))
+      else if (DateUtil.isValidElasticDateParameter(date))
       {
         return DateUtil.formatSpecificDate(date);
       }
