@@ -63,6 +63,7 @@ import DataTabs from 'etl/components/DataTabs';
 import TemplateList from 'etl/templates/components/TemplateList';
 import Jobs from 'jobs/components/Jobs';
 import ScheduleList from 'scheduler/components/ScheduleList';
+import ScheduleEditor from 'scheduler/components/ScheduleEditor';
 import Builder from './builder/components/Builder';
 import Logout from './common/components/Logout';
 import Placeholder from './common/components/Placeholder';

@@ -73,8 +73,10 @@ import XHR from 'util/XHR';
 export interface Props
 {
   location?: any;
-  params?: {
-    scheduleId?: number;
+  match?: {
+    params?: {
+      scheduleId?: number;
+    }
   };
   router?: any;
   route?: any;
@@ -140,9 +142,9 @@ class ScheduleEditor extends TerrainComponent<Props>
 
   public componentDidMount()
   {
-    const { schedules, params } = this.props;
+    const { schedules, match } = this.props;
     this.setState({
-      schedule: schedules.get(getScheduleId(params)),
+      schedule: schedules.get(getScheduleId(match.params)),
     });
     this.props.schedulerActions({
       actionType: 'getSchedules',
@@ -151,8 +153,8 @@ class ScheduleEditor extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    const { params } = this.props;
-    const nextParams = nextProps.params;
+    const { params } = this.props.match;
+    const nextParams = nextProps.match.params;
     const oldScheduleId = getScheduleId(params);
     const scheduleId = getScheduleId(nextParams);
     if (scheduleId !== -1 &&

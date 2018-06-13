@@ -112,12 +112,24 @@ class CRONEditor extends TerrainComponent<Props>
         <div className='note cron-editor-bottom-note'>
           <b>
             {
-              cronParser.parseExpression(this.props.cron, { tz: 'America/Los_Angeles' }).next().toDate().toString()
+              this.parseCron(this.props.cron)
             }
           </b>
         </div>
       </div>
     );
+  }
+
+  private parseCron(cron)
+  {
+    try {
+      return cronParser.parseExpression(this.props.cron, { tz: 'America/Los_Angeles' }).next().toDate().toString()
+    }
+    catch (e)
+    {
+      return 'Invalid CRON';
+    }
+
   }
 
   private handleOptionClick(daysOrHours: 'days' | 'hours', type: string)

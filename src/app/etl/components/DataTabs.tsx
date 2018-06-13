@@ -58,6 +58,7 @@ import * as React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import ScheduleList from 'scheduler/components/ScheduleList';
+import ScheduleEditor from 'scheduler/components/ScheduleEditor';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import Util from 'util/Util';
 import './DataTabs.less';
@@ -126,6 +127,7 @@ class DataTabs extends TerrainComponent<DataTabsProps>
               <Route exact path='/data/integrations/edit/integrationId=:integrationId' component={IntegrationEditorPage} />
 
               <Route exact path='/data/schedules' component={ScheduleList} />
+              <Route exact path='/data/schedules/edit/scheduleId=:scheduleId' component={ScheduleEditor} />
               <Route exact path='/data/jobs' component={Jobs} />
             </Switch>
           </TerrainTabs>
