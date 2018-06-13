@@ -75,23 +75,27 @@ export default class FollowUpBossEndpoint extends AEndpointStream
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<stream.Writable>
   {
     const config = await this.getIntegrationConfig(sink.integrationId);
-    return new FollowUpBossStream();
+    return new FollowUpBossStream(config);
   }
 }
 
 class FollowUpBossStream extends stream.Writable
 {
+  private config: any;
 
-  constructor()
+  constructor(config)
   {
     super({
       objectMode: true,
       highWaterMark: 1024 * 128,
     });
+
+    this.config = config;
   }
 
   public _write(chunk: any, encoding: string, callback: (err?: Error) => void): void
   {
+    console.log(JSON.stringify(this.config));
     console.log('CHUNK');
     console.dir(chunk, { depth: null });
 
@@ -107,13 +111,16 @@ class FollowUpBossStream extends stream.Writable
               chunk['Email'],
             ],
           },
+          headers : {
+            Authorization: 'Basic ' + new Buffer(this.config['apiKey'] + ':').toString('base64')
+          },
         },
         (error, response) => {
         if (error) {
-          console.log('got error: ' + error);
+          console.log('got error: ' + JSON.stringify(error));
         }
         else {
-          console.log('got response: ' + response);
+          console.log('got response: ' + JSON.stringify(response));
         }
       });
     } else {
