@@ -79,7 +79,18 @@ const NTColors =
     green: '#72ee7c',
   };
 
-const statuses =
+const connectionStatuses =
+  {
+    CONNECTED: '#94be6b',
+    CONN_TIME_OUT: '#ffa8b9',
+    ACCESS_DENIED: '#ffa8b9',
+    CONNECTING: '#1eb4fa',
+    DISCONNECTED: '#ea526f',
+    DISCONNECTING: '#ff8a5b',
+    UNKNOWN: '#cccccc',
+  };
+
+const jobStatuses =
   {
     SUCCESS: '#94be6b',
     ABORTED: '#ffa8b9',
@@ -116,7 +127,8 @@ const NewTheme =
     lightBlue: NTColors.blue1,
 
     success: NTColors.green,
-    statuses,
+    connectionStatuses,
+    jobStatuses,
     logLevels,
   };
 

@@ -138,7 +138,7 @@ class Jobs extends TerrainComponent<any> {
 
   public getStatusColor(status)
   {
-    return Colors().statuses[status];
+    return Colors().jobStatuses[status];
   }
 
   public getLogLevelColor(level)

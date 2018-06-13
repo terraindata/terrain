@@ -53,6 +53,7 @@ import
   TerrainRedux,
   Unroll,
 } from 'store/TerrainRedux';
+import { Connection } from 'users/components/Connections';
 import { _User, _UserState, User, UserMap, UserState } from 'users/UserTypes';
 import Ajax from 'util/Ajax';
 
@@ -78,6 +79,12 @@ export interface UserActionTypes
     actionType: 'completeTutorial';
     complete: boolean,
     stepId: number,
+  };
+  createConnection: {
+    actionType: 'createConnection',
+    connection: Connection,
+    onError?: (response: string | any) => void,
+    onLoad?: (result: Connection) => void,
   };
 }
 
@@ -120,6 +127,7 @@ class UserRedux extends TerrainRedux<UserActionTypes, UserState>
         state = state.set('currentUser', user); // update the version of the current user reference
         return state;
       },
+      createConnection: (state, action) => state,
     };
 
   public fetchAction(dispatch, getState)
@@ -147,11 +155,36 @@ class UserRedux extends TerrainRedux<UserActionTypes, UserState>
     });
   }
 
+  public createConnection(action: UserActionType<'createConnection'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const name = action.actionType;
+    const onLoad = (response) =>
+    {
+      console.log('Loaded!', response);
+      // this.getConnection(
+      //   {
+      //     actionType: 'getIntegration',
+      //     integrationId: response.id,
+      //   },
+      //   dispatch,
+      // );
+    };
+
+    // return ETLAjax.createIntegration(action.integration.toJS())
+    //   .then(this.onLoadFactory([onLoad, action.onLoad], directDispatch, name))
+    //   .catch(this.onErrorFactory(action.onError, directDispatch, name));
+  }
+
   public overrideAct(action: Unroll<UserActionTypes>)
   {
     if (action.actionType === 'fetch')
     {
       return this.fetchAction.bind(this);
+    }
+    else if (action.actionType === 'createConnection')
+    {
+      return this.createConnection.bind(this, action);
     }
   }
 }

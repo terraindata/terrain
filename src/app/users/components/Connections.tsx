@@ -50,7 +50,10 @@ import * as classNames from 'classnames';
 import { List, Map } from 'immutable';
 import * as React from 'react';
 
+import TerrainTools from 'app/util/TerrainTools';
 import { AuthState } from 'auth/AuthTypes';
+import { Colors, fontColor } from 'colors/Colors';
+import Badge from 'common/components/Badge';
 import FadeInOut from 'common/components/FadeInOut';
 import Switch from 'common/components/Switch';
 import { tooltip } from 'common/components/tooltip/Tooltips';
@@ -61,16 +64,18 @@ import CreateItem from '../../common/components/CreateItem';
 import Dropdown from '../../common/components/Dropdown';
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
-import TerrainComponent from '../../common/components/TerrainComponent';
+import TerrainComponent, { browserHistory } from '../../common/components/TerrainComponent';
+import { HeaderConfig, HeaderConfigItem, ItemList } from '../../etl/common/components/ItemList';
 import Ajax, { AjaxResponse } from '../../util/Ajax';
 import { UserActions } from '../data/UserRedux';
 import * as UserTypes from '../UserTypes';
 
+const CheckIcon = require('../../../images/icon_checkMark.svg');
 const CloseIcon = require('../../../images/icon_close_8x8.svg');
 
 import './Connections.less';
 
-interface Server extends BackendInstance
+export interface Connection extends BackendInstance
 {
   host: string;
   status: string;
@@ -95,8 +100,7 @@ export interface State
 {
   typeIndex: number;
   loading: boolean;
-  servers: Server[];
-  expanded: Map<number, boolean>;
+  connections: Connection[];
   addingConnection: boolean;
   errorModalOpen: boolean;
   errorModalMessage: string;
@@ -108,8 +112,7 @@ class Connections extends TerrainComponent<Props>
   public state: State = {
     typeIndex: 0,
     loading: true,
-    servers: null,
-    expanded: Map<number, boolean>(),
+    connections: null,
     addingConnection: false,
     errorModalOpen: false,
     errorModalMessage: '',
@@ -138,12 +141,12 @@ class Connections extends TerrainComponent<Props>
       'get',
       'database/status',
       {},
-      (servers: Server[]) =>
+      (connections: Connection[]) =>
       {
-        if (servers)
+        if (connections)
         {
           this.setState({
-            servers,
+            connections,
             loading: false,
           });
         }
@@ -161,30 +164,13 @@ class Connections extends TerrainComponent<Props>
     this.xhr = null;
   }
 
-  public componentWillReceiveProps(nextProps)
+  public removeConnection(id: number, e?)
   {
-    this.fetchConnections();
-  }
+    if (e !== undefined)
+    {
+      e.stopPropagation();
+    }
 
-  public updateState()
-  {
-    const { schema: state } = this.props;
-    this.setState({
-      servers: state.servers,
-      loading: state.loading,
-    });
-  }
-
-  public expandConnection(id: number)
-  {
-    const { expanded } = this.state;
-    this.setState({
-      expanded: expanded.set(id, !expanded.get(id)),
-    });
-  }
-
-  public removeConnection(id: number)
-  {
     Ajax.deleteDb(id, this.fetchConnections, (error) =>
     {
       this.setState({
@@ -195,156 +181,36 @@ class Connections extends TerrainComponent<Props>
     );
   }
 
-  public renderConnectionInfo(server: Server)
+  public handleRowClick(index: number)
   {
-    if (this.state.expanded.get(server.id as number))
-    {
-      return (
-        <div className='connections-item-info'>
-          <div className='connections-item-info-row'>
-            Type:
-            <div className='connections-item-info-value'>
-              {
-                server.type
-              }
-            </div>
-          </div>
-          <div className='connections-item-info-row'>
-            Address:
-            <div className='connections-item-info-value'>
-              {
-                server.host
-              }
-            </div>
-          </div>
-          {server.isAnalytics ?
-            (<div>
-              <div className='connections-item-info-row'>
-                Analytics Index:
-                  <div className='connections-item-info-value'>
-                  {
-                    server.analyticsIndex
-                  }
-                </div>
-              </div>
-              <div className='connections-item-info-row'>
-                Analytics Type:
-                  <div className='connections-item-info-value'>
-                  {
-                    server.analyticsType
-                  }
-                </div>
-              </div>
-            </div>) : null
-          }
-        </div>
-      );
-    }
-  }
-
-  public renderServer(server: Server)
-  {
-    const connInfo = this.renderConnectionInfo(server);
-    const id: number = server.id as number;
-    const connected: boolean = server.status === 'CONNECTED';
-    return (
-      <div key={server.id}>
-        <div className='connections-row'>
-          <div
-            className='connections-items'
-            onClick={this._fn(this.expandConnection, id)}>
-            <div className='connections-id'>
-              {
-                server.id
-              }
-            </div>
-            <div className='connections-name'>
-              {
-                server.name
-              }
-            </div>
-            <div className='connections-status'>
-              <div className={classNames({
-                connected,
-                disconnected: !connected,
-              })}>
-                {
-                  connected ? 'CONNECTED' : 'DISCONNECTED'
-                }
-              </div>
-            </div>
-          </div>
-          {
-            tooltip(
-              <div
-                className='connections-remove'
-                onClick={this._fn(this.removeConnection, id)}
-              >
-                <CloseIcon />
-              </div>,
-              'Remove',
-            )
-          }
-        </div>
-        {
-          connInfo
-        }
-      </div>
-    );
+    const connections = this.state.connections;
+    const connection = connections[index];
+    browserHistory.push(`/account/connections/connectionId=${connection.id}`)
   }
 
   public createConnection()
   {
-    const name: string = this.refs['name']['value'];
-    const address: string = this.refs['address']['value'];
-    const type = this.ConnectionTypes.get(this.state.typeIndex);
-    const { analyticsEnabled } = this.state;
-    const isAnalytics = analyticsEnabled === 1;
-    const analyticsIndex = this.analyticsIndex !== null ?
-      this.analyticsIndex.value : null;
-    const analyticsType = this.analyticsType !== null ?
-      this.analyticsType.value : null;
-
-    if (!name.length)
-    {
-      this.setState({
-        errorModalMessage: 'Connection name is required.',
-        errorModalOpen: true,
-      });
-      return;
-    }
-
-    if (!address.length)
-    {
-      this.setState({
-        errorModalMessage: 'Server address is required.',
-        errorModalOpen: true,
-      });
-      return;
-    }
-
-    this.refs['name']['value'] = '';
-    this.refs['address']['value'] = '';
-    this.setState({
-      addingConnection: false,
+    this.props.userActions({
+      actionType: 'createConnection',
+      connection: { id: undefined } as Connection,
     });
 
-    Ajax.createDb(
-      name,
-      address,
-      type,
-      isAnalytics,
-      analyticsIndex,
-      analyticsType,
-      this.fetchConnections,
-      (error) =>
-      {
-        this.setState({
-          errorModalMessage: 'Error creating connection: ' + JSON.stringify(error),
-          errorModalOpen: true,
-        });
-      },
-    );
+    // Ajax.createDb(
+    //   name,
+    //   address,
+    //   type,
+    //   isAnalytics,
+    //   analyticsIndex,
+    //   analyticsType,
+    //   this.fetchConnections,
+    //   (error) =>
+    //   {
+    //     this.setState({
+    //       errorModalMessage: 'Error creating connection: ' + JSON.stringify(error),
+    //       errorModalOpen: true,
+    //     });
+    //   },
+    // );
   }
 
   public handleTypeChange(index: number)
@@ -366,7 +232,7 @@ class Connections extends TerrainComponent<Props>
       if (this.state.addingConnection)
       {
         return (
-          <div className='create-server'>
+          <div className='create-connection'>
             <h3>Add a new connection</h3>
             <div className='flex-container'>
               <div className='flex-grow'>
@@ -377,12 +243,12 @@ class Connections extends TerrainComponent<Props>
                     options={this.ConnectionTypes}
                     onChange={this.handleTypeChange}
                     canEdit={true}
-                    className='create-server-dropdown'
+                    className='create-connection-dropdown'
                   />
                 </div>
               </div>
               <div className='flex-grow'>
-                <b>Connection Name</b>
+                <b>Name</b>
                 <div>
                   <input
                     ref='name'
@@ -391,7 +257,7 @@ class Connections extends TerrainComponent<Props>
                 </div>
               </div>
               <div className='flex-grow'>
-                <b>Server Address</b>
+                <b>Address</b>
                 <div>
                   <input
                     ref='address'
@@ -463,6 +329,57 @@ class Connections extends TerrainComponent<Props>
     );
   }
 
+  public getConnectionActions(index: number, connection: Connection)
+  {
+    return (
+      <CloseIcon
+        className='close'
+        onClick={this._fn(this.removeConnection, connection.id)}
+      />
+    );
+  }
+
+  public getStatusColor(status: string)
+  {
+    return Colors().connectionStatuses[status];
+  }
+
+  public renderProperty(propertyName, item: Connection, index: number)
+  {
+    if (propertyName === 'status')
+    {
+      return (
+        <Badge
+            label={item[propertyName]}
+            color={this.getStatusColor(item[propertyName])}
+        />
+      );
+    }
+    else if (propertyName === 'analytics')
+    {
+      if (item['isAnalytics'])
+      {
+        return (
+          <div
+            className='connections-analytics-status'
+            style={fontColor(Colors().success)}
+          >
+            <CheckIcon />
+          </div>
+        );
+      }
+    }
+    else
+    {
+      return (
+        <div>
+          { item[propertyName] }
+        </div>
+      );
+    }
+
+  }
+
   public toggleErrorModal()
   {
     this.setState({
@@ -480,34 +397,64 @@ class Connections extends TerrainComponent<Props>
 
   public render()
   {
-    const { servers, loading } = this.state;
+    const { connections, loading } = this.state;
 
     return (
-      <div>
-        <div className='connections'>
-          <div className='connections-page-title'>
-            Database Connections
-          </div>
-          {
-            loading &&
-            <InfoArea large='Loading...' />
-          }
-          {servers && servers.map(this.renderServer)}
-          {this.renderAddConnection()}
+      <div
+        className='connections-page'
+      >
+        <div
+          className='connection-list-wrapper'
+        >
+          <ItemList
+            items={List(connections)}
+            columnConfig={[
+              {
+                name: 'id',
+                render: this._fn(this.renderProperty, 'id'),
+                style: { width: `5%` },
+              },
+              {
+                name: 'name',
+                render: this._fn(this.renderProperty, 'name'),
+                style: { width: `30%` },
+              },
+              {
+                name: 'type',
+                render: this._fn(this.renderProperty, 'type'),
+                style: { width: `10%` },
+              },
+              {
+                name: 'host',
+                render: this._fn(this.renderProperty, 'host'),
+                style: { width: `30%` },
+              },
+              {
+                name: 'analytics',
+                render: this._fn(this.renderProperty, 'analytics'),
+              },
+              {
+                name: 'status',
+                render: this._fn(this.renderProperty, 'status'),
+                style: { width: `25%` },
+              },
+            ]}
+            onRowClicked={this.handleRowClick}
+            getActions={this.getConnectionActions}
+            itemsName='connection'
+            canCreate={TerrainTools.isAdmin()}
+            onCreate={this.createConnection}
+          />
         </div>
-        <Modal
-          message={this.state.errorModalMessage}
-          onClose={this.toggleErrorModal}
-          open={this.state.errorModalOpen}
-          error={true}
-        />
       </div>
     );
   }
 }
 
-export default Util.createTypedContainer(
+const ConnectionList = Util.createTypedContainer(
   Connections,
   ['auth', 'schema', 'users'],
   { userActions: UserActions },
 );
+
+export default ConnectionList;
