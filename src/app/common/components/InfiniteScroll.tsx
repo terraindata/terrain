@@ -87,7 +87,7 @@ class InfiniteScroll extends TerrainComponent<Props>
       });
       return;
     }
-    if (elem[0].scrollHeight - elem.scrollTop() === elem.outerHeight())
+    if (elem[0].scrollHeight - elem.scrollTop() <= elem.outerHeight())
     {
       if (lastPage * this.props.pageSize < this.props.totalSize)
       {

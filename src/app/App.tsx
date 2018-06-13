@@ -305,8 +305,27 @@ class App extends TerrainComponent<Props>
     }
   }
 
+  public specifyTitle(location)
+  {
+    const base = 'Terrain';
+    let customerTitle: string;
+    if (location.includes('localhost'))
+    {
+      customerTitle = '';
+    }
+    else
+    {
+      const segments = location.split('.');
+      const customerName: string = segments[0];
+      const capitalizeCustomer: string = customerName.charAt(0).toUpperCase() + customerName.slice(1);
+      customerTitle = ' | ' + capitalizeCustomer;
+    }
+    return base + customerTitle;
+  }
+
   public componentWillMount()
   {
+    document.title = this.specifyTitle(MIDWAY_HOST);
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: 'input',

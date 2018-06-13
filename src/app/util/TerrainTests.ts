@@ -95,7 +95,7 @@ export default class TerrainTests
   {
     const query: Query = _Query(queryConfig);
     const currentTql = query.tql;
-    const newTql = parsePath(query.path, query.inputs);
-    return newTql;
+    const { tql, pathErrorMap } = parsePath(query.path, query.inputs);
+    return { tql, pathErrorMap };
   }
 }
