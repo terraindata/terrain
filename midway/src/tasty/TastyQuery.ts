@@ -61,6 +61,9 @@ export class TastyQuery
   public upserts: object[];
   public numTaken: number;
   public numSkipped: number;
+  public isForUpdate: boolean;
+  public isNoWait: boolean;
+  public isSkipLocked: boolean;
 
   constructor(table: TastyTable)
   {
@@ -73,6 +76,9 @@ export class TastyQuery
     this.upserts = [];
     this.numTaken = 0;
     this.numSkipped = 0;
+    this.isForUpdate = false;
+    this.isNoWait = false;
+    this.isSkipLocked = false;
 
     this.command = new TastyNode('select', null);
   }
@@ -172,6 +178,24 @@ export class TastyQuery
   public skip(num: number): TastyQuery
   {
     this.numSkipped = num;
+    return this;
+  }
+
+  public forUpdate(): TastyQuery
+  {
+    this.isForUpdate = true;
+    return this;
+  }
+
+  public noWait(): TastyQuery
+  {
+    this.isNoWait = true;
+    return this;
+  }
+
+  public skipLocked(): TastyQuery
+  {
+    this.isSkipLocked = true;
     return this;
   }
 
