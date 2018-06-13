@@ -56,6 +56,9 @@ import AEndpointStream from './AEndpointStream';
 import JSONTransform from '../../io/streams/JSONTransform';
 import AExportTransform from '../../io/streams/AExportTransform';
 import * as Elastic from 'elasticsearch';
+import * as request from 'request';
+
+/* tslint:disable:max-classes-per-file */
 
 export default class FollowUpBossEndpoint extends AEndpointStream
 {
@@ -76,7 +79,6 @@ export default class FollowUpBossEndpoint extends AEndpointStream
   }
 }
 
-// noinspection TsLint
 class FollowUpBossStream extends stream.Writable
 {
 
@@ -88,13 +90,39 @@ class FollowUpBossStream extends stream.Writable
     });
   }
 
-public _write(chunk: any, encoding: string, callback: (err?: Error) => void): void
-{
+  public _write(chunk: any, encoding: string, callback: (err?: Error) => void): void
+  {
     console.log('CHUNK');
-    console.dir(chunk, {depth: null});
-    callback();
-}
+    console.dir(chunk, { depth: null });
 
+    if (!isNaN(chunk['FollowUpBossId'])) {
+      // Has valid FollowUpBossId, so do PUT (update)
+      request({
+          url: `https://api.followupboss.com/v1/people/${chunk['FollowUpBossId']}`,
+          method: 'PUT',
+          json: {
+            firstName: chunk['FirstName'],
+            lastName: chunk['LastName'],
+            emails: [
+              chunk['Email'],
+            ],
+          },
+        },
+        (error, response) => {
+        if (error) {
+          console.log('got error: ' + error);
+        }
+        else {
+          console.log('got response: ' + response);
+        }
+      });
+    } else {
+      // No existing ID, so do POST (create)
+
+    }
+
+    callback();
+  }
 
   public _final(callback: any)
   {
