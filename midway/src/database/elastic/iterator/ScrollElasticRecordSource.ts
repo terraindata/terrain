@@ -42,39 +42,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
 
-import * as csv from 'fast-csv';
-import { Transform } from 'stream';
+import RecordBlock from '../../../app/io/iterator/RecordBlock';
+import AElasticRecordSource from './AElasticRecordSource';
+import ElasticQueryDispatcher from './ElasticQueryDispatcher';
 
-/**
- * Import/Export from a CSV format. *
- * Additional configuration options are possible.
- */
-export default class CSVTransform
+export default class ScrollElasticRecordSource extends AElasticRecordSource
 {
-  public static createImportStream(
-    headers: boolean = true,
-    delimiter: string = ',',
-  ): Transform
+  public dispatcher: ElasticQueryDispatcher;
+  public scrollID?: string;
+  public numRemaining: number;
+
+  public nextBlock?: Promise<RecordBlock>;
+
+  constructor(dispatcher: ElasticQueryDispatcher,
+    query: object,
+    size: number,
+    nextBlock: Promise<RecordBlock>)
   {
-    return csv({
-      headers,
-      delimiter,
-      discardUnmappedColumns: true,
-    });
+    super(query);
+    this.dispatcher = dispatcher;
+    this.numRemaining = size;
+    this.nextBlock = nextBlock;
   }
 
-  public static createExportStream(
-    headers: boolean | string[] = true,
-    delimiter: string = ',',
-    rowDelimiter: string = '\r\n',
-  ): Transform
+  // TODO: consider adding a finalizer using a weak reference trigger to close the scroll
+
+  public async getNext(): Promise<RecordBlock>
   {
-    return csv.createWriteStream({
-      headers,
-      delimiter,
-      rowDelimiter,
-    });
+    if (this.nextBlock === undefined)
+    {
+      return new RecordBlock();
+    }
+
+    const nextBlock: Promise<RecordBlock> = this.nextBlock;
+    this.nextBlock = undefined;
+
+    const block: RecordBlock = await nextBlock;
+    if (!block.end)
+    {
+      this.nextBlock = this.dispatcher.continueScrolling(this);
+    }
+
+    return block;
   }
 }

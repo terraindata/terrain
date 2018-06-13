@@ -42,39 +42,44 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-
-import * as csv from 'fast-csv';
-import { Transform } from 'stream';
+// Copyright 2017 Terrain Data, Inc.
 
 /**
- * Import/Export from a CSV format. *
- * Additional configuration options are possible.
+ * Represents a block of records
+ *
+ * All blocks except the terminal block (with end = true) must have
+ * at least one record.
+ *
+ * The terminal block should have end = true set.
  */
-export default class CSVTransform
+export default class RecordBlock
 {
-  public static createImportStream(
-    headers: boolean = true,
-    delimiter: string = ',',
-  ): Transform
+  public end: boolean; // true if this is the last block in the iteration
+  public records: object[]; // records in the block
+  public errors: any[][]; // errors for each record (undefined if none are present)
+  public extra: { string: object; }; // extra data associated with this block
+
+  /**
+   * Makes an empty record block
+   */
+  constructor()
   {
-    return csv({
-      headers,
-      delimiter,
-      discardUnmappedColumns: true,
-    });
+    this.end = true;
+    this.records = [];
+    this.errors = [];
+    this.extra = {} as { string: object; };
   }
 
-  public static createExportStream(
-    headers: boolean | string[] = true,
-    delimiter: string = ',',
-    rowDelimiter: string = '\r\n',
-  ): Transform
-  {
-    return csv.createWriteStream({
-      headers,
-      delimiter,
-      rowDelimiter,
-    });
-  }
 }
+
+// alternate vectorized implementation saved for later use:
+// export default class VectorRecordBlock
+// {
+//   public end: boolean;
+//   public length: number;
+//   public keys: { string: number };
+//   public values: any[][];
+//   public errors: any[];
+//
+//   public extra: { string: object; };
+// }

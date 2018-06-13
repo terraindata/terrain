@@ -105,7 +105,7 @@ export function stringToKP(kp: string): KeyPath
 // turns ['foo', 'bar', 'baz'] into 'foo, bar, baz'
 export function kpToString(kp: KeyPath): string
 {
-  return kp.map((val) => val.replace(/\\/g, '\\\\').replace(/,/g, '\\,'))
+  return kp.map((val) => val.toString().replace(/\\/g, '\\\\').replace(/,/g, '\\,'))
     .reduce((accum, val) => accum === null ? val : `${accum}, ${val}`, null);
 }
 
@@ -147,7 +147,7 @@ export function validateNewFieldName(
       message: 'Invalid Name. Names cannot be empty',
     };
   }
-  if (newKeyPath.last() === '*')
+  if (newKeyPath.last() === -1)
   {
     return {
       isValid: false,
@@ -200,7 +200,7 @@ export function validateRename(
       message: 'Invalid Rename. Names cannot be empty',
     };
   }
-  if (newKeyPath.last() === '*')
+  if (newKeyPath.last() === -1)
   {
     return {
       isValid: false,

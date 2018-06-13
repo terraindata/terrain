@@ -42,39 +42,61 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
 
-import * as csv from 'fast-csv';
-import { Transform } from 'stream';
+import RecordBlock from './RecordBlock';
+import RecordSource from './RecordSource';
 
-/**
- * Import/Export from a CSV format. *
- * Additional configuration options are possible.
- */
-export default class CSVTransform
+export default class RecordIterator
 {
-  public static createImportStream(
-    headers: boolean = true,
-    delimiter: string = ',',
-  ): Transform
+  private source: RecordSource;
+  private block?: RecordBlock;
+  private blockIndex: number;
+
+  public constructor(source: RecordSource)
   {
-    return csv({
-      headers,
-      delimiter,
-      discardUnmappedColumns: true,
-    });
+    this.source = source;
+    this.block = undefined;
+    this.blockIndex = 0;
   }
 
-  public static createExportStream(
-    headers: boolean | string[] = true,
-    delimiter: string = ',',
-    rowDelimiter: string = '\r\n',
-  ): Transform
+  /**
+   * @return the next record from the record source, or null if no more records exist
+   */
+  public async getNext(): Promise<object | null>
   {
-    return csv.createWriteStream({
-      headers,
-      delimiter,
-      rowDelimiter,
-    });
+    while (this.block === undefined || this.blockIndex >= this.block.records.length)
+    {
+      if (this.block.end)
+      {
+        return null;
+      }
+
+      // get next block
+      this.block = await source.getNext();
+      this.blockIndex = 0;
+    }
+
+    // get next record from this block
+    const error = this.block.errors[this.blockIndex];
+    const result = this.block.records[this.blockIndex];
+    this.blockIndex++;
+
+    if (error !== undefined)
+    {
+      throw error;
+    }
+
+    return result;
+  }
+
+  public async getCurrentBlock(): Promise<RecordBlock>
+  {
+    if (this.block === undefined)
+    {
+      this.block = await source.getNext();
+    }
+
+    return this.block;
   }
 }

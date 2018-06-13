@@ -44,37 +44,19 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as csv from 'fast-csv';
-import { Transform } from 'stream';
+import { List } from 'immutable';
 
-/**
- * Import/Export from a CSV format. *
- * Additional configuration options are possible.
- */
-export default class CSVTransform
+import { KeyPath } from '../../util/KeyPath';
+import TransformationNodeType from '../TransformationNodeType';
+import TransformationNode from './TransformationNode';
+
+export default class RoundTransformationNode extends TransformationNode
 {
-  public static createImportStream(
-    headers: boolean = true,
-    delimiter: string = ',',
-  ): Transform
+  public constructor(id: number,
+    fields: List<KeyPath>,
+    options: object = {},
+    typeCode: TransformationNodeType = TransformationNodeType.RoundNode)
   {
-    return csv({
-      headers,
-      delimiter,
-      discardUnmappedColumns: true,
-    });
-  }
-
-  public static createExportStream(
-    headers: boolean | string[] = true,
-    delimiter: string = ',',
-    rowDelimiter: string = '\r\n',
-  ): Transform
-  {
-    return csv.createWriteStream({
-      headers,
-      delimiter,
-      rowDelimiter,
-    });
+    super(id, fields, options, typeCode);
   }
 }

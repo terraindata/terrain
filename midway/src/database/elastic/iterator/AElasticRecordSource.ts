@@ -42,39 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
 
-import * as csv from 'fast-csv';
-import { Transform } from 'stream';
+import RecordBlock from '../../../app/io/iterator/RecordBlock';
+import RecordSource from '../../../app/io/iterator/RecordSource';
 
-/**
- * Import/Export from a CSV format. *
- * Additional configuration options are possible.
- */
-export default class CSVTransform
+export default abstract class AElasticRecordSource implements RecordSource
 {
-  public static createImportStream(
-    headers: boolean = true,
-    delimiter: string = ',',
-  ): Transform
+  public query: object;
+
+  constructor(query: object)
   {
-    return csv({
-      headers,
-      delimiter,
-      discardUnmappedColumns: true,
-    });
+    this.query = query;
   }
 
-  public static createExportStream(
-    headers: boolean | string[] = true,
-    delimiter: string = ',',
-    rowDelimiter: string = '\r\n',
-  ): Transform
-  {
-    return csv.createWriteStream({
-      headers,
-      delimiter,
-      rowDelimiter,
-    });
-  }
+  public abstract async getNext(): Promise<RecordBlock>;
 }
