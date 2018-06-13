@@ -145,7 +145,7 @@ class PostgreSQLClient
   public async endTransaction(handle: TransactionHandle): Promise<void>
   {
     this.controller.log('PostgreSQLClient.endTransaction (transaction ' + handle.toString() + ')');
-    await this.transactionClients[handle].release();
+    this.transactionClients[handle].release();
     delete this.transactionClients[handle];
   }
 

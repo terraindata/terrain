@@ -51,7 +51,10 @@ import PostgresController from '../../../../src/database/pg/PostgreSQLController
 import PostgresDB from '../../../../src/database/pg/tasty/PostgreSQLDB';
 
 import * as Tasty from '../../../../src/tasty/Tasty';
+import TastyNode from '../../../../src/tasty/TastyNode';
 import TastyNodeTypes from '../../../../src/tasty/TastyNodeTypes';
+import TastyQuery from '../../../../src/tasty/TastyQuery';
+import TastyTable from '../../../../src/tasty/TastyTable';
 
 const DBMovies: Tasty.Table = new Tasty.Table('movies', ['movieID'], ['title', 'releaseDate'], 'movies');
 
@@ -114,5 +117,21 @@ test('Postgres Generator: mixedCase', async (done) =>
     'SELECT "movies"."movieID" FROM movies\n  WHERE "movies"."releaseDate" <> $1\n  ORDER BY "movies"."movieID" ASC;',
   ]);
 
+});
+
+test('Postgres: generator', async (done) =>
+{
+  const table = new TastyTable(
+    'test',
+    ['id'],
+    ['fname', 'lname'],
+  );
+  const query = new TastyQuery(table).select([table.getColumns().get('lname')])
+    .filter(table.getColumns().get('lname').lt(TastyNode.make('ABC')))
+    .filter(table.getColumns().get('lname').gt(TastyNode.make('A')))
+    .noWait().forUpdate();
+  expect(pgDB.generate(query)).toEqual(
+    [['SELECT test.lname FROM test\n  WHERE test.lname < $1\n     AND test.lname > $2\n  FOR UPDATE\n  NOWAIT;'], [['ABC', 'A']]],
+  );
   done();
 });
