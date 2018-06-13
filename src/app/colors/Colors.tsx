@@ -75,6 +75,7 @@ const NTColors =
     blue2: '#55c6fa',
     blue3: '#1a9cd9',
     blue4: '#157eb0',
+    blue5: '#c6edff',
 
     green: '#72ee7c',
   };
@@ -106,7 +107,6 @@ const logLevels =
     info: '#1eb4fa',
     warn: '#ff8a5b',
     error: '#ea526f',
-    blue5: '#c6edff',
   };
 
 const NewTheme =
