@@ -118,12 +118,12 @@ class SchemaTreeContextActions extends TerrainComponent<Props>
               className='schema-context-icon-wrapper'
               key={'schema-context-icon-delete'}
             >
-            {
-              tooltip(
-                <DeleteIcon />,
-                'Delete'
-              )
-            }
+              {
+                tooltip(
+                  <DeleteIcon />,
+                  'Delete',
+                )
+              }
             </div>
             <Modal
               open={this.state.deleteIndexModalOpen}

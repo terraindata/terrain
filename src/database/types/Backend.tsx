@@ -91,7 +91,7 @@ export interface Backend
   pathToCode(
     path: Path,
     inputs: List<any>,
-  ): string;
+  ): { tql: string, pathErrorMap: Map<string, List<string>};
 
   codeToQuery(
     query: Query,

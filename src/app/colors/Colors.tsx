@@ -106,6 +106,7 @@ const logLevels =
     info: '#1eb4fa',
     warn: '#ff8a5b',
     error: '#ea526f',
+    blue5: '#c6edff',
   };
 
 const NewTheme =
@@ -130,6 +131,8 @@ const NewTheme =
     connectionStatuses,
     jobStatuses,
     logLevels,
+
+    todayHighlight: NTColors.blue5,
   };
 
 // Will be deprecated

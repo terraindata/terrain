@@ -854,7 +854,7 @@ export class TransformationEngine
       // console.log('el = ' + el + ' for key ' + key);
       if (el !== undefined)
       {
-        if (isPrimitive(el) || Object.keys(el).length === 0)
+        if (isPrimitive(el) || el == null || Object.keys(el).length === 0)
         {
           yadeep.set(r, this.IDToFieldNameMap.get(value), el, { create: true });
         }
@@ -870,7 +870,7 @@ export class TransformationEngine
               const oldKeyReplaced: KeyPath = key.set(key.indexOf(-1), j.toString());
               if (oldKeyReplaced.get(oldKeyReplaced.size - 1) === -1 ||
                 Object.keys(yadeep.get(o, oldKeyReplaced.slice(0, -1).toList()))
-                .indexOf(oldKeyReplaced.get(oldKeyReplaced.size - 1).toString()) !== -1)
+                  .indexOf(oldKeyReplaced.get(oldKeyReplaced.size - 1).toString()) !== -1)
               {
                 // console.log('r here1');
                 this.renameHelper(r, o, newKeyReplaced, this.fieldNameToIDMap.get(newKeyReplaced), oldKeyReplaced);
