@@ -67,7 +67,9 @@ const DeleteIcon = require('images/icon_close.svg');
 
 interface Props
 {
-  object: object;
+  object: object | object[];
+  keyName?: string;
+  valueName?: string;
   onChange: (newValue: object, apply?: boolean) => void;
   label?: string;
 }
@@ -109,50 +111,102 @@ export default class ObjectForm extends TerrainComponent<Props>
     );
   }
 
-  public renderRow(key: string, index: number)
+  public renderRow(key: string | object, index: number)
   {
-    const value = this.props.object[key];
+    if (!Array.isArray(this.props.object))
+    {
+      const value = this.props.object[key as string];
 
-    return (
-      <div
-        key={index}
-        className='object-form-row'
-      >
-        <DynamicForm
-          inputMap={this.rowInputMap}
-          inputState={{ key, value }}
-          onStateChange={this.rowChangeFactory(index)}
-        />
-        <Quarantine>
-          <div
-            className='object-form-row-delete'
-            style={fontColor(Colors().text3, Colors().text2)}
-            onClick={this.handleDeleteRowFactory(index)}
-          >
-            <DeleteIcon />
-          </div>
-        </Quarantine>
-      </div>
-    );
+      return (
+        <div
+          key={index}
+          className='object-form-row'
+        >
+          <DynamicForm
+            inputMap={this.rowInputMap}
+            inputState={{ key, value }}
+            onStateChange={this.rowChangeFactory(index)}
+          />
+          <Quarantine>
+            <div
+              className='object-form-row-delete'
+              style={fontColor(Colors().text3, Colors().text2)}
+              onClick={this.handleDeleteRowFactory(index)}
+            >
+              <DeleteIcon />
+            </div>
+          </Quarantine>
+        </div>
+      );
+    }
+    else
+    {
+      const value = this.props.object[index];
+      const inputStateObj: object = key as object;
+      // inputStateObj[this.props.keyName] = key as object;
+      // inputStateObj[this.props.valueName] = value;
+      return (
+        <div
+          key={index}
+          className='object-form-row'
+        >
+          <DynamicForm
+            inputMap={this.rowInputMap}
+            inputState={inputStateObj}
+            onStateChange={this.rowChangeFactory(index)}
+          />
+          <Quarantine>
+            <div
+              className='object-form-row-delete'
+              style={fontColor(Colors().text3, Colors().text2)}
+              onClick={this.handleDeleteRowFactory(index)}
+            >
+              <DeleteIcon />
+            </div>
+          </Quarantine>
+        </div>
+      );
+    }
   }
 
   public render()
   {
-    const keys = List(Object.keys(this.props.object));
-    return (
-      <div className='object-form-container'>
-        {
-          this.props.label === undefined ? null :
-            <div className='object-form-label'>
-              {this.props.label}
-            </div>
-        }
-        <div className='object-kv-body' style={borderColor(Colors().border1)}>
-          {keys.map(this.renderRow)}
-          {this.renderAddNewRow()}
+    if (!Array.isArray(this.props.object))
+    {
+      const keys = List(Object.keys(this.props.object));
+      return (
+        <div className='object-form-container'>
+          {
+            this.props.label === undefined ? null :
+              <div className='object-form-label'>
+                {this.props.label}
+              </div>
+          }
+          <div className='object-kv-body' style={borderColor(Colors().border1)}>
+            {keys.map(this.renderRow)}
+            {this.renderAddNewRow()}
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
+    else
+    {
+      const rows = List(this.props.object);
+      return (
+        <div className='object-form-container'>
+          {
+            this.props.label === undefined ? null :
+              <div className='object-form-label'>
+                {this.props.label}
+              </div>
+          }
+          <div className='object-kv-body' style={borderColor(Colors().border1)}>
+            {rows.map(this.renderRow)}
+            {this.renderAddNewRow()}
+          </div>
+        </div>
+      );
+    }
   }
 
   @instanceFnDecorator(_.memoize)
@@ -160,10 +214,19 @@ export default class ObjectForm extends TerrainComponent<Props>
   {
     return () =>
     {
-      const keyToDelete = Object.keys(this.props.object)[index];
-      const newState = _.extend({}, this.props.object);
-      delete newState[keyToDelete];
-      this.props.onChange(newState, true);
+      if (!Array.isArray(this.props.object))
+      {
+        const keyToDelete = Object.keys(this.props.object)[index];
+        const newState = _.extend({}, this.props.object);
+        delete newState[keyToDelete];
+        this.props.onChange(newState, true);
+      }
+      else
+      {
+        const newState = this.props.object.slice();
+        newState.splice(index, 1);
+        this.props.onChange(newState, true);
+      }
     };
   }
 
@@ -195,29 +258,43 @@ export default class ObjectForm extends TerrainComponent<Props>
   // please refactor this if this form becomes stateful
   public addRow()
   {
-    const { object, onChange } = this.props;
-
-    // find a unique key
-    let newName = 'New Field';
-    for (let i = 1; i < 100; i++) // is there a better way to do this?
+    const { keyName, object, onChange, valueName } = this.props;
+    if (!Array.isArray(object))
     {
-      if (object[newName] === undefined)
+      // find a unique key
+      let newName = 'New Field';
+      for (let i = 1; i < 100; i++) // is there a better way to do this?
       {
-        break;
+        if (object[newName] === undefined)
+        {
+          break;
+        }
+        else
+        {
+          newName = `New Field ${i}`;
+        }
       }
-      else
+      if (object[newName] !== undefined)
       {
-        newName = `New Field ${i}`;
+        newName = `Field ${this.randomId()}`;
+      }
+
+      const newState = _.extend({}, object);
+      newState[newName] = '';
+      onChange(newState, true);
+    }
+    else
+    {
+      if (keyName !== undefined && valueName !== undefined)
+      {
+        const newObj: object = {};
+        newObj[keyName] = 'New Field';
+        newObj[valueName] = '';
+        const newState = object.slice();
+        newState.push(newObj);
+        onChange(newState, true);
       }
     }
-    if (object[newName] !== undefined)
-    {
-      newName = `Field ${this.randomId()}`;
-    }
-
-    const newState = _.extend({}, object);
-    newState[newName] = '';
-    onChange(newState, true);
   }
 
   public randomId(): string
