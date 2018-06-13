@@ -273,7 +273,7 @@ class PathfinderArea extends TerrainComponent<Props>
     const keyPath = this.getKeyPath();
     const keyPathString = JSON.stringify(keyPath);
 
-    const { pathfinderContext } = this.state; 
+    const { pathfinderContext } = this.state;
     const pathString = JSON.stringify(path.toJS());
     const errors = pathfinderContext.pathErrorMap.get(keyPathString);
     if (errors)

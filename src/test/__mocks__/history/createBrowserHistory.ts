@@ -43,7 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-export default function() {
+export default function()
+{
   return {
     replace: jest.fn(),
     push: jest.fn(),
