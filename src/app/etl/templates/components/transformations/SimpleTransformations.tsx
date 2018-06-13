@@ -130,6 +130,32 @@ export class HashTFF extends TransformationForm<HashOptions, TransformationNodeT
   };
 }
 
+type RoundOptions = NodeOptionsType<TransformationNodeType.RoundNode>;
+export class RoundTFF extends TransformationForm<RoundOptions, TransformationNodeType.RoundNode>
+{
+  protected readonly type = TransformationNodeType.RoundNode;
+  protected readonly inputMap: InputDeclarationMap<RoundOptions> = {
+    shift: {
+      type: DisplayType.NumberBox,
+      displayName: 'Decimal Place Value',
+    },
+  };
+  protected readonly initialState = {
+    shift: 0,
+  };
+
+  protected computeArgs()
+  {
+    const { shift } = this.state;
+    const args = super.computeArgs();
+
+    const options = _.extend({}, args.options, {
+      shift: Number(shift),
+    });
+    return _.extend({}, args, { options });
+  }
+}
+
 type AddOptions = NodeOptionsType<TransformationNodeType.AddNode>;
 export class AddTFF extends TransformationForm<AddOptions, TransformationNodeType.AddNode>
 {

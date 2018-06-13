@@ -605,12 +605,9 @@ const BuilderReducersWrapper = (
       if (!action.payload.notDirty)
       {
         const path = state.query.path;
-        state = state.setIn(['query', 'tql'],
-          AllBackendsMap[state.query.language].pathToCode(path, state.query.inputs));
-        //        if (TerrainTools.isFeatureEnabled(TerrainTools.COMPLEX_PARSER))
-        //        {
-        //          state = state.setIn(['query', 'cards'], PathToCards.updateRootCard(state.query));
-        //        }
+        const { tql, pathErrorMap } = AllBackendsMap[state.query.language].pathToCode(path, state.query.inputs);
+        state = state.setIn(['query', 'tql'], tql);
+        state = state.setIn(['query', 'pathErrorMap'], pathErrorMap);
       }
     }
 

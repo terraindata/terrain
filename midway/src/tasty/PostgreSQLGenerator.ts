@@ -236,6 +236,25 @@ export default class SQLGenerator
         this.queryString += 'OFFSET ' + query.numSkipped.toString();
       }
     }
+
+    if (query.isForUpdate)
+    {
+      this.newLine();
+      this.queryString += 'FOR UPDATE';
+    }
+
+    if (query.isNoWait)
+    {
+      this.newLine();
+      this.queryString += 'NOWAIT';
+    }
+
+    if (query.isSkipLocked)
+    {
+      this.newLine();
+      this.queryString += 'SKIP LOCKED';
+    }
+
     this.accumulateStatement(this.queryString, this.values);
   }
 

@@ -102,7 +102,7 @@ export function createFieldFromEngine(
     type: engine.getFieldType(id) as FieldTypes,
     etlType: EngineUtil.getETLFieldType(id, engine),
     transformations,
-    name: enginePath.last(),
+    name: enginePath.last().toString(),
   });
 }
 

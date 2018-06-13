@@ -65,6 +65,7 @@ import MultiplyTransformationNode from './nodes/MultiplyTransformationNode';
 import ProductTransformationNode from './nodes/ProductTransformationNode';
 import QuotientTransformationNode from './nodes/QuotientTransformationNode';
 import RemoveDuplicatesTransformationNode from './nodes/RemoveDuplicatesTransformationNode';
+import RoundTransformationNode from './nodes/RoundTransformationNode';
 import SetIfTransformationNode from './nodes/SetIfTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
@@ -295,6 +296,27 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitHashNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.RoundNode]:
+      {
+        humanName: 'Round',
+        editable: true,
+        creatable: true,
+        description: 'Round this field to the specified number of decimals',
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'number';
+        },
+        shortSummary: (meta) =>
+        {
+          return `Round ${meta.shift}`;
+        },
+        type: RoundTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitRoundNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.AddNode]:
       {

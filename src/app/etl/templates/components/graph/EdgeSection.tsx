@@ -174,8 +174,8 @@ class EdgeSection extends TerrainComponent<Props>
   public getRootFieldNames(engine: TransformationEngine): List<string>
   {
     return engine.getAllFieldIDs()
-      .filter((id) => engine.getOutputKeyPath(id).size === 1)
-      .map((id) => engine.getOutputKeyPath(id).get(0))
+      .filter((id) => engine.getOutputKeyPath(id).size === 1 && typeof engine.getOutputKeyPath(id).get(0) === 'string')
+      .map((id) => engine.getOutputKeyPath(id).get(0).toString())
       .toList();
   }
 

@@ -59,6 +59,7 @@ enum TransformationNodeType
   SubstringNode = 'SubstringNode',
   CastNode = 'CastNode',
   HashNode = 'HashNode',
+  RoundNode = 'RoundNode',
   AddNode = 'AddNode',
   SubtractNode = 'SubtractNode',
   MultiplyNode = 'MultiplyNode',
@@ -126,6 +127,9 @@ interface TransformationOptionTypes
   };
   HashNode: {
     salt: string;
+  };
+  RoundNode: {
+    shift: number;
   };
   AddNode: {
     shift: number;

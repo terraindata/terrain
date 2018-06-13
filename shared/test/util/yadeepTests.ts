@@ -73,12 +73,12 @@ test('nested array get', () =>
 
 test('wildcard nested get', () =>
 {
-  expect(yadeep.get(objd, KeyPath(['arr', '1', '*', 'a']))).toEqual(['dog', 'fren']);
+  expect(yadeep.get(objd, KeyPath(['arr', '1', -1, 'a']))).toEqual(['dog', 'fren']);
 });
 
 test('double wildcard sensible nested get', () =>
 {
-  expect(yadeep.get(objd, KeyPath(['arr', '*', '*', 'a']))).toEqual([undefined, ['dog', 'fren']]);
+  expect(yadeep.get(objd, KeyPath(['arr', -1, -1, 'a']))).toEqual([undefined, ['dog', 'fren']]);
 });
 
 test('simple top-level set', () =>
@@ -98,7 +98,7 @@ test('a deep set', () =>
 test('a deep set with a wildcard', () =>
 {
   const copy: object = { ...objd };
-  yadeep.set(copy, KeyPath(['arr', '1', '*', 'a']), 'jim');
+  yadeep.set(copy, KeyPath(['arr', '1', -1, 'a']), 'jim');
   expect(copy['arr']['1']['0']['a']).toBe('jim');
   expect(copy['arr']['1']['1']['a']).toBe('jim');
 });

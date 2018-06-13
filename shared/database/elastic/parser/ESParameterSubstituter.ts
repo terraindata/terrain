@@ -55,16 +55,16 @@ import ESValueInfo from './ESValueInfo';
 export default class ESParameterSubstituter
 {
   public static generate(source: ESValueInfo,
-    substitutionFunction: (param: string, runtimeParam?: string) => string): string
+    substitutionFunction: (param: ESValueInfo, runtimeParam?: string) => string): string
   {
     return (new ESParameterSubstituter(source, substitutionFunction)).result;
   }
 
-  private substitutionFunction: (param: string, runtimeParam?: string, inTerms?: boolean) => string;
+  private substitutionFunction: (param: ESValueInfo, runtimeParam?: string, inTerms?: boolean) => string;
   private result: string;
 
   public constructor(source: ESValueInfo,
-    substitutionFunction: (param: string, runtimeParam?: string) => string)
+    substitutionFunction: (param: ESValueInfo, runtimeParam?: string) => string)
   {
     this.substitutionFunction = substitutionFunction;
     this.result = '';
@@ -86,7 +86,7 @@ export default class ESParameterSubstituter
       case ESJSONType.string:
         if (source.parameter !== undefined)
         {
-          this.appendParameter(source.parameter, inShould && inTerms, inTerms, alias);
+          this.appendParameter(source, inShould && inTerms, inTerms, alias);
           break;
         }
 
@@ -94,7 +94,7 @@ export default class ESParameterSubstituter
         break;
 
       case ESJSONType.parameter:
-        this.appendParameter(source.parameter as string, inShould && inTerms, inTerms, alias);
+        this.appendParameter(source, inShould && inTerms, inTerms, alias);
         break;
 
       case ESJSONType.array:
@@ -169,7 +169,7 @@ export default class ESParameterSubstituter
     }
   }
 
-  private appendParameter(param: string, replaceNullWithEmptyArray: boolean, inTerms: boolean, alias?: string): void
+  private appendParameter(param: ESValueInfo, replaceNullWithEmptyArray: boolean, inTerms: boolean, alias?: string): void
   {
     let subst = this.substitutionFunction(param, alias, inTerms);
     if (replaceNullWithEmptyArray && subst === 'null')

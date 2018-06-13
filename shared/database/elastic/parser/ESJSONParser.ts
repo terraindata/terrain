@@ -477,10 +477,10 @@ export class ESJSONParser extends ESParser
 
   private readParameter(): string
   {
-    let match: string | null = this.matchAndSetToken(/^@([a-zA-Z_\.?][a-zA-Z_0-9\.\:\+?]*)/);
+    let match: string | null = this.matchAndSetToken(/^@([a-zA-Z_\.?][a-zA-Z_0-9\.\:\+\-?]*)/);
     if (match === null || !this.allowParameters)
     {
-      match = '';
+      match = this.matchAndSetToken(/^@/);
       this.accumulateErrorOnCurrentToken(
         'Invalid parameter name. Parameter names must begin with a letter or underscore, ' +
         'and can only contain letters, underscores, and numbers.');

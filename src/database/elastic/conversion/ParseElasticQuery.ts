@@ -53,6 +53,7 @@ import ESConverter from '../../../../shared/database/elastic/formatter/ESConvert
 import ESParameterFiller from '../../../../shared/database/elastic/parser/EQLParameterFiller';
 import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
+import ESParser from '../../../../shared/database/elastic/parser/ESParser';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 import * as SharedUtil from '../../../../shared/Util';
 import { Input, isInput, toInputMap } from '../../../blocks/types/Input';
@@ -134,7 +135,7 @@ export function stringifyWithParameters(
   }
 }
 
-export function ESParseTreeToCode(parser: ESJSONParser, options?: Options, inputs?: List<Input>): string
+export function ESParseTreeToCode(parser: ESParser, options?: Options, inputs?: List<Input>): string
 {
   if (options && options.replaceInputs)
   {
@@ -143,7 +144,7 @@ export function ESParseTreeToCode(parser: ESJSONParser, options?: Options, input
     const result = ESParameterFiller.generate(valueInfo, params);
     parser = new ESJSONParser(result);
   }
-  return ESConverter.formatES(parser);
+  return ESConverter.formatES(parser as ESJSONParser);
 }
 
 export function ESQueryToCode(queryObject: ESQueryObject, options?: Options, inputs?: List<Input>): string

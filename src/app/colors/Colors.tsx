@@ -75,6 +75,7 @@ const NTColors =
     blue2: '#55c6fa',
     blue3: '#1a9cd9',
     blue4: '#157eb0',
+    blue5: '#c6edff',
 
     green: '#72ee7c',
   };
@@ -118,6 +119,10 @@ const NewTheme =
     success: NTColors.green,
     statuses,
     logLevels,
+
+    todayHighlight: NTColors.blue5,
+
+    dateViewLabel: NTColors.blue4,
   };
 
 // Will be deprecated
