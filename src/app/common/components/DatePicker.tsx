@@ -194,6 +194,11 @@ class DatePicker extends TerrainComponent<Props>
         selector: '.DayPicker-Day--selected:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside)',
         style: { 'color': Colors().activeText, 'background-color': Colors().active },
       });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.DayPicker-Day--today',
+        style: { 'color': Colors().active, 'background-color': Colors().todayHighlight },
+      });
     }
   }
 
@@ -303,6 +308,7 @@ class DatePicker extends TerrainComponent<Props>
     const modifiers =
       {
         selected: (day) => DateUtils.isSameDay(day, date.toDate()),
+        today: new Date(),
       };
 
     return (

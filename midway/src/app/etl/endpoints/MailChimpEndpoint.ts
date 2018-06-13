@@ -101,17 +101,17 @@ class MailChimpStream extends stream.Writable
 
   public _write(chunk: any, encoding: string, callback: (err?: Error) => void): void
   {
-        if (this.batches.length === this.currentBatch)
-        {
-          this.batches.push([]);
-        }
-        this.batches[this.currentBatch].push(chunk);
-        if (this.batches[this.currentBatch].length >= this.batchSize)
-        {
-          // do the post request
-          this.sendToMailChimp(this.batches[this.currentBatch], this.currentBatch);
-        }
-        callback();
+    if (this.batches.length === this.currentBatch)
+    {
+      this.batches.push([]);
+    }
+    this.batches[this.currentBatch].push(chunk);
+    if (this.batches[this.currentBatch].length >= this.batchSize)
+    {
+      // do the post request
+      this.sendToMailChimp(this.batches[this.currentBatch], this.currentBatch);
+    }
+    callback();
   }
   public _final(callback: any)
   {
@@ -130,7 +130,7 @@ class MailChimpStream extends stream.Writable
         batchBody['operations'].push({
           method: 'PUT',
           path: 'lists/' + (this.config.listID as string) + '/members/'
-          + crypto.createHash('md5').update(row['EMAIL']).digest('hex').toString(),
+            + crypto.createHash('md5').update(row['EMAIL']).digest('hex').toString(),
           body: JSON.stringify({
             email_address: row['EMAIL'],
             status_if_new: 'subscribed',
@@ -149,30 +149,30 @@ class MailChimpStream extends stream.Writable
         url: (this.config.host as string) + 'batches',
         json: batchBody,
       }, (error, response, body) =>
-      {
-        winston.debug('Mailchimp response: ' + JSON.stringify(response));
-        const batchid: string = response['body']['id'];
-        setTimeout(() =>
         {
-          request.get({
-            url: (this.config.host as string) + 'batches/' + batchid,
-            auth: {
-              user: 'any',
-              password: this.config.apiKey,
-            },
-          }, (e2, r2, b2) =>
+          winston.debug('Mailchimp response: ' + JSON.stringify(response));
+          const batchid: string = response['body']['id'];
+          setTimeout(() =>
           {
-            winston.debug('Mailchimp response 2: ' + JSON.stringify(r2));
-          });
-        }, 60000);
-        this.batches[batchId] = [];
-      });
-      }
-      catch (e)
-      {
-        winston.error('MailChimp endpoint error: ');
-        winston.error(e);
-      }
-
+            request.get({
+              url: (this.config.host as string) + 'batches/' + batchid,
+              auth: {
+                user: 'any',
+                password: this.config.apiKey,
+              },
+            }, (e2, r2, b2) =>
+              {
+                winston.debug('Mailchimp response 2: ' + JSON.stringify(r2));
+              });
+          }, 60000);
+          this.batches[batchId] = [];
+        });
     }
+    catch (e)
+    {
+      winston.error('MailChimp endpoint error: ');
+      winston.error(e);
+    }
+
+  }
 }

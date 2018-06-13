@@ -69,6 +69,7 @@ import { RouteSelector, RouteSelectorOption, RouteSelectorOptionSet } from 'app/
 import MapUtil from 'app/util/MapUtil';
 import Util from 'app/util/Util';
 import ElasticBlockHelpers from 'database/elastic/blocks/ElasticBlockHelpers';
+import * as TerrainLog from 'loglevel';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
 import
@@ -162,7 +163,8 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   public render()
   {
     const { filterLine, canEdit, pathfinderContext } = this.props;
-    const { source } = pathfinderContext;
+    const { source, pathErrorMap } = pathfinderContext;
+
     return (
       <div
         className={classNames({
@@ -189,7 +191,10 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     const { props, state } = this;
     const fieldValue = props.filterLine.field;
     const comparisonValue = props.filterLine.comparison;
+    const { pathErrorMap } = this.props.pathfinderContext;
     const valueValue = this.shouldShowValue() ? props.filterLine.value : '';
+    const errorKey = JSON.stringify(this.props.keyPath);
+    const errors = pathErrorMap.get(errorKey);
     // const boostValue = props.filterLine.boost;
     const values = List([
       fieldValue,
@@ -217,6 +222,8 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         hideLine={true}
         autoFocus={true}
         footer={this.renderFooter()}
+        showWarning={errors !== undefined}
+        warningMessage={JSON.stringify(errors)}
         onToggleOpen={this.props.onToggleOpen}
         useTooltip={true}
       />

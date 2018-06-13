@@ -119,6 +119,10 @@ export class App
   private static unhandledRejectionHandler(err: Error): void
   {
     winston.error('Unhandled Promise Rejection: ' + err.toString());
+    if (err.stack !== undefined)
+    {
+      winston.error(err.stack);
+    }
   }
 
   private DB: Tasty.Tasty;

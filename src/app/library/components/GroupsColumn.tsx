@@ -136,14 +136,6 @@ class GroupsColumn extends TerrainComponent<Props>
     this.getSortedDatabases = memoizeOne(this.getSortedDatabases);
   }
 
-  public componentWillMount()
-  {
-    this._subscribe(RolesStore, {
-      stateKey: 'roles',
-      // isMounted: true
-    });
-  }
-
   public componentDidMount()
   {
     this.setState({

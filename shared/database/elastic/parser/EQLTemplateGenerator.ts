@@ -52,8 +52,9 @@ export default class EQLTemplateGenerator
   public static generate(source: ESValueInfo): string
   {
     return ESParameterSubstituter.generate(source,
-      (param: string): string =>
+      (paramValueInfo: ESValueInfo): string =>
       {
+        const param = paramValueInfo.parameter;
         return ' {{#toJson}}' + param + '{{/toJson}} ';
       });
   }

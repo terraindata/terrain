@@ -133,7 +133,7 @@ class AddFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
   };
 
   @instanceFnDecorator(memoizeOne)
-  public _validateKeyPath(engine, engineVersion, field, pathKP: List<string>)
+  public _validateKeyPath(engine, engineVersion, field, pathKP: KeyPath)
   {
     return validateNewFieldName(engine, field.fieldId, pathKP);
   }

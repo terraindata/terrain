@@ -80,7 +80,7 @@ export interface MappingType
 
 // generator that iterates over each field in mapping
 // e.g. ['properties', 'foo'], ['properties', 'foo', 'properties', 'bar'], ...
-function* getKeyPathsForComparison(mapping: MappingType): IterableIterator<List<string>>
+function* getKeyPathsForComparison(mapping: MappingType): IterableIterator<KeyPath>
 {
   if (_.has(mapping, 'properties'))
   {
@@ -177,7 +177,7 @@ export class ElasticMapping
   private isMerge: boolean;
   private mapping: MappingType = {};
   private primaryKey: string | null = null;
-  private primaryKeyAttempts: string[] = [];
+  private primaryKeyAttempts: any[] = [];
 
   constructor(engine: TransformationEngine, isMerge: boolean = false)
   {

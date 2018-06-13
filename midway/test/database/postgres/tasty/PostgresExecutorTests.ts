@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as winston from 'winston';
 
+import PostgreSQLClient from '../../../../src/database/pg/client/PostgreSQLClient';
 import PostgresConfig from '../../../../src/database/pg/PostgreSQLConfig';
 import PostgresController from '../../../../src/database/pg/PostgreSQLController';
 
@@ -114,29 +115,74 @@ for (let i = 0; i < tests.length; i++)
 
 test('Postgres: transactions', async (done) =>
 {
-  try
+  const queries = ['SELECT * \n  FROM movies\n  LIMIT 10;'];
+  const client: PostgreSQLClient = tasty.getDB()['client'];
+  const transactionIndex = client['nextTransactionIndex'];
+  await tasty.executeTransaction(async (handle, commit, rollback) =>
   {
-    const queries = ['SELECT * \n  FROM movies\n  LIMIT 10;'];
-    await tasty.executeTransaction(async (handle, commit, rollback) =>
+    await tasty.getDB().execute([queries, undefined], handle);
+    await commit();
+  }, IsolationLevel.REPEATABLE_READ, true);
+  await tasty.executeTransaction(async (handle, commit, rollback) =>
+  {
+    await tasty.getDB().execute([queries, undefined], handle);
+    await rollback();
+  }, IsolationLevel.SERIALIZABLE);
+  await tasty.executeTransaction(async (handle, commit, rollback) =>
+  {
+    await tasty.getDB().execute([queries, undefined], handle);
+    await commit();
+  });
+  await expect(tasty.executeTransaction(async (handle, commit, rollback) =>
+  {
+    throw new Error('ABC');
+  })).rejects.toThrow('ABC');
+  let poolClient;
+  await expect(tasty.executeTransaction(async (handle, commit, rollback) =>
+  {
+    expect((await tasty.getDB().execute([queries, undefined], handle)).length).toBe(10);
+    expect(client['transactionClients'][handle]).toBeTruthy();
+    poolClient = client['transactionClients'][handle];
+  })).rejects.toThrow('Transaction was not ended');
+  expect(poolClient.release).toThrow('Release called on client which has already been released to the pool.');
+  expect(client['transactionClients']).toEqual({});
+  expect(client['nextTransactionIndex']).toBeGreaterThanOrEqual(transactionIndex + 5);
+  done();
+});
+
+test('Postgres: transaction locking', async (done) =>
+{
+  const table = new Tasty.Table(
+    'movies',
+    ['movieid'],
+    ['title', 'votecount'],
+  );
+
+  expect(await tasty.executeTransaction(async (handle, commit, rollback) =>
+  {
+    const movies = await tasty.select(table, ['movieid'], { votecount: 541 }, true, false, false, handle);
+    expect(movies.length).toBe(2);
+    expect(await tasty.select(table, ['movieid'], { votecount: 541 })).toEqual(movies);
+
+    await expect(tasty.executeTransaction(async (handle2, commit2, rollback2) =>
     {
-      await tasty.getDB().execute([queries, undefined], handle);
-      await commit();
-    }, IsolationLevel.REPEATABLE_READ, true);
-    await tasty.executeTransaction(async (handle, commit, rollback) =>
+      expect(await tasty.select(table, ['movieid'], { movieid: movies[0]['movieid'] }, true, false, true, handle2)).toEqual([]);
+      await tasty.select(table, ['movieid'], { movieid: movies[0]['movieid'] }, true, true, false, handle2);
+    })).rejects.toThrow('could not obtain lock on row in relation "movies"');
+
+    const start = new Date().getTime();
+    setTimeout(commit, 2000);
+
+    await tasty.executeTransaction(async (handle2, commit2, rollback2) =>
     {
-      await tasty.getDB().execute([queries, undefined], handle);
-      await rollback();
-    }, IsolationLevel.SERIALIZABLE);
-    await tasty.executeTransaction(async (handle, commit, rollback) =>
-    {
-      await tasty.getDB().execute([queries, undefined], handle);
-      await commit();
+      await tasty.select(table, ['movieid'], { movieid: movies[0]['movieid'] }, true, false, false, handle2);
+      await commit2();
     });
-  }
-  catch (e)
-  {
-    fail(e);
-  }
+
+    expect(new Date().getTime() - start).toBeGreaterThan(1900);
+
+    return 3;
+  })).toBe(3);
   done();
 });
 
