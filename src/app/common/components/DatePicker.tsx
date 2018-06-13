@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires restrict-plus-operands
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
 import * as Immutable from 'immutable';
 import * as TerrainLog from 'loglevel';
@@ -116,6 +116,36 @@ const DateParameterArray = [
 ];
 const DateParameterOptions = Immutable.List(DateParameterArray);
 
+const DateTenseMap = {
+  '-': 'Past (Ago)',
+  '+': 'Future (From Now)',
+};
+const DateTenseMapImmu = Immutable.Map(DateTenseMap);
+const DateTenseArray = [
+  '-',
+  '+',
+];
+const DateTenseOptions = Immutable.List(DateTenseArray);
+
+export const DateUnitMap = {
+  m: 'Minute(s)',
+  h: 'Hour(s)',
+  d: 'Day(s)',
+  w: 'Week(s)',
+  M: 'Month(s)',
+  y: 'Year(s)',
+};
+const DateUnitMapImmu = Immutable.Map(DateUnitMap);
+export const DateUnitArray = [
+  'm',
+  'h',
+  'd',
+  'w',
+  'M',
+  'y',
+];
+const DateUnitOptions = Immutable.List(DateUnitArray);
+
 export interface Props
 {
   date: string;
@@ -127,17 +157,40 @@ export interface Props
 
 let COLORS_ACTIONS_SET = false;
 
-class DatePicker extends TerrainComponent<Props>
+export class DatePickerUncontained extends TerrainComponent<Props>
 {
+  public state = {
+    dateViewType: 'calendar',
+    sign: '-',
+    unit: 'M',
+    amount: 0,
+  };
   public componentDidMount()
   {
+    const currentDateViewType = this.getDateViewType(this.props.date);
+    this.setState(
+      {
+        dateViewType: currentDateViewType,
+      },
+    );
+    if (currentDateViewType === 'specific')
+    {
+      const updatedState = this.updateElasticState(this.props.date);
+      this.setState(
+        {
+          sign: updatedState[0];
+          unit: updatedState[1],
+          amount: updatedState[2],
+        },
+      );
+    }
     if (!COLORS_ACTIONS_SET)
     {
       COLORS_ACTIONS_SET = true;
       this.props.colorsActions({
         actionType: 'setStyle',
         selector: '.date-picker',
-        style: { background: Colors().bg1, color: Colors().text2 },
+        style: { background: Colors().bg, color: Colors().text2 },
       });
       this.props.colorsActions({
         actionType: 'setStyle',
@@ -199,7 +252,104 @@ class DatePicker extends TerrainComponent<Props>
         selector: '.DayPicker-Day--today',
         style: { 'color': Colors().active, 'background-color': Colors().todayHighlight },
       });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.date-view-label',
+        style: { 'color': Colors().dateViewLabel, 'background-color': Colors().bg },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.selected-date-type',
+        style: { 'color': Colors().active, 'border-color': Colors().activeHover },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.unselected-date-type',
+        style: { 'color': Colors().text3, 'background-color': Colors().bg },
+      });
     }
+  }
+
+  public updateElasticState(nextDate)
+  {
+    let newSign;
+    let newUnit;
+    let newAmount;
+    const newDate = nextDate.replace(/ /g, '');
+    const nextSign = newDate[3];
+    if (nextSign === '+' || nextSign === '-')
+    {
+      newSign = nextSign;
+    }
+    else
+    {
+      newSign = '-';
+    }
+    const nextUnit = newDate.slice(-1);
+    if (DateUnitArray.includes(nextUnit))
+    {
+      newUnit = nextUnit;
+    }
+    else
+    {
+      newUnit = 'M';
+    }
+    const nextAmount = parseInt(newDate.slice(4, -1), 10);
+    if (nextAmount >= 0)
+    {
+      newAmount = nextAmount;
+    }
+    else
+    {
+      newAmount = 0;
+    }
+    return [newSign, newUnit, newAmount];
+  }
+
+  public componentWillReceiveProps(nextProps)
+  {
+    let nextDateViewType;
+    if (this.props.date !== nextProps.date)
+    {
+      nextDateViewType = this.getDateViewType(nextProps.date);
+    }
+    if (nextDateViewType !== this.state.dateViewType)
+    {
+      this.setState(
+        {
+          dateViewType: nextDateViewType,
+        },
+      );
+    }
+    if (nextDateViewType === 'specific')
+    {
+      const updatedState = this.updateElasticState(nextProps.date);
+      this.setState(
+        {
+          sign: updatedState[0],
+          unit: updatedState[1],
+          amount: updatedState[2],
+        },
+      );
+    }
+  }
+
+  public getDateViewType(dateProp: string): string
+  {
+    let dateViewType;
+    if (dateProp.startsWith('@TerrainDate'))
+    {
+      dateViewType = 'relative';
+    }
+    else if ((dateProp.startsWith('Now')) || (dateProp.startsWith('now')))
+    {
+      dateViewType = 'specific';
+    }
+    else
+    {
+      dateViewType = 'calendar';
+    }
+    return dateViewType;
   }
 
   public getDate(): Moment
@@ -267,6 +417,28 @@ class DatePicker extends TerrainComponent<Props>
     this.props.onChange(date);
   }
 
+  public handleTenseChange(tenseIndex)
+  {
+    const sign = DateTenseArray[tenseIndex];
+    this.props.onChange(this.formatElasticQuery(sign, this.state.unit, this.state.amount));
+  }
+
+  public handleUnitChange(unitIndex)
+  {
+    const unit = DateUnitArray[unitIndex];
+    this.props.onChange(this.formatElasticQuery(this.state.sign, unit, this.state.amount));
+  }
+
+  public handleAmountChange(e)
+  {
+    this.props.onChange(this.formatElasticQuery(this.state.sign, this.state.unit, e.target.value));
+  }
+
+  public formatElasticQuery(sign: string, unit: string, amount: number): string
+  {
+    return 'Now' + sign + amount.toString() + unit;
+  }
+
   public dateToHourIndex(date: Moment)
   {
     return date.hours() * (60 / MINUTE_INTERVAL) + Math.floor(date.minutes() / MINUTE_INTERVAL);
@@ -286,20 +458,101 @@ class DatePicker extends TerrainComponent<Props>
   public renderTimePicker(date)
   {
     return (
-      <div className='date-time-time'>
+      <div className='labeled-row'>
+        <p className='date-view-label'>Time</p>
         <Dropdown
           canEdit={this.props.canEdit}
           options={HOUR_OPTIONS}
           selectedIndex={this.dateToHourIndex(this.getDate())}
           onChange={this.handleHourChange}
         />
+      </div>
+    );
+  }
+
+  public renderRelativeTimePicker(date)
+  {
+    return (
+      <div className='labeled-row'>
+        <p className='date-view-label'>Scope</p>
         <Dropdown
           canEdit={this.props.canEdit}
           options={DateParameterOptions}
           selectedIndex={this.dateToDateParameterMapIndex()}
           onChange={this.handleDateParameterChange}
         />
-      </div>);
+      </div>
+    );
+  }
+
+  public renderCalendar(dateArg, modifiersArg)
+  {
+    return (
+      <div className='date-time-time'>
+        <DayPicker
+          modifiers={modifiersArg}
+          onDayClick={this.handleDayClick}
+          initialMonth={dateArg.toDate()}
+        />
+        {this.renderTimePicker(dateArg)}
+      </div>
+    );
+  }
+
+  public renderRelative(dateArg)
+  {
+    return (
+      <div className='date-time-time-top'>
+        {this.renderRelativeTimePicker(dateArg)}
+        {this.renderTimePicker(dateArg)}
+      </div>
+    );
+  }
+
+  public renderSpecific()
+  {
+    return (
+      <div className='date-time-time-top'>
+        <div className='labeled-row'>
+          <p className='date-view-label'>Period</p>
+          <Dropdown
+            canEdit={this.props.canEdit}
+            options={DateTenseOptions}
+            optionsDisplayName={DateTenseMapImmu}
+            selectedIndex={DateTenseOptions.indexOf(this.state.sign)}
+            onChange={this.handleTenseChange}
+          />
+        </div>
+        <div className='labeled-row'>
+          <p className='date-view-label'>Unit of Time</p>
+          <Dropdown
+            canEdit={this.props.canEdit}
+            options={DateUnitOptions}
+            optionsDisplayName={DateUnitMapImmu}
+            selectedIndex={DateUnitOptions.indexOf(this.state.unit)}
+            onChange={this.handleUnitChange}
+          />
+        </div>
+        <div className='labeled-row'>
+          <p className='date-view-label'>Amount</p>
+          <input
+            className='specific-time-amount'
+            type='number'
+            min='0'
+            onChange={this.handleAmountChange}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  public onDateViewChange(changedDateView: string)
+  {
+    this.setState(
+      {
+        dateViewType: changedDateView,
+      },
+    );
   }
 
   public render()
@@ -315,21 +568,38 @@ class DatePicker extends TerrainComponent<Props>
       <div
         className='date-picker'
       >
-        <DayPicker
-          modifiers={modifiers}
-          onDayClick={this.handleDayClick}
-          initialMonth={date.toDate()}
-        />
-        {this.renderTimePicker(date)}
+        <p className='date-view-title'>View Type</p>
+        <div
+          className={this.state.dateViewType === 'calendar' ? 'selected-date-type' : 'unselected-date-type'}
+          onClick={this._fn(this.onDateViewChange, 'calendar')}
+        >
+          calendar
+        </div>
+        <div
+          className={this.state.dateViewType === 'relative' ? 'selected-date-type' : 'unselected-date-type'}
+          onClick={this._fn(this.onDateViewChange, 'relative')}
+        >
+          relative
+        </div>
+        <div
+          className={this.state.dateViewType === 'specific' ? 'selected-date-type' : 'unselected-date-type'}
+          onClick={this._fn(this.onDateViewChange, 'specific')}
+        >
+          custom
+        </div>
+        {this.state.dateViewType === 'calendar' && this.renderCalendar(date, modifiers)}
+        {this.state.dateViewType === 'relative' && this.renderRelative(date)}
+        {this.state.dateViewType === 'specific' && this.renderSpecific()}
       </div>
     );
   }
 }
 
-export default Util.createContainer(
-  DatePicker,
+const DatePicker = Util.createContainer(
+  DatePickerUncontained,
   [],
   {
     colorsActions: ColorsActions,
   },
 );
+export default DatePicker;
