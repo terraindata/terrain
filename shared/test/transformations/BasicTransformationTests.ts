@@ -1079,19 +1079,19 @@ test('Group By Transformation', () =>
 test('numeric keys', () =>
 {
   {
-    const doc = {0: {'5': 3, '-1': ['a', 'b']}};
+    const doc = { 0: { '5': 3, '-1': ['a', 'b'] } };
     const e = new TransformationEngine(doc);
     e.setOutputKeyPath(e.getOutputFieldID(KeyPath(['0', '5'])), KeyPath(['0', '1']));
     e.setOutputKeyPath(e.getOutputFieldID(KeyPath(['0', '-1'])), KeyPath(['0', '0']));
     e.appendTransformation(TransformationNodeType.CaseNode, List([List(['0', '-1', -1])]), { format: 'uppercase' });
-    expect(e.transform(doc)).toEqual({0: {1: 3, 0: ['A', 'B']}});
+    expect(e.transform(doc)).toEqual({ 0: { 1: 3, 0: ['A', 'B'] } });
   }
   {
-    const doc = {'-1': [{z: 1, 1: {2: 1}}, {z: 2.5}]};
+    const doc = { '-1': [{ z: 1, 1: { 2: 1 } }, { z: 2.5 }] };
     const e = new TransformationEngine(doc);
     e.appendTransformation(TransformationNodeType.AddNode, List([List(['-1', '0', '1', '2'])]), { shift: 13 });
     e.appendTransformation(TransformationNodeType.AddNode, List([List(['-1', -1, 'z'])]), { shift: 3 });
-    expect(e.transform(doc)).toEqual({'-1': [{z: 4, 1: {2: 14}}, {z: 5.5}]});
+    expect(e.transform(doc)).toEqual({ '-1': [{ z: 4, 1: { 2: 14 } }, { z: 5.5 }] });
   }
 });
 

@@ -46,9 +46,9 @@ THE SOFTWARE.
 
 import ESConverter from 'shared/database/elastic/formatter/ESConverter';
 import ESParameterFiller from 'shared/database/elastic/parser/EQLParameterFiller';
+import { ESParameterType } from 'shared/database/elastic/parser/ESParameter';
 import ESParameterSubstituter from 'shared/database/elastic/parser/ESParameterSubstituter';
 import CardsToCodeOptions from 'shared/database/types/CardsToCodeOptions';
-import { ESParameterType } from 'shared/database/elastic/parser/ESParameter';
 import ESClause from './clauses/ESClause';
 import EQLConfig from './EQLConfig';
 import ESJSONParser from './ESJSONParser';

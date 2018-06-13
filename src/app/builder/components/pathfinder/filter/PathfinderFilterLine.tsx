@@ -754,11 +754,7 @@ export function getCustomValueDisplayName(filterLine: FilterLine, value, setInde
       {
         return '';
       }
-<<<<<<< HEAD
-      return Util.formatDate(value, true);
-=======
       return (value !== undefined && DateUtil.formatDateValue(value.replace(/ /g, '')));
->>>>>>> master
     case FieldType.Geopoint:
       value = _DistanceValue(Util.asJS(value));
       return value.distance + ' ' + units[value.units] + ' of ' + value.address;
