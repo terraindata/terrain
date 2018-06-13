@@ -48,10 +48,17 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as React from 'react';
-import { Link } from 'react-router';
+import { Link, Route, Switch } from 'react-router-dom';
 
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Account.less';
+
+import Connections from './Connections';
+import EditProfile from './EditProfile';
+import Notifications from './Notifications';
+import Profile from './Profile';
+import Settings from './Settings';
+import Team from './Team';
 
 const HomeIcon = require('./../../../images/icon_profile_16x16.svg?name=HomeIcon');
 
@@ -167,9 +174,15 @@ class Account extends TerrainComponent<Props>
             </Link>
           </div>
           <div className='account-inner'>
-            {
-              this.props.children
-            }
+            <Switch>
+              <Route exact path='/' component={Profile} />
+              <Route exact path='/account/profile' component={Profile} />
+              <Route exact path='/account/profile/edit' component={EditProfile} />
+              <Route exact path='/account/settings' component={Settings} />
+              <Route exact path='/account/notifications' component={Notifications} />
+              <Route exact path='/account/connections' component={Connections} />
+              <Route exact path='/account/team' component={Team} />
+            </Switch>
           </div>
         </div>
       </div>

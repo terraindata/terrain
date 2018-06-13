@@ -77,6 +77,7 @@ import MultiplyTransformationNode from './nodes/MultiplyTransformationNode';
 import ProductTransformationNode from './nodes/ProductTransformationNode';
 import QuotientTransformationNode from './nodes/QuotientTransformationNode';
 import RemoveDuplicatesTransformationNode from './nodes/RemoveDuplicatesTransformationNode';
+import RoundTransformationNode from './nodes/RoundTransformationNode';
 import SetIfTransformationNode from './nodes/SetIfTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
@@ -90,6 +91,8 @@ import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+
+import * as math from 'mathjs';
 
 export default class TransformationEngineNodeVisitor extends TransformationNodeVisitor
 {
@@ -181,9 +184,9 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         for (let i: number = 0; i < el.length; i++)
         {
           let kp: KeyPath = field;
-          if (kp.contains('*'))
+          if (kp.contains(-1))
           {
-            kp = kp.set(kp.indexOf('*'), i.toString());
+            kp = kp.set(kp.indexOf(-1), i.toString());
           }
           else
           {
@@ -241,13 +244,13 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       {
         el = Object.assign({}, el);
       }
-      if (opts.newFieldKeyPaths.get(0).contains('*'))
+      if (opts.newFieldKeyPaths.get(0).contains(-1))
       {
         // assume el length is same as target length
         for (let i: number = 0; i < el.length; i++)
         {
           const kpi: KeyPath = opts.newFieldKeyPaths.get(0).set(
-            opts.newFieldKeyPaths.get(0).indexOf('*'), i.toString());
+            opts.newFieldKeyPaths.get(0).indexOf(-1), i.toString());
           yadeep.set(doc, kpi, el[i], { create: true });
         }
       } else
@@ -386,9 +389,9 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         for (let i: number = 0; i < Object.keys(el).length; i++)
         {
           let kpi: KeyPath = field;
-          if (kpi.contains('*'))
+          if (kpi.contains(-1))
           {
-            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+            kpi = kpi.set(kpi.indexOf(-1), i.toString());
           }
           else
           {
@@ -443,9 +446,9 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         for (let i: number = 0; i < Object.keys(el).length; i++)
         {
           let kpi: KeyPath = field;
-          if (kpi.contains('*'))
+          if (kpi.contains(-1))
           {
-            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+            kpi = kpi.set(kpi.indexOf(-1), i.toString());
           }
           else
           {
@@ -457,9 +460,9 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
           for (let j: number = 0; j < split.length; j++)
           {
             let newkpi: KeyPath = opts.newFieldKeyPaths.get(j);
-            if (newkpi.contains('*'))
+            if (newkpi.contains(-1))
             {
-              newkpi = newkpi.set(newkpi.indexOf('*'), i.toString());
+              newkpi = newkpi.set(newkpi.indexOf(-1), i.toString());
             }
             else
             {
@@ -597,82 +600,89 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
 
     return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
     {
-      if (typeof el === opts.toTypename || el == null || (el.constructor === Array && opts.toTypename === 'array'))
+      try
       {
-        return undefined;
-      }
+        if (typeof el === opts.toTypename || el == null || (el.constructor === Array && opts.toTypename === 'array'))
+        {
+          return undefined;
+        }
 
-      switch (opts.toTypename)
-      {
-        case 'string': {
-          if (typeof el === 'object')
-          {
-            yadeep.set(doc, kp, JSON.stringify(el));
-          }
-          else
-          {
-            yadeep.set(doc, kp, el.toString());
-          }
-          break;
-        }
-        case 'number': {
-          yadeep.set(doc, kp, Number(el));
-          break;
-        }
-        case 'boolean': {
-          if (typeof el === 'string')
-          {
-            yadeep.set(doc, kp, el.toLowerCase() === 'true');
-          }
-          else
-          {
-            yadeep.set(doc, kp, Boolean(el));
-          }
-          break;
-        }
-        case 'object': {
-          if (typeof el === 'string')
-          {
-            try
+        switch (opts.toTypename)
+        {
+          case 'string': {
+            if (typeof el === 'object')
             {
-              const parsed = JSON.parse(el);
-              yadeep.set(doc, kp, parsed);
+              yadeep.set(doc, kp, JSON.stringify(el));
             }
-            catch (e)
+            else
+            {
+              yadeep.set(doc, kp, el.toString());
+            }
+            break;
+          }
+          case 'number': {
+            yadeep.set(doc, kp, Number(el));
+            break;
+          }
+          case 'boolean': {
+            if (typeof el === 'string')
+            {
+              yadeep.set(doc, kp, el.toLowerCase() === 'true');
+            }
+            else
+            {
+              yadeep.set(doc, kp, Boolean(el));
+            }
+            break;
+          }
+          case 'object': {
+            if (typeof el === 'string')
+            {
+              try
+              {
+                const parsed = JSON.parse(el);
+                yadeep.set(doc, kp, parsed);
+              }
+              catch (e)
+              {
+                yadeep.set(doc, kp, {});
+              }
+            }
+            else
             {
               yadeep.set(doc, kp, {});
             }
+            break;
           }
-          else
-          {
-            yadeep.set(doc, kp, {});
+          case 'array': {
+            yadeep.set(doc, kp, []);
+            break;
           }
-          break;
-        }
-        case 'array': {
-          yadeep.set(doc, kp, []);
-          break;
-        }
-        case 'date': {
-          if (opts.format === 'ISOstring')
-          {
-            yadeep.set(doc, kp, new Date(el).toISOString());
+          case 'date': {
+            if (opts.format === 'ISOstring')
+            {
+              yadeep.set(doc, kp, new Date(el).toISOString());
+            }
+            else if (opts.format === 'MMDDYYYY')
+            {
+              yadeep.set(doc, kp, dateFormat('MM/dd/yyyy', new Date(el)));
+            }
+            break;
           }
-          else if (opts.format === 'MMDDYYYY')
-          {
-            yadeep.set(doc, kp, dateFormat('MM/dd/yyyy', new Date(el)));
+          default: {
+            return {
+              errors: [
+                {
+                  message: `Attempted to cast to an unsupported type ${opts.toTypename}`,
+                } as TransformationVisitError,
+              ],
+            } as TransformationVisitResult;
           }
-          break;
         }
-        default: {
-          return {
-            errors: [
-              {
-                message: `Attempted to cast to an unsupported type ${opts.toTypename}`,
-              } as TransformationVisitError,
-            ],
-          } as TransformationVisitResult;
-        }
+      }
+      catch (ex)
+      {
+        yadeep.set(doc, kp, null);
       }
     }, (kp, el) =>
       {
@@ -699,6 +709,29 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       else
       {
         yadeep.set(doc, kp, TransformationEngineNodeVisitor.hashHelper(el, opts.salt));
+      }
+    });
+  }
+
+  public visitRoundNode(node: RoundTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.RoundNode>;
+
+    return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
+    {
+      if (typeof el !== 'number')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to round a non-numeric field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      else
+      {
+        yadeep.set(doc, kp, math.round(el, opts.shift)); // CHECK THIS PARTTTT
       }
     });
   }
@@ -877,9 +910,9 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         for (let i: number = 0; i < el.length; i++)
         {
           let kpi: KeyPath = field;
-          if (kpi.contains('*'))
+          if (kpi.contains(-1))
           {
-            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+            kpi = kpi.set(kpi.indexOf(-1), i.toString());
           }
           else
           {

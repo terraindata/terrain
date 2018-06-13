@@ -66,10 +66,10 @@ class TemplateFieldC
   public readonly etlType: ETLFieldTypes = ETLFieldTypes.Object;
   public readonly fieldId: number = -1;
   public readonly name: string = '';
-  public readonly inputKeyPath: List<string> = List([]);
+  public readonly inputKeyPath: KeyPath = List([]);
   public readonly childrenIds: List<number> = List([]);
   public readonly transformations: List<TransformationNode> = List([]);
-  public readonly outputKeyPath: List<string> = List([]);
+  public readonly outputKeyPath: KeyPath = List([]);
 
   public isWildcardField(): boolean
   {
@@ -147,7 +147,7 @@ class TransformationNodeC
 {
   public id: number = 0;
   public typeCode: TransformationNodeType = TransformationNodeType.SplitNode;
-  public fields: List<List<string>> = List([]);
+  public fields: List<KeyPath> = List([]);
   public meta: object = {};
 }
 export type TransformationNode = WithIRecord<TransformationNodeC>;

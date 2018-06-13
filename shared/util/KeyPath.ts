@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
-export type WayPoint = string;
+export type WayPoint = string | number;
 export type KeyPath = List<WayPoint>;
 export const KeyPath = (args: WayPoint[] = []) => List<WayPoint>(args);
 
@@ -72,7 +72,7 @@ export function keyPathPrefixMatch(toCheck: KeyPath, toMatch: KeyPath): boolean
 
   for (let i: number = 0; i < toMatch.size; i++)
   {
-    if (toMatch.get(i) !== toCheck.get(i) && toCheck.get(i) !== '*' && toMatch.get(i) !== '*') // match * regardless
+    if (toMatch.get(i) !== toCheck.get(i) && toCheck.get(i) !== -1 && toMatch.get(i) !== -1) // match * regardless
     {
       return false;
     }
@@ -105,7 +105,7 @@ export function updateKeyPath(toUpdate: KeyPath, toReplace: KeyPath, replaceWith
   {
     for (let i: number = 0; i < updated.size; i++)
     {
-      if (updated.get(i) === '*' && toUpdate.get(i) !== '*')
+      if (updated.get(i) === -1 && toUpdate.get(i) !== -1)
       {
         updated = updated.set(i, toUpdate.get(i));
       }

@@ -57,13 +57,28 @@ import './App.less';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
+import { Redirect as RRedirect, Route, Switch } from 'react-router-dom';
 
-const Perf = require('react-addons-perf');
+import DataTabs from 'etl/components/DataTabs';
+import TemplateList from 'etl/templates/components/TemplateList';
+import Jobs from 'jobs/components/Jobs';
+import ScheduleList from 'scheduler/components/ScheduleList';
+import Builder from './builder/components/Builder';
+import Logout from './common/components/Logout';
+import Placeholder from './common/components/Placeholder';
+import Redirect from './common/components/Redirect';
+import UIComponentsPage from './common/UIComponentsPage';
+import ETLEditorPage from './etl/components/ETLEditorPage';
+import ETLWalkthrough from './etl/walkthrough/components/ETLWalkthrough';
+import Library from './library/components/LibraryDnd';
+import ManualWrapper from './manual/components/ManualWrapper';
+import SchemaPage from './schema/components/SchemaPage';
+import Account from './users/components/Account';
+import Profile from './users/components/Profile';
+import X from './x/components/X';
 
 require('velocity-animate');
 require('velocity-animate/velocity.ui');
-window['PerfStart'] = Perf.start;
-window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.getLastMeasurements()), 250); };
 
 // Components
 import { generateThemeStyles } from 'common/components/tooltip/Tooltips';
@@ -117,6 +132,14 @@ const ControlIcon = require('./../images/icon-control.svg');
 const TQLIcon = require('./../images/icon_tql_17x14.svg?name=TQLIcon');
 const ManualIcon = require('./../images/icon_info.svg');
 const BackgroundImage = require('./../images/background.png');
+
+const libraryLibrary = (props) => <Library basePath={'library'} {...props} />;
+const analyticsLibrary = (props) => (<Library
+  basePath={'analytics'}
+  canPinAlgorithms={true}
+  singleColumn={true}
+  {...props}
+/>);
 
 injectGlobal`
   @font-face {
@@ -282,8 +305,27 @@ class App extends TerrainComponent<Props>
     }
   }
 
+  public specifyTitle(location)
+  {
+    const base = 'Terrain';
+    let customerTitle: string;
+    if (location.includes('localhost'))
+    {
+      customerTitle = '';
+    }
+    else
+    {
+      const segments = location.split('.');
+      const customerName: string = segments[0];
+      const capitalizeCustomer: string = customerName.charAt(0).toUpperCase() + customerName.slice(1);
+      customerTitle = ' | ' + capitalizeCustomer;
+    }
+    return base + customerTitle;
+  }
+
   public componentWillMount()
   {
+    document.title = this.specifyTitle(MIDWAY_HOST);
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: 'input',
@@ -454,6 +496,7 @@ class App extends TerrainComponent<Props>
     const style = {
       backgroundImage: `url(${BackgroundImage})`,
     };
+
     const layout =
       {
         fullHeight: true,
@@ -476,9 +519,49 @@ class App extends TerrainComponent<Props>
                   className='app-inner'
                   style={style}
                 >
-                  {
-                    this.props.children
-                  }
+                  <Switch>
+                    <Route exact path='/' component={Redirect} />
+
+                    <Route exact path='/builder' component={Builder} />
+                    <Route exact path='/builder/:config' component={Builder} />
+                    <Route exact path='/builder/:config/:splitConfig' component={Builder} />
+
+                    <Route exact path='/library' render={libraryLibrary} />
+                    <Route exact path='/library/:categoryId' render={libraryLibrary} />
+                    <Route exact path='/library/:categoryId/:groupId' render={libraryLibrary} />
+                    <Route exact path='/library/:categoryId/:groupId/:algorithmId' render={libraryLibrary} />
+
+                    <Route path='/account' component={Account} />
+
+                    <Route exact path='/manual' component={ManualWrapper} />
+                    <Route exact path='/manual/:term' component={ManualWrapper} />
+
+                    <Route exact path='/users/:userId' component={Profile} />
+
+                    <Route path='/reporting' component={Placeholder} />
+
+                    <Route path='/logout' component={Logout} />
+
+                    <Route exact path='/x' component={X} />
+                    <Route exact path='/x/:x' component={X} />
+
+                    <Route path='/ui' component={UIComponentsPage} />
+
+                    <Route exact path='/browser' component={Redirect} />
+                    <Route exact path='/browser/:a' component={Redirect} />
+                    <Route exact path='/browser/:a/:b' component={Redirect} />
+                    <Route exact path='/browser/:a/:b/:c' component={Redirect} />
+
+                    <Route path='/schema' component={SchemaPage} />
+
+                    <Route exact path='/data' render={(props) => <RRedirect to='/data/templates' />} />
+                    <Route path='/data' component={DataTabs} />
+
+                    <Route exact path='/analytics' render={analyticsLibrary} />
+                    <Route exact path='/analytics/:categoryId' render={analyticsLibrary} />
+                    <Route exact path='/analytics/:categoryId/:groupId' render={analyticsLibrary} />
+                    <Route exact path='/analytics/:categoryId/:groupId/:algorithmId' render={analyticsLibrary} />
+                  </Switch>
                 </div>
               ,
             },

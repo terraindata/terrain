@@ -184,6 +184,7 @@ class Modal extends TerrainComponent<Props>
       >
         <div>
           <ReactModal
+            appElement={document.getElementById('app')}
             contentLabel={''}
             isOpen={true}
             overlayClassName='modal-overlay'
@@ -333,7 +334,7 @@ class Modal extends TerrainComponent<Props>
                             'button': true,
                             'modal-confirm-button': true,
                           })}
-                          onClick={!this.props.confirmDisabled && this.closeModalSuccess}
+                          onClick={this.props.confirmDisabled ? undefined : this.closeModalSuccess}
                           style={confirmButtonStyle}
                           key='modal-confirm-button'
                         >

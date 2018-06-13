@@ -48,14 +48,21 @@ THE SOFTWARE.
 
 import TransformUtil, { NUM_CURVE_POINTS } from 'app/util/TransformUtil';
 import Util from 'app/util/Util';
+import PathfinderLine from 'builder/components/pathfinder/PathfinderLine';
 import { PathToCards } from 'builder/components/pathfinder/PathToCards';
 import { List, Map } from 'immutable';
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as TerrainLog from 'loglevel';
 import { FieldType } from '../../../../../shared/builder/FieldTypes';
+import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
+import ESInterpreter from '../../../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESJSONType from '../../../../../shared/database/elastic/parser/ESJSONType';
-import { isInput } from '../../../../blocks/types/Input';
+import { ESJSParser } from '../../../../../shared/database/elastic/parser/ESJSParser';
+import ESParserError from '../../../../../shared/database/elastic/parser/ESParserError';
+import { index } from '../../../../../sigint/src/Demo';
+import { isInput, toInputMap } from '../../../../blocks/types/Input';
 import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import { _FilterGroup, DistanceValue, FilterGroup, FilterLine, More, Path, Score, Script, Source } from './PathfinderTypes';
 
@@ -68,7 +75,7 @@ const FlipNegativeMap = {
   notexists: 'exists',
 };
 
-export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
+export function parsePath(path: Path, inputs, nestedPath: boolean = false, indexPath: any[] = ['query', 'path']): any
 {
   const queryBody = {
     query: {
@@ -81,6 +88,7 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
     size: PathFinderDefaultSize,
     track_scores: path.more.trackScores,
     _source: true,
+    _annotation: indexPath.concat('source'),
   };
   const sourceBool = queryBody.query.bool;
 
@@ -99,9 +107,9 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   sourceBool.filter.push(indexQuery);
 
   // Filters
-  const filterObj = parseFilters(path.filterGroup, inputs);
+  const filterObj = parseFilters(path.filterGroup, inputs, indexPath.concat('filterGroup'));
   sourceBool.filter.push(filterObj);
-  const softFiltersObj = parseFilters(path.softFilterGroup, inputs, true);
+  const softFiltersObj = parseFilters(path.softFilterGroup, inputs, indexPath.concat('softFilterGroup'), true);
   sourceBool.should.push(softFiltersObj);
 
   // filterObj = filterObj.setIn(['bool', 'should'], softFiltersObj);
@@ -122,6 +130,7 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
       queryBody.query = sortObj;
       delete queryBody['sort'];
     }
+    sortObj._annotation = indexPath.concat('score');
   }
 
   const collapse = path.more.collapse;
@@ -137,25 +146,63 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
 
   // Scripts
   const scripts = parseScripts(path.more.scripts);
+  scripts['_annotation'] = indexPath.concat(['more', 'scripts']);
   queryBody['script_fields'] = scripts;
 
   // Nested algorithms (groupjoins)
-  const groupJoin = parseGroupJoin(path.reference, path.nested, inputs);
+  const groupJoin = parseGroupJoin(path.reference, path.nested, inputs, indexPath.concat('nested'));
   if (groupJoin)
   {
+    groupJoin['_annotation'] = indexPath.concat('nested');
     queryBody['groupJoin'] = groupJoin;
   }
 
-  // Export, without inputs
-  if (ignoreInputs)
+  if (nestedPath)
   {
     return queryBody;
   }
 
   // Export, with inputs
-  const text = stringifyWithParameters(queryBody, (name) => isInput(name, inputs));
-  const parser: ESJSONParser = new ESJSONParser(text, true);
-  return ESParseTreeToCode(parser, {}, inputs);
+  const qt = new ESJSParser(queryBody);
+  const params = toInputMap(inputs);
+  const interpreter: ESInterpreter = new ESInterpreter(qt, params);
+  const errorMap = {};
+  if (interpreter.hasError())
+  {
+    // build a error map
+    let accumulatedErrors = [];
+    let currentIndex = JSON.stringify(['query', 'path']);
+    interpreter.getErrors().map((e: string) => accumulatedErrors.push(e));
+
+    interpreter.rootValueInfo.recursivelyVisit((element) =>
+    {
+      if (element.annotation !== undefined)
+      {
+        if (accumulatedErrors.length > 0)
+        {
+          errorMap[currentIndex] = accumulatedErrors;
+        }
+        currentIndex = JSON.stringify(element.annotation);
+        accumulatedErrors = [];
+      }
+
+      if (element.hasError() === true)
+      {
+        element.errors.map((e: ESParserError) => accumulatedErrors.push(e.message));
+      }
+      return true;
+    });
+
+    if (accumulatedErrors.length > 0)
+    {
+      errorMap[currentIndex] = accumulatedErrors;
+    }
+
+    TerrainLog.debug('PathfinderParser found errors: ' + interpreter.getErrors());
+  }
+  // TODO: format the query when interpreting.
+  const formatedTql = ESConverter.formatES(new ESJSONParser(interpreter.query));
+  return { tql: formatedTql, pathErrorMap: Immutable.fromJS(errorMap) };
 
   // TODO
   // const moreObj = parseAggregations(path.more);
@@ -301,12 +348,79 @@ function parseTerrainScore(score: Score, simpleParser: boolean = false)
   return simpleParser ? sortObj : factors || [];
 }
 
+interface FilterLineMapElement
+{
+  line: FilterLine;
+  indexPath: string[];
+}
+
+/*
+ * Group filterlines in the filterGroup to a map
+ * map.filter: a list of normal filterlines.
+ * map.group: a list of group filterlines.
+ * map.nested: a list of nested filterlines.
+ * map.negativeNested: a list of nested filterlines whose operators are negative (notexists, notequal, isnotin)
+ */
+function mapFilterGroup(filterGroup, ignoreNested, indexPath: any[]):
+  {
+    filter: FilterLineMapElement[],
+    nested: FilterLineMapElement[],
+    negativeNested: FilterLineMapElement[],
+    group: FilterLineMapElement[],
+  }
+{
+  let linePathIsGiven = false;
+  if (Array.isArray(indexPath[0]) === true && filterGroup.lines.size === indexPath.length)
+  {
+    // IndexPath of filter lines in this filter group is given
+    linePathIsGiven = true;
+  }
+  const filterLineMap = { filter: [], nested: [], negativeNested: [], group: [] };
+  filterGroup.lines.map((line: FilterLine, i) =>
+  {
+    let lineIndexPath;
+    if (linePathIsGiven)
+    {
+      lineIndexPath = indexPath[i];
+    } else
+    {
+      lineIndexPath = indexPath.concat(['lines', i]);
+    }
+    if (line && line.filterGroup)
+    {
+      filterLineMap.group.push({ line, indexPath: lineIndexPath });
+    }
+    else if (line && (
+      (line.field && line.field.indexOf('.') !== -1) ||
+      line.fieldType === FieldType.Nested)
+      && !ignoreNested)
+    {
+      if (line.comparison === 'notexists' ||
+        line.comparison === 'notequal' ||
+        line.comparison === 'isnotin')
+      {
+        filterLineMap.negativeNested.push({ line, indexPath: lineIndexPath });
+      } else
+      {
+        filterLineMap.nested.push({ line, indexPath: lineIndexPath });
+      }
+    }
+    else if (line)
+    {
+      filterLineMap.filter.push({ line, indexPath: lineIndexPath });
+    }
+  });
+  return filterLineMap;
+}
+
 /*
  * Generate a bool query from a filtergroup.
  */
-function parseFilters(filterGroup: FilterGroup, inputs, isSoftGroup = false, ignoreNested = false): any
+function parseFilters(filterGroup: FilterGroup, inputs,
+  indexPath: any[],
+  isSoftGroup = false, ignoreNested = false): any
 {
-  const filterQuery = { bool: { filter: [], should: [] } };
+  const filterQuery = { bool: { filter: [], should: [] }, _annotation: indexPath };
   const filterBool = filterQuery.bool;
   let filterClause = filterBool.filter;
   if (isSoftGroup === true)
@@ -324,40 +438,50 @@ function parseFilters(filterGroup: FilterGroup, inputs, isSoftGroup = false, ign
     filterClause = filterBool.should;
   }
 
-  const filterMap = PathToCards.MapFilterGroup(filterGroup, ignoreNested);
+  const filterMap = mapFilterGroup(filterGroup, ignoreNested, indexPath);
   // normal filter lines first
-  filterMap.filter.map((line: FilterLine) =>
+  filterMap.filter.map((e: FilterLineMapElement) =>
   {
-    const q = filterLineToQuery(line);
+    const line = e.line;
+    const q = filterLineToQuery(line, e.indexPath);
     if (q !== null)
     {
       filterClause.push(q);
     }
   });
   // then inner groups
-  filterMap.group.map((line: FilterLine) =>
+  filterMap.group.map((e: FilterLineMapElement) =>
   {
-    const boolQuery = parseFilters(line.filterGroup, inputs, isSoftGroup, ignoreNested);
+    const line = e.line;
+    const boolQuery = parseFilters(line.filterGroup, inputs, e.indexPath.concat('filterGroup'), isSoftGroup, ignoreNested);
     filterClause.push(boolQuery);
   });
 
-  const filterLinePathMap = {};
-  filterMap.nested.map((line: FilterLine) =>
+  const filterLinePathMap: { [key: string]: FilterLineMapElement[] } = {};
+  filterMap.nested.map((e: FilterLineMapElement) =>
   {
+    const line = e.line;
     const path = line.field.split('.')[0];
     if (filterLinePathMap[path])
     {
-      filterLinePathMap[path].push(line);
+      filterLinePathMap[path].push(e);
     }
     else
     {
-      filterLinePathMap[path] = [line];
+      filterLinePathMap[path] = [e];
     }
   });
   _.keys(filterLinePathMap).forEach((path, i) =>
   {
-    const group = _FilterGroup({ lines: List(filterLinePathMap[path]), minMatches: filterGroup.minMatches });
-    const boolQuery = parseFilters(group, inputs, isSoftGroup, true);
+    const nestLines = [];
+    const nestLineIndexPathes = [];
+    filterLinePathMap[path].map((e: FilterLineMapElement) =>
+    {
+      nestLines.push(e.line);
+      nestLineIndexPathes.push(e.indexPath);
+    });
+    const group = _FilterGroup({ lines: List(nestLines), minMatches: filterGroup.minMatches });
+    const boolQuery = parseFilters(group, inputs, nestLineIndexPathes, isSoftGroup, true);
     // put the boolQuery in the wrapper
     const nestedQuery = {
       nested: {
@@ -370,9 +494,10 @@ function parseFilters(filterGroup: FilterGroup, inputs, isSoftGroup = false, ign
     filterClause.push(nestedQuery);
   });
 
-  filterMap.negativeNested.map((line: FilterLine) =>
+  filterMap.negativeNested.map((e: FilterLineMapElement) =>
   {
-    const q = nestedFilterLineToQuery(line);
+    const line = e.line;
+    const q = nestedFilterLineToQuery(line, e.indexPath);
     if (q !== null)
     {
       filterClause.push(q);
@@ -422,7 +547,7 @@ export function PathFinderStringToJSONArray(value: string)
   }
 }
 
-function nestedFilterLineToQuery(line: FilterLine)
+function nestedFilterLineToQuery(line: FilterLine, indexPath: string[])
 {
   const path = line.field.split('.')[0];
   const boost = typeof line.boost === 'string' ? parseFloat(line.boost) : line.boost;
@@ -432,6 +557,7 @@ function nestedFilterLineToQuery(line: FilterLine)
       score_mode: 'avg',
       ignore_unmapped: true,
       query: undefined,
+      _annotation: indexPath,
     },
   };
   const nestQuery = wrapper.nested;
@@ -445,7 +571,7 @@ function nestedFilterLineToQuery(line: FilterLine)
     };
     line = line.set('comparison', FlipNegativeMap[line.comparison]);
   }
-  const query = filterLineToQuery(line);
+  const query = filterLineToQuery(line, indexPath, false);
   if (query === null)
   {
     return null;
@@ -458,7 +584,7 @@ function nestedFilterLineToQuery(line: FilterLine)
  * Generate an query object (in JS object) from the line.
  * Return null if the line's comparison is unknow.
  */
-function filterLineToQuery(line: FilterLine)
+function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean = true)
 {
   // type priority: Date -> Number -> String
   // for how these values are finally tuned to query string, see ParseElasticQuery::stringifyWithParameters.
@@ -669,6 +795,10 @@ function filterLineToQuery(line: FilterLine)
       query = null;
       break;
   }
+  if (query !== null && annotateQuery === true)
+  {
+    query['_annotation'] = indexPath;
+  }
   return query;
 }
 
@@ -757,7 +887,7 @@ function parseAggregations(more: More): {}
 }
 
 // Put a nested path inside of a groupJoin
-function parseGroupJoin(reference: string, nested: List<Path>, inputs)
+function parseGroupJoin(reference: string, nested: List<Path>, inputs, indexPath)
 {
   if (nested.size === 0)
   {
@@ -768,7 +898,7 @@ function parseGroupJoin(reference: string, nested: List<Path>, inputs)
   {
     if (n && n.name)
     {
-      groupJoins[n.name] = parsePath(n, inputs, true);
+      groupJoins[n.name] = parsePath(n, inputs, true, indexPath.concat(i));
     }
   });
   if (_.isEmpty(groupJoins) === true)
@@ -780,6 +910,7 @@ function parseGroupJoin(reference: string, nested: List<Path>, inputs)
     groupJoins['dropIfLessThan'] = parseFloat(String(nested.get(0).minMatches));
   }
   groupJoins['parentAlias'] = reference;
+  groupJoins['_annotation'] = indexPath;
   return groupJoins;
 }
 

@@ -119,6 +119,10 @@ export class App
   private static unhandledRejectionHandler(err: Error): void
   {
     winston.error('Unhandled Promise Rejection: ' + err.toString());
+    if (err.stack !== undefined)
+    {
+      winston.error(err.stack);
+    }
   }
 
   private DB: Tasty.Tasty;
@@ -261,6 +265,22 @@ export class App
     for (const key of Object.keys(TBLS))
     {
       await DB.getDB().putMapping(TBLS[key]);
+    }
+    const query = [
+      [
+        'ALTER TABLE items ADD CONSTRAINT unique_item_names EXCLUDE (name WITH =, parent WITH =) WHERE (name != \'\');',
+      ],
+      undefined,
+    ];
+    try
+    {
+      await DB.getDB().execute(query);
+    } catch (e)
+    {
+      if (e.message !== 'relation "unique_item_names" already exists')
+      {
+        throw e;
+      }
     }
     winston.info('Finished creating application schema...');
 

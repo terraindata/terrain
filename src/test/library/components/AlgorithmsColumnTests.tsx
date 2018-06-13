@@ -50,8 +50,11 @@ import { AlgorithmsColumn } from 'library/components/AlgorithmsColumn';
 import { _LibraryState, LibraryState } from 'library/LibraryTypes';
 import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 import configureStore from 'redux-mock-store';
+
+import createHistory from 'history/createBrowserHistory';
+
+const browserHistory = createHistory();
 
 describe('AlgorithmsColumn', () =>
 {
@@ -107,7 +110,8 @@ describe('AlgorithmsColumn', () =>
         analytics={analytics}
         analyticsActions={analyticsActions}
         canPinItems={false}
-        router={{ params: { categoryId: '1' }, location: { query: '' } }}
+        match={{ params: { categoryId: '1' }, location: { query: '' } }}
+        location={{}}
       />,
     );
   });
@@ -121,8 +125,8 @@ describe('AlgorithmsColumn', () =>
         browserHistory.push = jest.fn();
         algorithmsColumnComponent.instance().handleDoubleClick(algorithmId);
 
-        expect(browserHistory.push).toHaveBeenCalledTimes(1);
-        expect(browserHistory.push).toHaveBeenCalledWith(`/builder/?o=${algorithmId}`);
+        expect(algorithmsColumnComponent.instance().browserHistory.push).toHaveBeenCalledTimes(1);
+        expect(algorithmsColumnComponent.instance().browserHistory.push).toHaveBeenCalledWith(`/builder/?o=${algorithmId}`);
       });
     });
 
@@ -142,14 +146,15 @@ describe('AlgorithmsColumn', () =>
             analytics={analytics}
             analyticsActions={analyticsActions}
             canPinItems={true}
-            router={{ params: { categoryId: '1' }, location: { query: '' } }}
+            match={{ params: { categoryId: '1' }, location: { query: '' } }}
+            location={{}}
           />,
         );
 
         browserHistory.push = jest.fn();
         algorithmsColumnComponent.instance().handleDoubleClick(algorithmId);
 
-        expect(browserHistory.push).not.toHaveBeenCalled();
+        expect(algorithmsColumnComponent.instance().browserHistory.push).not.toHaveBeenCalled();
       });
     });
   });
