@@ -42,11 +42,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-export default function()
+// Copyright 2017 Terrain Data, Inc.
+
+import ESJSONParser from 'shared/database/elastic/parser/ESJSONParser';
+import ESValueInfo from 'shared/database/elastic/parser/ESValueInfo';
+
+export enum ESParameterType
 {
-  return {
-    replace: jest.fn(),
-    push: jest.fn(),
-  };
+  Unknown,
+  // meta parameter
+  MetaParent,
+  MetaDate,
+  // given parameter
+  GivenName,
 }

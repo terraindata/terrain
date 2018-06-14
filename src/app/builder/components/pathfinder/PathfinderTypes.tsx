@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable no-var-requires
+// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable no-var-requires member-access
 
 /*
   User Friendly Builder, Codename: Pathfinder
@@ -555,6 +555,7 @@ class PathfinderContextC extends BaseClass
   public builderState: BuilderState = null;
   public parentSource?: Source = null;
   public parentName?: string = null;
+  public pathErrorMap?: Map<string, List<string>> = null;
 }
 export type PathfinderContext = PathfinderContextC & IRecord<PathfinderContextC>;
 export const _PathfinderContext = (config?: { [key: string]: any }) =>
