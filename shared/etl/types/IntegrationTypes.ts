@@ -89,6 +89,7 @@ export interface AuthConfigTypes
 {
   Sftp: {
     key: string;
+    password: string;
   };
   Http: {
     jwt: string;
@@ -119,6 +120,7 @@ export interface ConnectionConfigTypes
   Sftp: {
     ip: string;
     port: number;
+    username: string;
   };
   Http: {
     url: string;

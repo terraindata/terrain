@@ -65,14 +65,62 @@ export default class SFTPEndpoint extends AEndpointStream
 
   public async getSource(source: SourceConfig): Promise<Readable[]>
   {
-    const config: SSH.ConnectConfig = await this.getIntegrationConfig(source.integrationId);
+    const genericConfig: object = await this.getIntegrationConfig(source.integrationId);
+    if (genericConfig['username'] != null && genericConfig['username'] !== ''
+      && genericConfig['password'] != null && genericConfig['password'] != '')
+    {
+      delete genericConfig['privateKey'];
+    }
+    else
+    {
+      if (genericConfig['username'] !== undefined)
+      {
+        delete genericConfig['username'];
+      }
+      if (genericConfig['password'] !== undefined)
+      {
+        delete genericConfig['password'];
+      }
+      if (genericConfig['ip'] !== undefined)
+      {
+        genericConfig['host'] = genericConfig['ip'];
+        delete genericConfig['ip'];
+      }
+    }
+
+    const config: SSH.ConnectConfig = genericConfig as SSH.ConnectConfig;
+    console.log('config: ', JSON.stringify(config as object, null, 2));
     const sftp: SSH.SFTPWrapper = await this.getSFTPClient(config);
+    console.log('sftp client: ', sftp);
     return this.getSFTPList(source, sftp);
   }
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
-    const config: SSH.ConnectConfig = await this.getIntegrationConfig(sink.integrationId);
+    const genericConfig: object = await this.getIntegrationConfig(sink.integrationId);
+    if (genericConfig['username'] != null && genericConfig['username'] !== ''
+      && genericConfig['password'] != null && genericConfig['password'] != '')
+    {
+      delete genericConfig['privateKey'];
+    }
+    else
+    {
+      if (genericConfig['username'] !== undefined)
+      {
+        delete genericConfig['username'];
+      }
+      if (genericConfig['password'] !== undefined)
+      {
+        delete genericConfig['password'];
+      }
+      if (genericConfig['ip'] !== undefined)
+      {
+        genericConfig['host'] = genericConfig['ip'];
+        delete genericConfig['ip'];
+      }
+    }
+
+    const config: SSH.ConnectConfig = genericConfig as SSH.ConnectConfig;
     const sftp: SSH.SFTPWrapper = await this.getSFTPClient(config);
     return sftp.createWriteStream(sink.options['filepath']);
   }

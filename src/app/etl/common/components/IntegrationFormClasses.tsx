@@ -155,9 +155,17 @@ class SftpForm extends IntegrationFormBase<SftpAuthT, SftpConnectionT>
       type: DisplayType.TextBox,
       displayName: 'Private Key',
     },
+    password: {
+      type: DisplayType.TextBox,
+      displayName: 'Password',
+    },
   };
 
   public connectionMap: InputDeclarationMap<SftpConnectionT> = {
+    username: {
+      type: DisplayType.TextBox,
+      displayName: 'Username',
+    },
     ip: {
       type: DisplayType.TextBox,
       displayName: 'IP Address',
