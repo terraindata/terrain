@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires max-classes-per-file
+
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -55,19 +56,19 @@ import Util from 'util/Util';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import
+{
+  RootPostProcessConfig,
+  SinkConfig,
+  SourceConfig,
+} from 'shared/etl/immutable/EndpointRecords';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import ListForm from 'common/components/ListForm';
 import ObjectForm from 'common/components/ObjectForm';
 import { EndpointFormBase } from 'etl/common/components/EndpointFormClasses.tsx';
-import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import
-{
-  FileConfig as FileConfigI,
-  SftpOptions, SinkOptionsType, Sinks, SourceOptionsType,
-  Sources, SQLOptions,
-} from 'shared/etl/types/EndpointTypes';
+
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 import
 {
@@ -75,6 +76,7 @@ import
   PostProcessConfig,
   PostProcessOptionsType,
   PostProcessTypes,
+  RootPostProcessConfig as RootPostProcessConfigI,
 } from 'shared/etl/types/PostProcessTypes';
 import Quarantine from 'util/RadiumQuarantine';
 
@@ -83,14 +85,19 @@ import 'common/components/ObjectForm.less';
 
 const { List } = Immutable;
 
-type FormState = SourceOptionsType<Sources.GoogleAnalytics>;
-export class GoogleAnalyticsForm extends EndpointFormBase<FormState>
+export interface Props
 {
+  rootPostProcessConfig: RootPostProcessConfig;
+  onChange: (config: RootPostProcessConfig, isBlur?: boolean) => void;
+  style?: any;
+}
+
+type FormState = RootPostProcessConfigI;
+
+export class PostProcessForm extends TerrainComponent<Props>
+{
+
   public inputMap: InputDeclarationMap<FormState> = {
-    dayInterval: {
-      type: DisplayType.NumberBox,
-      displayName: 'Day Interval',
-    },
     transformations: {
       type: DisplayType.Custom,
       widthFactor: -1,
@@ -120,7 +127,7 @@ export class GoogleAnalyticsForm extends EndpointFormBase<FormState>
         key={index}
         className='object-form-row'
       >
-        <PostProcessForm
+        <TransformForm
           transformation={transformation}
           onChange={this.transformationChangeFactory(index)}
         />
@@ -141,14 +148,13 @@ export class GoogleAnalyticsForm extends EndpointFormBase<FormState>
   {
     return (cfg: PostProcessConfig, apply?: boolean) =>
     {
-      const { endpoint, onChange } = this.props;
-      const options: FormState = endpoint.options;
-      const newList = options.transformations.slice();
+      const { rootPostProcessConfig, onChange } = this.props;
+      const transformations: PostProcessConfig[] = rootPostProcessConfig.transformations;
+      const newList = transformations.slice();
       newList[index] = cfg;
-      const newOptions = _.extend({}, options, {
-        transformations: newList,
-      });
-      onChange(endpoint.set('options', newOptions), apply);
+      // const newTransformations = newList,
+      // });
+      onChange(rootPostProcessConfig.set('transformations', newList), apply);
     };
   }
 
@@ -167,6 +173,20 @@ export class GoogleAnalyticsForm extends EndpointFormBase<FormState>
     );
   }
 
+  public render()
+  {
+    return (
+      <DynamicForm
+        inputMap={this.inputMap}
+        // inputState={this.configToState(this.props.rootPostProcessConfig)}
+        // onStateChange={this.handleFormChange}
+        inputState={this.props.rootPostProcessConfig}
+        onStateChange={this.props.onChange}
+        style={this.props.style}
+      />
+    );
+  }
+
   public renderAddNewRow()
   {
     return (
@@ -182,21 +202,26 @@ export class GoogleAnalyticsForm extends EndpointFormBase<FormState>
 
   public addRow()
   {
-    const { endpoint, onChange } = this.props;
-    const transformations = endpoint.options.transformations !== undefined ?
-      endpoint.options.transformations :
+    const { rootPostProcessConfig, onChange } = this.props;
+    const transformations = rootPostProcessConfig.transformations != null ?
+      rootPostProcessConfig.transformations :
       [];
 
     const newItems = transformations.slice();
     newItems.push({
       type: 'Aggregate',
-      options: {},
+      options: {
+        fields: null,
+        operation: null,
+        pattern: null,
+        primaryKey: null,
+      },
     });
 
-    const newOptions = _.extend({}, endpoint.options, {
-      transformations: newItems,
-    });
-    onChange(endpoint.set('options', newOptions), true);
+    // const newOptions = _.extend({}, endpoint.options, {
+    //   transformations: newItems,
+    // });
+    onChange(rootPostProcessConfig.set('transformations', newItems), true);
   }
 
   @instanceFnDecorator(_.memoize)
@@ -204,18 +229,18 @@ export class GoogleAnalyticsForm extends EndpointFormBase<FormState>
   {
     return () =>
     {
-      const { endpoint, onChange } = this.props;
-      const transformations = endpoint.options.transformations !== undefined ?
-        endpoint.options.transformations :
+      const { rootPostProcessConfig, onChange } = this.props;
+      const transformations = rootPostProcessConfig.transformations != null ?
+        rootPostProcessConfig.transformations :
         [];
 
       const newItems = transformations.slice();
       newItems.splice(index, 1);
 
-      const newOptions = _.extend({}, endpoint.options, {
-        transformations: newItems,
-      });
-      onChange(endpoint.set('options', newOptions), true);
+      // const newOptions = _.extend({}, endpoint.options, {
+      //   transformations: newItems,
+      // });
+      onChange(rootPostProcessConfig.set('transformations', newItems), true);
     };
   }
 }
@@ -230,7 +255,7 @@ export interface PPTProps
   onChange: (cfg: PostProcessConfig, apply?: boolean) => void;
 }
 
-export class PostProcessForm extends TerrainComponent<PPTProps>
+export class TransformForm extends TerrainComponent<PPTProps>
 {
   public postProcessOptions: List<string> = List(['Aggregate']);
   public inputMap: InputDeclarationMap<PostProcessConfig> = {
@@ -278,7 +303,7 @@ export class PostProcessForm extends TerrainComponent<PPTProps>
   public getCurrentOptions()
   {
     const { transformation } = this.props;
-    return transformation.options !== undefined ? transformation.options : {};
+    return transformation.options != null ? transformation.options : {};
   }
 
   public handleOptionsChange(options, apply?: boolean)
@@ -344,7 +369,7 @@ export class AggregateForm extends TerrainComponent<AggregateProps>
 
   public renderFieldsForm(state: AggregateState, disabled)
   {
-    const fields = state.fields !== undefined ? state.fields : [];
+    const fields = state.fields != null ? state.fields : [];
     return (
       <ListForm
         items={fields}

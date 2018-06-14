@@ -42,38 +42,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file no-unused-expression
 
-import { Readable, Writable } from 'stream';
-
-import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
-import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
-import IntegrationConfig from '../../integrations/IntegrationConfig';
-import { integrations } from '../../scheduler/SchedulerRouter';
-
-/**
- * Abstract class for converting a result stream to a string stream for export formatting
- */
-export default abstract class AEndpointStream
+export enum InputFileTypes
 {
-  constructor()
-  {
-  }
-
-  public async getIntegrationConfig(integrationId: number): Promise<object>
-  {
-    const integration: IntegrationConfig[] = await integrations.get(null, integrationId);
-    if (integration.length === 0)
-    {
-      throw new Error('Invalid integration ID.');
-    }
-
-    const connectionConfig = integration[0].connectionConfig;
-    const authConfig = integration[0].authConfig;
-    return Object.assign(connectionConfig, authConfig);
-  }
-
-  public abstract async getSource(source: SourceConfig): Promise<Readable | Readable[]>;
-
-  public abstract async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>;
+  Date = 'Date',
+  Number = 'Number',
+  Text = 'Text',
 }
+
+// export interface FileInputTypes
+// {
+//   format: string;
+//   name: string;
+//   type: FileInputTypeEnum;
+//   options?:
+//   {
+//     dayInterval: number;
+//   };
+// }
+export interface InputConfig
+{
+  type: InputTypes;
+  options: InputOptionsType<InputTypes>;
+}
+
+export interface InputOptionsTypes
+{
+  File: {
+    dayInterval: number;
+    format: string;
+    name: string;
+    type: InputFileTypes;
+  };
+}
+
+export interface RootInputConfig
+{
+  inputs: InputConfig[];
+}
+
+export type InputTypes = keyof InputOptionsTypes;
+export type InputOptionsType<key extends InputTypes> = InputOptionsTypes[key];
