@@ -58,8 +58,8 @@ export default class XMLExportTransform extends AExportTransform
   constructor(path: string)
   {
     super();
-    const options = {headless: true};
-    if (path)
+    const options = { headless: true };
+    if (path === '' || path === undefined || path === null)
     {
       options['rootName'] = path;
     }
