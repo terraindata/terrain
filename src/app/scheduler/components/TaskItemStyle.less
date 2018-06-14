@@ -1,0 +1,34 @@
+@import "../../common/Common.less";
+
+.task-item-wrapper {
+	width: 200px;
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 6px;
+    flex-grow: 1;
+    max-width: 200px;
+    .task-item-header {
+    	height: 30px;
+    	margin-bottom: 6px;
+    	.task-item-name {
+    		width: 100%;
+    		height: 100%;
+			font-size: 18px;
+    		margin-left: 6px;
+		    position: relative;
+		    top: 5px;
+    	}
+    }
+    .task-item-body {
+    	margin-left: 6px;
+    	margin-right: 6px;
+    }
+    .task-item-subtask-buttons {
+    	display: flex;
+    	cursor: pointer;
+    	justify-content: center;
+    	.task-item-subtask-button {
+    		padding: 6px;
+    	}
+    }
+}

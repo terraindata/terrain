@@ -69,6 +69,8 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import SchedulerApi from 'scheduler/SchedulerApi';
 import XHR from 'util/XHR';
+import TaskItem from 'app/scheduler/components/TaskItem';
+import Button from 'app/common/components/Button';
 
 export interface Props
 {
@@ -245,6 +247,13 @@ class ScheduleEditor extends TerrainComponent<Props>
     );
   }
 
+  public handleTaskChange(newTask: TaskConfig)
+  {
+    let { schedule } = this.state;
+    const index = schedule.tasks.findIndex((task) => task.id === newTask.id);
+    this.handleScheduleChange('tasks', schedule.tasks.set(index, newTask));
+  }
+
   public renderTask(task, level, pos)
   {
     if (!task)
@@ -252,20 +261,25 @@ class ScheduleEditor extends TerrainComponent<Props>
       return this.renderSpacer(level, pos);
     }
     return (
-      <div
+      <TaskItem
+        task={task}
+        type={'ROOT'}
+        onDelete={_.noop}
+        onCreateSubtask={_.noop}
+        onTaskChange={this.handleTaskChange}
         key={task.id}
-      >
-        TASK: {task.id}
-      </div>
+      />
     );
   }
 
   public renderSpacer(level, pos)
   {
-    return (<div
-      key={String(level) + '-' + String(pos)}>
-      SPACER
-      </div>);
+    return (
+      <div
+        key={String(level) + '-' + String(pos)}
+        style={{width: 200}}
+      />
+    );
   }
 
   public renderTasks(tasks: List<TaskConfig>)
@@ -292,17 +306,54 @@ class ScheduleEditor extends TerrainComponent<Props>
           children.map((level, index) =>
             <div
               key={index}
-              style={{ display: 'flex' }}
+              style={{ display: 'flex', justifyContent: 'center' }}
             >
-              <span
-                style={{ margin: 'auto' }}
-              >
                 {
                   level.map((item) => item)
                 }
-              </span>
             </div>,
           )
+        }
+      </div>
+    );
+  }
+
+  public save()
+  {
+    const { schedule } = this.state;
+    this.props.schedulerActions({
+      actionType: 'updateSchedule',
+      schedule,
+    });
+    // Update route to go back
+    this.browserHistory.push('/data/schedules');
+  }
+
+  public cancel()
+  {
+    // Go back don't save
+    this.browserHistory.push('/data/schedules');
+  }
+
+  public renderButtons()
+  {
+    return (
+      <div
+        className='integration-buttons'
+      >
+        <Button
+          text={'Cancel'}
+          onClick={this.cancel}
+          size={'small'}
+        />
+        {
+          this.state.schedule &&
+          <Button
+            text={'Save'}
+            onClick={this.save}
+            size={'small'}
+            theme={'active'}
+          />
         }
       </div>
     );
@@ -315,9 +366,8 @@ class ScheduleEditor extends TerrainComponent<Props>
     let tasks = List();
     if (schedule)
     {
-      tasks = this.orderTasks(testTasks);
+      tasks = this.orderTasks(schedule.tasks);
     }
-    console.log('Tasks are ', tasks);
     if (!schedule)
     {
       return (<div>NO SCHEDULE</div>);
@@ -332,6 +382,9 @@ class ScheduleEditor extends TerrainComponent<Props>
         }
         {
           this.renderTasks(tasks)
+        }
+        {
+          this.renderButtons()
         }
       </div>
     );
