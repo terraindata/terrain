@@ -71,7 +71,6 @@ export interface Props
   onChange: (newConfig: IntegrationConfig, apply?: boolean) => void;
   hideType?: boolean;
   hideName?: boolean;
-  debounceAll?: boolean;
 }
 
 export default class IntegrationForm extends TerrainComponent<Props>
@@ -116,7 +115,6 @@ export default class IntegrationForm extends TerrainComponent<Props>
             inputMap={this.nameMap}
             inputState={this.nameValueToState(integration)}
             onStateChange={this.handleNameChange}
-            debounceAll={this.props.debounceAll}
           />
         }
         {
@@ -132,7 +130,6 @@ export default class IntegrationForm extends TerrainComponent<Props>
             <FormClass
               integration={integration}
               onChange={this.handleIntegrationChange}
-              debounceAll={this.props.debounceAll}
             />
             : null
         }
@@ -156,20 +153,27 @@ export default class IntegrationForm extends TerrainComponent<Props>
     };
   }
 
-  public handleTypeChange(state: { type: Integrations })
+  public handleTypeChange(state: { type: Integrations }, blur: boolean)
   {
-    const { integration, onChange } = this.props;
-    const newIntegration = integration
-      .set('authConfig', {})
-      .set('connectionConfig', {})
-      .set('type', state.type);
-    onChange(newIntegration);
+    if (blur)
+    {
+      const { integration, onChange } = this.props;
+      const newIntegration = integration
+        .set('authConfig', {})
+        .set('connectionConfig', {})
+        .set('type', state.type);
+      onChange(newIntegration);
+    }
   }
 
-  public handleNameChange(state: { name: string })
+  public handleNameChange(state: { name: string }, blur?: boolean)
   {
-    const { integration, onChange } = this.props;
-    onChange(integration.set('name', state.name));
+    if (blur)
+    {
+      const { integration, onChange } = this.props;
+      onChange(integration.set('name', state.name));
+    }
+
   }
 
   public handleIntegrationChange(newIntegration: IntegrationConfig, apply?: boolean)
