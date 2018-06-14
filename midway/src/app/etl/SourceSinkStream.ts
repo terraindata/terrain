@@ -188,7 +188,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
         }
       });
 
-      if (sourceStream !== undefined)
+      if (sourceStream !== undefined || importStreams.length === 1)
       {
         importStream = importStreams[0];
       }
