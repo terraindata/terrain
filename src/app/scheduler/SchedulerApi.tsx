@@ -60,17 +60,35 @@ class SchedulerApi
   public createSchedule(schedulerConfig)
   {
     const body = schedulerConfig;
-    return this.xhr.post('/scheduler', { body });
+    return this.xhr.post('/scheduler', { body }, {
+      params: {
+        id: localStorage['id'],
+        accessToken: localStorage['accessToken'],
+        body: {},
+      },
+    });
   }
 
   public getSchedules()
   {
-    return this.xhr.get('/scheduler');
+    return this.xhr.get('/scheduler', {
+      params: {
+        id: localStorage['id'],
+        accessToken: localStorage['accessToken'],
+        body: {},
+      },
+    });
   }
 
   public getSchedule(id: number)
   {
-    return this.xhr.get(`/scheduler/${id}`);
+    return this.xhr.get(`/scheduler/${id}`, {
+      params: {
+        id: localStorage['id'],
+        accessToken: localStorage['accessToken'],
+        body: {},
+      },
+    });
   }
 
   public updateSchedule(id: number, changes)
@@ -78,37 +96,79 @@ class SchedulerApi
     return this.xhr.post(`/scheduler/${id}`,
       {
         body: changes,
+      }, {
+        params: {
+          id: localStorage['id'],
+          accessToken: localStorage['accessToken'],
+          body: {},
+        },
       });
   }
 
   public deleteSchedule(id: number)
   {
-    return this.xhr.post(`/scheduler/delete/${id}`);
+    return this.xhr.post(`/scheduler/delete/${id}`, undefined, {
+      params: {
+        id: localStorage['id'],
+        accessToken: localStorage['accessToken'],
+        body: {},
+      },
+    });
   }
 
   public duplicateSchedule(id: number)
   {
-    return this.xhr.post(`/scheduler/duplicate/${id}`);
+    return this.xhr.post(`/scheduler/duplicate/${id}`, undefined, {
+      params: {
+        id: localStorage['id'],
+        accessToken: localStorage['accessToken'],
+        body: {},
+      },
+    });
   }
 
   public getScheduleLog(schedulerId: number)
   {
-    return this.xhr.get(`/scheduler/log/${schedulerId}`);
+    return this.xhr.get(`/scheduler/log/${schedulerId}`, {
+      params: {
+        id: localStorage['id'],
+        accessToken: localStorage['accessToken'],
+        body: {},
+      },
+    });
   }
 
   public pauseSchedule(id: number)
   {
-    return this.xhr.post(`/scheduler/pause/${id}`);
+    return this.xhr.post(`/scheduler/pause/${id}`, undefined, {
+      params: {
+        id: localStorage['id'],
+        accessToken: localStorage['accessToken'],
+        body: {},
+      },
+    });
   }
 
   public unpauseSchedule(id: number)
   {
-    return this.xhr.post(`/scheduler/unpause/${id}`);
+    return this.xhr.post(`/scheduler/unpause/${id}`, undefined, {
+      params: {
+        id: localStorage['id'],
+        accessToken: localStorage['accessToken'],
+        body: {},
+      },
+    });
   }
 
   public runSchedule(id: number)
   {
-    return this.xhr.post(`/scheduler/run/${id}`);
+    return this.xhr.post(`/scheduler/run/${id}`, undefined, {
+      params: {
+        id: localStorage['id'],
+        accessToken: localStorage['accessToken'],
+        body: {},
+      },
+    });
   }
 
   public setScheduleStatus(id: number, status: boolean)
@@ -116,6 +176,13 @@ class SchedulerApi
     return this.xhr.post(`/scheduler/status/${id}`,
       {
         body: { status },
+      },
+      {
+        params: {
+          id: localStorage['id'],
+          accessToken: localStorage['accessToken'],
+          body: {},
+        },
       });
   }
 }

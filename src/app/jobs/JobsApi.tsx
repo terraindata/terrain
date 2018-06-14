@@ -59,17 +59,35 @@ class JobsApi
 
   public getJobs()
   {
-    return this.xhr.get('/jobs');
+    return this.xhr.get('/jobs', {
+      params: {
+        id: localStorage['id'],
+        accessToken: localStorage['accessToken'],
+        body: {},
+      },
+    });
   }
 
   public getJob(id: number)
   {
-    return this.xhr.get(`/jobs/${id}`);
+    return this.xhr.get(`/jobs/${id}`, {
+      params: {
+        id: localStorage['id'],
+        accessToken: localStorage['accessToken'],
+        body: {},
+      },
+    });
   }
 
   public getJobLogs(jobId: string)
   {
-    return this.xhr.get(`/jobs/log/${jobId}`);
+    return this.xhr.get(`/jobs/log/${jobId}`, {
+      params: {
+        id: localStorage['id'],
+        accessToken: localStorage['accessToken'],
+        body: {},
+      },
+    });
   }
 }
 

@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 import axios, { AxiosInstance } from 'axios';
+import MidwayError from '../../../shared/error/MidwayError';
 
 class XHR
 {
@@ -56,24 +57,19 @@ class XHR
         baseURL: MIDWAY_HOST + '/midway/v1',
         timeout: 180000,
         withCredentials: false,
-        params: {
-          id: localStorage['id'],
-          accessToken: localStorage['accessToken'],
-          body: {},
-        },
       });
 
     terrainAxios.interceptors.response.use(
       (response) => response,
       (error) =>
       {
-        let processedError = error;
-        if (processedError && processedError.response)
+        let status = 400;
+        if (error && error.response && error.response.status)
         {
-          processedError = error.response.data.errors[0].detail;
+          status = error.response.status;
         }
-
-        return Promise.reject(processedError);
+        const routeError: MidwayError = new MidwayError(status, 'The Connection Has Been Lost.', JSON.stringify(error), {});
+        return Promise.reject(routeError);
       },
     );
 

@@ -59,6 +59,7 @@ import
   getPendingJobs,
   getRunningJobs,
 } from 'jobs/data/JobsSelectors';
+import * as TerrainLog from 'loglevel';
 import * as React from 'react';
 import Util from 'util/Util';
 import './Jobs.less';
@@ -102,11 +103,11 @@ class Jobs extends TerrainComponent<any> {
     this.props.jobsActions({ actionType: 'getJobs' })
       .then((response) =>
       {
+        TerrainLog.debug('Get all jobs: ' + JSON.stringify(response));
         this.setState({ responseText: JSON.stringify(response), jobs: response.data });
       })
       .catch((error) =>
       {
-        console.error(error);
         this.setState({ responseText: error });
       });
   }
