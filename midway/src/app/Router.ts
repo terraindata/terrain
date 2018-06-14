@@ -141,6 +141,8 @@ export function getRouter()
     const allowedNames: string[] = [
       'bundle.js',
       'vendor.bundle.js',
+      'bundle.js.gz',
+      'vendor.bundle.js.gz',
     ];
 
     // Allow any files matching these extensions
@@ -168,6 +170,11 @@ export function getRouter()
 
     if (process.env.NODE_ENV === 'production')
     {
+      if (ctx.params['asset'].includes('.gz'))
+      {
+        ctx.set('Content-Encoding', 'gzip');
+      }
+
       await send(ctx, `/midway/src/assets/${ctx.params['asset']}`);
     }
     else
