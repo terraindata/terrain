@@ -61,6 +61,11 @@ export interface PostProcessConfig
   options: PostProcessOptionsType<PostProcessTypes>;
 }
 
+export interface RootPostProcessConfig
+{
+  transformations: PostProcessConfig[];
+}
+
 export interface PostProcessOptionsTypes
 {
   Aggregate: {
