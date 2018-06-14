@@ -81,7 +81,7 @@ export const Ajax =
       Ajax.reduxStoreDispatch = config.reduxStoreDispatch;
     },
 
-    req(method: 'post' | 'get',
+    req(method: 'post' | 'get' | 'delete',
       url: string,
       body: object,
       onLoad: (response: object) => void,
@@ -678,6 +678,28 @@ export const Ajax =
         },
       );
     },
+
+    deleteItem(item: Item,
+      onLoad?: (resp: any) => void, onError?: (ev: Event) => void)
+    {
+      const id = item.id;
+      const route = `items/${id}`;
+      onLoad = onLoad || _.noop;
+
+      return Ajax.req(
+        'delete',
+        route,
+        null,
+        (respArray) =>
+        {
+          onLoad(respArray[0]);
+        },
+        {
+          onError,
+        },
+      );
+    },
+
     /**
      * Query M2
      */
