@@ -76,12 +76,7 @@ export class Databases
 
   public async select(columns: string[], filter?: object): Promise<DatabaseConfig[]>
   {
-    return new Promise<DatabaseConfig[]>(async (resolve, reject) =>
-    {
-      const rawResults = await App.DB.select(this.databaseTable, columns, filter);
-      const results: DatabaseConfig[] = rawResults.map((result: object) => new DatabaseConfig(result));
-      resolve(results);
-    });
+    return App.DB.select(this.databaseTable, columns, filter) as Promise<DatabaseConfig[]>;
   }
 
   public async get(id?: number, fields?: string[]): Promise<DatabaseConfig[]>

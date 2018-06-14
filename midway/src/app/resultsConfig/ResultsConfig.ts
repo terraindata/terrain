@@ -66,12 +66,7 @@ export class ResultsConfig
 
   public async select(columns: string[], filter: object): Promise<ResultsConfigConfig[]>
   {
-    return new Promise<ResultsConfigConfig[]>(async (resolve, reject) =>
-    {
-      const rawResults = await App.DB.select(this.resultsConfigTable, columns, filter);
-      const results: ResultsConfigConfig[] = rawResults.map((result: object) => new ResultsConfigConfig(result));
-      resolve(results);
-    });
+    return App.DB.select(this.resultsConfigTable, columns, filter) as Promise<ResultsConfigConfig[]>;
   }
 
   public async get(id?: number, index?: string): Promise<ResultsConfigConfig[]>

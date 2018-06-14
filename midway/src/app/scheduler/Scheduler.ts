@@ -419,13 +419,7 @@ export class Scheduler
   private async _select(columns: string[], filter: object,
     forUpdate?: boolean, noWait?: boolean, skipLocked?: boolean, handle?: TransactionHandle): Promise<SchedulerConfig[]>
   {
-    return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
-    {
-      const rawResults: object[] = await App.DB.select(this.schedulerTable, columns, filter, forUpdate, noWait, skipLocked, handle);
-
-      const results: SchedulerConfig[] = rawResults.map((result: object) => new SchedulerConfig(result as SchedulerConfig));
-      resolve(results);
-    });
+    return App.DB.select(this.schedulerTable, columns, filter, forUpdate, noWait, skipLocked, handle) as Promise<SchedulerConfig[]>;
   }
 
   private async _setStatus(id: number, status: boolean): Promise<SchedulerConfig[]>
