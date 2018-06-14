@@ -133,6 +133,8 @@ const NewTheme =
     logLevels,
 
     todayHighlight: NTColors.blue5,
+
+    dateViewLabel: NTColors.blue4,
   };
 
 // Will be deprecated
