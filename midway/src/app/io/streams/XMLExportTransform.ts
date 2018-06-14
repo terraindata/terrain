@@ -55,15 +55,20 @@ export default class XMLExportTransform extends AExportTransform
 {
   private builder: xml2js.Builder;
 
-  constructor()
+  constructor(path: string)
   {
     super();
-    this.builder = new xml2js.Builder();
+    const options = {headless: true};
+    if (path)
+    {
+      options['rootName'] = path;
+    }
+    this.builder = new xml2js.Builder(options);
   }
 
   protected preamble(): string
   {
-    return '\n';
+    return '<channel>';
   }
 
   protected transform(input: object, chunkNumber: number): string
@@ -78,6 +83,6 @@ export default class XMLExportTransform extends AExportTransform
 
   protected conclusion(chunkNumber: number): string
   {
-    return '\n';
+    return '</channel>';
   }
 }
