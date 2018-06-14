@@ -147,9 +147,9 @@ const DateUtil =
         (properSign === '+' || properSign === '-') &&
         (!properAmount.includes('+') && !properAmount.includes('-'))
         && (!isNaN((Number(properNumber))))
-        && (DateUnitArray.includes(properUnit))
+        && (DateUnitArray.indexOf(properUnit) !== -1)
       );
-    }
+    },
 
     formatDateValue(date)
     {
@@ -160,6 +160,10 @@ const DateUtil =
       else if (DateUtil.isValidElasticDateParameter(date))
       {
         return DateUtil.formatSpecificDate(date);
+      }
+      else if (date.charAt(0) === '@')
+      {
+        return date; // Input
       }
       else
       {
