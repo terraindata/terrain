@@ -54,8 +54,8 @@ import TerrainTabs from 'common/components/TerrainTabs';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import './Account.less';
 
-import ConnectionEditorPage from './ConnectionEditorPage';
-import Connections from './Connections';
+import ConnectionEditorPage from 'app/connections/components/ConnectionEditorPage';
+import Connections from 'app/connections/components/Connections';
 import EditProfile from './EditProfile';
 import Notifications from './Notifications';
 import Profile from './Profile';
@@ -106,7 +106,7 @@ class Account extends TerrainComponent<Props>
                 <Route exact path='/account/settings' component={Settings} />
                 <Route exact path='/account/notifications' component={Notifications} />
                 <Route exact path='/account/connections' component={Connections} />
-                <Route exact path='/account/connections/edit/connectionId=:connectionId' component={ConnectionEditorPage} />
+                <Route path='/account/connections/edit' component={ConnectionEditorPage} />
                 <Route exact path='/account/team' component={Team} />
               </Switch>
             </div>

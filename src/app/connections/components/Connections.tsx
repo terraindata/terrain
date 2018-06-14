@@ -51,13 +51,9 @@ import { List, Map } from 'immutable';
 import * as React from 'react';
 
 import TerrainTools from 'app/util/TerrainTools';
-import { AuthState } from 'auth/AuthTypes';
 import { Colors, fontColor } from 'colors/Colors';
 import Badge from 'common/components/Badge';
-import FadeInOut from 'common/components/FadeInOut';
-import Switch from 'common/components/Switch';
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
 import BackendInstance from '../../../database/types/BackendInstance';
 import CreateItem from '../../common/components/CreateItem';
@@ -66,12 +62,11 @@ import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
 import TerrainComponent, { browserHistory } from '../../common/components/TerrainComponent';
 import { HeaderConfig, HeaderConfigItem, ItemList } from '../../etl/common/components/ItemList';
+import { UserActions } from '../../users/data/UserRedux';
 import Ajax, { AjaxResponse } from '../../util/Ajax';
-import { UserActions } from '../data/UserRedux';
-import * as UserTypes from '../UserTypes';
 
-const CheckIcon = require('../../../images/icon_checkMark.svg');
-const CloseIcon = require('../../../images/icon_close_8x8.svg');
+const CheckIcon = require('images/icon_checkMark.svg');
+const CloseIcon = require('images/icon_close_8x8.svg');
 
 import './Connections.less';
 
@@ -87,48 +82,31 @@ export interface Connection extends BackendInstance
 export interface Props
 {
   params?: any;
-  history?: any;
-  children?: any;
-  // injected props
-  schema?: SchemaState;
-  auth?: AuthState;
-  users?: UserTypes.UserState;
   userActions?: typeof UserActions;
 }
 
 export interface State
 {
-  typeIndex: number;
   loading: boolean;
   connections: Connection[];
   addingConnection: boolean;
   errorModalOpen: boolean;
   errorModalMessage: string;
-  analyticsEnabled: number;
 }
 
 class Connections extends TerrainComponent<Props>
 {
   public state: State = {
-    typeIndex: 0,
     loading: true,
     connections: null,
     addingConnection: false,
     errorModalOpen: false,
     errorModalMessage: '',
-    analyticsEnabled: 0,
   };
 
   public xhr: AjaxResponse = null;
   public analyticsIndex: any = null;
   public analyticsType: any = null;
-
-  public ConnectionTypes = List(
-    [
-      'elastic',
-      'mysql',
-    ],
-  );
 
   constructor(props: Props)
   {
@@ -185,16 +163,11 @@ class Connections extends TerrainComponent<Props>
   {
     const connections = this.state.connections;
     const connection = connections[index];
-    browserHistory.push(`/account/connections/connectionId=${connection.id}`)
+    browserHistory.push(`/account/connections/edit/connectionId=${connection.id}`)
   }
 
   public createConnection()
   {
-    this.props.userActions({
-      actionType: 'createConnection',
-      connection: { id: undefined } as Connection,
-    });
-
     // Ajax.createDb(
     //   name,
     //   address,
@@ -211,131 +184,19 @@ class Connections extends TerrainComponent<Props>
     //     });
     //   },
     // );
-  }
 
-  public handleTypeChange(index: number)
-  {
-    this.setState({
-      typeIndex: index,
-    });
-
-    const type = this.ConnectionTypes.get(index);
-  }
-
-  public renderAddConnection()
-  {
-    const userId = this.props.auth.id;
-    const user = this.props.users.users.get(userId) as UserTypes.User;
-
-    if (user && user.isSuperUser)
-    {
-      if (this.state.addingConnection)
-      {
-        return (
-          <div className='create-connection'>
-            <h3>Add a new connection</h3>
-            <div className='flex-container'>
-              <div className='flex-grow'>
-                <b>Connection Type</b>
-                <div>
-                  <Dropdown
-                    selectedIndex={this.state.typeIndex}
-                    options={this.ConnectionTypes}
-                    onChange={this.handleTypeChange}
-                    canEdit={true}
-                    className='create-connection-dropdown'
-                  />
-                </div>
-              </div>
-              <div className='flex-grow'>
-                <b>Name</b>
-                <div>
-                  <input
-                    ref='name'
-                    placeholder='Connection Name'
-                  />
-                </div>
-              </div>
-              <div className='flex-grow'>
-                <b>Address</b>
-                <div>
-                  <input
-                    ref='address'
-                    placeholder='Connection Address (DSN)'
-                  />
-                </div>
-              </div>
-            </div>
-            {this.renderAnalyticsConnection()}
-            <div className='button' onClick={this.createConnection}>
-              Create
-            </div>
-            <div className='button' onClick={this._toggle('addingConnection')}>
-              Cancel
-            </div>
-          </div>
-        );
-      }
-
-      return (
-        <CreateItem
-          name='New Connection'
-          onCreate={this._toggle('addingConnection')}
-        />
-      );
-    }
-    return null;
-  }
-
-  public renderAnalyticsConnection()
-  {
-    const { analyticsEnabled } = this.state;
-
-    return (
-      <div className='connections-analytics flex-container'>
-        <div className='left-column flex-grow'>
-          <h4>Set Analytics Index and Type</h4>
-          <Switch
-            medium={true}
-            first='On'
-            second='Off'
-            selected={analyticsEnabled}
-            onChange={this.handleAnalyticsSwitch}
-          />
-        </div>
-        <div className='right-column flex-grow'>
-          <FadeInOut open={analyticsEnabled === 1}>
-            <div className='flex-grow'>
-              <b>Index</b>
-              <div>
-                <input
-                  ref={(input) => this.analyticsIndex = input}
-                  placeholder='Index'
-                />
-              </div>
-            </div>
-            <div className='flex-grow'>
-              <b>Type</b>
-              <div>
-                <input
-                  ref={(input) => this.analyticsType = input}
-                  placeholder='Type'
-                />
-              </div>
-            </div>
-          </FadeInOut>
-        </div>
-      </div>
-    );
+    browserHistory.push(`/account/connections/edit`)
   }
 
   public getConnectionActions(index: number, connection: Connection)
   {
     return (
-      <CloseIcon
+      <div
         className='close'
         onClick={this._fn(this.removeConnection, connection.id)}
-      />
+      >
+      <CloseIcon />
+      </div>
     );
   }
 
@@ -404,7 +265,7 @@ class Connections extends TerrainComponent<Props>
         className='connections-page'
       >
         <div
-          className='connection-list-wrapper'
+          className='connections-list-wrapper'
         >
           <ItemList
             items={List(connections)}
@@ -453,7 +314,7 @@ class Connections extends TerrainComponent<Props>
 
 const ConnectionList = Util.createTypedContainer(
   Connections,
-  ['auth', 'schema', 'users'],
+  [],
   { userActions: UserActions },
 );
 
