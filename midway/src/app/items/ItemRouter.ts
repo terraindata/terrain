@@ -163,4 +163,11 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   }
 });
 
+Router.delete('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('delete items');
+  await items.delete(ctx.params.id);
+  ctx.body = '';
+});
+
 export default Router;
