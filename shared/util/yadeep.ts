@@ -90,12 +90,12 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
     return;
   }
 
-  const waypoint: WayPoint = path.get(0);
+  const waypoint: WayPoint = path.get(0).toString();
 
   const keys: string[] = Object.keys(obj);
 
   // Handle the case of encountering a wildcard
-  if (waypoint === -1)
+  if (path.get(0) === -1)
   {
     const results: any[] = [];
     for (let j: number = 0; j < keys.length; j++)
