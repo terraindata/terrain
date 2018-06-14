@@ -427,6 +427,8 @@ class GoogleAnalyticsForm extends IntegrationFormBase<GoogleAnalyticsAuthT, Goog
     return (
       <ObjectForm
         object={state.metrics != null ? state.metrics : {}}
+        keyName='alias'
+        valueName='expression'
         onChange={this.handleMetricsChange}
         label='Metrics'
       />

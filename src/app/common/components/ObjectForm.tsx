@@ -113,9 +113,10 @@ export default class ObjectForm extends TerrainComponent<Props>
 
   public renderRow(key: string | object, index: number)
   {
-    if (!Array.isArray(this.props.object))
+    const { keyName, object, onChange, valueName } = this.props;
+    if (!Array.isArray(object) && (keyName == null || valueName == null))
     {
-      const value = this.props.object[key as string];
+      const value = object[key as string];
 
       return (
         <div
@@ -139,12 +140,26 @@ export default class ObjectForm extends TerrainComponent<Props>
         </div>
       );
     }
-    else
+    else if (!Array.isArray(object) && (keyName != null && valueName != null))
     {
-      const value = this.props.object[index];
-      const inputStateObj: object = key as object;
-      // inputStateObj[this.props.keyName] = key as object;
-      // inputStateObj[this.props.valueName] = value;
+      // convert props.object from kv format to array format
+      const objectKeys = Object.keys(object);
+      const newState: object[] = [];
+      objectKeys.forEach((objectKey) =>
+      {
+        const newKV: object = {};
+        newKV[keyName] = objectKey;
+        newKV[valueName] = object[objectKey];
+        newState.push(newKV);
+      });
+      this.props.onChange(newState, true);
+    }
+
+    if (Array.isArray(object))
+    {
+      const value = object[index];
+      const inputStateObj: object = { key: value[keyName], value: value[valueName] };
+
       return (
         <div
           key={index}
@@ -223,7 +238,7 @@ export default class ObjectForm extends TerrainComponent<Props>
       }
       else
       {
-        const newState = this.props.object.slice();
+        const newState = (this.props.object as object[]).slice();
         newState.splice(index, 1);
         this.props.onChange(newState, true);
       }
@@ -235,23 +250,36 @@ export default class ObjectForm extends TerrainComponent<Props>
   {
     return (newKV: KVPair, apply) =>
     {
-      const oldKey = Object.keys(this.props.object)[index];
-      const newState = _.extend({}, this.props.object);
-
-      if (oldKey !== newKV.key)
+      if (!Array.isArray(this.props.object))
       {
-        if (newState[newKV.key] === undefined)
+        const oldKey = Object.keys(this.props.object)[index];
+        const newState = _.extend({}, this.props.object);
+
+        if (oldKey !== newKV.key)
         {
-          delete newState[oldKey];
+          if (newState[newKV.key] === undefined)
+          {
+            delete newState[oldKey];
+          }
+          else
+          {
+            this.props.onChange(this.props.object, apply);
+            return;
+          }
         }
-        else
-        {
-          this.props.onChange(this.props.object, apply);
-          return;
-        }
+        newState[newKV.key] = newKV.value;
+        this.props.onChange(newState, apply);
       }
-      newState[newKV.key] = newKV.value;
-      this.props.onChange(newState, apply);
+      else
+      {
+        const oldRow = this.props.object[index];
+        const newState = this.props.object.slice();
+        const newRow: object = {};
+        newRow[this.props.keyName] = newKV.key;
+        newRow[this.props.valueName] = newKV.value;
+        newState[index] = newRow;
+        this.props.onChange(newState, apply);
+      }
     };
   }
 
@@ -259,7 +287,7 @@ export default class ObjectForm extends TerrainComponent<Props>
   public addRow()
   {
     const { keyName, object, onChange, valueName } = this.props;
-    if (!Array.isArray(object))
+    if (!Array.isArray(object) && (keyName == null || valueName == null))
     {
       // find a unique key
       let newName = 'New Field';
@@ -283,14 +311,14 @@ export default class ObjectForm extends TerrainComponent<Props>
       newState[newName] = '';
       onChange(newState, true);
     }
-    else
+    else if (Array.isArray(object))
     {
       if (keyName !== undefined && valueName !== undefined)
       {
         const newObj: object = {};
         newObj[keyName] = 'New Field';
         newObj[valueName] = '';
-        const newState = object.slice();
+        const newState = (object as object[]).slice();
         newState.push(newObj);
         onChange(newState, true);
       }
