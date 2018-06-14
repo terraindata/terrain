@@ -89,9 +89,7 @@ export default class SFTPEndpoint extends AEndpointStream
     }
 
     const config: SSH.ConnectConfig = genericConfig as SSH.ConnectConfig;
-    console.log('config: ', JSON.stringify(config as object, null, 2));
     const sftp: SSH.SFTPWrapper = await this.getSFTPClient(config);
-    console.log('sftp client: ', sftp);
     return this.getSFTPList(source, sftp);
   }
 
