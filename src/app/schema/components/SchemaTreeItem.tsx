@@ -468,13 +468,10 @@ class SchemaTreeItem extends TerrainComponent<Props>
                   this.renderName()
                 }
                 {
-                  isSelected ?
-                    <SchemaTreeContextActions
-                      id={this.props.id}
-                      type={this.props.type}
-                    />
-                    :
-                    null
+                  <SchemaTreeContextActions
+                    id={this.props.id}
+                    type={this.props.type}
+                  />
                 }
               </div>
             </div>

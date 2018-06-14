@@ -43,38 +43,45 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file no-unused-expression
 
-import * as csv from 'fast-csv';
-import { Transform } from 'stream';
-
-/**
- * Import/Export from a CSV format. *
- * Additional configuration options are possible.
- */
-export default class CSVTransform
+export enum InputFileTypes
 {
-  public static createImportStream(
-    headers: boolean = true,
-    delimiter: string = ',',
-  ): Transform
-  {
-    return csv({
-      headers,
-      delimiter,
-      discardUnmappedColumns: true,
-    });
-  }
-
-  public static createExportStream(
-    headers: boolean | string[] = true,
-    delimiter: string = ',',
-    rowDelimiter: string = '\r\n',
-  ): Transform
-  {
-    return csv.createWriteStream({
-      headers,
-      delimiter,
-      rowDelimiter,
-    });
-  }
+  Date = 'Date',
+  Number = 'Number',
+  Text = 'Text',
 }
+
+// export interface FileInputTypes
+// {
+//   format: string;
+//   name: string;
+//   type: FileInputTypeEnum;
+//   options?:
+//   {
+//     dayInterval: number;
+//   };
+// }
+export interface InputConfig
+{
+  type: InputTypes;
+  options: InputOptionsType<InputTypes>;
+}
+
+export interface InputOptionsTypes
+{
+  File: {
+    dayInterval: number;
+    format: string;
+    name: string;
+    type: InputFileTypes;
+  };
+}
+
+export interface RootInputConfig
+{
+  inputs: InputConfig[];
+}
+
+export type InputTypes = keyof InputOptionsTypes;
+export type InputOptionsType<key extends InputTypes> = InputOptionsTypes[key];

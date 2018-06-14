@@ -75,6 +75,7 @@ export interface Props
   onDuplicate: (id: ID) => void;
   onArchive: (id: ID) => void;
   onUnarchive: (id: ID) => void;
+  onDelete: (id: ID) => void;
   canArchive: boolean;
   canDuplicate: boolean;
   canUnarchive: boolean;
@@ -90,6 +91,7 @@ export interface Props
   canDrag: boolean;
   canCreate: boolean;
   canRename: boolean;
+  canDelete: boolean;
 
   onHover: (index: number, type: string, id: ID) => void;
   // ^ called on target
@@ -167,6 +169,21 @@ class LibraryItem extends TerrainComponent<Props>
             onClick: this.showTextfield,
           },
         ]),
+      duplicateRenameDelete:
+        List([
+          {
+            text: 'Duplicate',
+            onClick: this.handleDuplicate,
+          },
+          {
+            text: 'Rename',
+            onClick: this.showTextfield,
+          },
+          {
+            text: 'Delete',
+            onClick: this.handleDelete,
+          },
+        ]),
       archive:
         List([
           {
@@ -211,6 +228,21 @@ class LibraryItem extends TerrainComponent<Props>
           {
             text: 'Unarchive',
             onClick: this.handleUnarchive,
+          },
+        ]),
+      unarchiveRenameDelete:
+        List([
+          {
+            text: 'Rename',
+            onClick: this.showTextfield,
+          },
+          {
+            text: 'Unarchive',
+            onClick: this.handleUnarchive,
+          },
+          {
+            text: 'Delete',
+            onClick: this.handleDelete,
           },
         ]),
       duplicateArchive:
@@ -294,6 +326,11 @@ class LibraryItem extends TerrainComponent<Props>
   public handleUnarchive()
   {
     this.props.onUnarchive(this.props.id);
+  }
+
+  public handleDelete()
+  {
+    this.props.onDelete(this.props.id);
   }
 
   public handleKeyDown(event)
@@ -423,7 +460,7 @@ class LibraryItem extends TerrainComponent<Props>
     } = this.props;
     const draggingOver = isOver && dragItemType !== this.props.type;
 
-    const { canArchive, canDuplicate, canUnarchive, canRename } = this.props;
+    const { canArchive, canDuplicate, canUnarchive, canRename, canDelete } = this.props;
     const menuOptions =
       (canArchive && canDuplicate && canRename) ? this.menuOptions.duplicateRenameArchive :
         (
@@ -431,19 +468,25 @@ class LibraryItem extends TerrainComponent<Props>
             (
               (canArchive && canRename) ? this.menuOptions.archiveRename :
                 (
-                  (canDuplicate && canRename) ? this.menuOptions.duplicateRename :
+                  (canDuplicate && canRename && canDelete) ? this.menuOptions.duplicateRenameDelete :
                     (
-                      (canUnarchive && canRename) ? this.menuOptions.unarchiveRename :
+                      (canDuplicate && canRename) ? this.menuOptions.duplicateRename :
                         (
-                          (canUnarchive ? this.menuOptions.unarchive :
+                          (canUnarchive && canRename && canDelete) ? this.menuOptions.unarchiveRenameDelete :
                             (
-                              (canArchive ? this.menuOptions.archive :
+                              (canUnarchive && canRename) ? this.menuOptions.unarchiveRename :
                                 (
-                                  canDuplicate ? this.menuOptions.duplicate : this.menuOptions.none
+                                  (canUnarchive ? this.menuOptions.unarchive :
+                                    (
+                                      (canArchive ? this.menuOptions.archive :
+                                        (
+                                          canDuplicate ? this.menuOptions.duplicate : this.menuOptions.none
+                                        )
+                                      )
+                                    )
+                                  )
                                 )
-                              )
                             )
-                          )
                         )
                     )
                 )

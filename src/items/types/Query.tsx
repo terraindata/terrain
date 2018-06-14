@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import { List, Map, Record } from 'immutable';
 
+import * as Immutable from 'immutable';
 import { BaseClass, createRecordType, New } from 'shared/util/Classes';
 import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
 import { _ResultsConfig } from '../../../shared/results/types/ResultsConfig';
@@ -90,6 +91,7 @@ class QueryC
   cardsAndCodeInSync: boolean = false;
 
   path: Path = _Path();
+  pathErrorMap: Map<string, List<string>> = Map<string, List<string>>();
 
   resultsViewMode: string = 'Hits';
   aggregationList: Map<string, Aggregation> = Map<string, Aggregation>();
@@ -121,6 +123,7 @@ export const _Query = (config?: object) =>
   config['tuningOrder'] = List<string>(config['tuningOrder']);
   config['aggregationList'] = Map<string, Aggregation>(config['aggregationList']);
   config['path'] = _Path(config['path']);
+  config['pathErrorMap'] = Immutable.fromJS(config['pathErrorMap'] || {});
   if (config)
   {
     if (!config['modelVersion'] || config['modelVersion'] < 3)

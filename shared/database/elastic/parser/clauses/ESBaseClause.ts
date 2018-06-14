@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import { ESParameterType } from 'shared/database/elastic/parser/ESParameter';
 import ESClauseSettings from '../ESClauseSettings';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
@@ -64,10 +65,20 @@ export default class ESBaseClause extends ESClause
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     let jsonType = valueInfo.jsonType;
-
     if (ESJSONType[valueInfo.jsonType] === 'parameter')
     {
-      if (valueInfo.parameterValue !== null && valueInfo.parameterValue.getValueInfo() !== null)
+      if (valueInfo.parameterType === ESParameterType.Unknown)
+      {
+        interpreter.accumulateError(
+          valueInfo,
+          'Found an parameter whose value type is unknown when expecting a base type.'
+          + ' This value should be a base value: null, boolean, number, or string.');
+        return;
+      } else if (valueInfo.parameterType === ESParameterType.MetaParent)
+      {
+        // metaParent can be anything, so avoid keep digging
+        return;
+      } else
       {
         jsonType = valueInfo.parameterValue.getValueInfo().jsonType;
       }
@@ -83,11 +94,21 @@ export default class ESBaseClause extends ESClause
         break;
 
       default:
-        interpreter.accumulateError(
-          valueInfo,
-          'Found an ' +
-          ESJSONType[valueInfo.jsonType] +
-          ' when expecting a base type. This value should be a base value: null, boolean, number, or string.');
+        if (valueInfo.jsonType === ESJSONType.parameter)
+        {
+          interpreter.accumulateError(
+            valueInfo,
+            'Found an parameter whose value type is ' +
+            ESJSONType[valueInfo.parameterValue.getValueInfo().jsonType] +
+            ' when expecting a base type. This value of the parameter should be a base value: null, boolean, number, or string.');
+        } else
+        {
+          interpreter.accumulateError(
+            valueInfo,
+            'Found an ' +
+            ESJSONType[valueInfo.jsonType] +
+            ' when expecting a base type. This value should be a base value: null, boolean, number, or string.');
+        }
         break;
     }
   }

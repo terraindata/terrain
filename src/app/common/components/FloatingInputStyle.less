@@ -17,7 +17,18 @@
   min-width: 100px;
   
   height: 48px;
-  
+  .floating-input-warning {
+    position: absolute;
+    top: 23px;
+    right: 10px;
+
+    .tooltip-is-error {
+      height: 16px;
+      width: 16px;
+      fill: #d14f42;
+      transform: rotate(180deg);
+    }
+  }
   &.floating-input-container-small {
     height: 45px;
   }

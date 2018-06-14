@@ -693,7 +693,7 @@ export class TransformationEngine
   private addPrimitiveField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any): List<number>
   {
     // console.log('x3 ' + currentKeyPath.push(key.toString()));
-    return ids.push(this.addField(currentKeyPath.push(key.toString()), typeof obj[key]));
+    return ids.push(this.addField(currentKeyPath.push(key), typeof obj[key]));
   }
 
   private addArrayField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any, depth: number = 1): List<number>
@@ -715,11 +715,11 @@ export class TransformationEngine
     {
       arrayType = null;
     }
-    const arrayID: number = this.addField(currentKeyPath.push(key.toString()), 'array');
+    const arrayID: number = this.addField(currentKeyPath.push(key), 'array');
     ids = ids.push(arrayID);
     this.setFieldProp(arrayID, KeyPath(['valueType']), arrayType);
     // console.log('adding awid ' + currentKeyPath.push(key.toString()).push(-1));
-    let awkp: KeyPath = currentKeyPath.push(key.toString());
+    let awkp: KeyPath = currentKeyPath.push(key);
     awkp = awkp.slice(0, awkp.size - depth + 1).toList();
     for (let i: number = 0; i < depth; i++)
     {
@@ -735,19 +735,19 @@ export class TransformationEngine
       // const arrayKey_i: any = arrayKey.push(i.toString());
       if (isPrimitive(obj[key][i]))
       {
-        ids = this.addPrimitiveField(ids, obj[key], currentKeyPath.push(key.toString()), i);
+        ids = this.addPrimitiveField(ids, obj[key], currentKeyPath.push(key), i);
         // ids = ids.push(this.addField(currentKeyPath.push(arrayKey_i), typeof obj[key]));
       } else if (Array.isArray(obj[key][i]))
       {
         // console.log('cpk2 ' + currentKeyPath.push(key.toString()) + ' ' + JSON.stringify(obj[key][i]));
-        ids = this.addArrayField(ids, obj[key], currentKeyPath.push(key.toString()), i, depth + 1);
+        ids = this.addArrayField(ids, obj[key], currentKeyPath.push(key), i, depth + 1);
       } else
       {
         // console.log('x1 ' + currentKeyPath.push(key.toString()).push(i.toString()));
-        ids = ids.push(this.addField(currentKeyPath.push(key.toString()).push(i.toString()), typeof obj[key][i]));
+        ids = ids.push(this.addField(currentKeyPath.push(key).push(i), typeof obj[key][i]));
         // console.log('foo ' + currentKeyPath.push(key.toString()).push(i.toString()));
         ids = this.addObjectField(ids, obj[key][i], awkp, true);
-        ids = this.addObjectField(ids, obj[key][i], currentKeyPath.push(key.toString()).push(i.toString()), true);
+        ids = this.addObjectField(ids, obj[key][i], currentKeyPath.push(key).push(i), true);
       }
     }
     return ids;
@@ -866,10 +866,12 @@ export class TransformationEngine
             const upto: KeyPath = key.slice(0, key.indexOf(-1)).toList();
             for (let j: number = 0; j < Object.keys(yadeep.get(o, upto)).length; j++)
             {
-              const newKeyReplaced: KeyPath = newKey.set(newKey.indexOf(-1), j.toString());
-              const oldKeyReplaced: KeyPath = key.set(key.indexOf(-1), j.toString());
-              if (Object.keys(yadeep.get(o, oldKeyReplaced.slice(0, -1).toList()))
-                .indexOf(oldKeyReplaced.get(oldKeyReplaced.size - 1).toString()) !== -1)
+              const newKeyReplaced: KeyPath = newKey.set(newKey.indexOf(-1), j);
+              const oldKeyReplaced: KeyPath = key.set(key.indexOf(-1), j);
+              const oldKeyReplacedWithoutLast = oldKeyReplaced.butLast().toList();
+              if (oldKeyReplaced.last() === -1 ||
+                (yadeep.get(o, oldKeyReplacedWithoutLast) != null &&
+                  Object.keys(yadeep.get(o, oldKeyReplacedWithoutLast)).indexOf(oldKeyReplaced.last().toString()) !== -1))
               {
                 // console.log('r here1');
                 this.renameHelper(r, o, newKeyReplaced, this.fieldNameToIDMap.get(newKeyReplaced), oldKeyReplaced);

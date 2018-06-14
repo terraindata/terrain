@@ -135,7 +135,8 @@ export class Tasty
    *
    * @memberOf TastyInterface
    */
-  public async select(table: TastyTable, columns?: string[], filter?: object, handle?: TransactionHandle): Promise<object[]>
+  public async select(table: TastyTable, columns?: string[], filter?: object,
+    forUpdate?: boolean, noWait?: boolean, skipLocked?: boolean, handle?: TransactionHandle): Promise<object[]>
   {
     const query: TastyQuery = new TastyQuery(table);
     if (columns === undefined || columns.length === 0)
@@ -150,6 +151,21 @@ export class Tasty
     if (node !== null)
     {
       query.filter(node);
+    }
+
+    if (forUpdate === true)
+    {
+      query.forUpdate();
+    }
+
+    if (noWait === true)
+    {
+      query.noWait();
+    }
+
+    if (skipLocked)
+    {
+      query.skipLocked();
     }
 
     return this.execute(query, handle);
@@ -233,7 +249,7 @@ export class Tasty
   }
 
   public async executeTransaction(handler: (handle: TransactionHandle, commit: () => Promise<void>, rollback: () => Promise<void>)
-    => Promise<void>, isolationLevel = IsolationLevel.DEFAULT, readOnly = false)
+    => Promise<any>, isolationLevel = IsolationLevel.DEFAULT, readOnly = false)
   {
     const handle = await this.db.startTransaction(isolationLevel, readOnly);
     let live = true;
@@ -241,8 +257,8 @@ export class Tasty
     {
       if (live)
       {
-        await this.db.commitTransaction(handle);
         live = false;
+        await this.db.commitTransaction(handle);
       }
       else
       {
@@ -253,21 +269,28 @@ export class Tasty
     {
       if (live)
       {
-        await this.db.rollbackTransaction(handle);
         live = false;
+        await this.db.rollbackTransaction(handle);
       }
       else
       {
         throw new Error('Transaction is not live');
       }
     };
+    let result;
     try
     {
-      await handler(handle, commit, rollback);
+      result = await handler(handle, commit, rollback);
     }
     catch (error)
     {
-      await rollback();
+      try
+      {
+        await rollback();
+      }
+      catch (e)
+      {
+      }
       throw error;
     }
     if (live)
@@ -275,6 +298,7 @@ export class Tasty
       await rollback();
       throw new Error('Transaction was not ended');
     }
+    return result;
   }
 
   public async schema(): Promise<TastySchema>

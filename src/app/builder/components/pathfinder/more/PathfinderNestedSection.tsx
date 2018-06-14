@@ -130,7 +130,7 @@ class PathfinderNestedSection extends TerrainComponent<Props>
     }
     const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested');
     this.props.builderActions.changePath(nestedKeyPath,
-      this.props.nested.push(_Path({ name: undefined, step: 0 })), true);
+      this.props.nested.push(_Path({ name: undefined, step: 0, source: { count: 3 } })), true);
   }
 
   public handleDeleteNested(i)
@@ -187,6 +187,11 @@ class PathfinderNestedSection extends TerrainComponent<Props>
     return childName === undefined ||
       childName === '' ||
       this.state.childNames[childName] < 2;
+  }
+
+  public isValidParentName(parentName)
+  {
+    return !/[\@\-\s]/g.test(parentName);
   }
 
   public getChildNames(props)
@@ -251,6 +256,8 @@ class PathfinderNestedSection extends TerrainComponent<Props>
                         forceFloat={true}
                         noBorder={false}
                         showEllipsis={true}
+                        showWarning={!this.isValidParentName(reference)}
+                        warningText={'Parent alias cannot contain dashes or spaces'}
                       />,
                       PathfinderText.referenceExplanation,
                     )

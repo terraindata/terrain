@@ -44,37 +44,33 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as csv from 'fast-csv';
-import { Transform } from 'stream';
+import * as winston from 'winston';
 
-/**
- * Import/Export from a CSV format. *
- * Additional configuration options are possible.
- */
-export default class CSVTransform
+import PostgreSQLDB from '../../../../src/database/pg/tasty/PostgreSQLDB';
+import TastyNode from '../../../../src/tasty/TastyNode';
+import TastyQuery from '../../../../src/tasty/TastyQuery';
+import TastyTable from '../../../../src/tasty/TastyTable';
+
+beforeAll(async () =>
 {
-  public static createImportStream(
-    headers: boolean = true,
-    delimiter: string = ',',
-  ): Transform
-  {
-    return csv({
-      headers,
-      delimiter,
-      discardUnmappedColumns: true,
-    });
-  }
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
+});
 
-  public static createExportStream(
-    headers: boolean | string[] = true,
-    delimiter: string = ',',
-    rowDelimiter: string = '\r\n',
-  ): Transform
-  {
-    return csv.createWriteStream({
-      headers,
-      delimiter,
-      rowDelimiter,
-    });
-  }
-}
+test('Postgres: generator', async (done) =>
+{
+  const db = new PostgreSQLDB(null);
+  const table = new TastyTable(
+    'test',
+    ['id'],
+    ['fname', 'lname'],
+  );
+  const query = new TastyQuery(table).select([table.getColumns().get('lname')])
+    .filter(table.getColumns().get('lname').lt(TastyNode.make('ABC')))
+    .filter(table.getColumns().get('lname').gt(TastyNode.make('A')))
+    .noWait().forUpdate();
+  expect(db.generate(query)).toEqual(
+    [['SELECT test.lname FROM test\n  WHERE test.lname < $1\n     AND test.lname > $2\n  FOR UPDATE\n  NOWAIT;'], [['ABC', 'A']]],
+  );
+  done();
+});
