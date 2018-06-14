@@ -119,14 +119,19 @@ class CategoriesColumn extends TerrainComponent<Props>
 
   public handleArchive(id: ID)
   {
-    this.props.categoryActions.change(this.props.categories.find((g) => g.id === id)
+    this.props.categoryActions.change(this.props.categories.get(id)
       .set('status', ItemStatus.Archive) as Category);
   }
 
   public handleUnarchive(id: ID)
   {
-    this.props.categoryActions.change(this.props.categories.find((g) => g.id === id)
+    this.props.categoryActions.change(this.props.categories.get(id)
       .set('status', ItemStatus.Build) as Category);
+  }
+
+  public handleDelete(id: ID)
+  {
+    this.props.categoryActions.remove(this.props.categories.get(id));
   }
 
   public handleNameChange(id: ID, name: string)
@@ -191,8 +196,7 @@ class CategoriesColumn extends TerrainComponent<Props>
     const canEdit = canCreate || (me && me.isSuperUser);
     const canDrag = false;
 
-    let canRename = true;
-    canRename = this.props.algorithms.every(
+    const canRename = this.props.algorithms.every(
       (v: Algorithm) =>
       {
         if (id === v.categoryId)
@@ -203,7 +207,6 @@ class CategoriesColumn extends TerrainComponent<Props>
         }
         return true;
       },
-
     );
     // onDuplicate={this.handleDuplicate}
     return (
@@ -229,10 +232,12 @@ class CategoriesColumn extends TerrainComponent<Props>
         canDuplicate={false}
         canUnarchive={category.status === ItemStatus.Archive}
         canRename={canRename}
+        canDelete={canEdit && canRename && category.status === ItemStatus.Archive}
         onUnarchive={this.handleUnarchive}
         canCreate={canCreate}
         isSelected={+category.id === +params.categoryId}
         isFocused={this.props.isFocused}
+        onDelete={this.handleDelete}
       >
         <div className='category-library-info-wrapper'>
           {
