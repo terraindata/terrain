@@ -83,12 +83,13 @@ export interface Props
   router?: any;
   route?: any;
   schedules?: Map<ID, SchedulerConfig>;
-  schedulerActions?: typeof ETLActions;
+  schedulerActions?: typeof SchedulerActions;
 }
 
 interface State
 {
   schedule: SchedulerConfig;
+  orderedTasks: List<TaskConfig>;
 }
 
 function getScheduleId(params): number
@@ -97,59 +98,24 @@ function getScheduleId(params): number
   return Number.isNaN(asNumber) ? -1 : asNumber;
 }
 
-const testTasks: List<TaskConfig> = List([
-  _TaskConfig({
-    id: 0,
-    onFailure: 1,
-    onSuccess: 2,
-  }),
-  _TaskConfig({
-    id: 1,
-    onFailure: 4,
-    onSuccess: 3,
-  }), _TaskConfig({
-    id: 2,
-    onFailure: undefined,
-    onSuccess: undefined,
-  }),
-  _TaskConfig({
-    id: 3,
-    onFailure: 5,
-    onSuccess: 7,
-  }), _TaskConfig({
-    id: 4,
-    onFailure: 6,
-    onSuccess: undefined,
-  }), _TaskConfig({
-    id: 5,
-    onFailure: undefined,
-    onSuccess: undefined,
-  }), _TaskConfig({
-    id: 6,
-    onFailure: undefined,
-    onSuccess: undefined,
-  }), _TaskConfig({
-    id: 7,
-    onFailure: undefined,
-    onSuccess: undefined,
-  }),
-]);
-
 class ScheduleEditor extends TerrainComponent<Props>
 {
-
   public state: State = {
     schedule: null,
+    orderedTasks: List(),
   };
 
   public componentDidMount()
   {
     const { schedules, match } = this.props;
+    const schedule = schedules.get(getScheduleId(match.params));
     this.setState({
-      schedule: schedules.get(getScheduleId(match.params)),
+      schedule,
+      orderedTasks: schedule ? this.orderTasks(schedule.tasks) : [],
     });
     this.props.schedulerActions({
       actionType: 'getSchedules',
+
     });
   }
 
@@ -163,21 +129,26 @@ class ScheduleEditor extends TerrainComponent<Props>
       (oldScheduleId !== scheduleId ||
         this.props.schedules !== nextProps.schedules))
     {
+      const schedule = nextProps.schedules.get(scheduleId);
       this.setState({
-        schedule: nextProps.schedules.get(scheduleId),
+        schedule,
+        orderedTasks: schedule ? this.orderTasks(schedule.tasks) : List(),
       });
     }
   }
 
-  public handleScheduleChange(key: string, value: any)
+  public handleScheduleChange(key: string, value: any, reorderTasks?: boolean)
   {
+    const schedule = this.state.schedule.set(key, value);
     this.setState({
-      schedule: this.state.schedule.set(key, value),
+      schedule,
+      orderedTasks: reorderTasks ? this.orderTasks(schedule.tasks) : this.state.orderedTasks,
     });
   }
 
-  public orderTasks(tasks: List<TaskConfig>)
+  public orderTasks(tasks: List<TaskConfig>): List<TaskConfig>
   {
+    console.log('ORDER TASKS');
     const orderedTasks: TaskConfig[] = [];
     orderedTasks[0] = tasks.get(0);
     for (let i = 0; i < tasks.size; i++)
@@ -188,7 +159,7 @@ class ScheduleEditor extends TerrainComponent<Props>
       }
       if (orderedTasks[i].onFailure !== null)
       {
-        orderedTasks[i * 2 + 1] = tasks.get(orderedTasks[i].onFailure);
+        orderedTasks[i * 2 + 1] = tasks.get(orderedTasks[i].onFailure).set('type', 'FAILURE');
       }
       else
       {
@@ -196,7 +167,7 @@ class ScheduleEditor extends TerrainComponent<Props>
       }
       if (orderedTasks[i].onSuccess !== null)
       {
-        orderedTasks[i * 2 + 2] = tasks.get(orderedTasks[i].onSuccess);
+        orderedTasks[i * 2 + 2] = tasks.get(orderedTasks[i].onSuccess).set('type', 'SUCCESS');
       }
       else
       {
@@ -249,29 +220,38 @@ class ScheduleEditor extends TerrainComponent<Props>
   public handleTaskChange(newTask: TaskConfig)
   {
     const { schedule } = this.state;
-    const index = schedule.tasks.findIndex((task) => task.id === newTask.id);
+    const index = schedule.tasks.findIndex((task) => task && task.id === newTask.id);
     this.handleScheduleChange('tasks', schedule.tasks.set(index, newTask));
   }
 
   public handleTaskDelete(id: ID)
   {
-    const { schedule } = this.state;
-    const index = schedule.tasks.findIndex((task) => task.id === id);
+    let { tasks } = this.state.schedule;
+    const index = tasks.findIndex((task) => task &&  task.id === id);
     // TODO DELETE ALL SUBTASKS!!
-    this.handleScheduleChange('tasks', schedule.tasks.delete(index));
+    // Find parent task
+    const parentIndex = tasks.findIndex((task) => task && (
+      task.onFailure === index || task.onSuccess === index));
+    const parentTask = tasks.get(parentIndex);
+    const isFailure = parentTask.onFailure === index;
+    tasks = tasks
+      .set(parentIndex, parentTask.set(isFailure ? 'onFailure' : 'onSuccess', undefined))
+      .set(index, undefined);
+    this.handleScheduleChange('tasks', tasks, true);
   }
 
   public handleAddSubtask(parentId: ID, type: 'SUCCESS' | 'FAILURE')
   {
     const { schedule } = this.state;
-    const parentIndex = schedule.tasks.findIndex((task) => task.id === parentId);
+    const parentIndex = schedule.tasks.findIndex((task) => task && task.id === parentId);
     const newTask = _TaskConfig({
       id: schedule.tasks.size,
       taskId: type === 'FAILURE' ? 0 : 2,
+      type,
     });
     const parentTask = schedule.tasks.get(parentIndex)
       .set(type === 'SUCCESS' ? 'onSuccess' : 'onFailure', schedule.tasks.size);
-    this.handleScheduleChange('tasks', schedule.tasks.set(parentIndex, parentTask).push(newTask));
+    this.handleScheduleChange('tasks', schedule.tasks.set(parentIndex, parentTask).push(newTask), true);
   }
 
   public renderTask(task, level, pos)
@@ -283,7 +263,7 @@ class ScheduleEditor extends TerrainComponent<Props>
     return (
       <TaskItem
         task={task}
-        type={level === 1 ? 'ROOT' : 'SUCCESS'}
+        type={task.type || 'ROOT'}
         onDelete={this.handleTaskDelete}
         onCreateSubtask={this.handleAddSubtask}
         onTaskChange={this.handleTaskChange}
@@ -386,14 +366,7 @@ class ScheduleEditor extends TerrainComponent<Props>
     {
       return (<div>NO SCHEDULE</div>);
     }
-    console.log('schedule tasks are ', schedule.tasks.toJS());
-    // TODO MEMOIZE THIS
-    let tasks = List();
-    if (schedule)
-    {
-      tasks = this.orderTasks(schedule.tasks);
-    }
-    console.log('ordered tasks are ', tasks.toJS());
+        console.log(schedule.tasks);
     return (
       <div>
         <div>
@@ -403,7 +376,7 @@ class ScheduleEditor extends TerrainComponent<Props>
           this.renderScheduleInfo()
         }
         {
-          this.renderTasks(tasks)
+          this.renderTasks(this.state.orderedTasks)
         }
         {
           this.renderButtons()

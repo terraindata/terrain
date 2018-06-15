@@ -100,6 +100,7 @@ export const _SchedulerState = (config?: any) =>
 class TaskConfigC extends SharedTaskConfig
 {
   // Any extra functions / properties go here
+  public type: 'ROOT' | 'SUCCESS' | 'FAILURE' = 'ROOT';
 }
 
 const TaskConfig_Record = createRecordType(new TaskConfigC(), 'TaskConfigC');

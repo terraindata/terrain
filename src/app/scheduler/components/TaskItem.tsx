@@ -117,6 +117,7 @@ class TaskItem extends TerrainComponent<Props>
     return (
       <div
         className='task-item-wrapper'
+        style={borderColor(type === 'SUCCESS' ? 'green' : type === 'FAILURE' ? 'red' : 'gray')}
       >
         <div
           className='task-item-header'
