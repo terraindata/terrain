@@ -65,12 +65,12 @@ class ConnectionsApi
 
   public getConnections()
   {
-    return this.xhr.get('/database');
+    return this.xhr.get('/database/status');
   }
 
   public getConnection(id: number)
   {
-    return this.xhr.get(`/database/${id}`);
+    return this.xhr.get(`/database/status/${id}`);
   }
 
   public updateConnection(id: number, changes)

@@ -174,14 +174,14 @@ class Connections extends TerrainComponent<Props>
     {
       return (
         <Badge
-            label={item[propertyName]}
-            color={this.getStatusColor(item[propertyName])}
+            label={item.get(propertyName)}
+            color={this.getStatusColor(item.get(propertyName))}
         />
       );
     }
     else if (propertyName === 'analytics')
     {
-      if (item['isAnalytics'])
+      if (item.get('isAnalytics'))
       {
         return (
           <div
@@ -197,17 +197,14 @@ class Connections extends TerrainComponent<Props>
     {
       return (
         <div>
-          { item[propertyName] }
+          { item.get(propertyName) }
         </div>
       );
     }
-
   }
 
   public render()
   {
-    console.log(this.props);
-
     const { connections } = this.props;
     const keys = connections.keySeq().toList().sort();
     const connList = keys.map((id) => connections.get(id));
@@ -266,7 +263,7 @@ class Connections extends TerrainComponent<Props>
 
 const ConnectionList = Util.createTypedContainer(
   Connections,
-  ['connections', 'connections'],
+  [['connections', 'connections']],
   { connectionsActions: ConnectionsActions },
 );
 

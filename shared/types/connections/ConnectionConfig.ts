@@ -51,6 +51,7 @@ export class ConnectionConfig
   public type: string = '';
   public dsn: string = '';
   public host: string = '';
+  public status: string = 'DISCONNECTED';
   public isAnalytics: boolean = false;
   public analyticsIndex?: string = '';
   public analyticsType?: string = '';
