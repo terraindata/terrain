@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:triple-equals
 
 import * as SSH from 'ssh2';
 import { Readable, Writable } from 'stream';
