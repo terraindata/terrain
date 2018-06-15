@@ -216,7 +216,6 @@ class ScheduleEditor extends TerrainComponent<Props>
         break;
       }
     }
-    console.log(taskList.toJS());
     return taskList;
   }
 
@@ -249,9 +248,30 @@ class ScheduleEditor extends TerrainComponent<Props>
 
   public handleTaskChange(newTask: TaskConfig)
   {
-    let { schedule } = this.state;
+    const { schedule } = this.state;
     const index = schedule.tasks.findIndex((task) => task.id === newTask.id);
     this.handleScheduleChange('tasks', schedule.tasks.set(index, newTask));
+  }
+
+  public handleTaskDelete(id: ID)
+  {
+    const { schedule } = this.state;
+    const index = schedule.tasks.findIndex((task) => task.id === id);
+    // TODO DELETE ALL SUBTASKS!!
+    this.handleScheduleChange('tasks', schedule.tasks.delete(index));
+  }
+
+  public handleAddSubtask(parentId: ID, type: 'SUCCESS' | 'FAILURE')
+  {
+    const { schedule } = this.state;
+    const parentIndex = schedule.tasks.findIndex((task) => task.id === parentId);
+    const newTask = _TaskConfig({
+      id: schedule.tasks.size,
+      taskId: type === 'FAILURE' ? 0 : 2,
+    });
+    const parentTask = schedule.tasks.get(parentIndex)
+      .set(type === 'SUCCESS' ? 'onSuccess' : 'onFailure', schedule.tasks.size);
+    this.handleScheduleChange('tasks', schedule.tasks.set(parentIndex, parentTask).push(newTask));
   }
 
   public renderTask(task, level, pos)
@@ -263,9 +283,9 @@ class ScheduleEditor extends TerrainComponent<Props>
     return (
       <TaskItem
         task={task}
-        type={'ROOT'}
-        onDelete={_.noop}
-        onCreateSubtask={_.noop}
+        type={level === 1 ? 'ROOT' : 'SUCCESS'}
+        onDelete={this.handleTaskDelete}
+        onCreateSubtask={this.handleAddSubtask}
         onTaskChange={this.handleTaskChange}
         key={task.id}
       />
@@ -362,16 +382,18 @@ class ScheduleEditor extends TerrainComponent<Props>
   public render()
   {
     const { schedule } = this.state;
+    if (!schedule)
+    {
+      return (<div>NO SCHEDULE</div>);
+    }
+    console.log('schedule tasks are ', schedule.tasks.toJS());
     // TODO MEMOIZE THIS
     let tasks = List();
     if (schedule)
     {
       tasks = this.orderTasks(schedule.tasks);
     }
-    if (!schedule)
-    {
-      return (<div>NO SCHEDULE</div>);
-    }
+    console.log('ordered tasks are ', tasks.toJS());
     return (
       <div>
         <div>

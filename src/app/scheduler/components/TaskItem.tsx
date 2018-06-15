@@ -63,6 +63,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import './TaskItemStyle.less';
 
+const DeleteIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 const EditableField = (props) =>
   props.editing && props.canEdit ? props.editComponent : props.readOnlyComponent;
 
@@ -112,7 +113,7 @@ class TaskItem extends TerrainComponent<Props>
 
   public render()
   {
-    const { task } = this.props;
+    const { task, type } = this.props;
     return (
       <div
         className='task-item-wrapper'
@@ -152,6 +153,15 @@ class TaskItem extends TerrainComponent<Props>
               </div>
             }
           />
+          {
+            type !== 'ROOT' &&
+            <div
+              className='task-item-delete close'
+              onClick={this._fn(this.props.onDelete, task.id)}
+            >
+              <DeleteIcon />
+            </div>
+          }
         </div>
         <div
           className='task-item-body'
