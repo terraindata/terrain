@@ -49,6 +49,7 @@ THE SOFTWARE.
 import './FloatingInputStyle.less';
 
 import * as classNames from 'classnames';
+import Autocomplete from 'common/components/Autocomplete';
 import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
@@ -56,7 +57,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import Autocomplete from 'common/components/Autocomplete';
 const InfoIcon = require('images/icon_info.svg');
 
 export let LARGE_FONT_SIZE = '52px';

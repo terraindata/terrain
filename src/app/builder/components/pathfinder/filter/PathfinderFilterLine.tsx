@@ -553,6 +553,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                   onChange={this.handleMapChange}
                   keyPath={this.props.keyPath}
                   canEdit={pathfinderContext.canEdit}
+                  options={this.props.valueOptions.map((opt) => opt.value).toList()}
                 />
               </div>
             );
