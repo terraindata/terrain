@@ -101,12 +101,7 @@ class XHR
       },
       (error: any) =>
       {
-        let status = 400;
-        if (error && error.response && error.response.status)
-        {
-          status = error.response.status;
-        }
-        const routeError: MidwayError = new MidwayError(status, 'The request is failed before sending out.', JSON.stringify(error), {});
+        const routeError = MidwayError.fromAxiosErrorResponse(error, 'The request is failed before sending out.');
         return Promise.reject(routeError);
       },
     );
@@ -116,12 +111,7 @@ class XHR
       (response: AxiosResponse) => response,
       (error: any) =>
       {
-        let status = 400;
-        if (error && error.response && error.response.status)
-        {
-          status = error.response.status;
-        }
-        const routeError: MidwayError = new MidwayError(status, 'The request is failed.', JSON.stringify(error), {});
+        const routeError = MidwayError.fromAxiosErrorResponse(error, 'failed request');
         return Promise.reject(routeError);
       },
     );
