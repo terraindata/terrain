@@ -165,7 +165,7 @@ export default class SQLGenerator
         {
           this.appendSubexpression(alias.query);
           this.queryString += ' AS ';
-          this.queryString += this.escapeString(alias.name);
+          this.queryString += '"' + this.escapeString(alias.name) + '"';
         },
         () =>
         {
@@ -179,7 +179,7 @@ export default class SQLGenerator
     // write FROM clause
     // this.newLine();
     this.queryString += 'FROM ';
-    this.queryString += this.escapeString(query.table.getTableName());
+    this.queryString += '"' + this.escapeString(query.table.getTableName()) + '"';
 
     // write WHERE clause
     if (query.filters.length > 0)
@@ -264,7 +264,7 @@ export default class SQLGenerator
     this.queryString += ' INTO ';
 
     const tableName: string = this.escapeString(query.table.getTableName());
-    this.queryString += tableName;
+    this.queryString += '"' + tableName + '"';
 
     const baseQuery = this.queryString;
 

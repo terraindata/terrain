@@ -99,7 +99,7 @@ test('Postgres Generator: mixedCase', async (done) =>
   expect(qstr).toBeInstanceOf(Array);
   expect(qstr.length).toBeGreaterThan(0);
   expect(qstr[0]).toEqual([
-    'INSERT INTO movies ("movieID", "releaseDate")' +
+    'INSERT INTO "movies" ("movieID", "releaseDate")' +
     ' VALUES ($1, $2)' +
     ' ON CONFLICT ("movieID") DO UPDATE SET ("movieID", "releaseDate") = ($1, $2)' +
     ' WHERE ("movies"."movieID") = (13371337) RETURNING "movieID" AS insertid;',
@@ -114,7 +114,7 @@ test('Postgres Generator: mixedCase', async (done) =>
   expect(qstr).toBeInstanceOf(Array);
   expect(qstr.length).toBeGreaterThan(0);
   expect(qstr[0]).toEqual([
-    'SELECT "movies"."movieID" FROM movies\n  WHERE "movies"."releaseDate" <> $1\n  ORDER BY "movies"."movieID" ASC;',
+    'SELECT "movies"."movieID" FROM "movies"\n  WHERE "movies"."releaseDate" <> $1\n  ORDER BY "movies"."movieID" ASC;',
   ]);
   done();
 });
@@ -131,7 +131,7 @@ test('Postgres: generator', async (done) =>
     .filter(table.getColumns().get('lname').gt(TastyNode.make('A')))
     .noWait().forUpdate();
   expect(pgDB.generate(query)).toEqual(
-    [['SELECT "test"."lname" FROM test\n  WHERE "test"."lname" < $1\n     AND "test"."lname" > $2\n  FOR UPDATE\n  NOWAIT;'],
+    [['SELECT "test"."lname" FROM "test"\n  WHERE "test"."lname" < $1\n     AND "test"."lname" > $2\n  FOR UPDATE\n  NOWAIT;'],
     [['ABC', 'A']]],
   );
   done();
