@@ -62,6 +62,7 @@ import
 import * as TerrainLog from 'loglevel';
 import * as React from 'react';
 import Util from 'util/Util';
+import MidwayError from '../../../../shared/error/MidwayError';
 import './Jobs.less';
 
 const INTERVAL = 60000;
@@ -106,8 +107,9 @@ class Jobs extends TerrainComponent<any> {
         TerrainLog.debug('Get all jobs: ' + JSON.stringify(response));
         this.setState({ responseText: JSON.stringify(response), jobs: response.data });
       })
-      .catch((error) =>
+      .catch((error: MidwayError) =>
       {
+        TerrainLog.debug('Got error when getting all jobs: ' + error.getDetail());
         this.setState({ responseText: error });
       });
   }
