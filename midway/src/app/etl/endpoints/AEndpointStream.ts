@@ -73,7 +73,7 @@ export default abstract class AEndpointStream
     return Object.assign(connectionConfig, authConfig);
   }
 
-  public abstract async getSource(source: SourceConfig): Promise<Readable>;
+  public abstract async getSource(source: SourceConfig): Promise<Readable | Readable[]>;
 
   public abstract async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>;
 }

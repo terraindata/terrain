@@ -43,70 +43,45 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file no-unused-expression
 
-import * as Tasty from '../../tasty/Tasty';
-import * as App from '../App';
-
-import DatabaseController from '../../database/DatabaseController';
-import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import * as Scripts from '../../scripts/Scripts';
-import * as Util from '../AppUtil';
-import { metrics } from '../events/EventRouter';
-import UserConfig from '../users/UserConfig';
-import ResultsConfigConfig from './ResultsConfigConfig';
-
-export class ResultsConfig
+export enum InputFileTypes
 {
-  private resultsConfigTable: Tasty.Table;
-
-  public initialize()
-  {
-    this.resultsConfigTable = App.TBLS.resultsConfig;
-  }
-
-  public async select(columns: string[], filter: object): Promise<ResultsConfigConfig[]>
-  {
-    return App.DB.select(this.resultsConfigTable, columns, filter) as Promise<ResultsConfigConfig[]>;
-  }
-
-  public async get(id?: number, index?: string): Promise<ResultsConfigConfig[]>
-  {
-    if (id !== undefined)
-    {
-      return this.select([], { id });
-    }
-    else if (index !== undefined)
-    {
-      return this.select([], { index });
-    }
-    return this.select([], {});
-  }
-
-  public async upsert(user: UserConfig, index: string, resultsConfig: ResultsConfigConfig): Promise<ResultsConfigConfig>
-  {
-    return new Promise<ResultsConfigConfig>(async (resolve, reject) =>
-    {
-      let toUpsert: ResultsConfigConfig = {
-        index,
-        thumbnail: resultsConfig.thumbnail,
-        name: resultsConfig.name,
-        score: resultsConfig.score,
-        fields: JSON.stringify(resultsConfig.fields),
-        formats: JSON.stringify(resultsConfig.formats),
-        primaryKeys: JSON.stringify(resultsConfig.primaryKeys),
-      };
-      if (index !== undefined)
-      {
-        const results: ResultsConfigConfig[] = await this.get(undefined, index);
-        if (results.length > 0)
-        {
-          // update the existing results config
-          toUpsert = Util.updateObject(results[0], toUpsert);
-        }
-      }
-      resolve(await App.DB.upsert(this.resultsConfigTable, toUpsert) as ResultsConfigConfig);
-    });
-  }
+  Date = 'Date',
+  Number = 'Number',
+  Text = 'Text',
 }
 
-export default ResultsConfig;
+// export interface FileInputTypes
+// {
+//   format: string;
+//   name: string;
+//   type: FileInputTypeEnum;
+//   options?:
+//   {
+//     dayInterval: number;
+//   };
+// }
+export interface InputConfig
+{
+  type: InputTypes;
+  options: InputOptionsType<InputTypes>;
+}
+
+export interface InputOptionsTypes
+{
+  File: {
+    dayInterval: number;
+    format: string;
+    name: string;
+    type: InputFileTypes;
+  };
+}
+
+export interface RootInputConfig
+{
+  inputs: InputConfig[];
+}
+
+export type InputTypes = keyof InputOptionsTypes;
+export type InputOptionsType<key extends InputTypes> = InputOptionsTypes[key];

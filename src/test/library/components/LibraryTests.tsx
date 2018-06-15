@@ -105,7 +105,7 @@ describe('Library', () =>
           analyticsActions={analyticsActions}
           schema={schema}
           canPinAlgorithms={true}
-          match={{ params: { categoryId: '1' }}}
+          match={{ params: { categoryId: '1' } }}
           roleActions={{ fetch: jest.fn() }}
           userActions={jest.fn()}
         />,

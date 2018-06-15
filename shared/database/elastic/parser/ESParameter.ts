@@ -42,71 +42,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
 
-import * as Tasty from '../../tasty/Tasty';
-import * as App from '../App';
+import ESJSONParser from 'shared/database/elastic/parser/ESJSONParser';
+import ESValueInfo from 'shared/database/elastic/parser/ESValueInfo';
 
-import DatabaseController from '../../database/DatabaseController';
-import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import * as Scripts from '../../scripts/Scripts';
-import * as Util from '../AppUtil';
-import { metrics } from '../events/EventRouter';
-import UserConfig from '../users/UserConfig';
-import ResultsConfigConfig from './ResultsConfigConfig';
-
-export class ResultsConfig
+export enum ESParameterType
 {
-  private resultsConfigTable: Tasty.Table;
-
-  public initialize()
-  {
-    this.resultsConfigTable = App.TBLS.resultsConfig;
-  }
-
-  public async select(columns: string[], filter: object): Promise<ResultsConfigConfig[]>
-  {
-    return App.DB.select(this.resultsConfigTable, columns, filter) as Promise<ResultsConfigConfig[]>;
-  }
-
-  public async get(id?: number, index?: string): Promise<ResultsConfigConfig[]>
-  {
-    if (id !== undefined)
-    {
-      return this.select([], { id });
-    }
-    else if (index !== undefined)
-    {
-      return this.select([], { index });
-    }
-    return this.select([], {});
-  }
-
-  public async upsert(user: UserConfig, index: string, resultsConfig: ResultsConfigConfig): Promise<ResultsConfigConfig>
-  {
-    return new Promise<ResultsConfigConfig>(async (resolve, reject) =>
-    {
-      let toUpsert: ResultsConfigConfig = {
-        index,
-        thumbnail: resultsConfig.thumbnail,
-        name: resultsConfig.name,
-        score: resultsConfig.score,
-        fields: JSON.stringify(resultsConfig.fields),
-        formats: JSON.stringify(resultsConfig.formats),
-        primaryKeys: JSON.stringify(resultsConfig.primaryKeys),
-      };
-      if (index !== undefined)
-      {
-        const results: ResultsConfigConfig[] = await this.get(undefined, index);
-        if (results.length > 0)
-        {
-          // update the existing results config
-          toUpsert = Util.updateObject(results[0], toUpsert);
-        }
-      }
-      resolve(await App.DB.upsert(this.resultsConfigTable, toUpsert) as ResultsConfigConfig);
-    });
-  }
+  Unknown,
+  // meta parameter
+  MetaParent,
+  MetaDate,
+  // given parameter
+  GivenName,
 }
-
-export default ResultsConfig;

@@ -46,7 +46,8 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file no-unused-expression
 
 import { FileTypes, Languages } from './ETLTypes';
-import { PostProcessConfig } from './PostProcessTypes';
+import { RootInputConfig } from './InputTypes';
+import { RootPostProcessConfig } from './PostProcessTypes';
 
 export interface FileConfig
 {
@@ -109,6 +110,8 @@ export interface SourceConfig
   fileConfig: FileConfig;
   options: SourceOptionsType<SourceTypes>; // a union of all possible option types
   integrationId: number;
+  rootInputConfig: RootInputConfig;
+  rootPostProcessConfig: RootPostProcessConfig;
 }
 
 export interface DefaultSourceConfig
@@ -124,6 +127,8 @@ export interface SinkConfig
   fileConfig: FileConfig;
   options: SinkOptionsType<SinkTypes>; // a union of all possible option types
   integrationId: number;
+  rootInputConfig: RootInputConfig;
+  rootPostProcessConfig: RootPostProcessConfig;
 }
 
 export interface DefaultSinkConfig
@@ -228,7 +233,6 @@ export interface HttpOptions
 export interface GoogleAnalyticsOptions
 {
   dayInterval: number;
-  transformations?: PostProcessConfig[];
 }
 
 export interface SQLOptions

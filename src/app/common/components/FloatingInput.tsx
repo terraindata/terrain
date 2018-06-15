@@ -256,7 +256,7 @@ export class FloatingInput extends TerrainComponent<Props>
           />
           {
             props.showWarning ?
-              <div className='pf-more-nested-name-input-warning'>
+              <div className='floating-input-warning'>
                 {
                   tooltip(
                     <InfoIcon

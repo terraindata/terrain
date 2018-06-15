@@ -145,7 +145,7 @@ test('array in array in object: identity transformation', () =>
 test('transform of deeply nested value', () =>
 {
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc3);
-  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['hardarr', '1', '1', '0'])]), { format: 'uppercase' });
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['hardarr', 1, 1, 0])]), { format: 'uppercase' });
   expect(e.transform(TestDocs.doc3)).toEqual(
     {
       name: 'Bob',
@@ -179,7 +179,7 @@ test('transform of deeply nested value', () =>
 test('nested transform with wildcard', () =>
 {
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc3);
-  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['arr', '1', -1, 'a'])]), { format: 'uppercase' });
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['arr', 1, -1, 'a'])]), { format: 'uppercase' });
   expect(e.transform(TestDocs.doc3)).toEqual(
     {
       name: 'Bob',
@@ -675,12 +675,12 @@ test('duplicate a field and then rename that field', () =>
   const e = new TransformationEngine(doc);
   e.appendTransformation(
     TransformationNodeType.DuplicateNode,
-    List<KeyPath>([KeyPath(['foo', '0', 'bar'])]),
+    List<KeyPath>([KeyPath(['foo', 0, 'bar'])]),
     {
-      newFieldKeyPaths: List<KeyPath>([KeyPath(['foo', '0', 'baz'])]),
+      newFieldKeyPaths: List<KeyPath>([KeyPath(['foo', 0, 'baz'])]),
     },
   );
-  e.setOutputKeyPath(e.getOutputFieldID(KeyPath(['foo', '0', 'baz'])), KeyPath(['foo', '0', 'nice']));
+  e.setOutputKeyPath(e.getOutputFieldID(KeyPath(['foo', 0, 'baz'])), KeyPath(['foo', 0, 'nice']));
   expect(e.transform(doc)).toEqual({
     foo: [
       {
@@ -720,56 +720,56 @@ test('suite of numeric transformations', () =>
 
   e.appendTransformation(
     TransformationNodeType.AddNode,
-    List<KeyPath>([KeyPath(['foo', '0', 'bar', -1])]),
+    List<KeyPath>([KeyPath(['foo', 0, 'bar', -1])]),
     {
       shift: 1,
     },
   );
   e.appendTransformation(
     TransformationNodeType.SubtractNode,
-    List<KeyPath>([KeyPath(['foo', '1', 'bar', -1])]),
+    List<KeyPath>([KeyPath(['foo', 1, 'bar', -1])]),
     {
       shift: 1,
     },
   );
   e.appendTransformation(
     TransformationNodeType.MultiplyNode,
-    List<KeyPath>([KeyPath(['foo', '0', 'bar', -1])]),
+    List<KeyPath>([KeyPath(['foo', 0, 'bar', -1])]),
     {
       factor: 3,
     },
   );
   e.appendTransformation(
     TransformationNodeType.DivideNode,
-    List<KeyPath>([KeyPath(['foo', '1', 'bar', -1])]),
+    List<KeyPath>([KeyPath(['foo', 1, 'bar', -1])]),
     {
       factor: 2,
     },
   );
   e.appendTransformation(
     TransformationNodeType.RoundNode,
-    List<KeyPath>([KeyPath(['foo', '2', 'bar', -1])]),
+    List<KeyPath>([KeyPath(['foo', 2, 'bar', -1])]),
     {
       shift: 1,
     },
   );
   e.appendTransformation(
     TransformationNodeType.RoundNode,
-    List<KeyPath>([KeyPath(['foo', '3', 'bar', -1])]),
+    List<KeyPath>([KeyPath(['foo', 3, 'bar', -1])]),
     {
       shift: 0,
     },
   );
   e.appendTransformation(
     TransformationNodeType.RoundNode,
-    List<KeyPath>([KeyPath(['foo', '4', 'bar', -1])]),
+    List<KeyPath>([KeyPath(['foo', 4, 'bar', -1])]),
     {
       shift: 4,
     },
   );
   e.appendTransformation(
     TransformationNodeType.RoundNode,
-    List<KeyPath>([KeyPath(['foo', '4', 'bar', -1])]),
+    List<KeyPath>([KeyPath(['foo', 4, 'bar', -1])]),
     {
       shift: 2,
     },
@@ -893,7 +893,7 @@ test('take product of several fields', () =>
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
   e.appendTransformation(
     TransformationNodeType.ProductNode,
-    List<KeyPath>([KeyPath(['deepArray', '0', '0']), KeyPath(['deepArray', '1', '0'])]),
+    List<KeyPath>([KeyPath(['deepArray', 0, 0]), KeyPath(['deepArray', 1, 0])]),
     {
       newFieldKeyPaths: List<KeyPath>([KeyPath(['producto'])]),
     });
@@ -906,7 +906,7 @@ test('take quotient of several fields', () =>
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
   e.appendTransformation(
     TransformationNodeType.QuotientNode,
-    List<KeyPath>([KeyPath(['deepArray', '1', '0']), KeyPath(['deepArray', '0', '0'])]),
+    List<KeyPath>([KeyPath(['deepArray', 1, 0]), KeyPath(['deepArray', 0, 0])]),
     {
       newFieldKeyPaths: List<KeyPath>([KeyPath(['quotiento'])]),
     });
@@ -919,7 +919,7 @@ test('take sum of several fields', () =>
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
   e.appendTransformation(
     TransformationNodeType.SumNode,
-    List<KeyPath>([KeyPath(['deepArray', '0', '0']), KeyPath(['deepArray', '1', '0'])]),
+    List<KeyPath>([KeyPath(['deepArray', 0, 0]), KeyPath(['deepArray', 1, 0])]),
     {
       newFieldKeyPaths: List<KeyPath>([KeyPath(['summo'])]),
     });
@@ -932,7 +932,7 @@ test('take difference of several fields', () =>
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
   e.appendTransformation(
     TransformationNodeType.DifferenceNode,
-    List<KeyPath>([KeyPath(['deepArray', '0', '0']), KeyPath(['deepArray', '1', '0'])]),
+    List<KeyPath>([KeyPath(['deepArray', 0, 0]), KeyPath(['deepArray', 1, 0])]),
     {
       newFieldKeyPaths: List<KeyPath>([KeyPath(['differenceo'])]),
     });
@@ -1074,6 +1074,25 @@ test('Group By Transformation', () =>
       ],
     },
   );
+});
+
+test('numeric keys', () =>
+{
+  {
+    const doc = { 0: { '5': 3, '-1': ['a', 'b'] } };
+    const e = new TransformationEngine(doc);
+    e.setOutputKeyPath(e.getOutputFieldID(KeyPath(['0', '5'])), KeyPath(['0', '1']));
+    e.setOutputKeyPath(e.getOutputFieldID(KeyPath(['0', '-1'])), KeyPath(['0', '0']));
+    e.appendTransformation(TransformationNodeType.CaseNode, List([List(['0', '-1', -1])]), { format: 'uppercase' });
+    expect(e.transform(doc)).toEqual({ 0: { 1: 3, 0: ['A', 'B'] } });
+  }
+  {
+    const doc = { '-1': [{ z: 1, 1: { 2: 1 } }, { z: 2.5 }] };
+    const e = new TransformationEngine(doc);
+    e.appendTransformation(TransformationNodeType.AddNode, List([List(['-1', 0, '1', '2'])]), { shift: 13 });
+    e.appendTransformation(TransformationNodeType.AddNode, List([List(['-1', -1, 'z'])]), { shift: 3 });
+    expect(e.transform(doc)).toEqual({ '-1': [{ z: 4, 1: { 2: 14 } }, { z: 5.5 }] });
+  }
 });
 
 test('transform a zipcode', () =>
