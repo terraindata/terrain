@@ -49,7 +49,8 @@ import FloatingInput from 'app/common/components/FloatingInput';
 import { ETLActions } from 'app/etl/ETLRedux';
 import { ETLState } from 'app/etl/ETLTypes';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
-import {
+import
+{
   _TaskConfig,
   TaskConfig,
 } from 'app/scheduler/SchedulerTypes';
@@ -70,7 +71,7 @@ const EditableField = (props) =>
 export interface Props
 {
   // level: number;
- // position: number;
+  // position: number;
   task: TaskConfig;
   type: 'SUCCESS' | 'FAILURE' | 'ROOT';
   onDelete: (taskId: ID) => void;
@@ -107,7 +108,7 @@ class TaskItem extends TerrainComponent<Props>
   {
     this.setState({
       editingName: false,
-    })
+    });
     this.props.onTaskChange(this.props.task.set('name', this.state.name));
   }
 

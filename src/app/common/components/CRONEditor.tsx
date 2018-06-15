@@ -122,8 +122,9 @@ class CRONEditor extends TerrainComponent<Props>
 
   private parseCron(cron)
   {
-    try {
-      return cronParser.parseExpression(this.props.cron, { tz: 'America/Los_Angeles' }).next().toDate().toString()
+    try
+    {
+      return cronParser.parseExpression(this.props.cron, { tz: 'America/Los_Angeles' }).next().toDate().toString();
     }
     catch (e)
     {

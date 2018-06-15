@@ -46,12 +46,15 @@ THE SOFTWARE.
 // tslint:disable:no-console strict-boolean-expressions no-var-requires
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import Colors, { backgroundColor, borderColor, fontColor, getStyle } from 'app/colors/Colors';
+import Button from 'app/common/components/Button';
 import CRONEditor from 'app/common/components/CRONEditor';
 import FloatingInput from 'app/common/components/FloatingInput';
 import { ETLActions } from 'app/etl/ETLRedux';
 import { ETLState } from 'app/etl/ETLTypes';
+import TaskItem from 'app/scheduler/components/TaskItem';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
-import {
+import
+{
   _SchedulerConfig,
   _TaskConfig,
   scheduleForDatabase,
@@ -63,14 +66,12 @@ import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import SchedulerApi from 'scheduler/SchedulerApi';
 import XHR from 'util/XHR';
-import TaskItem from 'app/scheduler/components/TaskItem';
-import Button from 'app/common/components/Button';
 
 export interface Props
 {
@@ -78,7 +79,7 @@ export interface Props
   match?: {
     params?: {
       scheduleId?: number;
-    }
+    },
   };
   router?: any;
   route?: any;
@@ -227,7 +228,7 @@ class ScheduleEditor extends TerrainComponent<Props>
   public handleTaskDelete(id: ID)
   {
     let { tasks } = this.state.schedule;
-    const index = tasks.findIndex((task) => task &&  task.id === id);
+    const index = tasks.findIndex((task) => task && task.id === id);
     // TODO DELETE ALL SUBTASKS!!
     // Find parent task
     const parentIndex = tasks.findIndex((task) => task && (
@@ -277,7 +278,7 @@ class ScheduleEditor extends TerrainComponent<Props>
     return (
       <div
         key={String(level) + '-' + String(pos)}
-        style={{width: 200}}
+        style={{ width: 200 }}
       />
     );
   }
@@ -308,9 +309,9 @@ class ScheduleEditor extends TerrainComponent<Props>
               key={index}
               style={{ display: 'flex', justifyContent: 'center' }}
             >
-                {
-                  level.map((item) => item)
-                }
+              {
+                level.map((item) => item)
+              }
             </div>,
           )
         }
@@ -366,7 +367,7 @@ class ScheduleEditor extends TerrainComponent<Props>
     {
       return (<div>NO SCHEDULE</div>);
     }
-        console.log(schedule.tasks);
+    console.log(schedule.tasks);
     return (
       <div>
         <div>
