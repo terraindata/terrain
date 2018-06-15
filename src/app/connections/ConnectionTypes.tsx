@@ -44,8 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:variable-name max-classes-per-file
-import { Map } from 'immutable';
+import { List, Map } from 'immutable';
 
+import { ModalProps } from 'common/components/overlay/MultiModal';
 import SharedConnectionConfig from 'shared/types/connections/ConnectionConfig';
 import { createRecordType } from 'shared/util/Classes';
 import Util from 'util/Util';
@@ -66,8 +67,9 @@ export const _ConnectionConfig =
 class ConnectionStateC
 {
   public loading: boolean = true;
-  public connections: Immutable.Map<ID, ConnectionConfig> = Immutable.Map<ID, ConnectionConfig>({});
+  public connections: Map<ID, ConnectionConfig> = Map<ID, ConnectionConfig>({});
   public error: string = null;
+  public modalRequests: List<ModalProps> = List([]);
 }
 
 const ConnectionState_Record = createRecordType(new ConnectionStateC(), 'ConnectionStateC');

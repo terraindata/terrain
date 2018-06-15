@@ -46,14 +46,14 @@ THE SOFTWARE.
 
 export class ConnectionConfig
 {
-  public id: number = null;
+  public id: number = -1;
   public name: string = '';
   public type: string = '';
   public dsn: string = '';
   public host: string = '';
   public isAnalytics: boolean = false;
-  public analyticsIndex?: string = null;
-  public analyticsType?: string = null;
+  public analyticsIndex?: string = '';
+  public analyticsType?: string = '';
 }
 
 export default ConnectionConfig;

@@ -45,21 +45,19 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console strict-boolean-expressions
 import { List, Map } from 'immutable';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
 import Colors, { backgroundColor, borderColor } from 'app/colors/Colors';
 import Button from 'app/common/components/Button';
-import { ETLActions } from 'app/etl/ETLRedux';
+import { _ConnectionConfig, ConnectionConfig } from 'app/connections/ConnectionTypes';
+import { ConnectionsActions } from 'app/connections/data/ConnectionsRedux';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import Dropdown from 'common/components/Dropdown';
 import FadeInOut from 'common/components/FadeInOut';
 import Switch from 'common/components/Switch';
 import TerrainComponent from 'common/components/TerrainComponent';
-import { UserActions } from '../../users/data/UserRedux';
-import { Connection } from './Connections';
 
 export interface Props
 {
@@ -70,14 +68,13 @@ export interface Props
       connectionId?: number;
     };
   };
-  connections?: Map<ID, Connection>;
-  userActions?: typeof UserActions;
+  connections?: Map<ID, ConnectionConfig>;
+  connectionsActions?: typeof ConnectionsActions;
 }
 
 interface State
 {
-  connection: Connection;
-  analyticsEnabled: number;
+  connection: ConnectionConfig;
 }
 
 function getConnectionId(params): number
@@ -101,14 +98,31 @@ class ConnectionEditorPage extends TerrainComponent<Props>
 
   public componentDidMount()
   {
-    const { match } = this.props;
+    const { connections, match } = this.props;
     const connectionId = getConnectionId(match.params);
     this.setState({
-      connection: connectionId,
+      connection: connections.get(connectionId),
     });
-    // this.props.userActions({
-    //   actionType: 'getConnections',
-    // });
+
+    this.props.connectionsActions({
+      actionType: 'getConnections',
+    });
+  }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    const { params } = this.props.match;
+    const nextParams = nextProps.match.params;
+    const oldConnectionId = getConnectionId(params);
+    const connectionId = getConnectionId(nextParams);
+    if (connectionId !== -1 &&
+      (oldConnectionId !== connectionId ||
+        this.props.connections !== nextProps.connections))
+    {
+      this.setState({
+        connection: nextProps.connections.get(connectionId),
+      });
+    }
   }
 
   public handleConnectionChange(newConnection)
@@ -121,12 +135,10 @@ class ConnectionEditorPage extends TerrainComponent<Props>
   public save()
   {
     const { connection } = this.state;
-    console.log(connection);
-    // this.props.userActions({
-    //   actionType: 'updateConnection',
-    //   connectionId: connection.id,
-    //   connection,
-    // });
+    this.props.connectionsActions({
+      actionType: 'updateConnection',
+      connection,
+    });
     // Update route to go back
     this.browserHistory.push('/account/connections');
   }
@@ -135,15 +147,6 @@ class ConnectionEditorPage extends TerrainComponent<Props>
   {
     // Go back don't save
     this.browserHistory.push('/account/connections');
-  }
-
-  public handleTypeChange(index: number)
-  {
-    this.setState({
-      typeIndex: index,
-    });
-
-    const type = this.ConnectionTypes.get(index);
   }
 
   public render()
@@ -187,9 +190,9 @@ class ConnectionEditorPage extends TerrainComponent<Props>
 export default Util.createContainer(
   ConnectionEditorPage,
   [
-    ['users'],
+    ['connections'],
   ],
   {
-    userActions: UserActions,
+    connectionsActions: ConnectionsActions,
   },
 );

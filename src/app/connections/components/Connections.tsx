@@ -63,8 +63,6 @@ import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
 import TerrainComponent, { browserHistory } from '../../common/components/TerrainComponent';
 import { HeaderConfig, HeaderConfigItem, ItemList } from '../../etl/common/components/ItemList';
-import { UserActions } from '../../users/data/UserRedux';
-import Ajax, { AjaxResponse } from '../../util/Ajax';
 
 const CheckIcon = require('images/icon_checkMark.svg');
 const CloseIcon = require('images/icon_close_8x8.svg');
@@ -74,7 +72,7 @@ import './Connections.less';
 export interface Props
 {
   connections?: Immutable.Map<ID, ConnectionConfig>;
-  connectionActions?: typeof ConnectionsActions;
+  connectionsActions?: typeof ConnectionsActions;
   params?: any;
 }
 
@@ -99,7 +97,7 @@ class Connections extends TerrainComponent<Props>
   public createConnection()
   {
     const connection = _ConnectionConfig({ id: undefined });
-    this.props.connectionActions({
+    this.props.connectionsActions({
       actionType: 'createConnection',
       connection,
     });
@@ -115,13 +113,13 @@ class Connections extends TerrainComponent<Props>
     }
     const onConfirm = () =>
     {
-      this.props.connectionActions({
+      this.props.connectionsActions({
         actionType: 'deleteConnection',
         connectionId,
       });
     };
 
-    this.props.connectionActions({
+    this.props.connectionsActions({
       actionType: 'addModal',
       props: {
         title: 'Delete Connection',
@@ -136,14 +134,14 @@ class Connections extends TerrainComponent<Props>
 
   public getConnections()
   {
-    this.props.connectionActions({
+    this.props.connectionsActions({
       actionType: 'getConnections',
     });
   }
 
   public handleConnectionChange(connection: ConnectionConfig)
   {
-    this.props.connectionActions({
+    this.props.connectionsActions({
       actionType: 'updateConnection',
       connection,
     });
@@ -160,7 +158,7 @@ class Connections extends TerrainComponent<Props>
     return (
       <CloseIcon
         className='close'
-        onClick={this._fn(this.deleteConnection, connection.id)}
+        onClick={this._fn(this.deleteConnection, index)}
       />
     );
   }
@@ -208,6 +206,8 @@ class Connections extends TerrainComponent<Props>
 
   public render()
   {
+    console.log(this.props);
+
     const { connections } = this.props;
     const keys = connections.keySeq().toList().sort();
     const connList = keys.map((id) => connections.get(id));
@@ -266,8 +266,8 @@ class Connections extends TerrainComponent<Props>
 
 const ConnectionList = Util.createTypedContainer(
   Connections,
-  [],
-  { userActions: UserActions },
+  ['connections', 'connections'],
+  { connectionsActions: ConnectionsActions },
 );
 
 export default ConnectionList;

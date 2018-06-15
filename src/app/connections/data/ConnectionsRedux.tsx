@@ -48,14 +48,14 @@ import { Map } from 'immutable';
 
 import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
 import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
+import ConnectionsApi from '../ConnectionsApi';
 import
 {
   _ConnectionConfig,
   _ConnectionState,
   ConnectionConfig,
   ConnectionState,
-} from 'shared/types/connections/ConnectionTypes';
-import ConnectionsApi from '../ConnectionsApi';
+} from '../ConnectionTypes';
 
 import Util from 'util/Util';
 import XHR from 'util/XHR';
