@@ -96,13 +96,7 @@ class Connections extends TerrainComponent<Props>
 
   public createConnection()
   {
-    const connection = _ConnectionConfig({ id: undefined });
-    this.props.connectionsActions({
-      actionType: 'createConnection',
-      connection,
-    });
-
-    // browserHistory.push(`/account/connections/edit`)
+    browserHistory.push(`/account/connections/edit`)
   }
 
   public deleteConnection(connectionId: number, e?)
@@ -150,7 +144,8 @@ class Connections extends TerrainComponent<Props>
   public handleRowClick(index: number)
   {
     const { connections } = this.props;
-    browserHistory.push(`/account/connections/edit/connectionId=${connections.get(index)['id']}`)
+    const keys = connections.keySeq().toList().sort();
+    browserHistory.push(`/account/connections/edit/connectionId=${keys.get(index)}`)
   }
 
   public getConnectionActions(index: number, connection: ConnectionConfig)

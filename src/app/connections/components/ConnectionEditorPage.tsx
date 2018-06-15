@@ -58,6 +58,7 @@ import Dropdown from 'common/components/Dropdown';
 import FadeInOut from 'common/components/FadeInOut';
 import Switch from 'common/components/Switch';
 import TerrainComponent from 'common/components/TerrainComponent';
+import ConnectionForm from './ConnectionForm';
 
 export interface Props
 {
@@ -89,19 +90,13 @@ class ConnectionEditorPage extends TerrainComponent<Props>
     connection: null,
   };
 
-  public ConnectionTypes = List(
-    [
-      'elastic',
-      'mysql',
-    ],
-  );
-
   public componentDidMount()
   {
     const { connections, match } = this.props;
     const connectionId = getConnectionId(match.params);
+    const connection = (connectionId >= 0) ? connections.get(connectionId) : _ConnectionConfig({ id: undefined });
     this.setState({
-      connection: connections.get(connectionId),
+      connection,
     });
 
     this.props.connectionsActions({
@@ -135,6 +130,12 @@ class ConnectionEditorPage extends TerrainComponent<Props>
   public save()
   {
     const { connection } = this.state;
+
+    this.props.connectionsActions({
+      actionType: 'createConnection',
+      connection,
+    });
+
     this.props.connectionsActions({
       actionType: 'updateConnection',
       connection,
@@ -163,7 +164,10 @@ class ConnectionEditorPage extends TerrainComponent<Props>
         >
           Edit Connection
         </div>
-
+        <ConnectionForm
+          connection={connection}
+          onChange={this.handleConnectionChange}
+        />
         <div
           className='connection-buttons'
         >
@@ -172,15 +176,12 @@ class ConnectionEditorPage extends TerrainComponent<Props>
             onClick={this.cancel}
             size={'small'}
           />
-          {
-            connection &&
-            <Button
-              text={'Save'}
-              onClick={this.save}
-              size={'small'}
-              theme={'active'}
-            />
-          }
+          <Button
+            text={'Save'}
+            onClick={this.save}
+            size={'small'}
+            theme={'active'}
+          />
         </div>
       </div>
     );
@@ -190,7 +191,7 @@ class ConnectionEditorPage extends TerrainComponent<Props>
 export default Util.createContainer(
   ConnectionEditorPage,
   [
-    ['connections'],
+    [['connections', 'connections']],
   ],
   {
     connectionsActions: ConnectionsActions,
