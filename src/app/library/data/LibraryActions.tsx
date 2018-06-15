@@ -94,6 +94,10 @@ const Actions =
               );
             },
 
+        remove:
+          (category: Category) =>
+            $(ActionTypes.categories.remove, { category }),
+
         change:
           (
             category: Category,
@@ -157,6 +161,10 @@ const Actions =
                 },
               );
             },
+
+        remove:
+          (group: Group) =>
+            $(ActionTypes.groups.remove, { group }),
 
         createAs:
           (
@@ -260,6 +268,10 @@ const Actions =
                 },
               );
             },
+
+        remove:
+          (algorithm: Algorithm) =>
+            $(ActionTypes.algorithms.remove, { algorithm }),
 
         change:
           (algorithm: Algorithm) =>

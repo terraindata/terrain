@@ -55,6 +55,8 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import EngineUtil, { PathHashMap } from 'shared/transformations/util/EngineUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
+import * as TerrainLog from 'loglevel';
+
 export interface TypeConfig
 {
   type: string;
@@ -402,6 +404,9 @@ export class ElasticMapping
     {
       this.errors.push(`Error encountered while clearing Geopoint Mappings. Details: ${String(e)}`);
     }
+
+    TerrainLog.debug('Creat ES mapping: ' + JSON.stringify(this.mapping)
+      + ' from all fields: ' + JSON.stringify(this.engine.getAllFieldNames()));
   }
 
   protected verifyAndSetPrimaryKey(id: number)

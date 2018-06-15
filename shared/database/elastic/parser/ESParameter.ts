@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESJSONParser from 'shareddatabase/elastic/parser/ESJSONParser';
-import ESValueInfo from 'shareddatabase/elastic/parser/ESValueInfo';
+import ESJSONParser from 'shared/database/elastic/parser/ESJSONParser';
+import ESValueInfo from 'shared/database/elastic/parser/ESValueInfo';
 
 export enum ESParameterType
 {

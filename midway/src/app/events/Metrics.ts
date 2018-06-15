@@ -109,12 +109,7 @@ export class Metrics
 
   public async select(columns: string[], filter?: object): Promise<MetricConfig[]>
   {
-    return new Promise<MetricConfig[]>(async (resolve, reject) =>
-    {
-      const rawResults = await App.DB.select(this.metricsTable, columns, filter);
-      const results: MetricConfig[] = rawResults.map((result: object) => new MetricConfig(result));
-      resolve(results);
-    });
+    return App.DB.select(this.metricsTable, columns, filter) as Promise<MetricConfig[]>;
   }
 }
 
