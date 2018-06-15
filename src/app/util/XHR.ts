@@ -75,7 +75,7 @@ class XHR
           if (theId === undefined || theToken === undefined)
           {
             TerrainLog.debug('Both Auth and accessToken are empty');
-            const routeError: MidwayError = new MidwayError(400, 'Not authorized request.', 'The access token and id are empty', {});
+            const routeError: MidwayError = new MidwayError(400, 'unauthorized request.', 'The access token is missing.', {});
             return Promise.reject(routeError);
           }
           if (config.params.id !== theId)
