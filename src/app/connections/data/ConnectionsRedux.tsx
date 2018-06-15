@@ -90,11 +90,11 @@ export interface ConnectionsActionTypes
     actionType: 'createConnection';
     connection: any;
   };
-  createConnectionstart: {
-    actionType: 'createConnectionstart';
+  createConnectionStart: {
+    actionType: 'createConnectionStart';
   };
-  createConnectionsuccess: {
-    actionType: 'createConnectionsuccess';
+  createConnectionSuccess: {
+    actionType: 'createConnectionSuccess';
     connection: ConnectionConfig;
   };
   createConnectionFailed: {
@@ -106,11 +106,11 @@ export interface ConnectionsActionTypes
     actionType: 'updateConnection';
     connection: any;
   };
-  updateConnectionstart: {
-    actionType: 'updateConnectionstart';
+  updateConnectionStart: {
+    actionType: 'updateConnectionStart';
   };
-  updateConnectionsuccess: {
-    actionType: 'updateConnectionsuccess';
+  updateConnectionSuccess: {
+    actionType: 'updateConnectionSuccess';
     connection: ConnectionConfig;
   };
   updateConnectionFailed: {
@@ -122,11 +122,11 @@ export interface ConnectionsActionTypes
     actionType: 'deleteConnection';
     connectionId: ID;
   };
-  deleteConnectionstart: {
-    actionType: 'deleteConnectionstart';
+  deleteConnectionStart: {
+    actionType: 'deleteConnectionStart';
   };
-  deleteConnectionsuccess: {
-    actionType: 'deleteConnectionsuccess';
+  deleteConnectionSuccess: {
+    actionType: 'deleteConnectionSuccess';
     connectionId: ID;
   };
   deleteConnectionFailed: {
@@ -179,13 +179,13 @@ class ConnectionsRedux extends TerrainRedux<ConnectionsActionTypes, ConnectionSt
           .set('error', action.payload.error);
       },
 
-      createConnectionstart: (state, action) =>
+      createConnectionStart: (state, action) =>
       {
         return state
           .set('loading', true);
       },
 
-      createConnectionsuccess: (state, action) =>
+      createConnectionSuccess: (state, action) =>
       {
         const { connection } = action.payload;
         return state
@@ -200,13 +200,13 @@ class ConnectionsRedux extends TerrainRedux<ConnectionsActionTypes, ConnectionSt
           .set('error', action.payload.error);
       },
 
-      updateConnectionstart: (state, action) =>
+      updateConnectionStart: (state, action) =>
       {
         return state
           .set('loading', true);
       },
 
-      updateConnectionsuccess: (state, action) =>
+      updateConnectionSuccess: (state, action) =>
       {
         const { connection } = action.payload;
         return state
@@ -221,13 +221,13 @@ class ConnectionsRedux extends TerrainRedux<ConnectionsActionTypes, ConnectionSt
           .set('error', action.payload.error);
       },
 
-      deleteConnectionstart: (state, action) =>
+      deleteConnectionStart: (state, action) =>
       {
         return state
           .set('loading', true);
       },
 
-      deleteConnectionsuccess: (state, action) =>
+      deleteConnectionSuccess: (state, action) =>
       {
         const { connectionId } = action.payload;
         return state
@@ -268,7 +268,7 @@ class ConnectionsRedux extends TerrainRedux<ConnectionsActionTypes, ConnectionSt
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     directDispatch({
-      actionType: 'createConnectionstart',
+      actionType: 'createConnectionStart',
     });
 
     return this.api.createConnection(action.connection)
@@ -276,7 +276,7 @@ class ConnectionsRedux extends TerrainRedux<ConnectionsActionTypes, ConnectionSt
       {
         const connection: ConnectionConfig = response.data[0];
         directDispatch({
-          actionType: 'createConnectionsuccess',
+          actionType: 'createConnectionSuccess',
           connection,
         });
 
@@ -288,7 +288,7 @@ class ConnectionsRedux extends TerrainRedux<ConnectionsActionTypes, ConnectionSt
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     directDispatch({
-      actionType: 'updateConnectionstart',
+      actionType: 'updateConnectionStart',
     });
 
     const { connection: connectionChanges } = action;
@@ -298,7 +298,7 @@ class ConnectionsRedux extends TerrainRedux<ConnectionsActionTypes, ConnectionSt
       {
         const connection: ConnectionConfig = response.data[0];
         directDispatch({
-          actionType: 'updateConnectionsuccess',
+          actionType: 'updateConnectionSuccess',
           connection,
         });
 
@@ -310,7 +310,7 @@ class ConnectionsRedux extends TerrainRedux<ConnectionsActionTypes, ConnectionSt
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     directDispatch({
-      actionType: 'deleteConnectionstart',
+      actionType: 'deleteConnectionStart',
     });
 
     return this.api.deleteConnection(action.connectionId)
@@ -318,7 +318,7 @@ class ConnectionsRedux extends TerrainRedux<ConnectionsActionTypes, ConnectionSt
       {
         const connection: ConnectionConfig = response.data[0];
         directDispatch({
-          actionType: 'deleteConnectionsuccess',
+          actionType: 'deleteConnectionSuccess',
           connectionId: action.connectionId,
         });
 
