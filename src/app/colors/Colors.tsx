@@ -65,6 +65,8 @@ const NTColors =
     grey1: '#e3e3e3',
     grey2: '#d8d8d8',
     grey3: '#ccc',
+    grey4: '#f4f4f4',
+    grey5: '#adadad',
 
     dark1: '#000',
     dark2: '#231F20',
@@ -123,6 +125,10 @@ const NewTheme =
     todayHighlight: NTColors.blue5,
 
     dateViewLabel: NTColors.blue4,
+
+    sectionBg: NTColors.grey4,
+    sectionEditButton: NTColors.grey2,
+    sectionSubtitle: NTColors.grey5,
   };
 
 // Will be deprecated
