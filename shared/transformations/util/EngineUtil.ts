@@ -60,6 +60,8 @@ import objectify from 'shared/util/deepObjectify';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
+import * as TerrainLog from 'loglevel';
+
 export type PathHash = string;
 export interface PathHashMap<T>
 {
@@ -636,6 +638,8 @@ export default class EngineUtil
     });
     const engine = new TransformationEngine();
     EngineUtil.addFieldsToEngine(pathTypes, pathValueTypes, engine);
+
+    TerrainLog.debug('Add all fields: ' + JSON.stringify(engine.getAllFieldNames()) + ' to the engine');
 
     return {
       engine,

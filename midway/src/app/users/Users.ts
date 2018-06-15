@@ -156,12 +156,7 @@ export class Users
 
   public async select(columns: string[], filter: object): Promise<UserConfig[]>
   {
-    return new Promise<UserConfig[]>(async (resolve, reject) =>
-    {
-      const rawResults = await App.DB.select(this.userTable, columns, filter);
-      const results: UserConfig[] = rawResults.map((result: object) => new UserConfig(result));
-      resolve(results);
-    });
+    return App.DB.select(this.userTable, columns, filter) as Promise<UserConfig[]>;
   }
 
   public async get(id?: number): Promise<UserConfig[]>

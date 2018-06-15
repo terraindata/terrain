@@ -54,10 +54,6 @@ export class ConfigType
       {
         obj[key] = props[key];
       }
-      else if (props.hasOwnProperty(key.toLowerCase()))
-      {
-        obj[key] = props[key.toLowerCase()];
-      }
     }
   }
 }

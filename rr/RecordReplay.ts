@@ -180,10 +180,14 @@ async function rr()
   let startColumn: 'builder' | 'pathfinder' = 'pathfinder';
   if (options['column'] !== undefined)
   {
-    if (options['column'] !== 'builder' && options['column'] !== 'pathfinder')
+    if (options['column'] !== 'builder' && options['column'] !== 'pathfinder' && options['column'] !== 'import')
     {
       console.log(usage);
       return;
+    }
+    if (options['column'] === 'import')
+    {
+      url = 'http://localhost:8080/data/newtemplate/1';
     }
     startColumn = options['column'];
   }
