@@ -67,13 +67,13 @@ beforeAll(async () =>
   // TODO: get rid of this monstrosity once @types/winston is updated.
   (winston as any).level = 'debug';
   const config: PostgresConfig =
-  {
-    database: 'moviesdb',
-    host: 'localhost',
-    port: 65432,
-    password: 'r3curs1v3$',
-    user: 't3rr41n-demo',
-  };
+    {
+      database: 'moviesdb',
+      host: 'localhost',
+      port: 65432,
+      password: 'r3curs1v3$',
+      user: 't3rr41n-demo',
+    };
 
   try
   {
@@ -108,7 +108,7 @@ test('Postgres Generator: mixedCase', async (done) =>
   query = new Tasty.Query(DBMovies)
     .select([DBMovies['movieID']])
     .filter(DBMovies['releaseDate']
-    .doesNotEqual('01/01/2017'))
+      .doesNotEqual('01/01/2017'))
     .sort(DBMovies['movieID'], 'asc');
   qstr = pgDB.generate(query);
   expect(qstr).toBeInstanceOf(Array);
