@@ -170,12 +170,14 @@ export function getRouter()
 
     if (process.env.NODE_ENV === 'production')
     {
-      if (ctx.params['asset'].includes('.gz'))
+      let asset = ctx.params['asset'];
+      if (asset === 'bundle.js' || asset === 'vendor.bundle.js')
       {
         ctx.set('Content-Encoding', 'gzip');
+        asset = `${asset}.gz`;
       }
 
-      await send(ctx, `/midway/src/assets/${ctx.params['asset']}`);
+      await send(ctx, `/midway/src/assets/${asset}`);
     }
     else
     {
