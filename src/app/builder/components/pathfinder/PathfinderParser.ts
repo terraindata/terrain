@@ -85,6 +85,7 @@ export function parsePath(path: Path, inputs, nestedPath: boolean = false, index
       },
     },
     from: 0,
+    size: PathFinderDefaultSize,
     track_scores: path.more.trackScores,
     _source: true,
     _annotation: indexPath.concat('source'),
@@ -97,6 +98,10 @@ export function parsePath(path: Path, inputs, nestedPath: boolean = false, index
   if (sourceInfo.size !== 'all')
   {
     queryBody['size'] = sourceInfo.size;
+  }
+  else
+  {
+    delete queryBody['size'];
   }
   const indexQuery = {
     term: {
