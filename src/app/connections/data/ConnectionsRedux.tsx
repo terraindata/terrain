@@ -44,9 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
 import { Map } from 'immutable';
 
+import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
+import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 import
 {
   _ConnectionConfig,
@@ -61,6 +62,15 @@ import XHR from 'util/XHR';
 
 export interface ConnectionsActionTypes
 {
+  addModal: {
+    actionType: 'addModal';
+    props: ModalProps;
+  };
+  setModalRequests: {
+    actionType: 'setModalRequests';
+    requests: List<ModalProps>;
+  };
+
   getConnections?: {
     actionType: 'getConnections';
   };
@@ -132,6 +142,17 @@ class ConnectionsRedux extends TerrainRedux<ConnectionsActionTypes, ConnectionSt
 
   public reducers: ConstrainedMap<ConnectionsActionTypes, ConnectionState> =
     {
+      addModal: (state, action) =>
+      {
+        return state.set('modalRequests',
+          MultiModal.addRequest(state.modalRequests, action.payload.props));
+      },
+
+      setModalRequests: (state, action) =>
+      {
+        return state.set('modalRequests', action.payload.requests);
+      },
+
       getConnectionsStart: (state, action) =>
       {
         return state

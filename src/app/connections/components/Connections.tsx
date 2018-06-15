@@ -50,12 +50,13 @@ import * as classNames from 'classnames';
 import { List, Map } from 'immutable';
 import * as React from 'react';
 
+import { _ConnectionConfig, ConnectionConfig, ConnectionState } from 'app/connections/ConnectionTypes';
+import { ConnectionsActions } from 'app/connections/data/ConnectionsRedux';
 import TerrainTools from 'app/util/TerrainTools';
 import { Colors, fontColor } from 'colors/Colors';
 import Badge from 'common/components/Badge';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import Util from 'util/Util';
-import BackendInstance from '../../../database/types/BackendInstance';
 import CreateItem from '../../common/components/CreateItem';
 import Dropdown from '../../common/components/Dropdown';
 import InfoArea from '../../common/components/InfoArea';
@@ -70,133 +71,97 @@ const CloseIcon = require('images/icon_close_8x8.svg');
 
 import './Connections.less';
 
-export interface Connection extends BackendInstance
-{
-  host: string;
-  status: string;
-  isAnalytics: boolean;
-  analyticsIndex: string;
-  analyticsType: string;
-}
-
 export interface Props
 {
+  connections?: Immutable.Map<ID, ConnectionConfig>;
+  connectionActions?: typeof ConnectionsActions;
   params?: any;
-  userActions?: typeof UserActions;
-}
-
-export interface State
-{
-  loading: boolean;
-  connections: Connection[];
-  addingConnection: boolean;
-  errorModalOpen: boolean;
-  errorModalMessage: string;
 }
 
 class Connections extends TerrainComponent<Props>
 {
-  public state: State = {
-    loading: true,
-    connections: null,
-    addingConnection: false,
-    errorModalOpen: false,
-    errorModalMessage: '',
-  };
-
-  public xhr: AjaxResponse = null;
-  public analyticsIndex: any = null;
-  public analyticsType: any = null;
+  public state: {
+    confirmModalOpen: boolean,
+  } = {
+      confirmModalOpen: false,
+    };
 
   constructor(props: Props)
   {
     super(props);
   }
 
-  public fetchConnections()
-  {
-    this.xhr = Ajax.req(
-      'get',
-      'database/status',
-      {},
-      (connections: Connection[]) =>
-      {
-        if (connections)
-        {
-          this.setState({
-            connections,
-            loading: false,
-          });
-        }
-      });
-  }
-
   public componentWillMount()
   {
-    this.fetchConnections();
+    this.getConnections();
   }
 
-  public componentWillUnmount()
+  public createConnection()
   {
-    this.xhr && this.xhr.cancel();
-    this.xhr = null;
+    const connection = _ConnectionConfig({ id: undefined });
+    this.props.connectionActions({
+      actionType: 'createConnection',
+      connection,
+    });
+
+    // browserHistory.push(`/account/connections/edit`)
   }
 
-  public removeConnection(id: number, e?)
+  public deleteConnection(connectionId: number, e?)
   {
     if (e !== undefined)
     {
       e.stopPropagation();
     }
-
-    Ajax.deleteDb(id, this.fetchConnections, (error) =>
+    const onConfirm = () =>
     {
-      this.setState({
-        errorModalMessage: 'Error deleting connection: ' + JSON.stringify(error),
-        errorModalOpen: true,
+      this.props.connectionActions({
+        actionType: 'deleteConnection',
+        connectionId,
       });
-    },
-    );
+    };
+
+    this.props.connectionActions({
+      actionType: 'addModal',
+      props: {
+        title: 'Delete Connection',
+        message: 'Are you sure you want to delete this connection?',
+        closeOnConfirm: true,
+        confirm: true,
+        confirmButtonText: 'Delete',
+        onConfirm,
+      },
+    });
+  }
+
+  public getConnections()
+  {
+    this.props.connectionActions({
+      actionType: 'getConnections',
+    });
+  }
+
+  public handleConnectionChange(connection: ConnectionConfig)
+  {
+    this.props.connectionActions({
+      actionType: 'updateConnection',
+      connection,
+    });
   }
 
   public handleRowClick(index: number)
   {
-    const connections = this.state.connections;
-    const connection = connections[index];
-    browserHistory.push(`/account/connections/edit/connectionId=${connection.id}`)
+    const { connections } = this.props;
+    browserHistory.push(`/account/connections/edit/connectionId=${connections.get(index)['id']}`)
   }
 
-  public createConnection()
-  {
-    // Ajax.createDb(
-    //   name,
-    //   address,
-    //   type,
-    //   isAnalytics,
-    //   analyticsIndex,
-    //   analyticsType,
-    //   this.fetchConnections,
-    //   (error) =>
-    //   {
-    //     this.setState({
-    //       errorModalMessage: 'Error creating connection: ' + JSON.stringify(error),
-    //       errorModalOpen: true,
-    //     });
-    //   },
-    // );
-
-    browserHistory.push(`/account/connections/edit`)
-  }
-
-  public getConnectionActions(index: number, connection: Connection)
+  public getConnectionActions(index: number, connection: ConnectionConfig)
   {
     return (
-      <div
+      <CloseIcon
         className='close'
-        onClick={this._fn(this.removeConnection, connection.id)}
-      >
-      <CloseIcon />
-      </div>
+        onClick={this._fn(this.deleteConnection, connection.id)}
+      />
     );
   }
 
@@ -205,7 +170,7 @@ class Connections extends TerrainComponent<Props>
     return Colors().connectionStatuses[status];
   }
 
-  public renderProperty(propertyName, item: Connection, index: number)
+  public renderProperty(propertyName, item: ConnectionConfig, index: number)
   {
     if (propertyName === 'status')
     {
@@ -241,24 +206,11 @@ class Connections extends TerrainComponent<Props>
 
   }
 
-  public toggleErrorModal()
-  {
-    this.setState({
-      errorModalOpen: !this.state.errorModalOpen,
-    });
-  }
-
-  public handleAnalyticsSwitch(selected)
-  {
-    this.setState((state) =>
-    {
-      return { analyticsEnabled: selected };
-    });
-  }
-
   public render()
   {
-    const { connections, loading } = this.state;
+    const { connections } = this.props;
+    const keys = connections.keySeq().toList().sort();
+    const connList = keys.map((id) => connections.get(id));
 
     return (
       <div
@@ -268,7 +220,7 @@ class Connections extends TerrainComponent<Props>
           className='connections-list-wrapper'
         >
           <ItemList
-            items={List(connections)}
+            items={connList.toList()}
             columnConfig={[
               {
                 name: 'id',
