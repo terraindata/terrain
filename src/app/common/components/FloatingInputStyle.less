@@ -101,6 +101,19 @@
     outline: none;
     transition: all 0.15s;
   }
+
+  .autocomplete {
+    .ac-options {
+      width: 100%;
+      &.ac-options-open {
+        box-shadow: 0px 1px 3px lightgrey
+      }
+      .ac-option {
+        font-size: 16px;
+        overflow-x: hidden;
+      }
+    }
+  }
   
   &.floating-input-container-showEllipsis {
     .floating-input-input {

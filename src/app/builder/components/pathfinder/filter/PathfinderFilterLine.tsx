@@ -372,6 +372,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       getValueComponent: this.renderValueComponent(),
       getCustomDisplayName: this._fn(getCustomValueDisplayName, this.props.filterLine),
       forceFloat: true,
+      showOptionsOnOther: filterLine.fieldType === FieldType.Date,
     };
 
     const sets = [
