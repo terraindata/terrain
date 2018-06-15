@@ -91,7 +91,7 @@ class DataTabs extends TerrainComponent<DataTabsProps>
     newtemplate: '/data/newtemplate',
   };
 
-  public componentDidMount()
+  public componentWillMount()
   {
     this.props.etlActions({
       actionType: 'fetchTemplates',
