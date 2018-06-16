@@ -126,7 +126,19 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   public renderCustom(inputInfo: InputDeclarationType<S>, stateName, state: S, index, disabled: boolean)
   {
     const options: OptionType<DisplayType.Custom> = inputInfo.options || {};
-    return options.render(state, disabled);
+    return (
+      <div
+        className='dynamic-form-default-block'
+        key={index}
+      >
+        {
+          inputInfo.displayName ?
+            <div className='dynamic-form-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
+            : null
+        }
+        { options.render(state, disabled) }
+      </div>
+    );
   }
 
   public renderTextBox(inputInfo: InputDeclarationType<S>, stateName, state: S, index, disabled: boolean)

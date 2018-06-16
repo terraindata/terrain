@@ -78,12 +78,6 @@ export interface Props
 
 class Connections extends TerrainComponent<Props>
 {
-  public state: {
-    confirmModalOpen: boolean,
-  } = {
-      confirmModalOpen: false,
-    };
-
   constructor(props: Props)
   {
     super(props);
@@ -258,8 +252,12 @@ class Connections extends TerrainComponent<Props>
 
 const ConnectionList = Util.createTypedContainer(
   Connections,
-  [['connections', 'connections']],
-  { connectionsActions: ConnectionsActions },
+  [
+    ['connections', 'connections']
+  ],
+  {
+    connectionsActions: ConnectionsActions
+  },
 );
 
 export default ConnectionList;

@@ -62,7 +62,6 @@ import ConnectionForm from './ConnectionForm';
 
 export interface Props
 {
-  history?: any;
   location?: any;
   match?: {
     params?: {
@@ -86,22 +85,31 @@ function getConnectionId(params): number
 
 class ConnectionEditorPage extends TerrainComponent<Props>
 {
-  public state = {
-    connection: null,
+  public state: State = {
+    connection: _ConnectionConfig({ id: undefined }),
   };
+
+  public componentWillMount()
+  {
+    const { connections } = this.props;
+    if (connections.size === 0)
+    {
+      this.props.connectionsActions({
+        actionType: 'getConnections',
+      });
+    }
+  }
 
   public componentDidMount()
   {
     const { connections, match } = this.props;
     const connectionId = getConnectionId(match.params);
-    const connection = (connectionId >= 0) ? connections.get(connectionId) : _ConnectionConfig({ id: undefined });
-    this.setState({
-      connection,
-    });
-
-    this.props.connectionsActions({
-      actionType: 'getConnections',
-    });
+    if (connectionId >= 0)
+    {
+      this.setState({
+        connection: connections.get(connectionId),
+      });
+    }
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -130,16 +138,39 @@ class ConnectionEditorPage extends TerrainComponent<Props>
   public save()
   {
     const { connection } = this.state;
+    let dsn = '';
+    if (connection['user'] && connection['password'])
+    {
+      dsn += connection['user'] + ':' + connection['password'] + '@';
+      delete connection['user'];
+      delete connection['password'];
+    }
 
-    this.props.connectionsActions({
-      actionType: 'createConnection',
-      connection,
-    });
+    dsn += connection['host'];
 
-    this.props.connectionsActions({
-      actionType: 'updateConnection',
-      connection,
-    });
+    if (connection['port'])
+    {
+      dsn += ':' + connection['port'];
+      delete connection['port'];
+    }
+
+    connection['dsn'] = dsn;
+    connection['analyticsType'] = 'data';
+
+    if (connection['id'])
+    {
+      this.props.connectionsActions({
+        actionType: 'updateConnection',
+        connection,
+      });
+    }
+    else
+    {
+      this.props.connectionsActions({
+        actionType: 'createConnection',
+        connection,
+      });
+    }
     // Update route to go back
     this.browserHistory.push('/account/connections');
   }
@@ -153,6 +184,10 @@ class ConnectionEditorPage extends TerrainComponent<Props>
   public render()
   {
     const { connection } = this.state;
+    if (!connection)
+    {
+      return null;
+    }
 
     return (
       <div
@@ -191,7 +226,7 @@ class ConnectionEditorPage extends TerrainComponent<Props>
 export default Util.createContainer(
   ConnectionEditorPage,
   [
-    [['connections', 'connections']],
+    ['connections', 'connections']
   ],
   {
     connectionsActions: ConnectionsActions,

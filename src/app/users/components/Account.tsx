@@ -62,7 +62,7 @@ import Profile from './Profile';
 import Settings from './Settings';
 import Team from './Team';
 
-const HomeIcon = require('./../../../images/icon_profile_16x16.svg?name=HomeIcon');
+const HomeIcon = require('images/icon_profile_16x16.svg?name=HomeIcon');
 
 export interface Props
 {
@@ -106,7 +106,8 @@ class Account extends TerrainComponent<Props>
                 <Route exact path='/account/settings' component={Settings} />
                 <Route exact path='/account/notifications' component={Notifications} />
                 <Route exact path='/account/connections' component={Connections} />
-                <Route path='/account/connections/edit' component={ConnectionEditorPage} />
+                <Route exact path='/account/connections/edit' component={ConnectionEditorPage} />
+                <Route exact path='/account/connections/edit/connectionId=:connectionId' component={ConnectionEditorPage} />
                 <Route exact path='/account/team' component={Team} />
               </Switch>
             </div>

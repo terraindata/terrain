@@ -54,8 +54,13 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 
 import { _ConnectionConfig, ConnectionConfig } from 'app/connections/ConnectionTypes';
+import Autocomplete from 'common/components/Autocomplete';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import FadeInOut from 'common/components/FadeInOut';
+import Switch from 'common/components/Switch';
+import SharedConnectionConfig from 'shared/types/connections/ConnectionConfig';
+import SharedUtil from 'shared/Util';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { LibraryState } from 'library/LibraryTypes';
@@ -66,27 +71,141 @@ export interface Props
   onChange: (newConfig: ConnectionConfig, apply?: boolean) => void;
 }
 
-export const ConnectionTypes = Map(
+export type ConnectionFormConfig = SharedConnectionConfig & {
+  user: string,
+  password: string,
+  port: number,
+};
+
+const ConnectionTypes = Map(
   {
     elastic: 'Elasticsearch',
     mysql: 'MySQL',
   },
 );
 
+const connectionTypesList = List(ConnectionTypes.keys());
+
 export default class ConnectionForm extends TerrainComponent<Props>
 {
-  public connectionTypesList = List(Object.keys(ConnectionTypes));
+  public connectionMap: InputDeclarationMap<ConnectionFormConfig> = {
+    name: {
+      type: DisplayType.TextBox,
+      displayName: 'Name',
+      options: {},
+    },
+    type: {
+      type: DisplayType.Pick,
+      displayName: 'Type',
+      options: {
+        pickOptions: (s) => connectionTypesList,
+        displayNames: (s) => ConnectionTypes,
+        indexResolver: (value) => connectionTypesList.indexOf(value),
+      },
+    },
+    user: {
+      type: DisplayType.TextBox,
+      displayName: 'User',
+      group: 'auth row',
+      widthFactor: 2,
+    },
+    password: {
+      type: DisplayType.TextBox,
+      displayName: 'Password',
+      group: 'auth row',
+      widthFactor: 2,
+    },
+    host: {
+      type: DisplayType.TextBox,
+      displayName: 'Host',
+      group: 'addr row',
+      widthFactor: 3,
+    },
+    port: {
+      type: DisplayType.NumberBox,
+      displayName: 'Port',
+      group: 'addr row',
+      widthFactor: 1,
+    },
+  };
 
-  public render()
+  public analyticsMap: InputDeclarationMap<{ analytics: any }> = {
+    analytics: {
+      type: DisplayType.Custom,
+      displayName: 'Toggle Analytics',
+      options: {
+        render: this.renderAnalyticsSwitch,
+      }
+    }
+  };
+
+  public renderAnalyticsSwitch()
   {
-    const { connection, onChange } = this.props;
+    const { connection } = this.props;
+    const isAnalytics = connection.get('isAnalytics');
     return (
-      <div />
+      <div>
+        <Switch
+          medium={true}
+          first='On'
+          second='Off'
+          selected={isAnalytics ? 1 : 0}
+          onChange={this.handleAnalyticsSwitch}
+        />
+        <FadeInOut open={isAnalytics}>
+          <div className='dynamic-form-default-block'>
+            <div className='dynamic-form-label' style={fontColor(Colors().text2)}> Analytics Index </div>
+            <input
+              className='dynamic-form-autocomplete'
+              value={connection.get('analyticsIndex')}
+              onChange={this.handleAnalyticsIndexChange}
+            />
+          </div>
+        </FadeInOut>
+      </div>
     );
   }
 
-  public handleConnectionChange(newConnection: ConnectionConfig, apply?: boolean)
+  public handleAnalyticsSwitch(selected)
   {
-    this.props.onChange(newConnection, apply);
+    const connection = this.props.connection.set('isAnalytics', selected ? true : false);
+    this.props.onChange(connection, true);
+  }
+
+  public handleAnalyticsIndexChange(event)
+  {
+    const connection = this.props.connection.set('analyticsIndex', event.target.value);
+    this.props.onChange(connection, true);
+  }
+
+  public render()
+  {
+    return (
+      <div className='integration-form-block'>
+        <DynamicForm
+          inputMap={this.connectionMap}
+          inputState={this.configToState(this.props.connection)}
+          onStateChange={this.props.onChange}
+        />
+        <DynamicForm
+          inputMap={this.analyticsMap}
+          inputState={this.configToState(this.props.connection)}
+          onStateChange={this.handleAnalyticsSwitch}
+        />
+      </div>
+    );
+  }
+
+  @instanceFnDecorator(memoizeOne)
+  public configToState(config: ConnectionConfig): ConnectionFormConfig
+  {
+    let state = Util.asJS(config) as SharedConnectionConfig;
+    const dsnString = state['dsn'];
+    if (dsnString !== '')
+    {
+      const dsnConfig = SharedUtil.dsn.parseDSNConfig(dsnString);
+      state = _.merge(state, dsnConfig);
+    }
+    return state as ConnectionFormConfig;
   }
 }
