@@ -46,7 +46,8 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file no-unused-expression
 
 import { FileTypes, Languages } from './ETLTypes';
-import { PostProcessConfig } from './PostProcessTypes';
+import { RootInputConfig } from './InputTypes';
+import { RootPostProcessConfig } from './PostProcessTypes';
 
 export interface FileConfig
 {
@@ -77,26 +78,27 @@ export enum Sinks
   Sftp = 'Sftp',
   Http = 'Http',
   Fs = 'Fs',
+  MailChimp = 'MailChimp',
 }
 
 export const EndpointTypeNames =
   {
     Upload: 'Upload',
     Download: 'Download',
-    Algorithm: 'Algorithm',
+    Algorithm: 'Terrain Algorithm',
     Database: 'Database',
     Sftp: 'SFTP',
     Http: 'HTTP',
-    Fs: 'File System',
+    Fs: 'Local Filesystem',
     Mysql: 'MySQL',
     Postgresql: 'PostgreSQL',
     Magento: 'Magento',
     GoogleAnalytics: 'Google Analytics',
-    Mailchimp: 'MailChimp',
+    MailChimp: 'MailChimp',
   };
 
 export const SchedulableSinks: Sinks[] =
-  [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs];
+  [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs, Sinks.MailChimp];
 
 export const SchedulableSources: Sources[] =
   [Sources.Algorithm, Sources.Sftp, Sources.GoogleAnalytics, Sources.Http, Sources.Fs, Sources.Mysql, Sources.Postgresql];
@@ -108,6 +110,8 @@ export interface SourceConfig
   fileConfig: FileConfig;
   options: SourceOptionsType<SourceTypes>; // a union of all possible option types
   integrationId: number;
+  rootInputConfig: RootInputConfig;
+  rootPostProcessConfig: RootPostProcessConfig;
 }
 
 export interface DefaultSourceConfig
@@ -123,6 +127,8 @@ export interface SinkConfig
   fileConfig: FileConfig;
   options: SinkOptionsType<SinkTypes>; // a union of all possible option types
   integrationId: number;
+  rootInputConfig: RootInputConfig;
+  rootPostProcessConfig: RootPostProcessConfig;
 }
 
 export interface DefaultSinkConfig
@@ -180,13 +186,14 @@ export interface SinkOptionsTypes
   };
   Database: {
     language: Languages;
-    serverId: number;
+    serverId: string;
     database: string;
     table: string;
   };
   Sftp: SftpOptions;
   Http: HttpOptions;
   Fs: {};
+  MailChimp: {};
 }
 
 export const SinkOptionsDefaults: SinkOptionsTypes =
@@ -196,7 +203,7 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
     },
     Database: {
       language: Languages.Elastic,
-      serverId: -1,
+      serverId: '',
       database: '',
       table: '',
     },
@@ -208,6 +215,7 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
       method: 'POST',
     },
     Fs: {},
+    MailChimp: {},
   };
 
 export interface SftpOptions
@@ -225,7 +233,6 @@ export interface HttpOptions
 export interface GoogleAnalyticsOptions
 {
   dayInterval: number;
-  transformations?: PostProcessConfig[];
 }
 
 export interface SQLOptions

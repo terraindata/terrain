@@ -83,19 +83,19 @@ import { KeyPath, WayPoint } from './KeyPath';
  */
 export function find(obj: object, path: KeyPath, next: (found) => any, options: object = {}): void
 {
-  if (path.size === 0 || obj === undefined)
+  if (path.size === 0 || obj === null || obj === undefined)
   {
     // In all these kinds of statements, if next returns void, obj isn't modified
     obj = next(obj);
     return;
   }
 
-  const waypoint: WayPoint = path.get(0);
+  const waypoint: WayPoint = path.get(0).toString();
 
   const keys: string[] = Object.keys(obj);
 
   // Handle the case of encountering a wildcard
-  if (waypoint === '*')
+  if (path.get(0) === -1)
   {
     const results: any[] = [];
     for (let j: number = 0; j < keys.length; j++)
@@ -119,7 +119,7 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
   }
 
   // Create a field if it doesn't exist
-  if (options['create'] === true && !obj.hasOwnProperty(waypoint) && !isPrimitive(obj))
+  if (typeof waypoint === 'string' && options['create'] === true && !obj.hasOwnProperty(waypoint) && !isPrimitive(obj))
   {
     obj[waypoint] = {};
     keys.push(waypoint);

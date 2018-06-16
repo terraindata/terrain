@@ -48,129 +48,67 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as React from 'react';
-import { Link } from 'react-router';
+import { Link, Route, Switch } from 'react-router-dom';
 
-import TerrainComponent from './../../common/components/TerrainComponent';
+import TerrainTabs from 'common/components/TerrainTabs';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import './Account.less';
+
+import Connections from './Connections';
+import EditProfile from './EditProfile';
+import Notifications from './Notifications';
+import Profile from './Profile';
+import Settings from './Settings';
+import Team from './Team';
 
 const HomeIcon = require('./../../../images/icon_profile_16x16.svg?name=HomeIcon');
 
 export interface Props
 {
   location?: any;
-  children?: any;
+  children?: JSX.Element;
 }
 
 class Account extends TerrainComponent<Props>
 {
+  public tabs = [
+    { key: 'settings', label: 'Settings' },
+    { key: 'profile', label: 'Profile' },
+    { key: 'connections', label: 'Connections' },
+    { key: 'team', label: 'Team' },
+  ];
+
+  public tabToRouteMap = {
+    settings: '/account/settings',
+    profile: '/account/profile',
+    connections: '/account/connections',
+    team: '/account/team',
+  };
+
   public render()
   {
+    const { children, location } = this.props;
 
-    let title = 'Account';
-    let selected = '298px';
-    const linkWidth = -144;
-    let profileActive: boolean;
-    let notificationsActive: boolean;
-    let teamActive: boolean;
-    let settingsActive: boolean;
-    let connectionsActive: boolean;
-
-    switch (this.props.location.pathname)
-    {
-      case '/account/profile':
-      case '/account/profile/edit':
-        profileActive = true;
-        title = 'Profile';
-        // selected = '298px'; // use this when we add notifications back in
-        selected = '154px';
-        break;
-      case '/account/notifications':
-        notificationsActive = true;
-        title = 'Notifications';
-        selected = '154px';
-        break;
-      case '/account/connections':
-        connectionsActive = true;
-        title = 'Connections';
-        selected = '298px';
-        break;
-      case '/account/team':
-        teamActive = true;
-        title = 'Team';
-        selected = 'calc(100% - 10px - 144px)';
-        break;
-      case '/account/settings':
-        settingsActive = true;
-        title = 'Settings';
-        selected = '10px';
-        break;
-    }
-
-    // add this back in when ready
-    // <Link
-    //   to={'/account/notifications'}
-    //   className={classNames({
-    //     'account-link': true,
-    //     'active': notificationsActive,
-    //   })}  >
-    //   Notifications
-    // </Link>
     return (
       <div className='account'>
-        <div className='account-wrapper'>
-          <div className='account-title'>
-            <HomeIcon />
-            {
-              title
-            }
-          </div>
-          <div className='account-links'>
-            <div
-              className='selected-link-marker'
-              style={{
-                left: selected,
-              }}
-            />
-            <Link
-              to={'/account/settings'}
-              className={classNames({
-                'account-link': true,
-                'active': settingsActive,
-              })}
-            >
-              Settings
-            </Link>
-            <Link
-              to={'/account/profile'}
-              className={classNames({
-                'account-link': true,
-                'active': profileActive,
-              })}  >
-              Profile
-            </Link>
-            <Link
-              to={'/account/connections'}
-              className={classNames({
-                'account-link': true,
-                'active': connectionsActive,
-              })}
-            >
-              Connections
-            </Link>
-            <Link
-              to={'/account/team'}
-              className={classNames({
-                'account-link': true,
-                'active': teamActive,
-              })}  >
-              Team
-            </Link>
-          </div>
-          <div className='account-inner'>
-            {
-              this.props.children
-            }
-          </div>
+        <div className='account-tabs'>
+          <TerrainTabs
+            tabs={this.tabs}
+            tabToRouteMap={this.tabToRouteMap}
+            location={location}
+          >
+            <div className='account-inner'>
+              <Switch>
+                <Route exact path='/' component={Profile} />
+                <Route exact path='/account/profile' component={Profile} />
+                <Route exact path='/account/profile/edit' component={EditProfile} />
+                <Route exact path='/account/settings' component={Settings} />
+                <Route exact path='/account/notifications' component={Notifications} />
+                <Route exact path='/account/connections' component={Connections} />
+                <Route exact path='/account/team' component={Team} />
+              </Switch>
+            </div>
+          </TerrainTabs>
         </div>
       </div>
     );

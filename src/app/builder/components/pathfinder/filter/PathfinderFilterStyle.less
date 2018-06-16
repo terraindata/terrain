@@ -44,10 +44,16 @@
 	}
 	.routeselector-wrapper {
 		margin-bottom: 1px;
+		.routeselector-value-component {
+			height: 330px;
+		}
 		.routeselector {
 			.routeselector-box-values {
 				border-radius: 4px;
 			}
+		}
+		.routeselector-option-set:last-child {
+			min-width: calc(~"33.333% + 40px") !important;
 		}
 	}
 }
@@ -90,7 +96,7 @@
 			margin-left: 10px;
 		}
 		.expand-icon {
-			top: -2px;
+			top: -6px;
 			position: relative;
 		}
 	}

@@ -54,8 +54,8 @@ import { TestDocs } from './TestDocs';
 test('serialize to JSON', () =>
 {
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc1);
-  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['name'])]));
-  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['name'])]), { format: 'uppercase' });
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]), { format: 'uppercase' });
   expect(e.toJSON()).toEqual({
     dag: {
       options: {
@@ -66,13 +66,13 @@ test('serialize to JSON', () =>
       nodes: [
         {
           v: '0',
-          value: new (TransformationInfo.getType(TransformationNodeType.UppercaseNode))
-            (0, List<KeyPath>([KeyPath(['name'])]), {}, TransformationNodeType.UppercaseNode),
+          value: new (TransformationInfo.getType(TransformationNodeType.CaseNode))
+            (0, List<KeyPath>([KeyPath(['name'])]), { format: 'uppercase' }, TransformationNodeType.CaseNode),
         },
         {
           v: '1',
-          value: new (TransformationInfo.getType(TransformationNodeType.UppercaseNode))
-            (1, List<KeyPath>([KeyPath(['meta', 'school'])]), {}, TransformationNodeType.UppercaseNode),
+          value: new (TransformationInfo.getType(TransformationNodeType.CaseNode))
+            (1, List<KeyPath>([KeyPath(['meta', 'school'])]), { format: 'uppercase' }, TransformationNodeType.CaseNode),
         },
       ],
       edges: [],
@@ -122,8 +122,8 @@ test('serialize to JSON', () =>
 test('JSON serialize/deserialize round trip', () =>
 {
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc1);
-  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['name'])]));
-  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['name'])]), { format: 'uppercase' });
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]), { format: 'uppercase' });
   const j = e.toJSON();
   const e2 = TransformationEngine.load(j);
   expect(e.equals(e2)).toBe(true);
@@ -134,8 +134,8 @@ test('JSON serialize/deserialize round trip', () =>
 test('String serialize/deserialize round trip', () =>
 {
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc1);
-  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['name'])]));
-  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['name'])]), { format: 'uppercase' });
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]), { format: 'uppercase' });
   const j: string = JSON.stringify(e.toJSON());
   const e2 = TransformationEngine.load(j);
   expect(e.equals(e2)).toBe(true);

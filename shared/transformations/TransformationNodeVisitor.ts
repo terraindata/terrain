@@ -56,19 +56,22 @@ import HashTransformationNode from 'shared/transformations/nodes/HashTransformat
 import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
 import ProductTransformationNode from 'shared/transformations/nodes/ProductTransformationNode';
 import QuotientTransformationNode from 'shared/transformations/nodes/QuotientTransformationNode';
+import RemoveDuplicatesNode from 'shared/transformations/nodes/RemoveDuplicatesTransformationNode';
+import RoundTransformationNode from 'shared/transformations/nodes/RoundTransformationNode';
 import SetIfTransformationNode from 'shared/transformations/nodes/SetIfTransformationNode';
 import SubtractTransformationNode from 'shared/transformations/nodes/SubtractTransformationNode';
 import SumTransformationNode from 'shared/transformations/nodes/SumTransformationNode';
 import ArrayCountTransformationNode from './nodes/ArrayCountTransformationNode';
+import CaseTransformationNode from './nodes/CaseTransformationNode';
 import CastTransformationNode from './nodes/CastTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
+import FilterArrayTransformationNode from './nodes/FilterArrayTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
 import InsertTransformationNode from './nodes/InsertTransformationNode';
 import JoinTransformationNode from './nodes/JoinTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
-import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
 import ZipcodeTransformationNode from './nodes/ZipcodeTransformationNode';
 import TransformationVisitResult from './TransformationVisitResult';
 
@@ -116,7 +119,12 @@ export default abstract class TransformationNodeVisitor
     return this.visitDefault(node, doc, options);
   }
 
-  public visitUppercaseNode(node: UppercaseTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  public visitCaseNode(node: CaseTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitRoundNode(node: RoundTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }
@@ -192,6 +200,16 @@ export default abstract class TransformationNodeVisitor
   }
 
   public visitGroupByNode(node: GroupByTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitRemoveDuplicatesNode(node: RemoveDuplicatesNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitFilterArrayNode(node: FilterArrayTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }

@@ -128,18 +128,43 @@ class EndpointForm extends TerrainComponent<Props>
     });
   }
 
-  public handleIntegrationChange(newIntegration: IntegrationConfig)
+  public detectFileConfigFromIntegration(newEndpoint, integration: IntegrationConfig | number): SourceConfig | SinkConfig
+  {
+    const { integrations, endpoint } = this.props;
+    if (typeof integration === 'number')
+    {
+      integration = this.props.integrations.get(integration);
+    }
+    if (integration == null)
+    {
+      return newEndpoint;
+    }
+
+    const oldIntegration = integrations.get(endpoint.integrationId);
+
+    const newOpts = integration.guessFileOptions();
+    const oldOpts = oldIntegration !== undefined ? oldIntegration.guessFileOptions() : {};
+    const applyOpts = this.extractFileConfigDelta(oldOpts, newOpts);
+    const newFileConfig = _FileConfig(_.extend({}, (newEndpoint.fileConfig as any).toObject(), applyOpts));
+    newEndpoint = newEndpoint.set('fileConfig', newFileConfig);
+    return newEndpoint;
+  }
+
+  public handleIntegrationChange(newIntegration: IntegrationConfig, apply?)
   {
     this.props.etlActions({
       actionType: 'updateIntegration',
       integrationId: newIntegration.id,
       integration: newIntegration,
     });
+    const newEndpoint = this.detectFileConfigFromIntegration(this.props.endpoint, newIntegration);
+    this.props.onChange(newEndpoint, apply);
   }
 
   public handleIntegrationPickerChange(id: ID)
   {
-    this.handleEndpointChange(this.props.endpoint.set('integrationId', id));
+    const endpoint = this.detectFileConfigFromIntegration(this.props.endpoint.set('integrationId', id), Number(id));
+    this.props.onChange(endpoint);
     this.setState({
       usingCustomIntegration: false,
     });
@@ -176,7 +201,7 @@ class EndpointForm extends TerrainComponent<Props>
       (endpoint.type != null && endpoint.type !== '' && integrationList.indexOf(endpoint.type) === -1);
     return (
       <div className='endpoint-block'>
-        {
+        { // type picker
           hideTypePicker === true ? null :
             <DynamicForm
               inputMap={mapToUse}
@@ -184,7 +209,7 @@ class EndpointForm extends TerrainComponent<Props>
               onStateChange={this.handleTypeChange}
             />
         }
-        {
+        { // integration form
           isIntegrationType ?
             <IntegrationPicker
               integrationType={endpoint.type}
@@ -204,7 +229,6 @@ class EndpointForm extends TerrainComponent<Props>
             onChange={this.handleIntegrationChange}
             hideType={true}
             hideName={!usingCustomIntegration}
-            debounceAll={true}
           />
         </FadeInOut>
         <FadeInOut
@@ -243,7 +267,35 @@ class EndpointForm extends TerrainComponent<Props>
 
   public handleEndpointChange(newEndpoint: SinkConfig | SourceConfig, apply?: boolean)
   {
+    const newOpts = newEndpoint.guessFileOptions();
+    const oldOpts = this.props.endpoint.guessFileOptions();
+    const applyOpts = this.extractFileConfigDelta(oldOpts, newOpts);
+    const newFileConfig = _FileConfig(_.extend({}, (newEndpoint.fileConfig as any).toObject(), applyOpts));
+    newEndpoint = newEndpoint.set('fileConfig', newFileConfig);
+
     this.props.onChange(newEndpoint, apply);
+  }
+
+  public extractFileConfigDelta(oldConfig: Partial<FileConfig>, newConfig: Partial<FileConfig>): Partial<FileConfig>
+  {
+    if (oldConfig == null)
+    {
+      return newConfig;
+    }
+    if (newConfig == null)
+    {
+      return {};
+    }
+
+    const diff = {};
+    for (const k of Object.keys(newConfig))
+    {
+      if (oldConfig[k] !== newConfig[k])
+      {
+        diff[k] = newConfig[k];
+      }
+    }
+    return diff;
   }
 }
 

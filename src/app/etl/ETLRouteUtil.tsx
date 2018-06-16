@@ -43,10 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
 
-import * as _ from 'lodash';
-import { browserHistory } from 'react-router';
+import { browserHistory } from 'common/components/TerrainComponent';
 
 export default class ETLRouteUtil
 {
@@ -68,6 +66,11 @@ export default class ETLRouteUtil
   public static gotoEditTemplate(templateId)
   {
     browserHistory.push(`/data/templates/edit/templateId=${templateId}`);
+  }
+
+  public static gotoJobs()
+  {
+    browserHistory.push(`/data/jobs/`);
   }
 
   public static isRouteNewTemplate(location)

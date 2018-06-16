@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions
 
+import TerrainDndContext from 'common/components/TerrainDndContext';
 import * as React from 'react';
-import { DragDropContext } from 'react-dnd';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Manual from './Manual';
 import './ManualPopup.less';
@@ -77,6 +77,6 @@ class ManualWrapper extends TerrainComponent<Props>
 }
 
 // ReactRouter does not like the output of DragDropContext, hence the `any` cast
-const ManualExport = DragDropContext(HTML5Backend)(ManualWrapper);
+const ManualExport = TerrainDndContext(ManualWrapper);
 
 export default ManualWrapper;

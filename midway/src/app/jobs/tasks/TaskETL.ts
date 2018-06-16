@@ -49,11 +49,10 @@ import * as winston from 'winston';
 
 import { TaskConfig } from 'shared/types/jobs/TaskConfig';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
+import { templates } from '../../etl/TemplateRouter';
 import Templates from '../../etl/Templates';
 import LogStream from '../../io/streams/LogStream';
 import { Task } from '../Task';
-
-const templates: Templates = new Templates();
 
 export class TaskETL extends Task
 {
@@ -80,21 +79,22 @@ export class TaskETL extends Task
       {
         const streams = await templates.executeETL(this.taskConfig['params']['options'],
           this.taskConfig['params']['options']['inputStreams']);
+        winston.info('finished executing ETL');
         taskOutputConfig['options']['outputStream'] = streams['outputStream'];
         taskOutputConfig['options']['logStream'] = streams['logStream'];
+        resolve(taskOutputConfig);
       }
       catch (e)
       {
         taskOutputConfig.status = false;
         winston.error('Error while running ETL task: ' + String(e.toString()));
-        const errLogStream = new LogStream();
-        errLogStream.error(e.toString());
-        // errLogStream.push(null);
-        taskOutputConfig['options']['logStream'] = errLogStream;
-      }
-      finally
-      {
-        taskOutputConfig['options']['logStream'].push(null);
+        const outputStream = new stream.Readable();
+        outputStream.push(null);
+        const logStream = new LogStream();
+        logStream.log('Error while running ETL task: ' + String(e.toString()), 'error');
+        logStream.push(null);
+        taskOutputConfig['options']['logStream'] = logStream;
+        taskOutputConfig['options']['outputStream'] = outputStream;
         resolve(taskOutputConfig);
       }
     });

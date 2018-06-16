@@ -53,7 +53,6 @@ export class DatabaseConfig extends ConfigType
   public type: string = '';
   public dsn: string = '';
   public host: string = '';
-  public status?: string = undefined;
   public isAnalytics: boolean = false;
   public analyticsIndex?: string = undefined;
   public analyticsType?: string = undefined;

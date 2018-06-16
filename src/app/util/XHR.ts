@@ -43,7 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import * as TerrainLog from 'loglevel';
+import MidwayError from '../../../shared/error/MidwayError';
 
 class XHR
 {
@@ -57,23 +59,60 @@ class XHR
         timeout: 180000,
         withCredentials: false,
         params: {
-          id: localStorage['id'],
-          accessToken: localStorage['accessToken'],
           body: {},
         },
       });
 
-    terrainAxios.interceptors.response.use(
-      (response) => response,
-      (error) =>
+    // NOTE: axios passes the config by reference, which means that any mutations on the config
+    // will be kept in this axios instance
+    terrainAxios.interceptors.request.use(
+      (config: AxiosRequestConfig) =>
       {
-        let processedError = error;
-        if (processedError && processedError.response)
+        if (config.auth === undefined)
         {
-          processedError = error.response.data.errors[0].detail;
+          const theId = localStorage['id'];
+          const theToken = localStorage['accessToken'];
+          if (theId === undefined || theToken === undefined)
+          {
+            TerrainLog.debug('Both Auth and accessToken are empty');
+            const routeError: MidwayError = new MidwayError(400, 'unauthorized request.', 'The access token is missing.', {});
+            return Promise.reject(routeError);
+          }
+          if (config.params.id !== theId)
+          {
+            config.params.id = theId;
+          }
+          if (config.params.accessToken !== theToken)
+          {
+            config.params.accessToken = theToken;
+          }
+        } else
+        {
+          if (config.params.id)
+          {
+            delete config.params.id;
+          }
+          if (config.params.accessToken)
+          {
+            delete config.params.accessToken;
+          }
         }
+        return config;
+      },
+      (error: any) =>
+      {
+        const routeError = MidwayError.fromAxiosErrorResponse(error, 'The request is failed before sending out.');
+        return Promise.reject(routeError);
+      },
+    );
 
-        return Promise.reject(processedError);
+    // This process the query response
+    terrainAxios.interceptors.response.use(
+      (response: AxiosResponse) => response,
+      (error: any) =>
+      {
+        const routeError = MidwayError.fromAxiosErrorResponse(error, 'failed request');
+        return Promise.reject(routeError);
       },
     );
 

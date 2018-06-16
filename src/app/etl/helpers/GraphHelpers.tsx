@@ -62,7 +62,6 @@ import ETLRouteUtil from 'etl/ETLRouteUtil';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import
@@ -125,7 +124,7 @@ class GraphHelpers extends ETLHelpers
     // 1: create a merge node
     // 2: split the left edge using the merge node
     // 3: connect the right edge to the merge node
-    this._try((proxy) =>
+    const makePromise = () => this._try((proxy) =>
     {
       const leftEdgeId = proxy.value().findEdges((edge) => edge.from === leftId).first();
       const rightEdgeId = proxy.value().findEdges((edge) => edge.from === rightId).first();
@@ -136,6 +135,7 @@ class GraphHelpers extends ETLHelpers
         outputKey,
       });
     }).catch(this._editorErrorHandler('Could Not Create Merge Join', true));
+    this._blockOn('Calculating Merge Engine', makePromise);
   }
 
   public createEngineForSourceEdge(edgeId: number)
@@ -147,18 +147,21 @@ class GraphHelpers extends ETLHelpers
     if (fromNode.type === NodeTypes.Source)
     {
       const source = template.getSource(fromNode.endpoint);
-      DocumentsHelpers.fetchDocuments(source, fromNode.endpoint).then((documents) =>
-      {
-        this._try((proxy) =>
+      const makePromise = () => DocumentsHelpers.fetchDocuments(source, fromNode.endpoint)
+        .then(async (documents) =>
         {
-          proxy.createInitialEdgeEngine(edgeId, documents);
-        }).then(() =>
-        {
-          this.editorAct({
-            actionType: 'rebuildFieldMap',
-          });
-        }).catch(this._editorErrorHandler('Could Not Create Engine From Documents', true));
-      }).catch(this._editorErrorHandler('Could Not Fetch Documents', true));
+          await this._logUpdate('Calculating Template From Documents');
+          this._try((proxy) =>
+          {
+            proxy.createInitialEdgeEngine(edgeId, documents);
+          }).then(() =>
+          {
+            this.editorAct({
+              actionType: 'rebuildFieldMap',
+            });
+          }).catch(this._editorErrorHandler('Could Not Create Engine From Documents', true));
+        }).catch(this._editorErrorHandler('Could Not Fetch Documents', true));
+      this._blockOn('Initializing', makePromise);
     }
   }
 

@@ -81,6 +81,7 @@ export interface Props
   tooltips?: List<any>;
   wrapperTooltip?: string;
   placeholder?: string;
+  wrapperHeight?: string;
   icons?: Immutable.Map<any, any>;
 
   action?: (keyPath, value) => void;
@@ -350,7 +351,10 @@ class Dropdown extends TerrainComponent<Props>
       optionsEl =
         <div
           className='dropdown-options-wrapper'
-          style={{ border: '1px solid lightgray' }}
+          style={{
+            border: '1px solid lightgray',
+            maxHeight: this.props.wrapperHeight !== undefined ? this.props.wrapperHeight : undefined,
+          }}
         >
           {
             (this.props.options && this.props.options.size > 0) ?

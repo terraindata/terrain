@@ -46,24 +46,28 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires import-spacing
 
 import TerrainComponent from 'common/components/TerrainComponent';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import Modal from 'common/components/Modal';
 
+import TerrainTools from 'app/util/TerrainTools';
 import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateList';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
 
 const UndoIcon = require('images/icon_undo.svg');
 const RedoIcon = require('images/icon_redo.svg');
 const SaveAsIcon = require('images/icon_save_as.svg');
+const CopyIcon = require('images/icon_clipboard.svg');
 
 import './EditorActionsSection.less';
 
@@ -129,6 +133,7 @@ class EditorActionsSection extends TerrainComponent<Props>
           title={this.state.isSaveAs ? 'Save As' : 'Save Template'}
           open={this.state.saveTemplateModalOpen}
           showTextbox={true}
+          confirmButtonText='Save'
           onConfirm={this.handleSaveConfirm}
           onClose={this.handleCloseSave}
           confirmDisabled={this.state.newTemplateName === ''}
@@ -141,6 +146,34 @@ class EditorActionsSection extends TerrainComponent<Props>
       );
     }
     return modals;
+  }
+
+  public renderIcon(iconComponent, options:
+    {
+      key: string,
+      onClick?: () => void,
+      style?: any,
+      tip?: string,
+    })
+  {
+    const content = (
+      <div
+        className='editor-top-bar-icon'
+        style={options.style}
+        onClick={options.onClick}
+        key={options.key}
+      >
+        {iconComponent}
+      </div>
+    );
+    if (options.tip !== undefined)
+    {
+      return tooltip(content, options.tip);
+    }
+    else
+    {
+      return content;
+    }
   }
 
   public render()
@@ -163,30 +196,48 @@ class EditorActionsSection extends TerrainComponent<Props>
         >
           {titleName}
         </div>
-        <div
-          className='editor-top-bar-icon'
-          style={history.canRedo() ? topBarIconStyle : topBarIconDisabledStyle}
-          onClick={this.handleRedo}
-          key='redo'
-        >
-          <RedoIcon />
-        </div>
-        <div
-          className='editor-top-bar-icon'
-          style={history.canUndo() ? topBarIconStyle : topBarIconDisabledStyle}
-          onClick={this.handleUndo}
-          key='undo'
-        >
-          <UndoIcon />
-        </div>
-        <div
-          className='editor-top-bar-icon'
-          style={topBarIconStyle}
-          onClick={this.handleSaveAsClicked}
-          key='save as'
-        >
-          <SaveAsIcon />
-        </div>
+        {
+          this.renderIcon(<RedoIcon />, {
+            key: 'redo',
+            onClick: this.handleRedo,
+            style: history.canRedo() ? topBarIconStyle : topBarIconDisabledStyle,
+            tip: 'Redo',
+          })
+        }
+        {
+          this.renderIcon(<UndoIcon />, {
+            key: 'undo',
+            onClick: this.handleUndo,
+            style: history.canUndo() ? topBarIconStyle : topBarIconDisabledStyle,
+            tip: 'Undo',
+          })
+        }
+        {
+          TerrainTools.isFeatureEnabled(TerrainTools.TEMPLATE_COPY) ?
+            tooltip(
+              <CopyToClipboard
+                text={JSON.stringify(templateForBackend(this.props.templateEditor.template))}
+              >
+                {
+                  this.renderIcon(<CopyIcon />, {
+                    key: 'copy',
+                    style: topBarIconStyle,
+                  })
+                }
+              </CopyToClipboard>
+              ,
+              'Copy Template to Clipboard',
+            )
+            : null
+        }
+        {
+          this.renderIcon(<SaveAsIcon />, {
+            key: 'save as',
+            onClick: this.handleSaveAsClicked,
+            style: [...topBarIconStyle, { top: 2 }],
+            tip: 'Save As',
+          })
+        }
         <div
           className='editor-top-bar-item'
           style={topBarItemStyle}

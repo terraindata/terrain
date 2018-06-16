@@ -44,19 +44,47 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+// Section: Login Flow
+
+function onLoginSubmit(email, password)
+{
+	
+}
+
+function onLoggedIn(token)
+{
+	inject('vendor.bundle.js', token);
+	inject('bundle.js', token);
+}
+
+function onBundlesLoaded()
+{
+	
+}
+
+// Next two steps (bundle's executed & data's loaded) are run by bundle.js
+
+// Section: Event Handlers
+
+document.getElementById("login-submit").onclick = function()
+{
+	const em
+	
+	// TODO: authenticate with Midway, then pass accessToken into inject()
+	const token = '';
+	onLoggedIn(token);
+}	
+
+
+// Section: Functional
+
 function inject(path, token)
 {
 	const script = document.createElement('script')
 	script.setAttribute('src', '/midway/v1/assets/' + path);
 	script.setAttribute('type', 'text/javascript');
+	script.setAttribute('charset', 'utf-8');
 	document.body.appendChild(script);
 	console.log(path + ' injected');
 }
 
-document.getElementById("login-submit").onclick = function()
-{
-	// TODO: authenticate with Midway, then pass accessToken into inject()
-	const token = '';
-	inject('vendor.bundle.js', token);
-	inject('bundle.js', token);
-}	

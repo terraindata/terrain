@@ -53,19 +53,9 @@ export class StatusHistory
 {
   private statusHistoryTable: Tasty.Table;
 
-  constructor()
+  public initialize()
   {
-    this.statusHistoryTable = new Tasty.Table(
-      'statusHistory',
-      ['id'],
-      [
-        'createdAt',
-        'userId',
-        'algorithmId',
-        'fromStatus',
-        'toStatus',
-      ],
-    );
+    this.statusHistoryTable = App.TBLS.statusHistory;
   }
 
   public async create(user: UserConfig, id: number, obj: object, newStatus: string): Promise<StatusHistoryConfig>

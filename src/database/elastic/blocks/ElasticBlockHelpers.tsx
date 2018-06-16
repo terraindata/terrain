@@ -230,7 +230,7 @@ export const ElasticBlockHelpers = {
       }
       return FieldType.Text;
     }
-    if (!builderState.query)
+    if (!builderState.query && !overrideIndex)
     {
       return '';
     }
@@ -242,10 +242,10 @@ export const ElasticBlockHelpers = {
     {
       return undefined;
     }
-    const server = builderState.db.name;
     if (index !== null)
     {
-      const indexId = `${builderState.db.name}/${String(index)}`;
+      const server = builderState.db.name || builderState.query.db.name;
+      const indexId = `${server}/${String(index)}`;
       const fields = schemaState.columns.filter(
         (column) => column.serverId === String(server) &&
           column.databaseId === String(indexId),

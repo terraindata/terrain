@@ -110,13 +110,12 @@ export default class HTTPEndpoint extends AEndpointStream
         {
           if (res.headers['content-encoding'] === 'gzip')
           {
-            resolve(passThrough);
             const gunzip = zlib.createGunzip();
             gunzip.on('data', (data) =>
             {
               passThrough.write(data);
             });
-            res.pipe(gunzip);
+            resolve(res.pipe(gunzip));
           }
           else
           {

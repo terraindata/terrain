@@ -55,10 +55,11 @@ import { Permissions } from '../permissions/Permissions';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as Util from '../AppUtil';
-import { deleteElasticIndex, getSchema } from '../Schema';
+import { deleteElasticIndex, getSchema, getTable } from '../Schema';
 
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
+export const initialize = () => { };
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
@@ -83,6 +84,12 @@ Router.get('/:database', passport.authenticate('access-token-local'), async (ctx
 {
   winston.info('get schema');
   ctx.body = await getSchema(ctx.params.database);
+});
+
+Router.get('/:database/:table', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('get schema');
+  ctx.body = await getTable(ctx.params.database, ctx.params.table);
 });
 
 Router.post('/database/delete', passport.authenticate('access-token-local'), async (ctx, next) =>

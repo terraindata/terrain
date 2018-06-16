@@ -660,17 +660,17 @@ export class TransformationEngine
         (fieldNamesOrIDs as List<KeyPath>).map((name: KeyPath) =>
         {
           // Replace wildcards with explicit field IDs
-          if (name.contains('*'))
+          if (name.contains(-1))
           {
-            // const upto: KeyPath = name.slice(0, name.indexOf('*')).toList();
-            // ids = ids.push(this.fieldNameToIDMap.get(upto.push('*')));
+            // const upto: KeyPath = name.slice(0, name.indexOf(-1)).toList();
+            // ids = ids.push(this.fieldNameToIDMap.get(upto.push(-1)));
             /*if (this.fieldNameToIDMap.has(upto))
             {
               // Add extra fields we might know about from the example doc
               if (this.doc !== undefined && yadeep.get(this.doc, upto) !== undefined)
               {
                 for (let i: number = 0; i <= yadeep.get(this.doc, upto).length; i++) {
-                  ids = ids.concat(this.parseFieldIDs(List<KeyPath>([name.set(name.indexOf('*'), i.toString())]))).toList();
+                  ids = ids.concat(this.parseFieldIDs(List<KeyPath>([name.set(name.indexOf(-1), i.toString())]))).toList();
                 }
               }
             }*/
@@ -693,7 +693,7 @@ export class TransformationEngine
   private addPrimitiveField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any): List<number>
   {
     // console.log('x3 ' + currentKeyPath.push(key.toString()));
-    return ids.push(this.addField(currentKeyPath.push(key.toString()), typeof obj[key]));
+    return ids.push(this.addField(currentKeyPath.push(key), typeof obj[key]));
   }
 
   private addArrayField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any, depth: number = 1): List<number>
@@ -702,20 +702,28 @@ export class TransformationEngine
     // const arrayKey: any = [key.toString()];
     // const arrayID: number = this.addField(currentKeyPath.push(arrayKey), 'array');
     // console.log('x2 ' + currentKeyPath.push(key.toString()));
-    let arrayType = arrayTypeOfValues(obj[key]);
+    let arrayType;
+    try
+    {
+      arrayType = arrayTypeOfValues(obj[key]);
+    }
+    catch (e)
+    {
+      // todo log?
+    }
     if (arrayType === undefined)
     {
       arrayType = null;
     }
-    const arrayID: number = this.addField(currentKeyPath.push(key.toString()), 'array');
+    const arrayID: number = this.addField(currentKeyPath.push(key), 'array');
     ids = ids.push(arrayID);
     this.setFieldProp(arrayID, KeyPath(['valueType']), arrayType);
-    // console.log('adding awid ' + currentKeyPath.push(key.toString()).push('*'));
-    let awkp: KeyPath = currentKeyPath.push(key.toString());
+    // console.log('adding awid ' + currentKeyPath.push(key.toString()).push(-1));
+    let awkp: KeyPath = currentKeyPath.push(key);
     awkp = awkp.slice(0, awkp.size - depth + 1).toList();
     for (let i: number = 0; i < depth; i++)
     {
-      awkp = awkp.push('*');
+      awkp = awkp.push(-1);
     }
     // console.log('x4 ' + awkp);
     const arrayWildcardID: number = this.addField(awkp, 'array');
@@ -727,19 +735,19 @@ export class TransformationEngine
       // const arrayKey_i: any = arrayKey.push(i.toString());
       if (isPrimitive(obj[key][i]))
       {
-        ids = this.addPrimitiveField(ids, obj[key], currentKeyPath.push(key.toString()), i);
+        ids = this.addPrimitiveField(ids, obj[key], currentKeyPath.push(key), i);
         // ids = ids.push(this.addField(currentKeyPath.push(arrayKey_i), typeof obj[key]));
       } else if (Array.isArray(obj[key][i]))
       {
         // console.log('cpk2 ' + currentKeyPath.push(key.toString()) + ' ' + JSON.stringify(obj[key][i]));
-        ids = this.addArrayField(ids, obj[key], currentKeyPath.push(key.toString()), i, depth + 1);
+        ids = this.addArrayField(ids, obj[key], currentKeyPath.push(key), i, depth + 1);
       } else
       {
         // console.log('x1 ' + currentKeyPath.push(key.toString()).push(i.toString()));
-        ids = ids.push(this.addField(currentKeyPath.push(key.toString()).push(i.toString()), typeof obj[key][i]));
+        ids = ids.push(this.addField(currentKeyPath.push(key).push(i), typeof obj[key][i]));
         // console.log('foo ' + currentKeyPath.push(key.toString()).push(i.toString()));
         ids = this.addObjectField(ids, obj[key][i], awkp, true);
-        ids = this.addObjectField(ids, obj[key][i], currentKeyPath.push(key.toString()).push(i.toString()), true);
+        ids = this.addObjectField(ids, obj[key][i], currentKeyPath.push(key).push(i), true);
       }
     }
     return ids;
@@ -751,26 +759,26 @@ export class TransformationEngine
     {
       if (isPrimitive(obj[key]))
       {
-        if (prevArray && !this.fieldNameToIDMap.has(currentKeyPath.butLast().toList().push('*').push(key)))
+        if (prevArray && !this.fieldNameToIDMap.has(currentKeyPath.butLast().toList().push(-1).push(key)))
         {
-          ids = this.addPrimitiveField(ids, obj, currentKeyPath.butLast().toList().push('*'), key);
+          ids = this.addPrimitiveField(ids, obj, currentKeyPath.butLast().toList().push(-1), key);
         }
         ids = this.addPrimitiveField(ids, obj, currentKeyPath, key);
       } else if (obj[key].constructor === Array)
       {
-        if (prevArray && !this.fieldNameToIDMap.has(currentKeyPath.butLast().toList().push('*').push(key)))
+        if (prevArray && !this.fieldNameToIDMap.has(currentKeyPath.butLast().toList().push(-1).push(key)))
         {
-          ids = this.addArrayField(ids, obj, currentKeyPath.butLast().toList().push('*'), key);
+          ids = this.addArrayField(ids, obj, currentKeyPath.butLast().toList().push(-1), key);
         }
         ids = this.addArrayField(ids, obj, currentKeyPath, key);
       } else
       {
-        if (prevArray && !this.fieldNameToIDMap.has(currentKeyPath.butLast().toList().push('*').push(key)))
+        if (prevArray && !this.fieldNameToIDMap.has(currentKeyPath.butLast().toList().push(-1).push(key)))
         {
           // current children
-          ids = ids.push(this.addField(currentKeyPath.butLast().toList().push('*').push(key), typeof obj[key]));
+          ids = ids.push(this.addField(currentKeyPath.butLast().toList().push(-1).push(key), typeof obj[key]));
           // recursive call with wildcard
-          ids = this.addObjectField(ids, obj[key], currentKeyPath.butLast().toList().push('*').push(key));
+          ids = this.addObjectField(ids, obj[key], currentKeyPath.butLast().toList().push(-1).push(key));
         }
         ids = ids.push(this.addField(currentKeyPath.push(key), typeof obj[key]));
         // recursive call without wildcard
@@ -810,12 +818,21 @@ export class TransformationEngine
   {
     const r: object = {};
     const o: object = doc; // objectify(doc);
-    this.fieldNameToIDMap.forEach((value: number, key: KeyPath) =>
+    // sort the field map so that parent renames don't cause weird issues with children renames
+    const fieldToIDMap = this.fieldNameToIDMap.sort((valueA, valueB) =>
     {
-      // console.log('rn key = ' + key);
+      const sizeA = this.getOutputKeyPath(valueA).size;
+      const sizeB = this.getOutputKeyPath(valueB).size;
+      if (sizeA === sizeB)
+      {
+        return valueA - valueB;
+      }
+      return sizeA - sizeB;
+    });
+    fieldToIDMap.forEach((value: number, key: KeyPath) =>
+    {
       this.renameHelper(r, o, key, value);
     });
-
     return r;
   }
 
@@ -837,22 +854,28 @@ export class TransformationEngine
       // console.log('el = ' + el + ' for key ' + key);
       if (el !== undefined)
       {
-        if (isPrimitive(el))
+        if (isPrimitive(el) || Object.keys(el).length === 0)
         {
           yadeep.set(r, this.IDToFieldNameMap.get(value), el, { create: true });
         }
         else if (el.constructor === Array)
         {
-          if (key.contains('*'))
+          if (key.contains(-1))
           {
             const newKey: KeyPath = this.IDToFieldNameMap.get(value);
-            const upto: KeyPath = key.slice(0, key.indexOf('*')).toList();
+            const upto: KeyPath = key.slice(0, key.indexOf(-1)).toList();
             for (let j: number = 0; j < Object.keys(yadeep.get(o, upto)).length; j++)
             {
-              const newKeyReplaced: KeyPath = newKey.set(newKey.indexOf('*'), j.toString());
-              const oldKeyReplaced: KeyPath = key.set(key.indexOf('*'), j.toString());
-              // console.log('r here1');
-              this.renameHelper(r, o, newKeyReplaced, this.fieldNameToIDMap.get(newKeyReplaced), oldKeyReplaced);
+              const newKeyReplaced: KeyPath = newKey.set(newKey.indexOf(-1), j);
+              const oldKeyReplaced: KeyPath = key.set(key.indexOf(-1), j);
+              const oldKeyReplacedWithoutLast = oldKeyReplaced.butLast().toList();
+              if (oldKeyReplaced.last() === -1 ||
+                (yadeep.get(o, oldKeyReplacedWithoutLast) != null &&
+                  Object.keys(yadeep.get(o, oldKeyReplacedWithoutLast)).indexOf(oldKeyReplaced.last().toString()) !== -1))
+              {
+                // console.log('r here1');
+                this.renameHelper(r, o, newKeyReplaced, this.fieldNameToIDMap.get(newKeyReplaced), oldKeyReplaced);
+              }
             }
           }
           /*else
@@ -879,11 +902,18 @@ export class TransformationEngine
       // duplicating a disabled array
       if (yadeep.get(output, value) !== undefined)
       {
-        if (this.fieldTypes.get(key) === 'array' && !value.includes('*'))
+        if (this.fieldTypes.get(key) === 'array' && !value.includes(-1))
         {
           const x = yadeep.get(output, value);
-          x['length'] = Object.keys(x).length;
-          yadeep.set(output, value, Array.prototype.slice.call(x), { create: true });
+          if (x === null)
+          {
+            yadeep.set(output, value, [], { create: true });
+          }
+          else
+          {
+            x['length'] = Object.keys(x).length;
+            yadeep.set(output, value, Array.prototype.slice.call(x), { create: true });
+          }
         }
       }
     });

@@ -64,6 +64,7 @@ export interface HeaderConfigItem<T>
 {
   name: string;
   render: (rowElem: T, index) => any;
+  style?: object;
 }
 export type HeaderConfig<T> = Array<HeaderConfigItem<T>>;
 
@@ -124,7 +125,7 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
                   key={i}
                   style={_.extend(
                     {},
-                    { width: `${100 / columnConfig.length}%` },
+                    headerItem.style || { width: `${100 / columnConfig.length}%` },
                     fontColor(Colors().active),
                   )}
                 >
@@ -177,7 +178,10 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
                 <div
                   className='row-info-data'
                   key={i}
-                  style={{ width: `${100 / columnConfig.length}%` }}
+                  style={_.extend(
+                    {},
+                    headerItem.style || { width: `${100 / columnConfig.length}%` },
+                  )}
                 >
                   {headerItem.name}
                 </div>

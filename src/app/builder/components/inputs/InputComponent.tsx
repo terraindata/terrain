@@ -58,7 +58,6 @@ import MapUtil from '../../../util/MapUtil';
 import Util from '../../../util/Util';
 import BuilderActions from '../../data/BuilderActions';
 import './InputStyle.less';
-const shallowCompare = require('react-addons-shallow-compare');
 
 import { cardStyle, Colors, fontColor, getCardColors } from '../../../colors/Colors';
 import MapComponent from '../../../common/components/MapComponent';
@@ -141,11 +140,7 @@ class InputComponent extends TerrainComponent<Props>
 
     if (inputType === InputType.DATE)
     {
-      let date = new Date(this.props.input.value);
-      if (date.toString() === 'Invalid Date')
-      {
-        date = new Date();
-      }
+      const date = String(this.props.input.value || '');
       const value = Util.formatInputDate(date, this.props.language);
 
       this.props.action(this.getKeyPath('value'), value);

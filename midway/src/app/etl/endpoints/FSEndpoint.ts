@@ -51,7 +51,7 @@ import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/Endpoi
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import AEndpointStream from './AEndpointStream';
 
-export default class HTTPEndpoint extends AEndpointStream
+export default class FSEndpoint extends AEndpointStream
 {
   constructor()
   {
@@ -62,6 +62,10 @@ export default class HTTPEndpoint extends AEndpointStream
   {
     const config = await this.getIntegrationConfig(source.integrationId);
     // TODO: sanitize path here to allow reading only from whitelisted locations
+    if (!fs.existsSync(config['path']))
+    {
+      throw new Error(`The file path ${config['path']} does not exist`);
+    }
     return fs.createReadStream(config['path']);
   }
 

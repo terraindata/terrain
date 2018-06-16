@@ -66,7 +66,6 @@ export interface Props
 {
   integration: IntegrationConfig;
   onChange: (newIntegration: IntegrationConfig, apply?: boolean) => void;
-  debounceAll?: boolean;
 }
 
 abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props = Props> extends TerrainComponent<P>
@@ -115,13 +114,11 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
           inputMap={this.authMap}
           inputState={authState}
           onStateChange={this.handleAuthFormChange}
-          debounceAll={this.props.debounceAll}
         />
         <DynamicForm
           inputMap={this.connectionMap}
           inputState={connectionState}
           onStateChange={this.handleConnectionFormChange}
-          debounceAll={this.props.debounceAll}
         />
       </div>
     );
@@ -129,16 +126,23 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
 
   protected handleAuthFormChange(state: AuthState, apply?: boolean)
   {
-    const { onChange, integration } = this.props;
-    const newConfig = this.authStateToConfig(state);
-    onChange(integration.set('authConfig', newConfig), apply);
+    if (apply)
+    {
+      const { onChange, integration } = this.props;
+      const newConfig = this.authStateToConfig(state);
+      onChange(integration.set('authConfig', newConfig), apply);
+    }
+
   }
 
   protected handleConnectionFormChange(state: ConnectionState, apply?: boolean)
   {
-    const { onChange, integration } = this.props;
-    const newConfig = this.connectionStateToConfig(state);
-    onChange(integration.set('connectionConfig', newConfig), apply);
+    if (apply)
+    {
+      const { onChange, integration } = this.props;
+      const newConfig = this.connectionStateToConfig(state);
+      onChange(integration.set('connectionConfig', newConfig), apply);
+    }
   }
 }
 
@@ -370,18 +374,25 @@ class GoogleAnalyticsForm extends IntegrationFormBase<GoogleAnalyticsAuthT, Goog
       displayName: 'Email',
     },
     metrics: {
-      type: DisplayType.TagsBox,
-      displayName: 'Metrics',
+      type: DisplayType.Custom,
+      widthFactor: -1,
       options: {
-        transformValue: (value) => value.map((v) => (v.alias as string) + ',' + (v.expression as string)),
-        untransformValue: (value) => value.map((v) =>
-        {
-          const pieces = v != null ? v.split(',') : ['', ''];
-          return { alias: pieces[0] || '', expression: pieces[1] || '' };
-        },
-        ),
+        render: this.renderMetricsForm,
       },
     },
+    // metrics: {
+    //   type: DisplayType.TagsBox,
+    //   displayName: 'Metrics',
+    //   options: {
+    //     transformValue: (value) => value.map((v) => (v.alias as string) + ',' + (v.expression as string)),
+    //     untransformValue: (value) => value.map((v) =>
+    //     {
+    //       const pieces = v != null ? v.split(',') : ['', ''];
+    //       return { alias: pieces[0] || '', expression: pieces[1] || '' };
+    //     },
+    //     ),
+    //   },
+    // },
     dimensions: {
       type: DisplayType.TagsBox,
       displayName: 'Dimensions',
@@ -399,6 +410,42 @@ class GoogleAnalyticsForm extends IntegrationFormBase<GoogleAnalyticsAuthT, Goog
       displayName: 'View Id',
     },
   };
+
+  public defaultState = {
+    metrics: {},
+  };
+
+  public renderMetricsForm(state: GoogleAnalyticsConnectionT, disabled)
+  {
+    /*
+    options: {
+    //     transformValue: (value) => value.map((v) => (v.alias as string) + ',' + (v.expression as string)),
+    //     untransformValue: (value) => value.map((v) =>
+    //     {
+    //       const pieces = v != null ? v.split(',') : ['', ''];
+    //       return { alias: pieces[0] || '', expression: pieces[1] || '' };
+    //     },
+    //     ),
+    //   },
+    */
+    return (
+      <ObjectForm
+        object={state.metrics != null ? state.metrics : {}}
+        keyName='alias'
+        valueName='expression'
+        onChange={this.handleMetricsChange}
+        label='Metrics'
+      />
+    );
+  }
+
+  public handleMetricsChange(newMetrics, apply?: boolean)
+  {
+    const options = this.props.integration.connectionConfig as GoogleAnalyticsConnectionT;
+    const newFormState: GoogleAnalyticsConnectionT = _.extend({}, options);
+    newFormState.metrics = newMetrics;
+    this.handleConnectionFormChange(newFormState, apply);
+  }
 }
 
 type EmailAuthT = AuthConfigType<Integrations.Email>;
@@ -416,18 +463,18 @@ class EmailForm extends IntegrationFormBase<EmailAuthT, EmailConnectionT>
   };
 }
 
-type MailchimpAuthT = AuthConfigType<Integrations.Mailchimp>;
-type MailchimpConnectionT = ConnectionConfigType<Integrations.Mailchimp>;
-class MailchimpForm extends IntegrationFormBase<MailchimpAuthT, MailchimpConnectionT>
+type MailChimpAuthT = AuthConfigType<Integrations.MailChimp>;
+type MailChimpConnectionT = ConnectionConfigType<Integrations.MailChimp>;
+class MailChimpForm extends IntegrationFormBase<MailChimpAuthT, MailChimpConnectionT>
 {
-  public authMap: InputDeclarationMap<MailchimpAuthT> = {
+  public authMap: InputDeclarationMap<MailChimpAuthT> = {
     apiKey: {
       type: DisplayType.TextBox,
       displayName: 'API Key',
     },
   };
 
-  public connectionMap: InputDeclarationMap<MailchimpConnectionT> = {
+  public connectionMap: InputDeclarationMap<MailChimpConnectionT> = {
     host: {
       type: DisplayType.TextBox,
       displayName: 'Host',
@@ -450,5 +497,5 @@ export const IntegrationFormMap: FormLookupMap =
     [Integrations.Postgresql]: PostgresqlForm,
     [Integrations.Magento]: MagentoForm,
     [Integrations.GoogleAnalytics]: GoogleAnalyticsForm,
-    [Integrations.Mailchimp]: MailchimpForm,
+    [Integrations.MailChimp]: MailChimpForm,
   };

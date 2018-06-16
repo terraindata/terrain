@@ -22,7 +22,6 @@
             "common/*": ["app/common/*"],
             "deploy/*": ["app/deploy/*"],
             "etl*": ["src/app/etl/*"],
-            "fileimport/*": ["app/fileimport/*"],
             "jobs/*": ["app/jobs/*"],
             "manual/*": ["app/manual/*"],
             "roles/*": ["app/roles/*"],

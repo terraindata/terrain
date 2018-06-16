@@ -78,7 +78,10 @@ import 'etl/templates/components/transformations/TransformationEditor.less';
 const EditIcon = require('images/icon_edit.svg');
 const DeleteIcon = require('images/icon_close.svg');
 
-export type Props = TemplateEditorFieldProps;
+export interface Props extends TemplateEditorFieldProps
+{
+  registerApply: (apply: () => void) => void;
+}
 
 const enum ViewState
 {
@@ -120,6 +123,7 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
           fieldID={this._field().fieldId}
           onClose={this.handleUIClose}
           tryMutateEngine={this.mutateEngine}
+          registerApply={this.props.registerApply}
         />
       );
     }

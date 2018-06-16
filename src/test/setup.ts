@@ -44,6 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 import * as Enzyme from 'enzyme';
-import * as Adapter from 'enzyme-adapter-react-15';
+import * as Adapter from 'enzyme-adapter-react-16';
 
 Enzyme.configure({ adapter: new Adapter() });

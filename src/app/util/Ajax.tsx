@@ -64,6 +64,8 @@ import { AuthActions as Actions } from '../auth/data/AuthRedux';
 import * as LibraryTypes from '../library/LibraryTypes';
 import * as UserTypes from '../users/UserTypes';
 
+import * as TerrainLog from 'loglevel';
+
 import AjaxM1 from './AjaxM1';
 
 export interface AjaxResponse
@@ -81,7 +83,7 @@ export const Ajax =
       Ajax.reduxStoreDispatch = config.reduxStoreDispatch;
     },
 
-    req(method: 'post' | 'get',
+    req(method: 'post' | 'get' | 'delete',
       url: string,
       body: object,
       onLoad: (response: object) => void,
@@ -180,20 +182,16 @@ export const Ajax =
         (response) => response,
         (error) =>
         {
+          // This is an route error, we have to abstract the route error to an MidwayError object
           if (error && error.response)
           {
             if (error.response.status === 401)
             {
               Ajax.reduxStoreDispatch(Actions({ actionType: 'logout' }));
             }
-
-            if (error.response.status !== 200)
-            {
-              config && config.onError && config.onError(error.data);
-            }
           }
-
-          return Promise.reject(error);
+          const midwayError = MidwayError.fromAxiosErrorResponse(error, 'The Connection Has Been Lost.');
+          return Promise.reject(midwayError);
         },
       );
 
@@ -225,19 +223,17 @@ export const Ajax =
         {
           onLoad(response.data);
         })
-        .catch((err) =>
+        .catch((err: MidwayError) =>
         {
           if (axios.isCancel(err))
           {
             // Added for testing, can be removed.
-            console.error('isCanceled', err.message);
-          } else
-          {
-            const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
-            config && config.onError && config.onError(routeError);
+            TerrainLog.debug('isCanceled', err.getDetail());
           }
-
-          return Promise.reject(err);
+          // TODO: process this routeError via the Promise catch interface.
+          // pass the error to the error handler if there is one.
+          TerrainLog.debug('Midway Route Error: ' + err.getDetail());
+          config && config.onError && config.onError(err);
         });
 
       return {
@@ -671,6 +667,28 @@ export const Ajax =
         },
       );
     },
+
+    deleteItem(item: Item,
+      onLoad?: (resp: any) => void, onError?: (ev: Event) => void)
+    {
+      const id = item.id;
+      const route = `items/${id}`;
+      onLoad = onLoad || _.noop;
+
+      return Ajax.req(
+        'delete',
+        route,
+        null,
+        (respArray) =>
+        {
+          onLoad(respArray[0]);
+        },
+        {
+          onError,
+        },
+      );
+    },
+
     /**
      * Query M2
      */
@@ -738,464 +756,6 @@ export const Ajax =
         'query/',
         payload,
         onLoadHandler,
-        {
-          onError,
-        },
-      );
-    },
-
-    getAnalyzers(
-      index: string,
-      onLoad: (resp: object) => void,
-      onError?: (resp: any) => void,
-    )
-    {
-      const onLoadHandler = (resp) =>
-      {
-        onLoad(resp);
-      };
-      Ajax.req(
-        'get',
-        'import/analyzers',
-        {},
-        (response) =>
-        {
-          let responseData: object = null;
-          try
-          {
-            responseData = response;
-          }
-          catch (e)
-          {
-            onError && onError(e.message);
-          }
-
-          if (responseData !== undefined)
-          {
-            // needs to be outside of the try/catch so that any errors it throws aren't caught
-            onLoad(responseData);
-          }
-        },
-        {
-          onError, urlArgs: { index },
-        },
-      );
-      return;
-    },
-
-    getStreamingProgress(onLoad: (resp: any) => void,
-      onError: (resp: any) => void,
-    )
-    {
-      const onLoadHandler = (resp) =>
-      {
-        onLoad(resp);
-      };
-      Ajax.req(
-        'post',
-        'import/progress/',
-        {},
-        onLoadHandler,
-        {
-          onError,
-        },
-      );
-      return;
-    },
-
-    importFile(file: File,
-      filetype: string,
-      dbname: string,
-      tablename: string,
-      connectionId: number,
-      originalNames: Immutable.List<string>,
-      columnTypes: Immutable.Map<string, object>,
-      primaryKeys: List<string>,
-      transformations: Immutable.List<object>,
-      update: boolean,
-      hasCsvHeader: boolean,
-      isNewlineSeparatedJSON: boolean,
-      primaryKeyDelimiter: string,
-      requireJSONHaveAllFields: boolean,
-      onLoad: (resp: any) => void,
-      onError: (resp: any) => void,
-    )
-    {
-      // TODO: call Ajax.req() instead with formData in body
-
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('id', String(localStorage['id']));
-      formData.append('accessToken', localStorage['accessToken']);
-      formData.append('filetype', filetype);
-      formData.append('dbname', dbname);
-      formData.append('tablename', tablename);
-      formData.append('dbid', String(connectionId));
-      formData.append('originalNames', JSON.stringify(originalNames));
-      formData.append('columnTypes', JSON.stringify(columnTypes));
-      formData.append('primaryKeys', JSON.stringify(primaryKeys));
-      formData.append('transformations', JSON.stringify(transformations));
-      formData.append('update', String(update));
-      formData.append('hasCsvHeader', String(hasCsvHeader));
-      formData.append('isNewlineSeparatedJSON', String(isNewlineSeparatedJSON));
-      formData.append('primaryKeyDelimiter', primaryKeyDelimiter);
-      formData.append('requireJSONHaveAllFields', String(requireJSONHaveAllFields));
-
-      const xhr = new XMLHttpRequest();
-      xhr.open('post', MIDWAY_HOST + '/midway/v1/import/');
-      xhr.send(formData);
-
-      xhr.onerror = (err: any) =>
-      {
-        const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
-        onError(routeError);
-      };
-
-      xhr.onload = (ev: Event) =>
-      {
-        if (xhr.status === 401)
-        {
-          // TODO re-enable
-          Ajax.reduxStoreDispatch(Actions({ actionType: 'logout' }));
-        }
-
-        if (xhr.status !== 200)
-        {
-          onError(xhr.responseText);
-          return;
-        }
-
-        onLoad(xhr.responseText);
-      };
-      return;
-    },
-
-    exportFile(filetype: string,
-      serverId: number,
-      columnTypes: Immutable.Map<string, object>,
-      transformations: Immutable.List<object>,
-      query: string,
-      rank: boolean,
-      objectKey: string,
-      downloadFilename: string,
-      onLoad: (resp: any) => void,
-      onError?: (ev: string) => void,
-    )
-    {
-      const payload: object = {
-        dbid: serverId,
-        filetype,
-        columnTypes,
-        query,
-        rank,
-        objectKey,
-        transformations,
-      };
-      const onLoadHandler = (resp) =>
-      {
-        const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
-        onLoad(queryResult);
-      };
-      Ajax.req(
-        'post',
-        'export/',
-        payload,
-        onLoadHandler,
-        {
-          onError,
-          download: true,
-          downloadFilename,
-        },
-      );
-      return;
-    },
-
-    saveTemplate(dbname: string,
-      tablename: string,
-      dbid: number,
-      originalNames: List<string>,
-      columnTypes: Immutable.Map<string, object>,
-      primaryKeys: List<string>,
-      transformations: List<object>,
-      name: string,
-      exporting: boolean,
-      primaryKeyDelimiter: string,
-      requireJSONHaveAllFields: boolean,
-      objectKey: string,
-      rank: boolean,
-      onLoad: (resp: object[]) => void,
-      onError?: (ev: string) => void,
-    )
-    {
-      const payload: object = {
-        dbid,
-        dbname,
-        tablename,
-        originalNames,
-        columnTypes,
-        primaryKeys,
-        transformations,
-        name,
-        export: exporting,
-        primaryKeyDelimiter,
-        requireJSONHaveAllFields,
-        objectKey,
-        rank,
-      };
-      const onLoadHandler = (resp) =>
-      {
-        onLoad(resp);
-      };
-      const routeType = exporting ? 'export' : 'import';
-      Ajax.req(
-        'post',
-        routeType + '/templates/create',
-        payload,
-        onLoadHandler,
-        {
-          onError,
-        },
-      );
-      return;
-    },
-
-    updateTemplate(originalNames: List<string>,
-      columnTypes: Immutable.Map<string, object>,
-      primaryKeys: List<string>,
-      transformations: List<object>,
-      exporting: boolean,
-      primaryKeyDelimiter: string,
-      requireJSONHaveAllFields: boolean,
-      rank: boolean,
-      templateId: number,
-      onLoad: (resp: object[]) => void,
-      onError?: (ev: string) => void,
-    )
-    {
-      const payload: object = {
-        originalNames,
-        columnTypes,
-        primaryKeys,
-        transformations,
-        export: exporting,
-        primaryKeyDelimiter,
-        requireJSONHaveAllFields,
-        rank,
-      };
-      const onLoadHandler = (resp) =>
-      {
-        onLoad(resp);
-      };
-      const routeType = exporting ? 'export' : 'import';
-      Ajax.req(
-        'post',
-        routeType + '/templates/' + String(templateId),
-        payload,
-        onLoadHandler,
-        {
-          onError,
-        },
-      );
-      return;
-    },
-
-    deleteTemplate(
-      templateId: number,
-      exporting: boolean,
-      onLoad: (resp: object[]) => void,
-      onError?: (ev: string) => void,
-    )
-    {
-      const onLoadHandler = (resp) =>
-      {
-        onLoad(resp);
-      };
-      const routeType = exporting ? 'export' : 'import';
-      Ajax.req(
-        'post',
-        routeType + '/templates/delete/' + String(templateId),
-        {},
-        onLoadHandler,
-        {
-          onError,
-        },
-      );
-      return;
-    },
-
-    fetchTemplates(
-      connectionId: number,
-      dbname: string,
-      tablename: string,
-      exporting: boolean,
-      onLoad: (templates: object[]) => void,
-    )
-    {
-      const payload: object = {
-        dbid: connectionId,
-        dbname,
-        tablename,
-      };
-
-      if (exporting)
-      {
-        payload['exportOnly'] = true;
-      }
-      else
-      {
-        payload['importOnly'] = true;
-      }
-      const routeType = exporting ? 'export' : 'import';
-      Ajax.req(
-        'post',
-        routeType + '/templates/',
-        payload,
-        (response: object[]) =>
-        {
-          onLoad(response);
-        },
-      );
-    },
-
-    getAllTemplates(
-      exporting: boolean,
-      onLoad: (templates: object[]) => void,
-    )
-    {
-      const payload: object = {};
-      const routeType = exporting ? 'export' : 'import';
-      Ajax.req(
-        'post',
-        routeType + '/templates/',
-        payload,
-        (response: object[]) =>
-        {
-          onLoad(response);
-        },
-      );
-    },
-
-    resetTemplateToken(
-      templateId: number,
-      exporting: boolean,
-      onLoad: (resp: object[]) => void,
-      onError?: (ev: string) => void,
-    )
-    {
-      const onLoadHandler = (resp) =>
-      {
-        onLoad(resp);
-      };
-      const routeType = exporting ? 'export' : 'import';
-      return Ajax.req(
-        'post',
-        routeType + '/templates/updateAccessToken/',
-        { id: String(templateId) },
-        onLoadHandler,
-        {
-          onError,
-        },
-      );
-    },
-
-    getTypesFromQuery(
-      connectionId: number,
-      query: string,
-      onLoad: (templates: object) => void,
-    )
-    {
-      const payload: object = {
-        dbid: connectionId,
-        query,
-      };
-      Ajax.req(
-        'post',
-        'export/types',
-        payload,
-        (response: object) =>
-        {
-          onLoad(response);
-        },
-      );
-    },
-
-    getAllScheduledJobs(
-      onLoad: (schedules: object[]) => void,
-    )
-    {
-      const payload: object = {};
-
-      Ajax.req(
-        'get',
-        'scheduler/',
-        payload,
-        (response: object[]) =>
-        {
-          onLoad(response);
-        },
-      );
-    },
-
-    getCredentialConfigs(
-      onLoad: (credentials: object[]) => void,
-    )
-    {
-      const payload = {};
-
-      Ajax.req(
-        'get',
-        'scheduler/connections/',
-        payload,
-        (response: object[]) =>
-        {
-          onLoad(response);
-        },
-      );
-    },
-
-    createSchedule(
-      params: {
-        name: string,
-        jobType: string,
-        paramsJob: object,
-        schedule: string,
-        sort: string,
-        transport: object,
-      },
-      onLoad: (resp: object[]) => void,
-      onError?: (ev: string) => void,
-    )
-    {
-      return Ajax.req(
-        'post',
-        'scheduler/create/',
-        params,
-        (response: object[]) =>
-        {
-          onLoad(response);
-        },
-        {
-          onError,
-        },
-      );
-    },
-
-    deleteSchedule(
-      id: ID,
-      onLoad: (resp: object[]) => void,
-      onError?: (ev: string) => void,
-    )
-    {
-      const payload = {};
-
-      return Ajax.req(
-        'post',
-        'scheduler/delete/' + String(id),
-        payload,
-        (response: object[]) =>
-        {
-          onLoad(response);
-        },
         {
           onError,
         },

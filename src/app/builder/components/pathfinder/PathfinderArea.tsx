@@ -51,7 +51,7 @@ import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors, fontColor } from '../../../colors/Colors';
+import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 const { List } = Immutable;
 import BuilderActions from 'app/builder/data/BuilderActions';
@@ -60,16 +60,19 @@ import { ColorsState } from 'app/colors/data/ColorsTypes';
 import FadeInOut from 'app/common/components/FadeInOut';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import { BuilderState } from 'builder/data/BuilderState';
+import * as TerrainLog from 'loglevel';
 import withScrolling, { createHorizontalStrength, createVerticalStrength } from 'react-dnd-scrollzone';
 import { SchemaState } from 'schema/SchemaTypes';
+import TerrainTools from 'util/TerrainTools';
 import Util from 'util/Util';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
 import PathfinderNestedSection from './more/PathfinderNestedSection';
 import './Pathfinder.less';
-import { _PathfinderContext, _Script, Path, PathfinderSteps, Source } from './PathfinderTypes';
+import { _Path, _PathfinderContext, _Script, Path, PathfinderSteps, Source } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
+const InfoIcon = require('images/icon_info.svg');
 
 const ScrollingComponent = withScrolling('div');
 
@@ -106,13 +109,31 @@ class PathfinderArea extends TerrainComponent<Props>
       pathfinderContext.schemaState !== nextProps.schema ||
       pathfinderContext.builderState.db !== nextProps.builder.db ||
       pathfinderContext.parentSource !== nextProps.parentSource ||
-      pathfinderContext.parentName !== nextProps.parentName
+      pathfinderContext.parentName !== nextProps.parentName ||
+      pathfinderContext.pathErrorMap !== nextProps.builder.query.pathErrorMap as any
     )
     {
       this.setState({
         pathfinderContext: Util.reconcileContext(this.state.pathfinderContext,
           this.getPathfinderContext(nextProps)),
       });
+    }
+  }
+
+  public handlePastePathString(evt)
+  {
+    const newString = evt.target.value;
+    if (this.props.canEdit === true)
+    {
+      try
+      {
+        const pathConfig = JSON.parse(newString);
+        const path = _Path(pathConfig);
+        this.props.builderActions.changePath(this.getKeyPath(), path);
+      } catch (e)
+      {
+        TerrainLog.debug('Pasted pathfinder config is not a valid string: ' + newString);
+      }
     }
   }
 
@@ -126,6 +147,7 @@ class PathfinderArea extends TerrainComponent<Props>
       builderState: props.builder,
       parentSource: props.parentSource,
       parentName: props.parentName,
+      pathErrorMap: props.builder.query.pathErrorMap,
     };
   }
 
@@ -249,7 +271,15 @@ class PathfinderArea extends TerrainComponent<Props>
   {
     const { path, toSkip } = this.props;
     const keyPath = this.getKeyPath();
+    const keyPathString = JSON.stringify(keyPath);
+
     const { pathfinderContext } = this.state;
+    const pathString = JSON.stringify(path.toJS());
+    const errors = pathfinderContext.pathErrorMap.get(keyPathString);
+    if (errors)
+    {
+      TerrainLog.debug('Path ' + keyPathString + ' has Errors: ' + JSON.stringify(errors));
+    }
     return (
       <ScrollingComponent
         className='pf-area'
@@ -257,6 +287,13 @@ class PathfinderArea extends TerrainComponent<Props>
         verticalStrength={this.vStrength}
       >
         <div className='pathfinder-column-content'>
+          {errors &&
+            tooltip(<InfoIcon
+              className='pf-warning-icon'
+              style={getStyle('fill', Colors().error)}
+            />,
+              JSON.stringify(errors))
+          }
           <PathfinderSourceSection
             pathfinderContext={pathfinderContext}
             keyPath={this._ikeyPath(keyPath, 'source')}
@@ -318,6 +355,15 @@ class PathfinderArea extends TerrainComponent<Props>
               toSkip={toSkip !== undefined ? toSkip : 3}
             />
           </FadeInOut>
+          {
+            TerrainTools.isFeatureEnabled(TerrainTools.PATHFINDER_COPY) &&
+            <input
+              type='text'
+              className='path-copy-paste-inputarea'
+              value={pathString}
+              onChange={this.handlePastePathString as any}
+            />
+          }
         </div>
       </ScrollingComponent>
     );

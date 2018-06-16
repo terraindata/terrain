@@ -105,7 +105,7 @@ describe('Library', () =>
           analyticsActions={analyticsActions}
           schema={schema}
           canPinAlgorithms={true}
-          router={{ params: { categoryId: '1' } }}
+          match={{ params: { categoryId: '1' } }}
           roleActions={{ fetch: jest.fn() }}
           userActions={jest.fn()}
         />,
@@ -176,7 +176,7 @@ describe('Library', () =>
           analyticsActions={analyticsActions}
           schema={schema}
           canPinAlgorithms={false}
-          router={{ params: { categoryId: '1' } }}
+          match={{ params: { categoryId: '1' } }}
           roleActions={{ fetch: jest.fn() }}
           userActions={jest.fn()}
         />,
@@ -203,7 +203,7 @@ describe('Library', () =>
           analyticsActions={analyticsActions}
           schema={schema}
           singleColumn={true}
-          router={{ params: {} }}
+          match={{ params: {} }}
           roleActions={{ fetch: jest.fn() }}
           userActions={jest.fn()}
         />,
@@ -233,7 +233,7 @@ describe('Library', () =>
               analyticsActions={analyticsActions}
               schema={schema}
               singleColumn={true}
-              router={{ params: { categoryId } }}
+              match={{ params: { categoryId } }}
               roleActions={{ fetch: jest.fn() }}
               userActions={jest.fn()}
             />,
@@ -255,7 +255,7 @@ describe('Library', () =>
               analyticsActions={analyticsActions}
               schema={schema}
               singleColumn={true}
-              router={{ params: { categoryId, groupId } }}
+              match={{ params: { categoryId, groupId } }}
               roleActions={{ fetch: jest.fn() }}
               userActions={jest.fn()}
             />,
@@ -277,7 +277,7 @@ describe('Library', () =>
               analyticsActions={analyticsActions}
               schema={schema}
               singleColumn={true}
-              router={{ params: { categoryId, groupId, algorithmId: algorithmId.toString() } }}
+              match={{ params: { categoryId, groupId, algorithmId: algorithmId.toString() } }}
               roleActions={{ fetch: jest.fn() }}
               userActions={jest.fn()}
             />,

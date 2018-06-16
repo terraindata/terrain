@@ -60,19 +60,23 @@ const { List, Map } = Immutable;
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { compareObjects } from 'etl/ETLUtil';
 
 import
 {
   _TemplateField,
   TemplateField,
 } from 'etl/templates/FieldTypes';
-import { defaultProps, ElasticFieldProps, ElasticTypes, ETLToElasticOptions } from 'shared/etl/types/ETLElasticTypes';
+import { defaultProps, ElasticAnalyzers, ElasticFieldProps, ElasticTypes, ETLToElasticOptions } from 'shared/etl/types/ETLElasticTypes';
 import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './FieldSettings.less';
 
-export type Props = TemplateEditorFieldProps;
+export interface Props extends TemplateEditorFieldProps
+{
+  registerApply: (apply: () => void) => void;
+}
 
 class ElasticFieldSettings extends TemplateEditorField<Props>
 {
@@ -161,12 +165,17 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
   @instanceFnDecorator(memoizeOne)
   public getAnalyzerOptions()
   {
-    return List(['standard']);
+    return ElasticAnalyzers;
   }
 
-  public resolveAnalyzerIndex()
+  public resolveAnalyzerIndex(option)
   {
-    return 0;
+    return ElasticAnalyzers.indexOf(option);
+  }
+
+  public componentDidMount()
+  {
+    this.props.registerApply(() => this.handleSettingsApplied());
   }
 
   public componentWillReceiveProps(nextProps)
@@ -195,18 +204,10 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
           inputMap={this.inputMap}
           inputState={this.state}
           onStateChange={this.handleStateChange}
-          centerForm={true}
-          mainButton={{
-            name: 'Apply',
-            onClicked: this.handleSettingsApplied,
-          }}
-          secondButton={{
-            name: 'Close',
-            onClicked: this.handleCloseSettings,
-          }}
           style={{
             flexGrow: 1,
             padding: '12px',
+            justifyContent: 'center',
           }}
           actionBarStyle={{
             justifyContent: 'center',
@@ -218,17 +219,13 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
 
   public handleSettingsApplied()
   {
-    this._try((proxy) =>
+    if (!compareObjects(this.state, this.getFormState(this.props)))
     {
-      proxy.setFieldProps(this.state, Languages.Elastic);
-    });
-  }
-
-  public handleCloseSettings()
-  {
-    this.props.act({
-      actionType: 'closeSettings',
-    });
+      this._try((proxy) =>
+      {
+        proxy.setFieldProps(this.state, Languages.Elastic);
+      });
+    }
   }
 
   public handleStateChange(state)

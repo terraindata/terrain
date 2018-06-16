@@ -59,7 +59,7 @@ import ElasticUI from 'etl/templates/languages/ElasticUI';
 export interface LanguageInterface
 {
   language: Languages;
-  getSettingsComponent: () => React.ComponentClass<TemplateEditorFieldProps>;
+  getSettingsComponent: () => React.ComponentClass<TemplateEditorFieldProps & { registerApply: (apply) => void }>;
 }
 
 export default class LanguageUI

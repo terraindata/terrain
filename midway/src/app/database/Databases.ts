@@ -60,21 +60,9 @@ export class Databases
 {
   private databaseTable: Tasty.Table;
 
-  constructor()
+  public initialize()
   {
-    this.databaseTable = new Tasty.Table(
-      'databases',
-      ['id'],
-      [
-        'name',
-        'type',
-        'dsn',
-        'host',
-        'isAnalytics',
-        'analyticsIndex',
-        'analyticsType',
-      ],
-    );
+    this.databaseTable = App.TBLS.databases;
   }
 
   public async delete(user: UserConfig, id: number): Promise<object>
@@ -88,12 +76,7 @@ export class Databases
 
   public async select(columns: string[], filter?: object): Promise<DatabaseConfig[]>
   {
-    return new Promise<DatabaseConfig[]>(async (resolve, reject) =>
-    {
-      const rawResults = await App.DB.select(this.databaseTable, columns, filter);
-      const results: DatabaseConfig[] = rawResults.map((result: object) => new DatabaseConfig(result));
-      resolve(results);
-    });
+    return App.DB.select(this.databaseTable, columns, filter) as Promise<DatabaseConfig[]>;
   }
 
   public async get(id?: number, fields?: string[]): Promise<DatabaseConfig[]>
@@ -196,6 +179,28 @@ export class Databases
 
     const schema: Tasty.Schema = await controller.getTasty().schema();
     return schema.toString();
+  }
+
+  public async status(id?: number): Promise<Array<DatabaseConfig & string>>
+  {
+    if (id !== undefined)
+    {
+      const controller = DatabaseRegistry.get(id);
+      await controller.getClient().isConnected();
+      const config = controller.getConfig();
+      config['status'] = controller.getStatus();
+      return config;
+    }
+    else
+    {
+      const promises: Array<Promise<any>> = [];
+      for (const entry of DatabaseRegistry.getAll())
+      {
+        const _id = entry[0];
+        promises.push(this.status(_id));
+      }
+      return Promise.all(promises);
+    }
   }
 }
 

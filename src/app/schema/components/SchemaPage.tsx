@@ -49,7 +49,9 @@ THE SOFTWARE.
 import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
 const HTML5Backend = require('react-dnd-html5-backend');
-import { DragDropContext } from 'react-dnd';
+import TerrainDndContext from 'common/components/TerrainDndContext';
+import { SchemaActions } from 'schema/data/SchemaRedux';
+import TerrainStore from 'store/TerrainStore';
 
 import SchemaView from './SchemaView';
 
@@ -70,6 +72,13 @@ class SchemaPage extends TerrainComponent<Props>
       on: false,
     };
 
+  public componentDidMount()
+  {
+    TerrainStore.dispatch(SchemaActions({
+      actionType: 'fetch',
+    }));
+  }
+
   public render()
   {
     return (
@@ -83,6 +92,6 @@ class SchemaPage extends TerrainComponent<Props>
 }
 
 // ReactRouter does not like the output of DragDropContext, hence the `any` cast
-const SchemaExport = DragDropContext(HTML5Backend)(SchemaPage) as any;
+const SchemaExport = TerrainDndContext(SchemaPage) as any;
 
 export default SchemaExport;

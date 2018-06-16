@@ -79,7 +79,7 @@ class ETLAjax
         {},
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         });
     });
   }
@@ -98,7 +98,7 @@ class ETLAjax
         {},
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         });
     });
   }
@@ -117,7 +117,7 @@ class ETLAjax
         integration,
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         });
     });
   }
@@ -136,7 +136,7 @@ class ETLAjax
         integration,
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         });
     });
   }
@@ -155,7 +155,7 @@ class ETLAjax
         {},
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         });
     });
   }
@@ -191,7 +191,7 @@ class ETLAjax
         {},
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         },
       );
     });
@@ -211,7 +211,7 @@ class ETLAjax
         {},
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         },
       );
     });
@@ -233,7 +233,7 @@ class ETLAjax
         },
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         },
       );
     });
@@ -254,7 +254,7 @@ class ETLAjax
         templateToSave,
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         },
       );
     });
@@ -280,7 +280,7 @@ class ETLAjax
         templateToSave,
         handleResponse,
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         },
       );
     });
@@ -328,7 +328,7 @@ class ETLAjax
           return reject('No Job Id Returned.');
         },
         {
-          onError: reject,
+          onError: handlerFactory(reject),
         },
       );
     });
@@ -340,6 +340,7 @@ class ETLAjax
     files?: { [k: string]: File },
     downloadName?: string,
     mimeType?: string,
+    onProgress?: (progress: string) => void,
   ): Promise<any>
   {
     return new Promise((resolve, reject) =>
@@ -348,6 +349,7 @@ class ETLAjax
         onError: reject,
         downloadName,
         mimeType,
+        onProgress,
       };
 
       const templateToRun = JSON.stringify(templateForBackend(template));
@@ -397,17 +399,31 @@ class ETLAjax
         payload,
         handleResponse,
         {
-          onError: (ev) =>
-          {
-            if (ev === undefined)
-            {
-              reject('Unknown Error Trying to Retrieve Preview Documents');
-            }
-            else
-            {
-              reject(ev);
-            }
-          },
+          onError: handlerFactory(reject),
+        },
+      );
+    });
+  }
+
+  // should this be in schema?
+  public getMapping(
+    serverId: string,
+    database: string,
+  ): Promise<object>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const handleResponse = (response: any) =>
+      {
+        resolve(response);
+      };
+      return Ajax.req(
+        'get',
+        `schema/${serverId}/${database}`,
+        {},
+        handleResponse,
+        {
+          onError: handlerFactory(reject),
         },
       );
     });
@@ -449,6 +465,7 @@ class ETLAjax
       const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
       config.onError(routeError);
     };
+
     xhr.onload = (ev: Event) =>
     {
       if (xhr.status === 401)
@@ -473,6 +490,35 @@ class ETLAjax
       }
     };
 
+    if (config.onProgress !== undefined)
+    {
+      xhr.upload.addEventListener('progress', (e: ProgressEvent) =>
+      {
+        let percent = 0;
+        if (e.total !== 0)
+        {
+          percent = (e.loaded / e.total) * 100;
+          const progress = `Uploading file...${Math.round(percent)}%`;
+          config.onProgress(progress);
+        }
+      }, false);
+
+      // TODO: Think of a better way to show this progress
+      // xhr.onprogress = (ev: Event) =>
+      // {
+      //   try
+      //   {
+      //     const responseText = xhr.responseText.slice(xhr.responseText.lastIndexOf('{'), xhr.responseText.lastIndexOf('}') + 1);
+      //     const response = JSON.parse(responseText);
+      //     config.onProgress(`Documents processed...${response.successful}`);
+      //   }
+      //   catch (e)
+      //   {
+      //     // do nothing
+      //   }
+      // }
+    }
+
     xhr.open('post', MIDWAY_HOST + '/midway/v1/' + route);
     xhr.send(formData);
   }
@@ -483,6 +529,7 @@ interface ReqConfig
   onError?: (response: any) => void;
   downloadName?: string;
   mimeType?: string;
+  onProgress?: (progress: string) => void;
 }
 
 export interface ExecuteConfig
@@ -494,6 +541,66 @@ export interface ExecuteConfig
     downloadFilename?: string;
     mimeType?: string;
   };
+}
+
+export function errorToReadable(err: any, defaultMsg: string = 'Unknown Error Occurred')
+{
+  try
+  {
+    if (err == null)
+    {
+      return defaultMsg;
+    }
+    else if (typeof err.getDetail === 'function') // if the error is already a midway error
+    {
+      return err.getDetail();
+    }
+    try
+    {
+      try
+      { // attempt to see if the midway error was created from an already wrapped error
+        const detailError = _.get(err, ['response', 'data', 'errors', 0, 'detail']);
+        if (detailError !== undefined && detailError !== null)
+        {
+          if (typeof detailError === 'object')
+          {
+            return JSON.stringify(detailError);
+          }
+          else
+          {
+            return detailError;
+          }
+        }
+      }
+      catch (e)
+      {
+        // do nothing
+      }
+      const readable = MidwayError.fromJSON(err).getDetail();
+      return readable;
+    }
+    catch (e)
+    {
+      if (typeof err === 'object')
+      {
+        return JSON.stringify(err);
+      }
+      else if (typeof err === 'string')
+      {
+        return err;
+      }
+    }
+  }
+  catch (e)
+  {
+    return defaultMsg;
+  }
+  return defaultMsg;
+}
+
+function handlerFactory(reject)
+{
+  return (err) => reject(errorToReadable(err));
 }
 
 export default new ETLAjax();

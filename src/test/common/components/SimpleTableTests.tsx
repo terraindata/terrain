@@ -124,8 +124,6 @@ describe('SimpleTable', () =>
         .toEqual('item 1');
       expect(tableComponent.find('.simple-table-body .simple-table-cell').at(2).text())
         .toEqual('success');
-
-      expect(tableComponent.find('ShowMore')).toHaveLength(0);
     });
 
     it('should limit the rendered rows to props.displayRowCount', () =>
@@ -136,12 +134,7 @@ describe('SimpleTable', () =>
           displayRowCount={5}
         />,
       );
-      expect(tableComponent.find('.simple-table-body .simple-table-row')).toHaveLength(5);
-
-      const showMore = tableComponent.find('ShowMore');
-      expect(showMore).toHaveLength(1);
-      expect(showMore.props().colSpan).toEqual(columnsConfig.length);
-      expect(showMore.props().onClick).toEqual(tableComponent.instance().handleShowMoreClick);
+      expect(tableComponent.find('.simple-table-body .simple-table-row')).toHaveLength(6);
 
       tableComponent.setProps({ displayRowCount: 15 });
       expect(tableComponent.find('.simple-table-body .simple-table-row')).toHaveLength(10);
@@ -240,7 +233,7 @@ describe('SimpleTable', () =>
     });
   });
 
-  describe('#handleShowMoreClick', () =>
+  describe('#handlePageChange', () =>
   {
     it('should make visible the next props.displayRowCount chunk of rows', () =>
     {
@@ -251,15 +244,32 @@ describe('SimpleTable', () =>
         />,
       );
 
-      const showMoreButton = tableComponent.find('ShowMore');
+      let tableRows = tableComponent.find('.simple-table-body .simple-table-row');
+      expect(tableRows).toHaveLength(5);
+      expect(tableRows.at(0).find('.simple-table-cell').at(1).text())
+        .toEqual('item 1');
+      expect(tableRows.at(1).find('.simple-table-cell').at(1).text())
+        .toEqual('item 2');
 
-      showMoreButton.simulate('click');
-      expect(tableComponent.find('.simple-table-body .simple-table-row')).toHaveLength(8);
-      expect(tableComponent.find('ShowMore')).toHaveLength(1);
+      tableComponent.instance().handlePageChange(2);
+      tableComponent.update();
 
-      showMoreButton.simulate('click');
-      expect(tableComponent.find('.simple-table-body .simple-table-row')).toHaveLength(10);
-      expect(tableComponent.find('ShowMore')).toHaveLength(0);
+      tableRows = tableComponent.find('.simple-table-body .simple-table-row');
+      expect(tableRows).toHaveLength(5);
+      expect(tableRows.at(0).find('.simple-table-cell').at(1).text())
+        .toEqual('item 5');
+      expect(tableRows.at(1).find('.simple-table-cell').at(1).text())
+        .toEqual('item 6');
+
+      tableComponent.instance().handlePageChange(3);
+      tableComponent.update();
+
+      tableRows = tableComponent.find('.simple-table-body .simple-table-row');
+      expect(tableRows).toHaveLength(3);
+      expect(tableRows.at(0).find('.simple-table-cell').at(1).text())
+        .toEqual('item 9');
+      expect(tableRows.at(1).find('.simple-table-cell').at(1).text())
+        .toEqual('item 10');
     });
   });
 

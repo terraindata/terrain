@@ -61,6 +61,8 @@ type Algorithm = LibraryTypes.Algorithm;
 
 import Ajax from './../../util/Ajax';
 
+import { notificationManager } from './../../common/components/InAppNotification';
+
 const $ = (type: string, payload: any) =>
 {
   // jmansor: to prevent versioning duplication, only do it during global store dispatch.
@@ -92,9 +94,36 @@ const Actions =
               );
             },
 
-        change:
+        remove:
           (category: Category) =>
-            $(ActionTypes.categories.change, { category }),
+            $(ActionTypes.categories.remove, { category }),
+
+        change:
+          (
+            category: Category,
+          ) =>
+            (dispatch, getState, api) =>
+            {
+              api.saveItem(
+                category,
+                (response) =>
+                {
+                  dispatch($(ActionTypes.categories.change, { category }));
+                },
+                (ev) =>
+                {
+                  if (ev && ev.response && ev.response.data.errors[0].detail === 'Duplicate item name')
+                  {
+                    notificationManager.addNotification(
+                      'Item name is already taken',
+                      '',
+                      'error',
+                      4,
+                    );
+                  }
+                },
+              );
+            },
 
         move:
           (category, index: number) =>
@@ -132,6 +161,10 @@ const Actions =
                 },
               );
             },
+
+        remove:
+          (group: Group) =>
+            $(ActionTypes.groups.remove, { group }),
 
         createAs:
           (
@@ -235,6 +268,10 @@ const Actions =
                 },
               );
             },
+
+        remove:
+          (algorithm: Algorithm) =>
+            $(ActionTypes.algorithms.remove, { algorithm }),
 
         change:
           (algorithm: Algorithm) =>

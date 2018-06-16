@@ -55,12 +55,11 @@ import Util from 'util/Util';
 
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 
-import { GoogleAnalyticsForm } from 'etl/endpoints/GoogleAnalyticsIntegration';
 import
 {
   AlgorithmEndpoint,
-  DatabaseEndpoint, DownloadEndpoint, FsEndpoint
-  HttpEndpointForm, Props, SftpEndpoint,
+  DatabaseEndpoint, DownloadEndpoint, FsEndpoint, GoogleAnalyticsEndpoint,
+  HttpEndpointForm, MailChimpEndpoint, Props, SftpEndpoint,
   SQLEndpoint, UploadEndpoint,
 } from './EndpointFormClasses';
 
@@ -74,7 +73,7 @@ export const SourceFormMap: FormLookupMap<Sources> =
     [Sources.Upload]: UploadEndpoint,
     [Sources.Algorithm]: AlgorithmEndpoint,
     [Sources.Sftp]: SftpEndpoint,
-    [Sources.GoogleAnalytics]: GoogleAnalyticsForm,
+    [Sources.GoogleAnalytics]: GoogleAnalyticsEndpoint,
     [Sources.Http]: HttpEndpointForm,
     [Sources.Fs]: FsEndpoint,
     [Sources.Mysql]: SQLEndpoint,
@@ -88,4 +87,5 @@ export const SinkFormMap: FormLookupMap<Sinks> =
     [Sinks.Sftp]: SftpEndpoint,
     [Sinks.Http]: HttpEndpointForm,
     [Sinks.Fs]: FsEndpoint,
+    [Sinks.MailChimp]: MailChimpEndpoint,
   };

@@ -52,17 +52,9 @@ export class Metrics
 {
   private metricsTable: Tasty.Table;
 
-  constructor()
+  public initialize_()
   {
-    this.metricsTable = new Tasty.Table(
-      'metrics',
-      ['id'],
-      [
-        'database',
-        'label',
-        'events',
-      ],
-    );
+    this.metricsTable = App.TBLS.metrics;
   }
 
   public async initialize(database: number): Promise<any>
@@ -117,12 +109,7 @@ export class Metrics
 
   public async select(columns: string[], filter?: object): Promise<MetricConfig[]>
   {
-    return new Promise<MetricConfig[]>(async (resolve, reject) =>
-    {
-      const rawResults = await App.DB.select(this.metricsTable, columns, filter);
-      const results: MetricConfig[] = rawResults.map((result: object) => new MetricConfig(result));
-      resolve(results);
-    });
+    return App.DB.select(this.metricsTable, columns, filter) as Promise<MetricConfig[]>;
   }
 }
 

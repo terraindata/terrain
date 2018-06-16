@@ -114,7 +114,7 @@ class PickDatabaseStep extends ETLStepComponent
       <div className='etl-transition-column etl-walkthrough-db-step'>
         <DatabasePicker
           language={Languages.Elastic}
-          serverId={serverId != null ? serverId : -1}
+          serverId={serverId != null ? serverId : ''}
           database={database != null ? database : ''}
           table={table != null ? table : ''}
           onChange={this.handleDbPickerChange}
@@ -124,7 +124,7 @@ class PickDatabaseStep extends ETLStepComponent
           {
             this._renderNextButton(
               serverPicked && databasePicked && tablePicked,
-              serverId !== -1 && database !== '' && table !== '',
+              serverId !== '' && database !== '' && table !== '',
             )
           }
         </div>
@@ -132,7 +132,7 @@ class PickDatabaseStep extends ETLStepComponent
     );
   }
 
-  public handleDbPickerChange(serverId: number, database: string, table: string, language: Languages)
+  public handleDbPickerChange(serverId: string, database: string, table: string, language: Languages)
   {
     const changedOptions: Partial<DbOptions> = {
       serverId,

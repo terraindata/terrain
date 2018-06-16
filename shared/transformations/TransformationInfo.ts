@@ -43,16 +43,19 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 
 import AddTransformationNode from './nodes/AddTransformationNode';
 import ArrayCountTransformationNode from './nodes/ArrayCountTransformationNode';
 import ArraySumTransformationNode from './nodes/ArraySumTransformationNode';
+import CaseTransformationNode from './nodes/CaseTransformationNode';
 import CastTransformationNode from './nodes/CastTransformationNode';
 import DecryptTransformationNode from './nodes/DecryptTransformationNode';
 import DifferenceTransformationNode from './nodes/DifferenceTransformationNode';
 import DivideTransformationNode from './nodes/DivideTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import EncryptTransformationNode from './nodes/EncryptTransformationNode';
+import FilterArrayTransformationNode from './nodes/FilterArrayTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
 import FindReplaceTransformationNode from './nodes/FindReplaceTransformationNode';
 import HashTransformationNode from './nodes/HashTransformationNode';
@@ -61,13 +64,14 @@ import JoinTransformationNode from './nodes/JoinTransformationNode';
 import MultiplyTransformationNode from './nodes/MultiplyTransformationNode';
 import ProductTransformationNode from './nodes/ProductTransformationNode';
 import QuotientTransformationNode from './nodes/QuotientTransformationNode';
+import RemoveDuplicatesTransformationNode from './nodes/RemoveDuplicatesTransformationNode';
+import RoundTransformationNode from './nodes/RoundTransformationNode';
 import SetIfTransformationNode from './nodes/SetIfTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import SubtractTransformationNode from './nodes/SubtractTransformationNode';
 import SumTransformationNode from './nodes/SumTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
-import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
 import ZipcodeTransformationNode from './nodes/ZipcodeTransformationNode';
 import { TransformationEngine } from './TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from './TransformationNodeType';
@@ -88,7 +92,7 @@ export interface InfoType<T extends TransformationNodeType = any>
   description?: string; // description of what the transformation does
   isAvailable?: (engine: TransformationEngine, fieldId: number) => boolean;
   shortSummary?: (meta: NodeOptionsType<T>) => string;
-  type?: any;
+  type: any;
   targetedVisitor: (visitor: TransformationNodeVisitor,
     transformationNode: TransformationNode,
     docCopy: object,
@@ -172,8 +176,10 @@ const TransformationNodeInfo: AllNodeInfoType =
         type: DuplicateTransformationNode,
         isAvailable: (engine, fieldId) =>
         {
+          const etlType = EngineUtil.getETLFieldType(fieldId, engine);
           return (
-            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId)) &&
+            etlType !== ETLFieldTypes.Object && etlType !== ETLFieldTypes.Array
           );
         },
         targetedVisitor: (visitor: TransformationNodeVisitor,
@@ -215,22 +221,22 @@ const TransformationNodeInfo: AllNodeInfoType =
           options: object) =>
           visitor.visitInsertNode(transformationNode, docCopy, options),
       },
-    [TransformationNodeType.UppercaseNode]:
+    [TransformationNodeType.CaseNode]:
       {
-        humanName: 'Uppercase',
+        humanName: 'Change Case',
         editable: true,
         creatable: true,
-        description: 'Make all the text in this field uppercase',
+        description: 'Change case for text fields (e.g. lowercase, uppercase)',
         isAvailable: (engine, fieldId) =>
         {
           return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
         },
-        type: UppercaseTransformationNode,
+        type: CaseTransformationNode,
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,
           options: object) =>
-          visitor.visitUppercaseNode(transformationNode, docCopy, options),
+          visitor.visitCaseNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.SubstringNode]:
       {
@@ -290,6 +296,27 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitHashNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.RoundNode]:
+      {
+        humanName: 'Round',
+        editable: true,
+        creatable: true,
+        description: 'Round this field to the specified number of decimals',
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'number';
+        },
+        shortSummary: (meta) =>
+        {
+          return `Round ${meta.shift}`;
+        },
+        type: RoundTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitRoundNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.AddNode]:
       {
@@ -593,6 +620,49 @@ const TransformationNodeInfo: AllNodeInfoType =
           options: object) =>
           visitor.visitGroupByNode(transformationNode, docCopy, options),
         newFieldType: 'array',
+      },
+    [TransformationNodeType.FilterArrayNode]:
+      {
+        humanName: 'Filter Array',
+        editable: true,
+        creatable: true,
+        description: `Filter an array on its values`,
+        type: FilterArrayTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitFilterArrayNode(transformationNode, docCopy, options),
+        newFieldType: 'array',
+      },
+    [TransformationNodeType.RemoveDuplicatesNode]:
+      {
+        humanName: 'Remove Duplicates',
+        editable: true,
+        creatable: true,
+        description: 'Remove Duplicate Values from an Array',
+        type: RemoveDuplicatesTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          const valueType = EngineUtil.getValueType(fieldId, engine);
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+            (valueType === 'number' || valueType === 'string') &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitRemoveDuplicatesNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.ZipcodeNode]:
       {

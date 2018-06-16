@@ -136,14 +136,6 @@ class GroupsColumn extends TerrainComponent<Props>
     this.getSortedDatabases = memoizeOne(this.getSortedDatabases);
   }
 
-  public componentWillMount()
-  {
-    this._subscribe(RolesStore, {
-      stateKey: 'roles',
-      // isMounted: true
-    });
-  }
-
   public componentDidMount()
   {
     this.setState({
@@ -284,6 +276,11 @@ class GroupsColumn extends TerrainComponent<Props>
       this.props.groups.get(id)
         .set('status', ItemStatus.Build) as Group,
     );
+  }
+
+  public handleDelete(id: ID)
+  {
+    this.props.groupActions.remove(this.props.groups.get(id));
   }
 
   public handleCreate()
@@ -566,10 +563,12 @@ class GroupsColumn extends TerrainComponent<Props>
         canArchive={canArchive}
         canDuplicate={canDuplicate}
         canRename={canRename}
+        canDelete={canEdit && canRename && group.status === ItemStatus.Archive}
         isSelected={+group.id === +params.groupId}
         isFocused={this.props.isFocused}
         canUnarchive={group.status === ItemStatus.Archive}
         onUnarchive={this.handleUnarchive}
+        onDelete={this.handleDelete}
       >
         <div className='flex-container'>
           <UserThumbnail userId={userId} medium={true} />

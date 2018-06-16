@@ -49,16 +49,15 @@ THE SOFTWARE.
 /**
  * This is an extension of React.Component that adds extra
  * commonly needed functionality:
- * - shouldComponentUpdate with shallowCompare
  * - helper method for calling instance functions with arguments
  * - helper method for toggling a boolean state value
  * - helper method for subscribing to a Redux state
 */
 
+import createHistory from 'history/createBrowserHistory';
 import * as _ from 'lodash';
 import * as React from 'react';
 import Util from '../../util/Util';
-const shallowCompare = require('react-addons-shallow-compare');
 
 // Defines the configuration options for a Redux subscription
 interface SubscriptionConfig
@@ -75,8 +74,12 @@ interface Store
   getState: () => any;
 }
 
+export const browserHistory = createHistory();
+
 class TerrainComponent<T> extends React.Component<T, any>
 {
+  protected browserHistory = browserHistory;
+
   public props: T;
 
   // this is an anti-pattern
@@ -113,27 +116,45 @@ class TerrainComponent<T> extends React.Component<T, any>
 
     // copied from https://github.com/sindresorhus/auto-bind
     const self = this;
-    for (const key of Object.getOwnPropertyNames(self.constructor.prototype))
+    const dontBind = [
+      'getChildContext', // Skip or @Radium components cause infinite loop
+      'componentWillMount',
+      'componentDidMount',
+      'shouldComponentUpdate',
+      'componentWillReceiveProps',
+      'componentWillUpdate',
+      'componentDidUpdate',
+      'componentWillUnmount',
+    ];
+    let propertyNames = Object.getOwnPropertyNames(self.constructor.prototype);
+    // Radium enhancer breaks the old way of binding the component methods
+    // because it deepens the component hierarchy by two levels, e.g.:
+    // Instead of Login > TerrainComponent we have
+    // RadiumEnhancer > ComposedComponent > Login > TerrainComponent
+    if (self.constructor.name === 'RadiumEnhancer')
+    {
+      // Go to find the prototype two levels down.
+      const innerPrototype = Object.getPrototypeOf(
+        Object.getPrototypeOf(
+          Object.getPrototypeOf(self),
+        ),
+      );
+      propertyNames = propertyNames.concat(Object.getOwnPropertyNames(innerPrototype));
+      propertyNames = _.uniq(propertyNames);
+    }
+
+    for (const key of propertyNames.filter((k) => dontBind.indexOf(k) < 0))
     {
       const val = self[key];
-
       if (key !== 'constructor' && typeof val === 'function')
       {
         self[key] = val.bind(self);
       }
     }
 
-    const unmountFn = this['componentWillUnmount'];
-    this['componentWillUnmount'] = () =>
-    {
-      this._unmounted = true; // antipattern
-      this._unsubscribe();
-      unmountFn && unmountFn();
-    };
-
     this._setStateWrapper = _.memoize(this._setStateWrapper);
     this._setStateWrapperPath = _.memoize(this._setStateWrapperPath, this.__setStateWrapperPathResolver);
-    Util.bind(this, '_keyPath', '_subscribe', 'componentWillUnmount');
+    Util.bind(this, '_keyPath');
   }
 
   public _setStateWrapper(key: string): (val) => void

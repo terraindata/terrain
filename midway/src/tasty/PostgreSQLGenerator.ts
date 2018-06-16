@@ -113,19 +113,21 @@ export const TypeMap: Map<string, SQLGeneratorMapping> = new Map([
 export default class SQLGenerator
 {
   public statements: string[];
-  public values: any[][];
+  public valuesArray: any[][];
   public queryString: string;
+  public values: any[];
   private indentation: number;
 
   constructor()
   {
     this.statements = [];
-    this.values = [];
+    this.valuesArray = [];
     this.queryString = '';
+    this.values = [];
     this.indentation = 0;
   }
 
-  public generateSelectQuery(query: TastyQuery, placeholder: boolean)
+  public generateSelectQuery(query: TastyQuery)
   {
     this.appendExpression(query.command);
     this.indent();
@@ -163,7 +165,7 @@ export default class SQLGenerator
         {
           this.appendSubexpression(alias.query);
           this.queryString += ' AS ';
-          this.queryString += this.escapeString(alias.name);
+          this.queryString += '"' + this.escapeString(alias.name) + '"';
         },
         () =>
         {
@@ -177,7 +179,7 @@ export default class SQLGenerator
     // write FROM clause
     // this.newLine();
     this.queryString += 'FROM ';
-    this.queryString += this.escapeString(query.table.getTableName());
+    this.queryString += '"' + this.escapeString(query.table.getTableName()) + '"';
 
     // write WHERE clause
     if (query.filters.length > 0)
@@ -234,16 +236,35 @@ export default class SQLGenerator
         this.queryString += 'OFFSET ' + query.numSkipped.toString();
       }
     }
-    this.accumulateStatement(this.queryString);
+
+    if (query.isForUpdate)
+    {
+      this.newLine();
+      this.queryString += 'FOR UPDATE';
+    }
+
+    if (query.isNoWait)
+    {
+      this.newLine();
+      this.queryString += 'NOWAIT';
+    }
+
+    if (query.isSkipLocked)
+    {
+      this.newLine();
+      this.queryString += 'SKIP LOCKED';
+    }
+
+    this.accumulateStatement(this.queryString, this.values);
   }
 
-  public generateUpsertQuery(query: TastyQuery, upserts: object[], placeholder: boolean)
+  public generateUpsertQuery(query: TastyQuery, upserts: object[])
   {
     this.appendExpression(query.command);
     this.queryString += ' INTO ';
 
     const tableName: string = this.escapeString(query.table.getTableName());
-    this.queryString += tableName;
+    this.queryString += '"' + tableName + '"';
 
     const baseQuery = this.queryString;
 
@@ -262,9 +283,10 @@ export default class SQLGenerator
         const isInDefined: boolean = definedColumnsSet.has(col);
         if (isInObj !== isInDefined)
         {
-          this.accumulateUpsert(definedColumnsList, primaryKeys, tableName, accumulatedUpdates, placeholder);
+          this.accumulateUpsert(definedColumnsList, primaryKeys, tableName, accumulatedUpdates);
 
           this.queryString = baseQuery;
+          this.values = [];
           definedColumnsList = this.getDefinedColumns(columns, obj);
           definedColumnsSet = new Set();
           for (const definedCol of definedColumnsList)
@@ -278,7 +300,7 @@ export default class SQLGenerator
       accumulatedUpdates.push(obj);
     }
 
-    this.accumulateUpsert(definedColumnsList, primaryKeys, tableName, accumulatedUpdates, placeholder);
+    this.accumulateUpsert(definedColumnsList, primaryKeys, tableName, accumulatedUpdates);
     this.queryString = '';
   }
 
@@ -293,31 +315,32 @@ export default class SQLGenerator
     {
       this.queryString += ' READ WRITE';
     }
-    this.accumulateStatement(this.queryString);
+    this.accumulateStatement(this.queryString, []);
     if (isolationLevel !== IsolationLevel.DEFAULT)
     {
-      this.accumulateStatement('SET TRANSACTION ISOLATION LEVEL ' + isolationLevel);
+      this.accumulateStatement('SET TRANSACTION ISOLATION LEVEL ' + isolationLevel, []);
     }
   }
 
   public generateCommitQuery()
   {
     this.queryString = 'COMMIT';
-    this.accumulateStatement(this.queryString);
+    this.accumulateStatement(this.queryString, []);
   }
 
   public generateRollbackQuery()
   {
     this.queryString = 'ROLLBACK';
-    this.accumulateStatement(this.queryString);
+    this.accumulateStatement(this.queryString, []);
   }
 
-  public accumulateStatement(queryString: string): void
+  public accumulateStatement(queryString: string, values: any[]): void
   {
     if (queryString !== '')
     {
       queryString += ';';
       this.statements.push(queryString);
+      this.valuesArray.push(values);
     }
   }
 
@@ -335,21 +358,23 @@ export default class SQLGenerator
   }
 
   public accumulateUpsert(columns: string[], primaryKeys: string[],
-    tableName: string, accumulatedUpdates: object[],
-    placeholder: boolean): void
+    tableName: string, accumulatedUpdates: object[]): void
   {
     if (accumulatedUpdates.length <= 0)
     {
       return;
     }
 
-    const values: any[] = [];
+    const quotedColumns = columns.map((c) => '"' + c + '"');
+    const quotedPrimaryKeys = primaryKeys.map((c) => '"' + c + '"');
+
     let query = this.queryString;
-    const joinedColumnNames = ' (' + columns.join(', ') + ')';
+    const joinedColumnNames = ' (' + quotedColumns.join(', ') + ')';
     query += joinedColumnNames;
     query += ' VALUES ';
 
     let first: boolean = true;
+    let currentColumn1: number = 0;
     for (const obj of accumulatedUpdates)
     {
       if (!first)
@@ -359,20 +384,12 @@ export default class SQLGenerator
       first = false;
 
       query += '(';
-      let currentColumn1: number = 0;
       query += columns.map(
         (col: string) =>
         {
-          if (placeholder === true)
-          {
-            values.push(obj[col]);
-            currentColumn1++;
-            return '$' + currentColumn1.toString();
-          }
-          else
-          {
-            return this.sqlName(TastyNode.make(obj[col]));
-          }
+          this.values.push(obj[col]);
+          currentColumn1++;
+          return '$' + currentColumn1.toString();
         }).join(', ');
       query += ')';
     }
@@ -381,7 +398,7 @@ export default class SQLGenerator
       accumulatedUpdates[0][primaryKeys[0]] !== undefined)
     {
       query += ' ON CONFLICT (';
-      query += primaryKeys.join(', ');
+      query += quotedPrimaryKeys.join(', ');
       query += ') DO UPDATE SET';
       query += joinedColumnNames;
       query += ' = ';
@@ -390,32 +407,25 @@ export default class SQLGenerator
       query += columns.map(
         (col: string) =>
         {
-          if (placeholder === true)
-          {
-            currentColumn++;
-            return '$' + currentColumn.toString();
-          }
-          else
-          {
-            return this.sqlName(TastyNode.make(accumulatedUpdates[0][col]));
-          }
+          currentColumn++;
+          return '$' + currentColumn.toString();
         }).join(', ');
       query += ')';
-      query += ' WHERE (' + primaryKeys.map((col: string) => tableName + '.' + col).join(', ') + ') = (' + primaryKeys.map(
-        (col: string) =>
-        {
-          return JSON.stringify(accumulatedUpdates[0][col]);
-        }).join(', ');
+      query += ' WHERE (' + primaryKeys.map((col: string) => '"' + tableName + '".' + '"' + col + '"')
+        .join(', ') + ') = (' + primaryKeys.map(
+          (col: string) =>
+          {
+            return JSON.stringify(accumulatedUpdates[0][col]);
+          }).join(', ');
       query += ')';
     }
 
     if (primaryKeys !== undefined && primaryKeys.length > 0)
     {
-      query += ' RETURNING ' + primaryKeys[0] + ' AS insertid';
+      query += ' RETURNING "' + primaryKeys[0] + '" AS insertid';
     }
 
-    this.values.push(values);
-    this.accumulateStatement(query);
+    this.accumulateStatement(query, this.values);
   }
 
   public newLine()
@@ -578,7 +588,7 @@ export default class SQLGenerator
           case '\r':
             return '\\r';
           case '\"':
-            return '\"';
+            return '\"\"';
           case '\'':
             return '\'';
           case '\\':
@@ -605,11 +615,12 @@ export default class SQLGenerator
 
     if (node.type === 'reference')
     {
-      return this.escapeString(node.value);
+      return '"' + this.escapeString(node.value) + '"';
     }
     if (node.type === 'string')
     {
-      return '\'' + this.escapeString(node.value) + '\'';
+      this.values.push(node.value);
+      return '$' + this.values.length.toString();
     }
     if (node.type === 'number')
     {

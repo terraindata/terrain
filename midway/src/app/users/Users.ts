@@ -58,23 +58,9 @@ export class Users
   private readonly saltRounds = 10;
   private userTable: Tasty.Table;
 
-  constructor()
+  public initialize()
   {
-    this.userTable = new Tasty.Table(
-      'users',
-      ['id'],
-      [
-        'accessToken',
-        'email',
-        'isDisabled',
-        'isSuperUser',
-        'name',
-        'oldPassword',
-        'password',
-        'timezone',
-        'meta',
-      ],
-    );
+    this.userTable = App.TBLS.users;
   }
 
   public async initializeDefaultUser(): Promise<void>
@@ -170,12 +156,7 @@ export class Users
 
   public async select(columns: string[], filter: object): Promise<UserConfig[]>
   {
-    return new Promise<UserConfig[]>(async (resolve, reject) =>
-    {
-      const rawResults = await App.DB.select(this.userTable, columns, filter);
-      const results: UserConfig[] = rawResults.map((result: object) => new UserConfig(result));
-      resolve(results);
-    });
+    return App.DB.select(this.userTable, columns, filter) as Promise<UserConfig[]>;
   }
 
   public async get(id?: number): Promise<UserConfig[]>

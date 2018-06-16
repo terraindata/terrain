@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as _ from 'lodash';
 import * as stream from 'stream';
+import * as consume from 'stream-consume';
 import * as winston from 'winston';
 
 import { TaskConfig } from 'shared/types/jobs/TaskConfig';
@@ -53,6 +54,9 @@ import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 import { TaskTreeConfig } from 'shared/types/jobs/TaskTreeConfig';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import IntegrationConfig from '../integrations/IntegrationConfig';
+import SchedulerConfig from '../scheduler/SchedulerConfig';
+import { integrations } from '../scheduler/SchedulerRouter';
 import { Job } from './Job';
 import JobConfig from './JobConfig';
 import JobLogConfig from './JobLogConfig';
@@ -69,34 +73,13 @@ export class JobQueue
   private runningJobs: Map<number, Job>;
   private runningRunNowJobs: Map<number, Job>;
 
-  constructor()
+  public initialize()
   {
     this.maxConcurrentJobs = 1;
     this.maxConcurrentRunNowJobs = 50; // if we hit this limit something went very, very wrong (which means it'll happen someday)
     this.runningJobs = new Map<number, Job>();
     this.runningRunNowJobs = new Map<number, Job>();
-    this.jobTable = new Tasty.Table(
-      'jobs',
-      ['id'],
-      [
-        'createdAt',
-        'createdBy',
-        'endTime',
-        'logId',
-        'meta',
-        'name',
-        'pausedFilename',
-        'priority',
-        'running',
-        'runNowPriority',
-        'scheduleId',
-        'startTime',
-        'status',
-        'tasks',
-        'type',
-        'workerId',
-      ],
-    );
+    this.jobTable = App.TBLS.jobs;
   }
 
   public cancel(id: number): Promise<JobConfig[]>
@@ -314,26 +297,58 @@ export class JobQueue
       }
 
       const jobCreationStatus: boolean | string = newJob.create(newJobTasks, 'some random filename');
-      winston.info('created job');
+      winston.info('created run now job');
       if (typeof jobCreationStatus === 'string' || (jobCreationStatus as boolean) !== true)
       {
         winston.warn('Error while creating job: ' + (jobCreationStatus as string));
       }
-      // update the table to running = true
-      this.runningRunNowJobs.set(getJobs[0].id, newJob);
-      // actually run the job
-      const jobResult: TaskOutputConfig = await this.runningRunNowJobs.get(getJobs[0].id).run() as TaskOutputConfig;
-      const jobsFromId: JobConfig[] = await this.get(getJobs[0].id);
-      this.runningRunNowJobs.delete(getJobs[0].id);
-      // log job result
-      const jobLogConfig: JobLogConfig[] = await App.JobL.create(getJobs[0].id, jobResult['options']['logStream'], jobResult.status);
-      await this._setJobLogId(getJobs[0].id, jobLogConfig[0].id);
-      if (jobResult.options.outputStream === null)
+
+      try
       {
+        // update the table to running = true
+        this.runningRunNowJobs.set(getJobs[0].id, newJob);
+        // actually run the job
+        const jobResult: TaskOutputConfig = await this.runningRunNowJobs.get(getJobs[0].id).run() as TaskOutputConfig;
+        const jobsFromId: JobConfig[] = await this.get(getJobs[0].id);
+        // this.runningRunNowJobs.delete(getJobs[0].id);
+        // log job result
+        const jobLogConfig: JobLogConfig[] = await App.JobL.create(getJobs[0].id, jobResult['options']['logStream'],
+          jobResult.status, true);
+        await this._setJobLogId(getJobs[0].id, jobLogConfig[0].id);
+        if (jobResult.options.outputStream === null)
+        {
+          await App.JobQ.setJobStatus(getJobs[0].id, false, 'FAILURE');
+          reject(new Error('Error while running job'));
+        }
+        resolve(jobResult.options.outputStream as stream.Readable);
+      }
+      catch (e)
+      {
+        await App.JobQ.setJobStatus(getJobs[0].id, false, 'FAILURE');
         reject(new Error('Error while running job'));
       }
-      resolve(jobResult.options.outputStream as stream.Readable);
     });
+  }
+
+  public deleteRunningJob(id: number, runNow?: boolean): boolean
+  {
+    try
+    {
+      if (runNow === true)
+      {
+        this.runningRunNowJobs.delete(id);
+      }
+      else
+      {
+        this.runningJobs.delete(id);
+      }
+    }
+    catch (e)
+    {
+      winston.warn((e as any).toString() as string);
+      return false;
+    }
+    return true;
   }
 
   // Status codes: PENDING SUCCESS FAILURE PAUSED CANCELED RUNNING ABORTED (PAUSED/RUNNING when midway was restarted)
@@ -342,6 +357,7 @@ export class JobQueue
     return new Promise<boolean>(async (resolve, reject) =>
     {
       const jobs: JobConfig[] = await this._select([], { id }) as JobConfig[];
+      winston.info(`setting job status to ${running}, status ${status}`);
       if (jobs.length === 0)
       {
         return resolve(false);
@@ -363,8 +379,23 @@ export class JobQueue
       jobs[0].running = running;
       jobs[0].status = status;
       const doNothing: JobConfig[] = await App.DB.upsert(this.jobTable, jobs[0]) as JobConfig[];
+
+      if (status === 'FAILURE')
+      {
+        await this._sendEmail(id);
+      }
+
       resolve(true);
     });
+  }
+
+  public async setScheduleStatus(id: number, status: boolean = false): Promise<void>
+  {
+    const jobs: JobConfig[] = await this.get(id);
+    if (!(status === false && jobs[0].scheduleId === null))
+    {
+      await App.SKDR.setRunning(jobs[0].scheduleId, status);
+    }
   }
 
   public async unpause(id: number): Promise<JobConfig[]>
@@ -416,9 +447,8 @@ export class JobQueue
         .filter(this.jobTable['priority'].greaterThan(-1))
         .filter(this.jobTable['running'].equals(false)).sort(this.jobTable['priority'], 'asc')
         .sort(this.jobTable['runNowPriority'], 'desc').sort(this.jobTable['createdAt'], 'asc').take(newJobSlots);
-      const queryStr: string = App.DB.getDB().generateString(query);
-      const rawResults = await App.DB.getDB().execute([queryStr]);
-      const jobs: JobConfig[] = rawResults.map((result) => new JobConfig(result as JobConfig));
+      const generatedQuery = App.DB.getDB().generate(query);
+      const jobs = await App.DB.getDB().execute(generatedQuery) as JobConfig[];
 
       let i = 0;
       while (i < newJobSlots)
@@ -464,16 +494,26 @@ export class JobQueue
       resolve();
       jobIdLst.forEach(async (jobId) =>
       {
-        const jobResult: TaskOutputConfig = await this.runningJobs.get(jobId).run() as TaskOutputConfig;
-        const jobsFromId: JobConfig[] = await this.get(jobId);
-        const jobStatus: string = jobResult.status === true ? 'SUCCESS' : 'FAILURE';
-        await this.setJobStatus(jobsFromId[0].id, false, jobStatus);
-        await App.SKDR.setRunning(jobsFromId[0].scheduleId, false);
-        this.runningJobs.delete(jobId);
-        winston.info(`Job result: ${jobResult.status}`);
+        try
+        {
+          const jobResult: TaskOutputConfig = await this.runningJobs.get(jobId).run() as TaskOutputConfig;
+          const jobsFromId: JobConfig[] = await this.get(jobId);
+          const jobStatus: string = jobResult.status === true ? 'SUCCESS' : 'FAILURE';
 
-        const jobLogConfig: JobLogConfig[] = await App.JobL.create(jobId, jobResult['options']['logStream'], jobResult.status);
-        await this._setJobLogId(jobId, jobLogConfig[0].id);
+          const jobLogConfig: JobLogConfig[] = await App.JobL.create(jobId, jobResult['options']['logStream'], jobResult.status, false);
+          await this._setJobLogId(jobId, jobLogConfig[0].id);
+          if (jobResult.options.outputStream === null)
+          {
+            await App.JobQ.setJobStatus(jobId, false, 'FAILURE');
+            reject(new Error('Error while running job'));
+          }
+          consume(jobResult.options.outputStream as stream.Readable);
+        }
+        catch (e)
+        {
+          await App.JobQ.setJobStatus(jobId, false, 'FAILURE');
+          reject(new Error('Error while running job'));
+        }
       });
 
     });
@@ -506,25 +546,57 @@ export class JobQueue
 
   private async _select(columns: string[], filter: object, locked?: boolean): Promise<JobConfig[]>
   {
-    return new Promise<JobConfig[]>(async (resolve, reject) =>
+    if (locked === undefined) // all
     {
-      let rawResults: object[] = [];
-      if (locked === undefined) // all
-      {
-        rawResults = await App.DB.select(this.jobTable, columns, filter);
-      }
-      else if (locked === true) // currently running
-      {
-        // TODO
-      }
-      else // currently not running
-      {
-        // TODO
-      }
+      return App.DB.select(this.jobTable, columns, filter) as Promise<JobConfig[]>;
+    }
+    else if (locked === true) // currently running
+    {
+      // TODO
+      winston.info('not implemented');
+      return [];
+    }
+    else // currently not running
+    {
+      // TODO
+      winston.info('not implemented');
+      return [];
+    }
+  }
 
-      const results: JobConfig[] = rawResults.map((result: object) => new JobConfig(result as JobConfig));
-      resolve(results);
-    });
+  private async _sendEmail(jobId: number): Promise<void>
+  {
+    const emailIntegrations: IntegrationConfig[] = await integrations.get(null, undefined, 'Email', true) as IntegrationConfig[];
+    if (emailIntegrations.length !== 1)
+    {
+      winston.warn(`Invalid number of email integrations, found ${emailIntegrations.length}`);
+    }
+    else if (emailIntegrations.length === 1 && emailIntegrations[0].name !== 'Default Failure Email')
+    {
+      winston.warn('Invalid Email found.');
+    }
+    else
+    {
+      const jobs: JobConfig[] = await App.JobQ.get(jobId) as JobConfig[];
+      const jobLogs: JobLogConfig[] = await App.JobL.get(jobId) as JobLogConfig[];
+      if (jobs.length !== 0 && jobLogs.length !== 0)
+      {
+        if (jobs[0].scheduleId !== undefined)
+        {
+          const schedules: SchedulerConfig[] = await App.SKDR.get(jobs[0].scheduleId) as SchedulerConfig[];
+          if (schedules.length !== 0)
+          {
+            const connectionConfig = emailIntegrations[0].connectionConfig;
+            const authConfig = emailIntegrations[0].authConfig;
+            const fullConfig = Object.assign(connectionConfig, authConfig);
+            const subject: string = `[${fullConfig['customerName']}] Schedule "${schedules[0].name}" failed at job ${jobs[0].id}`;
+            const body: string = 'Check the job log table for details'; // should we include the log contents? jobLogs[0].contents;
+            const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body);
+            winston.info(`Email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
+          }
+        }
+      }
+    }
   }
 
   private async _setJobLogId(id: number, jobLogId: number): Promise<boolean>
@@ -552,10 +624,8 @@ export class JobQueue
       const query = new Tasty.Query(this.jobTable).filter(this.jobTable['status'].equals('PENDING'))
         .filter(this.jobTable['running'].equals(false)).filter(this.jobTable['priority'].equals(0))
         .sort(this.jobTable['runNowPriority'], 'desc').take(1);
-      const queryStr: string = App.DB.getDB().generateString(query);
-      const rawResults = await App.DB.getDB().execute([queryStr]);
-
-      const jobs: JobConfig[] = rawResults.map((result: object) => new JobConfig(result as JobConfig));
+      const generatedQuery = App.DB.getDB().generate(query);
+      const jobs = await App.DB.getDB().execute(generatedQuery) as JobConfig[];
       if (jobs.length !== 0)
       {
         maxRunNowPriority = jobs[0].runNowPriority;

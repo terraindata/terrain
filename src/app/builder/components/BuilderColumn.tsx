@@ -54,12 +54,12 @@ import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import './BuilderColumn.less';
 
+import * as shallowCompare from 'react-addons-shallow-compare'; // ES6
+import Query from '../../../items/types/Query';
 import Menu from '../../common/components/Menu';
 import { MenuOption } from '../../common/components/Menu';
 import RolesStore from '../../roles/data/RolesStore';
 import PanelMixin from './layout/PanelMixin';
-const shallowCompare = require('react-addons-shallow-compare');
-import Query from '../../../items/types/Query';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import Util from 'util/Util';

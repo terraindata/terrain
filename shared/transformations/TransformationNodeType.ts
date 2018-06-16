@@ -55,10 +55,11 @@ enum TransformationNodeType
   FilterNode = 'FilterNode',
   DuplicateNode = 'DuplicateNode',
   InsertNode = 'InsertNode',
-  UppercaseNode = 'UppercaseNode',
+  CaseNode = 'CaseNode',
   SubstringNode = 'SubstringNode',
   CastNode = 'CastNode',
   HashNode = 'HashNode',
+  RoundNode = 'RoundNode',
   AddNode = 'AddNode',
   SubtractNode = 'SubtractNode',
   MultiplyNode = 'MultiplyNode',
@@ -74,6 +75,8 @@ enum TransformationNodeType
   EncryptNode = 'EncryptNode',
   DecryptNode = 'DecryptNode',
   GroupByNode = 'GroupByNode',
+  FilterArrayNode = 'FilterArrayNode',
+  RemoveDuplicatesNode = 'RemoveDuplicatesNode',
   ZipcodeNode = 'ZipcodeNode',
 }
 
@@ -111,7 +114,8 @@ interface TransformationOptionTypes
     at?: number;
     value: string | KeyPath;
   };
-  UppercaseNode: {
+  CaseNode: {
+    format: string;
   };
   SubstringNode: {
     from: number;
@@ -123,6 +127,9 @@ interface TransformationOptionTypes
   };
   HashNode: {
     salt: string;
+  };
+  RoundNode: {
+    shift: number;
   };
   AddNode: {
     shift: number;
@@ -175,6 +182,12 @@ interface TransformationOptionTypes
     newFieldKeyPaths: List<KeyPath>;
     subkey: string;
     groupValues: any[];
+  };
+  FilterArrayNode: {
+    filterNull: boolean;
+    filterUndefined: boolean;
+  };
+  RemoveDuplicatesNode: {
   };
   ZipcodeNode: {
     format: string;

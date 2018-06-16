@@ -62,7 +62,6 @@ import ETLRouteUtil from 'etl/ETLRouteUtil';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { fetchDocumentsFromAlgorithm, fetchDocumentsFromFile } from 'etl/templates/DocumentRetrievalUtil';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import
 {
@@ -178,8 +177,9 @@ class DocumentsHelpers extends ETLHelpers
     key?: string,
   ): Promise<List<object>>
   {
-    return new Promise<List<object>>((resolve, reject) =>
+    return new Promise<List<object>>(async (resolve, reject) =>
     {
+      await this._logUpdate('Fetching Documents');
       const onFetchLoad = (documents: List<object>) =>
       {
         if (key !== undefined)

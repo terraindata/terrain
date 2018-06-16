@@ -59,13 +59,7 @@ const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
 
 export const integrations: Integrations = new Integrations();
-
-// Get schedule by search parameter, or all if none provided
-Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  await perm.SchedulerPermissions.verifyGetRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.SKDR.get(ctx.params.id);
-});
+export const initialize = () => integrations.initialize();
 
 // Get schedules by template id
 Router.get('/byTemplate/:templateId', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -94,13 +88,6 @@ Router.post('/duplicate/:id', passport.authenticate('access-token-local'), async
   ctx.body = await App.SKDR.duplicate(ctx.params.id);
 });
 
-// Retrieve schedule log by id
-Router.get('/log/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  await perm.SchedulerPermissions.verifyGetLogRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.SKDR.getLog(ctx.params.id);
-});
-
 // pause schedule by id
 Router.post('/pause/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
@@ -112,7 +99,7 @@ Router.post('/pause/:id', passport.authenticate('access-token-local'), async (ct
 Router.post('/run/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.SchedulerPermissions.verifyRunRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.SKDR.runSchedule(ctx.params.id, true);
+  ctx.body = await App.SKDR.runScheduleNow(ctx.params.id);
 });
 
 // unpause paused schedule by id
@@ -127,6 +114,19 @@ Router.post('/status/:id', passport.authenticate('access-token-local'), async (c
 {
   await perm.SchedulerPermissions.verifyStatusRoute(ctx.state.user as UserConfig, ctx.req);
   ctx.body = await App.SKDR.setStatus(ctx.params.id, ctx.request.body.body.status);
+});
+
+// returns current timezone that Midway is using
+Router.get('/timezone', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  ctx.body = await App.SKDR.getTimezone();
+});
+
+// Get schedule by search parameter, or all if none provided
+Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  await perm.SchedulerPermissions.verifyGetRoute(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await App.SKDR.get(ctx.params.id);
 });
 
 // Create schedule

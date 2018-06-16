@@ -196,7 +196,6 @@ export class TemplateProxy
   public createInitialEdgeEngine(edgeId: number, documents: List<object>)
   {
     const { engine, warnings, softWarnings } = EngineUtil.createEngineFromDocuments(documents);
-
     let castStringsToPrimitives = false;
     const fromNode = this.template.getNode(this.template.getEdge(edgeId).from);
     if (fromNode.type === NodeTypes.Source)
@@ -211,7 +210,6 @@ export class TemplateProxy
         castStringsToPrimitives = true;
       }
     }
-
     this.setEdgeTransformations(edgeId, engine);
     this.performTypeDetection(edgeId,
       {
@@ -289,7 +287,7 @@ export class TemplateProxy
       throw new Error(`No sink exists with key ${key}`);
     }
     const rootNames = order.ordering
-      .filter((id) => engine.getOutputKeyPath(id).size === 1)
+      .filter((id) => engine.getOutputKeyPath(id).size === 1 && engine.getFieldEnabled(id))
       .map((id) => engine.getOutputKeyPath(id).last());
     sink = sink.setIn(['fileConfig', 'fieldOrdering'], rootNames.toArray());
     this.setSink(key, sink);

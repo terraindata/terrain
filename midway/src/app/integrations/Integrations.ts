@@ -51,6 +51,7 @@ import IntegrationConfig from './IntegrationConfig';
 import { IntegrationPermission, IntegrationPermissionLevels } from './IntegrationPermissionLevels';
 import IntegrationSimpleConfig from './IntegrationSimpleConfig';
 
+import Encryption, { Keys } from 'shared/encryption/Encryption';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import * as Util from '../AppUtil';
@@ -61,34 +62,10 @@ import { versions } from '../versions/VersionRouter';
 export class Integrations
 {
   private integrationTable: Tasty.Table;
-  private key: any;
-  private privateKey: string;
 
-  constructor()
+  public initialize()
   {
-    this.integrationTable = new Tasty.Table(
-      'integrations',
-      ['id'],
-      [
-        'authConfig',
-        'connectionConfig',
-        'createdBy',
-        'meta',
-        'name',
-        'readPermission',
-        'type',
-        'lastModified',
-        'writePermission',
-      ],
-    );
-
-    // AES 128 requires a key that is 16, 24, or 32 bytes
-    this.privateKey = sha1(`0VAtqVlzusw8nqA8TMoSfGHR3ik3dB-c9t4-gKUjD5iRbsWQWRzeL
-                       -6mBtRGWV4M2A7ZZryVT7-NZjTvzuY7qhjrZdJTv4iGPmcbta-3iL
-                       kgfEzY3QufFvm14dqtzfsCXhboiOC23idadrMNGlQwyJ783XlGwLB
-                       xDeGI01olmhg0oiNCeoGc_4zDrHq3wcgcwQ_mpZYAj9mJsv_OI_yD
-                       iN83Y_gDQCTzA9u3NdmmxquD2jSrR2fSKRokspxqBjb5`).substring(0, 16);
-    this.key = aesjs.utils.utf8.toBytes(this.privateKey);
+    this.integrationTable = App.TBLS.integrations;
   }
 
   public async delete(user: UserConfig, id: number): Promise<IntegrationConfig[] | string>
@@ -113,8 +90,7 @@ export class Integrations
   {
     return new Promise<IntegrationConfig[]>(async (resolve, reject) =>
     {
-      const rawIntegrations = await App.DB.select(this.integrationTable, [], { id, type });
-      const integrations: IntegrationConfig[] = rawIntegrations.map((result: object) => new IntegrationConfig(result));
+      const integrations = await App.DB.select(this.integrationTable, [], { id, type }) as IntegrationConfig[];
       resolve(await Promise.all(integrations.map(async (integration) =>
       {
         if (integration.authConfig !== '')
@@ -140,8 +116,7 @@ export class Integrations
   // returns a string of names and ids that match given type
   public async getSimple(user: UserConfig, type?: string): Promise<IntegrationSimpleConfig[]>
   {
-    const rawIntegrations = await App.DB.select(this.integrationTable, [], { type });
-    return rawIntegrations.map((result: object) => new IntegrationSimpleConfig(result));
+    return App.DB.select(this.integrationTable, [], { type }) as Promise<IntegrationSimpleConfig[]>;
   }
 
   public async initializeDefaultIntegrations(): Promise<void>
@@ -182,6 +157,7 @@ export class Integrations
           }
         });
       }
+
       integration['authConfig'] = await this._encrypt(JSON.stringify(integration['authConfig'] as string)) as string;
       integration['connectionConfig'] = JSON.stringify(integration['connectionConfig']);
       await App.DB.upsert(this.integrationTable, integration);
@@ -278,25 +254,34 @@ export class Integrations
   // use standard AES 128 decryption
   private async _decrypt(msg: string, privateKey?: string): Promise<string>
   {
-    return new Promise<string>(async (resolve, reject) =>
+    return new Promise<string>((resolve, reject) =>
     {
-      const key: any = privateKey !== undefined ? aesjs.utils.utf8.toBytes(privateKey) : this.key;
-      const msgBytes: any = aesjs.utils.hex.toBytes(msg);
-      const aesCtr: any = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-      return resolve(aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes)));
+      if (privateKey === undefined)
+      {
+        return resolve(Encryption.decryptStatic(msg, Keys.Integrations));
+      }
+      else
+      {
+        return resolve(Encryption.decryptAny(msg, privateKey));
+      }
     });
   }
 
   // use standard AES 128 rencryption
   private async _encrypt(msg: string, privateKey?: string): Promise<string>
   {
-    return new Promise<string>(async (resolve, reject) =>
+    return new Promise<string>((resolve, reject) =>
     {
-      const key: any = privateKey !== undefined ? aesjs.utils.utf8.toBytes(privateKey) : this.key;
-      const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
-      const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-      return resolve(aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes)));
+      if (privateKey === undefined)
+      {
+        return resolve(Encryption.encryptStatic(msg, Keys.Integrations));
+      }
+      else
+      {
+        return resolve(Encryption.encryptAny(msg, privateKey));
+      }
     });
+
   }
 }
 

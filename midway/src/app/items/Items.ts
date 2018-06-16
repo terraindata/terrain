@@ -58,20 +58,13 @@ import ItemConfig from './ItemConfig';
 export class Items
 {
   private itemTable: Tasty.Table;
+  private statusHistory: StatusHistory;
 
-  constructor()
+  public initialize()
   {
-    this.itemTable = new Tasty.Table(
-      'items',
-      ['id'],
-      [
-        'meta',
-        'name',
-        'parent',
-        'status',
-        'type',
-      ],
-    );
+    this.itemTable = App.TBLS.items;
+    this.statusHistory = new StatusHistory();
+    this.statusHistory.initialize();
   }
 
   public async delete(id: number): Promise<ItemConfig[]>
@@ -81,12 +74,7 @@ export class Items
 
   public async select(columns: string[], filter: object): Promise<ItemConfig[]>
   {
-    return new Promise<ItemConfig[]>(async (resolve, reject) =>
-    {
-      const rawResults = await App.DB.select(this.itemTable, columns, filter);
-      const results: ItemConfig[] = rawResults.map((result: object) => new ItemConfig(result));
-      resolve(results);
-    });
+    return App.DB.select(this.itemTable, columns, filter) as Promise<ItemConfig[]>;
   }
 
   public async get(id?: number): Promise<ItemConfig[]>
@@ -211,24 +199,20 @@ export class Items
         await versions.create(user, 'items', id, items[0]);
         if (items[0].status !== item.status)
         {
-          const statusHistory = new StatusHistory();
-          await statusHistory.create(user, id, items[0], item.status as string);
+          await this.statusHistory.create(user, id, items[0], item.status as string);
         }
 
         item = Util.updateObject(items[0], item);
       }
 
-      if (item.name !== '')
+      try
       {
-        const itemsWithSameName = await this.select([], { name: item.name, type: item.type, parent: item.parent });
-        const isNameTaken = itemsWithSameName.length !== 0 && (item.id === undefined || itemsWithSameName[0].id !== item.id);
-        if (isNameTaken)
-        {
-          return reject('Item name is taken');
-        }
+        resolve(await App.DB.upsert(this.itemTable, item) as ItemConfig);
       }
-
-      resolve(await App.DB.upsert(this.itemTable, item) as ItemConfig);
+      catch (e)
+      {
+        reject(e);
+      }
     });
   }
 

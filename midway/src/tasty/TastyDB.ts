@@ -59,18 +59,7 @@ export abstract class TastyDB
    *
    * @memberof TastyDB
    */
-  public abstract generate(query: TastyQuery): any;
-
-  /**
-   * makes the generated query into a string
-   *
-   * @abstract
-   * @param {TastyQuery} query
-   * @returns {string}
-   *
-   * @memberof TastyDB
-   */
-  public abstract generateString(query: TastyQuery): string;
+  public abstract generate(query: TastyQuery): any[];
 
   /**
    * execute a database specific query
@@ -81,7 +70,7 @@ export abstract class TastyDB
    *
    * @memberof TastyDB
    */
-  public async abstract execute(queries: any[], handle?: TransactionHandle): Promise<object[]>;
+  public async abstract execute(query: any[], handle?: TransactionHandle): Promise<object[]>;
 
   /**
    * update or insert an array of objects in a TastyTable

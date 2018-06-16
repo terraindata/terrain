@@ -47,14 +47,18 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
+import * as _ from 'lodash';
 
+import { notificationManager } from 'common/components/InAppNotification';
 import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import TerrainStore from 'src/app/store/TerrainStore';
 import Util from 'util/Util';
 
+import ETLAjax from 'etl/ETLAjax';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+import { _JobConfig, JobConfig } from 'jobs/JobsTypes';
 import { getMimeType } from 'shared/etl/FileUtil';
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
@@ -63,30 +67,63 @@ import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointType
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import ETLHelpers from './ETLHelpers';
 
+import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
+
 class ExecutionHelpers extends ETLHelpers
 {
-  public canRunTemplate(template: ETLTemplate): { canRun: boolean, message: string }
+  public canRunTemplate(template: ETLTemplate): Promise<{ canRun: boolean, message: string }>
   {
-    const { runningTemplates } = this._etl;
-    const verifyErrors = TemplateUtil.verifyExecutable(template);
-    if (verifyErrors.length > 0)
+    return new Promise(async (resolve, reject) =>
     {
-      return {
-        canRun: false,
-        message: `Cannot run template "${template.templateName}": ${JSON.stringify(verifyErrors)}`,
-      };
-    }
-    else if (runningTemplates.has(template.id))
-    {
-      return {
-        canRun: false,
-        message: `Cannot run template "${template.templateName}". This template is already running`,
-      };
-    }
-    return {
-      canRun: true,
-      message: '',
-    };
+      const options: {
+        mappings: { [k: string]: object };
+      } = {
+          mappings: {},
+        };
+
+      const promises = [];
+      const indexMapping = [];
+      template.getSinks().forEach((sink, key) =>
+      {
+        if (sink.type === Sinks.Database)
+        {
+          indexMapping.push(key);
+          promises.push(ETLAjax.getMapping(sink.options.serverId, sink.options.database));
+        }
+      });
+      if (promises.length > 0)
+      {
+        await Promise.all(promises).then((mappings) =>
+        {
+          mappings.forEach((mapping, index) =>
+          {
+            const key = indexMapping[index];
+            options.mappings[key] = mapping;
+          });
+        }).catch((err) =>
+        {
+          return resolve({
+            canRun: false,
+            message: `Cannot run template "${template.templateName}". Error while fetching mappings: ${JSON.stringify(err, null, 2)}`,
+          });
+        });
+      }
+
+      const verifyErrors = TemplateUtil.verifyExecutable(template, options);
+
+      if (verifyErrors.length > 0)
+      {
+        return resolve({
+          canRun: false,
+          message: `Cannot run template "${template.templateName}": ${JSON.stringify(verifyErrors, null, 2)}`,
+        });
+      }
+
+      return resolve({
+        canRun: true,
+        message: '',
+      });
+    });
   }
 
   public createExecuteJob(templateName: string): Promise<number>
@@ -102,7 +139,7 @@ class ExecutionHelpers extends ETLHelpers
     });
   }
 
-  public runExecuteJobFactory(template: ETLTemplate): (id: number) => Promise<void>
+  public runExecuteJobFactory(template: ETLTemplate): (id: number) => Promise<number>
   {
     return (jobId: number) =>
     {
@@ -125,7 +162,7 @@ class ExecutionHelpers extends ETLHelpers
           files[key] = (source.options as SourceOptionsType<Sources.Upload>).file;
         }
       });
-      return new Promise<void>((resolve, reject) =>
+      return new Promise<number>((resolve, reject) =>
       {
         this.etlAct({
           actionType: 'runExecuteJob',
@@ -134,7 +171,7 @@ class ExecutionHelpers extends ETLHelpers
           files,
           downloadName,
           mimeType,
-          onLoad: resolve,
+          onLoad: () => resolve(jobId),
           onError: reject,
         });
       });
@@ -170,36 +207,159 @@ class ExecutionHelpers extends ETLHelpers
 
   public runInlineTemplate(template: ETLTemplate)
   {
-    const { canRun, message } = this.canRunTemplate(template);
-    if (!canRun)
+    const { runningTemplates } = this._etl;
+    if (runningTemplates.has(template.id))
     {
       this.etlAct({
         actionType: 'addModal',
         props: {
-          message,
+          message: `Cannot run template "${template.templateName}". This template is already running`,
           title: `Error`,
           error: true,
         },
       });
-      return;
     }
-
-    const updateUIAfterSuccess = () =>
+    else
     {
-      const templateName = (template !== null && template.id === -1) ?
-        'Unsaved Template' :
-        template.templateName;
-      this.afterRunTemplate(template);
-      this.etlAct({
-        actionType: 'addModal',
-        props: {
-          message: `"${templateName}" finished running`,
-          title: 'Task Complete',
-        },
+      this.beforeRunTemplate(template);
+      this.canRunTemplate(template).then(({ canRun, message }) =>
+      {
+        if (!canRun)
+        {
+          this.etlAct({
+            actionType: 'addModal',
+            props: {
+              message,
+              title: `Error`,
+              error: true,
+            },
+          });
+          this.afterRunTemplate(template);
+        }
+        else
+        {
+          this.runTemplate(template);
+        }
+      }).catch((err) =>
+      {
+        this.etlAct({
+          actionType: 'addModal',
+          props: {
+            message: 'Error while trying to run template',
+            title: `Error`,
+            error: true,
+          },
+        });
+        this.afterRunTemplate(template);
       });
-      this.schemaAct({
-        actionType: 'fetch',
+    }
+  }
+
+  // Wait for a job to finish. Returns a promise that resolves when the job is finished or paused
+  public pollOnJob(jobId: number, addNotifications?: boolean): Promise<JobConfig>
+  {
+    const checkJob = async () =>
+    {
+      const jobs = await this.jobsAct({
+        actionType: 'getJob',
+        jobId,
       });
+      if (jobs == null || jobs.length === 0)
+      {
+        throw new Error('Job could not be found');
+      }
+      return _JobConfig(jobs[0]);
+    };
+
+    const isJobComplete = (job: JobConfig) =>
+    {
+      if (job === undefined)
+      {
+        throw new Error(`Job with ID ${String(jobId)} not found`);
+      }
+      else
+      {
+        return !job.running && job.status !== 'PENDING';
+      }
+    };
+
+    return ETLHelpers.asyncPoll(checkJob, isJobComplete);
+  }
+
+  private runTemplate(template: ETLTemplate)
+  {
+    const templateName = (template !== null && template.id === -1) ?
+      'Unsaved Template' :
+      template.templateName;
+
+    const updateUIAfterRunResponse = (jobId: number) =>
+    {
+      const defaultSink = template.getDefaultSink();
+      if (defaultSink.type === Sinks.Download)
+      {
+        this.afterRunTemplate(template);
+        this.etlAct({
+          actionType: 'addModal',
+          props: {
+            message: `"${templateName}" finished running`,
+            title: 'Task Complete',
+            cancelButtonText: 'OK',
+            confirm: true,
+            confirmButtonText: 'View Jobs',
+            onConfirm: ETLRouteUtil.gotoJobs,
+          },
+        });
+      }
+      else
+      {
+        const modalMessage = `This ${template.isImport() ? 'Import' : 'Export'} is now running with Job ID ${jobId}`;
+        this.etlAct({
+          actionType: 'addModal',
+          props: {
+            message: modalMessage,
+            title: `Job Now Running`,
+            cancelButtonText: 'OK',
+            confirm: true,
+            confirmButtonText: 'View Jobs',
+            onConfirm: ETLRouteUtil.gotoJobs,
+          },
+        });
+        this.pollOnJob(jobId)
+          .then((job: JobConfig) =>
+          {
+            this.afterRunTemplate(template);
+            this.schemaAct({
+              actionType: 'fetch',
+            });
+
+            let message = '';
+            let notificationType = 'info';
+
+            if (job === undefined)
+            {
+              throw new Error('Job is undefined');
+            }
+            else if (job.status === 'PAUSED')
+            {
+              message = `Job ${jobId} Has Been Paused`;
+            }
+            else if (job.status === 'SUCCESS')
+            {
+              message = `Job ${jobId} Has Successfully Finished Running`;
+            }
+            else
+            {
+              notificationType = 'error';
+              message = `Job ${jobId} Had an Error`;
+            }
+            notificationManager.addNotification(message, '', notificationType, 4);
+          })
+          .catch((err) =>
+          {
+            this.afterRunTemplate(template);
+            notificationManager.addNotification(`Error occurred while checking status for job ${jobId}`, '', 'error', 4);
+          });
+      }
     };
     const updateUIAfterError = (ev) =>
     {
@@ -207,17 +367,15 @@ class ExecutionHelpers extends ETLHelpers
       this.etlAct({
         actionType: 'addModal',
         props: {
-          message: `Error while running: ${String(ev)}`,
+          message: `Error while running ${templateName}: ${String(ev)}`,
           title: `Error`,
           error: true,
         },
       });
     };
-
-    this.beforeRunTemplate(template);
     this.createExecuteJob(template.templateName)
       .then(this.runExecuteJobFactory(template))
-      .then(updateUIAfterSuccess)
+      .then(updateUIAfterRunResponse)
       .catch(updateUIAfterError);
   }
 }

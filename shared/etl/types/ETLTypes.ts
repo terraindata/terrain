@@ -212,3 +212,12 @@ export enum DateFormats
   ISOstring = 'ISOstring',
   MMDDYYYY = 'MMDDYYYY',
 }
+
+export enum CaseFormats
+{
+  uppercase = 'Uppercase',
+  lowercase = 'lowercase',
+  titlecase = 'Title Case',
+  camelcase = 'camelCase',
+  pascalcase = 'PascalCase',
+}

@@ -98,6 +98,7 @@ const SectionTitle = (props: SectionTitleProps) =>
       <div
         className='section-title-text'
         style={fontColor(Colors().text3)}
+        onClick={() => props.canExpand && props.onExpand(props.expanded)}
       >
         {
           tooltip(
@@ -109,6 +110,7 @@ const SectionTitle = (props: SectionTitleProps) =>
       <div
         className='section-title-text'
         style={fontColor(Colors().text3)}
+        onClick={() => props.canExpand && props.onExpand(props.expanded)}
       >
         {
           props.text

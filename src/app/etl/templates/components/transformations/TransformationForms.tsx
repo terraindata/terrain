@@ -57,6 +57,7 @@ const { List, Map } = Immutable;
 import { ArrayCountTFF, ArraySumTFF } from './ArrayStatTransformationForms';
 import { CastTFF } from './CastTransformationForm';
 import { DuplicateTFF } from './DuplicateTransformationForm';
+import { FilterArrayTFF } from './FilterArrayTransformationForm';
 import { GroupByTFF } from './GroupByTransformationForm';
 import { InsertTFF } from './InsertTransformationForm';
 import { JoinTFF } from './JoinTransformationForm';
@@ -64,8 +65,8 @@ import { DifferenceTFF, ProductTFF, QuotientTFF, SumTFF } from './NumericOperati
 import { SetIfTFF } from './SetIfTransformationForm';
 import
 {
-  AddTFF, DecryptTFF, DivideTFF, EncryptTFF, FindReplaceTFF, HashTFF,
-  MultiplyTFF, SubstringTFF, SubtractTFF, UppercaseTFF,
+  AddTFF, CaseTFF, DecryptTFF, DivideTFF, EncryptTFF, FindReplaceTFF,
+  HashTFF, MultiplyTFF, RemoveDuplicatesTFF, RoundTFF, SubstringTFF, SubtractTFF, ZipcodeTFF,
 } from './SimpleTransformations';
 import { SplitTFF } from './SplitTransformationForm';
 
@@ -73,8 +74,8 @@ export function getTransformationForm(type: TransformationNodeType): React.Compo
 {
   switch (type)
   {
-    case TransformationNodeType.UppercaseNode:
-      return UppercaseTFF;
+    case TransformationNodeType.CaseNode:
+      return CaseTFF;
     case TransformationNodeType.SubstringNode:
       return SubstringTFF;
     case TransformationNodeType.DuplicateNode:
@@ -91,6 +92,8 @@ export function getTransformationForm(type: TransformationNodeType): React.Compo
       return ArraySumTFF;
     case TransformationNodeType.ArrayCountNode:
       return ArrayCountTFF;
+    case TransformationNodeType.RoundNode:
+      return RoundTFF;
     case TransformationNodeType.AddNode:
       return AddTFF;
     case TransformationNodeType.SubtractNode:
@@ -119,6 +122,12 @@ export function getTransformationForm(type: TransformationNodeType): React.Compo
       return DecryptTFF;
     case TransformationNodeType.GroupByNode:
       return GroupByTFF;
+    case TransformationNodeType.FilterArrayNode:
+      return FilterArrayTFF;
+    case TransformationNodeType.RemoveDuplicatesNode:
+      return RemoveDuplicatesTFF;
+    case TransformationNodeType.ZipcodeNode:
+      return ZipcodeTFF;
     default:
       return null;
   }

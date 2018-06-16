@@ -50,7 +50,6 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as shallowCompare from 'react-addons-shallow-compare';
 import Util from 'util/Util';
 
 import * as Immutable from 'immutable';
@@ -252,11 +251,6 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return getCurrentLanguage(props);
   }
 
-  protected _inputDisabled(): boolean
-  {
-    return !this._field().isIncluded || !this.props.canEdit;
-  }
-
   protected _settingsAreOpen(props = this.props): boolean
   {
     this.updateChecker.setChecker('settingsOpen', settingsAreOpen);
@@ -273,12 +267,6 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   {
     return this._field(this.props.fieldId, this.props)
       !== this._field(nextProps.fieldId, nextProps);
-  }
-
-  // Returns the given function if input is not disabled. Otherwise returns undefined.
-  protected _noopIfDisabled<F>(fn: F): F | undefined
-  {
-    return this._inputDisabled() ? undefined : fn;
   }
 
   @instanceFnDecorator(memoizeOne)
@@ -327,8 +315,8 @@ function settingsAreOpen(props: TemplateEditorFieldProps)
   }
   else
   {
-    const uiState = (props as TemplateEditorFieldProps & Injected).templateEditor.uiState;
-    return fieldId === uiState.settingsFieldId &&
-      displayKeyPath.equals(uiState.settingsDisplayKeyPath);
+    const { settingsState } = (props as TemplateEditorFieldProps & Injected).templateEditor.uiState;
+    return fieldId === settingsState.fieldId &&
+      displayKeyPath.equals(settingsState.dkp);
   }
 }

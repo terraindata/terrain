@@ -72,6 +72,7 @@ export interface Props
   confirm?: boolean;
   confirmButtonText?: string;
   confirmDisabled?: boolean; // if true, confirm button is disabled
+  cancelButtonText?: string;
   onValidate?: () => boolean;
   onConfirm?: () => void;
   onClose: () => void;
@@ -183,6 +184,7 @@ class Modal extends TerrainComponent<Props>
       >
         <div>
           <ReactModal
+            appElement={document.getElementById('app')}
             contentLabel={''}
             isOpen={true}
             overlayClassName='modal-overlay'
@@ -332,7 +334,7 @@ class Modal extends TerrainComponent<Props>
                             'button': true,
                             'modal-confirm-button': true,
                           })}
-                          onClick={!this.props.confirmDisabled && this.closeModalSuccess}
+                          onClick={this.props.confirmDisabled ? undefined : this.closeModalSuccess}
                           style={confirmButtonStyle}
                           key='modal-confirm-button'
                         >
@@ -349,8 +351,10 @@ class Modal extends TerrainComponent<Props>
                       onClick={this.props.onClose}
                       key='modal-close-button'
                     >
-                      Cancel
-                      </div>
+                      {
+                        this.props.cancelButtonText ? this.props.cancelButtonText : 'Cancel'
+                      }
+                    </div>
                   </div>
                 }
               </div>

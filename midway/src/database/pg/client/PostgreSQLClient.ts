@@ -136,16 +136,16 @@ class PostgreSQLClient
   {
     const client = await this.delegate.connect();
     const handle = this.nextTransactionIndex;
+    this.nextTransactionIndex++;
     this.controller.log('PostgreSQLClient.startTransaction (transaction ' + handle.toString() + ')');
     this.transactionClients[handle] = client;
-    this.nextTransactionIndex++;
     return handle;
   }
 
   public async endTransaction(handle: TransactionHandle): Promise<void>
   {
     this.controller.log('PostgreSQLClient.endTransaction (transaction ' + handle.toString() + ')');
-    await this.transactionClients[handle].release();
+    this.transactionClients[handle].release();
     delete this.transactionClients[handle];
   }
 

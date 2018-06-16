@@ -66,6 +66,7 @@ import * as Config from './Config';
 import { DatabaseConfig } from './database/DatabaseConfig';
 import { databases } from './database/DatabaseRouter';
 import { Email } from './email/Email';
+import { registerMidwayEncryption } from './encryption/MidwayEncryptionController';
 import { events } from './events/EventRouter';
 import { integrations } from './integrations/IntegrationRouter';
 import { JobLog } from './jobs/JobLog';
@@ -87,6 +88,7 @@ export let HA: number;
 export let JobL: JobLog;
 export let JobQ: JobQueue;
 export let SKDR: Scheduler;
+export let TBLS: Schema.Tables;
 
 export class App
 {
@@ -117,6 +119,10 @@ export class App
   private static unhandledRejectionHandler(err: Error): void
   {
     winston.error('Unhandled Promise Rejection: ' + err.toString());
+    if (err.stack !== undefined)
+    {
+      winston.error(err.stack);
+    }
   }
 
   private DB: Tasty.Tasty;
@@ -135,24 +141,29 @@ export class App
 
     // first, load config from a config file, if one is specified
     config = Config.loadConfigFromFile(config);
-    this.DB = App.initializeDB(config.db as string, config.dsn as string);
-    DB = this.DB;
-
     winston.debug('Using configuration: ' + JSON.stringify(config));
     this.config = config;
     CFG = this.config;
+
+    TBLS = Schema.setupTables(config.db as string);
+
+    this.DB = App.initializeDB(config.db as string, config.dsn as string);
+    DB = this.DB;
 
     this.EMAIL = new Email();
     EMAIL = this.EMAIL;
 
     this.JobL = new JobLog();
     JobL = this.JobL;
+    JobL.initialize();
 
     this.JobQ = new JobQueue();
     JobQ = this.JobQ;
+    JobQ.initialize();
 
     this.SKDR = new Scheduler();
     SKDR = this.SKDR;
+    SKDR.initialize();
 
     this.app = new Koa();
     this.app.proxy = true;
@@ -225,7 +236,7 @@ export class App
 
     // make sure we insert the RouteErrorHandler first
     this.app.use(RouteError.RouteErrorHandler);
-    this.app.use(MidwayRouter.routes());
+    this.app.use(MidwayRouter().routes());
     this.app.use(serve({ rootDir: './midway/src/assets', rootPath: '/midway/v1/assets' }));
     this.app.use(NotFoundRouter.routes());
   }
@@ -251,12 +262,35 @@ export class App
     }
 
     // create application schema
-    await Schema.createAppSchema(this.config.db as string, this.DB);
+    for (const key of Object.keys(TBLS))
+    {
+      await DB.getDB().putMapping(TBLS[key]);
+    }
+    const query = [
+      [
+        'ALTER TABLE items ADD CONSTRAINT unique_item_names EXCLUDE (name WITH =, parent WITH =) WHERE (name != \'\');',
+      ],
+      undefined,
+    ];
+    try
+    {
+      await DB.getDB().execute(query);
+    } catch (e)
+    {
+      if (e.message !== 'relation "unique_item_names" already exists')
+      {
+        throw e;
+      }
+    }
     winston.info('Finished creating application schema...');
 
     // process configuration options
     await Config.handleConfig(this.config);
     winston.debug('Finished processing configuration options...');
+
+    // initialize system encryption keys
+    registerMidwayEncryption();
+    winston.debug('Finished Registering System Private Keys');
 
     // create a default seed user
     await users.initializeDefaultUser();

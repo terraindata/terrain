@@ -55,7 +55,7 @@ export enum Integrations
   Magento = 'Magento',
   GoogleAnalytics = 'GoogleAnalytics',
   Email = 'Email',
-  Mailchimp = 'Mailchimp',
+  MailChimp = 'MailChimp',
 }
 
 export const IntegrationNames =
@@ -68,7 +68,7 @@ export const IntegrationNames =
     Magento: 'Magento',
     GoogleAnalytics: 'Google Analytics',
     Email: 'Email',
-    Mailchimp: 'MailChimp',
+    MailChimp: 'MailChimp',
   };
 
 export interface IntegrationConfigBase
@@ -109,7 +109,7 @@ export interface AuthConfigTypes
   Email: {
     password: string;
   };
-  Mailchimp: {
+  MailChimp: {
     apiKey: string;
   };
 }
@@ -162,7 +162,7 @@ export interface ConnectionConfigTypes
     recipient: string;
     smtp: string;
   };
-  Mailchimp: {
+  MailChimp: {
     host: string;
   };
 }

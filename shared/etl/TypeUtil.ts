@@ -150,45 +150,50 @@ export default class TypeUtil
     }
   }
 
-  public static getCommonElasticType(values: string[]): ElasticTypes
+  public static areValuesGeoPoints(values: any[]): boolean
   {
-    let type: ElasticTypes = null;
+    if (values.length === 0)
+    {
+      return false;
+    }
+
+    let allGeopoints = true;
+    let someGeopoints = false;
 
     for (const val of values)
     {
-      if (TypeUtil.isNullHelper(val))
+      if (val === null || val === undefined)
       {
-        // do nothing
+        // ignore
       }
-      else if (TypeUtil.isDateHelper(val))
+      else if ((typeof val === 'object' || typeof val === 'string') && TypeUtil.isGeoHelper(val))
       {
-        type = (type === null || type === ElasticTypes.Date) ? ElasticTypes.Date : ElasticTypes.Auto;
+        someGeopoints = true;
       }
-      else if (TypeUtil.isGeoHelper(val))
+      else
       {
-        type = (type === null || type === ElasticTypes.GeoPoint) ? ElasticTypes.GeoPoint : ElasticTypes.Auto;
-      }
-    }
-    return type === null ? ElasticTypes.Auto : type;
-  }
-
-  public static getCommonElasticNumberType(values: number[]): ElasticTypes
-  {
-    let type: ElasticTypes = null;
-
-    for (const val of values)
-    {
-      if (val == null || Number.isNaN(val))
-      {
-        // do nothing
-      }
-      else if (TypeUtil.numberIsInteger(val))
-      {
-        type = (type === null || type === ElasticTypes.Integer) ? ElasticTypes.Integer : ElasticTypes.Auto;
+        allGeopoints = false;
       }
     }
-    return type === null ? ElasticTypes.Auto : type;
+    return allGeopoints && someGeopoints;
   }
+
+  // public static areValuesNull(values: any[]): boolean
+  // {
+  //   if (values.length === 0)
+  //   {
+  //     return false;
+  //   }
+
+  //   let allNull = true;
+  //   for (const val of values)
+  //   {
+  //     if (val !== null)
+  //     {
+  //       allNull
+  //     }
+  //   }
+  // }
 
   public static numberIsInteger(value: number): boolean
   {

@@ -45,12 +45,12 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
 import TerrainComponent from 'common/components/TerrainComponent';
+import TerrainDndContext from 'common/components/TerrainDndContext';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { DragDropContext } from 'react-dnd';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 const HTML5Backend = require('react-dnd-html5-backend');
@@ -70,15 +70,14 @@ import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import Quarantine from 'util/RadiumQuarantine';
 
 import EditorActionsSection from './EditorActionsSection';
 import EditorColumnActionsSection from './EditorColumnActionsSection';
 
-import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
-
 import './TemplateEditor.less';
 
-import Quarantine from 'util/RadiumQuarantine';
+import * as yadeep from 'shared/util/yadeep';
 
 const { List } = Immutable;
 
@@ -263,7 +262,7 @@ class TemplateEditor extends TerrainComponent<Props>
 const emptyList = List([]);
 
 export default Util.createContainer(
-  DragDropContext(HTML5Backend)(TemplateEditor),
+  TerrainDndContext(TemplateEditor),
   ['templateEditor'],
   {
     editorAct: TemplateEditorActions,

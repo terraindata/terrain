@@ -141,6 +141,12 @@ export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActions
     };
   }
 
+  // gets the state from thunk's getState function
+  public _getState(getState: () => any): StateType
+  {
+    return getState().get(this.namespace);
+  }
+
   public _act(action: Unroll<AllActionsT>): ActPayload<AllActionsT>
   {
     const override = this.overrideAct(action);

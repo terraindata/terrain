@@ -97,6 +97,7 @@ export class TransformationCreator extends TerrainComponent<Props>
         group: 'main',
         options: {
           pickOptions: this.getOptionNames,
+          wrapperHeight: '150px',
         },
       },
     };

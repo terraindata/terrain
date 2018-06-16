@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:strict-boolean-expressions
 
 import AnalyticsSelector from 'analytics/components/AnalyticsSelector';
 import Loading from 'common/components/Loading';
@@ -64,7 +65,7 @@ import LibraryInfoColumn from './LibraryInfoColumn';
 
 export interface Props
 {
-  params?: any;
+  match?: any;
   location?: any;
   router?: any;
   route?: any;
@@ -81,7 +82,7 @@ class Library extends TerrainComponent<any>
   public static ALGORITHMS_COLUMN = 'algorithms';
 
   public static defaultProps: Partial<Props> = {
-    params: {},
+    match: {},
     location: {},
     router: {},
     route: {},
@@ -121,7 +122,7 @@ class Library extends TerrainComponent<any>
       }
     }
 
-    if ((!this.props.params || !this.props.params.categoryId))
+    if (!this.props.match.params.categoryId)
     {
       loadLastRoute(basePath);
     }
@@ -285,8 +286,8 @@ class Library extends TerrainComponent<any>
 
   public isColumnVisible(columnName)
   {
-    const { singleColumn, router } = this.props;
-    const params = router !== undefined && router.params !== undefined ? router.params : {};
+    const { singleColumn, match } = this.props;
+    const params = match !== undefined && match.params !== undefined ? match.params : {};
     const { categoryId, groupId, algorithmId } = params;
 
     return !singleColumn ||
@@ -312,7 +313,7 @@ class Library extends TerrainComponent<any>
       library: libraryState,
       analytics,
       schema,
-      router,
+      match,
       basePath,
       canPinAlgorithms,
       singleColumn,
@@ -336,20 +337,23 @@ class Library extends TerrainComponent<any>
     } = analytics;
 
     const hasPinnedAlgorithms = pinnedAlgorithms.valueSeq().includes(true);
-    const { params } = router;
-
+    const { params } = match;
     const datasets = this.getDatasets();
 
     const categoryId = params.categoryId ? +params.categoryId : null;
-    const groupId = params.groupId ? +params.groupId : null;
-    const algorithmId = params.algorithmId ? +params.algorithmId : null;
-
     const category: LibraryTypes.Category = categoryId !== null ? categories.get(categoryId) : undefined;
+    let groupId = params.groupId ? +params.groupId : null;
+    if (groupId === null && !singleColumn)
+    {
+      groupId = (category && category.groupsOrder && category.groupsOrder.first()) ?
+        +category.groupsOrder.first() : null;
+      params['groupId'] = groupId;
+    }
+    const algorithmId = params.algorithmId ? +params.algorithmId : null;
     const group: LibraryTypes.Group = groupId !== null ? groups.get(groupId) : undefined;
     const algorithm: LibraryTypes.Algorithm = algorithmId !== null ? algorithms.get(algorithmId) : undefined;
     const groupsOrder: List<ID> = category !== undefined ? category.groupsOrder : undefined;
     const algorithmsOrder: List<ID> = group !== undefined ? group.algorithmsOrder : undefined;
-
     if (!!this.props.location.pathname)
     {
       saveLastRoute(basePath, this.props.location);
@@ -418,7 +422,8 @@ class Library extends TerrainComponent<any>
                 params,
                 canPinItems: canPinAlgorithms,
                 basePath,
-                router,
+                match,
+                location,
                 algorithmActions: this.props.libraryAlgorithmActions,
                 analytics,
                 analyticsActions: this.props.analyticsActions,
