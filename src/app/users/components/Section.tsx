@@ -93,7 +93,7 @@ export default class Section extends TerrainComponent<Props>
 
   public renderBlockColumn()
   {
-    if (this.props.columnNum === 1)
+    if (this.props.columnNum === 0)
     {
       return (
         <div className='section-body' style={{ background: Colors().bg }}>
@@ -111,11 +111,17 @@ export default class Section extends TerrainComponent<Props>
         let columnBlocks = this.props.sectionBoxes.slice(columnStart, columnStart + perColumn);
         columns = columns.push(columnBlocks);
       }
-      return (
-        <div className='section-body' style={{ background: Colors().bg }}>
-          {columns.map((col, i) => this.renderBlocks(col, 'profile-col-1', i))}
-        </div>
-      )
+
+      
+        return (
+          <div className='section-body' style={{ background: Colors().bg }}>
+          {this.props.hasPhoto ? <div className='profile-pic'></div> : null}  
+          <div className='profile-text'>
+            {columns.map((col, i) => this.renderBlocks(col, 'profile-col-1', i))}
+          </div>
+          </div>
+        );
+      
     }
   }
 

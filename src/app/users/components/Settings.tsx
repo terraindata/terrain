@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
+import * as Immutable from 'immutable';
 import { List } from 'immutable';
 import * as React from 'react';
 
@@ -83,6 +84,7 @@ export interface Props
   auth?: AuthState;
   users?: UserTypes.UserState;
   userActions?: typeof Actions;
+  canEdit: boolean;
 }
 
 class Settings extends TerrainComponent<Props>
@@ -445,8 +447,34 @@ class Settings extends TerrainComponent<Props>
           onChange={this.changeTimeZone}
           className='settings-timezone-dropdown'
           searchable={false}
+          openOuterUp={true}
         />
       </div>
+    );
+  }
+
+  public newRenderTimeZoneContent()
+  {
+    const timeZonesList = this.getTimeZonesList();
+    const timeZonesListImmu = Immutable.List(timeZonesList);
+    let timeZone: number;
+
+    if (this.props.users.currentUser)
+    {
+      timeZone = this.props.users.currentUser.timeZone || 158;
+    }
+    else
+    {
+      timeZone = 158;
+    }
+
+    return (
+      <Dropdown
+        canEdit={this.props.canEdit}
+        options={timeZonesListImmu}
+        selectedIndex={1}
+        onChange={this.changeTimeZone}
+      />
     );
   }
 
@@ -687,19 +715,19 @@ class Settings extends TerrainComponent<Props>
           ])
         }
         hasPhoto={false}
-        columnNum={1}
+        columnNum={0}
       />
       <Section
         sectionTitle='Time Zone'
         sectionType='timezone'
         sectionBoxes={
           List([
-            {header: 'GMT Offset', info: 'hiiii', type: 'Dropdown'},
+            {header: 'GMT Offset', info: this.newRenderTimeZoneContent(), type: 'Dropdown'},
             {header: 'Send Daily Email At', info: 'Midnight', type: 'Dropdown'},
           ])
         }
         hasPhoto={false}
-        columnNum={1}
+        columnNum={0}
       />
     </div>
     );
