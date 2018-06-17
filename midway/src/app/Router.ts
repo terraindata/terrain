@@ -128,14 +128,6 @@ export function getRouter()
     ctx.body = 'authenticated as ' + (ctx.state.user[0].email as string);
   });
 
-  const MidwayRouter = new KoaRouter();
-  MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
-
-  MidwayRouter.get('/', async (ctx, next) =>
-  {
-    await send(ctx, '/src/app/index.html');
-  });
-
   interface AllowedFileOptions
   {
     requiresAuth?: boolean;
@@ -164,10 +156,12 @@ export function getRouter()
   // Allow any files matching these extensions
   const allowedExtensions: string[] = [
     '.woff',
+    '.jpg',
   ];
-
-  MidwayRouter.get('/assets/:asset', async (ctx, next) =>
+  
+  const serveAsset = async (ctx, next) =>
   {
+    winston.info('assssset');
     let rejectRequest: boolean = false;
     const allowedFileOptions = allowedFiles[ctx.params['asset']];
     
@@ -199,15 +193,33 @@ export function getRouter()
       return;
     }
     
+    winston.info('asdf ' + allowedFileOptions.routeTo8080InDev + 'e' + process.env.NODE_ENV );
+    let path = `${ctx.params['path']}`;
+    if (ctx.params['folder'] != undefined)
+    {
+      path = ctx.params['folder'] + '/' + path;
+    }
+    winston.info('path ' + path);
+    
     if (allowedFileOptions.routeTo8080InDev && process.env.NODE_ENV !== 'production')
     {
-      winston.info('got bundle');
-      ctx.body = await Util.doRequest(`http://localhost:8080/assets/${ctx.params['asset']}`);
+      ctx.body = await Util.doRequest(`http://localhost:8080/midway/v1/assets/${path}`);
     }
     else
     {
-      await send(ctx, `/midway/src/assets/${ctx.params['asset']}`);
+      await send(ctx, `/midway/src/assets/${path}`);
     }
+  }
+  
+  AppRouter.get('/assets/static/:folder/:asset', serveAsset);
+  AppRouter.get('/assets/:asset', serveAsset);
+  
+  const MidwayRouter = new KoaRouter();
+  MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
+
+  MidwayRouter.get('/', async (ctx, next) =>
+  {
+    await send(ctx, '/src/app/index.html');
   });
 
   MidwayRouter.get('/robots.txt', async (ctx, next) =>
