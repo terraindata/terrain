@@ -42,21 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import { EventEmitter } from 'events';
-import * as fs from 'fs';
+import * as request from 'request';
 import * as stream from 'stream';
 
 import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import ElasticClient from '../../../database/elastic/client/ElasticClient';
-import SafeWritable from '../../io/streams/SafeWritable';
 import AEndpointStream from './AEndpointStream';
-import JSONTransform from '../../io/streams/JSONTransform';
-import AExportTransform from '../../io/streams/AExportTransform';
-import * as Elastic from 'elasticsearch';
-import * as request from 'request';
 
 /* tslint:disable:max-classes-per-file */
 
@@ -99,33 +92,71 @@ class FollowUpBossStream extends stream.Writable
     console.log('CHUNK');
     console.dir(chunk, { depth: null });
 
-    if (!isNaN(chunk['FollowUpBossId'])) {
+    const tags = chunk['tags'] || [];
+    if (tags.indexOf('terrain') === -1)
+    {
+      tags.push('terrain');
+    }
+
+    if (!isNaN(chunk['FollowUpBossId']))
+    {
       // Has valid FollowUpBossId, so do PUT (update)
       request({
-          url: `https://api.followupboss.com/v1/people/${chunk['FollowUpBossId']}`,
-          method: 'PUT',
-          json: {
-            firstName: chunk['FirstName'],
-            lastName: chunk['LastName'],
-            emails: [
-              chunk['Email'],
-            ],
-          },
-          headers : {
-            Authorization: 'Basic ' + new Buffer(this.config['apiKey'] + ':').toString('base64')
-          },
+        url: `https://api.followupboss.com/v1/people/${chunk['FollowUpBossId']}`,
+        method: 'PUT',
+        json: {
+          firstName: chunk['FirstName'],
+          lastName: chunk['LastName'],
+          emails: [
+            chunk['Email'],
+          ],
+          tags,
         },
-        (error, response) => {
-        if (error) {
-          console.log('got error: ' + JSON.stringify(error));
-        }
-        else {
-          console.log('got response: ' + JSON.stringify(response));
-        }
-      });
-    } else {
+        headers: {
+          Authorization: 'Basic ' + new Buffer(this.config['apiKey'] + ':').toString('base64'),
+        },
+      },
+        (error, response) =>
+        {
+          if (error)
+          {
+            console.log('got put error: ' + JSON.stringify(error));
+          }
+          else
+          {
+            console.log('got put response: ' + JSON.stringify(response));
+          }
+        });
+    } else
+    {
       // No existing ID, so do POST (create)
-
+      request({
+        url: 'https://api.followupboss.com/v1/people',
+        method: 'POST',
+        json: {
+          deduplicate: true,
+          firstName: chunk['FirstName'],
+              lastName: chunk['LastName'],
+          emails: [
+            chunk['Email'],
+          ],
+          tags,
+        },
+        headers: {
+          Authorization: 'Basic ' + new Buffer(this.config['apiKey'] + ':').toString('base64'),
+        },
+      },
+        (error, response) =>
+        {
+          if (error)
+          {
+            console.log('got post error: ' + JSON.stringify(error));
+          }
+          else
+          {
+            console.log('got post response: ' + JSON.stringify(response));
+          }
+        });
     }
 
     callback();
@@ -133,8 +164,6 @@ class FollowUpBossStream extends stream.Writable
 
   public _final(callback: any)
   {
-    // TODO post partial batch at the end of the stream
-
     callback();
   }
 }

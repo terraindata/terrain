@@ -100,7 +100,7 @@ test('rename a field (deeply nested property in array)', () =>
 {
   {
     const e: TransformationEngine = new TransformationEngine(TestDocs.doc3);
-    e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr', '1', -1, 'a'])), KeyPath(['arr', '1', -1, 'cool']));
+    e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr', 1, -1, 'a'])), KeyPath(['arr', 1, -1, 'cool']));
     expect(e.transform(TestDocs.doc3)['arr'][1][0]['a']).toBe(undefined);
     expect(e.transform(TestDocs.doc3)['arr'][1][0]['cool']).toBe('dog');
     expect(e.transform(TestDocs.doc3)['arr'][1][1]['a']).toBe(undefined);
@@ -110,14 +110,14 @@ test('rename a field (deeply nested property in array)', () =>
   {
     const doc = { d: [[{ b: 2 }, { b: 3 }]] };
     const e: TransformationEngine = new TransformationEngine(doc);
-    e.setOutputKeyPath(e.getInputFieldID(KeyPath(['d', '0', -1, 'b'])), KeyPath(['d', '0', -1, 'c']));
+    e.setOutputKeyPath(e.getInputFieldID(KeyPath(['d', 0, -1, 'b'])), KeyPath(['d', 0, -1, 'c']));
     expect(e.transform(doc)).toEqual({ d: [[{ c: 2 }, { c: 3 }]] });
   }
 
   {
     const doc = { a: [[{ b: 2 }, { b: 3 }]] };
     const e: TransformationEngine = new TransformationEngine(doc);
-    e.setOutputKeyPath(e.getInputFieldID(KeyPath(['a', '0', -1, 'b'])), KeyPath(['a', '0', -1, 'c']));
+    e.setOutputKeyPath(e.getInputFieldID(KeyPath(['a', 0, -1, 'b'])), KeyPath(['a', 0, -1, 'c']));
     expect(e.transform(doc)).toEqual({ a: [[{ c: 2 }, { c: 3 }]] });
   }
 });

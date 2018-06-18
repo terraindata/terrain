@@ -64,7 +64,7 @@ export interface Props
   canEdit: boolean;
   filterLine: FilterLine;
   onChange: (keyPath: KeyPath, filterLine, notDirty: boolean, fieldChange: boolean) => void;
-
+  options?: List<string>;
   // injected props
   spotlights?: SpotlightTypes.SpotlightState;
   builder?: BuilderState;
@@ -155,6 +155,7 @@ class BuilderMapComponent extends TerrainComponent<Props>
         distance={data && data.distance || 0}
         distanceUnit={data && data.units || 'miles'}
         wrapperClassName={'pf-filter-map-component-wrapper'}
+        options={this.props.options}
         // fadeInOut={true}
         onChange={this.handleMapChange}
         debounce={true}

@@ -48,6 +48,31 @@ import MidwayErrorItem from './MidwayErrorItem';
 
 export class MidwayError
 {
+  /**
+   * @param error: the error response passed to axios.onRejected
+   * @param {string} title: The title of this error if the passed error is not a MidwayError
+   * Please see RouteError::RouteErrorHandler about how Midway returns route errors.
+   */
+  public static fromAxiosErrorResponse(error: any, title: string): MidwayError
+  {
+    let status = 400;
+    let midwayError;
+    if (error && error.response && error.response.status)
+    {
+      status = error.response.status;
+    }
+
+    if (error && error.response && error.response.data && error.response.data.errors)
+    {
+      // this looks like an midway route error already
+      midwayError = Object.create(MidwayError.prototype);
+      midwayError.errors = error.response.data.errors;
+    } else
+    {
+      midwayError = new MidwayError(status, title, JSON.stringify(error), {});
+    }
+    return midwayError;
+  }
   public static fromJSON(json: string): MidwayError
   {
     const midwayError = Object.create(MidwayError.prototype);

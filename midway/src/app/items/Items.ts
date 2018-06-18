@@ -74,12 +74,7 @@ export class Items
 
   public async select(columns: string[], filter: object): Promise<ItemConfig[]>
   {
-    return new Promise<ItemConfig[]>(async (resolve, reject) =>
-    {
-      const rawResults = await App.DB.select(this.itemTable, columns, filter);
-      const results: ItemConfig[] = rawResults.map((result: object) => new ItemConfig(result));
-      resolve(results);
-    });
+    return App.DB.select(this.itemTable, columns, filter) as Promise<ItemConfig[]>;
   }
 
   public async get(id?: number): Promise<ItemConfig[]>

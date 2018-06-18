@@ -66,6 +66,7 @@ import DatePicker from 'app/common/components/DatePicker';
 import Dropdown from 'app/common/components/Dropdown';
 import { units } from 'app/common/components/MapComponent';
 import { RouteSelector, RouteSelectorOption, RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
+import DateUtil from 'app/util/DateUtil';
 import MapUtil from 'app/util/MapUtil';
 import Util from 'app/util/Util';
 import ElasticBlockHelpers from 'database/elastic/blocks/ElasticBlockHelpers';
@@ -371,6 +372,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       getValueComponent: this.renderValueComponent(),
       getCustomDisplayName: this._fn(getCustomValueDisplayName, this.props.filterLine),
       forceFloat: true,
+      showOptionsOnOther: filterLine.fieldType === FieldType.Date,
     };
 
     const sets = [
@@ -551,6 +553,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                   onChange={this.handleMapChange}
                   keyPath={this.props.keyPath}
                   canEdit={pathfinderContext.canEdit}
+                  options={this.props.valueOptions.map((opt) => opt.value).toList()}
                 />
               </div>
             );
@@ -726,6 +729,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     }
     this.props.onChange(this.props.keyPath, filterLine, false, fieldChange);
   }
+
 }
 
 export const COMPARISONS_WITHOUT_VALUES = [
@@ -752,7 +756,7 @@ export function getCustomValueDisplayName(filterLine: FilterLine, value, setInde
       {
         return '';
       }
-      return Util.formatDate(value, true);
+      return (value !== undefined && DateUtil.formatDateValue(value.replace(/ /g, '')));
     case FieldType.Geopoint:
       value = _DistanceValue(Util.asJS(value));
       return value.distance + ' ' + units[value.units] + ' of ' + value.address;

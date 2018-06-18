@@ -90,8 +90,7 @@ export class Integrations
   {
     return new Promise<IntegrationConfig[]>(async (resolve, reject) =>
     {
-      const rawIntegrations = await App.DB.select(this.integrationTable, [], { id, type });
-      const integrations: IntegrationConfig[] = rawIntegrations.map((result: object) => new IntegrationConfig(result));
+      const integrations = await App.DB.select(this.integrationTable, [], { id, type }) as IntegrationConfig[];
       resolve(await Promise.all(integrations.map(async (integration) =>
       {
         if (integration.authConfig !== '')
@@ -117,8 +116,7 @@ export class Integrations
   // returns a string of names and ids that match given type
   public async getSimple(user: UserConfig, type?: string): Promise<IntegrationSimpleConfig[]>
   {
-    const rawIntegrations = await App.DB.select(this.integrationTable, [], { type });
-    return rawIntegrations.map((result: object) => new IntegrationSimpleConfig(result));
+    return App.DB.select(this.integrationTable, [], { type }) as Promise<IntegrationSimpleConfig[]>;
   }
 
   public async initializeDefaultIntegrations(): Promise<void>

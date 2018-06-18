@@ -54,6 +54,7 @@ export default class TerrainStoreLogger
 
   public static recordingActionPercentileLatency = false;
   public static printStateChange = false;
+  public static printActions = false;
 
   public static actionSerializationLog = [];
   public static serializeAction = false;
@@ -79,6 +80,13 @@ export default class TerrainStoreLogger
         }
         const actionEnd = performance.now();
         const actionLatency = actionEnd - actionStart;
+        if (TerrainStoreLogger.printActions === true)
+        {
+          if (TerrainStoreLogger.shouldPrintBuilderAction(action))
+          {
+            TerrainLog.debug(String(action.type) + ' takes ' + String(actionLatency) + ' ms');
+          }
+        }
         if (actionLatency > 100)
         {
           // print out the long latency actions
@@ -98,7 +106,12 @@ export default class TerrainStoreLogger
           if (TerrainStoreLogger.shouldLoggingBuilderAction(action))
           {
             const actionString = RecordsSerializer.stringify(action);
-            const queryJS = store.getState().get('builder').query.toJS();
+            let queryJS = '';
+            const query = store.getState().get('builder').query;
+            if (query)
+            {
+              queryJS = query.toJS();
+            }
             TerrainStoreLogger.actionSerializationLog.push({ query: queryJS, action: actionString });
           }
         }

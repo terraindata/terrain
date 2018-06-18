@@ -278,6 +278,11 @@ class GroupsColumn extends TerrainComponent<Props>
     );
   }
 
+  public handleDelete(id: ID)
+  {
+    this.props.groupActions.remove(this.props.groups.get(id));
+  }
+
   public handleCreate()
   {
     this.props.groupActions.create(this.props.categoryId);
@@ -558,10 +563,12 @@ class GroupsColumn extends TerrainComponent<Props>
         canArchive={canArchive}
         canDuplicate={canDuplicate}
         canRename={canRename}
+        canDelete={canEdit && canRename && group.status === ItemStatus.Archive}
         isSelected={+group.id === +params.groupId}
         isFocused={this.props.isFocused}
         canUnarchive={group.status === ItemStatus.Archive}
         onUnarchive={this.handleUnarchive}
+        onDelete={this.handleDelete}
       >
         <div className='flex-container'>
           <UserThumbnail userId={userId} medium={true} />
