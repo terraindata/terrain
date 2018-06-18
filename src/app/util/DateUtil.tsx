@@ -81,7 +81,12 @@ const DateUtil =
 
     formatCalendarDate(date)
     {
-      return moment(date).tz(Intl.DateTimeFormat().resolvedOptions().timeZone).format('MMMM D YYYY, h:mm a');
+      let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (timeZone === undefined)
+      {
+        timeZone = 'America/Los_Angeles';
+      }
+      return moment(date).tz(timeZone).format('MMMM D YYYY, h:mm a');
     },
 
     formatRelativeDate(date)
