@@ -160,7 +160,8 @@ describe('Replay a builder action', () =>
         } else if (action.selector === '.template-editor-top-bar > :nth-child(7)')
         {
           // give more delay after click the `run` button.
-          sleep.sleep(10);
+          await page.mouse.move(0, 0);
+          sleep.sleep(30);
         }
       } else if (action.eventType === 'keypress')
       {
