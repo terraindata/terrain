@@ -156,11 +156,11 @@ describe('Replay a builder action', () =>
         if (action.selector === 'etl-step-big-button')
         {
           // give more delay after process to next step
-          sleep.sleep(30);
+          sleep.sleep(50);
         } else if (action.selector === '.template-editor-top-bar > :nth-child(7)')
         {
           // give more delay after click the `run` button.
-          sleep.sleep(30);
+          sleep.sleep(50);
         }
       } else if (action.eventType === 'keypress')
       {
