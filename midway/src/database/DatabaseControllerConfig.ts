@@ -69,6 +69,7 @@ export class DatabaseControllerConfig
     const dsn = config.dsn;
     const analyticsIndex = config.analyticsIndex;
     const analyticsType = config.analyticsType;
+    const indexPrefix = config.indexPrefix;
 
     const cfg = new DatabaseControllerConfig(type, dsn);
     if (type === 'sqlite')
@@ -85,7 +86,7 @@ export class DatabaseControllerConfig
     }
     else if (type === 'elasticsearch' || type === 'elastic')
     {
-      return new ElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType);
+      return new ElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType, indexPrefix);
     }
     else
     {

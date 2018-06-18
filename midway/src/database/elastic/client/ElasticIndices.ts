@@ -69,8 +69,23 @@ class ElasticIndices
    */
   public getMapping(params: Elastic.IndicesGetMappingParams, callback: (error: any, response: any, status: any) => void): void
   {
+    this.controller.modifyIndexParam(params, true);
     this.log('getMapping', params);
-    return this.delegate.indices.getMapping(params, callback);
+    return this.delegate.indices.getMapping(params, (err, res, status) =>
+    {
+      let newRes = res;
+      if (this.controller.getIndexPrefix() !== '')
+      {
+        newRes = {};
+        Object.keys(res).forEach((key) => {
+          if (key.startsWith(this.controller.getIndexPrefix()))
+          {
+            newRes[key.substring(this.controller.getIndexPrefix().length)] = res[key];
+          }
+        });
+      }
+      callback(err, newRes, status);
+    });
   }
 
   /**
@@ -80,6 +95,7 @@ class ElasticIndices
    */
   public create(params: Elastic.IndicesCreateParams, callback: (error: any, response: any, status: any) => void): void
   {
+    this.controller.modifyIndexParam(params);
     return this.delegate.indices.create(params, callback);
   }
 
@@ -100,6 +116,7 @@ class ElasticIndices
    */
   public putMapping(params: Elastic.IndicesPutMappingParams, callback: (err: any, response: any, status: any) => void): void
   {
+    this.controller.modifyIndexParam(params);
     this.log('putMapping', params);
     return this.delegate.indices.putMapping(params, callback);
   }
@@ -111,6 +128,7 @@ class ElasticIndices
    */
   public refresh(params: Elastic.IndicesRefreshParams, callback: (err: any, response: any) => void): void
   {
+    this.controller.modifyIndexParam(params);
     this.log('refresh', params);
     return this.delegate.indices.refresh(params, callback);
   }

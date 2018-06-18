@@ -62,8 +62,9 @@ class ElasticController extends DatabaseController
   private queryHandler: ElasticQueryHandler;
   private analyticsIndex: string;
   private analyticsType: string;
+  private indexPrefix: string;
 
-  constructor(config: ElasticConfig, id: number, name: string, analyticsIndex?: string, analyticsType?: string)
+  constructor(config: ElasticConfig, id: number, name: string, analyticsIndex?: string, analyticsType?: string, indexPrefix: string = '')
   {
     super('ElasticController', id, name);
     this.client = new ElasticClient(this, config);
@@ -83,6 +84,8 @@ class ElasticController extends DatabaseController
     {
       this.analyticsType = analyticsType;
     }
+
+    this.indexPrefix = indexPrefix;
   }
 
   public getClient(): ElasticClient
@@ -106,6 +109,47 @@ class ElasticController extends DatabaseController
       index: this.analyticsIndex,
       type: this.analyticsType,
     };
+  }
+
+  public getIndexPrefix(): string
+  {
+    return this.indexPrefix;
+  }
+
+  /**
+   * Returns whether `obj` was modified
+   */
+  public modifyIndexParam(obj, allowOther = false): boolean
+  {
+    if (!('index' in obj))
+    {
+      if (allowOther)
+      {
+        return false;
+      }
+      throw new Error('No index param');
+    }
+    if (typeof obj.index === 'string')
+    {
+      obj.index = this.getIndexPrefix() + (obj.index as string);
+      return true;
+    }
+    if (obj.index.constructor === Array)
+    {
+      obj.index = obj.index.map((s) => {
+        if (typeof s !== 'string')
+        {
+          throw new Error('Invalid index param');
+        }
+        return this.getIndexPrefix() + s;
+      });
+      return true;
+    }
+    if (!allowOther)
+    {
+      throw new Error('Invalid index param');
+    }
+    return false;
   }
 }
 

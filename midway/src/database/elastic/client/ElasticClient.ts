@@ -186,6 +186,7 @@ class ElasticClient
    */
   public update(params: Elastic.UpdateDocumentParams, callback: (error: any, response: any) => void): void
   {
+    this.controller.modifyIndexParam(params);
     this.log('update', params);
     this.delegate.update(params, callback);
   }
