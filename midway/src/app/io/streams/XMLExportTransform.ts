@@ -54,21 +54,28 @@ import AExportTransform from './AExportTransform';
 export default class XMLExportTransform extends AExportTransform
 {
   private builder: xml2js.Builder;
+  private preambleValue: string = '\n';
+  private conclusionValue: string = '\n';
 
-  constructor(path: string)
+  constructor(path: string, isPlaFeed?: boolean)
   {
     super();
     const options = { headless: true };
-    if (path === '' || path === undefined || path === null)
+    if (path !== '' && path !== undefined && path !== null)
     {
       options['rootName'] = path;
+    }
+    if (isPlaFeed)
+    {
+      this.preambleValue = '<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">\n<channel>\n';
+      this.conclusionValue = '</channel>\n</rss>';
     }
     this.builder = new xml2js.Builder(options);
   }
 
   protected preamble(): string
   {
-    return '<channel>';
+    return this.preambleValue;
   }
 
   protected transform(input: object, chunkNumber: number): string
@@ -83,6 +90,6 @@ export default class XMLExportTransform extends AExportTransform
 
   protected conclusion(chunkNumber: number): string
   {
-    return '</channel>';
+    return this.conclusionValue;
   }
 }

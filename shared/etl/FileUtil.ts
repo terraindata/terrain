@@ -145,6 +145,7 @@ export function getSampleRows(
     hasCsvHeader?: boolean;
     jsonNewlines?: boolean;
     xmlPath?: string;
+    isPlaFeed?: boolean;
   },
 )
 {
