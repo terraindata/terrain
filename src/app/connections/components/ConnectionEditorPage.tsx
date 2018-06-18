@@ -89,20 +89,16 @@ class ConnectionEditorPage extends TerrainComponent<Props>
     connection: _ConnectionConfig({ id: undefined }),
   };
 
-  public componentWillMount()
+  public componentDidMount()
   {
-    const { connections } = this.props;
+    const { connections, match } = this.props;
     if (connections.size === 0)
     {
       this.props.connectionsActions({
         actionType: 'getConnections',
       });
     }
-  }
 
-  public componentDidMount()
-  {
-    const { connections, match } = this.props;
     const connectionId = getConnectionId(match.params);
     if (connectionId >= 0)
     {
@@ -112,38 +108,12 @@ class ConnectionEditorPage extends TerrainComponent<Props>
     }
   }
 
-  public componentWillReceiveProps(nextProps: Props)
+  public handleConnectionChange(connection)
   {
-    const { params } = this.props.match;
-    const nextParams = nextProps.match.params;
-    const oldConnectionId = getConnectionId(params);
-    const connectionId = getConnectionId(nextParams);
-    if (connectionId !== -1 &&
-      (oldConnectionId !== connectionId ||
-        this.props.connections !== nextProps.connections))
-    {
-      this.setState({
-        connection: nextProps.connections.get(connectionId),
-      });
-    }
-  }
-
-  public handleConnectionChange(newConnection)
-  {
-    this.setState({
-      connection: newConnection,
-    });
-  }
-
-  public save()
-  {
-    const { connection } = this.state;
     let dsn = '';
     if (connection['user'] && connection['password'])
     {
       dsn += connection['user'] + ':' + connection['password'] + '@';
-      delete connection['user'];
-      delete connection['password'];
     }
 
     dsn += connection['host'];
@@ -151,11 +121,21 @@ class ConnectionEditorPage extends TerrainComponent<Props>
     if (connection['port'])
     {
       dsn += ':' + connection['port'];
-      delete connection['port'];
     }
 
     connection['dsn'] = dsn;
-    connection['analyticsType'] = 'data';
+    this.setState({
+      connection,
+    });
+  }
+
+  public save()
+  {
+    const { connection } = this.state;
+
+    delete connection['user'];
+    delete connection['password'];
+    delete connection['port'];
 
     if (connection['id'])
     {

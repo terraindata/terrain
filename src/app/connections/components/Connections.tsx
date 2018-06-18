@@ -55,6 +55,7 @@ import { ConnectionsActions } from 'app/connections/data/ConnectionsRedux';
 import TerrainTools from 'app/util/TerrainTools';
 import { Colors, fontColor } from 'colors/Colors';
 import Badge from 'common/components/Badge';
+import { MultiModal } from 'common/components/overlay/MultiModal';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import Util from 'util/Util';
 import CreateItem from '../../common/components/CreateItem';
@@ -71,8 +72,8 @@ import './Connections.less';
 
 export interface Props
 {
-  connections?: Immutable.Map<ID, ConnectionConfig>;
   connectionsActions?: typeof ConnectionsActions;
+  connections?: ConnectionState;
   params?: any;
 }
 
@@ -83,7 +84,7 @@ class Connections extends TerrainComponent<Props>
     super(props);
   }
 
-  public componentWillMount()
+  public componentDidMount()
   {
     this.getConnections();
   }
@@ -127,18 +128,18 @@ class Connections extends TerrainComponent<Props>
     });
   }
 
-  public handleConnectionChange(connection: ConnectionConfig)
+  public setModalRequests(requests)
   {
     this.props.connectionsActions({
-      actionType: 'updateConnection',
-      connection,
+      actionType: 'setModalRequests',
+      requests,
     });
   }
 
   public handleRowClick(index: number)
   {
     const { connections } = this.props;
-    const keys = connections.keySeq().toList().sort();
+    const keys = connections.connections.keySeq().toList().sort();
     browserHistory.push(`/account/connections/edit/connectionId=${keys.get(index)}`)
   }
 
@@ -147,7 +148,7 @@ class Connections extends TerrainComponent<Props>
     return (
       <CloseIcon
         className='close'
-        onClick={this._fn(this.deleteConnection, index)}
+        onClick={this._fn(this.deleteConnection, connection.id)}
       />
     );
   }
@@ -195,8 +196,8 @@ class Connections extends TerrainComponent<Props>
   public render()
   {
     const { connections } = this.props;
-    const keys = connections.keySeq().toList().sort();
-    const connList = keys.map((id) => connections.get(id));
+    const keys = connections.connections.keySeq().toList().sort();
+    const connList = keys.map((id) => connections.connections.get(id));
 
     return (
       <div
@@ -224,18 +225,19 @@ class Connections extends TerrainComponent<Props>
                 style: { width: `10%` },
               },
               {
-                name: 'host',
-                render: this._fn(this.renderProperty, 'host'),
+                name: 'address',
+                render: this._fn(this.renderProperty, 'dsn'),
                 style: { width: `30%` },
               },
               {
                 name: 'analytics',
                 render: this._fn(this.renderProperty, 'analytics'),
+                style: { width: `5%` },
               },
               {
                 name: 'status',
                 render: this._fn(this.renderProperty, 'status'),
-                style: { width: `25%` },
+                style: { width: `20%` },
               },
             ]}
             onRowClicked={this.handleRowClick}
@@ -245,6 +247,10 @@ class Connections extends TerrainComponent<Props>
             onCreate={this.createConnection}
           />
         </div>
+        <MultiModal
+          requests={this.props.connections.modalRequests}
+          setRequests={this.setModalRequests}
+        />
       </div>
     );
   }
@@ -253,7 +259,7 @@ class Connections extends TerrainComponent<Props>
 const ConnectionList = Util.createTypedContainer(
   Connections,
   [
-    ['connections', 'connections']
+    ['connections']
   ],
   {
     connectionsActions: ConnectionsActions

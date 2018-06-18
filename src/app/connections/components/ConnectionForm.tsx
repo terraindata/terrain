@@ -142,7 +142,7 @@ export default class ConnectionForm extends TerrainComponent<Props>
   public renderAnalyticsSwitch()
   {
     const { connection } = this.props;
-    const isAnalytics = connection.get('isAnalytics');
+    const isAnalytics = connection['isAnalytics'];
     return (
       <div>
         <Switch
@@ -157,7 +157,7 @@ export default class ConnectionForm extends TerrainComponent<Props>
             <div className='dynamic-form-label' style={fontColor(Colors().text2)}> Analytics Index </div>
             <input
               className='dynamic-form-autocomplete'
-              value={connection.get('analyticsIndex')}
+              value={connection['analyticsIndex']}
               onChange={this.handleAnalyticsIndexChange}
             />
           </div>
@@ -168,14 +168,17 @@ export default class ConnectionForm extends TerrainComponent<Props>
 
   public handleAnalyticsSwitch(selected)
   {
-    const connection = this.props.connection.set('isAnalytics', selected ? true : false);
-    this.props.onChange(connection, true);
+    const { connection } = this.props;
+    const newConnection = connection.set('isAnalytics', selected ? true : false);
+    this.handleConnectionChange(this.configToState(newConnection), true);
   }
 
   public handleAnalyticsIndexChange(event)
   {
-    const connection = this.props.connection.set('analyticsIndex', event.target.value);
-    this.props.onChange(connection, true);
+    const { connection } = this.props;
+    connection['analyticsIndex'] = event.target.value;
+    connection['analyticsType'] = 'data';
+    this.handleConnectionChange(connection, true);
   }
 
   public render()
@@ -185,12 +188,12 @@ export default class ConnectionForm extends TerrainComponent<Props>
         <DynamicForm
           inputMap={this.connectionMap}
           inputState={this.configToState(this.props.connection)}
-          onStateChange={this.props.onChange}
+          onStateChange={this.handleConnectionChange}
         />
         <DynamicForm
           inputMap={this.analyticsMap}
           inputState={this.configToState(this.props.connection)}
-          onStateChange={this.handleAnalyticsSwitch}
+          onStateChange={this.handleConnectionChange}
         />
       </div>
     );
@@ -199,13 +202,19 @@ export default class ConnectionForm extends TerrainComponent<Props>
   @instanceFnDecorator(memoizeOne)
   public configToState(config: ConnectionConfig): ConnectionFormConfig
   {
+    // console.log(config);
     let state = Util.asJS(config) as SharedConnectionConfig;
     const dsnString = state['dsn'];
     if (dsnString !== '')
     {
-      const dsnConfig = SharedUtil.dsn.parseDSNConfig(dsnString);
+      const dsnConfig = _.omitBy(SharedUtil.dsn.parseDSNConfig(dsnString), _.isUndefined);
       state = _.merge(state, dsnConfig);
     }
     return state as ConnectionFormConfig;
+  }
+
+  public handleConnectionChange(connection: ConnectionConfig, apply?: boolean)
+  {
+    this.props.onChange(connection, apply);
   }
 }
