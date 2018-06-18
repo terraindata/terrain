@@ -234,7 +234,7 @@ export class EngineProxy
     {
       throw new Error('Cannot extract array field, source keypath is empty');
     }
-    const specifiedSourceKP = sourceKP.set(sourceKP.size - 1, String(index));
+    const specifiedSourceKP = sourceKP.set(sourceKP.size - 1, index);
     const specifiedSourceType = EngineUtil.getETLFieldType(sourceId, this.engine);
 
     let specifiedSourceId: number;

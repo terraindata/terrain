@@ -46,6 +46,7 @@ dropETL() {
 dropOther() {
   echo "Dropping Miscellaneous Tables";
   dropSpecific 'metrics';
+  dropSpecific 'databases';
   dropSpecific 'schemaMetadata';
   dropSpecific 'statusHistory';
   dropSpecific 'versions';

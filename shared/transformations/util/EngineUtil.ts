@@ -198,8 +198,8 @@ export default class EngineUtil
     index?: number,
   ): boolean
   {
-    const last = index === undefined ? keypath.last() : keypath.get(index);
-    return last !== -1 && Number.isNaN(Number(last));
+    const last: string | number = index === undefined ? keypath.last() : keypath.get(index);
+    return typeof last !== 'number';
   }
 
   public static isWildcardField(
@@ -208,7 +208,7 @@ export default class EngineUtil
   ): boolean
   {
     const last = index === undefined ? keypath.last() : keypath.get(index);
-    return last === -1;
+    return typeof last === 'number' && last === -1;
   }
 
   // document merge logic

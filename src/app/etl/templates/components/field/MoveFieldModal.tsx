@@ -66,6 +66,7 @@ import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorField
 
 import './EditorFieldModal.less';
 
+// is this injector class still needed?
 export default class Injector extends TerrainComponent<TemplateEditorFieldProps>
 {
   public render()

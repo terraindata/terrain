@@ -61,7 +61,7 @@ const { List, Map } = Immutable;
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { compareObjects } from 'etl/ETLUtil';
-
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 import
 {
   _TemplateField,
@@ -128,14 +128,14 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
 
   public showPrimaryKey(s: ElasticFieldProps)
   {
-    const jsType = this._field().representedType();
+    const jsType = EngineUtil.getRepresentedType(this.props.fieldId, this._currentEngine())
     return ((jsType === 'string' || jsType === 'number') && this._isRootField()) ?
       DisplayState.Active : DisplayState.Inactive;
   }
 
   public showIsAnalyzed(s: ElasticFieldProps)
   {
-    const jsType = this._field().representedType();
+    const jsType = EngineUtil.getRepresentedType(this.props.fieldId, this._currentEngine())
     return (jsType === 'string' && !s.isPrimaryKey) ?
       DisplayState.Active : DisplayState.Inactive;
   }

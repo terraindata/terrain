@@ -200,11 +200,11 @@ export function validateRename(
       message: 'Invalid Rename. Names cannot be empty',
     };
   }
-  if (newKeyPath.last() === -1)
+  if (typeof newKeyPath.last() === 'number')
   {
     return {
       isValid: false,
-      message: 'Invalid Rename. Name cannot end with \'*\'',
+      message: 'Invalid Rename. Name cannot end with a number',
     };
   }
   const otherId = engine.getOutputFieldID(newKeyPath);
@@ -257,8 +257,8 @@ export function validateRename(
 // returns true if two given keypaths represent fields that are "local" to each other.
 // fields are local if they are unambiguously traversable to each other.
 // e.g. [a] is local to [b] and [c, d]
-// [a, *, b] would be local to [a, *, c]
-// [a] would not be local to [c, *, d]
+// [a, -1, b] would be local to [a, -1, c]
+// [a] would not be local to [c, -1, d]
 export function areFieldsLocal(kp1, kp2): boolean
 {
   const lastIndex1: number = kp1.findLastIndex((value, index) => !EngineUtil.isNamedField(kp1, index));
