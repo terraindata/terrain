@@ -113,7 +113,8 @@ class FollowUpBossStream extends stream.Writable
           tags,
         },
         headers: {
-          Authorization: 'Basic ' + new Buffer(this.config['apiKey'] + ':').toString('base64'),
+          'Authorization': 'Basic ' + new Buffer(this.config['apiKey'] + ':').toString('base64'),
+          'Content-Type': 'application/json',
         },
       },
         (error, response) =>
@@ -130,22 +131,29 @@ class FollowUpBossStream extends stream.Writable
     } else
     {
       // No existing ID, so do POST (create)
-      request({
-        url: 'https://api.followupboss.com/v1/people',
-        method: 'POST',
-        json: {
-          deduplicate: true,
-          firstName: chunk['FirstName'],
-              lastName: chunk['LastName'],
-          emails: [
-            chunk['Email'],
-          ],
-          tags,
-        },
-        headers: {
-          Authorization: 'Basic ' + new Buffer(this.config['apiKey'] + ':').toString('base64'),
-        },
-      },
+        const r = {
+            url: 'https://api.followupboss.com/v1/people',
+            method: 'POST',
+            json: {
+                firstName: chunk['FirstName'],
+                lastName: chunk['LastName'],
+                emails: [
+                    {
+                        type: 'home',
+                        value: chunk['Email'],
+                    },
+                ],
+                tags,
+            },
+            qs: {
+                deduplicate: true,
+            },
+            headers: {
+                'Authorization': 'Basic ' + new Buffer(this.config['apiKey'] + ':').toString('base64'),
+                'Content-Type': 'application/json',
+            },
+        };
+      request(r,
         (error, response) =>
         {
           if (error)
