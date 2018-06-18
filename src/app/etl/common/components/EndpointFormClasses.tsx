@@ -147,6 +147,7 @@ export abstract class EndpointFormBase<State, P extends Props = Props> extends T
             <FileConfigForm
               fileConfig={fileConfig}
               onChange={this.handleFileConfigChange}
+              isSource={this.props.isSource}
             /> : null
         }
         {
