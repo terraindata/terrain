@@ -113,14 +113,14 @@ class ConnectionEditorPage extends TerrainComponent<Props>
     let dsn = '';
     if (connection['user'] && connection['password'])
     {
-      dsn += connection['user'] + ':' + connection['password'] + '@';
+      dsn += String(connection['user']) + ':' + String(connection['password']) + '@';
     }
 
-    dsn += connection['host'];
+    dsn += String(connection['host']);
 
     if (connection['port'])
     {
-      dsn += ':' + connection['port'];
+      dsn += ':' + String(connection['port']);
     }
 
     connection['dsn'] = dsn;
@@ -206,7 +206,7 @@ class ConnectionEditorPage extends TerrainComponent<Props>
 export default Util.createContainer(
   ConnectionEditorPage,
   [
-    ['connections', 'connections']
+    ['connections', 'connections'],
   ],
   {
     connectionsActions: ConnectionsActions,

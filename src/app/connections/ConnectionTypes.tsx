@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:variable-name max-classes-per-file
+// tslint:disable:variable-name max-classes-per-file strict-boolean-expressions
 import { List, Map } from 'immutable';
 
 import { ModalProps } from 'common/components/overlay/MultiModal';

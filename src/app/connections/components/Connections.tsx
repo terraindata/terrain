@@ -91,7 +91,7 @@ class Connections extends TerrainComponent<Props>
 
   public createConnection()
   {
-    browserHistory.push(`/account/connections/edit`)
+    browserHistory.push(`/account/connections/edit`);
   }
 
   public deleteConnection(connectionId: number, e?)
@@ -140,7 +140,7 @@ class Connections extends TerrainComponent<Props>
   {
     const { connections } = this.props;
     const keys = connections.connections.keySeq().toList().sort();
-    browserHistory.push(`/account/connections/edit/connectionId=${keys.get(index)}`)
+    browserHistory.push(`/account/connections/edit/connectionId=${keys.get(index)}`);
   }
 
   public getConnectionActions(index: number, connection: ConnectionConfig)
@@ -164,8 +164,8 @@ class Connections extends TerrainComponent<Props>
     {
       return (
         <Badge
-            label={item.get(propertyName)}
-            color={this.getStatusColor(item.get(propertyName))}
+          label={item.get(propertyName)}
+          color={this.getStatusColor(item.get(propertyName))}
         />
       );
     }
@@ -187,7 +187,7 @@ class Connections extends TerrainComponent<Props>
     {
       return (
         <div>
-          { item.get(propertyName) }
+          {item.get(propertyName)}
         </div>
       );
     }
@@ -259,10 +259,10 @@ class Connections extends TerrainComponent<Props>
 const ConnectionList = Util.createTypedContainer(
   Connections,
   [
-    ['connections']
+    ['connections'],
   ],
   {
-    connectionsActions: ConnectionsActions
+    connectionsActions: ConnectionsActions,
   },
 );
 

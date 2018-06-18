@@ -136,7 +136,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
             <div className='dynamic-form-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
             : null
         }
-        { options.render(state, disabled) }
+        {options.render(state, disabled)}
       </div>
     );
   }

@@ -135,8 +135,8 @@ export default class ConnectionForm extends TerrainComponent<Props>
       displayName: 'Toggle Analytics',
       options: {
         render: this.renderAnalyticsSwitch,
-      }
-    }
+      },
+    },
   };
 
   public renderAnalyticsSwitch()
@@ -170,7 +170,7 @@ export default class ConnectionForm extends TerrainComponent<Props>
   {
     const { connection } = this.props;
     const newConnection = connection.set('isAnalytics', selected ? true : false);
-    this.handleConnectionChange(this.configToState(newConnection), true);
+    this.handleConnectionChange(newConnection, true);
   }
 
   public handleAnalyticsIndexChange(event)
