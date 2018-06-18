@@ -17,7 +17,18 @@
   min-width: 100px;
   
   height: 48px;
-  
+  .floating-input-warning {
+    position: absolute;
+    top: 23px;
+    right: 10px;
+
+    .tooltip-is-error {
+      height: 16px;
+      width: 16px;
+      fill: #d14f42;
+      transform: rotate(180deg);
+    }
+  }
   &.floating-input-container-small {
     height: 45px;
   }
@@ -89,6 +100,19 @@
     border: none;
     outline: none;
     transition: all 0.15s;
+  }
+
+  .autocomplete {
+    .ac-options {
+      width: 100%;
+      &.ac-options-open {
+        box-shadow: 0px 1px 3px lightgrey
+      }
+      .ac-option {
+        font-size: 16px;
+        overflow-x: hidden;
+      }
+    }
   }
   
   &.floating-input-container-showEllipsis {

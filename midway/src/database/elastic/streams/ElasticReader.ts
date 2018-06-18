@@ -70,7 +70,7 @@ export class ElasticReader extends SafeReadable
   private MAX_SEARCH_SIZE: number = 1000;
   private DEFAULT_SEARCH_SIZE: number = 500;
   private DEFAULT_SCROLL_TIMEOUT: string = '45m';
-
+  private DEFAULT_ALL_SIZE: number = 2147483647;
   private numRequested: number = 0;
 
   constructor(client: ElasticClient, query: string | object, streaming: boolean = false)
@@ -88,10 +88,8 @@ export class ElasticReader extends SafeReadable
     }
     this.streaming = streaming;
 
-    this.size = (query['size'] !== undefined) ? query['size'] as number : this.DEFAULT_SEARCH_SIZE;
+    this.size = (query['size'] !== undefined) ? query['size'] as number : this.DEFAULT_ALL_SIZE;
     this.scroll = (query['scroll'] !== undefined) ? query['scroll'] : this.DEFAULT_SCROLL_TIMEOUT;
-    this.numRequested = this.size;
-
     this.numRequested = this.size;
     this.scrolling = streaming && (this.size > this.DEFAULT_SEARCH_SIZE);
 

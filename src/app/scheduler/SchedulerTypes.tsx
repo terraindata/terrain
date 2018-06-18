@@ -55,6 +55,7 @@ import Util from 'util/Util';
 class SchedulerConfigC extends SharedSchedulerConfig
 {
   // if extra front-end specific functions or properties are needed, add here
+  public isNew: boolean = false;
 }
 
 const SchedulerConfig_Record = createRecordType(new SchedulerConfigC(), 'SchedulerConfigC');

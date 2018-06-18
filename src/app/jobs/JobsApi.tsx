@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 import axios, { AxiosInstance } from 'axios';
-import Ajax, { AjaxResponse } from 'util/Ajax';
-import XHR from 'util/XHR';
 
 // making this an instance in case we want stateful things like cancelling ajax requests
 class JobsApi

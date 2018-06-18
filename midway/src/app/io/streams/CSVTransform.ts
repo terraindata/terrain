@@ -61,6 +61,7 @@ export default class CSVTransform
     return csv({
       headers,
       delimiter,
+      discardUnmappedColumns: true,
     });
   }
 
