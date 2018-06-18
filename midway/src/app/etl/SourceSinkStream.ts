@@ -205,6 +205,10 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
         });
         writeStream.push(null);
       }
+      else if (importStreams.length > 1)
+      {
+        throw new Error('Too many streams without post process transformations');
+      }
       else
       {
         resolve(importStream);

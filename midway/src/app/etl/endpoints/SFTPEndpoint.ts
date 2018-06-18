@@ -47,6 +47,7 @@ THE SOFTWARE.
 
 import * as SSH from 'ssh2';
 import { Readable, Writable } from 'stream';
+import * as winston from 'winston';
 
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
@@ -70,7 +71,7 @@ export default class SFTPEndpoint extends AEndpointStream
     if (genericConfig['username'] != null && genericConfig['username'] !== ''
       && genericConfig['password'] != null && genericConfig['password'] != '')
     {
-      delete genericConfig['privateKey'];
+      delete genericConfig['key'];
     }
     else
     {
@@ -82,11 +83,11 @@ export default class SFTPEndpoint extends AEndpointStream
       {
         delete genericConfig['password'];
       }
-      if (genericConfig['ip'] !== undefined)
-      {
-        genericConfig['host'] = genericConfig['ip'];
-        delete genericConfig['ip'];
-      }
+    }
+    if (genericConfig['ip'] !== undefined)
+    {
+      genericConfig['host'] = genericConfig['ip'];
+      delete genericConfig['ip'];
     }
 
     const config: SSH.ConnectConfig = genericConfig as SSH.ConnectConfig;
@@ -152,10 +153,17 @@ export default class SFTPEndpoint extends AEndpointStream
     return new Promise<Readable[]>(async (resolve, reject) =>
     {
       const readStreams: Readable[] = [];
-
-      if (Array.isArray(source.options['inputs']))
+      if (Array.isArray(source.rootInputConfig['inputs']))
       {
-        const filenames: string[] = inputs.parseFilename(source.options['filename'], source.options['inputs']);
+        const pathToFile: string = source.options['filepath'].substring(0, (source.options['filepath'].lastIndexOf('/') as number) + 1);
+        const filesAtPath: string[] = await this._getFilesFromPath(pathToFile, sftp);
+        const options =
+          {
+            filename: source.options['filepath'],
+            inputs: source.rootInputConfig['inputs'],
+          };
+
+        const filenames: string[] = inputs.parseFilename(filesAtPath, options);
         filenames.forEach(async (filename) =>
         {
           readStreams.push(sftp.createReadStream(filename));
@@ -166,6 +174,41 @@ export default class SFTPEndpoint extends AEndpointStream
         readStreams.push(sftp.createReadStream(source.options['filepath']));
       }
       resolve(readStreams);
+    });
+  }
+
+  private async _getFilesFromPath(path: string, sftp: SSH.SFTPWrapper): Promise<string[]>
+  {
+    return new Promise<string[]>(async (resolve, reject) =>
+    {
+      const files: string[] = [];
+      try
+      {
+        sftp.readdir(path, (err, list) =>
+        {
+          if (err)
+          {
+            winston.warn((err as any).toString() as string);
+            return resolve([]);
+          }
+          else
+          {
+            list.forEach((file) =>
+            {
+              if (file['longname'].substring(0, 2) === '-r')
+              {
+                files.push(file['filename']);
+              }
+            });
+          }
+          resolve(files);
+        });
+      }
+      catch (e)
+      {
+        winston.warn((e as any).toString() as string);
+        return resolve([]);
+      }
     });
   }
 }
