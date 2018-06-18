@@ -83,7 +83,7 @@ const NTColors =
 const connectionStatuses =
   {
     CONNECTED: '#94be6b',
-    CONN_TIME_OUT: '#ffa8b9',
+    CONN_TIMEOUT: '#ffa8b9',
     ACCESS_DENIED: '#ffa8b9',
     CONNECTING: '#1eb4fa',
     DISCONNECTED: '#ea526f',
