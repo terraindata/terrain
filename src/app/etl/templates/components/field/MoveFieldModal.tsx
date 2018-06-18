@@ -46,6 +46,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires max-classes-per-file
 
 import * as classNames from 'classnames';
+import ListForm, { RowOptions } from 'common/components/ListForm';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -61,7 +62,7 @@ import Autocomplete from 'common/components/Autocomplete';
 import Modal from 'common/components/Modal';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { kpToString, stringToKP, validateRename } from 'shared/transformations/util/TransformationsUtil';
+import { validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './EditorFieldModal.less';
@@ -93,13 +94,9 @@ const emptyList = List([]);
 class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
 {
   public state: {
-    pathValue: string;
     pathKP: List<string>;
-    uneditableDepth: number;
   } = {
-      pathValue: '',
       pathKP: List([]),
-      uneditableDepth: 0,
     };
 
   constructor(props)
@@ -118,29 +115,9 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
 
   public computeStateFromProps(props)
   {
-    const engine = this._currentEngine();
-    const field = this._field();
-    const kp = engine.getOutputKeyPath(field.fieldId);
-    const lastNamed = kp.findLastIndex((value, index) => !field.isAncestorNamedField(index));
     return {
-      pathValue: kpToString(kp),
-      pathKP: kp,
-      uneditableDepth: lastNamed,
+      pathKP: this._field().outputKeyPath,
     };
-  }
-
-  // TODO replace this with an svg
-  public depthBoxStyle(depth)
-  {
-    return {
-      position: 'absolute',
-      left: `${indentSize * depth - indentSize / 2 - 4}px`,
-      width: `${indentSize / 2}px`,
-      height: `0.75em`,
-      top: `2px`,
-      borderLeft: `1px solid ${Colors().text3}`,
-      borderBottom: `1px solid ${Colors().text3}`,
-    } as any;
   }
 
   @instanceFnDecorator(memoizeOne)
@@ -157,58 +134,52 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
     return this._validateKeyPath(engine, engineVersion, field, this.state.pathKP);
   }
 
-  public renderLocationKey(key: string, isEditable: boolean, depth)
+  @instanceFnDecorator(memoizeOne)
+  public computeListProps(pathKP: KeyPath, field: TemplateField): { items: any[], computeOptions: (index) => RowOptions }
   {
-    const style = _.extend(
-      {
-        paddingLeft: `${depth * indentSize}px`,
-      },
-      fontColor(isEditable ? Colors().text2 : Colors().text3),
-    );
-
-    return (
-      <div
-        key={depth}
-        className='field-location-key'
-        style={style}
-      >
-        {depth > 0 ? <div style={this.depthBoxStyle(depth)} /> : null}
-        {key}
-      </div>
-    );
+    const currentKp = field.outputKeyPath;
+    const lastNamed = currentKp.findLastIndex((value, index) => !field.isAncestorNamedField(index));
+    const computeOptions = (index) =>
+    {
+      return { disabled: index <= lastNamed };
+    };
+    return {
+      items: pathKP.toJS(),
+      computeOptions,
+    };
   }
 
-  public renderLocation()
+  public renderMoveForm(isValid: boolean, message: string)
   {
-    const { pathKP, uneditableDepth } = this.state;
-    return (
-      <div className='field-location-visual'>
-        {
-          pathKP.map((key, index) =>
-            this.renderLocationKey(key, index > uneditableDepth, index),
-          )
-        }
-      </div>
-    );
-  }
+    const { items, computeOptions } = this.computeListProps(this.state.pathKP, this._field());
 
-  public renderMoveUI()
-  {
-    const { isValid, message } = this.validateKeyPath();
     return (
       <div className='move-field-modal'>
-        <div className='move-field-edit-section'>
-          <Autocomplete
-            value={this.state.pathValue}
-            options={emptyList}
-            onChange={this.handleChangePathValue}
-            help={message}
-            helpIsError={!isValid}
-          />
+        <div>
+          Edit This Field's Location
         </div>
-        {this.renderLocation()}
+        <ListForm
+          items={items}
+          computeOptions={computeOptions}
+          onChange={this.handleChangeKeyPath}
+          noBorder={true}
+          style={listFormStyle}
+        />
+        <div
+          className='move-field-modal-error-message'
+          style={fontColor(Colors().error)}
+        >
+          {isValid ? null : message}
+        </div>
       </div>
     );
+  }
+
+  public handleChangeKeyPath(newArray: any[])
+  {
+    this.setState({
+      pathKP: List(newArray),
+    });
   }
 
   public render()
@@ -226,20 +197,12 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
       >
         {
           this.props.fieldId !== null ?
-            this.renderMoveUI()
+            this.renderMoveForm(isValid, message)
             :
             null
         }
       </Modal>
     );
-  }
-
-  public handleChangePathValue(val: string)
-  {
-    this.setState({
-      pathValue: val,
-      pathKP: stringToKP(val),
-    });
   }
 
   public closeModal()
@@ -260,6 +223,10 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
     });
   }
 }
+
+const listFormStyle = {
+  alignItems: 'center',
+};
 
 const MoveFieldModal = Util.createTypedContainer(
   MoveFieldModalC,

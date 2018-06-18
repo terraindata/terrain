@@ -53,61 +53,61 @@ import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath } from 'shared/util/KeyPath';
 // turns 'foo, bar, baz' into ['foo', 'bar', 'baz']
 // commas should be escaped by \ e.g. 'foo\, bar' is ['foo,', 'bar']
-export function stringToKP(kp: string): KeyPath
-{
-  const split = kp.split(',');
-  const fuseList = split.map((val, i) =>
-  {
-    const replaced = val.replace(/\\\\/g, '');
-    if (replaced.length > 0 && replaced.charAt(replaced.length - 1) === '\\')
-    {
-      return {
-        fuseNext: true,
-        value: val.replace(/\\\\/g, '\\').replace(/^ +/, '').replace(/ +$/, '').slice(0, -1),
-      };
-    }
-    else
-    {
-      return {
-        fuseNext: false,
-        value: val.replace(/\\\\/g, '\\').replace(/^ +/, '').replace(/ +$/, ''),
-      };
-    }
-  });
-  const reduced = fuseList.reduce((accum, val) =>
-  {
-    if (accum.length > 0)
-    {
-      const last = accum[accum.length - 1];
-      if (last.fuseNext)
-      {
-        accum[accum.length - 1] = {
-          fuseNext: val.fuseNext,
-          value: `${last.value},${val.value}`,
-        };
-        return accum;
-      }
-      else
-      {
-        accum.push(val);
-        return accum;
-      }
-    }
-    return [val];
-  }, []);
-  if (reduced.length > 0 && reduced[reduced.length - 1].fuseNext)
-  {
-    reduced[reduced.length - 1].value += ',';
-  }
-  return List(reduced.map((val, i) => val.value));
-}
+// export function stringToKP(kp: string): KeyPath
+// {
+//   const split = kp.split(',');
+//   const fuseList = split.map((val, i) =>
+//   {
+//     const replaced = val.replace(/\\\\/g, '');
+//     if (replaced.length > 0 && replaced.charAt(replaced.length - 1) === '\\')
+//     {
+//       return {
+//         fuseNext: true,
+//         value: val.replace(/\\\\/g, '\\').replace(/^ +/, '').replace(/ +$/, '').slice(0, -1),
+//       };
+//     }
+//     else
+//     {
+//       return {
+//         fuseNext: false,
+//         value: val.replace(/\\\\/g, '\\').replace(/^ +/, '').replace(/ +$/, ''),
+//       };
+//     }
+//   });
+//   const reduced = fuseList.reduce((accum, val) =>
+//   {
+//     if (accum.length > 0)
+//     {
+//       const last = accum[accum.length - 1];
+//       if (last.fuseNext)
+//       {
+//         accum[accum.length - 1] = {
+//           fuseNext: val.fuseNext,
+//           value: `${last.value},${val.value}`,
+//         };
+//         return accum;
+//       }
+//       else
+//       {
+//         accum.push(val);
+//         return accum;
+//       }
+//     }
+//     return [val];
+//   }, []);
+//   if (reduced.length > 0 && reduced[reduced.length - 1].fuseNext)
+//   {
+//     reduced[reduced.length - 1].value += ',';
+//   }
+//   return List(reduced.map((val, i) => val.value));
+// }
 
-// turns ['foo', 'bar', 'baz'] into 'foo, bar, baz'
-export function kpToString(kp: KeyPath): string
-{
-  return kp.map((val) => val.toString().replace(/\\/g, '\\\\').replace(/,/g, '\\,'))
-    .reduce((accum, val) => accum === null ? val : `${accum}, ${val}`, null);
-}
+// // turns ['foo', 'bar', 'baz'] into 'foo, bar, baz'
+// export function kpToString(kp: KeyPath): string
+// {
+//   return kp.map((val) => val.toString().replace(/\\/g, '\\\\').replace(/,/g, '\\,'))
+//     .reduce((accum, val) => accum === null ? val : `${accum}, ${val}`, null);
+// }
 
 // TODO make these into real tests?
 // const tests = [
