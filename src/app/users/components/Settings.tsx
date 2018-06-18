@@ -67,8 +67,8 @@ import { UserActions as Actions } from '../data/UserRedux';
 import * as UserTypes from '../UserTypes';
 import AccountEntry from './AccountEntry';
 import PasswordStrengthInput from './PasswordStrengthInput';
-import Section from './Section';
 import Profile from './Profile';
+import Section from './Section';
 
 import './Settings.less';
 type User = UserTypes.User;
@@ -470,12 +470,12 @@ class Settings extends TerrainComponent<Props>
     }
 
     return;
-      /*<Dropdown
-        canEdit={this.props.canEdit}
-        options={timeZonesListImmu}
-        selectedIndex={1}
-        onChange={this.changeTimeZone}
-      />*/
+    /*<Dropdown
+      canEdit={this.props.canEdit}
+      options={timeZonesListImmu}
+      selectedIndex={1}
+      onChange={this.changeTimeZone}
+    />*/
   }
 
   public changeTheme(val)
@@ -685,51 +685,54 @@ class Settings extends TerrainComponent<Props>
   public render()
   {
     return (
-    <div>
-      <div className='settings-page-title'>Account Settings</div>
-      <Section
-        sectionTitle='Profile'
-        sectionType='profile'
-        sectionBoxes={
-          List([
-            {header: 'Name', info: 'hekko hi', type: 'Input'},
-            {header: 'Email', info: 'thor@avengers.io', type: 'Input'},
-            {header: 'Phone', info: '1234567', type: 'Input'},
-            {header: 'User Id', info: 'thorrr', type: 'Input'},
-            {header: 'What I Do', info: 'thorrrrr', type: 'Input'},
-            {header: 'Skype', info: 'yes', type: 'Input'},
-          ])
-        }
-        hasPhoto={true}
-        columnNum={2}
-      />
-      <Section
-        sectionTitle='Password'
-        sectionType='password'
-        sectionBoxes={
-          List([
-            {header: 'Enter Current Password', info: 'hereeeeee', type: 'Input'},
-            {header: 'New Password', info: 'thorrrrr', type: 'Input'},
-            {header: 'Verify Password', info: 'yes', type: 'Input'},
+      <div>
+        <div className='settings-page-title' style={{ color: Colors().mainSectionTitle }}>Account Settings</div>
+        <Section
+          user={this.props.users.currentUser}
+          sectionTitle='Profile'
+          sectionType='profile'
+          sectionBoxes={
+            List([
+              { header: 'Name', info: this.props.users.currentUser.name, type: 'Input' },
+              { header: 'Email', info: this.props.users.currentUser.email, type: 'Input' },
+              { header: 'Phone', info: this.props.users.currentUser.phone, type: 'Input' },
+              { header: 'User Id', info: 'some userid', type: 'Input' },
+              { header: 'What I Do', info: this.props.users.currentUser.whatIDo, type: 'Input' },
+              { header: 'Skype', info: this.props.users.currentUser.skype, type: 'Input' },
+            ])
+          }
+          hasPhoto={true}
+          columnNum={2}
+        />
+        <Section
+          user={this.props.users.currentUser}
+          sectionTitle='Password'
+          sectionType='password'
+          sectionBoxes={
+            List([
+              { header: 'Enter Current Password', info: 'hereeeeee', type: 'Input' },
+              { header: 'New Password', info: 'thorrrrr', type: 'Input' },
+              { header: 'Verify Password', info: 'yes', type: 'Input' },
 
-          ])
-        }
-        hasPhoto={false}
-        columnNum={0}
-      />
-      <Section
-        sectionTitle='Time Zone'
-        sectionType='timezone'
-        sectionBoxes={
-          List([
-            {header: 'GMT Offset', info: this.newRenderTimeZoneContent(), type: 'Dropdown'},
-            {header: 'Send Daily Email At', info: 'Midnight', type: 'Dropdown'},
-          ])
-        }
-        hasPhoto={false}
-        columnNum={0}
-      />
-    </div>
+            ])
+          }
+          hasPhoto={false}
+          columnNum={0}
+        />
+        <Section
+          user={this.props.users.currentUser}
+          sectionTitle='Time Zone'
+          sectionType='timezone'
+          sectionBoxes={
+            List([
+              { header: 'GMT Offset', info: this.newRenderTimeZoneContent(), type: 'Dropdown' },
+              { header: 'Send Daily Email At', info: 'Midnight', type: 'Dropdown' },
+            ])
+          }
+          hasPhoto={false}
+          columnNum={0}
+        />
+      </div>
     );
     /*return (
       <div>

@@ -58,26 +58,26 @@ import Switch from 'common/components/Switch';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as momentZon from 'moment-timezone';
 import { MidwayError } from 'shared/error/MidwayError';
+import Settings from 'users/components/Settings';
 import Util from 'util/Util';
 import Ajax from '../../util/Ajax';
 import TerrainTools from '../../util/TerrainTools';
 import { UserActions as Actions } from '../data/UserRedux';
 import * as UserTypes from '../UserTypes';
 import AccountEntry from './AccountEntry';
-import Settings from 'users/components/Settings';
 
-
-import './Section.less';
 import { backgroundColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
+import './Section.less';
 
 export interface Props
 {
-  sectionTitle: string,
-  sectionType: string,
-  sectionBoxes: List<any>,
-  hasPhoto: boolean,
-  columnNum: number,
+  user: any;
+  sectionTitle: string;
+  sectionType: string;
+  sectionBoxes: List<any>;
+  hasPhoto: boolean;
+  columnNum: number;
 }
 
 export default class Section extends TerrainComponent<Props>
@@ -88,7 +88,7 @@ export default class Section extends TerrainComponent<Props>
 
     this.state = {
       isEditing: false,
-    }
+    };
   }
 
   public renderBlockColumn()
@@ -97,9 +97,9 @@ export default class Section extends TerrainComponent<Props>
     {
       return (
         <div className='section-body' style={{ background: Colors().bg }}>
-        {this.renderBlocks(this.props.sectionBoxes, 'no-column', 1)}
+          {this.renderBlocks(this.props.sectionBoxes, 'no-column', 1)}
         </div>
-        );
+      );
     }
     else
     {
@@ -107,157 +107,203 @@ export default class Section extends TerrainComponent<Props>
       let columns = List([]);
       for (let column = 0; column < this.props.columnNum; column++)
       {
-        let columnStart = column * perColumn;
-        let columnBlocks = this.props.sectionBoxes.slice(columnStart, columnStart + perColumn);
+        const columnStart = column * perColumn;
+        const columnBlocks = this.props.sectionBoxes.slice(columnStart, columnStart + perColumn);
         columns = columns.push(columnBlocks);
       }
 
-      
-        return (
-          <div className='section-body' style={{ background: Colors().bg }}>
-          {this.props.hasPhoto ? <div className='profile-pic'><img src={UserTypes.profileUrlFor(this.state.user)}
-          ref='profilePicImg' /></div> : null}  
+      return (
+        <div className='section-body' style={{ background: Colors().bg }}>
+          {this.props.hasPhoto ? <div className='profile-pic'><img src={UserTypes.profileUrlFor(this.props.user)} // this.props.user
+            ref='profilePicImg' /></div> : null}
           <div className='profile-text'>
             {columns.map((col, i) => this.renderBlocks(col, 'profile-col-1', i))}
           </div>
-          </div>
-        );
-      
+        </div>
+      );
+
     }
   }
 
-  public renderBlocks(blockList, colClassName, columnKey) 
+  public renderBlocks(blockList, colClassName, columnKey)
   {
-      return (
-        <div className={colClassName} key={columnKey}>
-          {blockList.map((block, i) =>
-            <div className='profile-block' key={i}>
-              <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>{block.header}</div>
-              <div className='profile-inner-info'>{block.info}</div>
-            </div>
-          )}
-        </div>
-      );
+    return (
+      <div className={colClassName} key={columnKey}>
+        {blockList.map((block, i) =>
+          <div className='profile-block' key={i}>
+            <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>{block.header}</div>
+            <div className='profile-inner-info'>{block.info}</div>
+          </div>,
+        )}
+      </div>
+    );
   }
 
   public renderProfile()
   {
     return (
-      <div 
+      <div
         className='section-body'
         style={{ background: Colors().bg }}
       >
-          <div className='profile-pic'>
-            this is a photo
+        <div className='profile-pic'>
+          this is a photo
           </div>
-          <div className='profile-text'>
-            <div className='profile-col-1'>
-              <div className='profile-block'>
-                <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>Name</div>
-                <div className='profile-inner-info'>The name</div>
-              </div>
-              <div className='profile-block'>
-                <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>Email</div>
-                <div className='profile-inner-info'>The email</div>
-              </div>
-              <div className='profile-block'>
-                <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>Phone</div>
-                <div className='profile-inner-info'>123456789</div>
-              </div>
+        <div className='profile-text'>
+          <div className='profile-col-1'>
+            <div className='profile-block'>
+              <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>Name</div>
+              <div className='profile-inner-info'>The name</div>
             </div>
-            <div className='profile-col-2'>
-              <div className='profile-block'>
-                <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>User Id</div>
-                <div className='profile-inner-info'>the user id</div>
-              </div>
-              <div className='profile-block'>
-                <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>What I Do</div>
-                <div className='profile-inner-info'>cry</div>
-              </div>
-              <div className='profile-block'>
-                <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>Skype</div>
-                <div className='profile-inner-info'>yes</div>
-              </div>
+            <div className='profile-block'>
+              <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>Email</div>
+              <div className='profile-inner-info'>The email</div>
+            </div>
+            <div className='profile-block'>
+              <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>Phone</div>
+              <div className='profile-inner-info'>123456789</div>
+            </div>
+          </div>
+          <div className='profile-col-2'>
+            <div className='profile-block'>
+              <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>User Id</div>
+              <div className='profile-inner-info'>the user id</div>
+            </div>
+            <div className='profile-block'>
+              <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>What I Do</div>
+              <div className='profile-inner-info'>cry</div>
+            </div>
+            <div className='profile-block'>
+              <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>Skype</div>
+              <div className='profile-inner-info'>yes</div>
             </div>
           </div>
         </div>
+      </div>
     );
   }
 
   public renderPassword()
   {
     return (
-      <div 
+      <div
         className='section-body'
         style={{ background: Colors().bg }}
       >
 
-          <div className='profile-block'>
-            <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>Enter Current Password</div>
-            <div className='profile-inner-info'>text entry here</div>
-          </div>
-          <div className='profile-block'>
-            <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>New Password</div>
-            <div className='profile-inner-info'>text entry here</div>
-          </div>
-          <div className='profile-block'>
-            <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>Verify Password</div>
-            <div className='profile-inner-info'>text entry here</div>
-          </div>
+        <div className='profile-block'>
+          <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>Enter Current Password</div>
+          <div className='profile-inner-info'>text entry here</div>
         </div>
+        <div className='profile-block'>
+          <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>New Password</div>
+          <div className='profile-inner-info'>text entry here</div>
+        </div>
+        <div className='profile-block'>
+          <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>Verify Password</div>
+          <div className='profile-inner-info'>text entry here</div>
+        </div>
+      </div>
     );
   }
 
   public renderTimeZone()
   {
     return (
-      <div 
+      <div
         className='section-body'
         style={{ background: Colors().bg }}
       >
-          <div className='profile-block'>
-            <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>GMT Offset</div>
-            <div className='profile-inner-info'>hiiii</div>
-          </div>
-          <div className='profile-block'>
-            <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>Send Daily Email At</div>
-            <div className='profile-inner-info'>
-              dropbox here
-            </div>
-          </div>
+        <div className='profile-block'>
+          <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>GMT Offset</div>
+          <div className='profile-inner-info'>hiiii</div>
         </div>
+        <div className='profile-block'>
+          <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>Send Daily Email At</div>
+          <div className='profile-inner-info'>
+            dropbox here
+            </div>
+        </div>
+      </div>
     );
   }
 
   public onEditChange()
   {
-    const updatedIsEditing = !this.state.isEditing;
     this.setState(
       {
-        isEditing: updatedIsEditing,
+        isEditing: true,
       },
     );
   }
 
-  public render() {
-    return (
-    <div 
-      className='section-container'
-      style={{ background: Colors().sectionBg }}
-    >
-      <div className='section-header-bar'>
-        <div className='section-header'>{this.props.sectionTitle}</div>
-        <div 
-          className='section-edit-button'
-          onClick={this.onEditChange}
-          style={{ color: Colors().bg, background: Colors().sectionEditButton }}
-        >
-          Edit
-        </div>
-      </div>
+  public onSaveChange()
+  {
+    this.setState(
+      {
+        isEditing: false,
+      },
+    );
+  }
 
-      {this.renderBlockColumn()}
-    </div>
+  public onCancelChange()
+  {
+    this.setState(
+      {
+        isEditing: false,
+      },
+    );
+  }
+
+  public renderEditButton()
+  {
+    return (
+      <div
+        className='section-edit-button'
+        onClick={this.onEditChange}
+        style={{ color: Colors().bg, background: Colors().sectionEditButton }}
+      >
+        Edit
+      </div>
+    );
+  }
+
+  public renderCancelAndSaveButtons()
+  {
+    return (
+      <div className='section-cancel-save'>
+        <div
+          className='section-save-button'
+          onClick={this.onSaveChange}
+          style={{ color: Colors().bg, background: Colors().mainBlue }}
+        >
+          Save
+          </div>
+        <div
+          className='section-cancel-button'
+          onClick={this.onCancelChange}
+          style={{ color: Colors().sectionSubtitle, background: Colors().bg }}
+        >
+          Cancel
+          </div>
+      </div>
+    );
+  }
+
+  public render()
+  {
+    return (
+      <div
+        className='section-container'
+        style={{ background: Colors().sectionBg }}
+      >
+        <div className='section-header-bar'>
+          <div className='section-header'>{this.props.sectionTitle}</div>
+          {this.state.isEditing ? this.renderCancelAndSaveButtons() : this.renderEditButton()}
+        </div>
+
+        {this.renderBlockColumn()}
+      </div>
     );
   }
 }

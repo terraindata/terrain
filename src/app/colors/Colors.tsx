@@ -78,6 +78,7 @@ const NTColors =
     blue3: '#1a9cd9',
     blue4: '#157eb0',
     blue5: '#c6edff',
+    blue6: '#0087c6',
 
     green: '#72ee7c',
   };
@@ -122,6 +123,7 @@ const NewTheme =
     statuses,
     logLevels,
 
+    mainBlue: NTColors.mainBlue,
     todayHighlight: NTColors.blue5,
 
     dateViewLabel: NTColors.blue4,
@@ -129,6 +131,7 @@ const NewTheme =
     sectionBg: NTColors.grey4,
     sectionEditButton: NTColors.grey2,
     sectionSubtitle: NTColors.grey5,
+    mainSectionTitle: NTColors.blue6,
   };
 
 // Will be deprecated
