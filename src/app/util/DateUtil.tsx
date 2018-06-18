@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import { DateUnitArray, DateUnitMap } from 'app/common/components/DatePicker';
 import TerrainDateParameter from 'shared/database/elastic/parser/TerrainDateParameter';
-const moment = require('moment');
+const moment = require('moment-timezone');
 
 const DateUtil =
   {
@@ -81,7 +81,7 @@ const DateUtil =
 
     formatCalendarDate(date)
     {
-      return moment(date).format('MMMM D YYYY, h:mm a');
+      return moment(date).tz(Intl.DateTimeFormat().resolvedOptions().timeZone).format('MMMM D YYYY, h:mm a');
     },
 
     formatRelativeDate(date)
