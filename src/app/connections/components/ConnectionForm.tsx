@@ -68,7 +68,7 @@ import { LibraryState } from 'library/LibraryTypes';
 export interface Props
 {
   connection: ConnectionConfig;
-  onChange: (newConfig: ConnectionConfig, apply?: boolean) => void;
+  onChange: (newConfig: ConnectionFormConfig, apply?: boolean) => void;
 }
 
 export type ConnectionFormConfig = SharedConnectionConfig & {
@@ -170,15 +170,15 @@ export default class ConnectionForm extends TerrainComponent<Props>
   {
     const { connection } = this.props;
     const newConnection = connection.set('isAnalytics', selected ? true : false);
-    this.handleConnectionChange(newConnection, true);
+    this.handleConnectionChange(this.configToState(newConnection), true);
   }
 
   public handleAnalyticsIndexChange(event)
   {
     const { connection } = this.props;
-    connection['analyticsIndex'] = event.target.value;
-    connection['analyticsType'] = 'data';
-    this.handleConnectionChange(connection, true);
+    let newConnection = connection.set('analyticsIndex', event.target.value);
+    newConnection = newConnection.set('analyticsType', 'data');
+    this.handleConnectionChange(this.configToState(newConnection), true);
   }
 
   public render()
@@ -213,7 +213,7 @@ export default class ConnectionForm extends TerrainComponent<Props>
     return state as ConnectionFormConfig;
   }
 
-  public handleConnectionChange(connection: ConnectionConfig, apply?: boolean)
+  public handleConnectionChange(connection: ConnectionFormConfig, apply?: boolean)
   {
     this.props.onChange(connection, apply);
   }

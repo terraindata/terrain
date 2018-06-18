@@ -124,19 +124,19 @@ class ConnectionEditorPage extends TerrainComponent<Props>
     }
 
     connection['dsn'] = dsn;
+
+    delete connection['user'];
+    delete connection['password'];
+    delete connection['port'];
+
     this.setState({
-      connection,
+      connection: _ConnectionConfig(connection),
     });
   }
 
   public save()
   {
     const { connection } = this.state;
-
-    delete connection['user'];
-    delete connection['password'];
-    delete connection['port'];
-
     if (connection['id'])
     {
       this.props.connectionsActions({
