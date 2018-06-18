@@ -102,7 +102,7 @@ export default class ESWildcardStructureClause extends ESStructureClause
 
     super.mark(interpreter, valueInfo);
 
-    // If no wildcard property was marked, accumulate and error (because this is required)
+    // The ESWildcardStructureClause should have at least one wildcard kv.
     if (!this.wildcardMarked)
     {
       interpreter.accumulateError(marker !== undefined ? marker.propertyName : null,
@@ -110,29 +110,20 @@ export default class ESWildcardStructureClause extends ESStructureClause
     }
   }
 
+  // This function is called back from the marking processing of the ESStructureClause when the field name is not one of the
+  // ESStructureClause's known keys. We mark the type of the value to the type of the wildcard value type. The type marking process will
+  // try to mark the value with the wildcard field type, and report errors if the value does not match the wildcard field.
   protected unknownPropertyName(interpreter: ESInterpreter, children: { [name: string]: ESPropertyInfo }, viTuple: ESPropertyInfo)
   {
     const nameClause: ESClause = interpreter.config.getClause(this.nameType);
     const valueClause: ESClause = interpreter.config.getClause(this.valueType);
-    // check if this is the wild card field
-    if (!this.wildcardMarked)
+
+    viTuple.propertyName.clause = nameClause;
+    if (viTuple.propertyValue !== null)
     {
-      viTuple.propertyName.clause = nameClause;
-      if (viTuple.propertyValue !== null)
-      {
-        viTuple.propertyValue.clause = valueClause;
-      }
-      this.wildcardMarked = true;
-      return false;
+      viTuple.propertyValue.clause = valueClause;
     }
-    else
-    {
-      interpreter.accumulateError(viTuple.propertyName,
-        'Unknown property \"' + String(name) +
-        '\". Expected one of these properties: ' +
-        JSON.stringify(_.difference(Object.keys(this.structure), Object.keys(children)), null, 2),
-        true);
-      return true;
-    }
+    this.wildcardMarked = true;
+    return false;
   }
 }

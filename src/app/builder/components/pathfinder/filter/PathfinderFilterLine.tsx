@@ -372,6 +372,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       getValueComponent: this.renderValueComponent(),
       getCustomDisplayName: this._fn(getCustomValueDisplayName, this.props.filterLine),
       forceFloat: true,
+      showOptionsOnOther: filterLine.fieldType === FieldType.Date,
     };
 
     const sets = [
@@ -552,6 +553,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                   onChange={this.handleMapChange}
                   keyPath={this.props.keyPath}
                   canEdit={pathfinderContext.canEdit}
+                  options={this.props.valueOptions.map((opt) => opt.value).toList()}
                 />
               </div>
             );
