@@ -72,6 +72,7 @@ class FileConfigC implements FileConfigI
   public xmlPath = null;
   public jsonPath = null;
   public fieldOrdering = null;
+  public isPlaFeed = false;
 }
 export type FileConfig = WithIRecord<FileConfigC>;
 export const _FileConfig = makeConstructor(FileConfigC);

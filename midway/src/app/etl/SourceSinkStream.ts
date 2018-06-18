@@ -248,7 +248,8 @@ export async function getSinkStream(
             break;
           case 'xml':
             const xmlPath: string | undefined = sink.fileConfig.xmlPath;
-            transformStream = XMLTransform.createExportStream(xmlPath);
+            const isPlaFeed: boolean = sink.fileConfig.isPlaFeed;
+            transformStream = XMLTransform.createExportStream(xmlPath, isPlaFeed);
             break;
           default:
             throw new Error('Export file type must be either CSV, TSV, JSON or XML.');

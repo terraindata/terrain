@@ -405,7 +405,7 @@ class App extends TerrainComponent<Props>
       if (window['dataLayer'] !== undefined)
       {
         // track new pageview event, as the URL changed
-        window['dataLayer'].push({event: 'pageview'});
+        window['dataLayer'].push({ event: 'pageview' });
       }
     }
   }
