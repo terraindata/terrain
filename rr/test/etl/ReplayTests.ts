@@ -54,11 +54,15 @@ import * as request from 'then-request';
 
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
 import * as winston from 'winston';
-import { replayBuilderActions } from '../../FullstackUtils';
+import TerrainTools from '../../../src/app/util/TerrainTools';
+import { replayInputEventOnly, replayReduxEventOnly, replayRREvents } from '../../FullstackUtils';
 
 const COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > svg';
 const CARDS_COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > div > div.menu-options-wrapper > div:nth-child(3) > div > div.menu-text-padding';
 const CARDSTARTER_SELECTOR = '#cards-column-inner > div.info-area > div.info-area-buttons-container > div';
+const USERNAME_SELECTOR = '#login-email';
+const PASSWORD_SELECTOR = '#login-password';
+const BUTTON_SELECTOR = '#app > div > div.app-wrapper > div > div.login-container > div.login-submit-button-wrapper > div';
 
 expect.extend({ toMatchImageSnapshot } as any);
 
@@ -98,23 +102,27 @@ async function takeBuilderActionScreenshot(page)
   await takeAndCompareScreenShot(page);
 }
 
-async function gotoStarterCard(page, url)
+async function gotoStarterPage(page, url)
 {
   await page.goto(url);
+  sleep.sleep(5);
+  winston.info('Goto the login page ' + url);
+  try
+  {
+    await page.waitForSelector(USERNAME_SELECTOR, { timeout: 0 });
+    winston.info('Username selector is ready.');
+    await page.click(USERNAME_SELECTOR);
+    await page.keyboard.type('admin@terraindata.com');
+    await page.click(PASSWORD_SELECTOR);
+    await page.keyboard.type('CnAATPys6tEB*ypTvqRRP5@2fUzTuY!C^LZP#tBQcJiC*5');
+    await page.click(BUTTON_SELECTOR);
+  } catch (e)
+  {
+    winston.warn('The page might be already loaded, keep going.');
+  }
+  winston.info('Goto the starting page.');
   winston.info('Start builder at : ' + String(url));
   sleep.sleep(3);
-  await page.waitForSelector(COLUMN_SELECTOR);
-  await page.click(COLUMN_SELECTOR);
-  winston.info('Select the column.');
-  sleep.sleep(1);
-  await page.waitForSelector(CARDS_COLUMN_SELECTOR);
-  await page.click(CARDS_COLUMN_SELECTOR);
-  winston.info('Select the card column.');
-  sleep.sleep(1);
-  await page.waitForSelector(CARDSTARTER_SELECTOR);
-  await page.click(CARDSTARTER_SELECTOR);
-  winston.info('Builder is started.');
-  sleep.sleep(1);
 }
 
 describe('Replay a builder action', () =>
@@ -135,14 +143,32 @@ describe('Replay a builder action', () =>
   {
     page = await browser.newPage();
     await page.setViewport({ width: 1600, height: 1200 });
-    const url = `http://${ip.address()}:3000/builder/!3`;
-    await gotoStarterCard(page, url);
+    const url = `http://${ip.address()}:3000`;
+    await gotoStarterPage(page, url);
     await takeBuilderActionScreenshot(page);
     const actions = actionFileData['actions'];
     const serializeRecords = actionFileData['records'];
     console.log('Replaying ' + actions.length + ' actions.');
-    await replayBuilderActions(page, url, actions, serializeRecords, async () =>
+    await replayRREvents(page, url, actions, serializeRecords, replayInputEventOnly, async (action) =>
     {
+      if (action.eventType === 'mousedown')
+      {
+        if (action.selector === '.etl-step-big-button')
+        {
+          // give more delay after process to next step
+          sleep.sleep(10);
+        } else if (action.selector === '.template-editor-top-bar > :nth-child(7)')
+        {
+          // give more delay after click the `run` button.
+          await page.mouse.move(0, 0);
+          sleep.sleep(30);
+        }
+      } else if (action.eventType === 'keypress')
+      {
+        // no delay for key pressing, and avoid taking the snapshot too
+        return;
+      }
+      sleep.sleep(1);
       await takeBuilderActionScreenshot(page);
     });
   }, 600000);

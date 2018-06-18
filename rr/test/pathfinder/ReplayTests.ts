@@ -55,7 +55,7 @@ import * as request from 'then-request';
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
 import * as winston from 'winston';
 import TerrainTools from '../../../src/app/util/TerrainTools';
-import { replayBuilderActions } from '../../FullstackUtils';
+import { replayReduxEventOnly, replayRREvents } from '../../FullstackUtils';
 
 const COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > svg';
 const CARDS_COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > div > div.menu-options-wrapper > div:nth-child(3) > div > div.menu-text-padding';
@@ -130,14 +130,11 @@ describe('Replay a builder action', () =>
     const actions = actionFileData['actions'];
     const serializeRecords = actionFileData['records'];
     console.log('Replaying ' + actions.length + ' actions.');
-    //    console.log('Active the simple Parser.');
-    //    await page.evaluate(() =>
-    //    {
-    //      window['TerrainTools'].activate('simple_parser');
-    //    });
-    await replayBuilderActions(page, url, actions, serializeRecords, async () =>
+    await replayRREvents(page, url, actions, serializeRecords, replayReduxEventOnly, async (action) =>
     {
+      sleep.sleep(1);
       await takeBuilderActionScreenshot(page);
+      return true;
     });
   }, 600000);
 
