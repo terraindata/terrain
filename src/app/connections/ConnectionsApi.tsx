@@ -83,7 +83,7 @@ class ConnectionsApi
 
   public deleteConnection(id: number)
   {
-    return this.xhr.post(`/database/delete/${id}`);
+    return this.xhr.post(`/database/${id}/delete`);
   }
 }
 
