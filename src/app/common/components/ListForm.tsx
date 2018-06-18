@@ -87,7 +87,7 @@ export default class ListForm extends TerrainComponent<Props>
   {
     return (
       <PathfinderCreateLine
-        text={'New Field'}
+        text={'New Entry'}
         canEdit={true}
         onCreate={this.addRow}
         showText={true}

@@ -155,7 +155,7 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
 
     return (
       <div className='move-field-modal'>
-        <div>
+        <div className='move-field-modal-description'>
           Edit This Field's Location
         </div>
         <ListForm
