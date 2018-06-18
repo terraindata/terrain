@@ -97,7 +97,11 @@ export function parsePath(path: Path, inputs, nestedPath: boolean = false, index
   queryBody.from = sourceInfo.from;
   if (sourceInfo.size !== 'all')
   {
-    queryBody.size = sourceInfo.size;
+    queryBody['size'] = sourceInfo.size;
+  }
+  else
+  {
+    delete queryBody['size'];
   }
   const indexQuery = {
     term: {

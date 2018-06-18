@@ -67,13 +67,13 @@ beforeAll(async () =>
   // TODO: get rid of this monstrosity once @types/winston is updated.
   (winston as any).level = 'debug';
   const config: PostgresConfig =
-  {
-    database: 'moviesdb',
-    host: 'localhost',
-    port: 65432,
-    password: 'r3curs1v3$',
-    user: 't3rr41n-demo',
-  };
+    {
+      database: 'moviesdb',
+      host: 'localhost',
+      port: 65432,
+      password: 'r3curs1v3$',
+      user: 't3rr41n-demo',
+    };
 
   try
   {
@@ -99,7 +99,7 @@ test('Postgres Generator: mixedCase', async (done) =>
   expect(qstr).toBeInstanceOf(Array);
   expect(qstr.length).toBeGreaterThan(0);
   expect(qstr[0]).toEqual([
-    'INSERT INTO movies ("movieID", "releaseDate")' +
+    'INSERT INTO "movies" ("movieID", "releaseDate")' +
     ' VALUES ($1, $2)' +
     ' ON CONFLICT ("movieID") DO UPDATE SET ("movieID", "releaseDate") = ($1, $2)' +
     ' WHERE ("movies"."movieID") = (13371337) RETURNING "movieID" AS insertid;',
@@ -108,13 +108,13 @@ test('Postgres Generator: mixedCase', async (done) =>
   query = new Tasty.Query(DBMovies)
     .select([DBMovies['movieID']])
     .filter(DBMovies['releaseDate']
-    .doesNotEqual('01/01/2017'))
+      .doesNotEqual('01/01/2017'))
     .sort(DBMovies['movieID'], 'asc');
   qstr = pgDB.generate(query);
   expect(qstr).toBeInstanceOf(Array);
   expect(qstr.length).toBeGreaterThan(0);
   expect(qstr[0]).toEqual([
-    'SELECT "movies"."movieID" FROM movies\n  WHERE "movies"."releaseDate" <> $1\n  ORDER BY "movies"."movieID" ASC;',
+    'SELECT "movies"."movieID" FROM "movies"\n  WHERE "movies"."releaseDate" <> $1\n  ORDER BY "movies"."movieID" ASC;',
   ]);
   done();
 });
@@ -131,7 +131,7 @@ test('Postgres: generator', async (done) =>
     .filter(table.getColumns().get('lname').gt(TastyNode.make('A')))
     .noWait().forUpdate();
   expect(pgDB.generate(query)).toEqual(
-    [['SELECT "test"."lname" FROM test\n  WHERE "test"."lname" < $1\n     AND "test"."lname" > $2\n  FOR UPDATE\n  NOWAIT;'],
+    [['SELECT "test"."lname" FROM "test"\n  WHERE "test"."lname" < $1\n     AND "test"."lname" > $2\n  FOR UPDATE\n  NOWAIT;'],
     [['ABC', 'A']]],
   );
   done();
