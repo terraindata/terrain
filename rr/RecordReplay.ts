@@ -249,7 +249,7 @@ async function rr()
       {
         await startBuilder(page);
       }
-      await replayRREvents(page, url, actions, serializeRecords, async (action) => true, async (action) =>
+      await replayRREvents(page, url, actions, serializeRecords, async (action) =>
       {
         if (action.eventType)
         {
@@ -265,7 +265,26 @@ async function rr()
           }
         }
         return true;
-      });
+      }, async (action) =>
+        {
+          if (action.eventType === 'mousedown')
+          {
+            if (action.selector === 'etl-step-big-button')
+            {
+              sleep.sleep(10);
+              return;
+            } else if (action.selector === '.template-editor-top-bar > :nth-child(7)')
+            {
+              sleep.sleep(30);
+              return;
+            }
+          } else if (action.eventType === 'keypress')
+          {
+            // no delay for key pressing, return
+            return;
+          }
+          sleep.sleep(1);
+        });
     } catch (e)
     {
       console.log(e.message);
@@ -274,7 +293,7 @@ async function rr()
     await waitForInput('Typing to stop the replay');
   }
 
-  console.log('Closing thebrowser');
+  console.log('Closing the browser');
   await browser.close();
   console.log('The browser is closed.');
 }

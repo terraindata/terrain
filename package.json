@@ -38,6 +38,7 @@
     "test-fullstack-login": "jest ./rr/test/login --forceExit",
     "test-fullstack-import": "jest ./rr/test/import --forceExit",
     "test-rr-pathfinder": "jest ./rr/test/pathfinder --forceExit",
+    "test-rr-etl-http-import": "jest ./rr/test/etl --forceExit",
     "test-fullstack-component": "jest ./rr/test/components --forceExit",
     "clean": "rm -rf .cache && rm -rf .cache-loader && rm -rf midway/src/assets/.cache"
   },

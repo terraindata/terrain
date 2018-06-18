@@ -133,6 +133,11 @@ fullstack-screenshot:
     - sleep 10
     - yarn test-fullstack-login
     - yarn test-rr-pathfinder
+    - pkill node || true;
+    - timeout 240 yarn test-fullstack-setup
+    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
+    - sleep 10
+    - yarn test-rr-etl-http-import
   stage: screenshot-tests
   allow_failure: true
   artifacts:
