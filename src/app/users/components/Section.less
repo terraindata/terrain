@@ -53,6 +53,9 @@
 
 .profile-block {
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   margin: 16px;
 }
 
@@ -68,9 +71,14 @@
 }
 
 .profile-pic {
-  flex-grow: 1;
-  border: solid;
-  margin-right: 30px;
+  height: 0;
+  width: 20%;
+  padding-bottom: 20%;
+  margin-right: 40px;
+}
+
+img {
+  max-width: 100%;
 }
 
 .profile-text {
@@ -86,13 +94,15 @@
 }
 
 .profile-col-1 {
-  display: block;
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
   text-align: left;
+  justify-content: space-around;
 }
 
-.profile-col-2 {
-  display: block;
-  flex-grow: 1;
-  text-align: left;
-}
+//.profile-col-2 {
+//  display: block;
+// flex-grow: 1;
+//  text-align: left
+//}

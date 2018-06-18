@@ -68,6 +68,7 @@ import * as UserTypes from '../UserTypes';
 import AccountEntry from './AccountEntry';
 import PasswordStrengthInput from './PasswordStrengthInput';
 import Section from './Section';
+import Profile from './Profile';
 
 import './Settings.less';
 type User = UserTypes.User;
@@ -468,14 +469,13 @@ class Settings extends TerrainComponent<Props>
       timeZone = 158;
     }
 
-    return (
-      <Dropdown
+    return;
+      /*<Dropdown
         canEdit={this.props.canEdit}
         options={timeZonesListImmu}
         selectedIndex={1}
         onChange={this.changeTimeZone}
-      />
-    );
+      />*/
   }
 
   public changeTheme(val)
@@ -692,7 +692,7 @@ class Settings extends TerrainComponent<Props>
         sectionType='profile'
         sectionBoxes={
           List([
-            {header: 'Name', info: 'thor', type: 'Input'},
+            {header: 'Name', info: 'hekko hi', type: 'Input'},
             {header: 'Email', info: 'thor@avengers.io', type: 'Input'},
             {header: 'Phone', info: '1234567', type: 'Input'},
             {header: 'User Id', info: 'thorrr', type: 'Input'},

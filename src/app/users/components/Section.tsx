@@ -115,7 +115,8 @@ export default class Section extends TerrainComponent<Props>
       
         return (
           <div className='section-body' style={{ background: Colors().bg }}>
-          {this.props.hasPhoto ? <div className='profile-pic'></div> : null}  
+          {this.props.hasPhoto ? <div className='profile-pic'><img src={UserTypes.profileUrlFor(this.state.user)}
+          ref='profilePicImg' /></div> : null}  
           <div className='profile-text'>
             {columns.map((col, i) => this.renderBlocks(col, 'profile-col-1', i))}
           </div>
