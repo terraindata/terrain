@@ -126,7 +126,7 @@ fullstack-meta:
 fullstack-screenshot:
   script:
     - pkill node || true;
-    - timeout 600 yarn test-fullstack-setup
+    - timeout 240 yarn test-fullstack-setup
     - yarn clean
     - MIDWAY_HOST=`hostname`:3000 yarn build
     - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&

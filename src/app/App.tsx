@@ -48,6 +48,8 @@ THE SOFTWARE.
 
 /// <reference path="../../shared/typings/tsd.d.ts" />
 
+import TerrainStoreLogger from 'store/TerrainStoreLogger';
+
 require('babel-polyfill');
 
 // Style
@@ -592,7 +594,8 @@ class App extends TerrainComponent<Props>
         {({ width, height }) => (
           <div
             className='app'
-            onMouseMove={this.handleMouseMove}
+            onMouseDown={TerrainStoreLogger.recordMouseClick as any}
+            onKeyPress={TerrainStoreLogger.recordKeyPress as any}
             key='app'
             style={APP_STYLE}
           >
