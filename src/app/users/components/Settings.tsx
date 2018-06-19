@@ -682,8 +682,32 @@ class Settings extends TerrainComponent<Props>
   //   buttonText={this.renderDeactivateButton()}
   //   lastEntry={true}
   //   />
+
+  public updateUserInfo(editingSections)
+  {
+    let newUser = this.props.users.currentUser;
+    //console.log(newUser);
+    for (let header in editingSections)
+    {
+      //console.log(header);
+      //console.log(editingSections[header]);
+      newUser = newUser.set(header.toLowerCase().replace(/ /g,''), editingSections[header]);
+    }
+    //console.log(newUser);
+    this.props.userActions({
+      actionType: 'change',
+      user: newUser as UserTypes.User,
+    });
+
+    this.setState({
+      saving: true,
+      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
+    });
+  }
+
   public render()
   {
+    console.log(this.props.users.currentUser.name);
     return (
       <div>
         <div className='settings-page-title' style={{ color: Colors().mainSectionTitle }}>Account Settings</div>
@@ -703,6 +727,7 @@ class Settings extends TerrainComponent<Props>
           }
           hasPhoto={true}
           columnNum={2}
+          onChange={this.updateUserInfo}
         />
         <Section
           user={this.props.users.currentUser}
@@ -718,6 +743,7 @@ class Settings extends TerrainComponent<Props>
           }
           hasPhoto={false}
           columnNum={0}
+          onChange={this.updateUserInfo}
         />
         <Section
           user={this.props.users.currentUser}
@@ -731,6 +757,7 @@ class Settings extends TerrainComponent<Props>
           }
           hasPhoto={false}
           columnNum={0}
+          onChange={this.updateUserInfo}
         />
       </div>
     );

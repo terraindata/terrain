@@ -78,6 +78,7 @@ export interface Props
   sectionBoxes: List<any>;
   hasPhoto: boolean;
   columnNum: number;
+  onChange: (value: any) => void;
 }
 
 export default class Section extends TerrainComponent<Props>
@@ -88,6 +89,8 @@ export default class Section extends TerrainComponent<Props>
 
     this.state = {
       isEditing: false,
+      sections: this.props.sectionBoxes,
+      editingSections: {},
     };
   }
 
@@ -125,6 +128,32 @@ export default class Section extends TerrainComponent<Props>
     }
   }
 
+  //public handleInputEdit(blockList, block)
+  //{
+  //  const inputIndex = blockList.indexOf(block);
+  //  let inputValue = document.getElementsByTagName('input')[inputIndex].value;
+  //}
+
+  public handleInputEdit(block, e)
+  {
+    const keyHeader = block.header;
+    const currentInput = e.target.value;
+    let currentEditingState = this.state.editingSections;
+    currentEditingState[keyHeader] = currentInput;
+    this.setState(
+      {
+        editingSections: currentEditingState,
+      },
+    );
+  }
+
+  public renderEditField(blockList, block)
+  {
+    return (
+      <input id={block.header} type='text' defaultValue={block.info} onChange={this._fn(this.handleInputEdit, block)} required />
+    );
+  }
+
   public renderBlocks(blockList, colClassName, columnKey)
   {
     return (
@@ -132,7 +161,7 @@ export default class Section extends TerrainComponent<Props>
         {blockList.map((block, i) =>
           <div className='profile-block' key={i}>
             <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>{block.header}</div>
-            <div className='profile-inner-info'>{block.info}</div>
+            <div className='profile-inner-info'>{this.state.isEditing ? this.renderEditField(blockList, block) : block.info}</div>
           </div>,
         )}
       </div>
@@ -155,6 +184,8 @@ export default class Section extends TerrainComponent<Props>
         isEditing: false,
       },
     );
+    this.props.onChange(this.state.editingSections);
+    //console.log(this.state.editingSections);
   }
 
   public onCancelChange()
@@ -162,6 +193,7 @@ export default class Section extends TerrainComponent<Props>
     this.setState(
       {
         isEditing: false,
+        editingSections: {},
       },
     );
   }
