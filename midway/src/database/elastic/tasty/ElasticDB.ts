@@ -74,13 +74,20 @@ export class ElasticDB implements TastyDB
     return JSON.stringify(this.generate(query));
   }
 
-  public async schema(): Promise<TastySchema>
+  public async schema(skipHidden: boolean = true): Promise<TastySchema>
   {
     const result = await new Promise((resolve, reject) =>
     {
       this.client.indices.getMapping(
         {},
-        util.promise.makeCallback(resolve, reject));
+        util.promise.makeCallback((response) => {
+          let filteredResponse = response;
+          if (skipHidden)
+          {
+            filteredResponse = this.filterHiddenIndexes(filteredResponse);
+          }
+          return resolve(filteredResponse);
+        }, reject));
     });
 
     return TastySchema.fromElasticTree(result);
@@ -424,6 +431,17 @@ export class ElasticDB implements TastyDB
       {
         return element[key];
       }).join(table.getPrimaryKeyDelimiter());
+  }
+
+  private filterHiddenIndexes(indexes)
+  {
+    const indexesKeys = Object.keys(indexes);
+    const visibleIndexes = indexesKeys.filter((i) => !/^\./.test(i));
+    const filteredIndexes = {};
+
+    visibleIndexes.map((i) => filteredIndexes[i] = indexes[i]);
+
+    return filteredIndexes;
   }
 }
 
