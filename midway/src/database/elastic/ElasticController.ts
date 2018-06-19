@@ -64,7 +64,7 @@ class ElasticController extends DatabaseController
   private analyticsType: string;
   private indexPrefix: string;
 
-  constructor(config: ElasticConfig, id: number, name: string, analyticsIndex?: string, analyticsType?: string, indexPrefix: string = '')
+  constructor(config: ElasticConfig, id: number, name: string, analyticsIndex?: string, analyticsType?: string, indexPrefix?: string)
   {
     super('ElasticController', id, name);
     this.client = new ElasticClient(this, config);
@@ -85,7 +85,7 @@ class ElasticController extends DatabaseController
       this.analyticsType = analyticsType;
     }
 
-    this.indexPrefix = indexPrefix;
+    this.indexPrefix = indexPrefix === undefined ? '' : indexPrefix;
   }
 
   public getClient(): ElasticClient

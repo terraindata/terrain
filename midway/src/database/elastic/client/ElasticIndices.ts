@@ -81,7 +81,7 @@ class ElasticIndices
       {
         if (err)
         {
-          if (err.statusCode === 400)
+          if (err.statusCode === 404)
           {
             callback(null, {}, 200);
           }
