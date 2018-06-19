@@ -94,6 +94,18 @@ export default class Section extends TerrainComponent<Props>
     };
   }
 
+  public shouldComponentUpdate(nextProps, nextState)
+  {
+    if (!_.isEqual(nextState.editingSections, this.state.editingSections))
+    {
+      return true;
+    }
+    else
+    {
+      return (this.props !== nextProps) || (this.state !== nextState);
+    }
+  }
+
   public renderBlockColumn()
   {
     if (this.props.columnNum === 0)
@@ -154,8 +166,8 @@ export default class Section extends TerrainComponent<Props>
         id={block.header}
         type='text'
         onChange={this._fn(this.handleInputEdit, block)}
-        defaultValue={(this.state.editingValues !== undefined) && (this.state.editingValues[block.header] !== undefined) ?
-          this.state.editingValues[block.header] : block.info}
+        value={(this.state.editingSections !== undefined) && (this.state.editingSections[block.header] !== undefined) ?
+          this.state.editingSections[block.header] : block.info}
         required />
     );
   }

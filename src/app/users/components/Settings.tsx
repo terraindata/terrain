@@ -685,7 +685,7 @@ class Settings extends TerrainComponent<Props>
 
   public updateUserInfo(editingSections)
   {
-    let newUser = this.props.users.currentUser;
+    let newUser = this.props.users.users.get(this.props.users.currentUser.id);
     for (const header of Object.keys(editingSections))
     {
       const headerKey = (header.charAt(0).toLowerCase() + header.slice(1)).replace(/ /g, '');
