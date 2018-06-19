@@ -686,8 +686,7 @@ class Settings extends TerrainComponent<Props>
   public updateUserInfo(editingSections)
   {
     let newUser = this.props.users.currentUser;
-    console.log(newUser);
-    for (const header in editingSections)
+    for (const header of Object.keys(editingSections))
     {
       const headerKey = (header.charAt(0).toLowerCase() + header.slice(1)).replace(/ /g, '');
       newUser = newUser.set(headerKey, editingSections[header]);
@@ -706,7 +705,6 @@ class Settings extends TerrainComponent<Props>
   public render()
   {
     const currentUser = this.props.users.users.get(this.props.users.currentUser.id);
-    console.log(this.props.users);
     return (
       <div>
         <div className='settings-page-title' style={{ color: Colors().mainSectionTitle }}>Account Settings</div>
