@@ -61,6 +61,8 @@ import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 
 import { TaskConfig, ParamConfigType } from 'app/scheduler/SchedulerTypes';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
+import EndpointForm from 'app/etl/common/components/EndpointForm';
+
 
 const { List, Map } = Immutable;
 
@@ -97,14 +99,11 @@ abstract class TaskFormBase<FormState, P extends Props = Props> extends TerrainC
 
   public render()
   {
-    console.log('TASK BASE CLASS ', this.props.task);
     const { params } = this.props.task;
     let state = {};
     if (params !== undefined)
     {
-      console.log('params isnt udnefined', params);
       state = this.configToState(params.get('options'));
-      console.log('params map ', params.get('options'));
     }
     console.log('STATE IS ', state);
     return (
@@ -149,7 +148,8 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
       type: DisplayType.Pick,
       displayName: 'Template',
       options: {
-        pickOptions: (state) => !this.props.templates ? List() : this.props.templates.map((t) => t.id).toList(),
+        pickOptions: (state) => !this.props.templates ? List() :
+          this.props.templates.filter((t) => t.canSchedule()).map((t) => t.id).toList(),
         indexResolver: (option) => this.props.templates.findIndex((t) => t.id === option),
         displayNames: (state) => {
           if (!this.props.templates)
@@ -164,6 +164,74 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
         },
       }
     },
+    overrideSources: {
+      type: DisplayType.Custom,
+      displayName: 'Sources',
+      options: {
+        render: (state, disabled) => {
+          const template = this.props.templates.find((t) => t.id === state.templateId);
+          if (!template)
+          {
+            return <div>No Sources</div>;
+          }
+          const sources = template.sources;
+          return (
+            <div>
+              Sources
+              {
+                sources.keySeq().map((key) =>
+                {
+                  const source = state.overrideSources[key] || sources.get(key);
+                  return (
+                    <EndpointForm
+                      isSource={true}
+                      endpoint={source}
+                      onChange={this.handleFormChange}
+                      isSchedule={true}
+                      key={source.name}
+                    />
+                  )
+                })
+              }
+            </div>
+          );
+        },
+      }
+    },
+    overrideSinks: {
+      type: DisplayType.Custom,
+      displayName: 'Sources',
+      options: {
+        render: (state, disabled) => {
+          const template = this.props.templates.find((t) => t.id === state.templateId);
+          if (!template)
+          {
+            return <div>No Sinks</div>;
+          }
+          const sinks = template.sinks;
+          return (
+            <div>
+              Sinks
+              {
+                sinks.keySeq().map((key) =>
+                {
+                  const source = state.overrideSinks[key] || sinks.get(key);
+                  return (
+                    <EndpointForm
+                      isSource={true}
+                      endpoint={source}
+                      onChange={this.handleFormChange}
+                      isSchedule={true}
+                      key={source.name}
+                    />
+                  )
+                })
+              }
+            </div>
+          );
+        },
+      }
+    }
   };
 }
 
