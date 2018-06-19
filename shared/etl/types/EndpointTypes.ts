@@ -57,6 +57,7 @@ export interface FileConfig
   xmlPath?: string;
   jsonPath?: string;
   fieldOrdering?: string[];
+  isPlaFeed?: boolean;
 }
 
 export enum Sources

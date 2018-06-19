@@ -161,7 +161,8 @@ class PlacesAutocomplete extends TerrainComponent<Props>
     {
       return [];
     }
-    return items.filter((item) => item.startsWith(inputValue)).map((item, i) => {
+    return items.filter((item) => item.startsWith(inputValue)).map((item, i) =>
+    {
       return {
         index: i,
         suggestion: item,

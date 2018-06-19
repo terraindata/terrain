@@ -6586,6 +6586,12 @@ moment-timezone@^0.5.0:
   dependencies:
     moment ">= 2.9.0"
 
+moment-timezone@^0.5.20:
+  version "0.5.20"
+  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.20.tgz#fe66da425dd9f9bbf416f131bf17659680aabb99"
+  dependencies:
+    moment ">= 2.9.0"
+
 "moment@>= 2.9.0", moment@>=2.14.0, moment@^2.22.2:
   version "2.22.2"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.2.tgz#3c257f9839fc0e93ff53149632239eb90783ff66"
@@ -10048,6 +10054,10 @@ unique-filename@^1.1.0:
   resolved "https://registry.yarnpkg.com/unique-filename/-/unique-filename-1.1.0.tgz#d05f2fe4032560871f30e93cbe735eea201514f3"
   dependencies:
     unique-slug "^2.0.0"
+
+unique-selector@^0.3.6:
+  version "0.3.6"
+  resolved "https://registry.yarnpkg.com/unique-selector/-/unique-selector-0.3.6.tgz#21e0c982abcd7946a7ec4378f91cceac7456565e"
 
 unique-slug@^2.0.0:
   version "2.0.0"
