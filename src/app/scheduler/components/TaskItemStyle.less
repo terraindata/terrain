@@ -1,10 +1,12 @@
 .task-item-wrapper {
-	width: 300px;
+	width: 250px;
     border: 1px solid;
     border-radius: 3px;
     margin: 6px;
     flex-grow: 1;
-    max-width: 300px;
+    max-width: 250px;
+    position: relative;
+    padding-bottom: 20px;
     .task-item-header {
     	height: 30px;
     	margin-bottom: 6px;
@@ -31,6 +33,9 @@
     	display: flex;
     	cursor: pointer;
     	justify-content: center;
+        position: absolute;
+        bottom: 0px;
+        width: 100%;
     	.task-item-subtask-button {
     		padding: 6px;
     	}

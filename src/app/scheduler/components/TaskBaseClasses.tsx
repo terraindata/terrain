@@ -62,7 +62,7 @@ import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { TaskConfig, ParamConfigType } from 'app/scheduler/SchedulerTypes';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
 import EndpointForm from 'app/etl/common/components/EndpointForm';
-
+import FadeInOut from 'common/components/FadeInOut';
 
 const { List, Map } = Immutable;
 
@@ -76,6 +76,10 @@ export interface Props
 abstract class TaskFormBase<FormState, P extends Props = Props> extends TerrainComponent<P>
 {
   public abstract inputMap: InputDeclarationMap<FormState>;
+
+  public state = {
+    open: Map<string, boolean>(),
+  }
 
   constructor(props)
   {
@@ -97,6 +101,14 @@ abstract class TaskFormBase<FormState, P extends Props = Props> extends TerrainC
     return state ? Map(state) : state;
   }
 
+  public toggleState(key: string)
+  {
+    const toggled = this.state.open.get(key) ? false : true;
+    this.setState({
+      open: this.state.open.set(key, toggled),
+    });
+  }
+
   public render()
   {
     const { params } = this.props.task;
@@ -105,7 +117,6 @@ abstract class TaskFormBase<FormState, P extends Props = Props> extends TerrainC
     {
       state = this.configToState(params.get('options'));
     }
-    console.log('STATE IS ', state);
     return (
       <div>
         <DynamicForm
@@ -172,12 +183,19 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
           const template = this.props.templates.find((t) => t.id === state.templateId);
           if (!template)
           {
-            return <div>No Sources</div>;
+            return null;
           }
           const sources = template.sources;
           return (
             <div>
-              Sources
+              <div
+                onClick={this._fn(this.toggleState, 'sources')}
+              >
+                Sources
+              </div>
+              <FadeInOut
+                open={this.state.open.get('sources')}
+              >
               {
                 sources.keySeq().map((key) =>
                 {
@@ -188,11 +206,12 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
                       endpoint={source}
                       onChange={this.handleFormChange}
                       isSchedule={true}
-                      key={source.name}
+                      key={source.name }
                     />
                   )
                 })
               }
+              </FadeInOut>
             </div>
           );
         },
@@ -206,27 +225,35 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
           const template = this.props.templates.find((t) => t.id === state.templateId);
           if (!template)
           {
-            return <div>No Sinks</div>;
+            return null;
           }
           const sinks = template.sinks;
           return (
             <div>
-              Sinks
-              {
-                sinks.keySeq().map((key) =>
+              <div
+                onClick={this._fn(this.toggleState, 'sinks')}
+              >
+                Sinks
+              </div>
+              <FadeInOut
+                open={this.state.open.get('sinks')}
+              >
                 {
-                  const source = state.overrideSinks[key] || sinks.get(key);
-                  return (
-                    <EndpointForm
-                      isSource={true}
-                      endpoint={source}
-                      onChange={this.handleFormChange}
-                      isSchedule={true}
-                      key={source.name}
-                    />
-                  )
-                })
-              }
+                  sinks.keySeq().map((key) =>
+                  {
+                    const source = state.overrideSinks[key] || sinks.get(key);
+                    return (
+                      <EndpointForm
+                        isSource={true}
+                        endpoint={source}
+                        onChange={this.handleFormChange}
+                        isSchedule={true}
+                        key={source.name}
+                      />
+                    )
+                  })
+                }
+              </FadeInOut>
             </div>
           );
         },

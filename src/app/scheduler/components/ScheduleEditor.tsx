@@ -125,6 +125,7 @@ class ScheduleEditor extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
+    console.log('will receive props');
     const { params } = this.props.match;
     const nextParams = nextProps.match.params;
     const oldScheduleId = getScheduleId(params);
@@ -236,7 +237,6 @@ class ScheduleEditor extends TerrainComponent<Props>
   {
     let { tasks } = this.state.schedule;
     const index = tasks.findIndex((task) => task && task.id === id);
-    // TODO DELETE ALL SUBTASKS!!
     // Find parent task
     const parentIndex = tasks.findIndex((task) => task && (
       task.onFailure === index || task.onSuccess === index));
@@ -286,7 +286,7 @@ class ScheduleEditor extends TerrainComponent<Props>
     return (
       <div
         key={String(level) + '-' + String(pos)}
-        style={{ width: 200 }}
+        style={{ width: 300 }}
       />
     );
   }
