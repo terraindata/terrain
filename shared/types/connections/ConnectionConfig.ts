@@ -44,55 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
+export class ConnectionConfig
+{
+  public id: number = -1;
+  public name: string = '';
+  public type: string = '';
+  public dsn: string = '';
+  public host: string = '';
+  public status: string = 'DISCONNECTED';
+  public isAnalytics: boolean = false;
+  public analyticsIndex?: string = '';
+  public analyticsType?: string = '';
+}
 
-import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import { SpotlightReducers } from 'app/builder/data/SpotlightRedux';
-import { ConnectionsReducers } from 'app/connections/data/ConnectionsRedux';
-import { AuthReducers } from 'auth/data/AuthRedux';
-import BuilderCardsReducers from 'builder/data/BuilderCardsReducers';
-import BuilderReducers from 'builder/data/BuilderReducers';
-import { ETLReducers } from 'etl/ETLRedux';
-import { TemplateEditorReducers } from 'etl/templates/TemplateEditorRedux';
-import { WalkthroughReducers } from 'etl/walkthrough/ETLWalkthroughRedux';
-import { JobsReducers } from 'jobs/data/JobsRedux';
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
-import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import { SchemaReducers } from 'schema/data/SchemaRedux';
-import TerrainStoreLogger from 'store/TerrainStoreLogger';
-import { UserReducers } from 'users/data/UserRedux';
-import Ajax from 'util/Ajax';
-import { ColorsReducers } from '../colors/data/ColorsRedux';
-import { SchedulerReducers } from '../scheduler/data/SchedulerRedux';
-
-const reducers = {
-  analytics: AnalyticsReducer,
-  auth: AuthReducers,
-  builder: BuilderReducers,
-  colors: ColorsReducers,
-  connections: ConnectionsReducers,
-  etl: ETLReducers,
-  library: LibraryReducer,
-  roles: RolesReducer,
-  templateEditor: TemplateEditorReducers,
-  schema: SchemaReducers,
-  users: UserReducers,
-  spotlights: SpotlightReducers,
-  walkthrough: WalkthroughReducers,
-  builderCards: BuilderCardsReducers,
-  scheduler: SchedulerReducers,
-  jobs: JobsReducers,
-};
-
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
-
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk.withExtraArgument(Ajax), TerrainStoreLogger.reduxMiddleWare),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
-
-export default terrainStore;
+export default ConnectionConfig;

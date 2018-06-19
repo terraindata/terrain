@@ -44,55 +44,39 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 
-import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import { SpotlightReducers } from 'app/builder/data/SpotlightRedux';
-import { ConnectionsReducers } from 'app/connections/data/ConnectionsRedux';
-import { AuthReducers } from 'auth/data/AuthRedux';
-import BuilderCardsReducers from 'builder/data/BuilderCardsReducers';
-import BuilderReducers from 'builder/data/BuilderReducers';
-import { ETLReducers } from 'etl/ETLRedux';
-import { TemplateEditorReducers } from 'etl/templates/TemplateEditorRedux';
-import { WalkthroughReducers } from 'etl/walkthrough/ETLWalkthroughRedux';
-import { JobsReducers } from 'jobs/data/JobsRedux';
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
-import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import { SchemaReducers } from 'schema/data/SchemaRedux';
-import TerrainStoreLogger from 'store/TerrainStoreLogger';
-import { UserReducers } from 'users/data/UserRedux';
-import Ajax from 'util/Ajax';
-import { ColorsReducers } from '../colors/data/ColorsRedux';
-import { SchedulerReducers } from '../scheduler/data/SchedulerRedux';
+export interface DSNConfig
+{
+  user: string;
+  password: string;
+  host: string;
+  port: number;
+  database: string;
+}
 
-const reducers = {
-  analytics: AnalyticsReducer,
-  auth: AuthReducers,
-  builder: BuilderReducers,
-  colors: ColorsReducers,
-  connections: ConnectionsReducers,
-  etl: ETLReducers,
-  library: LibraryReducer,
-  roles: RolesReducer,
-  templateEditor: TemplateEditorReducers,
-  schema: SchemaReducers,
-  users: UserReducers,
-  spotlights: SpotlightReducers,
-  walkthrough: WalkthroughReducers,
-  builderCards: BuilderCardsReducers,
-  scheduler: SchedulerReducers,
-  jobs: JobsReducers,
-};
+export function parseDSNConfig(dsnString: string): DSNConfig
+{
+  const idx0 = dsnString.lastIndexOf('@');
+  const idx1 = dsnString.lastIndexOf('/');
+  const end = idx1 > 0 ? idx1 : dsnString.length;
+  const h0 = dsnString.substr(0, idx0);
+  const h1 = dsnString.substr(idx0 + 1, end);
+  const h2 = (idx1 > 0) ? dsnString.substr(idx1 + 1, dsnString.length - idx1) : undefined;
+  const q1 = h0 !== '' ? h0.split(':') : [];
+  const q2 = h1 !== '' ? h1.split(':') : [];
 
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
+  const user: string = q1.length > 0 ? q1[0] : undefined;
+  const password: string = q1.length > 1 ? q1[1] : undefined;
+  const host: string = q2.length > 0 ? q2[0] : undefined;
+  const port: number = q2.length > 1 ? parseInt(q2[1], 10) : undefined;
+  const database: string = (h2 !== undefined && h2 !== '') ? h2 : undefined;
 
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk.withExtraArgument(Ajax), TerrainStoreLogger.reduxMiddleWare),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
-
-export default terrainStore;
+  return {
+    user,
+    password,
+    host,
+    port,
+    database,
+  };
+}

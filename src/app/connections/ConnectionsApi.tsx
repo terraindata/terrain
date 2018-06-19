@@ -42,57 +42,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+import axios, { AxiosInstance } from 'axios';
+import Ajax, { AjaxResponse } from 'util/Ajax';
+import XHR from 'util/XHR';
 
-import * as Immutable from 'immutable';
+// making this an instance in case we want stateful things like cancelling ajax requests
+class ConnectionsApi
+{
+  public xhr: AxiosInstance = null;
 
-import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import { SpotlightReducers } from 'app/builder/data/SpotlightRedux';
-import { ConnectionsReducers } from 'app/connections/data/ConnectionsRedux';
-import { AuthReducers } from 'auth/data/AuthRedux';
-import BuilderCardsReducers from 'builder/data/BuilderCardsReducers';
-import BuilderReducers from 'builder/data/BuilderReducers';
-import { ETLReducers } from 'etl/ETLRedux';
-import { TemplateEditorReducers } from 'etl/templates/TemplateEditorRedux';
-import { WalkthroughReducers } from 'etl/walkthrough/ETLWalkthroughRedux';
-import { JobsReducers } from 'jobs/data/JobsRedux';
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
-import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import { SchemaReducers } from 'schema/data/SchemaRedux';
-import TerrainStoreLogger from 'store/TerrainStoreLogger';
-import { UserReducers } from 'users/data/UserRedux';
-import Ajax from 'util/Ajax';
-import { ColorsReducers } from '../colors/data/ColorsRedux';
-import { SchedulerReducers } from '../scheduler/data/SchedulerRedux';
+  public constructor(xhr: AxiosInstance)
+  {
+    this.xhr = xhr;
+  }
 
-const reducers = {
-  analytics: AnalyticsReducer,
-  auth: AuthReducers,
-  builder: BuilderReducers,
-  colors: ColorsReducers,
-  connections: ConnectionsReducers,
-  etl: ETLReducers,
-  library: LibraryReducer,
-  roles: RolesReducer,
-  templateEditor: TemplateEditorReducers,
-  schema: SchemaReducers,
-  users: UserReducers,
-  spotlights: SpotlightReducers,
-  walkthrough: WalkthroughReducers,
-  builderCards: BuilderCardsReducers,
-  scheduler: SchedulerReducers,
-  jobs: JobsReducers,
-};
+  public createConnection(connectionConfig)
+  {
+    const body = connectionConfig;
+    return this.xhr.post('/database', { body });
+  }
 
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
+  public getConnections()
+  {
+    return this.xhr.get('/database/status');
+  }
 
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk.withExtraArgument(Ajax), TerrainStoreLogger.reduxMiddleWare),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
+  public getConnection(id: number)
+  {
+    return this.xhr.get(`/database/status/${id}`);
+  }
 
-export default terrainStore;
+  public updateConnection(id: number, changes)
+  {
+    return this.xhr.post(`/database/${id}`,
+      {
+        body: changes,
+      });
+  }
+
+  public deleteConnection(id: number)
+  {
+    return this.xhr.post(`/database/${id}/delete`);
+  }
+}
+
+export default ConnectionsApi;

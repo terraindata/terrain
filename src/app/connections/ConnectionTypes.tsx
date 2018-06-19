@@ -43,56 +43,38 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:variable-name max-classes-per-file strict-boolean-expressions
+import { List, Map } from 'immutable';
 
-import * as Immutable from 'immutable';
+import { ModalProps } from 'common/components/overlay/MultiModal';
+import SharedConnectionConfig from 'shared/types/connections/ConnectionConfig';
+import { createRecordType } from 'shared/util/Classes';
+import Util from 'util/Util';
 
-import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import { SpotlightReducers } from 'app/builder/data/SpotlightRedux';
-import { ConnectionsReducers } from 'app/connections/data/ConnectionsRedux';
-import { AuthReducers } from 'auth/data/AuthRedux';
-import BuilderCardsReducers from 'builder/data/BuilderCardsReducers';
-import BuilderReducers from 'builder/data/BuilderReducers';
-import { ETLReducers } from 'etl/ETLRedux';
-import { TemplateEditorReducers } from 'etl/templates/TemplateEditorRedux';
-import { WalkthroughReducers } from 'etl/walkthrough/ETLWalkthroughRedux';
-import { JobsReducers } from 'jobs/data/JobsRedux';
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
-import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import { SchemaReducers } from 'schema/data/SchemaRedux';
-import TerrainStoreLogger from 'store/TerrainStoreLogger';
-import { UserReducers } from 'users/data/UserRedux';
-import Ajax from 'util/Ajax';
-import { ColorsReducers } from '../colors/data/ColorsRedux';
-import { SchedulerReducers } from '../scheduler/data/SchedulerRedux';
+class ConnectionConfigC extends SharedConnectionConfig
+{
+  // if extra front-end specific functions or properties are needed, add here
+}
 
-const reducers = {
-  analytics: AnalyticsReducer,
-  auth: AuthReducers,
-  builder: BuilderReducers,
-  colors: ColorsReducers,
-  connections: ConnectionsReducers,
-  etl: ETLReducers,
-  library: LibraryReducer,
-  roles: RolesReducer,
-  templateEditor: TemplateEditorReducers,
-  schema: SchemaReducers,
-  users: UserReducers,
-  spotlights: SpotlightReducers,
-  walkthrough: WalkthroughReducers,
-  builderCards: BuilderCardsReducers,
-  scheduler: SchedulerReducers,
-  jobs: JobsReducers,
+const ConnectionConfig_Record = createRecordType(new ConnectionConfigC(), 'ConnectionConfigC');
+export interface ConnectionConfig extends ConnectionConfigC, IMap<ConnectionConfig> { }
+export const _ConnectionConfig =
+  (config: object) =>
+  {
+    return new ConnectionConfig_Record(config) as any as ConnectionConfig;
+  };
+
+class ConnectionStateC
+{
+  public loading: boolean = true;
+  public connections: Map<ID, ConnectionConfig> = Map<ID, ConnectionConfig>({});
+  public error: string = null;
+  public modalRequests: List<ModalProps> = List([]);
+}
+
+const ConnectionState_Record = createRecordType(new ConnectionStateC(), 'ConnectionStateC');
+export interface ConnectionState extends ConnectionStateC, IRecord<ConnectionState> { }
+export const _ConnectionState = (config?: any) =>
+{
+  return new ConnectionState_Record(Util.extendId(config || {})) as any as ConnectionState;
 };
-
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
-
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk.withExtraArgument(Ajax), TerrainStoreLogger.reduxMiddleWare),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
-
-export default terrainStore;
