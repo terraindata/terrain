@@ -69,6 +69,7 @@ import AccountEntry from './AccountEntry';
 import { backgroundColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import './Section.less';
+import * as _ from 'lodash';
 
 export interface Props
 {
