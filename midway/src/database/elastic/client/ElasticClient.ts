@@ -434,7 +434,15 @@ class ElasticClient
       }
       else
       {
-        f(res);
+        try
+        {
+          f(res);
+        }
+        catch (e)
+        {
+          this.log('error', e);
+          return cb(e, undefined);
+        }
         cb(err, res);
       }
     };
