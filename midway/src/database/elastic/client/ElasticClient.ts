@@ -430,7 +430,7 @@ class ElasticClient
     {
       if (err)
       {
-        cb(err, null);
+        cb(err, undefined);
       }
       else
       {

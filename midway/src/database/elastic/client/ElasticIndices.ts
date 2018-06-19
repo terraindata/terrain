@@ -83,11 +83,11 @@ class ElasticIndices
         {
           if (err.statusCode === 404)
           {
-            callback(null, {}, 200);
+            callback(undefined, {}, 200);
           }
           else
           {
-            callback(err, null, status);
+            callback(err, undefined, status);
           }
         }
         else
@@ -114,7 +114,7 @@ class ElasticIndices
     {
       if (err)
       {
-        callback(err, null, status);
+        callback(err, undefined, status);
       }
       else
       {
