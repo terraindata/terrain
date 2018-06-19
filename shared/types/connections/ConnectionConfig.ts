@@ -42,41 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
 
-import * as csv from 'fast-csv';
-import { Transform } from 'stream';
-
-/**
- * Import/Export from a CSV format. *
- * Additional configuration options are possible.
- */
-export default class CSVTransform
+export class ConnectionConfig
 {
-  public static createImportStream(
-    headers: boolean = true,
-    delimiter: string = ',',
-  ): Transform
-  {
-    return csv({
-      headers,
-      delimiter,
-      discardUnmappedColumns: true,
-      quote: null,
-    });
-  }
-
-  public static createExportStream(
-    headers: boolean | string[] = true,
-    delimiter: string = ',',
-    rowDelimiter: string = '\r\n',
-  ): Transform
-  {
-    return csv.createWriteStream({
-      headers,
-      delimiter,
-      rowDelimiter,
-      quote: null,
-    });
-  }
+  public id: number = -1;
+  public name: string = '';
+  public type: string = '';
+  public dsn: string = '';
+  public host: string = '';
+  public status: string = 'DISCONNECTED';
+  public isAnalytics: boolean = false;
+  public analyticsIndex?: string = '';
+  public analyticsType?: string = '';
 }
+
+export default ConnectionConfig;

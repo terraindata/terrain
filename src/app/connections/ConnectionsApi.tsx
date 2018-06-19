@@ -43,40 +43,48 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+import axios, { AxiosInstance } from 'axios';
+import Ajax, { AjaxResponse } from 'util/Ajax';
+import XHR from 'util/XHR';
 
-import * as csv from 'fast-csv';
-import { Transform } from 'stream';
-
-/**
- * Import/Export from a CSV format. *
- * Additional configuration options are possible.
- */
-export default class CSVTransform
+// making this an instance in case we want stateful things like cancelling ajax requests
+class ConnectionsApi
 {
-  public static createImportStream(
-    headers: boolean = true,
-    delimiter: string = ',',
-  ): Transform
+  public xhr: AxiosInstance = null;
+
+  public constructor(xhr: AxiosInstance)
   {
-    return csv({
-      headers,
-      delimiter,
-      discardUnmappedColumns: true,
-      quote: null,
-    });
+    this.xhr = xhr;
   }
 
-  public static createExportStream(
-    headers: boolean | string[] = true,
-    delimiter: string = ',',
-    rowDelimiter: string = '\r\n',
-  ): Transform
+  public createConnection(connectionConfig)
   {
-    return csv.createWriteStream({
-      headers,
-      delimiter,
-      rowDelimiter,
-      quote: null,
-    });
+    const body = connectionConfig;
+    return this.xhr.post('/database', { body });
+  }
+
+  public getConnections()
+  {
+    return this.xhr.get('/database/status');
+  }
+
+  public getConnection(id: number)
+  {
+    return this.xhr.get(`/database/status/${id}`);
+  }
+
+  public updateConnection(id: number, changes)
+  {
+    return this.xhr.post(`/database/${id}`,
+      {
+        body: changes,
+      });
+  }
+
+  public deleteConnection(id: number)
+  {
+    return this.xhr.post(`/database/${id}/delete`);
   }
 }
+
+export default ConnectionsApi;

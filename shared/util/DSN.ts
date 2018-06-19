@@ -42,41 +42,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
 
-import * as csv from 'fast-csv';
-import { Transform } from 'stream';
+import * as _ from 'lodash';
 
-/**
- * Import/Export from a CSV format. *
- * Additional configuration options are possible.
- */
-export default class CSVTransform
+export interface DSNConfig
 {
-  public static createImportStream(
-    headers: boolean = true,
-    delimiter: string = ',',
-  ): Transform
-  {
-    return csv({
-      headers,
-      delimiter,
-      discardUnmappedColumns: true,
-      quote: null,
-    });
-  }
+  user: string;
+  password: string;
+  host: string;
+  port: number;
+  database: string;
+}
 
-  public static createExportStream(
-    headers: boolean | string[] = true,
-    delimiter: string = ',',
-    rowDelimiter: string = '\r\n',
-  ): Transform
-  {
-    return csv.createWriteStream({
-      headers,
-      delimiter,
-      rowDelimiter,
-      quote: null,
-    });
-  }
+export function parseDSNConfig(dsnString: string): DSNConfig
+{
+  const idx0 = dsnString.lastIndexOf('@');
+  const idx1 = dsnString.lastIndexOf('/');
+  const end = idx1 > 0 ? idx1 : dsnString.length;
+  const h0 = dsnString.substr(0, idx0);
+  const h1 = dsnString.substr(idx0 + 1, end);
+  const h2 = (idx1 > 0) ? dsnString.substr(idx1 + 1, dsnString.length - idx1) : undefined;
+  const q1 = h0 !== '' ? h0.split(':') : [];
+  const q2 = h1 !== '' ? h1.split(':') : [];
+
+  const user: string = q1.length > 0 ? q1[0] : undefined;
+  const password: string = q1.length > 1 ? q1[1] : undefined;
+  const host: string = q2.length > 0 ? q2[0] : undefined;
+  const port: number = q2.length > 1 ? parseInt(q2[1], 10) : undefined;
+  const database: string = (h2 !== undefined && h2 !== '') ? h2 : undefined;
+
+  return {
+    user,
+    password,
+    host,
+    port,
+    database,
+  };
 }

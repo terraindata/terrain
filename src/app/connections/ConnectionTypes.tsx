@@ -42,41 +42,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
+// tslint:disable:variable-name max-classes-per-file strict-boolean-expressions
+import { List, Map } from 'immutable';
 
-import * as csv from 'fast-csv';
-import { Transform } from 'stream';
+import { ModalProps } from 'common/components/overlay/MultiModal';
+import SharedConnectionConfig from 'shared/types/connections/ConnectionConfig';
+import { createRecordType } from 'shared/util/Classes';
+import Util from 'util/Util';
 
-/**
- * Import/Export from a CSV format. *
- * Additional configuration options are possible.
- */
-export default class CSVTransform
+class ConnectionConfigC extends SharedConnectionConfig
 {
-  public static createImportStream(
-    headers: boolean = true,
-    delimiter: string = ',',
-  ): Transform
-  {
-    return csv({
-      headers,
-      delimiter,
-      discardUnmappedColumns: true,
-      quote: null,
-    });
-  }
-
-  public static createExportStream(
-    headers: boolean | string[] = true,
-    delimiter: string = ',',
-    rowDelimiter: string = '\r\n',
-  ): Transform
-  {
-    return csv.createWriteStream({
-      headers,
-      delimiter,
-      rowDelimiter,
-      quote: null,
-    });
-  }
+  // if extra front-end specific functions or properties are needed, add here
 }
+
+const ConnectionConfig_Record = createRecordType(new ConnectionConfigC(), 'ConnectionConfigC');
+export interface ConnectionConfig extends ConnectionConfigC, IMap<ConnectionConfig> { }
+export const _ConnectionConfig =
+  (config: object) =>
+  {
+    return new ConnectionConfig_Record(config) as any as ConnectionConfig;
+  };
+
+class ConnectionStateC
+{
+  public loading: boolean = true;
+  public connections: Map<ID, ConnectionConfig> = Map<ID, ConnectionConfig>({});
+  public error: string = null;
+  public modalRequests: List<ModalProps> = List([]);
+}
+
+const ConnectionState_Record = createRecordType(new ConnectionStateC(), 'ConnectionStateC');
+export interface ConnectionState extends ConnectionStateC, IRecord<ConnectionState> { }
+export const _ConnectionState = (config?: any) =>
+{
+  return new ConnectionState_Record(Util.extendId(config || {})) as any as ConnectionState;
+};
