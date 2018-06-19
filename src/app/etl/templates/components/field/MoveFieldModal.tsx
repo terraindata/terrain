@@ -94,7 +94,7 @@ const emptyList = List([]);
 class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
 {
   public state: {
-    pathKP: List<string>;
+    pathKP: KeyPath;
   } = {
       pathKP: List([]),
     };
@@ -121,7 +121,7 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
   }
 
   @instanceFnDecorator(memoizeOne)
-  public _validateKeyPath(engine, engineVersion, field, pathKP: List<string>)
+  public _validateKeyPath(engine, engineVersion, field, pathKP: KeyPath)
   {
     return validateRename(engine, field.fieldId, pathKP);
   }
