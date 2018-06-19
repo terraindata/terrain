@@ -686,14 +686,12 @@ class Settings extends TerrainComponent<Props>
   public updateUserInfo(editingSections)
   {
     let newUser = this.props.users.currentUser;
-    //console.log(newUser);
-    for (let header in editingSections)
+    console.log(newUser);
+    for (const header in editingSections)
     {
-      //console.log(header);
-      //console.log(editingSections[header]);
-      newUser = newUser.set(header.toLowerCase().replace(/ /g,''), editingSections[header]);
+      const headerKey = (header.charAt(0).toLowerCase() + header.slice(1)).replace(/ /g, '');
+      newUser = newUser.set(headerKey, editingSections[header]);
     }
-    //console.log(newUser);
     this.props.userActions({
       actionType: 'change',
       user: newUser as UserTypes.User,
@@ -707,7 +705,8 @@ class Settings extends TerrainComponent<Props>
 
   public render()
   {
-    console.log(this.props.users.currentUser.name);
+    const currentUser = this.props.users.users.get(this.props.users.currentUser.id);
+    console.log(this.props.users);
     return (
       <div>
         <div className='settings-page-title' style={{ color: Colors().mainSectionTitle }}>Account Settings</div>
@@ -717,12 +716,10 @@ class Settings extends TerrainComponent<Props>
           sectionType='profile'
           sectionBoxes={
             List([
-              { header: 'Name', info: this.props.users.currentUser.name, type: 'Input' },
-              { header: 'Email', info: this.props.users.currentUser.email, type: 'Input' },
-              { header: 'Phone', info: this.props.users.currentUser.phone, type: 'Input' },
-              { header: 'User Id', info: 'some userid', type: 'Input' },
-              { header: 'What I Do', info: this.props.users.currentUser.whatIDo, type: 'Input' },
-              { header: 'Skype', info: this.props.users.currentUser.skype, type: 'Input' },
+              { header: 'Name', info: currentUser.name, type: 'Input' },
+              { header: 'Email', info: currentUser.email, type: 'Input' },
+              { header: 'Phone', info: currentUser.phone, type: 'Input' },
+              { header: 'What I Do', info: currentUser.whatIDo, type: 'Input' },
             ])
           }
           hasPhoto={true}

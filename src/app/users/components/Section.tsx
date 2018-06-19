@@ -106,7 +106,7 @@ export default class Section extends TerrainComponent<Props>
     }
     else
     {
-      const perColumn = Math.floor(this.props.sectionBoxes.count() / this.props.columnNum);
+      const perColumn = Math.ceil(this.props.sectionBoxes.count() / this.props.columnNum);
       let columns = List([]);
       for (let column = 0; column < this.props.columnNum; column++)
       {
@@ -128,17 +128,17 @@ export default class Section extends TerrainComponent<Props>
     }
   }
 
-  //public handleInputEdit(blockList, block)
-  //{
+  // public handleInputEdit(blockList, block)
+  // {
   //  const inputIndex = blockList.indexOf(block);
   //  let inputValue = document.getElementsByTagName('input')[inputIndex].value;
-  //}
+  // }
 
   public handleInputEdit(block, e)
   {
     const keyHeader = block.header;
     const currentInput = e.target.value;
-    let currentEditingState = this.state.editingSections;
+    const currentEditingState = this.state.editingSections;
     currentEditingState[keyHeader] = currentInput;
     this.setState(
       {
@@ -150,7 +150,13 @@ export default class Section extends TerrainComponent<Props>
   public renderEditField(blockList, block)
   {
     return (
-      <input id={block.header} type='text' defaultValue={block.info} onChange={this._fn(this.handleInputEdit, block)} required />
+      <input
+        id={block.header}
+        type='text'
+        onChange={this._fn(this.handleInputEdit, block)}
+        defaultValue={(this.state.editingValues !== undefined) && (this.state.editingValues[block.header] !== undefined) ?
+          this.state.editingValues[block.header] : block.info}
+        required />
     );
   }
 
@@ -173,6 +179,7 @@ export default class Section extends TerrainComponent<Props>
     this.setState(
       {
         isEditing: true,
+        editingSections: {},
       },
     );
   }
@@ -182,10 +189,10 @@ export default class Section extends TerrainComponent<Props>
     this.setState(
       {
         isEditing: false,
+        editingSections: {},
       },
     );
     this.props.onChange(this.state.editingSections);
-    //console.log(this.state.editingSections);
   }
 
   public onCancelChange()
