@@ -69,22 +69,36 @@ class ElasticIndices
    */
   public getMapping(params: Elastic.IndicesGetMappingParams, callback: (error: any, response: any, status: any) => void): void
   {
-    this.controller.modifyIndexParam(params, true);
+    this.controller.prependIndexParam(params);
     this.log('getMapping', params);
     return this.delegate.indices.getMapping(params, (err, res, status) =>
     {
-      let newRes = res;
-      if (this.controller.getIndexPrefix() !== '')
+      if (this.controller.getIndexPrefix() === '')
       {
-        newRes = {};
-        Object.keys(res).forEach((key) => {
-          if (key.startsWith(this.controller.getIndexPrefix()))
-          {
-            newRes[key.substring(this.controller.getIndexPrefix().length)] = res[key];
-          }
-        });
+        callback(err, res, status);
       }
-      callback(err, newRes, status);
+      else
+      {
+        if (err)
+        {
+          if (err.statusCode === 400)
+          {
+            callback(null, {}, 200);
+          }
+          else
+          {
+            callback(err, null, status);
+          }
+        }
+        else
+        {
+          const newRes = {};
+          Object.keys(res).forEach((key) => {
+            newRes[this.controller.removeIndexPrefix(key)] = res[key];
+          });
+          callback(err, newRes, status);
+        }
+      }
     });
   }
 
@@ -95,8 +109,19 @@ class ElasticIndices
    */
   public create(params: Elastic.IndicesCreateParams, callback: (error: any, response: any, status: any) => void): void
   {
-    this.controller.modifyIndexParam(params);
-    return this.delegate.indices.create(params, callback);
+    this.controller.prependIndexParam(params);
+    return this.delegate.indices.create(params, (err, res, status) =>
+    {
+      if (err)
+      {
+        callback(err, null, status);
+      }
+      else
+      {
+        res.index = this.controller.removeIndexPrefix(res.index);
+        callback(err, res, status);
+      }
+    });
   }
 
   /**
@@ -106,6 +131,7 @@ class ElasticIndices
    */
   public delete(params: Elastic.IndicesDeleteParams, callback: (error: any, response: any, status: any) => void): void
   {
+    this.controller.prependIndexParam(params);
     return this.delegate.indices.delete(params, callback);
   }
 
@@ -116,7 +142,7 @@ class ElasticIndices
    */
   public putMapping(params: Elastic.IndicesPutMappingParams, callback: (err: any, response: any, status: any) => void): void
   {
-    this.controller.modifyIndexParam(params);
+    this.controller.prependIndexParam(params);
     this.log('putMapping', params);
     return this.delegate.indices.putMapping(params, callback);
   }
@@ -128,7 +154,7 @@ class ElasticIndices
    */
   public refresh(params: Elastic.IndicesRefreshParams, callback: (err: any, response: any) => void): void
   {
-    this.controller.modifyIndexParam(params);
+    this.controller.prependIndexParam(params);
     this.log('refresh', params);
     return this.delegate.indices.refresh(params, callback);
   }

@@ -69,6 +69,7 @@ class ElasticCluster
    */
   public health(params: Elastic.ClusterHealthParams, callback: (error: any, response: any) => void): void
   {
+    this.controller.prependIndexParam(params);
     this.log('health', params);
     return this.delegate.cluster.health(params, callback);
   }
@@ -80,6 +81,7 @@ class ElasticCluster
    */
   public state(params: Elastic.ClusterStateParams, callback: (error: any, response: any) => void): void
   {
+    this.controller.prependIndexParam(params);
     this.log('state', params);
     return this.delegate.cluster.state(params, callback);
   }

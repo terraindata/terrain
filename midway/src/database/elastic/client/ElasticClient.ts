@@ -95,8 +95,48 @@ class ElasticClient
    */
   public bulk(params: Elastic.BulkIndexDocumentsParams, callback: (error: any, response: any) => void): void
   {
+    const body: object[] = params.body;
+    for (let i = 0; i < body.length;)
+    {
+      const obj = body[i];
+      const keys = Object.keys(obj);
+      if (keys.length !== 1)
+      {
+        throw new Error('Bad bulk params');
+      }
+      switch (keys[0])
+      {
+        case 'index':
+          i += 2;
+          break;
+        case 'create':
+          i += 2;
+          break;
+        case 'delete':
+          i++;
+          break;
+        case 'update':
+          i += 2;
+          break;
+        default:
+          throw new Error('Bad bulk params');
+      }
+      this.controller.prependIndexTerm(obj[keys[0]]);
+    }
     // this.log('bulk', params);
-    this.delegate.bulk(params, callback);
+    this.delegate.bulk(params, this.wrapCallback(callback, (res) =>
+    {
+      const items: any[] = res.items;
+      items.forEach((item) =>
+      {
+        if (Object.keys(item).length !== 1)
+        {
+          throw new Error('Bad response');
+        }
+        const doc = item[Object.keys(item)[0]];
+        this.controller.removeDocIndexPrefix(doc);
+      });
+    }));
   }
 
   /**
@@ -105,8 +145,9 @@ class ElasticClient
   public delete(params: Elastic.DeleteDocumentParams,
     callback: (error: any, response: Elastic.DeleteDocumentResponse) => void): void
   {
+    this.controller.prependIndexParam(params);
     this.log('delete', params);
-    this.delegate.delete(params, callback);
+    this.delegate.delete(params, this.wrapCallback(callback, this.controller.removeDocIndexPrefix.bind(this.controller)));
   }
 
   /**
@@ -177,8 +218,9 @@ class ElasticClient
    */
   public index<T>(params: Elastic.IndexDocumentParams<T>, callback: (error: any, response: any) => void): void
   {
+    this.controller.prependIndexParam(params);
     this.log('index', params);
-    this.delegate.index(params, callback);
+    this.delegate.index(params, this.wrapCallback(callback, this.controller.removeDocIndexPrefix.bind(this.controller)));
   }
 
   /**
@@ -186,9 +228,9 @@ class ElasticClient
    */
   public update(params: Elastic.UpdateDocumentParams, callback: (error: any, response: any) => void): void
   {
-    this.controller.modifyIndexParam(params);
+    this.controller.prependIndexParam(params);
     this.log('update', params);
-    this.delegate.update(params, callback);
+    this.delegate.update(params, this.wrapCallback(callback, this.controller.removeDocIndexPrefix.bind(this.controller)));
   }
 
   /**
@@ -259,8 +301,13 @@ class ElasticClient
   public search<T>(params: Elastic.SearchParams,
     callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
   {
+    this.controller.prependIndexParam(params);
+    this.modifySearchQuery(params.body);
     this.log('search', params);
-    this.delegate.search(params, callback);
+    this.delegate.search(params, this.wrapCallback(callback, (res: Elastic.SearchResponse<T>) =>
+    {
+      res.hits.hits.forEach(this.controller.removeDocIndexPrefix.bind(this.controller));
+    }));
   }
 
   /**
@@ -269,8 +316,22 @@ class ElasticClient
   public msearch<T>(params: Elastic.MSearchParams,
     callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void
   {
+    const searches: any[] = params.body;
+    for (let i = 0; i < searches.length; i += 2)
+    {
+      const searchHeader = searches[i];
+      const searchBody = searches[i + 1];
+      this.controller.prependIndexParam(searchHeader);
+      this.modifySearchQuery(searchBody);
+    }
     this.log('msearch', params);
-    this.delegate.msearch(params, callback);
+    this.delegate.msearch(params, this.wrapCallback(callback, (res: Elastic.MSearchResponse<T>) =>
+    {
+      res.responses.forEach((res2) =>
+      {
+        res2.hits.hits.forEach(this.controller.removeDocIndexPrefix.bind(this.controller));
+      });
+    }));
   }
 
   /**
@@ -280,7 +341,8 @@ class ElasticClient
     callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void
   {
     this.log('msearchTemplate', params);
-    this.delegate.msearchTemplate(params, callback);
+    throw new Error();
+    // this.delegate.msearchTemplate(params, callback);
   }
 
   public getDelegate(): Elastic.Client
@@ -339,6 +401,43 @@ class ElasticClient
     }
 
     return host;
+  }
+
+  private modifySearchQuery(body)
+  {
+    if (body.query && body.query.bool && body.query.bool.filter)
+    {
+      if (body.query.bool.filter.constructor === Array)
+      {
+        if (body.query.bool.filter.length > 0 && body.query.bool.filter[0].term && body.query.bool.filter[0].term._index)
+        {
+          this.controller.prependIndexTerm(body.query.bool.filter[0].term);
+        }
+      }
+      else
+      {
+        if (body.query.bool.filter.term && body.query.bool.filter.term._index)
+        {
+          this.controller.prependIndexTerm(body.query.bool.filter.term);
+        }
+      }
+    }
+  }
+
+  private wrapCallback(cb: (err, res) => void, f: (res) => void)
+  {
+    return (err, res) =>
+    {
+      if (err)
+      {
+        cb(err, null);
+      }
+      else
+      {
+        f(res);
+        cb(err, res);
+      }
+    };
   }
 }
 

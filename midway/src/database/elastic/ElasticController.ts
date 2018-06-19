@@ -116,25 +116,17 @@ class ElasticController extends DatabaseController
     return this.indexPrefix;
   }
 
-  /**
-   * Returns whether `obj` was modified
-   */
-  public modifyIndexParam(obj, allowOther = false): boolean
+  public prependIndexParam(obj): void
   {
     if (!('index' in obj))
     {
-      if (allowOther)
-      {
-        return false;
-      }
-      throw new Error('No index param');
+      obj.index = this.getIndexPrefix() + '*';
     }
-    if (typeof obj.index === 'string')
+    else if (typeof obj.index === 'string')
     {
       obj.index = this.getIndexPrefix() + (obj.index as string);
-      return true;
     }
-    if (obj.index.constructor === Array)
+    else if (obj.index.constructor === Array)
     {
       obj.index = obj.index.map((s) => {
         if (typeof s !== 'string')
@@ -143,13 +135,44 @@ class ElasticController extends DatabaseController
         }
         return this.getIndexPrefix() + s;
       });
-      return true;
     }
-    if (!allowOther)
+    else
     {
       throw new Error('Invalid index param');
     }
-    return false;
+  }
+
+  public prependIndexTerm(obj): void
+  {
+    if (!('_index' in obj))
+    {
+      throw new Error('No _index term');
+    }
+    else if (typeof obj._index === 'string')
+    {
+      obj._index = this.getIndexPrefix() + (obj._index as string);
+    }
+    else
+    {
+      throw new Error('Invalid _index term');
+    }
+  }
+
+  public removeIndexPrefix(index: string): string
+  {
+    if (index.startsWith(this.getIndexPrefix()))
+    {
+      return index.substring(this.getIndexPrefix().length);
+    }
+    else
+    {
+      throw new Error(`Index name "${index}" is missing prefix "${this.getIndexPrefix()}"`);
+    }
+  }
+
+  public removeDocIndexPrefix(obj): void
+  {
+    obj._index = this.removeIndexPrefix(obj._index);
   }
 }
 

@@ -113,7 +113,8 @@ export class ElasticReader extends SafeReadable
     }
     catch (e)
     {
-      this.emit('error', e);
+      throw e;
+      // this.emit('error', e);
     }
   }
 
