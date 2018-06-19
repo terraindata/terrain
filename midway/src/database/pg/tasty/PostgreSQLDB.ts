@@ -177,9 +177,9 @@ export class PostgreSQLDB implements TastyDB
 
   public async putMapping(table: TastyTable): Promise<object>
   {
-    let queryStr = 'CREATE TABLE IF NOT EXISTS ' + table.getTableName() + ' (\n';
+    let queryStr = 'CREATE TABLE IF NOT EXISTS "' + table.getTableName() + '" (\n';
     const mapping: { [col: string]: string } = table.getMapping() as { [col: string]: string };
-    queryStr += table.getColumnNamesUnsorted().map((name) => '  ' + name + ' ' + mapping[name]).join(',\n');
+    queryStr += table.getColumnNamesUnsorted().map((name) => '  "' + name + '" ' + mapping[name]).join(',\n');
     queryStr += '\n);';
     return this.execute([[queryStr], undefined]);
   }

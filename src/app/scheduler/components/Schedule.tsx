@@ -73,6 +73,7 @@ export interface Props
   onUnpause: (id: ID) => void;
   onDisable: (id: ID) => void;
   onEnable: (id: ID) => void;
+  defaultOpen: boolean;
 }
 
 interface State
@@ -399,6 +400,7 @@ class Schedule extends TerrainComponent<Props>
         footer={this.renderFooter()}
         confirmDelete={true}
         itemName={'schedule'}
+        defaultOpen={this.props.defaultOpen}
       />
     );
   }

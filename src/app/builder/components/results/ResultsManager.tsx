@@ -933,13 +933,15 @@ export class ResultsManager extends TerrainComponent<Props>
       try
       {
         error = MidwayError.fromJSON(response);
-      } catch (err)
+      }
+      catch (err)
       {
         console.log('The error message does not match MidwayError.' + response);
         error = new MidwayError(-1, 'Unknow Route Error', response, {});
       }
       errorItems = error.getMidwayErrors();
-    } else
+    }
+    else
     {
       errorItems = response.errors;
     }

@@ -74,8 +74,9 @@ export interface Props
   placeholder?: string;
   help?: string;
   helpIsError?: boolean;
+  title?: string;
+  id?: string;
 
-  ref?: string;
   className?: string;
   disabled?: boolean;
   debounce?: boolean;
@@ -455,6 +456,8 @@ class Autocomplete extends TerrainComponent<Props>
           disabled={this.props.disabled}
           placeholder={this.props.placeholder}
           autoFocus={this.props.autoFocus}
+          title={this.props.title}
+          id={this.props.id}
         />
         {
           this.props.help &&

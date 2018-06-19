@@ -46,20 +46,81 @@ THE SOFTWARE.
 
 import * as winston from 'winston';
 
-import PostgreSQLDB from '../../../../src/database/pg/tasty/PostgreSQLDB';
+import PostgresConfig from '../../../../src/database/pg/PostgreSQLConfig';
+import PostgresController from '../../../../src/database/pg/PostgreSQLController';
+import PostgresDB from '../../../../src/database/pg/tasty/PostgreSQLDB';
+
+import * as Tasty from '../../../../src/tasty/Tasty';
 import TastyNode from '../../../../src/tasty/TastyNode';
+import TastyNodeTypes from '../../../../src/tasty/TastyNodeTypes';
 import TastyQuery from '../../../../src/tasty/TastyQuery';
 import TastyTable from '../../../../src/tasty/TastyTable';
+
+const DBMovies: Tasty.Table = new Tasty.Table('movies', ['movieID'], ['title', 'releaseDate'], 'movies');
+
+let tasty: Tasty.Tasty;
+let pgController: PostgresController;
+let pgDB: PostgresDB;
 
 beforeAll(async () =>
 {
   // TODO: get rid of this monstrosity once @types/winston is updated.
   (winston as any).level = 'debug';
+  const config: PostgresConfig =
+    {
+      database: 'moviesdb',
+      host: 'localhost',
+      port: 65432,
+      password: 'r3curs1v3$',
+      user: 't3rr41n-demo',
+    };
+
+  try
+  {
+    pgController = new PostgresController(config, 0, 'PostgresGeneratorTests');
+    tasty = pgController.getTasty();
+    pgDB = pgController.getTasty().getDB() as PostgresDB;
+  }
+  catch (e)
+  {
+    fail(e);
+  }
+});
+
+test('Postgres Generator: mixedCase', async (done) =>
+{
+  const movie = {
+    movieID: 13371337,
+    releaseDate: new Date('01/01/17').toISOString().substring(0, 10),
+    myTitle: 'My New Movie',
+  };
+  let query = new Tasty.Query(DBMovies).upsert(movie);
+  let qstr = pgDB.generate(query);
+  expect(qstr).toBeInstanceOf(Array);
+  expect(qstr.length).toBeGreaterThan(0);
+  expect(qstr[0]).toEqual([
+    'INSERT INTO "movies" ("movieID", "releaseDate")' +
+    ' VALUES ($1, $2)' +
+    ' ON CONFLICT ("movieID") DO UPDATE SET ("movieID", "releaseDate") = ($1, $2)' +
+    ' WHERE ("movies"."movieID") = (13371337) RETURNING "movieID" AS insertid;',
+  ]);
+
+  query = new Tasty.Query(DBMovies)
+    .select([DBMovies['movieID']])
+    .filter(DBMovies['releaseDate']
+      .doesNotEqual('01/01/2017'))
+    .sort(DBMovies['movieID'], 'asc');
+  qstr = pgDB.generate(query);
+  expect(qstr).toBeInstanceOf(Array);
+  expect(qstr.length).toBeGreaterThan(0);
+  expect(qstr[0]).toEqual([
+    'SELECT "movies"."movieID" FROM "movies"\n  WHERE "movies"."releaseDate" <> $1\n  ORDER BY "movies"."movieID" ASC;',
+  ]);
+  done();
 });
 
 test('Postgres: generator', async (done) =>
 {
-  const db = new PostgreSQLDB(null);
   const table = new TastyTable(
     'test',
     ['id'],
@@ -69,8 +130,9 @@ test('Postgres: generator', async (done) =>
     .filter(table.getColumns().get('lname').lt(TastyNode.make('ABC')))
     .filter(table.getColumns().get('lname').gt(TastyNode.make('A')))
     .noWait().forUpdate();
-  expect(db.generate(query)).toEqual(
-    [['SELECT test.lname FROM test\n  WHERE test.lname < $1\n     AND test.lname > $2\n  FOR UPDATE\n  NOWAIT;'], [['ABC', 'A']]],
+  expect(pgDB.generate(query)).toEqual(
+    [['SELECT "test"."lname" FROM "test"\n  WHERE "test"."lname" < $1\n     AND "test"."lname" > $2\n  FOR UPDATE\n  NOWAIT;'],
+    [['ABC', 'A']]],
   );
   done();
 });

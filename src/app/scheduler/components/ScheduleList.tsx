@@ -128,6 +128,7 @@ class ScheduleList extends TerrainComponent<Props>
         id: 0,
         taskId: 2,
       }],
+      isNew: true,
     };
     this.props.schedulerActions({
       actionType: 'createSchedule',
@@ -187,6 +188,7 @@ class ScheduleList extends TerrainComponent<Props>
                 onChange={this.handleScheduleChange}
                 templates={this.props.templates}
                 algorithms={this.props.algorithms}
+                defaultOpen={schedule.isNew}
               />,
             )
           }
