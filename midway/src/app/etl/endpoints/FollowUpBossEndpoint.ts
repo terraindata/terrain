@@ -92,10 +92,9 @@ class FollowUpBossStream extends stream.Writable
     console.log('CHUNK');
     console.dir(chunk, { depth: null });
 
-    const tags = chunk['tags'] || [];
-    if (tags.indexOf('terrain') === -1)
+    if (chunk['tags'].indexOf('terrain') === -1)
     {
-      tags.push('terrain');
+        chunk['tags'].push('terrain');
     }
 
     if (!isNaN(chunk['FollowUpBossId']))
@@ -104,14 +103,7 @@ class FollowUpBossStream extends stream.Writable
       request({
         url: `https://api.followupboss.com/v1/people/${chunk['FollowUpBossId']}`,
         method: 'PUT',
-        json: {
-          firstName: chunk['FirstName'],
-          lastName: chunk['LastName'],
-          emails: [
-            chunk['Email'],
-          ],
-          tags,
-        },
+        json: chunk,
         headers: {
           'Authorization': 'Basic ' + new Buffer(this.config['apiKey'] + ':').toString('base64'),
           'Content-Type': 'application/json',
@@ -122,6 +114,7 @@ class FollowUpBossStream extends stream.Writable
           if (error)
           {
             console.log('got put error: ' + JSON.stringify(error));
+            callback(error);
           }
           else
           {
@@ -134,17 +127,7 @@ class FollowUpBossStream extends stream.Writable
         const r = {
             url: 'https://api.followupboss.com/v1/people',
             method: 'POST',
-            json: {
-                firstName: chunk['FirstName'],
-                lastName: chunk['LastName'],
-                emails: [
-                    {
-                        type: 'home',
-                        value: chunk['Email'],
-                    },
-                ],
-                tags,
-            },
+            json: chunk,
             qs: {
                 deduplicate: true,
             },
@@ -159,6 +142,7 @@ class FollowUpBossStream extends stream.Writable
           if (error)
           {
             console.log('got post error: ' + JSON.stringify(error));
+            callback(error);
           }
           else
           {
