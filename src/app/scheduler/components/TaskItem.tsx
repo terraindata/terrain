@@ -56,13 +56,18 @@ import
 } from 'app/scheduler/SchedulerTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
+import { DynamicForm } from 'common/components/DynamicForm';
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
+import TaskEnum from 'shared/types/jobs/TaskEnum';
+import { TaskFormMap } from './TaskBaseClasses';
 import './TaskItemStyle.less';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 
 const DeleteIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 const EditableField = (props) =>
@@ -70,13 +75,12 @@ const EditableField = (props) =>
 
 export interface Props
 {
-  // level: number;
-  // position: number;
   task: TaskConfig;
   type: 'SUCCESS' | 'FAILURE' | 'ROOT';
-  onDelete: (taskId: ID) => void;
+  onDelete: (id: ID) => void;
   onCreateSubtask: (parentId: ID, type: 'SUCCESS' | 'FAILURE') => void;
   onTaskChange: (newTask: TaskConfig) => void;
+  templates?: List<ETLTemplate>;
 }
 
 interface State
@@ -91,6 +95,18 @@ class TaskItem extends TerrainComponent<Props>
   public state: State = {
     editingName: false,
     name: this.props.task.name,
+  };
+
+  public taskTypeMap = {
+    taskId: {
+      type: DisplayType.Pick,
+      displayName: 'Task Type',
+      options: {
+        pickOptions: (s) => taskTypeList,
+        indexResolver: (value) => taskTypeList.indexOf(value),
+        displayNames: (s) => taskTypeDisplayNames,
+      },
+    },
   };
 
   public handleTextKeyDown(e)
@@ -112,9 +128,39 @@ class TaskItem extends TerrainComponent<Props>
     this.props.onTaskChange(this.props.task.set('name', this.state.name));
   }
 
+  public handleTaskIdChange(s)
+  {
+    this.props.onTaskChange(this.props.task.set('taskId', s.taskId));
+  }
+
+  public renderTaskSettings(task: TaskConfig)
+  {
+    const FormClass = TaskFormMap[task.taskId];
+    return (
+      <div>
+        <DynamicForm
+          inputMap={this.taskTypeMap}
+          inputState={{ taskId: task.taskId }}
+          onStateChange={this.handleTaskIdChange}
+        />
+        {
+          FormClass &&
+          <FormClass
+            task={task}
+            onChange={this.props.onTaskChange}
+            templates={this.props.templates}
+          />
+        }
+      </div>
+    );
+  }
+
   public render()
   {
     const { task, type } = this.props;
+    console.log('Render Task item ');
+    const hasFailureTask = task.onFailure !== undefined && task.onFailure !== null;
+    const hasSuccessTask = task.onSuccess !== undefined && task.onSuccess !== null;
     return (
       <div
         className='task-item-wrapper'
@@ -168,20 +214,24 @@ class TaskItem extends TerrainComponent<Props>
         <div
           className='task-item-body'
         >
-          Choose type of task and the options for it here!
+          {
+            this.renderTaskSettings(task)
+          }
         </div>
         <div
           className='task-item-subtask-buttons'
         >
           <div
             className='task-item-subtask-button'
-            onClick={this._fn(this.props.onCreateSubtask, task.id, 'FAILURE')}
+            onClick={hasFailureTask ? _.noop : this._fn(this.props.onCreateSubtask, task.id, 'FAILURE')}
+            style={hasFailureTask ? {} : fontColor(Colors().error)}
           >
             On Failure
           </div>
           <div
             className='task-item-subtask-button'
-            onClick={this._fn(this.props.onCreateSubtask, task.id, 'SUCCESS')}
+            onClick={hasSuccessTask ? _.noop : this._fn(this.props.onCreateSubtask, task.id, 'SUCCESS')}
+            style={hasSuccessTask ? {} : fontColor(Colors().success)}
           >
             On Success
           </div>
@@ -190,5 +240,12 @@ class TaskItem extends TerrainComponent<Props>
     );
   }
 }
+
+const taskTypeList = List(Object.keys(TaskEnum));
+const taskTypeDisplayNames = Map({
+  taskDefaultExit: 'Default Exit',
+  taskDefaultFailure: 'Default Failure',
+  taskETL: 'ETL Task',
+});
 
 export default TaskItem;

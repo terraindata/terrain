@@ -62,6 +62,7 @@ import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import SchedulerApi from 'scheduler/SchedulerApi';
+import TaskEnum from 'shared/types/jobs/TaskEnum';
 import XHR from 'util/XHR';
 import Schedule from './Schedule';
 import './Schedule.less';
@@ -159,7 +160,7 @@ class ScheduleList extends TerrainComponent<Props>
           },
         },
         id: 0,
-        taskId: 2,
+        taskId: TaskEnum.taskETL,
       }],
     };
     this.props.schedulerActions({

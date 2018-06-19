@@ -71,7 +71,9 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import SchedulerApi from 'scheduler/SchedulerApi';
+import TaskEnum from 'shared/types/jobs/TaskEnum';
 import XHR from 'util/XHR';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 
 export interface Props
 {
@@ -85,6 +87,7 @@ export interface Props
   route?: any;
   schedules?: Map<ID, SchedulerConfig>;
   schedulerActions?: typeof SchedulerActions;
+  templates?: List<ETLTemplate>;
 }
 
 interface State
@@ -149,7 +152,6 @@ class ScheduleEditor extends TerrainComponent<Props>
 
   public orderTasks(tasks: List<TaskConfig>): List<TaskConfig>
   {
-    console.log('ORDER TASKS');
     const orderedTasks: TaskConfig[] = [];
     orderedTasks[0] = tasks.get(0);
     for (let i = 0; i < tasks.size; i++)
@@ -158,7 +160,7 @@ class ScheduleEditor extends TerrainComponent<Props>
       {
         continue;
       }
-      if (orderedTasks[i].onFailure !== null)
+      if (orderedTasks[i].onFailure !== null && orderedTasks[i].onFailure !== undefined)
       {
         orderedTasks[i * 2 + 1] = tasks.get(orderedTasks[i].onFailure).set('type', 'FAILURE');
       }
@@ -166,7 +168,7 @@ class ScheduleEditor extends TerrainComponent<Props>
       {
         orderedTasks[i * 2 + 1] = undefined;
       }
-      if (orderedTasks[i].onSuccess !== null)
+      if (orderedTasks[i].onSuccess !== null && orderedTasks[i].onSuccess !== undefined)
       {
         orderedTasks[i * 2 + 2] = tasks.get(orderedTasks[i].onSuccess).set('type', 'SUCCESS');
       }
@@ -223,6 +225,11 @@ class ScheduleEditor extends TerrainComponent<Props>
     const { schedule } = this.state;
     const index = schedule.tasks.findIndex((task) => task && task.id === newTask.id);
     this.handleScheduleChange('tasks', schedule.tasks.set(index, newTask));
+    // Also update in ordered schedules
+    const orderedIndex = this.state.orderedTasks.findIndex((task) => task && task.id === newTask.id);
+    this.setState({
+      orderedTasks: this.state.orderedTasks.set(orderedIndex, newTask),
+    });
   }
 
   public handleTaskDelete(id: ID)
@@ -247,7 +254,7 @@ class ScheduleEditor extends TerrainComponent<Props>
     const parentIndex = schedule.tasks.findIndex((task) => task && task.id === parentId);
     const newTask = _TaskConfig({
       id: schedule.tasks.size,
-      taskId: type === 'FAILURE' ? 0 : 2,
+      taskId: type === 'FAILURE' ? TaskEnum.taskDefaultFailure : TaskEnum.taskETL,
       type,
     });
     const parentTask = schedule.tasks.get(parentIndex)
@@ -269,6 +276,7 @@ class ScheduleEditor extends TerrainComponent<Props>
         onCreateSubtask={this.handleAddSubtask}
         onTaskChange={this.handleTaskChange}
         key={task.id}
+        templates={this.props.templates}
       />
     );
   }
@@ -362,12 +370,12 @@ class ScheduleEditor extends TerrainComponent<Props>
 
   public render()
   {
+    console.log('render schedule editor');
     const { schedule } = this.state;
     if (!schedule)
     {
       return (<div>NO SCHEDULE</div>);
     }
-    console.log(schedule.tasks);
     return (
       <div>
         <div>
@@ -391,6 +399,7 @@ export default Util.createContainer(
   ScheduleEditor,
   [
     ['scheduler', 'schedules'],
+    ['etl', 'templates'],
   ],
   {
     schedulerActions: SchedulerActions,
