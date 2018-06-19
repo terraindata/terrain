@@ -470,7 +470,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     {
       const { group } = inputMap[stateName];
       const inputInfo: InputDeclarationType<S> = _.defaults({}, inputMap[stateName],
-        { displayName: stateName, getDisplayState: () => DisplayState.Active },
+        { getDisplayState: () => DisplayState.Active },
       );
       let useIndex = renderMatrix.size;
       if (group !== undefined)
