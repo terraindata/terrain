@@ -237,7 +237,7 @@ export interface HttpOptions
 }
 
 // tslint:disable-next-line no-empty-interface
-export interface FollowUpBossOptions {}
+export interface FollowUpBossOptions { }
 
 export interface GoogleAnalyticsOptions
 {

@@ -89,13 +89,13 @@ class FollowUpBossStream extends stream.Writable
 
   public _write(chunk: any, encoding: string, callback: (err?: Error) => void): void
   {
-      winston.debug(JSON.stringify(this.config));
-      winston.debug('CHUNK');
-      winston.debug(JSON.stringify(chunk));
+    winston.debug(JSON.stringify(this.config));
+    winston.debug('CHUNK');
+    winston.debug(JSON.stringify(chunk));
 
     if (chunk['tags'].indexOf('terrain') === -1)
     {
-        chunk['tags'].push('terrain');
+      chunk['tags'].push('terrain');
     }
 
     if (!isNaN(chunk['FollowUpBossId']))
@@ -114,40 +114,40 @@ class FollowUpBossStream extends stream.Writable
         {
           if (error)
           {
-              winston.debug('got put error: ' + JSON.stringify(error));
+            winston.debug('got put error: ' + JSON.stringify(error));
             callback(error);
           }
           else
           {
-              winston.debug('got put response: ' + JSON.stringify(response));
+            winston.debug('got put response: ' + JSON.stringify(response));
           }
         });
     } else
     {
       // No existing ID, so do POST (create)
-        const r = {
-            url: 'https://api.followupboss.com/v1/people',
-            method: 'POST',
-            json: chunk,
-            qs: {
-                deduplicate: true,
-            },
-            headers: {
-                'Authorization': `Basic ${new Buffer((this.config['apiKey'] as string) + ':').toString('base64')}`,
-                'Content-Type': 'application/json',
-            },
-        };
+      const r = {
+        url: 'https://api.followupboss.com/v1/people',
+        method: 'POST',
+        json: chunk,
+        qs: {
+          deduplicate: true,
+        },
+        headers: {
+          'Authorization': `Basic ${new Buffer((this.config['apiKey'] as string) + ':').toString('base64')}`,
+          'Content-Type': 'application/json',
+        },
+      };
       request(r,
         (error, response) =>
         {
           if (error)
           {
-              winston.debug('got post error: ' + JSON.stringify(error));
+            winston.debug('got post error: ' + JSON.stringify(error));
             callback(error);
           }
           else
           {
-              winston.debug('got post response: ' + JSON.stringify(response));
+            winston.debug('got post response: ' + JSON.stringify(response));
           }
         });
     }
