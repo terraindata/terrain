@@ -57,6 +57,7 @@ import { notificationManager } from 'common/components/InAppNotification';
 import Modal from 'common/components/Modal';
 import Switch from 'common/components/Switch';
 import TerrainComponent from 'common/components/TerrainComponent';
+import { errorToReadable } from 'etl/ETLAjax';
 import * as momentZon from 'moment-timezone';
 import { MidwayError } from 'shared/error/MidwayError';
 import Util from 'util/Util';
@@ -69,9 +70,7 @@ import AccountEntry from './AccountEntry';
 import PasswordStrengthInput from './PasswordStrengthInput';
 import Profile from './Profile';
 import Section from './Section';
-import { errorToReadable } from 'etl/ETLAjax';
 const moment = require('moment-timezone');
-
 
 import './Settings.less';
 type User = UserTypes.User;
@@ -150,7 +149,7 @@ class Settings extends TerrainComponent<Props>
 
   public changeUserField(field: string, value: string)
   {
-    //let newUser = this.props.users.currentUser;
+    // let newUser = this.props.users.currentUser;
     let newUser = this.props.users.users.get(this.props.users.currentUser.id);
     newUser = newUser.set(field, value);
     this.props.userActions({
@@ -337,7 +336,7 @@ class Settings extends TerrainComponent<Props>
     }, (error) =>
       {
         this.setState({
-          modalMessage: 'Error changing your password: ' + errorToReadable(error),
+          modalMessage: 'Error changing your password: ' + String(errorToReadable(error)),
           errorModal: true,
         });
         this.toggleModal();
@@ -464,14 +463,14 @@ class Settings extends TerrainComponent<Props>
 
   public getTimeZonesList()
   {
-    const timeZonesList = TimeZones.map((tz, i) =>
+    const timeZonesListMap = TimeZones.map((tz, i) =>
     {
       return {
         value: i,
         label: tz.DisplayName,
       };
     });
-    return timeZonesList;
+    return timeZonesListMap;
   }
 
   public changeTimeZone(val)
@@ -484,7 +483,7 @@ class Settings extends TerrainComponent<Props>
 
   public renderTimeZoneContent()
   {
-    const timeZonesList = this.getTimeZonesList();
+    const timeZonesListOld = this.getTimeZonesList();
     let timeZone: number;
 
     if (this.props.users.currentUser)
@@ -501,7 +500,7 @@ class Settings extends TerrainComponent<Props>
         <Select
           clearable={false}
           value={timeZone}
-          options={timeZonesList}
+          options={timeZonesListOld}
           onChange={this.changeTimeZone}
           className='settings-timezone-dropdown'
           searchable={false}
@@ -524,20 +523,6 @@ class Settings extends TerrainComponent<Props>
       timeZone = 158;
     }
     return timeZone;
-  }
-
-  public updateUserTimeZone(editingSections)
-  {
-    //const timeZonesList = this.getTimeZonesList();
-    //const timeZonesListImmu = Immutable.List(timeZonesList);
-    //let timeZone: number;
-    this.changeUserField('timeZone', editingSections.timeZone);
-    this.setState(
-      {
-        timeZone: editingSections.timeZone,
-      }
-    );
-    //console.log(this.props.users.users.get(this.props.users.currentUser.id).timeZone);
   }
 
   public changeTheme(val)
@@ -766,9 +751,6 @@ class Settings extends TerrainComponent<Props>
   public render()
   {
     const currentUser = this.props.users.users.get(this.props.users.currentUser.id);
-    const startingTimeZone = currentUser === undefined ? "Pacific Daylight Time (UTC - 7)" : currentUser.timeZone; //check
-    //console.log(startingTimeZone);
-    //console.log(timeZonesImmu.get(startingTimeZone));
     return (
       <div className='settings-main-container'>
         <div className='settings-page-title' style={{ color: Colors().mainSectionTitle }}>Account Settings</div>
@@ -810,13 +792,15 @@ class Settings extends TerrainComponent<Props>
           sectionType='timezone'
           sectionBoxes={
             List([
-              { key: 'timeZone', header: 'GMT Offset', info: startingTimeZone, type: 'Dropdown' },
-              { key: 'emailtimesth', header: 'Send Daily Email At', info: 'dummy test', type: 'Dropdown' },
+              {
+                key: 'timeZone', header: 'GMT Offset', info: (typeof (currentUser.timeZone) === 'number' ?
+                  timeZonesImmu.get(currentUser.timeZone) : currentUser.timeZone), type: 'Dropdown', options: timeZonesImmu
+              },
             ])
           }
           hasPhoto={false}
           columnNum={0}
-          onChange={this.updateUserTimeZone}
+          onChange={this.updateUserInfo}
         />
         <Modal
           message={this.state.modalMessage}

@@ -67,15 +67,11 @@ import { UserActions as Actions } from '../data/UserRedux';
 import * as UserTypes from '../UserTypes';
 import AccountEntry from './AccountEntry';
 
+import * as _ from 'lodash';
 import { backgroundColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import './Section.less';
-import * as _ from 'lodash';
 const moment = require('moment-timezone');
-const TimeZones = require('./timezones.json');
-const timeZonesList: List<string> = TimeZones.map((tz, i) => tz.DisplayName);
-const timeZonesImmu = Immutable.List(timeZonesList);
-
 
 export interface Props
 {
@@ -147,12 +143,6 @@ export default class Section extends TerrainComponent<Props>
     }
   }
 
-  // public handleInputEdit(blockList, block)
-  // {
-  //  const inputIndex = blockList.indexOf(block);
-  //  let inputValue = document.getElementsByTagName('input')[inputIndex].value;
-  // }
-
   public handleInputEdit(block, e)
   {
     const keyHeader = block.key;
@@ -164,13 +154,12 @@ export default class Section extends TerrainComponent<Props>
         editingSections: currentEditingState,
       },
     );
-    //console.log(this.state.editingSections);
   }
 
-  public handleTimeZoneEdit(index)
+  public handleTimeZoneEdit(block, index)
   {
-    const currentInput = timeZonesImmu.get(index);
-    //console.log("current input " + currentInput);
+    const currentInput = block.options.get(index);
+    // console.log("current input " + currentInput);
     const currentEditingState = this.state.editingSections;
     currentEditingState.timeZone = currentInput;
     this.setState(
@@ -178,12 +167,10 @@ export default class Section extends TerrainComponent<Props>
         editingSections: currentEditingState,
       },
     );
-    //console.log(this.state.editingSections);
   }
 
   public renderEditField(blockList, block)
   {
-    //console.log("block info " + block.info);
     switch (block.type)
     {
       case 'Input':
@@ -205,17 +192,17 @@ export default class Section extends TerrainComponent<Props>
             onChange={this._fn(this.handleInputEdit, block)}
             value={(this.state.editingSections !== undefined) && (this.state.editingSections[block.key] !== undefined) ?
               this.state.editingSections[block.key] : block.info}
-            required 
+            required
           />
         );
       case 'Dropdown':
-        return <Dropdown 
+        return <Dropdown
           canEdit={this.state.isEditing}
-          options={timeZonesImmu}
-          selectedIndex={(this.state.editingSections[block.key] !== undefined) ?
-            timeZonesImmu.indexOf(this.state.editingSections[block.key]) : timeZonesImmu.indexOf(block.info)}
-          onChange={this.handleTimeZoneEdit}
-        />
+          options={block.options}
+          selectedIndex={(this.state.editingSections !== undefined) && (this.state.editingSections[block.key] !== undefined) ?
+            block.options.indexOf(this.state.editingSections[block.key]) : block.options.indexOf(block.info)}
+          onChange={this._fn(this.handleTimeZoneEdit, block)}
+        />;
       default:
         return block.info;
     }
