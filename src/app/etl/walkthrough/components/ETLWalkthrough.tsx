@@ -70,7 +70,6 @@ import ETLUploadStep from './ETLUploadStep';
 import PickAlgorithmStep from './PickAlgorithmStep';
 import PickDatabaseStep from './PickDatabaseStep';
 import PickEndpointStep from './PickEndpointStep';
-import PickTemplateStep from './PickTemplateStep';
 
 import './ETLWalkthrough.less';
 
@@ -110,7 +109,6 @@ class ETLWalkthrough extends TerrainComponent<Props>
           setSteps={this.handleStepsChange}
           transitionParams={{ act: this.props.act, walkthrough: this.props.walkthrough }}
         />
-        <div className='etl-walkthrough-spacer' />
       </div>
     );
   }
@@ -194,22 +192,6 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
           link: ViewState.PickExportAlgorithm,
           buttonText: 'Start a New Export',
         },
-        // {
-        //   link: ViewState.PickTemplate,
-        //   buttonText: 'Edit an Existing Template',
-        // },
-      ],
-    },
-    [ViewState.PickTemplate]: {
-      prompt: 'Select a Saved Template',
-      crumbText: 'Select Template',
-      options: [
-        {
-          link: ViewState.Review,
-          component: PickTemplateStep,
-          onRevert: PickTemplateStep.onRevert,
-          onArrive: PickTemplateStep.onArrive,
-        },
       ],
     },
     [ViewState.PickExportAlgorithm]: {
@@ -252,7 +234,7 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
         {
           link: ViewState.Review,
           component: PickEndpointStep,
-          extraProps: { isSource: false },
+          extraProps: () => ({ isSource: false }),
           onRevert: PickEndpointStep.onRevert.bind(undefined, false),
           onArrive: PickEndpointStep.onArrive.bind(undefined, false),
         },
@@ -292,7 +274,7 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
         {
           link: ViewState.PickDatabase,
           component: PickEndpointStep,
-          extraProps: { isSource: true },
+          extraProps: () => ({ isSource: true }),
           onRevert: PickEndpointStep.onRevert.bind(undefined, true),
           onArrive: PickEndpointStep.onArrive.bind(undefined, true),
         },

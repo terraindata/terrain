@@ -86,7 +86,7 @@ class ElasticClient
    */
   public ping(params: Elastic.PingParams, callback: (error: any, response: any) => void): void
   {
-    // this.log('ping', params);
+    this.log('ping', params);
     this.delegate.ping(params, callback);
   }
 
@@ -123,7 +123,7 @@ class ElasticClient
       }
       this.controller.prependIndexTerm(obj[keys[0]]);
     }
-    // this.log('bulk', params);
+    this.log('bulk', params);
     this.delegate.bulk(params, this.wrapCallback(callback, (res) =>
     {
       const items: any[] = res.items;
