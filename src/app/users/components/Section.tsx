@@ -251,13 +251,13 @@ export default class Section extends TerrainComponent<Props>
 
   public onSaveChange()
   {
+    this.props.onChange(this.state.editingSections);
     this.setState(
       {
         isEditing: false,
         editingSections: {},
       },
     );
-    this.props.onChange(this.state.editingSections);
   }
 
   public onCancelChange()
