@@ -64,10 +64,10 @@ import { List, Map } from 'immutable';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
 import { TaskFormMap } from './TaskBaseClasses';
 import './TaskItemStyle.less';
-import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 
 const DeleteIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 const EditableField = (props) =>
@@ -194,8 +194,8 @@ class TaskItem extends TerrainComponent<Props>
                 style={
                   _.extend({},
                     fontColor(Colors().active),
-                    {fontStyle: this.state.name ? 'normal' : 'italic'})
-                 }
+                    { fontStyle: this.state.name ? 'normal' : 'italic' })
+                }
                 onClick={this._toggle('editingName')}
               >
                 {

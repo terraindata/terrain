@@ -71,9 +71,9 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import SchedulerApi from 'scheduler/SchedulerApi';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
 import XHR from 'util/XHR';
-import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import './ScheduleEditorStyle';
 
 export interface Props
@@ -95,7 +95,7 @@ interface State
 {
   schedule: SchedulerConfig;
   currentTasks: List<TaskConfig>;
-  rootTask: number;
+  rootTasks: List<number>;
 }
 
 function getScheduleId(params): number
@@ -109,7 +109,7 @@ class ScheduleEditor extends TerrainComponent<Props>
   public state: State = {
     schedule: null,
     currentTasks: List(),
-    rootTask: 0,
+    rootTasks: List([0]),
   };
 
   public componentDidMount()
@@ -139,6 +139,7 @@ class ScheduleEditor extends TerrainComponent<Props>
       this.setState({
         schedule,
         currentTasks: schedule ? this.getCurrentTasks(schedule.tasks) : List(),
+        rootTasks: List([0]),
       });
     }
   }
@@ -243,7 +244,7 @@ class ScheduleEditor extends TerrainComponent<Props>
     const newTask = _TaskConfig({
       id: tasks.size,
       taskId: TaskEnum.taskETL,
-      type: 'SUCCESS'
+      type: 'SUCCESS',
     });
     this.handleScheduleChange(
       'tasks',
@@ -264,12 +265,12 @@ class ScheduleEditor extends TerrainComponent<Props>
       rootTask = _TaskConfig({
         type: 'FAILURE',
         id: scheduleTasks.size,
-        taskId: TaskEnum.taskDefaultFailure
+        taskId: TaskEnum.taskDefaultFailure,
       });
       newRootTaskId = scheduleTasks.size;
       const parentIndex = scheduleTasks.findIndex((task) => task && task.id === id);
       const parentTask = scheduleTasks.get(parentIndex).set('onFailure', newRootTaskId);
-      schedule = schedule.set('tasks', scheduleTasks.set(parentIndex, parentTask).push(rootTask))
+      schedule = schedule.set('tasks', scheduleTasks.set(parentIndex, parentTask).push(rootTask));
     }
     else
     {
@@ -279,7 +280,7 @@ class ScheduleEditor extends TerrainComponent<Props>
     const newTasks = this.getCurrentTasks(schedule.tasks, newRootTaskId);
     this.setState({
       currentTasks: newTasks,
-      rootTask: newRootTaskId,
+      rootTasks: this.state.rootTasks.push(newRootTaskId),
       schedule,
     });
   }
@@ -302,12 +303,11 @@ class ScheduleEditor extends TerrainComponent<Props>
   public back()
   {
     // Find it's parent task
-    const parentTask =
-      this.state.schedule.tasks.find((task) => task && task.onFailure === this.state.rootTask);
-    const newTasks = this.getCurrentTasks(this.state.schedule.tasks, parentTask.id);
+    const rootTasks = this.state.rootTasks.delete(this.state.rootTasks.size - 1);
+    const newTasks = this.getCurrentTasks(this.state.schedule.tasks, rootTasks.last());
     this.setState({
       currentTasks: newTasks,
-      rootTask: parentTask.id,
+      rootTasks,
     });
   }
 
@@ -316,15 +316,15 @@ class ScheduleEditor extends TerrainComponent<Props>
     return (
       <div>
         {
-          this.state.rootTask !== 0 ?
-          <div
-            className='schedule-editor-back'
-            onClick={this.back}
-          >
-           BACK!!
+          this.state.rootTasks.size !== 1 ?
+            <div
+              className='schedule-editor-back'
+              onClick={this.back}
+            >
+              BACK!!
           </div>
-          :
-          null
+            :
+            null
         }
         {
           tasks.map((task, index) => this.renderTask(task))
@@ -385,6 +385,7 @@ class ScheduleEditor extends TerrainComponent<Props>
       <div
         className='schedule-editor-column'
         style={borderColor(Colors().blockOutline)}
+        onClick={this._toggle('open')}
       >
         <div
           className='schedule-editor-column-header'
@@ -408,6 +409,7 @@ class ScheduleEditor extends TerrainComponent<Props>
   public render()
   {
     const { schedule } = this.state;
+
     if (!schedule)
     {
       return (<div>NO SCHEDULE</div>);

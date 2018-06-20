@@ -48,10 +48,10 @@ import { List, Record } from 'immutable';
 import * as Immutable from 'immutable';
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { TaskConfig as SharedTaskConfig } from 'shared/types/jobs/TaskConfig';
+import TaskEnum from 'shared/types/jobs/TaskEnum';
 import SharedSchedulerConfig from 'shared/types/scheduler/SchedulerConfig';
 import { createRecordType } from 'shared/util/Classes';
 import Util from 'util/Util';
-import TaskEnum from 'shared/types/jobs/TaskEnum';
 
 class SchedulerConfigC extends SharedSchedulerConfig
 {
@@ -163,13 +163,13 @@ function parseToObject(parent, keyPath, defaultVal = {}): object
 export function scheduleForDatabase(schedule: SchedulerConfig): object
 {
   const tasks = schedule.tasks.map((task) =>
+  {
+    if (task.taskId === TaskEnum.taskETL)
     {
-      if (task.taskId === TaskEnum.taskETL)
-      {
-        task = task
-          .updateIn(['params', 'options', 'overrideSinks'], (value) => JSON.stringify(value))
-          .updateIn(['params', 'options', 'overrideSources'], (value) => JSON.stringify(value));
-      }
-    });
+      task = task
+        .updateIn(['params', 'options', 'overrideSinks'], (value) => JSON.stringify(value))
+        .updateIn(['params', 'options', 'overrideSources'], (value) => JSON.stringify(value));
+    }
+  });
   return schedule.update('tasks', (value) => JSON.stringify(value)).toJS();
 }

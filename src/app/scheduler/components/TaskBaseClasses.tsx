@@ -56,13 +56,13 @@ import Util from 'util/Util';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import ObjectForm from 'common/components/ObjectForm';
-import { instanceFnDecorator } from 'shared/util/Classes';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { instanceFnDecorator } from 'shared/util/Classes';
 
-import { TaskConfig, ParamConfigType } from 'app/scheduler/SchedulerTypes';
-import TaskEnum from 'shared/types/jobs/TaskEnum';
 import EndpointForm from 'app/etl/common/components/EndpointForm';
+import { ParamConfigType, TaskConfig } from 'app/scheduler/SchedulerTypes';
 import FadeInOut from 'common/components/FadeInOut';
+import TaskEnum from 'shared/types/jobs/TaskEnum';
 
 const { List, Map } = Immutable;
 
@@ -79,7 +79,7 @@ abstract class TaskFormBase<FormState, P extends Props = Props> extends TerrainC
 
   public state = {
     open: Map<string, boolean>(),
-  }
+  };
 
   constructor(props)
   {
@@ -161,24 +161,27 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
         pickOptions: (state) => !this.props.templates ? List() :
           this.props.templates.filter((t) => t.canSchedule()).map((t) => t.id).toList(),
         indexResolver: (option) => this.props.templates.findIndex((t) => t.id === option),
-        displayNames: (state) => {
+        displayNames: (state) =>
+        {
           if (!this.props.templates)
           {
             return Map();
           }
           let displayNames: IMMap<number, string> = Map<number, string>();
-          this.props.templates.forEach((template) => {
+          this.props.templates.forEach((template) =>
+          {
             displayNames = displayNames.set(template.id, template.templateName);
           });
           return displayNames;
         },
-      }
+      },
     },
     overrideSources: {
       type: DisplayType.Custom,
       displayName: 'Sources',
       options: {
-        render: (state, disabled) => {
+        render: (state, disabled) =>
+        {
           const template = this.props.templates.find((t) => t.id === state.templateId);
           if (!template)
           {
@@ -195,32 +198,33 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
               <FadeInOut
                 open={this.state.open.get('sources')}
               >
-              {
-                sources.keySeq().map((key) =>
                 {
-                  const source = state.overrideSources[key] || sources.get(key);
-                  return (
-                    <EndpointForm
-                      isSource={true}
-                      endpoint={source}
-                      onChange={this.handleFormChange}
-                      isSchedule={true}
-                      key={source.name }
-                    />
-                  )
-                })
-              }
+                  sources.keySeq().map((key) =>
+                  {
+                    const source = state.overrideSources[key] || sources.get(key);
+                    return (
+                      <EndpointForm
+                        isSource={true}
+                        endpoint={source}
+                        onChange={this.handleFormChange}
+                        isSchedule={true}
+                        key={source.name}
+                      />
+                    );
+                  })
+                }
               </FadeInOut>
             </div>
           );
         },
-      }
+      },
     },
     overrideSinks: {
       type: DisplayType.Custom,
       displayName: 'Sources',
       options: {
-        render: (state, disabled) => {
+        render: (state, disabled) =>
+        {
           const template = this.props.templates.find((t) => t.id === state.templateId);
           if (!template)
           {
@@ -249,15 +253,15 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
                         isSchedule={true}
                         key={source.name}
                       />
-                    )
+                    );
                   })
                 }
               </FadeInOut>
             </div>
           );
         },
-      }
-    }
+      },
+    },
   };
 }
 
