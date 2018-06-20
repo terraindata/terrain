@@ -195,7 +195,7 @@ export default class GroupJoinTransform extends SafeReadable
               {
                 [this.parentAlias]: inputs[i]['_source'],
               });
-            body.push(queryStr);
+            body.push(JSON.parse(queryStr));
           }
           catch (e)
           {
