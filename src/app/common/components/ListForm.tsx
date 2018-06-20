@@ -103,6 +103,10 @@ export default class ListForm extends TerrainComponent<Props>
     {
       return computeOptions(index);
     }
+    else
+    {
+      return {};
+    }
   }
 
   public renderRow(index: number)

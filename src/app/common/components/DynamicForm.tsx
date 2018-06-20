@@ -469,18 +469,24 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     for (const stateName of Object.keys(inputMap))
     {
       const { group } = inputMap[stateName];
-      const inputInfo: InputDeclarationType<S> = _.defaults({}, inputMap[stateName],
+      // set defaults
+      const inputInfo: InputDeclarationType<S> = _.defaults(
+        {},
+        inputMap[stateName],
         { getDisplayState: () => DisplayState.Active },
       );
+
+      // build the render matrix
       let useIndex = renderMatrix.size;
       if (group !== undefined)
       {
+        // set groupToIndex[group] to be the next index, if it doesn't exist. Otherwise don't change it
         groupToIndex[group] = _.get(groupToIndex, group, useIndex);
         useIndex = groupToIndex[group];
       }
+      // renderMatrix is a 2D matrix of functions
       renderMatrix = renderMatrix.updateIn([useIndex], List([]), (value) => value.push(
         this.renderInputElementFactory(inputInfo, stateName),
-        // (state, index) => this.renderInputElement(inputInfo, stateName, state, index),
       ));
     }
     return renderMatrix;
