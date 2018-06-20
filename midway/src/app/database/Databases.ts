@@ -129,7 +129,7 @@ export class Databases
       throw new Error('Database does not have an ID');
     }
 
-    const controller: DatabaseController = DatabaseControllerConfig.makeDatabaseController(db);
+    const controller: DatabaseController = DatabaseControllerConfig.makeDatabaseController(db, App.CFG.instanceId);
     controller.setConfig(db);
     const connected: boolean = await controller.getClient().isConnected();
 

@@ -103,7 +103,7 @@ export class App
       isAnalytics: false,
     };
     winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
-    const controller = DatabaseControllerConfig.makeDatabaseController(dbConfig);
+    const controller = DatabaseControllerConfig.makeDatabaseController(dbConfig, CFG.instanceId);
     return controller.getTasty();
   }
 
