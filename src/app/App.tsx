@@ -318,7 +318,7 @@ class App extends TerrainComponent<Props>
     else
     {
       const segments = location.split('.');
-      const customerName: string = segments[0];
+      const customerName: string = segments[0].replace('https://', '');
       const capitalizeCustomer: string = customerName.charAt(0).toUpperCase() + customerName.slice(1);
       customerTitle = ' | ' + capitalizeCustomer;
     }
