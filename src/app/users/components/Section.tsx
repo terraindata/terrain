@@ -176,6 +176,7 @@ export default class Section extends TerrainComponent<Props>
       case 'Input':
         return (
           <input
+            className='profile-input'
             id={block.header}
             type='text'
             onChange={this._fn(this.handleInputEdit, block)}
