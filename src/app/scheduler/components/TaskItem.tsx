@@ -78,7 +78,6 @@ export interface Props
   task: TaskConfig;
   type: 'SUCCESS' | 'FAILURE' | 'ROOT';
   onDelete: (id: ID) => void;
-  onCreateSubtask: (parentId: ID, type: 'SUCCESS' | 'FAILURE') => void;
   onTaskChange: (newTask: TaskConfig) => void;
   templates?: List<ETLTemplate>;
 }
@@ -192,7 +191,11 @@ class TaskItem extends TerrainComponent<Props>
             readOnlyComponent={
               <div
                 className='task-item-name'
-                style={fontColor(Colors().active)}
+                style={
+                  _.extend({},
+                    fontColor(Colors().active),
+                    {fontStyle: this.state.name ? 'normal' : 'italic'})
+                 }
                 onClick={this._toggle('editingName')}
               >
                 {
@@ -217,24 +220,6 @@ class TaskItem extends TerrainComponent<Props>
           {
             this.renderTaskSettings(task)
           }
-        </div>
-        <div
-          className='task-item-subtask-buttons'
-        >
-          <div
-            className='task-item-subtask-button'
-            onClick={hasFailureTask ? _.noop : this._fn(this.props.onCreateSubtask, task.id, 'FAILURE')}
-            style={hasFailureTask ? {} : fontColor(Colors().error)}
-          >
-            On Failure
-          </div>
-          <div
-            className='task-item-subtask-button'
-            onClick={hasSuccessTask ? _.noop : this._fn(this.props.onCreateSubtask, task.id, 'SUCCESS')}
-            style={hasSuccessTask ? {} : fontColor(Colors().success)}
-          >
-            On Success
-          </div>
         </div>
       </div>
     );

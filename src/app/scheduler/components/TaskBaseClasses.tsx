@@ -93,7 +93,6 @@ abstract class TaskFormBase<FormState, P extends Props = Props> extends TerrainC
   public configToState(config): FormState
   {
     return config ? config.toJS() : {};
-    return (config || {}) as FormState;
   }
 
   public stateToConfig(state: FormState)
