@@ -107,16 +107,12 @@ class ElasticClient
       switch (keys[0])
       {
         case 'index':
-          i += 2;
-          break;
         case 'create':
+        case 'update':
           i += 2;
           break;
         case 'delete':
           i++;
-          break;
-        case 'update':
-          i += 2;
           break;
         default:
           throw new Error('Bad bulk params');

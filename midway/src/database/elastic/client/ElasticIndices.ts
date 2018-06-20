@@ -93,9 +93,17 @@ class ElasticIndices
         else
         {
           const newRes = {};
-          Object.keys(res).forEach((key) => {
-            newRes[this.controller.removeIndexPrefix(key)] = res[key];
-          });
+          try
+          {
+            Object.keys(res).forEach((key) => {
+              newRes[this.controller.removeIndexPrefix(key)] = res[key];
+            });
+          }
+          catch (e)
+          {
+            this.log('error', e);
+            return callback(e, undefined, status);
+          }
           callback(err, newRes, status);
         }
       }
