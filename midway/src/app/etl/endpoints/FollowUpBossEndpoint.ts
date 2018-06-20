@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as request from 'request';
 import * as stream from 'stream';
+import * as winston from 'winston';
 
 import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -88,9 +89,9 @@ class FollowUpBossStream extends stream.Writable
 
   public _write(chunk: any, encoding: string, callback: (err?: Error) => void): void
   {
-    console.log(JSON.stringify(this.config));
-    console.log('CHUNK');
-    console.dir(chunk, { depth: null });
+      winston.debug(JSON.stringify(this.config));
+      winston.debug('CHUNK');
+      winston.debug(JSON.stringify(chunk));
 
     if (chunk['tags'].indexOf('terrain') === -1)
     {
@@ -105,7 +106,7 @@ class FollowUpBossStream extends stream.Writable
         method: 'PUT',
         json: chunk,
         headers: {
-          'Authorization': 'Basic ' + new Buffer(this.config['apiKey'] + ':').toString('base64'),
+          'Authorization': `Basic ${new Buffer((this.config['apiKey'] as string) + ':').toString('base64')}`,
           'Content-Type': 'application/json',
         },
       },
@@ -113,12 +114,12 @@ class FollowUpBossStream extends stream.Writable
         {
           if (error)
           {
-            console.log('got put error: ' + JSON.stringify(error));
+              winston.debug('got put error: ' + JSON.stringify(error));
             callback(error);
           }
           else
           {
-            console.log('got put response: ' + JSON.stringify(response));
+              winston.debug('got put response: ' + JSON.stringify(response));
           }
         });
     } else
@@ -132,7 +133,7 @@ class FollowUpBossStream extends stream.Writable
                 deduplicate: true,
             },
             headers: {
-                'Authorization': 'Basic ' + new Buffer(this.config['apiKey'] + ':').toString('base64'),
+                'Authorization': `Basic ${new Buffer((this.config['apiKey'] as string) + ':').toString('base64')}`,
                 'Content-Type': 'application/json',
             },
         };
@@ -141,12 +142,12 @@ class FollowUpBossStream extends stream.Writable
         {
           if (error)
           {
-            console.log('got post error: ' + JSON.stringify(error));
+              winston.debug('got post error: ' + JSON.stringify(error));
             callback(error);
           }
           else
           {
-            console.log('got post response: ' + JSON.stringify(response));
+              winston.debug('got post response: ' + JSON.stringify(response));
           }
         });
     }
