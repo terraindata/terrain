@@ -794,7 +794,7 @@ class Settings extends TerrainComponent<Props>
             List([
               {
                 key: 'timeZone', header: 'GMT Offset', info: (typeof (currentUser.timeZone) === 'number' ?
-                  timeZonesImmu.get(currentUser.timeZone) : currentUser.timeZone), type: 'Dropdown', options: timeZonesImmu
+                  timeZonesImmu.get(currentUser.timeZone) : currentUser.timeZone), type: 'Dropdown', options: timeZonesImmu,
               },
             ])
           }
