@@ -74,6 +74,7 @@ import SchedulerApi from 'scheduler/SchedulerApi';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
 import XHR from 'util/XHR';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import './ScheduleEditorStyle';
 
 export interface Props
 {
@@ -93,7 +94,8 @@ export interface Props
 interface State
 {
   schedule: SchedulerConfig;
-  orderedTasks: List<TaskConfig>;
+  currentTasks: List<TaskConfig>;
+  rootTask: number;
 }
 
 function getScheduleId(params): number
@@ -106,7 +108,8 @@ class ScheduleEditor extends TerrainComponent<Props>
 {
   public state: State = {
     schedule: null,
-    orderedTasks: List(),
+    currentTasks: List(),
+    rootTask: 0,
   };
 
   public componentDidMount()
@@ -115,17 +118,15 @@ class ScheduleEditor extends TerrainComponent<Props>
     const schedule = schedules.get(getScheduleId(match.params));
     this.setState({
       schedule,
-      orderedTasks: schedule ? this.orderTasks(schedule.tasks) : [],
+      currentTasks: schedule ? this.getCurrentTasks(schedule.tasks) : [],
     });
     this.props.schedulerActions({
       actionType: 'getSchedules',
-
     });
   }
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    console.log('will receive props');
     const { params } = this.props.match;
     const nextParams = nextProps.match.params;
     const oldScheduleId = getScheduleId(params);
@@ -137,61 +138,35 @@ class ScheduleEditor extends TerrainComponent<Props>
       const schedule = nextProps.schedules.get(scheduleId);
       this.setState({
         schedule,
-        orderedTasks: schedule ? this.orderTasks(schedule.tasks) : List(),
+        currentTasks: schedule ? this.getCurrentTasks(schedule.tasks) : List(),
       });
     }
   }
 
-  public handleScheduleChange(key: string, value: any, reorderTasks?: boolean)
+  public handleScheduleChange(key: string, value: any, newTasks?: List<TaskConfig>)
   {
     const schedule = this.state.schedule.set(key, value);
     this.setState({
       schedule,
-      orderedTasks: reorderTasks ? this.orderTasks(schedule.tasks) : this.state.orderedTasks,
+      currentTasks: newTasks || this.state.currentTasks,
     });
   }
 
-  public orderTasks(tasks: List<TaskConfig>): List<TaskConfig>
+  public getCurrentTasks(tasks: List<TaskConfig>): List<TaskConfig>
   {
-    const orderedTasks: TaskConfig[] = [];
-    orderedTasks[0] = tasks.get(0);
-    for (let i = 0; i < tasks.size; i++)
+    let currentTasks: List<TaskConfig> = List();
+    let currId = this.state.rootTask;
+    while (true)
     {
-      if (!orderedTasks[i])
-      {
-        continue;
-      }
-      if (orderedTasks[i].onFailure !== null && orderedTasks[i].onFailure !== undefined)
-      {
-        orderedTasks[i * 2 + 1] = tasks.get(orderedTasks[i].onFailure).set('type', 'FAILURE');
-      }
-      else
-      {
-        orderedTasks[i * 2 + 1] = undefined;
-      }
-      if (orderedTasks[i].onSuccess !== null && orderedTasks[i].onSuccess !== undefined)
-      {
-        orderedTasks[i * 2 + 2] = tasks.get(orderedTasks[i].onSuccess).set('type', 'SUCCESS');
-      }
-      else
-      {
-        orderedTasks[i * 2 + 2] = undefined;
-      }
-    }
-    // Clear end of array
-    let taskList = List(orderedTasks);
-    for (let i = taskList.size - 1; i >= 0; i--)
-    {
-      if (!taskList.get(i))
-      {
-        taskList = taskList.delete(i);
-      }
-      else
+      if (currId === undefined || currId === null)
       {
         break;
       }
+      const task = tasks.find((t) => t.id === currId);
+      currentTasks = currentTasks.push(task);
+      currId = task.onSuccess;
     }
-    return taskList;
+    return currentTasks;
   }
 
   // Schedule name and interval config
@@ -201,7 +176,6 @@ class ScheduleEditor extends TerrainComponent<Props>
     return (
       <div>
         <div>
-          Schedule Name
           <FloatingInput
             label={'Name'}
             value={schedule.name}
@@ -211,7 +185,11 @@ class ScheduleEditor extends TerrainComponent<Props>
           />
         </div>
         <div>
-          Schedule Interval
+          <div
+            className='schedule-editor-sub-header'
+          >
+            Interval
+          </div>
           <CRONEditor
             cron={schedule.cron}
             onChange={this._fn(this.handleScheduleChange, 'cron')}
@@ -225,12 +203,13 @@ class ScheduleEditor extends TerrainComponent<Props>
   {
     const { schedule } = this.state;
     const index = schedule.tasks.findIndex((task) => task && task.id === newTask.id);
-    this.handleScheduleChange('tasks', schedule.tasks.set(index, newTask));
-    // Also update in ordered schedules
-    const orderedIndex = this.state.orderedTasks.findIndex((task) => task && task.id === newTask.id);
-    this.setState({
-      orderedTasks: this.state.orderedTasks.set(orderedIndex, newTask),
-    });
+    let newTasks = this.state.currentTasks;
+    const currentIndex = newTasks.findIndex((task) => task && task.id === newTask.id);
+    if (currentIndex !== -1)
+    {
+      newTasks = newTasks.set(currentIndex, newTask);
+    }
+    this.handleScheduleChange('tasks', schedule.tasks.set(index, newTask), newTasks);
   }
 
   public handleTaskDelete(id: ID)
@@ -245,7 +224,13 @@ class ScheduleEditor extends TerrainComponent<Props>
     tasks = tasks
       .set(parentIndex, parentTask.set(isFailure ? 'onFailure' : 'onSuccess', undefined))
       .set(index, undefined);
-    this.handleScheduleChange('tasks', tasks, true);
+    let newTasks = this.state.currentTasks;
+    const currentIndex = newTasks.findIndex((task) => task && task.id === id);
+    if (currentIndex !== -1)
+    {
+      newTasks = newTasks.slice(0, currentIndex).toList();
+    }
+    this.handleScheduleChange('tasks', tasks, newTasks);
   }
 
   public handleAddSubtask(parentId: ID, type: 'SUCCESS' | 'FAILURE')
@@ -259,15 +244,15 @@ class ScheduleEditor extends TerrainComponent<Props>
     });
     const parentTask = schedule.tasks.get(parentIndex)
       .set(type === 'SUCCESS' ? 'onSuccess' : 'onFailure', schedule.tasks.size);
-    this.handleScheduleChange('tasks', schedule.tasks.set(parentIndex, parentTask).push(newTask), true);
+    this.handleScheduleChange(
+      'tasks',
+      schedule.tasks.set(parentIndex, parentTask).push(newTask),
+      type === 'SUCCESS' ? this.state.currentTasks.push(newTask) : this.state.currentTasks,
+    );
   }
 
-  public renderTask(task, level, pos)
+  public renderTask(task)
   {
-    if (!task)
-    {
-      return this.renderSpacer(level, pos);
-    }
     return (
       <TaskItem
         task={task}
@@ -281,47 +266,12 @@ class ScheduleEditor extends TerrainComponent<Props>
     );
   }
 
-  public renderSpacer(level, pos)
-  {
-    return (
-      <div
-        key={String(level) + '-' + String(pos)}
-        style={{ width: 300 }}
-      />
-    );
-  }
-
   public renderTasks(tasks: List<TaskConfig>)
   {
-    const numLevels = Math.ceil(Math.log2(tasks.size + 1));
-    let levelSize = 1;
-    // over all levels
-    let i = 0;
-    const children = [];
-    for (let level = 1; level <= numLevels; level++)
-    {
-      const levelRender = [];
-      for (let pos = 0; pos < levelSize; pos++)
-      {
-        levelRender.push(this.renderTask(tasks.get(i), level, pos));
-        i += 1;
-      }
-      children.push(levelRender);
-      levelSize *= 2;
-    }
     return (
       <div>
         {
-          children.map((level, index) =>
-            <div
-              key={index}
-              style={{ display: 'flex', justifyContent: 'center' }}
-            >
-              {
-                level.map((item) => item)
-              }
-            </div>,
-          )
+          tasks.map((task, index) => this.renderTask(task))
         }
       </div>
     );
@@ -348,7 +298,7 @@ class ScheduleEditor extends TerrainComponent<Props>
   {
     return (
       <div
-        className='integration-buttons'
+        className='schedule-editor-buttons'
       >
         <Button
           text={'Cancel'}
@@ -368,25 +318,54 @@ class ScheduleEditor extends TerrainComponent<Props>
     );
   }
 
+  public renderColumn(header, content)
+  {
+    return (
+      <div
+        className='schedule-editor-column'
+        style={borderColor(Colors().blockOutline)}
+      >
+        <div
+          className='schedule-editor-column-header'
+          style={backgroundColor(Colors().blockBg)}
+        >
+          {
+            header
+          }
+        </div>
+        <div
+          className='schedule-editor-column-content'
+        >
+          {
+            content
+          }
+        </div>
+      </div>
+    );
+  }
+
   public render()
   {
-    console.log('render schedule editor');
     const { schedule } = this.state;
     if (!schedule)
     {
       return (<div>NO SCHEDULE</div>);
     }
     return (
-      <div>
-        <div>
-          Edit Schedule
+      <div
+        className='schedule-editor'
+      >
+        <div
+          className='schedule-editor-columns'
+          style={borderColor(Colors().blockOutline)}
+        >
+          {
+            this.renderColumn('Schedule', this.renderScheduleInfo())
+          }
+          {
+            this.renderColumn('Tasks', this.renderTasks(this.state.currentTasks))
+          }
         </div>
-        {
-          this.renderScheduleInfo()
-        }
-        {
-          this.renderTasks(this.state.orderedTasks)
-        }
         {
           this.renderButtons()
         }

@@ -1,0 +1,52 @@
+.schedule-editor
+{
+    overflow: hidden;
+    .schedule-editor-columns {
+        display: inline-flex;
+        width: calc(~"100% - 20px");
+        margin: 10px;
+        border: 1px solid;
+        border-radius: 4px;
+        .schedule-editor-column {
+            width: 50%;
+            &:first-child {
+                border-right: 1px solid;
+            }
+            .schedule-editor-column-header {
+                font-size: 20px;
+                padding: 10px;
+            }
+            .schedule-editor-column-content {
+                margin: 20px;
+                .schedule-editor-sub-header {
+                    font-size: 16px;
+                    margin-top: 10px;
+                    text-transform: uppercase;
+                }
+                .cron-editor-notes {
+                    margin-left: 15px;
+                }
+                .common-label-style {
+                    margin-top: 6px;
+                    padding: 0px;
+                    opacity: 0.8;
+                }
+                .cron-editor-footer {
+                    margin-left: -15px;
+                    width: calc(~"100% + 19px");
+                    .common-option-name-style {
+                        padding-right: 0px;
+                    }
+                }
+            }
+        }
+    }
+    .schedule-editor-buttons {
+        padding-bottom: 20px;
+        padding-right: 10px;
+        float: right;
+        .button:first-child {
+            margin-right: 10px;
+        }
+    }
+}
