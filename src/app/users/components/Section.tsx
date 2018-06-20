@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires switch-default strict-boolean-expressions
 
+import * as Immutable from 'immutable';
 import { List } from 'immutable';
 import * as React from 'react';
 
@@ -70,6 +71,11 @@ import { backgroundColor, Colors, fontColor, getStyle } from '../../colors/Color
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import './Section.less';
 import * as _ from 'lodash';
+const moment = require('moment-timezone');
+const TimeZones = require('./timezones.json');
+const timeZonesList: List<string> = TimeZones.map((tz, i) => tz.DisplayName);
+const timeZonesImmu = Immutable.List(timeZonesList);
+
 
 export interface Props
 {
@@ -149,7 +155,7 @@ export default class Section extends TerrainComponent<Props>
 
   public handleInputEdit(block, e)
   {
-    const keyHeader = block.header;
+    const keyHeader = block.key;
     const currentInput = e.target.value;
     const currentEditingState = this.state.editingSections;
     currentEditingState[keyHeader] = currentInput;
@@ -158,19 +164,61 @@ export default class Section extends TerrainComponent<Props>
         editingSections: currentEditingState,
       },
     );
+    //console.log(this.state.editingSections);
+  }
+
+  public handleTimeZoneEdit(index)
+  {
+    const currentInput = timeZonesImmu.get(index);
+    //console.log("current input " + currentInput);
+    const currentEditingState = this.state.editingSections;
+    currentEditingState.timeZone = currentInput;
+    this.setState(
+      {
+        editingSections: currentEditingState,
+      },
+    );
+    //console.log(this.state.editingSections);
   }
 
   public renderEditField(blockList, block)
   {
-    return (
-      <input
-        id={block.header}
-        type='text'
-        onChange={this._fn(this.handleInputEdit, block)}
-        value={(this.state.editingSections !== undefined) && (this.state.editingSections[block.header] !== undefined) ?
-          this.state.editingSections[block.header] : block.info}
-        required />
-    );
+    //console.log("block info " + block.info);
+    switch (block.type)
+    {
+      case 'Input':
+        return (
+          <input
+            id={block.header}
+            type='text'
+            onChange={this._fn(this.handleInputEdit, block)}
+            value={(this.state.editingSections !== undefined) && (this.state.editingSections[block.key] !== undefined) ?
+              this.state.editingSections[block.key] : block.info}
+            required
+          />
+        );
+      case 'Password':
+        return (
+          <input
+            id={block.header}
+            type='password'
+            onChange={this._fn(this.handleInputEdit, block)}
+            value={(this.state.editingSections !== undefined) && (this.state.editingSections[block.key] !== undefined) ?
+              this.state.editingSections[block.key] : block.info}
+            required 
+          />
+        );
+      case 'Dropdown':
+        return <Dropdown 
+          canEdit={this.state.isEditing}
+          options={timeZonesImmu}
+          selectedIndex={(this.state.editingSections[block.key] !== undefined) ?
+            timeZonesImmu.indexOf(this.state.editingSections[block.key]) : timeZonesImmu.indexOf(block.info)}
+          onChange={this.handleTimeZoneEdit}
+        />
+      default:
+        return block.info;
+    }
   }
 
   public renderBlocks(blockList, colClassName, columnKey)
@@ -179,8 +227,12 @@ export default class Section extends TerrainComponent<Props>
       <div className={colClassName} key={columnKey}>
         {blockList.map((block, i) =>
           <div className='profile-block' key={i}>
-            <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>{block.header}</div>
-            <div className='profile-inner-info'>{this.state.isEditing ? this.renderEditField(blockList, block) : block.info}</div>
+            <div className='profile-header' style={{ color: Colors().sectionSubtitle }}>
+              {block.header}
+            </div>
+            <div className='profile-inner-info'>
+              {this.state.isEditing ? this.renderEditField(blockList, block) : (block.type !== 'Password' && block.info)}
+            </div>
           </div>,
         )}
       </div>
@@ -265,7 +317,7 @@ export default class Section extends TerrainComponent<Props>
           {this.state.isEditing ? this.renderCancelAndSaveButtons() : this.renderEditButton()}
         </div>
 
-        {this.renderBlockColumn()}
+        {(!(this.props.sectionType === 'password' && !this.state.isEditing)) && this.renderBlockColumn()}
       </div>
     );
   }
