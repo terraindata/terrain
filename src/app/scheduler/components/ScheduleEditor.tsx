@@ -152,10 +152,10 @@ class ScheduleEditor extends TerrainComponent<Props>
     });
   }
 
-  public getCurrentTasks(tasks: List<TaskConfig>): List<TaskConfig>
+  public getCurrentTasks(tasks: List<TaskConfig>, rootTask: number = 0): List<TaskConfig>
   {
     let currentTasks: List<TaskConfig> = List();
-    let currId = this.state.rootTask;
+    let currId = rootTask;
     while (true)
     {
       if (currId === undefined || currId === null)
@@ -233,22 +233,55 @@ class ScheduleEditor extends TerrainComponent<Props>
     this.handleScheduleChange('tasks', tasks, newTasks);
   }
 
-  public handleAddSubtask(parentId: ID, type: 'SUCCESS' | 'FAILURE')
+  public handleAddSuccessTask()
   {
-    const { schedule } = this.state;
-    const parentIndex = schedule.tasks.findIndex((task) => task && task.id === parentId);
+    const { schedule, currentTasks } = this.state;
+    const { tasks } = schedule;
+
+    const parentIndex = tasks.findIndex((task) => task && task.id === currentTasks.last().get('id'));
+    const parentTask = tasks.get(parentIndex).set('onSuccess', tasks.size);
     const newTask = _TaskConfig({
-      id: schedule.tasks.size,
-      taskId: type === 'FAILURE' ? TaskEnum.taskDefaultFailure : TaskEnum.taskETL,
-      type,
+      id: tasks.size,
+      taskId: TaskEnum.taskETL,
+      type: 'SUCCESS'
     });
-    const parentTask = schedule.tasks.get(parentIndex)
-      .set(type === 'SUCCESS' ? 'onSuccess' : 'onFailure', schedule.tasks.size);
     this.handleScheduleChange(
       'tasks',
-      schedule.tasks.set(parentIndex, parentTask).push(newTask),
-      type === 'SUCCESS' ? this.state.currentTasks.push(newTask) : this.state.currentTasks,
+      tasks.set(parentIndex, parentTask).push(newTask),
+      currentTasks.set(currentTasks.size - 1, parentTask).push(newTask),
     );
+  }
+
+  public handleTaskErrorClick(id: ID)
+  {
+    // If there is no error task, add one
+    const scheduleTasks = this.state.schedule.tasks;
+    let newRootTaskId = this.state.currentTasks.find((task) => task.id === id).onFailure;
+    let rootTask;
+    let schedule = this.state.schedule;
+    if (newRootTaskId === undefined || newRootTaskId === null)
+    {
+      rootTask = _TaskConfig({
+        type: 'FAILURE',
+        id: scheduleTasks.size,
+        taskId: TaskEnum.taskDefaultFailure
+      });
+      newRootTaskId = scheduleTasks.size;
+      const parentIndex = scheduleTasks.findIndex((task) => task && task.id === id);
+      const parentTask = scheduleTasks.get(parentIndex).set('onFailure', newRootTaskId);
+      schedule = schedule.set('tasks', scheduleTasks.set(parentIndex, parentTask).push(rootTask))
+    }
+    else
+    {
+      rootTask = scheduleTasks.find((task) => task.id === newRootTaskId);
+    }
+    // switch the root task
+    const newTasks = this.getCurrentTasks(schedule.tasks, newRootTaskId);
+    this.setState({
+      currentTasks: newTasks,
+      rootTask: newRootTaskId,
+      schedule,
+    });
   }
 
   public renderTask(task)
@@ -258,12 +291,24 @@ class ScheduleEditor extends TerrainComponent<Props>
         task={task}
         type={task.type || 'ROOT'}
         onDelete={this.handleTaskDelete}
-        onCreateSubtask={this.handleAddSubtask}
         onTaskChange={this.handleTaskChange}
         key={task.id}
         templates={this.props.templates}
+        onErrorClick={this.handleTaskErrorClick}
       />
     );
+  }
+
+  public back()
+  {
+    // Find it's parent task
+    const parentTask =
+      this.state.schedule.tasks.find((task) => task && task.onFailure === this.state.rootTask);
+    const newTasks = this.getCurrentTasks(this.state.schedule.tasks, parentTask.id);
+    this.setState({
+      currentTasks: newTasks,
+      rootTask: parentTask.id,
+    });
   }
 
   public renderTasks(tasks: List<TaskConfig>)
@@ -271,8 +316,24 @@ class ScheduleEditor extends TerrainComponent<Props>
     return (
       <div>
         {
+          this.state.rootTask !== 0 ?
+          <div
+            className='schedule-editor-back'
+            onClick={this.back}
+          >
+           BACK!!
+          </div>
+          :
+          null
+        }
+        {
           tasks.map((task, index) => this.renderTask(task))
         }
+        <PathfinderCreateLine
+          onCreate={this.handleAddSuccessTask}
+          text={'Add Task'}
+          canEdit={TerrainTools.isAdmin()}
+        />
       </div>
     );
   }

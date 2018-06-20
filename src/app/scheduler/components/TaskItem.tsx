@@ -80,6 +80,7 @@ export interface Props
   onDelete: (id: ID) => void;
   onTaskChange: (newTask: TaskConfig) => void;
   templates?: List<ETLTemplate>;
+  onErrorClick: (id: ID) => void;
 }
 
 interface State
@@ -157,13 +158,12 @@ class TaskItem extends TerrainComponent<Props>
   public render()
   {
     const { task, type } = this.props;
-    console.log('Render Task item ');
     const hasFailureTask = task.onFailure !== undefined && task.onFailure !== null;
     const hasSuccessTask = task.onSuccess !== undefined && task.onSuccess !== null;
     return (
       <div
         className='task-item-wrapper'
-        style={borderColor(type === 'SUCCESS' ? 'green' : type === 'FAILURE' ? 'red' : 'gray')}
+        style={borderColor(Colors().blockOutline)}
       >
         <div
           className='task-item-header'
@@ -220,6 +220,12 @@ class TaskItem extends TerrainComponent<Props>
           {
             this.renderTaskSettings(task)
           }
+        </div>
+        <div
+          className='task-item-error'
+          onClick={this._fn(this.props.onErrorClick, task.id)}
+        >
+          Error
         </div>
       </div>
     );
