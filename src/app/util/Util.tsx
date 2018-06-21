@@ -910,7 +910,7 @@ const Util = {
   assertUnreachable(param: never): never
   {
     throw new Error('Unreachable code reached');
-  }
+  },
 
 };
 

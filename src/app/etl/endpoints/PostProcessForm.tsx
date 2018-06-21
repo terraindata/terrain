@@ -65,13 +65,14 @@ import
 {
   PostProcessAggregationTypes as AggregationTypes,
   PostProcessConfig,
+  PostProcessOptionsDefaults,
   PostProcessOptionsType,
   PostProcessTypes,
-  PostProcessOptionsDefaults,
   RootPostProcessConfig as RootPostProcessConfigI,
 } from 'shared/etl/types/PostProcessTypes';
 
-import {
+import
+{
   AggregateForm, AggregateState,
   FilterForm, FilterState,
   ParseForm, ParseState,
@@ -243,7 +244,7 @@ export interface PPTProps
 
 export class TransformForm extends TerrainComponent<PPTProps>
 {
-  public postProcessOptions: List<string> = List(['Aggregate']);
+  public postProcessOptions: List<string> = List(['Aggregate', 'Filter', 'Parse', 'Sort']);
   public inputMap: InputDeclarationMap<PostProcessConfig> = {
     type: {
       type: DisplayType.Pick,
@@ -267,7 +268,7 @@ export class TransformForm extends TerrainComponent<PPTProps>
       <DynamicForm
         inputMap={this.inputMap}
         inputState={this.props.transformation}
-        onStateChange={this.props.onChange}
+        onStateChange={this.handleChange}
       />
     );
   }
@@ -276,7 +277,7 @@ export class TransformForm extends TerrainComponent<PPTProps>
   {
     if (cfg.type !== this.props.transformation.type)
     {
-      cfg = _.extend({}, cfg);
+      cfg = _.extend({}, cfg, { options: PostProcessOptionsDefaults[cfg.type] });
     }
     this.props.onChange(cfg, apply);
   }
@@ -303,7 +304,6 @@ export class TransformForm extends TerrainComponent<PPTProps>
     const options = this.getCurrentOptions();
 
     const Component = this.getPPTComponent(state.type);
-
     return (
       <Component
         options={options as any}

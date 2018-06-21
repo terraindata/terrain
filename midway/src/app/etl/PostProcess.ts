@@ -49,12 +49,13 @@ import * as queryString from 'query-string';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import {
+import
+{
   PostProcessAggregationTypes,
   PostProcessConfig,
   PostProcessFilterTypes,
-  PostProcessParseTypes,
   PostProcessOptionsTypes,
+  PostProcessParseTypes,
 } from 'shared/etl/types/PostProcessTypes';
 
 import BufferTransform from '../io/streams/BufferTransform';

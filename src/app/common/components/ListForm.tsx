@@ -170,7 +170,7 @@ export default class ListForm<T = string> extends TerrainComponent<Props<T>>
 
   public render()
   {
-    const indices = Immutable.Range(0, this.props.items.length);
+    const indices = this.props.items != null ? Immutable.Range(0, this.props.items.length) : null;
     return (
       <div
         className='object-form-container'
@@ -186,7 +186,7 @@ export default class ListForm<T = string> extends TerrainComponent<Props<T>>
           className='object-kv-body'
           style={this.props.noBorder ? { border: 'none' } : borderColor(Colors().border1)}
         >
-          {indices.map(this.renderRow)}
+          {indices !== null ? indices.map(this.renderRow) : null}
           {this.renderAddNewRow()}
         </div>
       </div>
@@ -228,8 +228,16 @@ export default class ListForm<T = string> extends TerrainComponent<Props<T>>
   {
     const { items, onChange } = this.props;
 
-    const newItems = items.slice();
-    newItems.push(this.props.newItemDefault);
+    const newItems = items != null ? items.slice() : [];
+    if (this.props.newItemDefault !== undefined)
+    {
+      newItems.push(this.props.newItemDefault);
+    }
+    else
+    {
+      newItems.push('' as any);
+    }
+
     onChange(newItems, true);
   }
 }

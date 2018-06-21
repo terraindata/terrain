@@ -63,13 +63,13 @@ import
 {
   PostProcessAggregationTypes as AggregationTypes,
   PostProcessConfig,
+  PostProcessFilterTypes as FilterTypes,
   PostProcessOptionsType,
+  PostProcessParseTypes as ParseTypes,
+  PostProcessSortObjectTypes,
+  PostProcessSortTypes as SortTypes,
   PostProcessTypes,
   RootPostProcessConfig as RootPostProcessConfigI,
-  PostProcessFilterTypes as FilterTypes,
-  PostProcessParseTypes as ParseTypes,
-  PostProcessSortTypes as SortTypes,
-  PostProcessSortObjectTypes
 } from 'shared/etl/types/PostProcessTypes';
 
 const { List } = Immutable;
@@ -93,10 +93,8 @@ export class AggregateForm extends TerrainComponent<FormProps<AggregateState>>
 
   public inputMap: InputDeclarationMap<AggregateState> = {
     fields: {
-      type: DisplayType.Custom,
-      options: {
-        render: this.renderFieldsForm,
-      },
+      type: DisplayType.TagsBox,
+      displayName: 'Fields',
     },
     operation: {
       type: DisplayType.Pick,
@@ -125,26 +123,6 @@ export class AggregateForm extends TerrainComponent<FormProps<AggregateState>>
         inputState={this.props.options}
       />
     );
-  }
-
-  public renderFieldsForm(state: AggregateState, disabled)
-  {
-    const fields = state.fields != null ? state.fields : [];
-    return (
-      <ListForm
-        items={fields}
-        onChange={this.handleFieldsChange}
-        label='Fields'
-      />
-    );
-  }
-
-  public handleFieldsChange(newFields: string[], apply?: boolean)
-  {
-    const newState = _.extend({}, this.props.options, {
-      fields: newFields,
-    });
-    this.props.onChange(newState, apply);
   }
 }
 
@@ -207,12 +185,12 @@ export class ParseForm extends TerrainComponent<FormProps<ParseState>>
       options: {
         pickOptions: (s) => this.parseOptions,
         indexResolver: (value) => this.parseOptions.indexOf(value),
-      }
+      },
     },
     url: {
       type: DisplayType.TextBox,
       displayName: 'URL',
-    }
+    },
   };
 
   public render()
@@ -239,7 +217,7 @@ export class SortForm extends TerrainComponent<FormProps<SortState>>
         component: SortObjectForm,
         inputKey: 'options',
         isList: true,
-        listDefaultValue: { field: '', sort: SortTypes.Asc }
+        listDefaultValue: { field: '', sort: SortTypes.Asc },
       },
     },
   };
@@ -260,7 +238,7 @@ export class SortObjectForm extends TerrainComponent<FormProps<PostProcessSortOb
 {
   public sortOptions: List<SortTypes> = List([
     SortTypes.Asc,
-    SortTypes.Desc
+    SortTypes.Desc,
   ]);
 
   public inputMap: InputDeclarationMap<PostProcessSortObjectTypes> = {
@@ -268,17 +246,19 @@ export class SortObjectForm extends TerrainComponent<FormProps<PostProcessSortOb
       type: DisplayType.Pick,
       displayName: 'Sort Type',
       group: 'row',
+      widthFactor: 2,
       options: {
         pickOptions: (s) => this.sortOptions,
         indexResolver: (value) => this.sortOptions.indexOf(value),
-      }
+      },
     },
     field: {
+      widthFactor: 2,
       type: DisplayType.TextBox,
       displayName: 'Field Name',
       group: 'row',
-    }
-  }
+    },
+  };
 
   public render()
   {
