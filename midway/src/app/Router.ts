@@ -141,6 +141,8 @@ export function getRouter()
     const allowedNames: string[] = [
       'bundle.js',
       'vendor.bundle.js',
+      'bundle.js.map',
+      'vendor.bundle.js.map',
       'bundle.js.gz',
       'vendor.bundle.js.gz',
     ];
