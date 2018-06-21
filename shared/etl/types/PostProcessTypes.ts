@@ -50,9 +50,32 @@ import { FileTypes, Languages } from './ETLTypes';
 export enum PostProcessAggregationTypes
 {
   Average = 'Average',
-  Merge = 'Merge',
   Concat = 'Concat',
+  Merge = 'Merge',
   Sum = 'Sum',
+}
+
+export enum PostProcessFilterTypes
+{
+  MostRecent = 'MostRecent',
+  RemoveByPattern = 'RemoveByPattern',
+}
+
+export enum PostProcessParseTypes
+{
+  ParseURL = 'ParseURL',
+}
+
+export enum PostProcessSortTypes
+{
+  Asc = 'Asc',
+  Desc = 'Desc',
+}
+
+export interface PostProcessSortObjectTypes
+{
+  field: string;
+  sort: PostProcessSortTypes;
 }
 
 export interface PostProcessConfig
@@ -73,6 +96,20 @@ export interface PostProcessOptionsTypes
     operation: PostProcessAggregationTypes;
     pattern: string;
     primaryKey: string;
+  };
+  Filter: {
+    operation: PostProcessFilterTypes;
+    pattern: string;
+    primaryKey: string;
+  };
+  Parse: {
+    field: string;
+    operation: PostProcessParseTypes;
+    url: string;
+  };
+  Sort: {
+    fields: string[];
+    operations: PostProcessSortObjectTypes[];
   };
 }
 

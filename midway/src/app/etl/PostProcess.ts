@@ -45,10 +45,17 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as _ from 'lodash';
+import * as queryString from 'query-string';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import { PostProcessAggregationTypes, PostProcessConfig, PostProcessOptionsTypes } from 'shared/etl/types/PostProcessTypes';
+import {
+  PostProcessAggregationTypes,
+  PostProcessConfig,
+  PostProcessFilterTypes,
+  PostProcessParseTypes,
+  PostProcessOptionsTypes,
+} from 'shared/etl/types/PostProcessTypes';
 
 import BufferTransform from '../io/streams/BufferTransform';
 
@@ -95,6 +102,15 @@ export class PostProcess
           {
             case 'Aggregate':
               processedData = this._aggregate(transformConfig.options, processedData);
+              break;
+            case 'Filter':
+              processedData = this._filter(transformConfig.options, processedData);
+              break;
+            case 'Parse':
+              processedData = this._parse(transformConfig.options, processedData);
+              break;
+            case 'Sort':
+              processedData = this._sort(transformConfig.options, processedData);
               break;
             default:
               break;
@@ -184,7 +200,57 @@ export class PostProcess
           }
         });
         break;
+      default:
+    }
+    return returnData;
+  }
 
+  private _parse(options: object, data: object[]): object[]
+  {
+    const returnData: object[] = [];
+    switch (options['operation'])
+    {
+      case PostProcessParseTypes.ParseURL:
+        data.forEach((row) =>
+        {
+          const newRow = _.cloneDeep(row);
+          const parsedClicks = queryString.parseUrl(newRow[options['field']]);
+          const parsedClicksUrl = parsedClicks['url'];
+          const parsedClicksQuery = parsedClicks['query'];
+          const domainName = options['url'];
+          let parsedClicksUrlArr = [];
+          try
+          {
+            parsedClicksUrlArr = parsedClicksUrl.substring(parsedClicksUrl.indexOf(domainName) + domainName.length).split('/').filter((token) => token.length !== 0);
+          }
+          catch (e)
+          {
+            // do nothing
+          }
+          if (parsedClicksUrlArr.length !== 0)
+          {
+            newRow[options['field']] = parsedClicksQuery;
+          }
+
+          returnData.push(newRow);
+        });
+        break;
+      default:
+    }
+    return returnData;
+  }
+
+  private _filter(options: object, data: object[]): object[]
+  {
+    let returnData: object[] = [];
+    switch (options['operation'])
+    {
+      case PostProcessFilterTypes.RemoveByPattern:
+        returnData = data.filter((row) =>
+          row[options['primaryKey']] != null && Array.isArray(row[options['primaryKey']].match(new RegExp(options['pattern'], 'g'))));
+        break;
+      case PostProcessFilterTypes.MostRecent:
+        break;
       default:
     }
     return returnData;
