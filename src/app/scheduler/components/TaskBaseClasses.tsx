@@ -62,8 +62,8 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 import EndpointForm from 'app/etl/common/components/EndpointForm';
 import { ParamConfigType, TaskConfig } from 'app/scheduler/SchedulerTypes';
 import FadeInOut from 'common/components/FadeInOut';
-import TaskEnum from 'shared/types/jobs/TaskEnum';
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import TaskEnum from 'shared/types/jobs/TaskEnum';
 
 const { List, Map } = Immutable;
 
@@ -93,7 +93,7 @@ abstract class TaskFormBase<FormState, P extends Props = Props> extends TerrainC
    */
   public configToState(config): FormState
   {
-    return config ? config.toJS() : {};
+    return config ? config.toObject() : {};
   }
 
   public stateToConfig(state: FormState)
@@ -130,8 +130,6 @@ abstract class TaskFormBase<FormState, P extends Props = Props> extends TerrainC
 
   protected handleFormChange(state: FormState, apply?: boolean)
   {
-    console.log('Apply ', apply);
-    console.log('state ', state);
     if (apply)
     {
       const { onChange, task } = this.props;
@@ -143,17 +141,11 @@ abstract class TaskFormBase<FormState, P extends Props = Props> extends TerrainC
   protected handleComponentChange(componentType, key, value)
   {
     const { params } = this.props.task;
-    let state = Map();
-    console.log('params ', params);
     if (params !== undefined)
     {
-      state = params.get('options').get(componentType);
-      console.log('key path ', componentType, key);
-      console.log('options ', state);
-      state = state.set(key, value);
+      const newValue = params.get('options').get(componentType).set(key, value);
+      this.props.onChange(this.props.task.setIn(['params', 'options', componentType], newValue));
     }
-    console.log('state is ', state);
-    this.props.onChange(this.props.task.setIn(['params', 'options', componentType], state));
   }
 }
 
@@ -197,7 +189,7 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
     },
     overrideSources: {
       type: DisplayType.Custom,
-      displayName: 'Sources',
+      displayName: undefined,
       options: {
         render: (state, disabled) =>
         {
@@ -220,12 +212,11 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
                 {
                   sources.keySeq().map((key) =>
                   {
-                    const source = state.overrideSources[key] || sources.get(key);
-                    console.log('passing source in as ', source);
+                    const source = state.overrideSources.get(key) || sources.get(key);
                     return (
                       <EndpointForm
                         isSource={true}
-                        endpoint={_SourceConfig(Util.asJS(source))}
+                        endpoint={source}
                         onChange={this._fn(this.handleComponentChange, 'overrideSources', key)}
                         isSchedule={true}
                         key={source.name}
@@ -241,7 +232,7 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
     },
     overrideSinks: {
       type: DisplayType.Custom,
-      displayName: 'Sources',
+      displayName: undefined,
       options: {
         render: (state, disabled) =>
         {
@@ -268,7 +259,7 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
                     return (
                       <EndpointForm
                         isSource={true}
-                        endpoint={_SinkConfig(Util.asJS(sink))}
+                        endpoint={sink}
                         onChange={this._fn(this.handleComponentChange, 'overrideSinks', key)}
                         isSchedule={true}
                         key={sink.name}

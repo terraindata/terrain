@@ -97,8 +97,8 @@ class ScheduleList extends TerrainComponent<Props>
     {
       name: 'Status',
       render: (schedule, index) => this.getScheduleStatus(schedule),
-      style: { width: '30%'}
-    }
+      style: { width: '30%' },
+    },
   ];
 
   public interval;
@@ -106,8 +106,8 @@ class ScheduleList extends TerrainComponent<Props>
   public state: {
     confirmModalOpen: boolean,
   } = {
-    confirmModalOpen: false,
-  };
+      confirmModalOpen: false,
+    };
 
   public componentWillMount()
   {
@@ -191,17 +191,17 @@ class ScheduleList extends TerrainComponent<Props>
     let actions = List([
       {
         text: schedule.shouldRunNext ? 'Disable' : 'Enable',
-        onClick: this._fn(this.performAction, 'disableSchedule', schedule.id)
-      }
+        onClick: this._fn(this.performAction, 'disableSchedule', schedule.id),
+      },
     ]);
     if (!schedule.running)
     {
       actions = actions.push({
         text: 'Run Now',
-        onClick: this._fn(this.performAction, 'runSchedule', schedule.id)
+        onClick: this._fn(this.performAction, 'runSchedule', schedule.id),
       }).push({
         text: 'Delete',
-        onClick: this._fn(this.performAction, 'deleteSchedule', schedule.id)
+        onClick: this._fn(this.performAction, 'deleteSchedule', schedule.id),
       });
     }
     return actions;

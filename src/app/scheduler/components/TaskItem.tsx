@@ -158,8 +158,7 @@ class TaskItem extends TerrainComponent<Props>
   public render()
   {
     const { task, type } = this.props;
-    const hasFailureTask = task.onFailure !== undefined && task.onFailure !== null;
-    const hasSuccessTask = task.onSuccess !== undefined && task.onSuccess !== null;
+    console.log('RENDER TASK ', task);
     return (
       <div
         className='task-item-wrapper'

@@ -66,19 +66,20 @@ import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import { List, Map } from 'immutable';
 import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
+import
+{
+  CSSTransition,
+  TransitionGroup,
+} from 'react-transition-group';
 import SchedulerApi from 'scheduler/SchedulerApi';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
 import XHR from 'util/XHR';
 import './ScheduleEditorStyle';
-import {
-  CSSTransition,
-  TransitionGroup,
-} from 'react-transition-group';
 export interface Props
 {
   location?: any;
@@ -292,7 +293,7 @@ class ScheduleEditor extends TerrainComponent<Props>
   {
     return (
       <CSSTransition
-        key={task.id + '-animate'}
+        key={String(task.id) + '-animate'}
         timeout={500}
         classNames='example'
       >

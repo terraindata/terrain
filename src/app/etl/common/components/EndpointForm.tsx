@@ -158,7 +158,6 @@ class EndpointForm extends TerrainComponent<Props>
       integration: newIntegration,
     });
     const newEndpoint = this.detectFileConfigFromIntegration(this.props.endpoint, newIntegration);
-    console.log('new endpoint ', newEndpoint);
 
     this.props.onChange(newEndpoint, apply);
   }
@@ -166,7 +165,6 @@ class EndpointForm extends TerrainComponent<Props>
   public handleIntegrationPickerChange(id: ID)
   {
     const endpoint = this.detectFileConfigFromIntegration(this.props.endpoint.set('integrationId', id), Number(id));
-    console.log('new endpoint ', endpoint);
     this.props.onChange(endpoint);
     this.setState({
       usingCustomIntegration: false,
@@ -265,7 +263,6 @@ class EndpointForm extends TerrainComponent<Props>
     const { isSource, endpoint, onChange } = this.props;
     const constructorToUse = isSource ? _SourceConfig : _SinkConfig;
     const newEndpoint = constructorToUse({ type: state.type });
-    console.log('new endpoitn ', newEndpoint);
     onChange(newEndpoint);
   }
 
@@ -276,7 +273,6 @@ class EndpointForm extends TerrainComponent<Props>
     const applyOpts = this.extractFileConfigDelta(oldOpts, newOpts);
     const newFileConfig = _FileConfig(_.extend({}, (newEndpoint.fileConfig as any).toObject(), applyOpts));
     newEndpoint = newEndpoint.set('fileConfig', newFileConfig);
-    console.log('new endpoitn ', newEndpoint);
     this.props.onChange(newEndpoint, apply);
   }
 
