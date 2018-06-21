@@ -98,6 +98,7 @@ export interface InputDeclarationOptionTypes<S = any>
     inputKey?: string; // default to 'inputState'
     onChangeKey?: string; // defaults to 'onChange'
     isList?: boolean;
+    listDefaultValue?: any;
   };
 }
 

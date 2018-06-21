@@ -156,12 +156,7 @@ export class Users
 
   public async select(columns: string[], filter: object): Promise<UserConfig[]>
   {
-    return new Promise<UserConfig[]>(async (resolve, reject) =>
-    {
-      const rawResults = await App.DB.select(this.userTable, columns, filter);
-      const results: UserConfig[] = rawResults.map((result: object) => new UserConfig(result));
-      resolve(results);
-    });
+    return App.DB.select(this.userTable, columns, filter) as Promise<UserConfig[]>;
   }
 
   public async get(id?: number): Promise<UserConfig[]>
@@ -175,18 +170,15 @@ export class Users
 
   public async loginWithAccessToken(id: number, accessToken: string): Promise<UserConfig | null>
   {
-    return new Promise<UserConfig | null>(async (resolve, reject) =>
+    const results: UserConfig[] = await this.select([], { id, accessToken }) as UserConfig[];
+    if (results.length > 0 && results[0]['accessToken'].length !== 0)
     {
-      const results: UserConfig[] = await this.select([], { id, accessToken }) as UserConfig[];
-      if (results.length > 0 && results[0]['accessToken'].length !== 0)
-      {
-        resolve(results[0]);
-      }
-      else
-      {
-        resolve(null);
-      }
-    });
+      return results[0];
+    }
+    else
+    {
+      return null;
+    }
   }
 
   public async loginWithEmail(email: string, password: string): Promise<UserConfig | null>

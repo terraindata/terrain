@@ -160,7 +160,7 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
       }
     }
 
-    if (algorithmIds.length > 0)
+    if (algorithmIds.length > 0 && analytics.selectedAnalyticsConnection !== null)
     {
       this.props.analyticsActions.fetch(
         analytics.selectedAnalyticsConnection,
@@ -317,6 +317,11 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
     );
   }
 
+  public handleDelete(id: ID)
+  {
+    this.props.algorithmActions.remove(this.props.algorithms.get(id));
+  }
+
   public handleCreate()
   {
     this.props.algorithmActions.create(this.props.categoryId, this.props.groupId);
@@ -428,16 +433,20 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
     if (selectedAlgorithm === id)
     {
       this.props.algorithmActions.unselect();
-    } else
+    }
+    else
     {
       this.props.algorithmActions.select(id);
-      this.props.analyticsActions.fetch(
-        analytics.selectedAnalyticsConnection,
-        [id],
-        analytics.selectedMetric,
-        analytics.selectedInterval,
-        analytics.selectedDateRange,
-      );
+      if (analytics.selectedAnalyticsConnection !== null)
+      {
+        this.props.analyticsActions.fetch(
+          analytics.selectedAnalyticsConnection,
+          [id],
+          analytics.selectedMetric,
+          analytics.selectedInterval,
+          analytics.selectedDateRange,
+        );
+      }
     }
   }
 
@@ -567,6 +576,7 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
         canDuplicate={canEdit}
         canUnarchive={algorithm.status === ItemStatus.Archive}
         canRename={canRename}
+        canDelete={canEdit && canRename && algorithm.status === ItemStatus.Archive}
         canPin={canPinItems}
         isPinned={isPinned}
         onPin={this.handlePinAlgorithm}
@@ -589,6 +599,7 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
         isStarred={algorithm.status === 'DEFAULT'}
         isSelected={isSelected}
         isFocused={true}
+        onDelete={this.handleDelete}
       >
         <div className='flex-container'>
           <UserThumbnail

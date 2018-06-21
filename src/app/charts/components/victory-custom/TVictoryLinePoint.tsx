@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
-import { Line, Point } from 'victory';
+import { Axis, Point } from 'victory';
 
 interface TVictoryLinePointProps
 {
@@ -58,7 +58,7 @@ const TVictoryLinePoint = (props: TVictoryLinePointProps) =>
 {
   return props.active ? (
     <g>
-      <Line
+      <Axis
         style={props.lineStyle}
         x1={props.x}
         y1={0}

@@ -46,6 +46,7 @@ THE SOFTWARE.
 // tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
 import { List, Record } from 'immutable';
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import { _SinkConfig, _SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { TaskConfig as SharedTaskConfig } from 'shared/types/jobs/TaskConfig';
 import SharedSchedulerConfig from 'shared/types/scheduler/SchedulerConfig';
@@ -55,6 +56,7 @@ import Util from 'util/Util';
 class SchedulerConfigC extends SharedSchedulerConfig
 {
   // if extra front-end specific functions or properties are needed, add here
+  public isNew: boolean = false;
 }
 
 const SchedulerConfig_Record = createRecordType(new SchedulerConfigC(), 'SchedulerConfigC');
@@ -112,9 +114,9 @@ export const _TaskConfig =
     task = task.setIn(['params', 'options'], task.getIn(['params', 'options']) ?
       Immutable.Map(task.getIn(['params', 'options'])) : Immutable.Map({}));
     task = task.setIn(['params', 'options', 'overrideSources'],
-      Util.objectToImmutableMap(parseToObject(task, ['params', 'options', 'overrideSources']), _SourceConfig));
+      Util.objectToImmutableMap(parseToObject(task, ['params', 'options', 'overrideSources']), _.partialRight(_SourceConfig, true)));
     task = task.setIn(['params', 'options', 'overrideSinks'],
-      Util.objectToImmutableMap(parseToObject(task, ['params', 'options', 'overrideSinks']), _SinkConfig));
+      Util.objectToImmutableMap(parseToObject(task, ['params', 'options', 'overrideSinks']), _.partialRight(_SinkConfig, true)));
     return task;
   };
 

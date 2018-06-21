@@ -74,7 +74,7 @@ export function buildRoute(routeComponents: LibraryRouteComponents)
     }
   }
 
-  if (routeComponents.pinned !== undefined)
+  if (routeComponents.pinned !== undefined && routeComponents.pinned.length > 0)
   {
     route += `?pinned=${routeComponents.pinned.join(',')}`;
   }

@@ -82,28 +82,22 @@ export class Versions
 
   public async get(objectType?: string, objectId?: number): Promise<VersionConfig[]>
   {
-    return new Promise<VersionConfig[]>(async (resolve, reject) =>
+    if (objectId !== undefined && objectType !== undefined)
     {
-      let rawResults;
-      if (objectId !== undefined && objectType !== undefined)
-      {
-        rawResults = await App.DB.select(this.versionTable, [], { objectType, objectId });
-      }
-      else if (objectType !== undefined)
-      {
-        rawResults = await App.DB.select(this.versionTable, [], { objectType });
-      }
-      else if (objectId !== undefined)
-      {
-        rawResults = await App.DB.select(this.versionTable, [], { objectId });
-      }
-      else
-      {
-        rawResults = await App.DB.select(this.versionTable, [], {});
-      }
-      const results: VersionConfig[] = rawResults.map((result: object) => new VersionConfig(result));
-      resolve(results);
-    });
+      return App.DB.select(this.versionTable, [], { objectType, objectId }) as Promise<VersionConfig[]>;
+    }
+    else if (objectType !== undefined)
+    {
+      return App.DB.select(this.versionTable, [], { objectType }) as Promise<VersionConfig[]>;
+    }
+    else if (objectId !== undefined)
+    {
+      return App.DB.select(this.versionTable, [], { objectId }) as Promise<VersionConfig[]>;
+    }
+    else
+    {
+      return App.DB.select(this.versionTable, [], {}) as Promise<VersionConfig[]>;
+    }
   }
 }
 

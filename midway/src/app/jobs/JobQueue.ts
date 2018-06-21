@@ -448,8 +448,7 @@ export class JobQueue
         .filter(this.jobTable['running'].equals(false)).sort(this.jobTable['priority'], 'asc')
         .sort(this.jobTable['runNowPriority'], 'desc').sort(this.jobTable['createdAt'], 'asc').take(newJobSlots);
       const generatedQuery = App.DB.getDB().generate(query);
-      const rawResults = await App.DB.getDB().execute(generatedQuery);
-      const jobs: JobConfig[] = rawResults.map((result) => new JobConfig(result as JobConfig));
+      const jobs = await App.DB.getDB().execute(generatedQuery) as JobConfig[];
 
       let i = 0;
       while (i < newJobSlots)
@@ -547,25 +546,22 @@ export class JobQueue
 
   private async _select(columns: string[], filter: object, locked?: boolean): Promise<JobConfig[]>
   {
-    return new Promise<JobConfig[]>(async (resolve, reject) =>
+    if (locked === undefined) // all
     {
-      let rawResults: object[] = [];
-      if (locked === undefined) // all
-      {
-        rawResults = await App.DB.select(this.jobTable, columns, filter);
-      }
-      else if (locked === true) // currently running
-      {
-        // TODO
-      }
-      else // currently not running
-      {
-        // TODO
-      }
-
-      const results: JobConfig[] = rawResults.map((result: object) => new JobConfig(result as JobConfig));
-      resolve(results);
-    });
+      return App.DB.select(this.jobTable, columns, filter) as Promise<JobConfig[]>;
+    }
+    else if (locked === true) // currently running
+    {
+      // TODO
+      winston.info('not implemented');
+      return [];
+    }
+    else // currently not running
+    {
+      // TODO
+      winston.info('not implemented');
+      return [];
+    }
   }
 
   private async _sendEmail(jobId: number): Promise<void>
@@ -629,9 +625,7 @@ export class JobQueue
         .filter(this.jobTable['running'].equals(false)).filter(this.jobTable['priority'].equals(0))
         .sort(this.jobTable['runNowPriority'], 'desc').take(1);
       const generatedQuery = App.DB.getDB().generate(query);
-      const rawResults = await App.DB.getDB().execute(generatedQuery);
-
-      const jobs: JobConfig[] = rawResults.map((result: object) => new JobConfig(result as JobConfig));
+      const jobs = await App.DB.getDB().execute(generatedQuery) as JobConfig[];
       if (jobs.length !== 0)
       {
         maxRunNowPriority = jobs[0].runNowPriority;

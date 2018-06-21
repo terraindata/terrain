@@ -48,6 +48,8 @@ THE SOFTWARE.
 
 /// <reference path="../../shared/typings/tsd.d.ts" />
 
+import TerrainStoreLogger from 'store/TerrainStoreLogger';
+
 require('babel-polyfill');
 
 // Style
@@ -316,7 +318,7 @@ class App extends TerrainComponent<Props>
     else
     {
       const segments = location.split('.');
-      const customerName: string = segments[0];
+      const customerName: string = segments[0].replace('https://', '');
       const capitalizeCustomer: string = customerName.charAt(0).toUpperCase() + customerName.slice(1);
       customerTitle = ' | ' + capitalizeCustomer;
     }
@@ -423,7 +425,7 @@ class App extends TerrainComponent<Props>
     });
   }
 
-  public componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (this.props.auth !== nextProps.auth)
     {
@@ -439,6 +441,15 @@ class App extends TerrainComponent<Props>
       if (token !== null)
       {
         this.fetchData();
+      }
+    }
+
+    if (this.props.location.pathname !== nextProps.location.pathname)
+    {
+      if (window['dataLayer'] !== undefined)
+      {
+        // track new pageview event, as the URL changed
+        window['dataLayer'].push({ event: 'pageview' });
       }
     }
   }
@@ -592,7 +603,8 @@ class App extends TerrainComponent<Props>
         {({ width, height }) => (
           <div
             className='app'
-            onMouseMove={this.handleMouseMove}
+            onMouseDown={TerrainStoreLogger.recordMouseClick as any}
+            onKeyPress={TerrainStoreLogger.recordKeyPress as any}
             key='app'
             style={APP_STYLE}
           >

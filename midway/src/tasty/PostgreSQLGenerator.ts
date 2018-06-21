@@ -165,7 +165,7 @@ export default class SQLGenerator
         {
           this.appendSubexpression(alias.query);
           this.queryString += ' AS ';
-          this.queryString += this.escapeString(alias.name);
+          this.queryString += '"' + this.escapeString(alias.name) + '"';
         },
         () =>
         {
@@ -179,7 +179,7 @@ export default class SQLGenerator
     // write FROM clause
     // this.newLine();
     this.queryString += 'FROM ';
-    this.queryString += this.escapeString(query.table.getTableName());
+    this.queryString += '"' + this.escapeString(query.table.getTableName()) + '"';
 
     // write WHERE clause
     if (query.filters.length > 0)
@@ -264,7 +264,7 @@ export default class SQLGenerator
     this.queryString += ' INTO ';
 
     const tableName: string = this.escapeString(query.table.getTableName());
-    this.queryString += tableName;
+    this.queryString += '"' + tableName + '"';
 
     const baseQuery = this.queryString;
 
@@ -365,8 +365,11 @@ export default class SQLGenerator
       return;
     }
 
+    const quotedColumns = columns.map((c) => '"' + c + '"');
+    const quotedPrimaryKeys = primaryKeys.map((c) => '"' + c + '"');
+
     let query = this.queryString;
-    const joinedColumnNames = ' (' + columns.join(', ') + ')';
+    const joinedColumnNames = ' (' + quotedColumns.join(', ') + ')';
     query += joinedColumnNames;
     query += ' VALUES ';
 
@@ -395,7 +398,7 @@ export default class SQLGenerator
       accumulatedUpdates[0][primaryKeys[0]] !== undefined)
     {
       query += ' ON CONFLICT (';
-      query += primaryKeys.join(', ');
+      query += quotedPrimaryKeys.join(', ');
       query += ') DO UPDATE SET';
       query += joinedColumnNames;
       query += ' = ';
@@ -408,17 +411,18 @@ export default class SQLGenerator
           return '$' + currentColumn.toString();
         }).join(', ');
       query += ')';
-      query += ' WHERE (' + primaryKeys.map((col: string) => tableName + '.' + col).join(', ') + ') = (' + primaryKeys.map(
-        (col: string) =>
-        {
-          return JSON.stringify(accumulatedUpdates[0][col]);
-        }).join(', ');
+      query += ' WHERE (' + primaryKeys.map((col: string) => '"' + tableName + '".' + '"' + col + '"')
+        .join(', ') + ') = (' + primaryKeys.map(
+          (col: string) =>
+          {
+            return JSON.stringify(accumulatedUpdates[0][col]);
+          }).join(', ');
       query += ')';
     }
 
     if (primaryKeys !== undefined && primaryKeys.length > 0)
     {
-      query += ' RETURNING ' + primaryKeys[0] + ' AS insertid';
+      query += ' RETURNING "' + primaryKeys[0] + '" AS insertid';
     }
 
     this.accumulateStatement(query, this.values);
@@ -584,9 +588,9 @@ export default class SQLGenerator
           case '\r':
             return '\\r';
           case '\"':
-            return '\"';
+            return '\"\"';
           case '\'':
-            return '\'\'';
+            return '\'';
           case '\\':
           case '%':
             return '\\' + char;
@@ -611,7 +615,7 @@ export default class SQLGenerator
 
     if (node.type === 'reference')
     {
-      return this.escapeString(node.value);
+      return '"' + this.escapeString(node.value) + '"';
     }
     if (node.type === 'string')
     {

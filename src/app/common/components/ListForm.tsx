@@ -65,13 +65,21 @@ import Quarantine from 'util/RadiumQuarantine';
 import './ObjectForm.less';
 const DeleteIcon = require('images/icon_close.svg');
 
+export interface RowOptions
+{
+  disabled?: boolean;
+}
+
 interface Props<T>
 {
   items: T[];
   onChange: (newValue: T[], apply?: boolean) => void;
-  renderItem?: (item: T) => any;
+  renderItem?: (item: T, index?: number) => any;
   newItemDefault?: T;
   label?: string;
+  computeOptions?: (index: number) => RowOptions;
+  noBorder?: boolean;
+  style?: any;
 }
 
 // performance of this component can be optimized
@@ -81,7 +89,7 @@ export default class ListForm<T = string> extends TerrainComponent<Props<T>>
   {
     return (
       <PathfinderCreateLine
-        text={'New Field'}
+        text={'New Entry'}
         canEdit={true}
         onCreate={this.addRow}
         showText={true}
@@ -90,14 +98,29 @@ export default class ListForm<T = string> extends TerrainComponent<Props<T>>
     );
   }
 
+  public getOptions(index: number): RowOptions
+  {
+    const { computeOptions } = this.props;
+    if (computeOptions !== undefined)
+    {
+      return computeOptions(index);
+    }
+    else
+    {
+      return {};
+    }
+  }
+
   public renderRow(index: number)
   {
     const value = this.props.items[index];
 
+    const { disabled } = this.getOptions(index);
+
     let component: any;
     if (this.props.renderItem !== undefined)
     {
-      component = this.props.renderItem(value);
+      component = this.props.renderItem(value, index);
     }
     else
     {
@@ -107,6 +130,7 @@ export default class ListForm<T = string> extends TerrainComponent<Props<T>>
           onChange={this.rowChangeFactory(index)}
           options={emptyOptions}
           onBlur={this.onBlurFactory(index)}
+          disabled={disabled}
         />
       );
     }
@@ -120,8 +144,8 @@ export default class ListForm<T = string> extends TerrainComponent<Props<T>>
         <Quarantine>
           <div
             className='list-form-row-delete'
-            style={fontColor(Colors().text3, Colors().text2)}
-            onClick={this.handleDeleteRowFactory(index)}
+            style={this.getRowStyle(disabled)}
+            onClick={disabled ? undefined : this.handleDeleteRowFactory(index)}
           >
             <DeleteIcon />
           </div>
@@ -130,18 +154,38 @@ export default class ListForm<T = string> extends TerrainComponent<Props<T>>
     );
   }
 
+  public getRowStyle(disabled: boolean = false)
+  {
+    if (disabled)
+    {
+      return {
+        visibility: 'hidden',
+      };
+    }
+    else
+    {
+      return fontColor(Colors().text3, Colors().text2);
+    }
+  }
+
   public render()
   {
     const indices = Immutable.Range(0, this.props.items.length);
     return (
-      <div className='object-form-container'>
+      <div
+        className='object-form-container'
+        style={this.props.style}
+      >
         {
           this.props.label === undefined ? null :
             <div className='object-form-label'>
               {this.props.label}
             </div>
         }
-        <div className='object-kv-body' style={borderColor(Colors().border1)}>
+        <div
+          className='object-kv-body'
+          style={this.props.noBorder ? { border: 'none' } : borderColor(Colors().border1)}
+        >
           {indices.map(this.renderRow)}
           {this.renderAddNewRow()}
         </div>

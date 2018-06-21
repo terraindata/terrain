@@ -45,13 +45,16 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as csv from './util/CSV';
+import * as dsn from './util/DSN';
 import * as elastic from './util/Elastic';
 import * as json from './util/JSON';
 import * as promise from './util/Promise';
 import * as xml from './util/XML';
+
 export const Util =
   {
     csv,
+    dsn,
     elastic,
     json,
     promise,

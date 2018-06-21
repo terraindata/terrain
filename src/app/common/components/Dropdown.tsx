@@ -60,6 +60,7 @@ import KeyboardFocus from './../../common/components/KeyboardFocus';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import FloatingInput from './FloatingInput';
 
+import TerrainStoreLogger from 'store/TerrainStoreLogger';
 import './Dropdown.less';
 
 export interface Props
@@ -164,6 +165,7 @@ class Dropdown extends TerrainComponent<Props>
   public onMouseDown(event)
   {
     event.stopPropagation();
+    TerrainStoreLogger.recordMouseClick(event);
     $('body').unbind('click', this.close);
   }
 

@@ -179,7 +179,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       {
         return accumulator;
       }
-      if (Array.isArray(el))
+      if (Array.isArray(el) && field.contains(-1))
       {
         for (let i: number = 0; i < el.length; i++)
         {

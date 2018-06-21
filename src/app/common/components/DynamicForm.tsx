@@ -66,6 +66,7 @@ import Autocomplete from 'common/components/Autocomplete';
 import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
 import FadeInOut from 'common/components/FadeInOut';
+import ListForm from 'common/components/ListForm';
 
 import './DynamicForm.less';
 
@@ -128,7 +129,19 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   public renderCustom(inputInfo: InputDeclarationType<S>, stateName, state: S, index, disabled: boolean)
   {
     const options: OptionType<DisplayType.Custom> = inputInfo.options || {};
-    return options.render(state, disabled);
+    return (
+      <div
+        className='dynamic-form-default-block'
+        key={index}
+      >
+        {
+          inputInfo.displayName ?
+            <div className='dynamic-form-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
+            : null
+        }
+        {options.render(state, disabled)}
+      </div>
+    );
   }
 
   public renderDelegate(inputInfo: InputDeclarationType<S>, stateName, state: S, index, disabled: boolean)
@@ -143,7 +156,9 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     let formElement;
     if (options.isList)
     {
-
+      formElement = (
+        <ListForm
+      );
     }
     
     return (
@@ -493,18 +508,24 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     for (const stateName of Object.keys(inputMap))
     {
       const { group } = inputMap[stateName];
-      const inputInfo: InputDeclarationType<S> = _.defaults({}, inputMap[stateName],
-        { displayName: stateName, getDisplayState: () => DisplayState.Active },
+      // set defaults
+      const inputInfo: InputDeclarationType<S> = _.defaults(
+        {},
+        inputMap[stateName],
+        { getDisplayState: () => DisplayState.Active },
       );
+
+      // build the render matrix
       let useIndex = renderMatrix.size;
       if (group !== undefined)
       {
+        // set groupToIndex[group] to be the next index, if it doesn't exist. Otherwise don't change it
         groupToIndex[group] = _.get(groupToIndex, group, useIndex);
         useIndex = groupToIndex[group];
       }
+      // renderMatrix is a 2D matrix of functions
       renderMatrix = renderMatrix.updateIn([useIndex], List([]), (value) => value.push(
         this.renderInputElementFactory(inputInfo, stateName),
-        // (state, index) => this.renderInputElement(inputInfo, stateName, state, index),
       ));
     }
     return renderMatrix;

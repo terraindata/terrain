@@ -55,6 +55,7 @@ export enum Integrations
   Magento = 'Magento',
   GoogleAnalytics = 'GoogleAnalytics',
   Email = 'Email',
+  FollowUpBoss = 'FollowUpBoss',
   MailChimp = 'MailChimp',
 }
 
@@ -68,6 +69,7 @@ export const IntegrationNames =
     Magento: 'Magento',
     GoogleAnalytics: 'Google Analytics',
     Email: 'Email',
+    FollowUpBoss: 'Follow Up Boss',
     MailChimp: 'MailChimp',
   };
 
@@ -111,6 +113,9 @@ export interface AuthConfigTypes
     password: string;
   };
   MailChimp: {
+    apiKey: string;
+  };
+  FollowUpBoss: {
     apiKey: string;
   };
 }
@@ -166,6 +171,8 @@ export interface ConnectionConfigTypes
   };
   MailChimp: {
     host: string;
+  };
+  FollowUpBoss: {
   };
 }
 

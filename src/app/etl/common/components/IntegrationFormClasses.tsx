@@ -490,6 +490,25 @@ class MailChimpForm extends IntegrationFormBase<MailChimpAuthT, MailChimpConnect
   };
 }
 
+type FollowUpBossAuthT = AuthConfigType<Integrations.FollowUpBoss>;
+type FollowUpBossConnectionT = ConnectionConfigType<Integrations.FollowUpBoss>;
+class FollowUpBossForm extends IntegrationFormBase<FollowUpBossAuthT, FollowUpBossConnectionT>
+{
+  public authMap: InputDeclarationMap<FollowUpBossAuthT> = {
+    apiKey: {
+      type: DisplayType.TextBox,
+      displayName: 'API Key',
+    },
+  };
+
+  public connectionMap: InputDeclarationMap<FollowUpBossConnectionT> = {
+    host: {
+      type: DisplayType.TextBox,
+      displayName: 'Host',
+    },
+  };
+}
+
 type FormLookupMap =
   {
     [k in Integrations]: React.ComponentClass<Props>
@@ -505,5 +524,6 @@ export const IntegrationFormMap: FormLookupMap =
     [Integrations.Postgresql]: PostgresqlForm,
     [Integrations.Magento]: MagentoForm,
     [Integrations.GoogleAnalytics]: GoogleAnalyticsForm,
+    [Integrations.FollowUpBoss]: FollowUpBossForm,
     [Integrations.MailChimp]: MailChimpForm,
   };
