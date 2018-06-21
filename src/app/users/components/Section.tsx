@@ -109,8 +109,15 @@ export default class Section extends TerrainComponent<Props>
     }
   }
 
+  public renderProfilePicture()
+  {
+    return (<img src={UserTypes.profileUrlFor(this.props.user)}
+            ref='profilePicImg' />);
+  }
+
   public renderBlockColumn()
   {
+    let picEditPrompt: number = (this.state.isEditing) ? 0.4 : 1; 
     if (this.props.columnNum === 0)
     {
       return (
@@ -132,8 +139,7 @@ export default class Section extends TerrainComponent<Props>
 
       return (
         <div className='section-body' style={{ background: Colors().bg }}>
-          {this.props.hasPhoto ? <div className='profile-pic'><img src={UserTypes.profileUrlFor(this.props.user)} // this.props.user
-            ref='profilePicImg' /></div> : null}
+          {this.props.hasPhoto ? <div className='profile-pic' style={{ opacity: picEditPrompt}} > {this.renderProfilePicture()} </div> : null}
           <div className='profile-text'>
             {columns.map((col, i) => this.renderBlocks(col, 'profile-col-1', i))}
           </div>
@@ -159,7 +165,6 @@ export default class Section extends TerrainComponent<Props>
   public handleTimeZoneEdit(block, index)
   {
     const currentInput = block.options.get(index);
-    // console.log("current input " + currentInput);
     const currentEditingState = this.state.editingSections;
     currentEditingState.timeZone = currentInput;
     this.setState(

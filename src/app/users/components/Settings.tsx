@@ -300,6 +300,16 @@ class Settings extends TerrainComponent<Props>
     const newPassword: string = editingSections.newPassword;
     const confirmPassword: string = editingSections.confirmPassword;
 
+    if (currentPassword === undefined || newPassword === undefined || confirmPassword === undefined)
+    {
+      this.setState({
+        modalMessage: 'Missing input field',
+        errorModal: true,
+      });
+      this.toggleModal();
+      return;
+    }
+
     if (newPassword.length < 6)
     {
       this.setState({
