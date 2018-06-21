@@ -237,7 +237,7 @@ export class App
     // make sure we insert the RouteErrorHandler first
     this.app.use(RouteError.RouteErrorHandler);
     this.app.use(MidwayRouter().routes());
-    // this.app.use(serve({ rootDir: './midway/src/assets', rootPath: '/midway/v1/assets' }));
+    this.app.use(serve({ rootDir: './midway/src/assets', rootPath: '/midway/v1/assets' }));
     this.app.use(NotFoundRouter.routes());
   }
 

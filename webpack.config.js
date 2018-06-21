@@ -56,7 +56,7 @@ module.exports =
   output:
   {
     path: __dirname,
-    publicPath: '/midway/v1/assets/',
+    publicPath: '/midway/v1/bundles/',
     filename: 'bundle.js',
     chunkFilename: '[name].bundle.js'
   },
@@ -65,7 +65,21 @@ module.exports =
   devServer: {
     headers: {
       'Access-Control-Allow-Origin': '*'
-    }
+    },
+    
+    // proxy midway requests to dev midway
+    proxy: {
+      '/midway/**': {
+        target: 'http://localhost:3000/midway',
+        rewrite: function(req) {
+          console.log('HEYYYYAAAA ' + req.url);
+          return req.url;
+        },
+        pathRewrite: { '^/midway': '' },
+        secure: false,
+        logLevel: 'debug',
+      },
+    },
   },
 
   resolve:
@@ -141,7 +155,7 @@ module.exports =
       { test: /\.txt$/, exclude: /midway/, loader: 'raw-loader' },
     ],
   },
-
+  
   plugins:
   [
     new webpack.DefinePlugin({

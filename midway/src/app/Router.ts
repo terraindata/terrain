@@ -128,92 +128,18 @@ export function getRouter()
     ctx.body = 'authenticated as ' + (ctx.state.user[0].email as string);
   });
 
-  interface AllowedFileOptions
+  AppRouter.get('/bundles/:bundle', passport.authenticate('access-token-local'), async (ctx, next) =>
   {
-    requiresAuth?: boolean;
-    routeTo8080InDev?: boolean;
-  }
-
-  // Allow these specific filenames
-  const allowedFiles: { [name: string]: AllowedFileOptions } = {
-    'index.html': {
-      routeTo8080InDev: true,
-    },
-    'login.js': { },
-    'login.css': { },
-    'login-bg.png': { },
-    
-    'bundle.js': {
-      requiresAuth: true,
-      routeTo8080InDev: true,
-    },
-    'vendor.bundle.js': {
-      requiresAuth: true,
-      routeTo8080InDev: true,
-    }
-  };
-
-  // Allow any files matching these extensions
-  const allowedExtensions: string[] = [
-    '.woff',
-    '.jpg',
-  ];
-  
-  const serveAsset = async (ctx, next) =>
-  {
-    winston.info('assssset');
-    let rejectRequest: boolean = false;
-    const allowedFileOptions = allowedFiles[ctx.params['asset']];
-    
-    if (allowedFileOptions === undefined)
+    if (process.env.NODE_ENV !== 'production')
     {
-      rejectRequest = true;
-      allowedExtensions.forEach((ext) =>
-      {
-        if (ctx.params['asset'].endsWith(ext))
-        {
-          rejectRequest = false;
-        }
-      });
-    }
-    else if(allowedFileOptions.requiresAuth)
-    {
-      let authenticated = true;
-      
-      // TODO authenticate
-      
-      if (!authenticated)
-      {
-        rejectRequest = true;
-      }
-    }
-
-    if (rejectRequest === true)
-    {
-      return;
-    }
-    
-    winston.info('asdf ' + allowedFileOptions.routeTo8080InDev + 'e' + process.env.NODE_ENV );
-    let path = `${ctx.params['path']}`;
-    if (ctx.params['folder'] != undefined)
-    {
-      path = ctx.params['folder'] + '/' + path;
-    }
-    winston.info('path ' + path);
-    
-    if (allowedFileOptions.routeTo8080InDev && process.env.NODE_ENV !== 'production')
-    {
-      ctx.body = await Util.doRequest(`http://localhost:8080/midway/v1/assets/${path}`);
+      ctx.body = await Util.doRequest(`http://localhost:8080/midway/v1/bundles/${ctx.params['bundle']}`);
     }
     else
     {
-      await send(ctx, `/midway/src/assets/${path}`);
+      await send(ctx, `/midway/src/bundles/${ctx.params['bundle']}`);
     }
-  }
-  
-  AppRouter.get('/assets/static/:folder/:asset', serveAsset);
-  AppRouter.get('/assets/:asset', serveAsset);
-  
+  });
+
   const MidwayRouter = new KoaRouter();
   MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
 
