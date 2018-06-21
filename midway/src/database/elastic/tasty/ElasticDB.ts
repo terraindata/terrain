@@ -80,7 +80,8 @@ export class ElasticDB implements TastyDB
     {
       this.client.indices.getMapping(
         {},
-        util.promise.makeCallback((response) => {
+        util.promise.makeCallback((response) =>
+        {
           let filteredResponse = response;
           if (skipHidden)
           {
@@ -435,11 +436,15 @@ export class ElasticDB implements TastyDB
 
   private filterHiddenIndexes(indexes)
   {
-    const indexesKeys = Object.keys(indexes);
-    const visibleIndexes = indexesKeys.filter((i) => !/^\./.test(i));
     const filteredIndexes = {};
 
-    visibleIndexes.map((i) => filteredIndexes[i] = indexes[i]);
+    Object.keys(indexes).forEach((i) =>
+    {
+      if (!i.startsWith('.'))
+      {
+        filteredIndexes[i] = indexes[i];
+      }
+    });
 
     return filteredIndexes;
   }
