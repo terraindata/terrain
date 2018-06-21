@@ -144,11 +144,12 @@ interface TransformationOptionTypes
     factor: number;
   };
   SetIfNode: {
-    filterNull: boolean;
-    filterNaN: boolean;
-    filterStringNull: boolean;
-    filterUndefined: boolean;
-    filterValue: any | undefined;
+    filterNull?: boolean;
+    filterNaN?: boolean;
+    filterStringNull?: boolean;
+    filterUndefined?: boolean;
+    filterValue?: any | undefined;
+    invert?: boolean;
     newValue: any;
   };
   FindReplaceNode: {
