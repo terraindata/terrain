@@ -102,10 +102,21 @@ class FollowUpBossStream extends stream.Writable
     if (!isNaN(chunk['FollowUpBossId']))
     {
       // Has valid FollowUpBossId, so do PUT (update)
+
+      const formattedChunk = _.omit(chunk, 'FollowUpBossId');
+      if (formattedChunk['tags'] && formattedChunk['tags'].indexOf('terrain') === -1)
+      {
+        formattedChunk['tags'].push('terrain');
+      }
+      else if (!formattedChunk['tags'])
+      {
+        formattedChunk['tags'] = ['terrain'];
+      }
+
       request({
         url: `https://api.followupboss.com/v1/people/${chunk['FollowUpBossId']}`,
         method: 'PUT',
-        json: _.omit(chunk, 'FollowUpBossId'),
+        json: formattedChunk,
         headers: {
           'Authorization': `Basic ${new Buffer((this.config['apiKey'] as string) + ':').toString('base64')}`,
           'Content-Type': 'application/json',
