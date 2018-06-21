@@ -60,8 +60,8 @@ export default class XMLTransform
     return new XMLImportTransform(path);
   }
 
-  public static createExportStream(path?: string): Transform
+  public static createExportStream(path?: string, isPlaFeed: boolean): Transform
   {
-    return new XMLExportTransform(path);
+    return new XMLExportTransform(path, isPlaFeed);
   }
 }

@@ -58,7 +58,9 @@ import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import
 {
   AlgorithmEndpoint,
-  DatabaseEndpoint, DownloadEndpoint, FsEndpoint, GoogleAnalyticsEndpoint,
+  DatabaseEndpoint, DownloadEndpoint,
+  FollowUpBossEndpoint, FsEndpoint,
+  GoogleAnalyticsEndpoint,
   HttpEndpointForm, MailChimpEndpoint, Props, SftpEndpoint,
   SQLEndpoint, UploadEndpoint,
 } from './EndpointFormClasses';
@@ -87,5 +89,6 @@ export const SinkFormMap: FormLookupMap<Sinks> =
     [Sinks.Sftp]: SftpEndpoint,
     [Sinks.Http]: HttpEndpointForm,
     [Sinks.Fs]: FsEndpoint,
+    [Sinks.FollowUpBoss]: FollowUpBossEndpoint,
     [Sinks.MailChimp]: MailChimpEndpoint,
   };

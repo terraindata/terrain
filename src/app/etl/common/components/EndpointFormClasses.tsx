@@ -147,6 +147,7 @@ export abstract class EndpointFormBase<State, P extends Props = Props> extends T
             <FileConfigForm
               fileConfig={fileConfig}
               onChange={this.handleFileConfigChange}
+              isSource={this.props.isSource}
             /> : null
         }
         {
@@ -424,6 +425,12 @@ export class DatabaseEndpoint extends EndpointFormBase<DatabaseState>
     const newOptions = { serverId, database, table, language };
     onChange(endpoint.set('options', newOptions));
   }
+}
+
+type FollowUpBossState = SinkOptionsType<Sinks.FollowUpBoss>;
+export class FollowUpBossEndpoint extends EndpointFormBase<FollowUpBossState>
+{
+  public inputMap: InputDeclarationMap<FollowUpBossState> = {};
 }
 
 type FsState = SinkOptionsType<Sinks.Fs>;

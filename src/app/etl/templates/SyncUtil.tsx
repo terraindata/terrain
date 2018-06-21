@@ -99,7 +99,6 @@ export function createFieldFromEngine(
     fieldProps: engine.getFieldProps(id),
     inputKeyPath: engine.getInputKeyPath(id),
     outputKeyPath: engine.getOutputKeyPath(id),
-    type: engine.getFieldType(id) as FieldTypes,
     etlType: EngineUtil.getETLFieldType(id, engine),
     transformations,
     name: enginePath.last().toString(),

@@ -97,6 +97,7 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
             onChange={this.handleFileConfigChange}
             hideTypePicker={true}
             style={{ padding: '3px' }}
+            isSource={true}
           />
         </div>
       </span>

@@ -59,7 +59,6 @@ import
 {
   Border,
   createContainer,
-  Line,
   Point,
   VictoryArea,
   VictoryAxis,
@@ -547,7 +546,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                     interpolation={config.bottomChart.interpolation}
                     x={xDataKey}
                     y={yDataKey}
-                  />))}
+                  />)).toList()}
                 </VictoryGroup>
               </VictoryChart>
             )}
