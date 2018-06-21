@@ -425,9 +425,9 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     this.props.onChange(this.formatElasticQuery(this.state.sign, this.state.unit, e.target.value));
   }
 
-  public formatElasticQuery(sign: string, unit: string, amount: number): string
+  public formatElasticQuery(sign: string, unit: string, amount: string): string
   {
-    return 'now' + sign + amount.toString() + unit;
+    return 'now' + sign + amount + unit;
   }
 
   public dateToHourIndex(date: Moment)
