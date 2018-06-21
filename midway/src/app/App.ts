@@ -78,6 +78,11 @@ import { Scheduler } from './scheduler/Scheduler';
 import * as Schema from './Schema';
 import { users } from './users/UserRouter';
 
+// import bluebird = require('bluebird');
+
+// global.Promise = bluebird;
+// (Promise as any).longStackTraces();
+
 const MAX_CONN_RETRIES = 5;
 const CONN_RETRY_TIMEOUT = 1000;
 
