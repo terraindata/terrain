@@ -45,6 +45,8 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires no-unused-expression strict-boolean-expressions
 
+import * as React from 'react';
+
 export enum DisplayType
 {
   TextBox = 'TextBox',
@@ -53,6 +55,7 @@ export enum DisplayType
   Pick = 'Pick',
   TagsBox = 'TagsBox',
   Custom = 'Custom',
+  Delegate = 'Delegate',
 }
 
 export type InputDeclarationMap<State extends { [k: string]: any }> =
@@ -89,6 +92,12 @@ export interface InputDeclarationOptionTypes<S = any>
   };
   Custom: {
     render: (state: S, disabled: boolean) => any;
+  };
+  Delegate: {
+    component: React.ComponentClass<any>;
+    inputKey?: string; // default to 'inputState'
+    onChangeKey?: string; // defaults to 'onChange'
+    isList?: boolean;
   };
 }
 

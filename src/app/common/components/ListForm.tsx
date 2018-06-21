@@ -65,15 +65,17 @@ import Quarantine from 'util/RadiumQuarantine';
 import './ObjectForm.less';
 const DeleteIcon = require('images/icon_close.svg');
 
-interface Props
+interface Props<T>
 {
-  items: string[];
-  onChange: (newValue: string[], apply?: boolean) => void;
+  items: T[];
+  onChange: (newValue: T[], apply?: boolean) => void;
+  renderItem?: (item: T) => any;
+  newItemDefault?: T;
   label?: string;
 }
 
 // performance of this component can be optimized
-export default class ListForm extends TerrainComponent<Props>
+export default class ListForm<T = string> extends TerrainComponent<Props<T>>
 {
   public renderAddNewRow()
   {
@@ -92,17 +94,29 @@ export default class ListForm extends TerrainComponent<Props>
   {
     const value = this.props.items[index];
 
+    let component: any;
+    if (this.props.renderItem !== undefined)
+    {
+      component = this.props.renderItem(value);
+    }
+    else
+    {
+      component = (
+        <Autocomplete
+          value={value as any}
+          onChange={this.rowChangeFactory(index)}
+          options={emptyOptions}
+          onBlur={this.onBlurFactory(index)}
+        />
+      );
+    }
+
     return (
       <div
         key={index}
         className='object-form-row'
       >
-        <Autocomplete
-          value={value}
-          onChange={this.rowChangeFactory(index)}
-          options={emptyOptions}
-          onBlur={this.onBlurFactory(index)}
-        />
+        {component}
         <Quarantine>
           <div
             className='list-form-row-delete'
@@ -171,7 +185,7 @@ export default class ListForm extends TerrainComponent<Props>
     const { items, onChange } = this.props;
 
     const newItems = items.slice();
-    newItems.push('');
+    newItems.push(this.props.newItemDefault);
     onChange(newItems, true);
   }
 }

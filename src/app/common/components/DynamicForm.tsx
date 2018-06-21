@@ -105,6 +105,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       [DisplayType.Pick]: this.renderPick,
       [DisplayType.TagsBox]: this.renderTagsBox,
       [DisplayType.Custom]: this.renderCustom,
+      [DisplayType.Delegate]: this.renderDelegate,
     };
 
   public yOffsetLookup:
@@ -116,6 +117,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       [DisplayType.Pick]: 0,
       [DisplayType.TagsBox]: 0,
       [DisplayType.Custom]: 0,
+      [DisplayType.Delegate]: 0,
     };
   constructor(props)
   {
@@ -127,6 +129,40 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   {
     const options: OptionType<DisplayType.Custom> = inputInfo.options || {};
     return options.render(state, disabled);
+  }
+
+  public renderDelegate(inputInfo: InputDeclarationType<S>, stateName, state: S, index, disabled: boolean)
+  {
+    const options: OptionType<DisplayType.Delegate> = inputInfo.options || {};
+    const value = this.props.inputState[stateName];
+    const inputKey = options.inputKey || 'inputState';
+    const onChangeKey = options.onChangeKey || 'onChange';
+
+    const Component = options.component;
+
+    let formElement;
+    if (options.isList)
+    {
+
+    }
+    
+    return (
+      <div
+        className='dynamic-form-default-block'
+        key={index}
+      >
+        <div className='dynamic-form-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
+        <Component
+          { ...
+            {
+              [inputKey]: value,
+              [onChangeKey]: this.setStateHOC(stateName)
+            }
+          }
+          disabled={disabled}
+        />
+      </div>
+    );
   }
 
   public renderTextBox(inputInfo: InputDeclarationType<S>, stateName, state: S, index, disabled: boolean)
