@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import * as _ from 'lodash';
 import * as request from 'request';
 import * as stream from 'stream';
 import * as winston from 'winston';
@@ -104,7 +105,7 @@ class FollowUpBossStream extends stream.Writable
       request({
         url: `https://api.followupboss.com/v1/people/${chunk['FollowUpBossId']}`,
         method: 'PUT',
-        json: chunk,
+        json: _.omit(chunk, 'FollowUpBossId'),
         headers: {
           'Authorization': `Basic ${new Buffer((this.config['apiKey'] as string) + ':').toString('base64')}`,
           'Content-Type': 'application/json',
