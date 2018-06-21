@@ -153,29 +153,44 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
 
     const Component = options.component;
 
+    const renderComponent = (item) => {
+      return (
+        <Component
+          { ...
+            {
+              [inputKey]: item,
+              [onChangeKey]: this.setStateHOC(stateName)
+            }
+          }
+          disabled={disabled}
+        />
+      );
+    };
+
     let formElement;
     if (options.isList)
     {
       formElement = (
         <ListForm
+          items={value}
+          onChange={this.setStateHOC(stateName)}
+          newItemDefault={options.listDefaultValue}
+          renderItem={renderComponent}
+        />
       );
     }
-    
+    else
+    {
+      formElement = renderComponent(value);
+    }
+
     return (
       <div
         className='dynamic-form-default-block'
         key={index}
       >
         <div className='dynamic-form-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
-        <Component
-          { ...
-            {
-              [inputKey]: value,
-              [onChangeKey]: this.setStateHOC(stateName)
-            }
-          }
-          disabled={disabled}
-        />
+        {formElement}
       </div>
     );
   }

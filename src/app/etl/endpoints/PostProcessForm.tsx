@@ -56,32 +56,32 @@ import Util from 'util/Util';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import
-{
-  RootPostProcessConfig,
-  SinkConfig,
-  SourceConfig,
-} from 'shared/etl/immutable/EndpointRecords';
+import { RootPostProcessConfig } from 'shared/etl/immutable/EndpointRecords';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
-import ListForm from 'common/components/ListForm';
-import ObjectForm from 'common/components/ObjectForm';
-import { EndpointFormBase } from 'etl/common/components/EndpointFormClasses.tsx';
 
-import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 import
 {
   PostProcessAggregationTypes as AggregationTypes,
   PostProcessConfig,
   PostProcessOptionsType,
   PostProcessTypes,
+  PostProcessOptionsDefaults,
   RootPostProcessConfig as RootPostProcessConfigI,
 } from 'shared/etl/types/PostProcessTypes';
+
+import {
+  AggregateForm, AggregateState,
+  FilterForm, FilterState,
+  ParseForm, ParseState,
+  SortForm, SortState,
+} from 'etl/endpoints/PostProcessTypeForms';
+import { FormProps } from 'etl/endpoints/PostProcessTypeForms';
+
 import Quarantine from 'util/RadiumQuarantine';
 
 const DeleteIcon = require('images/icon_close.svg');
-import 'common/components/ObjectForm.less';
 
 const { List } = Immutable;
 
@@ -152,8 +152,6 @@ export class PostProcessForm extends TerrainComponent<Props>
       const transformations: PostProcessConfig[] = rootPostProcessConfig.transformations;
       const newList = transformations.slice();
       newList[index] = cfg;
-      // const newTransformations = newList,
-      // });
       onChange(rootPostProcessConfig.set('transformations', newList), apply);
     };
   }
@@ -178,8 +176,6 @@ export class PostProcessForm extends TerrainComponent<Props>
     return (
       <DynamicForm
         inputMap={this.inputMap}
-        // inputState={this.configToState(this.props.rootPostProcessConfig)}
-        // onStateChange={this.handleFormChange}
         inputState={this.props.rootPostProcessConfig}
         onStateChange={this.props.onChange}
         style={this.props.style}
@@ -208,19 +204,12 @@ export class PostProcessForm extends TerrainComponent<Props>
       [];
 
     const newItems = transformations.slice();
+
     newItems.push({
       type: 'Aggregate',
-      options: {
-        fields: null,
-        operation: null,
-        pattern: null,
-        primaryKey: null,
-      },
+      options: PostProcessOptionsDefaults['Aggregate'],
     });
 
-    // const newOptions = _.extend({}, endpoint.options, {
-    //   transformations: newItems,
-    // });
     onChange(rootPostProcessConfig.set('transformations', newItems), true);
   }
 
@@ -237,9 +226,6 @@ export class PostProcessForm extends TerrainComponent<Props>
       const newItems = transformations.slice();
       newItems.splice(index, 1);
 
-      // const newOptions = _.extend({}, endpoint.options, {
-      //   transformations: newItems,
-      // });
       onChange(rootPostProcessConfig.set('transformations', newItems), true);
     };
   }
@@ -286,18 +272,44 @@ export class TransformForm extends TerrainComponent<PPTProps>
     );
   }
 
-  public renderOptions(state, disabled)
+  public handleChange(cfg: PostProcessConfig, apply?: boolean)
+  {
+    if (cfg.type !== this.props.transformation.type)
+    {
+      cfg = _.extend({}, cfg);
+    }
+    this.props.onChange(cfg, apply);
+  }
+
+  public getPPTComponent(type: PostProcessTypes): React.ComponentClass<FormProps<any>>
+  {
+    switch (type)
+    {
+      case 'Aggregate':
+        return AggregateForm;
+      case 'Filter':
+        return FilterForm;
+      case 'Parse':
+        return ParseForm;
+      case 'Sort':
+        return SortForm;
+      default:
+        return Util.assertUnreachable(type);
+    }
+  }
+
+  public renderOptions(state: PostProcessConfig, disabled)
   {
     const options = this.getCurrentOptions();
-    if (state.type === 'Aggregate')
-    {
-      return (
-        <AggregateForm
-          options={options as AggregateState}
-          onChange={this.handleOptionsChange}
-        />
-      );
-    }
+
+    const Component = this.getPPTComponent(state.type);
+
+    return (
+      <Component
+        options={options as any}
+        onChange={this.handleOptionsChange}
+      />
+    );
   }
 
   public getCurrentOptions()
@@ -312,78 +324,5 @@ export class TransformForm extends TerrainComponent<PPTProps>
       options,
     });
     this.props.onChange(newTransformation, apply);
-  }
-}
-
-type AggregateState = PostProcessOptionsType<'Aggregate'>;
-export interface AggregateProps
-{
-  options: AggregateState;
-  onChange: (cfg: AggregateState, apply?: boolean) => void;
-}
-
-export class AggregateForm extends TerrainComponent<AggregateProps>
-{
-  public aggregationOptions: List<AggregationTypes> = List([
-    AggregationTypes.Average,
-    AggregationTypes.Merge,
-    AggregationTypes.Concat,
-    AggregationTypes.Sum,
-  ]);
-
-  public inputMap: InputDeclarationMap<AggregateState> = {
-    fields: {
-      type: DisplayType.Custom,
-      options: {
-        render: this.renderFieldsForm,
-      },
-    },
-    operation: {
-      type: DisplayType.Pick,
-      displayName: 'Operation',
-      options: {
-        pickOptions: (s) => this.aggregationOptions,
-        indexResolver: (value) => this.aggregationOptions.indexOf(value),
-      },
-    },
-    pattern: {
-      type: DisplayType.TextBox,
-      displayName: 'Pattern',
-    },
-    primaryKey: {
-      type: DisplayType.TextBox,
-      displayName: 'Primary Key Name',
-    },
-  };
-
-  public render()
-  {
-    return (
-      <DynamicForm
-        inputMap={this.inputMap}
-        onStateChange={this.props.onChange}
-        inputState={this.props.options}
-      />
-    );
-  }
-
-  public renderFieldsForm(state: AggregateState, disabled)
-  {
-    const fields = state.fields != null ? state.fields : [];
-    return (
-      <ListForm
-        items={fields}
-        onChange={this.handleFieldsChange}
-        label='Fields'
-      />
-    );
-  }
-
-  public handleFieldsChange(newFields: string[], apply?: boolean)
-  {
-    const newState = _.extend({}, this.props.options, {
-      fields: newFields,
-    });
-    this.props.onChange(newState, apply);
   }
 }
