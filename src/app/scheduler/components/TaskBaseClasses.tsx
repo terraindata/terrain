@@ -63,6 +63,7 @@ import EndpointForm from 'app/etl/common/components/EndpointForm';
 import { ParamConfigType, TaskConfig } from 'app/scheduler/SchedulerTypes';
 import FadeInOut from 'common/components/FadeInOut';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
+import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 
 const { List, Map } = Immutable;
 
@@ -129,12 +130,30 @@ abstract class TaskFormBase<FormState, P extends Props = Props> extends TerrainC
 
   protected handleFormChange(state: FormState, apply?: boolean)
   {
+    console.log('Apply ', apply);
+    console.log('state ', state);
     if (apply)
     {
       const { onChange, task } = this.props;
       const newConfig = this.stateToConfig(state);
       onChange(task.setIn(['params', 'options'], newConfig));
     }
+  }
+
+  protected handleComponentChange(componentType, key, value)
+  {
+    const { params } = this.props.task;
+    let state = Map();
+    console.log('params ', params);
+    if (params !== undefined)
+    {
+      state = params.get('options').get(componentType);
+      console.log('key path ', componentType, key);
+      console.log('options ', state);
+      state = state.set(key, value);
+    }
+    console.log('state is ', state);
+    this.props.onChange(this.props.task.setIn(['params', 'options', componentType], state));
   }
 }
 
@@ -202,11 +221,12 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
                   sources.keySeq().map((key) =>
                   {
                     const source = state.overrideSources[key] || sources.get(key);
+                    console.log('passing source in as ', source);
                     return (
                       <EndpointForm
                         isSource={true}
-                        endpoint={source}
-                        onChange={this.handleFormChange}
+                        endpoint={_SourceConfig(Util.asJS(source))}
+                        onChange={this._fn(this.handleComponentChange, 'overrideSources', key)}
                         isSchedule={true}
                         key={source.name}
                       />
@@ -244,14 +264,14 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
                 {
                   sinks.keySeq().map((key) =>
                   {
-                    const source = state.overrideSinks[key] || sinks.get(key);
+                    const sink = state.overrideSinks[key] || sinks.get(key);
                     return (
                       <EndpointForm
                         isSource={true}
-                        endpoint={source}
-                        onChange={this.handleFormChange}
+                        endpoint={_SinkConfig(Util.asJS(sink))}
+                        onChange={this._fn(this.handleComponentChange, 'overrideSinks', key)}
                         isSchedule={true}
-                        key={source.name}
+                        key={sink.name}
                       />
                     );
                   })

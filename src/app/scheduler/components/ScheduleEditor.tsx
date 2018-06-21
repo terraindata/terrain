@@ -75,7 +75,10 @@ import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
 import XHR from 'util/XHR';
 import './ScheduleEditorStyle';
-
+import {
+  CSSTransition,
+  TransitionGroup,
+} from 'react-transition-group';
 export interface Props
 {
   location?: any;
@@ -163,7 +166,7 @@ class ScheduleEditor extends TerrainComponent<Props>
       {
         break;
       }
-      const task = tasks.find((t) => t.id === currId);
+      const task = tasks.find((t) => t && t.id === currId);
       currentTasks = currentTasks.push(task);
       currId = task.onSuccess;
     }
@@ -288,15 +291,21 @@ class ScheduleEditor extends TerrainComponent<Props>
   public renderTask(task)
   {
     return (
-      <TaskItem
-        task={task}
-        type={task.type || 'ROOT'}
-        onDelete={this.handleTaskDelete}
-        onTaskChange={this.handleTaskChange}
-        key={task.id}
-        templates={this.props.templates}
-        onErrorClick={this.handleTaskErrorClick}
-      />
+      <CSSTransition
+        key={task.id + '-animate'}
+        timeout={500}
+        classNames='example'
+      >
+        <TaskItem
+          task={task}
+          type={task.type || 'ROOT'}
+          onDelete={this.handleTaskDelete}
+          onTaskChange={this.handleTaskChange}
+          key={task.id}
+          templates={this.props.templates}
+          onErrorClick={this.handleTaskErrorClick}
+        />
+      </CSSTransition>
     );
   }
 
@@ -326,9 +335,13 @@ class ScheduleEditor extends TerrainComponent<Props>
             :
             null
         }
-        {
-          tasks.map((task, index) => this.renderTask(task))
-        }
+        <TransitionGroup
+          className='example-group'
+        >
+          {
+            tasks.map((task, index) => this.renderTask(task))
+          }
+        </TransitionGroup>
         <PathfinderCreateLine
           onCreate={this.handleAddSuccessTask}
           text={'Add Task'}
