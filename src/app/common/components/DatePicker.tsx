@@ -436,7 +436,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
 
   public formatElasticQuery(sign: string, unit: string, amount: number): string
   {
-    return 'Now' + sign + amount.toString() + unit;
+    return 'now' + sign + amount.toString() + unit;
   }
 
   public dateToHourIndex(date: Moment)

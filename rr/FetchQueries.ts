@@ -54,7 +54,7 @@ import * as sleep from 'sleep';
 import * as request from 'supertest';
 import * as winston from 'winston';
 import ESInterpreter from '../shared/database/elastic/parser/ESInterpreter';
-import { loginToBuilder } from './FullstackUtils';
+import { login } from './FullstackUtils';
 
 const optionDefinitions = [
   { name: 'help', alias: 'h' },
@@ -105,7 +105,7 @@ async function getChromePage(browser)
   const url = 'http://localhost:8080';
   const page = await browser.newPage();
   await page.setViewport({ width: 1600, height: 1200 });
-  await loginToBuilder(page, url);
+  await login(page, url);
   sleep.sleep(3);
   return page;
 }

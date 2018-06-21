@@ -48,6 +48,7 @@ import * as Immutable from 'immutable';
 
 import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
 import { SpotlightReducers } from 'app/builder/data/SpotlightRedux';
+import { ConnectionsReducers } from 'app/connections/data/ConnectionsRedux';
 import { AuthReducers } from 'auth/data/AuthRedux';
 import BuilderCardsReducers from 'builder/data/BuilderCardsReducers';
 import BuilderReducers from 'builder/data/BuilderReducers';
@@ -72,6 +73,7 @@ const reducers = {
   auth: AuthReducers,
   builder: BuilderReducers,
   colors: ColorsReducers,
+  connections: ConnectionsReducers,
   etl: ETLReducers,
   library: LibraryReducer,
   roles: RolesReducer,

@@ -133,6 +133,8 @@ Router.post('/:id/disconnect', passport.authenticate('access-token-local'), asyn
 Router.post('/:id/delete', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('delete a database entry');
+  await databases.disconnect(ctx.state.user, Number(ctx.params.id));
+  DatabaseRegistry.remove(Number(ctx.params.id));
   ctx.body = await databases.delete(ctx.state.user, Number(ctx.params.id));
 });
 

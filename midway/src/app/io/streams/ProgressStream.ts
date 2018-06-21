@@ -51,7 +51,7 @@ import * as winston from 'winston';
 /**
  * Monitors progress of the writable stream
  */
-export default class ProgressStream extends Transform
+export default class ProgressStream extends Duplex
 {
   private writer: Writable;
   private frequency: number;

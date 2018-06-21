@@ -96,7 +96,7 @@ class Library extends TerrainComponent<any>
   {
     const { basePath, analytics, schema } = this.props;
 
-    if (analytics.selectedAnalyticsConnection === '')
+    if (analytics.selectedAnalyticsConnection === null)
     {
       const analyticsConnection = null;
 
@@ -106,19 +106,6 @@ class Library extends TerrainComponent<any>
         this.props.analyticsActions.selectAnalyticsConnection(
           lastAnalyticsConnection,
         );
-      }
-      else
-      {
-        const firstServerWithAnalytics = schema.servers.find(
-          (value, key) => value.isAnalytics,
-        );
-        if (firstServerWithAnalytics !== undefined)
-        {
-          this.props.analyticsActions.selectAnalyticsConnection(
-            firstServerWithAnalytics.name,
-          );
-          localStorage.setItem('analyticsConnection', firstServerWithAnalytics.name);
-        }
       }
     }
 
@@ -162,7 +149,7 @@ class Library extends TerrainComponent<any>
       (selectedDateRange !== nextSelectedDateRange) ||
       (pinnedAlgorithms !== nextPinnedAlgorithms);
 
-    if (analyticsFilterChanged)
+    if (analyticsFilterChanged && nextAnalytics.selectedAnalyticsConnection !== null)
     {
       this.fetchAnalytics(nextProps);
     }
@@ -450,33 +437,39 @@ class Library extends TerrainComponent<any>
         {canPinAlgorithms && (selectedAlgorithm !== null || hasPinnedAlgorithms) ?
           <div className='library-bottom'>
             <div className='library-analytics-chart-wrapper'>
-              {analytics.loaded ?
-                (analytics.errors.length === 0 ?
-                  <MultipleAreaChart
-                    datasets={datasets}
-                    xDataKey={'key'}
-                    yDataKey={'doc_count'}
-                    onLegendClick={this.handleLegendClick}
-                    legendTitle={selectedMetricObject !== undefined ?
-                      selectedMetricObject.label : ''
-                    }
-                    domain={selectedDateRangeDomain}
-                    dateFormat={
-                      analytics.selectedInterval === 'hour' ?
-                        'MM/DD/YYYY ha' : 'MM/DD/YYYY'
-                    }
-                  /> : (
+              {
+                analytics.loaded ?
+                  (analytics.errors.length === 0 ?
+                    <MultipleAreaChart
+                      datasets={datasets}
+                      xDataKey={'key'}
+                      yDataKey={'doc_count'}
+                      onLegendClick={this.handleLegendClick}
+                      legendTitle={selectedMetricObject !== undefined ?
+                        selectedMetricObject.label : ''
+                      }
+                      domain={selectedDateRangeDomain}
+                      dateFormat={
+                        analytics.selectedInterval === 'hour' ?
+                          'MM/DD/YYYY ha' : 'MM/DD/YYYY'
+                      }
+                    /> : (
+                      <div className='library-analytics-error'>
+                        <p>An error occurred while fetching the analytics data</p>
+                        <ul>{analytics.errors.map((e, i) => <li key={i}>* {e}</li>)}</ul>
+                      </div>)
+                  ) :
+                  analytics.selectedAnalyticsConnection !== null ?
+                    <Loading
+                      width={150}
+                      height={150}
+                      loading={true}
+                      loaded={false}
+                    /> :
                     <div className='library-analytics-error'>
                       <p>An error occurred while fetching the analytics data</p>
-                      <ul>{analytics.errors.map((e, i) => <li key={i}>* {e}</li>)}</ul>
-                    </div>)
-                ) :
-                <Loading
-                  width={150}
-                  height={150}
-                  loading={true}
-                  loaded={false}
-                />
+                      <ul><li>No database selected</li></ul>
+                    </div>
               }
             </div>
             <div className='library-analytics-selector-wrapper'>
