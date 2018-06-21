@@ -56,7 +56,7 @@ module.exports =
   output:
   {
     path: __dirname,
-    publicPath: '/midway/v1/bundles/',
+    publicPath: '/midway/v1/bundles/', // this is where midway stores bundles
     filename: 'bundle.js',
     chunkFilename: '[name].bundle.js'
   },
@@ -71,13 +71,9 @@ module.exports =
     proxy: {
       '/midway/**': {
         target: 'http://localhost:3000/midway',
-        rewrite: function(req) {
-          console.log('HEYYYYAAAA ' + req.url);
-          return req.url;
-        },
         pathRewrite: { '^/midway': '' },
         secure: false,
-        logLevel: 'debug',
+        // logLevel: 'debug', // useful when debugging
       },
     },
   },

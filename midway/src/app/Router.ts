@@ -143,11 +143,6 @@ export function getRouter()
   const MidwayRouter = new KoaRouter();
   MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
 
-  MidwayRouter.get('/', async (ctx, next) =>
-  {
-    await send(ctx, '/src/app/index.html');
-  });
-
   MidwayRouter.get('/robots.txt', async (ctx, next) =>
   {
     await send(ctx, '/src/app/robots.txt');

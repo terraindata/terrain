@@ -49,7 +49,6 @@ import * as request from 'request';
 import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
 import { ItemConfig } from '../app/items/ItemConfig';
 import { items } from '../app/items/ItemRouter';
-import * as winston from 'winston'; // TODO remove when not needed
 
 export function doRequest(url)
 {
