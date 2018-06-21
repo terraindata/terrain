@@ -104,13 +104,13 @@ class FollowUpBossStream extends stream.Writable
       // Has valid FollowUpBossId, so do PUT (update)
 
       const formattedChunk = _.omit(chunk, 'FollowUpBossId');
-      if (formattedChunk['tags'] && formattedChunk['tags'].indexOf('terrain') === -1)
-      {
-        formattedChunk['tags'].push('terrain');
-      }
-      else if (!formattedChunk['tags'])
+      if (!formattedChunk['tags'])
       {
         formattedChunk['tags'] = ['terrain'];
+      }
+      else if (formattedChunk['tags'] && formattedChunk['tags'].indexOf('terrain') === -1)
+      {
+        formattedChunk['tags'].push('terrain');
       }
 
       request({
