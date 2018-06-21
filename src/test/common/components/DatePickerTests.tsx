@@ -96,7 +96,7 @@ describe('DatePicker', () =>
     expect(datePickerComponent.state()['dateViewType']).toEqual('calendar');
     expect(datePickerComponent.state()['sign']).toEqual('-');
     expect(datePickerComponent.state()['unit']).toEqual('M');
-    expect(datePickerComponent.state()['amount']).toEqual(0);
+    expect(datePickerComponent.state()['amount']).toEqual('');
     expect(datePickerComponent.find(Dropdown)).toHaveLength(1);
   });
 
@@ -123,7 +123,7 @@ describe('DatePicker', () =>
       expect(datePickerComponent.state()['dateViewType']).toEqual('specific');
       expect(datePickerComponent.state()['sign']).toEqual('+');
       expect(datePickerComponent.state()['unit']).toEqual('w');
-      expect(datePickerComponent.state()['amount']).toEqual(24);
+      expect(datePickerComponent.state()['amount']).toEqual('24');
       expect(datePickerComponent.find(Dropdown)).toHaveLength(2);
 
       datePickerComponent.setProps({ date: 'Now - 1M' });
@@ -134,7 +134,7 @@ describe('DatePicker', () =>
       expect(datePickerComponent.state()['dateViewType']).toEqual('specific');
       expect(datePickerComponent.state()['sign']).toEqual('-');
       expect(datePickerComponent.state()['unit']).toEqual('M');
-      expect(datePickerComponent.state()['amount']).toEqual(1);
+      expect(datePickerComponent.state()['amount']).toEqual('1');
       expect(datePickerComponent.find(Dropdown)).toHaveLength(2);
 
       datePickerComponent.setProps({ date: 'now +21342y' });
@@ -145,7 +145,7 @@ describe('DatePicker', () =>
       expect(datePickerComponent.state()['dateViewType']).toEqual('specific');
       expect(datePickerComponent.state()['sign']).toEqual('+');
       expect(datePickerComponent.state()['unit']).toEqual('y');
-      expect(datePickerComponent.state()['amount']).toEqual(21342);
+      expect(datePickerComponent.state()['amount']).toEqual('21342');
       expect(datePickerComponent.find(Dropdown)).toHaveLength(2);
 
       datePickerComponent.setProps({ date: 'Now- 0m' });
@@ -156,7 +156,7 @@ describe('DatePicker', () =>
       expect(datePickerComponent.state()['dateViewType']).toEqual('specific');
       expect(datePickerComponent.state()['sign']).toEqual('-');
       expect(datePickerComponent.state()['unit']).toEqual('m');
-      expect(datePickerComponent.state()['amount']).toEqual(0);
+      expect(datePickerComponent.state()['amount']).toEqual('0');
       expect(datePickerComponent.find(Dropdown)).toHaveLength(2);
     });
 
