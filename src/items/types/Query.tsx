@@ -48,8 +48,8 @@ THE SOFTWARE.
 
 import { List, Map, Record } from 'immutable';
 
-import * as Immutable from 'immutable';
 import { BaseClass, createRecordType, New } from 'shared/util/Classes';
+import * as Immutable from 'immutable';
 import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
 import { _ResultsConfig } from '../../../shared/results/types/ResultsConfig';
 import { _Path, Path } from '../../app/builder/components/pathfinder/PathfinderTypes';
