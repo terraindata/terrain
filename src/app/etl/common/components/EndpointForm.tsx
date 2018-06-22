@@ -158,7 +158,6 @@ class EndpointForm extends TerrainComponent<Props>
       integration: newIntegration,
     });
     const newEndpoint = this.detectFileConfigFromIntegration(this.props.endpoint, newIntegration);
-
     this.props.onChange(newEndpoint, apply);
   }
 
@@ -273,6 +272,7 @@ class EndpointForm extends TerrainComponent<Props>
     const applyOpts = this.extractFileConfigDelta(oldOpts, newOpts);
     const newFileConfig = _FileConfig(_.extend({}, (newEndpoint.fileConfig as any).toObject(), applyOpts));
     newEndpoint = newEndpoint.set('fileConfig', newFileConfig);
+    
     this.props.onChange(newEndpoint, apply);
   }
 

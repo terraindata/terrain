@@ -106,7 +106,6 @@ export interface RouteSelectorOptionSet
   getCustomDisplayName?: (value, setIndex: number) => string | undefined;
   getValueComponent?: (props: { value: any }) => React.ReactElement<any>;
   headerBelowValueComponent?: boolean;
-  otherBelowComponent?: boolean;
   overrideWidthPercentage?: number; // If used for one optionSet, this should be set for all optionSets
 }
 
@@ -512,9 +511,7 @@ export class RouteSelector extends TerrainComponent<Props>
           (optionSet.headerText && !optionSet.headerBelowValueComponent) &&
           headerText
         }
-        {
-          getValueComponentContent
-        }
+
         {
           showTextbox ?
             <div
@@ -539,6 +536,10 @@ export class RouteSelector extends TerrainComponent<Props>
               onFocusLost={this._fn(this.handleOptionSearchFocusLost, index)}
               focusOverride={this.state.focusedSetIndex === index}
             />
+        }
+
+        {
+          getValueComponentContent
         }
         {
           (optionSet.headerText && optionSet.headerBelowValueComponent) &&
