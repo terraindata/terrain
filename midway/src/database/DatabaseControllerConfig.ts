@@ -71,7 +71,7 @@ export class DatabaseControllerConfig
     const dsn = config.dsn;
     const analyticsIndex = config.analyticsIndex;
     const analyticsType = config.analyticsType;
-    const usePrefix = config.usePrefix;
+    const isMultitenant = config.isMultitenant;
 
     const cfg = new DatabaseControllerConfig(type, dsn);
     if (type === 'sqlite')
@@ -88,7 +88,7 @@ export class DatabaseControllerConfig
     }
     else if (type === 'elasticsearch' || type === 'elastic')
     {
-      return new ElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType, usePrefix ? prefix : '');
+      return new ElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType, isMultitenant ? prefix : '');
     }
     else
     {
@@ -112,8 +112,10 @@ export class DatabaseControllerConfig
     }
     else if (type === 'elasticsearch' || type === 'elastic')
     {
+      const config = Util.dsn.parseDSNConfig(dsnString);
       this.config = {
-        hosts: [dsnString],
+        hosts: [config.host + ':' + config.port.toString()],
+        httpAuth: config.user + ':' + config.password,
         keepAlive: false,
         requestTimeout: 600000,
       } as ElasticConfig;

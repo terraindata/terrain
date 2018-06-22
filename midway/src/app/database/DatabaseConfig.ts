@@ -56,7 +56,7 @@ export class DatabaseConfig extends ConfigType
   public isAnalytics: boolean = false;
   public analyticsIndex?: string = undefined;
   public analyticsType?: string = undefined;
-  public usePrefix: boolean = false;
+  public isMultitenant: boolean = false;
 
   constructor(props: object)
   {

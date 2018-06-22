@@ -63,7 +63,7 @@ export interface Config
   debug?: boolean;
   help?: boolean;
   verbose?: boolean;
-  databases?: object[];
+  databases?: DatabaseConfig[];
   analyticsdb?: string;
 }
 
@@ -113,7 +113,12 @@ export async function handleConfig(config: Config): Promise<void>
     const dbs = await databases.select(['id', 'name']);
     for (const database of config.databases)
     {
-      const db = database as DatabaseConfig;
+      let db: DatabaseConfig = database;
+      if (db.isMultitenant)
+      {
+        db = JSON.parse(JSON.stringify(db));
+        db.dsn = '';
+      }
       const foundDB = dbs.filter((d) => d.name === db.name);
       if (foundDB.length > 0)
       {
