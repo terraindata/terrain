@@ -282,13 +282,13 @@ class ScheduleEditor extends TerrainComponent<Props>
     this.setState({
       back: false,
     }, () =>
-    {
-      this.setState({
-        currentTasks: newTasks,
-        rootTasks: this.state.rootTasks.push(newRootTaskId),
-        schedule,
+      {
+        this.setState({
+          currentTasks: newTasks,
+          rootTasks: this.state.rootTasks.push(newRootTaskId),
+          schedule,
+        });
       });
-    });
   }
 
   public back(newSchedule?: SchedulerConfig)
@@ -300,13 +300,13 @@ class ScheduleEditor extends TerrainComponent<Props>
     this.setState({
       back: true,
     }, () =>
-    {
-      this.setState({
-        currentTasks: newTasks,
-        rootTasks,
-        schedule: newSchedule || this.state.schedule,
+      {
+        this.setState({
+          currentTasks: newTasks,
+          rootTasks,
+          schedule: newSchedule || this.state.schedule,
+        });
       });
-    });
   }
 
   public save()

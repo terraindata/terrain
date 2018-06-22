@@ -272,7 +272,7 @@ class EndpointForm extends TerrainComponent<Props>
     const applyOpts = this.extractFileConfigDelta(oldOpts, newOpts);
     const newFileConfig = _FileConfig(_.extend({}, (newEndpoint.fileConfig as any).toObject(), applyOpts));
     newEndpoint = newEndpoint.set('fileConfig', newFileConfig);
-    
+
     this.props.onChange(newEndpoint, apply);
   }
 
