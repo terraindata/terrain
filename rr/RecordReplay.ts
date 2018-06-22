@@ -52,7 +52,7 @@ import * as jsonfile from 'jsonfile';
 import * as puppeteer from 'puppeteer';
 import * as sleep from 'sleep';
 import * as winston from 'winston';
-import { filteringRecordBuilderActions, loginToBuilder, replayBuilderActions, waitForInput } from './FullstackUtils';
+import { filteringRecordBuilderActions, login, replayRREvents, waitForInput } from './FullstackUtils';
 
 const COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > svg';
 const CARDS_COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > div > div.menu-options-wrapper > div:nth-child(3) > div > div.menu-text-padding';
@@ -62,6 +62,7 @@ const optionDefinitions = [
   { name: 'record', alias: 'r', type: Boolean },
   { name: 'replay', alias: 'p', type: Boolean },
   { name: 'column', alias: 'c', type: String },
+  { name: 'event', alias: 'e', type: String },
   { name: 'help', alias: 'h' },
   { name: 'directory', alias: 'd', type: String },
   { name: 'url', alias: 'u', type: String },
@@ -95,6 +96,11 @@ const usageSections = [
         description: 'Which column (builder/pathfinder) to start.',
       },
       {
+        name: 'event',
+        typeLabel: 'string',
+        description: 'The type (input/redux/all) of events been recorded or replayed',
+      },
+      {
         name: 'directory',
         typeLabel: '[underline]{directory}',
         description: 'Where to save/load the action json file.',
@@ -122,12 +128,24 @@ async function startBuilder(page)
   await page.click(CARDSTARTER_SELECTOR);
 }
 
+function recordJSConsoleOutput(page)
+{
+  page.on('console', (msg) =>
+  {
+    for (let i = 0; i < msg.args().length; ++i)
+    {
+      console.log('JS console' + `${i}: ${msg.args()[i]}`);
+    }
+  });
+}
+
 async function recordBuilderActions(browser, url, column: 'builder' | 'pathfinder')
 {
   const page = await browser.newPage();
   await page.setViewport({ width: 1600, height: 1200 });
-  await loginToBuilder(page, url);
-  sleep.sleep(3);
+  await login(page, url);
+  sleep.sleep(2);
+
   if (column === 'builder')
   {
     await startBuilder(page);
@@ -167,7 +185,7 @@ async function rr()
   }
 
   // record
-  let url = 'http://localhost:3000/builder/!3';
+  let url = 'http://localhost:8080';
   if (options['url'] !== undefined)
   {
     url = options['url'];
@@ -177,19 +195,25 @@ async function rr()
   {
     actionFileName = options['directory'] + '/actions.json';
   }
-  let startColumn: 'builder' | 'pathfinder' = 'pathfinder';
+  let startColumn: 'builder' | 'pathfinder';
   if (options['column'] !== undefined)
   {
-    if (options['column'] !== 'builder' && options['column'] !== 'pathfinder' && options['column'] !== 'import')
+    if (options['column'] !== 'builder' && options['column'] !== 'pathfinder')
     {
       console.log(usage);
       return;
     }
-    if (options['column'] === 'import')
-    {
-      url = 'http://localhost:8080/data/newtemplate/1';
-    }
     startColumn = options['column'];
+    // let's start from the first builder page
+    url = 'http://localhost:3000/builder/!3';
+  }
+  let actionType = 'all';
+  if (options['event'] === 'input')
+  {
+    actionType = 'input';
+  } else if (options['event'] === 'redux')
+  {
+    actionType = 'redux';
   }
 
   const browser = await puppeteer.launch({ headless: false });
@@ -219,21 +243,57 @@ async function rr()
       const page = await browser.newPage();
       await page.setViewport({ width: 1600, height: 1200 });
       await page.goto(url);
-      await loginToBuilder(page, url);
-      sleep.sleep(1);
+      await login(page, url);
+      sleep.sleep(3);
       if (startColumn === 'builder')
       {
         await startBuilder(page);
       }
-      await replayBuilderActions(page, url, actions, serializeRecords);
+      await replayRREvents(page, url, actions, serializeRecords, async (action) =>
+      {
+        if (action.eventType)
+        {
+          if (actionType === 'redux')
+          {
+            return false;
+          }
+        } else
+        {
+          if (actionType === 'input')
+          {
+            return false;
+          }
+        }
+        return true;
+      }, async (action) =>
+        {
+          if (action.eventType === 'mousedown')
+          {
+            if (action.selector === 'etl-step-big-button')
+            {
+              sleep.sleep(10);
+              return;
+            } else if (action.selector === '.template-editor-top-bar > :nth-child(7)')
+            {
+              sleep.sleep(30);
+              return;
+            }
+          } else if (action.eventType === 'keypress')
+          {
+            // no delay for key pressing, return
+            return;
+          }
+          sleep.sleep(1);
+        });
     } catch (e)
     {
+      console.log(e.message);
       console.trace(e);
     }
     await waitForInput('Typing to stop the replay');
   }
 
-  console.log('Closing thebrowser');
+  console.log('Closing the browser');
   await browser.close();
   console.log('The browser is closed.');
 }

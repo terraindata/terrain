@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as stream from 'stream';
 
+import TaskEnum from 'shared/types/jobs/TaskEnum';
 import ATaskConfig from './ATaskConfig';
 
 export class TaskConfig
@@ -60,7 +61,7 @@ export class TaskConfig
   public params: any = null;                    // input parameters for the task
   public paused: number = null;                 // where in the tree of tasks the tasks are paused
   public rootLogStream: stream.Writable = null; // contains all of the logs from a TaskTree with multiple nodes that produce logStreams
-  public taskId: number = null;                 // maps to a statically declared task
+  public taskId: TaskEnum = null;               // maps to a statically declared task
 }
 
 export default TaskConfig;

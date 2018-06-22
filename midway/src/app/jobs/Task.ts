@@ -80,7 +80,7 @@ export abstract class Task
     return this.taskConfig.onSuccess;
   }
 
-  public getTaskId(): number
+  public getTaskId(): TaskEnum
   {
     return this.taskConfig.taskId;
   }

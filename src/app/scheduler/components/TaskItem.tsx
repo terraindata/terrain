@@ -56,12 +56,17 @@ import
 } from 'app/scheduler/SchedulerTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
+import { DynamicForm } from 'common/components/DynamicForm';
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import TaskEnum from 'shared/types/jobs/TaskEnum';
+import { TaskFormMap } from './TaskBaseClasses';
 import './TaskItemStyle.less';
 
 const DeleteIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
@@ -70,13 +75,12 @@ const EditableField = (props) =>
 
 export interface Props
 {
-  // level: number;
-  // position: number;
   task: TaskConfig;
   type: 'SUCCESS' | 'FAILURE' | 'ROOT';
-  onDelete: (taskId: ID) => void;
-  onCreateSubtask: (parentId: ID, type: 'SUCCESS' | 'FAILURE') => void;
+  onDelete: (id: ID) => void;
   onTaskChange: (newTask: TaskConfig) => void;
+  templates?: List<ETLTemplate>;
+  onErrorClick: (id: ID) => void;
 }
 
 interface State
@@ -91,6 +95,18 @@ class TaskItem extends TerrainComponent<Props>
   public state: State = {
     editingName: false,
     name: this.props.task.name,
+  };
+
+  public taskTypeMap = {
+    taskId: {
+      type: DisplayType.Pick,
+      displayName: 'Task Type',
+      options: {
+        pickOptions: (s) => taskTypeList,
+        indexResolver: (value) => taskTypeList.indexOf(value),
+        displayNames: (s) => taskTypeDisplayNames,
+      },
+    },
   };
 
   public handleTextKeyDown(e)
@@ -112,13 +128,40 @@ class TaskItem extends TerrainComponent<Props>
     this.props.onTaskChange(this.props.task.set('name', this.state.name));
   }
 
+  public handleTaskIdChange(s)
+  {
+    this.props.onTaskChange(this.props.task.set('taskId', s.taskId));
+  }
+
+  public renderTaskSettings(task: TaskConfig)
+  {
+    const FormClass = TaskFormMap[task.taskId];
+    return (
+      <div>
+        <DynamicForm
+          inputMap={this.taskTypeMap}
+          inputState={{ taskId: task.taskId }}
+          onStateChange={this.handleTaskIdChange}
+        />
+        {
+          FormClass &&
+          <FormClass
+            task={task}
+            onChange={this.props.onTaskChange}
+            templates={this.props.templates}
+          />
+        }
+      </div>
+    );
+  }
+
   public render()
   {
     const { task, type } = this.props;
     return (
       <div
         className='task-item-wrapper'
-        style={borderColor(type === 'SUCCESS' ? 'green' : type === 'FAILURE' ? 'red' : 'gray')}
+        style={borderColor(Colors().blockOutline)}
       >
         <div
           className='task-item-header'
@@ -146,7 +189,11 @@ class TaskItem extends TerrainComponent<Props>
             readOnlyComponent={
               <div
                 className='task-item-name'
-                style={fontColor(Colors().active)}
+                style={
+                  _.extend({},
+                    fontColor(Colors().active),
+                    { fontStyle: this.state.name ? 'normal' : 'italic' })
+                }
                 onClick={this._toggle('editingName')}
               >
                 {
@@ -168,27 +215,27 @@ class TaskItem extends TerrainComponent<Props>
         <div
           className='task-item-body'
         >
-          Choose type of task and the options for it here!
+          {
+            this.renderTaskSettings(task)
+          }
         </div>
         <div
-          className='task-item-subtask-buttons'
+          className='task-item-error'
+          onClick={this._fn(this.props.onErrorClick, task.id)}
+          style={fontColor(Colors().error)}
         >
-          <div
-            className='task-item-subtask-button'
-            onClick={this._fn(this.props.onCreateSubtask, task.id, 'FAILURE')}
-          >
-            On Failure
-          </div>
-          <div
-            className='task-item-subtask-button'
-            onClick={this._fn(this.props.onCreateSubtask, task.id, 'SUCCESS')}
-          >
-            On Success
-          </div>
+          On Failure
         </div>
       </div>
     );
   }
 }
+
+const taskTypeList = List(Object.keys(TaskEnum));
+const taskTypeDisplayNames = Map({
+  taskDefaultExit: 'Default Exit',
+  taskDefaultFailure: 'Default Failure',
+  taskETL: 'ETL Task',
+});
 
 export default TaskItem;

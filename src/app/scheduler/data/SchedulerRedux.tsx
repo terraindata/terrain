@@ -80,6 +80,7 @@ export interface SchedulerActionTypes
   createSchedule?: {
     actionType: 'createSchedule';
     schedule: any;
+    onLoad?: (schedule) => void;
   };
   createScheduleStart: {
     actionType: 'createScheduleStart';
@@ -289,7 +290,10 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
           actionType: 'createScheduleSuccess',
           schedule,
         });
-
+        if (action.onLoad)
+        {
+          action.onLoad(schedule);
+        }
         return Promise.resolve(schedule);
       });
   }

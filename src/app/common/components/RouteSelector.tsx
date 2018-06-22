@@ -91,6 +91,7 @@ export interface RouteSelectorOptionSet
   key: string;
   options: List<RouteSelectorOption>;
   hasOther?: boolean;
+  showOptionsOnOther?: boolean;
   focusOtherByDefault?: boolean;
   shortNameText?: string;
   headerText?: string | El;
@@ -105,7 +106,6 @@ export interface RouteSelectorOptionSet
   getCustomDisplayName?: (value, setIndex: number) => string | undefined;
   getValueComponent?: (props: { value: any }) => React.ReactElement<any>;
   headerBelowValueComponent?: boolean;
-  otherBelowComponent?: boolean;
   overrideWidthPercentage?: number; // If used for one optionSet, this should be set for all optionSets
 }
 
@@ -481,6 +481,8 @@ export class RouteSelector extends TerrainComponent<Props>
           onKeyDown={this.handleInputKeyDown}
           onFocus={this.handleOptionSearchFocus}
           id={index}
+          options={optionSet.showOptionsOnOther ?
+            optionSet.options.map((option) => option.value).toList() : undefined}
         />
       );
     }
@@ -509,9 +511,7 @@ export class RouteSelector extends TerrainComponent<Props>
           (optionSet.headerText && !optionSet.headerBelowValueComponent) &&
           headerText
         }
-        {
-          getValueComponentContent
-        }
+
         {
           showTextbox ?
             <div
@@ -537,40 +537,47 @@ export class RouteSelector extends TerrainComponent<Props>
               focusOverride={this.state.focusedSetIndex === index}
             />
         }
+
+        {
+          getValueComponentContent
+        }
         {
           (optionSet.headerText && optionSet.headerBelowValueComponent) &&
           headerText
         }
-        <div
-          className={classNames({
-            'routeselector-options': true,
-            'routeselector-options-column': optionSet.column,
-          })}
-          ref={this._fn(this.attachColumnRef, index)}
-          style={this.props.footer ? { paddingBottom: 27 } : {}}
-        >
-          {
-            optionSet.options.map(this._fn(this.renderOption, index, visibleOptionCounter, incrementVisibleOptions))
-          }
+        {
+          !optionSet.showOptionsOnOther &&
+          <div
+            className={classNames({
+              'routeselector-options': true,
+              'routeselector-options-column': optionSet.column,
+            })}
+            ref={this._fn(this.attachColumnRef, index)}
+            style={this.props.footer ? { paddingBottom: 27 } : {}}
+          >
+            {
+              optionSet.options.map(this._fn(this.renderOption, index, visibleOptionCounter, incrementVisibleOptions))
+            }
 
-          {
-            optionSet.options.size > 3 &&
-            [
-              /*Add fodder, to help items space horizontally evenly. These will not appear*/
-              <div key='1' className='routeselector-option-wrapper' />,
-              <div key='2' className='routeselector-option-wrapper' />,
-              <div key='3' className='routeselector-option-wrapper' />,
-            ]
-          }
-          {
-            optionSet.options.size !== 0 ?
-              <div
-                className='routeselector-options-gradient'
-              />
-              :
-              null
-          }
-        </div>
+            {
+              optionSet.options.size > 3 &&
+              [
+                /*Add fodder, to help items space horizontally evenly. These will not appear*/
+                <div key='1' className='routeselector-option-wrapper' />,
+                <div key='2' className='routeselector-option-wrapper' />,
+                <div key='3' className='routeselector-option-wrapper' />,
+              ]
+            }
+            {
+              optionSet.options.size !== 0 ?
+                <div
+                  className='routeselector-options-gradient'
+                />
+                :
+                null
+            }
+          </div>
+        }
       </div>
     );
   }

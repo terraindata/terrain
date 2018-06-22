@@ -1,0 +1,122 @@
+.schedule-editor
+{
+    overflow: hidden;
+    height: 100%;
+    .schedule-editor-columns {
+        display: inline-flex;
+        width: calc(~"100% - 20px");
+        height: calc(~"100% - 75px");
+        margin: 10px;
+        border: 1px solid;
+        border-radius: 4px;
+        .schedule-editor-column {
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            &:first-child {
+                border-right: 1px solid;
+            }
+            .schedule-editor-column-header {
+                font-size: 20px;
+                padding: 10px;
+            }
+            .schedule-editor-column-content {
+                margin: 20px;
+                margin-right: 0px;
+                height: calc(~"100% - 70px");
+                overflow: auto;
+                overflow-x: hidden;
+                padding-right: 15px;
+                position: relative;
+                margin-top: 0px;
+                padding-top: 20px;
+                // .pf-create {
+                //     position: absolute;
+                //     bottom: 0px;
+                // }
+                .schedule-editor-sub-header {
+                    font-size: 16px;
+                    margin-top: 10px;
+                    text-transform: uppercase;
+                }
+                .cron-editor-notes {
+                    margin-left: 15px;
+                }
+                .common-label-style {
+                    margin-top: 6px;
+                    padding: 0px;
+                    opacity: 0.8;
+                }
+                .cron-editor-footer {
+                    margin-left: -15px;
+                    width: calc(~"100% + 19px");
+                    .common-option-name-style {
+                        padding-right: 0px;
+                    }
+                }
+                .schedule-editor-back {
+                    position: absolute;
+                    svg {
+                        height: 25px;
+                        width: 25px;
+                        &:hover {
+                            opacity: 0.6;
+                        }
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+    }
+    .schedule-editor-buttons {
+        padding-bottom: 20px;
+        padding-right: 10px;
+        float: right;
+        .button:first-child {
+            margin-right: 10px;
+        }
+    }
+}
+
+.tasks-wrapper {
+    position: absolute;
+    margin: auto;
+    top: 10px;
+    pointer-events: none;
+    width: 100%;
+    .pf-create {
+        pointer-events: all;
+    }
+}
+
+.forward-enter {
+    left: 100%;
+}
+.forward-enter-active {
+    left: 0%;
+    transition: left 500ms ease-in;
+}
+.forward-exit {
+    left: 0%;
+    position: absolute;
+}
+.forward-exit-active {
+    left: -100%;
+    transition: left 500ms ease-in;
+}
+
+.back-enter {
+    left: -100%;
+}
+.back-enter-active {
+    left: 0%;
+    transition: left 500ms ease-in;
+}
+.back-exit {
+    left: 0%;
+}
+.back-exit-active {
+    left: 100%;
+    transition: left 500ms ease-in;
+}
+

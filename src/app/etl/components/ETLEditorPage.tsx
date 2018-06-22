@@ -221,8 +221,12 @@ class ETLEditorPage extends TerrainComponent<Props>
   // is there a better pattern for this?
   public componentWillReceiveProps(nextProps)
   {
-    const { match: { params } } = this.props;
-    const nextParams = nextProps.params;
+    if (this.props.match === undefined || nextProps.match === undefined)
+    {
+      return;
+    }
+    const params = this.props.match.params;
+    const nextParams = nextProps.match.params;
 
     if (params == null || nextParams == null)
     {
