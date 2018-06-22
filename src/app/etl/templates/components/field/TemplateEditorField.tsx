@@ -122,11 +122,6 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
       return false;
     }
 
-    if (this._currentEngine().getOutputKeyPath(this.props.fieldId) === undefined)
-    {
-      return false;
-    }
-
     // check state
     if (!compareObjects(this.state, nextState))
     {
