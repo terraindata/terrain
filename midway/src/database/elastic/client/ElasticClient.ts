@@ -86,7 +86,7 @@ class ElasticClient
    */
   public ping(params: Elastic.PingParams, callback: (error: any, response: any) => void): void
   {
-    // this.log('ping', params);
+    this.log('ping', params);
     this.delegate.ping(params, callback);
   }
 
@@ -95,7 +95,7 @@ class ElasticClient
    */
   public bulk(params: Elastic.BulkIndexDocumentsParams, callback: (error: any, response: any) => void): void
   {
-    // this.log('bulk', params);
+    this.log('bulk', params);
     this.delegate.bulk(params, callback);
   }
 

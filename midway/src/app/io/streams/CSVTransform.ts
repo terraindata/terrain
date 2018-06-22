@@ -62,6 +62,7 @@ export default class CSVTransform
       headers,
       delimiter,
       discardUnmappedColumns: true,
+      quote: null,
     });
   }
 
@@ -75,6 +76,7 @@ export default class CSVTransform
       headers,
       delimiter,
       rowDelimiter,
+      quote: null,
     });
   }
 }

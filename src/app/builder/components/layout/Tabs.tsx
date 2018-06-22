@@ -415,27 +415,24 @@ class Tabs extends TerrainComponent<TabsProps> {
   {
 
     const { tabs } = this.state;
-
-    const tabsLayout =
+    const tabsLayout = {
+      compact: true,
+      columns: tabs ? tabs.slice(-4).map((tab, index) =>
       {
-        compact: true,
-        columns: tabs ? tabs.map((tab, index) => (
-          {
-            key: tab.id,
-            content:
-              <Tab
-                name={tab.name}
-                selected={tab.selected}
-                id={tab.id}
-                index={index}
-                onClick={this.handleClick}
-                onClose={this.handleClose}
-                ref={(tabElement) => { this.tabRefs[tab.name] = tabElement; }}
-              />
-            ,
-          }))
-          : [],
-      };
+        return {
+          key: tab.id,
+          content: <Tab
+            name={tab.name}
+            selected={tab.selected}
+            id={tab.id}
+            index={index}
+            onClick={this.handleClick}
+            onClose={this.handleClose}
+            ref={(tabElement) => { this.tabRefs[tab.name] = tabElement; }}
+          />,
+        };
+      }) : [],
+    };
 
     return (
       <div

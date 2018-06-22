@@ -80,6 +80,9 @@ class AuthRedux extends TerrainRedux<AuthActionTypes, AuthState>
         // store these values in localStorage so that the user is auto-logged in next time they visit
         localStorage['accessToken'] = accessToken;
         localStorage['id'] = id;
+
+        setGTMUserId(id);
+
         return state.set('accessToken', accessToken).set('id', +id);
       },
 
@@ -91,9 +94,30 @@ class AuthRedux extends TerrainRedux<AuthActionTypes, AuthState>
         localStorage.removeItem('id');
         Ajax.logout(storedAccessToken, storedId);
 
+        setGTMUserId(null);
+
         return state.set('accessToken', null).set('id', null);
       },
     };
+}
+
+function setGTMUserId(id)
+{
+  // for Google Tag Manager
+  const userId = String(id) + '-' + window.location.host;
+  const dataLayer = window['dataLayer'] !== undefined ? window['dataLayer'] : [];
+  const dataLayerIndex = dataLayer.findIndex(
+    (obj) => obj.userId !== undefined,
+  );
+  if (dataLayerIndex === -1)
+  {
+    dataLayer.push({ userId });
+  }
+  else
+  {
+    dataLayer[dataLayerIndex].userId = userId;
+  }
+  window['dataLayer'] = dataLayer;
 }
 
 const ReduxInstance = new AuthRedux();

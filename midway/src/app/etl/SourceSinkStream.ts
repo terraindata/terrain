@@ -74,6 +74,7 @@ import XMLTransform from '../io/streams/XMLTransform';
 import AEndpointStream from './endpoints/AEndpointStream';
 import AlgorithmEndpoint from './endpoints/AlgorithmEndpoint';
 import ElasticEndpoint from './endpoints/ElasticEndpoint';
+import FollowUpBossEndpoint from './endpoints/FollowUpBossEndpoint';
 import FSEndpoint from './endpoints/FSEndpoint';
 import GoogleAnalyticsEndpoint from './endpoints/GoogleAnalyticsEndpoint';
 import HTTPEndpoint from './endpoints/HTTPEndpoint';
@@ -145,7 +146,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
           sourceStream = await endpoint.getSource(source) as stream.Readable;
           return resolve(sourceStream);
         default:
-          throw new Error('not implemented.');
+          throw new Error('Source type not implemented.');
       }
 
       if (sourceStream === undefined && sourceStreams === undefined)
@@ -237,7 +238,7 @@ export async function getSinkStream(
 
     try
     {
-      if (sink.type !== 'Database' && sink.type !== 'MailChimp')
+      if (sink.type !== 'Database' && sink.type !== 'FollowUpBoss' && sink.type !== 'MailChimp')
       {
         switch (sink.fileConfig.fileType)
         {
@@ -292,7 +293,8 @@ export async function getSinkStream(
             break;
           case 'xml':
             const xmlPath: string | undefined = sink.fileConfig.xmlPath;
-            transformStream = XMLTransform.createExportStream(xmlPath);
+            const isPlaFeed: boolean = sink.fileConfig.isPlaFeed;
+            transformStream = XMLTransform.createExportStream(xmlPath, isPlaFeed);
             break;
           default:
             throw new Error('Export file type must be either CSV, TSV, JSON or XML.');
@@ -319,17 +321,20 @@ export async function getSinkStream(
         case 'Fs':
           endpoint = new FSEndpoint();
           break;
+        case 'FollowUpBoss':
+          endpoint = new FollowUpBossEndpoint();
+          break;
         case 'MailChimp':
           endpoint = new MailChimpEndpoint();
           break;
         default:
-          throw new Error('not implemented.');
+          throw new Error('Sink type not implemented.');
       }
 
       const sinkStream = await endpoint.getSink(sink, engine);
       if (transformStream !== undefined)
       {
-        const writableStream = transformStream.pipe(sinkStream);
+        transformStream.pipe(sinkStream);
         const progressStream = new ProgressStream(transformStream);
         resolve(progressStream);
       }

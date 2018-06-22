@@ -160,7 +160,7 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
       }
     }
 
-    if (algorithmIds.length > 0)
+    if (algorithmIds.length > 0 && analytics.selectedAnalyticsConnection !== null)
     {
       this.props.analyticsActions.fetch(
         analytics.selectedAnalyticsConnection,
@@ -329,23 +329,6 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
 
   public handleNameChange(id: ID, name: string)
   {
-    if (this.props.algorithms.get(id).name !== name)
-    {
-      const oldName = this.props.algorithms.get(id).name;
-      let message = '"' + oldName + '" is now "' + name + '"';
-      if (!oldName)
-      {
-        message = 'To "' + name + '"';
-      }
-
-      notificationManager.addNotification(
-        'Renamed',
-        message,
-        'info',
-        5,
-      );
-    }
-
     this.props.algorithmActions.change(
       this.props.algorithms.get(id)
         .set('name', name) as Algorithm,
@@ -433,16 +416,20 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
     if (selectedAlgorithm === id)
     {
       this.props.algorithmActions.unselect();
-    } else
+    }
+    else
     {
       this.props.algorithmActions.select(id);
-      this.props.analyticsActions.fetch(
-        analytics.selectedAnalyticsConnection,
-        [id],
-        analytics.selectedMetric,
-        analytics.selectedInterval,
-        analytics.selectedDateRange,
-      );
+      if (analytics.selectedAnalyticsConnection !== null)
+      {
+        this.props.analyticsActions.fetch(
+          analytics.selectedAnalyticsConnection,
+          [id],
+          analytics.selectedMetric,
+          analytics.selectedInterval,
+          analytics.selectedDateRange,
+        );
+      }
     }
   }
 

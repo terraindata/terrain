@@ -94,7 +94,7 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
       if (option.component != null)
       {
         const ComponentClass = option.component;
-        const extraProps = option.extraProps !== undefined ? option.extraProps : {};
+        const extraProps = option.extraProps !== undefined ? option.extraProps() : {};
         const customComponent = (
           <div key={'WalkthroughOptions'}>
             <ComponentClass
@@ -103,7 +103,6 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
               context={this.props.context}
               onDone={this.handleMoveToNextFactory(option.link)}
             />
-            {option.componentNeedsButton ? buttonComponent : null}
           </div>
         );
         // TODO style the container
@@ -139,11 +138,11 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
 
     public render()
     {
-      const { stepIndex, stepHistory } = this.props;
+      const { stepIndex, stepHistory, style } = this.props;
       const currentStep = stepHistory.get(stepIndex);
       const graphNode = graph[currentStep as any];
       return (
-        <div className='walkthrough-root'>
+        <div className='walkthrough-root' style={style}>
           {
             graphNode != null ?
               this.renderNode(graphNode) :
