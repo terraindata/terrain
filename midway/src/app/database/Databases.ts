@@ -141,6 +141,10 @@ export class Databases
       newDb.dsn = '';
       controller.setConfig(newDb);
     }
+    else
+    {
+      controller.setConfig(db);
+    }
     const connected: boolean = await controller.getClient().isConnected();
 
     DatabaseRegistry.set(db.id, controller);
