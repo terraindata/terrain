@@ -44,86 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:member-ordering
+import ESJSONParser from 'shareddatabase/elastic/parser/ESJSONParser';
+import ESValueInfo from 'shareddatabase/elastic/parser/ESValueInfo';
 
-// A generic type of backend, e.g. mysql or elastic
-
-import { Path } from 'app/builder/components/pathfinder/PathfinderTypes';
-import * as Immutable from 'immutable';
-import CardsToCodeOptions from '../../../shared/database/types/CardsToCodeOptions';
-import { BlockConfig } from '../../blocks/types/Block';
-import { Card } from '../../blocks/types/Card';
-import Query from '../../items/types/Query';
-
-export interface Backend
+export enum ESParameterType
 {
-  type: string;
-  name: string;
-
-  // The Building Blocks of Terrain
-  // Blocks are either a card or some inside part of a card.
-  // Note: each type should be unique among the whole scope of cards in all languages.
-  blocks:
-  {
-    [type: string]: BlockConfig,
-  };
-  creatingType: string; // type of the block that marks where a card is being created
-  inputType: string; // type of the block for inputs
-
-  getRootCards: () => List<Card>;
-  // Cards that can go at the top/root level
-  topLevelCards: List<string>;
-
-  // Ordering of the cards deck
-  cardsDeck: List<List<string>>;
-  cardsList: List<string>;
-
-  loadQuery(
-    query: Query,
-    queryReady: (query: Query) => void,
-  ): Query;
-
-  queryToCode(
-    query: Query,
-    options: CardsToCodeOptions,
-  ): string;
-
-  pathToCode(
-    path: Path,
-    inputs: List<any>,
-  ): { tql: string, pathErrorMap: Map<string, List<string>};
-
-  codeToQuery(
-    query: Query,
-    queryReady: (query: Query) => void,
-  ): Query;
-
-  parseQuery(
-    query: Query,
-  ): any;
-
-  parseTreeToQueryString(
-    query: Query,
-    options: CardsToCodeOptions,
-  ): string;
-
-  syntaxConfig: object;
-
-  // schema?
-
-  // function to get transform bars?
-  // autocomplete?
+  Unknown,
+  // meta parameter
+  MetaParent,
+  MetaDate,
+  // given parameter
+  GivenName,
 }
-
-export const cardsDeckToList = (cardsDeck: List<List<string>>) =>
-{
-  return cardsDeck.reduce(
-    (memo: List<string>, miniList: List<string>) =>
-    {
-      return memo.concat(miniList);
-    },
-    Immutable.List<string>([]),
-  ).toList();
-};
-
-export default Backend;
