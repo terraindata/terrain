@@ -50,15 +50,17 @@ import ATaskConfig from './ATaskConfig';
 
 export class TaskConfig
 {
-  public cancel: boolean = null;     // whether the tree of tasks should be cancelled
-  public id: number = null;          // unique id that identifies this task to other tasks in the input array of TaskConfigs
-  public jobStatus: number = null;   // 0: not running, 1: running, 2: paused
-  public name: string = '';          // name of the task i.e. 'import'
-  public onFailure: number = null;   // id of task to Pexecute on failure
-  public onSuccess: number = null;   // id of next task to execute (default should be next in array)
-  public params: any = null;         // input parameters for the task
-  public paused: number = null;      // where in the tree of tasks the tasks are paused
-  public taskId: number = null;      // maps to a statically declared task
+  public async: boolean = null;                 // whether the task should resolve immediately or wait until completion before returning
+  public cancel: boolean = null;                // whether the tree of tasks should be cancelled
+  public id: number = null;                     // unique id that identifies this task to other tasks in the input array of TaskConfigs
+  public jobStatus: number = null;              // 0: not running, 1: running, 2: paused
+  public name: string = '';                     // name of the task i.e. 'import'
+  public onFailure: number = null;              // id of task to Pexecute on failure
+  public onSuccess: number = null;              // id of next task to execute (default should be next in array)
+  public params: any = null;                    // input parameters for the task
+  public paused: number = null;                 // where in the tree of tasks the tasks are paused
+  public rootLogStream: stream.Writable = null; // contains all of the logs from a TaskTree with multiple nodes that produce logStreams
+  public taskId: number = null;                 // maps to a statically declared task
 }
 
 export default TaskConfig;

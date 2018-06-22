@@ -53,6 +53,7 @@ import { Task } from '../Task';
 
 const taskOutputConfig: TaskOutputConfig =
   {
+    async: true,
     exit: true,
     options:
       {

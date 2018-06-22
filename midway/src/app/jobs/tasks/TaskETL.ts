@@ -67,11 +67,13 @@ export class TaskETL extends Task
     {
       const taskOutputConfig: TaskOutputConfig =
         {
+          async: this.taskConfig.async,
           exit: false,
           options: {
             logStream: null,
             outputStream: null,
           },
+          rootLogStream: this.taskConfig.rootLogStream,
           status: true,
         };
 
@@ -82,7 +84,15 @@ export class TaskETL extends Task
         winston.info('finished executing ETL');
         taskOutputConfig['options']['outputStream'] = streams['outputStream'];
         taskOutputConfig['options']['logStream'] = streams['logStream'];
-        resolve(taskOutputConfig);
+        streams['logStream'].pipe(taskOutputConfig['rootLogStream']);
+
+        if (taskOutputConfig.async !== true)
+        {
+          streams['logStream'].on('end', () =>
+          {
+            resolve(taskOutputConfig);
+          });
+        }
       }
       catch (e)
       {
@@ -95,6 +105,15 @@ export class TaskETL extends Task
         logStream.push(null);
         taskOutputConfig['options']['logStream'] = logStream;
         taskOutputConfig['options']['outputStream'] = outputStream;
+        streams['logStream'].pipe(taskOutputConfig['rootLogStream']);
+
+        if (taskOutputConfig.async !== true)
+        {
+          streams['logStream'].on('end', () =>
+          {
+            resolve(taskOutputConfig);
+          });
+        }
         resolve(taskOutputConfig);
       }
     });

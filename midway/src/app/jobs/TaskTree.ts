@@ -52,6 +52,7 @@ import { TaskConfig } from 'shared/types/jobs/TaskConfig';
 import { TaskEnum } from 'shared/types/jobs/TaskEnum';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 import { TaskTreeConfig } from 'shared/types/jobs/TaskTreeConfig';
+import LogStream from '../io/streams/LogStream';
 import { Task } from './Task';
 import { TaskTreeNode } from './TaskTreeNode';
 import { TaskTreePrinter } from './TaskTreePrinter';
@@ -99,6 +100,7 @@ export class TaskTree
         invalidIds = true;
       }
       idSet.add(task.id);
+      task.async = (task.async != null) ? task.async : true;
       task.cancel = (task.cancel !== undefined && task.cancel !== null) ? task.cancel : false;
       task.jobStatus = (task.jobStatus !== undefined && task.jobStatus !== null) ? task.jobStatus : 0;
       task.name = (task.name !== undefined && task.name !== null) ? task.name : '';
@@ -207,15 +209,22 @@ export class TaskTree
         const taskOutputConfig: TaskOutputConfig =
           {
             exit: true,
-            status: true,
             options:
               {
                 logStream: null,
                 outputStream: null,
               },
+            rootLogStream: null,
+            status: true,
           };
         return resolve(taskOutputConfig);
       }
+      const rootLogStream: LogStream = new LogStream();
+      this.tasks.forEach((task, i) =>
+      {
+        this.tasks[ind].setRootLogStream(rootLogStream);
+      });
+
       let ind: number = 0;
       if (this.taskTreeConfig.jobStatus === 2)
       {

@@ -310,9 +310,9 @@ export class JobQueue
         // actually run the job
         const jobResult: TaskOutputConfig = await this.runningRunNowJobs.get(getJobs[0].id).run() as TaskOutputConfig;
         const jobsFromId: JobConfig[] = await this.get(getJobs[0].id);
-        // this.runningRunNowJobs.delete(getJobs[0].id);
+
         // log job result
-        const jobLogConfig: JobLogConfig[] = await App.JobL.create(getJobs[0].id, jobResult['options']['logStream'],
+        const jobLogConfig: JobLogConfig[] = await App.JobL.create(getJobs[0].id, jobResult.rootLogStream,
           jobResult.status, true);
         await this._setJobLogId(getJobs[0].id, jobLogConfig[0].id);
         if (jobResult.options.outputStream === null)
@@ -420,7 +420,7 @@ export class JobQueue
           await App.SKDR.setRunning(jobsFromId[0].scheduleId, false);
           this.runningJobs.delete(id);
 
-          const jobLogConfig: JobLogConfig[] = await App.JobL.create(id, jobResult['options']['logStream']);
+          const jobLogConfig: JobLogConfig[] = await App.JobL.create(id, jobResult.rootLogStream);
           await this._setJobLogId(id, jobLogConfig[0].id);
         }
       }
@@ -500,7 +500,7 @@ export class JobQueue
           const jobsFromId: JobConfig[] = await this.get(jobId);
           const jobStatus: string = jobResult.status === true ? 'SUCCESS' : 'FAILURE';
 
-          const jobLogConfig: JobLogConfig[] = await App.JobL.create(jobId, jobResult['options']['logStream'], jobResult.status, false);
+          const jobLogConfig: JobLogConfig[] = await App.JobL.create(jobId, jobResult.rootLogStream, jobResult.status, false);
           await this._setJobLogId(jobId, jobLogConfig[0].id);
           if (jobResult.options.outputStream === null)
           {
