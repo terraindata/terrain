@@ -61,13 +61,14 @@ export class Email
   constructor()
   {
     this.transports = new Map<number, any>(); // transports for nodemailer
+    integrations.initialize();
   }
 
   /*
    * Creates and sends an email.
    * PARAMS: integration ID, subject, body (number, string, string ==> Promise<boolean>)
    */
-  public async send(integrationId: number, subject: string, body: string): Promise<boolean>
+  public async send(integrationId: number, subject: string, body: string, attachment?: string): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>
     {
@@ -77,7 +78,7 @@ export class Email
         const connectionConfig = integrationConfigs[0].connectionConfig;
         const authConfig = integrationConfigs[0].authConfig;
         const fullConfig: object = Object.assign(connectionConfig, authConfig);
-
+        // winston.info(fullConfig);
         // if this integration hasn't been loaded into memory yet as a nodemailer transport
         if (!this.transports.has(integrationId))
         {
@@ -94,7 +95,6 @@ export class Email
           this.transports.set(integrationId, nodemailer.createTransport(transportOptions));
         }
         const currTransport = this.transports.get(integrationId);
-
         // set email parameters
         const emailContents: object =
           {
@@ -103,7 +103,10 @@ export class Email
             subject,
             text: body,
           };
-
+        if (attachment !== undefined)
+        {
+          emailContents['attachments'] = [{path: attachment}];
+        }
         // send the email
         currTransport.sendMail(emailContents, (err, info) =>
         {

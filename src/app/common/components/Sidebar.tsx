@@ -48,22 +48,45 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import AccountDropdown from 'common/components/AccountDropdown';
+import CheckBox from 'common/components/CheckBox';
+import Modal from 'common/components/Modal';
+import PopUpForm from 'common/components/PopUpForm';
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateList';
+import * as html2canvas from 'html2canvas';
+import * as inLiner from 'inliner';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
+import * as request from 'request';
+import { Ajax } from 'util/Ajax';
+import { AuthState } from '../../auth/AuthTypes';
 import { backgroundColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import TerrainComponent from '../../common/components/TerrainComponent';
+import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
 import './Sidebar.less';
-
+// import * as UserRouter from 'midway/src/app/users/UserRouter';
+type User = UserTypes.User;
 const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 const linkHeight = 50; // Coordinate with Sidebar.less
 const TerrainIcon = require('images/logo_terrainLong_blue@2x.png');
 const TerrainSmallIcon = require('images/logo_terrain_mountain.png');
+const BugSmallIcon = require('images/icon-bug.png');
+const FeedbackSmallIcon = require('images/icon-feedback.png');
 const linkOffsetExpanded = 207;
 const linkOffsetCollapsed = 133;
+const topBarItemStyle = [backgroundColor(Colors().bg3, Colors().bg2), fontColor(Colors().active)];
+const topBarRunStyle = [backgroundColor(Colors().activeHover, Colors().active), fontColor(Colors().activeText)];
+    // const buttonTextColor = Color('#242424');
+    // const buttonStyle = [
+    //   fontColor('#424242', buttonTextColor.alpha(buttonTextColor.alpha() * 0.5)),
+    //   backgroundColor('#fff'),
+    //   borderColor('#EDEFF3'),
+    // ];
+    const Color = require('color');
+
 export interface ILink
 {
   icon: any;
@@ -80,6 +103,7 @@ export interface Props
   expandable?: boolean;
   expanded?: boolean;
   onExpand?: () => void;
+  users?: UserTypes.UserState;
 }
 
 @Radium
@@ -87,10 +111,183 @@ export class Sidebar extends TerrainComponent<Props>
 {
   public state: {
     linkOffset: number,
+    reportBugModalOpen: boolean,
+    reportFeedbackModalOpen: boolean,
+    bugScreenshotChecked: boolean,
+    feedbackScreenshotChecked: boolean,
+    bugDescription: string,
+    feedbackText: string,
+    modalError: string;
   } =
     {
       linkOffset: 0,
+      reportBugModalOpen: false,
+      reportFeedbackModalOpen: false,
+      bugScreenshotChecked: true,
+      feedbackScreenshotChecked: true,
+      bugDescription: '',
+      feedbackText: '',
+      modalError: '',
     };
+
+  public renderRootLevelModals(): any[]
+  {
+    const modals = [];
+    if (this.state.reportBugModalOpen)
+    {
+      modals.push(
+        <PopUpForm
+          key='reportBug'
+          className='bug-report'
+          title={'REPORT A BUG'}
+          open={this.state.reportBugModalOpen}
+          onClose={this.closeTemplateUI}
+          wide={true}
+          showTextbox={true}
+          confirmButtonText='SUBMIT'
+          onConfirm={this.sendBugReport}
+          textboxValue={this.state.bugDescription}
+          onTextboxValueChange={this.saveBugDescription}
+          textboxPlaceholderValue='Bug description here.'
+          closeOnConfirm={true}
+          confirm={true}
+          errorMessage={this.state.modalError}
+          descriptionValue='Please describe your bug in as much detail as possible below. Your email address will be recorded.'
+        >
+        <CheckBox
+        checked={this.state.bugScreenshotChecked}
+        onChange={this.handleBugScreenshotCheckedChange}
+        label= 'Check to include screenshot.'>
+        </CheckBox>
+        </PopUpForm>,
+      );
+    }
+    if (this.state.reportFeedbackModalOpen)
+    {
+      modals.push(
+        <PopUpForm
+          key='giveFeedback'
+          className='feedback-report'
+          title={'GENERAL FEEDBACK'}
+          open={this.state.reportFeedbackModalOpen}
+          onClose={this.closeTemplateUI}
+          wide={true}
+          showTextbox={true}
+          confirmButtonText='SUBMIT'
+          onConfirm={this.sendFeedbackReport}
+          textboxValue={this.state.feedbackText}
+          onTextboxValueChange={this.saveFeedback}
+          textboxPlaceholderValue='Feedback description here.'
+          closeOnConfirm={true}
+          confirm={true}
+          errorMessage={this.state.modalError}
+          descriptionValue='Please submit any feedback you have below. Your email address will be recorded.'
+        >
+        <CheckBox
+        checked={this.state.feedbackScreenshotChecked}
+        onChange={this.handleFeedbackScreenshotCheckedChange}
+        label= 'Check to include screenshot.'>
+        </CheckBox>
+        </PopUpForm>,
+      );
+    }
+    return modals;
+  }
+
+  public createTextbox()
+  {
+    return (
+      <input
+      type='text'/>
+    );
+  }
+
+  public saveBugDescription(newValue: string)
+  {
+    this.setState({
+      bugDescription: newValue,
+    });
+    // console.log("bug description: " + this.state.bugDescription);
+  }
+
+  public saveFeedback(newValue: string)
+  {
+    this.setState({
+      feedbackText: newValue,
+    });
+  }
+
+  public handleBugScreenshotCheckedChange()
+  {
+    this.setState({
+      bugScreenshotChecked: !this.state.bugScreenshotChecked,
+    });
+  }
+
+  public handleFeedbackScreenshotCheckedChange()
+  {
+    this.setState({
+        feedbackScreenshotChecked: !this.state.feedbackScreenshotChecked,
+      });
+  }
+
+  public sendBugReport(): void
+  {
+    const data = {
+      bug: true,
+      description: this.state.bugDescription,
+      user: this.props.users.currentUser.email,
+      browserInfo: navigator.appVersion,
+    };
+    this.takeScreenshot(data, this.state.bugScreenshotChecked);
+  }
+
+  public sendFeedbackReport(): void
+  {
+    const data = {
+      bug: false,
+      description: this.state.feedbackText,
+      user: this.props.users.currentUser.email,
+      browserInfo: navigator.appVersion,
+    };
+    this.takeScreenshot(data, this.state.feedbackScreenshotChecked);
+  }]
+
+  public takeScreenshot(data: {}, screenshotChecked: boolean): void
+  {
+    if (screenshotChecked)
+    {
+        const app: HTMLElement = document.getElementsByClassName('app-inner')[0] as HTMLElement;
+        app.style.opacity = '1.0';
+        // let newApp = document.getElementsByClassName("app-copy")[0];
+        html2canvas(app).then((canvas) => {
+          const dataUrl = canvas.toDataURL();
+          data['screenshot'] = dataUrl;
+          // console.log(JSON.stringify(data));
+          Ajax.req(
+            'post',
+            `feedback/bug`,
+            data,
+            (response) => {},
+            {
+              onError: (err) => {
+                const newApp: HTMLElement = document.getElementsByClassName('app-inner')[0] as HTMLElement;
+                newApp.style.opacity = 'inherit'; },
+            });
+        });
+    }
+    else
+    {
+      Ajax.req(
+        'post',
+        `feedback/bug`,
+        data,
+        (response) => {},
+        {
+          onError: (err) => {},
+        });
+    }
+  }
 
   public componentWillMount()
   {
@@ -140,6 +337,7 @@ export class Sidebar extends TerrainComponent<Props>
 
   public render()
   {
+    // console.log(this.props.users);
     return (
       <div
         className={classNames({
@@ -148,6 +346,7 @@ export class Sidebar extends TerrainComponent<Props>
         })}
         style={backgroundColor(Colors().sidebarBg)}
       >
+      {... this.renderRootLevelModals()}
         {
           this.props.expanded ?
             <img
@@ -220,6 +419,7 @@ export class Sidebar extends TerrainComponent<Props>
             )
           }
         </div>
+
         {
           this.props.expandable ?
             (
@@ -242,14 +442,83 @@ export class Sidebar extends TerrainComponent<Props>
             )
             : null
         }
+
+        { this.props.expanded ?
+        <div className='bug-button'
+          onClick={this.openBugModal}
+          key='report'>
+       BUGS </div>
+       :
+               <img
+              src={BugSmallIcon} className='bug-button-collapsed'
+          onClick={this.openBugModal}
+          key='report'
+            />
+     }
+
+{ this.props.expanded ?
+
+               <div className='feedback-button'
+          onClick={this.openFeedbackModal}
+          key='feedback'>
+       FEEDBACK </div>
+
+       :
+       <img className='feedback-button-collapsed' src={FeedbackSmallIcon}
+          onClick={this.openFeedbackModal}
+          key='feedback'/>
+
+     }
+
       </div>
+
     );
   }
+
+  public openBugModal()
+  {
+    // console.log(this.props.users.currentUser.email);
+    if (this.state.reportBugModalOpen)
+    {
+      this.setState({
+        reportBugModalOpen: false,
+      });
+    }
+    else {
+      this.setState({
+        reportBugModalOpen: true,
+      });
+    }
+  }
+
+    public openFeedbackModal()
+  {
+    if (this.state.reportFeedbackModalOpen)
+    {
+      this.setState({
+        reportFeedbackModalOpen: false,
+      });
+    }
+    else {
+      this.setState({
+        reportFeedbackModalOpen: true,
+      });
+    }
+  }
+
+    public closeTemplateUI()
+  {
+    this.setState({
+      reportBugModalOpen: false,
+      reportFeedbackModalOpen: false,
+    });
+  }
+
 }
 
 export default Util.createContainer(
   Sidebar,
-  [],
+  ['users'],
   {
     colorsActions: ColorsActions,
   },
