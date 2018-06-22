@@ -158,7 +158,6 @@ class TaskItem extends TerrainComponent<Props>
   public render()
   {
     const { task, type } = this.props;
-    console.log('RENDER TASK ', task);
     return (
       <div
         className='task-item-wrapper'
@@ -223,8 +222,9 @@ class TaskItem extends TerrainComponent<Props>
         <div
           className='task-item-error'
           onClick={this._fn(this.props.onErrorClick, task.id)}
+          style={fontColor(Colors().error)}
         >
-          Error
+          On Failure
         </div>
       </div>
     );

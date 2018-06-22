@@ -9,6 +9,7 @@
     padding-bottom: 20px;
     margin: auto;
     margin-top: 12px;
+    pointer-events: all;
     .task-item-header {
     	height: 30px;
     	margin-bottom: 6px;
@@ -27,6 +28,15 @@
             right: 3px;
         }
     }
+    .task-item-error {
+        float: right;
+        position: relative;
+        cursor: pointer;
+        margin-right: 12px;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
     .task-item-body {
     	margin-left: 6px;
     	margin-right: 6px;
@@ -41,5 +51,12 @@
     	.task-item-subtask-button {
     		padding: 6px;
     	}
+    }
+    .task-item-sub-header {
+        cursor: pointer;
+        text-transform: capitalize;
+        &:hover {
+            text-decoration: underline;
+        }
     }
 }

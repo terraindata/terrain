@@ -147,6 +147,46 @@ abstract class TaskFormBase<FormState, P extends Props = Props> extends TerrainC
       this.props.onChange(this.props.task.setIn(['params', 'options', componentType], newValue));
     }
   }
+  protected renderEndpointSection(state, endpointType: string)
+  {
+    const template = this.props.templates.find((t) => t.id === state.templateId);
+    if (!template)
+    {
+      return null;
+    }
+    const endpoints = template[endpointType];
+    const overrideString = 'override' + endpointType.charAt(0).toUpperCase() + endpointType.slice(1);
+    return (
+      <div>
+        <div
+          onClick={this._fn(this.toggleState, endpointType)}
+          className='task-item-sub-header'
+          style={fontColor(Colors().active)}
+        >
+          {endpointType}
+        </div>
+        <FadeInOut
+          open={this.state.open.get(endpointType)}
+        >
+          {
+            endpoints.keySeq().map((key) =>
+            {
+              const endpoint = state[overrideString].get(key) || endpoints.get(key);
+              return (
+                <EndpointForm
+                  isSource={endpointType === 'sources'}
+                  endpoint={endpoint}
+                  onChange={this._fn(this.handleComponentChange, overrideString, key)}
+                  isSchedule={true}
+                  key={endpoint.name}
+                />
+              );
+            })
+          }
+        </FadeInOut>
+      </div>
+    );
+  }
 }
 
 type DefaultExitParamsT = ParamConfigType<TaskEnum.taskDefaultExit>;
@@ -193,40 +233,7 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
       options: {
         render: (state, disabled) =>
         {
-          const template = this.props.templates.find((t) => t.id === state.templateId);
-          if (!template)
-          {
-            return null;
-          }
-          const sources = template.sources;
-          return (
-            <div>
-              <div
-                onClick={this._fn(this.toggleState, 'sources')}
-              >
-                Sources
-              </div>
-              <FadeInOut
-                open={this.state.open.get('sources')}
-              >
-                {
-                  sources.keySeq().map((key) =>
-                  {
-                    const source = state.overrideSources.get(key) || sources.get(key);
-                    return (
-                      <EndpointForm
-                        isSource={true}
-                        endpoint={source}
-                        onChange={this._fn(this.handleComponentChange, 'overrideSources', key)}
-                        isSchedule={true}
-                        key={source.name}
-                      />
-                    );
-                  })
-                }
-              </FadeInOut>
-            </div>
-          );
+          return this.renderEndpointSection(state, 'sources');
         },
       },
     },
@@ -236,40 +243,7 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
       options: {
         render: (state, disabled) =>
         {
-          const template = this.props.templates.find((t) => t.id === state.templateId);
-          if (!template)
-          {
-            return null;
-          }
-          const sinks = template.sinks;
-          return (
-            <div>
-              <div
-                onClick={this._fn(this.toggleState, 'sinks')}
-              >
-                Sinks
-              </div>
-              <FadeInOut
-                open={this.state.open.get('sinks')}
-              >
-                {
-                  sinks.keySeq().map((key) =>
-                  {
-                    const sink = state.overrideSinks[key] || sinks.get(key);
-                    return (
-                      <EndpointForm
-                        isSource={true}
-                        endpoint={sink}
-                        onChange={this._fn(this.handleComponentChange, 'overrideSinks', key)}
-                        isSchedule={true}
-                        key={sink.name}
-                      />
-                    );
-                  })
-                }
-              </FadeInOut>
-            </div>
-          );
+          return this.renderEndpointSection(state, 'sinks');
         },
       },
     },
