@@ -61,10 +61,8 @@ import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import SchedulerApi from 'scheduler/SchedulerApi';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
 import XHR from 'util/XHR';
-import Schedule from './Schedule';
 import './Schedule.less';
 const RefreshIcon = require('images/icon_refresh.svg?name=RefreshIcon');
 
