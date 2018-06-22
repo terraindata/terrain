@@ -47,11 +47,76 @@ THE SOFTWARE.
 import dateFormat = require('date-format');
 import * as winston from 'winston';
 
+class MemoryTransport extends winston.Transport
+{
+  private msgs: any[];
+  private index: number;
+  private hasWrapped: boolean;
+  private maxMsgSize: number = 1000;
+
+  constructor(options)
+  {
+    super(options);
+
+    this.name = 'MemoryTransport';
+    if (options != null && options.maxMsgSize != null)
+    {
+      this.maxMsgSize = options.maxMsgSize;
+    }
+
+    this.index = 0;
+    this.hasWrapped = false;
+    this.msgs = new Array(this.maxMsgSize);
+  }
+
+  public log(level: string, msg, meta, callback)
+  {
+    if (level === 'info' || level === 'warning' || level === 'error')
+    {
+      const timestamp: string = dateFormat('yyyy-MM-dd hh:mm:ss.SSS ');
+      this.msgs[this.next()] = timestamp + level + ': ' + String(msg);
+    }
+    this.emit('logged');
+    callback(null, true);
+  }
+
+  public getAll()
+  {
+    let msgStr;
+    if (!this.hasWrapped)
+    {
+      msgStr = this.msgs.slice(0, this.index).join('\n');
+    }
+    else
+    {
+      msgStr = this.msgs.slice(this.index + 1).join('\n') + '\n' + this.msgs.slice(0, this.index).join('\n');
+    }
+
+    return msgStr;
+  }
+
+  private next()
+  {
+    if (this.index === this.maxMsgSize - 1)
+    {
+      this.index = 0;
+      this.hasWrapped = true;
+    }
+    else
+    {
+      this.index++;
+    }
+    return this.index;
+  }
+}
+
+winston.transports['MemoryTransport'] = MemoryTransport;
+
 winston.configure(
   {
     transports:
       [
-        new (winston.transports.Console)(
+        new winston.transports.Console(
           {
             formatter: (options) =>
             {
@@ -67,5 +132,6 @@ winston.configure(
             },
           },
         ),
+        new (winston.transports['MemoryTransport'])(),
       ],
   });

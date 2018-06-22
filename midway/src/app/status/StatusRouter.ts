@@ -49,6 +49,7 @@ import * as KoaRouter from 'koa-router';
 import * as os from 'os';
 import * as process from 'process';
 import * as v8 from 'v8';
+import * as winston from 'winston';
 
 import appStats from '../AppStats';
 import { databases } from '../database/DatabaseRouter';
@@ -113,6 +114,12 @@ Router.get('/stats', passport.authenticate('access-token-local'), async (ctx, ne
 
     databases: dbs,
   };
+});
+
+Router.get('/logs', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const transport = winston['default'].transports['MemoryTransport'];
+  ctx.body = (transport as any).getAll();
 });
 
 /**
