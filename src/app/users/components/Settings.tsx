@@ -765,7 +765,7 @@ class Settings extends TerrainComponent<Props>
       <div className='settings-main-container'>
         <div className='settings-page-title' style={{ color: Colors().mainSectionTitle }}>Account Settings</div>
         <Section
-          user={this.props.users.currentUser}
+          user={currentUser}
           sectionTitle='Profile'
           sectionType='profile'
           sectionBoxes={
@@ -781,7 +781,7 @@ class Settings extends TerrainComponent<Props>
           onChange={this.updateUserInfo}
         />
         <Section
-          user={this.props.users.currentUser}
+          user={currentUser}
           sectionTitle='Password'
           sectionType='password'
           sectionBoxes={
@@ -797,7 +797,7 @@ class Settings extends TerrainComponent<Props>
           onChange={this.updateUserPassword}
         />
         <Section
-          user={this.props.users.currentUser}
+          user={currentUser}
           sectionTitle='Time Zone'
           sectionType='timezone'
           sectionBoxes={

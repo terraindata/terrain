@@ -94,6 +94,8 @@ export default class Section extends TerrainComponent<Props>
       isEditing: false,
       sections: this.props.sectionBoxes,
       editingSections: {},
+      errorModalOpen: false,
+      errorModalMessage: '',
     };
   }
 
@@ -109,15 +111,89 @@ export default class Section extends TerrainComponent<Props>
     }
   }
 
-  public renderProfilePicture()
+  public toggleErrorModal()
   {
-    return (<img src={UserTypes.profileUrlFor(this.props.user)}
-            ref='profilePicImg' />);
+    this.setState({
+      errorModalOpen: !this.state.errorModalOpen,
+    });
+  }
+
+  public handleUploadImage()
+  {
+    if (!this.state.isEditing)
+    {
+      return;
+    }
+    this.refs['imageInput']['click']();
+  }
+
+  public handleProfilePicChange(event)
+  {
+    if (!this.state.isEditing)
+    {
+      return;
+    }
+    const reader = new FileReader();
+
+    reader.addEventListener('load', () =>
+    {
+      this.refs['profilePicImg']['src'] = reader.result;
+      const editingPic = this.state.editingSections;
+      editingPic['imgSrc'] = reader.result;
+      this.setState({
+        editingSections: editingPic,
+      });
+    }, false);
+
+    if (event.target.files !== undefined)
+    {
+      const file = event.target.files[0];
+
+      if (file)
+      {
+        if (file.size > 3000000)
+        {
+          this.setState({
+            errorModalMessage: 'Maximum allowed file size is 3MB',
+          });
+          this.toggleErrorModal();
+          return;
+        }
+
+        reader.readAsDataURL(file);
+      }
+    }
+  }
+
+  public renderSelectProfilePicture()
+  {
+    return (
+      <div className='profile-pic-and-edit'>
+        <img
+          src={this.state.editingSections['imgSrc'] || UserTypes.profileUrlFor(this.props.user)}
+          style={{ opacity: 0 }}
+          onClick={this.handleUploadImage}
+          ref='profilePicImg' />
+        <input
+          ref='imageInput'
+          type='file'
+          className='profile-pic-upload'
+          onChange={this.handleProfilePicChange}
+          id='profile-image-input'
+        />
+      </div>
+    );
+  }
+
+  public handleProfilePictureSource(): string
+  {
+    const newImageUrl = this.state.editingSections['imgSrc'];
+    const imageUrl: string = (newImageUrl === undefined) ? UserTypes.profileUrlFor(this.props.user) : newImageUrl;
+    return 'url(' + imageUrl + ')';
   }
 
   public renderBlockColumn()
   {
-    let picEditPrompt: number = (this.state.isEditing) ? 0.4 : 1; 
     if (this.props.columnNum === 0)
     {
       return (
@@ -139,7 +215,16 @@ export default class Section extends TerrainComponent<Props>
 
       return (
         <div className='section-body' style={{ background: Colors().bg }}>
-          {this.props.hasPhoto ? <div className='profile-pic' style={{ opacity: picEditPrompt}} > {this.renderProfilePicture()} </div> : null}
+          {this.props.hasPhoto ?
+            <div
+              className='profile-pic'
+              onClick={this.handleProfilePicChange}
+              style={{
+                backgroundImage: this.handleProfilePictureSource(), opacity: (this.state.isEditing) ? 0.4 : 1,
+                cursor: (this.state.isEditing) ? 'pointer' : 'default'
+              }}>
+              {this.renderSelectProfilePicture()}
+            </div> : null}
           <div className='profile-text'>
             {columns.map((col, i) => this.renderBlocks(col, 'profile-col-1', i))}
           </div>
@@ -311,6 +396,12 @@ export default class Section extends TerrainComponent<Props>
         </div>
 
         {(!(this.props.sectionType === 'password' && !this.state.isEditing)) && this.renderBlockColumn()}
+        <Modal
+          message={this.state.errorModalMessage}
+          onClose={this.toggleErrorModal}
+          open={this.state.errorModalOpen}
+          error={true}
+        />
       </div>
     );
   }

@@ -1,5 +1,3 @@
-@import "../../common/Common.less";
-
 html *
 {
   letter-spacing: 0.8px;
@@ -107,16 +105,28 @@ html *
 }
 
 .profile-pic {
-  height: 0;
-  width: 22%;
-  padding-bottom: 22%;
+  //height: 0;
+  //width: 22%;
+  //padding-bottom: 22%;
   margin-right: 40px;
+  height: 14vw;
+  width: 14vw;
+  background-size: cover;
+  border-radius: 10px;
 }
 
 .profile-text {
   display: flex;
   flex-wrap: wrap;
   flex-grow: 4.5;
+}
+
+.profile-pic-upload {
+  display: none;
+}
+
+.profile-pic-and-edit {
+  background: none;
 }
 
 .profile-input {
