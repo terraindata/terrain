@@ -54,7 +54,6 @@ import PopUpForm from 'common/components/PopUpForm';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateList';
 import * as html2canvas from 'html2canvas';
-import * as inLiner from 'inliner';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
