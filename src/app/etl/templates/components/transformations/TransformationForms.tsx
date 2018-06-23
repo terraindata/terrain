@@ -49,8 +49,8 @@ import { DisplayState, DisplayType, InputDeclarationMap } from 'common/component
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { InfoType, TransformationInfo } from 'shared/transformations/TransformationInfo';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { TransformationFormProps, TransformationForm } from './TransformationFormBase';
 import TransformationNodeVisitor from 'shared/transformations/TransformationNodeVisitor';
+import { TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
@@ -134,7 +134,7 @@ import { SplitTFF } from './SplitTransformationForm';
 //   }
 // }
 
-const forms: Array<{ new (props): TransformationForm<any, any> }> = [
+const forms: Array<{ new(props): TransformationForm<any, any> }> = [
   CaseTFF,
   SubstringTFF,
   DuplicateTFF,
@@ -194,7 +194,12 @@ class TransformationFormVisitor extends TransformationNodeVisitor<React.Componen
   }
 }
 
-export const transformationFormVisitor = new TransformationFormVisitor();
+const transformationFormVisitor = new TransformationFormVisitor();
+
+export function getTransformationForm(type: TransformationNodeType): React.ComponentClass<TransformationFormProps>
+{
+  return transformationFormVisitor.visit(type);
+}
 
 export const availableTransformations: List<TransformationNodeType> = determineAvailableTransformations();
 // all transformation types for which getTransformationForm does not return null

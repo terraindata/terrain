@@ -46,13 +46,13 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
-import * as yadeep from 'shared/util/yadeep';
-import { KeyPath } from 'shared/util/KeyPath';
-import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationNode from './TransformationNode';
 import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationVisitError from 'shared/transformations/TransformationVisitError';
 import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import { KeyPath } from 'shared/util/KeyPath';
+import * as yadeep from 'shared/util/yadeep';
+import TransformationNode from './TransformationNode';
 
 export default class QuotientTransformationNode extends TransformationNode
 {

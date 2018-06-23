@@ -43,8 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import TransformationNodeType from './TransformationNodeType';
 import TransformationNode from './nodes/TransformationNode';
+import TransformationNodeType from './TransformationNodeType';
 
 // import AddTransformationNode from 'shared/transformations/nodes/AddTransformationNode';
 // import ArraySumTransformationNode from 'shared/transformations/nodes/ArraySumTransformationNode';

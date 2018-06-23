@@ -240,7 +240,7 @@ export class TransformationEngine
   {
     // const fieldIDs: List<number> = this.parseFieldIDs(fieldNamesOrIDs);
     const node: TransformationNode =
-      new (TransformationInfo.getType(nodeType))(this.uidNode, fieldNames, options, /*nodeType*/);
+      new (TransformationInfo.getType(nodeType))(this.uidNode, fieldNames, options /*nodeType*/);
 
     // Process fields created/disabled by this transformation
     if (options !== undefined)
@@ -290,16 +290,18 @@ export class TransformationEngine
   {
     let output: object = this.rename(doc);
     this.restoreArrays(output);
-
+    const visitor = new TransformationEngineNodeVisitor();
     for (const nodeKey of this.dag.sources())
     {
       const toTraverse: string[] = GraphLib.alg.preorder(this.dag, [nodeKey]);
       for (let i = 0; i < toTraverse.length; i++)
       {
         const preprocessedNode: TransformationNode = this.preprocessNode(this.dag.node(toTraverse[i]), output);
-        const visitor: TransformationEngineNodeVisitor = new TransformationEngineNodeVisitor();
-        const transformationResult: TransformationVisitResult =
-          visitor.applyTransformationNode(preprocessedNode, output);
+
+        // const transformationResult: TransformationVisitResult =
+        //   visitor.applyTransformationNode(preprocessedNode, output);
+
+        const transformationResult = preprocessedNode.accept(visitor, output);
         if (transformationResult.errors !== undefined)
         {
           // winston.error('Transformation encountered errors!:');
