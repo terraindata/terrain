@@ -71,69 +71,6 @@ import
 } from './SimpleTransformations';
 import { SplitTFF } from './SplitTransformationForm';
 
-// export function getTransformationForm(type: TransformationNodeType): React.ComponentClass<TransformationFormProps>
-// {
-//   switch (type)
-//   {
-//     case TransformationNodeType.CaseNode:
-//       return CaseTFF;
-//     case TransformationNodeType.SubstringNode:
-//       return SubstringTFF;
-//     case TransformationNodeType.DuplicateNode:
-//       return DuplicateTFF;
-//     case TransformationNodeType.SplitNode:
-//       return SplitTFF;
-//     case TransformationNodeType.JoinNode:
-//       return JoinTFF;
-//     case TransformationNodeType.CastNode:
-//       return CastTFF;
-//     case TransformationNodeType.HashNode:
-//       return HashTFF;
-//     case TransformationNodeType.ArraySumNode:
-//       return ArraySumTFF;
-//     case TransformationNodeType.ArrayCountNode:
-//       return ArrayCountTFF;
-//     case TransformationNodeType.RoundNode:
-//       return RoundTFF;
-//     case TransformationNodeType.AddNode:
-//       return AddTFF;
-//     case TransformationNodeType.SubtractNode:
-//       return SubtractTFF;
-//     case TransformationNodeType.MultiplyNode:
-//       return MultiplyTFF;
-//     case TransformationNodeType.DivideNode:
-//       return DivideTFF;
-//     case TransformationNodeType.SetIfNode:
-//       return SetIfTFF;
-//     case TransformationNodeType.FindReplaceNode:
-//       return FindReplaceTFF;
-//     case TransformationNodeType.InsertNode:
-//       return InsertTFF;
-//     case TransformationNodeType.SumNode:
-//       return SumTFF;
-//     case TransformationNodeType.DifferenceNode:
-//       return DifferenceTFF;
-//     case TransformationNodeType.ProductNode:
-//       return ProductTFF;
-//     case TransformationNodeType.QuotientNode:
-//       return QuotientTFF;
-//     case TransformationNodeType.EncryptNode:
-//       return EncryptTFF;
-//     case TransformationNodeType.DecryptNode:
-//       return DecryptTFF;
-//     case TransformationNodeType.GroupByNode:
-//       return GroupByTFF;
-//     case TransformationNodeType.FilterArrayNode:
-//       return FilterArrayTFF;
-//     case TransformationNodeType.RemoveDuplicatesNode:
-//       return RemoveDuplicatesTFF;
-//     case TransformationNodeType.ZipcodeNode:
-//       return ZipcodeTFF;
-//     default:
-//       return null;
-//   }
-// }
-
 const forms: Array<{ new(props): TransformationForm<any, any> }> = [
   CaseTFF,
   SubstringTFF,

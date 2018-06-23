@@ -298,9 +298,6 @@ export class TransformationEngine
       {
         const preprocessedNode: TransformationNode = this.preprocessNode(this.dag.node(toTraverse[i]), output);
 
-        // const transformationResult: TransformationVisitResult =
-        //   visitor.applyTransformationNode(preprocessedNode, output);
-
         const transformationResult = preprocessedNode.accept(visitor, output);
         if (transformationResult.errors !== undefined)
         {

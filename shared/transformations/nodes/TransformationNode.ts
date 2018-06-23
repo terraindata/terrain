@@ -47,33 +47,11 @@ THE SOFTWARE.
 import { List } from 'immutable';
 
 import { KeyPath } from '../../util/KeyPath';
-// import { TransformationInfo } from '../TransformationInfo';
+
 import TransformationNodeType from '../TransformationNodeType';
 import TransformationNodeVisitor from '../TransformationNodeVisitor';
-// import TransformationVisitError from '../TransformationVisitError';
+import TransformationVisitError from '../TransformationVisitError';
 import TransformationVisitResult from '../TransformationVisitResult';
-
-// export default abstract class TransformationNode
-// {
-//   public id: number;
-//   public typeCode: TransformationNodeType;
-//   public fields: List<KeyPath>;
-//   public meta: object;
-
-//   public constructor(id: number, fields: List<KeyPath>, options: object = {}, typeCode: TransformationNodeType)
-//   {
-//     this.id = id;
-//     this.fields = fields;
-//     this.meta = options;
-//     this.typeCode = typeCode;
-//   }
-
-//   public accept(visitor: TransformationNodeVisitor, doc: object, options: object = {}): TransformationVisitResult
-//   {
-//     const docCopy = Object.assign({}, doc); // Preserve original doc in case of errors that would mangle it
-//     return TransformationInfo.applyTargetedVisitor(visitor, this, docCopy, options);
-//   }
-// }
 
 export default abstract class TransformationNode
 {
@@ -93,6 +71,10 @@ export default abstract class TransformationNode
 
   public accept<R, P>(visitor: TransformationNodeVisitor<R, P>, args: P): R
   {
+    if (typeof visitor.visit !== 'function')
+    {
+      throw new Error(String(visitor.constructor);
+    }
     return visitor.visit(this.typeCode, this, args);
   }
 }
