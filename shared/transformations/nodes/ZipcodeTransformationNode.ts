@@ -64,7 +64,7 @@ const TYPECODE = TransformationNodeType.ZipcodeNode;
 
 export class ZipcodeTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -92,7 +92,7 @@ export class ZipcodeTransformationNode extends TransformationNode
 
 class ZipcodeTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Zipcode';
   public description = 'Convert a zipcode into location data';
   public nodeClass = ZipcodeTransformationNode;

@@ -64,7 +64,7 @@ const TYPECODE = TransformationNodeType.RemoveDuplicatesNode;
 
 export class RemoveDuplicatesTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -109,7 +109,7 @@ export class RemoveDuplicatesTransformationNode extends TransformationNode
 
 class RemoveDuplicatesTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Remove Duplicates';
   public description = 'Remove Duplicate Values from an Array';
   public nodeClass = RemoveDuplicatesTransformationNode;

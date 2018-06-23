@@ -66,7 +66,7 @@ const TYPECODE = TransformationNodeType.CastNode;
 
 export class CastTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -167,7 +167,7 @@ export class CastTransformationNode extends TransformationNode
 
 class CastTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Cast';
   public description = 'Convert this field to a different type';
   public nodeClass = CastTransformationNode;

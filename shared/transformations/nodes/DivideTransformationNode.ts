@@ -64,7 +64,7 @@ const TYPECODE = TransformationNodeType.DivideNode;
 
 export class DivideTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -92,7 +92,7 @@ export class DivideTransformationNode extends TransformationNode
 
 class DivideTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Divide';
   public description = 'Divide this field by a constant number';
   public nodeClass = DivideTransformationNode;

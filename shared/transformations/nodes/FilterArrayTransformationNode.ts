@@ -64,7 +64,7 @@ const TYPECODE = TransformationNodeType.FilterArrayNode;
 
 export class FilterArrayTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -114,7 +114,7 @@ export class FilterArrayTransformationNode extends TransformationNode
 
 class FilterArrayTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Filter Array';
   public description = 'Filter an array on its values';
   public nodeClass = FilterArrayTransformationNode;

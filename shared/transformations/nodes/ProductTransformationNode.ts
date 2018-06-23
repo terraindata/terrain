@@ -64,7 +64,7 @@ const TYPECODE = TransformationNodeType.ProductNode;
 
 export class ProductTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -110,7 +110,7 @@ export class ProductTransformationNode extends TransformationNode
 
 class ProductTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Product of Fields';
   public description = 'Multiplies two or more fields together and puts the result in a new field';
   public nodeClass = ProductTransformationNode;

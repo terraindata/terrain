@@ -63,7 +63,7 @@ const TYPECODE = TransformationNodeType.JoinNode;
 
 export class JoinTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE ;
+  public readonly typeCode = TYPECODE ;
 
   public transform(doc: object)
   {
@@ -102,7 +102,7 @@ export class JoinTransformationNode extends TransformationNode
 
 class JoinTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Join Field';
   public description = 'Join this field with another field';
   public nodeClass = JoinTransformationNode;

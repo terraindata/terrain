@@ -64,7 +64,7 @@ const TYPECODE = TransformationNodeType.MultiplyNode;
 
 export class MultiplyTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -92,7 +92,7 @@ export class MultiplyTransformationNode extends TransformationNode
 
 class MultiplyTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Multiply';
   public description = 'Multiply this field by a constant factor';
   public nodeClass = MultiplyTransformationNode;

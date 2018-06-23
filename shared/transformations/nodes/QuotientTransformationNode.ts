@@ -64,7 +64,7 @@ const TYPECODE = TransformationNodeType.QuotientNode;
 
 export class QuotientTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -110,7 +110,7 @@ export class QuotientTransformationNode extends TransformationNode
 
 class QuotientTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Quotient of Fields';
   public description = 'Divides two fields and puts the result in a new field';
   public nodeClass = QuotientTransformationNode;

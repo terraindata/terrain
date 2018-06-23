@@ -64,7 +64,7 @@ const TYPECODE = TransformationNodeType.AddNode;
 
 export class AddTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -92,7 +92,7 @@ export class AddTransformationNode extends TransformationNode
 
 class AddTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Add';
   public description = 'Add a constant number to this field';
   public nodeClass = AddTransformationNode;

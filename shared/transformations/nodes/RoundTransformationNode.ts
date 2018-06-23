@@ -66,7 +66,7 @@ const TYPECODE = TransformationNodeType.RoundNode;
 
 export class RoundTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -94,7 +94,7 @@ export class RoundTransformationNode extends TransformationNode
 
 class RoundTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Round';
   public description = 'Round this field to the specified number of decimals';
   public nodeClass = RoundTransformationNode;

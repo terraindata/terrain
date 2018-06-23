@@ -66,7 +66,7 @@ const TYPECODE = TransformationNodeType.HashNode;
 
 export class HashTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -94,7 +94,7 @@ export class HashTransformationNode extends TransformationNode
 
 class HashTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Hash';
   public description = 'Hash this field using SHA3/Keccak256';
   public nodeClass = HashTransformationNode;

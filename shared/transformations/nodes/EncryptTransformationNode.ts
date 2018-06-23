@@ -66,7 +66,7 @@ const TYPECODE = TransformationNodeType.EncryptNode;
 
 export class EncryptTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -94,7 +94,7 @@ export class EncryptTransformationNode extends TransformationNode
 
 class EncryptTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Encrypt';
   public description = 'Encrypt a field using the secure AES algorithm';
   public nodeClass = EncryptTransformationNode;

@@ -64,7 +64,7 @@ const TYPECODE = TransformationNodeType.SubtractNode;
 
 export class SubtractTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -92,7 +92,7 @@ export class SubtractTransformationNode extends TransformationNode
 
 class SubtractTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Subtract';
   public description = 'Subtract a constant number from this field';
   public nodeClass = SubtractTransformationNode;

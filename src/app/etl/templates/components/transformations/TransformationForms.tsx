@@ -47,9 +47,9 @@ THE SOFTWARE.
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { InfoType, TransformationInfo } from 'shared/transformations/TransformationInfo';
+import { TransformationInfo } from 'shared/transformations/TransformationInfo';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import TransformationNodeVisitor from 'shared/transformations/TransformationNodeVisitor';
+import TransformationNodeVisitor, { VisitorLookupMap } from 'shared/transformations/TransformationNodeVisitor';
 import { TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
 import * as Immutable from 'immutable';
@@ -101,9 +101,10 @@ const forms: Array<{ new(props): TransformationForm<any, any> }> = [
   ZipcodeTFF,
 ];
 
-class TransformationFormVisitor extends TransformationNodeVisitor<React.ComponentClass<TransformationFormProps>>
+type FormClass = React.ComponentClass<TransformationFormProps>;
+class TransformationFormVisitor extends TransformationNodeVisitor<FormClass>
 {
-  public visitorLookup = {};
+  public visitorLookup: VisitorLookupMap<FormClass> = {};
 
   constructor()
   {
@@ -133,7 +134,7 @@ class TransformationFormVisitor extends TransformationNodeVisitor<React.Componen
 
 const transformationFormVisitor = new TransformationFormVisitor();
 
-export function getTransformationForm(type: TransformationNodeType): React.ComponentClass<TransformationFormProps>
+export function getTransformationForm(type: TransformationNodeType): FormClass
 {
   return transformationFormVisitor.visit(type);
 }

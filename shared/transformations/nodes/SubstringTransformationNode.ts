@@ -64,7 +64,7 @@ const TYPECODE = TransformationNodeType.SubstringNode;
 
 export class SubstringTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -110,7 +110,7 @@ export class SubstringTransformationNode extends TransformationNode
 
 class SubstringTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Substring';
   public description = `Extract a piece from this field's text`;
   public nodeClass = SubstringTransformationNode;

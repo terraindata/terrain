@@ -64,7 +64,7 @@ const TYPECODE = TransformationNodeType.SetIfNode;
 
 export class SetIfTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -84,7 +84,7 @@ export class SetIfTransformationNode extends TransformationNode
 
 class SetIfTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Set If';
   public description = 'Checks if a field matches a certain special value, and if so, replaces that value';
   public nodeClass = SetIfTransformationNode;

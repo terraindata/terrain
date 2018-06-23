@@ -66,7 +66,7 @@ const TYPECODE = TransformationNodeType.CaseNode;
 
 export class CaseTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -121,7 +121,7 @@ export class CaseTransformationNode extends TransformationNode
 
 class CaseTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Change Case';
   public description = 'Change case for text fields (e.g. lowercase, uppercase)';
   public nodeClass = CaseTransformationNode;

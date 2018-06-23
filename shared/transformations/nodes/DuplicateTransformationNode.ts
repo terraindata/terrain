@@ -66,7 +66,7 @@ const TYPECODE = TransformationNodeType.DuplicateNode;
 
 export class DuplicateTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -101,7 +101,7 @@ export class DuplicateTransformationNode extends TransformationNode
 
 class DuplicateTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Duplicate';
   public description = 'Duplicate this field';
   public nodeClass = DuplicateTransformationNode;

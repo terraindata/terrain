@@ -50,14 +50,14 @@ import * as yadeep from '../util/yadeep';
 
 import TransformationNode from './nodes/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from './TransformationNodeType';
-import TransformationNodeVisitor from './TransformationNodeVisitor';
+import TransformationNodeVisitor, { VisitorLookupMap } from './TransformationNodeVisitor';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
 export default class TransformationEngineNodeVisitor
   extends TransformationNodeVisitor<TransformationVisitResult, object>
 {
-  public visitorLookup = {};
+  public visitorLookup: VisitorLookupMap<TransformationVisitResult, object> = {};
 
   public visitDefault(type: TransformationNodeType, node: TransformationNode, doc: object)
   {

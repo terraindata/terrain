@@ -46,11 +46,14 @@ THE SOFTWARE.
 import TransformationNode from './nodes/TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
 
+export type VisitorFn<ReturnT, ArgsT = any> = (type: TransformationNodeType, node?: TransformationNode, args?: ArgsT) => ReturnT;
+export type VisitorLookupMap<ReturnT, ArgsT = any> = {
+  [K in TransformationNodeType]?: VisitorFn<ReturnT, ArgsT>;
+};
+
 export default abstract class TransformationNodeVisitor<ReturnT, ArgsT = any>
 {
-  public abstract visitorLookup: {
-    [K in TransformationNodeType]?: (type: TransformationNodeType, node?: TransformationNode, args?: ArgsT) => ReturnT;
-  };
+  public abstract visitorLookup: VisitorLookupMap<ReturnT, ArgsT>;
 
   public abstract visitDefault(type: TransformationNodeType, node?: TransformationNode, args?: ArgsT): ReturnT;
 

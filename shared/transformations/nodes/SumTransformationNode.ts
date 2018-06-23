@@ -64,7 +64,7 @@ const TYPECODE = TransformationNodeType.SumNode;
 
 export class SumTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -101,7 +101,7 @@ export class SumTransformationNode extends TransformationNode
 
 class SumTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Sum of Fields';
   public description = 'Sums two or more fields and puts the result in a new field';
   public nodeClass = SumTransformationNode;

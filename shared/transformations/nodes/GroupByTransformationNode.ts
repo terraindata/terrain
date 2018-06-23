@@ -66,7 +66,7 @@ const TYPECODE = TransformationNodeType.GroupByNode;
 
 export class GroupByTransformationNode extends TransformationNode
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -128,7 +128,7 @@ export class GroupByTransformationNode extends TransformationNode
 
 class GroupByTransformationInfoC extends TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public readonly typeCode = TYPECODE;
   public humanName = 'Group Array Values';
   public description = 'Group an array of objects by a value';
   public nodeClass = GroupByTransformationNode;
