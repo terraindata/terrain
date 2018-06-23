@@ -47,9 +47,9 @@ THE SOFTWARE.
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { TransformationInfo } from 'shared/transformations/TransformationInfo';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import TransformationNodeVisitor, { VisitorLookupMap } from 'shared/transformations/TransformationNodeVisitor';
+import TransformationRegistry from 'shared/transformations/TransformationRegistry';
 import { TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
 import * as Immutable from 'immutable';
@@ -117,7 +117,7 @@ class TransformationFormVisitor extends TransformationNodeVisitor<FormClass>
     return null;
   }
 
-  private addToVisitors(formClass)
+  private addToVisitors(formClass: { new(props): any })
   {
     const instance = new formClass({});
     this.visitorLookup[instance.type] = () => formClass;
@@ -149,7 +149,7 @@ function determineAvailableTransformations(): List<TransformationNodeType>
   {
     if (
       transformationFormVisitor.visit(type as TransformationNodeType) !== null
-      && TransformationInfo.canCreate(type as TransformationNodeType)
+      && TransformationRegistry.canCreate(type as TransformationNodeType)
     )
     {
       typeList = typeList.push(type);

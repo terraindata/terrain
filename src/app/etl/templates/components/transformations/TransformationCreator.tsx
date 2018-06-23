@@ -64,8 +64,8 @@ import { availableTransformations, getTransformationForm } from 'etl/templates/c
 import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { TransformationInfo } from 'shared/transformations/TransformationInfo';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import TransformationRegistry from 'shared/transformations/TransformationRegistry';
 
 import './TransformationEditor.less';
 
@@ -107,7 +107,7 @@ export class TransformationCreator extends TerrainComponent<Props>
     return availableTransformations.filter(
       (type, index) =>
       {
-        return TransformationInfo.isAvailable(type, this.props.engine, this.props.fieldID);
+        return TransformationRegistry.isAvailable(type, this.props.engine, this.props.fieldID);
       },
     ).toList();
   }
@@ -115,7 +115,7 @@ export class TransformationCreator extends TerrainComponent<Props>
   public getOptionNames(s: FormState)
   {
     const transformations = this.getValidOptions();
-    return transformations.map((type) => TransformationInfo.getReadableName(type)).toList();
+    return transformations.map((type) => TransformationRegistry.getReadableName(type)).toList();
   }
 
   public renderCreateTransformation()

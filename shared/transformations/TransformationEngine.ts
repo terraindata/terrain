@@ -56,8 +56,8 @@ import * as yadeep from '../util/yadeep';
 import DataStore from './DataStore';
 import TransformationNode from './nodes/TransformationNode';
 import TransformationEngineNodeVisitor from './TransformationEngineNodeVisitor';
-import { TransformationInfo } from './TransformationInfo';
 import TransformationNodeType from './TransformationNodeType';
+import TransformationRegistry from './TransformationRegistry';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
@@ -146,7 +146,7 @@ export class TransformationEngine
     {
       const raw: object = parsed['dag']['nodes'][i]['value'];
       parsed['dag']['nodes'][i]['value'] =
-        new (TransformationInfo.getType(raw['typeCode']))(
+        new (TransformationRegistry.getType(raw['typeCode']))(
           raw['id'],
           List<KeyPath>(raw['fields'].map((item) => KeyPath(item))),
           TransformationEngine.makeMetaImmutable(raw['meta']),
@@ -240,7 +240,7 @@ export class TransformationEngine
   {
     // const fieldIDs: List<number> = this.parseFieldIDs(fieldNamesOrIDs);
     const node: TransformationNode =
-      new (TransformationInfo.getType(nodeType))(this.uidNode, fieldNames, options /*nodeType*/);
+      new (TransformationRegistry.getType(nodeType))(this.uidNode, fieldNames, options /*nodeType*/);
 
     // Process fields created/disabled by this transformation
     if (options !== undefined)
@@ -250,13 +250,13 @@ export class TransformationEngine
         for (let i: number = 0; i < options['newFieldKeyPaths'].size; i++)
         {
           let inferredTypeNameOfNewFields: string;
-          if (TransformationInfo.getNewFieldType(nodeType) === 'same' && fieldNames.size > 0)
+          if (TransformationRegistry.getNewFieldType(nodeType) === 'same' && fieldNames.size > 0)
           {
             inferredTypeNameOfNewFields = this.getFieldType(this.getInputFieldID(fieldNames.get(0)));
           }
-          else if (TransformationInfo.getNewFieldType(nodeType))
+          else if (TransformationRegistry.getNewFieldType(nodeType))
           {
-            inferredTypeNameOfNewFields = TransformationInfo.getNewFieldType(nodeType);
+            inferredTypeNameOfNewFields = TransformationRegistry.getNewFieldType(nodeType);
           }
           else
           {

@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 
 import { AddTransformationInfo, AddTransformationNode } from './nodes/AddTransformationNode';
 import { ArrayCountTransformationInfo, ArrayCountTransformationNode } from './nodes/ArrayCountTransformationNode';
@@ -72,41 +73,43 @@ import { SubtractTransformationInfo, SubtractTransformationNode } from './nodes/
 import { SumTransformationInfo, SumTransformationNode } from './nodes/SumTransformationNode';
 import { ZipcodeTransformationInfo, ZipcodeTransformationNode } from './nodes/ZipcodeTransformationNode';
 
+import TransformationNodeInfo from 'shared/transformations/nodes/info/TransformationNodeInfo';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import TransformationNodeVisitor, { VisitorLookupMap } from 'shared/transformations/TransformationNodeVisitor';
-import TransformationNodeInfo from 'shared/transformations/nodes/info/TransformationNodeInfo';
+import TransformationNode from './nodes/TransformationNode';
 
 const infos: {
   [k in TransformationNodeType]: TransformationNodeInfo & { typeCode: k }
 } = {
-  [TransformationNodeType.AddNode]: AddTransformationInfo,
-  [TransformationNodeType.ArrayCountNode]: ArrayCountTransformationInfo,
-  [TransformationNodeType.ArraySumNode]: ArraySumTransformationInfo,
-  [TransformationNodeType.CaseNode]: CaseTransformationInfo,
-  [TransformationNodeType.CastNode]: CastTransformationInfo,
-  [TransformationNodeType.DecryptNode]: DecryptTransformationInfo,
-  [TransformationNodeType.DifferenceNode]: DifferenceTransformationInfo,
-  [TransformationNodeType.DivideNode]: DivideTransformationInfo,
-  [TransformationNodeType.DuplicateNode]: DuplicateTransformationInfo,
-  [TransformationNodeType.EncryptNode]: EncryptTransformationInfo,
-  [TransformationNodeType.FilterArrayNode]: FilterArrayTransformationInfo,
-  [TransformationNodeType.FindReplaceNode]: FindReplaceTransformationInfo,
-  [TransformationNodeType.GroupByNode]: GroupByTransformationInfo,
-  [TransformationNodeType.HashNode]: HashTransformationInfo,
-  [TransformationNodeType.InsertNode]: InsertTransformationInfo,
-  [TransformationNodeType.JoinNode]: JoinTransformationInfo,
-  [TransformationNodeType.MultiplyNode]: MultiplyTransformationInfo,
-  [TransformationNodeType.ProductNode]: ProductTransformationInfo,
-  [TransformationNodeType.QuotientNode]: QuotientTransformationInfo,
-  [TransformationNodeType.RemoveDuplicatesNode]: RemoveDuplicatesTransformationInfo,
-  [TransformationNodeType.RoundNode]: RoundTransformationInfo,
-  [TransformationNodeType.SetIfNode]: SetIfTransformationInfo,
-  [TransformationNodeType.SplitNode]: SplitTransformationInfo,
-  [TransformationNodeType.SubstringNode]: SubstringTransformationInfo,
-  [TransformationNodeType.SubtractNode]: SubtractTransformationInfo,
-  [TransformationNodeType.SumNode]: SumTransformationInfo,
-  [TransformationNodeType.ZipcodeNode]: ZipcodeTransformationInfo,
-};
+    [TransformationNodeType.AddNode]: AddTransformationInfo,
+    [TransformationNodeType.ArrayCountNode]: ArrayCountTransformationInfo,
+    [TransformationNodeType.ArraySumNode]: ArraySumTransformationInfo,
+    [TransformationNodeType.CaseNode]: CaseTransformationInfo,
+    [TransformationNodeType.CastNode]: CastTransformationInfo,
+    [TransformationNodeType.DecryptNode]: DecryptTransformationInfo,
+    [TransformationNodeType.DifferenceNode]: DifferenceTransformationInfo,
+    [TransformationNodeType.DivideNode]: DivideTransformationInfo,
+    [TransformationNodeType.DuplicateNode]: DuplicateTransformationInfo,
+    [TransformationNodeType.EncryptNode]: EncryptTransformationInfo,
+    [TransformationNodeType.FilterArrayNode]: FilterArrayTransformationInfo,
+    [TransformationNodeType.FindReplaceNode]: FindReplaceTransformationInfo,
+    [TransformationNodeType.GroupByNode]: GroupByTransformationInfo,
+    [TransformationNodeType.HashNode]: HashTransformationInfo,
+    [TransformationNodeType.InsertNode]: InsertTransformationInfo,
+    [TransformationNodeType.JoinNode]: JoinTransformationInfo,
+    [TransformationNodeType.MultiplyNode]: MultiplyTransformationInfo,
+    [TransformationNodeType.ProductNode]: ProductTransformationInfo,
+    [TransformationNodeType.QuotientNode]: QuotientTransformationInfo,
+    [TransformationNodeType.RemoveDuplicatesNode]: RemoveDuplicatesTransformationInfo,
+    [TransformationNodeType.RoundNode]: RoundTransformationInfo,
+    [TransformationNodeType.SetIfNode]: SetIfTransformationInfo,
+    [TransformationNodeType.SplitNode]: SplitTransformationInfo,
+    [TransformationNodeType.SubstringNode]: SubstringTransformationInfo,
+    [TransformationNodeType.SubtractNode]: SubtractTransformationInfo,
+    [TransformationNodeType.SumNode]: SumTransformationInfo,
+    [TransformationNodeType.ZipcodeNode]: ZipcodeTransformationInfo,
+  };
 
 class TransformationRegistryVisitor extends TransformationNodeVisitor<TransformationNodeInfo>
 {
@@ -125,11 +128,58 @@ class TransformationRegistryVisitor extends TransformationNodeVisitor<Transforma
 
   private init()
   {
-    for (const type of Object.keys(infos))
+    for (const type of Object.keys(infos) as TransformationNodeType[])
     {
-      this.visitorLookup[type] = infos[type];
+      this.visitorLookup[type] = () => infos[type];
     }
   }
 }
 
-export default new TransformationRegistryVisitor();
+const registryVisitor = new TransformationRegistryVisitor();
+
+export type TNodeObject = Pick<TransformationNode, 'fields' | 'meta'>;
+
+class TransformationRegistryLookup
+{
+  public getReadableName(type: TransformationNodeType)
+  {
+    return registryVisitor.visit(type).humanName;
+  }
+
+  public getReadableSummary(type: TransformationNodeType, transformation: TNodeObject): string
+  {
+    return registryVisitor.visit(type).shortSummary(transformation.meta);
+  }
+
+  public getDescription(type: TransformationNodeType)
+  {
+    return registryVisitor.visit(type).description;
+  }
+
+  public isAvailable(type: TransformationNodeType, engine: TransformationEngine, field: number)
+  {
+    return registryVisitor.visit(type).isAvailable(engine, field);
+  }
+
+  public canCreate(type: TransformationNodeType): boolean
+  {
+    return registryVisitor.visit(type).creatable;
+  }
+
+  public canEdit(type: TransformationNodeType): boolean
+  {
+    return registryVisitor.visit(type).editable;
+  }
+
+  public getType(type: TransformationNodeType): any
+  {
+    return registryVisitor.visit(type).nodeClass;
+  }
+
+  public getNewFieldType(type: TransformationNodeType): any
+  {
+    return registryVisitor.visit(type).newFieldType;
+  }
+}
+
+export default new TransformationRegistryLookup();

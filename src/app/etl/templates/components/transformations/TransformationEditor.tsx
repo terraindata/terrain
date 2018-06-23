@@ -61,8 +61,8 @@ import { getTransformationForm } from 'etl/templates/components/transformations/
 import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { TransformationInfo } from 'shared/transformations/TransformationInfo';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import TransformationRegistry from 'shared/transformations/TransformationRegistry';
 
 import './TransformationEditor.less';
 

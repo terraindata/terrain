@@ -54,9 +54,9 @@ import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 import TransformationNode from './TransformationNode';
 
-import TransformationNodeInfo from './info/TransformationNodeInfo';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
+import TransformationNodeInfo from './info/TransformationNodeInfo';
 
 const TYPECODE = TransformationNodeType.SplitNode;
 
