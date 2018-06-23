@@ -46,17 +46,49 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
+import * as yadeep from 'shared/util/yadeep';
+import { KeyPath } from 'shared/util/KeyPath';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationNode from './TransformationNode';
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 
 export default class JoinTransformationNode extends TransformationNode
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.JoinNode)
+  public typeCode = TransformationNodeType.JoinNode;
+
+  public transform(doc: object)
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<TransformationNodeType.JoinNode>;
+    let joined: string;
+    this.fields.forEach((field) =>
+    {
+      const el: any = yadeep.get(doc, field);
+      if (typeof el !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to join using a non-string field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+
+      if (joined === undefined)
+      {
+        joined = el as string;
+      }
+      else
+      {
+        joined = joined + opts.delimiter + (el as string);
+      }
+    });
+    yadeep.set(doc, opts.newFieldKeyPaths.get(0), joined, { create: true });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
   }
 }

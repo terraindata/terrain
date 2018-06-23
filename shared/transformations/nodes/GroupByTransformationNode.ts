@@ -46,17 +46,72 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
+import * as yadeep from 'shared/util/yadeep';
+import { KeyPath } from 'shared/util/KeyPath';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationNode from './TransformationNode';
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 
 export default class GroupByTransformationNode extends TransformationNode
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.GroupByNode)
+  public typeCode = TransformationNodeType.GroupByNode;
+
+  public transform(doc: object)
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<TransformationNodeType.GroupByNode>;
+
+    const mapper: {
+      [k: string]: KeyPath,
+    } = {};
+
+    const outputs: {
+      [k: string]: object[],
+    } = {};
+
+    for (let i = 0; i < opts.groupValues.length; i++)
+    {
+      mapper[opts.groupValues[i]] = opts.newFieldKeyPaths.get(i);
+      outputs[opts.groupValues[i]] = [];
+    }
+
+    this.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        // let count: number = 0;
+        for (let i: number = 0; i < el.length; i++)
+        {
+          const objToGroup = el[i];
+          const groupValue = objToGroup[opts.subkey];
+          if (outputs[groupValue] !== undefined)
+          {
+            outputs[groupValue].push(_.cloneDeep(objToGroup));
+          }
+        }
+        for (const key of Object.keys(mapper))
+        {
+          const kpi = mapper[key];
+          const arr = outputs[key];
+          yadeep.set(doc, kpi, arr, { create: true });
+        }
+      }
+      else
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to group on a non-array (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
   }
 }

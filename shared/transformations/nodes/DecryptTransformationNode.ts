@@ -44,21 +44,48 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import aesjs = require('aes-js');
 import { List } from 'immutable';
-import sha1 = require('sha1');
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
+import * as yadeep from 'shared/util/yadeep';
+import { KeyPath } from 'shared/util/KeyPath';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationNode from './TransformationNode';
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+
+import Encryption, { Keys } from 'shared/encryption/Encryption';
+
+// use standard AES 128 decryption
+function decryptHelper(msg: string, key?: any): string
+{
+  return Encryption.decryptStatic(msg, Keys.Transformations);
+}
 
 export default class DecryptTransformationNode extends TransformationNode
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.DecryptNode)
+  public typeCode = TransformationNodeType.DecryptNode;
+
+  public transform(doc: object)
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<TransformationNodeType.DecryptNode>;
+
+    return visitHelper(this.fields, doc, { document: doc }, (kp, el) =>
+    {
+      if (typeof el !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to decrypt a non-string (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      else
+      {
+        yadeep.set(doc, kp, decryptHelper(el));
+      }
+    });
   }
 }

@@ -51,7 +51,7 @@ import { KeyPath } from '../../util/KeyPath';
 import TransformationNodeType from '../TransformationNodeType';
 import TransformationNodeVisitor from '../TransformationNodeVisitor';
 // import TransformationVisitError from '../TransformationVisitError';
-// import TransformationVisitResult from '../TransformationVisitResult';
+import TransformationVisitResult from '../TransformationVisitResult';
 
 // export default abstract class TransformationNode
 // {
@@ -78,17 +78,18 @@ import TransformationNodeVisitor from '../TransformationNodeVisitor';
 export default abstract class TransformationNode
 {
   public id: number;
-  public typeCode: TransformationNodeType;
+  public abstract typeCode: TransformationNodeType;
   public fields: List<KeyPath>;
   public meta: object;
 
-  public constructor(id: number, fields: List<KeyPath>, options: object = {}, typeCode: TransformationNodeType)
+  public constructor(id: number, fields: List<KeyPath>, options: object = {})
   {
     this.id = id;
     this.fields = fields;
     this.meta = options;
-    this.typeCode = typeCode;
   }
+
+  public abstract transform(doc: object): TransformationVisitResult;
 
   public accept<R, P>(visitor: TransformationNodeVisitor<R, P>, args: P): R
   {

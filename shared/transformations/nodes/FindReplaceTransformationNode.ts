@@ -46,17 +46,45 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
+import * as yadeep from 'shared/util/yadeep';
+import { KeyPath } from 'shared/util/KeyPath';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationNode from './TransformationNode';
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 
 export default class FindReplaceTransformationNode extends TransformationNode
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.FindReplaceNode)
+  public typeCode = TransformationNodeType.FindReplaceNode;
+
+  public transform(doc: object)
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<TransformationNodeType.FindReplaceNode>;
+
+    return visitHelper(this.fields, doc, { document: doc }, (kp, el) =>
+    {
+      if (typeof el !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to do a find/replace on a non-string field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      else
+      {
+        if (opts.regex)
+        {
+          yadeep.set(doc, kp, el.replace(new RegExp(opts.find, 'g'), opts.replace));
+        }
+        else
+        {
+          yadeep.set(doc, kp, el.split(opts.find).join(opts.replace));
+        }
+      }
+    });
   }
 }

@@ -52,7 +52,7 @@ enum TransformationNodeType
 {
   SplitNode = 'SplitNode',
   JoinNode = 'JoinNode',
-  FilterNode = 'FilterNode',
+  // FilterNode = 'FilterNode',
   DuplicateNode = 'DuplicateNode',
   InsertNode = 'InsertNode',
   CaseNode = 'CaseNode',
@@ -106,7 +106,7 @@ interface TransformationOptionTypes
     preserveOldFields: boolean;
     delimiter: string;
   };
-  FilterNode: any;
+  // FilterNode: any;
   DuplicateNode: {
     newFieldKeyPaths: List<KeyPath>;
   };

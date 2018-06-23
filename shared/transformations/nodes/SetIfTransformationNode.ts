@@ -46,17 +46,56 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
+import * as yadeep from 'shared/util/yadeep';
+import { KeyPath } from 'shared/util/KeyPath';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationNode from './TransformationNode';
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+
+function setIfHelper(o: NodeOptionsType<TransformationNodeType.SetIfNode>, e: any)
+{
+  if (o.filterNaN)
+  {
+    return isNaN(e);
+  }
+  else if (o.filterUndefined)
+  {
+    return e === undefined;
+  }
+  else if (o.filterNull)
+  {
+    return e === null;
+  }
+  else if (o.filterStringNull)
+  {
+    return e === 'null';
+  }
+  else if (o.filterValue !== undefined)
+  {
+    return e === o.filterValue;
+  }
+
+  return false;
+}
 
 export default class SetIfTransformationNode extends TransformationNode
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.SetIfNode)
+  public typeCode = TransformationNodeType.SetIfNode;
+
+  public transform(doc: object)
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<TransformationNodeType.SetIfNode>;
+
+    return visitHelper(this.fields, doc, { document: doc }, (kp, el) =>
+    {
+      let condition = setIfHelper(opts, el);
+      condition = opts.invert ? !condition : condition;
+      if (condition)
+      {
+        yadeep.set(doc, kp, opts.newValue, { create: true });
+      }
+    });
   }
 }

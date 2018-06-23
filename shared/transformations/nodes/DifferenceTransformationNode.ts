@@ -46,17 +46,56 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
+import * as yadeep from 'shared/util/yadeep';
+import { KeyPath } from 'shared/util/KeyPath';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationNode from './TransformationNode';
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 
 export default class DifferenceTransformationNode extends TransformationNode
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.DifferenceNode)
+  public typeCode = TransformationNodeType.DifferenceNode;
+
+  public transform(doc: object)
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<TransformationNodeType.DifferenceNode>;
+
+    let difference: number = 0;
+    let initialized: boolean = false;
+
+    this.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (typeof el === 'number')
+      {
+        if (initialized)
+        {
+          difference -= el;
+        }
+        else
+        {
+          difference = el;
+          initialized = true;
+        }
+      }
+      else
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to compute a difference using non-numeric fields (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+    });
+
+    yadeep.set(doc, opts.newFieldKeyPaths.get(0), difference, { create: true });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
   }
 }

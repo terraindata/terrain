@@ -56,7 +56,7 @@ import DivideTransformationNode from './nodes/DivideTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import EncryptTransformationNode from './nodes/EncryptTransformationNode';
 import FilterArrayTransformationNode from './nodes/FilterArrayTransformationNode';
-import FilterTransformationNode from './nodes/FilterTransformationNode';
+// import FilterTransformationNode from './nodes/FilterTransformationNode';
 import FindReplaceTransformationNode from './nodes/FindReplaceTransformationNode';
 import HashTransformationNode from './nodes/HashTransformationNode';
 import InsertTransformationNode from './nodes/InsertTransformationNode';
@@ -93,10 +93,10 @@ export interface InfoType<T extends TransformationNodeType = any>
   isAvailable?: (engine: TransformationEngine, fieldId: number) => boolean;
   shortSummary?: (meta: NodeOptionsType<T>) => string;
   type: any;
-  targetedVisitor: (visitor: TransformationNodeVisitor,
-    transformationNode: TransformationNode,
-    docCopy: object,
-    options: object) => TransformationVisitResult;
+  // targetedVisitor: (visitor: TransformationNodeVisitor,
+  //   transformationNode: TransformationNode,
+  //   docCopy: object,
+  //   options: object) => TransformationVisitResult;
   newFieldType?: string;
 }
 
@@ -121,11 +121,11 @@ const TransformationNodeInfo: AllNodeInfoType =
           const names = meta.newFieldKeyPaths.map((value) => value.last());
           return `Split on ${meta.delimiter} into ${names.toJS()}`;
         },
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitSplitNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitSplitNode(transformationNode, docCopy, options),
         newFieldType: 'string',
       },
     [TransformationNodeType.JoinNode]:
@@ -147,26 +147,26 @@ const TransformationNodeInfo: AllNodeInfoType =
           const names = meta.newFieldKeyPaths.map((value) => value.last());
           return `Join on ${meta.delimiter} from ${names.toJS()}`;
         },
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitJoinNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitJoinNode(transformationNode, docCopy, options),
         newFieldType: 'string',
       },
-    [TransformationNodeType.FilterNode]: // what does this do?
-      {
-        humanName: 'Filter',
-        editable: true,
-        creatable: true,
-        description: '???',
-        type: FilterTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitFilterNode(transformationNode, docCopy, options),
-      },
+    // [TransformationNodeType.FilterNode]: // what does this do?
+    //   {
+    //     humanName: 'Filter',
+    //     editable: true,
+    //     creatable: true,
+    //     description: '???',
+    //     type: FilterTransformationNode,
+    //     // targetedVisitor: (visitor: TransformationNodeVisitor,
+    //     //   transformationNode: TransformationNode,
+    //     //   docCopy: object,
+    //     //   options: object) =>
+    //     //   visitor.visitFilterNode(transformationNode, docCopy, options),
+    //   },
     [TransformationNodeType.DuplicateNode]:
       {
         humanName: 'Duplicate',
@@ -182,11 +182,11 @@ const TransformationNodeInfo: AllNodeInfoType =
             etlType !== ETLFieldTypes.Object && etlType !== ETLFieldTypes.Array
           );
         },
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitDuplicateNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitDuplicateNode(transformationNode, docCopy, options),
         newFieldType: 'same',
       },
     [TransformationNodeType.InsertNode]:
@@ -215,11 +215,11 @@ const TransformationNodeInfo: AllNodeInfoType =
             return `Insert Text at Position ${meta.at}`;
           }
         },
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitInsertNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitInsertNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.CaseNode]:
       {
@@ -232,11 +232,11 @@ const TransformationNodeInfo: AllNodeInfoType =
           return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
         },
         type: CaseTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitCaseNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitCaseNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.SubstringNode]:
       {
@@ -253,11 +253,11 @@ const TransformationNodeInfo: AllNodeInfoType =
           return `Substring from ${meta.from} to ${meta.from + meta.length}`;
         },
         type: SubstringTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitSubstringNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitSubstringNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.CastNode]:
       {
@@ -270,11 +270,11 @@ const TransformationNodeInfo: AllNodeInfoType =
         {
           return `Cast to ${meta.toTypename}`;
         },
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitCastNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitCastNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.HashNode]:
       {
@@ -291,11 +291,11 @@ const TransformationNodeInfo: AllNodeInfoType =
           return `Hash with salt "${meta.salt}`;
         },
         type: HashTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitHashNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitHashNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.RoundNode]:
       {
@@ -312,11 +312,11 @@ const TransformationNodeInfo: AllNodeInfoType =
           return `Round ${meta.shift}`;
         },
         type: RoundTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitRoundNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitRoundNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.AddNode]:
       {
@@ -333,11 +333,11 @@ const TransformationNodeInfo: AllNodeInfoType =
           return `Add ${meta.shift}`;
         },
         type: AddTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitAddNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitAddNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.SubtractNode]:
       {
@@ -354,11 +354,11 @@ const TransformationNodeInfo: AllNodeInfoType =
           return `Subtract ${meta.shift}`;
         },
         type: SubtractTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitSubtractNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitSubtractNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.MultiplyNode]:
       {
@@ -375,11 +375,11 @@ const TransformationNodeInfo: AllNodeInfoType =
           return `Multiply by ${meta.factor}`;
         },
         type: MultiplyTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitMultiplyNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitMultiplyNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.DivideNode]:
       {
@@ -396,11 +396,11 @@ const TransformationNodeInfo: AllNodeInfoType =
           return `Divide by ${meta.factor}`;
         },
         type: DivideTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitDivideNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitDivideNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.SetIfNode]:
       {
@@ -414,11 +414,11 @@ const TransformationNodeInfo: AllNodeInfoType =
           return type === 'number' || type === 'string' || type === 'boolean';
         },
         type: SetIfTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitSetIfNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitSetIfNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.FindReplaceNode]:
       {
@@ -432,11 +432,11 @@ const TransformationNodeInfo: AllNodeInfoType =
           return type === 'string';
         },
         type: FindReplaceTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitFindReplaceNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitFindReplaceNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.ArraySumNode]:
       {
@@ -453,11 +453,11 @@ const TransformationNodeInfo: AllNodeInfoType =
             EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
           );
         },
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitArraySumNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitArraySumNode(transformationNode, docCopy, options),
         newFieldType: 'number',
       },
     [TransformationNodeType.ArrayCountNode]:
@@ -474,11 +474,11 @@ const TransformationNodeInfo: AllNodeInfoType =
             EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
           );
         },
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitArrayCountNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitArrayCountNode(transformationNode, docCopy, options),
         newFieldType: 'number',
       },
     [TransformationNodeType.ProductNode]:
@@ -495,11 +495,11 @@ const TransformationNodeInfo: AllNodeInfoType =
             EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
           );
         },
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitProductNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitProductNode(transformationNode, docCopy, options),
         newFieldType: 'number',
       },
     [TransformationNodeType.QuotientNode]:
@@ -516,11 +516,11 @@ const TransformationNodeInfo: AllNodeInfoType =
             EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
           );
         },
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitQuotientNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitQuotientNode(transformationNode, docCopy, options),
         newFieldType: 'number',
       },
     [TransformationNodeType.SumNode]:
@@ -537,11 +537,11 @@ const TransformationNodeInfo: AllNodeInfoType =
             EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
           );
         },
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitSumNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitSumNode(transformationNode, docCopy, options),
         newFieldType: 'number',
       },
     [TransformationNodeType.DifferenceNode]:
@@ -558,11 +558,11 @@ const TransformationNodeInfo: AllNodeInfoType =
             EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
           );
         },
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitDifferenceNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitDifferenceNode(transformationNode, docCopy, options),
         newFieldType: 'number',
       },
     [TransformationNodeType.EncryptNode]:
@@ -576,11 +576,11 @@ const TransformationNodeInfo: AllNodeInfoType =
           return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
         },
         type: EncryptTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitEncryptNode((transformationNode as EncryptTransformationNode), docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitEncryptNode((transformationNode as EncryptTransformationNode), docCopy, options),
       },
     [TransformationNodeType.DecryptNode]:
       {
@@ -593,11 +593,11 @@ const TransformationNodeInfo: AllNodeInfoType =
           return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
         },
         type: DecryptTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitDecryptNode((transformationNode as DecryptTransformationNode), docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitDecryptNode((transformationNode as DecryptTransformationNode), docCopy, options),
       },
     [TransformationNodeType.GroupByNode]:
       {
@@ -614,11 +614,11 @@ const TransformationNodeInfo: AllNodeInfoType =
             EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
           );
         },
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitGroupByNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitGroupByNode(transformationNode, docCopy, options),
         newFieldType: 'array',
       },
     [TransformationNodeType.FilterArrayNode]:
@@ -635,11 +635,11 @@ const TransformationNodeInfo: AllNodeInfoType =
             EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
           );
         },
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitFilterArrayNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitFilterArrayNode(transformationNode, docCopy, options),
         newFieldType: 'array',
       },
     [TransformationNodeType.RemoveDuplicatesNode]:
@@ -658,11 +658,11 @@ const TransformationNodeInfo: AllNodeInfoType =
             EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
           );
         },
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitRemoveDuplicatesNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitRemoveDuplicatesNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.ZipcodeNode]:
       {
@@ -675,11 +675,11 @@ const TransformationNodeInfo: AllNodeInfoType =
           return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
         },
         type: ZipcodeTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitZipcodeNode(transformationNode, docCopy, options),
+        // targetedVisitor: (visitor: TransformationNodeVisitor,
+        //   transformationNode: TransformationNode,
+        //   docCopy: object,
+        //   options: object) =>
+        //   visitor.visitZipcodeNode(transformationNode, docCopy, options),
       },
   };
 
@@ -755,16 +755,16 @@ export abstract class TransformationInfo
     return TransformationNodeInfo[type].newFieldType;
   }
 
-  public static applyTargetedVisitor(visitor: TransformationNodeVisitor,
-    transformationNode: TransformationNode,
-    docCopy: object,
-    options: object = {}): TransformationVisitResult
-  {
-    return TransformationNodeInfo[transformationNode.typeCode].targetedVisitor(
-      visitor,
-      transformationNode,
-      docCopy,
-      options,
-    );
-  }
+  // public static applyTargetedVisitor(visitor: TransformationNodeVisitor,
+  //   transformationNode: TransformationNode,
+  //   docCopy: object,
+  //   options: object = {}): TransformationVisitResult
+  // {
+  //   return TransformationNodeInfo[transformationNode.typeCode].targetedVisitor(
+  //     visitor,
+  //     transformationNode,
+  //     docCopy,
+  //     options,
+  //   );
+  // }
 }

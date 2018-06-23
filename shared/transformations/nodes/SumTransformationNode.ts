@@ -46,17 +46,47 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
+import * as yadeep from 'shared/util/yadeep';
+import { KeyPath } from 'shared/util/KeyPath';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationNode from './TransformationNode';
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 
 export default class SumTransformationNode extends TransformationNode
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.SumNode)
+  public typeCode = TransformationNodeType.SumNode;
+
+  public transform(doc: object)
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<TransformationNodeType.SumNode>;
+
+    let sum: number = 0;
+
+    this.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (typeof el === 'number')
+      {
+        sum += el;
+      }
+      else
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to compute a sum using non-numeric fields (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+    });
+
+    yadeep.set(doc, opts.newFieldKeyPaths.get(0), sum, { create: true });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
   }
 }

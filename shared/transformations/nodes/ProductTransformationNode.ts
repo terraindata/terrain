@@ -46,17 +46,56 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
+import * as yadeep from 'shared/util/yadeep';
+import { KeyPath } from 'shared/util/KeyPath';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationNode from './TransformationNode';
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 
 export default class ProductTransformationNode extends TransformationNode
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.ProductNode)
+  public typeCode = TransformationNodeType.ProductNode;
+
+  public transform(doc: object)
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<TransformationNodeType.ProductNode>;
+
+    let product: number = 0;
+    let initialized: boolean = false;
+
+    this.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (typeof el === 'number')
+      {
+        if (initialized)
+        {
+          product *= el;
+        }
+        else
+        {
+          product = el;
+          initialized = true;
+        }
+      }
+      else
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to compute a product using non-numeric fields (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+    });
+
+    yadeep.set(doc, opts.newFieldKeyPaths.get(0), product, { create: true });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
   }
 }

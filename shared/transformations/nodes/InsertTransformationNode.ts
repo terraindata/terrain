@@ -46,17 +46,129 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
+import * as yadeep from 'shared/util/yadeep';
+import { KeyPath } from 'shared/util/KeyPath';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationNode from './TransformationNode';
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 
 export default class InsertTransformationNode extends TransformationNode
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.InsertNode)
+  public typeCode = TransformationNodeType.InsertNode;
+
+  public transform(doc: object)
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<TransformationNodeType.InsertNode>;
+    let result: TransformationVisitResult;
+    this.fields.forEach((field) =>
+    {
+      const el: any = yadeep.get(doc, field);
+      if (el === undefined || result !== undefined)
+      {
+        return;
+      }
+      if (typeof el !== 'string' && el.constructor !== Array)
+      {
+        result = {
+          errors: [
+            {
+              message: 'Attempted to insert in a non-string field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+        return;
+      }
+
+      let at: number = 0;
+      if (typeof opts['at'] === 'number')
+      {
+        at = opts['at'];
+        if (opts['at'] < 0)
+        {
+          at += (el.length as number) + 1;
+        }
+      }
+      else if (opts['at'] === undefined)
+      {
+        at = el.length;
+      }
+      else
+      {
+        result = {
+          errors: [
+            {
+              message: 'Insert node: "at" property is invalid',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+        return;
+      }
+
+      let value;
+      if (Immutable.Iterable.isIterable(opts['value']) || opts['value'] instanceof KeyPath)
+      {
+        value = yadeep.get(doc, opts['value'] as KeyPath);
+        if (typeof value !== 'string')
+        {
+          result = {
+            errors: [
+              {
+                message: 'Insert: field denoted by "value" keypath is not a string',
+              } as TransformationVisitError,
+            ],
+          } as TransformationVisitResult;
+          return;
+        }
+      }
+      else if (typeof opts['value'] === 'string')
+      {
+        value = opts['value'];
+      }
+      else
+      {
+        result = {
+          errors: [
+            {
+              message: 'Insert: "value" property is missing or invalid',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+        return;
+      }
+
+      if (el.constructor === Array)
+      {
+        for (let i: number = 0; i < Object.keys(el).length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains(-1))
+          {
+            kpi = kpi.set(kpi.indexOf(-1), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+          const eli: any = yadeep.get(doc, kpi);
+          yadeep.set(doc, kpi, (eli.slice(0, at) as string) + String(value) + (eli.slice(at) as string), { create: true });
+        }
+      }
+      else
+      {
+        // Currently assumes a single from and length for all fieldIDs
+        yadeep.set(doc, field, (el.slice(0, at) as string) + String(value) + (el.slice(at) as string), { create: true });
+      }
+    });
+
+    if (result !== undefined)
+    {
+      return result;
+    }
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
   }
 }

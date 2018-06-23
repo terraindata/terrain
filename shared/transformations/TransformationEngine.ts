@@ -150,7 +150,7 @@ export class TransformationEngine
           raw['id'],
           List<KeyPath>(raw['fields'].map((item) => KeyPath(item))),
           TransformationEngine.makeMetaImmutable(raw['meta']),
-          raw['typeCode'],
+          // raw['typeCode'],
         ) as TransformationNode;
     }
     return parsed;
@@ -240,7 +240,7 @@ export class TransformationEngine
   {
     // const fieldIDs: List<number> = this.parseFieldIDs(fieldNamesOrIDs);
     const node: TransformationNode =
-      new (TransformationInfo.getType(nodeType))(this.uidNode, fieldNames, options, nodeType);
+      new (TransformationInfo.getType(nodeType))(this.uidNode, fieldNames, options, /*nodeType*/);
 
     // Process fields created/disabled by this transformation
     if (options !== undefined)

@@ -46,17 +46,117 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
+import * as yadeep from 'shared/util/yadeep';
+import { KeyPath } from 'shared/util/KeyPath';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationNode from './TransformationNode';
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+
+function splitHelper(el: any, opts: NodeOptionsType<TransformationNodeType.SplitNode>): string[]
+{
+  let split: string[];
+  if (typeof opts.delimiter === 'number')
+  {
+    split = [
+      (el as string).slice(0, opts.delimiter as number),
+      (el as string).slice(opts.delimiter as number),
+    ];
+  }
+  else if (opts.regex === true)
+  {
+    split = (el as string).split(RegExp(opts.delimiter as string));
+  }
+  else
+  {
+    split = (el as string).split(opts.delimiter as string);
+  }
+  return split;
+}
 
 export default class SplitTransformationNode extends TransformationNode
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.SplitNode)
+  public typeCode = TransformationNodeType.SplitNode;
+
+  public transform(doc: object)
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<TransformationNodeType.SplitNode>;
+
+    if (this.fields.size > 1)
+    {
+      return {
+        errors: [
+          {
+            message: 'Attempted to split multiple fields at once (this is not supported)',
+          } as TransformationVisitError,
+        ],
+      } as TransformationVisitResult;
+    }
+
+    this.fields.forEach((field) =>
+    {
+      const el: any = yadeep.get(doc, field);
+      if (el === undefined)
+      {
+        return;
+      }
+      let split: string[];
+      if (el.constructor === Array)
+      {
+        for (let i: number = 0; i < Object.keys(el).length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains(-1))
+          {
+            kpi = kpi.set(kpi.indexOf(-1), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+
+          split = splitHelper(yadeep.get(doc, kpi), opts);
+
+          for (let j: number = 0; j < split.length; j++)
+          {
+            let newkpi: KeyPath = opts.newFieldKeyPaths.get(j);
+            if (newkpi.contains(-1))
+            {
+              newkpi = newkpi.set(newkpi.indexOf(-1), i.toString());
+            }
+            else
+            {
+              newkpi = newkpi.push(i.toString());
+            }
+            yadeep.set(doc, newkpi, split[j], { create: true });
+          }
+        }
+      }
+      if (typeof el !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to split a non-string field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+
+      split = splitHelper(el, opts);
+      if (split.length > opts.newFieldKeyPaths.size)
+      {
+        split[opts.newFieldKeyPaths.size - 1] = split.slice(opts.newFieldKeyPaths.size - 1).join(String(opts.delimiter));
+      }
+      for (let i: number = 0; i < opts.newFieldKeyPaths.size; i++)
+      {
+        yadeep.set(doc, opts.newFieldKeyPaths.get(i), split[i], { create: true });
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
   }
 }

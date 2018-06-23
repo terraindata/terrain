@@ -46,17 +46,47 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
+import * as yadeep from 'shared/util/yadeep';
+import { KeyPath } from 'shared/util/KeyPath';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationNode from './TransformationNode';
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+
+import isPrimitive = require('is-primitive');
 
 export default class DuplicateTransformationNode extends TransformationNode
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.DuplicateNode)
+  public typeCode = TransformationNodeType.DuplicateNode;
+
+  public transform(doc: object)
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<TransformationNodeType.DuplicateNode>;
+    this.fields.forEach((field) =>
+    {
+      let el: any = yadeep.get(doc, field);
+      if (!isPrimitive(el) && el.constructor !== Array)
+      {
+        el = Object.assign({}, el);
+      }
+      if (opts.newFieldKeyPaths.get(0).contains(-1))
+      {
+        // assume el length is same as target length
+        for (let i: number = 0; i < el.length; i++)
+        {
+          const kpi: KeyPath = opts.newFieldKeyPaths.get(0).set(
+            opts.newFieldKeyPaths.get(0).indexOf(-1), i.toString());
+          yadeep.set(doc, kpi, el[i], { create: true });
+        }
+      } else
+      {
+        yadeep.set(doc, opts.newFieldKeyPaths.get(0), el, { create: true });
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
   }
 }

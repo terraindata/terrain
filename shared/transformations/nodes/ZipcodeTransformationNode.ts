@@ -46,17 +46,62 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
+import * as yadeep from 'shared/util/yadeep';
+import { KeyPath } from 'shared/util/KeyPath';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationNode from './TransformationNode';
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+
+function zipcodeHelper(zipcode: string, opts: NodeOptionsType<TransformationNodeType.ZipcodeNode>)
+{
+  const data = TransformationEngine.datastore.get('zips')[zipcode];
+  if (!data)
+  {
+    return null;
+  }
+  switch (opts.format)
+  {
+    case 'city':
+      return data.city;
+    case 'state':
+      return data.state;
+    case 'citystate':
+      return (data.city as string) + ', ' + (data.state as string);
+    case 'type':
+      return data.type;
+    default:
+      return data.loc;
+  }
+}
 
 export default class ZipcodeTransformationNode extends TransformationNode
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.ZipcodeNode)
+  public typeCode = TransformationNodeType.ZipcodeNode;
+
+  public transform(doc: object)
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<TransformationNodeType.ZipcodeNode>;
+
+    return visitHelper(this.fields, doc, { document: doc }, (kp, el) =>
+    {
+      if (typeof el !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to convert a non-string field into a zipcode (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      else
+      {
+        yadeep.set(doc, kp, zipcodeHelper(el, opts));
+      }
+    });
   }
 }
