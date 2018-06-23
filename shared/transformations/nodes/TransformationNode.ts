@@ -71,10 +71,6 @@ export default abstract class TransformationNode
 
   public accept<R, P>(visitor: TransformationNodeVisitor<R, P>, args: P): R
   {
-    if (typeof visitor.visit !== 'function')
-    {
-      throw new Error(String(visitor.constructor);
-    }
     return visitor.visit(this.typeCode, this, args);
   }
 }
