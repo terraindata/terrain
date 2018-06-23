@@ -45,34 +45,36 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 
-import AddTransformationNode from './nodes/AddTransformationNode';
-import ArrayCountTransformationNode from './nodes/ArrayCountTransformationNode';
-import ArraySumTransformationNode from './nodes/ArraySumTransformationNode';
-import CaseTransformationNode from './nodes/CaseTransformationNode';
-import CastTransformationNode from './nodes/CastTransformationNode';
-import DecryptTransformationNode from './nodes/DecryptTransformationNode';
-import DifferenceTransformationNode from './nodes/DifferenceTransformationNode';
-import DivideTransformationNode from './nodes/DivideTransformationNode';
-import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
-import EncryptTransformationNode from './nodes/EncryptTransformationNode';
-import FilterArrayTransformationNode from './nodes/FilterArrayTransformationNode';
-import FindReplaceTransformationNode from './nodes/FindReplaceTransformationNode';
-import GroupByTransformationNode from './nodes/GroupByTransformationNode';
-import HashTransformationNode from './nodes/HashTransformationNode';
-import InsertTransformationNode from './nodes/InsertTransformationNode';
-import JoinTransformationNode from './nodes/JoinTransformationNode';
-import MultiplyTransformationNode from './nodes/MultiplyTransformationNode';
-import ProductTransformationNode from './nodes/ProductTransformationNode';
-import QuotientTransformationNode from './nodes/QuotientTransformationNode';
-import RemoveDuplicatesTransformationNode from './nodes/RemoveDuplicatesTransformationNode';
-import RoundTransformationNode from './nodes/RoundTransformationNode';
-import SetIfTransformationNode from './nodes/SetIfTransformationNode';
+import { AddTransformationInfo, AddTransformationNode } from './nodes/AddTransformationNode';
+import { ArrayCountTransformationInfo, ArrayCountTransformationNode } from './nodes/ArrayCountTransformationNode';
+import { ArraySumTransformationInfo, ArraySumTransformationNode } from './nodes/ArraySumTransformationNode';
+import { CaseTransformationInfo, CaseTransformationNode } from './nodes/CaseTransformationNode';
+import { CastTransformationInfo, CastTransformationNode } from './nodes/CastTransformationNode';
+import { DecryptTransformationInfo, DecryptTransformationNode } from './nodes/DecryptTransformationNode';
+import { DifferenceTransformationInfo, DifferenceTransformationNode } from './nodes/DifferenceTransformationNode';
+import { DivideTransformationInfo, DivideTransformationNode } from './nodes/DivideTransformationNode';
+import { DuplicateTransformationInfo, DuplicateTransformationNode } from './nodes/DuplicateTransformationNode';
+import { EncryptTransformationInfo, EncryptTransformationNode } from './nodes/EncryptTransformationNode';
+import { FilterArrayTransformationInfo, FilterArrayTransformationNode } from './nodes/FilterArrayTransformationNode';
+import { FindReplaceTransformationInfo, FindReplaceTransformationNode } from './nodes/FindReplaceTransformationNode';
+import { GroupByTransformationInfo, GroupByTransformationNode } from './nodes/GroupByTransformationNode';
+import { HashTransformationInfo, HashTransformationNode } from './nodes/HashTransformationNode';
+import { InsertTransformationInfo, InsertTransformationNode } from './nodes/InsertTransformationNode';
+import { JoinTransformationInfo, JoinTransformationNode } from './nodes/JoinTransformationNode';
+import { MultiplyTransformationInfo, MultiplyTransformationNode } from './nodes/MultiplyTransformationNode';
+import { ProductTransformationInfo, ProductTransformationNode } from './nodes/ProductTransformationNode';
+import { QuotientTransformationInfo, QuotientTransformationNode } from './nodes/QuotientTransformationNode';
+import { RemoveDuplicatesTransformationInfo, RemoveDuplicatesTransformationNode } from './nodes/RemoveDuplicatesTransformationNode';
+import { RoundTransformationInfo, RoundTransformationNode } from './nodes/RoundTransformationNode';
+import { SetIfTransformationInfo, SetIfTransformationNode } from './nodes/SetIfTransformationNode';
 import { SplitTransformationInfo, SplitTransformationNode } from './nodes/SplitTransformationNode';
-import SubstringTransformationNode from './nodes/SubstringTransformationNode';
-import SubtractTransformationNode from './nodes/SubtractTransformationNode';
-import SumTransformationNode from './nodes/SumTransformationNode';
+import { SubstringTransformationInfo, SubstringTransformationNode } from './nodes/SubstringTransformationNode';
+import { SubtractTransformationInfo, SubtractTransformationNode } from './nodes/SubtractTransformationNode';
+import { SumTransformationInfo, SumTransformationNode } from './nodes/SumTransformationNode';
+import { ZipcodeTransformationInfo, ZipcodeTransformationNode } from './nodes/ZipcodeTransformationNode';
+
 import TransformationNode from './nodes/TransformationNode';
-import ZipcodeTransformationNode from './nodes/ZipcodeTransformationNode';
+
 import { TransformationEngine } from './TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from './TransformationNodeType';
 import TransformationNodeVisitor from './TransformationNodeVisitor';
@@ -95,58 +97,6 @@ export interface InfoType<T extends TransformationNodeType = any>
   type: any;
   newFieldType?: string;
 }
-
-function printCode(type: string)
-{
-  const word = (type as string).replace('Node', '');
-  const info = TransformationNodeInfo[type as any];
-  const str = `
-// tslint:disable:max-classes-per-file
-
-import TransformationNodeInfo from './info/TransformationNodeInfo';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
-
-
-
-const TYPECODE = TransformationNodeType.${word}Node;
-
-
-
-
-
-class ${word}TransformationInfoC extends TransformationNodeInfo
-{
-  public typeCode = TYPECODE;
-  public humanName = '${info.humanName}';
-  public description = '${info.description}';
-  public nodeClass = ${word}TransformationNode;
-
-  ${info.editable !== undefined ? `public editable = ${info.editable};` : ''}
-  ${info.creatable !== undefined ? `public creatable = ${info.creatable};` : ''}
-  ${info.newFieldType !== undefined ? `public newFieldType = '${info.newFieldType}';` : ''}
-
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-
-  }
-
-  public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
-  {
-
-  }
-}
-
-export const ${word}TransformationInfo = new ${word}TransformationInfoC();
-
-
-
-`;
-return str;
-}
-
-setTimeout(() => console.log(printCode('ZipcodeNode')), 1000);
 
 const TransformationNodeInfo: AllNodeInfoType =
   {
@@ -615,11 +565,6 @@ export abstract class TransformationInfo
   public static getDescription(type: TransformationNodeType)
   {
     return TransformationNodeInfo[type].description;
-  }
-
-  public static getInfo(type: TransformationNodeType): InfoType // get the whole info object
-  {
-    return TransformationNodeInfo[type];
   }
 
   public static isAvailable(type: TransformationNodeType, engine: TransformationEngine, field: number)

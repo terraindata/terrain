@@ -64,7 +64,7 @@ import isPrimitive = require('is-primitive');
 
 const TYPECODE = TransformationNodeType.DuplicateNode;
 
-export default class DuplicateTransformationNode extends TransformationNode
+export class DuplicateTransformationNode extends TransformationNode
 {
   public typeCode = TYPECODE;
 

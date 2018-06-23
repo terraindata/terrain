@@ -62,7 +62,7 @@ import TransformationNode from './TransformationNode';
 
 const TYPECODE = TransformationNodeType.QuotientNode;
 
-export default class QuotientTransformationNode extends TransformationNode
+export class QuotientTransformationNode extends TransformationNode
 {
   public typeCode = TYPECODE;
 

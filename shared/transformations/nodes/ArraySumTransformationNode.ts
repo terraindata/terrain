@@ -50,9 +50,6 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 
-
-
-
 import { List } from 'immutable';
 
 import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
@@ -65,7 +62,7 @@ import TransformationNode from './TransformationNode';
 
 const TYPECODE = TransformationNodeType.ArraySumNode;
 
-export default class ArraySumTransformationNode extends TransformationNode
+export class ArraySumTransformationNode extends TransformationNode
 {
   public typeCode = TYPECODE;
 

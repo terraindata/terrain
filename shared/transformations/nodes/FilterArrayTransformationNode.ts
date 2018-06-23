@@ -62,7 +62,7 @@ import TransformationNode from './TransformationNode';
 
 const TYPECODE = TransformationNodeType.FilterArrayNode;
 
-export default class FilterArrayTransformationNode extends TransformationNode
+export class FilterArrayTransformationNode extends TransformationNode
 {
   public typeCode = TYPECODE;
 

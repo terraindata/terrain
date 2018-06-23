@@ -62,7 +62,7 @@ import TransformationNode from './TransformationNode';
 
 const TYPECODE = TransformationNodeType.SubstringNode;
 
-export default class SubstringTransformationNode extends TransformationNode
+export class SubstringTransformationNode extends TransformationNode
 {
   public typeCode = TYPECODE;
 

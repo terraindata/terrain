@@ -62,7 +62,7 @@ import TransformationNode from './TransformationNode';
 
 const TYPECODE = TransformationNodeType.SubtractNode;
 
-export default class SubtractTransformationNode extends TransformationNode
+export class SubtractTransformationNode extends TransformationNode
 {
   public typeCode = TYPECODE;
 

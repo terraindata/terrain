@@ -62,7 +62,7 @@ import TransformationNode from './TransformationNode';
 
 const TYPECODE = TransformationNodeType.ArrayCountNode;
 
-export default class ArrayCountTransformationNode extends TransformationNode
+export class ArrayCountTransformationNode extends TransformationNode
 {
   public typeCode = TYPECODE;
 

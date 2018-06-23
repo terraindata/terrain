@@ -64,7 +64,7 @@ import * as _ from 'lodash';
 
 const TYPECODE = TransformationNodeType.CaseNode;
 
-export default class CaseTransformationNode extends TransformationNode
+export class CaseTransformationNode extends TransformationNode
 {
   public typeCode = TYPECODE;
 

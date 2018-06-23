@@ -64,7 +64,7 @@ import * as _ from 'lodash';
 
 const TYPECODE = TransformationNodeType.GroupByNode;
 
-export default class GroupByTransformationNode extends TransformationNode
+export class GroupByTransformationNode extends TransformationNode
 {
   public typeCode = TYPECODE;
 

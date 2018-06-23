@@ -62,7 +62,7 @@ import TransformationNode from './TransformationNode';
 
 const TYPECODE = TransformationNodeType.RemoveDuplicatesNode;
 
-export default class RemoveDuplicatesTransformationNode extends TransformationNode
+export class RemoveDuplicatesTransformationNode extends TransformationNode
 {
   public typeCode = TYPECODE;
 

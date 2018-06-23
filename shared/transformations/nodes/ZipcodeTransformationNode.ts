@@ -62,7 +62,7 @@ import TransformationNode from './TransformationNode';
 
 const TYPECODE = TransformationNodeType.ZipcodeNode;
 
-export default class ZipcodeTransformationNode extends TransformationNode
+export class ZipcodeTransformationNode extends TransformationNode
 {
   public typeCode = TYPECODE;
 

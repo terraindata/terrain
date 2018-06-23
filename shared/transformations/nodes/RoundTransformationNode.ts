@@ -64,7 +64,7 @@ import * as math from 'mathjs';
 
 const TYPECODE = TransformationNodeType.RoundNode;
 
-export default class RoundTransformationNode extends TransformationNode
+export class RoundTransformationNode extends TransformationNode
 {
   public typeCode = TYPECODE;
 

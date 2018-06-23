@@ -62,7 +62,7 @@ import TransformationNode from './TransformationNode';
 
 const TYPECODE = TransformationNodeType.SumNode;
 
-export default class SumTransformationNode extends TransformationNode
+export class SumTransformationNode extends TransformationNode
 {
   public typeCode = TYPECODE;
 

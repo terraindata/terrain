@@ -64,7 +64,7 @@ import Encryption, { Keys } from 'shared/encryption/Encryption';
 
 const TYPECODE = TransformationNodeType.EncryptNode;
 
-export default class EncryptTransformationNode extends TransformationNode
+export class EncryptTransformationNode extends TransformationNode
 {
   public typeCode = TYPECODE;
 

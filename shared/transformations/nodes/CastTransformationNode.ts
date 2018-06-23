@@ -64,7 +64,7 @@ import dateFormat = require('date-format');
 
 const TYPECODE = TransformationNodeType.CastNode;
 
-export default class CastTransformationNode extends TransformationNode
+export class CastTransformationNode extends TransformationNode
 {
   public typeCode = TYPECODE;
 

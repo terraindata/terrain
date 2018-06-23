@@ -62,7 +62,7 @@ import TransformationNode from './TransformationNode';
 
 const TYPECODE = TransformationNodeType.MultiplyNode;
 
-export default class MultiplyTransformationNode extends TransformationNode
+export class MultiplyTransformationNode extends TransformationNode
 {
   public typeCode = TYPECODE;
 

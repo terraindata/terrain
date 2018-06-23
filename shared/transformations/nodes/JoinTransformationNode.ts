@@ -61,7 +61,7 @@ import TransformationNode from './TransformationNode';
 
 const TYPECODE = TransformationNodeType.JoinNode;
 
-export default class JoinTransformationNode extends TransformationNode
+export class JoinTransformationNode extends TransformationNode
 {
   public typeCode = TYPECODE ;
 

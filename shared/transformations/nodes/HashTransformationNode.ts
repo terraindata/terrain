@@ -64,7 +64,7 @@ import { keccak256 } from 'js-sha3';
 
 const TYPECODE = TransformationNodeType.HashNode;
 
-export default class HashTransformationNode extends TransformationNode
+export class HashTransformationNode extends TransformationNode
 {
   public typeCode = TYPECODE;
 
