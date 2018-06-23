@@ -43,6 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+
+import TransformationNodeInfo from './info/TransformationNodeInfo';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 
 import { List } from 'immutable';
 
@@ -54,33 +60,11 @@ import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 import TransformationNode from './TransformationNode';
 
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-
-function zipcodeHelper(zipcode: string, opts: NodeOptionsType<TransformationNodeType.ZipcodeNode>)
-{
-  const data = TransformationEngine.datastore.get('zips')[zipcode];
-  if (!data)
-  {
-    return null;
-  }
-  switch (opts.format)
-  {
-    case 'city':
-      return data.city;
-    case 'state':
-      return data.state;
-    case 'citystate':
-      return (data.city as string) + ', ' + (data.state as string);
-    case 'type':
-      return data.type;
-    default:
-      return data.loc;
-  }
-}
+const TYPECODE = TransformationNodeType.ZipcodeNode;
 
 export default class ZipcodeTransformationNode extends TransformationNode
 {
-  public typeCode = TransformationNodeType.ZipcodeNode;
+  public typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -103,5 +87,45 @@ export default class ZipcodeTransformationNode extends TransformationNode
         yadeep.set(doc, kp, zipcodeHelper(el, opts));
       }
     });
+  }
+}
+
+class ZipcodeTransformationInfoC extends TransformationNodeInfo
+{
+  public typeCode = TYPECODE;
+  public humanName = 'Zipcode';
+  public description = 'Convert a zipcode into location data';
+  public nodeClass = ZipcodeTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+  }
+}
+
+export const ZipcodeTransformationInfo = new ZipcodeTransformationInfoC();
+
+function zipcodeHelper(zipcode: string, opts: NodeOptionsType<TransformationNodeType.ZipcodeNode>)
+{
+  const data = TransformationEngine.datastore.get('zips')[zipcode];
+  if (!data)
+  {
+    return null;
+  }
+  switch (opts.format)
+  {
+    case 'city':
+      return data.city;
+    case 'state':
+      return data.state;
+    case 'citystate':
+      return (data.city as string) + ', ' + (data.state as string);
+    case 'type':
+      return data.type;
+    default:
+      return data.loc;
   }
 }

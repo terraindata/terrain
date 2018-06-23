@@ -43,6 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+
+import TransformationNodeInfo from './info/TransformationNodeInfo';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 
 import { List } from 'immutable';
 
@@ -56,22 +62,11 @@ import TransformationNode from './TransformationNode';
 
 import { keccak256 } from 'js-sha3';
 
-function hashHelper(toHash: string, salt: string): string
-{
-  if (typeof toHash !== 'string')
-  {
-    throw new Error('Value to hash is not a string');
-  }
-  else if (typeof salt !== 'string')
-  {
-    throw new Error('Salt is not a string');
-  }
-  return keccak256.update(toHash + salt).hex();
-}
+const TYPECODE = TransformationNodeType.HashNode;
 
 export default class HashTransformationNode extends TransformationNode
 {
-  public typeCode = TransformationNodeType.HashNode;
+  public typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -95,4 +90,40 @@ export default class HashTransformationNode extends TransformationNode
       }
     });
   }
+}
+
+class HashTransformationInfoC extends TransformationNodeInfo
+{
+  public typeCode = TYPECODE;
+  public humanName = 'Hash';
+  public description = 'Hash this field using SHA3/Keccak256';
+  public nodeClass = HashTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+  }
+
+  public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
+  {
+    return `Hash with salt "${meta.salt}`;
+  }
+}
+
+export const HashTransformationInfo = new HashTransformationInfoC();
+
+function hashHelper(toHash: string, salt: string): string
+{
+  if (typeof toHash !== 'string')
+  {
+    throw new Error('Value to hash is not a string');
+  }
+  else if (typeof salt !== 'string')
+  {
+    throw new Error('Salt is not a string');
+  }
+  return keccak256.update(toHash + salt).hex();
 }

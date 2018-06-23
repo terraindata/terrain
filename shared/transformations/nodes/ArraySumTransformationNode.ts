@@ -43,6 +43,15 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+
+import TransformationNodeInfo from './info/TransformationNodeInfo';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+
+
+
 
 import { List } from 'immutable';
 
@@ -54,9 +63,11 @@ import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 import TransformationNode from './TransformationNode';
 
+const TYPECODE = TransformationNodeType.ArraySumNode;
+
 export default class ArraySumTransformationNode extends TransformationNode
 {
-  public typeCode = TransformationNodeType.ArraySumNode;
+  public typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -100,3 +111,26 @@ export default class ArraySumTransformationNode extends TransformationNode
     } as TransformationVisitResult;
   }
 }
+
+class ArraySumTransformationInfoC extends TransformationNodeInfo
+{
+  public typeCode = TYPECODE;
+  public humanName = 'Array Sum';
+  public description = 'Sum the entries of an array';
+  public nodeClass = ArraySumTransformationNode;
+
+  public editable = false;
+  public creatable = true;
+  public newFieldType = 'number';
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return (
+      EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+      EngineUtil.getValueType(fieldId, engine) === 'number' &&
+      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+    );
+  }
+}
+
+export const ArraySumTransformationInfo = new ArraySumTransformationInfoC();

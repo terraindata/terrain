@@ -67,7 +67,7 @@ import QuotientTransformationNode from './nodes/QuotientTransformationNode';
 import RemoveDuplicatesTransformationNode from './nodes/RemoveDuplicatesTransformationNode';
 import RoundTransformationNode from './nodes/RoundTransformationNode';
 import SetIfTransformationNode from './nodes/SetIfTransformationNode';
-import SplitTransformationNode from './nodes/SplitTransformationNode';
+import { SplitTransformationInfo, SplitTransformationNode } from './nodes/SplitTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import SubtractTransformationNode from './nodes/SubtractTransformationNode';
 import SumTransformationNode from './nodes/SumTransformationNode';
@@ -95,6 +95,58 @@ export interface InfoType<T extends TransformationNodeType = any>
   type: any;
   newFieldType?: string;
 }
+
+function printCode(type: string)
+{
+  const word = (type as string).replace('Node', '');
+  const info = TransformationNodeInfo[type as any];
+  const str = `
+// tslint:disable:max-classes-per-file
+
+import TransformationNodeInfo from './info/TransformationNodeInfo';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+
+
+
+const TYPECODE = TransformationNodeType.${word}Node;
+
+
+
+
+
+class ${word}TransformationInfoC extends TransformationNodeInfo
+{
+  public typeCode = TYPECODE;
+  public humanName = '${info.humanName}';
+  public description = '${info.description}';
+  public nodeClass = ${word}TransformationNode;
+
+  ${info.editable !== undefined ? `public editable = ${info.editable};` : ''}
+  ${info.creatable !== undefined ? `public creatable = ${info.creatable};` : ''}
+  ${info.newFieldType !== undefined ? `public newFieldType = '${info.newFieldType}';` : ''}
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+
+  }
+
+  public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
+  {
+
+  }
+}
+
+export const ${word}TransformationInfo = new ${word}TransformationInfoC();
+
+
+
+`;
+return str;
+}
+
+setTimeout(() => console.log(printCode('ZipcodeNode')), 1000);
 
 const TransformationNodeInfo: AllNodeInfoType =
   {

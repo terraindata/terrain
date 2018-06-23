@@ -43,6 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+
+import TransformationNodeInfo from './info/TransformationNodeInfo';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 
 import { List } from 'immutable';
 
@@ -54,9 +60,11 @@ import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 import TransformationNode from './TransformationNode';
 
+const TYPECODE = TransformationNodeType.ProductNode;
+
 export default class ProductTransformationNode extends TransformationNode
 {
-  public typeCode = TransformationNodeType.ProductNode;
+  public typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -99,3 +107,25 @@ export default class ProductTransformationNode extends TransformationNode
     } as TransformationVisitResult;
   }
 }
+
+class ProductTransformationInfoC extends TransformationNodeInfo
+{
+  public typeCode = TYPECODE;
+  public humanName = 'Product of Fields';
+  public description = 'Multiplies two or more fields together and puts the result in a new field';
+  public nodeClass = ProductTransformationNode;
+
+  public editable = false;
+  public creatable = true;
+  public newFieldType = 'number';
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return (
+      EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
+      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+    );
+  }
+}
+
+export const ProductTransformationInfo = new ProductTransformationInfoC();

@@ -43,6 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+
+import TransformationNodeInfo from './info/TransformationNodeInfo';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 
 import { List } from 'immutable';
 
@@ -56,9 +62,11 @@ import TransformationNode from './TransformationNode';
 
 import dateFormat = require('date-format');
 
+const TYPECODE = TransformationNodeType.CastNode;
+
 export default class CastTransformationNode extends TransformationNode
 {
-  public typeCode = TransformationNodeType.CastNode;
+  public typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -156,3 +164,21 @@ export default class CastTransformationNode extends TransformationNode
       });
   }
 }
+
+class CastTransformationInfoC extends TransformationNodeInfo
+{
+  public typeCode = TYPECODE;
+  public humanName = 'Cast';
+  public description = 'Convert this field to a different type';
+  public nodeClass = CastTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+
+  public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
+  {
+    return `Cast to ${meta.toTypename}`;
+  }
+}
+
+export const CastTransformationInfo = new CastTransformationInfoC();

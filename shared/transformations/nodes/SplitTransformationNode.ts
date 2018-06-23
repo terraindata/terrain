@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-
+// tslint:disable:max-classes-per-file
 import { List } from 'immutable';
 
 import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
@@ -54,30 +54,15 @@ import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 import TransformationNode from './TransformationNode';
 
-function splitHelper(el: any, opts: NodeOptionsType<TransformationNodeType.SplitNode>): string[]
-{
-  let split: string[];
-  if (typeof opts.delimiter === 'number')
-  {
-    split = [
-      (el as string).slice(0, opts.delimiter as number),
-      (el as string).slice(opts.delimiter as number),
-    ];
-  }
-  else if (opts.regex === true)
-  {
-    split = (el as string).split(RegExp(opts.delimiter as string));
-  }
-  else
-  {
-    split = (el as string).split(opts.delimiter as string);
-  }
-  return split;
-}
+import TransformationNodeInfo from './info/TransformationNodeInfo';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-export default class SplitTransformationNode extends TransformationNode
+const TYPECODE = TransformationNodeType.SplitNode;
+
+export class SplitTransformationNode extends TransformationNode
 {
-  public typeCode = TransformationNodeType.SplitNode;
+  public typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -159,4 +144,53 @@ export default class SplitTransformationNode extends TransformationNode
       document: doc,
     } as TransformationVisitResult;
   }
+}
+
+class SplitTransformationInfoC extends TransformationNodeInfo
+{
+  public typeCode = TYPECODE;
+  public humanName = 'Split Field';
+  public description = 'Split this field into 2 or more fields';
+  public nodeClass = SplitTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+  public newFieldType = 'string';
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return (
+      EngineUtil.getRepresentedType(fieldId, engine) === 'string' &&
+      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+    );
+  }
+
+  public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
+  {
+    const names = meta.newFieldKeyPaths.map((value) => value.last());
+    return `Split on ${meta.delimiter} into ${names.toJS()}`;
+  }
+}
+
+export const SplitTransformationInfo = new SplitTransformationInfoC();
+
+function splitHelper(el: any, opts: NodeOptionsType<TransformationNodeType.SplitNode>): string[]
+{
+  let split: string[];
+  if (typeof opts.delimiter === 'number')
+  {
+    split = [
+      (el as string).slice(0, opts.delimiter as number),
+      (el as string).slice(opts.delimiter as number),
+    ];
+  }
+  else if (opts.regex === true)
+  {
+    split = (el as string).split(RegExp(opts.delimiter as string));
+  }
+  else
+  {
+    split = (el as string).split(opts.delimiter as string);
+  }
+  return split;
 }

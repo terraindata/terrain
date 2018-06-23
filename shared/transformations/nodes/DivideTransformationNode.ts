@@ -43,6 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+
+import TransformationNodeInfo from './info/TransformationNodeInfo';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 
 import { List } from 'immutable';
 
@@ -54,9 +60,11 @@ import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 import TransformationNode from './TransformationNode';
 
+const TYPECODE = TransformationNodeType.DivideNode;
+
 export default class DivideTransformationNode extends TransformationNode
 {
-  public typeCode = TransformationNodeType.DivideNode;
+  public typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -81,3 +89,26 @@ export default class DivideTransformationNode extends TransformationNode
     });
   }
 }
+
+class DivideTransformationInfoC extends TransformationNodeInfo
+{
+  public typeCode = TYPECODE;
+  public humanName = 'Divide';
+  public description = 'Divide this field by a constant number';
+  public nodeClass = DivideTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return EngineUtil.getRepresentedType(fieldId, engine) === 'number';
+  }
+
+  public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
+  {
+    return `Divide by ${meta.factor}`;
+  }
+}
+
+export const DivideTransformationInfo = new DivideTransformationInfoC();

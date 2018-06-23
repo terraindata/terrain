@@ -43,6 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+
+import TransformationNodeInfo from './info/TransformationNodeInfo';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 
 import { List } from 'immutable';
 
@@ -56,9 +62,11 @@ import TransformationNode from './TransformationNode';
 
 import isPrimitive = require('is-primitive');
 
+const TYPECODE = TransformationNodeType.DuplicateNode;
+
 export default class DuplicateTransformationNode extends TransformationNode
 {
-  public typeCode = TransformationNodeType.DuplicateNode;
+  public typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -90,3 +98,26 @@ export default class DuplicateTransformationNode extends TransformationNode
     } as TransformationVisitResult;
   }
 }
+
+class DuplicateTransformationInfoC extends TransformationNodeInfo
+{
+  public typeCode = TYPECODE;
+  public humanName = 'Duplicate';
+  public description = 'Duplicate this field';
+  public nodeClass = DuplicateTransformationNode;
+
+  public editable = false;
+  public creatable = true;
+  public newFieldType = 'same';
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    const etlType = EngineUtil.getETLFieldType(fieldId, engine);
+    return (
+      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId)) &&
+      etlType !== ETLFieldTypes.Object && etlType !== ETLFieldTypes.Array
+    );
+  }
+}
+
+export const DuplicateTransformationInfo = new DuplicateTransformationInfoC();

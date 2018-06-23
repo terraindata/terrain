@@ -43,6 +43,11 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+
+import TransformationNodeInfo from './info/TransformationNodeInfo';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import { List } from 'immutable';
 
@@ -54,9 +59,11 @@ import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 import TransformationNode from './TransformationNode';
 
+const TYPECODE = TransformationNodeType.JoinNode;
+
 export default class JoinTransformationNode extends TransformationNode
 {
-  public typeCode = TransformationNodeType.JoinNode;
+  public typeCode = TYPECODE ;
 
   public transform(doc: object)
   {
@@ -92,3 +99,31 @@ export default class JoinTransformationNode extends TransformationNode
     } as TransformationVisitResult;
   }
 }
+
+class JoinTransformationInfoC extends TransformationNodeInfo
+{
+  public typeCode = TYPECODE;
+  public humanName = 'Join Field';
+  public description = 'Join this field with another field';
+  public nodeClass = JoinTransformationNode;
+
+  public editable = false;
+  public creatable = true;
+  public newFieldType = 'string';
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return (
+      EngineUtil.getRepresentedType(fieldId, engine) === 'string' &&
+      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+    );
+  }
+
+  public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
+  {
+    const names = meta.newFieldKeyPaths.map((value) => value.last());
+    return `Join on ${meta.delimiter} from ${names.toJS()}`;
+  }
+}
+
+export const JoinTransformationInfo = new JoinTransformationInfoC();

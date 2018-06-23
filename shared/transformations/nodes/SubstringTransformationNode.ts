@@ -43,6 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+
+import TransformationNodeInfo from './info/TransformationNodeInfo';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 
 import { List } from 'immutable';
 
@@ -54,9 +60,11 @@ import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 import TransformationNode from './TransformationNode';
 
+const TYPECODE = TransformationNodeType.SubstringNode;
+
 export default class SubstringTransformationNode extends TransformationNode
 {
-  public typeCode = TransformationNodeType.SubstringNode;
+  public typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -99,3 +107,26 @@ export default class SubstringTransformationNode extends TransformationNode
     });
   }
 }
+
+class SubstringTransformationInfoC extends TransformationNodeInfo
+{
+  public typeCode = TYPECODE;
+  public humanName = 'Substring';
+  public description = `Extract a piece from this field's text`;
+  public nodeClass = SubstringTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+  }
+
+  public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
+  {
+    return `Substring from ${meta.from} to ${meta.from + meta.length}`;
+  }
+}
+
+export const SubstringTransformationInfo = new SubstringTransformationInfoC();

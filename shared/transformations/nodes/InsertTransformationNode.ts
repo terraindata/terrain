@@ -43,6 +43,13 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+
+import TransformationNodeInfo from './info/TransformationNodeInfo';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+
 import * as Immutable from 'immutable';
 import { List } from 'immutable';
 
@@ -54,9 +61,11 @@ import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 import TransformationNode from './TransformationNode';
 
+const TYPECODE = TransformationNodeType.InsertNode;
+
 export default class InsertTransformationNode extends TransformationNode
 {
-  public typeCode = TransformationNodeType.InsertNode;
+  public typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -172,3 +181,37 @@ export default class InsertTransformationNode extends TransformationNode
     } as TransformationVisitResult;
   }
 }
+
+class InsertTransformationInfoC extends TransformationNodeInfo
+{
+  public typeCode = TYPECODE;
+  public humanName = 'Append / Prepend';
+  public description = 'Append, Prepend, or Insert Text';
+  public nodeClass = InsertTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+  }
+
+  public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
+  {
+    if (meta.at === -1)
+    {
+      return 'Append Text';
+    }
+    else if (meta.at === 0)
+    {
+      return 'Prepend Text';
+    }
+    else
+    {
+      return `Insert Text at Position ${meta.at}`;
+    }
+  }
+}
+
+export const InsertTransformationInfo = new InsertTransformationInfoC();

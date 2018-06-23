@@ -43,6 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+
+import TransformationNodeInfo from './info/TransformationNodeInfo';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 
 import { List } from 'immutable';
 
@@ -56,9 +62,11 @@ import TransformationNode from './TransformationNode';
 
 import * as math from 'mathjs';
 
+const TYPECODE = TransformationNodeType.RoundNode;
+
 export default class RoundTransformationNode extends TransformationNode
 {
-  public typeCode = TransformationNodeType.RoundNode;
+  public typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -83,3 +91,26 @@ export default class RoundTransformationNode extends TransformationNode
     });
   }
 }
+
+class RoundTransformationInfoC extends TransformationNodeInfo
+{
+  public typeCode = TYPECODE;
+  public humanName = 'Round';
+  public description = 'Round this field to the specified number of decimals';
+  public nodeClass = RoundTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return EngineUtil.getRepresentedType(fieldId, engine) === 'number';
+  }
+
+  public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
+  {
+    return `Round ${meta.shift}`;
+  }
+}
+
+export const RoundTransformationInfo = new RoundTransformationInfoC();

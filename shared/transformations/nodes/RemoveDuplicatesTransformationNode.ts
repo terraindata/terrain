@@ -43,6 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+
+import TransformationNodeInfo from './info/TransformationNodeInfo';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 
 import { List } from 'immutable';
 
@@ -54,9 +60,11 @@ import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 import TransformationNode from './TransformationNode';
 
+const TYPECODE = TransformationNodeType.RemoveDuplicatesNode;
+
 export default class RemoveDuplicatesTransformationNode extends TransformationNode
 {
-  public typeCode = TransformationNodeType.RemoveDuplicatesNode;
+  public typeCode = TYPECODE;
 
   public transform(doc: object)
   {
@@ -98,3 +106,26 @@ export default class RemoveDuplicatesTransformationNode extends TransformationNo
     } as TransformationVisitResult;
   }
 }
+
+class RemoveDuplicatesTransformationInfoC extends TransformationNodeInfo
+{
+  public typeCode = TYPECODE;
+  public humanName = 'Remove Duplicates';
+  public description = 'Remove Duplicate Values from an Array';
+  public nodeClass = RemoveDuplicatesTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    const valueType = EngineUtil.getValueType(fieldId, engine);
+    return (
+      EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+      (valueType === 'number' || valueType === 'string') &&
+      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+    );
+  }
+}
+
+export const RemoveDuplicatesTransformationInfo = new RemoveDuplicatesTransformationInfoC();

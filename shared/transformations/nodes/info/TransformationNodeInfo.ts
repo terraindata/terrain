@@ -43,72 +43,31 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file
-
-import TransformationNodeInfo from './info/TransformationNodeInfo';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 
 import { List } from 'immutable';
-
-import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
-import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
-import TransformationNode from './TransformationNode';
+import TransformationNode from '../TransformationNode';
 
-const TYPECODE = TransformationNodeType.MultiplyNode;
-
-export default class MultiplyTransformationNode extends TransformationNode
+export default abstract class TransformationNodeInfo
 {
-  public typeCode = TYPECODE;
+  public abstract typeCode: TransformationNodeType;
 
-  public transform(doc: object)
+  public abstract humanName: string;
+  public abstract description: string;
+  public abstract nodeClass: { new(... args: any[]): TransformationNode };
+
+  public editable: boolean = false;
+  public creatable: boolean = false;
+  public newFieldType: string = 'string';
+
+  public isAvailable(engine: TransformationEngine, fieldId: number): boolean
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.MultiplyNode>;
+    return false;
+  }
 
-    return visitHelper(this.fields, doc, { document: doc }, (kp, el) =>
-    {
-      if (typeof el !== 'number')
-      {
-        return {
-          errors: [
-            {
-              message: 'Attempted to multiply a non-numeric (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-      else
-      {
-        yadeep.set(doc, kp, el * opts.factor);
-      }
-    });
+  public shortSummary(meta: object): string
+  {
+    return this.humanName;
   }
 }
-
-class MultiplyTransformationInfoC extends TransformationNodeInfo
-{
-  public typeCode = TYPECODE;
-  public humanName = 'Multiply';
-  public description = 'Multiply this field by a constant factor';
-  public nodeClass = MultiplyTransformationNode;
-
-  public editable = true;
-  public creatable = true;
-
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    return EngineUtil.getRepresentedType(fieldId, engine) === 'number';
-  }
-
-  public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
-  {
-    return `Multiply by ${meta.factor}`;
-  }
-}
-
-export const MultiplyTransformationInfo = new MultiplyTransformationInfoC();

@@ -43,6 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+
+import TransformationNodeInfo from './info/TransformationNodeInfo';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 
 import { List } from 'immutable';
 
@@ -53,6 +59,47 @@ import TransformationVisitResult from 'shared/transformations/TransformationVisi
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 import TransformationNode from './TransformationNode';
+
+const TYPECODE = TransformationNodeType.SetIfNode;
+
+export default class SetIfTransformationNode extends TransformationNode
+{
+  public typeCode = TYPECODE;
+
+  public transform(doc: object)
+  {
+    const opts = this.meta as NodeOptionsType<TransformationNodeType.SetIfNode>;
+
+    return visitHelper(this.fields, doc, { document: doc }, (kp, el) =>
+    {
+      let condition = setIfHelper(opts, el);
+      condition = opts.invert ? !condition : condition;
+      if (condition)
+      {
+        yadeep.set(doc, kp, opts.newValue, { create: true });
+      }
+    });
+  }
+}
+
+class SetIfTransformationInfoC extends TransformationNodeInfo
+{
+  public typeCode = TYPECODE;
+  public humanName = 'Set If';
+  public description = 'Checks if a field matches a certain special value, and if so, replaces that value';
+  public nodeClass = SetIfTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    const type = EngineUtil.getRepresentedType(fieldId, engine);
+    return type === 'number' || type === 'string' || type === 'boolean';
+  }
+}
+
+export const SetIfTransformationInfo = new SetIfTransformationInfoC();
 
 function setIfHelper(o: NodeOptionsType<TransformationNodeType.SetIfNode>, e: any)
 {
@@ -78,24 +125,4 @@ function setIfHelper(o: NodeOptionsType<TransformationNodeType.SetIfNode>, e: an
   }
 
   return false;
-}
-
-export default class SetIfTransformationNode extends TransformationNode
-{
-  public typeCode = TransformationNodeType.SetIfNode;
-
-  public transform(doc: object)
-  {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.SetIfNode>;
-
-    return visitHelper(this.fields, doc, { document: doc }, (kp, el) =>
-    {
-      let condition = setIfHelper(opts, el);
-      condition = opts.invert ? !condition : condition;
-      if (condition)
-      {
-        yadeep.set(doc, kp, opts.newValue, { create: true });
-      }
-    });
-  }
 }

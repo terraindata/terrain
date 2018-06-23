@@ -52,7 +52,6 @@ enum TransformationNodeType
 {
   SplitNode = 'SplitNode',
   JoinNode = 'JoinNode',
-  // FilterNode = 'FilterNode',
   DuplicateNode = 'DuplicateNode',
   InsertNode = 'InsertNode',
   CaseNode = 'CaseNode',
