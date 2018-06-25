@@ -46,17 +46,14 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions no-unused-expression
 
-import { AuthState } from 'auth/AuthTypes';
 import * as React from 'react';
-import { Link } from 'react-router-dom';
 import Util from 'util/Util';
-import CreateItem from '../../common/components/CreateItem';
+import { MidwayError } from '../../../../shared/error/MidwayError';
 import Ajax from '../../util/Ajax';
-import * as UserTypes from '../UserTypes';
 import InfoArea from './../../common/components/InfoArea';
-import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import UserThumbnail from './UserThumbnail';
+
+import './Logs.less';
 
 export interface Props
 {
@@ -65,22 +62,81 @@ export interface Props
   children?: any;
 }
 
+interface State
+{
+  loading: boolean;
+  logs: string;
+}
+
 class Logs extends TerrainComponent<Props>
 {
+  public state: State = {
+    loading: false,
+    logs: '',
+  };
+
+  public componentDidMount()
+  {
+    this.fetchLogs();
+  }
+
+  public fetchLogs()
+  {
+    this.setState({
+      loading: true,
+    });
+    const log = Ajax.getLogs(
+      (logs) =>
+      {
+        if (this.state.loading)
+        {
+          this.setState({
+            logs,
+            loading: false,
+          });
+        }
+      },
+      (error) =>
+      {
+        let readable;
+        try
+        {
+          readable = MidwayError.fromJSON(error as any).getDetail();
+        }
+        catch {
+          readable = error;
+        }
+        if (this.state.loading)
+        {
+          this.setState({
+            logs: readable,
+            loading: false,
+          });
+        }
+      }
+    );
+  }
+
   public render()
   {
-    const loading = true;
+    const loading = this.state.loading;
     return (
       <div>
         <div className='logs'>
-          <div className='logs-page'>
+          <div className='logs-page-title'>
             Console Logs
-        </div>
+          </div>
           {
             loading &&
             <InfoArea large='Loading...' />
           }
         </div>
+        {
+          !loading &&
+          <div className='logs-area'>
+          {this.state.logs}
+          </div>
+        }
       </div>
     );
   }

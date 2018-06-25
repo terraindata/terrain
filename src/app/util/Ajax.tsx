@@ -1104,6 +1104,29 @@ export const Ajax =
         { onError });
     },
 
+    getLogs(
+      onLoad: (response: any) => void,
+      onError?: (ev: Event) => void,
+    )
+    {
+      return Ajax.req(
+        'get',
+        'status/logs',
+        {},
+        (response: any) =>
+        {
+          try
+          {
+            onLoad(response);
+          }
+          catch (e)
+          {
+            onError && onError(response as any);
+          }
+        },
+        { onError });
+    },
+
     // not to be confused with deleteDb, which actually deletes a server connection
     deleteDatabase(
       dbid: number,
