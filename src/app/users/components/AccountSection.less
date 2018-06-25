@@ -5,7 +5,7 @@ html *
 
 .section-container {
   display: block;
-  margin: 10px 20px 10px 20px;
+  margin: 10px auto 10px auto;
   padding-top: 8px;
   padding-bottom: 4px;
   border-radius: 8px;
@@ -105,9 +105,6 @@ html *
 }
 
 .profile-pic {
-  //height: 0;
-  //width: 22%;
-  //padding-bottom: 22%;
   margin-right: 40px;
   height: 14vw;
   width: 14vw;
@@ -132,6 +129,7 @@ html *
 .profile-input {
   max-height: 20px;
   margin-left: -6px;
+  min-width: 24px;
 }
 
 .no-column {
@@ -140,7 +138,7 @@ html *
   flex-grow: 1;
 }
 
-.profile-col-1 {
+.profile-col {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -148,9 +146,3 @@ html *
   justify-content: space-around;
   min-width: 230px;
 }
-
-//.profile-col-2 {
-//  display: block;
-// flex-grow: 1;
-//  text-align: left
-//}

@@ -58,7 +58,6 @@ import ConnectionEditorPage from 'app/connections/components/ConnectionEditorPag
 import Connections from 'app/connections/components/Connections';
 import EditProfile from './EditProfile';
 import Notifications from './Notifications';
-import Profile from './Profile';
 import Settings from './Settings';
 import Team from './Team';
 

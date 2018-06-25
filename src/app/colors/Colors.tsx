@@ -67,6 +67,7 @@ const NTColors =
     grey3: '#ccc',
     grey4: '#f4f4f4',
     grey5: '#adadad',
+    grey6: '#878787',
 
     dark1: '#000',
     dark2: '#231F20',
@@ -143,7 +144,7 @@ const NewTheme =
     sectionBg: NTColors.grey4,
     sectionEditButton: NTColors.grey2,
     sectionSubtitle: NTColors.grey5,
-    mainSectionTitle: NTColors.blue6,
+    mainSectionTitle: NTColors.grey6,
   };
 
 // Will be deprecated

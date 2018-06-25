@@ -70,12 +70,13 @@ import AccountEntry from './AccountEntry';
 import * as _ from 'lodash';
 import { backgroundColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
-import './Section.less';
+import FadeInOut from '../../common/components/FadeInOut';
+import './AccountSection.less';
 const moment = require('moment-timezone');
 
 export interface Props
 {
-  user: any;
+  user?: any;
   sectionTitle: string;
   sectionType: string;
   sectionBoxes: List<any>;
@@ -221,12 +222,12 @@ export default class Section extends TerrainComponent<Props>
               onClick={this.handleProfilePicChange}
               style={{
                 backgroundImage: this.handleProfilePictureSource(), opacity: (this.state.isEditing) ? 0.4 : 1,
-                cursor: (this.state.isEditing) ? 'pointer' : 'default'
+                cursor: (this.state.isEditing) ? 'pointer' : 'default',
               }}>
               {this.renderSelectProfilePicture()}
             </div> : null}
           <div className='profile-text'>
-            {columns.map((col, i) => this.renderBlocks(col, 'profile-col-1', i))}
+            {columns.map((col, i) => this.renderBlocks(col, 'profile-col', i))}
           </div>
         </div>
       );
@@ -394,8 +395,12 @@ export default class Section extends TerrainComponent<Props>
           <div className='section-header'>{this.props.sectionTitle}</div>
           {this.state.isEditing ? this.renderCancelAndSaveButtons() : this.renderEditButton()}
         </div>
-
-        {(!(this.props.sectionType === 'password' && !this.state.isEditing)) && this.renderBlockColumn()}
+        {
+          <FadeInOut
+            open={(!(this.props.sectionType === 'password' && !this.state.isEditing))}
+            children={this.renderBlockColumn()}
+          />
+        }
         <Modal
           message={this.state.errorModalMessage}
           onClose={this.toggleErrorModal}

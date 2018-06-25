@@ -67,9 +67,8 @@ import TerrainTools from '../../util/TerrainTools';
 import { UserActions as Actions } from '../data/UserRedux';
 import * as UserTypes from '../UserTypes';
 import AccountEntry from './AccountEntry';
+import Section from './AccountSection';
 import PasswordStrengthInput from './PasswordStrengthInput';
-import Profile from './Profile';
-import Section from './Section';
 const moment = require('moment-timezone');
 
 import './Settings.less';
@@ -498,11 +497,11 @@ class Settings extends TerrainComponent<Props>
 
     if (this.props.users.currentUser)
     {
-      timeZone = this.props.users.currentUser.timeZone || 158;
+      timeZone = this.props.users.currentUser.timeZone || 157;
     }
     else
     {
-      timeZone = 158;
+      timeZone = 157;
     }
 
     return (
@@ -526,11 +525,11 @@ class Settings extends TerrainComponent<Props>
 
     if (this.props.users.currentUser)
     {
-      timeZone = this.props.users.currentUser.timeZone || 158;
+      timeZone = this.props.users.currentUser.timeZone || 157;
     }
     else
     {
-      timeZone = 158;
+      timeZone = 157;
     }
     return timeZone;
   }
