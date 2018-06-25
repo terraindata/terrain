@@ -48,10 +48,12 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import Util from 'util/Util';
+
 import { MidwayError } from '../../../../shared/error/MidwayError';
 import Ajax from '../../util/Ajax';
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
+import TerrainTools from 'app/util/TerrainTools';
 
 import './Logs.less';
 
@@ -64,6 +66,7 @@ export interface Props
 
 interface State
 {
+  isAdmin: boolean;
   loading: boolean;
   logs: string;
 }
@@ -71,6 +74,7 @@ interface State
 class Logs extends TerrainComponent<Props>
 {
   public state: State = {
+    isAdmin: TerrainTools.isAdmin(),
     loading: false,
     logs: '',
   };
@@ -82,6 +86,11 @@ class Logs extends TerrainComponent<Props>
 
   public fetchLogs()
   {
+    if (!this.state.isAdmin)
+    {
+      return;
+    }
+
     this.setState({
       loading: true,
     });
@@ -117,6 +126,26 @@ class Logs extends TerrainComponent<Props>
     );
   }
 
+  public renderLogs()
+  {
+    if (this.state.isAdmin)
+    {
+      return (
+        <div className='logs-area'>
+          {this.state.logs}
+        </div>
+      );
+    }
+    else
+    {
+      return (
+        <div className='logs-error'>
+           <InfoArea large='You need administrator privileges to view console logs.' />
+        </div>
+      )
+    }
+  }
+
   public render()
   {
     const loading = this.state.loading;
@@ -130,13 +159,10 @@ class Logs extends TerrainComponent<Props>
             loading &&
             <InfoArea large='Loading...' />
           }
+          {
+            !loading && this.renderLogs()
+          }
         </div>
-        {
-          !loading &&
-          <div className='logs-area'>
-          {this.state.logs}
-          </div>
-        }
       </div>
     );
   }
