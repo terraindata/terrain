@@ -50,7 +50,7 @@ import * as winston from 'winston';
 /**
  * A log stream
  */
-export default class LogStream extends Readable
+export default class LogStream extends Transform
 {
   private buffers: string[];
   private abortThreshold: number;

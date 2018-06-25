@@ -85,13 +85,16 @@ export class TaskETL extends Task
         taskOutputConfig['options']['outputStream'] = streams['outputStream'];
         taskOutputConfig['options']['logStream'] = streams['logStream'];
         streams['logStream'].pipe(taskOutputConfig['rootLogStream']);
-
         if (taskOutputConfig.async !== true)
         {
           streams['logStream'].on('end', () =>
           {
             resolve(taskOutputConfig);
           });
+        }
+        else
+        {
+          resolve(taskOutputConfig);
         }
       }
       catch (e)
