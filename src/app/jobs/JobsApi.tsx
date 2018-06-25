@@ -69,6 +69,11 @@ class JobsApi
   {
     return this.xhr.get(`/jobs/log/${jobId}`);
   }
+
+  public cancelJob(jobId: string)
+  {
+    return this.xhr.post(`/jobs/cancel/${jobId}`);
+  }
 }
 
 export default JobsApi;

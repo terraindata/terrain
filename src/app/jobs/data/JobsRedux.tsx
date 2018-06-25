@@ -84,6 +84,21 @@ export interface JobActionTypes
     actionType: 'getJobLogs';
     jobId: ID;
   };
+  cancelJob?: {
+    actionType: 'cancelJob',
+    jobId: ID,
+  };
+  cancelJobStart: {
+    actionType: 'cancelJobStart';
+  };
+  cancelJobSuccess: {
+    actionType: 'cancelJobSuccess';
+    job: JobConfig;
+  };
+  cancelJobFailed: {
+    actionType: 'cancelJobFailed';
+    error: string;
+  };
 }
 
 class JobRedux extends TerrainRedux<JobActionTypes, JobsState>
@@ -123,6 +138,27 @@ class JobRedux extends TerrainRedux<JobActionTypes, JobsState>
       },
 
       getJobsFailed: (state, action) =>
+      {
+        return state
+          .set('loading', false)
+          .set('error', action.payload.error);
+      },
+
+      cancelJobStart: (state, action) =>
+      {
+        return state
+          .set('loading', true);
+      },
+
+      cancelJobSuccess: (state, action) =>
+      {
+        const { job } = action.payload;
+        return state
+          .set('loading', false)
+          .setIn(['jobs', job.id], _JobConfig(job));
+      },
+
+      cancelJobFailed: (state, action) =>
       {
         return state
           .set('loading', false)
@@ -184,12 +220,34 @@ class JobRedux extends TerrainRedux<JobActionTypes, JobsState>
       });
   }
 
+  public cancelJob(action, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'cancelJobStart',
+    });
+
+    return this.api.cancelJob(action.jobId)
+      .then((response) =>
+      {
+        const job = response.data;
+
+        directDispatch({
+          actionType: 'cancelJobSuccess',
+          job,
+        });
+
+        return Promise.resolve(job);
+      });
+  }
+
   public overrideAct(action: Unroll<JobActionTypes>)
   {
     const asyncActions = [
       'getJobs',
       'getJob',
       'getJobLogs',
+      'cancelJob',
     ];
 
     if (asyncActions.indexOf(action.actionType) > -1)
