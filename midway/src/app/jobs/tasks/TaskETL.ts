@@ -79,7 +79,6 @@ export class TaskETL extends Task
 
       try
       {
-        console.log('TaskConfig: ', JSON.stringify(this.taskConfig, null, 2));
         const streams = await templates.executeETL(this.taskConfig['params']['options'],
           this.taskConfig['params']['options']['inputStreams']);
         winston.info('finished executing ETL');
@@ -88,7 +87,6 @@ export class TaskETL extends Task
         streams['logStream'].pipe(taskOutputConfig['rootLogStream']);
         if (taskOutputConfig.async !== true)
         {
-          winston.error('GOING TO ADD ON END HANDLER');
           streams['logStream'].on('end', () =>
           {
             resolve(taskOutputConfig);
@@ -114,8 +112,6 @@ export class TaskETL extends Task
 
         if (taskOutputConfig.async !== true)
         {
-          winston.error('GOING TO ADD ON END HANDLER');
-          console.log(logStream);
           logStream.on('end', () =>
           {
             resolve(taskOutputConfig);

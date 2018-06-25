@@ -113,10 +113,10 @@ export const _TaskConfig =
   {
     let task = new TaskConfig_Record(config) as any as TaskConfig;
     task = task.set('params', task.params ? Immutable.Map(task.params) : Immutable.Map({}));
+    task = task.setIn(['params', 'options'], task.getIn(['params', 'options']) ?
+      Immutable.Map(task.getIn(['params', 'options'])) : Immutable.Map({}));
     if (task.taskId === TaskEnum.taskETL)
     {
-      task = task.setIn(['params', 'options'], task.getIn(['params', 'options']) ?
-        Immutable.Map(task.getIn(['params', 'options'])) : Immutable.Map({}));
       task = task.setIn(['params', 'options', 'overrideSources'],
         Util.objectToImmutableMap(parseToObject(task, ['params', 'options', 'overrideSources']), _.partialRight(_SourceConfig, true)));
       task = task.setIn(['params', 'options', 'overrideSinks'],
@@ -175,6 +175,5 @@ export function scheduleForDatabase(schedule: SchedulerConfig): object
     return task.toJS();
   });
   const scheduleObj = schedule.set('tasks', JSON.stringify(tasks.toArray())).toJS();
-  console.log('schedule for database is ', scheduleObj);
   return scheduleObj;
 }

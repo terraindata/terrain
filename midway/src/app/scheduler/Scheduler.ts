@@ -173,7 +173,6 @@ export class Scheduler
 
   public async runSchedule(id: number, handle: TransactionHandle, runNow?: boolean, userId?: number): Promise<SchedulerConfig[] | string>
   {
-    console.log('RUN SCHEDULE ', id);
     return new Promise<SchedulerConfig[] | string>(async (resolve, reject) =>
     {
       if (this.runningSchedules.get(id) !== undefined)

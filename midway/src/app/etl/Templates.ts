@@ -303,21 +303,15 @@ export default class Templates
     {
       let sources: Immutable.Map<string, SourceRecord>;
       let sinks: Immutable.Map<string, SinkRecord>;
-      console.log('HERE sources' , sources);
-      console.log('HERE sinks' , sinks);
 
       if (overrideSources !== undefined)
       {
-        console.log('parsing override Sources', overrideSources);
         const parsed = JSON.parse(overrideSources);
-        console.log(parsed);
         sources = Immutable.Map<string, SourceRecord>(parsed).map((source, key) => _SourceConfig(source, true)).toMap();
       }
       if (overrideSinks !== undefined)
       {
-        console.log('override sinks ', overrideSinks)
         const parsed = JSON.parse(overrideSinks);
-        console.log(parsed);
         sinks = Immutable.Map<string, SinkRecord>(parsed).map((sink, key) => _SinkConfig(sink, true)).toMap();
       }
 
@@ -621,7 +615,6 @@ export default class Templates
     }
     catch (e)
     {
-      console.trace();
       logStream.error(`Failed to execute ETL pipeline: ${String(e)}`);
       throw new Error(`Failed to execute ETL pipeline: ${String(e)}`);
     }
