@@ -157,6 +157,7 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
         'analyticsIndex',
         'analyticsType',
         'indexPrefix',
+        'isProtected',
       ],
       undefined,
       {
@@ -169,6 +170,7 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
         analyticsIndex: 'text',
         analyticsType: 'text',
         indexPrefix: 'text',
+        isProtected: 'bool DEFAULT ' + falseValue,
       },
     ),
     new DatabaseConfig({}),

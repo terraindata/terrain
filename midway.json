@@ -9,7 +9,8 @@
             "isAnalytics": true,
             "analyticsIndex": "terrain-analytics",
             "analyticsType": "events",
-            "indexPrefix": "0498de8a9ccbbc0f81a1fae645ecd59a."
+            "indexPrefix": "c6ed8c257f0a0bad8e9eb61bcfa1e0b5ac9bd7fba761cab9e1168496f87b7dbc.",
+            "isProtected": true
         }
     ]
 }

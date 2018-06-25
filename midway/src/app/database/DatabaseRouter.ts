@@ -67,7 +67,7 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
 Router.get('/status/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting all databases (with their statuses)');
-  ctx.body = await databases.status(ctx.params.id);
+  ctx.body = await databases.status(ctx.params.id, true);
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -112,6 +112,13 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
     {
       throw Error('Database ID does not match the supplied id in the URL');
     }
+  }
+
+  const isProtected = (await databases.get(db.id))[0].isProtected;
+
+  if (isProtected)
+  {
+    throw new Error('Cannot update a protected database');
   }
 
   ctx.body = await databases.upsert(ctx.state.user, db);
