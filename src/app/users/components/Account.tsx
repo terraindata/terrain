@@ -58,7 +58,6 @@ import ConnectionEditorPage from 'app/connections/components/ConnectionEditorPag
 import Connections from 'app/connections/components/Connections';
 import EditProfile from './EditProfile';
 import Notifications from './Notifications';
-import Profile from './Profile';
 import Settings from './Settings';
 import Team from './Team';
 
@@ -74,14 +73,14 @@ class Account extends TerrainComponent<Props>
 {
   public tabs = [
     { key: 'settings', label: 'Settings' },
-    { key: 'profile', label: 'Profile' },
+    // { key: 'profile', label: 'Profile' },
     { key: 'connections', label: 'Connections' },
     { key: 'team', label: 'Team' },
   ];
 
   public tabToRouteMap = {
     settings: '/account/settings',
-    profile: '/account/profile',
+    // profile: '/account/profile',
     connections: '/account/connections',
     team: '/account/team',
   };
@@ -89,6 +88,8 @@ class Account extends TerrainComponent<Props>
   public render()
   {
     const { children, location } = this.props;
+    // <Route exact path='/account/profile' component={Profile} />
+    // <Route exact path='/account/profile/edit' component={EditProfile} />
 
     return (
       <div className='account'>
@@ -100,9 +101,7 @@ class Account extends TerrainComponent<Props>
           >
             <div className='account-inner'>
               <Switch>
-                <Route exact path='/' component={Profile} />
-                <Route exact path='/account/profile' component={Profile} />
-                <Route exact path='/account/profile/edit' component={EditProfile} />
+                <Route exact path='/' component={Settings} />
                 <Route exact path='/account/settings' component={Settings} />
                 <Route exact path='/account/notifications' component={Notifications} />
                 <Route exact path='/account/connections' component={Connections} />
