@@ -1,5 +1,4 @@
 {
-    "instanceId": "0498de8a9ccbbc0f81a1fae645ecd59a",
     "debug": true,
     "databases": [
         {
@@ -10,7 +9,7 @@
             "isAnalytics": true,
             "analyticsIndex": "terrain-analytics",
             "analyticsType": "events",
-            "isMultitenant": true
+            "indexPrefix": "0498de8a9ccbbc0f81a1fae645ecd59a."
         }
     ]
 }

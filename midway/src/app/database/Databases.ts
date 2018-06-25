@@ -129,22 +129,8 @@ export class Databases
       throw new Error('Database does not have an ID');
     }
 
-    if (db.isMultitenant)
-    {
-      db.dsn = App.CFG.databases.find((cfg: DatabaseConfig) => cfg.name === db.name).dsn;
-    }
-
-    const controller: DatabaseController = DatabaseControllerConfig.makeDatabaseController(db, App.CFG.instanceId);
-    if (db.isMultitenant)
-    {
-      const newDb = JSON.parse(JSON.stringify(db));
-      newDb.dsn = '';
-      controller.setConfig(newDb);
-    }
-    else
-    {
-      controller.setConfig(db);
-    }
+    const controller: DatabaseController = DatabaseControllerConfig.makeDatabaseController(db);
+    controller.setConfig(db);
     const connected: boolean = await controller.getClient().isConnected();
 
     DatabaseRegistry.set(db.id, controller);

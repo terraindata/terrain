@@ -63,7 +63,7 @@ import Util from 'shared/Util';
 
 export class DatabaseControllerConfig
 {
-  public static makeDatabaseController(config: DatabaseConfig, prefix: string): DatabaseController
+  public static makeDatabaseController(config: DatabaseConfig): DatabaseController
   {
     const id = config.id as number;
     const name = config.name;
@@ -71,7 +71,7 @@ export class DatabaseControllerConfig
     const dsn = config.dsn;
     const analyticsIndex = config.analyticsIndex;
     const analyticsType = config.analyticsType;
-    const isMultitenant = config.isMultitenant;
+    const indexPrefix = config.indexPrefix;
 
     const cfg = new DatabaseControllerConfig(type, dsn);
     if (type === 'sqlite')
@@ -88,7 +88,7 @@ export class DatabaseControllerConfig
     }
     else if (type === 'elasticsearch' || type === 'elastic')
     {
-      return new ElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType, isMultitenant ? prefix : '');
+      return new ElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType, indexPrefix);
     }
     else
     {

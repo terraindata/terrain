@@ -55,7 +55,6 @@ import UserConfig from './users/UserConfig';
 
 export interface Config
 {
-  instanceId?: string;
   config?: string;
   port?: number;
   db?: string;
