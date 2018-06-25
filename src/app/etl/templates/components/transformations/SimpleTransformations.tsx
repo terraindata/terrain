@@ -54,11 +54,11 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
+import { availableCases, CaseFormats, caseFormatToReadable } from 'shared/transformations/nodes/CaseTransformationNode';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
-import { CaseFormats, caseFormatToReadable, availableCases } from 'shared/transformations/nodes/CaseTransformationNode';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';

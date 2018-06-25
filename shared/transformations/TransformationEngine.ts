@@ -49,12 +49,12 @@ import * as GraphLib from 'graphlib';
 import { List, Map } from 'immutable';
 import isPrimitive = require('is-primitive');
 import * as _ from 'lodash';
+import TransformationNode from 'shared/transformations/TransformationNode';
 import objectify from '../util/deepObjectify';
 import { KeyPath, keyPathPrefixMatch, updateKeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 // import * as winston from 'winston'; // TODO what to do for error logging?
 import DataStore from './DataStore';
-import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationEngineNodeVisitor from './TransformationEngineNodeVisitor';
 import TransformationNodeType from './TransformationNodeType';
 import TransformationRegistry from './TransformationRegistry';

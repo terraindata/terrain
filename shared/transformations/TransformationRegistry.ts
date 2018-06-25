@@ -73,11 +73,11 @@ import { SubtractTransformationInfo, SubtractTransformationNode } from './nodes/
 import { SumTransformationInfo, SumTransformationNode } from './nodes/SumTransformationNode';
 import { ZipcodeTransformationInfo, ZipcodeTransformationNode } from './nodes/ZipcodeTransformationNode';
 
-import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNode from 'shared/transformations/TransformationNode';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import TransformationNodeVisitor, { VisitorLookupMap } from 'shared/transformations/TransformationNodeVisitor';
-import TransformationNode from 'shared/transformations/TransformationNode';
 
 const infos: {
   [k in TransformationNodeType]: TransformationNodeInfo & { typeCode: k }
