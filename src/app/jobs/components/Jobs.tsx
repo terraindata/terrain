@@ -185,8 +185,19 @@ class Jobs extends TerrainComponent<any> {
 
   public parseJobLogContents(jobLogs)
   {
-    return jobLogs.contents !== '' && jobLogs.contents !== undefined ?
-      jobLogs.contents.split('\n').map((logLine) => JSON.parse(logLine)) : [];
+    console.log(jobLogs);
+    let contents = [];
+    if (jobLogs.contents !== '' && jobLogs.contents !== undefined)
+    {
+      try {
+        contents = jobLogs.contents.split('\n').map((logLine => JSON.parse(logLine)));
+      }
+      catch (e)
+      {
+        contents = [jobLogs.contents];
+      }
+    }
+    return contents;
   }
 
   public render()

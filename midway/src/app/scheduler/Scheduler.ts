@@ -176,6 +176,7 @@ export class Scheduler
 
   public async runSchedule(id: number, handle: TransactionHandle, runNow?: boolean, userId?: number): Promise<SchedulerConfig[] | string>
   {
+    console.log('RUN SCHEDULE ', id);
     return new Promise<SchedulerConfig[] | string>(async (resolve, reject) =>
     {
       if (this.runningSchedules.get(id) !== undefined)
@@ -299,7 +300,7 @@ export class Scheduler
         schedule.running = (schedule.running !== undefined && schedule.running !== null) ? schedule.running : false;
         schedule.shouldRunNext = (schedule.shouldRunNext !== undefined && schedule.shouldRunNext !== null)
           ? schedule.shouldRunNext : true;
-        schedule.tasks = (schedule.tasks !== undefined && schedule.tasks !== null) ? JSON.stringify(schedule.tasks) : JSON.stringify([]);
+        schedule.tasks = (schedule.tasks !== undefined && schedule.tasks !== null) ? schedule.tasks : JSON.stringify([]);
         schedule.workerId = (schedule.workerId !== undefined && schedule.workerId !== null) ? schedule.workerId : 1;
       }
       else

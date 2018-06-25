@@ -85,22 +85,14 @@ class CRONEditor extends TerrainComponent<Props>
   public render()
   {
     return (
-      <div
-        className='cron-editor'
-      >
-        <div
-          className='cron-editor-columns'
-        >
-          {
-            this.renderDays()
-          }
-          {
-            this.renderHours()
-          }
-        </div>
-        <div
-          className='cron-editor-footer'
-        >
+      <div>
+        {
+          this.renderDays()
+        }
+        {
+          this.renderHours()
+        }
+        <div className='cron-editor-footer'>
           {
             this.renderCustom()
           }
@@ -118,7 +110,7 @@ class CRONEditor extends TerrainComponent<Props>
             }
             <div className='note'>
               Schedule will next be executed:
-            </div>
+              </div>
             <div className='note cron-editor-bottom-note'>
               <b>
                 {
@@ -142,7 +134,6 @@ class CRONEditor extends TerrainComponent<Props>
     {
       return 'Invalid CRON';
     }
-
   }
 
   private handleOptionClick(daysOrHours: 'days' | 'hours', type: string)
@@ -212,33 +203,33 @@ class CRONEditor extends TerrainComponent<Props>
     const { cron } = this.props;
     const sched = this.canRenderCRONSchedule() ? parseCRONDaySchedule(cron, true) : null;
 
-    return (
-      <div className='cron-editor-column'>
-        {this.renderHeader('Day')}
-        {this.renderOption('Every day', 'daily', sched, 'days')}
-        {this.renderOption('Every weekday', 'workweek', sched, 'days')}
-        {this.renderOption('Specific weekday(s)', 'weekly', sched, 'days',
-          <div key='w' style={getStyle('margin', '0px -3px')}>
-            <Picker
-              options={this.getCRONOptions(sched, 'weekdays', CRONWeekDayOptionsList, CRONWeekDayNames, true)}
-              canEdit={true}
-              circular={true}
-              onSelect={this._fn(this.handleCRONValueSelect, 'days', 'weekdays')}
-            />
-          </div>,
-        )}
-        {this.renderOption('Specific day(s) of the month', 'monthly', sched, 'days',
-          <div key='m' style={getStyle('margin', '0px -3px')}>
-            <Picker
-              options={this.getCRONOptions(sched, 'days', CRONMonthDayOptionsList)}
-              canEdit={true}
-              onSelect={this._fn(this.handleCRONValueSelect, 'days', 'days')}
-              rowSize={7}
-            />
-          </div>,
-        )}
-      </div>
-    );
+    return [
+      this.renderHeader('Day'),
+      this.renderOption('Every day', 'daily', sched, 'days'),
+      this.renderOption('Every weekday', 'workweek', sched, 'days'),
+
+      this.renderOption('Specific weekday(s)', 'weekly', sched, 'days',
+        <div key='w' style={getStyle('margin', '0px -3px')}>
+          <Picker
+            options={this.getCRONOptions(sched, 'weekdays', CRONWeekDayOptionsList, CRONWeekDayNames, true)}
+            canEdit={true}
+            circular={true}
+            onSelect={this._fn(this.handleCRONValueSelect, 'days', 'weekdays')}
+          />
+        </div>,
+      ),
+
+      this.renderOption('Specific day(s) of the month', 'monthly', sched, 'days',
+        <div key='m' style={getStyle('margin', '0px -3px')}>
+          <Picker
+            options={this.getCRONOptions(sched, 'days', CRONMonthDayOptionsList)}
+            canEdit={true}
+            onSelect={this._fn(this.handleCRONValueSelect, 'days', 'days')}
+            rowSize={7}
+          />
+        </div>,
+      ),
+    ];
   }
 
   private renderHours()
@@ -246,52 +237,53 @@ class CRONEditor extends TerrainComponent<Props>
     const { cron } = this.props;
     const sched = this.canRenderCRONSchedule() ? parseCRONHourSchedule(cron, true) : null;
 
-    return (
-      <div className='cron-editor-column'>
-        {this.renderHeader('Time')}
-        {this.renderOption('Every minute', 'minute', sched, 'hours')}
-        {this.renderOption('Every hour', 'hourly', sched, 'hours',
-          <div key='h' style={getStyle('margin', '0px -3px')}>
-            <Picker
-              options={this.getCRONOptions(sched, 'minutes', LimitedCRONMinuteOptionsList,
-                LimitedCRONMinuteOptionsNames)}
-              canEdit={true}
-              onSelect={this._fn(this.handleCRONValueSelect, 'hours', 'minutes')}
-              optionWidth={50}
-            />
-          </div>,
-        )}
-        {this.renderOption('Specific hour(s)', 'daily', sched, 'hours',
-          <div key='d' style={getStyle('margin', '0px -3px')}>
-            <Picker
-              options={this.getCRONOptions(sched, 'hours', CRONHourOptionsList, CRONHourNames, false)}
-              canEdit={true}
-              onSelect={this._fn(this.handleCRONValueSelect, 'hours', 'hours')}
-              optionWidth={70}
-            />
-          </div>,
-        )}
-      </div>
-    );
+    return [
+      this.renderHeader('Time'),
+      this.renderOption('Every minute', 'minute', sched, 'hours'),
+      this.renderOption('Every hour', 'hourly', sched, 'hours',
+        <div key='h' style={getStyle('margin', '0px -3px')}>
+          <Picker
+            options={this.getCRONOptions(sched, 'minutes', LimitedCRONMinuteOptionsList,
+              LimitedCRONMinuteOptionsNames)}
+            canEdit={true}
+            onSelect={this._fn(this.handleCRONValueSelect, 'hours', 'minutes')}
+            optionWidth={50}
+          />
+        </div>,
+      ),
+
+      this.renderOption('Specific hour(s)', 'daily', sched, 'hours',
+        <div key='d' style={getStyle('margin', '0px -3px')}>
+          <Picker
+            options={this.getCRONOptions(sched, 'hours', CRONHourOptionsList, CRONHourNames, false)}
+            canEdit={true}
+            onSelect={this._fn(this.handleCRONValueSelect, 'hours', 'hours')}
+            optionWidth={70}
+          />
+        </div>,
+      ),
+    ];
   }
 
   private renderCustom()
   {
-    return (<div
-      className='common-list-option-style'
-      key='c'
-    >
-      <div className='common-option-name-style'>
-        <FloatingInput
-          value={this.props.cron}
-          onChange={this.props.onChange}
-          label={'CRON Schedule'}
-          isTextInput={true}
-          canEdit={true}
-        />
-      </div>
-    </div>
-    );
+    return [
+      this.renderHeader('Custom'),
+      <div
+        className='common-list-option-style'
+        key='c'
+      >
+        <div className='common-option-name-style'>
+          <FloatingInput
+            value={this.props.cron}
+            onChange={this.props.onChange}
+            label={'CRON Schedule'}
+            isTextInput={true}
+            canEdit={true}
+          />
+        </div>
+      </div>,
+    ];
   }
 
   private getCRONOptions(schedule: CRONDaySchedule | CRONHourSchedule, scheduleKey: string, CRONOptions: number[],

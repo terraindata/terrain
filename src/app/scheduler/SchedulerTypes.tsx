@@ -172,6 +172,9 @@ export function scheduleForDatabase(schedule: SchedulerConfig): object
         .updateIn(['params', 'options', 'overrideSinks'], (value) => JSON.stringify(value))
         .updateIn(['params', 'options', 'overrideSources'], (value) => JSON.stringify(value));
     }
+    return task.toJS();
   });
-  return schedule.update('tasks', (value) => JSON.stringify(value)).toJS();
+  const scheduleObj = schedule.set('tasks', JSON.stringify(tasks.toArray())).toJS();
+  console.log('schedule for database is ', scheduleObj);
+  return scheduleObj;
 }

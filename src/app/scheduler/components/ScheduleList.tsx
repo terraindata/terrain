@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-console strict-boolean-expressions no-var-requires
+// tslint:disable:strict-boolean-expressions no-var-requires
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import Colors, { backgroundColor, borderColor, fontColor, getStyle } from 'app/colors/Colors';
 import { ETLActions } from 'app/etl/ETLRedux';
@@ -153,6 +153,7 @@ class ScheduleList extends TerrainComponent<Props>
       name: '',
       tasks: [{
         params: {
+          exit: true,
           options: {
             templateId: -1,
           },
@@ -163,14 +164,13 @@ class ScheduleList extends TerrainComponent<Props>
     };
     this.props.schedulerActions({
       actionType: 'createSchedule',
-      schedule: blankSchedule,
+      schedule: scheduleForDatabase(_SchedulerConfig(blankSchedule)) as SchedulerConfig,
       onLoad: (schedule) => EtlRouteUtil.gotoEditSchedule(schedule.id),
     });
   }
 
   public performAction(action, scheduleId: ID)
   {
-    console.log('perform action  ', action, 'on ', scheduleId);
     this.props.schedulerActions({
       actionType: action,
       scheduleId,
@@ -214,7 +214,6 @@ class ScheduleList extends TerrainComponent<Props>
     return (
       <div
         className='schedule-list-wrapper'
-        style={backgroundColor(Colors().blockBg)}
       >
         <ItemList
           items={scheduleList}

@@ -314,7 +314,7 @@ class ScheduleEditor extends TerrainComponent<Props>
     const { schedule } = this.state;
     this.props.schedulerActions({
       actionType: 'updateSchedule',
-      schedule,
+      schedule: scheduleForDatabase(schedule) as SchedulerConfig,
     });
     // Update route to go back
     this.browserHistory.push('/data/schedules');

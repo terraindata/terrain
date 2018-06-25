@@ -222,7 +222,7 @@ export class TaskTree
       const rootLogStream: LogStream = new LogStream();
       this.tasks.forEach((task, i) =>
       {
-        this.tasks[ind].setRootLogStream(rootLogStream);
+        this.tasks[i].setRootLogStream(rootLogStream);
       });
 
       let ind: number = 0;

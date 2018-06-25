@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console strict-boolean-expressions no-var-requires
 import Colors, { backgroundColor, borderColor, fontColor, getStyle } from 'app/colors/Colors';
+import CheckBox from 'app/common/components/CheckBox';
 import FloatingInput from 'app/common/components/FloatingInput';
 import { ETLActions } from 'app/etl/ETLRedux';
 import { ETLState } from 'app/etl/ETLTypes';
@@ -68,7 +69,6 @@ import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
 import { TaskFormMap } from './TaskBaseClasses';
 import './TaskItemStyle.less';
-import CheckBox from 'app/common/components/CheckBox';
 
 const DeleteIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 const EditableField = (props) =>
@@ -225,21 +225,21 @@ class TaskItem extends TerrainComponent<Props>
             this.renderTaskSettings(task)
           }
         </div>
-       {
-         (task.onSuccess != null || task.onFailure != null) ?       
-         <div
-           className='task-item-settings'
-         >
-           <CheckBox
-             checked={!task.async}
-             onChange={this.handleAsyncChange}
-             disabled={!TerrainTools.isAdmin()}
-             label='Complete task before starting next task'
-           />
-         </div>
-         :
-         null
-       }
+        {
+          (task.onSuccess != null || task.onFailure != null) ?
+            <div
+              className='task-item-settings'
+            >
+              <CheckBox
+                checked={!task.async}
+                onChange={this.handleAsyncChange}
+                disabled={!TerrainTools.isAdmin()}
+                label='Complete task before starting next task'
+              />
+            </div>
+            :
+            null
+        }
         <div
           className='task-item-error'
           onClick={this._fn(this.props.onErrorClick, task.id)}
