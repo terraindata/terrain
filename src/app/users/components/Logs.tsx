@@ -49,11 +49,11 @@ THE SOFTWARE.
 import * as React from 'react';
 import Util from 'util/Util';
 
+import TerrainTools from 'app/util/TerrainTools';
 import { MidwayError } from '../../../../shared/error/MidwayError';
 import Ajax from '../../util/Ajax';
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import TerrainTools from 'app/util/TerrainTools';
 
 import './Logs.less';
 
@@ -122,7 +122,7 @@ class Logs extends TerrainComponent<Props>
             loading: false,
           });
         }
-      }
+      },
     );
   }
 
@@ -140,9 +140,9 @@ class Logs extends TerrainComponent<Props>
     {
       return (
         <div className='logs-error'>
-           <InfoArea large='You need administrator privileges to view console logs.' />
+          <InfoArea large='You need administrator privileges to view console logs.' />
         </div>
-      )
+      );
     }
   }
 
