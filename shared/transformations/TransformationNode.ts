@@ -67,10 +67,52 @@ export default abstract class TransformationNode
     this.meta = options;
   }
 
-  public abstract transform(doc: object): TransformationVisitResult;
+  // override to provide static validation
+  public validate(): string | boolean
+  {
+    return true;
+  }
+
+  // override to customize entire transformation behavior
+  public transform(doc: object): TransformationVisitResult
+  {
+    try {
+      const valid = this.validate();
+      if (valid !== true)
+      {
+        return {
+          errors: [
+            {
+              message: String(valid),
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+
+      return this.transformDocument(doc);
+    }
+    catch (e)
+    {
+      return {
+        errors: [
+          {
+            message: `Error in ${this.typeCode}: String(e)`,
+          } as TransformationVisitError,
+        ],
+      } as TransformationVisitResult;
+    }
+  }
 
   public accept<R, P>(visitor: TransformationNodeVisitor<R, P>, args: P): R
   {
     return visitor.visit(this.typeCode, this, args);
+  }
+
+  // override to specify document transformation behavior
+  protected transformDocument(doc: object): TransformationVisitResult
+  {
+    return {
+      document: doc,
+    };
   }
 }

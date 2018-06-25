@@ -71,35 +71,17 @@ export default abstract class AggregateTransformationType extends Transformation
   // this defines the main behavior of the transformation
   public abstract aggregator(vals: any[]): any;
 
-  // override to provide static validation
-  public validate(): string | boolean
+  protected transformDocument(doc: object): TransformationVisitResult
   {
-    return true;
-  }
-
-  public transform(doc: object): TransformationVisitResult
-  {
+    const errors = [];
     const opts = this.meta as NodeOptionsType<any>;
-
-    const valid = this.validate();
-    if (valid !== true)
-    {
-      return {
-        errors: [
-          {
-            message: String(valid),
-          } as TransformationVisitError,
-        ],
-      } as TransformationVisitResult;
-    }
-
     this.fields.forEach((field) =>
     {
       const el = yadeep.get(doc, field);
 
       if (el === null && this.skipNulls)
       {
-        return undefined;
+        return;
       }
 
       if (Array.isArray(el))
@@ -109,18 +91,13 @@ export default abstract class AggregateTransformationType extends Transformation
       }
       else
       {
-        return {
-          errors: [
-            {
-              message: `Error in ${this.typeCode}: Element is a non-array.`,
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
+        errors.push(`Error in ${this.typeCode}: Expected array but got a(n) ${typeof el}.`);
       }
     });
 
     return {
       document: doc,
+      errors,
     } as TransformationVisitResult;
   }
 }

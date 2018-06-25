@@ -45,57 +45,45 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
+
+const { List, Map } = Immutable;
+
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import { List } from 'immutable';
-
-import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
+
+import CombineTransformationType from 'shared/transformations/types/CombineTransformationType';
 
 const TYPECODE = TransformationNodeType.SumNode;
 
-export class SumTransformationNode extends TransformationNode
+export class SumTransformationNode extends CombineTransformationType
 {
   public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'number';
 
-  public transform(doc: object)
+  public combine(vals: number[]): number
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.SumNode>;
-
-    let sum: number = 0;
-
-    this.fields.forEach((field) =>
+    if (vals.length > 0)
     {
-      const el = yadeep.get(doc, field);
-      if (typeof el === 'number')
+      let sum: number = vals[0];
+      for (let i = 1; i < vals.length; i++)
       {
-        sum += el;
+        sum += vals[i];
       }
-      else
-      {
-        return {
-          errors: [
-            {
-              message: 'Attempted to compute a sum using non-numeric fields (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-    });
-
-    yadeep.set(doc, opts.newFieldKeyPaths.get(0), sum, { create: true });
-
-    return {
-      document: doc,
-    } as TransformationVisitResult;
+      return sum;
+    }
+    else
+    {
+      return null;
+    }
   }
 }
 

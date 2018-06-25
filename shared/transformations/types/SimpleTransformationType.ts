@@ -67,52 +67,38 @@ export default abstract class SimpleTransformationType extends TransformationNod
 {
   // override this to operate on null values
   public readonly skipNulls: boolean = true;
-  // override this to specify that transformed elements must be a certain js type
+  // override this to only operate on a certain js type
   public readonly acceptedType: string;
 
   public abstract transformer(val: any): any;
 
-  // override to provide static validation
-  public validate(): string | boolean
+  protected transformDocument(doc: object): TransformationVisitResult
   {
-    return true;
-  }
+    const errors = [];
+    const result = {
+      document: doc,
+      errors,
+    };
 
-  public transform(doc: object): TransformationVisitResult
-  {
-    const valid = this.validate();
-    if (valid !== true)
-    {
-      return {
-        errors: [
-          {
-            message: String(valid),
-          } as TransformationVisitError,
-        ],
-      } as TransformationVisitResult;
-    }
-
-    return visitHelper(this.fields, doc, { document: doc }, (kp, el) =>
-    {
-      if (el === null && this.skipNulls)
+    return visitHelper(
+      this.fields,
+      doc,
+      result,
+      (kp, el) =>
       {
-        return undefined;
-      }
+        if (el === null && this.skipNulls)
+        {
+          return undefined;
+        }
 
-      if (this.acceptedType !== undefined && typeof el !== this.acceptedType)
-      {
-        return {
-          errors: [
-            {
-              message: `Error in ${this.typeCode}: Element was of type ${typeof el}, but expected ${this.acceptedType}.`,
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
+        if (this.acceptedType !== undefined && typeof el !== this.acceptedType)
+        {
+          errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof el}.`);
+        }
 
-      const newValue = this.transformer(el);
-      yadeep.set(doc, kp, newValue);
-
-    });
+        const newValue = this.transformer(el);
+        yadeep.set(doc, kp, newValue);
+      },
+    );
   }
 }

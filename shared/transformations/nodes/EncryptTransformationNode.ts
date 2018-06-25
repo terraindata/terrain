@@ -45,50 +45,34 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
+
+const { List, Map } = Immutable;
+
+import Encryption, { Keys } from 'shared/encryption/Encryption';
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import { List } from 'immutable';
-
-import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
 
-import Encryption, { Keys } from 'shared/encryption/Encryption';
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
 
 const TYPECODE = TransformationNodeType.EncryptNode;
 
-export class EncryptTransformationNode extends TransformationNode
+export class EncryptTransformationNode extends SimpleTransformationType
 {
   public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'string';
 
-  public transform(doc: object)
+  public transformer(el: string): string
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.EncryptNode>;
-
-    return visitHelper(this.fields, doc, { document: doc }, (kp, el) =>
-    {
-      if (typeof el !== 'string')
-      {
-        return {
-          errors: [
-            {
-              message: 'Attempted to encrypt a non-string (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-      else
-      {
-        yadeep.set(doc, kp, encryptHelper(el));
-      }
-    });
+    return Encryption.encryptStatic(el, Keys.Transformations);
   }
 }
 
@@ -109,9 +93,3 @@ class EncryptTransformationInfoC extends TransformationNodeInfo
 }
 
 export const EncryptTransformationInfo = new EncryptTransformationInfoC();
-
-// use standard AES 128 encryption
-function encryptHelper(msg: string, key?: any): string
-{
-  return Encryption.encryptStatic(msg, Keys.Transformations);
-}

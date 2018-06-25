@@ -45,66 +45,65 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as yadeep from 'shared/util/yadeep';
-
-const { List, Map } = Immutable;
-
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
+import { List } from 'immutable';
+
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
+import * as yadeep from 'shared/util/yadeep';
 
-import CombineTransformationType from 'shared/transformations/types/CombineTransformationType';
-
-const TYPECODE = TransformationNodeType.ProductNode;
-
-export class ProductTransformationNode extends CombineTransformationType
+/*
+ *  Combine Transformations produce a synthetic field out of multiple input fields
+ */
+export default abstract class CombineTransformationType extends TransformationNode
 {
-  public readonly typeCode = TYPECODE;
-  public readonly acceptedType = 'number';
+  // override this to operate on null values
+  public readonly skipNulls: boolean = true;
+  // override this to only operate on a certain js type
+  public readonly acceptedType: string;
 
-  public combine(vals: number[]): number
+  public abstract combine(vals: any[]): any;
+
+  protected transformDocument(doc: object): TransformationVisitResult
   {
-    if (vals.length > 0)
+    const vals = [];
+    const errors = [];
+
+    this.fields.forEach((field) =>
     {
-      let product: number = vals[0];
-      for (let i = 1; i < vals.length; i++)
+      const el = yadeep.get(doc, field);
+
+      if (el === null && this.skipNulls)
       {
-        product *= vals[i];
+        return undefined;
       }
-      return product;
-    }
-    else
-    {
-      return null;
-    }
+
+      if (this.acceptedType !== undefined && typeof el !== this.acceptedType)
+      {
+        errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof el}.`);
+      }
+      else
+      {
+        vals.push(el);
+      }
+    });
+
+    const opts = this.meta as NodeOptionsType<any>;
+    const result = this.combine(vals);
+
+    yadeep.set(doc, opts.newFieldKeyPaths.get(0), result, { create: true });
+
+    return {
+      document: doc,
+      errors,
+    } as TransformationVisitResult;
   }
 }
-
-class ProductTransformationInfoC extends TransformationNodeInfo
-{
-  public readonly typeCode = TYPECODE;
-  public humanName = 'Product of Fields';
-  public description = 'Multiplies two or more fields together and puts the result in a new field';
-  public nodeClass = ProductTransformationNode;
-
-  public editable = false;
-  public creatable = true;
-  public newFieldType = 'number';
-
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    return (
-      EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
-      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
-    );
-  }
-}
-
-export const ProductTransformationInfo = new ProductTransformationInfoC();
