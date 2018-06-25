@@ -49,8 +49,6 @@ import Colors, { backgroundColor, borderColor, fontColor, getStyle } from 'app/c
 import Button from 'app/common/components/Button';
 import CRONEditor from 'app/common/components/CRONEditor';
 import FloatingInput from 'app/common/components/FloatingInput';
-import { ETLActions } from 'app/etl/ETLRedux';
-import { ETLState } from 'app/etl/ETLTypes';
 import TaskItem from 'app/scheduler/components/TaskItem';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
 import
@@ -78,7 +76,6 @@ import
 import SchedulerApi from 'scheduler/SchedulerApi';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
-import XHR from 'util/XHR';
 import './ScheduleEditorStyle';
 const BackIcon = require('images/icon_back?name=BackIcon');
 

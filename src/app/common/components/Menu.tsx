@@ -115,6 +115,9 @@ class Menu extends TerrainComponent<Props & InjectedOnClickOutProps>
         event.preventDefault();
         event.stopPropagation();
         option.onClick(index, this.props.id);
+        this.setState({
+          open: false,
+        });
       };
     }
 
