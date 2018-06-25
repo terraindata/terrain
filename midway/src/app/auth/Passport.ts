@@ -56,10 +56,15 @@ Middleware.passport.use('access-token-local', new passportLocal.Strategy(
     passwordField: 'accessToken',
     usernameField: 'id',
   },
-  async (req: any, id: string, accessToken: string, done) =>
+  (req: any, id: string, accessToken: string, done) =>
   {
-    const user = await users.loginWithAccessToken(Number(id), accessToken);
-    done(null, user);
+    users.loginWithAccessToken(Number(id), accessToken).then((user) =>
+    {
+      done(null, user);
+    }).catch((e) =>
+    {
+      done(e, null);
+    });
   }));
 
 // authenticate with email and password
@@ -68,10 +73,15 @@ Middleware.passport.use('local', new passportLocal.Strategy(
     passReqToCallback: true,
     usernameField: 'email',
   },
-  async (req: any, email: string, password: string, done) =>
+  (req: any, email: string, password: string, done) =>
   {
-    const user = await users.loginWithEmail(email, password);
-    done(null, user);
+    users.loginWithEmail(email, password).then((user) =>
+    {
+      done(null, user);
+    }).catch((e) =>
+    {
+      done(e, null);
+    });
   }));
 
 Middleware.passport.serializeUser((user, done) =>
@@ -82,16 +92,13 @@ Middleware.passport.serializeUser((user, done) =>
   }
 });
 
-Middleware.passport.deserializeUser(async (id: number, done) =>
+Middleware.passport.deserializeUser((id: number, done) =>
 {
-  try
+  users.get(id).then((user) =>
   {
-    const user = await users.get(id);
     done(null, user);
-  }
-  catch (e)
+  }).catch((e) =>
   {
     done(e, null);
-  }
-
+  });
 });

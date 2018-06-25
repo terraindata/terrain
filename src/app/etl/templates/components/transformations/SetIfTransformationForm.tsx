@@ -90,6 +90,11 @@ export class SetIfTFF extends TransformationForm<SetOptions, TransformationNodeT
       group: 'checkboxes',
       widthFactor: 3,
     },
+    invert: {
+      type: DisplayType.CheckBox,
+      displayName: 'Set if NOT',
+      widthFactor: 3,
+    },
     filterValue: {
       type: DisplayType.TextBox,
       displayName: 'Custom Value',
@@ -106,6 +111,7 @@ export class SetIfTFF extends TransformationForm<SetOptions, TransformationNodeT
     filterNaN: false,
     filterStringNull: false,
     filterUndefined: false,
+    invert: false,
     filterValue: '',
     newValue: '',
   };

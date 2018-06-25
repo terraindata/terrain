@@ -179,7 +179,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       {
         return accumulator;
       }
-      if (Array.isArray(el))
+      if (Array.isArray(el) && field.contains(-1))
       {
         for (let i: number = 0; i < el.length; i++)
         {
@@ -860,7 +860,9 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
 
     return TransformationEngineNodeVisitor.visitHelper(node.fields, doc, { document: doc }, (kp, el) =>
     {
-      if (setIfHelper(opts, el))
+      let condition = setIfHelper(opts, el);
+      condition = opts.invert ? !condition : condition;
+      if (condition)
       {
         yadeep.set(doc, kp, opts.newValue, { create: true });
       }
