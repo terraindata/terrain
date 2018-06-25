@@ -573,7 +573,9 @@ class HitsArea extends TerrainComponent<Props>
         large='Querying results...'
       />;
     }
-    else if (!hits)
+
+    // If we have hits, we try to show the `infoAreaContent` on top of last `hits`.
+    if (!hits)
     {
       infoAreaContent = <InfoArea
         large='Compose a query to view results here.'

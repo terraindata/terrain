@@ -110,9 +110,10 @@ export default class ESValueInfo
    */
   private _errors: ESParserError[];
 
-  public constructor()
+  public constructor(type = ESJSONType.unknown, value?)
   {
-    this.jsonType = ESJSONType.unknown;
+    this.jsonType = type;
+    this.value = value;
     this.tokens = [];
     this._errors = [];
     this.parameterValue = null;
