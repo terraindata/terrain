@@ -77,6 +77,8 @@ export class TaskDefaultFailure extends Task
       // TODO: call other functions (needs to wrap in Promise for later)
       taskOutputConfig['options']['outputStream'] = this.taskConfig['params']['options']['inputStreams'][0];
       taskOutputConfig['options']['logStream'] = this.taskConfig['params']['options']['logStream'];
+      this.taskConfig['rootLogStream'].push(null);
+
       resolve(taskOutputConfig);
     });
   }

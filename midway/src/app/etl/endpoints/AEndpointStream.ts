@@ -49,7 +49,7 @@ import { Readable, Writable } from 'stream';
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import IntegrationConfig from '../../integrations/IntegrationConfig';
-import { integrations } from '../../scheduler/SchedulerRouter';
+import { integrations } from '../../integrations/IntegrationRouter';
 
 /**
  * Abstract class for converting a result stream to a string stream for export formatting

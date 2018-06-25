@@ -621,6 +621,7 @@ export default class Templates
     }
     catch (e)
     {
+      console.trace();
       logStream.error(`Failed to execute ETL pipeline: ${String(e)}`);
       throw new Error(`Failed to execute ETL pipeline: ${String(e)}`);
     }

@@ -223,6 +223,7 @@ export class TaskTree
       this.tasks.forEach((task, i) =>
       {
         this.tasks[i].setRootLogStream(rootLogStream);
+        console.log('Task index ', i);
       });
 
       let ind: number = 0;
@@ -269,6 +270,8 @@ export class TaskTree
         }
         result = await taskTreeNode.accept(taskTreeVisitor, this.tasks[ind]);
       }
+      result.rootLogStream = rootLogStream;
+      console.log('returning result from tasktree', result);
       return resolve(result);
     });
   }

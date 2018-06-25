@@ -135,6 +135,8 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
           break;
         case 'Fs':
           endpoint = new FSEndpoint();
+          console.log('endpoint is ', endpoint);
+          console.log('source is ', source);
           sourceStream = await endpoint.getSource(source) as stream.Readable;
           break;
         case 'Mysql':

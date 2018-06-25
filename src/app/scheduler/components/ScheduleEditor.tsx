@@ -162,7 +162,7 @@ class ScheduleEditor extends TerrainComponent<Props>
     let taskMap: Map<ID, TaskConfig> = Map();
     tasks.forEach((task, i) =>
     {
-      taskMap = taskMap.set(task.id, task);      
+      taskMap = taskMap.set(task.id, task);
     });
     return taskMap;
   }
@@ -225,60 +225,74 @@ class ScheduleEditor extends TerrainComponent<Props>
 
   public handleTaskChange(newTask: TaskConfig)
   {
-    const { schedule } = this.state;
-    const index = schedule.tasks.findIndex((task) => task && task.id === newTask.id);
-    let newTasks = this.state.currentTasks;
-    const currentIndex = newTasks.findIndex((task) => task && task.id === newTask.id);
-    if (currentIndex !== -1)
-    {
-      newTasks = newTasks.set(currentIndex, newTask);
-    }
-    this.handleScheduleChange('tasks', schedule.tasks.set(index, newTask), newTasks);
+    this.setState({
+      taskMap: this.state.taskMap.set(newTask.id, newTask),
+    })
+
+    // const { schedule } = this.state;
+    // const index = schedule.tasks.findIndex((task) => task && task.id === newTask.id);
+    // let newTasks = this.state.currentTasks;
+    // const currentIndex = newTasks.findIndex((task) => task && task.id === newTask.id);
+    // if (currentIndex !== -1)
+    // {
+    //   newTasks = newTasks.set(currentIndex, newTask);
+    // }
+    // this.handleScheduleChange('tasks', schedule.tasks.set(index, newTask), newTasks);
   }
 
   public handleTaskDelete(id: ID)
   {
-    let { tasks } = this.state.schedule;
-    const index = tasks.findIndex((task) => task && task.id === id);
-    // Find parent task
-    const parentIndex = tasks.findIndex((task) => task && (
-      task.onFailure === index || task.onSuccess === index));
-    const parentTask = tasks.get(parentIndex);
-    const isFailure = parentTask.onFailure === index;
-    tasks = tasks.set(parentIndex, parentTask.set(isFailure ? 'onFailure' : 'onSuccess', undefined));
-    let newTasks = this.state.currentTasks;
-    const currentIndex = newTasks.findIndex((task) => task && task.id === id);
-    if (currentIndex !== -1)
-    {
-      newTasks = newTasks.slice(0, currentIndex).toList();
-    }
-    // If they deleted the current root task, go back
-    if (id === this.state.rootTasks.last())
-    {
-      this.back(this.state.schedule.set('tasks', tasks));
-    }
-    else
-    {
-      this.handleScheduleChange('tasks', tasks, newTasks);
-    }
+    const { taskMap } = this.state;
+    const [parentKey, parentTask] = taskMap.findEntry((task) => task.onFailure === id || task.onSuccess === id);
+    const key = parentTask.onSuccess === id ? 'onSuccess' : 'onFailure'
+    this.setState({
+      taskMap: taskMap.delete(id).set(parentKey, parentTask.set(key, null)),
+    });
+    // let { tasks } = this.state.schedule;
+    // const index = tasks.findIndex((task) => task && task.id === id);
+    // // Find parent task
+    // const parentIndex = tasks.findIndex((task) => task && (
+    //   task.onFailure === index || task.onSuccess === index));
+    // const parentTask = tasks.get(parentIndex);
+    // const isFailure = parentTask.onFailure === index;
+    // tasks = tasks.set(parentIndex, parentTask.set(isFailure ? 'onFailure' : 'onSuccess', undefined));
+    // let newTasks = this.state.currentTasks;
+    // const currentIndex = newTasks.findIndex((task) => task && task.id === id);
+    // if (currentIndex !== -1)
+    // {
+    //   newTasks = newTasks.slice(0, currentIndex).toList();
+    // }
+    // // If they deleted the current root task, go back
+    // if (id === this.state.rootTasks.last())
+    // {
+    //   this.back(this.state.schedule.set('tasks', tasks));
+    // }
+    // else
+    // {
+    //   this.handleScheduleChange('tasks', tasks, newTasks);
+    // }
   }
+
+  public getVisibleTasks()
 
   public handleAddSuccessTask()
   {
-    const { schedule, currentTasks } = this.state;
-    const { tasks } = schedule;
-    let { task, index } = this.getTaskAndIndexById(tasks, currentTasks.last().get('id'));
-    task = task.set('onSuccess', tasks.size);
-    const newTask = _TaskConfig({
-      id: tasks.size,
-      taskId: TaskEnum.taskETL,
-      type: 'SUCCESS',
-    });
-    this.handleScheduleChange(
-      'tasks',
-      tasks.set(index, task).push(newTask),
-      currentTasks.set(currentTasks.size - 1, task).push(newTask),
-    );
+    // Need to get last task
+    const lastTask = this.getVisibleTasks(this.state.taskMap).last();
+    // const { schedule, currentTasks } = this.state;
+    // const { tasks } = schedule;
+    // let { task, index } = this.getTaskAndIndexById(tasks, currentTasks.last().get('id'));
+    // task = task.set('onSuccess', tasks.size);
+    // const newTask = _TaskConfig({
+    //   id: tasks.size,
+    //   taskId: TaskEnum.taskETL,
+    //   type: 'SUCCESS',
+    // });
+    // this.handleScheduleChange(
+    //   'tasks',
+    //   tasks.set(index, task).push(newTask),
+    //   currentTasks.set(currentTasks.size - 1, task).push(newTask),
+    // );
   }
 
   public handleTaskErrorClick(parentId: ID)
