@@ -136,6 +136,7 @@ export default class EngineUtil
         const fieldTypeErrors = EngineUtil.fieldHasValidType(engine, id);
         if (fieldTypeErrors.length > 0)
         {
+          errors.push(`Errors Encountered with field ${id} (${okp.toJS()})`);
           errors = errors.concat(fieldTypeErrors);
         }
       });

@@ -94,23 +94,18 @@ class FollowUpBossStream extends stream.Writable
     winston.debug('CHUNK');
     winston.debug(JSON.stringify(chunk));
 
-    if (chunk['tags'].indexOf('terrain') === -1)
-    {
-      chunk['tags'].push('terrain');
-    }
-
     if (!isNaN(chunk['FollowUpBossId']))
     {
       // Has valid FollowUpBossId, so do PUT (update)
 
       const formattedChunk = _.omit(chunk, 'FollowUpBossId');
-      if (formattedChunk['tags'] && formattedChunk['tags'].indexOf('terrain') === -1)
-      {
-        formattedChunk['tags'].push('terrain');
-      }
-      else if (!formattedChunk['tags'])
+      if (!formattedChunk['tags'])
       {
         formattedChunk['tags'] = ['terrain'];
+      }
+      else if (formattedChunk['tags'] && formattedChunk['tags'].indexOf('terrain') === -1)
+      {
+        formattedChunk['tags'].push('terrain');
       }
 
       request({
@@ -137,10 +132,21 @@ class FollowUpBossStream extends stream.Writable
     } else
     {
       // No existing ID, so do POST (create)
+
+      const formattedChunk = chunk;
+      if (!formattedChunk['tags'])
+      {
+        formattedChunk['tags'] = ['terrain'];
+      }
+      else if (formattedChunk['tags'] && formattedChunk['tags'].indexOf('terrain') === -1)
+      {
+        formattedChunk['tags'].push('terrain');
+      }
+
       const r = {
         url: 'https://api.followupboss.com/v1/people',
         method: 'POST',
-        json: chunk,
+        json: formattedChunk,
         qs: {
           deduplicate: true,
         },

@@ -42,86 +42,79 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
 
-import * as stream from 'stream';
+const webpack = require('webpack');
+const path = require('path');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const CompressionPlugin = require("compression-webpack-plugin");
+const nodeExternals = require('webpack-node-externals');
 
-import * as Tasty from '../../../../src/tasty/Tasty';
-import DatabaseController from '../../../database/DatabaseController';
-import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
-import CSVTransform from '../streams/CSVTransform';
+const nodeEnv = process.env.NODE_ENV;
+const isProduction = nodeEnv !== 'development';
 
-let tasty: Tasty.Tasty;
-
-export interface MySQLSourceConfig
+module.exports =
 {
-  id: number;
-  tablename: string;
-  query: string;
-}
+  entry: './midway/src/Midway.ts',
 
-export interface MySQLRowConfig
-{
-  rows: object[];
-}
-
-export class MySQL
-{
-
-  public async getQueryAsCSVStream(mysqlRowConfig: MySQLRowConfig | string): Promise<stream.Readable | string>
+  output:
   {
-    return new Promise<stream.Readable | string>(async (resolve, reject) =>
-    {
-      if (typeof mysqlRowConfig === 'string')
-      {
-        return resolve(mysqlRowConfig);
-      }
+    path: __dirname,
+    publicPath: '/assets/',
+    filename: 'bundle.server.js',
+  },
+  externals: [
+    nodeExternals()
+  ],
+  target: 'node',
 
-      const writer = CSVTransform.createExportStream();
-      if ((mysqlRowConfig as MySQLRowConfig).rows.length > 0)
-      {
-        (mysqlRowConfig as MySQLRowConfig).rows.forEach((row) =>
-        {
-          writer.write(row);
-        });
-      }
-      writer.end();
-      resolve(writer);
-    });
-  }
-
-  public async runQuery(mysqlConfig: MySQLSourceConfig): Promise<MySQLRowConfig | string>
+  resolve:
   {
-    return new Promise<MySQLRowConfig | string>(async (resolve, reject) =>
-    {
-      try
-      {
-        const mysqlRowConfig: MySQLRowConfig =
-          {
-            rows: [],
-          };
-        const database: DatabaseController | undefined = DatabaseRegistry.get(mysqlConfig.id);
-        if (database !== undefined)
-        {
-          if (database.getType() !== 'MySQLController')
-          {
-            return resolve('MySQL source requires a MySQL database ID.');
-          }
-          tasty = database.getTasty() as Tasty.Tasty;
-          mysqlRowConfig.rows = await tasty.getDB().execute([mysqlConfig.query]) as object[];
-          resolve(mysqlRowConfig);
-        }
-        else
-        {
-          return resolve('Database not found.');
-        }
-      }
-      catch (e)
-      {
-        resolve((e as any).toString());
-      }
-    });
-  }
-}
+    extensions: ['.ts', '.tsx', '.js'],
+    alias: {
+      shared: path.resolve(__dirname, 'shared'),
+      database: path.resolve(__dirname, 'src/database'),
+    }
+  },
 
-export default MySQL;
+  module:
+  {
+    rules:
+    [
+      // note: this first loader string gets updated in webpack.config.prod.js
+      //  keep it first in this list
+      {
+        test: /\.ts(x?)$/,
+        exclude: [/analytics.js/, /sigint/, /node_modules/, /assets/],
+        loader:
+        'babel-loader!thread-loader!ts-loader?happyPackMode=true'
+        + JSON.stringify({
+          compilerOptions: {
+          },
+        }),
+      },
+    ],
+  },
+
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': {
+      NODE_ENV: JSON.stringify(nodeEnv),
+      },
+    }),
+    new webpack.NamedModulesPlugin()
+  ],
+  optimization: {
+    minimizer: [
+      new UglifyJSPlugin({
+        // sourceMap: true,
+        cache: true,
+        parallel: true,
+        uglifyOptions: {
+          keep_fnames: true,
+        }
+      })
+    ],
+  },
+};
