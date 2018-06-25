@@ -278,14 +278,16 @@ class ElasticClient
     callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
   {
     this.log('scroll', params);
-    this.delegate.scroll(params, callback);
+    this.delegate.scroll(params, this.wrapCallback(callback, (res: Elastic.SearchResponse<T>) =>
+    {
+      res.hits.hits.forEach(this.controller.removeDocIndexPrefix.bind(this.controller));
+    }));
   }
 
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-clearscroll
    */
-  public clearScroll<T>(params: Elastic.ClearScrollParams,
-    callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
+  public clearScroll(params: Elastic.ClearScrollParams, callback: (error: any, response: any) => void): void
   {
     this.log('clearScroll', params);
     this.delegate.clearScroll(params, callback);
