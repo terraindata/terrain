@@ -56,6 +56,8 @@ import
   PostProcessFilterTypes,
   PostProcessOptionsTypes,
   PostProcessParseTypes,
+  PostProcessSortObjectTypes,
+  PostProcessSortTypes,
 } from 'shared/etl/types/PostProcessTypes';
 
 import BufferTransform from '../io/streams/BufferTransform';
@@ -69,7 +71,6 @@ export class PostProcess
 
   public async process(transformConfigs: PostProcessConfig[], dataStreams: stream.Readable[]): Promise<object[]>
   {
-    // [{"name":"aggregate","pattern":"[0-9]{1,}-[0-9]{1,}","primaryKey":"ga:productSku","aggParams":["Item Quantity","Item Revenue"]}]
     return new Promise<object[]>(async (resolve, reject) =>
     {
       const data: object[] = [];
@@ -254,6 +255,55 @@ export class PostProcess
         break;
       default:
     }
+    return returnData;
+  }
+
+  private _sort(options: object, data: object[]): object[]
+  {
+    let returnData: object[] = data.slice();
+    returnData.sort((a, b) =>
+    {
+      let returnValue: number = 0;
+      options['operations'].some((operation: PostProcessSortObjectTypes) =>
+      {
+        const convertToComparableFormat = (value) =>
+        {
+          if (typeof value === 'string')
+          {
+            try
+            {
+              const valueAsDate: Date = new Date(value);
+              if (valueAsDate + '' !== 'Invalid Date')
+              {
+                return valueAsDate.getTime();
+              }
+            }
+            catch (e)
+            {
+              // do nothing
+            }
+          }
+          return value;
+        };
+        const aValue = convertToComparableFormat(a[operation.field]);
+        const bValue = convertToComparableFormat(b[operation.field]);
+        if (aValue === bValue)
+        {
+          return false;
+        }
+
+        switch (operation.sort)
+        {
+          case PostProcessSortTypes.Asc:
+            returnValue = aValue - bValue;
+            break;
+          default:
+            returnValue = bValue - aValue;
+        }
+      });
+      return returnValue;
+    });
+
     return returnData;
   }
 }
