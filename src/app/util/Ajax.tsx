@@ -1002,32 +1002,6 @@ export const Ajax =
       );
     },
 
-    checkLogin(accessToken: string, id: number, onSuccess: () => void, onError: () => void)
-    {
-      Ajax.req(
-        'post',
-        'status/loggedIn',
-        {
-          accessToken,
-          id,
-        },
-        (data: { loggedIn: boolean }) =>
-        {
-          if (data && data.loggedIn)
-          {
-            onSuccess();
-          }
-          else
-          {
-            onError();
-          }
-        },
-        {
-          onError,
-        },
-      );
-    },
-
     logout(accessToken: string, id: number)
     {
       return Ajax.req(

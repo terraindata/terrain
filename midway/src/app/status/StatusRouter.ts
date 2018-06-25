@@ -122,15 +122,4 @@ Router.get('/logs', passport.authenticate('access-token-local'), async (ctx, nex
   ctx.body = (transport as any).getAll();
 });
 
-/**
- * to check if you are correctly logged in
- */
-Router.post('/loggedin', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  ctx.body =
-    {
-      loggedIn: true,
-    };
-});
-
 export default Router;
