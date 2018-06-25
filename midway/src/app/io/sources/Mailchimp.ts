@@ -50,10 +50,7 @@ import jsonStream = require('JSONStream');
 import * as winston from 'winston';
 
 import * as request from 'request';
-import { Integrations } from '../../integrations/Integrations';
 import { ExportSourceConfig } from './Sources';
-
-export const integrations: Integrations = new Integrations();
 
 export interface MailchimpSourceConfig
 {
