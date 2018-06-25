@@ -103,6 +103,7 @@ interface State
   currentTasks: List<TaskConfig>;
   rootTasks: List<number>;
   back: boolean;
+  taskMap: Map<ID, TaskConfig>;
 }
 
 function getScheduleId(params): number
@@ -118,6 +119,7 @@ class ScheduleEditor extends TerrainComponent<Props>
     currentTasks: List(),
     rootTasks: List([0]),
     back: false,
+    taskMap: Map(),
   };
 
   public componentDidMount()
@@ -126,6 +128,7 @@ class ScheduleEditor extends TerrainComponent<Props>
     const schedule = schedules.get(getScheduleId(match.params));
     this.setState({
       schedule,
+      taskMap: schedule ? this.buildTaskMap(schedule.tasks) : Map(),
       currentTasks: schedule ? this.getCurrentTasks(schedule.tasks) : [],
     });
     this.props.schedulerActions({
@@ -146,11 +149,41 @@ class ScheduleEditor extends TerrainComponent<Props>
       const schedule = nextProps.schedules.get(scheduleId);
       this.setState({
         schedule,
+        taskMap: schedule ? this.buildTaskMap(schedule.tasks) : Map(),
         currentTasks: schedule ? this.getCurrentTasks(schedule.tasks) : List(),
         rootTasks: List([0]),
         back: false,
       });
     }
+  }
+
+  public buildTaskMap(tasks: List<TaskConfig>): Map<ID, TaskConfig>
+  {
+    let taskMap: Map<ID, TaskConfig> = Map();
+    tasks.forEach((task, i) =>
+    {
+      taskMap = taskMap.set(task.id, task);      
+    });
+    return taskMap;
+  }
+
+  public taskMapToList(): List<TaskConfig>
+  {
+    const { taskMap } = this.state;
+    const tasks = taskMap.keySeq().map((key) =>
+    {
+      let task = taskMap.get(key);
+      if (task.onSuccess == null && task.onFailure == null)
+      {
+        task = task.setIn(['params', 'options', 'exit'], true);
+      }
+      else
+      {
+        task = task.setIn(['params', 'options', 'exit'], false);
+      }
+      return task;
+    });
+    return tasks.toList();
   }
 
   public getTaskAndIndexById(tasks, id): { task: TaskConfig, index: number }
