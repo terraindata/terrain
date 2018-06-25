@@ -60,44 +60,67 @@ import TransformationVisitResult from 'shared/transformations/TransformationVisi
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
-import AggregateTransformationType from 'shared/transformations/types/AggregateTransformationType';
-
-const TYPECODE = TransformationNodeType.ArraySumNode;
-
-export class ArraySumTransformationNode extends AggregateTransformationType
+/*
+ *  Aggregate Transformations inspect an array and output a synthesized value
+ */
+export default abstract class AggregateTransformationType extends TransformationNode
 {
-  public readonly typeCode = TYPECODE;
+  // override this to operate on null values
+  public readonly skipNulls: boolean = true;
 
-  public aggregator(vals: any[]): any
+  // this defines the main behavior of the transformation
+  public abstract aggregator(vals: any[]): any;
+
+  // override to provide static validation
+  public validate(): string | boolean
   {
-    let sum: number = 0;
-    for (let i: number = 0; i < vals.length; i++)
+    return true;
+  }
+
+  public transform(doc: object): TransformationVisitResult
+  {
+    const opts = this.meta as NodeOptionsType<any>;
+
+    const valid = this.validate();
+    if (valid !== true)
     {
-      sum += vals[i];
+      return {
+        errors: [
+          {
+            message: String(valid),
+          } as TransformationVisitError,
+        ],
+      } as TransformationVisitResult;
     }
-    return sum;
+
+    this.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+
+      if (el === null && this.skipNulls)
+      {
+        return undefined;
+      }
+
+      if (Array.isArray(el))
+      {
+        const aggregate = this.aggregator(el);
+        yadeep.set(doc, opts.newFieldKeyPaths.get(0), aggregate, { create: true });
+      }
+      else
+      {
+        return {
+          errors: [
+            {
+              message: `Error in ${this.typeCode}: Element is a non-array.`,
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
   }
 }
-
-class ArraySumTransformationInfoC extends TransformationNodeInfo
-{
-  public readonly typeCode = TYPECODE;
-  public humanName = 'Array Sum';
-  public description = 'Sum the entries of an array';
-  public nodeClass = ArraySumTransformationNode;
-
-  public editable = false;
-  public creatable = true;
-  public newFieldType = 'number';
-
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    return (
-      EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
-      EngineUtil.getValueType(fieldId, engine) === 'number' &&
-      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
-    );
-  }
-}
-
-export const ArraySumTransformationInfo = new ArraySumTransformationInfoC();

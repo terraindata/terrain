@@ -60,6 +60,9 @@ import TransformationVisitResult from 'shared/transformations/TransformationVisi
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
+/*
+ *  Simple Transformations mutate a value of a document in-place
+ */
 export default abstract class SimpleTransformationType extends TransformationNode
 {
   // override this to operate on null values

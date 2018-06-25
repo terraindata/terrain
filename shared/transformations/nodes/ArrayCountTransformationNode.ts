@@ -60,38 +60,17 @@ import TransformationVisitResult from 'shared/transformations/TransformationVisi
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
+import AggregateTransformationType from 'shared/transformations/types/AggregateTransformationType';
+
 const TYPECODE = TransformationNodeType.ArrayCountNode;
 
-export class ArrayCountTransformationNode extends TransformationNode
+export class ArrayCountTransformationNode extends AggregateTransformationType
 {
   public readonly typeCode = TYPECODE;
 
-  public transform(doc: object)
+  public aggregator(vals: any[]): number
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.ArrayCountNode>;
-
-    this.fields.forEach((field) =>
-    {
-      const el = yadeep.get(doc, field);
-      if (Array.isArray(el))
-      {
-        yadeep.set(doc, opts.newFieldKeyPaths.get(0), el.length, { create: true });
-      }
-      else
-      {
-        return {
-          errors: [
-            {
-              message: 'Attempted to count a non-array (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-    });
-
-    return {
-      document: doc,
-    } as TransformationVisitResult;
+    return vals.length;
   }
 }
 
