@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import TransformationNode from './nodes/TransformationNode';
+import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
 
 export type VisitorFn<ReturnT, ArgsT = any> = (type: TransformationNodeType, node?: TransformationNode, args?: ArgsT) => ReturnT;

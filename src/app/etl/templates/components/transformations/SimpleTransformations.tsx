@@ -58,9 +58,10 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
+import { CaseFormats, caseFormatToReadable, availableCases } from 'shared/transformations/nodes/CaseTransformationNode';
 
 import { DynamicForm } from 'common/components/DynamicForm';
-import { CaseFormats, ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 import * as Immutable from 'immutable';
@@ -104,9 +105,9 @@ export class CaseTFF extends TransformationForm<CaseOptions, TransformationNodeT
       type: DisplayType.Pick,
       displayName: 'Format',
       options: {
-        pickOptions: (s) => List<string>(Object.keys(CaseFormats)),
-        indexResolver: (value) => List<string>(Object.keys(CaseFormats)).indexOf(value),
-        displayNames: (s) => Map<string, string>(_.zipObject(Object.keys(CaseFormats), _.values(CaseFormats))),
+        pickOptions: (s) => availableCases,
+        indexResolver: (value) => availableCases.indexOf(value),
+        displayNames: (s) => caseFormatToReadable,
       },
     },
   };

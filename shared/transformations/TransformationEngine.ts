@@ -54,7 +54,7 @@ import { KeyPath, keyPathPrefixMatch, updateKeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 // import * as winston from 'winston'; // TODO what to do for error logging?
 import DataStore from './DataStore';
-import TransformationNode from './nodes/TransformationNode';
+import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationEngineNodeVisitor from './TransformationEngineNodeVisitor';
 import TransformationNodeType from './TransformationNodeType';
 import TransformationRegistry from './TransformationRegistry';

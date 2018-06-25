@@ -45,32 +45,29 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { List } from 'immutable';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import TransformationNode from 'shared/transformations/TransformationNode';
 
-import { KeyPath } from '../../util/KeyPath';
-
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNodeVisitor from '../TransformationNodeVisitor';
-import TransformationVisitError from '../TransformationVisitError';
-import TransformationVisitResult from '../TransformationVisitResult';
-
-export default abstract class TransformationNode
+export default abstract class TransformationNodeInfo
 {
-  public id: number;
   public abstract typeCode: TransformationNodeType;
-  public fields: List<KeyPath>;
-  public meta: object;
 
-  public constructor(id: number, fields: List<KeyPath>, options: object = {})
+  public abstract humanName: string;
+  public abstract description: string;
+  public abstract nodeClass: { new(...args: any[]): TransformationNode };
+
+  public editable: boolean = false;
+  public creatable: boolean = false;
+  public newFieldType: string = 'string';
+
+  public isAvailable(engine: TransformationEngine, fieldId: number): boolean
   {
-    this.id = id;
-    this.fields = fields;
-    this.meta = options;
+    return false;
   }
 
-  public abstract transform(doc: object): TransformationVisitResult;
-
-  public accept<R, P>(visitor: TransformationNodeVisitor<R, P>, args: P): R
+  public shortSummary(meta: object): string
   {
-    return visitor.visit(this.typeCode, this, args);
+    return this.humanName;
   }
 }

@@ -48,9 +48,10 @@ THE SOFTWARE.
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
-import TransformationNodeInfo from './info/TransformationNodeInfo';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
 
 import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -58,64 +59,69 @@ import TransformationVisitError from 'shared/transformations/TransformationVisit
 import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
-import TransformationNode from './TransformationNode';
+import TransformationNode from 'shared/transformations/TransformationNode';
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
 
 import * as _ from 'lodash';
 
 const TYPECODE = TransformationNodeType.CaseNode;
 
-export class CaseTransformationNode extends TransformationNode
+export enum CaseFormats
+{
+  uppercase = 'uppercase',
+  lowercase = 'lowercase',
+  titlecase = 'titlecase',
+  camelcase = 'camelcase',
+  pascalcase = 'pascalcase',
+}
+
+export const caseFormatToReadable = Immutable.Map<string, string>({
+  [CaseFormats.uppercase]: 'Uppercase',
+  [CaseFormats.lowercase]: 'lowercase',
+  [CaseFormats.titlecase]: 'Title Case',
+  [CaseFormats.camelcase]: 'camelCase',
+  [CaseFormats.pascalcase]: 'PascalCase',
+});
+
+export const availableCases = List(caseFormatToReadable.keys());
+
+export class CaseTransformationNode extends SimpleTransformationType
 {
   public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'string';
 
-  public transform(doc: object)
+  public validate(): string | boolean
   {
     const opts = this.meta as NodeOptionsType<TransformationNodeType.CaseNode>;
-
-    return visitHelper(this.fields, doc, { document: doc }, (kp, el) =>
+    if (!caseFormatToReadable.has(opts.format))
     {
-      if (typeof el !== 'string')
-      {
-        return {
-          errors: [
-            {
-              message: 'Attempted to change the case of a non-string field (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-      else
-      {
-        switch (opts.format)
-        {
-          case 'uppercase':
-            yadeep.set(doc, kp, el.toUpperCase());
-            break;
-          case 'lowercase':
-            yadeep.set(doc, kp, el.toLowerCase());
-            break;
-          case 'titlecase':
-            yadeep.set(doc, kp, el.toLowerCase().replace(/[^\s_\-/]*/g, (word) =>
-              word.replace(/./, (ch) => ch.toUpperCase()),
-            ));
-            break;
-          case 'camelcase':
-            yadeep.set(doc, kp, _.camelCase(el));
-            break;
-          case 'pascalcase':
-            yadeep.set(doc, kp, _.upperFirst(_.camelCase(el)));
-            break;
-          default:
-            return {
-              errors: [
-                {
-                  message: 'Unknown case format specified',
-                } as TransformationVisitError,
-              ],
-            } as TransformationVisitResult;
-        }
-      }
-    });
+      return 'Unknown case format specified';
+    }
+    else
+    {
+      return true;
+    }
+  }
+
+  public transformer(el: string): string
+  {
+    const opts = this.meta as NodeOptionsType<TransformationNodeType.CaseNode>;
+    switch (opts.format)
+    {
+      case CaseFormats.uppercase:
+        return el.toUpperCase();
+      case CaseFormats.lowercase:
+        return el.toLowerCase();
+      case CaseFormats.titlecase:
+        return el.toLowerCase().replace(/[^\s_\-/]*/g, (word) =>
+          word.replace(/./, (ch) => ch.toUpperCase()));
+      case CaseFormats.camelcase:
+        return _.camelCase(el);
+      case CaseFormats.pascalcase:
+        return _.upperFirst(_.camelCase(el));
+      default:
+        return el;
+    }
   }
 }
 

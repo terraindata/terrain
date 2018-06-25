@@ -48,7 +48,7 @@ THE SOFTWARE.
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
-import TransformationNodeInfo from './info/TransformationNodeInfo';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 
 import { List } from 'immutable';
 
@@ -58,35 +58,20 @@ import TransformationVisitError from 'shared/transformations/TransformationVisit
 import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
-import TransformationNode from './TransformationNode';
+import TransformationNode from 'shared/transformations/TransformationNode';
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
 
 const TYPECODE = TransformationNodeType.AddNode;
 
-export class AddTransformationNode extends TransformationNode
+export class AddTransformationNode extends SimpleTransformationType
 {
   public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'number';
 
-  public transform(doc: object)
+  public transformer(el: number): number
   {
     const opts = this.meta as NodeOptionsType<TransformationNodeType.AddNode>;
-
-    return visitHelper(this.fields, doc, { document: doc }, (kp, el) =>
-    {
-      if (typeof el !== 'number')
-      {
-        return {
-          errors: [
-            {
-              message: 'Attempted to add to a non-numeric (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-      else
-      {
-        yadeep.set(doc, kp, el + opts.shift);
-      }
-    });
+    return el + opts.shift;
   }
 }
 

@@ -43,31 +43,65 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 
 import { List } from 'immutable';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationNode from '../TransformationNode';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import { KeyPath } from 'shared/util/KeyPath';
+import * as yadeep from 'shared/util/yadeep';
+import TransformationNode from 'shared/transformations/TransformationNode';
 
-export default abstract class TransformationNodeInfo
+export default abstract class SimpleTransformationType extends TransformationNode
 {
-  public abstract typeCode: TransformationNodeType;
+  public readonly acceptedType: string;
 
-  public abstract humanName: string;
-  public abstract description: string;
-  public abstract nodeClass: { new(...args: any[]): TransformationNode };
+  public abstract transformer(val: any): any;
 
-  public editable: boolean = false;
-  public creatable: boolean = false;
-  public newFieldType: string = 'string';
-
-  public isAvailable(engine: TransformationEngine, fieldId: number): boolean
+  // override to provide static validation
+  public validate(): string | boolean
   {
-    return false;
+    return true;
   }
 
-  public shortSummary(meta: object): string
+  public transform(doc: object): TransformationVisitResult
   {
-    return this.humanName;
+    const valid = this.validate();
+    if (valid !== true)
+    {
+      return {
+        errors: [
+          {
+            message: String(valid),
+          } as TransformationVisitError,
+        ],
+      } as TransformationVisitResult;
+    }
+
+    return visitHelper(this.fields, doc, { document: doc }, (kp, el) =>
+    {
+      if (this.acceptedType !== undefined && typeof el !== this.acceptedType)
+      {
+        return {
+          errors: [
+            {
+              message: `Error in ${this.typeCode}: Element was of type ${typeof el}, but expected ${this.acceptedType}.`,
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+
+      const newValue = this.transformer(el);
+      yadeep.set(doc, kp, newValue);
+
+    });
   }
 }

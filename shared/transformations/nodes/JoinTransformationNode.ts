@@ -47,7 +47,7 @@ THE SOFTWARE.
 
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
-import TransformationNodeInfo from './info/TransformationNodeInfo';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 
 import { List } from 'immutable';
 
@@ -57,7 +57,7 @@ import TransformationVisitError from 'shared/transformations/TransformationVisit
 import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
-import TransformationNode from './TransformationNode';
+import TransformationNode from 'shared/transformations/TransformationNode';
 
 const TYPECODE = TransformationNodeType.JoinNode;
 

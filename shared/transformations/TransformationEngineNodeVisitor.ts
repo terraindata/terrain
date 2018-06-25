@@ -48,7 +48,7 @@ import * as _ from 'lodash';
 import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 
-import TransformationNode from './nodes/TransformationNode';
+import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from './TransformationNodeType';
 import TransformationNodeVisitor, { VisitorLookupMap } from './TransformationNodeVisitor';
 import TransformationVisitError from './TransformationVisitError';

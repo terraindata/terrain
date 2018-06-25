@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 // import { KeyPath } from '../../util/KeyPath';
 // import TransformationNodeType from '../TransformationNodeType';
-// import TransformationNode from './TransformationNode';
+// import TransformationNode from 'shared/transformations/TransformationNode';
 
 // export default class FilterTransformationNode extends TransformationNode
 // {
