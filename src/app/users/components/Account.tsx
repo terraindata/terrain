@@ -57,6 +57,7 @@ import './Account.less';
 import ConnectionEditorPage from 'app/connections/components/ConnectionEditorPage';
 import Connections from 'app/connections/components/Connections';
 import EditProfile from './EditProfile';
+import Logs from './Logs';
 import Notifications from './Notifications';
 import Profile from './Profile';
 import Settings from './Settings';
@@ -77,6 +78,7 @@ class Account extends TerrainComponent<Props>
     { key: 'profile', label: 'Profile' },
     { key: 'connections', label: 'Connections' },
     { key: 'team', label: 'Team' },
+    { key: 'logs', label: 'Logs' },
   ];
 
   public tabToRouteMap = {
@@ -84,6 +86,7 @@ class Account extends TerrainComponent<Props>
     profile: '/account/profile',
     connections: '/account/connections',
     team: '/account/team',
+    logs: '/account/logs',
   };
 
   public render()
@@ -109,6 +112,7 @@ class Account extends TerrainComponent<Props>
                 <Route exact path='/account/connections/edit' component={ConnectionEditorPage} />
                 <Route exact path='/account/connections/edit/connectionId=:connectionId' component={ConnectionEditorPage} />
                 <Route exact path='/account/team' component={Team} />
+                <Route exact path='/account/logs' component={Logs} />
               </Switch>
             </div>
           </TerrainTabs>
