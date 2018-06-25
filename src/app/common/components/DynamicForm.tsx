@@ -81,7 +81,7 @@ export interface Props<FState>
 {
   inputMap: InputDeclarationMap<FState>; // inputMap is memoized, so be careful about changing its properties on the fly!
   inputState: FState;
-  onStateChange: (newState: FState, blur?: boolean) => void;
+  onStateChange: (newState: FState, blur?: boolean) => void;  
   mainButton?: ButtonOptions; // active styling by default
   secondButton?: ButtonOptions; // buttons are rendered from right to left
   thirdButton?: ButtonOptions;
@@ -90,6 +90,7 @@ export interface Props<FState>
   children?: any; // children get rendered between the buttons and the form components
   centerForm?: boolean; // if true, the form content gets centered in the container
   validate?: (state: FState) => string | undefined; // return a string if there's an error
+  onTextInputEnter?: () => void;
 }
 // if we want to allow immutable state objects, add an optional state mutator to each input declaration type
 
@@ -158,6 +159,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
           debounce={options.debounce}
+          onEnter={this.props.onTextInputEnter}
         />
       </div>
     );
@@ -181,6 +183,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
           debounce={options.debounce}
+          onEnter={this.props.onTextInputEnter}
         />
       </div>
     );
