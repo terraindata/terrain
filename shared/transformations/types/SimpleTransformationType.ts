@@ -62,6 +62,9 @@ import * as yadeep from 'shared/util/yadeep';
 
 export default abstract class SimpleTransformationType extends TransformationNode
 {
+  // override this to operate on null values
+  public readonly skipNulls: boolean = true;
+  // override this to specify that transformed elements must be a certain js type
   public readonly acceptedType: string;
 
   public abstract transformer(val: any): any;
@@ -88,6 +91,11 @@ export default abstract class SimpleTransformationType extends TransformationNod
 
     return visitHelper(this.fields, doc, { document: doc }, (kp, el) =>
     {
+      if (el === null && this.skipNulls)
+      {
+        return undefined;
+      }
+
       if (this.acceptedType !== undefined && typeof el !== this.acceptedType)
       {
         return {
