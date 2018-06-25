@@ -68,6 +68,7 @@ import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
 import { TaskFormMap } from './TaskBaseClasses';
 import './TaskItemStyle.less';
+import CheckBox from 'app/common/components/CheckBox';
 
 const DeleteIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 const EditableField = (props) =>
@@ -155,6 +156,11 @@ class TaskItem extends TerrainComponent<Props>
     );
   }
 
+  public handleAsyncChange()
+  {
+    this.props.onTaskChange(this.props.task.set('async', !this.props.task.async));
+  }
+
   public render()
   {
     const { task, type } = this.props;
@@ -219,6 +225,21 @@ class TaskItem extends TerrainComponent<Props>
             this.renderTaskSettings(task)
           }
         </div>
+       {
+         (task.onSuccess != null || task.onFailure != null) ?       
+         <div
+           className='task-item-settings'
+         >
+           <CheckBox
+             checked={!task.async}
+             onChange={this.handleAsyncChange}
+             disabled={!TerrainTools.isAdmin()}
+             label='Complete task before starting next task'
+           />
+         </div>
+         :
+         null
+       }
         <div
           className='task-item-error'
           onClick={this._fn(this.props.onErrorClick, task.id)}

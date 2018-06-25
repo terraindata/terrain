@@ -329,6 +329,10 @@ class ScheduleEditor extends TerrainComponent<Props>
   // Compute header for tasks section, listing out the current levels of tasks by name or id
   public computeHeader(taskList: List<number>): string
   {
+    if (taskList.size === 1)
+    {
+      return 'Task';
+    }
     let header: string = '';
     taskList.forEach((taskId, index) =>
     {
@@ -350,7 +354,7 @@ class ScheduleEditor extends TerrainComponent<Props>
         header += ' > ';
       }
     });
-    return header;
+    return 'Tasks: ' + header;
   }
 
   // Schedule name and interval config
@@ -512,7 +516,7 @@ class ScheduleEditor extends TerrainComponent<Props>
             this.renderColumn('Schedule', this.renderScheduleInfo())
           }
           {
-            this.renderColumn('Tasks: ' + tasksHeader, this.renderTasks(this.state.currentTasks))
+            this.renderColumn(tasksHeader, this.renderTasks(this.state.currentTasks))
           }
         </div>
         {
