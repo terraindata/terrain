@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires switch-default
+// tslint:disable:no-var-requires switch-default strict-boolean-expressions
 
 import * as classNames from 'classnames';
 import * as React from 'react';
