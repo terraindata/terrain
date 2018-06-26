@@ -55,7 +55,7 @@ const Router = new KoaRouter();
 const integrations: Integrations = new Integrations();
 export const initialize = () => integrations.initialize();
 
-Router.post('/bug', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const fullBody = ctx.request.body.body;
   const description = JSON.stringify(fullBody.description);

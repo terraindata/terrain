@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
@@ -90,7 +90,7 @@ export interface Props
   allowOverflow?: boolean;
   closeOnConfirm?: boolean;
   className?: string;
-  noFooterPadding?: boolean; // TODO: find better way
+  noFooterPadding?: boolean; 
   inputClassName?: string;
   descriptionValue?: string;
 }
@@ -110,10 +110,6 @@ class PopUpForm extends TerrainComponent<Props>
       style: { background: Colors().altScrollbarPiece },
     });
   }
-
-  // ::-webkit-scrollbar-thumb {
-  //   background: rgba(0, 0, 0, 0.15);
-  // }
 
   public closeModalSuccess()
   {
@@ -140,6 +136,14 @@ class PopUpForm extends TerrainComponent<Props>
     if (this.props.onTextboxValueChange)
     {
       this.props.onTextboxValueChange(evt.target.value);
+      // if (this.props.isBug)
+      // {
+      //   this.props.bugDescription = evt.target.value;
+      // }
+      // else 
+      // {
+      //   this.props.feedbackDescription = evt.target.value;
+      // }
     }
   }
 
@@ -188,7 +192,7 @@ class PopUpForm extends TerrainComponent<Props>
             appElement={document.getElementById('app')}
             contentLabel={''}
             isOpen={true}
-            overlayClassName='modal-overlay'
+            overlayClassName='popupform-overlay'
             style={
               {
                 content: getStyle('boxShadow', `0px 0px 5px 2px ${Colors().boxShadow}`),
@@ -197,17 +201,17 @@ class PopUpForm extends TerrainComponent<Props>
             className={'dead-center-flex-wrapper'}
           >
             <div className={classNames({
-              'modal-content': true,
-              'modal-content-wide': false,
-              'modal-content-fill': false,
-              'modal-content-allow-overflow': this.props.allowOverflow,
+              'popupform-content': true,
+              'popupform-content-wide': false,
+              'popupform-content-fill': false,
+              'popupform-content-allow-overflow': this.props.allowOverflow,
               [this.props.className]: (this.props.className !== '' && this.props.className !== undefined),
             })}>
               <div
                 className={classNames({
-                  'modal-dialog': true,
-                  'modal-dialog-no-footer': !this.props.confirm,
-                  'modal-dialog-no-footer-padding': this.props.noFooterPadding,
+                  'popupform-dialog': true,
+                  'popupform-dialog-no-footer': !this.props.confirm,
+                  'popupform-dialog-no-footer-padding': this.props.noFooterPadding,
                 })}
                 style={[
                   fontColor(Colors().altText1),
@@ -216,8 +220,8 @@ class PopUpForm extends TerrainComponent<Props>
               >
                 <div
                   className={classNames({
-                    'modal-title': true,
-                    'modal-title-error': this.props.error,
+                    'popupform-title': true,
+                    'popupform-title-error': this.props.error,
                   })}
                   style={[
                     fontColor('ffffff'),
@@ -233,7 +237,7 @@ class PopUpForm extends TerrainComponent<Props>
                       null
                   }
                   <div
-                    className='modal-title-inner'
+                    className='popupform-title-inner'
                   >
                     {
                       this.props.title ? this.props.title : defaultTitle
@@ -242,7 +246,7 @@ class PopUpForm extends TerrainComponent<Props>
                   {
                     !this.props.confirm &&
                     <CloseIcon
-                      className='modal-close-x'
+                      className='popupform-close-x'
                       onClick={this.props.onClose}
                     />
                   }
@@ -272,14 +276,14 @@ class PopUpForm extends TerrainComponent<Props>
                   )
                 }
                 {
-                  <div className='description'> {this.props.descriptionValue}
+                  <div className='popupform-description'> {this.props.descriptionValue}
                   </div>
                 }
                 {
                   this.props.showTextbox &&
                   <textarea
                     className={classNames({
-                      'standard-input': true,
+                      'popupform-standard-input': true,
                       [this.props.inputClassName]: this.props.inputClassName !== undefined && this.props.inputClassName !== '',
                     })}
                     placeholder={this.props.textboxPlaceholderValue}
@@ -309,7 +313,7 @@ class PopUpForm extends TerrainComponent<Props>
                 {
                   this.props.confirm &&
                   <div
-                    className='modal-buttons'
+                    className='popupform-modal-buttons'
                     style={[
                       fontColor(Colors().altText1),
                     ]}

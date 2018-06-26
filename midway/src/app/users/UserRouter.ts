@@ -69,9 +69,6 @@ Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next
   ctx.body = await users.select(['email', 'id', 'isDisabled', 'isSuperUser', 'name', 'timezone', 'meta'], { id: ctx.params.id });
 });
 
-Router.post('/bug', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-});
 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
