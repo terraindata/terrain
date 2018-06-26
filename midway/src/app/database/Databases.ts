@@ -181,7 +181,7 @@ export class Databases
     return schema.toString();
   }
 
-  public async status(id?: number, removeProtectedDSN: boolean = false): Promise<Array<DatabaseConfig & string> | DatabaseConfig>
+  public async status(id?: number, removeProtectedDSN: boolean = true): Promise<Array<DatabaseConfig & string> | DatabaseConfig>
   {
     if (id !== undefined)
     {

@@ -90,6 +90,8 @@ beforeAll(async (done) =>
             isAnalytics: true,
             analyticsIndex: 'terrain-analytics',
             analyticsType: 'events',
+            indexPrefix: 'abc.',
+            isProtected: true,
           },
           {
             name: 'MySQL Test Connection',
@@ -97,6 +99,7 @@ beforeAll(async (done) =>
             dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:63306/moviesdb',
             host: '127.0.0.1:63306',
             isAnalytics: false,
+            isProtected: false,
           },
         ],
       };
@@ -145,9 +148,19 @@ beforeAll(async (done) =>
         'type',
       ],
     );
-    await DB.getDB().execute(
-      DB.getDB().generate(new Tasty.Query(itemTable).upsert(items)),
-    );
+    try
+    {
+      await DB.getDB().execute(
+        DB.getDB().generate(new Tasty.Query(itemTable).upsert(items)),
+      );
+    }
+    catch (e)
+    {
+      if (e.toString() !== 'error: conflicting key value violates exclusion constraint "unique_item_names"')
+      {
+        throw e;
+      }
+    }
 
     const versions = [
       {
@@ -869,9 +882,9 @@ describe('Query route tests', () =>
                 "query" : {
                   "bool" : {
                     "filter": [
+                      { "term": {"_index" : "movies"} },
                       { "term": {"movieid" : @movie.movieid} },
-                      { "match": {"_index" : "movies"} },
-                      { "match": {"_type" : "data"} }
+                      { "term": {"_type" : "data"} }
                     ]
                   }
                 }
@@ -945,8 +958,8 @@ describe('Query route tests', () =>
                 "query" : {
                   "bool": {
                     "filter": [
-                      { "match": {"_index" : "movies"} },
-                      { "match": {"_type" : "data"} }
+                      { "term": {"_index" : "movies"} },
+                      { "term": {"_type" : "data"} }
                     ],
                     "must_not": [
                       { "term": { "budget": 0 } },
@@ -1116,8 +1129,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: defaultUserAccessToken,
         database: 1,
-        start: new Date(2018, 2, 16, 7, 24, 4),
-        end: new Date(2018, 2, 16, 7, 36, 4),
+        start: new Date(2018, 6, 20, 7, 24, 4),
+        end: new Date(2018, 6, 20, 7, 36, 4),
         eventname: 'impression',
         algorithmid: 'bestMovies3',
         agg: 'select',
@@ -1131,7 +1144,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['bestMovies3'].length).toEqual(4);
+        expect(respData['bestMovies3'].length).toEqual(5);
       });
   });
 
@@ -1143,8 +1156,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: defaultUserAccessToken,
         database: 1,
-        start: new Date(2018, 2, 16, 7, 24, 4),
-        end: new Date(2018, 2, 16, 7, 36, 4),
+        start: new Date(2018, 6, 20, 7, 24, 4),
+        end: new Date(2018, 6, 20, 7, 36, 4),
         eventname: 'impression',
         algorithmid: 'bestMovies3',
         agg: 'histogram',
@@ -1159,7 +1172,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['bestMovies3'].length).toEqual(8);
+        expect(respData['bestMovies3'].length).toEqual(5);
       });
   });
 
@@ -1171,8 +1184,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: defaultUserAccessToken,
         database: 1,
-        start: new Date(2018, 3, 3, 7, 24, 4),
-        end: new Date(2018, 3, 3, 10, 24, 4),
+        start: new Date(2018, 6, 20, 7, 24, 4),
+        end: new Date(2018, 6, 20, 10, 24, 4),
         eventname: 'click,impression',
         algorithmid: 'bestMovies3',
         agg: 'rate',

@@ -73,7 +73,7 @@ beforeAll(async () =>
       hosts: ['http://localhost:9200'],
     };
 
-    elasticController = new ElasticController(config, 0, 'ElasticExecutorTest');
+    elasticController = new ElasticController(config, 0, 'ElasticExecutorTest', undefined, undefined, 'abc.');
     elasticDB = elasticController.getTasty().getDB() as ElasticDB;
   }
   catch (e)

@@ -67,7 +67,7 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
 Router.get('/status/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting all databases (with their statuses)');
-  ctx.body = await databases.status(ctx.params.id, true);
+  ctx.body = await databases.status(ctx.params.id);
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>

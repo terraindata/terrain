@@ -63,7 +63,7 @@ beforeAll(() =>
     hosts: ['http://localhost:9200'],
   };
 
-  elasticController = new ElasticController(config, 0, 'ElasticWriterTests');
+  elasticController = new ElasticController(config, 0, 'ElasticWriterTests', undefined, undefined, 'abc.');
   elasticClient = elasticController.getClient();
 });
 
