@@ -83,6 +83,7 @@ export interface Props
   hasPhoto: boolean;
   columnNum: number;
   onChange: (value: any) => void;
+  canEdit: boolean;
 }
 
 export default class Section extends TerrainComponent<Props>
@@ -393,7 +394,7 @@ export default class Section extends TerrainComponent<Props>
       >
         <div className='section-header-bar'>
           <div className='section-header'>{this.props.sectionTitle}</div>
-          {this.state.isEditing ? this.renderCancelAndSaveButtons() : this.renderEditButton()}
+          {this.props.canEdit ? (this.state.isEditing ? this.renderCancelAndSaveButtons() : this.renderEditButton()) : null}
         </div>
         {
           <FadeInOut

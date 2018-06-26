@@ -778,6 +778,7 @@ class Settings extends TerrainComponent<Props>
           hasPhoto={true}
           columnNum={2}
           onChange={this.updateUserInfo}
+          canEdit={true}
         />
         <Section
           user={currentUser}
@@ -794,6 +795,7 @@ class Settings extends TerrainComponent<Props>
           hasPhoto={false}
           columnNum={0}
           onChange={this.updateUserPassword}
+          canEdit={true}
         />
         <Section
           user={currentUser}
@@ -810,6 +812,7 @@ class Settings extends TerrainComponent<Props>
           hasPhoto={false}
           columnNum={0}
           onChange={this.updateUserInfo}
+          canEdit={true}
         />
         <Modal
           message={this.state.modalMessage}
