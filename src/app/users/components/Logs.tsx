@@ -42,86 +42,133 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
 
-import * as stream from 'stream';
+// tslint:disable:strict-boolean-expressions no-unused-expression
 
-import * as Tasty from '../../../../src/tasty/Tasty';
-import DatabaseController from '../../../database/DatabaseController';
-import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
-import CSVTransform from '../streams/CSVTransform';
+import AnsiUp from 'ansi_up';
+import * as React from 'react';
+import Util from 'util/Util';
 
-let tasty: Tasty.Tasty;
+import TerrainTools from 'app/util/TerrainTools';
+import { MidwayError } from '../../../../shared/error/MidwayError';
+import Ajax from '../../util/Ajax';
+import InfoArea from './../../common/components/InfoArea';
+import TerrainComponent from './../../common/components/TerrainComponent';
 
-export interface MySQLSourceConfig
+import './Logs.less';
+
+const AU = new AnsiUp();
+
+export interface Props
 {
-  id: number;
-  tablename: string;
-  query: string;
+  params?: any;
+  history?: any;
+  children?: any;
 }
 
-export interface MySQLRowConfig
+interface State
 {
-  rows: object[];
+  loading: boolean;
+  logs: string;
 }
 
-export class MySQL
+class Logs extends TerrainComponent<Props>
 {
+  public state: State = {
+    loading: false,
+    logs: '',
+  };
 
-  public async getQueryAsCSVStream(mysqlRowConfig: MySQLRowConfig | string): Promise<stream.Readable | string>
+  public componentDidMount()
   {
-    return new Promise<stream.Readable | string>(async (resolve, reject) =>
-    {
-      if (typeof mysqlRowConfig === 'string')
-      {
-        return resolve(mysqlRowConfig);
-      }
-
-      const writer = CSVTransform.createExportStream();
-      if ((mysqlRowConfig as MySQLRowConfig).rows.length > 0)
-      {
-        (mysqlRowConfig as MySQLRowConfig).rows.forEach((row) =>
-        {
-          writer.write(row);
-        });
-      }
-      writer.end();
-      resolve(writer);
-    });
+    this.fetchLogs();
   }
 
-  public async runQuery(mysqlConfig: MySQLSourceConfig): Promise<MySQLRowConfig | string>
+  public fetchLogs()
   {
-    return new Promise<MySQLRowConfig | string>(async (resolve, reject) =>
+    if (!TerrainTools.isAdmin())
     {
-      try
+      return;
+    }
+
+    this.setState({
+      loading: true,
+    });
+    const log = Ajax.getLogs(
+      (logs) =>
       {
-        const mysqlRowConfig: MySQLRowConfig =
-          {
-            rows: [],
-          };
-        const database: DatabaseController | undefined = DatabaseRegistry.get(mysqlConfig.id);
-        if (database !== undefined)
+        if (this.state.loading)
         {
-          if (database.getType() !== 'MySQLController')
+          this.setState({
+            logs,
+            loading: false,
+          });
+        }
+      },
+      (error) =>
+      {
+        let readable;
+        try
+        {
+          readable = MidwayError.fromJSON(error as any).getDetail();
+        }
+        catch {
+          readable = error;
+        }
+        if (this.state.loading)
+        {
+          this.setState({
+            logs: readable,
+            loading: false,
+          });
+        }
+      },
+    );
+  }
+
+  public renderLogs()
+  {
+    if (TerrainTools.isAdmin())
+    {
+      return (
+        <div className='logs-area' dangerouslySetInnerHTML={{ __html: AU.ansi_to_html(this.state.logs) }} />
+      );
+    }
+    else
+    {
+      return (
+        <div className='logs-error'>
+          <InfoArea large='You need administrator privileges to view console logs.' />
+        </div>
+      );
+    }
+  }
+
+  public render()
+  {
+    const loading = this.state.loading;
+    return (
+      <div>
+        <div className='logs'>
+          <div className='logs-page-title'>
+            Console Logs
+          </div>
           {
-            return resolve('MySQL source requires a MySQL database ID.');
+            loading &&
+            <InfoArea large='Loading...' />
           }
-          tasty = database.getTasty() as Tasty.Tasty;
-          mysqlRowConfig.rows = await tasty.getDB().execute([mysqlConfig.query]) as object[];
-          resolve(mysqlRowConfig);
-        }
-        else
-        {
-          return resolve('Database not found.');
-        }
-      }
-      catch (e)
-      {
-        resolve((e as any).toString());
-      }
-    });
+          {
+            !loading && this.renderLogs()
+          }
+        </div>
+      </div>
+    );
   }
 }
 
-export default MySQL;
+export default Util.createContainer(
+  Logs,
+  [],
+  {},
+);

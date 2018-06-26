@@ -115,6 +115,13 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
 
   public shouldComponentUpdate(nextProps, nextState)
   {
+    // check if this field no longer exists
+    const currentEngine = getCurrentEngine(nextProps);
+    if (currentEngine == null || currentEngine.getOutputKeyPath(nextProps.fieldId) === undefined)
+    {
+      return false;
+    }
+
     // check state
     if (!compareObjects(this.state, nextState))
     {

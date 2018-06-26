@@ -49,6 +49,7 @@ import * as KoaRouter from 'koa-router';
 import * as os from 'os';
 import * as process from 'process';
 import * as v8 from 'v8';
+import * as winston from 'winston';
 
 import appStats from '../AppStats';
 import { databases } from '../database/DatabaseRouter';
@@ -115,15 +116,17 @@ Router.get('/stats', passport.authenticate('access-token-local'), async (ctx, ne
   };
 });
 
-/**
- * to check if you are correctly logged in
- */
-Router.post('/loggedin', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/logs', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body =
-    {
-      loggedIn: true,
-    };
+  if (ctx.state.user.isSuperUser)
+  {
+    const transport = winston['default'].transports['MemoryTransport'];
+    ctx.body = (transport as any).getAll();
+  }
+  else
+  {
+    ctx.throw(403, 'Only admins are allowed to view console logs.');
+  }
 });
 
 export default Router;
