@@ -434,18 +434,7 @@ class App extends TerrainComponent<Props>
     {
       this.handleLoginLoadComplete();
     }
-  }
-
-  public componentDidMount()
-  {
-    console.log(this.props.auth.accessToken);
-    this.fetchData();
-
-    if (document.getElementById('login-submit'))
-    {
-      document.getElementById('login-submit').innerHTML = 'Loading Your Data';
-    }
-
+    
     if (this.props.location.pathname !== nextProps.location.pathname)
     {
       if (window['dataLayer'] !== undefined)
@@ -456,6 +445,16 @@ class App extends TerrainComponent<Props>
     }
   }
 
+  public componentDidMount()
+  {
+    this.fetchData();
+
+    if (document.getElementById('login-submit'))
+    {
+      document.getElementById('login-submit').innerHTML = 'Loading Your Data';
+    }
+  }
+  
   public fetchData()
   {
     this.props.userActions({
@@ -484,6 +483,7 @@ class App extends TerrainComponent<Props>
     {
       document.getElementById('login-submit').innerHTML = 'Done!';
     }
+    
     const loginEl = document.getElementById('login');
     if (loginEl)
     {
