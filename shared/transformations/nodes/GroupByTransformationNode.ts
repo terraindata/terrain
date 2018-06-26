@@ -45,30 +45,30 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
+
+const { List, Map } = Immutable;
+
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import { List } from 'immutable';
-
-import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
-import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
 
-import * as _ from 'lodash';
+import ForkTransformationType, { OutputField } from 'shared/transformations/types/ForkTransformationType';
 
 const TYPECODE = TransformationNodeType.GroupByNode;
 
-export class GroupByTransformationNode extends TransformationNode
+export class GroupByTransformationNode extends ForkTransformationType
 {
   public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'array';
 
-  public transform(doc: object)
+  public split(el: any[]): OutputField[]
   {
     const opts = this.meta as NodeOptionsType<TransformationNodeType.GroupByNode>;
 
@@ -86,43 +86,27 @@ export class GroupByTransformationNode extends TransformationNode
       outputs[opts.groupValues[i]] = [];
     }
 
-    this.fields.forEach((field) =>
+    for (let i: number = 0; i < el.length; i++)
     {
-      const el = yadeep.get(doc, field);
-      if (Array.isArray(el))
+      const objToGroup = el[i];
+      const groupValue = objToGroup[opts.subkey];
+      if (outputs[groupValue] !== undefined)
       {
-        // let count: number = 0;
-        for (let i: number = 0; i < el.length; i++)
-        {
-          const objToGroup = el[i];
-          const groupValue = objToGroup[opts.subkey];
-          if (outputs[groupValue] !== undefined)
-          {
-            outputs[groupValue].push(_.cloneDeep(objToGroup));
-          }
-        }
-        for (const key of Object.keys(mapper))
-        {
-          const kpi = mapper[key];
-          const arr = outputs[key];
-          yadeep.set(doc, kpi, arr, { create: true });
-        }
+        outputs[groupValue].push(_.cloneDeep(objToGroup));
       }
-      else
-      {
-        return {
-          errors: [
-            {
-              message: 'Attempted to group on a non-array (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-    });
+    }
 
-    return {
-      document: doc,
-    } as TransformationVisitResult;
+    const outputFields = [];
+    for (const key of Object.keys(mapper))
+    {
+      const kpi = mapper[key];
+      const arr = outputs[key];
+      outputFields.push({
+        kp: kpi,
+        value: arr,
+      });
+    }
+    return outputFields;
   }
 }
 

@@ -1128,3 +1128,17 @@ test('transform a zipcode', () =>
   expect(r['zip7']).toBe('MILITARY');
   expect(r['zip8']).toBe(null);
 });
+
+test('simple transformation on deep array', () => {
+  const e = new TransformationEngine();
+  e.addField(KeyPath(['numbers']), 'array');
+  e.addField(KeyPath(['numbers', -1]), 'array');
+  e.addField(KeyPath(['numbers', -1, -1]), 'array');
+  e.appendTransformation(TransformationNodeType.AddNode, List([KeyPath(['numbers', -1, -1])]), { shift: 1});
+  const r = e.transform(TestDocs.doc10);
+  expect(r['numbers']).toEqual([
+    [2, 3, 4],
+    [5, 6, 7],
+    [8, 9, 10],
+  ]);
+});

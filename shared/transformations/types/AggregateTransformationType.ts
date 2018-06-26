@@ -62,6 +62,7 @@ import * as yadeep from 'shared/util/yadeep';
 
 /*
  *  Aggregate Transformations inspect an array and output a synthesized value
+ *  Currently acceptedType is not supported
  */
 export default abstract class AggregateTransformationType extends TransformationNode
 {

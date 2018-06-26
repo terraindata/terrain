@@ -67,8 +67,6 @@ export default abstract class SimpleTransformationType extends TransformationNod
 {
   // override this to operate on null values
   public readonly skipNulls: boolean = true;
-  // override this to only operate on a certain js type
-  public readonly acceptedType: string;
 
   public abstract transformer(val: any): any;
 
@@ -91,7 +89,7 @@ export default abstract class SimpleTransformationType extends TransformationNod
           return undefined;
         }
 
-        if (this.acceptedType !== undefined && typeof el !== this.acceptedType)
+        if (!this.checkType(el))
         {
           errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof el}.`);
         }

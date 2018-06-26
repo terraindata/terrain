@@ -44,105 +44,46 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
-import { List } from 'immutable';
 
-import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
-import TransformationNode from 'shared/transformations/TransformationNode';
-import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
-import { KeyPath } from 'shared/util/KeyPath';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as yadeep from 'shared/util/yadeep';
 
+const { List, Map } = Immutable;
+
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath } from 'shared/util/KeyPath';
+
+import ForkTransformationType, { OutputField } from 'shared/transformations/types/ForkTransformationType';
+
 const TYPECODE = TransformationNodeType.SplitNode;
 
-export class SplitTransformationNode extends TransformationNode
+export class SplitTransformationNode extends ForkTransformationType
 {
   public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'string';
 
-  public transform(doc: object)
+  public split(el: string): OutputField[]
   {
     const opts = this.meta as NodeOptionsType<TransformationNodeType.SplitNode>;
 
-    if (this.fields.size > 1)
+    const split = splitHelper(el, opts);
+    const outputFields = [];
+
+    for (let i = 0; i < opts.newFieldKeyPaths.size; i++)
     {
-      return {
-        errors: [
-          {
-            message: 'Attempted to split multiple fields at once (this is not supported)',
-          } as TransformationVisitError,
-        ],
-      } as TransformationVisitResult;
+      outputFields.push({
+        value: split[i],
+        kp: opts.newFieldKeyPaths.get(i),
+      });
     }
 
-    this.fields.forEach((field) =>
-    {
-      const el: any = yadeep.get(doc, field);
-      if (el === undefined)
-      {
-        return;
-      }
-      let split: string[];
-      if (el.constructor === Array)
-      {
-        for (let i: number = 0; i < Object.keys(el).length; i++)
-        {
-          let kpi: KeyPath = field;
-          if (kpi.contains(-1))
-          {
-            kpi = kpi.set(kpi.indexOf(-1), i.toString());
-          }
-          else
-          {
-            kpi = kpi.push(i.toString());
-          }
-
-          split = splitHelper(yadeep.get(doc, kpi), opts);
-
-          for (let j: number = 0; j < split.length; j++)
-          {
-            let newkpi: KeyPath = opts.newFieldKeyPaths.get(j);
-            if (newkpi.contains(-1))
-            {
-              newkpi = newkpi.set(newkpi.indexOf(-1), i.toString());
-            }
-            else
-            {
-              newkpi = newkpi.push(i.toString());
-            }
-            yadeep.set(doc, newkpi, split[j], { create: true });
-          }
-        }
-      }
-      if (typeof el !== 'string')
-      {
-        return {
-          errors: [
-            {
-              message: 'Attempted to split a non-string field (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-
-      split = splitHelper(el, opts);
-      if (split.length > opts.newFieldKeyPaths.size)
-      {
-        split[opts.newFieldKeyPaths.size - 1] = split.slice(opts.newFieldKeyPaths.size - 1).join(String(opts.delimiter));
-      }
-      for (let i: number = 0; i < opts.newFieldKeyPaths.size; i++)
-      {
-        yadeep.set(doc, opts.newFieldKeyPaths.get(i), split[i], { create: true });
-      }
-    });
-
-    return {
-      document: doc,
-    } as TransformationVisitResult;
+    return outputFields;
   }
 }
 

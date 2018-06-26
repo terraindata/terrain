@@ -43,77 +43,70 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 
-export const TestDocs = {
-  doc1: {
-    name: 'Bob',
-    age: 17,
-    meta: {
-      school: 'Stanford',
-    },
-  },
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-  doc2: {
-    name: 'Bob',
-    age: 17,
-    meta: {
-      school: 'Stanford',
-      sport: 'bobsled',
-    },
-  },
+import { List } from 'immutable';
 
-  doc3: {
-    name: 'Bob',
-    arr: ['sled', [{ a: 'dog' }, { a: 'fren', b: 'doggo' }]],
-    // arr2: [{foo: {bar: {cat: 'a'}}}],
-    // arr2: [[{foo: 'a', bar: 'b'}], [{foo: 'c'}]],
-    hardarr: [['a'], ['b', ['c']]],
-  },
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationNode from 'shared/transformations/TransformationNode';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import { KeyPath } from 'shared/util/KeyPath';
+import * as yadeep from 'shared/util/yadeep';
 
-  doc4: {
-    arr: ['a', 'b'],
-  },
+export interface OutputField
+{
+  kp: KeyPath;
+  value: any;
+}
 
-  doc5: {
-    arr: ['a', 'b', 'c', 'd'],
-  },
+/*
+ *  Fork Transformations produce multiple synthetic field out of a single input field
+ */
+export default abstract class ForkTransformationType extends TransformationNode
+{
+  // override this to operate on null values
+  public readonly skipNulls: boolean = true;
 
-  doc6: {
-    value: null,
-  },
+  public abstract split(val: any): OutputField[];
 
-  doc7: {
-    deepArray:
-      [
-        [
-          5,
-        ],
-        [
-          6,
-        ],
-      ],
-  },
+  protected transformDocument(doc: object): TransformationVisitResult
+  {
+    const errors = [];
+    const opts = this.meta as NodeOptionsType<any>;
+    this.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
 
-  doc8: {
-    t: '1',
-    f: '',
-    tb: true,
-    fb: false,
-  },
+      if (el === null && this.skipNulls)
+      {
+        return;
+      }
 
-  doc9: {
-    name: 'Bob',
-    age: '17 years',
-    meta: {
-      school: 'Stanford',
-    },
-  },
+      if (!this.checkType(el))
+      {
+        errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof el}.`);
+      }
+      else
+      {
+        const newValues = this.split(el);
 
-  doc10: {
-    numbers: [
-      [1, 2, 3],
-      [4, 5, 6],
-      [7, 8, 9],
-    ],
-  },
-};
+        for (const newValue of newValues)
+        {
+          yadeep.set(doc, newValue.kp, newValue.value, { create: true });
+        }
+      }
+    });
+
+    return {
+      document: doc,
+      errors,
+    } as TransformationVisitResult;
+  }
+}

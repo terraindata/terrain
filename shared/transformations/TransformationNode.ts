@@ -60,6 +60,9 @@ export default abstract class TransformationNode
   public fields: List<KeyPath>;
   public meta: object;
 
+  // override this to only operate on a certain js type
+  public readonly acceptedType: string;
+
   public constructor(id: number, fields: List<KeyPath>, options: object = {})
   {
     this.id = id;
@@ -115,5 +118,21 @@ export default abstract class TransformationNode
     return {
       document: doc,
     };
+  }
+
+  protected checkType(value: any): boolean
+  {
+    if (this.acceptedType !== undefined)
+    {
+      if (this.acceptedType === 'array')
+      {
+        return Array.isArray(value);
+      }
+      else
+      {
+        return typeof value === this.acceptedType;
+      }
+    }
+    return true;
   }
 }
