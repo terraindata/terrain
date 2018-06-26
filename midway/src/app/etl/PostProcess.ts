@@ -217,22 +217,20 @@ export class PostProcess
         {
           const newRow = _.cloneDeep(row);
           const parsedClicks = queryString.parseUrl(newRow[options['field']]);
-          const parsedClicksUrl = parsedClicks['url'];
-          const parsedClicksQuery = parsedClicks['query'];
-          const domainName = options['url'];
-          let parsedClicksUrlArr = [];
-          try
-          {
-            parsedClicksUrlArr = parsedClicksUrl.substring(parsedClicksUrl.indexOf(domainName) + domainName.length).split('/').filter((token) => token.length !== 0);
-          }
-          catch (e)
-          {
-            // do nothing
-          }
-          if (parsedClicksUrlArr.length !== 0)
-          {
-            newRow[options['field']] = parsedClicksQuery;
-          }
+          // const parsedClicksUrl = parsedClicks['url'];
+          // const parsedClicksQuery = parsedClicks['query'];
+          // const domainName = options['url'];
+          // let parsedClicksUrlArr = [];
+          // try
+          // {
+          //   parsedClicksUrlArr = parsedClicksUrl.substring(parsedClicksUrl.indexOf(domainName)
+          //     + domainName.length).split('/').filter((token) => token.length !== 0);
+          // }
+          // catch (e)
+          // {
+          //   // do nothing
+          // }
+          newRow[options['field']] = parsedClicks;
 
           returnData.push(newRow);
         });
@@ -242,6 +240,7 @@ export class PostProcess
     return returnData;
   }
 
+  // filter out objects by primary key matching a regex pattern
   private _filter(options: object, data: object[]): object[]
   {
     let returnData: object[] = [];
@@ -258,51 +257,52 @@ export class PostProcess
     return returnData;
   }
 
+  // let's ignore this sort function for now...
   private _sort(options: object, data: object[]): object[]
   {
-    let returnData: object[] = data.slice();
-    returnData.sort((a, b) =>
-    {
-      let returnValue: number = 0;
-      options['operations'].some((operation: PostProcessSortObjectTypes) =>
-      {
-        const convertToComparableFormat = (value) =>
-        {
-          if (typeof value === 'string')
-          {
-            try
-            {
-              const valueAsDate: Date = new Date(value);
-              if (valueAsDate + '' !== 'Invalid Date')
-              {
-                return valueAsDate.getTime();
-              }
-            }
-            catch (e)
-            {
-              // do nothing
-            }
-          }
-          return value;
-        };
-        const aValue = convertToComparableFormat(a[operation.field]);
-        const bValue = convertToComparableFormat(b[operation.field]);
-        if (aValue === bValue)
-        {
-          return false;
-        }
+    const returnData: object[] = data.slice();
+    // returnData.sort((a, b) =>
+    // {
+    //   let returnValue: number = 0;
+    //   options['operations'].some((operation: PostProcessSortObjectTypes) =>
+    //   {
+    //     const convertToComparableFormat = (value) =>
+    //     {
+    //       if (typeof value === 'string')
+    //       {
+    //         try
+    //         {
+    //           const valueAsDate: Date = new Date(value);
+    //           if (valueAsDate + '' !== 'Invalid Date')
+    //           {
+    //             return valueAsDate.getTime();
+    //           }
+    //         }
+    //         catch (e)
+    //         {
+    //           // do nothing
+    //         }
+    //       }
+    //       return value;
+    //     };
+    //     const aValue = convertToComparableFormat(a[operation.field]);
+    //     const bValue = convertToComparableFormat(b[operation.field]);
+    //     if (aValue === bValue)
+    //     {
+    //       return false;
+    //     }
 
-        switch (operation.sort)
-        {
-          case PostProcessSortTypes.Asc:
-            returnValue = aValue - bValue;
-            break;
-          default:
-            returnValue = bValue - aValue;
-        }
-      });
-      return returnValue;
-    });
+    //     switch (operation.sort)
+    //     {
+    //       case PostProcessSortTypes.Asc:
+    //         returnValue = aValue - bValue;
+    //         break;
+    //       default:
+    //         returnValue = bValue - aValue;
+    //     }
+    //   });
+    //   return returnValue;
+    // });
 
     return returnData;
   }
