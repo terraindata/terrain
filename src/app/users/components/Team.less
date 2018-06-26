@@ -1,7 +1,21 @@
 @import "../../common/Common.less";
 
-.team {
+.team-main-container {
   width: 100%;
+  text-align: center;
+
+  .profile-block {
+    min-width: 360px;
+  }
+
+  .user-thumbnail {
+    .user-thumnail-image {
+      width: 80px;
+      height: 80px;
+      border-radius: 6px;
+      margin-right: 50px;
+    }
+  }
 
   .team-row {
     color: @grey;
@@ -102,4 +116,5 @@
     text-transform: uppercase;
     margin-bottom: 20px;
     margin-left: 10px;
+    text-align: left;
   }

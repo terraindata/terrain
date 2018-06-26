@@ -46,8 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions no-unused-expression
 
+import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import { AuthState } from 'auth/AuthTypes';
 import { Colors, fontColor } from 'colors/Colors';
+import { List } from 'immutable';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import Util from 'util/Util';
@@ -58,8 +60,10 @@ import InfoArea from './../../common/components/InfoArea';
 import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import { UserActions as Actions } from './../data/UserRedux';
+import Section from './AccountSection';
 import './Team.less';
 import UserThumbnail from './UserThumbnail';
+
 type User = UserTypes.User;
 type UserMap = UserTypes.UserMap;
 
@@ -104,80 +108,80 @@ class Team extends TerrainComponent<Props>
     this.unsub && this.unsub();
   }
 
-  public renderUser(user: User)
-  {
-    if (user.isDisabled && !this.state.showDisabledUsers)
-    {
-      return null;
-    }
+  // public renderUser(user: User)
+  // {
+  //   if (user.isDisabled && !this.state.showDisabledUsers)
+  //   {
+  //     return null;
+  //   }
 
-    return (
-      <Link to={`/users/${user.id}`} className='team-link' key={user.id}>
-        <div className='team-row'>
-          <div>
-            <UserThumbnail
-              large={true}
-              userId={user.id}
-              square={true}
-            />
-          </div>
-          <div className='team-item-names'>
-            <div className='team-name'>
-              {
-                user.name
-              }
-            </div>
-            <div className='team-role'>
-              {
-                user.isDisabled ? <b>Disabled</b> : user.whatIDo
-              }
-            </div>
-          </div>
-          <div className='team-item-info'>
-            {
-              !!user.phone &&
-              <div className='team-item-info-row'>
-                <div className='team-item-info-label'>
-                  Phone Number
-                  </div>
-                <div className='team-item-info-value'>
-                  {
-                    user.phone
-                  }
-                </div>
-              </div>
-            }
-            {
-              !!user.email &&
-              <div className='team-item-info-row'>
-                <div className='team-item-info-label'>
-                  Email
-                  </div>
-                <div className='team-item-info-value'>
-                  {
-                    user.email
-                  }
-                </div>
-              </div>
-            }
-            {
-              !!user.skype &&
-              <div className='team-item-info-row'>
-                <div className='team-item-info-label'>
-                  Skype
-                  </div>
-                <div className='team-item-info-value'>
-                  {
-                    user.skype
-                  }
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-      </Link>
-    );
-  }
+  //   return (
+  //     <Link to={`/users/${user.id}`} className='team-link' key={user.id}>
+  //       <div className='team-row'>
+  //         <div>
+  //           <UserThumbnail
+  //             large={true}
+  //             userId={user.id}
+  //             square={true}
+  //           />
+  //         </div>
+  //         <div className='team-item-names'>
+  //           <div className='team-name'>
+  //             {
+  //               user.name
+  //             }
+  //           </div>
+  //           <div className='team-role'>
+  //             {
+  //               user.isDisabled ? <b>Disabled</b> : user.whatIDo
+  //             }
+  //           </div>
+  //         </div>
+  //         <div className='team-item-info'>
+  //           {
+  //             !!user.phone &&
+  //             <div className='team-item-info-row'>
+  //               <div className='team-item-info-label'>
+  //                 Phone Number
+  //                 </div>
+  //               <div className='team-item-info-value'>
+  //                 {
+  //                   user.phone
+  //                 }
+  //               </div>
+  //             </div>
+  //           }
+  //           {
+  //             !!user.email &&
+  //             <div className='team-item-info-row'>
+  //               <div className='team-item-info-label'>
+  //                 Email
+  //                 </div>
+  //               <div className='team-item-info-value'>
+  //                 {
+  //                   user.email
+  //                 }
+  //               </div>
+  //             </div>
+  //           }
+  //           {
+  //             !!user.skype &&
+  //             <div className='team-item-info-row'>
+  //               <div className='team-item-info-label'>
+  //                 Skype
+  //                 </div>
+  //               <div className='team-item-info-value'>
+  //                 {
+  //                   user.skype
+  //                 }
+  //               </div>
+  //             </div>
+  //           }
+  //         </div>
+  //       </div>
+  //     </Link>
+  //   );
+  // }
 
   public toggleAddingUser()
   {
@@ -208,11 +212,13 @@ class Team extends TerrainComponent<Props>
     );
   }
 
-  public createNewUser()
+  public createNewUser(editingSections)
   {
-    const email: string = this.refs['newEmail']['value'];
-    const password: string = this.refs['newPassword']['value'];
-    const confirmPassword: string = this.refs['confirmPassword']['value'];
+    const name: string = editingSections.name;
+    const email: string = editingSections.newEmail;
+    const password: string = editingSections.newPassword;
+    const confirmPassword: string = editingSections.confirmPassword;
+    // console.log(name + ' ' + email + ' ' + password + ' ' + confirmPassword);
 
     const emailCheck = email.length >= 5 && email.indexOf('@') > 0;
     if (!emailCheck)
@@ -252,9 +258,10 @@ class Team extends TerrainComponent<Props>
       return;
     }
 
-    this.refs['newEmail']['value'] = '';
-    this.refs['newPassword']['value'] = '';
-    this.refs['confirmPassword']['value'] = '';
+    editingSections = {};
+    // this.refs['newEmail']['value'] = '';
+    // this.refs['newPassword']['value'] = '';
+    // this.refs['confirmPassword']['value'] = '';
     this.setState({
       addingUser: false,
     });
@@ -273,7 +280,7 @@ class Team extends TerrainComponent<Props>
       });
   }
 
-  public renderAddUser()
+  /*public renderAddUser()
   {
     const userId = this.props.auth.id;
     const user = this.props.users.getIn(['users', userId]) as User;
@@ -324,6 +331,51 @@ class Team extends TerrainComponent<Props>
       );
     }
     return null;
+  }*/
+
+  public newRenderAddUser()
+  {
+    const userId = this.props.auth.id;
+    const user = this.props.users.getIn(['users', userId]) as User;
+
+    if (user && user.isSuperUser)
+    {
+      if (this.state.addingUser)
+      {
+        return (
+          <Section
+            isEditing={true}
+            sectionTitle='Create New User'
+            sectionType='password'
+            sectionBoxes={
+              List([
+                { key: 'name', header: 'Name', info: '', type: 'Input' },
+                { key: 'newEmail', header: 'Email', info: '', type: 'Input' },
+                { key: 'newPassword', header: 'Temporary Password', info: '', type: 'Password' },
+                { key: 'confirmPassword', header: 'Confirm Password', info: '', type: 'Password' },
+              ])
+            }
+            hasPhoto={false}
+            columnNum={0}
+            onChange={this.createNewUser}
+            onCancel={this.toggleAddingUser}
+            canEdit={true}
+            canDisable={false}
+            addingUser={true}
+          />
+        );
+      }
+
+      return (
+        <PathfinderCreateLine
+          text='Create new user'
+          canEdit={true}
+          onCreate={this.toggleAddingUser}
+          showText={true}
+        />
+      );
+    }
+    return null;
   }
 
   public toggleErrorModal()
@@ -333,11 +385,65 @@ class Team extends TerrainComponent<Props>
     });
   }
 
+  public disableUser(user, editingSections)
+  {
+    user.isDisabled = editingSections.isDisabled;
+  }
+
+  public newRenderUser(user: User)
+  {
+    if (user.isDisabled && !this.state.showDisabledUsers)
+    {
+      return null;
+    }
+
+    return (
+      <Section
+        user={user.id}
+        key={user.id}
+        sectionTitle={user.name}
+        sectionType='profile'
+        sectionBoxes={
+          List([
+            // { key: '', header: '', info: <UserThumbnail largest={true} userId={user.id} square={true} />, type: 'Image'}
+            { key: 'email', header: 'Email', info: user.email, type: 'Text' },
+            { key: 'phone', header: 'Phone', info: user.phone, type: 'Text' },
+            { key: 'skype', header: 'Skype', info: user.name, type: 'Text' },
+          ])
+        }
+        hasPhoto={true}
+        userImage={<UserThumbnail large={true} userId={user.id} square={true} />}
+        columnNum={0}
+        onChange={this._fn(this.disableUser, user)}
+        canEdit={false}
+        canDisable={true}
+        addingUser={false}
+      />
+    );
+  }
+
   public render()
   {
     const { users, loading } = this.props.users;
 
     return (
+      <div className='team-main-container'>
+        <div className='team-page-title' style={{ color: Colors().mainSectionTitle }}>
+          Team Directory
+        </div>
+        {users && users.toArray().map(this.newRenderUser)}
+        {this.newRenderAddUser()}
+        {this.renderShowDisabledUsers()}
+        <Modal
+          message={this.state.errorModalMessage}
+          onClose={this.toggleErrorModal}
+          open={this.state.errorModalOpen}
+          error={true}
+        />
+      </div>
+    );
+
+    /*return (
       <div>
         <div className='team'>
           <div className='team-page-title' style={{ color: Colors().mainSectionTitle }}>
@@ -358,7 +464,7 @@ class Team extends TerrainComponent<Props>
           error={true}
         />
       </div>
-    );
+    );*/
   }
 }
 

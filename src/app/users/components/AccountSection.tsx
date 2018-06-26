@@ -77,13 +77,19 @@ const moment = require('moment-timezone');
 export interface Props
 {
   user?: any;
+  key?: any;
+  isEditing?: boolean;
   sectionTitle: string;
   sectionType: string;
   sectionBoxes: List<any>;
   hasPhoto: boolean;
+  userImage?: any;
   columnNum: number;
   onChange: (value: any) => void;
+  onCancel?: () => void;
   canEdit: boolean;
+  canDisable: boolean;
+  addingUser: boolean;
 }
 
 export default class Section extends TerrainComponent<Props>
@@ -93,7 +99,8 @@ export default class Section extends TerrainComponent<Props>
     super(props);
 
     this.state = {
-      isEditing: false,
+      isEditing: this.props.isEditing,
+      isDisabled: false,
       sections: this.props.sectionBoxes,
       editingSections: {},
       errorModalOpen: false,
@@ -200,6 +207,12 @@ export default class Section extends TerrainComponent<Props>
     {
       return (
         <div className='section-body' style={{ background: Colors().bg }}>
+          {this.props.hasPhoto &&
+            <div
+              className='icon-pic'
+            >
+              {this.props.userImage}
+            </div>}
           {this.renderBlocks(this.props.sectionBoxes, 'no-column', 1)}
         </div>
       );
@@ -217,7 +230,7 @@ export default class Section extends TerrainComponent<Props>
 
       return (
         <div className='section-body' style={{ background: Colors().bg }}>
-          {this.props.hasPhoto ?
+          {this.props.hasPhoto &&
             <div
               className='profile-pic'
               onClick={this.handleProfilePicChange}
@@ -226,7 +239,7 @@ export default class Section extends TerrainComponent<Props>
                 cursor: (this.state.isEditing) ? 'pointer' : 'default',
               }}>
               {this.renderSelectProfilePicture()}
-            </div> : null}
+            </div>}
           <div className='profile-text'>
             {columns.map((col, i) => this.renderBlocks(col, 'profile-col', i))}
           </div>
@@ -269,6 +282,7 @@ export default class Section extends TerrainComponent<Props>
         return (
           <input
             className='profile-input'
+            ref={block.key}
             id={block.header}
             type='text'
             onChange={this._fn(this.handleInputEdit, block)}
@@ -280,6 +294,7 @@ export default class Section extends TerrainComponent<Props>
       case 'Password':
         return (
           <input
+            ref={block.key}
             id={block.header}
             type='password'
             onChange={this._fn(this.handleInputEdit, block)}
@@ -342,10 +357,38 @@ export default class Section extends TerrainComponent<Props>
 
   public onCancelChange()
   {
+    if (this.props.onCancel !== undefined)
+    {
+      this.props.onCancel();
+    }
     this.setState(
       {
         isEditing: false,
         editingSections: {},
+      },
+    );
+  }
+
+  public onDisableChange()
+  {
+    const updatedEditingSections = this.state.editingSections;
+    updatedEditingSections.isDisabled = true;
+    this.setState(
+      {
+        isDisabled: true,
+        editingSections: updatedEditingSections,
+      },
+    );
+  }
+
+  public onEnableChange()
+  {
+    const updatedEditingSections = this.state.editingSections;
+    updatedEditingSections.isDisabled = false;
+    this.setState(
+      {
+        isDisabled: false,
+        editingSections: updatedEditingSections,
       },
     );
   }
@@ -385,16 +428,66 @@ export default class Section extends TerrainComponent<Props>
     );
   }
 
+  public renderEnableButton()
+  {
+    return (
+      <div
+        className='section-edit-button'
+        onClick={this.onEnableChange}
+        style={{ color: Colors().bg, background: Colors().mainBlue }}
+      >
+        Enable
+      </div>
+    );
+  }
+
+  public renderDisableButton()
+  {
+    return (
+      <div
+        className='section-edit-button'
+        onClick={this.onDisableChange}
+        style={{ color: Colors().bg, background: Colors().sectionEditButton }}
+      >
+        Disable
+      </div>
+    );
+  }
+
+  /*public renderAddingUserButtons()
+  {
+    return (
+      <div className='section-cancel-save'>
+        <div
+          className='section-save-button'
+          onClick={this.onAddUserChange}
+          style={{ color: Colors().bg, background: Colors().mainBlue }}
+        >
+          Save
+          </div>
+        <div
+          className='section-cancel-button'
+          onClick={this.onCancelUserChange}
+          style={{ color: Colors().sectionSubtitle, background: Colors().bg }}
+        >
+          Cancel
+          </div>
+      </div>
+    );
+  }*/
+
   public render()
   {
     return (
       <div
         className='section-container'
-        style={{ background: Colors().blockBg }}
+        style={{ background: Colors().blockBg, opacity: this.state.isDisabled ? 0.5 : 1 }}
       >
         <div className='section-header-bar'>
           <div className='section-header'>{this.props.sectionTitle}</div>
-          {this.props.canEdit ? (this.state.isEditing ? this.renderCancelAndSaveButtons() : this.renderEditButton()) : null}
+          {(this.props.canEdit || this.props.addingUser) && (this.state.isEditing ?
+            this.renderCancelAndSaveButtons() : this.renderEditButton())}
+          {this.props.canDisable && (this.state.isDisabled ? this.renderEnableButton() : this.renderDisableButton())}
         </div>
         {
           <FadeInOut

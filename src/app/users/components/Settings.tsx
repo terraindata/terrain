@@ -772,13 +772,15 @@ class Settings extends TerrainComponent<Props>
               { key: 'name', header: 'Name', info: currentUser.name, type: 'Input' },
               { key: 'email', header: 'Email', info: currentUser.email, type: 'Input' },
               { key: 'phone', header: 'Phone', info: currentUser.phone, type: 'Input' },
-              { key: 'whatIDo', header: 'What I Do', info: currentUser.whatIDo, type: 'Input' },
+              { key: 'skype', header: 'Skype', info: currentUser.skype, type: 'Input' },
             ])
           }
           hasPhoto={true}
           columnNum={2}
           onChange={this.updateUserInfo}
           canEdit={true}
+          canDisable={false}
+          addingUser={false}
         />
         <Section
           user={currentUser}
@@ -796,6 +798,8 @@ class Settings extends TerrainComponent<Props>
           columnNum={0}
           onChange={this.updateUserPassword}
           canEdit={true}
+          canDisable={false}
+          addingUser={false}
         />
         <Section
           user={currentUser}
@@ -813,6 +817,8 @@ class Settings extends TerrainComponent<Props>
           columnNum={0}
           onChange={this.updateUserInfo}
           canEdit={true}
+          canDisable={false}
+          addingUser={false}
         />
         <Modal
           message={this.state.modalMessage}
