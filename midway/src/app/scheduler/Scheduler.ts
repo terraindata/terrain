@@ -211,13 +211,15 @@ export class Scheduler
           workerId: 1, // TODO change this for clustering support
         };
       await this.setRunning(id, true, handle);
+      const runningSched = await this.get(id);
       const jobCreateStatus: JobConfig[] | string = await App.JobQ.create(jobConfig, runNow, userId);
       if (typeof jobCreateStatus === 'string')
       {
         return reject(new Error(jobCreateStatus as string));
       }
       this.runningSchedules.delete(id);
-      return resolve(await this.get(id) as SchedulerConfig[]);
+      const sched = await this.get(id);
+      return resolve(sched as SchedulerConfig[]);
     });
   }
 
@@ -247,7 +249,8 @@ export class Scheduler
           // }
         }
         schedules[0].running = running;
-        return resolve(await App.DB.upsert(this.schedulerTable, schedules[0], handle) as SchedulerConfig[]);
+        const val = await App.DB.upsert(this.schedulerTable, schedules[0], handle) as SchedulerConfig[];
+        return resolve(val);
       }
     });
   }

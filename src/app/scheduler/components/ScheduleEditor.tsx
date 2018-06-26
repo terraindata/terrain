@@ -172,6 +172,11 @@ class ScheduleEditor extends TerrainComponent<Props>
       {
         // This adjusts the task map so that index always = id (for backend)
         task = task.set('id', id);
+        if (task.taskId === TaskEnum.taskDefaultExit || task.taskId === TaskEnum.taskDefaultFailure)
+        {
+          // Set exit = true
+          task = task.setIn(['params', 'exit'], true);
+        }
         tasks = tasks.push(task);
         id += 1;
       }
@@ -235,11 +240,13 @@ class ScheduleEditor extends TerrainComponent<Props>
   public handleAddSuccessTask()
   {
     const lastTask = this.getVisibleTasks(this.state.taskMap, this.state.rootTasks.last()).last();
-    const newId = this.state.taskMap.size;
+    const newId = Number(this.state.taskMap.keySeq().sort().last()) + 1;
     const newTask = _TaskConfig({
       id: newId,
       taskId: TaskEnum.taskETL,
       type: 'SUCCESS',
+      blocking: true,
+      name: 'Task ' + String(newId + 1),
     });
     this.setState({
       taskMap: this.state.taskMap.set(lastTask.id, lastTask.set('onSuccess', newId)).set(newId, newTask),
@@ -253,11 +260,12 @@ class ScheduleEditor extends TerrainComponent<Props>
     let newId;
     if (task.onFailure == null)
     {
-      newId = taskMap.size;
+      newId = Number(this.state.taskMap.keySeq().sort().last()) + 1;
       const newTask = _TaskConfig({
         type: 'FAILURE',
         id: newId,
         taskId: TaskEnum.taskDefaultFailure,
+        name: 'Task ' + String(newId + 1),
       });
       taskMap = taskMap.set(parentId, task.set('onFailure', newId)).set(newId, newTask);
     }
@@ -315,10 +323,6 @@ class ScheduleEditor extends TerrainComponent<Props>
   {
     if (taskList.size === 1)
     {
-      if (this.state.taskMap.size === 1)
-      {
-        return 'Task';
-      }
       return 'Tasks';
     }
     let header: string = '';

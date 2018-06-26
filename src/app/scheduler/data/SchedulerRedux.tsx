@@ -410,6 +410,7 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
       .then((response) =>
       {
         const schedule: SchedulerConfig = response.data[0];
+        schedule['running'] = true;
         directDispatch({
           actionType: 'updateScheduleSuccess',
           schedule,

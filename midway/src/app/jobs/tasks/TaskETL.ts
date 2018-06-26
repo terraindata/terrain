@@ -87,24 +87,29 @@ export class TaskETL extends Task
 
         taskOutputConfig['options']['logStream'].pipe(this.taskConfig.rootLogStream);
         this.taskConfig.rootLogStream.pipeLogs(taskOutputConfig['options']['logStream']);
-
+        console.log('increment for task ', this.taskConfig['name']);
         this.taskConfig.rootLogStream.increment();
 
         if (taskOutputConfig.blocking !== true)
         {
           streams['logStream'].on('end', () =>
           {
-            this.taskConfig.rootLogStream.decrement();
-            resolve(taskOutputConfig);
-          });
-        }
-        else
-        {
-          streams['logStream'].on('end', () =>
-          {
+            console.log('decrement for task', this.taskConfig['name']);
             this.taskConfig.rootLogStream.decrement();
           });
           resolve(taskOutputConfig);
+        }
+        else
+        {
+          console.log('its a blocking task');
+          console.log(streams['logStream']);
+          console.log(streams);
+          streams['logStream'].on('end', () =>
+          {
+            console.log('decrement for task', this.taskConfig['name']);
+            this.taskConfig.rootLogStream.decrement();
+            resolve(taskOutputConfig);
+          });
         }
       }
       catch (e)
@@ -120,25 +125,27 @@ export class TaskETL extends Task
         logStream.push(null);
         taskOutputConfig['options']['logStream'] = logStream;
         taskOutputConfig['options']['outputStream'] = outputStream;
-
+        console.log('increment ERROR for task', this.taskConfig['name']);
         this.taskConfig.rootLogStream.increment();
 
         if (taskOutputConfig.blocking !== true)
         {
           logStream.on('end', () =>
           {
+            console.log('decrement ERROR for task', this.taskConfig['name']);
             this.taskConfig.rootLogStream.decrement();
-            resolve(taskOutputConfig);
           });
+          resolve(taskOutputConfig);
         }
         else
         {
           logStream.on('end', () =>
           {
+            console.log('decrement ERROR for task', this.taskConfig['name']);
             this.taskConfig.rootLogStream.decrement();
+            resolve(taskOutputConfig);
           });
         }
-        resolve(taskOutputConfig);
       }
     });
   }

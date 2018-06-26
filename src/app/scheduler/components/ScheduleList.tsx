@@ -159,6 +159,7 @@ class ScheduleList extends TerrainComponent<Props>
         },
         id: 0,
         taskId: TaskEnum.taskETL,
+        name: 'Task 1',
       }],
     };
     this.props.schedulerActions({

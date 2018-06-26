@@ -80,6 +80,7 @@ export class TaskDefaultExit extends Task
       console.log('HERE! ', taskOutputConfig['options']['logStream']);
       taskOutputConfig['options']['logStream'].on('end', () =>
         {
+          console.log('DECREMENT!!!');
           this.taskConfig.rootLogStream.decrement();
         });
       resolve(taskOutputConfig);
