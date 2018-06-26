@@ -85,7 +85,7 @@ class ElasticController extends DatabaseController
       this.analyticsType = analyticsType;
     }
 
-    this.indexPrefix = indexPrefix == null ? '' : indexPrefix;
+    this.indexPrefix = (indexPrefix == null ? '' : indexPrefix);
   }
 
   public getClient(): ElasticClient
