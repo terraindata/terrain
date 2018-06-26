@@ -61,7 +61,6 @@ export default class FSEndpoint extends AEndpointStream
   public async getSource(source: SourceConfig): Promise<Readable>
   {
     const config = await this.getIntegrationConfig(source.integrationId);
-    console.log('config is ',config);
     // TODO: sanitize path here to allow reading only from whitelisted locations
     if (!fs.existsSync(config['path']))
     {

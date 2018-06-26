@@ -91,9 +91,7 @@ export class JobLog
       let jobStatusMsg: string = 'SUCCESS';
       try
       {
-        console.log('accumulating logstream');
         const accumulatedLog: string[] = await BufferTransform.toArray(logStream);
-        console.log('accumulated log: ', accumulatedLog);
         updatedContentJobLog.contents = accumulatedLog.join('\n');
         if (jobStatus === false)
         {

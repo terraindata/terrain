@@ -171,7 +171,8 @@ abstract class TaskFormBase<FormState, P extends Props = Props> extends TerrainC
           {
             endpoints.keySeq().map((key) =>
             {
-              const endpoint = state[overrideString].get(key) || endpoints.get(key);
+              const endpoint = state[overrideString] && state[overrideString].get(key)
+                ? state[overrideString].get(key) : endpoints.get(key);
               return (
                 <EndpointForm
                   isSource={endpointType === 'sources'}
