@@ -389,7 +389,7 @@ export default class Section extends TerrainComponent<Props>
     return (
       <div
         className='section-container'
-        style={{ background: Colors().sectionBg }}
+        style={{ background: Colors().blockBg }}
       >
         <div className='section-header-bar'>
           <div className='section-header'>{this.props.sectionTitle}</div>
