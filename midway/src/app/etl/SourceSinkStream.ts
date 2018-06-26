@@ -194,6 +194,8 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
         importStream = importStreams[0];
       }
 
+      // ETL transformation engine currently only takes a single source stream, so we have to do postprocessing on
+      // multiple streams to reduce them down to a single stream, or throw an error if we would be returning multiple streams
       if (Array.isArray(source.options['transformations']) && source.options['transformations'].length !== 0)
       {
         const writeStream = new stream.Readable({ objectMode: true });
