@@ -104,12 +104,17 @@ export class TaskETL extends Task
           console.log('its a blocking task');
           console.log(streams['logStream']);
           console.log(streams);
+
           streams['logStream'].on('end', () =>
           {
             console.log('decrement for task', this.taskConfig['name']);
             this.taskConfig.rootLogStream.decrement();
             resolve(taskOutputConfig);
           });
+          streams['outputStream'].resume();
+          streams['logStream'].resume();
+          // console.log('buff transform: ',await BufferTransform.toArray(streams['logStream']));
+
         }
       }
       catch (e)

@@ -100,6 +100,7 @@ export default class LogStream extends Transform
     if (chunk === null)
     {
       this.drainLog();
+      this.emit('end');
       return super.push(null);
     }
 
