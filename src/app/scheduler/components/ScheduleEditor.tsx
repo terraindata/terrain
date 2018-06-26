@@ -295,6 +295,7 @@ class ScheduleEditor extends TerrainComponent<Props>
   {
     let { schedule } = this.state;
     schedule = schedule.set('tasks', this.taskMapToList());
+    console.log('schedule ', schedule.toJS());
     this.props.schedulerActions({
       actionType: 'updateSchedule',
       schedule: scheduleForDatabase(schedule) as SchedulerConfig,

@@ -156,10 +156,10 @@ class TaskItem extends TerrainComponent<Props>
     );
   }
 
-  public handleAsyncChange()
+  public handleBlockingChange()
   {
-    const { async } = this.props.task;
-    this.props.onTaskChange(this.props.task.set('async', async !== null ? async : false));
+    const { blocking } = this.props.task;
+    this.props.onTaskChange(this.props.task.set('blocking', blocking !== null ? !blocking : false));
   }
 
   public render()
@@ -232,8 +232,8 @@ class TaskItem extends TerrainComponent<Props>
               className='task-item-settings'
             >
               <CheckBox
-                checked={task.async === false}
-                onChange={this.handleAsyncChange}
+                checked={task.blocking !== false}
+                onChange={this.handleBlockingChange}
                 disabled={!TerrainTools.isAdmin()}
                 label='Complete task before starting next task'
               />

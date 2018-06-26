@@ -112,6 +112,7 @@ export class Scheduler
       {
         delete schedules[0].id;
         schedules[0].name = schedules[0].name + ' - Copy';
+        schedules[0].running = false;
         resolve(await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[]);
       }
     });
