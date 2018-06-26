@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import { EventEmitter } from 'events';
 import { Readable, Transform, Writable } from 'stream';
 import * as winston from 'winston';
 
@@ -55,14 +56,32 @@ export default class LogStream extends Transform
   private buffers: string[];
   private abortThreshold: number;
   private errorCount: number;
+  private count: number;
 
-  constructor(abortThreshold: number = 1000)
+  constructor(abortThreshold: number = 1000, initialCount = 1)
   {
     super();
 
     this.buffers = [];
     this.abortThreshold = abortThreshold;
     this.errorCount = 0;
+    this.count = initialCount;
+  }
+
+  public pipeLogs(stream: LogStream)
+  {
+    stream.on('log', (message, level) =>
+    {
+      this.log(message, level);
+    });
+
+    stream.on('error', (e) =>
+    {
+      this.log(e.toString());
+      this.drainLog();
+      this.emit('error', e);
+      stream.destroy(e);
+    });
   }
 
   public _read(size?: number)
@@ -165,6 +184,7 @@ export default class LogStream extends Transform
       level,
       message,
     }));
+    this.emit('log', message, level);
   }
 
   public info(message: string)
@@ -180,6 +200,21 @@ export default class LogStream extends Transform
   public error(message: string)
   {
     this.log(message, 'error');
+  }
+
+  public decrement()
+  {
+    this.count--;
+
+    if (this.count === 0)
+    {
+      this.push(null);
+    }
+  }
+
+  public increment()
+  {
+    this.count++;
   }
 
   private drainLog()
