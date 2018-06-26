@@ -51,81 +51,6 @@ import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath } from 'shared/util/KeyPath';
-// turns 'foo, bar, baz' into ['foo', 'bar', 'baz']
-// commas should be escaped by \ e.g. 'foo\, bar' is ['foo,', 'bar']
-export function stringToKP(kp: string): KeyPath
-{
-  const split = kp.split(',');
-  const fuseList = split.map((val, i) =>
-  {
-    const replaced = val.replace(/\\\\/g, '');
-    if (replaced.length > 0 && replaced.charAt(replaced.length - 1) === '\\')
-    {
-      return {
-        fuseNext: true,
-        value: val.replace(/\\\\/g, '\\').replace(/^ +/, '').replace(/ +$/, '').slice(0, -1),
-      };
-    }
-    else
-    {
-      return {
-        fuseNext: false,
-        value: val.replace(/\\\\/g, '\\').replace(/^ +/, '').replace(/ +$/, ''),
-      };
-    }
-  });
-  const reduced = fuseList.reduce((accum, val) =>
-  {
-    if (accum.length > 0)
-    {
-      const last = accum[accum.length - 1];
-      if (last.fuseNext)
-      {
-        accum[accum.length - 1] = {
-          fuseNext: val.fuseNext,
-          value: `${last.value},${val.value}`,
-        };
-        return accum;
-      }
-      else
-      {
-        accum.push(val);
-        return accum;
-      }
-    }
-    return [val];
-  }, []);
-  if (reduced.length > 0 && reduced[reduced.length - 1].fuseNext)
-  {
-    reduced[reduced.length - 1].value += ',';
-  }
-  return List(reduced.map((val, i) => val.value));
-}
-
-// turns ['foo', 'bar', 'baz'] into 'foo, bar, baz'
-export function kpToString(kp: KeyPath): string
-{
-  return kp.map((val) => val.toString().replace(/\\/g, '\\\\').replace(/,/g, '\\,'))
-    .reduce((accum, val) => accum === null ? val : `${accum}, ${val}`, null);
-}
-
-// TODO make these into real tests?
-// const tests = [
-//   List(['hi,', 'bye']),
-//   List(['hi', 'bye', 'why,']),
-//   List(['hi', 'bye\\', 'why']),
-//   List(['hi', 'bye\\\\', 'why']),
-//   List(['h\i', 'b\\,\\y\e\\', 'w\\h\\\y']),
-//   List([',h\\\,i', 'by,e', 'wh,\,,y,']),
-// ];
-// tests.forEach((val, i) =>
-// {
-//   const str: string = kpToString(val);
-//   if (kpToString(stringToKP(str)) !== str)
-//   {
-//     console.log(String(val), ':', str, ':', String(stringToKP(str)), ':', kpToString(stringToKP(str)));
-//   }
-// });
 
 // return true if the given keypath would be a valid new child field under provided fieldId
 // if fieldId is not provided or -1, then it does not consider the new field as a child field
@@ -200,11 +125,11 @@ export function validateRename(
       message: 'Invalid Rename. Names cannot be empty',
     };
   }
-  if (newKeyPath.last() === -1)
+  if (typeof newKeyPath.last() === 'number')
   {
     return {
       isValid: false,
-      message: 'Invalid Rename. Name cannot end with \'*\'',
+      message: 'Invalid Rename. Name cannot end with a number',
     };
   }
   const otherId = engine.getOutputFieldID(newKeyPath);
@@ -257,8 +182,8 @@ export function validateRename(
 // returns true if two given keypaths represent fields that are "local" to each other.
 // fields are local if they are unambiguously traversable to each other.
 // e.g. [a] is local to [b] and [c, d]
-// [a, *, b] would be local to [a, *, c]
-// [a] would not be local to [c, *, d]
+// [a, -1, b] would be local to [a, -1, c]
+// [a] would not be local to [c, -1, d]
 export function areFieldsLocal(kp1, kp2): boolean
 {
   const lastIndex1: number = kp1.findLastIndex((value, index) => !EngineUtil.isNamedField(kp1, index));

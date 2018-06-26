@@ -1,0 +1,163 @@
+@import "../../common/Common.less";
+
+.connections-page {
+	width: 100%;
+	padding-top: 1px;
+  text-align: left;
+}
+
+.connections-page-title {
+  text-transform: uppercase;
+  font-size: 20px;
+  line-height: 18px;
+  margin-left: 10px;
+  margin-bottom: 20px;
+}
+
+.connections-list-wrapper {
+	//padding: 12px;
+  margin-left: auto;
+  margin-right: auto;
+  //width: 80%;
+  .item-list-table {
+    .row-info-header {
+      .row-info-data {
+        font-size: 16px;
+        overflow: hidden;
+        padding: 6px 12px; 
+        text-align: center;
+      }
+    }
+    .row-info {
+      .row-info-data {
+        padding: 20px 16px;
+        font-size: 18px;
+        word-wrap: break-word;
+        text-align: center;
+      }
+    }
+  }
+
+  .row-info:hover {
+    .close {
+        opacity: 1;
+    }
+  }
+	.close {
+		opacity: 0;
+		.transition;
+		position: absolute;
+    left: -16px;
+		top: calc(~"50% - 6px");
+	}
+	.connections-list-header {
+		height: 20px;
+	  overflow: hidden;
+	  padding-bottom: 6px;
+	  padding-left: 6px;
+		font-size: @pretty-large-font-size;
+	}
+}
+
+.create-connection {
+  h3 {
+    margin: 40px 0;
+  }
+
+  b {
+    margin-left: 6px;
+  }
+
+  input {
+    border: 1px solid #ccc;
+    margin: 6px;
+  }
+
+  .flex-grow {
+    text-align: left;
+    padding: 0px 6px;
+    box-sizing: border-box;
+  }
+
+  .button {
+    width: 80px;
+    font-size: 16px;
+    padding: 10px;
+    margin: 40px 20px 0 20px;
+  }
+
+  .create-connection-dropdown {
+    margin: 6px;
+    border: 1px solid #ccc;
+  }
+
+  color: #999;
+  position: relative;
+}
+
+.connections-analytics {
+  color: black;
+  text-align: left;
+  display: flex;
+  flex-direction: 'row';
+  border-top: 1px solid black;
+  margin-top: 8px;
+  padding-top: 5px;
+
+  .left-column, .right-column {
+    flex: 1;
+  }
+
+  input {
+    width: 100%;
+    margin: 6px;
+  }
+
+  b {
+    margin-left: 6px;
+  }
+}
+
+.connections-analytics-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: @quarter-spacing;
+  margin-left: @half-spacing;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+  }
+}
+
+.connection-wrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 24px;
+	border-radius: 4px;
+	align-items: center;
+    min-width: 200px;
+    margin: auto;
+    height: calc(100% - 48px);
+    overflow: auto;
+	.connection-editor-header {
+		font-size: @pretty-large-font-size;
+		padding-bottom: 6px;
+		text-align: center;
+	}
+	.connection-buttons {
+		float: right;
+		margin-top: 12px;
+		.button {
+			box-shadow: 0px 1px 6px -1px grey;
+			&:first-child {
+				margin-right: 12px;
+			}
+		}
+	}
+}
+
+

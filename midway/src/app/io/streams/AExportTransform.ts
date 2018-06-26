@@ -107,11 +107,11 @@ export default abstract class AExportTransform extends Transform
     callback(null, result);
   }
 
-  protected abstract preamble(): string;
+  protected preamble(): string { return ''; }
 
   protected abstract transform(input: object, chunkNumber: number): string | Promise<string>;
 
-  protected abstract delimiter(): string;
+  protected delimiter(): string { return ''; }
 
-  protected abstract conclusion(chunkNumber: number): string;
+  protected conclusion(chunkNumber: number): string { return ''; }
 }

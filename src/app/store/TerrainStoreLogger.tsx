@@ -47,6 +47,7 @@ import { pathFinderTypeLoader } from 'builder/components/pathfinder/PathfinderTy
 import * as hdr from 'hdr-histogram-js';
 import * as TerrainLog from 'loglevel';
 import { AllRecordNameArray, RecordsSerializer, resetRecordNameArray } from 'shared/util/Classes';
+import unique from 'unique-selector';
 
 export default class TerrainStoreLogger
 {
@@ -185,6 +186,25 @@ export default class TerrainStoreLogger
       return false;
     }
     return true;
+  }
+
+  public static recordMouseClick(e: MEvent)
+  {
+    if (TerrainStoreLogger.serializeAction)
+    {
+      const selector = unique(e.target);
+      TerrainLog.debug(String(e.type) + ' on selector' + String(selector));
+      TerrainStoreLogger.actionSerializationLog.push({ eventType: e.type, selector });
+    }
+  }
+  public static recordKeyPress(e: KeyboardEvent)
+  {
+    if (TerrainStoreLogger.serializeAction)
+    {
+      const selector = unique(e.target);
+      TerrainLog.debug(String(e.type) + ' on selector' + String(selector));
+      TerrainStoreLogger.actionSerializationLog.push({ eventType: e.type, selector, key: e.key });
+    }
   }
 
   private static loadRecordTypes()

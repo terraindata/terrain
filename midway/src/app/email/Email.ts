@@ -49,9 +49,8 @@ import * as winston from 'winston';
 
 import * as App from '../App';
 import IntegrationConfig from '../integrations/IntegrationConfig';
-import Integrations from '../integrations/Integrations';
 
-const integrations: Integrations = new Integrations();
+import { integrations } from '../integrations/IntegrationRouter';
 
 // currently a root level member of App: App.EMAIL
 export class Email

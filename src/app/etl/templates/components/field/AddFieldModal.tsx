@@ -66,7 +66,7 @@ import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { ETLFieldTypes, etlFieldTypesList, etlFieldTypesNames, FieldTypes } from 'shared/etl/types/ETLTypes';
-import { kpToString, stringToKP, validateNewFieldName } from 'shared/transformations/util/TransformationsUtil';
+import { validateNewFieldName } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 

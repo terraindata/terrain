@@ -141,7 +141,7 @@ class Jobs extends TerrainComponent<any> {
 
   public getStatusColor(status)
   {
-    return Colors().statuses[status];
+    return Colors().jobStatuses[status];
   }
 
   public getLogLevelColor(level)
@@ -180,6 +180,14 @@ class Jobs extends TerrainComponent<any> {
     this.setState({
       jobLogs: Immutable.Map(),
       logsModalOpen: false,
+    });
+  }
+
+  public handleJobCancel(colKey, rowData)
+  {
+    this.props.jobsActions({
+      actionType: 'cancelJob',
+      jobId: rowData.id,
     });
   }
 
@@ -236,6 +244,15 @@ class Jobs extends TerrainComponent<any> {
       },
     ];
 
+    const jobCancelColumn = {
+      columnKey: 'cancel',
+      columnLabel: '',
+      component: <ButtonColumn
+        label={'Cancel'}
+        onClick={this.handleJobCancel}
+      />,
+    };
+
     const defaultOrder = {
       columnKey: 'createdAt',
       direction: 'desc' as 'asc' | 'desc',
@@ -265,7 +282,7 @@ class Jobs extends TerrainComponent<any> {
           contentCount={runningJobs.count()}
         >
           <SimpleTable
-            columnsConfig={jobsHeader}
+            columnsConfig={jobsHeader.concat(jobCancelColumn)}
             data={runningJobs}
             defaultOrder={defaultOrder}
           />

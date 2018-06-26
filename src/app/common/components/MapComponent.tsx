@@ -81,6 +81,7 @@ export interface Props
   onZoomChange?: (zoom) => void;
   zoom?: number;
   debounce?: boolean;
+  options?: List<string>; // list of additional options for autocompelte
   // Show/Hide certain features
   hideZoomControl?: boolean;
   hideSearchBar?: boolean;
@@ -284,6 +285,11 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
   // Given an address, find the corresponding coorindates
   public geocode(address)
   {
+    if (address.charAt(0) === '@')
+    {
+      // Just an input, dont geocode it
+      return;
+    }
     if (this.geoCache[address] !== undefined)
     {
       this.onChange(this.geoCache[address], address);
@@ -629,6 +635,12 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
     };
     const inputStyle = this.props.canEdit === false ? _.extend({}, backgroundColor(Colors().darkerHighlight)) : {};
     const location = MapUtil.getCoordinatesFromGeopoint(this.props.coordinates);
+    let usingInput = false;
+    if (this.state.inputValue.charAt(0) === '@')
+    {
+      // Looking for input not place
+      usingInput = true;
+    }
     return (
       <div
         className='map-component-search-bar'
@@ -643,6 +655,7 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
               styles={{ input: inputStyle }}
               geocoder={this.props.geocoder}
               classNames={{ root: 'map-component-address-input' }}
+              autocompleteOptions={usingInput ? this.props.options.toArray() : undefined}
             />
         }
         {

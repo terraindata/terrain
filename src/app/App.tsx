@@ -48,6 +48,8 @@ THE SOFTWARE.
 
 /// <reference path="../../shared/typings/tsd.d.ts" />
 
+import TerrainStoreLogger from 'store/TerrainStoreLogger';
+
 require('babel-polyfill');
 
 // Style
@@ -74,7 +76,6 @@ import Library from './library/components/LibraryDnd';
 import ManualWrapper from './manual/components/ManualWrapper';
 import SchemaPage from './schema/components/SchemaPage';
 import Account from './users/components/Account';
-import Profile from './users/components/Profile';
 import X from './x/components/X';
 
 require('velocity-animate');
@@ -320,7 +321,7 @@ class App extends TerrainComponent<Props>
     else
     {
       const segments = location.split('.');
-      const customerName: string = segments[0];
+      const customerName: string = segments[0].replace('https://', '');
       const capitalizeCustomer: string = customerName.charAt(0).toUpperCase() + customerName.slice(1);
       customerTitle = ' | ' + capitalizeCustomer;
     }
@@ -427,7 +428,7 @@ class App extends TerrainComponent<Props>
     });
   }
 
-  public componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (!this.isAppStateLoaded(this.props) && this.isAppStateLoaded(nextProps))
     {
@@ -443,6 +444,15 @@ class App extends TerrainComponent<Props>
     if (document.getElementById('login-submit'))
     {
       document.getElementById('login-submit').innerHTML = 'Loading Your Data';
+    }
+
+    if (this.props.location.pathname !== nextProps.location.pathname)
+    {
+      if (window['dataLayer'] !== undefined)
+      {
+        // track new pageview event, as the URL changed
+        window['dataLayer'].push({ event: 'pageview' });
+      }
     }
   }
 
@@ -544,7 +554,7 @@ class App extends TerrainComponent<Props>
                     <Route exact path='/manual' component={ManualWrapper} />
                     <Route exact path='/manual/:term' component={ManualWrapper} />
 
-                    <Route exact path='/users/:userId' component={Profile} />
+                    <Route exact path='/users/:userId' component={Account} />
 
                     <Route path='/reporting' component={Placeholder} />
 
@@ -600,7 +610,8 @@ class App extends TerrainComponent<Props>
         {({ width, height }) => (
           <div
             className='app'
-            onMouseMove={this.handleMouseMove}
+            onMouseDown={TerrainStoreLogger.recordMouseClick as any}
+            onKeyPress={TerrainStoreLogger.recordKeyPress as any}
             key='app'
             style={APP_STYLE}
           >

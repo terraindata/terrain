@@ -57,7 +57,7 @@ import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import objectify from 'shared/util/deepObjectify';
-import { KeyPath } from 'shared/util/KeyPath';
+import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
 import * as TerrainLog from 'loglevel';
@@ -136,6 +136,7 @@ export default class EngineUtil
         const fieldTypeErrors = EngineUtil.fieldHasValidType(engine, id);
         if (fieldTypeErrors.length > 0)
         {
+          errors.push(`Errors Encountered with field ${id} (${okp.toJS()})`);
           errors = errors.concat(fieldTypeErrors);
         }
       });
@@ -198,8 +199,8 @@ export default class EngineUtil
     index?: number,
   ): boolean
   {
-    const last = index === undefined ? keypath.last() : keypath.get(index);
-    return last !== -1 && Number.isNaN(Number(last));
+    const last: WayPoint = index === undefined ? keypath.last() : keypath.get(index);
+    return typeof last !== 'number';
   }
 
   public static isWildcardField(
@@ -208,7 +209,7 @@ export default class EngineUtil
   ): boolean
   {
     const last = index === undefined ? keypath.last() : keypath.get(index);
-    return last === -1;
+    return last as number === -1;
   }
 
   // document merge logic

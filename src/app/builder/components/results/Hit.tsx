@@ -689,9 +689,9 @@ class HitComponent extends TerrainComponent<Props> {
             All Fields
           </div>
           {
-            hit.fields.map(
-              (value, key) =>
-                this.renderExpandedField(value, key),
+            hit.fields.keySeq().map(
+              (key) =>
+                this.renderExpandedField(hit.fields.get(key), key),
             )
           }
         </div>

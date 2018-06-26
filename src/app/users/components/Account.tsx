@@ -44,24 +44,26 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires switch-default
+// tslint:disable:no-var-requires switch-default strict-boolean-expressions
 
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
 
+import TerrainTools from 'app/util/TerrainTools';
 import TerrainTabs from 'common/components/TerrainTabs';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import './Account.less';
 
-import Connections from './Connections';
+import ConnectionEditorPage from 'app/connections/components/ConnectionEditorPage';
+import Connections from 'app/connections/components/Connections';
 import EditProfile from './EditProfile';
+import Logs from './Logs';
 import Notifications from './Notifications';
-import Profile from './Profile';
 import Settings from './Settings';
 import Team from './Team';
 
-const HomeIcon = require('./../../../images/icon_profile_16x16.svg?name=HomeIcon');
+const HomeIcon = require('images/icon_profile_16x16.svg?name=HomeIcon');
 
 export interface Props
 {
@@ -73,21 +75,25 @@ class Account extends TerrainComponent<Props>
 {
   public tabs = [
     { key: 'settings', label: 'Settings' },
-    { key: 'profile', label: 'Profile' },
+    // { key: 'profile', label: 'Profile' },
     { key: 'connections', label: 'Connections' },
     { key: 'team', label: 'Team' },
+    ...(TerrainTools.isAdmin() ? [{ key: 'logs', label: 'Logs' }] : []),
   ];
 
   public tabToRouteMap = {
     settings: '/account/settings',
-    profile: '/account/profile',
+    // profile: '/account/profile',
     connections: '/account/connections',
     team: '/account/team',
+    ...(TerrainTools.isAdmin() ? { logs: '/account/logs' } : {}),
   };
 
   public render()
   {
     const { children, location } = this.props;
+    // <Route exact path='/account/profile' component={Profile} />
+    // <Route exact path='/account/profile/edit' component={EditProfile} />
 
     return (
       <div className='account'>
@@ -99,13 +105,14 @@ class Account extends TerrainComponent<Props>
           >
             <div className='account-inner'>
               <Switch>
-                <Route exact path='/' component={Profile} />
-                <Route exact path='/account/profile' component={Profile} />
-                <Route exact path='/account/profile/edit' component={EditProfile} />
+                <Route exact path='/' component={Settings} />
                 <Route exact path='/account/settings' component={Settings} />
                 <Route exact path='/account/notifications' component={Notifications} />
                 <Route exact path='/account/connections' component={Connections} />
+                <Route exact path='/account/connections/edit' component={ConnectionEditorPage} />
+                <Route exact path='/account/connections/edit/connectionId=:connectionId' component={ConnectionEditorPage} />
                 <Route exact path='/account/team' component={Team} />
+                {TerrainTools.isAdmin() && <Route exact path='/account/logs' component={Logs} />}
               </Switch>
             </div>
           </TerrainTabs>
