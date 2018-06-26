@@ -143,7 +143,7 @@ class ElasticClient
   {
     this.controller.prependIndexParam(params);
     this.log('delete', params);
-    this.delegate.delete(params, this.wrapCallback(callback, this.controller.removeDocIndexPrefix.bind(this.controller)));
+    this.delegate.delete(params, this.wrapCallback(callback, (o) => this.controller.removeDocIndexPrefix(o)));
   }
 
   /**
@@ -216,7 +216,7 @@ class ElasticClient
   {
     this.controller.prependIndexParam(params);
     this.log('index', params);
-    this.delegate.index(params, this.wrapCallback(callback, this.controller.removeDocIndexPrefix.bind(this.controller)));
+    this.delegate.index(params, this.wrapCallback(callback, (o) => this.controller.removeDocIndexPrefix(o)));
   }
 
   /**
@@ -226,7 +226,7 @@ class ElasticClient
   {
     this.controller.prependIndexParam(params);
     this.log('update', params);
-    this.delegate.update(params, this.wrapCallback(callback, this.controller.removeDocIndexPrefix.bind(this.controller)));
+    this.delegate.update(params, this.wrapCallback(callback, (o) => this.controller.removeDocIndexPrefix(o)));
   }
 
   /**
@@ -280,7 +280,7 @@ class ElasticClient
     this.log('scroll', params);
     this.delegate.scroll(params, this.wrapCallback(callback, (res: Elastic.SearchResponse<T>) =>
     {
-      res.hits.hits.forEach(this.controller.removeDocIndexPrefix.bind(this.controller));
+      res.hits.hits.forEach((o) => this.controller.removeDocIndexPrefix(o));
     }));
   }
 
@@ -304,7 +304,7 @@ class ElasticClient
     this.log('search', params);
     this.delegate.search(params, this.wrapCallback(callback, (res: Elastic.SearchResponse<T>) =>
     {
-      res.hits.hits.forEach(this.controller.removeDocIndexPrefix.bind(this.controller));
+      res.hits.hits.forEach((o) => this.controller.removeDocIndexPrefix(o));
     }));
   }
 
@@ -327,7 +327,7 @@ class ElasticClient
     {
       res.responses.forEach((res2) =>
       {
-        res2.hits.hits.forEach(this.controller.removeDocIndexPrefix.bind(this.controller));
+        res2.hits.hits.forEach((o) => this.controller.removeDocIndexPrefix(o));
       });
     }));
   }
