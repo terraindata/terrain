@@ -153,7 +153,6 @@ class ScheduleList extends TerrainComponent<Props>
       name: '',
       tasks: [{
         params: {
-          exit: true,
           options: {
             templateId: -1,
           },
@@ -181,7 +180,11 @@ class ScheduleList extends TerrainComponent<Props>
   {
     const { schedules } = this.props;
     const keys = schedules.keySeq().toList().sort();
-    EtlRouteUtil.gotoEditSchedule(keys.get(index));
+    const id = keys.get(index);
+    if (!schedules.get(id).running)
+    {
+      EtlRouteUtil.gotoEditSchedule(keys.get(index));
+    }
   }
 
   public getMenuActions(schedule: SchedulerConfig)

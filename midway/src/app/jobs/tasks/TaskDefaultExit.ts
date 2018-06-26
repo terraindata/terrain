@@ -77,6 +77,7 @@ export class TaskDefaultExit extends Task
       // TODO: call other functions (needs to wrap in Promise for later)
       taskOutputConfig['options']['outputStream'] = this.taskConfig['params']['options']['inputStreams'][0];
       taskOutputConfig['options']['logStream'] = this.taskConfig['params']['options']['logStream'];
+      console.log('HERE! ', taskOutputConfig['options']['logStream']);
       taskOutputConfig['options']['logStream'].on('end', () =>
         {
           this.taskConfig.rootLogStream.decrement();

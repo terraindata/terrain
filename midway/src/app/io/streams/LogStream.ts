@@ -204,8 +204,9 @@ export default class LogStream extends Transform
 
   public decrement()
   {
+    console.log('Decrement AFTER ', this.count);
     this.count--;
-
+    console.log('Decrement AFTER ', this.count);
     if (this.count === 0)
     {
       this.push(null);
@@ -214,7 +215,10 @@ export default class LogStream extends Transform
 
   public increment()
   {
+    console.log('INCREMENT BEFORE ', this.count);
     this.count++;
+    console.log('INCREMENT AFTER ', this.count);
+
   }
 
   private drainLog()

@@ -162,7 +162,8 @@ export class TaskTree
           break;
       }
     });
-
+    console.log('TASKS ARE ', this.tasks);
+    console.log('TASKS ARE ', JSON.stringify(this.tasks, null, 2));
     return this.isValid() as boolean;
   }
 
