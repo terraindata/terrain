@@ -118,8 +118,15 @@ Router.get('/stats', passport.authenticate('access-token-local'), async (ctx, ne
 
 Router.get('/logs', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const transport = winston['default'].transports['MemoryTransport'];
-  ctx.body = (transport as any).getAll();
+  if (ctx.state.user.isSuperUser)
+  {
+    const transport = winston['default'].transports['MemoryTransport'];
+    ctx.body = (transport as any).getAll();
+  }
+  else
+  {
+    ctx.throw(403, 'Only admins are allowed to view console logs.');
+  }
 });
 
 export default Router;
