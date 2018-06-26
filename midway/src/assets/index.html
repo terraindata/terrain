@@ -2,6 +2,7 @@
     <head>
         <title> Terrain </title>
         <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+        <link href="/midway/v1/assets/Gilroy.css" rel="stylesheet">
         <link href="/midway/v1/assets/login.css" rel="stylesheet">
         <meta charset="utf-8">
         <link rel="shortcut icon" href="/favicon.ico"/>
@@ -19,27 +20,41 @@
         height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- End Google Tag Manager (noscript) -->
         
+        <div id="app"></div>
+        
         <div id="login">
             <div id="login-area">
-                <input
-                    id="login-email"
-                    type="email"
-                    placeholder="charles@example.com"
-                />
-                <input
-                    id="login-password"
-                    type="password"
-                    placeholder=""
-                />
-                <div
-                    id="login-submit"
-                >
+                <img class="login-img" src="/midway/v1/assets/icon-terrain.png" srcset="/midway/v1/assets/icon-terrain@2x.png 2x, /midway/v1/assets/icon-terrain@3x.png 3x" />
+                
+                <div class='login-input-container hide-on-login' id='login-email-container'>
+                    <input type='email' id='login-email' />
+                    <label for='login-email'>
+                        Email
+                    </label>
+                </div>
+                
+                <div class='login-input-container hide-on-login' id='login-password-container'>
+                    <input type='password' id='login-password' />
+                    <label for='login-password'>
+                        Password
+                    </label>
+                </div>
+                
+                <div id="login-submit">
                     Login
+                </div>
+                
+                <div id="login-forgot-password" class="hide-on-login">
+                    Forgot password?
+                </div>
+                
+                <div id="login-forgot-password-message" class="hide-on-login">
+                    Sorry to hear that! <br />
+                    Email leslie@terraindata.com to get back in.
                 </div>
             </div>
         </div>
         
-        <div id="app"></div>
 
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCJWmfGt5jsesHrATBYByvXzpf8JbE5eFU&libraries=places"></script>
         

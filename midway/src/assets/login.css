@@ -10,3 +10,182 @@ html, body {
 	background-image: url('login-bg.png');
 	background-size: cover;
 }
+
+#login-bg {
+	display: block;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	height: 100%;
+	width: 100%;
+	overflow:  hidden;
+	z-index: 0;
+	text-align: center;
+}
+
+#login-bg img {
+	min-width: 100%;
+	min-height: 100%;
+}
+
+#login {
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	height: 100%;
+	width: 100%;
+	z-index: 999999999;
+	
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	
+	background-color: #1eb4fa;
+	background-image: url("/midway/v1/assets/bg-pattern-logo.png");
+	background-size: cover;
+	background-position: center center;
+	
+	opacity: 1;
+	transition: all 0.4s;
+}
+
+#login.login-loaded {
+	opacity: 0;
+}
+
+#login-area {
+	width: 100%;
+	max-width: 328px;
+	
+	text-align: center;
+}
+
+.login-img {
+	margin-bottom: 62px;
+}
+
+/* Inputs */
+
+.login-input-container {
+  position: relative;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.login-input-container label {
+  position: absolute;
+  left: 18px;
+  top: 15px;
+  font-size: 14px;
+  transition: all 0.15s;
+  color: #2f3132;
+  text-transform: uppercase;
+}
+
+.login-input-container input {
+  padding-right: 6px;
+  padding-left: 18px;
+  padding-top: 20px;
+  padding-bottom: 4px;
+  border-radius: 3px;
+  width: 100%;
+  outline: none;
+  font-size: 18px;
+  box-sizing: border-box;
+  border-width: 0px;
+  transition:  all 0.3s;
+}
+
+.login-input-container:not(.login-input-container-active) input:-webkit-autofill {
+	/* work-around for autofill situations we can't detect through JS  */
+	padding-left: 110px;
+	padding-top: 12px;
+	padding-bottom: 12px;
+}
+
+.login-input-container.login-input-container-active label {
+  font-size: 10px;
+  top: 6px;
+}
+
+#login-submit {
+	font-size: 14px;
+	padding: 14px 0px;
+	border-radius: 3px;
+	border:  solid 2px #fff;
+	text-transform: uppercase;
+	color: #fff;
+	transition:  all 0.15s;
+  letter-spacing: 0px;
+  margin-bottom: 20px;
+}
+
+#login-submit:hover {
+	background:  rgba(255,255,255,0.15);
+	cursor: pointer;
+  letter-spacing: 10px;
+  transition: background 0.15s, letter-spacing 3s 5s;
+}
+
+
+.hide-on-login {
+	max-height: 50px;
+	opacity: 1;
+}
+
+#login.logged-in .hide-on-login {
+	max-height: 0px !important;
+	opacity: 0;
+	transition: all 0.3s;
+}
+
+
+
+#login-forgot-password {
+	padding:  10px;
+	color: #fff;
+	text-align: center;
+	cursor: pointer;
+}
+#login-forgot-password:hover {
+	text-decoration: underline;
+}
+
+#login-forgot-password-message {
+	max-height: 0px;
+	box-sizing: border-box;
+	overflow:  hidden;
+	color: #fff;
+	transition:  all 0.3s;
+}
+
+#login-forgot-password-message.showing {
+	max-height: 80px;
+	padding-top: 10px;
+}
+
+
+/* @2x Images (Pixel Ratio of 1.25+) */
+@media only screen and (-o-min-device-pixel-ratio: 5/4),
+       only screen and (-webkit-min-device-pixel-ratio: 1.25),
+       only screen and (min-device-pixel-ratio: 1.25),
+       only screen and (min-resolution: 1.25dppx) {
+    #login {background-image: url("/midway/v1/assets/bg-pattern-logo@2x.png");}
+}
+
+/* @3x Images (Pixel Ratio of 2.25+) */
+@media only screen and (-o-min-device-pixel-ratio: 9/4),
+       only screen and (-webkit-min-device-pixel-ratio: 2.25),
+       only screen and (min-device-pixel-ratio: 2.25),
+       only screen and (min-resolution: 2.25dppx) {
+    #login {background-image: url("/midway/v1/assets/bg-pattern-logo@3x.png");}
+}
+
+/* @4x Images (Pixel Ratio of 3.25+) */ 
+@media only screen and (-o-min-device-pixel-ratio: 13/4),
+       only screen and (-webkit-min-device-pixel-ratio: 3.25),
+       only screen and (min-device-pixel-ratio: 3.25),
+       only screen and (min-resolution: 3.25dppx) {
+    #login {background-image: url("/midway/v1/assets/bg-pattern-logo@3x.png");}
+    /* replace with 4x if ever available */
+}
