@@ -339,8 +339,11 @@ class ElasticClient
     callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void
   {
     this.log('msearchTemplate', params);
-    throw new Error();
-    // this.delegate.msearchTemplate(params, callback);
+    if (this.controller.getIndexPrefix() !== '')
+    {
+      throw new Error();
+    }
+    this.delegate.msearchTemplate(params, callback);
   }
 
   public getDelegate(): Elastic.Client
