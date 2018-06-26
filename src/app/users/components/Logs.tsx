@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions no-unused-expression
 
+import AnsiUp from 'ansi_up';
 import * as React from 'react';
 import Util from 'util/Util';
 
@@ -57,6 +58,8 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 
 import './Logs.less';
 
+const AU = new AnsiUp();
+
 export interface Props
 {
   params?: any;
@@ -66,7 +69,6 @@ export interface Props
 
 interface State
 {
-  isAdmin: boolean;
   loading: boolean;
   logs: string;
 }
@@ -74,7 +76,6 @@ interface State
 class Logs extends TerrainComponent<Props>
 {
   public state: State = {
-    isAdmin: TerrainTools.isAdmin(),
     loading: false,
     logs: '',
   };
@@ -86,7 +87,7 @@ class Logs extends TerrainComponent<Props>
 
   public fetchLogs()
   {
-    if (!this.state.isAdmin)
+    if (!TerrainTools.isAdmin())
     {
       return;
     }
@@ -128,12 +129,10 @@ class Logs extends TerrainComponent<Props>
 
   public renderLogs()
   {
-    if (this.state.isAdmin)
+    if (TerrainTools.isAdmin())
     {
       return (
-        <div className='logs-area'>
-          {this.state.logs}
-        </div>
+        <div className='logs-area' dangerouslySetInnerHTML={{ __html: AU.ansi_to_html(this.state.logs) }} />
       );
     }
     else
