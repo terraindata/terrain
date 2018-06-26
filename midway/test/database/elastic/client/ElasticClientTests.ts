@@ -242,6 +242,19 @@ test('prefix isolation', async () =>
     },
   );
 
+  await expect(expectNoSecret('search',
+    {
+      index: 'bcd.secret',
+      body: {
+        query: {
+          term: {
+            _id: '13333337',
+          },
+        },
+      },
+    },
+  )).rejects.toThrow(/index_not_found_exception/g);
+
   const scrollId = (await new Promise<SearchResponse<any>>((resolve, reject) =>
   {
     elasticClient.search(
