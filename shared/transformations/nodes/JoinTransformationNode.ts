@@ -45,58 +45,56 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
+
+const { List, Map } = Immutable;
+
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import { List } from 'immutable';
-
-import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
-import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
+
+import CombineTransformationType from 'shared/transformations/types/CombineTransformationType';
 
 const TYPECODE = TransformationNodeType.JoinNode;
 
-export class JoinTransformationNode extends TransformationNode
+export class JoinTransformationNode extends CombineTransformationType
 {
   public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'string';
 
-  public transform(doc: object)
+  public validate()
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.JoinNode>;
-    let joined: string;
-    this.fields.forEach((field) =>
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    if (typeof opts.delimiter !== 'string')
     {
-      const el: any = yadeep.get(doc, field);
-      if (typeof el !== 'string')
-      {
-        return {
-          errors: [
-            {
-              message: 'Attempted to join using a non-string field (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
+      return `Option 'delimiter' (${opts.delimiter}) is invalid`;
+    }
+    return super.validate();
+  }
 
+  public combine(vals: string[]): string
+  {
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+
+    let joined: string;
+    for (const val of vals)
+    {
       if (joined === undefined)
       {
-        joined = el as string;
+        joined = val as string;
       }
       else
       {
-        joined = joined + opts.delimiter + (el as string);
+        joined = joined + opts.delimiter + (val as string);
       }
-    });
-    yadeep.set(doc, opts.newFieldKeyPaths.get(0), joined, { create: true });
-
-    return {
-      document: doc,
-    } as TransformationVisitResult;
+    }
+    return joined;
   }
 }
 

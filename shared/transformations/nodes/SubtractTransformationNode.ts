@@ -73,7 +73,7 @@ export class SubtractTransformationNode extends SimpleTransformationType
     const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
     if (typeof opts.shift !== 'number')
     {
-      return 'Shift is not provided, or not a number';
+      return `Option 'shift' (${opts.shift}) is invalid`;
     }
     return super.validate();
   }

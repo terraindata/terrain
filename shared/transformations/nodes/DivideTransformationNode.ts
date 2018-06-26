@@ -73,7 +73,7 @@ export class DivideTransformationNode extends SimpleTransformationType
     const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
     if (typeof opts.factor !== 'number')
     {
-      return 'Factor is not provided, or not a number';
+      return `Option 'factor' (${opts.factor}) is invalid`;
     }
     return super.validate();
   }

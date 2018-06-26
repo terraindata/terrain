@@ -45,40 +45,43 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
+
+const { List, Map } = Immutable;
+
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import { List } from 'immutable';
-
-import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
-import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
+
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
 
 const TYPECODE = TransformationNodeType.SetIfNode;
 
-export class SetIfTransformationNode extends TransformationNode
+export class SetIfTransformationNode extends SimpleTransformationType
 {
   public readonly typeCode = TYPECODE;
+  public readonly skipNulls = false;
 
-  public transform(doc: object)
+  public transformer(el: any): any
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.SetIfNode>;
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
 
-    return visitHelper(this.fields, doc, { document: doc }, (kp, el) =>
+    let condition = setIfHelper(opts, el);
+    condition = opts.invert ? !condition : condition;
+    if (condition)
     {
-      let condition = setIfHelper(opts, el);
-      condition = opts.invert ? !condition : condition;
-      if (condition)
-      {
-        yadeep.set(doc, kp, opts.newValue, { create: true });
-      }
-    });
+      return opts.newValue;
+    }
+    else
+    {
+      return undefined;
+    }
   }
 }
 

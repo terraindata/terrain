@@ -97,7 +97,10 @@ export default abstract class SimpleTransformationType extends TransformationNod
         }
 
         const newValue = this.transformer(el);
-        yadeep.set(doc, kp, newValue);
+        if (newValue !== undefined)
+        {
+          yadeep.set(doc, kp, newValue, { create: true });
+        }
       },
     );
   }

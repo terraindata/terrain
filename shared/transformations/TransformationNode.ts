@@ -76,7 +76,8 @@ export default abstract class TransformationNode
   // override to customize entire transformation behavior
   public transform(doc: object): TransformationVisitResult
   {
-    try {
+    try
+    {
       const valid = this.validate();
       if (typeof valid === 'string')
       {

@@ -128,7 +128,7 @@ interface TransformationOptionTypes
     salt: string;
   };
   RoundNode: {
-    shift: number;
+    precision: number;
   };
   AddNode: {
     shift: number;

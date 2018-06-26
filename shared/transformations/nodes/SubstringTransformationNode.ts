@@ -56,7 +56,6 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { KeyPath } from 'shared/util/KeyPath';
 

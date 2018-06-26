@@ -69,9 +69,23 @@ export class FindReplaceTransformationNode extends SimpleTransformationType
   public readonly typeCode = TYPECODE;
   public readonly acceptedType = 'string';
 
+  public validate()
+  {
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    if (typeof opts.find !== 'string')
+    {
+      return `Option 'find' (${opts.find}) is invalid`;
+    }
+    if (typeof opts.replace !== 'string')
+    {
+      return `Option 'replace' (${opts.replace}) is invalid`;
+    }
+    return super.validate();
+  }
+
   public transformer(el: string): string
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.FindReplaceNode>;
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
     if (opts.regex)
     {
       return el.replace(new RegExp(opts.find, 'g'), opts.replace);

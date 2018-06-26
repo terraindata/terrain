@@ -45,50 +45,44 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as math from 'mathjs';
+import * as yadeep from 'shared/util/yadeep';
+
+const { List, Map } = Immutable;
+
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import { List } from 'immutable';
-
-import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
-import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
 
-import * as math from 'mathjs';
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
 
 const TYPECODE = TransformationNodeType.RoundNode;
 
-export class RoundTransformationNode extends TransformationNode
+export class RoundTransformationNode extends SimpleTransformationType
 {
   public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'string';
 
-  public transform(doc: object)
+  public validate()
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.RoundNode>;
-
-    return visitHelper(this.fields, doc, { document: doc }, (kp, el) =>
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    if (typeof opts.precision !== 'number')
     {
-      if (typeof el !== 'number')
-      {
-        return {
-          errors: [
-            {
-              message: 'Attempted to round a non-numeric field (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-      else
-      {
-        yadeep.set(doc, kp, math.round(el, opts.shift)); // CHECK THIS PARTTTT
-      }
-    });
+      return `Option 'precision' (${opts.precision}) is invalid`;
+    }
+    return super.validate();
+  }
+
+  public transformer(el: number): number
+  {
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    return math.round(el, opts.precision);
   }
 }
 
@@ -109,7 +103,7 @@ class RoundTransformationInfoC extends TransformationNodeInfo
 
   public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
   {
-    return `Round ${meta.shift}`;
+    return `Round to ${meta.precision} digits`;
   }
 }
 

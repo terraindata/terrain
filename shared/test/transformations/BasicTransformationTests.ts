@@ -751,28 +751,28 @@ test('suite of numeric transformations', () =>
     TransformationNodeType.RoundNode,
     List<KeyPath>([KeyPath(['foo', 2, 'bar', -1])]),
     {
-      shift: 1,
+      precision: 1,
     },
   );
   e.appendTransformation(
     TransformationNodeType.RoundNode,
     List<KeyPath>([KeyPath(['foo', 3, 'bar', -1])]),
     {
-      shift: 0,
+      precision: 0,
     },
   );
   e.appendTransformation(
     TransformationNodeType.RoundNode,
     List<KeyPath>([KeyPath(['foo', 4, 'bar', -1])]),
     {
-      shift: 4,
+      precision: 4,
     },
   );
   e.appendTransformation(
     TransformationNodeType.RoundNode,
     List<KeyPath>([KeyPath(['foo', 4, 'bar', -1])]),
     {
-      shift: 2,
+      precision: 2,
     },
   );
 

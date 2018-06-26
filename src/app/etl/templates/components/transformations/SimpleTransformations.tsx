@@ -136,22 +136,22 @@ export class RoundTFF extends TransformationForm<RoundOptions, TransformationNod
 {
   protected readonly type = TransformationNodeType.RoundNode;
   protected readonly inputMap: InputDeclarationMap<RoundOptions> = {
-    shift: {
+    precision: {
       type: DisplayType.NumberBox,
       displayName: 'Decimal Place Value',
     },
   };
   protected readonly initialState = {
-    shift: 0,
+    precision: 0,
   };
 
   protected computeArgs()
   {
-    const { shift } = this.state;
+    const { precision } = this.state;
     const args = super.computeArgs();
 
     const options = _.extend({}, args.options, {
-      shift: Number(shift),
+      precision: Number(precision),
     });
     return _.extend({}, args, { options });
   }
