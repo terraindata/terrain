@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions no-unused-expression
 
 import { AuthState } from 'auth/AuthTypes';
+import { Colors, fontColor } from 'colors/Colors';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import Util from 'util/Util';
@@ -339,9 +340,9 @@ class Team extends TerrainComponent<Props>
     return (
       <div>
         <div className='team'>
-          <div className='team-page-title'>
+          <div className='team-page-title' style={{ color: Colors().mainSectionTitle }}>
             Team Directory
-        </div>
+          </div>
           {
             loading &&
             <InfoArea large='Loading...' />
