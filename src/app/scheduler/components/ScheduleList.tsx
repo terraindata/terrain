@@ -186,12 +186,10 @@ class ScheduleList extends TerrainComponent<Props>
 
   public getMenuActions(schedule: SchedulerConfig)
   {
-    let actions = List([
-      {
-        text: schedule.shouldRunNext ? 'Disable' : 'Enable',
-        onClick: this._fn(this.performAction, 'disableSchedule', schedule.id),
-      },
-    ]);
+    let actions = List([{
+      text: 'Duplicate',
+      onClick: this._fn(this.performAction, 'duplicateSchedule', schedule.id),
+    }]);
     if (!schedule.running)
     {
       actions = actions.push({
@@ -200,6 +198,27 @@ class ScheduleList extends TerrainComponent<Props>
       }).push({
         text: 'Delete',
         onClick: this._fn(this.performAction, 'deleteSchedule', schedule.id),
+      });
+    }
+    else
+    {
+      actions = actions.push({
+        text: 'Pause',
+        onClick: this._fn(this.performAction, 'pauseSchedule', schedule.id),
+      })
+    }
+    if (schedule.shouldRunNext && !schedule.running)
+    {
+      actions = actions.push({
+        text: 'Disable',
+        onClick: this._fn(this.performAction, 'disableSchedule', schedule.id),
+      });
+    }
+    else
+    {
+      actions = actions.push({
+        text: 'Enable',
+        onClick: this._fn(this.performAction, 'enableSchedule', schedule.id),
       });
     }
     return actions;
