@@ -112,7 +112,7 @@ class Account extends TerrainComponent<Props>
                 <Route exact path='/account/connections/edit' component={ConnectionEditorPage} />
                 <Route exact path='/account/connections/edit/connectionId=:connectionId' component={ConnectionEditorPage} />
                 <Route exact path='/account/team' component={Team} />
-                { TerrainTools.isAdmin() && <Route exact path='/account/logs' component={Logs} /> }
+                {TerrainTools.isAdmin() && <Route exact path='/account/logs' component={Logs} />}
               </Switch>
             </div>
           </TerrainTabs>
