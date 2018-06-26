@@ -51,7 +51,7 @@ import ATaskConfig from './ATaskConfig';
 
 export class TaskConfig
 {
-  public async: boolean = null;                 // whether the task should resolve immediately or wait until completion before returning
+  public blocking: boolean = null;              // whether the task should resolve immediately or wait until completion before returning
   public cancel: boolean = null;                // whether the tree of tasks should be cancelled
   public id: number = null;                     // unique id that identifies this task to other tasks in the input array of TaskConfigs
   public jobStatus: number = null;              // 0: not running, 1: running, 2: paused

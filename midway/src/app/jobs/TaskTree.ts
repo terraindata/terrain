@@ -100,7 +100,7 @@ export class TaskTree
         invalidIds = true;
       }
       idSet.add(task.id);
-      task.async = (task.async != null) ? task.async : true;
+      task.blocking = (task.blocking != null) ? task.blocking : true;
       task.cancel = (task.cancel !== undefined && task.cancel !== null) ? task.cancel : false;
       task.jobStatus = (task.jobStatus !== undefined && task.jobStatus !== null) ? task.jobStatus : 0;
       task.name = (task.name !== undefined && task.name !== null) ? task.name : '';
@@ -219,7 +219,8 @@ export class TaskTree
           };
         return resolve(taskOutputConfig);
       }
-      const rootLogStream: LogStream = new LogStream();
+
+      const rootLogStream: LogStream = new LogStream(1000, 1);
       this.tasks.forEach((task, i) =>
       {
         this.tasks[i].setRootLogStream(rootLogStream);
