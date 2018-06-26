@@ -56,7 +56,6 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { KeyPath } from 'shared/util/KeyPath';
 
@@ -69,9 +68,19 @@ export class AddTransformationNode extends SimpleTransformationType
   public readonly typeCode = TYPECODE;
   public readonly acceptedType = 'number';
 
+  public validate()
+  {
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    if (typeof opts.shift !== 'number')
+    {
+      return 'Shift is not provided, or not a number';
+    }
+    return super.validate();
+  }
+
   public transformer(el: number): number
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.AddNode>;
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
     return el + opts.shift;
   }
 }

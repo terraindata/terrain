@@ -45,55 +45,41 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
+
+const { List, Map } = Immutable;
+
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import { List } from 'immutable';
-
-import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
+
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
 
 const TYPECODE = TransformationNodeType.FindReplaceNode;
 
-export class FindReplaceTransformationNode extends TransformationNode
+export class FindReplaceTransformationNode extends SimpleTransformationType
 {
   public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'string';
 
-  public transform(doc: object)
+  public transformer(el: string): string
   {
     const opts = this.meta as NodeOptionsType<TransformationNodeType.FindReplaceNode>;
-
-    return visitHelper(this.fields, doc, { document: doc }, (kp, el) =>
+    if (opts.regex)
     {
-      if (typeof el !== 'string')
-      {
-        return {
-          errors: [
-            {
-              message: 'Attempted to do a find/replace on a non-string field (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-      else
-      {
-        if (opts.regex)
-        {
-          yadeep.set(doc, kp, el.replace(new RegExp(opts.find, 'g'), opts.replace));
-        }
-        else
-        {
-          yadeep.set(doc, kp, el.split(opts.find).join(opts.replace));
-        }
-      }
-    });
+      return el.replace(new RegExp(opts.find, 'g'), opts.replace);
+    }
+    else
+    {
+      return el.split(opts.find).join(opts.replace);
+    }
   }
 }
 

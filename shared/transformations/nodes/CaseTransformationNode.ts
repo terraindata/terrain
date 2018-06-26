@@ -90,20 +90,17 @@ export class CaseTransformationNode extends SimpleTransformationType
 
   public validate(): string | boolean
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.CaseNode>;
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
     if (!caseFormatToReadable.has(opts.format))
     {
       return 'Unknown case format specified';
     }
-    else
-    {
-      return true;
-    }
+    return super.validate();
   }
 
   public transformer(el: string): string
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.CaseNode>;
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
     switch (opts.format)
     {
       case CaseFormats.uppercase:

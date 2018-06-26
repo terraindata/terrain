@@ -78,12 +78,12 @@ export default abstract class TransformationNode
   {
     try {
       const valid = this.validate();
-      if (valid !== true)
+      if (typeof valid === 'string')
       {
         return {
           errors: [
             {
-              message: String(valid),
+              message: `${this.typeCode} is malformed: ${String(valid)}`,
             } as TransformationVisitError,
           ],
         } as TransformationVisitResult;

@@ -45,48 +45,43 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
+
+const { List, Map } = Immutable;
+
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import { List } from 'immutable';
-
-import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
-import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
+
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
 
 const TYPECODE = TransformationNodeType.SubtractNode;
 
-export class SubtractTransformationNode extends TransformationNode
+export class SubtractTransformationNode extends SimpleTransformationType
 {
   public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'number';
 
-  public transform(doc: object)
+  public validate()
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.SubtractNode>;
-
-    return visitHelper(this.fields, doc, { document: doc }, (kp, el) =>
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    if (typeof opts.shift !== 'number')
     {
-      if (typeof el !== 'number')
-      {
-        return {
-          errors: [
-            {
-              message: 'Attempted to subtract a non-numeric (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-      else
-      {
-        yadeep.set(doc, kp, el - opts.shift);
-      }
-    });
+      return 'Shift is not provided, or not a number';
+    }
+    return super.validate();
+  }
+
+  public transformer(el: number): number
+  {
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    return el - opts.shift;
   }
 }
 
