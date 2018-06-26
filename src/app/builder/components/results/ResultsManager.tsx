@@ -675,7 +675,8 @@ export class ResultsManager extends TerrainComponent<Props>
       this.props.query.path.nested.get(0).minMatches
     )
     {
-      const ratio = Math.min(1, hits.size / (SCROLL_SIZE * this.props.hitsPage));
+      const denominator = Math.min(changes['estimatedTotal'], (SCROLL_SIZE * this.props.hitsPage));
+      const ratio = Math.min(1, hits.size / denominator);
       changes['estimatedTotal'] = Math.round(changes['estimatedTotal'] * ratio);
     }
 
