@@ -86,35 +86,33 @@ export class TaskETL extends Task
         taskOutputConfig['options']['logStream'] = streams['logStream'];
 
         taskOutputConfig['options']['logStream'].pipe(this.taskConfig.rootLogStream);
-        this.taskConfig.rootLogStream.pipeLogs(taskOutputConfig['options']['logStream']);
-        console.log('increment for task ', this.taskConfig['name']);
-        this.taskConfig.rootLogStream.increment();
+        // this.taskConfig.rootLogStream.pipeLogs(taskOutputConfig['options']['logStream']);
+
+        // this.taskConfig.rootLogStream.increment();
 
         if (taskOutputConfig.blocking !== true)
         {
-          streams['logStream'].on('end', () =>
-          {
-            console.log('decrement for task', this.taskConfig['name']);
-            this.taskConfig.rootLogStream.decrement();
-          });
+          // streams['logStream'].on('end', () =>
+          // {
+          //   // console.log('decrement for task', this.taskConfig['name']);
+          //   this.taskConfig.rootLogStream.decrement();
+          // });
           resolve(taskOutputConfig);
         }
         else
         {
-          console.log('its a blocking task');
-          console.log(streams['logStream']);
-          console.log(streams);
+          // console.log('its a blocking task');
+          // console.log(streams['logStream']);
+          // console.log(streams);
 
           streams['logStream'].on('end', () =>
           {
-            console.log('decrement for task', this.taskConfig['name']);
-            this.taskConfig.rootLogStream.decrement();
+            // console.log('decrement for task', this.taskConfig['name']);
+            // this.taskConfig.rootLogStream.decrement();
             resolve(taskOutputConfig);
           });
           streams['outputStream'].resume();
           streams['logStream'].resume();
-          // console.log('buff transform: ',await BufferTransform.toArray(streams['logStream']));
-
         }
       }
       catch (e)
@@ -124,30 +122,30 @@ export class TaskETL extends Task
         const outputStream = new stream.Readable();
         outputStream.push(null);
         const logStream = new LogStream();
-        logStream.pipeLogs(this.taskConfig.rootLogStream);
+        logStream.pipe(this.taskConfig.rootLogStream);
         logStream.log('Error while running ETL task: ' + String(e.toString()), 'error');
         this.taskConfig.rootLogStream.push(null);
         logStream.push(null);
         taskOutputConfig['options']['logStream'] = logStream;
         taskOutputConfig['options']['outputStream'] = outputStream;
-        console.log('increment ERROR for task', this.taskConfig['name']);
-        this.taskConfig.rootLogStream.increment();
+
+        // this.taskConfig.rootLogStream.increment();
 
         if (taskOutputConfig.blocking !== true)
         {
-          logStream.on('end', () =>
-          {
-            console.log('decrement ERROR for task', this.taskConfig['name']);
-            this.taskConfig.rootLogStream.decrement();
-          });
+          // logStream.on('end', () =>
+          // {
+          //   console.log('decrement ERROR for task', this.taskConfig['name']);
+          //   this.taskConfig.rootLogStream.decrement();
+          // });
           resolve(taskOutputConfig);
         }
         else
         {
           logStream.on('end', () =>
           {
-            console.log('decrement ERROR for task', this.taskConfig['name']);
-            this.taskConfig.rootLogStream.decrement();
+            // console.log('decrement ERROR for task', this.taskConfig['name']);
+            // this.taskConfig.rootLogStream.decrement();
             resolve(taskOutputConfig);
           });
         }
