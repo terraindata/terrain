@@ -55,14 +55,11 @@ import * as request from 'then-request';
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
 import * as winston from 'winston';
 import TerrainTools from '../../../src/app/util/TerrainTools';
-import { replayInputEventOnly, replayReduxEventOnly, replayRREvents } from '../../FullstackUtils';
+import { login, replayInputEventOnly, replayReduxEventOnly, replayRREvents } from '../../FullstackUtils';
 
-const COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > svg';
-const CARDS_COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > div > div.menu-options-wrapper > div:nth-child(3) > div > div.menu-text-padding';
-const CARDSTARTER_SELECTOR = '#cards-column-inner > div.info-area > div.info-area-buttons-container > div';
 const USERNAME_SELECTOR = '#login-email';
 const PASSWORD_SELECTOR = '#login-password';
-const BUTTON_SELECTOR = '#app > div > div.app-wrapper > div > div.login-container > div.login-submit-button-wrapper > div';
+const BUTTON_SELECTOR = '#login-submit';
 
 expect.extend({ toMatchImageSnapshot } as any);
 
@@ -102,29 +99,6 @@ async function takeBuilderActionScreenshot(page)
   await takeAndCompareScreenShot(page);
 }
 
-async function gotoStarterPage(page, url)
-{
-  await page.goto(url);
-  sleep.sleep(5);
-  winston.info('Goto the login page ' + url);
-  try
-  {
-    await page.waitForSelector(USERNAME_SELECTOR, { timeout: 0 });
-    winston.info('Username selector is ready.');
-    await page.click(USERNAME_SELECTOR);
-    await page.keyboard.type('admin@terraindata.com');
-    await page.click(PASSWORD_SELECTOR);
-    await page.keyboard.type('CnAATPys6tEB*ypTvqRRP5@2fUzTuY!C^LZP#tBQcJiC*5');
-    await page.click(BUTTON_SELECTOR);
-  } catch (e)
-  {
-    winston.warn('The page might be already loaded, keep going.');
-  }
-  winston.info('Goto the starting page.');
-  winston.info('Start builder at : ' + String(url));
-  sleep.sleep(3);
-}
-
 describe('Replay a builder action', () =>
 {
   let browser;
@@ -144,7 +118,7 @@ describe('Replay a builder action', () =>
     page = await browser.newPage();
     await page.setViewport({ width: 1600, height: 1200 });
     const url = `http://${ip.address()}:3000`;
-    await gotoStarterPage(page, url);
+    await login(page, url);
     await takeBuilderActionScreenshot(page);
     const actions = actionFileData['actions'];
     const serializeRecords = actionFileData['records'];

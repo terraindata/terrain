@@ -434,7 +434,7 @@ class App extends TerrainComponent<Props>
     {
       this.handleLoginLoadComplete();
     }
-    
+
     if (this.props.location.pathname !== nextProps.location.pathname)
     {
       if (window['dataLayer'] !== undefined)
@@ -454,7 +454,7 @@ class App extends TerrainComponent<Props>
       document.getElementById('login-submit').innerHTML = 'Loading Your Data';
     }
   }
-  
+
   public fetchData()
   {
     this.props.userActions({
@@ -483,7 +483,7 @@ class App extends TerrainComponent<Props>
     {
       document.getElementById('login-submit').innerHTML = 'Done!';
     }
-    
+
     const loginEl = document.getElementById('login');
     if (loginEl)
     {
