@@ -69,6 +69,19 @@ const $ = (type: string, payload: any) =>
   return { type, payload: Object.assign({}, payload, { versioning: true }) };
 };
 
+const duplicateNameHandler = (ev) =>
+{
+  if (ev && ev.errors && ev.errors[0].detail === 'Duplicate item name')
+  {
+    notificationManager.addNotification(
+      'Item name is already taken',
+      '',
+      'error',
+      4,
+    );
+  }
+};
+
 const Actions =
   {
     categories:
@@ -91,6 +104,7 @@ const Actions =
 
                   idCallBack && idCallBack(id);
                 },
+                duplicateNameHandler,
               );
             },
 
@@ -99,9 +113,7 @@ const Actions =
             $(ActionTypes.categories.remove, { category }),
 
         change:
-          (
-            category: Category,
-          ) =>
+          (category: Category) =>
             (dispatch, getState, api) =>
             {
               api.saveItem(
@@ -110,18 +122,7 @@ const Actions =
                 {
                   dispatch($(ActionTypes.categories.change, { category }));
                 },
-                (ev) =>
-                {
-                  if (ev && ev.response && ev.response.data.errors[0].detail === 'Duplicate item name')
-                  {
-                    notificationManager.addNotification(
-                      'Item name is already taken',
-                      '',
-                      'error',
-                      4,
-                    );
-                  }
-                },
+                duplicateNameHandler,
               );
             },
 
@@ -159,6 +160,7 @@ const Actions =
                   }));
                   idCallback && idCallback(id);
                 },
+                duplicateNameHandler,
               );
             },
 
@@ -184,7 +186,17 @@ const Actions =
 
         change:
           (group: Group) =>
-            $(ActionTypes.groups.change, { group }),
+            (dispatch, getState, api) =>
+            {
+              api.saveItem(
+                group,
+                (response) =>
+                {
+                  dispatch($(ActionTypes.groups.change, { group }));
+                },
+                duplicateNameHandler,
+              );
+            },
 
         move:
           (group: Group, index: number, categoryId: ID) =>
@@ -266,6 +278,7 @@ const Actions =
                   }));
                   responseHandler && responseHandler(response, algorithm);
                 },
+                duplicateNameHandler,
               );
             },
 
@@ -275,7 +288,33 @@ const Actions =
 
         change:
           (algorithm: Algorithm) =>
-            $(ActionTypes.algorithms.change, { algorithm }),
+            (dispatch, getState, api) =>
+            {
+              api.saveItem(
+                algorithm,
+                (response) =>
+                {
+                  const oldName: string = getState().get('library').algorithms.get(algorithm.id).name;
+                  if (oldName !== algorithm.name)
+                  {
+                    let message = '"' + oldName + '" is now "' + algorithm.name + '"';
+                    if (!oldName)
+                    {
+                      message = 'To "' + algorithm.name + '"';
+                    }
+
+                    notificationManager.addNotification(
+                      'Renamed',
+                      message,
+                      'info',
+                      5,
+                    );
+                  }
+                  dispatch($(ActionTypes.algorithms.change, { algorithm }));
+                },
+                duplicateNameHandler,
+              );
+            },
 
         move:
           (algorithm: Algorithm, index: number, categoryId: ID, groupId: ID) => (dispatch, getState) =>

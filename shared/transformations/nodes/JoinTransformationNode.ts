@@ -43,20 +43,85 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+const { List, Map } = Immutable;
 
-export default class JoinTransformationNode extends TransformationNode
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath } from 'shared/util/KeyPath';
+
+import CombineTransformationType from 'shared/transformations/types/CombineTransformationType';
+
+const TYPECODE = TransformationNodeType.JoinNode;
+
+export class JoinTransformationNode extends CombineTransformationType
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.JoinNode)
+  public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'string';
+
+  public validate()
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    if (typeof opts.delimiter !== 'string')
+    {
+      return `Option 'delimiter' (${opts.delimiter}) is invalid`;
+    }
+    return super.validate();
+  }
+
+  public combine(vals: string[]): string
+  {
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+
+    let joined: string;
+    for (const val of vals)
+    {
+      if (joined === undefined)
+      {
+        joined = val as string;
+      }
+      else
+      {
+        joined = joined + opts.delimiter + (val as string);
+      }
+    }
+    return joined;
   }
 }
+
+class JoinTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Join Field';
+  public description = 'Join this field with another field';
+  public nodeClass = JoinTransformationNode;
+
+  public editable = false;
+  public creatable = true;
+  public newFieldType = 'string';
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return (
+      EngineUtil.getRepresentedType(fieldId, engine) === 'string' &&
+      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+    );
+  }
+
+  public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
+  {
+    const names = meta.newFieldKeyPaths.map((value) => value.last());
+    return `Join on ${meta.delimiter} from ${names.toJS()}`;
+  }
+}
+
+export const JoinTransformationInfo = new JoinTransformationInfoC();

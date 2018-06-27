@@ -203,6 +203,7 @@ class Connections extends TerrainComponent<Props>
       <div
         className='connections-page'
       >
+        <div className='connections-page-title' style={{ color: Colors().mainSectionTitle }}>Database Connections</div>
         <div
           className='connections-list-wrapper'
         >
@@ -227,17 +228,17 @@ class Connections extends TerrainComponent<Props>
               {
                 name: 'address',
                 render: this._fn(this.renderProperty, 'dsn'),
-                style: { width: `30%` },
+                style: { width: `20%` },
               },
               {
                 name: 'analytics',
                 render: this._fn(this.renderProperty, 'analytics'),
-                style: { width: `5%` },
+                style: { width: `20%` },
               },
               {
                 name: 'status',
                 render: this._fn(this.renderProperty, 'status'),
-                style: { width: `20%` },
+                style: { width: `15%` },
               },
             ]}
             onRowClicked={this.handleRowClick}

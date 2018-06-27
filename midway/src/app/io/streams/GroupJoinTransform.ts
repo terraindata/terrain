@@ -134,7 +134,14 @@ export default class GroupJoinTransform extends SafeReadable
           response = this.source.read();
         }
       });
-      this.source.on('end', () => { this._isSourceEmpty = true; });
+      this.source.on('end', () =>
+      {
+        this._isSourceEmpty = true;
+        if (this.bufferedOutputs.length === 0)
+        {
+          this.push(null);
+        }
+      });
       this.source.on('error', (e) => this.emit('error', e));
 
     }
@@ -167,6 +174,12 @@ export default class GroupJoinTransform extends SafeReadable
     const inputs = response['hits'].hits;
     const numInputs = inputs.length;
     const numQueries = Object.keys(query).length;
+
+    if (numInputs === 0)
+    {
+      this.push(response);
+      return;
+    }
 
     // issue a ticket to track the progress of this query; count indicates the number of subqueries
     // associated with this query

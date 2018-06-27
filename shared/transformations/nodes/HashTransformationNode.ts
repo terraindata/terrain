@@ -43,20 +43,81 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+import { keccak256 } from 'js-sha3';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+const { List, Map } = Immutable;
 
-export default class HashTransformationNode extends TransformationNode
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath } from 'shared/util/KeyPath';
+
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
+
+const TYPECODE = TransformationNodeType.HashNode;
+
+export class HashTransformationNode extends SimpleTransformationType
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.HashNode)
+  public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'string';
+
+  public validate()
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    if (typeof opts.salt !== 'string')
+    {
+      return `salt "${opts.salt} is not a valid salt`;
+    }
+    return super.validate();
   }
+
+  public transformer(el: string): string
+  {
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    return hashHelper(el, opts.salt);
+  }
+}
+
+class HashTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Hash';
+  public description = 'Hash this field using SHA3/Keccak256';
+  public nodeClass = HashTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+  }
+
+  public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
+  {
+    return `Hash with salt "${meta.salt}`;
+  }
+}
+
+export const HashTransformationInfo = new HashTransformationInfoC();
+
+function hashHelper(toHash: string, salt: string): string
+{
+  if (typeof toHash !== 'string')
+  {
+    throw new Error('Value to hash is not a string');
+  }
+  else if (typeof salt !== 'string')
+  {
+    throw new Error('Salt is not a string');
+  }
+  return keccak256.update(toHash + salt).hex();
 }

@@ -329,23 +329,6 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
 
   public handleNameChange(id: ID, name: string)
   {
-    if (this.props.algorithms.get(id).name !== name)
-    {
-      const oldName = this.props.algorithms.get(id).name;
-      let message = '"' + oldName + '" is now "' + name + '"';
-      if (!oldName)
-      {
-        message = 'To "' + name + '"';
-      }
-
-      notificationManager.addNotification(
-        'Renamed',
-        message,
-        'info',
-        5,
-      );
-    }
-
     this.props.algorithmActions.change(
       this.props.algorithms.get(id)
         .set('name', name) as Algorithm,

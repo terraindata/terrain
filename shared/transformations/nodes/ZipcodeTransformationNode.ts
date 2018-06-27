@@ -43,20 +43,73 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+const { List, Map } = Immutable;
 
-export default class ZipcodeTransformationNode extends TransformationNode
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath } from 'shared/util/KeyPath';
+
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
+
+const TYPECODE = TransformationNodeType.ZipcodeNode;
+
+export class ZipcodeTransformationNode extends SimpleTransformationType
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.ZipcodeNode)
+  public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'string';
+
+  public transformer(el: string): string
   {
-    super(id, fields, options, typeCode);
+    return zipcodeHelper(el, this.meta as NodeOptionsType<typeof TYPECODE>);
+  }
+}
+
+class ZipcodeTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Zipcode';
+  public description = 'Convert a zipcode into location data';
+  public nodeClass = ZipcodeTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+  }
+}
+
+export const ZipcodeTransformationInfo = new ZipcodeTransformationInfoC();
+
+function zipcodeHelper(zipcode: string, opts: NodeOptionsType<TransformationNodeType.ZipcodeNode>)
+{
+  const data = TransformationEngine.datastore.get('zips')[zipcode];
+  if (!data)
+  {
+    return null;
+  }
+  switch (opts.format)
+  {
+    case 'city':
+      return data.city;
+    case 'state':
+      return data.state;
+    case 'citystate':
+      return (data.city as string) + ', ' + (data.state as string);
+    case 'type':
+      return data.type;
+    default:
+      return data.loc;
   }
 }

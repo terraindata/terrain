@@ -43,20 +43,97 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+const { List, Map } = Immutable;
 
-export default class CaseTransformationNode extends TransformationNode
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+
+import TransformationNode from 'shared/transformations/TransformationNode';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath } from 'shared/util/KeyPath';
+
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
+
+const TYPECODE = TransformationNodeType.CaseNode;
+
+export enum CaseFormats
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.CaseNode)
+  uppercase = 'uppercase',
+  lowercase = 'lowercase',
+  titlecase = 'titlecase',
+  camelcase = 'camelcase',
+  pascalcase = 'pascalcase',
+}
+
+export const caseFormatToReadable = Immutable.Map<string, string>({
+  [CaseFormats.uppercase]: 'Uppercase',
+  [CaseFormats.lowercase]: 'lowercase',
+  [CaseFormats.titlecase]: 'Title Case',
+  [CaseFormats.camelcase]: 'camelCase',
+  [CaseFormats.pascalcase]: 'PascalCase',
+});
+
+export const availableCases = List(caseFormatToReadable.keys());
+
+export class CaseTransformationNode extends SimpleTransformationType
+{
+  public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'string';
+
+  public validate(): string | boolean
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    if (!caseFormatToReadable.has(opts.format))
+    {
+      return 'Unknown case format specified';
+    }
+    return super.validate();
+  }
+
+  public transformer(el: string): string
+  {
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    switch (opts.format)
+    {
+      case CaseFormats.uppercase:
+        return el.toUpperCase();
+      case CaseFormats.lowercase:
+        return el.toLowerCase();
+      case CaseFormats.titlecase:
+        return el.toLowerCase().replace(/[^\s_\-/]*/g, (word) =>
+          word.replace(/./, (ch) => ch.toUpperCase()));
+      case CaseFormats.camelcase:
+        return _.camelCase(el);
+      case CaseFormats.pascalcase:
+        return _.upperFirst(_.camelCase(el));
+      default:
+        return el;
+    }
   }
 }
+
+class CaseTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Change Case';
+  public description = 'Change case for text fields (e.g. lowercase, uppercase)';
+  public nodeClass = CaseTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+  }
+}
+
+export const CaseTransformationInfo = new CaseTransformationInfoC();

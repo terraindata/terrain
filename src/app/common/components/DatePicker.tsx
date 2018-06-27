@@ -163,7 +163,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     dateViewType: 'calendar',
     sign: '-',
     unit: 'M',
-    amount: 0,
+    amount: '',
   };
   public componentDidMount()
   {
@@ -274,7 +274,6 @@ export class DatePickerUncontained extends TerrainComponent<Props>
   {
     let newSign;
     let newUnit;
-    let newAmount;
     const newDate = nextDate.replace(/ /g, '');
     const nextSign = newDate[3];
     if (nextSign === '+' || nextSign === '-')
@@ -286,7 +285,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
       newSign = '-';
     }
     const nextUnit = newDate.slice(-1);
-    if (DateUnitArray.includes(nextUnit))
+    if (DateUnitArray.includes(nextUnit) && newDate.toLowerCase() !== 'now')
     {
       newUnit = nextUnit;
     }
@@ -294,15 +293,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     {
       newUnit = 'M';
     }
-    const nextAmount = parseInt(newDate.slice(4, -1), 10);
-    if (nextAmount >= 0)
-    {
-      newAmount = nextAmount;
-    }
-    else
-    {
-      newAmount = 0;
-    }
+    const newAmount = newDate.slice(4, -1);
     return [newSign, newUnit, newAmount];
   }
 
@@ -334,14 +325,16 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     }
   }
 
-  public getDateViewType(dateProp: string): string
+  public getDateViewType(rawDateProp: string): string
   {
     let dateViewType;
+    const dateProp = rawDateProp.replace(/ /g, '');
+    const elasticCheck = dateProp.slice(0, 3).toLowerCase();
     if (dateProp.startsWith('@TerrainDate'))
     {
       dateViewType = 'relative';
     }
-    else if ((dateProp.startsWith('Now')) || (dateProp.startsWith('now')))
+    else if (elasticCheck === 'now')
     {
       dateViewType = 'specific';
     }
@@ -434,9 +427,9 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     this.props.onChange(this.formatElasticQuery(this.state.sign, this.state.unit, e.target.value));
   }
 
-  public formatElasticQuery(sign: string, unit: string, amount: number): string
+  public formatElasticQuery(sign: string, unit: string, amount: string): string
   {
-    return 'now' + sign + amount.toString() + unit;
+    return 'now' + sign + amount + unit;
   }
 
   public dateToHourIndex(date: Moment)
@@ -537,8 +530,8 @@ export class DatePickerUncontained extends TerrainComponent<Props>
           <p className='date-view-label'>Amount</p>
           <input
             className='specific-time-amount'
-            type='number'
-            min='0'
+            type='text'
+            value={this.state.amount || ''}
             onChange={this.handleAmountChange}
           />
         </div>

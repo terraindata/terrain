@@ -62,6 +62,10 @@ export function doRequest(url)
       }
       else
       {
+        if (error === null || error === undefined)
+        {
+          error = 'Received status ' + String(res.statusCode) + " on Midway's request.";
+        }
         reject(error);
       }
     });

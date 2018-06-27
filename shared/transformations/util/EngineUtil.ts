@@ -136,6 +136,7 @@ export default class EngineUtil
         const fieldTypeErrors = EngineUtil.fieldHasValidType(engine, id);
         if (fieldTypeErrors.length > 0)
         {
+          errors.push(`Errors Encountered with field ${id} (${okp.toJS()})`);
           errors = errors.concat(fieldTypeErrors);
         }
       });
@@ -789,6 +790,14 @@ export default class EngineUtil
   // warning types get typed as strings, but should emit a warning
   private static mergeTypes(type1: FieldTypes = null, type2: FieldTypes = null): FieldTypes | 'warning' | 'softWarning'
   {
+    if (type1 === 'undefined' as any)
+    {
+      type1 = null;
+    }
+    if (type2 === 'undefined' as any)
+    {
+      type2 = null;
+    }
     if (type1 === null)
     {
       return type2;
