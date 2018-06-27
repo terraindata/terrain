@@ -90,7 +90,6 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     if (fullBody.screenshot)
     {
       attachment = fullBody.screenshot;
-
     }
     // winston.info("id: " + emailIntegrations[0].id);
     const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body, attachment);
