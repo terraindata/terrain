@@ -72,13 +72,15 @@ export class SplitTransformationNode extends ForkTransformationType
   {
     const opts = this.meta as NodeOptionsType<TransformationNodeType.SplitNode>;
 
-    const split = splitHelper(el, opts);
+    const expectedSize = opts.newFieldKeyPaths.size;
+    const split = trimHelper(splitHelper(el, opts, expectedSize), expectedSize);
     const outputFields = [];
 
     for (let i = 0; i < opts.newFieldKeyPaths.size; i++)
     {
+      const value = split[i];
       outputFields.push({
-        value: split[i],
+        value,
         field: i,
       });
     }
@@ -115,9 +117,20 @@ class SplitTransformationInfoC extends TransformationNodeInfo
 
 export const SplitTransformationInfo = new SplitTransformationInfoC();
 
-function splitHelper(el: any, opts: NodeOptionsType<TransformationNodeType.SplitNode>): string[]
+function trimHelper(splits: string[], size: number, defaultValue = ''): string[]
 {
-  let split: string[];
+  const newSplits = splits.slice();
+  for (let i = newSplits.length; i < size; i++)
+  {
+    newSplits[i] = defaultValue;
+  }
+  return newSplits;
+}
+
+function splitHelper(el: string, opts: NodeOptionsType<TransformationNodeType.SplitNode>, size: number)
+{
+  let split: string[] = [];
+
   if (typeof opts.delimiter === 'number')
   {
     split = [
@@ -125,13 +138,50 @@ function splitHelper(el: any, opts: NodeOptionsType<TransformationNodeType.Split
       (el as string).slice(opts.delimiter as number),
     ];
   }
-  else if (opts.regex === true)
-  {
-    split = (el as string).split(RegExp(opts.delimiter as string));
-  }
   else
   {
-    split = (el as string).split(opts.delimiter as string);
+    const searcher = opts.regex ? RegExp(opts.delimiter) : opts.delimiter;
+    let str = el;
+    let i;
+    for (i = 0; i < size - 1; i++)
+    {
+      const match = str.match(searcher);
+      if (match === null)
+      {
+        break;
+      }
+      else
+      {
+        const matchPosition = match.index;
+        const matchLength = match[0].length;
+        const newValue = str.slice(0, matchPosition);
+        str = str.slice(matchPosition + matchLength);
+        split[i] = newValue;
+      }
+    }
+    split[i] = str;
   }
   return split;
 }
+
+// function splitHelper(el: any, opts: NodeOptionsType<TransformationNodeType.SplitNode>): string[]
+// {
+//   let split: string[];
+
+//   if (typeof opts.delimiter === 'number')
+//   {
+//     split = [
+//       (el as string).slice(0, opts.delimiter as number),
+//       (el as string).slice(opts.delimiter as number),
+//     ];
+//   }
+//   else if (opts.regex === true)
+//   {
+//     split = (el as string).split(RegExp(opts.delimiter as string));
+//   }
+//   else
+//   {
+//     split = (el as string).split(opts.delimiter as string);
+//   }
+//   return split;
+// }

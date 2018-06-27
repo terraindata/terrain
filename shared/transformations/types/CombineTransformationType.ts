@@ -51,14 +51,22 @@ import TransformationNodeInfo from 'shared/transformations/TransformationNodeInf
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import { List } from 'immutable';
+import * as _ from 'lodash';
 
-import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import { createLocalMatcher, visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationVisitError from 'shared/transformations/TransformationVisitError';
 import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
+
+export interface InputField
+{
+  field: KeyPath;
+  matchField: KeyPath;
+  value: any;
+}
 
 /*
  *  Combine Transformations produce a synthetic field out of multiple input fields
@@ -70,38 +78,97 @@ export default abstract class CombineTransformationType extends TransformationNo
 
   public abstract combine(vals: any[]): any;
 
+  // todo make validate check to make sure all the input fields are local to eachother
+
+  // override this to customize how the values that get passed to combine appear
+  // values in the array should always match the order of this.fields; however there may be values missing
+  protected processMatchSet(matchSet: InputField[]): any[]
+  {
+    return matchSet.map((inputField) => inputField.value);
+  }
+
   protected transformDocument(doc: object): TransformationVisitResult
   {
-    const vals = [];
     const errors = [];
+    const matchSets: {
+      [k: string]: InputField[],
+    } = {};
 
     this.fields.forEach((field) =>
     {
-      const el = yadeep.get(doc, field);
+      for (const match of yadeep.search(doc, field))
+      {
+        const { value, location } = match;
+        if (value === null && this.skipNulls)
+        {
+          return;
+        }
+        if (!this.checkType(value))
+        {
+          errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof value}.`);
+          return;
+        }
 
-      if (el === null && this.skipNulls)
-      {
-        return undefined;
-      }
-
-      if (!this.checkType(el))
-      {
-        errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof el}.`);
-      }
-      else
-      {
-        vals.push(el);
+        const hash = hashMatchToLocale(field, location);
+        const inputs: InputField[] = _.get(matchSets, hash, []);
+        inputs.push({
+          field,
+          value,
+          matchField: location,
+        });
+        matchSets[hash] = inputs;
       }
     });
 
     const opts = this.meta as NodeOptionsType<any>;
-    const result = this.combine(vals);
+    const newFieldKeyPath = opts.newFieldKeyPaths.get(0);
 
-    yadeep.set(doc, opts.newFieldKeyPaths.get(0), result, { create: true });
+    for (const locale of Object.keys(matchSets))
+    {
+      const matchSet = matchSets[locale];
+      const matcher = createLocalMatcher(matchSet[0].field, matchSet[0].matchField);
+      if (matcher === null)
+      {
+        errors.push(`Error in ${this.typeCode}: Field and Match location are inconsistent`);
+      }
+      else
+      {
+        const destKP = matcher(newFieldKeyPath);
+        const newValue = this.combine(this.processMatchSet(matchSet));
+        yadeep.set(doc, destKP, newValue, { create: true });
+      }
+    }
 
     return {
       document: doc,
       errors,
     } as TransformationVisitResult;
   }
+}
+
+// like with createLocalMatcher, matchKP should not contain -1
+function hashMatchToLocale(searchKP: KeyPath, matchKP: KeyPath): string
+{
+  let hash = '';
+  if (searchKP.size !== matchKP.size)
+  {
+    return null;
+  }
+  for (let i = 0; i < searchKP.size; i++)
+  {
+    const searchIndex = searchKP.get(i);
+    const matchIndex = matchKP.get(i);
+    if (searchIndex !== matchIndex)
+    {
+      if (typeof searchIndex !== 'number' || typeof matchIndex !== 'number')
+      {
+        return null;
+      }
+      else
+      {
+        hash = `.${i}:${matchIndex}`;
+      }
+    }
+  }
+  return hash;
 }

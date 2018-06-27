@@ -45,12 +45,15 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { List } from 'immutable';
+import * as _ from 'lodash';
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
 import { TransformationEngine } from '../../transformations/TransformationEngine';
 import TransformationNodeType from '../../transformations/TransformationNodeType';
 import { KeyPath } from '../../util/KeyPath';
 import * as yadeep from '../../util/yadeep';
 import { TestDocs } from './TestDocs';
+
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 test('add fields manually', () =>
 {
@@ -251,6 +254,40 @@ test('join two fields', () =>
   expect(r['meta']['school']).toBe(undefined);
 });
 
+test('join multiple fields in a nested array', () =>
+{
+  const doc = {
+    fields: [
+      {
+        foo: 'somebody',
+        bar: 'once',
+        baz: 'told',
+      },
+      {
+        blah: [],
+      },
+      {
+        foo: 'me',
+        baz: 'the',
+      },
+    ],
+  };
+
+  const e: TransformationEngine = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.JoinNode,
+    List([KeyPath(['fields', -1, 'foo']), KeyPath(['fields', -1, 'bar']), KeyPath(['fields', -1, 'baz'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([KeyPath(['fields', -1, 'combo'])]),
+      preserveOldFields: false,
+      delimiter: ' ',
+    });
+  const r = e.transform(doc);
+  expect(r['fields'][0]['combo']).toBe('somebody once told');
+  expect(r['fields'][1].hasOwnProperty('combo')).toBe(false);
+  expect(r['fields'][2]['combo']).toBe('me the');
+});
+
 test('duplicate a field', () =>
 {
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc2);
@@ -320,6 +357,104 @@ test('split a field (regex delimiter)', () =>
   expect(r['s1']).toBe('la');
   expect(r['s2']).toBe('dee');
   expect(r['s3']).toBe('da');
+});
+
+test('split multiple fields in a nested array', () =>
+{
+  const doc = {
+    fields: [
+      {
+        foo: 'look what',
+      },
+      {
+        blah: 'hi',
+      },
+      {
+        foo: 'the cat dragged in',
+      },
+    ],
+  };
+
+  const e: TransformationEngine = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.SplitNode,
+    List([KeyPath(['fields', -1, 'foo'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([
+        KeyPath(['fields', -1, 'f1']),
+        KeyPath(['fields', -1, 'f2']),
+        KeyPath(['fields', -1, 'f3']),
+      ]),
+      delimiter: ' ',
+    });
+
+  const r = e.transform(doc);
+
+  expect(r['fields'][0]).toEqual({
+    foo: 'look what',
+    f1: 'look',
+    f2: 'what',
+    f3: '',
+  });
+  expect(r['fields'][1].hasOwnProperty('f1')).toBe(false);
+  expect(r['fields'][2]).toEqual({
+    foo: 'the cat dragged in',
+    f1: 'the',
+    f2: 'cat',
+    f3: 'dragged in',
+  });
+});
+
+test('regex split multiple fields in a nested array', () =>
+{
+  const doc = {
+    fields: [
+      {
+        foo: 'XYZ1234ABC',
+      },
+      {
+        foo: 'XYZ1234',
+      },
+      {
+        foo: '143QWERTY000HELLO9ABC',
+      },
+    ],
+  };
+
+  const e: TransformationEngine = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.SplitNode,
+    List([KeyPath(['fields', -1, 'foo'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([
+        KeyPath(['fields', -1, 'f1']),
+        KeyPath(['fields', -1, 'f2']),
+        KeyPath(['fields', -1, 'f3']),
+      ]),
+      delimiter: '[0-9]+',
+      regex: true,
+    });
+
+  const r = e.transform(doc);
+
+  expect(r['fields'][0]).toEqual({
+    foo: 'XYZ1234ABC',
+    f1: 'XYZ',
+    f2: 'ABC',
+    f3: '',
+  });
+  expect(r['fields'][1]).toEqual({
+    foo: 'XYZ1234',
+    f1: 'XYZ',
+    f2: '',
+    f3: '',
+  });
+  expect(r['fields'][2]).toEqual({
+    foo: '143QWERTY000HELLO9ABC',
+    f1: '',
+    f2: 'QWERTY',
+    f3: 'HELLO9ABC',
+  });
 });
 
 test('cast node tests', () =>
@@ -1142,4 +1277,48 @@ test('simple transformation on deep array', () =>
     [5, 6, 7],
     [8, 9, 10],
   ]);
+});
+
+test('identity transformation for nested arrays', () =>
+{
+  const doc = {
+    fields: [
+      {
+        foo: 'look what',
+      },
+      {
+        blah: [],
+      },
+      {
+        foo: 'the cat dragged in',
+      },
+    ],
+  };
+
+  const copyOfDoc = _.cloneDeep(doc);
+  const e = new TransformationEngine(doc);
+  const r = e.transform(doc);
+  expect(r).toEqual(copyOfDoc);
+});
+
+test('identity transformation for ui-constructed nested arrays', () =>
+{
+  const doc = {
+    fields: [
+      {
+        foo: 'look what',
+      },
+      {
+        blah: [],
+      },
+      {
+        foo: 'the cat dragged in',
+      },
+    ],
+  };
+
+  const copyOfDoc = _.cloneDeep(doc);
+  const e = EngineUtil.createEngineFromDocuments(List([doc])).engine;
+  const r = e.transform(doc);
+  expect(r).toEqual(copyOfDoc);
 });

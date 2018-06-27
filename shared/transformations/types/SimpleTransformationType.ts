@@ -74,7 +74,8 @@ export default abstract class SimpleTransformationType extends TransformationNod
   {
     const errors = [];
 
-    this.fields.forEach((field) => {
+    this.fields.forEach((field) =>
+    {
       for (const match of yadeep.search(doc, field))
       {
         const { value, location } = match;

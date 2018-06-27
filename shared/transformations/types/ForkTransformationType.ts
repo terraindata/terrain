@@ -85,8 +85,10 @@ export default abstract class ForkTransformationType extends TransformationNode
       return 'Transformation has no newFieldKeyPaths';
     }
     let valid = true;
-    this.fields.forEach((field) => {
-      opts.newFieldKeyPaths.forEach((nfkp) => {
+    this.fields.forEach((field) =>
+    {
+      opts.newFieldKeyPaths.forEach((nfkp) =>
+      {
         if (valid && !areFieldsLocal(field, nfkp))
         {
           valid = false;
@@ -106,7 +108,8 @@ export default abstract class ForkTransformationType extends TransformationNode
     const errors = [];
     const opts = this.meta as NodeOptionsType<any>;
 
-    this.fields.forEach((field) => {
+    this.fields.forEach((field) =>
+    {
       for (const match of yadeep.search(doc, field))
       {
         const { value, location } = match;
@@ -128,9 +131,10 @@ export default abstract class ForkTransformationType extends TransformationNode
         }
 
         const newFields = this.split(value);
+
         for (const newField of newFields)
         {
-          const newFieldKeyPath = typeof newField.field === 'number' ?
+          const newFieldKeyPath: KeyPath = typeof newField.field === 'number' ?
             opts.newFieldKeyPaths.get(newField.field) :
             newField.field;
           yadeep.set(doc, matcher(newFieldKeyPath), newField.value, { create: true });

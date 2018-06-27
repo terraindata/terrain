@@ -66,11 +66,12 @@ export default class TransformationEngineNodeVisitor
 }
 
 /*
+ * referenceKP can contain -1
  * matchKP should not contain -1
  */
-export function createLocalMatcher(searchKP: KeyPath, matchKP: KeyPath): (newKP: KeyPath) => KeyPath
+export function createLocalMatcher(referenceKP: KeyPath, matchKP: KeyPath): (newKP: KeyPath) => KeyPath
 {
-  if (searchKP.size !== matchKP.size || searchKP.size === 0)
+  if (referenceKP.size !== matchKP.size || referenceKP.size === 0)
   {
     return null;
   }
@@ -81,9 +82,9 @@ export function createLocalMatcher(searchKP: KeyPath, matchKP: KeyPath): (newKP:
 
   let maxIndex = -1;
 
-  for (let i = 0; i < searchKP.size; i++)
+  for (let i = 0; i < referenceKP.size; i++)
   {
-    const searchIndex = searchKP.get(i);
+    const searchIndex = referenceKP.get(i);
     const matchIndex = matchKP.get(i);
     if (searchIndex !== matchIndex)
     {
@@ -101,7 +102,8 @@ export function createLocalMatcher(searchKP: KeyPath, matchKP: KeyPath): (newKP:
 
   const baseMatchPath = matchKP.slice(0, maxIndex + 1);
 
-  return (newKP: KeyPath) => {
+  return (newKP: KeyPath) =>
+  {
     if (maxIndex === -1)
     {
       return newKP;
