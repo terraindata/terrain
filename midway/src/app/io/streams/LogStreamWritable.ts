@@ -67,29 +67,12 @@ export default class LogStreamWritable extends SafeWritable
 
     this.on('pipe', (src) =>
     {
-      console.log('PIPING');
       this.increment();
-    });
-
-    this.on('unpipe', (src) =>
-    {
-      console.log('UNPIPING');
-      this.decrement();
     });
   }
 
-  // public pipeLogs(stream: LogStream)
-  // {
-  //   stream.on('error', (e) =>
-  //   {
-  //     this.emit('error', e);
-  //     stream.destroy(e);
-  //   });
-  // }
-
   public push(chunk: any, encoding?: string): boolean
   {
-    console.log('WWAAAAAAAA');
     if (chunk === null)
     {
       return super.push(null);
@@ -129,7 +112,7 @@ export default class LogStreamWritable extends SafeWritable
 
   public decrement()
   {
-    console.log('Decrement AFTER ', this.count);
+    console.log('Decrement BEFORE ', this.count);
     this.count--;
     console.log('Decrement AFTER ', this.count);
     if (this.count === 0)
@@ -143,6 +126,5 @@ export default class LogStreamWritable extends SafeWritable
     console.log('INCREMENT BEFORE ', this.count);
     this.count++;
     console.log('INCREMENT AFTER ', this.count);
-
   }
 }
