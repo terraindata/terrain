@@ -56,6 +56,7 @@ export enum DisplayType
   TagsBox = 'TagsBox',
   Custom = 'Custom',
   Delegate = 'Delegate',
+  Switch = 'Switch',
 }
 
 export type InputDeclarationMap<State extends { [k: string]: any }> =
@@ -99,6 +100,9 @@ export interface InputDeclarationOptionTypes<S = any>
     onChangeKey?: string; // defaults to 'onChange'
     isList?: boolean;
     listDefaultValue?: any;
+  };
+  Switch: {
+    values: List<string>;
   };
 }
 

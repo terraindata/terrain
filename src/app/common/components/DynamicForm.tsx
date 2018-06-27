@@ -67,6 +67,7 @@ import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
 import FadeInOut from 'common/components/FadeInOut';
 import ListForm from 'common/components/ListForm';
+import Switch from 'common/components/Switch';
 
 import './DynamicForm.less';
 
@@ -107,6 +108,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       [DisplayType.TagsBox]: this.renderTagsBox,
       [DisplayType.Custom]: this.renderCustom,
       [DisplayType.Delegate]: this.renderDelegate,
+      [DisplayType.Switch]: this.renderSwitch,
     };
 
   public yOffsetLookup:
@@ -119,6 +121,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       [DisplayType.TagsBox]: 0,
       [DisplayType.Custom]: 0,
       [DisplayType.Delegate]: 0,
+      [DisplayType.Switch]: 0,
     };
   constructor(props)
   {
@@ -140,6 +143,24 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
             : null
         }
         {options.render(state, disabled)}
+      </div>
+    );
+  }
+
+  public renderSwitch(inputInfo: InputDeclarationType<S>, stateName, state: S, index, disabled: boolean)
+  {
+    const options: OptionType<DisplayType.Switch> = inputInfo.options || {};
+    return (
+      <div
+        className='dynamic-form-default-block'
+        key={index}
+      >
+        <Switch
+          first={options.values.get(0) ? options.values.get(0) : 'Option 1'}
+          second={options.values.get(1) ? options.values.get(1) : 'Option 2'}
+          selected={this.props.inputState[stateName]}
+          onChange={this.setStateHOC(stateName)}
+        />
       </div>
     );
   }

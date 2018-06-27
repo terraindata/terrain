@@ -90,7 +90,7 @@ export interface IntegrationConfigBase
 export interface AuthConfigTypes
 {
   Sftp: {
-    key: string;
+    privateKey: string;
     password: string;
   };
   Http: {
@@ -123,7 +123,7 @@ export interface AuthConfigTypes
 export interface ConnectionConfigTypes
 {
   Sftp: {
-    ip: string;
+    host: string;
     port: number;
     username: string;
   };
