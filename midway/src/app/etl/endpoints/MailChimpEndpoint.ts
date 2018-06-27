@@ -52,14 +52,11 @@ import * as winston from 'winston';
 import * as request from 'request';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { Readable, Writable } from 'stream';
-import { Integrations } from '../../integrations/Integrations';
 import AEndpointStream from './AEndpointStream';
 
 import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
 
 /* tslint:disable:max-classes-per-file */
-
-export const integrations: Integrations = new Integrations();
 
 export default class MailChimpEndpoint extends AEndpointStream
 {

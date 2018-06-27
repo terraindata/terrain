@@ -76,7 +76,6 @@ import Library from './library/components/LibraryDnd';
 import ManualWrapper from './manual/components/ManualWrapper';
 import SchemaPage from './schema/components/SchemaPage';
 import Account from './users/components/Account';
-import Profile from './users/components/Profile';
 import X from './x/components/X';
 
 require('velocity-animate');
@@ -547,7 +546,7 @@ class App extends TerrainComponent<Props>
                     <Route exact path='/manual' component={ManualWrapper} />
                     <Route exact path='/manual/:term' component={ManualWrapper} />
 
-                    <Route exact path='/users/:userId' component={Profile} />
+                    <Route exact path='/users/:userId' component={Account} />
 
                     <Route path='/reporting' component={Placeholder} />
 
