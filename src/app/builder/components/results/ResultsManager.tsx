@@ -534,16 +534,20 @@ export class ResultsManager extends TerrainComponent<Props>
       this.handleM2RouteError(errorMsg, false);
       return;
     }
-    this.postprocessEQL(interpreter, hitsPage, appendResults);
     if (interpreter.hasError())
     {
       TerrainLog.debug('Query has errors after updating from and size: ' + interpreter.getErrors());
       return;
     }
-    const eql = interpreter.finalQuery;
+    let eql = interpreter.finalQuery;
     if (this.state.query && this.state.query.xhr)
     {
       this.state.query.xhr.cancel();
+    }
+    eql = this.postprocessEQL(interpreter, hitsPage, appendResults);
+    if (query.path)
+    {
+      querySize = query.path.source.count;
     }
     TerrainLog.debug('Issue query ' + eql);
     this.setState({
@@ -668,6 +672,7 @@ export class ResultsManager extends TerrainComponent<Props>
     }
     changes['estimatedTotal'] = querySize === undefined ? resultsData.rawResult.hits.total :
       Math.min(querySize, resultsData.rawResult.hits.total);
+    console.log('QUERY SIZE IS ', querySize);
     // Need to take into account drop if less than group joins
     if (this.props.query.path &&
       this.props.query.path.nested &&
