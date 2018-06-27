@@ -45,65 +45,46 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
+
+const { List, Map } = Immutable;
+
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import { List } from 'immutable';
-
-import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
-import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
+
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
 
 const TYPECODE = TransformationNodeType.RemoveDuplicatesNode;
 
-export class RemoveDuplicatesTransformationNode extends TransformationNode
+export class RemoveDuplicatesTransformationNode extends SimpleTransformationType
 {
   public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'array';
 
-  public transform(doc: object)
+  public transformer(el: any[]): any[]
   {
     const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
 
-    this.fields.forEach((field) =>
+    const newArray = [];
+    const seen = {};
+    for (let i = 0; i < el.length; i++)
     {
-      const el = yadeep.get(doc, field);
-      if (Array.isArray(el))
+      const item = el[i];
+      const hash = String(item);
+      if (seen[hash] === undefined)
       {
-        const newArray = [];
-        const seen = {};
-        for (let i = 0; i < el.length; i++)
-        {
-          const item = el[i];
-          const hash = String(item);
-          if (seen[hash] === undefined)
-          {
-            newArray.push(item);
-            seen[hash] = true;
-          }
-        }
-        yadeep.set(doc, field, newArray, { create: true });
+        newArray.push(item);
+        seen[hash] = true;
       }
-      else
-      {
-        return {
-          errors: [
-            {
-              message: 'Attempted to remove duplicates on a non-array (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-    });
-
-    return {
-      document: doc,
-    } as TransformationVisitResult;
+    }
+    return newArray;
   }
 }
 

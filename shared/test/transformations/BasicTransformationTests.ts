@@ -55,6 +55,11 @@ import { TestDocs } from './TestDocs';
 
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
+function wrap(kp: any[])
+{
+  return List([List(kp)]);
+}
+
 test('add fields manually', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
@@ -821,10 +826,6 @@ test('duplicate a field and then rename that field', () =>
 
 test('super deep duplication and modify', () =>
 {
-  const wrap = (kp: any[]) =>
-  {
-    return List([List(kp)]);
-  };
   const doc = {
     fields1: [
       {
@@ -1146,11 +1147,6 @@ test('take difference of several fields', () =>
 
 test('Duplicate a nested field', () =>
 {
-  const wrap = (kp: string[]) =>
-  {
-    return List([List(kp)]);
-  };
-
   const doc = {
     field: {
       subField: {
@@ -1222,8 +1218,6 @@ test('Group By Transformation', () =>
         { status: 'some garbage', mlsId: 5 },
       ],
     };
-
-  const wrap = (kp: string[]) => List([List(kp)]);
 
   const e = new TransformationEngine(doc);
   e.appendTransformation(TransformationNodeType.GroupByNode, wrap(['items']), {
@@ -1362,4 +1356,103 @@ test('identity transformation for ui-constructed nested arrays', () =>
   const e = EngineUtil.createEngineFromDocuments(List([doc])).engine;
   const r = e.transform(doc);
   expect(r).toEqual(copyOfDoc);
+});
+
+test('remove duplicates test', () =>
+{
+  const doc = {
+    fields: [1, 4, 3, 2, 2, 5, 1],
+  };
+  const e = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.RemoveDuplicatesNode,
+    wrap(['fields']),
+    { },
+  );
+  const r = e.transform(doc);
+  expect(r).toEqual({
+    fields: [1, 4, 3, 2, 5],
+  });
+});
+
+test('remove nested duplicates test', () =>
+{
+  const doc = {
+    fields: [
+      [1, 3, 2, 1],
+      [2, 3, 3, 4],
+      [5, 6, 7],
+    ],
+  };
+  const e = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.RemoveDuplicatesNode,
+    wrap(['fields', -1]),
+    { },
+  );
+  const r = e.transform(doc);
+  expect(r).toEqual({
+    fields: [
+      [1, 3, 2],
+      [2, 3, 4],
+      [5, 6, 7],
+    ],
+  });
+});
+
+test('filter array test null', () =>
+{
+  const doc = {
+    fields: [3, 2, null, 5, null, undefined],
+  };
+  const e = EngineUtil.createEngineFromDocuments(List([doc])).engine;
+
+  e.appendTransformation(
+    TransformationNodeType.FilterArrayNode,
+    wrap(['fields']),
+    { filterNull : true },
+  );
+  const r = e.transform(doc);
+  expect(r).toEqual({
+    fields: [3, 2, 5, undefined],
+  });
+});
+
+test('filter array test undefined', () =>
+{
+  const doc = {
+    fields: [3, 2, null, 5, null, undefined],
+  };
+  const e = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.FilterArrayNode,
+    wrap(['fields']),
+    { filterUndefined : true},
+  );
+  const r = e.transform(doc);
+  expect(r).toEqual({
+    fields: [3, 2, null, 5, null],
+  });
+});
+
+test('filter array test complex', () =>
+{
+  const doc = {
+    fields: [3, 2, null, 5, null, undefined],
+  };
+  const e = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.FilterArrayNode,
+    wrap(['fields']),
+    { filterUndefined : true, filterNull: true },
+  );
+  const r = e.transform(doc);
+  expect(r).toEqual({
+    fields: [3, 2, 5],
+  });
+  expect(e.transform({
+    fields: [],
+  })).toEqual({
+    fields: [],
+  });
 });

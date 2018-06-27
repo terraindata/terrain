@@ -142,13 +142,13 @@ test('falsy search', () =>
     falseValue: false,
     nestedFalsies: [
       0,
-      undefined,
       {
         nullAgain: null,
         undefinedAgain: undefined,
       },
       null,
       '',
+      undefined,
     ],
   };
 
@@ -176,7 +176,7 @@ test('falsy search', () =>
   const deepSearch = yadeep.search(doc, KeyPath(['nestedFalsies', -1]));
   expect(deepSearch.length).toBe(5);
   expect(deepSearch.map((match) => match.value)).toEqual([
-    0, undefined, { nullAgain: null, undefinedAgain: undefined }, null, '',
+    0, { nullAgain: null, undefinedAgain: undefined }, null, '', undefined,
   ]);
 });
 
