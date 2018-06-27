@@ -285,7 +285,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
       newSign = '-';
     }
     const nextUnit = newDate.slice(-1);
-    if (DateUnitArray.includes(nextUnit))
+    if (DateUnitArray.includes(nextUnit) && newDate.toLowerCase() !== 'now')
     {
       newUnit = nextUnit;
     }
@@ -325,14 +325,16 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     }
   }
 
-  public getDateViewType(dateProp: string): string
+  public getDateViewType(rawDateProp: string): string
   {
     let dateViewType;
+    const dateProp = rawDateProp.replace(/ /g, '');
+    const elasticCheck = dateProp.slice(0,3).toLowerCase();
     if (dateProp.startsWith('@TerrainDate'))
     {
       dateViewType = 'relative';
     }
-    else if ((dateProp.startsWith('Now')) || (dateProp.startsWith('now')))
+    else if (elasticCheck === 'now')
     {
       dateViewType = 'specific';
     }

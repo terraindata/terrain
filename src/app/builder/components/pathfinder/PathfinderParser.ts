@@ -598,14 +598,14 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
   if (isDateValue)
   {
     const newDate = Util.formatInputDate(value, 'elastic');
-    const checkElastic = value.slice(0, 3);
+    const checkElastic = value.slice(0, 3).toLowerCase();
     if (newDate)
     {
       value = newDate;
     }
-    if (checkElastic === 'now' || checkElastic === 'Now')
+    if (checkElastic === 'now')
     {
-      value = value.charAt(0).toLowerCase() + value.slice(1);
+      value = value.slice(0,3).toLowerCase() + value.slice(3);
     }
   } else if (isNumberValue)
   {
