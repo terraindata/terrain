@@ -312,15 +312,15 @@ class PopUpForm extends TerrainComponent<Props>
                   }
 
                       <div className='popupform-modal-buttons modal-confirm-button'>
-                      <Button 
+                      <Button
                       theme='active'
                       text={this.props.confirmButtonText ? this.props.confirmButtonText : 'CONTINUE'}
                       onClick={!this.props.confirmDisabled && this.closePopUpFormSuccess}></Button>
                       </div>
-                      
 
                       <div className='popupform-modal-buttons modal-close-button'>
                       <Button
+                      theme='active'
                       text={this.props.cancelButtonText ? this.props.cancelButtonText : 'CANCEL'}
                       onClick={this.props.onClose}></Button>
                       </div>
