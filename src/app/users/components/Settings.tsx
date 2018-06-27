@@ -155,11 +155,6 @@ class Settings extends TerrainComponent<Props>
       actionType: 'change',
       user: newUser as UserTypes.User,
     });
-
-    this.setState({
-      saving: true,
-      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
-    });
   }
 
   public handleCurrentPasswordChange(ev)
@@ -749,11 +744,6 @@ class Settings extends TerrainComponent<Props>
     this.props.userActions({
       actionType: 'change',
       user: newUser as UserTypes.User,
-    });
-
-    this.setState({
-      saving: true,
-      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
     });
   }
 
