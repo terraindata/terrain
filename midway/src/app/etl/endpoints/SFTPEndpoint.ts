@@ -90,7 +90,22 @@ export default class SFTPEndpoint extends AEndpointStream
       delete genericConfig['ip'];
     }
 
+    if (genericConfig['key'] !== undefined)
+    {
+      let genericConfigPrivateKey: string = '-----BEGIN RSA PRIVATE KEY-----' + ((genericConfig['key'] as string)
+        .replace('-----BEGIN RSA PRIVATE KEY-----', '').replace('-----END RSA PRIVATE KEY-----', '')
+        .replace(new RegExp('\\s', 'g'), '\n').replace(new RegExp('\\n+', 'g'), '\n') as string) + '-----END RSA PRIVATE KEY-----';
+      if (genericConfig['key'].indexOf('BEGIN PRIVATE KEY') !== -1 && genericConfig['key'].indexOf('END PRIVATE KEY') !== -1)
+      {
+        genericConfigPrivateKey = '-----BEGIN PRIVATE KEY-----' + ((genericConfig['key'] as string)
+          .replace('-----BEGIN PRIVATE KEY-----', '').replace('-----END PRIVATE KEY-----', '')
+          .replace(new RegExp('\\s', 'g'), '\n').replace(new RegExp('\\n+', 'g'), '\n') as string) + '-----END PRIVATE KEY-----';
+      }
+      genericConfig['privateKey'] = genericConfigPrivateKey;
+    }
+
     const config: SSH.ConnectConfig = genericConfig as SSH.ConnectConfig;
+        console.log('EVEN: ',JSON.stringify(config, null, 2));
     const sftp: SSH.SFTPWrapper = await this.getSFTPClient(config);
     return this.getSFTPList(source, sftp);
   }
@@ -121,6 +136,7 @@ export default class SFTPEndpoint extends AEndpointStream
     }
 
     const config: SSH.ConnectConfig = genericConfig as SSH.ConnectConfig;
+    console.log('ODD: ',JSON.stringify(config, null, 2));
     const sftp: SSH.SFTPWrapper = await this.getSFTPClient(config);
     return sftp.createWriteStream(sink.options['filepath']);
   }
