@@ -1011,7 +1011,11 @@ export const Ajax =
           accessToken,
           id,
         },
-        _.noop,
+        () =>
+        {
+          // successfully logged out, reload the page
+          location.reload();
+        },
         {
           noCredentials: true,
         },

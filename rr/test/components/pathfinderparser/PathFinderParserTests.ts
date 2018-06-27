@@ -53,7 +53,7 @@ import * as winston from 'winston';
 import * as jsonfile from 'jsonfile';
 
 import * as puppeteer from 'puppeteer';
-import { getChromeDebugAddress } from '../../../FullstackUtils';
+import { getChromeDebugAddress, login } from '../../../FullstackUtils';
 
 const USERNAME_SELECTOR = '#login-email';
 
@@ -83,20 +83,17 @@ describe('Testing the pathfinder parser', () =>
     browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
     // browser = await puppeteer.launch({ headless: false });
     winston.info('Connected to the Chrome ' + String(wsAddress));
-  });
-
-  it('pathfinder parser test', async () =>
-  {
     page = await browser.newPage();
     winston.info('Created a new browser page.');
     await page.setViewport({ width: 1600, height: 1200 });
     winston.info('Set the page view to 1600x1200.');
     const url = `http://${ip.address()}:3000`;
     winston.info('Get url:' + url);
-    await page.goto(url);
-    winston.info('Visited url:' + url);
-    await page.waitForSelector(USERNAME_SELECTOR);
+    await login(page, url);
+  });
 
+  it('pathfinder parser test', async () =>
+  {
     for (let i = 0; i < actions.length; i++)
     {
       const thisAction = JSON.parse(actions[i].action);
