@@ -310,30 +310,21 @@ class PopUpForm extends TerrainComponent<Props>
                     label={this.props.checkboxLabel ? this.props.checkboxLabel : ''}
                     />
                   }
-                  {
-                    <div
-                    className='popupform-modal-buttons'
-                    style={[
-                      fontColor(Colors().altText1),
-                      ]}
-                      >
-                      <div className='popupform-modal-buttons modal-confirm-button'>
 
-                      <Button
-                      text={this.props.confirmButtonText ? this.props.confirmButtonText : 'Continue'}
+                      <div className='popupform-modal-buttons modal-confirm-button'>
+                      <Button 
+                      theme='active'
+                      text={this.props.confirmButtonText ? this.props.confirmButtonText : 'CONTINUE'}
                       onClick={!this.props.confirmDisabled && this.closePopUpFormSuccess}></Button>
                       </div>
+                      
 
                       <div className='popupform-modal-buttons modal-close-button'>
-
                       <Button
                       text={this.props.cancelButtonText ? this.props.cancelButtonText : 'CANCEL'}
                       onClick={this.props.onClose}></Button>
                       </div>
 
-                      </div>
-
-                    }
                     </div>
                     </div>
                     </ReactModal>
@@ -341,6 +332,7 @@ class PopUpForm extends TerrainComponent<Props>
                     </FadeInOut>
                     );
 }
+
 }
 
 const ReactModal = require('react-modal');

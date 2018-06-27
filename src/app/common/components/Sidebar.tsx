@@ -158,7 +158,7 @@ export class Sidebar extends TerrainComponent<Props>
         <PopUpForm
           title='GENERAL FEEDBACK'
           formDescription='Please submit any feedback you have below. Your email address will be recorded.'
-          textboxPlaceholderVAlue='Feedback description here.'
+          textboxPlaceholderValue='Feedback description here.'
           isBug={false}
           key='giveFeedback'
           className='feedback-report'
