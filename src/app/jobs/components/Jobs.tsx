@@ -282,7 +282,8 @@ class Jobs extends TerrainComponent<any> {
           contentCount={runningJobs.count()}
         >
           <SimpleTable
-            columnsConfig={jobsHeader.concat(jobCancelColumn)}
+            //columnsConfig={jobsHeader.concat(jobCancelColumn)}
+            columnsConfig={jobsHeader}
             data={runningJobs}
             defaultOrder={defaultOrder}
           />
