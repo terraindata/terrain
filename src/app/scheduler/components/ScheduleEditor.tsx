@@ -368,7 +368,7 @@ class ScheduleEditor extends TerrainComponent<Props>
           <div
             className='schedule-editor-sub-header'
           >
-            Interval
+            Frequency
           </div>
           <CRONEditor
             cron={schedule.cron}
