@@ -1144,7 +1144,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['bestMovies3'].length).toEqual(5);
+        expect(respData['bestMovies3'].length).toEqual(4);
       });
   });
 
@@ -1172,7 +1172,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['bestMovies3'].length).toEqual(5);
+        expect(respData['bestMovies3'].length).toEqual(8);
       });
   });
 
