@@ -78,6 +78,14 @@ function onLoginSubmit(useExistingToken)
 	{
 		const email = document.getElementById("login-email").value;
 		const password = document.getElementById("login-password").value;
+		
+		if (email.length === 0 || password.length === 0)
+		{
+			document.getElementById("login-submit").innerHTML = "Please provide email and password";
+			IS_LOGGING_IN = false;
+			TIMEOUT_RESET_LOGIN_MESSAGE = setTimeout(resetLoginMessage, 3000);
+			return;
+		}
 	
 		config = {
 			route: '/midway/v1/auth/login',
