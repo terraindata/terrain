@@ -67,76 +67,14 @@ export default class SFTPEndpoint extends AEndpointStream
 
   public async getSource(source: SourceConfig): Promise<Readable[]>
   {
-    const genericConfig: object = await this.getIntegrationConfig(source.integrationId);
-    if (genericConfig['username'] != null && genericConfig['username'] !== ''
-      && genericConfig['password'] != null && genericConfig['password'] != '')
-    {
-      delete genericConfig['key'];
-    }
-    else
-    {
-      // if (genericConfig['username'] !== undefined)
-      // {
-      //   delete genericConfig['username'];
-      // }
-      if (genericConfig['password'] !== undefined)
-      {
-        delete genericConfig['password'];
-      }
-    }
-    if (genericConfig['ip'] !== undefined)
-    {
-      genericConfig['host'] = genericConfig['ip'];
-      delete genericConfig['ip'];
-    }
-
-    if (genericConfig['key'] !== undefined)
-    {
-      let genericConfigPrivateKey: string = '-----BEGIN RSA PRIVATE KEY-----' + ((genericConfig['key'] as string)
-        .replace('-----BEGIN RSA PRIVATE KEY-----', '').replace('-----END RSA PRIVATE KEY-----', '')
-        .replace(new RegExp('\\s', 'g'), '\n').replace(new RegExp('\\n+', 'g'), '\n') as string) + '-----END RSA PRIVATE KEY-----';
-      if (genericConfig['key'].indexOf('BEGIN PRIVATE KEY') !== -1 && genericConfig['key'].indexOf('END PRIVATE KEY') !== -1)
-      {
-        genericConfigPrivateKey = '-----BEGIN PRIVATE KEY-----' + ((genericConfig['key'] as string)
-          .replace('-----BEGIN PRIVATE KEY-----', '').replace('-----END PRIVATE KEY-----', '')
-          .replace(new RegExp('\\s', 'g'), '\n').replace(new RegExp('\\n+', 'g'), '\n') as string) + '-----END PRIVATE KEY-----';
-      }
-      genericConfig['privateKey'] = genericConfigPrivateKey;
-    }
-
-    const config: SSH.ConnectConfig = genericConfig as SSH.ConnectConfig;
-        console.log('EVEN: ',JSON.stringify(config, null, 2));
+    const config: SSH.ConnectConfig = this._parseConfig(await this.getIntegrationConfig(source.integrationId) as object);
     const sftp: SSH.SFTPWrapper = await this.getSFTPClient(config);
     return this.getSFTPList(source, sftp);
   }
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
-    const genericConfig: object = await this.getIntegrationConfig(sink.integrationId);
-    if (genericConfig['username'] != null && genericConfig['username'] !== ''
-      && genericConfig['password'] != null && genericConfig['password'] != '')
-    {
-      delete genericConfig['privateKey'];
-    }
-    else
-    {
-      // if (genericConfig['username'] !== undefined)
-      // {
-      //   delete genericConfig['username'];
-      // }
-      if (genericConfig['password'] !== undefined)
-      {
-        delete genericConfig['password'];
-      }
-    }
-    if (genericConfig['ip'] !== undefined)
-    {
-      genericConfig['host'] = genericConfig['ip'];
-      delete genericConfig['ip'];
-    }
-
-    const config: SSH.ConnectConfig = genericConfig as SSH.ConnectConfig;
-    console.log('ODD: ',JSON.stringify(config, null, 2));
+    const config: SSH.ConnectConfig = this._parseConfig(await this.getIntegrationConfig(sink.integrationId) as object);
     const sftp: SSH.SFTPWrapper = await this.getSFTPClient(config);
     return sftp.createWriteStream(sink.options['filepath']);
   }
@@ -226,5 +164,36 @@ export default class SFTPEndpoint extends AEndpointStream
         return resolve([]);
       }
     });
+  }
+
+  private _parseConfig(genericConfig: object): SSH.ConnectConfig
+  {
+    if (genericConfig['username'] != null && genericConfig['username'] !== ''
+      && genericConfig['password'] != null && genericConfig['password'] != '')
+    {
+      delete genericConfig['privateKey'];
+    }
+    else
+    {
+      if (genericConfig['password'] !== undefined)
+      {
+        delete genericConfig['password'];
+      }
+    }
+
+    if (genericConfig['privateKey'] !== undefined)
+    {
+      let genericConfigPrivateKey: string = '-----BEGIN RSA PRIVATE KEY-----' + ((genericConfig['privateKey'] as string)
+        .replace('-----BEGIN RSA PRIVATE KEY-----', '').replace('-----END RSA PRIVATE KEY-----', '')
+        .replace(new RegExp('\\s', 'g'), '\n').replace(new RegExp('\\n+', 'g'), '\n') as string) + '-----END RSA PRIVATE KEY-----';
+      if (genericConfig['privateKey'].indexOf('BEGIN PRIVATE KEY') !== -1 && genericConfig['privateKey'].indexOf('END PRIVATE KEY') !== -1)
+      {
+        genericConfigPrivateKey = '-----BEGIN PRIVATE KEY-----' + ((genericConfig['privateKey'] as string)
+          .replace('-----BEGIN PRIVATE KEY-----', '').replace('-----END PRIVATE KEY-----', '')
+          .replace(new RegExp('\\s', 'g'), '\n').replace(new RegExp('\\n+', 'g'), '\n') as string) + '-----END PRIVATE KEY-----';
+      }
+      genericConfig['privateKey'] = genericConfigPrivateKey;
+    }
+    return genericConfig as SSH.ConnectConfig;
   }
 }

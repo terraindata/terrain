@@ -150,13 +150,13 @@ type SftpAuthT = AuthConfigType<Integrations.Sftp>;
 type SftpConnectionT = ConnectionConfigType<Integrations.Sftp>;
 class SftpForm extends IntegrationFormBase<SftpAuthT, SftpConnectionT>
 {
-  public authMap: InputDeclarationMap<SftpAuthT & {switch}> = {
+  public authMap: InputDeclarationMap<SftpAuthT & { switch }> = {
     switch: {
       type: DisplayType.Switch,
       displayName: '',
       options: {
         values: List(['Private Key', 'Password']),
-      }
+      },
     },
     privateKey: {
       type: DisplayType.TextBox,
