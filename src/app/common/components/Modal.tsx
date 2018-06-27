@@ -287,6 +287,7 @@ class Modal extends TerrainComponent<Props>
                     onChange={this.handleTextboxChange} // see CardsDeck.tsx for example function
                     autoFocus
                     onFocus={this.handleFocus}
+                    onKeyPress={Util.onEnter(this.closeModalSuccess)}
                   />
                 }
                 {
