@@ -43,20 +43,62 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import { List } from 'immutable';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationNode from 'shared/transformations/TransformationNode';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import { KeyPath } from 'shared/util/KeyPath';
+import * as yadeep from 'shared/util/yadeep';
 
-export default class FilterTransformationNode extends TransformationNode
+/*
+ *  Aggregate Transformations inspect an array and output a synthesized value
+ *  Currently acceptedType is not supported
+ */
+export default abstract class AggregateTransformationType extends TransformationNode
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.FilterNode)
+  // override this to operate on null values
+  public readonly skipNulls: boolean = true;
+
+  // this defines the main behavior of the transformation
+  public abstract aggregator(vals: any[]): any;
+
+  protected transformDocument(doc: object): TransformationVisitResult
   {
-    super(id, fields, options, typeCode);
+    const errors = [];
+    const opts = this.meta as NodeOptionsType<any>;
+    this.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+
+      if (el === null && this.skipNulls)
+      {
+        return;
+      }
+
+      if (Array.isArray(el))
+      {
+        const aggregate = this.aggregator(el);
+        yadeep.set(doc, opts.newFieldKeyPaths.get(0), aggregate, { create: true });
+      }
+      else
+      {
+        errors.push(`Error in ${this.typeCode}: Expected array but got a(n) ${typeof el}.`);
+      }
+    });
+
+    return {
+      document: doc,
+      errors,
+    } as TransformationVisitResult;
   }
 }

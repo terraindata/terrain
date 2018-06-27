@@ -46,31 +46,93 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
-import { KeyPath } from '../../util/KeyPath';
-import { TransformationInfo } from '../TransformationInfo';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNodeVisitor from '../TransformationNodeVisitor';
-import TransformationVisitError from '../TransformationVisitError';
-import TransformationVisitResult from '../TransformationVisitResult';
+import { KeyPath } from './../util/KeyPath';
+
+import TransformationNodeType from './TransformationNodeType';
+import TransformationNodeVisitor from './TransformationNodeVisitor';
+import TransformationVisitError from './TransformationVisitError';
+import TransformationVisitResult from './TransformationVisitResult';
 
 export default abstract class TransformationNode
 {
   public id: number;
-  public typeCode: TransformationNodeType;
+  public abstract typeCode: TransformationNodeType;
   public fields: List<KeyPath>;
   public meta: object;
 
-  public constructor(id: number, fields: List<KeyPath>, options: object = {}, typeCode: TransformationNodeType)
+  // override this to only operate on a certain js type
+  public readonly acceptedType: string;
+
+  public constructor(id: number, fields: List<KeyPath>, options: object = {})
   {
     this.id = id;
     this.fields = fields;
     this.meta = options;
-    this.typeCode = typeCode;
   }
 
-  public accept(visitor: TransformationNodeVisitor, doc: object, options: object = {}): TransformationVisitResult
+  // override to provide static validation
+  public validate(): string | boolean
   {
-    const docCopy = Object.assign({}, doc); // Preserve original doc in case of errors that would mangle it
-    return TransformationInfo.applyTargetedVisitor(visitor, this, docCopy, options);
+    return true;
+  }
+
+  // override to customize entire transformation behavior
+  public transform(doc: object): TransformationVisitResult
+  {
+    try
+    {
+      const valid = this.validate();
+      if (typeof valid === 'string')
+      {
+        return {
+          errors: [
+            {
+              message: `${this.typeCode} is malformed: ${String(valid)}`,
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+
+      return this.transformDocument(doc);
+    }
+    catch (e)
+    {
+      return {
+        errors: [
+          {
+            message: `Error in ${this.typeCode}: String(e)`,
+          } as TransformationVisitError,
+        ],
+      } as TransformationVisitResult;
+    }
+  }
+
+  public accept<R, P>(visitor: TransformationNodeVisitor<R, P>, args: P): R
+  {
+    return visitor.visit(this.typeCode, this, args);
+  }
+
+  // override to specify document transformation behavior
+  protected transformDocument(doc: object): TransformationVisitResult
+  {
+    return {
+      document: doc,
+    };
+  }
+
+  protected checkType(value: any): boolean
+  {
+    if (this.acceptedType !== undefined)
+    {
+      if (this.acceptedType === 'array')
+      {
+        return Array.isArray(value);
+      }
+      else
+      {
+        return typeof value === this.acceptedType;
+      }
+    }
+    return true;
   }
 }

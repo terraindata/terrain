@@ -45,79 +45,67 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
-import * as Immutable from 'immutable';
-import { keccak256 } from 'js-sha3';
-import * as _ from 'lodash';
-import * as yadeep from 'shared/util/yadeep';
-
-const { List, Map } = Immutable;
-
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
+import { List } from 'immutable';
+
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
+import * as yadeep from 'shared/util/yadeep';
 
-import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
-
-const TYPECODE = TransformationNodeType.HashNode;
-
-export class HashTransformationNode extends SimpleTransformationType
+/*
+ *  Simple Transformations mutate a value of a document in-place
+ */
+export default abstract class SimpleTransformationType extends TransformationNode
 {
-  public readonly typeCode = TYPECODE;
-  public readonly acceptedType = 'string';
+  // override this to operate on null values
+  public readonly skipNulls: boolean = true;
 
-  public validate()
+  // override this transformation to prevent transformation from occuring
+  public shouldTransform(el: any): boolean
   {
-    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
-    if (typeof opts.salt !== 'string')
+    return true;
+  }
+
+  public abstract transformer(val: any): any;
+
+  protected transformDocument(doc: object): TransformationVisitResult
+  {
+    const errors = [];
+
+    this.fields.forEach((field) =>
     {
-      return `salt "${opts.salt} is not a valid salt`;
-    }
-    return super.validate();
+      for (const match of yadeep.search(doc, field))
+      {
+        const { value, location } = match;
+        if (value === null && this.skipNulls)
+        {
+          return;
+        }
+        if (!this.checkType(value))
+        {
+          errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof value}.`);
+          return;
+        }
+        if (!this.shouldTransform(value))
+        {
+          return;
+        }
+        const newValue = this.transformer(value);
+        yadeep.set(doc, location, newValue, { create: true });
+      }
+    });
+
+    return {
+      document: doc,
+      errors,
+    } as TransformationVisitResult;
   }
-
-  public transformer(el: string): string
-  {
-    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
-    return hashHelper(el, opts.salt);
-  }
-}
-
-class HashTransformationInfoC extends TransformationNodeInfo
-{
-  public readonly typeCode = TYPECODE;
-  public humanName = 'Hash';
-  public description = 'Hash this field using SHA3/Keccak256';
-  public nodeClass = HashTransformationNode;
-
-  public editable = true;
-  public creatable = true;
-
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
-  }
-
-  public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
-  {
-    return `Hash with salt "${meta.salt}`;
-  }
-}
-
-export const HashTransformationInfo = new HashTransformationInfoC();
-
-function hashHelper(toHash: string, salt: string): string
-{
-  if (typeof toHash !== 'string')
-  {
-    throw new Error('Value to hash is not a string');
-  }
-  else if (typeof salt !== 'string')
-  {
-    throw new Error('Salt is not a string');
-  }
-  return keccak256.update(toHash + salt).hex();
 }
