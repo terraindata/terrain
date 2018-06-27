@@ -75,10 +75,10 @@ export default class SFTPEndpoint extends AEndpointStream
     }
     else
     {
-      if (genericConfig['username'] !== undefined)
-      {
-        delete genericConfig['username'];
-      }
+      // if (genericConfig['username'] !== undefined)
+      // {
+      //   delete genericConfig['username'];
+      // }
       if (genericConfig['password'] !== undefined)
       {
         delete genericConfig['password'];
@@ -105,19 +105,19 @@ export default class SFTPEndpoint extends AEndpointStream
     }
     else
     {
-      if (genericConfig['username'] !== undefined)
-      {
-        delete genericConfig['username'];
-      }
+      // if (genericConfig['username'] !== undefined)
+      // {
+      //   delete genericConfig['username'];
+      // }
       if (genericConfig['password'] !== undefined)
       {
         delete genericConfig['password'];
       }
-      if (genericConfig['ip'] !== undefined)
-      {
-        genericConfig['host'] = genericConfig['ip'];
-        delete genericConfig['ip'];
-      }
+    }
+    if (genericConfig['ip'] !== undefined)
+    {
+      genericConfig['host'] = genericConfig['ip'];
+      delete genericConfig['ip'];
     }
 
     const config: SSH.ConnectConfig = genericConfig as SSH.ConnectConfig;
