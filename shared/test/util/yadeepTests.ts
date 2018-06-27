@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import * as _ from 'lodash';
 import objectify from '../../util/deepObjectify';
 import { KeyPath } from '../../util/KeyPath';
 import * as yadeep from '../../util/yadeep';
@@ -101,4 +102,175 @@ test('a deep set with a wildcard', () =>
   yadeep.set(copy, KeyPath(['arr', '1', -1, 'a']), 'jim');
   expect(copy['arr']['1']['0']['a']).toBe('jim');
   expect(copy['arr']['1']['1']['a']).toBe('jim');
+});
+
+test('basic search', () =>
+{
+  const copy: object = _.cloneDeep(doc3);
+  const singleMatches = yadeep.search(copy, KeyPath(['name']));
+  expect(singleMatches).toEqual([{
+    value: 'Bob',
+    location: KeyPath(['name']),
+  }]);
+  const multiMatches = yadeep.search(copy, KeyPath(['arr', -1, -1]));
+  expect(multiMatches.length).toBe(2);
+  expect(multiMatches).toContainEqual({
+    value: { a: 'dog' },
+    location: KeyPath(['arr', 1, 0]),
+  });
+  expect(multiMatches).toContainEqual({
+    value: { b: 'doggo', a: 'fren' },
+    location: KeyPath(['arr', 1, 1]),
+  });
+});
+
+test('negative basic search', () =>
+{
+  const copy: object = _.cloneDeep(doc3);
+  const matches = yadeep.search(copy, KeyPath(['namez']));
+  expect(matches).toEqual([]);
+
+  const deepMatches = yadeep.search(copy, KeyPath(['arr', -1, -1, 'c']));
+  expect(deepMatches).toEqual([]);
+});
+
+test('falsy search', () =>
+{
+  const doc: object = {
+    nullValue: null,
+    undefinedValue: undefined,
+    falseValue: false,
+    nestedFalsies: [
+      0,
+      undefined,
+      {
+        nullAgain: null,
+        undefinedAgain: undefined,
+      },
+      null,
+      '',
+    ],
+  };
+
+  expect(yadeep.search(doc, KeyPath(['nullValue']))).toEqual([
+    {
+      value: null,
+      location: KeyPath(['nullValue']),
+    },
+  ]);
+
+  expect(yadeep.search(doc, KeyPath(['undefinedValue']))).toEqual([
+    {
+      value: undefined,
+      location: KeyPath(['undefinedValue']),
+    },
+  ]);
+
+  expect(yadeep.search(doc, KeyPath(['falseValue']))).toEqual([
+    {
+      value: false,
+      location: KeyPath(['falseValue']),
+    },
+  ]);
+
+  const deepSearch = yadeep.search(doc, KeyPath(['nestedFalsies', -1]));
+  expect(deepSearch.length).toBe(5);
+  expect(deepSearch.map((match) => match.value)).toEqual([
+    0, undefined, { nullAgain: null, undefinedAgain: undefined }, null, '',
+  ]);
+});
+
+test('search long keypath', () =>
+{
+  const copy: object = _.cloneDeep(doc3);
+  expect(yadeep.search(copy, KeyPath(['arr', -1, -1, 'a', 'b']))).toEqual([]);
+  expect(yadeep.search(copy, KeyPath(['arr', -1, -1, 'a', -1]))).toEqual([]);
+  expect(yadeep.search(copy, KeyPath(['arr', -1, -1, -1, 'a']))).toEqual([]);
+});
+
+test('search empty keypath', () =>
+{
+  const copy: object = _.cloneDeep(doc3);
+  expect(yadeep.search(copy, KeyPath([]))[0].value).toEqual(doc3);
+});
+
+test('array search', () =>
+{
+  const copy: object = _.cloneDeep(doc3);
+  const matches = yadeep.search(copy, KeyPath(['arr', -1]));
+  expect(matches).toContainEqual({
+    value: 'sled',
+    location: KeyPath(['arr', 0]),
+  });
+  expect(matches).toContainEqual({
+    value: [{ a: 'dog' }, { b: 'doggo', a: 'fren' }],
+    location: KeyPath(['arr', 1]),
+  });
+});
+
+test('only find existing search', () =>
+{
+  const doc: object = {
+    items: [
+      {
+        foo: 5,
+      },
+      {
+        notFoo: 'hi',
+      },
+      {
+        foo: [1, 2, 3],
+      },
+    ],
+  };
+
+  const matches = yadeep.search(doc, KeyPath(['items', -1, 'foo']));
+  const justTheValues = matches.map((match) => match.value);
+  expect(justTheValues).not.toContain(undefined);
+  expect(justTheValues).not.toContain(null);
+});
+
+test('search specific indexed keypath', () =>
+{
+  const copy: object = _.cloneDeep(doc3);
+  const matches = yadeep.search(copy, KeyPath(['arr', 1, 0, 'a']));
+  expect(matches).toEqual([{
+    value: 'dog',
+    location: KeyPath(['arr', 1, 0, 'a']),
+  }]);
+});
+
+test('trick numeric index', () =>
+{
+  const doc: object = {
+    notArr: {
+      '-1': 100,
+      '0': 200,
+      '1': 300,
+    },
+    arr: [
+      10,
+      20,
+      30,
+    ],
+  };
+
+  // search on notArr
+  expect(yadeep.search(doc, KeyPath(['notArr', '0']))).toEqual([{
+    value: 200,
+    location: KeyPath(['notArr', '0']),
+  }]);
+  expect(yadeep.search(doc, KeyPath(['notArr', '-1']))).toEqual([{
+    value: 100,
+    location: KeyPath(['notArr', '-1']),
+  }]);
+  expect(yadeep.search(doc, KeyPath(['notArr', 1]))).toEqual([]);
+  expect(yadeep.search(doc, KeyPath(['notArr', -1]))).toEqual([]);
+
+  expect(yadeep.search(doc, KeyPath(['arr', 0]))).toEqual([{
+    value: 10,
+    location: KeyPath(['arr', 0]),
+  }]);
+  expect(yadeep.search(doc, KeyPath(['arr', '1']))).toEqual([]);
+  expect(yadeep.search(doc, KeyPath(['arr', '-1']))).toEqual([]);
 });

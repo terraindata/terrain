@@ -51,8 +51,8 @@ THE SOFTWARE.
  * `KeyPath`s, including wildcards for operating
  * on all children.
  */
-
 import isPrimitive = require('is-primitive');
+import * as _ from 'lodash';
 import { KeyPath, WayPoint } from './KeyPath';
 
 /**
@@ -203,4 +203,85 @@ export function set(obj: object, path: KeyPath, value: any, options: object = {}
 export function remove(obj: object, path: KeyPath): void
 {
   set(obj, path, undefined, { delete: true });
+}
+
+interface ContextResult
+{
+  value: any;
+  location: KeyPath;
+}
+
+function contains(obj: object | any[], key: number | string): boolean
+{
+  if (isPrimitive(obj))
+  {
+    return false;
+  }
+  if (Array.isArray(obj))
+  {
+    if (typeof key === 'number')
+    {
+      return obj.length > key;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  return typeof key === 'string' && obj.hasOwnProperty(key);
+}
+
+function* searchDFS(obj: object | any[], path: KeyPath, index: number = 0): IterableIterator<ContextResult>
+{
+  if (index === path.size) // even if obj is null or undefined, it is a property of its parent
+  {
+    return yield {
+      value: obj,
+      location: path,
+    };
+  }
+  else if (index > path.size || isPrimitive(obj))
+  {
+    return undefined;
+  }
+
+  const waypoint = path.get(index);
+
+  if (waypoint === -1)
+  {
+    if (Array.isArray(obj))
+    {
+      for (let i = 0; i < obj.length; i++)
+      {
+        const elem = obj[i];
+        const nextPath = path.set(index, i);
+        yield* searchDFS(elem, nextPath, index + 1);
+      }
+    }
+    else
+    {
+      return undefined;
+    }
+  }
+  else
+  {
+    if (contains(obj, waypoint))
+    {
+      yield* searchDFS(obj[waypoint], path, index + 1);
+    }
+  }
+}
+
+/**
+ * Gets an array of all values and locations that
+ * match `KeyPath` in the document `obj`
+ * `KeyPath` in the document `obj`.
+ *
+ * @param obj  The deeply-nested doc to search.
+ * @param path The path of value(s) to get.
+ * @returns    An array of objects with fields 'location' and 'value'
+ */
+export function search(obj: object, path: KeyPath): ContextResult[]
+{
+  return Array.from(searchDFS(obj, path));
 }
