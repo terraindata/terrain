@@ -51,23 +51,48 @@ import * as request from 'request';
 import { DatabaseControllerStatus } from '../../DatabaseControllerStatus';
 import ElasticConfig from '../ElasticConfig';
 import ElasticController from '../ElasticController';
-import ElasticCluster from './ElasticCluster';
-import ElasticIndices from './ElasticIndices';
+import ElasticCluster, { IElasticCluster } from './ElasticCluster';
+import ElasticIndices, { IElasticIndices } from './ElasticIndices';
+
+// tslint:disable-next-line:interface-name
+export interface IElasticClient
+{
+  cluster: IElasticCluster;
+  indices: IElasticIndices;
+  ping(params: Elastic.PingParams, callback: (error: any, response: any) => void): void;
+  bulk(params: Elastic.BulkIndexDocumentsParams, callback: (error: any, response: any) => void): void;
+  delete(params: Elastic.DeleteDocumentParams, callback: (error: any, response: Elastic.DeleteDocumentResponse) => void): void;
+  deleteTemplate(params: Elastic.DeleteTemplateParams, callback: (error: any, response: any) => void): void;
+  deleteScript(params: Elastic.DeleteScriptParams, callback: (error: any, response: any) => void): void;
+  getTemplate(params: Elastic.GetTemplateParams, callback: (error: any, response: any) => void): void;
+  getScript(params: Elastic.GetScriptParams, callback: (error: any, response: any) => void): void;
+  index<T>(params: Elastic.IndexDocumentParams<T>, callback: (error: any, response: any) => void): void;
+  update(params: Elastic.UpdateDocumentParams, callback: (error: any, response: any) => void): void;
+  putScript(params: Elastic.PutScriptParams, callback: (err: any, response: any, status: any) => void): void;
+  putTemplate(params: Elastic.PutTemplateParams, callback: (err: any, response: any, status: any) => void): void;
+  scroll<T>(params: Elastic.ScrollParams, callback: (error: any, response: Elastic.SearchResponse<T>) => void): void;
+  clearScroll(params: Elastic.ClearScrollParams, callback: (error: any, response: any) => void): void;
+  search<T>(params: Elastic.SearchParams, callback: (error: any, response: Elastic.SearchResponse<T>) => void): void;
+  msearch<T>(params: Elastic.MSearchParams, callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void;
+  msearchTemplate<T>(params: Elastic.MSearchTemplateParams, callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void;
+}
 
 /**
  * An client which acts as a selective isomorphic wrapper around
  * the elastic.js API.
  */
-class ElasticClient
+class ElasticClient implements IElasticClient
 {
-  public cluster: ElasticCluster;
-  public indices: ElasticIndices;
+  public cluster: IElasticCluster;
+  public indices: IElasticIndices;
 
-  private controller: ElasticController;
+  protected controller: ElasticController;
   private config: ElasticConfig;
-  private delegate: Elastic.Client;
+  private delegate: IElasticClient;
 
-  constructor(controller: ElasticController, config: ElasticConfig)
+  constructor(controller: ElasticController, config: ElasticConfig,
+    Cluster: { new (controller: ElasticController, delegate: IElasticClient): IElasticCluster } = ElasticCluster,
+    Indices: { new (controller: ElasticController, delegate: IElasticClient): IElasticIndices } = ElasticIndices)
   {
     this.controller = controller;
 
@@ -77,8 +102,8 @@ class ElasticClient
     this.controller.setStatus(DatabaseControllerStatus.CONNECTING);
     this.delegate = new Elastic.Client(_.extend(this.config));
 
-    this.cluster = new ElasticCluster(controller, this.delegate);
-    this.indices = new ElasticIndices(controller, this.delegate);
+    this.cluster = new Cluster(controller, this.delegate);
+    this.indices = new Indices(controller, this.delegate);
   }
 
   /**
@@ -95,44 +120,8 @@ class ElasticClient
    */
   public bulk(params: Elastic.BulkIndexDocumentsParams, callback: (error: any, response: any) => void): void
   {
-    const body: object[] = params.body;
-    for (let i = 0; i < body.length;)
-    {
-      const obj = body[i];
-      const keys = Object.keys(obj);
-      if (keys.length !== 1)
-      {
-        throw new Error('Bad bulk params');
-      }
-      switch (keys[0])
-      {
-        case 'index':
-        case 'create':
-        case 'update':
-          i += 2;
-          break;
-        case 'delete':
-          i++;
-          break;
-        default:
-          throw new Error('Bad bulk params');
-      }
-      this.controller.prependIndexTerm(obj[keys[0]]);
-    }
     this.log('bulk', params);
-    this.delegate.bulk(params, this.wrapCallback(callback, (res) =>
-    {
-      const items: any[] = res.items;
-      items.forEach((item) =>
-      {
-        if (Object.keys(item).length !== 1)
-        {
-          throw new Error('Bad response');
-        }
-        const doc = item[Object.keys(item)[0]];
-        this.controller.removeDocIndexPrefix(doc);
-      });
-    }));
+    this.delegate.bulk(params, callback);
   }
 
   /**
@@ -141,9 +130,8 @@ class ElasticClient
   public delete(params: Elastic.DeleteDocumentParams,
     callback: (error: any, response: Elastic.DeleteDocumentResponse) => void): void
   {
-    this.controller.prependIndexParam(params);
     this.log('delete', params);
-    this.delegate.delete(params, this.wrapCallback(callback, (o) => this.controller.removeDocIndexPrefix(o)));
+    this.delegate.delete(params, callback);
   }
 
   /**
@@ -214,9 +202,8 @@ class ElasticClient
    */
   public index<T>(params: Elastic.IndexDocumentParams<T>, callback: (error: any, response: any) => void): void
   {
-    this.controller.prependIndexParam(params);
     this.log('index', params);
-    this.delegate.index(params, this.wrapCallback(callback, (o) => this.controller.removeDocIndexPrefix(o)));
+    this.delegate.index(params, callback);
   }
 
   /**
@@ -224,9 +211,8 @@ class ElasticClient
    */
   public update(params: Elastic.UpdateDocumentParams, callback: (error: any, response: any) => void): void
   {
-    this.controller.prependIndexParam(params);
     this.log('update', params);
-    this.delegate.update(params, this.wrapCallback(callback, (o) => this.controller.removeDocIndexPrefix(o)));
+    this.delegate.update(params, callback);
   }
 
   /**
@@ -278,10 +264,7 @@ class ElasticClient
     callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
   {
     this.log('scroll', params);
-    this.delegate.scroll(params, this.wrapCallback(callback, (res: Elastic.SearchResponse<T>) =>
-    {
-      res.hits.hits.forEach((o) => this.controller.removeDocIndexPrefix(o));
-    }));
+    this.delegate.scroll(params, callback);
   }
 
   /**
@@ -299,13 +282,8 @@ class ElasticClient
   public search<T>(params: Elastic.SearchParams,
     callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
   {
-    this.controller.prependIndexParam(params);
-    this.modifySearchQuery(params.body);
     this.log('search', params);
-    this.delegate.search(params, this.wrapCallback(callback, (res: Elastic.SearchResponse<T>) =>
-    {
-      res.hits.hits.forEach((o) => this.controller.removeDocIndexPrefix(o));
-    }));
+    this.delegate.search(params, callback);
   }
 
   /**
@@ -314,22 +292,8 @@ class ElasticClient
   public msearch<T>(params: Elastic.MSearchParams,
     callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void
   {
-    const searches: any[] = params.body;
-    for (let i = 0; i < searches.length; i += 2)
-    {
-      const searchHeader = searches[i];
-      const searchBody = searches[i + 1];
-      this.controller.prependIndexParam(searchHeader);
-      this.modifySearchQuery(searchBody);
-    }
     this.log('msearch', params);
-    this.delegate.msearch(params, this.wrapCallback(callback, (res: Elastic.MSearchResponse<T>) =>
-    {
-      res.responses.forEach((res2) =>
-      {
-        res2.hits.hits.forEach((o) => this.controller.removeDocIndexPrefix(o));
-      });
-    }));
+    this.delegate.msearch(params, callback);
   }
 
   /**
@@ -339,14 +303,10 @@ class ElasticClient
     callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void
   {
     this.log('msearchTemplate', params);
-    if (this.controller.getIndexPrefix() !== '')
-    {
-      throw new Error();
-    }
     this.delegate.msearchTemplate(params, callback);
   }
 
-  public getDelegate(): Elastic.Client
+  public getDelegate(): IElasticClient
   {
     return this.delegate;
   }
@@ -375,7 +335,7 @@ class ElasticClient
     });
   }
 
-  private log(methodName: string, info: any)
+  protected log(methodName: string, info: any)
   {
     this.controller.log('ElasticClient.' + methodName, info);
   }
@@ -402,51 +362,6 @@ class ElasticClient
     }
 
     return host;
-  }
-
-  private modifySearchQuery(body)
-  {
-    if (body.query && body.query.bool && body.query.bool.filter)
-    {
-      if (body.query.bool.filter.constructor === Array)
-      {
-        if (body.query.bool.filter.length > 0 && body.query.bool.filter[0].term && body.query.bool.filter[0].term._index)
-        {
-          this.controller.prependIndexTerm(body.query.bool.filter[0].term);
-        }
-      }
-      else
-      {
-        if (body.query.bool.filter.term && body.query.bool.filter.term._index)
-        {
-          this.controller.prependIndexTerm(body.query.bool.filter.term);
-        }
-      }
-    }
-  }
-
-  private wrapCallback(cb: (err, res) => void, f: (res) => void)
-  {
-    return (err, res) =>
-    {
-      if (err)
-      {
-        cb(err, undefined);
-      }
-      else
-      {
-        try
-        {
-          f(res);
-        }
-        catch (e)
-        {
-          this.log('error', e);
-          return cb(e, undefined);
-        }
-        cb(err, res);
-      }
-    };
   }
 }
 

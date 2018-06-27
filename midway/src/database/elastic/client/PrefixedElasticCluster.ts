@@ -46,58 +46,26 @@ THE SOFTWARE.
 
 import * as Elastic from 'elasticsearch';
 import ElasticController from '../ElasticController';
-import { IElasticClient } from './ElasticClient';
+import ElasticCluster from './ElasticCluster';
 
-// tslint:disable-next-line:interface-name
-export interface IElasticCluster
+class PrefixedElasticCluster extends ElasticCluster
 {
-  health(params: Elastic.ClusterHealthParams, callback: (error: any, response: any) => void): void;
-  state(params: Elastic.ClusterStateParams, callback: (error: any, response: any) => void): void;
-}
-
-/**
- * An client which acts as a selective isomorphic wrapper around
- * the elastic.js cluster API.
- */
-class ElasticCluster implements IElasticCluster
-{
-  protected controller: ElasticController;
-  private delegate: IElasticClient;
-
-  constructor(controller: ElasticController, delegate: IElasticClient)
+  constructor(controller: ElasticController, delegate: Elastic.Client)
   {
-    this.controller = controller;
-    this.delegate = delegate;
+    super(controller, delegate);
   }
 
-  /**
-   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-cat-health
-   * @param params
-   * @param callback
-   */
   public health(params: Elastic.ClusterHealthParams, callback: (error: any, response: any) => void): void
   {
     this.controller.prependIndexParam(params);
-    this.log('health', params);
-    return this.delegate.cluster.health(params, callback);
+    return super.health(params, callback);
   }
 
-  /**
-   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-cluster-state
-   * @param params
-   * @param callback
-   */
   public state(params: Elastic.ClusterStateParams, callback: (error: any, response: any) => void): void
   {
     this.controller.prependIndexParam(params);
-    this.log('state', params);
-    return this.delegate.cluster.state(params, callback);
-  }
-
-  protected log(methodName: string, info: any)
-  {
-    this.controller.log('ElasticCluster.' + methodName, info);
+    return super.state(params, callback);
   }
 }
 
-export default ElasticCluster;
+export default PrefixedElasticCluster;

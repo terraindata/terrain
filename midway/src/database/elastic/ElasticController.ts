@@ -48,6 +48,7 @@ import * as Tasty from '../../tasty/Tasty';
 
 import DatabaseController from '../DatabaseController';
 import ElasticClient from './client/ElasticClient';
+import PrefixedElasticClient from './client/PrefixedElasticClient';
 import ElasticConfig from './ElasticConfig';
 import ElasticQueryHandler from './query/ElasticQueryHandler';
 import ElasticDB from './tasty/ElasticDB';
@@ -67,7 +68,17 @@ class ElasticController extends DatabaseController
   constructor(config: ElasticConfig, id: number, name: string, analyticsIndex?: string, analyticsType?: string, indexPrefix?: string)
   {
     super('ElasticController', id, name);
-    this.client = new ElasticClient(this, config);
+
+    this.indexPrefix = (indexPrefix == null ? '' : indexPrefix);
+
+    if (this.indexPrefix === '')
+    {
+      this.client = new ElasticClient(this, config);
+    }
+    else
+    {
+      this.client = new PrefixedElasticClient(this, config);
+    }
 
     this.tasty = new Tasty.Tasty(
       this,
@@ -84,8 +95,6 @@ class ElasticController extends DatabaseController
     {
       this.analyticsType = analyticsType;
     }
-
-    this.indexPrefix = (indexPrefix == null ? '' : indexPrefix);
   }
 
   public getClient(): ElasticClient

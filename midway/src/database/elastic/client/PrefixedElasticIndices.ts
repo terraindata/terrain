@@ -46,90 +46,91 @@ THE SOFTWARE.
 
 import * as Elastic from 'elasticsearch';
 import ElasticController from '../ElasticController';
-import { IElasticClient } from './ElasticClient';
+import ElasticIndices from './ElasticIndices';
 
-// tslint:disable-next-line:interface-name
-export interface IElasticIndices
+class PrefixedElasticIndices extends ElasticIndices
 {
-  getMapping(params: Elastic.IndicesGetMappingParams, callback: (error: any, response: any, status: any) => void): void;
-  create(params: Elastic.IndicesCreateParams, callback: (error: any, response: any, status: any) => void): void;
-  delete(params: Elastic.IndicesDeleteParams, callback: (error: any, response: any, status: any) => void): void;
-  putMapping(params: Elastic.IndicesPutMappingParams, callback: (err: any, response: any, status: any) => void): void;
-  refresh(params: Elastic.IndicesRefreshParams, callback: (err: any, response: any) => void): void;
-}
-
-/**
- * An client which acts as a selective isomorphic wrapper around
- * the elastic.js indices API.
- */
-class ElasticIndices implements IElasticIndices
-{
-  protected controller: ElasticController;
-  private delegate: IElasticClient;
-
-  constructor(controller: ElasticController, delegate: IElasticClient)
+  constructor(controller: ElasticController, delegate: Elastic.Client)
   {
-    this.controller = controller;
-    this.delegate = delegate;
+    super(controller, delegate);
   }
 
-  /**
-   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-indices-getmapping
-   * @param params
-   * @param callback
-   */
   public getMapping(params: Elastic.IndicesGetMappingParams, callback: (error: any, response: any, status: any) => void): void
   {
-    this.log('getMapping', params);
-    return this.delegate.indices.getMapping(params, callback);
+    this.controller.prependIndexParam(params);
+    return super.getMapping(params, (err, res, status) =>
+    {
+      if (this.controller.getIndexPrefix() === '')
+      {
+        callback(err, res, status);
+      }
+      else
+      {
+        if (err)
+        {
+          if (err.statusCode === 404)
+          {
+            callback(undefined, {}, 200);
+          }
+          else
+          {
+            callback(err, undefined, status);
+          }
+        }
+        else
+        {
+          const newRes = {};
+          try
+          {
+            Object.keys(res).forEach((key) => {
+              newRes[this.controller.removeIndexPrefix(key)] = res[key];
+            });
+          }
+          catch (e)
+          {
+            this.log('error', e);
+            return callback(e, undefined, status);
+          }
+          callback(err, newRes, status);
+        }
+      }
+    });
   }
 
-  /**
-   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-indices-create
-   * @param params
-   * @param callback
-   */
   public create(params: Elastic.IndicesCreateParams, callback: (error: any, response: any, status: any) => void): void
   {
-    return this.delegate.indices.create(params, callback);
+    this.controller.prependIndexParam(params);
+    return super.create(params, (err, res, status) =>
+    {
+      if (err)
+      {
+        callback(err, undefined, status);
+      }
+      else
+      {
+        res.index = this.controller.removeIndexPrefix(res.index);
+        callback(err, res, status);
+      }
+    });
   }
 
-  /**
-   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-indices-delete
-   * @param params
-   * @param callback
-   */
   public delete(params: Elastic.IndicesDeleteParams, callback: (error: any, response: any, status: any) => void): void
   {
-    return this.delegate.indices.delete(params, callback);
+    this.controller.prependIndexParam(params);
+    return super.delete(params, callback);
   }
 
-  /**
-   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-indices-putmapping
-   * @param params
-   * @param callback
-   */
   public putMapping(params: Elastic.IndicesPutMappingParams, callback: (err: any, response: any, status: any) => void): void
   {
-    this.log('putMapping', params);
-    return this.delegate.indices.putMapping(params, callback);
+    this.controller.prependIndexParam(params);
+    return super.putMapping(params, callback);
   }
 
-  /**
-   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-indices-refresh
-   * @param params
-   * @param callback
-   */
   public refresh(params: Elastic.IndicesRefreshParams, callback: (err: any, response: any) => void): void
   {
-    this.log('refresh', params);
-    return this.delegate.indices.refresh(params, callback);
-  }
-
-  protected log(methodName: string, info: any)
-  {
-    this.controller.log('ElasticIndices.' + methodName, info);
+    this.controller.prependIndexParam(params);
+    return super.refresh(params, callback);
   }
 }
 
-export default ElasticIndices;
+export default PrefixedElasticIndices;
