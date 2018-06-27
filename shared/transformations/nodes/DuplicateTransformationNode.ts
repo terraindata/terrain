@@ -67,6 +67,7 @@ import isPrimitive = require('is-primitive');
 
 const TYPECODE = TransformationNodeType.DuplicateNode;
 
+// Duplicate is not categorized yet
 export class DuplicateTransformationNode extends TransformationNode
 {
   public readonly typeCode = TYPECODE;

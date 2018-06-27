@@ -1367,7 +1367,7 @@ test('remove duplicates test', () =>
   e.appendTransformation(
     TransformationNodeType.RemoveDuplicatesNode,
     wrap(['fields']),
-    { },
+    {},
   );
   const r = e.transform(doc);
   expect(r).toEqual({
@@ -1388,7 +1388,7 @@ test('remove nested duplicates test', () =>
   e.appendTransformation(
     TransformationNodeType.RemoveDuplicatesNode,
     wrap(['fields', -1]),
-    { },
+    {},
   );
   const r = e.transform(doc);
   expect(r).toEqual({
@@ -1410,7 +1410,7 @@ test('filter array test null', () =>
   e.appendTransformation(
     TransformationNodeType.FilterArrayNode,
     wrap(['fields']),
-    { filterNull : true },
+    { filterNull: true },
   );
   const r = e.transform(doc);
   expect(r).toEqual({
@@ -1427,7 +1427,7 @@ test('filter array test undefined', () =>
   e.appendTransformation(
     TransformationNodeType.FilterArrayNode,
     wrap(['fields']),
-    { filterUndefined : true},
+    { filterUndefined: true },
   );
   const r = e.transform(doc);
   expect(r).toEqual({
@@ -1444,7 +1444,7 @@ test('filter array test complex', () =>
   e.appendTransformation(
     TransformationNodeType.FilterArrayNode,
     wrap(['fields']),
-    { filterUndefined : true, filterNull: true },
+    { filterUndefined: true, filterNull: true },
   );
   const r = e.transform(doc);
   expect(r).toEqual({

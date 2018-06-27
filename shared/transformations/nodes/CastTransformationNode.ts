@@ -153,7 +153,8 @@ export class CastTransformationNode extends SimpleTransformationType
         }
       }
       case 'date': {
-        try {
+        try
+        {
           if (opts.format === 'ISOstring')
           {
             return new Date(el).toISOString();
