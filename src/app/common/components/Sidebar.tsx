@@ -48,9 +48,10 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import AccountDropdown from 'common/components/AccountDropdown';
+import BugFeedbackForm from 'common/components/BugFeedbackForm';
+import Button from 'common/components/Button';
 import CheckBox from 'common/components/CheckBox';
 import Modal from 'common/components/Modal';
-import Button from 'common/components/Button';
 import PopUpForm from 'common/components/PopUpForm';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateList';
@@ -79,7 +80,6 @@ const linkOffsetCollapsed = 133;
 const topBarItemStyle = [backgroundColor(Colors().bg3, Colors().bg2), fontColor(Colors().active)];
 const topBarRunStyle = [backgroundColor(Colors().activeHover, Colors().active), fontColor(Colors().activeText)];
 const Color = require('color');
-
 
 export interface ILink
 {
@@ -123,132 +123,116 @@ export class Sidebar extends TerrainComponent<Props>
   public renderRootLevelModals(): any[]
   {
     const modals = [];
+    const bugForm =
+    <BugFeedbackForm
+    title='REPORT A BUG'
+    formDescription='Please describe your bug in as much detail as possible below. Your email address will be recorded.'
+    textboxPlaceholder='Put your bug description here.'
+    isBug={true}
+    checkboxLabel= 'Check to include screenshot.'> </BugFeedbackForm>;
+
+    const feedbackForm =
+    <BugFeedbackForm
+    title='GENERAL FEEDBACK'
+    formDescription='Please submit any feedback you have below. Your email address will be recorded.'
+    textboxPlaceholder='Feedback description here.'
+    isBug={false}
+    checkboxLabel= 'Check to include screenshot.'> </BugFeedbackForm>;
 
     if (this.state.reportBugModalOpen)
     {
       modals.push(
         <PopUpForm
           key='reportBug'
+          formContent={bugForm}
           className='bug-report'
-          title={'REPORT A BUG'}
           open={this.state.reportBugModalOpen}
           onClose={this.closeTemplateUI}
           wide={true}
           showTextbox={true}
-          confirmButtonText='SUBMIT'
-          onConfirm={this.handleSendReportClicked}
-          textboxValue={this.state.description}
-          onTextboxValueChange={this.handleDescriptionChange}
-          textboxPlaceholderValue='Put your bug description here.'
           closeOnConfirm={true}
           confirm={true}
-          descriptionValue='Please describe your bug in as much detail as possible below. Your email address will be recorded.'
           >
-        <CheckBox
-        key='bugCheckbox'
-        checked={this.state.screenshotChecked}
-        onChange={this.handleScreenshotCheckedChange}
-        label='Check to include screenshot.'/>
-        </PopUpForm>
+        </PopUpForm>,
       );
-      this.state.isBug = true;
     }
     if (this.state.reportFeedbackModalOpen)
     {
       modals.push(
         <PopUpForm
           key='giveFeedback'
+          formContent={feedbackForm}
+          title={feedbackForm.props.title}
           className='feedback-report'
-          title={'GENERAL FEEDBACK'}
           open={this.state.reportFeedbackModalOpen}
           onClose={this.closeTemplateUI}
           wide={true}
           showTextbox={true}
-          confirmButtonText='SUBMIT'
-          onConfirm={this.handleSendReportClicked}
-          textboxValue={this.state.description}
-          onTextboxValueChange={this.handleDescriptionChange}
-          textboxPlaceholderValue='Feedback description here.'
           closeOnConfirm={true}
           confirm={true}
-          descriptionValue='Please submit any feedback you have below. Your email address will be recorded.'
         >
-        <CheckBox
-        key='feedbackCheckbox'
-        checked={this.state.screenshotChecked}
-        onChange={this.handleScreenshotCheckedChange}
-        label='Check to include screenshot.'
-        />
-        </PopUpForm>
+        </PopUpForm>,
       );
-      this.state.isBug = false;
     }
     return modals;
   }
 
-  public handleDescriptionChange(newValue: string)
-  {
-    this.setState({
-      description: newValue,
-    })
-  }
+  // public handleDescriptionChange(newValue: string)
+  // {
+  //   this.setState({
+  //     description: newValue,
+  //   });
+  // }
 
-  public handleScreenshotCheckedChange()
-  {
-    this.setState({
-      screenshotChecked: !this.state.screenshotChecked,
-    })
-  }
+  // public handleSendReportClicked(): void
+  // {
+  //   const data = {
+  //     bug: this.state.isBug,
+  //     description: this.state.description,
+  //     user: this.props.users.currentUser.email,
+  //     browserInfo: navigator.appVersion,
+  //   };
+  //   this.takeScreenshot(data, this.state.screenshotChecked);
+  // }
 
-  public handleSendReportClicked(): void
-  {
-    const data = {
-      bug: this.state.isBug,
-      description: this.state.description,
-      user: this.props.users.currentUser.email,
-      browserInfo: navigator.appVersion,
-    };
-    this.takeScreenshot(data, this.state.screenshotChecked);
-  }
+  // public postFeedbackData(data: object)
+  // {
+  //   const restoreAppOpacity = () => {
+  //     if (data['screenshot'] !== undefined)
+  //     {
+  //       const newApp: HTMLElement = document.getElementsByClassName('app-inner')[0] as HTMLElement;
+  //       newApp.style.opacity = 'inherit';
+  //     }
+  //   };
 
-  public postFeedbackData(data: object) 
-  {
-    const restoreAppOpacity = () => {
-      if (data["screenshot"] !== undefined)
-      {
-        const newApp: HTMLElement = document.getElementsByClassName('app-inner')[0] as HTMLElement;
-        newApp.style.opacity = 'inherit';
-      }
-    };
-    
-    Ajax.req(
-      'post',
-      `feedback/`,
-      data,
-      (response) => restoreAppOpacity(),
-      {
-        onError: (err) => restoreAppOpacity(),
+  //   Ajax.req(
+  //     'post',
+  //     `feedback/`,
+  //     data,
+  //     (response) => restoreAppOpacity(),
+  //     {
+  //       onError: (err) => restoreAppOpacity(),
 
-      });
-  }
+  //     });
+  // }
 
-  public takeScreenshot(data: object, screenshotChecked: boolean): void
-  {
-    if (screenshotChecked)
-    {
-        const app: HTMLElement = document.getElementsByClassName('app-inner')[0] as HTMLElement;
-        app.style.opacity = '1.0';
-        html2canvas(app).then((canvas) => {
-          const dataUrl = canvas.toDataURL();
-          data['screenshot'] = dataUrl;
-          this.postFeedbackData(data);
-        });
-    }
-    else
-    {
-      this.postFeedbackData(data);
-    }
-  }
+  // public takeScreenshot(data: object, screenshotChecked: boolean): void
+  // {
+  //   if (screenshotChecked)
+  //   {
+  //       const app: HTMLElement = document.getElementsByClassName('app-inner')[0] as HTMLElement;
+  //       app.style.opacity = '1.0';
+  //       html2canvas(app).then((canvas) => {
+  //         const dataUrl = canvas.toDataURL();
+  //         data['screenshot'] = dataUrl;
+  //         this.postFeedbackData(data);
+  //       });
+  //   }
+  //   else
+  //   {
+  //     this.postFeedbackData(data);
+  //   }
+  // }
 
   public componentWillMount()
   {
@@ -404,7 +388,7 @@ public render()
             : null
         }
         { this.props.expanded ?
-       <div className='sidebar-button sidebar-bug-button'>   
+       <div className='sidebar-button sidebar-bug-button'>
        <Button
        text='BUGS'
        onClick={this._toggle('reportBugModalOpen')}> </Button>
@@ -418,7 +402,7 @@ public render()
      }
 
 { this.props.expanded ?
-  <div className='sidebar-button sidebar-feedback-button'>   
+  <div className='sidebar-button sidebar-feedback-button'>
        <Button
        text='FEEDBACK'
        onClick={this._toggle('reportFeedbackModalOpen')}
@@ -436,7 +420,6 @@ public render()
 
     );
 }
-
 
     public closeTemplateUI()
   {

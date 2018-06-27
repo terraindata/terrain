@@ -47,6 +47,9 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
 import * as classNames from 'classnames';
+import BugFeedbackForm from 'common/components/BugFeedbackForm';
+import CheckBox from 'common/components/CheckBox';
+import Modal from 'common/components/Modal';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -59,48 +62,46 @@ import './PopUpForm.less';
 
 const Color = require('color');
 
+// put
 export interface Props
 {
-  open: boolean;
   colorsActions: typeof ColorsActions;
-  message?: string;
-  errorMessage?: string;
   title?: string;
-  error?: boolean;
-  fill?: boolean;
+  open: boolean;
   wide?: boolean;
   confirm?: boolean;
   confirmButtonText?: string;
   confirmDisabled?: boolean; // if true, confirm button is disabled
   cancelButtonText?: string;
-  onValidate?: () => boolean;
-  onConfirm?: (reportType: boolean) => void;
   onClose: () => void;
   onErrorClear: () => void;
-  children?: any;
-  childrenMessage?: string;
-  thirdButtonText?: string;
-  onThirdButton?: () => void;
-  pre?: boolean;
+  formContent?: typeof BugFeedbackForm;
+  formDescription?: string;
   showTextbox?: boolean;
-  textboxValue?: string;
-  initialTextboxValue?: string;
   textboxPlaceholderValue?: string;
+  textboxValue?: string;
   onTextboxValueChange?: (newValue: string) => void;
-  allowOverflow?: boolean;
   closeOnConfirm?: boolean;
   className?: string;
-  noFooterPadding?: boolean; 
-  inputClassName?: string;
-  descriptionValue?: string;
+  checkboxDescription?: boolean;
+  onConfirm?: () => void;
+  checkboxLabel?: string;
 }
 
 @Radium
 class PopUpForm extends TerrainComponent<Props>
 {
   public static defaultProps = {
-    errorMessage: '',
+    confirmButtonText: 'SUBMIT',
   };
+  public state: {
+    checkboxChecked: boolean,
+    textboxValue: string,
+  } =
+    {
+      checkboxChecked: true,
+      textboxValue: '',
+    };
 
   public componentWillMount()
   {
@@ -113,22 +114,14 @@ class PopUpForm extends TerrainComponent<Props>
 
   public closeModalSuccess()
   {
-    let isValid = true;
-    if (this.props.onValidate !== undefined)
+    if (this.props.closeOnConfirm !== undefined && !this.props.closeOnConfirm)
     {
-      isValid = this.props.onValidate();
+      this.props.onConfirm ? this.props.onConfirm() : null;
+      return;
     }
-
-    if (isValid)
-    {
-      if (this.props.closeOnConfirm !== undefined && !this.props.closeOnConfirm)
-      {
-        this.props.onConfirm ? this.props.onConfirm(true) : null;
-        return;
-      }
-      this.props.onClose();
-      this.props.onConfirm ? this.props.onConfirm(true) : null;
-    }
+    this.props.onClose();
+    this.props.onConfirm ? this.props.onConfirm() : null;
+    //console.log(typeof(this.props.formContent));
   }
 
   public handleTextboxChange(evt)
@@ -136,15 +129,19 @@ class PopUpForm extends TerrainComponent<Props>
     if (this.props.onTextboxValueChange)
     {
       this.props.onTextboxValueChange(evt.target.value);
-      // if (this.props.isBug)
-      // {
-      //   this.props.bugDescription = evt.target.value;
-      // }
-      // else 
-      // {
-      //   this.props.feedbackDescription = evt.target.value;
-      // }
     }
+    this.setState({
+      textboxValue: evt.target.value,
+    });
+    //console.log(this.props.formContent);
+  }
+
+  public handleCheckboxCheckedChange()
+  {
+    this.setState({
+      checkboxChecked: !this.state.checkboxChecked,
+    });
+
   }
 
   public handleFocus(e)
@@ -154,10 +151,6 @@ class PopUpForm extends TerrainComponent<Props>
 
   public render()
   {
-    const defaultTitle = this.props.error ? 'Error' : 'Please Confirm';
-
-    const msgTag = this.props.pre ? <pre /> : <div />;
-
     const messageStyle = [
       fontColor('#242424'),
       backgroundColor('#fff'),
@@ -204,14 +197,12 @@ class PopUpForm extends TerrainComponent<Props>
               'popupform-content': true,
               'popupform-content-wide': false,
               'popupform-content-fill': false,
-              'popupform-content-allow-overflow': this.props.allowOverflow,
               [this.props.className]: (this.props.className !== '' && this.props.className !== undefined),
             })}>
               <div
                 className={classNames({
                   'popupform-dialog': true,
                   'popupform-dialog-no-footer': !this.props.confirm,
-                  'popupform-dialog-no-footer-padding': this.props.noFooterPadding,
                 })}
                 style={[
                   fontColor(Colors().altText1),
@@ -221,26 +212,17 @@ class PopUpForm extends TerrainComponent<Props>
                 <div
                   className={classNames({
                     'popupform-title': true,
-                    'popupform-title-error': this.props.error,
                   })}
                   style={[
                     fontColor('ffffff'),
                     backgroundColor('#55c6fa'),
                   ]}
                 >
-                  {
-                    this.props.error ?
-                      <div className='modal-info-icon'>
-                        <InfoIcon />
-                      </div>
-                      :
-                      null
-                  }
                   <div
                     className='popupform-title-inner'
                   >
                     {
-                      this.props.title ? this.props.title : defaultTitle
+                      this.props.formContent ? this.props.formContent.props.title  : this.props.title
                     }
                   </div>
                   {
@@ -252,31 +234,9 @@ class PopUpForm extends TerrainComponent<Props>
                   }
                 </div>
                 {
-                  this.props.errorMessage !== '' ?
-                    <div className='modal-error'>
-                      {this.props.errorMessage}
-                      <CloseIcon
-                        className='modal-error-close-x'
-                        onClick={this.props.onErrorClear}
-                      />
-                    </div> : null
-                }
-
-                {
-                  this.props.message &&
-                  React.cloneElement(
-                    msgTag,
-                    {
-                      className: classNames({
-                        'modal-message': true,
-                      }),
-                      style: messageStyle,
-                      children: this.props.message,
-                    },
-                  )
-                }
-                {
-                  <div className='popupform-description'> {this.props.descriptionValue}
+                  <div className='popupform-description'> {
+                    this.props.formContent ? this.props.formContent.props.formDescription : this.props.formDescription
+                  }
                   </div>
                 }
                 {
@@ -284,10 +244,12 @@ class PopUpForm extends TerrainComponent<Props>
                   <textarea
                     className={classNames({
                       'popupform-standard-input': true,
-                      [this.props.inputClassName]: this.props.inputClassName !== undefined && this.props.inputClassName !== '',
+
                     })}
-                    placeholder={this.props.textboxPlaceholderValue}
-                    defaultValue={this.props.initialTextboxValue}
+                    placeholder={
+                      this.props.formContent ?  this.props.formContent.props.textboxPlaceholder : this.props.textboxPlaceholderValue
+                    }
+                    defaultValue=''
                     value={this.props.textboxValue}
                     onChange={this.handleTextboxChange} // see CardsDeck.tsx for example function
                     autoFocus
@@ -295,20 +257,12 @@ class PopUpForm extends TerrainComponent<Props>
                   />
                 }
                 {
-                  this.props.childrenMessage &&
-                  React.cloneElement(
-                    msgTag,
-                    {
-                      className: classNames({
-                        'modal-message': true,
-                      }),
-                      style: messageStyle,
-                      children: this.props.childrenMessage,
-                    },
-                  )
                 }
                 {
-                  this.props.children
+                  <CheckBox
+                  checked={this.state.checkboxChecked}
+                  onChange={this.handleCheckboxCheckedChange}
+                  label={this.props.formContent ? this.props.formContent.props.checkboxLabel : this.props.checkboxLabel}/>
                 }
                 {
                   this.props.confirm &&
@@ -318,19 +272,6 @@ class PopUpForm extends TerrainComponent<Props>
                       fontColor(Colors().altText1),
                     ]}
                   >
-                    {
-                      this.props.thirdButtonText &&
-                      <div
-                        className='button modal-third-button'
-                        onClick={this.props.onThirdButton}
-                        style={buttonStyle}
-                        key='modal-third-button'
-                      >
-                        {
-                          this.props.thirdButtonText
-                        }
-                      </div>
-                    }
                     <div
                       className='button modal-close-button'
                       style={buttonStyle}
