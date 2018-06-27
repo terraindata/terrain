@@ -380,6 +380,7 @@ class Settings extends TerrainComponent<Props>
             value={this.state.newEmail}
             onChange={this.updateNewEmail}
             className='settings-input password-input'
+            onKeyDown={Util.onEnter(this.changeEmail)}
           />
           <div className='settings-white-space' />
         </div>

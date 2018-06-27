@@ -906,6 +906,15 @@ const Util = {
     }
     return immutableMap;
   },
+
+  onEnter(handler) {
+    return (e) => {
+      if (e.key === 'Enter')
+      {
+        handler();
+      }
+    }
+  }
 };
 
 export default Util;

@@ -81,7 +81,7 @@ export interface Props<FState>
 {
   inputMap: InputDeclarationMap<FState>; // inputMap is memoized, so be careful about changing its properties on the fly!
   inputState: FState;
-  onStateChange: (newState: FState, blur?: boolean) => void;  
+  onStateChange: (newState: FState, blur?: boolean) => void;
   mainButton?: ButtonOptions; // active styling by default
   secondButton?: ButtonOptions; // buttons are rendered from right to left
   thirdButton?: ButtonOptions;
@@ -514,6 +514,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     {
       const shallowCopy = _.clone(this.props.inputState);
       shallowCopy[stateName] = value;
+
       this.props.onStateChange(shallowCopy, true);
     };
   }
@@ -525,6 +526,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     {
       const shallowCopy = _.clone(this.props.inputState);
       shallowCopy[stateName] = value;
+
       this.props.onStateChange(shallowCopy, false);
     };
   }

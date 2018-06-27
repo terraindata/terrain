@@ -69,6 +69,7 @@ export interface Props
 {
   integration: IntegrationConfig;
   onChange: (newConfig: IntegrationConfig, apply?: boolean) => void;
+  onSubmit?: () => void;
   hideType?: boolean;
   hideName?: boolean;
 }
@@ -115,6 +116,7 @@ export default class IntegrationForm extends TerrainComponent<Props>
             inputMap={this.nameMap}
             inputState={this.nameValueToState(integration)}
             onStateChange={this.handleNameChange}
+            onTextInputEnter={this.props.onSubmit}
           />
         }
         {
@@ -123,6 +125,7 @@ export default class IntegrationForm extends TerrainComponent<Props>
             inputMap={this.typeMap}
             inputState={this.typeValueToState(integration)}
             onStateChange={this.handleTypeChange}
+            onTextInputEnter={this.props.onSubmit}
           />
         }
         {
@@ -130,6 +133,7 @@ export default class IntegrationForm extends TerrainComponent<Props>
             <FormClass
               integration={integration}
               onChange={this.handleIntegrationChange}
+              onSubmit={this.props.onSubmit}
             />
             : null
         }

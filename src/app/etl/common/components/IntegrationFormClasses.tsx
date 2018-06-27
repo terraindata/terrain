@@ -66,6 +66,7 @@ export interface Props
 {
   integration: IntegrationConfig;
   onChange: (newIntegration: IntegrationConfig, apply?: boolean) => void;
+  onSubmit?: () => void;
 }
 
 abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props = Props> extends TerrainComponent<P>
@@ -114,11 +115,13 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
           inputMap={this.authMap}
           inputState={authState}
           onStateChange={this.handleAuthFormChange}
+          onTextInputEnter={this.props.onSubmit}
         />
         <DynamicForm
           inputMap={this.connectionMap}
           inputState={connectionState}
           onStateChange={this.handleConnectionFormChange}
+          onTextInputEnter={this.props.onSubmit}
         />
       </div>
     );
@@ -222,6 +225,7 @@ class HttpForm extends IntegrationFormBase<HttpAuthT, HttpConnectionT>
         object={state.headers != null ? state.headers : {}}
         onChange={this.handleHeadersChange}
         label='Headers'
+        onSubmit={this.props.onSubmit}
       />
     );
   }
@@ -241,6 +245,7 @@ class HttpForm extends IntegrationFormBase<HttpAuthT, HttpConnectionT>
         object={state.params != null ? state.params : {}}
         onChange={this.handleParamsChange}
         label='Parameters'
+        onSubmit={this.props.onSubmit}
       />
     );
   }
@@ -435,6 +440,7 @@ class GoogleAnalyticsForm extends IntegrationFormBase<GoogleAnalyticsAuthT, Goog
         valueName='expression'
         onChange={this.handleMetricsChange}
         label='Metrics'
+        onSubmit={this.props.onSubmit}
       />
     );
   }
