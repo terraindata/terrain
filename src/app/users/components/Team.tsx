@@ -108,81 +108,6 @@ class Team extends TerrainComponent<Props>
     this.unsub && this.unsub();
   }
 
-  // public renderUser(user: User)
-  // {
-  //   if (user.isDisabled && !this.state.showDisabledUsers)
-  //   {
-  //     return null;
-  //   }
-
-  //   return (
-  //     <Link to={`/users/${user.id}`} className='team-link' key={user.id}>
-  //       <div className='team-row'>
-  //         <div>
-  //           <UserThumbnail
-  //             large={true}
-  //             userId={user.id}
-  //             square={true}
-  //           />
-  //         </div>
-  //         <div className='team-item-names'>
-  //           <div className='team-name'>
-  //             {
-  //               user.name
-  //             }
-  //           </div>
-  //           <div className='team-role'>
-  //             {
-  //               user.isDisabled ? <b>Disabled</b> : user.whatIDo
-  //             }
-  //           </div>
-  //         </div>
-  //         <div className='team-item-info'>
-  //           {
-  //             !!user.phone &&
-  //             <div className='team-item-info-row'>
-  //               <div className='team-item-info-label'>
-  //                 Phone Number
-  //                 </div>
-  //               <div className='team-item-info-value'>
-  //                 {
-  //                   user.phone
-  //                 }
-  //               </div>
-  //             </div>
-  //           }
-  //           {
-  //             !!user.email &&
-  //             <div className='team-item-info-row'>
-  //               <div className='team-item-info-label'>
-  //                 Email
-  //                 </div>
-  //               <div className='team-item-info-value'>
-  //                 {
-  //                   user.email
-  //                 }
-  //               </div>
-  //             </div>
-  //           }
-  //           {
-  //             !!user.skype &&
-  //             <div className='team-item-info-row'>
-  //               <div className='team-item-info-label'>
-  //                 Skype
-  //                 </div>
-  //               <div className='team-item-info-value'>
-  //                 {
-  //                   user.skype
-  //                 }
-  //               </div>
-  //             </div>
-  //           }
-  //         </div>
-  //       </div>
-  //     </Link>
-  //   );
-  // }
-
   public toggleAddingUser()
   {
     this.setState({
@@ -214,7 +139,7 @@ class Team extends TerrainComponent<Props>
 
   public createNewUser(editingSections)
   {
-    const name: string = editingSections.name;
+    const name: string = editingSections.newName;
     const email: string = editingSections.newEmail;
     const password: string = editingSections.newPassword;
     const confirmPassword: string = editingSections.confirmPassword;
@@ -258,15 +183,11 @@ class Team extends TerrainComponent<Props>
       return;
     }
 
-    editingSections = {};
-    // this.refs['newEmail']['value'] = '';
-    // this.refs['newPassword']['value'] = '';
-    // this.refs['confirmPassword']['value'] = '';
     this.setState({
       addingUser: false,
     });
 
-    Ajax.createUser(email, password, () =>
+    Ajax.createUser(name, email, password, () =>
     {
       this.props.userActions({
         actionType: 'fetch',
@@ -280,60 +201,7 @@ class Team extends TerrainComponent<Props>
       });
   }
 
-  /*public renderAddUser()
-  {
-    const userId = this.props.auth.id;
-    const user = this.props.users.getIn(['users', userId]) as User;
-
-    if (user && user.isSuperUser)
-    {
-      if (this.state.addingUser)
-      {
-        return (
-          <div className='create-user'>
-            <div className='create-user-cancel' onClick={this.toggleAddingUser}>
-              x
-            </div>
-            <h3>Create a new user</h3>
-
-            <div className='flex-container'>
-              <div className='flex-grow'>
-                <b>Email</b>
-                <div>
-                  <input ref='newEmail' placeholder='Email' />
-                </div>
-              </div>
-              <div className='flex-grow'>
-                <b>Temporary Password</b>
-                <div>
-                  <input ref='newPassword' placeholder='Password' type='password' />
-                </div>
-              </div>
-              <div className='flex-grow'>
-                <b>Confirm Password</b>
-                <div>
-                  <input ref='confirmPassword' placeholder='Confirm password' type='password' />
-                </div>
-              </div>
-            </div>
-            <div className='button' onClick={this.createNewUser}>
-              Create
-            </div>
-          </div>
-        );
-      }
-
-      return (
-        <CreateItem
-          name='New User'
-          onCreate={this.toggleAddingUser}
-        />
-      );
-    }
-    return null;
-  }*/
-
-  public newRenderAddUser()
+  public renderAddUser()
   {
     const userId = this.props.auth.id;
     const user = this.props.users.getIn(['users', userId]) as User;
@@ -349,7 +217,7 @@ class Team extends TerrainComponent<Props>
             sectionType='password'
             sectionBoxes={
               List([
-                { key: 'name', header: 'Name', info: '', type: 'Input' },
+                { key: 'newName', header: 'Name', info: '', type: 'Input' },
                 { key: 'newEmail', header: 'Email', info: '', type: 'Input' },
                 { key: 'newPassword', header: 'Temporary Password', info: '', type: 'Password' },
                 { key: 'confirmPassword', header: 'Confirm Password', info: '', type: 'Password' },
@@ -387,25 +255,27 @@ class Team extends TerrainComponent<Props>
 
   public disableUser(user, editingSections)
   {
-    user.isDisabled = editingSections.isDisabled;
+    this.props.userActions({
+      actionType: 'change',
+      user: user.set('isDisabled', editingSections.isDisabledFlag),
+    });
   }
 
-  public newRenderUser(user: User)
+  public renderUser(user: User)
   {
     if (user.isDisabled && !this.state.showDisabledUsers)
     {
       return null;
     }
-
     return (
       <Section
         user={user.id}
         key={user.id}
+        isDisabled={user.isDisabled}
         sectionTitle={user.name}
         sectionType='profile'
         sectionBoxes={
           List([
-            // { key: '', header: '', info: <UserThumbnail largest={true} userId={user.id} square={true} />, type: 'Image'}
             { key: 'email', header: 'Email', info: user.email, type: 'Text' },
             { key: 'phone', header: 'Phone', info: user.phone, type: 'Text' },
             { key: 'skype', header: 'Skype', info: user.name, type: 'Text' },
@@ -431,8 +301,10 @@ class Team extends TerrainComponent<Props>
         <div className='team-page-title' style={{ color: Colors().mainSectionTitle }}>
           Team Directory
         </div>
-        {users && users.toArray().map(this.newRenderUser)}
-        {this.newRenderAddUser()}
+        {users &&
+          users.keySeq().sort().map((userId) => this.renderUser(users.get(userId)))
+        }
+        {this.renderAddUser()}
         {this.renderShowDisabledUsers()}
         <Modal
           message={this.state.errorModalMessage}
@@ -442,29 +314,6 @@ class Team extends TerrainComponent<Props>
         />
       </div>
     );
-
-    /*return (
-      <div>
-        <div className='team'>
-          <div className='team-page-title' style={{ color: Colors().mainSectionTitle }}>
-            Team Directory
-          </div>
-          {
-            loading &&
-            <InfoArea large='Loading...' />
-          }
-          {users && users.toArray().map(this.renderUser)}
-          {this.renderAddUser()}
-          {this.renderShowDisabledUsers()}
-        </div>
-        <Modal
-          message={this.state.errorModalMessage}
-          onClose={this.toggleErrorModal}
-          open={this.state.errorModalOpen}
-          error={true}
-        />
-      </div>
-    );*/
   }
 }
 
