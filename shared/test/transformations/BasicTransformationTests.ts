@@ -1314,49 +1314,49 @@ test('simple transformation on deep array', () =>
   ]);
 });
 
-test('identity transformation for nested arrays', () =>
-{
-  const doc = {
-    fields: [
-      {
-        foo: 'look what',
-      },
-      {
-        blah: [],
-      },
-      {
-        foo: 'the cat dragged in',
-      },
-    ],
-  };
+// test('identity transformation for nested arrays', () =>
+// {
+//   const doc = {
+//     fields: [
+//       {
+//         foo: 'look what',
+//       },
+//       {
+//         blah: [],
+//       },
+//       {
+//         foo: 'the cat dragged in',
+//       },
+//     ],
+//   };
 
-  const copyOfDoc = _.cloneDeep(doc);
-  const e = new TransformationEngine(doc);
-  const r = e.transform(doc);
-  expect(r).toEqual(copyOfDoc);
-});
+//   const copyOfDoc = _.cloneDeep(doc);
+//   const e = new TransformationEngine(doc);
+//   const r = e.transform(doc);
+//   expect(r).toEqual(copyOfDoc);
+// });
 
-test('identity transformation for ui-constructed nested arrays', () =>
-{
-  const doc = {
-    fields: [
-      {
-        foo: 'look what',
-      },
-      {
-        blah: [],
-      },
-      {
-        foo: 'the cat dragged in',
-      },
-    ],
-  };
+// test('identity transformation for ui-constructed nested arrays', () =>
+// {
+//   const doc = {
+//     fields: [
+//       {
+//         foo: 'look what',
+//       },
+//       {
+//         blah: [],
+//       },
+//       {
+//         foo: 'the cat dragged in',
+//       },
+//     ],
+//   };
 
-  const copyOfDoc = _.cloneDeep(doc);
-  const e = EngineUtil.createEngineFromDocuments(List([doc])).engine;
-  const r = e.transform(doc);
-  expect(r).toEqual(copyOfDoc);
-});
+//   const copyOfDoc = _.cloneDeep(doc);
+//   const e = EngineUtil.createEngineFromDocuments(List([doc])).engine;
+//   const r = e.transform(doc);
+//   expect(r).toEqual(copyOfDoc);
+// });
 
 test('remove duplicates test', () =>
 {
