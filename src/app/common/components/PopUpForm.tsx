@@ -48,9 +48,9 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import BugFeedbackForm from 'common/components/BugFeedbackForm';
+import Button from 'common/components/Button';
 import CheckBox from 'common/components/CheckBox';
 import Modal from 'common/components/Modal';
-import Button from 'common/components/Button';
 import * as html2canvas from 'html2canvas';
 import * as Radium from 'radium';
 import * as React from 'react';
@@ -321,16 +321,15 @@ class PopUpForm extends TerrainComponent<Props>
 
                       <Button
                       text={this.props.confirmButtonText ? this.props.confirmButtonText : 'Continue'}
-                      onClick={!this.props.confirmDisabled && this.closePopUpFormSuccess}></Button> 
+                      onClick={!this.props.confirmDisabled && this.closePopUpFormSuccess}></Button>
                       </div>
 
                       <div className='popupform-modal-buttons modal-close-button'>
 
                       <Button
                       text={this.props.cancelButtonText ? this.props.cancelButtonText : 'CANCEL'}
-                      onClick={this.props.onClose}></Button> 
+                      onClick={this.props.onClose}></Button>
                       </div>
-
 
                       </div>
 

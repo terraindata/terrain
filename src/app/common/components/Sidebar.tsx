@@ -385,7 +385,7 @@ public render()
             )
             : null
         }
-        { 
+        {
           this.props.expanded ?
           <div className='sidebar-button sidebar-bug-button'>
           <Button
@@ -399,7 +399,7 @@ public render()
           key='reportImage'/>
         }
 
-        { 
+        {
           this.props.expanded ?
           <div className='sidebar-button sidebar-feedback-button'>
           <Button
