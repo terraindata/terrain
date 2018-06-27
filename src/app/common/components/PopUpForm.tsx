@@ -50,6 +50,7 @@ import * as classNames from 'classnames';
 import BugFeedbackForm from 'common/components/BugFeedbackForm';
 import CheckBox from 'common/components/CheckBox';
 import Modal from 'common/components/Modal';
+import Button from 'common/components/Button';
 import * as html2canvas from 'html2canvas';
 import * as Radium from 'radium';
 import * as React from 'react';
@@ -197,30 +198,30 @@ class PopUpForm extends TerrainComponent<Props>
 
   public render()
   {
-    const messageStyle = [
-    fontColor('#242424'),
-    backgroundColor('#fff'),
-    ];
-    const buttonTextColor = Color('#242424');
-    const buttonStyle = [
-    fontColor('#424242', buttonTextColor.alpha(buttonTextColor.alpha() * 0.5)),
-    backgroundColor('#fff'),
-    borderColor('#EDEFF3'),
-    ];
+    // const messageStyle = [
+    // fontColor('#242424'),
+    // backgroundColor('#fff'),
+    // ];
+    // const buttonTextColor = Color('#242424');
+    // const buttonStyle = [
+    // fontColor('#424242', buttonTextColor.alpha(buttonTextColor.alpha() * 0.5)),
+    // backgroundColor('#fff'),
+    // borderColor('#EDEFF3'),
+    // ];
 
-    const confirmButtonStyle = this.props.confirmDisabled ?
-    [
-    fontColor(Colors().activeText),
-    backgroundColor(Colors().activeHover),
-    borderColor(Colors().altBg2),
-    getStyle('cursor', 'default'),
-    ]
-    :
-    [
-    backgroundColor(Colors().active, Colors().activeHover),
-    borderColor(Colors().active, Colors().activeHover),
-    fontColor(Colors().activeText),
-    ];
+    // const confirmButtonStyle = this.props.confirmDisabled ?
+    // [
+    // fontColor(Colors().activeText),
+    // backgroundColor(Colors().activeHover),
+    // borderColor(Colors().altBg2),
+    // getStyle('cursor', 'default'),
+    // ]
+    // :
+    // [
+    // backgroundColor(Colors().active, Colors().activeHover),
+    // borderColor(Colors().active, Colors().activeHover),
+    // fontColor(Colors().activeText),
+    // ];
 
     return (
       <FadeInOut
@@ -303,8 +304,6 @@ class PopUpForm extends TerrainComponent<Props>
                     />
                   }
                   {
-                  }
-                  {
                     <CheckBox
                     checked={this.state.checkboxChecked}
                     onChange={this.handleCheckboxCheckedChange}
@@ -312,43 +311,29 @@ class PopUpForm extends TerrainComponent<Props>
                     />
                   }
                   {
-                    this.props.confirm &&
                     <div
                     className='popupform-modal-buttons'
                     style={[
                       fontColor(Colors().altText1),
                       ]}
                       >
-                      <div
-                      className='button modal-close-button'
-                      style={buttonStyle}
-                      onClick={this.props.onClose}
-                      key='modal-close-button'
-                      >
-                      {
-                        this.props.cancelButtonText ? this.props.cancelButtonText : 'CANCEL'
-                      }
+                      <div className='popupform-modal-buttons modal-confirm-button'>
+
+                      <Button
+                      text={this.props.confirmButtonText ? this.props.confirmButtonText : 'Continue'}
+                      onClick={!this.props.confirmDisabled && this.closePopUpFormSuccess}></Button> 
                       </div>
-                      {
-                        this.props.confirm ?
-                        <div
-                        className={classNames({
-                          'button': true,
-                          'modal-confirm-button': true,
-                        })}
-                        onClick={!this.props.confirmDisabled && this.closePopUpFormSuccess}
-                        style={confirmButtonStyle}
-                        key='modal-confirm-button'
-                        >
-                        {
-                          this.props.confirmButtonText ? this.props.confirmButtonText : 'Continue'
-                        }
-                        </div>
-                        :
-                        <div />
-                      }
+
+                      <div className='popupform-modal-buttons modal-close-button'>
+
+                      <Button
+                      text={this.props.cancelButtonText ? this.props.cancelButtonText : 'CANCEL'}
+                      onClick={this.props.onClose}></Button> 
+                      </div>
+
 
                       </div>
+
                     }
                     </div>
                     </div>

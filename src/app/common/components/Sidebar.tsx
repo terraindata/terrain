@@ -136,10 +136,10 @@ export class Sidebar extends TerrainComponent<Props>
     {
       modals.push(
         <PopUpForm
-
+          title='REPORT A BUG'
           key='reportBug'
           formDescription='Please describe your bug in as much detail as possible below. Your email address will be recorded.'
-          textboxPlaceholder='Put your bug description here.'
+          textboxPlaceholderValue='Put your bug description here.'
           isBug={true}
           className='bug-report'
           open={this.state.reportBugModalOpen}
@@ -158,7 +158,7 @@ export class Sidebar extends TerrainComponent<Props>
         <PopUpForm
           title='GENERAL FEEDBACK'
           formDescription='Please submit any feedback you have below. Your email address will be recorded.'
-          textboxPlaceholder='Feedback description here.'
+          textboxPlaceholderVAlue='Feedback description here.'
           isBug={false}
           key='giveFeedback'
           className='feedback-report'
@@ -385,34 +385,32 @@ public render()
             )
             : null
         }
-        { this.props.expanded ?
-       <div className='sidebar-button sidebar-bug-button'>
-       <Button
-       text='BUGS'
-       onClick={this._toggle('reportBugModalOpen')}> </Button>
-       </div>
-       :
-               <img
-              src={BugSmallIcon} className='sidebar-button-collapsed sidebar-bug-button-collapsed'
+        { 
+          this.props.expanded ?
+          <div className='sidebar-button sidebar-bug-button'>
+          <Button
+          text='BUGS'
+          onClick={this._toggle('reportBugModalOpen')}> </Button>
+          </div>
+          :
+          <img
+          src={BugSmallIcon} className='sidebar-button-collapsed sidebar-bug-button-collapsed'
           onClick={this._toggle('reportBugModalOpen')}
-          key='reportImage'
-            />
-     }
+          key='reportImage'/>
+        }
 
-{ this.props.expanded ?
-  <div className='sidebar-button sidebar-feedback-button'>
-       <Button
-       text='FEEDBACK'
-       onClick={this._toggle('reportFeedbackModalOpen')}
-       > </Button>
-       </div>
-
-       :
-       <img className='sidebar-button-collapsed sidebar-feedback-button-collapsed' src={FeedbackSmallIcon}
+        { 
+          this.props.expanded ?
+          <div className='sidebar-button sidebar-feedback-button'>
+          <Button
+          text='FEEDBACK'
+          onClick={this._toggle('reportFeedbackModalOpen')}> </Button>
+          </div>
+          :
+          <img className='sidebar-button-collapsed sidebar-feedback-button-collapsed' src={FeedbackSmallIcon}
           onClick={this._toggle('reportFeedbackModalOpen')}
           key='feedbackImage'/>
-
-     }
+        }
 
       </div>
 

@@ -137,7 +137,7 @@ export class Integrations
               customerName: '',
               email: 'notifications@terraindata.com',
               port: 465,
-              recipient: 'alerts@terraindata.com',
+              recipient: 'roopa.ramanujam@terraindata.com',
               smtp: 'smtp.gmail.com',
             },
           createdBy: userConfigs[0].id,
