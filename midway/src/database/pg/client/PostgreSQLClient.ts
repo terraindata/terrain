@@ -71,16 +71,42 @@ class PostgreSQLClient
     this.config = config;
 
     this.controller.setStatus(DatabaseControllerStatus.CONNECTING);
-    this.delegate = new pg.Pool(config);
 
-    this.delegate.on('acquire', (connection: pg.PoolClient) =>
+    const client = new pg.Client(config);
+    client.connect((connectErr: any) =>
     {
-      this.controller.log('PostgreSQLClient', 'Connection acquired ');
-    });
+      // database does not exist, create a new one
+      if (connectErr !== null && connectErr.code === '3D000')
+      {
+        const newDatabase = config.database;
+        config.database = 'postgres';
+        const newClient = new pg.Client(config);
+        newClient.connect((connectErr2) =>
+        {
+          if (connectErr2 != null)
+          {
+            config.database = newDatabase;
+            throw connectErr2;
+          }
 
-    this.delegate.on('remove' as any, (connection: pg.PoolClient) =>
-    {
-      this.controller.log('PostgreSQLClient', 'Connection released ');
+          newClient.query('create database ' + newDatabase, (queryErr, res) =>
+          {
+            config.database = newDatabase;
+            if (queryErr != null)
+            {
+              throw queryErr;
+            }
+
+            this.delegate = this.createPool(config);
+            newClient.end();
+          });
+        });
+      }
+      else
+      {
+        this.delegate = this.createPool(config);
+      }
+      client.end();
     });
   }
 
@@ -90,6 +116,11 @@ class PostgreSQLClient
     return new Promise<boolean>((resolve, reject) =>
     {
       this.controller.setStatus(DatabaseControllerStatus.CONNECTING);
+      if (this.delegate === undefined)
+      {
+        return resolve(false);
+      }
+
       this.delegate.connect((err: any, client, done) =>
       {
         if (err !== null && err !== undefined)
@@ -163,6 +194,22 @@ class PostgreSQLClient
   public getConfig(): PostgreSQLConfig
   {
     return this.config;
+  }
+
+  private createPool(config: PostgreSQLConfig)
+  {
+    const delegate = new pg.Pool(config);
+    delegate.on('acquire', (connection: pg.PoolClient) =>
+    {
+      this.controller.log('PostgreSQLClient', 'Connection acquired ');
+    });
+
+    delegate.on('remove' as any, (connection: pg.PoolClient) =>
+    {
+      this.controller.log('PostgreSQLClient', 'Connection released ');
+    });
+
+    return delegate;
   }
 }
 
