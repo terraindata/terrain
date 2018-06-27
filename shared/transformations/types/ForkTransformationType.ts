@@ -49,10 +49,11 @@ import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { areFieldsLocal } from 'shared/transformations/util/TransformationsUtil';
 
 import { List } from 'immutable';
 
-import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import { createLocalMatcher, visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationVisitError from 'shared/transformations/TransformationVisitError';
@@ -62,7 +63,7 @@ import * as yadeep from 'shared/util/yadeep';
 
 export interface OutputField
 {
-  kp: KeyPath;
+  field: number | KeyPath;
   value: any;
 }
 
@@ -76,30 +77,63 @@ export default abstract class ForkTransformationType extends TransformationNode
 
   public abstract split(val: any): OutputField[];
 
+  public validate()
+  {
+    const opts = this.meta as NodeOptionsType<any>;
+    if (opts.newFieldKeyPaths === undefined || opts.newFieldKeyPaths.size === 0)
+    {
+      return 'Transformation has no newFieldKeyPaths';
+    }
+    let valid = true;
+    this.fields.forEach((field) => {
+      opts.newFieldKeyPaths.forEach((nfkp) => {
+        if (valid && !areFieldsLocal(field, nfkp))
+        {
+          valid = false;
+        }
+      });
+    });
+    if (!valid)
+    {
+      return 'Fields and newFieldKeyPaths are not local';
+    }
+
+    return super.validate();
+  }
+
   protected transformDocument(doc: object): TransformationVisitResult
   {
     const errors = [];
     const opts = this.meta as NodeOptionsType<any>;
-    this.fields.forEach((field) =>
-    {
-      const el = yadeep.get(doc, field);
 
-      if (el === null && this.skipNulls)
+    this.fields.forEach((field) => {
+      for (const match of yadeep.search(doc, field))
       {
-        return;
-      }
-
-      if (!this.checkType(el))
-      {
-        errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof el}.`);
-      }
-      else
-      {
-        const newValues = this.split(el);
-
-        for (const newValue of newValues)
+        const { value, location } = match;
+        if (value === null && this.skipNulls)
         {
-          yadeep.set(doc, newValue.kp, newValue.value, { create: true });
+          return;
+        }
+        if (!this.checkType(value))
+        {
+          errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof value}.`);
+          return;
+        }
+
+        const matcher = createLocalMatcher(field, location);
+        if (matcher === null)
+        {
+          errors.push(`Error in ${this.typeCode}: Field and Match location are inconsistent`);
+          return;
+        }
+
+        const newFields = this.split(value);
+        for (const newField of newFields)
+        {
+          const newFieldKeyPath = typeof newField.field === 'number' ?
+            opts.newFieldKeyPaths.get(newField.field) :
+            newField.field;
+          yadeep.set(doc, matcher(newFieldKeyPath), newField.value, { create: true });
         }
       }
     });

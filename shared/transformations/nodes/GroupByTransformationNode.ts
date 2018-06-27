@@ -72,8 +72,12 @@ export class GroupByTransformationNode extends ForkTransformationType
   {
     const opts = this.meta as NodeOptionsType<TransformationNodeType.GroupByNode>;
 
+    // const mapper: {
+    //   [k: string]: KeyPath,
+    // } = {};
+
     const mapper: {
-      [k: string]: KeyPath,
+      [k: string]: number,
     } = {};
 
     const outputs: {
@@ -82,7 +86,7 @@ export class GroupByTransformationNode extends ForkTransformationType
 
     for (let i = 0; i < opts.groupValues.length; i++)
     {
-      mapper[opts.groupValues[i]] = opts.newFieldKeyPaths.get(i);
+      mapper[opts.groupValues[i]] = i;
       outputs[opts.groupValues[i]] = [];
     }
 
@@ -99,10 +103,10 @@ export class GroupByTransformationNode extends ForkTransformationType
     const outputFields = [];
     for (const key of Object.keys(mapper))
     {
-      const kpi = mapper[key];
+      const index = mapper[key];
       const arr = outputs[key];
       outputFields.push({
-        kp: kpi,
+        field: index,
         value: arr,
       });
     }

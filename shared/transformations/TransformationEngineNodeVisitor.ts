@@ -65,6 +65,56 @@ export default class TransformationEngineNodeVisitor
   }
 }
 
+/*
+ * matchKP should not contain -1
+ */
+export function createLocalMatcher(searchKP: KeyPath, matchKP: KeyPath): (newKP: KeyPath) => KeyPath
+{
+  if (searchKP.size !== matchKP.size || searchKP.size === 0)
+  {
+    return null;
+  }
+
+  const replacements: {
+    [k: number]: number;
+  } = {};
+
+  let maxIndex = -1;
+
+  for (let i = 0; i < searchKP.size; i++)
+  {
+    const searchIndex = searchKP.get(i);
+    const matchIndex = matchKP.get(i);
+    if (searchIndex !== matchIndex)
+    {
+      if (typeof searchIndex !== 'number' || typeof matchIndex !== 'number')
+      {
+        return null;
+      }
+      else
+      {
+        replacements[i] = matchIndex;
+        maxIndex = i;
+      }
+    }
+  }
+
+  const baseMatchPath = matchKP.slice(0, maxIndex + 1);
+
+  return (newKP: KeyPath) => {
+    if (maxIndex === -1)
+    {
+      return newKP;
+    }
+    else
+    {
+      const toTransplant = newKP.slice(maxIndex + 1);
+      return baseMatchPath.concat(toTransplant).toList();
+    }
+
+  };
+}
+
 export function visitHelper(fields: List<KeyPath>, doc: object, defaultResult: TransformationVisitResult,
   cb: (kp: KeyPath, el: any) => TransformationVisitResult | void,
   shouldTransform: (kp: KeyPath, el: any) => boolean = (kp, el) => true): TransformationVisitResult

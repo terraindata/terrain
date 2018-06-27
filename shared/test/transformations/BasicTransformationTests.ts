@@ -825,7 +825,7 @@ test('test set if transformation', () =>
 
   const r = e.transform(TestDocs.doc1);
   expect(r['name']).toEqual('Tim');
-  expect(r['bleep']).toEqual('bloop');
+  expect(r['bleep']).not.toEqual('bloop');
 });
 
 test('duplicate a disabled array', () =>

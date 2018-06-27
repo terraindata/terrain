@@ -67,7 +67,7 @@ const TYPECODE = TransformationNodeType.RoundNode;
 export class RoundTransformationNode extends SimpleTransformationType
 {
   public readonly typeCode = TYPECODE;
-  public readonly acceptedType = 'string';
+  public readonly acceptedType = 'number';
 
   public validate()
   {

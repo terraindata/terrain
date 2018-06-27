@@ -73,33 +73,31 @@ export default abstract class SimpleTransformationType extends TransformationNod
   protected transformDocument(doc: object): TransformationVisitResult
   {
     const errors = [];
-    const result = {
-      document: doc,
-      errors,
-    };
 
-    return visitHelper(
-      this.fields,
-      doc,
-      result,
-      (kp, el) =>
+    this.fields.forEach((field) => {
+      for (const match of yadeep.search(doc, field))
       {
-        if (el === null && this.skipNulls)
+        const { value, location } = match;
+        if (value === null && this.skipNulls)
         {
-          return undefined;
+          return;
         }
-
-        if (!this.checkType(el))
+        if (!this.checkType(value))
         {
-          errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof el}.`);
+          errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof value}.`);
+          return;
         }
-
-        const newValue = this.transformer(el);
+        const newValue = this.transformer(value);
         if (newValue !== undefined)
         {
-          yadeep.set(doc, kp, newValue, { create: true });
+          yadeep.set(doc, location, newValue, { create: true });
         }
-      },
-    );
+      }
+    });
+
+    return {
+      document: doc,
+      errors,
+    } as TransformationVisitResult;
   }
 }

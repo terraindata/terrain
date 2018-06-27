@@ -79,7 +79,7 @@ export class SplitTransformationNode extends ForkTransformationType
     {
       outputFields.push({
         value: split[i],
-        kp: opts.newFieldKeyPaths.get(i),
+        field: i,
       });
     }
 
