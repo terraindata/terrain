@@ -63,7 +63,7 @@ function getExpectedFile(): string
   return __filename.split('.')[0] + '.expected';
 }
 
-beforeAll(async () =>
+beforeAll(async (done) =>
 {
   // TODO: get rid of this monstrosity once @types/winston is updated.
   (winston as any).level = 'debug';
@@ -88,6 +88,7 @@ beforeAll(async () =>
 
   elasticController = new ElasticController(config, 0, 'ElasticClientTests', undefined, undefined, 'abc.');
   elasticClient = elasticController.getClient();
+  done();
 });
 
 test('elastic health', async (done) =>
@@ -199,7 +200,7 @@ test('putScript', async (done) =>
   done();
 });
 
-test('prefix isolation', async () =>
+test('prefix isolation', async (done) =>
 {
   const checkHit = (hit) =>
   {
@@ -291,4 +292,6 @@ test('prefix isolation', async () =>
       ],
     },
   );
+
+  done();
 });
