@@ -231,18 +231,19 @@ function contains(obj: object | any[], key: number | string): boolean
   return typeof key === 'string' && obj.hasOwnProperty(key);
 }
 
-function* searchDFS(obj: object | any[], path: KeyPath, index: number = 0): IterableIterator<ContextResult>
+// can easily make this function be a generator/iterator instead. This way is faster though.
+function searchRecurse(obj: object | any[], path: KeyPath, cb: (match: ContextResult) => void, index: number = 0)
 {
   if (index === path.size) // even if obj is null or undefined, it is a property of its parent
   {
-    return yield {
+    return cb({
       value: obj,
       location: path,
-    };
+    });
   }
   else if (index > path.size || isPrimitive(obj))
   {
-    return undefined;
+    return;
   }
 
   const waypoint = path.get(index);
@@ -255,19 +256,19 @@ function* searchDFS(obj: object | any[], path: KeyPath, index: number = 0): Iter
       {
         const elem = obj[i];
         const nextPath = path.set(index, i);
-        yield* searchDFS(elem, nextPath, index + 1);
+        searchRecurse(elem, nextPath, cb, index + 1);
       }
     }
     else
     {
-      return undefined;
+      return;
     }
   }
   else
   {
     if (contains(obj, waypoint))
     {
-      yield* searchDFS(obj[waypoint], path, index + 1);
+      searchRecurse(obj[waypoint], path, cb, index + 1);
     }
   }
 }
@@ -283,5 +284,8 @@ function* searchDFS(obj: object | any[], path: KeyPath, index: number = 0): Iter
  */
 export function search(obj: object, path: KeyPath): ContextResult[]
 {
-  return Array.from(searchDFS(obj, path));
+  // return Array.from(searchDFS(obj, path));
+  const results = [];
+  searchRecurse(obj, path, (result) => results.push(result));
+  return results;
 }
