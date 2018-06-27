@@ -111,7 +111,7 @@ interface TransformationOptionTypes
   };
   InsertNode: {
     at?: number;
-    value: string | KeyPath;
+    value: string;
   };
   CaseNode: {
     format: string;

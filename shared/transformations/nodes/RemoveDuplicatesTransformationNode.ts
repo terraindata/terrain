@@ -68,7 +68,7 @@ export class RemoveDuplicatesTransformationNode extends TransformationNode
 
   public transform(doc: object)
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.RemoveDuplicatesNode>;
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
 
     this.fields.forEach((field) =>
     {

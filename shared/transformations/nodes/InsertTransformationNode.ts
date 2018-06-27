@@ -45,140 +45,59 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
+
+const { List, Map } = Immutable;
+
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import * as Immutable from 'immutable';
-import { List } from 'immutable';
-
-import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
-import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
+
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
 
 const TYPECODE = TransformationNodeType.InsertNode;
 
-export class InsertTransformationNode extends TransformationNode
+export class InsertTransformationNode extends SimpleTransformationType
 {
   public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'string';
 
-  public transform(doc: object)
+  public validate()
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.InsertNode>;
-    let result: TransformationVisitResult;
-    this.fields.forEach((field) =>
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    if (opts.value === undefined)
     {
-      const el: any = yadeep.get(doc, field);
-      if (el === undefined || result !== undefined)
-      {
-        return;
-      }
-      if (typeof el !== 'string' && el.constructor !== Array)
-      {
-        result = {
-          errors: [
-            {
-              message: 'Attempted to insert in a non-string field (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-        return;
-      }
-
-      let at: number = 0;
-      if (typeof opts['at'] === 'number')
-      {
-        at = opts['at'];
-        if (opts['at'] < 0)
-        {
-          at += (el.length as number) + 1;
-        }
-      }
-      else if (opts['at'] === undefined)
-      {
-        at = el.length;
-      }
-      else
-      {
-        result = {
-          errors: [
-            {
-              message: 'Insert node: "at" property is invalid',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-        return;
-      }
-
-      let value;
-      if (Immutable.Iterable.isIterable(opts['value']) || opts['value'] instanceof KeyPath)
-      {
-        value = yadeep.get(doc, opts['value'] as KeyPath);
-        if (typeof value !== 'string')
-        {
-          result = {
-            errors: [
-              {
-                message: 'Insert: field denoted by "value" keypath is not a string',
-              } as TransformationVisitError,
-            ],
-          } as TransformationVisitResult;
-          return;
-        }
-      }
-      else if (typeof opts['value'] === 'string')
-      {
-        value = opts['value'];
-      }
-      else
-      {
-        result = {
-          errors: [
-            {
-              message: 'Insert: "value" property is missing or invalid',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-        return;
-      }
-
-      if (el.constructor === Array)
-      {
-        for (let i: number = 0; i < Object.keys(el).length; i++)
-        {
-          let kpi: KeyPath = field;
-          if (kpi.contains(-1))
-          {
-            kpi = kpi.set(kpi.indexOf(-1), i.toString());
-          }
-          else
-          {
-            kpi = kpi.push(i.toString());
-          }
-          const eli: any = yadeep.get(doc, kpi);
-          yadeep.set(doc, kpi, (eli.slice(0, at) as string) + String(value) + (eli.slice(at) as string), { create: true });
-        }
-      }
-      else
-      {
-        // Currently assumes a single from and length for all fieldIDs
-        yadeep.set(doc, field, (el.slice(0, at) as string) + String(value) + (el.slice(at) as string), { create: true });
-      }
-    });
-
-    if (result !== undefined)
-    {
-      return result;
+      return 'value is not provided';
     }
+    return super.validate();
+  }
 
-    return {
-      document: doc,
-    } as TransformationVisitResult;
+  public transformer(el: string): string
+  {
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+
+    let at: number = 0;
+    if (typeof opts['at'] === 'number')
+    {
+      at = opts['at'];
+      if (opts['at'] < 0)
+      {
+        at += (el.length as number) + 1;
+      }
+    }
+    else if (opts['at'] === undefined)
+    {
+      at = el.length;
+    }
+    const value = opts['value'];
+
+    return (el.slice(0, at) as string) + String(value) + (el.slice(at) as string);
   }
 }
 

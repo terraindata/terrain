@@ -102,17 +102,6 @@ test('append string to a field', () =>
   expect(r['name']).toBe('Bobs Burgers');
 });
 
-test('insert field value in a field', () =>
-{
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc1);
-  e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath(['name'])]),
-    { at: 0, value: ' ' });
-  e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath(['name'])]),
-    { at: 0, value: KeyPath(['meta', 'school']) });
-  const r = e.transform(TestDocs.doc1);
-  expect(r['name']).toBe('Stanford Bob');
-});
-
 test('transform doc with null value(s)', () =>
 {
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc6);
@@ -828,6 +817,58 @@ test('duplicate a field and then rename that field', () =>
       },
     ],
   });
+});
+
+test('super deep duplication and modify', () =>
+{
+  const wrap = (kp: any[]) =>
+  {
+    return List([List(kp)]);
+  };
+  const doc = {
+    fields1: [
+      {
+        fields2: [
+          [1, 2, 3],
+          [4, 5, 6],
+        ],
+      },
+      {
+        fields2: [
+          [0.5],
+          [100],
+        ],
+      },
+    ],
+  };
+  const e = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.DuplicateNode,
+    wrap(['fields1', -1, 'fields2']),
+    {
+      newFieldKeyPaths: wrap(['fields1', -1, 'fields3']),
+    },
+  );
+  e.appendTransformation(
+    TransformationNodeType.AddNode,
+    wrap(['fields1', -1, 'fields2', -1, -1]),
+    {
+      shift: 10,
+    },
+  );
+  const r = e.transform(doc);
+  expect(r['fields1'][0]['fields3']).toEqual([
+    [1, 2, 3],
+    [4, 5, 6],
+  ]);
+  expect(r['fields1'][0]['fields2']).toEqual([
+    [11, 12, 13],
+    [14, 15, 16],
+  ]);
+  expect(r['fields1'][1]['fields2']).toEqual([
+    [10.5],
+    [110],
+  ]);
 });
 
 test('suite of numeric transformations', () =>

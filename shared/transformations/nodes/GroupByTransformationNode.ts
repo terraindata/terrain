@@ -70,7 +70,7 @@ export class GroupByTransformationNode extends ForkTransformationType
 
   public split(el: any[]): OutputField[]
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.GroupByNode>;
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
 
     // const mapper: {
     //   [k: string]: KeyPath,

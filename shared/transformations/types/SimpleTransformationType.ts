@@ -68,6 +68,12 @@ export default abstract class SimpleTransformationType extends TransformationNod
   // override this to operate on null values
   public readonly skipNulls: boolean = true;
 
+  // override this transformation to prevent transformation from occuring
+  public shouldTransform(el: any): boolean
+  {
+    return true;
+  }
+
   public abstract transformer(val: any): any;
 
   protected transformDocument(doc: object): TransformationVisitResult
@@ -88,11 +94,12 @@ export default abstract class SimpleTransformationType extends TransformationNod
           errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof value}.`);
           return;
         }
-        const newValue = this.transformer(value);
-        if (newValue !== undefined)
+        if (!this.shouldTransform(value))
         {
-          yadeep.set(doc, location, newValue, { create: true });
+          return;
         }
+        const newValue = this.transformer(value);
+        yadeep.set(doc, location, newValue, { create: true });
       }
     });
 

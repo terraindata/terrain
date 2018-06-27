@@ -45,20 +45,23 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
+
+const { List, Map } = Immutable;
+
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import { List } from 'immutable';
-
-import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import { createLocalMatcher, visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationVisitError from 'shared/transformations/TransformationVisitError';
 import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
 
 import isPrimitive = require('is-primitive');
 
@@ -68,33 +71,37 @@ export class DuplicateTransformationNode extends TransformationNode
 {
   public readonly typeCode = TYPECODE;
 
-  public transform(doc: object)
+  protected transformDocument(doc: object): TransformationVisitResult
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.DuplicateNode>;
+    const errors = [];
+    const opts = this.meta as NodeOptionsType<any>;
+
     this.fields.forEach((field) =>
     {
-      let el: any = yadeep.get(doc, field);
-      if (!isPrimitive(el) && el.constructor !== Array)
+      for (const match of yadeep.search(doc, field))
       {
-        el = Object.assign({}, el);
-      }
-      if (opts.newFieldKeyPaths.get(0).contains(-1))
-      {
-        // assume el length is same as target length
-        for (let i: number = 0; i < el.length; i++)
+        let { value } = match;
+
+        const matcher = createLocalMatcher(field, match.location);
+        if (matcher === null)
         {
-          const kpi: KeyPath = opts.newFieldKeyPaths.get(0).set(
-            opts.newFieldKeyPaths.get(0).indexOf(-1), i.toString());
-          yadeep.set(doc, kpi, el[i], { create: true });
+          errors.push(`Error in ${this.typeCode}: Field and Match location are inconsistent`);
+          return;
         }
-      } else
-      {
-        yadeep.set(doc, opts.newFieldKeyPaths.get(0), el, { create: true });
+
+        if (!isPrimitive(value))
+        {
+          value = _.cloneDeep(value);
+        }
+
+        const newFieldKeyPath = opts.newFieldKeyPaths.get(0);
+        yadeep.set(doc, matcher(newFieldKeyPath), value, { create: true });
       }
     });
 
     return {
       document: doc,
+      errors,
     } as TransformationVisitResult;
   }
 }

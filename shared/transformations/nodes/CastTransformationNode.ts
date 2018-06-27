@@ -45,123 +45,137 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
+
+const { List, Map } = Immutable;
+
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import { List } from 'immutable';
-
-import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
-import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
+
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
 
 import dateFormat = require('date-format');
 
 const TYPECODE = TransformationNodeType.CastNode;
 
-export class CastTransformationNode extends TransformationNode
+export class CastTransformationNode extends SimpleTransformationType
 {
   public readonly typeCode = TYPECODE;
+  public readonly skipNulls = false;
 
-  public transform(doc: object)
+  public shouldTransform(el: any)
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.CastNode>;
-
-    return visitHelper(this.fields, doc, { document: doc }, (kp, el) =>
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    if (typeof el === opts.toTypename || el == null || (el.constructor === Array && opts.toTypename === 'array'))
     {
-      try
-      {
-        if (typeof el === opts.toTypename || el == null || (el.constructor === Array && opts.toTypename === 'array'))
-        {
-          return undefined;
-        }
+      return false;
+    }
+    else
+    {
+      return true;
+    }
+  }
 
-        switch (opts.toTypename)
+  public transformer(el: any): any
+  {
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+
+    switch (opts.toTypename)
+    {
+      case 'string': {
+        if (typeof el === 'object')
         {
-          case 'string': {
-            if (typeof el === 'object')
-            {
-              yadeep.set(doc, kp, JSON.stringify(el));
-            }
-            else
-            {
-              yadeep.set(doc, kp, el.toString());
-            }
-            break;
-          }
-          case 'number': {
-            yadeep.set(doc, kp, Number(el));
-            break;
-          }
-          case 'boolean': {
-            if (typeof el === 'string')
-            {
-              yadeep.set(doc, kp, el.toLowerCase() === 'true');
-            }
-            else
-            {
-              yadeep.set(doc, kp, Boolean(el));
-            }
-            break;
-          }
-          case 'object': {
-            if (typeof el === 'string')
-            {
-              try
-              {
-                const parsed = JSON.parse(el);
-                yadeep.set(doc, kp, parsed);
-              }
-              catch (e)
-              {
-                yadeep.set(doc, kp, {});
-              }
-            }
-            else
-            {
-              yadeep.set(doc, kp, {});
-            }
-            break;
-          }
-          case 'array': {
-            yadeep.set(doc, kp, []);
-            break;
-          }
-          case 'date': {
-            if (opts.format === 'ISOstring')
-            {
-              yadeep.set(doc, kp, new Date(el).toISOString());
-            }
-            else if (opts.format === 'MMDDYYYY')
-            {
-              yadeep.set(doc, kp, dateFormat('MM/dd/yyyy', new Date(el)));
-            }
-            break;
-          }
-          default: {
-            return {
-              errors: [
-                {
-                  message: `Attempted to cast to an unsupported type ${opts.toTypename}`,
-                } as TransformationVisitError,
-              ],
-            } as TransformationVisitResult;
-          }
+          return JSON.stringify(el);
+        }
+        else
+        {
+          return el.toString();
         }
       }
-      catch (ex)
-      {
-        yadeep.set(doc, kp, null);
+      case 'number': {
+        return Number(el);
       }
-    }, (kp, el) =>
-      {
-        return !(typeof el === opts.toTypename || el == null || (el.constructor === Array && opts.toTypename === 'array'));
-      });
+      case 'boolean': {
+        if (typeof el === 'string')
+        {
+          return el.toLowerCase() === 'true';
+        }
+        else
+        {
+          return Boolean(el);
+        }
+      }
+      case 'object': {
+        if (typeof el === 'string')
+        {
+          try
+          {
+            const parsed = JSON.parse(el);
+            return parsed;
+          }
+          catch (e)
+          {
+            return {};
+          }
+        }
+        else
+        {
+          return {};
+        }
+      }
+      case 'array': {
+        if (typeof el === 'string')
+        {
+          try
+          {
+            const parsed = JSON.parse(el);
+            if (!Array.isArray(parsed))
+            {
+              return [];
+            }
+            return parsed;
+          }
+          catch (e)
+          {
+            return [];
+          }
+        }
+        else
+        {
+          return [el];
+        }
+      }
+      case 'date': {
+        try {
+          if (opts.format === 'ISOstring')
+          {
+            return new Date(el).toISOString();
+          }
+          else if (opts.format === 'MMDDYYYY')
+          {
+            return dateFormat('MM/dd/yyyy', new Date(el));
+          }
+          else
+          {
+            return el;
+          }
+        }
+        catch (ex)
+        {
+          return null;
+        }
+      }
+      default: {
+        return null;
+      }
+    }
   }
 }
 

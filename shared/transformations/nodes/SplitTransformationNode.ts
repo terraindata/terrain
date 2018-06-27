@@ -70,7 +70,7 @@ export class SplitTransformationNode extends ForkTransformationType
 
   public split(el: string): OutputField[]
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.SplitNode>;
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
 
     const expectedSize = opts.newFieldKeyPaths.size;
     const split = trimHelper(splitHelper(el, opts, expectedSize), expectedSize);
@@ -163,25 +163,3 @@ function splitHelper(el: string, opts: NodeOptionsType<TransformationNodeType.Sp
   }
   return split;
 }
-
-// function splitHelper(el: any, opts: NodeOptionsType<TransformationNodeType.SplitNode>): string[]
-// {
-//   let split: string[];
-
-//   if (typeof opts.delimiter === 'number')
-//   {
-//     split = [
-//       (el as string).slice(0, opts.delimiter as number),
-//       (el as string).slice(opts.delimiter as number),
-//     ];
-//   }
-//   else if (opts.regex === true)
-//   {
-//     split = (el as string).split(RegExp(opts.delimiter as string));
-//   }
-//   else
-//   {
-//     split = (el as string).split(opts.delimiter as string);
-//   }
-//   return split;
-// }

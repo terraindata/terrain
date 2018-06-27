@@ -68,7 +68,7 @@ export class ZipcodeTransformationNode extends TransformationNode
 
   public transform(doc: object)
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.ZipcodeNode>;
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
 
     return visitHelper(this.fields, doc, { document: doc }, (kp, el) =>
     {

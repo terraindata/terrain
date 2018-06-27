@@ -68,7 +68,7 @@ export class FilterArrayTransformationNode extends TransformationNode
 
   public transform(doc: object)
   {
-    const opts = this.meta as NodeOptionsType<TransformationNodeType.FilterArrayNode>;
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
 
     this.fields.forEach((field) =>
     {
