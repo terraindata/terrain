@@ -72,17 +72,16 @@ export interface Props
   checkboxLabel: string;
   textboxPlaceholder?: string;
 }
-
 @Radium
 class BugFeedbackForm extends TerrainComponent<Props>
 {
   public state: {
     checkboxChecked: boolean;
-    userInput: string;
+    textboxValue: string;
   } =
     {
       checkboxChecked: true;
-      userInput: '',
+      textboxValue: '',
     };
 
   public handleSubmitForm(): void
@@ -95,6 +94,20 @@ class BugFeedbackForm extends TerrainComponent<Props>
     };
     this.takeScreenshot(data, this.state.checkboxChecked);
   }
+
+  // public updateCheckboxStatus(status: boolean): void
+  // {
+  //   this.setState({
+  //     checkboxChecked: status
+  //   });
+  // }
+
+  // public updatetextBoxValue(value: string): void
+  // {
+  //   this.setState({
+  //     textboxValue: value
+  //   });
+  // }
 
   public postFeedbackData(data: object)
   {
@@ -134,12 +147,12 @@ class BugFeedbackForm extends TerrainComponent<Props>
       this.postFeedbackData(data);
     }
   }
-  public render()
-  {
-    return (
-      <div> </div>
-      );
-  }
+  // public render()
+  // {
+  //   return (
+  //     <div> </div>
+  //     );
+  // }
 }
 
 const ReactModal = require('react-modal');
@@ -150,6 +163,6 @@ export default Util.createContainer(
   BugFeedbackForm,
   ['users'],
   {
-    colorsActions: ColorsActions,
+
   },
 );

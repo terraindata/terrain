@@ -48,7 +48,6 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import AccountDropdown from 'common/components/AccountDropdown';
-import BugFeedbackForm from 'common/components/BugFeedbackForm';
 import Button from 'common/components/Button';
 import CheckBox from 'common/components/CheckBox';
 import Modal from 'common/components/Modal';
@@ -107,44 +106,41 @@ export class Sidebar extends TerrainComponent<Props>
     linkOffset: number,
     reportBugModalOpen: boolean,
     reportFeedbackModalOpen: boolean,
-    description: string,
-    screenshotChecked: boolean,
-    isBug: boolean,
   } =
     {
       linkOffset: 0,
       reportBugModalOpen: false,
       reportFeedbackModalOpen: false,
-      description: '',
-      screenshotChecked: true,
-      isBug: false,
     };
 
   public renderRootLevelModals(): any[]
   {
     const modals = [];
-    const bugForm =
-    <BugFeedbackForm
-    title='REPORT A BUG'
-    formDescription='Please describe your bug in as much detail as possible below. Your email address will be recorded.'
-    textboxPlaceholder='Put your bug description here.'
-    isBug={true}
-    checkboxLabel= 'Check to include screenshot.'> </BugFeedbackForm>;
+    // const bugForm =
+    // <BugFeedbackForm
+    // title='REPORT A BUG'
+    // formDescription='Please describe your bug in as much detail as possible below. Your email address will be recorded.'
+    // textboxPlaceholder='Put your bug description here.'
+    // isBug={true}
+    // checkboxLabel= 'Check to include screenshot.'> </BugFeedbackForm>;
 
-    const feedbackForm =
-    <BugFeedbackForm
-    title='GENERAL FEEDBACK'
-    formDescription='Please submit any feedback you have below. Your email address will be recorded.'
-    textboxPlaceholder='Feedback description here.'
-    isBug={false}
-    checkboxLabel= 'Check to include screenshot.'> </BugFeedbackForm>;
+    // const feedbackForm =
+    // <BugFeedbackForm
+    // title='GENERAL FEEDBACK'
+    // formDescription='Please submit any feedback you have below. Your email address will be recorded.'
+    // textboxPlaceholder='Feedback description here.'
+    // isBug={false}
+    // checkboxLabel= 'Check to include screenshot.'> </BugFeedbackForm>;
 
     if (this.state.reportBugModalOpen)
     {
       modals.push(
         <PopUpForm
+
           key='reportBug'
-          formContent={bugForm}
+          formDescription='Please describe your bug in as much detail as possible below. Your email address will be recorded.'
+          textboxPlaceholder='Put your bug description here.'
+          isBug={true}
           className='bug-report'
           open={this.state.reportBugModalOpen}
           onClose={this.closeTemplateUI}
@@ -160,9 +156,11 @@ export class Sidebar extends TerrainComponent<Props>
     {
       modals.push(
         <PopUpForm
+          title='GENERAL FEEDBACK'
+          formDescription='Please submit any feedback you have below. Your email address will be recorded.'
+          textboxPlaceholder='Feedback description here.'
+          isBug={false}
           key='giveFeedback'
-          formContent={feedbackForm}
-          title={feedbackForm.props.title}
           className='feedback-report'
           open={this.state.reportFeedbackModalOpen}
           onClose={this.closeTemplateUI}

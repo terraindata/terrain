@@ -50,18 +50,21 @@ import * as classNames from 'classnames';
 import BugFeedbackForm from 'common/components/BugFeedbackForm';
 import CheckBox from 'common/components/CheckBox';
 import Modal from 'common/components/Modal';
+import * as html2canvas from 'html2canvas';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { Ajax } from 'util/Ajax';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
+import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import FadeInOut from './FadeInOut';
 import './PopUpForm.less';
+type User = UserTypes.User;
 
 const Color = require('color');
-
 // put
 export interface Props
 {
@@ -75,17 +78,16 @@ export interface Props
   cancelButtonText?: string;
   onClose: () => void;
   onErrorClear: () => void;
-  formContent?: typeof BugFeedbackForm;
   formDescription?: string;
   showTextbox?: boolean;
   textboxPlaceholderValue?: string;
   textboxValue?: string;
-  onTextboxValueChange?: (newValue: string) => void;
   closeOnConfirm?: boolean;
   className?: string;
-  checkboxDescription?: boolean;
   onConfirm?: () => void;
   checkboxLabel?: string;
+  isBug: boolean;
+  users?: UserTypes.UserState;
 }
 
 @Radium
@@ -93,15 +95,16 @@ class PopUpForm extends TerrainComponent<Props>
 {
   public static defaultProps = {
     confirmButtonText: 'SUBMIT',
+    checkboxLabel: 'Check to include screenshot.',
   };
   public state: {
     checkboxChecked: boolean,
     textboxValue: string,
   } =
-    {
-      checkboxChecked: true,
-      textboxValue: '',
-    };
+  {
+    checkboxChecked: true,
+    textboxValue: '',
+  };
 
   public componentWillMount()
   {
@@ -112,28 +115,23 @@ class PopUpForm extends TerrainComponent<Props>
     });
   }
 
-  public closeModalSuccess()
+  public closePopUpFormSuccess()
   {
-    if (this.props.closeOnConfirm !== undefined && !this.props.closeOnConfirm)
-    {
-      this.props.onConfirm ? this.props.onConfirm() : null;
-      return;
-    }
+    this.handleSubmitForm();
+    // if (this.props.closeOnConfirm !== undefined && !this.props.closeOnConfirm)
+    // {
+    //   this.props.onConfirm ? this.props.onConfirm() : null;
+    //   return;
+    // }
     this.props.onClose();
-    this.props.onConfirm ? this.props.onConfirm() : null;
-    //console.log(typeof(this.props.formContent));
+    // this.props.onConfirm ? this.props.onConfirm() : null;
   }
 
   public handleTextboxChange(evt)
   {
-    if (this.props.onTextboxValueChange)
-    {
-      this.props.onTextboxValueChange(evt.target.value);
-    }
     this.setState({
       textboxValue: evt.target.value,
     });
-    //console.log(this.props.formContent);
   }
 
   public handleCheckboxCheckedChange()
@@ -141,175 +139,224 @@ class PopUpForm extends TerrainComponent<Props>
     this.setState({
       checkboxChecked: !this.state.checkboxChecked,
     });
-
   }
 
   public handleFocus(e)
   {
     e.target.select(); // text input field value will show selected
   }
+  public handleSubmitForm(): void
+  {
+    const data = {
+      bug: this.props.isBug,
+      description: this.state.textboxValue,
+      user: this.props.users.currentUser.email,
+      browserInfo: navigator.appVersion,
+    };
+    this.takeScreenshot(data, this.state.checkboxChecked);
+  }
+
+  public postFeedbackData(data: object)
+  {
+    const restoreAppOpacity = () => {
+      if (data['screenshot'] !== undefined)
+      {
+        const newApp: HTMLElement = document.getElementsByClassName('app-inner')[0] as HTMLElement;
+        newApp.style.opacity = 'inherit';
+      }
+    };
+
+    Ajax.req(
+      'post',
+      `feedback/`,
+      data,
+      (response) => restoreAppOpacity(),
+      {
+        onError: (err) => restoreAppOpacity(),
+
+      });
+  }
+
+  public takeScreenshot(data: object, screenshotChecked: boolean): void
+  {
+    if (screenshotChecked)
+    {
+      const app: HTMLElement = document.getElementsByClassName('app-inner')[0] as HTMLElement;
+      app.style.opacity = '1.0';
+      html2canvas(app).then((canvas) => {
+        const dataUrl = canvas.toDataURL();
+        data['screenshot'] = dataUrl;
+        this.postFeedbackData(data);
+      });
+    }
+    else
+    {
+      this.postFeedbackData(data);
+    }
+  }
 
   public render()
   {
     const messageStyle = [
-      fontColor('#242424'),
-      backgroundColor('#fff'),
+    fontColor('#242424'),
+    backgroundColor('#fff'),
     ];
     const buttonTextColor = Color('#242424');
     const buttonStyle = [
-      fontColor('#424242', buttonTextColor.alpha(buttonTextColor.alpha() * 0.5)),
-      backgroundColor('#fff'),
-      borderColor('#EDEFF3'),
+    fontColor('#424242', buttonTextColor.alpha(buttonTextColor.alpha() * 0.5)),
+    backgroundColor('#fff'),
+    borderColor('#EDEFF3'),
     ];
 
     const confirmButtonStyle = this.props.confirmDisabled ?
-      [
-        fontColor(Colors().activeText),
-        backgroundColor(Colors().activeHover),
-        borderColor(Colors().altBg2),
-        getStyle('cursor', 'default'),
-      ]
-      :
-      [
-        backgroundColor(Colors().active, Colors().activeHover),
-        borderColor(Colors().active, Colors().activeHover),
-        fontColor(Colors().activeText),
-      ];
+    [
+    fontColor(Colors().activeText),
+    backgroundColor(Colors().activeHover),
+    borderColor(Colors().altBg2),
+    getStyle('cursor', 'default'),
+    ]
+    :
+    [
+    backgroundColor(Colors().active, Colors().activeHover),
+    borderColor(Colors().active, Colors().activeHover),
+    fontColor(Colors().activeText),
+    ];
 
     return (
       <FadeInOut
-        open={this.props.open}
+      open={this.props.open}
       >
-        <div>
-          <ReactModal
-            appElement={document.getElementById('app')}
-            contentLabel={''}
-            isOpen={true}
-            overlayClassName='popupform-overlay'
-            style={
-              {
-                content: getStyle('boxShadow', `0px 0px 5px 2px ${Colors().boxShadow}`),
-              }
-            }
-            className={'dead-center-flex-wrapper'}
+      <div>
+      <ReactModal
+      appElement={document.getElementById('app')}
+      contentLabel={''}
+      isOpen={true}
+      overlayClassName='popupform-overlay'
+      style={
+        {
+          content: getStyle('boxShadow', `0px 0px 5px 2px ${Colors().boxShadow}`),
+        }
+      }
+      className={'dead-center-flex-wrapper'}
+      >
+      <div className={classNames({
+        'popupform-content': true,
+        'popupform-content-wide': false,
+        'popupform-content-fill': false,
+        [this.props.className]: (this.props.className !== '' && this.props.className !== undefined),
+      })}>
+      <div
+      className={classNames({
+        'popupform-dialog': true,
+        'popupform-dialog-no-footer': !this.props.confirm,
+      })}
+      style={[
+        fontColor(Colors().altText1),
+        backgroundColor('#fff'),
+        ]}
+        >
+        <div
+        className={classNames({
+          'popupform-title': true,
+        })}
+        style={[
+          fontColor('ffffff'),
+          backgroundColor('#55c6fa'),
+          ]}
           >
-            <div className={classNames({
-              'popupform-content': true,
-              'popupform-content-wide': false,
-              'popupform-content-fill': false,
-              [this.props.className]: (this.props.className !== '' && this.props.className !== undefined),
-            })}>
-              <div
-                className={classNames({
-                  'popupform-dialog': true,
-                  'popupform-dialog-no-footer': !this.props.confirm,
-                })}
-                style={[
-                  fontColor(Colors().altText1),
-                  backgroundColor('#fff'),
-                ]}
-              >
-                <div
-                  className={classNames({
-                    'popupform-title': true,
-                  })}
-                  style={[
-                    fontColor('ffffff'),
-                    backgroundColor('#55c6fa'),
-                  ]}
-                >
-                  <div
-                    className='popupform-title-inner'
-                  >
-                    {
-                      this.props.formContent ? this.props.formContent.props.title  : this.props.title
-                    }
-                  </div>
-                  {
-                    !this.props.confirm &&
-                    <CloseIcon
-                      className='popupform-close-x'
-                      onClick={this.props.onClose}
-                    />
-                  }
-                </div>
-                {
-                  <div className='popupform-description'> {
-                    this.props.formContent ? this.props.formContent.props.formDescription : this.props.formDescription
-                  }
-                  </div>
-                }
-                {
-                  this.props.showTextbox &&
-                  <textarea
-                    className={classNames({
-                      'popupform-standard-input': true,
+          <div
+          className='popupform-title-inner'
+          >
+          {
+            this.props.title ? this.props.title : ''
+          }
+          </div>
+          {
+            !this.props.confirm &&
+            <CloseIcon
+            className='popupform-close-x'
+            onClick={this.props.onClose}
+            />
+          }
+          </div>
+          {
+            <div className='popupform-description'> {
+              this.props.formDescription ? this.props.formDescription : ''
+            }
+            </div>
+          }
+          {
+            this.props.showTextbox &&
+            <textarea
+            className={classNames({
+              'popupform-standard-input': true,
 
-                    })}
-                    placeholder={
-                      this.props.formContent ?  this.props.formContent.props.textboxPlaceholder : this.props.textboxPlaceholderValue
-                    }
-                    defaultValue=''
-                    value={this.props.textboxValue}
+            })}
+            placeholder={
+              this.props.textboxPlaceholderValue ? this.props.textboxPlaceholderValue : ''
+            }
+            defaultValue=''
+            value={this.props.textboxValue}
                     onChange={this.handleTextboxChange} // see CardsDeck.tsx for example function
                     autoFocus
                     onFocus={this.handleFocus}
-                  />
-                }
-                {
-                }
-                {
-                  <CheckBox
-                  checked={this.state.checkboxChecked}
-                  onChange={this.handleCheckboxCheckedChange}
-                  label={this.props.formContent ? this.props.formContent.props.checkboxLabel : this.props.checkboxLabel}/>
-                }
-                {
-                  this.props.confirm &&
-                  <div
+                    />
+                  }
+                  {
+                  }
+                  {
+                    <CheckBox
+                    checked={this.state.checkboxChecked}
+                    onChange={this.handleCheckboxCheckedChange}
+                    label={this.props.checkboxLabel ? this.props.checkboxLabel : ''}
+                    />
+                  }
+                  {
+                    this.props.confirm &&
+                    <div
                     className='popupform-modal-buttons'
                     style={[
                       fontColor(Colors().altText1),
-                    ]}
-                  >
-                    <div
+                      ]}
+                      >
+                      <div
                       className='button modal-close-button'
                       style={buttonStyle}
                       onClick={this.props.onClose}
                       key='modal-close-button'
-                    >
+                      >
                       {
                         this.props.cancelButtonText ? this.props.cancelButtonText : 'CANCEL'
                       }
-                    </div>
-                    {
-                      this.props.confirm ?
+                      </div>
+                      {
+                        this.props.confirm ?
                         <div
-                          className={classNames({
-                            'button': true,
-                            'modal-confirm-button': true,
-                          })}
-                          onClick={!this.props.confirmDisabled && this.closeModalSuccess}
-                          style={confirmButtonStyle}
-                          key='modal-confirm-button'
+                        className={classNames({
+                          'button': true,
+                          'modal-confirm-button': true,
+                        })}
+                        onClick={!this.props.confirmDisabled && this.closePopUpFormSuccess}
+                        style={confirmButtonStyle}
+                        key='modal-confirm-button'
                         >
-                          {
-                            this.props.confirmButtonText ? this.props.confirmButtonText : 'Continue'
-                          }
+                        {
+                          this.props.confirmButtonText ? this.props.confirmButtonText : 'Continue'
+                        }
                         </div>
                         :
                         <div />
-                    }
+                      }
 
-                  </div>
-                }
-              </div>
-            </div>
-          </ReactModal>
-        </div>
-      </FadeInOut>
-    );
-  }
+                      </div>
+                    }
+                    </div>
+                    </div>
+                    </ReactModal>
+                    </div>
+                    </FadeInOut>
+                    );
+}
 }
 
 const ReactModal = require('react-modal');
@@ -318,8 +365,8 @@ const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon')
 
 export default Util.createContainer(
   PopUpForm,
-  [],
+  ['users'],
   {
     colorsActions: ColorsActions,
   },
-);
+  );
