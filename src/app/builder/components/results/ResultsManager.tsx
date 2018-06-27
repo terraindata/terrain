@@ -672,7 +672,6 @@ export class ResultsManager extends TerrainComponent<Props>
     }
     changes['estimatedTotal'] = querySize === undefined ? resultsData.rawResult.hits.total :
       Math.min(querySize, resultsData.rawResult.hits.total);
-    console.log('QUERY SIZE IS ', querySize);
     // Need to take into account drop if less than group joins
     if (this.props.query.path &&
       this.props.query.path.nested &&
