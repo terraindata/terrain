@@ -59,8 +59,10 @@ import
   getPendingJobs,
   getRunningJobs,
 } from 'jobs/data/JobsSelectors';
+import * as TerrainLog from 'loglevel';
 import * as React from 'react';
 import Util from 'util/Util';
+import MidwayError from '../../../../shared/error/MidwayError';
 import './Jobs.less';
 
 const INTERVAL = 60000;
@@ -102,11 +104,12 @@ class Jobs extends TerrainComponent<any> {
     this.props.jobsActions({ actionType: 'getJobs' })
       .then((response) =>
       {
+        TerrainLog.debug('Get all jobs: ' + JSON.stringify(response));
         this.setState({ responseText: JSON.stringify(response), jobs: response.data });
       })
-      .catch((error) =>
+      .catch((error: MidwayError) =>
       {
-        console.error(error);
+        TerrainLog.debug('Got error when getting all jobs: ' + error.getDetail());
         this.setState({ responseText: error });
       });
   }
@@ -138,7 +141,7 @@ class Jobs extends TerrainComponent<any> {
 
   public getStatusColor(status)
   {
-    return Colors().statuses[status];
+    return Colors().jobStatuses[status];
   }
 
   public getLogLevelColor(level)
@@ -177,6 +180,14 @@ class Jobs extends TerrainComponent<any> {
     this.setState({
       jobLogs: Immutable.Map(),
       logsModalOpen: false,
+    });
+  }
+
+  public handleJobCancel(colKey, rowData)
+  {
+    this.props.jobsActions({
+      actionType: 'cancelJob',
+      jobId: rowData.id,
     });
   }
 
@@ -233,6 +244,15 @@ class Jobs extends TerrainComponent<any> {
       },
     ];
 
+    const jobCancelColumn = {
+      columnKey: 'cancel',
+      columnLabel: '',
+      component: <ButtonColumn
+        label={'Cancel'}
+        onClick={this.handleJobCancel}
+      />,
+    };
+
     const defaultOrder = {
       columnKey: 'createdAt',
       direction: 'desc' as 'asc' | 'desc',
@@ -262,6 +282,7 @@ class Jobs extends TerrainComponent<any> {
           contentCount={runningJobs.count()}
         >
           <SimpleTable
+            // columnsConfig={jobsHeader.concat(jobCancelColumn)}
             columnsConfig={jobsHeader}
             data={runningJobs}
             defaultOrder={defaultOrder}

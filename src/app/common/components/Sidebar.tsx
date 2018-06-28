@@ -116,21 +116,6 @@ export class Sidebar extends TerrainComponent<Props>
   public renderRootLevelModals(): any[]
   {
     const modals = [];
-    // const bugForm =
-    // <BugFeedbackForm
-    // title='REPORT A BUG'
-    // formDescription='Please describe your bug in as much detail as possible below. Your email address will be recorded.'
-    // textboxPlaceholder='Put your bug description here.'
-    // isBug={true}
-    // checkboxLabel= 'Check to include screenshot.'> </BugFeedbackForm>;
-
-    // const feedbackForm =
-    // <BugFeedbackForm
-    // title='GENERAL FEEDBACK'
-    // formDescription='Please submit any feedback you have below. Your email address will be recorded.'
-    // textboxPlaceholder='Feedback description here.'
-    // isBug={false}
-    // checkboxLabel= 'Check to include screenshot.'> </BugFeedbackForm>;
 
     if (this.state.reportBugModalOpen)
     {
@@ -174,63 +159,6 @@ export class Sidebar extends TerrainComponent<Props>
     }
     return modals;
   }
-
-  // public handleDescriptionChange(newValue: string)
-  // {
-  //   this.setState({
-  //     description: newValue,
-  //   });
-  // }
-
-  // public handleSendReportClicked(): void
-  // {
-  //   const data = {
-  //     bug: this.state.isBug,
-  //     description: this.state.description,
-  //     user: this.props.users.currentUser.email,
-  //     browserInfo: navigator.appVersion,
-  //   };
-  //   this.takeScreenshot(data, this.state.screenshotChecked);
-  // }
-
-  // public postFeedbackData(data: object)
-  // {
-  //   const restoreAppOpacity = () => {
-  //     if (data['screenshot'] !== undefined)
-  //     {
-  //       const newApp: HTMLElement = document.getElementsByClassName('app-inner')[0] as HTMLElement;
-  //       newApp.style.opacity = 'inherit';
-  //     }
-  //   };
-
-  //   Ajax.req(
-  //     'post',
-  //     `feedback/`,
-  //     data,
-  //     (response) => restoreAppOpacity(),
-  //     {
-  //       onError: (err) => restoreAppOpacity(),
-
-  //     });
-  // }
-
-  // public takeScreenshot(data: object, screenshotChecked: boolean): void
-  // {
-  //   if (screenshotChecked)
-  //   {
-  //       const app: HTMLElement = document.getElementsByClassName('app-inner')[0] as HTMLElement;
-  //       app.style.opacity = '1.0';
-  //       html2canvas(app).then((canvas) => {
-  //         const dataUrl = canvas.toDataURL();
-  //         data['screenshot'] = dataUrl;
-  //         this.postFeedbackData(data);
-  //       });
-  //   }
-  //   else
-  //   {
-  //     this.postFeedbackData(data);
-  //   }
-  // }
 
   public componentWillMount()
   {
@@ -280,7 +208,6 @@ export class Sidebar extends TerrainComponent<Props>
 
 public render()
   {
-    // console.log(this.props.users);
     return (
       <div
         className={classNames({

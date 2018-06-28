@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
 import * as classNames from 'classnames';
-import BugFeedbackForm from 'common/components/BugFeedbackForm';
 import Button from 'common/components/Button';
 import CheckBox from 'common/components/CheckBox';
 import Modal from 'common/components/Modal';
@@ -119,13 +118,7 @@ class PopUpForm extends TerrainComponent<Props>
   public closePopUpFormSuccess()
   {
     this.handleSubmitForm();
-    // if (this.props.closeOnConfirm !== undefined && !this.props.closeOnConfirm)
-    // {
-    //   this.props.onConfirm ? this.props.onConfirm() : null;
-    //   return;
-    // }
     this.props.onClose();
-    // this.props.onConfirm ? this.props.onConfirm() : null;
   }
 
   public handleTextboxChange(evt)
@@ -174,7 +167,6 @@ class PopUpForm extends TerrainComponent<Props>
       (response) => restoreAppOpacity(),
       {
         onError: (err) => restoreAppOpacity(),
-
       });
   }
 
@@ -285,6 +277,12 @@ class PopUpForm extends TerrainComponent<Props>
                     label={this.props.checkboxLabel ? this.props.checkboxLabel : ''}
                     />
                   }
+
+                <div className='popupform-modal-buttons modal-close-button'>
+                  <Button
+                  text={this.props.cancelButtonText ? this.props.cancelButtonText : 'CANCEL'}
+                  onClick={this.props.onClose}></Button>
+                </div>
                 <div className='popupform-modal-buttons modal-confirm-button'>
                   <Button
                   theme='active'
@@ -292,11 +290,6 @@ class PopUpForm extends TerrainComponent<Props>
                   onClick={!this.props.confirmDisabled && this.closePopUpFormSuccess}></Button>
                 </div>
 
-                <div className='popupform-modal-buttons modal-close-button'>
-                  <Button
-                  text={this.props.cancelButtonText ? this.props.cancelButtonText : 'CANCEL'}
-                  onClick={this.props.onClose}></Button>
-                </div>
               </div>
             </div>
          </ReactModal>

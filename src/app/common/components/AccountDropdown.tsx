@@ -126,7 +126,7 @@ class AccountDropdown extends TerrainComponent<Props>
 
   public editProfile()
   {
-    this.go('/account/profile/edit');
+    this.go('/account/settings');
   }
 
   public showConnections()
@@ -223,6 +223,14 @@ class AccountDropdown extends TerrainComponent<Props>
     const { users } = this.props;
     const user = users.users.get(users.currentUser.id);
     const src: string = UserTypes.profileUrlFor(user);
+    let displayName;
+    if (user.name === '' || user.name === undefined)
+    {
+      displayName = user.email;
+    } else
+    {
+      displayName = user.name;
+    }
     return (
       <div
         className={classNames({
@@ -239,7 +247,7 @@ class AccountDropdown extends TerrainComponent<Props>
           }}
         />
         <div className='account-dropdown-name-wrapper'>
-          <div className='account-dropdown-name'>{user.name}</div>
+          <div className='account-dropdown-name'>{displayName}</div>
           <ArrowIcon className='account-arrow-icon' />
         </div>
       </div>

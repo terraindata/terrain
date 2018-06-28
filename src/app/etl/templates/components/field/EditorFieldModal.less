@@ -6,21 +6,17 @@
   padding: @spacing;
   flex-direction: column;
   width: calc(~"100% - @{double-spacing}");
+  min-height: 200px;
 
-  .move-field-edit-section {
-    .big-text;
-  }
-
-  .field-location-visual {
-    display: flex;
-    padding: @spacing;
-    flex-direction: column;
-  }
-
-  .field-location-key {
+  .move-field-modal-error-message {
+    box-sizing: border-box;
+    min-height: 28px;
     padding: @quarter-spacing;
-    position: relative;
-    cursor: default;
+    text-align: center;
+  }
+
+  .move-field-modal-description {
+    text-align: center;
   }
 }
 

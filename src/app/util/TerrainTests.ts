@@ -54,6 +54,7 @@ import CardsToElastic from '../../database/elastic/conversion/CardsToElastic';
 import { ElasticValueInfoToCards } from '../../database/elastic/conversion/ElasticToCards';
 import ESCardParser from '../../database/elastic/conversion/ESCardParser';
 import { _Query, default as Query } from '../../items/types/Query';
+import ETLRouteUtil from '../etl/ETLRouteUtil';
 
 export default class TerrainTests
 {
@@ -95,7 +96,7 @@ export default class TerrainTests
   {
     const query: Query = _Query(queryConfig);
     const currentTql = query.tql;
-    const newTql = parsePath(query.path, query.inputs);
-    return newTql;
+    const { tql, pathErrorMap } = parsePath(query.path, query.inputs);
+    return { tql, pathErrorMap };
   }
 }

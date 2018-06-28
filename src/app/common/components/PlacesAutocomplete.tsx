@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:strict-boolean-expressions
 
 import * as _ from 'lodash';
 import * as React from 'react';
@@ -62,6 +63,7 @@ export interface Props
   onEnterKeyDown?: (value: string) => void;
   classNames?: any;
   styles?: any;
+  autocompleteOptions?: string[];
 }
 
 const defaultStyles = {
@@ -101,9 +103,13 @@ class PlacesAutocomplete extends TerrainComponent<Props>
   public autocompleteOK;
   public state: {
     autocompleteItems: any,
+    showOptions: boolean,
+    typedValue: string,
   } =
     {
       autocompleteItems: [],
+      showOptions: false,
+      typedValue: this.props.inputProps.value,
     };
 
   public constructor(props: Props)
@@ -131,8 +137,39 @@ class PlacesAutocomplete extends TerrainComponent<Props>
       this.autocompleteService = new google.maps.places.AutocompleteService();
       this.autocompleteOK = google.maps.places.PlacesServiceStatus.OK;
     }
-    // have another geocoder option
+    this.setState({
+      autocompleteItems:
+        this.getAutocompleteItems(this.props.autocompleteOptions, this.state.typedValue),
+    });
+  }
 
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (!_.isEqual(this.props.autocompleteOptions, nextProps.autocompleteOptions)
+      && nextProps.autocompleteOptions
+    )
+    {
+      this.setState({
+        autocompleteItems: this.getAutocompleteItems(nextProps.autocompleteOptions, this.state.typedValue),
+      });
+    }
+  }
+
+  public getAutocompleteItems(items: string[], inputValue: string): any[]
+  {
+    if (!items)
+    {
+      return [];
+    }
+    return items.filter((item) => item.startsWith(inputValue)).map((item, i) =>
+    {
+      return {
+        index: i,
+        suggestion: item,
+        placeId: item,
+        active: false,
+      };
+    });
   }
 
   public photonAutocompleteCallback(predictions)
@@ -240,6 +277,8 @@ class PlacesAutocomplete extends TerrainComponent<Props>
   {
     this.setState({
       autocompleteItems: [],
+      showOptions: false,
+      typedValue: this.props.inputProps.value,
     });
   }
 
@@ -303,7 +342,7 @@ class PlacesAutocomplete extends TerrainComponent<Props>
 
   public handleDownKey()
   {
-    if (this.state.autocompleteItems.length === 0)
+    if (!this.state.showOptions)
     {
       return;
     }
@@ -321,7 +360,7 @@ class PlacesAutocomplete extends TerrainComponent<Props>
 
   public handleUpKey()
   {
-    if (this.state.autocompleteItems.length === 0)
+    if (!this.state.showOptions)
     {
       return;
     }
@@ -370,7 +409,7 @@ class PlacesAutocomplete extends TerrainComponent<Props>
     this.setState({
       autocompleteItems: this.state.autocompleteItems.map((item, idx) =>
       {
-        if (idx === index)
+        if (item.index === index)
         {
           return _.extend({}, item, { active: true });
         }
@@ -399,7 +438,20 @@ class PlacesAutocomplete extends TerrainComponent<Props>
       this.clearAutocomplete();
       return;
     }
-    this.fetchPredictions();
+    if (!this.props.autocompleteOptions)
+    {
+      this.fetchPredictions();
+    }
+    const newState = {
+      showOptions: true,
+      typedValue: event.target.value,
+    };
+    if (this.props.autocompleteOptions)
+    {
+      newState['autocompleteItems'] =
+        this.getAutocompleteItems(this.props.autocompleteOptions, event.target.value);
+    }
+    this.setState(newState);
   }
 
   public handleInputOnBlur(event)
@@ -443,11 +495,17 @@ class PlacesAutocomplete extends TerrainComponent<Props>
     });
   }
 
+  public handleFocus()
+  {
+    this.setState({
+      showOptions: true,
+    });
+  }
+
   public render()
   {
-    const autocompleteItems = this.state.autocompleteItems;
+    const { autocompleteItems, showOptions } = this.state;
     const inputProps = this.getInputProps();
-
     return (
       <div
         id='PlacesAutocomplete__root'
@@ -457,9 +515,10 @@ class PlacesAutocomplete extends TerrainComponent<Props>
         <input
           placeholder='Address'
           {...inputProps}
+          onFocus={this.handleFocus}
         />
         {
-          autocompleteItems.length > 0 ?
+          showOptions && autocompleteItems.length > 0 ?
             <div
               id='PlacesAutocomplete__autocomplete-container'
               style={this.getStyleFor('autocompleteContainer')}

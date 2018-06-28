@@ -50,15 +50,43 @@ import { FileTypes, Languages } from './ETLTypes';
 export enum PostProcessAggregationTypes
 {
   Average = 'Average',
-  Merge = 'Merge',
   Concat = 'Concat',
+  Merge = 'Merge',
   Sum = 'Sum',
+}
+
+export enum PostProcessFilterTypes
+{
+  MostRecent = 'MostRecent',
+  RemoveByPattern = 'RemoveByPattern',
+}
+
+export enum PostProcessParseTypes
+{
+  ParseURL = 'ParseURL',
+}
+
+export enum PostProcessSortTypes
+{
+  Asc = 'Asc',
+  Desc = 'Desc',
+}
+
+export interface PostProcessSortObjectTypes
+{
+  field: string;
+  sort: PostProcessSortTypes;
 }
 
 export interface PostProcessConfig
 {
   type: PostProcessTypes;
   options: PostProcessOptionsType<PostProcessTypes>;
+}
+
+export interface RootPostProcessConfig
+{
+  transformations: PostProcessConfig[];
 }
 
 export interface PostProcessOptionsTypes
@@ -69,7 +97,43 @@ export interface PostProcessOptionsTypes
     pattern: string;
     primaryKey: string;
   };
+  Filter: {
+    operation: PostProcessFilterTypes;
+    pattern: string;
+    primaryKey: string;
+  };
+  Parse: {
+    field: string;
+    operation: PostProcessParseTypes;
+    url: string;
+  };
+  Sort: {
+    operations: PostProcessSortObjectTypes[];
+  };
 }
+
+export const PostProcessOptionsDefaults: PostProcessOptionsTypes =
+  {
+    Aggregate: {
+      fields: [],
+      operation: null,
+      pattern: '',
+      primaryKey: '',
+    },
+    Filter: {
+      operation: null,
+      pattern: '',
+      primaryKey: '',
+    },
+    Parse: {
+      field: '',
+      operation: null,
+      url: '',
+    },
+    Sort: {
+      operations: [],
+    },
+  };
 
 export type PostProcessTypes = keyof PostProcessOptionsTypes;
 export type PostProcessOptionsType<key extends PostProcessTypes> = PostProcessOptionsTypes[key];

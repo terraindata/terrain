@@ -43,20 +43,61 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import { List } from 'immutable';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationNode from 'shared/transformations/TransformationNode';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import { KeyPath } from 'shared/util/KeyPath';
+import * as yadeep from 'shared/util/yadeep';
 
-export default class ArraySumTransformationNode extends TransformationNode
+import AggregateTransformationType from 'shared/transformations/types/AggregateTransformationType';
+
+const TYPECODE = TransformationNodeType.ArraySumNode;
+
+export class ArraySumTransformationNode extends AggregateTransformationType
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.ArraySumNode)
+  public readonly typeCode = TYPECODE;
+
+  public aggregator(vals: any[]): any
   {
-    super(id, fields, options, typeCode);
+    let sum: number = 0;
+    for (let i: number = 0; i < vals.length; i++)
+    {
+      sum += vals[i];
+    }
+    return sum;
   }
 }
+
+class ArraySumTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Array Sum';
+  public description = 'Sum the entries of an array';
+  public nodeClass = ArraySumTransformationNode;
+
+  public editable = false;
+  public creatable = true;
+  public newFieldType = 'number';
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return (
+      EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+      EngineUtil.getValueType(fieldId, engine) === 'number' &&
+      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+    );
+  }
+}
+
+export const ArraySumTransformationInfo = new ArraySumTransformationInfoC();

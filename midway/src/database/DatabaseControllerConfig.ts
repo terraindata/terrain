@@ -49,6 +49,7 @@ import DatabaseController from './DatabaseController';
 
 import ElasticConfig from './elastic/ElasticConfig';
 import ElasticController from './elastic/ElasticController';
+import PrefixedElasticController from './elastic/PrefixedElasticController';
 
 import MySQLConfig from './mysql/MySQLConfig';
 import MySQLController from './mysql/MySQLController';
@@ -58,6 +59,8 @@ import PostgreSQLController from './pg/PostgreSQLController';
 
 import SQLiteConfig from './sqlite/SQLiteConfig';
 import SQLiteController from './sqlite/SQLiteController';
+
+import Util from 'shared/Util';
 
 export class DatabaseControllerConfig
 {
@@ -69,6 +72,7 @@ export class DatabaseControllerConfig
     const dsn = config.dsn;
     const analyticsIndex = config.analyticsIndex;
     const analyticsType = config.analyticsType;
+    const indexPrefix = config.indexPrefix;
 
     const cfg = new DatabaseControllerConfig(type, dsn);
     if (type === 'sqlite')
@@ -85,7 +89,14 @@ export class DatabaseControllerConfig
     }
     else if (type === 'elasticsearch' || type === 'elastic')
     {
-      return new ElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType);
+      if (indexPrefix != null && indexPrefix !== '')
+      {
+        return new PrefixedElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType, indexPrefix);
+      }
+      else
+      {
+        return new ElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType);
+      }
     }
     else
     {
@@ -105,38 +116,14 @@ export class DatabaseControllerConfig
     }
     else if (type === 'mysql' || type === 'postgres')
     {
-      const idx0 = dsnString.lastIndexOf('@');
-      const idx1 = dsnString.lastIndexOf('/');
-      const end = idx1 > 0 ? idx1 : dsnString.length;
-      const h0 = dsnString.substr(0, idx0);
-      const h1 = dsnString.substr(idx0 + 1, end);
-      const h2 = (idx1 > 0) ? dsnString.substr(idx1 + 1, dsnString.length - idx1) : undefined;
-      const q1 = h0.split(':');
-      const q2 = h1.split(':');
-
-      if (q1.length !== 2 || q2.length !== 2)
-      {
-        throw new Error('Error interpreting DSN parameter for MySQL.');
-      }
-
-      const user: string = q1[0];
-      const password: string = q1[1];
-      const host: string = q2[0];
-      const port: number = parseInt(q2[1], 10);
-      const database: string = (h2 !== undefined && h2 !== '') ? h2 : 'midway';
-
-      this.config = {
-        user,
-        password,
-        host,
-        port,
-        database,
-      };
+      this.config = Util.dsn.parseDSNConfig(dsnString);
     }
     else if (type === 'elasticsearch' || type === 'elastic')
     {
+      const config = Util.dsn.parseDSNConfig(dsnString);
       this.config = {
-        hosts: [dsnString],
+        hosts: [config.host + ':' + config.port.toString()],
+        httpAuth: config.user + ':' + config.password,
         keepAlive: false,
         requestTimeout: 600000,
       } as ElasticConfig;

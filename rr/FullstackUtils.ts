@@ -135,50 +135,112 @@ export async function waitForInput(msg: string)
   rl.close();
 }
 
-export async function replayBuilderActions(page, url, actions, records, actionCallBack?)
+export async function replayInputEventOnly(action)
+{
+  if (action.eventType)
+  {
+    return true;
+  } else
+  {
+    return false;
+  }
+}
+
+export async function replayReduxEventOnly(action)
+{
+  if (action.eventType)
+  {
+    return false;
+  } else
+  {
+    return true;
+  }
+}
+
+/**
+ *
+ * @param action
+ * @returns {Promise<boolean>}: If true, keep replaying the action, if false, jump this record.
+ */
+export async function defaultBeforeAction(action)
+{
+  return true;
+}
+
+export async function defaultAfterAction(action)
+{
+  sleep.sleep(1);
+  return;
+}
+
+export async function replayRREvents(page, url, actions, records,
+  beforeAction: (action) => Promise<boolean> = defaultBeforeAction,
+  afterAction: (action) => void = defaultAfterAction)
 {
   const loadRecords = await page.evaluate((recordNames) =>
   {
-    // window['TerrainTools'].setLogLevel();
     return window['TerrainTools'].terrainStoreLogger.resetSerializeRecordArray(recordNames);
   }, records);
   if (loadRecords === false)
   {
-    console.warn('Serialization records are changed.');
+    console.warn('Serialization records are changed');
   }
   // replay the log
   for (let i = 0; i < actions.length; i = i + 1)
   {
-    let action = actions[i].action;
-    console.log('Replaying Action ' + typeof action + ':' + action);
-
-    if (ignoreBuilderAction(action))
+    const a = actions[i];
+    if (await beforeAction(a) === false)
     {
-      console.log('Ignoring action: ' + String(action));
       continue;
     }
-    action = removeFunctionFromBuilderAction(action);
-    await page.mouse.move(0, 0);
-    await page.evaluate((act) =>
+    try
     {
-      return window['TerrainTools'].terrainStoreLogger.replayAction(window['TerrainTools'].terrainStore, act);
-    }, action);
-    sleep.sleep(1);
-    if (actionCallBack)
+      if (a.eventType)
+      {
+        console.log('Replaying dom event ' + a.eventType + ' on element ' + a.selector);
+        await page.waitForSelector(a.selector, { visible: true, hidden: true, timeout: 10000 });
+        if (a.eventType === 'click' || a.eventType === 'mousedown')
+        {
+          await page.click(a.selector);
+        } else if (a.eventType === 'dblclick')
+        {
+          await page.click(a.selector, { clickCount: 2 });
+        } else if (a.eventType === 'keypress')
+        {
+          await page.keyboard.type(a.key);
+        }
+      } else
+      {
+        let reduxEvent = actions[i].action;
+        if (ignoreBuilderAction(reduxEvent))
+        {
+          console.log('Ignoring Redux action: ' + String(reduxEvent));
+          continue;
+        }
+        console.log('Replaying the Redux action ' + reduxEvent);
+        reduxEvent = removeFunctionFromBuilderAction(reduxEvent);
+        await page.mouse.move(0, 0);
+        await page.evaluate((act) =>
+        {
+          return window['TerrainTools'].terrainStoreLogger.replayAction(window['TerrainTools'].terrainStore, act);
+        }, reduxEvent);
+      }
+    } catch (e)
     {
-      await actionCallBack();
+      console.log('WARNING: ' + e);
     }
+    await afterAction(a);
   }
 }
 
 export function filteringRecordBuilderActions(actions: any[])
 {
-  return actions.filter((record) => ignoreBuilderAction(record.action) === false);
+  return actions.filter((record) => record.action === undefined || ignoreBuilderAction(record.action) === false);
 }
 
 const USERNAME_SELECTOR = '#login-email';
 const PASSWORD_SELECTOR = '#login-password';
-const BUTTON_SELECTOR = '#app > div > div.app-wrapper > div > div.login-container > div.login-submit-button-wrapper > div';
+const BUTTON_SELECTOR = '#login-submit';
 async function loadPage(page, url)
 {
   if (url)
@@ -189,12 +251,29 @@ async function loadPage(page, url)
   }
 }
 
-export async function loginToBuilder(page, url?)
+/**
+ * Try to login in to the page
+ * @param page
+ * @param {string} url
+ */
+export async function login(page, url: string)
 {
-  await loadPage(page, url);
-  await page.click(USERNAME_SELECTOR);
-  await page.keyboard.type('admin@terraindata.com');
-  await page.click(PASSWORD_SELECTOR);
-  await page.keyboard.type('CnAATPys6tEB*ypTvqRRP5@2fUzTuY!C^LZP#tBQcJiC*5');
-  await page.click(BUTTON_SELECTOR);
+  await page.goto(url);
+  sleep.sleep(1);
+  winston.info('Login ' + url);
+  try
+  {
+    await page.waitForSelector(USERNAME_SELECTOR, { timeout: 0 });
+    winston.info('Username selector is ready.');
+    await page.click(USERNAME_SELECTOR);
+    await page.keyboard.type('admin@terraindata.com');
+    await page.click(PASSWORD_SELECTOR);
+    await page.keyboard.type('CnAATPys6tEB*ypTvqRRP5@2fUzTuY!C^LZP#tBQcJiC*5');
+    await page.click(BUTTON_SELECTOR);
+    sleep.sleep(5);
+  } catch (e)
+  {
+    winston.warn('The page might be already loaded, keep going.');
+    sleep.sleep(4);
+  }
 }

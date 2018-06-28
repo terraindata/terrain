@@ -70,7 +70,7 @@ export class ElasticReader extends SafeReadable
   private MAX_SEARCH_SIZE: number = 1000;
   private DEFAULT_SEARCH_SIZE: number = 500;
   private DEFAULT_SCROLL_TIMEOUT: string = '45m';
-
+  private DEFAULT_ALL_SIZE: number = 2147483647;
   private numRequested: number = 0;
 
   constructor(client: ElasticClient, query: string | object, streaming: boolean = false)
@@ -88,35 +88,26 @@ export class ElasticReader extends SafeReadable
     }
     this.streaming = streaming;
 
-    this.size = (query['size'] !== undefined) ? query['size'] as number : this.DEFAULT_SEARCH_SIZE;
+    this.size = (query['size'] !== undefined) ? query['size'] as number : this.DEFAULT_ALL_SIZE;
     this.scroll = (query['scroll'] !== undefined) ? query['scroll'] : this.DEFAULT_SCROLL_TIMEOUT;
-    this.numRequested = this.size;
-
     this.numRequested = this.size;
     this.scrolling = streaming && (this.size > this.DEFAULT_SEARCH_SIZE);
 
-    try
+    const body = {
+      body: this.query,
+    };
+
+    if (this.scrolling)
     {
-      const body = {
-        body: this.query,
-      };
-
-      if (this.scrolling)
-      {
-        body['scroll'] = this.scroll;
-      }
-
-      body['size'] = Math.min(this.size, this.MAX_SEARCH_SIZE);
-
-      this.querying = true;
-      this.client.search(
-        body,
-        this.makeSafe(this.scrollCallback.bind(this)));
+      body['scroll'] = this.scroll;
     }
-    catch (e)
-    {
-      this.emit('error', e);
-    }
+
+    body['size'] = Math.min(this.size, this.MAX_SEARCH_SIZE);
+
+    this.querying = true;
+    this.client.search(
+      body,
+      this.makeSafe(this.scrollCallback.bind(this)));
   }
 
   public _read(size: number = 1024)

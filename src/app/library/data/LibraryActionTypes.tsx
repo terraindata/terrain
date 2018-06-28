@@ -46,6 +46,7 @@ THE SOFTWARE.
 import Util from './../../util/Util';
 
 const create = '';
+const remove = '';
 const change = '';
 const move = '';
 const duplicate = '';
@@ -54,18 +55,18 @@ export let LibraryActionTypes =
   {
     categories:
       {
-        create, change, move,
+        create, remove, change, move,
         // duplicate,
       },
 
     groups:
       {
-        create, change, move,
+        create, remove, change, move,
       },
 
     algorithms:
       {
-        create, change, move,
+        create, remove, change, move,
         status: '',
         fetchVersion: '',
         loadVersion: '',

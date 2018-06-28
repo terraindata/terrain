@@ -14,7 +14,7 @@ EOF
 
 dropSpecific() {
   echo "Dropping Table: " $1;
-  PGPASSWORD="r3curs1v3$" psql -U "t3rr41n-demo" -d midway -h localhost -c "DROP TABLE IF EXISTS $1; " -p 5432;
+  PGPASSWORD="r3curs1v3$" psql -U "t3rr41n-demo" -d midway -h localhost -c "DROP TABLE IF EXISTS \"$1\"; " -p 5432;
 }
 
 resetES () {
@@ -46,6 +46,7 @@ dropETL() {
 dropOther() {
   echo "Dropping Miscellaneous Tables";
   dropSpecific 'metrics';
+  dropSpecific 'databases';
   dropSpecific 'schemaMetadata';
   dropSpecific 'statusHistory';
   dropSpecific 'versions';

@@ -49,7 +49,6 @@ import * as KoaRouter from 'koa-router';
 
 import * as App from '../App';
 import * as AppUtil from '../AppUtil';
-import Integrations from '../integrations/Integrations';
 import { Permissions } from '../permissions/Permissions';
 import UserConfig from '../users/UserConfig';
 import Scheduler from './Scheduler';
@@ -58,8 +57,7 @@ import SchedulerConfig from './SchedulerConfig';
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
 
-export const integrations: Integrations = new Integrations();
-export const initialize = () => integrations.initialize();
+export const initialize = () => { };
 
 // Get schedules by template id
 Router.get('/byTemplate/:templateId', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -99,7 +97,7 @@ Router.post('/pause/:id', passport.authenticate('access-token-local'), async (ct
 Router.post('/run/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.SchedulerPermissions.verifyRunRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.SKDR.runSchedule(ctx.params.id, true);
+  ctx.body = await App.SKDR.runScheduleNow(ctx.params.id);
 });
 
 // unpause paused schedule by id

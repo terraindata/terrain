@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as send from 'koa-send';
+import * as winston from 'winston'; // TODO remove when not needed
 
 import * as Util from './AppUtil';
 import * as AuthRouter from './auth/AuthRouter';
@@ -131,54 +132,31 @@ export function getRouter()
     ctx.body = 'authenticated as ' + (ctx.state.user[0].email as string);
   });
 
-  const MidwayRouter = new KoaRouter();
-  MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
 
-  MidwayRouter.get('/', async (ctx, next) =>
+  const serveBundle = async (ctx, next) =>
   {
-    await send(ctx, '/src/app/index.html');
-  });
-
-  MidwayRouter.get('/assets/:asset', async (ctx, next) =>
-  {
-    // Allow these specific filenames
-    const allowedNames: string[] = [
-      'bundle.js',
-      'vendor.bundle.js',
-    ];
-
-    // Allow any files matching these extensions
-    const allowedExtensions: string[] = [
-      '.woff',
-    ];
-
-    let rejectRequest: boolean = false;
-    if (!allowedNames.includes(ctx.params['asset']))
+    if (process.env.NODE_ENV !== 'production')
     {
-      rejectRequest = true;
-      allowedExtensions.forEach((ext) =>
-      {
-        if (ctx.params['asset'].endsWith(ext))
-        {
-          rejectRequest = false;
-        }
-      });
-    }
-
-    if (rejectRequest === true)
-    {
-      return;
-    }
-
-    if (process.env.NODE_ENV === 'production')
-    {
-      await send(ctx, `/midway/src/assets/${ctx.params['asset']}`);
+      ctx.body = await Util.doRequest(`http://localhost:8080/midway/v1/bundles/${ctx.params['bundle']}`);
     }
     else
     {
-      ctx.body = await Util.doRequest(`http://localhost:8080/assets/${ctx.params['asset']}`);
+      await send(ctx, `/midway/src/bundles/${ctx.params['bundle']}`);
     }
-  });
+  };
+  
+  if (process.env.NODE_ENV === 'fullstack-test')
+  {
+    // no auth for fullstack tests
+    AppRouter.get('/bundles/:bundle', serveBundle);
+  }
+  else
+  {
+    AppRouter.get('/bundles/:bundle', passport.authenticate('access-token-local'), serveBundle);
+  }
+
+  const MidwayRouter = new KoaRouter();
+  MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
 
   MidwayRouter.get('/robots.txt', async (ctx, next) =>
   {

@@ -65,21 +65,31 @@ import Quarantine from 'util/RadiumQuarantine';
 import './ObjectForm.less';
 const DeleteIcon = require('images/icon_close.svg');
 
-interface Props
+export interface RowOptions
 {
-  items: string[];
-  onChange: (newValue: string[], apply?: boolean) => void;
+  disabled?: boolean;
+}
+
+interface Props<T>
+{
+  items: T[];
+  onChange: (newValue: T[], apply?: boolean) => void;
+  renderItem?: (item: T, index?: number) => any;
+  newItemDefault?: T;
   label?: string;
+  computeOptions?: (index: number) => RowOptions;
+  noBorder?: boolean;
+  style?: any;
 }
 
 // performance of this component can be optimized
-export default class ListForm extends TerrainComponent<Props>
+export default class ListForm<T = string> extends TerrainComponent<Props<T>>
 {
   public renderAddNewRow()
   {
     return (
       <PathfinderCreateLine
-        text={'New Field'}
+        text={'New Entry'}
         canEdit={true}
         onCreate={this.addRow}
         showText={true}
@@ -88,26 +98,54 @@ export default class ListForm extends TerrainComponent<Props>
     );
   }
 
+  public getOptions(index: number): RowOptions
+  {
+    const { computeOptions } = this.props;
+    if (computeOptions !== undefined)
+    {
+      return computeOptions(index);
+    }
+    else
+    {
+      return {};
+    }
+  }
+
   public renderRow(index: number)
   {
     const value = this.props.items[index];
+
+    const { disabled } = this.getOptions(index);
+
+    let component: any;
+    if (this.props.renderItem !== undefined)
+    {
+      component = this.props.renderItem(value, index);
+    }
+    else
+    {
+      component = (
+        <Autocomplete
+          value={value as any}
+          onChange={this.rowChangeFactory(index)}
+          options={emptyOptions}
+          onBlur={this.onBlurFactory(index)}
+          disabled={disabled}
+        />
+      );
+    }
 
     return (
       <div
         key={index}
         className='object-form-row'
       >
-        <Autocomplete
-          value={value}
-          onChange={this.rowChangeFactory(index)}
-          options={emptyOptions}
-          onBlur={this.onBlurFactory(index)}
-        />
+        {component}
         <Quarantine>
           <div
             className='list-form-row-delete'
-            style={fontColor(Colors().text3, Colors().text2)}
-            onClick={this.handleDeleteRowFactory(index)}
+            style={this.getRowStyle(disabled)}
+            onClick={disabled ? undefined : this.handleDeleteRowFactory(index)}
           >
             <DeleteIcon />
           </div>
@@ -116,19 +154,39 @@ export default class ListForm extends TerrainComponent<Props>
     );
   }
 
+  public getRowStyle(disabled: boolean = false)
+  {
+    if (disabled)
+    {
+      return {
+        visibility: 'hidden',
+      };
+    }
+    else
+    {
+      return fontColor(Colors().text3, Colors().text2);
+    }
+  }
+
   public render()
   {
-    const indices = Immutable.Range(0, this.props.items.length);
+    const indices = this.props.items != null ? Immutable.Range(0, this.props.items.length) : null;
     return (
-      <div className='object-form-container'>
+      <div
+        className='object-form-container'
+        style={this.props.style}
+      >
         {
           this.props.label === undefined ? null :
             <div className='object-form-label'>
               {this.props.label}
             </div>
         }
-        <div className='object-kv-body' style={borderColor(Colors().border1)}>
-          {indices.map(this.renderRow)}
+        <div
+          className='object-kv-body'
+          style={this.props.noBorder ? { border: 'none' } : borderColor(Colors().border1)}
+        >
+          {indices !== null ? indices.map(this.renderRow) : null}
           {this.renderAddNewRow()}
         </div>
       </div>
@@ -170,8 +228,16 @@ export default class ListForm extends TerrainComponent<Props>
   {
     const { items, onChange } = this.props;
 
-    const newItems = items.slice();
-    newItems.push('');
+    const newItems = items != null ? items.slice() : [];
+    if (this.props.newItemDefault !== undefined)
+    {
+      newItems.push(this.props.newItemDefault);
+    }
+    else
+    {
+      newItems.push('' as any);
+    }
+
     onChange(newItems, true);
   }
 }

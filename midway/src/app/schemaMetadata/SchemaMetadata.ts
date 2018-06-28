@@ -66,12 +66,7 @@ export class SchemaMetadata
 
   public async select(columns: string[], filter: object): Promise<SchemaMetadataConfig[]>
   {
-    return new Promise<SchemaMetadataConfig[]>(async (resolve, reject) =>
-    {
-      const rawResults = await App.DB.select(this.schemaMetadataTable, columns, filter);
-      const results: SchemaMetadataConfig[] = rawResults.map((result: object) => new SchemaMetadataConfig(result));
-      resolve(results);
-    });
+    return App.DB.select(this.schemaMetadataTable, columns, filter) as Promise<SchemaMetadataConfig[]>;
   }
 
   public async get(id?: number): Promise<SchemaMetadataConfig[]>

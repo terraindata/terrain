@@ -1,0 +1,38 @@
+@font-face {
+  font-family: 'Gilroy';
+  src: url('/midway/v1/assets/Gilroy/Gilroy-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+    font-family: 'Gilroy';
+    src: url('/midway/v1/assets/Gilroy/Gilroy-LightItalic.woff') format('woff');
+    font-weight: 300;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Gilroy';
+    src: url('/midway/v1/assets/Gilroy/Gilroy-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Gilroy';
+    src: url('/midway/v1/assets/Gilroy/Gilroy-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Gilroy';
+    src: url('/midway/v1/assets/Gilroy/Gilroy-SemiBold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+}
+
+html, body {
+  font-family: Gilroy, "Helvetica Neue", sans;
+}

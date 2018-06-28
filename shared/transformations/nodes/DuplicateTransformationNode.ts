@@ -43,20 +43,89 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+const { List, Map } = Immutable;
 
-export default class DuplicateTransformationNode extends TransformationNode
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+
+import { createLocalMatcher, visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationNode from 'shared/transformations/TransformationNode';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import { KeyPath } from 'shared/util/KeyPath';
+
+import isPrimitive = require('is-primitive');
+
+const TYPECODE = TransformationNodeType.DuplicateNode;
+
+// Duplicate is not categorized yet
+export class DuplicateTransformationNode extends TransformationNode
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.DuplicateNode)
+  public readonly typeCode = TYPECODE;
+
+  protected transformDocument(doc: object): TransformationVisitResult
   {
-    super(id, fields, options, typeCode);
+    const errors = [];
+    const opts = this.meta as NodeOptionsType<any>;
+
+    this.fields.forEach((field) =>
+    {
+      for (const match of yadeep.search(doc, field))
+      {
+        let { value } = match;
+
+        const matcher = createLocalMatcher(field, match.location);
+        if (matcher === null)
+        {
+          errors.push(`Error in ${this.typeCode}: Field and Match location are inconsistent`);
+          return;
+        }
+
+        if (!isPrimitive(value))
+        {
+          value = _.cloneDeep(value);
+        }
+
+        const newFieldKeyPath = opts.newFieldKeyPaths.get(0);
+        yadeep.set(doc, matcher(newFieldKeyPath), value, { create: true });
+      }
+    });
+
+    return {
+      document: doc,
+      errors,
+    } as TransformationVisitResult;
   }
 }
+
+class DuplicateTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Duplicate';
+  public description = 'Duplicate this field';
+  public nodeClass = DuplicateTransformationNode;
+
+  public editable = false;
+  public creatable = true;
+  public newFieldType = 'same';
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    const etlType = EngineUtil.getETLFieldType(fieldId, engine);
+    return (
+      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId)) &&
+      etlType !== ETLFieldTypes.Object && etlType !== ETLFieldTypes.Array
+    );
+  }
+}
+
+export const DuplicateTransformationInfo = new DuplicateTransformationInfoC();

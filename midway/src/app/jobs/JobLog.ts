@@ -127,14 +127,7 @@ export class JobLog
 
   private async _select(columns: string[], filter: object): Promise<JobLogConfig[]>
   {
-    return new Promise<JobLogConfig[]>(async (resolve, reject) =>
-    {
-      let rawResults: object[] = [];
-      rawResults = await App.DB.select(this.jobLogTable, columns, filter);
-
-      const results: JobLogConfig[] = rawResults.map((result: object) => new JobLogConfig(result as JobLogConfig));
-      resolve(results);
-    });
+    return App.DB.select(this.jobLogTable, columns, filter) as Promise<JobLogConfig[]>;
   }
 }
 

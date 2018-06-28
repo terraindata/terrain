@@ -43,20 +43,75 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+const { List, Map } = Immutable;
 
-export default class FindReplaceTransformationNode extends TransformationNode
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+
+import TransformationNode from 'shared/transformations/TransformationNode';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath } from 'shared/util/KeyPath';
+
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
+
+const TYPECODE = TransformationNodeType.FindReplaceNode;
+
+export class FindReplaceTransformationNode extends SimpleTransformationType
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.FindReplaceNode)
+  public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'string';
+
+  public validate()
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    if (typeof opts.find !== 'string')
+    {
+      return `Option 'find' (${opts.find}) is invalid`;
+    }
+    if (typeof opts.replace !== 'string')
+    {
+      return `Option 'replace' (${opts.replace}) is invalid`;
+    }
+    return super.validate();
+  }
+
+  public transformer(el: string): string
+  {
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    if (opts.regex)
+    {
+      return el.replace(new RegExp(opts.find, 'g'), opts.replace);
+    }
+    else
+    {
+      return el.split(opts.find).join(opts.replace);
+    }
   }
 }
+
+class FindReplaceTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Find/Replace';
+  public description = 'Finds and replaces certain patterns of characters in a string';
+  public nodeClass = FindReplaceTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    const type = EngineUtil.getRepresentedType(fieldId, engine);
+    return type === 'string';
+  }
+}
+
+export const FindReplaceTransformationInfo = new FindReplaceTransformationInfoC();

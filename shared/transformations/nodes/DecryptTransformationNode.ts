@@ -43,22 +43,53 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 
-import aesjs = require('aes-js');
-import { List } from 'immutable';
-import sha1 = require('sha1');
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+const { List, Map } = Immutable;
 
-export default class DecryptTransformationNode extends TransformationNode
+import Encryption, { Keys } from 'shared/encryption/Encryption';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+
+import TransformationNode from 'shared/transformations/TransformationNode';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath } from 'shared/util/KeyPath';
+
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
+
+const TYPECODE = TransformationNodeType.DecryptNode;
+
+export class DecryptTransformationNode extends SimpleTransformationType
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.DecryptNode)
+  public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'string';
+
+  public transformer(el: string): string
   {
-    super(id, fields, options, typeCode);
+    return Encryption.decryptStatic(el, Keys.Transformations);
   }
 }
+
+class DecryptTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Decrypt';
+  public description = 'Decrypt a field that was previously encrypted with an Encrypt transformation';
+  public nodeClass = DecryptTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+  }
+}
+
+export const DecryptTransformationInfo = new DecryptTransformationInfoC();

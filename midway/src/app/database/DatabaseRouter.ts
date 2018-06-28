@@ -114,6 +114,13 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
     }
   }
 
+  const isProtected = (await databases.get(db.id))[0].isProtected;
+
+  if (isProtected)
+  {
+    throw new Error('Cannot update a protected database');
+  }
+
   ctx.body = await databases.upsert(ctx.state.user, db);
   await databases.connect(ctx.state.user, db.id);
 });
@@ -133,6 +140,8 @@ Router.post('/:id/disconnect', passport.authenticate('access-token-local'), asyn
 Router.post('/:id/delete', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('delete a database entry');
+  await databases.disconnect(ctx.state.user, Number(ctx.params.id));
+  DatabaseRegistry.remove(Number(ctx.params.id));
   ctx.body = await databases.delete(ctx.state.user, Number(ctx.params.id));
 });
 

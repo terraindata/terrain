@@ -45,11 +45,20 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { List } from 'immutable';
+import * as _ from 'lodash';
+import TransformationRegistry from 'shared/transformations/TransformationRegistry';
 import { TransformationEngine } from '../../transformations/TransformationEngine';
 import TransformationNodeType from '../../transformations/TransformationNodeType';
 import { KeyPath } from '../../util/KeyPath';
 import * as yadeep from '../../util/yadeep';
 import { TestDocs } from './TestDocs';
+
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+
+function wrap(kp: any[])
+{
+  return List([List(kp)]);
+}
 
 test('add fields manually', () =>
 {
@@ -98,17 +107,6 @@ test('append string to a field', () =>
   expect(r['name']).toBe('Bobs Burgers');
 });
 
-test('insert field value in a field', () =>
-{
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc1);
-  e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath(['name'])]),
-    { at: 0, value: ' ' });
-  e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath(['name'])]),
-    { at: 0, value: KeyPath(['meta', 'school']) });
-  const r = e.transform(TestDocs.doc1);
-  expect(r['name']).toBe('Stanford Bob');
-});
-
 test('transform doc with null value(s)', () =>
 {
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc6);
@@ -145,7 +143,7 @@ test('array in array in object: identity transformation', () =>
 test('transform of deeply nested value', () =>
 {
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc3);
-  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['hardarr', '1', '1', '0'])]), { format: 'uppercase' });
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['hardarr', 1, 1, 0])]), { format: 'uppercase' });
   expect(e.transform(TestDocs.doc3)).toEqual(
     {
       name: 'Bob',
@@ -179,7 +177,7 @@ test('transform of deeply nested value', () =>
 test('nested transform with wildcard', () =>
 {
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc3);
-  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['arr', '1', -1, 'a'])]), { format: 'uppercase' });
+  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['arr', 1, -1, 'a'])]), { format: 'uppercase' });
   expect(e.transform(TestDocs.doc3)).toEqual(
     {
       name: 'Bob',
@@ -248,6 +246,40 @@ test('join two fields', () =>
   expect(r['meta']['fullTeam']).toBe('Stanford bobsled');
   expect(r['meta']['sport']).toBe(undefined);
   expect(r['meta']['school']).toBe(undefined);
+});
+
+test('join multiple fields in a nested array', () =>
+{
+  const doc = {
+    fields: [
+      {
+        foo: 'somebody',
+        bar: 'once',
+        baz: 'told',
+      },
+      {
+        blah: [],
+      },
+      {
+        foo: 'me',
+        baz: 'the',
+      },
+    ],
+  };
+
+  const e: TransformationEngine = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.JoinNode,
+    List([KeyPath(['fields', -1, 'foo']), KeyPath(['fields', -1, 'bar']), KeyPath(['fields', -1, 'baz'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([KeyPath(['fields', -1, 'combo'])]),
+      preserveOldFields: false,
+      delimiter: ' ',
+    });
+  const r = e.transform(doc);
+  expect(r['fields'][0]['combo']).toBe('somebody once told');
+  expect(r['fields'][1].hasOwnProperty('combo')).toBe(false);
+  expect(r['fields'][2]['combo']).toBe('me the');
 });
 
 test('duplicate a field', () =>
@@ -319,6 +351,104 @@ test('split a field (regex delimiter)', () =>
   expect(r['s1']).toBe('la');
   expect(r['s2']).toBe('dee');
   expect(r['s3']).toBe('da');
+});
+
+test('split multiple fields in a nested array', () =>
+{
+  const doc = {
+    fields: [
+      {
+        foo: 'look what',
+      },
+      {
+        blah: 'hi',
+      },
+      {
+        foo: 'the cat dragged in',
+      },
+    ],
+  };
+
+  const e: TransformationEngine = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.SplitNode,
+    List([KeyPath(['fields', -1, 'foo'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([
+        KeyPath(['fields', -1, 'f1']),
+        KeyPath(['fields', -1, 'f2']),
+        KeyPath(['fields', -1, 'f3']),
+      ]),
+      delimiter: ' ',
+    });
+
+  const r = e.transform(doc);
+
+  expect(r['fields'][0]).toEqual({
+    foo: 'look what',
+    f1: 'look',
+    f2: 'what',
+    f3: '',
+  });
+  expect(r['fields'][1].hasOwnProperty('f1')).toBe(false);
+  expect(r['fields'][2]).toEqual({
+    foo: 'the cat dragged in',
+    f1: 'the',
+    f2: 'cat',
+    f3: 'dragged in',
+  });
+});
+
+test('regex split multiple fields in a nested array', () =>
+{
+  const doc = {
+    fields: [
+      {
+        foo: 'XYZ1234ABC',
+      },
+      {
+        foo: 'XYZ1234',
+      },
+      {
+        foo: '143QWERTY000HELLO9ABC',
+      },
+    ],
+  };
+
+  const e: TransformationEngine = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.SplitNode,
+    List([KeyPath(['fields', -1, 'foo'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([
+        KeyPath(['fields', -1, 'f1']),
+        KeyPath(['fields', -1, 'f2']),
+        KeyPath(['fields', -1, 'f3']),
+      ]),
+      delimiter: '[0-9]+',
+      regex: true,
+    });
+
+  const r = e.transform(doc);
+
+  expect(r['fields'][0]).toEqual({
+    foo: 'XYZ1234ABC',
+    f1: 'XYZ',
+    f2: 'ABC',
+    f3: '',
+  });
+  expect(r['fields'][1]).toEqual({
+    foo: 'XYZ1234',
+    f1: 'XYZ',
+    f2: '',
+    f3: '',
+  });
+  expect(r['fields'][2]).toEqual({
+    foo: '143QWERTY000HELLO9ABC',
+    f1: '',
+    f2: 'QWERTY',
+    f3: 'HELLO9ABC',
+  });
 });
 
 test('cast node tests', () =>
@@ -675,12 +805,12 @@ test('duplicate a field and then rename that field', () =>
   const e = new TransformationEngine(doc);
   e.appendTransformation(
     TransformationNodeType.DuplicateNode,
-    List<KeyPath>([KeyPath(['foo', '0', 'bar'])]),
+    List<KeyPath>([KeyPath(['foo', 0, 'bar'])]),
     {
-      newFieldKeyPaths: List<KeyPath>([KeyPath(['foo', '0', 'baz'])]),
+      newFieldKeyPaths: List<KeyPath>([KeyPath(['foo', 0, 'baz'])]),
     },
   );
-  e.setOutputKeyPath(e.getOutputFieldID(KeyPath(['foo', '0', 'baz'])), KeyPath(['foo', '0', 'nice']));
+  e.setOutputKeyPath(e.getOutputFieldID(KeyPath(['foo', 0, 'baz'])), KeyPath(['foo', 0, 'nice']));
   expect(e.transform(doc)).toEqual({
     foo: [
       {
@@ -694,15 +824,63 @@ test('duplicate a field and then rename that field', () =>
   });
 });
 
+test('super deep duplication and modify', () =>
+{
+  const doc = {
+    fields1: [
+      {
+        fields2: [
+          [1, 2, 3],
+          [4, 5, 6],
+        ],
+      },
+      {
+        fields2: [
+          [0.5],
+          [100],
+        ],
+      },
+    ],
+  };
+  const e = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.DuplicateNode,
+    wrap(['fields1', -1, 'fields2']),
+    {
+      newFieldKeyPaths: wrap(['fields1', -1, 'fields3']),
+    },
+  );
+  e.appendTransformation(
+    TransformationNodeType.AddNode,
+    wrap(['fields1', -1, 'fields2', -1, -1]),
+    {
+      shift: 10,
+    },
+  );
+  const r = e.transform(doc);
+  expect(r['fields1'][0]['fields3']).toEqual([
+    [1, 2, 3],
+    [4, 5, 6],
+  ]);
+  expect(r['fields1'][0]['fields2']).toEqual([
+    [11, 12, 13],
+    [14, 15, 16],
+  ]);
+  expect(r['fields1'][1]['fields2']).toEqual([
+    [10.5],
+    [110],
+  ]);
+});
+
 test('suite of numeric transformations', () =>
 {
   const doc = {
     foo: [
       {
-        bar: [1, 2, 3],
+        bar: [1, 2, 3, 4],
       },
       {
-        bar: [3, 2, 1],
+        bar: [3, 2, 1, 0],
       },
       {
         bar: [13.45, 16.5, 131.98],
@@ -720,58 +898,58 @@ test('suite of numeric transformations', () =>
 
   e.appendTransformation(
     TransformationNodeType.AddNode,
-    List<KeyPath>([KeyPath(['foo', '0', 'bar', -1])]),
+    List<KeyPath>([KeyPath(['foo', 0, 'bar', -1])]),
     {
       shift: 1,
     },
   );
   e.appendTransformation(
     TransformationNodeType.SubtractNode,
-    List<KeyPath>([KeyPath(['foo', '1', 'bar', -1])]),
+    List<KeyPath>([KeyPath(['foo', 1, 'bar', -1])]),
     {
       shift: 1,
     },
   );
   e.appendTransformation(
     TransformationNodeType.MultiplyNode,
-    List<KeyPath>([KeyPath(['foo', '0', 'bar', -1])]),
+    List<KeyPath>([KeyPath(['foo', 0, 'bar', -1])]),
     {
       factor: 3,
     },
   );
   e.appendTransformation(
     TransformationNodeType.DivideNode,
-    List<KeyPath>([KeyPath(['foo', '1', 'bar', -1])]),
+    List<KeyPath>([KeyPath(['foo', 1, 'bar', -1])]),
     {
       factor: 2,
     },
   );
   e.appendTransformation(
     TransformationNodeType.RoundNode,
-    List<KeyPath>([KeyPath(['foo', '2', 'bar', -1])]),
+    List<KeyPath>([KeyPath(['foo', 2, 'bar', -1])]),
     {
-      shift: 1,
+      precision: 1,
     },
   );
   e.appendTransformation(
     TransformationNodeType.RoundNode,
-    List<KeyPath>([KeyPath(['foo', '3', 'bar', -1])]),
+    List<KeyPath>([KeyPath(['foo', 3, 'bar', -1])]),
     {
-      shift: 0,
+      precision: 0,
     },
   );
   e.appendTransformation(
     TransformationNodeType.RoundNode,
-    List<KeyPath>([KeyPath(['foo', '4', 'bar', -1])]),
+    List<KeyPath>([KeyPath(['foo', 4, 'bar', -1])]),
     {
-      shift: 4,
+      precision: 4,
     },
   );
   e.appendTransformation(
     TransformationNodeType.RoundNode,
-    List<KeyPath>([KeyPath(['foo', '4', 'bar', -1])]),
+    List<KeyPath>([KeyPath(['foo', 4, 'bar', -1])]),
     {
-      shift: 2,
+      precision: 2,
     },
   );
 
@@ -779,10 +957,10 @@ test('suite of numeric transformations', () =>
     {
       foo: [
         {
-          bar: [6, 9, 12],
+          bar: [6, 9, 12, 15],
         },
         {
-          bar: [1, 0.5, 0],
+          bar: [1, 0.5, 0, -0.5],
         },
         {
           bar: [13.5, 16.5, 132.0],
@@ -824,7 +1002,7 @@ test('test set if transformation', () =>
 
   const r = e.transform(TestDocs.doc1);
   expect(r['name']).toEqual('Tim');
-  expect(r['bleep']).toEqual('bloop');
+  expect(r['bleep']).not.toEqual('bloop');
 });
 
 test('duplicate a disabled array', () =>
@@ -893,7 +1071,7 @@ test('take product of several fields', () =>
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
   e.appendTransformation(
     TransformationNodeType.ProductNode,
-    List<KeyPath>([KeyPath(['deepArray', '0', '0']), KeyPath(['deepArray', '1', '0'])]),
+    List<KeyPath>([KeyPath(['deepArray', 0, 0]), KeyPath(['deepArray', 1, 0])]),
     {
       newFieldKeyPaths: List<KeyPath>([KeyPath(['producto'])]),
     });
@@ -906,7 +1084,7 @@ test('take quotient of several fields', () =>
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
   e.appendTransformation(
     TransformationNodeType.QuotientNode,
-    List<KeyPath>([KeyPath(['deepArray', '1', '0']), KeyPath(['deepArray', '0', '0'])]),
+    List<KeyPath>([KeyPath(['deepArray', 1, 0]), KeyPath(['deepArray', 0, 0])]),
     {
       newFieldKeyPaths: List<KeyPath>([KeyPath(['quotiento'])]),
     });
@@ -919,7 +1097,7 @@ test('take sum of several fields', () =>
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
   e.appendTransformation(
     TransformationNodeType.SumNode,
-    List<KeyPath>([KeyPath(['deepArray', '0', '0']), KeyPath(['deepArray', '1', '0'])]),
+    List<KeyPath>([KeyPath(['deepArray', 0, 0]), KeyPath(['deepArray', 1, 0])]),
     {
       newFieldKeyPaths: List<KeyPath>([KeyPath(['summo'])]),
     });
@@ -932,7 +1110,7 @@ test('take difference of several fields', () =>
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
   e.appendTransformation(
     TransformationNodeType.DifferenceNode,
-    List<KeyPath>([KeyPath(['deepArray', '0', '0']), KeyPath(['deepArray', '1', '0'])]),
+    List<KeyPath>([KeyPath(['deepArray', 0, 0]), KeyPath(['deepArray', 1, 0])]),
     {
       newFieldKeyPaths: List<KeyPath>([KeyPath(['differenceo'])]),
     });
@@ -969,11 +1147,6 @@ test('take difference of several fields', () =>
 
 test('Duplicate a nested field', () =>
 {
-  const wrap = (kp: string[]) =>
-  {
-    return List([List(kp)]);
-  };
-
   const doc = {
     field: {
       subField: {
@@ -1046,8 +1219,6 @@ test('Group By Transformation', () =>
       ],
     };
 
-  const wrap = (kp: string[]) => List([List(kp)]);
-
   const e = new TransformationEngine(doc);
   e.appendTransformation(TransformationNodeType.GroupByNode, wrap(['items']), {
     newFieldKeyPaths: List([
@@ -1074,6 +1245,25 @@ test('Group By Transformation', () =>
       ],
     },
   );
+});
+
+test('numeric keys', () =>
+{
+  {
+    const doc = { 0: { '5': 3, '-1': ['a', 'b'] } };
+    const e = new TransformationEngine(doc);
+    e.setOutputKeyPath(e.getOutputFieldID(KeyPath(['0', '5'])), KeyPath(['0', '1']));
+    e.setOutputKeyPath(e.getOutputFieldID(KeyPath(['0', '-1'])), KeyPath(['0', '0']));
+    e.appendTransformation(TransformationNodeType.CaseNode, List([List(['0', '-1', -1])]), { format: 'uppercase' });
+    expect(e.transform(doc)).toEqual({ 0: { 1: 3, 0: ['A', 'B'] } });
+  }
+  {
+    const doc = { '-1': [{ z: 1, 1: { 2: 1 } }, { z: 2.5 }] };
+    const e = new TransformationEngine(doc);
+    e.appendTransformation(TransformationNodeType.AddNode, List([List(['-1', 0, '1', '2'])]), { shift: 13 });
+    e.appendTransformation(TransformationNodeType.AddNode, List([List(['-1', -1, 'z'])]), { shift: 3 });
+    expect(e.transform(doc)).toEqual({ '-1': [{ z: 4, 1: { 2: 14 } }, { z: 5.5 }] });
+  }
 });
 
 test('transform a zipcode', () =>
@@ -1107,4 +1297,162 @@ test('transform a zipcode', () =>
   expect(r['zip6']).toBe(null);
   expect(r['zip7']).toBe('MILITARY');
   expect(r['zip8']).toBe(null);
+});
+
+test('simple transformation on deep array', () =>
+{
+  const e = new TransformationEngine();
+  e.addField(KeyPath(['numbers']), 'array');
+  e.addField(KeyPath(['numbers', -1]), 'array');
+  e.addField(KeyPath(['numbers', -1, -1]), 'array');
+  e.appendTransformation(TransformationNodeType.AddNode, List([KeyPath(['numbers', -1, -1])]), { shift: 1 });
+  const r = e.transform(TestDocs.doc10);
+  expect(r['numbers']).toEqual([
+    [2, 3, 4],
+    [5, 6, 7],
+    [8, 9, 10],
+  ]);
+});
+
+// test('identity transformation for nested arrays', () =>
+// {
+//   const doc = {
+//     fields: [
+//       {
+//         foo: 'look what',
+//       },
+//       {
+//         blah: [],
+//       },
+//       {
+//         foo: 'the cat dragged in',
+//       },
+//     ],
+//   };
+
+//   const copyOfDoc = _.cloneDeep(doc);
+//   const e = new TransformationEngine(doc);
+//   const r = e.transform(doc);
+//   expect(r).toEqual(copyOfDoc);
+// });
+
+// test('identity transformation for ui-constructed nested arrays', () =>
+// {
+//   const doc = {
+//     fields: [
+//       {
+//         foo: 'look what',
+//       },
+//       {
+//         blah: [],
+//       },
+//       {
+//         foo: 'the cat dragged in',
+//       },
+//     ],
+//   };
+
+//   const copyOfDoc = _.cloneDeep(doc);
+//   const e = EngineUtil.createEngineFromDocuments(List([doc])).engine;
+//   const r = e.transform(doc);
+//   expect(r).toEqual(copyOfDoc);
+// });
+
+test('remove duplicates test', () =>
+{
+  const doc = {
+    fields: [1, 4, 3, 2, 2, 5, 1],
+  };
+  const e = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.RemoveDuplicatesNode,
+    wrap(['fields']),
+    {},
+  );
+  const r = e.transform(doc);
+  expect(r).toEqual({
+    fields: [1, 4, 3, 2, 5],
+  });
+});
+
+test('remove nested duplicates test', () =>
+{
+  const doc = {
+    fields: [
+      [1, 3, 2, 1],
+      [2, 3, 3, 4],
+      [5, 6, 7],
+    ],
+  };
+  const e = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.RemoveDuplicatesNode,
+    wrap(['fields', -1]),
+    {},
+  );
+  const r = e.transform(doc);
+  expect(r).toEqual({
+    fields: [
+      [1, 3, 2],
+      [2, 3, 4],
+      [5, 6, 7],
+    ],
+  });
+});
+
+test('filter array test null', () =>
+{
+  const doc = {
+    fields: [3, 2, null, 5, null, undefined],
+  };
+  const e = EngineUtil.createEngineFromDocuments(List([doc])).engine;
+
+  e.appendTransformation(
+    TransformationNodeType.FilterArrayNode,
+    wrap(['fields']),
+    { filterNull: true },
+  );
+  const r = e.transform(doc);
+  expect(r).toEqual({
+    fields: [3, 2, 5, undefined],
+  });
+});
+
+test('filter array test undefined', () =>
+{
+  const doc = {
+    fields: [3, 2, null, 5, null, undefined],
+  };
+  const e = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.FilterArrayNode,
+    wrap(['fields']),
+    { filterUndefined: true },
+  );
+  const r = e.transform(doc);
+  expect(r).toEqual({
+    fields: [3, 2, null, 5, null],
+  });
+});
+
+test('filter array test complex', () =>
+{
+  const doc = {
+    fields: [3, 2, null, 5, null, undefined],
+  };
+  const e = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.FilterArrayNode,
+    wrap(['fields']),
+    { filterUndefined: true, filterNull: true },
+  );
+  const r = e.transform(doc);
+  expect(r).toEqual({
+    fields: [3, 2, 5],
+  });
+  expect(e.transform({
+    fields: [],
+  })).toEqual({
+    fields: [],
+  });
 });

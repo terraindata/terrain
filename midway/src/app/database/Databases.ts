@@ -76,12 +76,7 @@ export class Databases
 
   public async select(columns: string[], filter?: object): Promise<DatabaseConfig[]>
   {
-    return new Promise<DatabaseConfig[]>(async (resolve, reject) =>
-    {
-      const rawResults = await App.DB.select(this.databaseTable, columns, filter);
-      const results: DatabaseConfig[] = rawResults.map((result: object) => new DatabaseConfig(result));
-      resolve(results);
-    });
+    return App.DB.select(this.databaseTable, columns, filter) as Promise<DatabaseConfig[]>;
   }
 
   public async get(id?: number, fields?: string[]): Promise<DatabaseConfig[]>
@@ -186,13 +181,17 @@ export class Databases
     return schema.toString();
   }
 
-  public async status(id?: number): Promise<Array<DatabaseConfig & string>>
+  public async status(id?: number, removeProtectedDSN: boolean = true): Promise<Array<DatabaseConfig & string> | DatabaseConfig>
   {
     if (id !== undefined)
     {
       const controller = DatabaseRegistry.get(id);
       await controller.getClient().isConnected();
       const config = controller.getConfig();
+      if (removeProtectedDSN && config.isProtected)
+      {
+        delete config.dsn;
+      }
       config['status'] = controller.getStatus();
       return config;
     }
@@ -202,7 +201,7 @@ export class Databases
       for (const entry of DatabaseRegistry.getAll())
       {
         const _id = entry[0];
-        promises.push(this.status(_id));
+        promises.push(this.status(_id, removeProtectedDSN));
       }
       return Promise.all(promises);
     }

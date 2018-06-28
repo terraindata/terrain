@@ -126,7 +126,21 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     throw new Error('Invalid parameter item ID');
   }
 
-  ctx.body = await items.upsert(ctx.state.user, item);
+  try
+  {
+    ctx.body = await items.upsert(ctx.state.user, item);
+  }
+  catch (e)
+  {
+    if (e.toString() === 'error: conflicting key value violates exclusion constraint "unique_item_names"')
+    {
+      ctx.throw(400, 'Duplicate item name');
+    }
+    else
+    {
+      throw e;
+    }
+  }
 });
 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -161,6 +175,13 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
       throw e;
     }
   }
+});
+
+Router.delete('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('delete items');
+  await items.delete(ctx.params.id);
+  ctx.body = '';
 });
 
 export default Router;

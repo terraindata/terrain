@@ -55,6 +55,7 @@ export enum Integrations
   Magento = 'Magento',
   GoogleAnalytics = 'GoogleAnalytics',
   Email = 'Email',
+  FollowUpBoss = 'FollowUpBoss',
   MailChimp = 'MailChimp',
 }
 
@@ -68,6 +69,7 @@ export const IntegrationNames =
     Magento: 'Magento',
     GoogleAnalytics: 'Google Analytics',
     Email: 'Email',
+    FollowUpBoss: 'Follow Up Boss',
     MailChimp: 'MailChimp',
   };
 
@@ -88,7 +90,8 @@ export interface IntegrationConfigBase
 export interface AuthConfigTypes
 {
   Sftp: {
-    key: string;
+    privateKey: string;
+    password: string;
   };
   Http: {
     jwt: string;
@@ -112,13 +115,17 @@ export interface AuthConfigTypes
   MailChimp: {
     apiKey: string;
   };
+  FollowUpBoss: {
+    apiKey: string;
+  };
 }
 
 export interface ConnectionConfigTypes
 {
   Sftp: {
-    ip: string;
+    host: string;
     port: number;
+    username: string;
   };
   Http: {
     url: string;
@@ -164,6 +171,8 @@ export interface ConnectionConfigTypes
   };
   MailChimp: {
     host: string;
+  };
+  FollowUpBoss: {
   };
 }
 

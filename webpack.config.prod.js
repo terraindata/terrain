@@ -48,6 +48,8 @@ const path = require('path');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const CompressionPlugin = require("compression-webpack-plugin");
 
 module.exports =
 {
@@ -56,7 +58,7 @@ module.exports =
   output:
   {
     path: __dirname,
-    publicPath: '/assets/',
+    publicPath: '/midway/v1/bundles/', // this is where midway stores bundles
     filename: 'bundle.js',
     chunkFilename: '[name].bundle.js'
   },
@@ -65,7 +67,17 @@ module.exports =
   devServer: {
     headers: {
       'Access-Control-Allow-Origin': '*'
-    }
+    },
+    
+    // proxy midway requests to dev midway
+    proxy: {
+      '/midway/**': {
+        target: 'http://localhost:3000/midway',
+        pathRewrite: { '^/midway': '' },
+        secure: false,
+        // logLevel: 'debug', // useful when debugging
+      },
+    },
   },
 
   resolve:
@@ -152,6 +164,14 @@ module.exports =
       cacheDirectory: './.cache/hard-source/dev/[confighash]',
     }),
     new ForkTsCheckerWebpackPlugin(),
+    // new BundleAnalyzerPlugin(),
+    new CompressionPlugin({
+      asset: "[path].gz[query]",
+      algorithm: "gzip",
+      test: /\.js$|\.css$|\.html$/,
+      threshold: 10240,
+      minRatio: 0.8
+    })
   ],
   optimization: {
     splitChunks: {

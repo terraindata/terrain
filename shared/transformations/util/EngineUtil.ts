@@ -57,8 +57,10 @@ import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import objectify from 'shared/util/deepObjectify';
-import { KeyPath } from 'shared/util/KeyPath';
+import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
+
+import * as TerrainLog from 'loglevel';
 
 export type PathHash = string;
 export interface PathHashMap<T>
@@ -134,6 +136,7 @@ export default class EngineUtil
         const fieldTypeErrors = EngineUtil.fieldHasValidType(engine, id);
         if (fieldTypeErrors.length > 0)
         {
+          errors.push(`Errors Encountered with field ${id} (${okp.toJS()})`);
           errors = errors.concat(fieldTypeErrors);
         }
       });
@@ -196,8 +199,8 @@ export default class EngineUtil
     index?: number,
   ): boolean
   {
-    const last = index === undefined ? keypath.last() : keypath.get(index);
-    return last !== -1 && Number.isNaN(Number(last));
+    const last: WayPoint = index === undefined ? keypath.last() : keypath.get(index);
+    return typeof last !== 'number';
   }
 
   public static isWildcardField(
@@ -206,7 +209,7 @@ export default class EngineUtil
   ): boolean
   {
     const last = index === undefined ? keypath.last() : keypath.get(index);
-    return last === -1;
+    return last as number === -1;
   }
 
   // document merge logic
@@ -637,6 +640,8 @@ export default class EngineUtil
     const engine = new TransformationEngine();
     EngineUtil.addFieldsToEngine(pathTypes, pathValueTypes, engine);
 
+    TerrainLog.debug('Add all fields: ' + JSON.stringify(engine.getAllFieldNames()) + ' to the engine');
+
     return {
       engine,
       warnings,
@@ -785,6 +790,14 @@ export default class EngineUtil
   // warning types get typed as strings, but should emit a warning
   private static mergeTypes(type1: FieldTypes = null, type2: FieldTypes = null): FieldTypes | 'warning' | 'softWarning'
   {
+    if (type1 === 'undefined' as any)
+    {
+      type1 = null;
+    }
+    if (type2 === 'undefined' as any)
+    {
+      type2 = null;
+    }
     if (type1 === null)
     {
       return type2;
