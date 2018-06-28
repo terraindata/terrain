@@ -184,6 +184,7 @@
     "promise-queue": "^2.2.3",
     "prop-types": "^15.6.1",
     "puppeteer": "1.4.0",
+    "query-string": "^6.1.0",
     "radium": "^0.24.0",
     "rc-slider": "^8.6.1",
     "react": "16.2.0",
