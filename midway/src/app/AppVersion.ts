@@ -42,19 +42,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-import configureMockStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
+// Copyright 2018 Terrain Data, Inc.
 
-export const Ajax: any = {};
+export type Version = 'v4' | 'v5';
 
-export function createMockStore()
+export const CURRENT_VERSION: Version = 'v5'; // current version of midway
+export const FIRST_VERSION: Version = 'v4'; // default version if it doesn't exist
+
+export interface Migrator
 {
-  const middlewares = [thunk.withExtraArgument(Ajax)];
-  return configureMockStore(middlewares);
-}
-
-export function connect(componentName)
-{
-  return `Connect(${componentName})`;
+  fromPattern?: string; // not yet supported
+  fromVersion?: Version;
+  toVersion: Version;
+  migrate: (from: Version, to: Version) => Promise<boolean>;
 }

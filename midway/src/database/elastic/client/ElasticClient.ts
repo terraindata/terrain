@@ -91,8 +91,8 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
   private delegate: IElasticClient;
 
   constructor(controller: TController, config: ElasticConfig,
-    Cluster: { new (controller: TController, delegate: IElasticClient): IElasticCluster } = ElasticCluster,
-    Indices: { new (controller: TController, delegate: IElasticClient): IElasticIndices } = ElasticIndices)
+    Cluster: { new(controller: TController, delegate: IElasticClient): IElasticCluster } = ElasticCluster,
+    Indices: { new(controller: TController, delegate: IElasticClient): IElasticIndices } = ElasticIndices)
   {
     this.controller = controller;
 
