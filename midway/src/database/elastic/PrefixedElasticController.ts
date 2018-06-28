@@ -44,28 +44,84 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as Elastic from 'elasticsearch';
-import PrefixedElasticController from '../PrefixedElasticController';
-import ElasticCluster from './ElasticCluster';
+import PrefixedElasticClient from './client/PrefixedElasticClient';
+import ElasticConfig from './ElasticConfig';
+import ElasticController from './ElasticController';
 
-class PrefixedElasticCluster extends ElasticCluster<PrefixedElasticController>
+class PrefixedElasticController extends ElasticController
 {
-  constructor(controller: PrefixedElasticController, delegate: Elastic.Client)
+  private indexPrefix: string;
+
+  constructor(config: ElasticConfig, id: number, name: string, analyticsIndex?: string, analyticsType?: string, indexPrefix?: string)
   {
-    super(controller, delegate);
+    super(config, id, name, analyticsIndex, analyticsType, PrefixedElasticClient);
+
+    this.indexPrefix = (indexPrefix == null ? '' : indexPrefix);
   }
 
-  public health(params: Elastic.ClusterHealthParams, callback: (error: any, response: any) => void): void
+  public getIndexPrefix(): string
   {
-    this.controller.prependIndexParam(params);
-    return super.health(params, callback);
+    return this.indexPrefix;
   }
 
-  public state(params: Elastic.ClusterStateParams, callback: (error: any, response: any) => void): void
+  public prependIndexParam(obj): void
   {
-    this.controller.prependIndexParam(params);
-    return super.state(params, callback);
+    if (!('index' in obj))
+    {
+      obj.index = this.getIndexPrefix() + '*';
+    }
+    else if (typeof obj.index === 'string')
+    {
+      obj.index = this.getIndexPrefix() + (obj.index as string);
+    }
+    else if (obj.index.constructor === Array)
+    {
+      obj.index = obj.index.map((s) => {
+        if (typeof s !== 'string')
+        {
+          throw new Error('Invalid index param');
+        }
+        return this.getIndexPrefix() + s;
+      });
+    }
+    else
+    {
+      throw new Error('Invalid index param');
+    }
+  }
+
+  public prependIndexTerm(obj): void
+  {
+    if (!('_index' in obj))
+    {
+      throw new Error('No _index term');
+    }
+    else if (typeof obj._index === 'string')
+    {
+      obj._index = this.getIndexPrefix() + (obj._index as string);
+    }
+    else
+    {
+      throw new Error('Invalid _index term');
+    }
+  }
+
+  public removeIndexPrefix(index: string): string
+  {
+    if (index.startsWith(this.getIndexPrefix()))
+    {
+      return index.substring(this.getIndexPrefix().length);
+    }
+    else
+    {
+      throw new Error(`Index name "${index}" is missing prefix "${this.getIndexPrefix()}"`);
+    }
+  }
+
+  public removeDocIndexPrefix(obj): void
+  {
+    obj._index = this.removeIndexPrefix(obj._index);
   }
 }
 
-export default PrefixedElasticCluster;
+export default PrefixedElasticController;

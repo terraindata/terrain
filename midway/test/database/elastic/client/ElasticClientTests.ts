@@ -52,6 +52,7 @@ import * as Utils from '../../TestUtil';
 import ElasticClient from '../../../../src/database/elastic/client/ElasticClient';
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
+import PrefixedElasticController from '../../../../src/database/elastic/PrefixedElasticController';
 
 import { MSearchResponse, SearchResponse } from 'elasticsearch';
 
@@ -86,7 +87,7 @@ beforeAll(async (done) =>
     );
   });
 
-  elasticController = new ElasticController(config, 0, 'ElasticClientTests', undefined, undefined, 'abc.');
+  elasticController = new PrefixedElasticController(config, 0, 'ElasticClientTests', undefined, undefined, 'abc.');
   elasticClient = elasticController.getClient();
   done();
 });

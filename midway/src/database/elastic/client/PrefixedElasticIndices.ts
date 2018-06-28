@@ -45,12 +45,12 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
-import ElasticController from '../ElasticController';
+import PrefixedElasticController from '../PrefixedElasticController';
 import ElasticIndices from './ElasticIndices';
 
-class PrefixedElasticIndices extends ElasticIndices
+class PrefixedElasticIndices extends ElasticIndices<PrefixedElasticController>
 {
-  constructor(controller: ElasticController, delegate: Elastic.Client)
+  constructor(controller: PrefixedElasticController, delegate: Elastic.Client)
   {
     super(controller, delegate);
   }
@@ -60,39 +60,32 @@ class PrefixedElasticIndices extends ElasticIndices
     this.controller.prependIndexParam(params);
     return super.getMapping(params, (err, res, status) =>
     {
-      if (this.controller.getIndexPrefix() === '')
+      if (err)
       {
-        callback(err, res, status);
-      }
-      else
-      {
-        if (err)
+        if (err.statusCode === 404)
         {
-          if (err.statusCode === 404)
-          {
-            callback(undefined, {}, 200);
-          }
-          else
-          {
-            callback(err, undefined, status);
-          }
+          callback(undefined, {}, 200);
         }
         else
         {
-          const newRes = {};
-          try
-          {
-            Object.keys(res).forEach((key) => {
-              newRes[this.controller.removeIndexPrefix(key)] = res[key];
-            });
-          }
-          catch (e)
-          {
-            this.log('error', e);
-            return callback(e, undefined, status);
-          }
-          callback(err, newRes, status);
+          callback(err, undefined, status);
         }
+      }
+      else
+      {
+        const newRes = {};
+        try
+        {
+          Object.keys(res).forEach((key) => {
+            newRes[this.controller.removeIndexPrefix(key)] = res[key];
+          });
+        }
+        catch (e)
+        {
+          this.log('error', e);
+          return callback(e, undefined, status);
+        }
+        callback(err, newRes, status);
       }
     });
   }

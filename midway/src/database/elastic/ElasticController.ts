@@ -48,7 +48,6 @@ import * as Tasty from '../../tasty/Tasty';
 
 import DatabaseController from '../DatabaseController';
 import ElasticClient from './client/ElasticClient';
-import PrefixedElasticClient from './client/PrefixedElasticClient';
 import ElasticConfig from './ElasticConfig';
 import ElasticQueryHandler from './query/ElasticQueryHandler';
 import ElasticDB from './tasty/ElasticDB';
@@ -63,22 +62,13 @@ class ElasticController extends DatabaseController
   private queryHandler: ElasticQueryHandler;
   private analyticsIndex: string;
   private analyticsType: string;
-  private indexPrefix: string;
 
-  constructor(config: ElasticConfig, id: number, name: string, analyticsIndex?: string, analyticsType?: string, indexPrefix?: string)
+  constructor(config: ElasticConfig, id: number, name: string, analyticsIndex?: string, analyticsType?: string,
+    Client: { new (controller: ElasticController, config: ElasticConfig): ElasticClient } = ElasticClient)
   {
     super('ElasticController', id, name);
 
-    this.indexPrefix = (indexPrefix == null ? '' : indexPrefix);
-
-    if (this.indexPrefix === '')
-    {
-      this.client = new ElasticClient(this, config);
-    }
-    else
-    {
-      this.client = new PrefixedElasticClient(this, config);
-    }
+    this.client = new Client(this, config);
 
     this.tasty = new Tasty.Tasty(
       this,
@@ -118,70 +108,6 @@ class ElasticController extends DatabaseController
       index: this.analyticsIndex,
       type: this.analyticsType,
     };
-  }
-
-  public getIndexPrefix(): string
-  {
-    return this.indexPrefix;
-  }
-
-  public prependIndexParam(obj): void
-  {
-    if (!('index' in obj))
-    {
-      obj.index = this.getIndexPrefix() + '*';
-    }
-    else if (typeof obj.index === 'string')
-    {
-      obj.index = this.getIndexPrefix() + (obj.index as string);
-    }
-    else if (obj.index.constructor === Array)
-    {
-      obj.index = obj.index.map((s) => {
-        if (typeof s !== 'string')
-        {
-          throw new Error('Invalid index param');
-        }
-        return this.getIndexPrefix() + s;
-      });
-    }
-    else
-    {
-      throw new Error('Invalid index param');
-    }
-  }
-
-  public prependIndexTerm(obj): void
-  {
-    if (!('_index' in obj))
-    {
-      throw new Error('No _index term');
-    }
-    else if (typeof obj._index === 'string')
-    {
-      obj._index = this.getIndexPrefix() + (obj._index as string);
-    }
-    else
-    {
-      throw new Error('Invalid _index term');
-    }
-  }
-
-  public removeIndexPrefix(index: string): string
-  {
-    if (index.startsWith(this.getIndexPrefix()))
-    {
-      return index.substring(this.getIndexPrefix().length);
-    }
-    else
-    {
-      throw new Error(`Index name "${index}" is missing prefix "${this.getIndexPrefix()}"`);
-    }
-  }
-
-  public removeDocIndexPrefix(obj): void
-  {
-    obj._index = this.removeIndexPrefix(obj._index);
   }
 }
 

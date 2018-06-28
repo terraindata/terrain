@@ -59,12 +59,12 @@ export interface IElasticCluster
  * An client which acts as a selective isomorphic wrapper around
  * the elastic.js cluster API.
  */
-class ElasticCluster implements IElasticCluster
+class ElasticCluster<TController extends ElasticController = ElasticController> implements IElasticCluster
 {
-  protected controller: ElasticController;
+  protected controller: TController;
   private delegate: IElasticClient;
 
-  constructor(controller: ElasticController, delegate: IElasticClient)
+  constructor(controller: TController, delegate: IElasticClient)
   {
     this.controller = controller;
     this.delegate = delegate;
@@ -77,7 +77,6 @@ class ElasticCluster implements IElasticCluster
    */
   public health(params: Elastic.ClusterHealthParams, callback: (error: any, response: any) => void): void
   {
-    this.controller.prependIndexParam(params);
     this.log('health', params);
     return this.delegate.cluster.health(params, callback);
   }
@@ -89,7 +88,6 @@ class ElasticCluster implements IElasticCluster
    */
   public state(params: Elastic.ClusterStateParams, callback: (error: any, response: any) => void): void
   {
-    this.controller.prependIndexParam(params);
     this.log('state', params);
     return this.delegate.cluster.state(params, callback);
   }

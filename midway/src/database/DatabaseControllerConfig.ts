@@ -49,6 +49,7 @@ import DatabaseController from './DatabaseController';
 
 import ElasticConfig from './elastic/ElasticConfig';
 import ElasticController from './elastic/ElasticController';
+import PrefixedElasticController from './elastic/PrefixedElasticController';
 
 import MySQLConfig from './mysql/MySQLConfig';
 import MySQLController from './mysql/MySQLController';
@@ -88,7 +89,14 @@ export class DatabaseControllerConfig
     }
     else if (type === 'elasticsearch' || type === 'elastic')
     {
-      return new ElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType, indexPrefix);
+      if (indexPrefix != null && indexPrefix !== '')
+      {
+        return new PrefixedElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType, indexPrefix);
+      }
+      else
+      {
+        return new ElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType);
+      }
     }
     else
     {

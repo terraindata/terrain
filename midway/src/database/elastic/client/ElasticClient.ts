@@ -81,18 +81,18 @@ export interface IElasticClient
  * An client which acts as a selective isomorphic wrapper around
  * the elastic.js API.
  */
-class ElasticClient implements IElasticClient
+class ElasticClient<TController extends ElasticController = ElasticController> implements IElasticClient
 {
   public cluster: IElasticCluster;
   public indices: IElasticIndices;
 
-  protected controller: ElasticController;
+  protected controller: TController;
   private config: ElasticConfig;
   private delegate: IElasticClient;
 
-  constructor(controller: ElasticController, config: ElasticConfig,
-    Cluster: { new (controller: ElasticController, delegate: IElasticClient): IElasticCluster } = ElasticCluster,
-    Indices: { new (controller: ElasticController, delegate: IElasticClient): IElasticIndices } = ElasticIndices)
+  constructor(controller: TController, config: ElasticConfig,
+    Cluster: { new (controller: TController, delegate: IElasticClient): IElasticCluster } = ElasticCluster,
+    Indices: { new (controller: TController, delegate: IElasticClient): IElasticIndices } = ElasticIndices)
   {
     this.controller = controller;
 

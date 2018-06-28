@@ -47,14 +47,14 @@ THE SOFTWARE.
 import * as Elastic from 'elasticsearch';
 
 import ElasticConfig from '../ElasticConfig';
-import ElasticController from '../ElasticController';
+import PrefixedElasticController from '../PrefixedElasticController';
 import ElasticClient from './ElasticClient';
 import PrefixedElasticCluster from './PrefixedElasticCluster';
 import PrefixedElasticIndices from './PrefixedElasticIndices';
 
-class PrefixedElasticClient extends ElasticClient
+class PrefixedElasticClient extends ElasticClient<PrefixedElasticController>
 {
-  constructor(controller: ElasticController, config: ElasticConfig)
+  constructor(controller: PrefixedElasticController, config: ElasticConfig)
   {
     super(controller, config, PrefixedElasticCluster, PrefixedElasticIndices);
   }

@@ -52,6 +52,7 @@ import ElasticClient from '../../../../src/database/elastic/client/ElasticClient
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
 import ElasticQueryDispatcher from '../../../../src/database/elastic/iterator/ElasticQueryDispatcher';
+import PrefixedElasticController from '../../../../src/database/elastic/PrefixedElasticController';
 
 let elasticController: ElasticController;
 let elasticClient: ElasticClient;
@@ -63,7 +64,7 @@ beforeAll(() =>
     hosts: ['http://localhost:9200'],
   };
 
-  elasticController = new ElasticController(config, 0, 'ElasticStreamTests', undefined, undefined, 'abc.');
+  elasticController = new PrefixedElasticController(config, 0, 'ElasticStreamTests', undefined, undefined, 'abc.');
   elasticClient = elasticController.getClient();
 });
 

@@ -51,11 +51,8 @@ import * as winston from 'winston';
 
 import { App, DB } from '../../src/app/App';
 import ElasticConfig from '../../src/database/elastic/ElasticConfig';
-import ElasticController from '../../src/database/elastic/ElasticController';
-import ElasticDB from '../../src/database/elastic/tasty/ElasticDB';
 import * as Tasty from '../../src/tasty/Tasty';
 
-let elasticDB: ElasticDB;
 let server;
 
 let defaultUserAccessToken: string = '';
@@ -110,9 +107,6 @@ beforeAll(async (done) =>
     const config: ElasticConfig = {
       hosts: ['http://localhost:9200'],
     };
-
-    const elasticController: ElasticController = new ElasticController(config, 0, 'RouteTests');
-    elasticDB = elasticController.getTasty().getDB() as ElasticDB;
 
     const items = [
       {

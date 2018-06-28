@@ -49,6 +49,7 @@ import * as winston from 'winston';
 import ElasticClient from '../../../../src/database/elastic/client/ElasticClient';
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
+import PrefixedElasticController from '../../../../src/database/elastic/PrefixedElasticController';
 import ElasticReader from '../../../../src/database/elastic/streams/ElasticReader';
 
 import BufferTransform from '../../../../src/app/io/streams/BufferTransform';
@@ -63,7 +64,7 @@ beforeAll(() =>
     hosts: ['http://localhost:9200'],
   };
 
-  elasticController = new ElasticController(config, 0, 'ElasticReaderTests', undefined, undefined, 'abc.');
+  elasticController = new PrefixedElasticController(config, 0, 'ElasticReaderTests', undefined, undefined, 'abc.');
   elasticClient = elasticController.getClient();
 });
 

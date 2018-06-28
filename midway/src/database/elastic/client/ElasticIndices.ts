@@ -62,12 +62,12 @@ export interface IElasticIndices
  * An client which acts as a selective isomorphic wrapper around
  * the elastic.js indices API.
  */
-class ElasticIndices implements IElasticIndices
+class ElasticIndices<TController extends ElasticController = ElasticController> implements IElasticIndices
 {
-  protected controller: ElasticController;
+  protected controller: TController;
   private delegate: IElasticClient;
 
-  constructor(controller: ElasticController, delegate: IElasticClient)
+  constructor(controller: TController, delegate: IElasticClient)
   {
     this.controller = controller;
     this.delegate = delegate;
