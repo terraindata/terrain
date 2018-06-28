@@ -143,6 +143,7 @@
     "graphlib": "^2.1.5",
     "hdr-histogram-js": "^1.1.4",
     "history": "^4.7.2",
+    "html2canvas": "^1.0.0-alpha.12",
     "immutable": "^3.8.2",
     "ip": "^1.1.5",
     "is-primitive": "^3.0.1",
