@@ -56,16 +56,16 @@ import UserConfig from './users/UserConfig';
 
 export interface Config
 {
-  config?: string;
-  port?: number;
-  db?: string;
-  dsn?: string;
-  debug?: boolean;
-  help?: boolean;
-  verbose?: boolean;
-  instanceId?: string;
-  databases?: DatabaseConfig[];
-  analyticsdb?: string;
+  config?: string;               // path to the configuration file to use
+  port?: number;                 // port to listen on
+  db?: string;                   // type of system database to use (e.g. postgres, mysql, sqlite, etc.)
+  dsn?: string;                  // dsn (data source name) of the system database
+  debug?: boolean;               // enable/disable debug mode
+  help?: boolean;                // show help and usage information
+  verbose?: boolean;             // print verbose information
+  instanceId?: string;           // unique identifier to use for this midway instance
+  databases?: DatabaseConfig[];  // list of databases to connect to on startup
+  analyticsdb?: string;          // dsn (data source name) of analytics database to use
 }
 
 export function loadConfigFromFile(config: Config): Config
