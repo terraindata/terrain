@@ -49,6 +49,7 @@ import DatabaseController from './DatabaseController';
 
 import ElasticConfig from './elastic/ElasticConfig';
 import ElasticController from './elastic/ElasticController';
+import PrefixedElasticController from './elastic/PrefixedElasticController';
 
 import MySQLConfig from './mysql/MySQLConfig';
 import MySQLController from './mysql/MySQLController';
@@ -71,6 +72,7 @@ export class DatabaseControllerConfig
     const dsn = config.dsn;
     const analyticsIndex = config.analyticsIndex;
     const analyticsType = config.analyticsType;
+    const indexPrefix = config.indexPrefix;
 
     const cfg = new DatabaseControllerConfig(type, dsn);
     if (type === 'sqlite')
@@ -87,7 +89,14 @@ export class DatabaseControllerConfig
     }
     else if (type === 'elasticsearch' || type === 'elastic')
     {
-      return new ElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType);
+      if (indexPrefix != null && indexPrefix !== '')
+      {
+        return new PrefixedElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType, indexPrefix);
+      }
+      else
+      {
+        return new ElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType);
+      }
     }
     else
     {
@@ -111,8 +120,10 @@ export class DatabaseControllerConfig
     }
     else if (type === 'elasticsearch' || type === 'elastic')
     {
+      const config = Util.dsn.parseDSNConfig(dsnString);
       this.config = {
-        hosts: [dsnString],
+        hosts: [config.host + ':' + config.port.toString()],
+        httpAuth: config.user + ':' + config.password,
         keepAlive: false,
         requestTimeout: 600000,
       } as ElasticConfig;

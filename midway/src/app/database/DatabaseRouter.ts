@@ -114,6 +114,13 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
     }
   }
 
+  const isProtected = (await databases.get(db.id))[0].isProtected;
+
+  if (isProtected)
+  {
+    throw new Error('Cannot update a protected database');
+  }
+
   ctx.body = await databases.upsert(ctx.state.user, db);
   await databases.connect(ctx.state.user, db.id);
 });

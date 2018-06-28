@@ -95,14 +95,14 @@ class DatabasePicker extends TerrainComponent<Props>
     this.inputMap = {
       serverIndex: {
         type: DisplayType.Pick,
-        displayName: 'Server',
+        displayName: 'Instance',
         options: {
           pickOptions: this.getServerOptions,
         },
       },
       database: {
         type: DisplayType.TextBox,
-        displayName: 'ES Index',
+        displayName: 'Dataset Name',
         getDisplayState: this.getDisplayStateBoxes,
         options: {
           acOptions: this.getDatabaseOptions,
@@ -125,15 +125,15 @@ class DatabasePicker extends TerrainComponent<Props>
     const db = state.database;
     if (db === '')
     {
-      return 'Database name cannot be empty.';
+      return 'Dataset name cannot be empty.';
     }
     if (db.search(/[^a-z0-9\-\_]/) !== -1 && db.substr(0, 1) !== '-')
     {
-      return 'Invalid database name. You must use lowercase letters, numbers, - and _.';
+      return 'Invalid Dataset name. You must use lowercase letters, numbers, - and _.';
     }
     if (db[0] === '_' || db[0] === '-')
     {
-      return 'Invalid database name. Database name cannot start with - or _.';
+      return 'Invalid Dataset name. Dataset name cannot start with - or _.';
     }
     const table = state.table;
     if (table === '')
@@ -228,7 +228,7 @@ class DatabasePicker extends TerrainComponent<Props>
   {
     const index = this._getSortedServers(servers)
       .findIndex((server, k) => server.id === serverId);
-    return index != null ? index : -1;
+    return index != null ? index : 0;
   }
 
   public computeFormState(): FormState

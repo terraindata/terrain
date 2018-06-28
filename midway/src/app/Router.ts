@@ -132,7 +132,8 @@ export function getRouter()
     ctx.body = 'authenticated as ' + (ctx.state.user[0].email as string);
   });
 
-  AppRouter.get('/bundles/:bundle', passport.authenticate('access-token-local'), async (ctx, next) =>
+
+  const serveBundle = async (ctx, next) =>
   {
     if (process.env.NODE_ENV !== 'production')
     {
@@ -142,7 +143,17 @@ export function getRouter()
     {
       await send(ctx, `/midway/src/bundles/${ctx.params['bundle']}`);
     }
-  });
+  };
+  
+  if (process.env.NODE_ENV === 'fullstack-test')
+  {
+    // no auth for fullstack tests
+    AppRouter.get('/bundles/:bundle', serveBundle);
+  }
+  else
+  {
+    AppRouter.get('/bundles/:bundle', passport.authenticate('access-token-local'), serveBundle);
+  }
 
   const MidwayRouter = new KoaRouter();
   MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
