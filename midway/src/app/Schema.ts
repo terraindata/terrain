@@ -65,6 +65,7 @@ import { SchemaMetadataConfig } from './schemaMetadata/SchemaMetadataConfig';
 import { StatusHistoryConfig } from './statusHistory/StatusHistoryConfig';
 import { UserConfig } from './users/UserConfig';
 import { VersionConfig } from './versions/VersionConfig';
+import { MigrationRecordConfig } from './migrations/MigrationRecordConfig';
 
 export class Tables
 {
@@ -81,6 +82,7 @@ export class Tables
   public jobLogs: Tasty.Table;
   public jobs: Tasty.Table;
   public statusHistory: Tasty.Table;
+  public migrationRecords: Tasty.Table;
 }
 
 function verifyTableWithConfig(table: Tasty.Table, configClass: object)
@@ -454,6 +456,29 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
       },
     ),
     new StatusHistoryConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
+      'migrationRecords',
+      ['id'],
+      [
+        'createdAt',
+        'lastModified',
+        'fromVersion',
+        'toVersion',
+        'isCurrent',
+      ],
+      undefined,
+      {
+        id: primaryKeyType + ' PRIMARY KEY',
+        createdAt: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+        lastModified: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+        fromVersion: 'text NOT NULL',
+        toVersion: 'text NOT NULL',
+        isCurrent: 'bool NOT NULL',
+      },
+    ),
+    new MigrationRecordConfig({}),
   );
 
   return tables as Tables;

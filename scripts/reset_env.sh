@@ -53,6 +53,11 @@ dropOther() {
   dropSpecific 'resultsConfig';
 }
 
+dropMigrations() {
+  echo "Dropping Migration Tables";
+  dropSpecific 'migrationRecords';
+}
+
 if [ $# -eq 0 ]; then
   echo "No Options Specified";
   echo "$HELPSTRING";
@@ -63,9 +68,10 @@ if [[ $1 = "--all" ]]; then
   dropUsers;
   dropETL;
   dropOther;
+  dropMigrations;
   resetES;
 else
-  while getopts "iuedx:o" opt; do
+  while getopts "iuedx:om" opt; do
     case $opt in
       i)
         dropItems
@@ -84,6 +90,9 @@ else
         ;;
       o)
         dropOther
+        ;;
+      m)
+        dropMigrations
         ;;
       \?)
         echo "Invalid option: -$OPTARG";
