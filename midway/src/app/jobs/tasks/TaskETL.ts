@@ -103,7 +103,6 @@ export class TaskETL extends Task
             resolve(taskOutputConfig);
           });
           streams['outputStream'].resume();
-          streams['logStream'].resume();
         }
       }
       catch (e)

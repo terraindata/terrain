@@ -163,8 +163,6 @@ export class TaskTree
           break;
       }
     });
-    console.log('TASKS ARE ', this.tasks);
-    console.log('TASKS ARE ', JSON.stringify(this.tasks, null, 2));
     return this.isValid() as boolean;
   }
 
@@ -222,7 +220,7 @@ export class TaskTree
         return resolve(taskOutputConfig);
       }
 
-      const rootLogStream: LogStreamWritable = new LogStreamWritable(1000, 1);
+      const rootLogStream: LogStreamWritable = new LogStreamWritable(1);
       this.tasks.forEach((task, i) =>
       {
         this.tasks[i].setRootLogStream(rootLogStream);

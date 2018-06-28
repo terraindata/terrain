@@ -265,7 +265,7 @@ class ScheduleEditor extends TerrainComponent<Props>
         type: 'FAILURE',
         id: newId,
         taskId: TaskEnum.taskDefaultFailure,
-        name: 'Task ' + String(newId + 1),
+        name: 'Task ' + String((newId as number) + 1),
       });
       taskMap = taskMap.set(parentId, task.set('onFailure', newId)).set(newId, newTask);
     }
@@ -276,12 +276,12 @@ class ScheduleEditor extends TerrainComponent<Props>
     this.setState({
       back: false,
     }, () =>
-    {
-      this.setState({
-        taskMap,
-        rootTasks: this.state.rootTasks.push(newId),
+      {
+        this.setState({
+          taskMap,
+          rootTasks: this.state.rootTasks.push(newId),
+        });
       });
-    });
   }
 
   public back(newSchedule?: SchedulerConfig)
@@ -303,7 +303,6 @@ class ScheduleEditor extends TerrainComponent<Props>
   {
     let { schedule } = this.state;
     schedule = schedule.set('tasks', this.taskMapToList());
-    console.log('schedule ', schedule.toJS());
     this.props.schedulerActions({
       actionType: 'updateSchedule',
       schedule: scheduleForDatabase(schedule) as SchedulerConfig,

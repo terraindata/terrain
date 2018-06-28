@@ -50,7 +50,7 @@ import * as winston from 'winston';
 /**
  * A log stream
  */
-export default class LogStream extends Transform
+export default class LogStream extends Readable
 {
   private buffers: string[];
   private abortThreshold: number;
@@ -81,7 +81,9 @@ export default class LogStream extends Transform
     if (chunk === null)
     {
       this.drainLog();
-      return super.push(null);
+      const superPush = super.push(null);
+      this.emit('end');
+      return superPush;
     }
 
     const logMsg = {

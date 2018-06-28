@@ -45,86 +45,87 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import { EventEmitter } from 'events';
-import { Readable, Transform, Writable } from 'stream';
+import { Duplex, Readable, Transform, Writable } from 'stream';
 import * as winston from 'winston';
 
 import { SafeWritable } from './SafeWritable';
 /**
  * A log stream
  */
-export default class LogStreamWritable extends SafeWritable
+export default class LogStreamWritable extends Writable
 {
-  private buffers: string[];
-  private abortThreshold: number;
-  private errorCount: number;
+  private buffers: any[];
   private count: number;
+  private state: boolean;
 
-  constructor(abortThreshold: number = 1000, initialCount = 1)
+  constructor(initialCount = 1)
   {
     super({ objectMode: true });
 
+    this.buffers = [];
+
     this.count = initialCount;
+
+    this.state = false;
 
     this.on('pipe', (src) =>
     {
       this.increment();
     });
+
+    this.on('finish', () =>
+    {
+      this.state = true;
+    });
   }
 
-  public push(chunk: any, encoding?: string): boolean
+  public _write(chunk: any, encoding: string, callback: (err?: Error) => void): void
   {
-    if (chunk === null)
-    {
-      return super.push(null);
-    }
-
-    const logMsg = {
-      timestamp: new Date(),
-      level: 'info',
-      message: '',
-    };
-
     try
     {
-      const c = JSON.parse(chunk);
-      if (c.timestamp !== undefined)
-      {
-        logMsg.timestamp = c.timestamp;
-      }
-
-      if (c.level !== undefined)
-      {
-        logMsg.level = c.level;
-      }
-
-      if (c.message !== undefined)
-      {
-        logMsg.message = c.message;
-      }
+      this.buffers.push(chunk);
+      super._write(chunk, encoding, callback);
     }
     catch (e)
     {
-      logMsg.message = chunk;
+      this.emit('error', e);
     }
+  }
 
-    return super.push(JSON.stringify(logMsg), encoding);
+  public _writev(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
+  {
+    try
+    {
+      this.buffers = this.buffers.concat(chunks);
+      super._writev(chunks, callback);
+    }
+    catch (e)
+    {
+      this.emit('error', e);
+    }
+  }
+
+  public getBuffers(): any[]
+  {
+    return this.buffers;
+  }
+
+  public getState(): boolean
+  {
+    return this.state;
   }
 
   public decrement()
   {
-    console.log('Decrement BEFORE ', this.count);
     this.count--;
-    console.log('Decrement AFTER ', this.count);
     if (this.count === 0)
     {
-      this.push(null);
+      this.end();
     }
   }
 
   public increment()
   {
-    console.log('INCREMENT BEFORE ', this.count);
     this.count++;
-    console.log('INCREMENT AFTER ', this.count);
   }
 }
