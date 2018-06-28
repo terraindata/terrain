@@ -119,13 +119,7 @@ class PopUpForm extends TerrainComponent<Props>
   public closePopUpFormSuccess()
   {
     this.handleSubmitForm();
-    // if (this.props.closeOnConfirm !== undefined && !this.props.closeOnConfirm)
-    // {
-    //   this.props.onConfirm ? this.props.onConfirm() : null;
-    //   return;
-    // }
     this.props.onClose();
-    // this.props.onConfirm ? this.props.onConfirm() : null;
   }
 
   public handleTextboxChange(evt)
@@ -174,7 +168,6 @@ class PopUpForm extends TerrainComponent<Props>
       (response) => restoreAppOpacity(),
       {
         onError: (err) => restoreAppOpacity(),
-
       });
   }
 
