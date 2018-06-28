@@ -44,71 +44,28 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as Tasty from '../../tasty/Tasty';
+import * as Elastic from 'elasticsearch';
+import PrefixedElasticController from '../PrefixedElasticController';
+import ElasticCluster from './ElasticCluster';
 
-import DatabaseController from '../DatabaseController';
-import ElasticClient from './client/ElasticClient';
-import ElasticConfig from './ElasticConfig';
-import ElasticQueryHandler from './query/ElasticQueryHandler';
-import ElasticDB from './tasty/ElasticDB';
-
-/**
- * The central controller for communicating with ElasticSearch.
- */
-class ElasticController extends DatabaseController
+class PrefixedElasticCluster extends ElasticCluster<PrefixedElasticController>
 {
-  private client: ElasticClient;
-  private tasty: Tasty.Tasty;
-  private queryHandler: ElasticQueryHandler;
-  private analyticsIndex: string;
-  private analyticsType: string;
-
-  constructor(config: ElasticConfig, id: number, name: string, analyticsIndex?: string, analyticsType?: string,
-    Client: { new (controller: ElasticController, config: ElasticConfig): ElasticClient } = ElasticClient)
+  constructor(controller: PrefixedElasticController, delegate: Elastic.Client)
   {
-    super('ElasticController', id, name);
-
-    this.client = new Client(this, config);
-
-    this.tasty = new Tasty.Tasty(
-      this,
-      new ElasticDB(this.client));
-
-    this.queryHandler = new ElasticQueryHandler(this);
-
-    if (analyticsIndex !== undefined)
-    {
-      this.analyticsIndex = analyticsIndex;
-    }
-
-    if (analyticsType !== undefined)
-    {
-      this.analyticsType = analyticsType;
-    }
+    super(controller, delegate);
   }
 
-  public getClient(): ElasticClient
+  public health(params: Elastic.ClusterHealthParams, callback: (error: any, response: any) => void): void
   {
-    return this.client;
+    this.controller.prependIndexParam(params);
+    return super.health(params, callback);
   }
 
-  public getTasty(): Tasty.Tasty
+  public state(params: Elastic.ClusterStateParams, callback: (error: any, response: any) => void): void
   {
-    return this.tasty;
-  }
-
-  public getQueryHandler(): ElasticQueryHandler
-  {
-    return this.queryHandler;
-  }
-
-  public getAnalyticsDB(): object
-  {
-    return {
-      index: this.analyticsIndex,
-      type: this.analyticsType,
-    };
+    this.controller.prependIndexParam(params);
+    return super.state(params, callback);
   }
 }
 
-export default ElasticController;
+export default PrefixedElasticCluster;

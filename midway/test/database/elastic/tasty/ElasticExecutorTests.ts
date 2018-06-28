@@ -48,6 +48,7 @@ import * as winston from 'winston';
 
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
+import PrefixedElasticController from '../../../../src/database/elastic/PrefixedElasticController';
 import ElasticDB from '../../../../src/database/elastic/tasty/ElasticDB';
 
 import * as Tasty from '../../../../src/tasty/Tasty';
@@ -73,7 +74,7 @@ beforeAll(async () =>
       hosts: ['http://localhost:9200'],
     };
 
-    elasticController = new ElasticController(config, 0, 'ElasticExecutorTest');
+    elasticController = new PrefixedElasticController(config, 0, 'ElasticExecutorTest', undefined, undefined, 'abc.');
     elasticDB = elasticController.getTasty().getDB() as ElasticDB;
   }
   catch (e)

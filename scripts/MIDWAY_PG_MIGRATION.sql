@@ -27,6 +27,9 @@ ALTER TABLE "databases" RENAME COLUMN isanalytics TO "isAnalytics";
 ALTER TABLE "databases" RENAME COLUMN analyticsindex TO "analyticsIndex";
 ALTER TABLE "databases" RENAME COLUMN analyticstype TO "analyticsType";
 
+ALTER TABLE "databases" ADD COLUMN "indexPrefix" text;
+ALTER TABLE "databases" ADD COLUMN "isProtected" bool DEFAULT false;
+
 -- users
 ALTER TABLE users RENAME TO "users";
 ALTER TABLE "users" RENAME COLUMN id TO "id";
