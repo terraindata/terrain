@@ -43,68 +43,87 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file
 
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
-
-import { List } from 'immutable';
-
-import TransformationNode from 'shared/transformations/TransformationNode';
-import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import * as _ from 'lodash';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-/*
- *  Simple Transformations mutate a value of a document in-place
- */
-export default abstract class SimpleTransformationType extends TransformationNode
+export default class TopologyUtil
 {
-  // override this to operate on null values
-  public readonly skipNulls: boolean = true;
-
-  // override this transformation to prevent transformation from occuring
-  public shouldTransform(el: any): boolean
+  
+  /*
+   * referenceKP can contain -1
+   * matchKP should not contain -1
+   */
+  public static createLocalMatcher(referenceKP: KeyPath, matchKP: KeyPath): (newKP: KeyPath) => KeyPath
   {
-    return true;
+    if (referenceKP.size !== matchKP.size || referenceKP.size === 0)
+    {
+      return null;
+    }
+
+    const replacements: {
+      [k: number]: number;
+    } = {};
+
+    let maxIndex = -1;
+
+    for (let i = 0; i < referenceKP.size; i++)
+    {
+      const searchIndex = referenceKP.get(i);
+      const matchIndex = matchKP.get(i);
+      if (searchIndex !== matchIndex)
+      {
+        if (typeof searchIndex !== 'number' || typeof matchIndex !== 'number')
+        {
+          return null;
+        }
+        else
+        {
+          replacements[i] = matchIndex;
+          maxIndex = i;
+        }
+      }
+    }
+
+    const baseMatchPath = matchKP.slice(0, maxIndex + 1);
+
+    return (newKP: KeyPath) =>
+    {
+      if (maxIndex === -1)
+      {
+        return newKP;
+      }
+      else
+      {
+        const toTransplant = newKP.slice(maxIndex + 1);
+        return baseMatchPath.concat(toTransplant).toList();
+      }
+
+    };
   }
 
-  public abstract transformer(val: any): any;
-
-  protected transformDocument(doc: object): TransformationVisitResult
+  // returns true if two given keypaths represent fields that are "local" to each other.
+  // fields are local if they are unambiguously traversable to each other.
+  // e.g. [a] is local to [b] and [c, d]
+  // [a, -1, b] would be local to [a, -1, c]
+  // [a] would not be local to [c, -1, d]
+  public static areFieldsLocal(kp1, kp2): boolean
   {
-    const errors = [];
+    const lastIndex1: number = kp1.findLastIndex((value, index) => !EngineUtil.isNamedField(kp1, index));
+    const concretePath1 = kp1.slice(0, lastIndex1 + 1);
+    const lastIndex2: number = kp2.findLastIndex((value, index) => !EngineUtil.isNamedField(kp2, index));
+    const concretePath2 = kp2.slice(0, lastIndex2 + 1);
 
-    this.fields.forEach((field) =>
+    if (lastIndex2 !== lastIndex1 || !concretePath1.equals(concretePath2))
     {
-      for (const match of yadeep.search(doc, field))
-      {
-        const { value, location } = match;
-        if (value === null && this.skipNulls)
-        {
-          return;
-        }
-        if (!this.checkType(value))
-        {
-          errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof value}.`);
-          return;
-        }
-        if (!this.shouldTransform(value))
-        {
-          return;
-        }
-        const newValue = this.transformer(value);
-        yadeep.set(doc, location, newValue, { create: true });
-      }
-    });
-
-    return {
-      document: doc,
-      errors,
-    } as TransformationVisitResult;
+      return false;
+    }
+    else
+    {
+      // check if fields are wildcards themselves?
+      return true;
+    }
   }
 }

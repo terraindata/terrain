@@ -56,7 +56,7 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import { createLocalMatcher, visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import Topology from 'shared/transformations/util/TopologyUtil';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationVisitError from 'shared/transformations/TransformationVisitError';
@@ -83,7 +83,7 @@ export class DuplicateTransformationNode extends TransformationNode
       {
         let { value } = match;
 
-        const matcher = createLocalMatcher(field, match.location);
+        const matcher = Topology.createLocalMatcher(field, match.location);
         if (matcher === null)
         {
           errors.push(`Error in ${this.typeCode}: Field and Match location are inconsistent`);

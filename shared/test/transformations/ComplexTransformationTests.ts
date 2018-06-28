@@ -43,68 +43,82 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file
-
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import { List } from 'immutable';
+import * as _ from 'lodash';
+import TransformationRegistry from 'shared/transformations/TransformationRegistry';
+import { TransformationEngine } from '../../transformations/TransformationEngine';
+import TransformationNodeType from '../../transformations/TransformationNodeType';
+import { KeyPath } from '../../util/KeyPath';
+import * as yadeep from '../../util/yadeep';
+import { TestDocs } from './TestDocs';
 
-import TransformationNode from 'shared/transformations/TransformationNode';
-import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
-import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-/*
- *  Simple Transformations mutate a value of a document in-place
- */
-export default abstract class SimpleTransformationType extends TransformationNode
+function wrap(kp: any[])
 {
-  // override this to operate on null values
-  public readonly skipNulls: boolean = true;
-
-  // override this transformation to prevent transformation from occuring
-  public shouldTransform(el: any): boolean
-  {
-    return true;
-  }
-
-  public abstract transformer(val: any): any;
-
-  protected transformDocument(doc: object): TransformationVisitResult
-  {
-    const errors = [];
-
-    this.fields.forEach((field) =>
-    {
-      for (const match of yadeep.search(doc, field))
-      {
-        const { value, location } = match;
-        if (value === null && this.skipNulls)
-        {
-          return;
-        }
-        if (!this.checkType(value))
-        {
-          errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof value}.`);
-          return;
-        }
-        if (!this.shouldTransform(value))
-        {
-          return;
-        }
-        const newValue = this.transformer(value);
-        yadeep.set(doc, location, newValue, { create: true });
-      }
-    });
-
-    return {
-      document: doc,
-      errors,
-    } as TransformationVisitResult;
-  }
+  return List([List<string | number>(kp)]);
 }
+
+test('extract an array field (duplicate)', () =>
+{
+  const doc = {
+    fields: ['foo', 'bar', 'baz'],
+  };
+  const e = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.DuplicateNode,
+    wrap(['fields', 0]),
+    { newFieldKeyPaths: wrap(['zeroth']) },
+  );
+  e.addField(List(['fields', 5]), 'string');
+  e.appendTransformation(
+    TransformationNodeType.DuplicateNode,
+    wrap(['fields', 5]),
+    { newFieldKeyPaths: wrap(['tooBig']) },
+  );
+
+  const r = e.transform(doc);
+  expect(r).toEqual({
+    fields: ['foo', 'bar', 'baz'],
+    zeroth: 'foo',
+  });
+});
+
+test('make an array of values from nested array (duplicate)', () => {
+  const doc = {
+    items: [
+      {
+        foo: 1,
+      },
+      {
+        foo: 2,
+      },
+      {
+        foo: 3,
+      },
+    ],
+  };
+  const e = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.DuplicateNode,
+    wrap(['items', -1, 'foo']),
+    { newFieldKeyPaths: wrap(['allFoos']) },
+  );
+
+  const r = e.transform(doc);
+  expect(r).toEqual({
+    items: [
+      {
+        foo: 1,
+      },
+      {
+        foo: 2,
+      },
+      {
+        foo: 3,
+      },
+    ],
+    allFoos: [ 1, 2, 3 ],
+  });
+});

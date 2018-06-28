@@ -49,11 +49,10 @@ import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
-import { areFieldsLocal } from 'shared/transformations/util/TransformationsUtil';
 
 import { List } from 'immutable';
 
-import { createLocalMatcher, visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import Topology from 'shared/transformations/util/TopologyUtil';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationVisitError from 'shared/transformations/TransformationVisitError';
@@ -89,7 +88,7 @@ export default abstract class ForkTransformationType extends TransformationNode
     {
       opts.newFieldKeyPaths.forEach((nfkp) =>
       {
-        if (valid && !areFieldsLocal(field, nfkp))
+        if (valid && !Topology.areFieldsLocal(field, nfkp))
         {
           valid = false;
         }
@@ -123,7 +122,7 @@ export default abstract class ForkTransformationType extends TransformationNode
           return;
         }
 
-        const matcher = createLocalMatcher(field, location);
+        const matcher = Topology.createLocalMatcher(field, location);
         if (matcher === null)
         {
           errors.push(`Error in ${this.typeCode}: Field and Match location are inconsistent`);

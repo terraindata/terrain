@@ -63,7 +63,6 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
-import { areFieldsLocal } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 

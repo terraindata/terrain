@@ -53,7 +53,7 @@ import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { List } from 'immutable';
 import * as _ from 'lodash';
 
-import { createLocalMatcher, visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import Topology from 'shared/transformations/util/TopologyUtil';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationVisitError from 'shared/transformations/TransformationVisitError';
@@ -126,7 +126,7 @@ export default abstract class CombineTransformationType extends TransformationNo
     for (const locale of Object.keys(matchSets))
     {
       const matchSet = matchSets[locale];
-      const matcher = createLocalMatcher(matchSet[0].field, matchSet[0].matchField);
+      const matcher = Topology.createLocalMatcher(matchSet[0].field, matchSet[0].matchField);
       if (matcher === null)
       {
         errors.push(`Error in ${this.typeCode}: Field and Match location are inconsistent`);
