@@ -116,7 +116,7 @@ export class Foldout extends TerrainComponent<Props>
         })}
         style={[
           backgroundColor(Colors().sidebarBg),
-          getStyle('width', state.expanded ? props.width : expandButtonWidth),
+          getStyle('min-width', state.expanded ? props.width : expandButtonWidth),
         ]}
       >
         <div
