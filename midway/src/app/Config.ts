@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as winston from 'winston';
 
@@ -63,7 +64,7 @@ export interface Config
   help?: boolean;
   verbose?: boolean;
   instanceId?: string;
-  databases?: object[];
+  databases?: DatabaseConfig[];
   analyticsdb?: string;
 }
 
@@ -113,12 +114,23 @@ export async function handleConfig(config: Config): Promise<void>
     const dbs = await databases.select(['id', 'name']);
     for (const database of config.databases)
     {
-      const db = database as DatabaseConfig;
+      const db: DatabaseConfig = database;
       const foundDB = dbs.filter((d) => d.name === db.name);
       if (foundDB.length > 0)
       {
         db.id = foundDB[0].id;
       }
+
+      if (db.id === undefined && db['isMultitenant'])
+      {
+        db.isProtected = true;
+        if (db.indexPrefix === undefined)
+        {
+          db.indexPrefix = crypto.randomBytes(32).toString('hex') + '.';
+        }
+      }
+
+      delete db['isMultitenant'];
 
       winston.info('Registering new database item: ', db);
       await databases.upsert({} as UserConfig, db);

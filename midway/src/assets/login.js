@@ -208,7 +208,10 @@ function handleFocus(id)
 {
 	clearInterval(INTERVAL_CHECK_AUTOFILL);
 	const el = document.getElementById(id + "-container");
-	el.className = el.className + " login-input-container-active";
+	if (el)
+	{
+		el.className = el.className + " login-input-container-active";
+	}
 }
 
 function checkForBlur(id)
