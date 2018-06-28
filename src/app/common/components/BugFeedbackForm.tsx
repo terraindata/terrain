@@ -95,20 +95,6 @@ class BugFeedbackForm extends TerrainComponent<Props>
     this.takeScreenshot(data, this.state.checkboxChecked);
   }
 
-  // public updateCheckboxStatus(status: boolean): void
-  // {
-  //   this.setState({
-  //     checkboxChecked: status
-  //   });
-  // }
-
-  // public updatetextBoxValue(value: string): void
-  // {
-  //   this.setState({
-  //     textboxValue: value
-  //   });
-  // }
-
   public postFeedbackData(data: object)
   {
     const restoreAppOpacity = () => {
@@ -147,12 +133,6 @@ class BugFeedbackForm extends TerrainComponent<Props>
       this.postFeedbackData(data);
     }
   }
-  // public render()
-  // {
-  //   return (
-  //     <div> </div>
-  //     );
-  // }
 }
 
 const ReactModal = require('react-modal');
