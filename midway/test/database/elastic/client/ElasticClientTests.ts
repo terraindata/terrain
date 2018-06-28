@@ -265,7 +265,7 @@ test('prefix isolation', async (done) =>
         body: {
           query: {
             terms: {
-              _id: [ '13333337', '133333372' ],
+              _id: ['13333337', '133333372'],
             },
           },
         },

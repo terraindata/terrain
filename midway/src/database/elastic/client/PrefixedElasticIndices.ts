@@ -76,7 +76,8 @@ class PrefixedElasticIndices extends ElasticIndices<PrefixedElasticController>
         const newRes = {};
         try
         {
-          Object.keys(res).forEach((key) => {
+          Object.keys(res).forEach((key) =>
+          {
             newRes[this.controller.removeIndexPrefix(key)] = res[key];
           });
         }

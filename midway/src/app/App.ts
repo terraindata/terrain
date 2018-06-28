@@ -295,12 +295,16 @@ export class App
     winston.info('Finished creating application schema...');
 
     // process configuration options
-    await Config.handleConfig(this.config);
-    winston.debug('Finished processing configuration options...');
+    await Config.initialHandleConfig(this.config);
+    winston.debug('Finished initial processing configuration options...');
 
     // perform migrations
     await this.Migrations.runMigrations();
     winston.info('Finished migration checks and updates. State is up to Date.');
+
+    // process configuration options
+    await Config.handleConfig(this.config);
+    winston.debug('Finished processing configuration options...');
 
     // initialize system encryption keys
     registerMidwayEncryption();
