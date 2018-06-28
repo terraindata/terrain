@@ -54,13 +54,14 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
+import { availableCases, CaseFormats, caseFormatToReadable } from 'shared/transformations/nodes/CaseTransformationNode';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
 import { DynamicForm } from 'common/components/DynamicForm';
-import { CaseFormats, ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 import * as Immutable from 'immutable';
@@ -104,9 +105,9 @@ export class CaseTFF extends TransformationForm<CaseOptions, TransformationNodeT
       type: DisplayType.Pick,
       displayName: 'Format',
       options: {
-        pickOptions: (s) => List<string>(Object.keys(CaseFormats)),
-        indexResolver: (value) => List<string>(Object.keys(CaseFormats)).indexOf(value),
-        displayNames: (s) => Map<string, string>(_.zipObject(Object.keys(CaseFormats), _.values(CaseFormats))),
+        pickOptions: (s) => availableCases,
+        indexResolver: (value) => availableCases.indexOf(value),
+        displayNames: (s) => caseFormatToReadable,
       },
     },
   };
@@ -135,22 +136,22 @@ export class RoundTFF extends TransformationForm<RoundOptions, TransformationNod
 {
   protected readonly type = TransformationNodeType.RoundNode;
   protected readonly inputMap: InputDeclarationMap<RoundOptions> = {
-    shift: {
+    precision: {
       type: DisplayType.NumberBox,
       displayName: 'Decimal Place Value',
     },
   };
   protected readonly initialState = {
-    shift: 0,
+    precision: 0,
   };
 
   protected computeArgs()
   {
-    const { shift } = this.state;
+    const { precision } = this.state;
     const args = super.computeArgs();
 
     const options = _.extend({}, args.options, {
-      shift: Number(shift),
+      precision: Number(precision),
     });
     return _.extend({}, args, { options });
   }

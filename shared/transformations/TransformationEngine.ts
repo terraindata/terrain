@@ -49,15 +49,15 @@ import * as GraphLib from 'graphlib';
 import { List, Map } from 'immutable';
 import isPrimitive = require('is-primitive');
 import * as _ from 'lodash';
+import TransformationNode from 'shared/transformations/TransformationNode';
 import objectify from '../util/deepObjectify';
 import { KeyPath, keyPathPrefixMatch, updateKeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 // import * as winston from 'winston'; // TODO what to do for error logging?
 import DataStore from './DataStore';
-import TransformationNode from './nodes/TransformationNode';
 import TransformationEngineNodeVisitor from './TransformationEngineNodeVisitor';
-import { TransformationInfo } from './TransformationInfo';
 import TransformationNodeType from './TransformationNodeType';
+import TransformationRegistry from './TransformationRegistry';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
@@ -146,11 +146,11 @@ export class TransformationEngine
     {
       const raw: object = parsed['dag']['nodes'][i]['value'];
       parsed['dag']['nodes'][i]['value'] =
-        new (TransformationInfo.getType(raw['typeCode']))(
+        new (TransformationRegistry.getType(raw['typeCode']))(
           raw['id'],
           List<KeyPath>(raw['fields'].map((item) => KeyPath(item))),
           TransformationEngine.makeMetaImmutable(raw['meta']),
-          raw['typeCode'],
+          // raw['typeCode'],
         ) as TransformationNode;
     }
     return parsed;
@@ -240,7 +240,7 @@ export class TransformationEngine
   {
     // const fieldIDs: List<number> = this.parseFieldIDs(fieldNamesOrIDs);
     const node: TransformationNode =
-      new (TransformationInfo.getType(nodeType))(this.uidNode, fieldNames, options, nodeType);
+      new (TransformationRegistry.getType(nodeType))(this.uidNode, fieldNames, options /*nodeType*/);
 
     // Process fields created/disabled by this transformation
     if (options !== undefined)
@@ -250,13 +250,13 @@ export class TransformationEngine
         for (let i: number = 0; i < options['newFieldKeyPaths'].size; i++)
         {
           let inferredTypeNameOfNewFields: string;
-          if (TransformationInfo.getNewFieldType(nodeType) === 'same' && fieldNames.size > 0)
+          if (TransformationRegistry.getNewFieldType(nodeType) === 'same' && fieldNames.size > 0)
           {
             inferredTypeNameOfNewFields = this.getFieldType(this.getInputFieldID(fieldNames.get(0)));
           }
-          else if (TransformationInfo.getNewFieldType(nodeType))
+          else if (TransformationRegistry.getNewFieldType(nodeType))
           {
-            inferredTypeNameOfNewFields = TransformationInfo.getNewFieldType(nodeType);
+            inferredTypeNameOfNewFields = TransformationRegistry.getNewFieldType(nodeType);
           }
           else
           {
@@ -290,16 +290,15 @@ export class TransformationEngine
   {
     let output: object = this.rename(doc);
     this.restoreArrays(output);
-
+    const visitor = new TransformationEngineNodeVisitor();
     for (const nodeKey of this.dag.sources())
     {
       const toTraverse: string[] = GraphLib.alg.preorder(this.dag, [nodeKey]);
       for (let i = 0; i < toTraverse.length; i++)
       {
         const preprocessedNode: TransformationNode = this.preprocessNode(this.dag.node(toTraverse[i]), output);
-        const visitor: TransformationEngineNodeVisitor = new TransformationEngineNodeVisitor();
-        const transformationResult: TransformationVisitResult =
-          visitor.applyTransformationNode(preprocessedNode, output);
+
+        const transformationResult = preprocessedNode.accept(visitor, output);
         if (transformationResult.errors !== undefined)
         {
           // winston.error('Transformation encountered errors!:');

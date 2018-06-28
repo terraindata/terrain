@@ -82,4 +82,11 @@ Router.post('/logout', async (ctx, next) =>
   ctx.body = await users.logout(Number(ctx.request.body['id']), ctx.request.body['accessToken']);
 });
 
+Router.get('/check', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  ctx.body = {
+    check: 'ok',
+  };
+});
+
 export default Router;

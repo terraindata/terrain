@@ -1,0 +1,120 @@
+@import "../../common/Common.less";
+
+@border-radius: 3px;
+
+.popupform-overlay {
+  height: 100%;
+  transition: width 0.3s ease-in-out;
+  position: relative;
+  z-index: 11;
+  .fade-in;
+}
+
+.popupform-dialog{
+  width: 456px;
+  height: 490px;
+  padding-bottom: 0px;
+
+  &.popupform-dialog-no-footer
+  {
+    padding-bottom: @half-spacing;
+  }
+
+  &.popupform-dialog-no-footer-padding
+  {
+    padding-bottom: 0px;
+  }
+
+  .popupform-title {
+    padding: @spacing;
+    padding-left:30px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    font-family: Gilroy;
+    font-size: 14px;
+    font-weight: 500;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: 0.4px;
+    color: #ffffff;
+    color: var(--white-two);
+
+    .popupform-title-inner {
+      flex-grow: 1;   
+    }
+
+    .popupform-close-x {
+      .close-large;
+      .close-dark;
+    }
+  }
+}
+
+.popupform-description {
+  align-content: left;
+  width: 365px;
+  padding:30px;
+  font-family: Gilroy;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+}
+
+.popupform-content {
+  padding: 30px;
+  outline: none;
+  overflow: auto;
+  WebkitOverflowScrolling: touch;
+  // border-radius: @border-radius;
+  width: 456px;
+  height: 524px;
+  max-height: 100%;
+
+
+  &.popupform-content-wide {
+    width: 800px;
+  }
+
+  &.popupform-content-fill {
+    height: calc(~"100% - 96px");
+    width:  calc(~"100% - 48px");
+
+    .ReactModal__Content ReactModal__Content--after-open{
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  &.popupform-content-allow-overflow {
+    overflow: visible;
+  }
+
+
+  .popupform-standard-input {
+    align-content: left;
+    margin-top:20px;
+    margin-left:30px;
+    width: 365px;
+    height: 158px;
+    background-color: #f8f8f8;
+    font-family: Gilroy;
+    font-size: 12px;
+    font-weight: 300;
+    color: #000000;
+    text-align: left;
+  }
+
+}
+
+.popupform-modal-buttons.modal-close-button,
+.popupform-modal-buttons.modal-confirm-button {
+  margin-top:30px;
+  border:none;
+}
+
+.popupform-modal-buttons.modal-close-button, {
+  margin-right:230px;
+  margin-left:20px;
+}

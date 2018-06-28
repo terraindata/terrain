@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { TransformationInfo } from 'shared/transformations/TransformationInfo';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import TransformationRegistry from 'shared/transformations/TransformationRegistry';
 import { KeyPath } from 'shared/util/KeyPath';
 import { TestDocs } from './TestDocs';
 
@@ -66,12 +66,12 @@ test('serialize to JSON', () =>
       nodes: [
         {
           v: '0',
-          value: new (TransformationInfo.getType(TransformationNodeType.CaseNode))
+          value: new (TransformationRegistry.getType(TransformationNodeType.CaseNode))
             (0, List<KeyPath>([KeyPath(['name'])]), { format: 'uppercase' }, TransformationNodeType.CaseNode),
         },
         {
           v: '1',
-          value: new (TransformationInfo.getType(TransformationNodeType.CaseNode))
+          value: new (TransformationRegistry.getType(TransformationNodeType.CaseNode))
             (1, List<KeyPath>([KeyPath(['meta', 'school'])]), { format: 'uppercase' }, TransformationNodeType.CaseNode),
         },
       ],

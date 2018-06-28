@@ -43,20 +43,157 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+const { List, Map } = Immutable;
 
-export default class CastTransformationNode extends TransformationNode
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath } from 'shared/util/KeyPath';
+
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
+
+import dateFormat = require('date-format');
+
+const TYPECODE = TransformationNodeType.CastNode;
+
+export class CastTransformationNode extends SimpleTransformationType
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.CastNode)
+  public readonly typeCode = TYPECODE;
+  public readonly skipNulls = false;
+
+  public shouldTransform(el: any)
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    if (typeof el === opts.toTypename || el == null || (el.constructor === Array && opts.toTypename === 'array'))
+    {
+      return false;
+    }
+    else
+    {
+      return true;
+    }
+  }
+
+  public transformer(el: any): any
+  {
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+
+    switch (opts.toTypename)
+    {
+      case 'string': {
+        if (typeof el === 'object')
+        {
+          return JSON.stringify(el);
+        }
+        else
+        {
+          return el.toString();
+        }
+      }
+      case 'number': {
+        return Number(el);
+      }
+      case 'boolean': {
+        if (typeof el === 'string')
+        {
+          return el.toLowerCase() === 'true';
+        }
+        else
+        {
+          return Boolean(el);
+        }
+      }
+      case 'object': {
+        if (typeof el === 'string')
+        {
+          try
+          {
+            const parsed = JSON.parse(el);
+            return parsed;
+          }
+          catch (e)
+          {
+            return {};
+          }
+        }
+        else
+        {
+          return {};
+        }
+      }
+      case 'array': {
+        if (typeof el === 'string')
+        {
+          try
+          {
+            const parsed = JSON.parse(el);
+            if (!Array.isArray(parsed))
+            {
+              return [];
+            }
+            return parsed;
+          }
+          catch (e)
+          {
+            return [];
+          }
+        }
+        else
+        {
+          return [el];
+        }
+      }
+      case 'date': {
+        try
+        {
+          if (opts.format === 'ISOstring')
+          {
+            return new Date(el).toISOString();
+          }
+          else if (opts.format === 'MMDDYYYY')
+          {
+            return dateFormat('MM/dd/yyyy', new Date(el));
+          }
+          else
+          {
+            return el;
+          }
+        }
+        catch (ex)
+        {
+          return null;
+        }
+      }
+      default: {
+        return null;
+      }
+    }
   }
 }
+
+class CastTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Cast';
+  public description = 'Convert this field to a different type';
+  public nodeClass = CastTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+
+  public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
+  {
+    return `Cast to ${meta.toTypename}`;
+  }
+}
+
+export const CastTransformationInfo = new CastTransformationInfoC();

@@ -233,7 +233,7 @@ export class App
     this.app.use(session(undefined, this.app));
 
     this.app.use(Middleware.bodyParser({ jsonLimit: '10gb', formLimit: '10gb' }));
-    this.app.use(Middleware.favicon(__dirname + '/../../../src/app/favicon.ico'));
+    this.app.use(Middleware.favicon(__dirname + './midway/src/assets/favicon.ico'));
     this.app.use(Middleware.logger(winston));
     this.app.use(Middleware.responseTime());
     this.app.use(Middleware.passport.initialize());
