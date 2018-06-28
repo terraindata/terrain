@@ -736,7 +736,10 @@ class HitsArea extends TerrainComponent<Props>
     {
       const { count, estimatedTotal } = resultsState;
       text = `${count || 'No'}${count === MAX_HITS ? '+' : ''} hit${count === 1 ? '' : 's'}`;
-      text += ` (Estimated Total: ${estimatedTotal})`;
+      if (estimatedTotal > count)
+      {
+        text += ` (Estimated Total: ${estimatedTotal})`;
+      }
     }
     else
     {

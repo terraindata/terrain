@@ -240,7 +240,7 @@ export function filteringRecordBuilderActions(actions: any[])
 
 const USERNAME_SELECTOR = '#login-email';
 const PASSWORD_SELECTOR = '#login-password';
-const BUTTON_SELECTOR = '#app > div > div.app-wrapper > div > div.login-container > div.login-submit-button-wrapper > div';
+const BUTTON_SELECTOR = '#login-submit';
 async function loadPage(page, url)
 {
   if (url)
@@ -251,12 +251,29 @@ async function loadPage(page, url)
   }
 }
 
-export async function login(page, url?)
+/**
+ * Try to login in to the page
+ * @param page
+ * @param {string} url
+ */
+export async function login(page, url: string)
 {
-  await loadPage(page, url);
-  await page.click(USERNAME_SELECTOR);
-  await page.keyboard.type('admin@terraindata.com');
-  await page.click(PASSWORD_SELECTOR);
-  await page.keyboard.type('CnAATPys6tEB*ypTvqRRP5@2fUzTuY!C^LZP#tBQcJiC*5');
-  await page.click(BUTTON_SELECTOR);
+  await page.goto(url);
+  sleep.sleep(1);
+  winston.info('Login ' + url);
+  try
+  {
+    await page.waitForSelector(USERNAME_SELECTOR, { timeout: 0 });
+    winston.info('Username selector is ready.');
+    await page.click(USERNAME_SELECTOR);
+    await page.keyboard.type('admin@terraindata.com');
+    await page.click(PASSWORD_SELECTOR);
+    await page.keyboard.type('CnAATPys6tEB*ypTvqRRP5@2fUzTuY!C^LZP#tBQcJiC*5');
+    await page.click(BUTTON_SELECTOR);
+    sleep.sleep(5);
+  } catch (e)
+  {
+    winston.warn('The page might be already loaded, keep going.');
+    sleep.sleep(4);
+  }
 }

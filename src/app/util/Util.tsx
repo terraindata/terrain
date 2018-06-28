@@ -906,6 +906,12 @@ const Util = {
     }
     return immutableMap;
   },
+
+  assertUnreachable(param: never): never
+  {
+    throw new Error('Unreachable code reached');
+  },
+
 };
 
 export default Util;

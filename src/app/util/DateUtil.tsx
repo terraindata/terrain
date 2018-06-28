@@ -112,6 +112,10 @@ const DateUtil =
 
     formatSpecificDate(date)
     {
+      if (date.toLowerCase() === 'now')
+      {
+        return 'now';
+      }
       let tense;
       let dateParser;
       let plural;
@@ -143,17 +147,17 @@ const DateUtil =
 
     isValidElasticDateParameter(date)
     {
-      const properNow = date.slice(0, 3);
+      const properNow = date.slice(0, 3).toLowerCase();
       const properSign = date[3];
       const properUnit = date.slice(-1);
       const properAmount = date.slice(4);
       const properNumber = date.slice(4, -1);
-      return ((properNow === 'Now' || properNow === 'now') &&
+      return ((date.toLowerCase() === 'now') || ((properNow === 'now') &&
         (properSign === '+' || properSign === '-') &&
         (!properAmount.includes('+') && !properAmount.includes('-'))
         && (!isNaN((Number(properNumber))))
         && (DateUnitArray.indexOf(properUnit) !== -1)
-      );
+      ));
     },
 
     formatDateValue(date)

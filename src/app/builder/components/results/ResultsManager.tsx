@@ -534,16 +534,20 @@ export class ResultsManager extends TerrainComponent<Props>
       this.handleM2RouteError(errorMsg, false);
       return;
     }
-    this.postprocessEQL(interpreter, hitsPage, appendResults);
     if (interpreter.hasError())
     {
       TerrainLog.debug('Query has errors after updating from and size: ' + interpreter.getErrors());
       return;
     }
-    const eql = interpreter.finalQuery;
+    let eql = interpreter.finalQuery;
     if (this.state.query && this.state.query.xhr)
     {
       this.state.query.xhr.cancel();
+    }
+    eql = this.postprocessEQL(interpreter, hitsPage, appendResults);
+    if (query.path)
+    {
+      querySize = query.path.source.count;
     }
     TerrainLog.debug('Issue query ' + eql);
     this.setState({
@@ -675,7 +679,8 @@ export class ResultsManager extends TerrainComponent<Props>
       this.props.query.path.nested.get(0).minMatches
     )
     {
-      const ratio = Math.min(1, hits.size / (SCROLL_SIZE * this.props.hitsPage));
+      const denominator = Math.min(changes['estimatedTotal'], (SCROLL_SIZE * this.props.hitsPage));
+      const ratio = Math.min(1, hits.size / denominator);
       changes['estimatedTotal'] = Math.round(changes['estimatedTotal'] * ratio);
     }
 

@@ -71,7 +71,7 @@ import { TemplateField, TransformationNode } from 'etl/templates/FieldTypes';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
-import { TransformationInfo } from 'shared/transformations/TransformationInfo';
+import TransformationRegistry from 'shared/transformations/TransformationRegistry';
 
 import 'etl/templates/components/transformations/TransformationEditor.less';
 
@@ -165,14 +165,14 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
   public renderTransformationListItem(value: TransformationNode, index: number)
   {
     const style = this.transformationListItemStyle(index === this.state.currentIndex && this.state.viewState === ViewState.EDIT);
-    const canEdit = TransformationInfo.canEdit(value.typeCode);
+    const canEdit = TransformationRegistry.canEdit(value.typeCode);
     return (
       <div className='transformation-row' key={index}>
         <div className='transformation-row-text' style={style.textStyle}>
           {index + 1}
         </div>
         <div className='transformation-row-text' style={style.textStyle}>
-          {TransformationInfo.getReadableSummary(value.typeCode, value)}
+          {TransformationRegistry.getReadableSummary(value.typeCode, value)}
         </div>
         <div className='tef-transformation-spacer'>
           {
