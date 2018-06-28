@@ -57,6 +57,7 @@ import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/Reorderabl
 import { _TemplateSettings, TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
 import { _TemplateUIData, TemplateUIData } from 'shared/etl/immutable/TemplateUIDataRecords';
 import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
+import { CURRENT_TEMPLATE_VERSION } from 'shared/etl/migrations/TemplateVersions';
 import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -82,7 +83,7 @@ class ETLTemplateC implements ETLTemplateI
   public sources = Map<string, SourceConfig>();
   public sinks = Map<string, SinkConfig>();
   public settings = _TemplateSettings();
-  public meta = {};
+  public meta = { version: CURRENT_TEMPLATE_VERSION };
   public uiData = _TemplateUIData();
 
   // Returns true if and only if there is 1 sink and it is a database

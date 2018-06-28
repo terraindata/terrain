@@ -9,6 +9,20 @@
   transition: width 0.3s ease-in-out;
   position: relative;
   z-index: 10;
+  overflow-y: auto;
+  
+  display: flex;
+  flex-direction: column;
+  
+  .sidebar-top-section {
+    flex-grow: 1;
+  }
+  
+  .sidebar-bottom-section {
+    margin: 6px;
+    display: flex;
+    flex-wrap: wrap;
+  }
   
   .sidebar-links {
     overflow: hidden;
@@ -120,45 +134,32 @@
   }
 
   .sidebar-button {
-  position: fixed;
-  margin-top: 20%;
-  border-radius: @spacing;
-  height: @double-spacing;
-  font-size: 12px;
-  &.sidebar-bug-button {
-    margin-left:120px;
-    margin-right:5px;
+    border-radius: @spacing;
+    font-size: 12px;
+    margin: 6px;
+    flex-grow: 1;
   }
-  &.sidebar-feedback-button {
-    margin-left:5px;
-  }
-}
-}
-.checkbox-wrapper {
-    display: flex;
-    align-items: center;
-    margin-top:30px;
-    margin-left:30px;
 }
 
-.bug-report, .feedback-report {
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  margin-top:30px;
+  margin-left:30px;
+}
+
+.bug-report, 
+.feedback-report {
   position: fixed;
-  bottom:100px;
-  left:30px;
+  bottom:0px;
+  left:200px;
 }
 
 .sidebar-button-collapsed {
   height: 20px;
   width:20px;
-  position:fixed;
   cursor: pointer;
-  margin-left: 10px;
-  &.sidebar-bug-button-collapsed { 
-    margin-top: 20%;
-  }
-  &.sidebar-feedback-button-collapsed {
-    margin-top: 22%;
-  }
+  margin: 6px;
 }
 
 

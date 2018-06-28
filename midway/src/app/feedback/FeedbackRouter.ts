@@ -80,12 +80,12 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     if (fullBody.bug)
     {
       subject = 'Bug report from ' + user;
-      body = 'A user has submitted a bug report detailed below. \n \n'  + description + '\n \n Browser/OS information: ' + browserInfo;
+      body = 'A user has submitted a bug report detailed below. \n \n' + description + '\n \n Browser/OS information: ' + browserInfo;
     }
     else
     {
       subject = 'Feedback report from ' + user;
-      body = 'A user has submitted a feedback report detailed below. \n \n'  + description + '\n \n Browser/OS information: ' + browserInfo;
+      body = 'A user has submitted a feedback report detailed below. \n \n' + description + '\n \n Browser/OS information: ' + browserInfo;
     }
     if (fullBody.screenshot)
     {
