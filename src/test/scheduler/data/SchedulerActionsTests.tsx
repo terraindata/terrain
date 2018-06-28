@@ -124,7 +124,7 @@ jest.mock('scheduler/SchedulerApi', () =>
         {
           return new Promise(
             (resolve, reject) => resolve({
-              data: [{ id: 2, name: 'Schedule 2 running' }],
+              data: [{ id: 2, name: 'Schedule 2 running', running: true }],
             }),
           );
         },

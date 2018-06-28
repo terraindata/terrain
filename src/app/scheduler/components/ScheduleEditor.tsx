@@ -251,7 +251,7 @@ class ScheduleEditor extends TerrainComponent<Props>
     this.setState({
       taskMap: this.state.taskMap
         .set(lastTask.id, lastTask
-        .set('onSuccess', newId)).set(newId, newTask),
+          .set('onSuccess', newId)).set(newId, newTask),
     });
   }
 
