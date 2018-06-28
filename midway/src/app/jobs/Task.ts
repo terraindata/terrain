@@ -51,7 +51,7 @@ import { TaskEnum } from 'shared/types/jobs/TaskEnum';
 import { TaskInputConfig } from 'shared/types/jobs/TaskInputConfig';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 
-import LogStream from '../io/streams/LogStream';
+import LogStreamWritable from '../io/streams/LogStreamWritable';
 
 export abstract class Task
 {
@@ -96,7 +96,7 @@ export abstract class Task
     this.taskConfig.params['options']['inputStreams'] = Array.isArray(inputStream) ? inputStream : [inputStream];
   }
 
-  public setRootLogStream(rootLogStream: LogStream): void
+  public setRootLogStream(rootLogStream: LogStreamWritable): void
   {
     this.taskConfig.rootLogStream = rootLogStream;
   }

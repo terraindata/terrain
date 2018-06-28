@@ -204,7 +204,7 @@ class CRONEditor extends TerrainComponent<Props>
     const sched = this.canRenderCRONSchedule() ? parseCRONDaySchedule(cron, true) : null;
 
     return [
-      this.renderHeader('Day'),
+      this.renderHeader('Which Day?'),
       this.renderOption('Every day', 'daily', sched, 'days'),
       this.renderOption('Every weekday', 'workweek', sched, 'days'),
 
@@ -238,7 +238,7 @@ class CRONEditor extends TerrainComponent<Props>
     const sched = this.canRenderCRONSchedule() ? parseCRONHourSchedule(cron, true) : null;
 
     return [
-      this.renderHeader('Time'),
+      this.renderHeader('What Time?'),
       this.renderOption('Every minute', 'minute', sched, 'hours'),
       this.renderOption('Every hour', 'hourly', sched, 'hours',
         <div key='h' style={getStyle('margin', '0px -3px')}>

@@ -44,54 +44,87 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as stream from 'stream';
+import { EventEmitter } from 'events';
+import { Readable, Transform, Writable } from 'stream';
 import * as winston from 'winston';
 
-import { TaskConfig } from 'shared/types/jobs/TaskConfig';
-import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
-import { Task } from '../Task';
-
-const taskOutputConfig: TaskOutputConfig =
-  {
-    blocking: true,
-    exit: true,
-    options:
-      {
-        logStream: null,
-        outputStream: null,
-      },
-    status: true,
-  };
-
-export class TaskDefaultExit extends Task
+import { SafeWritable } from './SafeWritable';
+/**
+ * A log stream
+ */
+export default class LogStreamWritable extends SafeWritable
 {
-  constructor(taskConfig: TaskConfig)
-  {
-    super(taskConfig);
-  }
+  private buffers: string[];
+  private abortThreshold: number;
+  private errorCount: number;
+  private count: number;
 
-  public async run(): Promise<TaskOutputConfig>
+  constructor(abortThreshold: number = 1000, initialCount = 1)
   {
-    return new Promise<TaskOutputConfig>(async (resolve, reject) =>
+    super({ objectMode: true });
+
+    this.count = initialCount;
+
+    this.on('pipe', (src) =>
     {
-      // TODO: call other functions (needs to wrap in Promise for later)
-      taskOutputConfig['options']['outputStream'] = this.taskConfig['params']['options']['inputStreams'][0];
-      taskOutputConfig['options']['logStream'] = this.taskConfig['params']['options']['logStream'];
-      console.log('wat');
-      this.taskConfig.rootLogStream.decrement();
-      console.log('ok');
-      // console.log('HERE! ', taskOutputConfig['options']['logStream']);
-      // taskOutputConfig['options']['logStream'].on('done', () =>
-      //   {
-      //     console.log('DECREMENT!!!');
-      //   });
-      resolve(taskOutputConfig);
+      this.increment();
     });
   }
 
-  public async printNode(): Promise<TaskOutputConfig>
+  public push(chunk: any, encoding?: string): boolean
   {
-    winston.info('Printing Default Exit, params: ' + JSON.stringify(taskOutputConfig as object));
-    return Promise.resolve(taskOutputConfig);
+    if (chunk === null)
+    {
+      return super.push(null);
+    }
+
+    const logMsg = {
+      timestamp: new Date(),
+      level: 'info',
+      message: '',
+    };
+
+    try
+    {
+      const c = JSON.parse(chunk);
+      if (c.timestamp !== undefined)
+      {
+        logMsg.timestamp = c.timestamp;
+      }
+
+      if (c.level !== undefined)
+      {
+        logMsg.level = c.level;
+      }
+
+      if (c.message !== undefined)
+      {
+        logMsg.message = c.message;
+      }
+    }
+    catch (e)
+    {
+      logMsg.message = chunk;
+    }
+
+    return super.push(JSON.stringify(logMsg), encoding);
+  }
+
+  public decrement()
+  {
+    console.log('Decrement BEFORE ', this.count);
+    this.count--;
+    console.log('Decrement AFTER ', this.count);
+    if (this.count === 0)
+    {
+      this.push(null);
+    }
+  }
+
+  public increment()
+  {
+    console.log('INCREMENT BEFORE ', this.count);
+    this.count++;
+    console.log('INCREMENT AFTER ', this.count);
   }
 }

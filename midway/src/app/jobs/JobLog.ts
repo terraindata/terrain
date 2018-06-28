@@ -68,7 +68,7 @@ export class JobLog
    * PARAMS: jobId, logStream (number, stream.Readable ==> number)
    *
    */
-  public async create(jobId: number, logStream: stream.Readable, jobStatus?: boolean, runNow?: boolean): Promise<JobLogConfig[]>
+  public async create(jobId: number, logStream: stream.Writable, jobStatus?: boolean, runNow?: boolean): Promise<JobLogConfig[]>
   {
     return new Promise<JobLogConfig[]>(async (resolve, reject) =>
     {
