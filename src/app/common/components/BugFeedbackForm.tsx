@@ -112,7 +112,6 @@ class BugFeedbackForm extends TerrainComponent<Props>
       (response) => restoreAppOpacity(),
       {
         onError: (err) => restoreAppOpacity(),
-
       });
   }
 
