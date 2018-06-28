@@ -51,15 +51,8 @@ import * as winston from 'winston';
 import * as App from '../App';
 import * as Tasty from '../../tasty/Tasty';
 
-import { MigrationRecordConfig as MigrationRecord } from './MigrationRecordConfig'
-
-
-interface Migration
-{
-  fromVersion: string;
-  toVersion: string;
-  migrate: (from: string, to: string) => boolean;
-}
+import { MigrationRecordConfig as MigrationRecord } from './MigrationRecordConfig';
+import { CURRENT_VERSION, Version } from './MigrationTypes';
 
 export class Migrations
 {

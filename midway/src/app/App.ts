@@ -77,6 +77,7 @@ import MidwayRouter from './Router';
 import { Scheduler } from './scheduler/Scheduler';
 import * as Schema from './Schema';
 import { users } from './users/UserRouter';
+import { Migrations } from './migrations/Migrations';
 
 // import bluebird = require('bluebird');
 
@@ -135,6 +136,7 @@ export class App
   private JobL: JobLog;
   private JobQ: JobQueue;
   private SKDR: Scheduler;
+  private Migrations: Migrations; // for now, do not allow external access
   private app: Koa;
   private config: Config.Config;
   private heapAvail: number;
@@ -154,6 +156,9 @@ export class App
 
     this.DB = App.initializeDB(config.db as string, config.dsn as string);
     DB = this.DB;
+
+    this.Migrations = new Migrations();
+    this.Migrations.initialize();
 
     this.EMAIL = new Email();
     EMAIL = this.EMAIL;
@@ -292,6 +297,10 @@ export class App
     // process configuration options
     await Config.handleConfig(this.config);
     winston.debug('Finished processing configuration options...');
+
+    // perform migrations
+    await Migrations.runMigrations();
+    winston.debug('Finished performing migrations');
 
     // initialize system encryption keys
     registerMidwayEncryption();

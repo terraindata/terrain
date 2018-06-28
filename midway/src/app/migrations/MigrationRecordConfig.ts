@@ -51,13 +51,15 @@ import { DefaultSinkConfig, DefaultSourceConfig } from 'shared/etl/types/Endpoin
 import { ETLProcess, TemplateBase, TemplateMeta, TemplateObject, TemplateSettings } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
+import { CURRENT_VERSION, Version } from './MigrationTypes';
+
 export class MigrationRecordConfig extends ConfigType
 {
   public id?: number = undefined;
   public createdAt: Date = null;
   public lastModified: Date = null;
-  public fromVersion: string = '';
-  public toVersion: string = '';
+  public fromVersion: Version = null;
+  public toVersion: Version = null;
   public isCurrent: boolean = false;
 
   constructor(props: object)

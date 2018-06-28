@@ -44,10 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-export const CURRENT_VERSION = '5';
+export type Version = 'v4' | 'v5';
 
-export const VERSIONS = [
-  '4',
-  '5',
-];
+export const CURRENT_VERSION: Version = 'v5';
 
+export interface Migration
+{
+  fromPattern?: string;
+  fromVersion?: Version;
+  toVersion: Version;
+  migrate: (from: Version, to: Version) => Promise<boolean>;
+}
