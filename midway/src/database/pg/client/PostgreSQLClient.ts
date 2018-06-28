@@ -98,7 +98,7 @@ class PostgreSQLClient
             }
 
             this.delegate = this.createPool(config);
-            newClient.end();
+            newClient.end((err) => {});
           });
         });
       }
@@ -106,7 +106,7 @@ class PostgreSQLClient
       {
         this.delegate = this.createPool(config);
       }
-      client.end();
+      client.end((err) => {});
     });
   }
 
