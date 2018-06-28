@@ -64,7 +64,7 @@ export interface Props
 {
   text: string;
   onClick: () => void;
-
+  className?: string;
   icon?: 'next' | 'back' | 'check' | El;
   iconComesAfter?: boolean;
   size?: 'small' | 'normal' | 'large';
@@ -129,6 +129,7 @@ class Button extends TerrainComponent<Props>
           'button-large': size === 'large',
           'button-with-icon-before': icon && !iconComesAfter,
           'button-with-icon-after': icon && iconComesAfter,
+
         })}
         style={style}
         onClick={onClick}

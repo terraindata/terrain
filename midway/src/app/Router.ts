@@ -53,6 +53,7 @@ import * as AuthRouter from './auth/AuthRouter';
 import * as DatabaseRouter from './database/DatabaseRouter';
 import * as ETLRouter from './etl/ETLRouter';
 import * as EventRouter from './events/EventRouter';
+import * as FeedbackRouter from './feedback/FeedbackRouter';
 import * as IntegrationRouter from './integrations/IntegrationRouter';
 import * as ItemRouter from './items/ItemRouter';
 import * as JobRouter from './jobs/JobRouter';
@@ -64,6 +65,7 @@ import * as SchemaMetadataRouter from './schemaMetadata/SchemaMetadataRouter';
 import * as StatusRouter from './status/StatusRouter';
 import * as UserRouter from './users/UserRouter';
 import * as VersionRouter from './versions/VersionRouter';
+// /feedback
 
 export function getRouter()
 {
@@ -84,6 +86,7 @@ export function getRouter()
   ETLRouter.initialize();
   SchemaMetadataRouter.initialize();
   ResultsConfigRouter.initialize();
+  FeedbackRouter.initialize();
   AppRouter.use('/auth', AuthRouter.default.routes(), AuthRouter.default.allowedMethods());
   AppRouter.use('/events', EventRouter.default.routes(), EventRouter.default.allowedMethods());
   AppRouter.use('/users', UserRouter.default.routes(), UserRouter.default.allowedMethods());
@@ -99,6 +102,7 @@ export function getRouter()
   AppRouter.use('/etl', ETLRouter.default.routes(), ETLRouter.default.allowedMethods());
   AppRouter.use('/schemametadata', SchemaMetadataRouter.default.routes(), SchemaMetadataRouter.default.allowedMethods());
   AppRouter.use('/resultsconfig', ResultsConfigRouter.default.routes(), ResultsConfigRouter.default.allowedMethods());
+  AppRouter.use('/feedback', FeedbackRouter.default.routes(), FeedbackRouter.default.allowedMethods());
   // Add future routes here.
 
   AppRouter.get('/time', (ctx, next) =>
