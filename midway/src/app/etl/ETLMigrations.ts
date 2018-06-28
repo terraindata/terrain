@@ -48,19 +48,35 @@ import * as assert from 'assert';
 import * as _ from 'lodash';
 import * as winston from 'winston';
 
-import * as App from '../App';
 import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
 
-import { MigrationRecordConfig as MigrationRecord } from '../migrations/MigrationRecordConfig';
 import { CURRENT_VERSION, FIRST_VERSION, Migrator, Version } from '../AppVersion';
-import { templates as templatesDb} from './TemplateRouter';
+import { MigrationRecordConfig as MigrationRecord } from '../migrations/MigrationRecordConfig';
+import { templates as templatesDb } from './TemplateRouter';
 
-export const keypathMigration: Migrator = {
+import { TemplateVersion, updateTemplateIfNeeded } from 'shared/etl/migrations/TemplateVersions';
+
+export const defaultETLMigration: Migrator = {
   fromVersion: 'v4',
   toVersion: 'v5',
-  migrate: async (from, to) => {
-    const templates = await templatesDb.get();
-    return true;
+  migrate: (from, to) =>
+  {
+    return new Promise<boolean>(async (resolve, reject) =>
+    {
+      let anyUpdated = false;
+      const templates = await templatesDb.get();
+      for (const t of templates)
+      {
+        const { template, updated, message } = updateTemplateIfNeeded(t);
+        await templatesDb.update(template);
+        if (updated)
+        {
+          anyUpdated = true;
+          winston.debug(`Updated Template ${template.id}: ${message}`);
+        }
+      }
+      resolve(anyUpdated);
+    });
   },
 };
-

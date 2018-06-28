@@ -59,13 +59,13 @@ import { IntegrationConfig } from './integrations/IntegrationConfig';
 import { ItemConfig } from './items/ItemConfig';
 import { JobConfig } from './jobs/JobConfig';
 import { JobLogConfig } from './jobs/JobLogConfig';
+import { MigrationRecordConfig } from './migrations/MigrationRecordConfig';
 import { ResultsConfigConfig } from './resultsConfig/ResultsConfigConfig';
 import { SchedulerConfig } from './scheduler/SchedulerConfig';
 import { SchemaMetadataConfig } from './schemaMetadata/SchemaMetadataConfig';
 import { StatusHistoryConfig } from './statusHistory/StatusHistoryConfig';
 import { UserConfig } from './users/UserConfig';
 import { VersionConfig } from './versions/VersionConfig';
-import { MigrationRecordConfig } from './migrations/MigrationRecordConfig';
 
 export class Tables
 {

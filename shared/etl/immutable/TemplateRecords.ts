@@ -57,10 +57,10 @@ import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/Reorderabl
 import { _TemplateSettings, TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
 import { _TemplateUIData, TemplateUIData } from 'shared/etl/immutable/TemplateUIDataRecords';
 import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
+import { CURRENT_TEMPLATE_VERSION } from 'shared/etl/migrations/TemplateVersions';
 import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { CURRENT_TEMPLATE_VERSION } from 'shared/etl/migrations/TemplateVersions';
 
 export type SourcesMap = Immutable.Map<string, SourceConfig>;
 export type SinksMap = Immutable.Map<string, SinkConfig>;

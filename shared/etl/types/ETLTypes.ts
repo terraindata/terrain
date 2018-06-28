@@ -46,9 +46,9 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file
 import * as _ from 'lodash';
 
+import { TemplateVersion } from 'shared/etl/migrations/TemplateVersions';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { SinkConfig, SourceConfig } from './EndpointTypes';
-import { TemplateVersion } from 'shared/etl/migrations/TemplateVersions';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
@@ -80,7 +80,7 @@ export interface TemplateBase
   sinks: any;
   process: any;
   settings: any;
-  meta: { version: TemplateVersion };
+  meta: TemplateMeta;
   uiData: any;
 }
 
@@ -92,7 +92,7 @@ export interface TemplateSettings
 // currently unused
 export interface TemplateMeta
 {
-  placeholder?: any;
+  version: TemplateVersion;
 }
 
 export type TemplateObject = {

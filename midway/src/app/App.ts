@@ -72,12 +72,12 @@ import { integrations } from './integrations/IntegrationRouter';
 import { JobLog } from './jobs/JobLog';
 import { JobQueue } from './jobs/JobQueue';
 import Middleware from './Middleware';
+import { Migrations } from './migrations/Migrations';
 import NotFoundRouter from './NotFoundRouter';
 import MidwayRouter from './Router';
 import { Scheduler } from './scheduler/Scheduler';
 import * as Schema from './Schema';
 import { users } from './users/UserRouter';
-import { Migrations } from './migrations/Migrations';
 
 // import bluebird = require('bluebird');
 
@@ -299,8 +299,8 @@ export class App
     winston.debug('Finished processing configuration options...');
 
     // perform migrations
-    await Migrations.runMigrations();
-    winston.debug('Finished performing migrations');
+    await this.Migrations.runMigrations();
+    winston.info('Finished migration checks and updates. State is up to Date.');
 
     // initialize system encryption keys
     registerMidwayEncryption();

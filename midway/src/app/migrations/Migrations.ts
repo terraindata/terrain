@@ -48,15 +48,16 @@ import * as assert from 'assert';
 import * as _ from 'lodash';
 import * as winston from 'winston';
 
-import * as App from '../App';
 import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
 
+import { CURRENT_VERSION, FIRST_VERSION, Migrator, Version } from '../AppVersion';
 import { MigrationRecordConfig as MigrationRecord } from './MigrationRecordConfig';
-import { CURRENT_VERSION, FIRST_VERSION, Version } from '../AppVersion';
 
-const registeredMigrations = [
-  
+import { defaultETLMigration } from '../etl/ETLMigrations';
 
+const registeredMigrations: Migrator[] = [
+  defaultETLMigration,
 ];
 
 export class Migrations
@@ -75,14 +76,35 @@ export class Migrations
 
   public async runMigrations(): Promise<void>
   {
-    return new Promise<void>(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) =>
+    {
       const currentRecord = await this.getCurrent();
+
       let fromVersion = FIRST_VERSION;
       if (currentRecord !== undefined)
       {
         fromVersion = currentRecord.toVersion;
       }
+      winston.info(`Checking migrations from version ${fromVersion} to version ${CURRENT_VERSION}`);
+      let anyUpdated = false;
+      for (const migrator of registeredMigrations)
+      {
+        if (migrator.toVersion === CURRENT_VERSION && migrator.fromVersion === fromVersion)
+        {
+          anyUpdated = await migrator.migrate(fromVersion, CURRENT_VERSION) || anyUpdated;
+        }
+      }
+      if (!anyUpdated)
+      {
+        winston.info('No Migrations Occurred');
+      }
 
+      if (fromVersion !== CURRENT_VERSION)
+      {
+        winston.info('Updating Application Version Record');
+        await this.createCurrent(fromVersion, CURRENT_VERSION);
+      }
+      resolve();
     });
   }
 
@@ -107,7 +129,7 @@ export class Migrations
   /*
    *  Create a new migration record and set it to be the (only) current one.
    */
-  private async createCurrent(record: MigrationRecord): Promise<MigrationRecord[]>
+  private async createCurrent(fromVersion: Version, toVersion: Version): Promise<MigrationRecord[]>
   {
     return new Promise<MigrationRecord[]>(async (resolve, reject) =>
     {
@@ -119,7 +141,14 @@ export class Migrations
           await this.update(_.extend({}, currentMigration, { isCurrent: false }));
         }
       }
-      const newCurrentRecord = _.extend({}, record, { isCurrent: true });
+      const currDateTime: Date = new Date(Date.now());
+      const newCurrentRecord: MigrationRecord = {
+        createdAt: currDateTime,
+        lastModified: currDateTime,
+        fromVersion,
+        toVersion,
+        isCurrent: true,
+      };
       resolve(await this.upsert(newCurrentRecord));
     });
   }

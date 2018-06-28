@@ -45,18 +45,17 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 import * as GraphLib from 'graphlib';
-import memoizeOne from 'memoize-one';
+import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
-import { KeyPath } from '../util/KeyPath';
-import { _ETLTemplate, ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
 import { _SinkConfig, _SourceConfig, ItemWithName, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'shared/etl/immutable/ETLProcessRecords';
 import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
+import { _ETLTemplate, ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
 import { _TemplateSettings, TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
 import { _TemplateUIData, TemplateUIData } from 'shared/etl/immutable/TemplateUIDataRecords';
 import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
@@ -64,10 +63,11 @@ import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, SourceOpt
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNode from 'shared/transformations/TransformationNode';
+import { KeyPath } from 'shared/util/KeyPath';
 
-export const CURRENT_TEMPLATE_VERSION: TemplateVersion = 'v5';
-export const FIRST_TEMPLATE_VERSION: TemplateVersion = 'v4';
-export type TemplateVersion = 'v4' | 'v5';
+export const CURRENT_TEMPLATE_VERSION: TemplateVersion = 'tv5';
+export const FIRST_TEMPLATE_VERSION: TemplateVersion = 'tv4';
+export type TemplateVersion = 'tv4' | 'tv5';
 
 export function getTemplateVersion(templateObj: object): TemplateVersion
 {
@@ -85,9 +85,11 @@ export function getTemplateVersion(templateObj: object): TemplateVersion
 function upgrade4To5(templateObj: object): { changes: number, template: TemplateBase }
 {
   let changes = 0;
-  const convertKeyPath = (kp: KeyPath) => {
+  const convertKeyPath = (kp: KeyPath) =>
+  {
     let changed = false;
-    const newKp = kp.map((value) => {
+    const newKp = kp.map((value) =>
+    {
       if (value === '*')
       {
         changed = true;
@@ -102,7 +104,7 @@ function upgrade4To5(templateObj: object): { changes: number, template: Template
       {
         return value;
       }
-    });
+    }).toList();
     if (changed)
     {
       changes++;
@@ -113,7 +115,8 @@ function upgrade4To5(templateObj: object): { changes: number, template: Template
 
   let template = _ETLTemplate(templateObj, true);
   let edges = template.process.edges;
-  edges = edges.map((edge) => {
+  edges = edges.map((edge) =>
+  {
     const engine = edge.transformations as any as {
       dag: GraphLib.Graph;
       uidField: number;
@@ -129,7 +132,8 @@ function upgrade4To5(templateObj: object): { changes: number, template: Template
     const nodes = dag.nodes();
     if (nodes === undefined && nodes.length > 0)
     {
-      nodes.forEach((id) => {
+      nodes.forEach((id) =>
+      {
         const node: TransformationNode = dag.node(id);
         node.fields = convertAll(node.fields);
         if (node.meta['newFieldKeyPaths'] !== undefined)
@@ -149,7 +153,7 @@ function upgrade4To5(templateObj: object): { changes: number, template: Template
   };
 }
 
-export function updateTemplateIfNeeded(templateObj: object): { template: object, updated: boolean, message: string }
+export function updateTemplateIfNeeded(templateObj: TemplateBase): { template: TemplateBase, updated: boolean, message: string }
 {
   const version = getTemplateVersion(templateObj);
   let template = templateObj;
@@ -157,15 +161,22 @@ export function updateTemplateIfNeeded(templateObj: object): { template: object,
   let updated = false;
   let changes = 0;
 
-  if (version === 'v4')
+  if (version === 'tv4')
   {
     const upgrade = upgrade4To5(template);
     template = upgrade.template;
     changes += upgrade.changes;
+    updated = true;
+  }
+
+  if (getTemplateVersion(template) !== CURRENT_TEMPLATE_VERSION)
+  {
+    changes++;
+    updated = true;
+    template.meta['version'] = CURRENT_TEMPLATE_VERSION;
   }
 
   message = `${changes} changes made to template`;
-  updated = updated || changes > 0;
 
   return {
     template,
