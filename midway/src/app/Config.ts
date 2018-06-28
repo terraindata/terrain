@@ -62,6 +62,7 @@ export interface Config
   debug?: boolean;
   help?: boolean;
   verbose?: boolean;
+  instanceId?: string;
   databases?: object[];
   analyticsdb?: string;
 }

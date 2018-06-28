@@ -99,6 +99,14 @@ export class App
 {
   private static initializeDB(type: string, dsn: string): Tasty.Tasty
   {
+    const ctrlConfig = new DatabaseControllerConfig(type, dsn).getConfig();
+    if (ctrlConfig.database !== undefined)
+    {
+      winston.info(`Overriding specified database name ${ctrlConfig.database} with instance ID ${CFG.instanceId}`);
+      dsn = dsn.slice(0, dsn.lastIndexOf('/'));
+    }
+
+    dsn += '/' + CFG.instanceId;
     const dbConfig: DatabaseConfig = {
       id: 0,
       name: '[system]',
@@ -149,6 +157,11 @@ export class App
     winston.debug('Using configuration: ' + JSON.stringify(config));
     this.config = config;
     CFG = this.config;
+
+    if (config.instanceId === undefined)
+    {
+      throw new Error('Required setting instanceId not found in the configuration.');
+    }
 
     TBLS = Schema.setupTables(config.db as string);
 

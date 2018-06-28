@@ -89,7 +89,7 @@ class PostgreSQLClient
             throw connectErr2;
           }
 
-          newClient.query('create database ' + newDatabase, (queryErr, res) =>
+          newClient.query('create database ' + newDatabase, (queryErr) =>
           {
             config.database = newDatabase;
             if (queryErr != null)
