@@ -129,7 +129,6 @@ class Button extends TerrainComponent<Props>
           'button-large': size === 'large',
           'button-with-icon-before': icon && !iconComesAfter,
           'button-with-icon-after': icon && iconComesAfter,
-
         })}
         style={style}
         onClick={onClick}
