@@ -197,7 +197,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
     }
     else
     {
-      return transformation.meta as NodeOptionsType<Type>;
+      return transformation.meta as any;
     }
   }
 

@@ -825,7 +825,7 @@ describe('Query route tests', () =>
         });
     });
 
-  test('Elastic groupJoin Query Result: POST /midway/v1/query', async () =>
+  test('Elastic groupJoin: POST /midway/v1/query', async () =>
   {
     await request(server)
       .post('/midway/v1/query/')
@@ -893,6 +893,132 @@ describe('Query route tests', () =>
         expect(respData['errors'].length).toEqual(0);
         expect(respData['result'].hits.hits.length).toEqual(5);
         expect(respData['result'].hits.hits[0]._id === respData['result'].hits.hits[0].englishMovies[0]._id);
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/query/ request returned an error: ' + String(error));
+      });
+  });
+
+  test('Elastic groupJoin (empty parent result): POST /midway/v1/query', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/query/')
+      .send({
+        id: 1,
+        accessToken: defaultUserAccessToken,
+        body: {
+          database: 1,
+          type: 'search',
+          body: `{
+            "query": {
+              "bool": {
+                "filter": [
+                  {
+                    "term": {
+                      "_index": "movies"
+                    }
+                  },
+                  {
+                    "bool": {
+                      "filter": [
+                        {
+                          "term": {
+                            "budget": {
+                              "value": -1,
+                              "boost": 1
+                            }
+                          }
+                        }
+                      ],
+                      "should": [
+                      ]
+                    }
+                  }
+                ],
+                "should": [
+                  {
+                    "bool": {
+                      "filter": [
+                        {
+                          "exists": {
+                            "field": "_id"
+                          }
+                        }
+                      ],
+                      "should": [
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "from": 0,
+            "size": 100,
+            "track_scores": true,
+            "_source": true,
+            "script_fields": {
+            },
+            "groupJoin": {
+              "movies": {
+                "query": {
+                  "bool": {
+                    "filter": [
+                      {
+                        "term": {
+                          "_index": "movies"
+                        }
+                      },
+                      {
+                        "bool": {
+                          "filter": [
+                          ],
+                          "should": [
+                          ]
+                        }
+                      }
+                    ],
+                    "should": [
+                      {
+                        "bool": {
+                          "filter": [
+                            {
+                              "exists": {
+                                "field": "_id"
+                              }
+                            }
+                          ],
+                          "should": [
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                "from": 0,
+                "size": 3,
+                "track_scores": true,
+                "_source": true,
+                "script_fields": {
+                }
+              },
+              "parentAlias": "user"
+            }
+          }`,
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        winston.info(response.text);
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('GET /schema request returned empty response body');
+        }
+        const respData = JSON.parse(response.text);
+        expect(respData['errors'].length).toEqual(0);
+        expect(respData['result'].hits.hits.length).toEqual(0);
       })
       .catch((error) =>
       {

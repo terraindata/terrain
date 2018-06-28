@@ -83,7 +83,6 @@ require('velocity-animate/velocity.ui');
 
 // Components
 import { generateThemeStyles } from 'common/components/tooltip/Tooltips';
-import Login from './auth/components/Login';
 import LayoutManager from './builder/components/layout/LayoutManager';
 import InfoArea from './common/components/InfoArea';
 import Sidebar from './common/components/Sidebar';
@@ -116,11 +115,11 @@ import LibraryActions from './library/data/LibraryActions';
 // import RolesStore from './roles/data/RolesStore';
 import TerrainStore from './store/TerrainStore';
 import { UserActions } from './users/data/UserRedux';
-const GilroySrc = require('app/common/fonts/Gilroy-Regular.woff');
-const GilroyLightSrc = require('app/common/fonts/Gilroy-Light.woff');
-const GilroyLightItalicSrc = require('app/common/fonts/Gilroy-LightItalic.woff');
-const GilroyBoldSrc = require('app/common/fonts/Gilroy-Bold.woff');
-const GilroySemiBoldSrc = require('app/common/fonts/Gilroy-SemiBold.woff');
+// const GilroySrc = require('app/common/fonts/Gilroy-Regular.woff');
+// const GilroyLightSrc = require('app/common/fonts/Gilroy-Light.woff');
+// const GilroyLightItalicSrc = require('app/common/fonts/Gilroy-LightItalic.woff');
+// const GilroyBoldSrc = require('app/common/fonts/Gilroy-Bold.woff');
+// const GilroySemiBoldSrc = require('app/common/fonts/Gilroy-SemiBold.woff');
 
 // Icons
 const HomeIcon = require('./../images/icon_profile_16x16.svg?name=HomeIcon');
@@ -142,42 +141,42 @@ const analyticsLibrary = (props) => (<Library
   {...props}
 />);
 
-injectGlobal`
-  @font-face {
-    font-family: 'Gilroy';
-    src: url(${GilroySrc}) format('woff');
-    font-weight: normal;
-    font-style: normal;
-  }
+// injectGlobal`
+//   @font-face {
+//     font-family: 'Gilroy';
+//     src: url(${GilroySrc}) format('woff');
+//     font-weight: normal;
+//     font-style: normal;
+//   }
 
-@font-face {
-    font-family: 'Gilroy-Light-Italic';
-    src: url(${GilroyLightItalicSrc}) format('woff');
-    font-weight: 300;
-    font-style: italic;
-}
+// @font-face {
+//     font-family: 'Gilroy-Light-Italic';
+//     src: url(${GilroyLightItalicSrc}) format('woff');
+//     font-weight: 300;
+//     font-style: italic;
+// }
 
-@font-face {
-    font-family: 'Gilroy-Light';
-    src: url(${GilroyLightSrc}) format('woff');
-    font-weight: 300;
-    font-style: normal;
-}
+// @font-face {
+//     font-family: 'Gilroy-Light';
+//     src: url(${GilroyLightSrc}) format('woff');
+//     font-weight: 300;
+//     font-style: normal;
+// }
 
-@font-face {
-    font-family: 'Gilroy-Bold';
-    src: url(${GilroyBoldSrc}) format('woff');
-    font-weight: bold;
-    font-style: normal;
-}
+// @font-face {
+//     font-family: 'Gilroy-Bold';
+//     src: url(${GilroyBoldSrc}) format('woff');
+//     font-weight: bold;
+//     font-style: normal;
+// }
 
-  @font-face {
-      font-family: 'Gilroy-Semi-Bold';
-      src: url(${GilroySemiBoldSrc}) format('woff');
-      font-weight: 600;
-      font-style: normal;
-  }
-`;
+//   @font-face {
+//       font-family: 'Gilroy-Semi-Bold';
+//       src: url(${GilroySemiBoldSrc}) format('woff');
+//       font-weight: 600;
+//       font-style: normal;
+//   }
+// `;
 
 const RESOLUTION_BREAKPOINT_1 = 980; // First resolution breakpoint is 980px
 
@@ -304,6 +303,11 @@ class App extends TerrainComponent<Props>
         id,
       });
     }
+    else
+    {
+      console.error('NO ACCESS TOKEN');
+      alert('ERROR: No access token found in localStorage');
+    }
   }
 
   public specifyTitle(location)
@@ -426,21 +430,9 @@ class App extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (this.props.auth !== nextProps.auth)
+    if (!this.isAppStateLoaded(this.props) && this.isAppStateLoaded(nextProps))
     {
-      const token = nextProps.auth.accessToken;
-      const loggedIn = !!token;
-      const loggedInAndLoaded = loggedIn && this.state.loggedInAndLoaded;
-
-      this.setState({
-        loggedIn,
-        loggedInAndLoaded,
-      });
-
-      if (token !== null)
-      {
-        this.fetchData();
-      }
+      this.handleLoginLoadComplete();
     }
 
     if (this.props.location.pathname !== nextProps.location.pathname)
@@ -450,6 +442,16 @@ class App extends TerrainComponent<Props>
         // track new pageview event, as the URL changed
         window['dataLayer'].push({ event: 'pageview' });
       }
+    }
+  }
+
+  public componentDidMount()
+  {
+    this.fetchData();
+
+    if (document.getElementById('login-submit'))
+    {
+      document.getElementById('login-submit').innerHTML = 'Loading Your Data';
     }
   }
 
@@ -463,7 +465,6 @@ class App extends TerrainComponent<Props>
     this.props.schemaActions({
       actionType: 'fetch',
     });
-    // RolesActions.fetch();
   }
 
   public toggleSidebar()
@@ -478,26 +479,33 @@ class App extends TerrainComponent<Props>
     this.setState({
       loggedInAndLoaded: true,
     });
+    if (document.getElementById('login-submit'))
+    {
+      document.getElementById('login-submit').innerHTML = 'Done!';
+    }
+
+    const loginEl = document.getElementById('login');
+    if (loginEl)
+    {
+      loginEl.className = loginEl.className + ' login-loaded';
+      setTimeout(() =>
+      {
+        loginEl.parentNode.removeChild(loginEl);
+      }, 500);
+    }
   }
 
-  public isAppStateLoaded(): boolean
+  public isAppStateLoaded(props: Props): boolean
   {
-    return this.props.library.loaded
-      && (this.props.users && this.props.users.get('loaded'));
-    // && this.state.rolessLoaded
+    return props.library.loaded
+      && (props.users && props.users.get('loaded'));
   }
 
   public renderApp(width)
   {
     if (!this.state.loggedInAndLoaded)
     {
-      return (
-        <Login
-          loggedIn={this.state.loggedIn}
-          appStateLoaded={this.isAppStateLoaded()}
-          onLoadComplete={this.handleLoginLoadComplete}
-        />
-      );
+      return null;
     }
 
     const sidebarWidth = this.state.sidebarExpanded && width > RESOLUTION_BREAKPOINT_1 ? 205 : 36;

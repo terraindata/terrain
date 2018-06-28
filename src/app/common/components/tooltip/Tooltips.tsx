@@ -54,6 +54,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { Tooltip } from 'react-tippy';
 import 'react-tippy/dist/tippy.css';
+import Util from 'util/Util';
 
 import { Colors } from './../../../colors/Colors';
 
@@ -62,11 +63,6 @@ import './Tooltips.less';
 const tooltipTitleStyle = { maxWidth: '400px', display: 'inline-block' };
 // tooltipMaxWidth makes text-only tooltips have a consistent size
 // tippy-popper's max-width is 400 by default but we override it so that large html tooltips work.
-
-function assertUnreachable(param: never): never
-{
-  throw new Error('Unreachable code reached');
-}
 
 // https://stackoverflow.com/questions/12303989/cartesian-product-of-multiple-arrays-in-javascript
 function cartesianProductOf(...vars: any[])
@@ -155,7 +151,7 @@ class TooltipStyleGenerator
           'background-color': color,
         };
       default:
-        assertUnreachable(modifier);
+        Util.assertUnreachable(modifier);
     }
     switch (direction)
     {
@@ -184,7 +180,7 @@ class TooltipStyleGenerator
           'border-bottom': `${size} solid transparent`,
         };
       default:
-        assertUnreachable(direction);
+        Util.assertUnreachable(direction);
     }
   }
 
@@ -205,7 +201,7 @@ class TooltipStyleGenerator
         suffix = '';
         break;
       default:
-        assertUnreachable(modifier);
+        Util.assertUnreachable(modifier);
     }
     return `.tippy-popper[x-placement^=${direction}] .tippy-tooltip.${theme}-theme [${bracketText}]${suffix}`;
   }

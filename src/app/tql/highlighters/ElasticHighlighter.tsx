@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 // parser imports
 import * as Immutable from 'immutable';
+import Util from 'util/Util';
 
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
@@ -63,15 +64,6 @@ import { ESParserTokenizer, FlaggedToken } from '../../../../shared/database/ela
 import SyntaxHighlighter from './SyntaxHighlighter';
 
 import { toInputMap } from '../../../blocks/types/Input';
-
-/*
- *  Errors involving this function probably mean a missing a case on a switch.
- *  See: https://stackoverflow.com/questions/39419170
- */
-function assertUnreachable(param: never): never
-{
-  throw new Error('Unreachable code reached');
-}
 
 /*
  * Elastic highlighter - should not maintain state across highlight calls.
@@ -168,7 +160,7 @@ class ElasticHighlighter extends SyntaxHighlighter
       case ESJSONType.parameter:
         return 'cm-variable-2 es-parameter';
       default:
-        assertUnreachable(fToken.parserToken.jsonType);
+        Util.assertUnreachable(fToken.parserToken.jsonType);
       // an error on assertUnreachable might mean a missing case
     }
   }

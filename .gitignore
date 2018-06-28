@@ -4,6 +4,7 @@
 .cache-loader
 coverage/
 node_modules
+midway/src/bundles
 bundle.js
 bundle.js.map
 bundle.prod.js

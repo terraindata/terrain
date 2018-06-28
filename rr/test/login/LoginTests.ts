@@ -54,15 +54,13 @@ import * as request from 'then-request';
 const USERNAME_SELECTOR = '#login-email';
 const PASSWORD_SELECTOR = '#login-password';
 import * as winston from 'winston';
-const BUTTON_SELECTOR = '#app > div > div.app-wrapper > div > div.login-container > div.login-submit-button-wrapper > div';
-const CREATE_CATEGORY_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-1 > div.library-column-content > div > div.info-area-buttons-container > div';
-const CATEGORY_ITEM_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-1 > div.library-column-content > div > div.library-category.library-category-BUILD.library-category-open > div > div:nth-child(1) > a > div > div > div > div.library-item-content > div';
-const CREATE_GROUP_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-2 > div.library-column-content > div.info-area > div.info-area-buttons-container > div';
-const CREATE_GROUP_BUTTON_SELECTOR = 'body > div.ReactModalPortal > div > div > div > div > div.modal-buttons > div.button.modal-confirm-button';
-const CREATE_ALGORITHM_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-3 > div.library-column-content > div.info-area > div.info-area-buttons-container > div';
-// const ALGORITHM_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-3 > div.library-column-content > div:nth-child(2) > div.library-category.library-category-BUILD.library-category-open > div > div:nth-child(1) > a > div > div > div > div.library-item-content > div > div.flex-grow';
-const ALGORITHM_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-3 > div.library-column-content > div:nth-child(2) > div.library-category.library-category-BUILD.library-category-open > div > div:nth-child(1) > a > div > div > div > div.library-item-content > div > div.flex-grow';
-const CARDSTARTER_SELECTOR = '#cards-column-inner > div.info-area > div.info-area-buttons-container > div';
+const BUTTON_SELECTOR = '#login-submit';
+const CREATE_CATEGORY_SELECTOR = '.info-area-button';
+const CATEGORY_ITEM_SELECTOR = '.category-library-info-wrapper';
+const CREATE_GROUP_SELECTOR = '.info-area-button';
+const CREATE_GROUP_BUTTON_SELECTOR = '.modal-confirm-button';
+const CREATE_ALGORITHM_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-3 > div.library-column-content > div.info-area > div.info-area-buttons-container > div';
+const ALGORITHM_SELECTOR = ':nth-child(2) > .library-category-BUILD > .library-category-content > :nth-child(1) > .library-item-link > .library-item-wrapper > .library-item > :nth-child(1) > .library-item-content > .flex-container > .flex-grow > .library-item-line';
 
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
 import { getChromeDebugAddress } from '../../FullstackUtils';
@@ -83,7 +81,7 @@ async function takeAndCompareScreenShot(page, options?)
 async function loginToBuilder(page, url)
 {
   await page.goto(url);
-  sleep.sleep(5);
+  sleep.sleep(1);
   winston.info('Goto the login page ' + url);
   await page.waitForSelector(USERNAME_SELECTOR);
   winston.info('Username selector is ready.');
@@ -93,40 +91,41 @@ async function loginToBuilder(page, url)
   await page.click(PASSWORD_SELECTOR);
   await page.keyboard.type('CnAATPys6tEB*ypTvqRRP5@2fUzTuY!C^LZP#tBQcJiC*5');
   await page.click(BUTTON_SELECTOR);
-  sleep.sleep(1);
+  sleep.sleep(4);
   winston.info('Goto the starting page.');
+  const selectorConfig = { visible: true, hidden: true };
 
-  await page.waitForSelector(CREATE_CATEGORY_SELECTOR);
+  await page.waitForSelector(CREATE_CATEGORY_SELECTOR, selectorConfig);
   await page.click(CREATE_CATEGORY_SELECTOR);
   winston.info('Create category');
   sleep.sleep(1);
   await takeAndCompareScreenShot(page);
 
-  await page.waitForSelector(CATEGORY_ITEM_SELECTOR);
+  await page.waitForSelector(CATEGORY_ITEM_SELECTOR, selectorConfig);
   await page.click(CATEGORY_ITEM_SELECTOR);
   winston.info('Select category');
   sleep.sleep(1);
   await takeAndCompareScreenShot(page);
 
-  await page.waitForSelector(CREATE_GROUP_SELECTOR);
+  await page.waitForSelector(CREATE_GROUP_SELECTOR, selectorConfig);
   await page.click(CREATE_GROUP_SELECTOR);
   winston.info('Select group');
   sleep.sleep(1);
   await takeAndCompareScreenShot(page);
 
-  await page.waitForSelector(CREATE_GROUP_BUTTON_SELECTOR);
+  await page.waitForSelector(CREATE_GROUP_BUTTON_SELECTOR, selectorConfig);
   await page.click(CREATE_GROUP_BUTTON_SELECTOR);
   winston.info('Create group');
   sleep.sleep(1);
   await takeAndCompareScreenShot(page);
 
-  await page.waitForSelector(CREATE_ALGORITHM_SELECTOR);
-  await page.click(CREATE_ALGORITHM_SELECTOR);
+  await page.waitForSelector(CREATE_ALGORITHM_SELECTOR, selectorConfig);
+  await page.click(CREATE_ALGORITHM_SELECTOR, { clickCount: 2 });
   winston.info('Create algorithm');
   sleep.sleep(1);
   await takeAndCompareScreenShot(page);
 
-  await page.waitForSelector(ALGORITHM_SELECTOR);
+  await page.waitForSelector(ALGORITHM_SELECTOR, selectorConfig);
   await page.click(ALGORITHM_SELECTOR, { clickCount: 2 });
   winston.info('Select algorithm');
   sleep.sleep(1);

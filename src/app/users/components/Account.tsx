@@ -44,12 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires switch-default
+// tslint:disable:no-var-requires switch-default strict-boolean-expressions
 
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
 
+import TerrainTools from 'app/util/TerrainTools';
 import TerrainTabs from 'common/components/TerrainTabs';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import './Account.less';
@@ -57,6 +58,7 @@ import './Account.less';
 import ConnectionEditorPage from 'app/connections/components/ConnectionEditorPage';
 import Connections from 'app/connections/components/Connections';
 import EditProfile from './EditProfile';
+import Logs from './Logs';
 import Notifications from './Notifications';
 import Settings from './Settings';
 import Team from './Team';
@@ -76,6 +78,7 @@ class Account extends TerrainComponent<Props>
     // { key: 'profile', label: 'Profile' },
     { key: 'connections', label: 'Connections' },
     { key: 'team', label: 'Team' },
+    ...(TerrainTools.isAdmin() ? [{ key: 'logs', label: 'Logs' }] : []),
   ];
 
   public tabToRouteMap = {
@@ -83,6 +86,7 @@ class Account extends TerrainComponent<Props>
     // profile: '/account/profile',
     connections: '/account/connections',
     team: '/account/team',
+    ...(TerrainTools.isAdmin() ? { logs: '/account/logs' } : {}),
   };
 
   public render()
@@ -108,6 +112,7 @@ class Account extends TerrainComponent<Props>
                 <Route exact path='/account/connections/edit' component={ConnectionEditorPage} />
                 <Route exact path='/account/connections/edit/connectionId=:connectionId' component={ConnectionEditorPage} />
                 <Route exact path='/account/team' component={Team} />
+                {TerrainTools.isAdmin() && <Route exact path='/account/logs' component={Logs} />}
               </Switch>
             </div>
           </TerrainTabs>
