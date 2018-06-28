@@ -336,12 +336,13 @@ export const Ajax =
       );
     },
 
-    createUser(email: string, password: string, onSave: (response: any) => void, onError: (response: any) => void)
+    createUser(name: string, email: string, password: string, onSave: (response: any) => void, onError: (response: any) => void)
     {
       return Ajax.req(
         'post',
         `users`,
         {
+          name,
           email,
           password,
         },
