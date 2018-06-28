@@ -78,6 +78,11 @@ import { Scheduler } from './scheduler/Scheduler';
 import * as Schema from './Schema';
 import { users } from './users/UserRouter';
 
+// import bluebird = require('bluebird');
+
+// global.Promise = bluebird;
+// (Promise as any).longStackTraces();
+
 const MAX_CONN_RETRIES = 5;
 const CONN_RETRY_TIMEOUT = 1000;
 
@@ -119,6 +124,10 @@ export class App
   private static unhandledRejectionHandler(err: Error): void
   {
     winston.error('Unhandled Promise Rejection: ' + err.toString());
+    if (err.stack !== undefined)
+    {
+      winston.error(err.stack);
+    }
   }
 
   private DB: Tasty.Tasty;
@@ -224,7 +233,7 @@ export class App
     this.app.use(session(undefined, this.app));
 
     this.app.use(Middleware.bodyParser({ jsonLimit: '10gb', formLimit: '10gb' }));
-    this.app.use(Middleware.favicon(__dirname + '/../../../src/app/favicon.ico'));
+    this.app.use(Middleware.favicon(__dirname + './midway/src/assets/favicon.ico'));
     this.app.use(Middleware.logger(winston));
     this.app.use(Middleware.responseTime());
     this.app.use(Middleware.passport.initialize());

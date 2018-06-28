@@ -46,7 +46,8 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file no-unused-expression
 
 import { FileTypes, Languages } from './ETLTypes';
-import { PostProcessConfig } from './PostProcessTypes';
+import { RootInputConfig } from './InputTypes';
+import { RootPostProcessConfig } from './PostProcessTypes';
 
 export interface FileConfig
 {
@@ -56,6 +57,7 @@ export interface FileConfig
   xmlPath?: string;
   jsonPath?: string;
   fieldOrdering?: string[];
+  isPlaFeed?: boolean;
 }
 
 export enum Sources
@@ -77,6 +79,7 @@ export enum Sinks
   Sftp = 'Sftp',
   Http = 'Http',
   Fs = 'Fs',
+  FollowUpBoss = 'FollowUpBoss',
   MailChimp = 'MailChimp',
 }
 
@@ -94,10 +97,11 @@ export const EndpointTypeNames =
     Magento: 'Magento',
     GoogleAnalytics: 'Google Analytics',
     MailChimp: 'MailChimp',
+    FollowUpBoss: 'Follow Up Boss',
   };
 
 export const SchedulableSinks: Sinks[] =
-  [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs, Sinks.MailChimp];
+  [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs, Sinks.FollowUpBoss, Sinks.MailChimp];
 
 export const SchedulableSources: Sources[] =
   [Sources.Algorithm, Sources.Sftp, Sources.GoogleAnalytics, Sources.Http, Sources.Fs, Sources.Mysql, Sources.Postgresql];
@@ -109,6 +113,8 @@ export interface SourceConfig
   fileConfig: FileConfig;
   options: SourceOptionsType<SourceTypes>; // a union of all possible option types
   integrationId: number;
+  rootInputConfig: RootInputConfig;
+  rootPostProcessConfig: RootPostProcessConfig;
 }
 
 export interface DefaultSourceConfig
@@ -124,6 +130,8 @@ export interface SinkConfig
   fileConfig: FileConfig;
   options: SinkOptionsType<SinkTypes>; // a union of all possible option types
   integrationId: number;
+  rootInputConfig: RootInputConfig;
+  rootPostProcessConfig: RootPostProcessConfig;
 }
 
 export interface DefaultSinkConfig
@@ -188,6 +196,7 @@ export interface SinkOptionsTypes
   Sftp: SftpOptions;
   Http: HttpOptions;
   Fs: {};
+  FollowUpBoss: FollowUpBossOptions;
   MailChimp: {};
 }
 
@@ -210,6 +219,8 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
       method: 'POST',
     },
     Fs: {},
+    FollowUpBoss: {
+    },
     MailChimp: {},
   };
 
@@ -225,10 +236,12 @@ export interface HttpOptions
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 }
 
+// tslint:disable-next-line no-empty-interface
+export interface FollowUpBossOptions { }
+
 export interface GoogleAnalyticsOptions
 {
   dayInterval: number;
-  transformations?: PostProcessConfig[];
 }
 
 export interface SQLOptions

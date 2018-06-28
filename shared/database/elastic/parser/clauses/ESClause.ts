@@ -53,6 +53,7 @@ import ESInterpreter from '../ESInterpreter';
 import ESJSONType from '../ESJSONType';
 import ESValueInfo from '../ESValueInfo';
 
+import { ESParameterType } from 'shared/database/elastic/parser/ESParameter';
 import ESClauseSettings from '../ESClauseSettings';
 import ESAnyClause from './ESAnyClause';
 import ESArrayClause from './ESArrayClause';
@@ -190,33 +191,36 @@ abstract class ESClause
   {
     if (ESJSONType[valueInfo.jsonType] === 'parameter')
     {
-      if (valueInfo.parameterValue && valueInfo.parameterValue.getValueInfo())
-      {
-        const parameterType = valueInfo.parameterValue.getValueInfo().jsonType;
-        if (parameterType !== expected && ESJSONType[parameterType] !== 'parameter' && ESJSONType[parameterType] !== 'array')
-        {
-          interpreter.accumulateError(valueInfo,
-            'Expected a ' + ESJSONType[expected] + ', but found a parameter ' + String(valueInfo.parameter) +
-            ' whose type is ' + ESJSONType[parameterType] + ' instead.');
-          return false;
-        }
-      } else
+      if (valueInfo.parameterType === ESParameterType.Unknown)
       {
         interpreter.accumulateError(valueInfo,
           'Expected a ' + ESJSONType[expected] + ', but found a parameter ' + String(valueInfo.parameter) +
           ' whose type is unknown.');
-      }
-    } else
-    {
-      if (valueInfo.jsonType !== expected)
-      {
-        interpreter.accumulateError(valueInfo,
-          'Expected a ' + ESJSONType[expected] + ', but found a ' +
-          ESJSONType[valueInfo.jsonType] + ' instead.');
         return false;
+      } else if (valueInfo.parameterType === ESParameterType.MetaParent)
+      {
+        // metaParent can be anything, so avoid keep digging
+        return false;
+      } else
+      {
+        const parameterValueType = valueInfo.parameterValue.getValueInfo().jsonType;
+        if (parameterValueType !== expected)
+        {
+          interpreter.accumulateError(valueInfo,
+            'Expected a ' + ESJSONType[expected] + ', but found a parameter ' + String(valueInfo.parameter) +
+            ' whose type is a ' + ESJSONType[parameterValueType] + '.');
+          return false;
+        }
+        return true;
       }
     }
-
+    if (valueInfo.jsonType !== expected)
+    {
+      interpreter.accumulateError(valueInfo,
+        'Expected a ' + ESJSONType[expected] + ', but found a ' +
+        ESJSONType[valueInfo.jsonType] + ' instead.');
+      return false;
+    }
     return true;
   }
 

@@ -49,7 +49,7 @@ import { Readable, Writable } from 'stream';
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import IntegrationConfig from '../../integrations/IntegrationConfig';
-import { integrations } from '../../scheduler/SchedulerRouter';
+import { integrations } from '../../integrations/IntegrationRouter';
 
 /**
  * Abstract class for converting a result stream to a string stream for export formatting
@@ -73,7 +73,7 @@ export default abstract class AEndpointStream
     return Object.assign(connectionConfig, authConfig);
   }
 
-  public abstract async getSource(source: SourceConfig): Promise<Readable>;
+  public abstract async getSource(source: SourceConfig): Promise<Readable | Readable[]>;
 
   public abstract async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>;
 }

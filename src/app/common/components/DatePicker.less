@@ -83,6 +83,7 @@
 .date-picker {
   border-radius: 5px;
   padding-bottom: 12px;
+  text-align: center;
 
   font-weight: 500;
   
@@ -97,8 +98,89 @@
 
   .date-time-time {
     padding: 0px 15px;
+    margin-bottom: 25px;
+    margin-top: 2px;
+
+    .labeled-row {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .dropdown-wrapper {
+      flex-grow: 1;
+      min-width: 100px;
+      width: auto;
+    }
+
+    .dropdown-options-wrapper {
+      max-height: 88px;
+    }
   }
   
+  .date-time-time-top {
+    padding: 0px 15px;
+    margin-bottom: 25px;
+    margin-top: 25px;
+
+    .labeled-row {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .specific-time-amount {
+      flex-grow: 1;
+      height: 33px;
+      width: auto;
+      margin-right: 2px;
+    }
+
+    .dropdown-wrapper {
+      flex-grow: 1;
+      min-width: 100px;
+      width: auto;
+    }
+
+    .dropdown-options-wrapper {
+      max-height: 88px;
+    }
+  }
+}
+
+.date-view-title {
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.date-view-label {
+  font-size: 11px;
+  padding-top: 6px;
+  margin-right: 20px;
+  text-transform: uppercase;
+  text-align: right;
+  width: 100px;
+}
+
+.selected-date-type {
+  display: inline-block;
+  padding: 5px;
+  margin: -5px 5px 5px 5px;
+  border-radius: 4px;
+  border-style: solid;
+  border-width: 1px;
+  text-align: center;
+  font-size: 13px;
+  .transition;
+}
+
+.unselected-date-type {
+  display: inline-block;
+  padding: 5px;
+  margin: -5px 5px 5px 5px;
+  border: none;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 13px;
+  .transition;
 }
 
 .DayPicker {
@@ -118,6 +200,7 @@
   position: relative;
   padding-bottom: 12px;
   padding-top: 6px;
+  margin-bottom: 3px;
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;

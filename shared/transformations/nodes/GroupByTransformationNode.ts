@@ -43,20 +43,96 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+const { List, Map } = Immutable;
 
-export default class GroupByTransformationNode extends TransformationNode
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath } from 'shared/util/KeyPath';
+
+import ForkTransformationType, { OutputField } from 'shared/transformations/types/ForkTransformationType';
+
+const TYPECODE = TransformationNodeType.GroupByNode;
+
+export class GroupByTransformationNode extends ForkTransformationType
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.GroupByNode)
+  public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'array';
+
+  public split(el: any[]): OutputField[]
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+
+    // const mapper: {
+    //   [k: string]: KeyPath,
+    // } = {};
+
+    const mapper: {
+      [k: string]: number,
+    } = {};
+
+    const outputs: {
+      [k: string]: object[],
+    } = {};
+
+    for (let i = 0; i < opts.groupValues.length; i++)
+    {
+      mapper[opts.groupValues[i]] = i;
+      outputs[opts.groupValues[i]] = [];
+    }
+
+    for (let i: number = 0; i < el.length; i++)
+    {
+      const objToGroup = el[i];
+      const groupValue = objToGroup[opts.subkey];
+      if (outputs[groupValue] !== undefined)
+      {
+        outputs[groupValue].push(_.cloneDeep(objToGroup));
+      }
+    }
+
+    const outputFields = [];
+    for (const key of Object.keys(mapper))
+    {
+      const index = mapper[key];
+      const arr = outputs[key];
+      outputFields.push({
+        field: index,
+        value: arr,
+      });
+    }
+    return outputFields;
   }
 }
+
+class GroupByTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Group Array Values';
+  public description = 'Group an array of objects by a value';
+  public nodeClass = GroupByTransformationNode;
+
+  public editable = false;
+  public creatable = true;
+  public newFieldType = 'array';
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return (
+      EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+      EngineUtil.getValueType(fieldId, engine) === 'object' &&
+      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+    );
+  }
+}
+
+export const GroupByTransformationInfo = new GroupByTransformationInfoC();

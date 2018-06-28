@@ -4,10 +4,12 @@
 .cache-loader
 coverage/
 node_modules
+midway/src/bundles
 bundle.js
 bundle.js.map
 bundle.prod.js
 bundle.demo.js
+bundle.server.js
 src/commitlog.txt
 npm-debug.log
 src/**/*.js.map

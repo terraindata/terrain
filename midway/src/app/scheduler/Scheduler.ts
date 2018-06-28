@@ -53,14 +53,12 @@ import { JobConfig } from 'shared/types/jobs/JobConfig';
 import { TaskConfig } from 'shared/types/jobs/TaskConfig';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 import * as Tasty from '../../tasty/Tasty';
+import { TransactionHandle } from '../../tasty/TastyDB';
 import * as App from '../App';
 import IntegrationConfig from '../integrations/IntegrationConfig';
-import Integrations from '../integrations/Integrations';
 import { Job } from '../jobs/Job';
 import { UserConfig } from '../users/UserConfig';
 import SchedulerConfig from './SchedulerConfig';
-
-export const integrations: Integrations = new Integrations();
 
 export class Scheduler
 {
@@ -157,7 +155,23 @@ export class Scheduler
     return Promise.resolve(timezoneObj);
   }
 
-  public async runSchedule(id: number, runNow?: boolean, userId?: number): Promise<SchedulerConfig[] | string>
+  public async runScheduleNow(id: number): Promise<SchedulerConfig[] | string>
+  {
+    let result: SchedulerConfig[] | string;
+
+    await App.DB.executeTransaction(async (handle, commit, rollback) =>
+    {
+      await this._select([], { id }, true, false, false, handle);
+
+      result = await this.runSchedule(id, handle, true);
+
+      await commit();
+    });
+
+    return result;
+  }
+
+  public async runSchedule(id: number, handle: TransactionHandle, runNow?: boolean, userId?: number): Promise<SchedulerConfig[] | string>
   {
     return new Promise<SchedulerConfig[] | string>(async (resolve, reject) =>
     {
@@ -195,7 +209,7 @@ export class Scheduler
           type: jobType,
           workerId: 1, // TODO change this for clustering support
         };
-      await this.setRunning(id, true);
+      await this.setRunning(id, true, handle);
       const jobCreateStatus: JobConfig[] | string = await App.JobQ.create(jobConfig, runNow, userId);
       if (typeof jobCreateStatus === 'string')
       {
@@ -216,7 +230,7 @@ export class Scheduler
     return Promise.reject(new Error('Schedule not found.'));
   }
 
-  public async setRunning(id: number, running: boolean): Promise<SchedulerConfig[]>
+  public async setRunning(id: number, running: boolean, handle: TransactionHandle): Promise<SchedulerConfig[]>
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
@@ -232,7 +246,7 @@ export class Scheduler
           // }
         }
         schedules[0].running = running;
-        return resolve(await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[]);
+        return resolve(await App.DB.upsert(this.schedulerTable, schedules[0], handle) as SchedulerConfig[]);
       }
     });
   }
@@ -313,23 +327,59 @@ export class Scheduler
   {
     // TODO check the scheduler for unlocked rows and detect which schedules should run next
     const availableSchedules: number[] = await this._getAvailableSchedules();
-    availableSchedules.forEach((scheduleId) =>
+    for (const scheduleId of availableSchedules)
     {
-      this._checkSchedulerTableHelper(scheduleId).catch((err) =>
+      await App.DB.executeTransaction(async (handle, commit, rollback) =>
       {
-        winston.warn(err.toString() as string);
+        const schedules = await this._select([], { id: scheduleId }, true, false, true, handle);
+
+        if (schedules.length === 1 && !schedules[0].running && this._shouldScheduleRun(schedules[0]))
+        {
+          try
+          {
+            await this._checkSchedulerTableHelper(scheduleId, handle);
+          }
+          catch (err)
+          {
+            winston.warn(err.toString() as string);
+          }
+        }
+
+        await commit();
       });
-    });
+    }
     setTimeout(this._checkSchedulerTable.bind(this), 60000 - new Date().getTime() % 60000);
   }
 
-  private async _checkSchedulerTableHelper(scheduleId: number): Promise<void>
+  private async _checkSchedulerTableHelper(scheduleId: number, handle: TransactionHandle): Promise<void>
   {
-    const result: SchedulerConfig[] | string = await this.runSchedule(scheduleId);
+    const result: SchedulerConfig[] | string = await this.runSchedule(scheduleId, handle);
     if (typeof result === 'string')
     {
       winston.info(result as string);
     }
+  }
+
+  private _shouldScheduleRun(schedule: SchedulerConfig): boolean
+  {
+    try
+    {
+      const lastRun = new Date(schedule.lastRun);
+      const currTime = new Date(new Date().valueOf() + 1000);
+      const currIntervalCronDate = cronParser.parseExpression(schedule.cron, { tz: 'America/Los_Angeles' });
+      const prevInterval = currIntervalCronDate.prev().toDate();
+
+      if (prevInterval.valueOf() > lastRun.valueOf() && currTime.valueOf() > lastRun.valueOf()
+        && schedule.shouldRunNext === true)
+      {
+        return true;
+      }
+    }
+    catch (e)
+    {
+      winston.warn('Error while trying to parse scheduler cron: ' + ((e as any).toString() as string));
+    }
+    return false;
   }
 
   private async _getAvailableSchedules(): Promise<number[]>
@@ -340,22 +390,9 @@ export class Scheduler
       const schedules: SchedulerConfig[] = await this._select([], { running: false }) as SchedulerConfig[];
       schedules.forEach((schedule) =>
       {
-        try
+        if (this._shouldScheduleRun(schedule))
         {
-          const lastRun = new Date(schedule.lastRun);
-          const currTime = new Date(new Date().valueOf() + 1000);
-          const currIntervalCronDate = cronParser.parseExpression(schedule.cron, { tz: 'America/Los_Angeles' });
-          const prevInterval = currIntervalCronDate.prev().toDate();
-
-          if (prevInterval.valueOf() > lastRun.valueOf() && currTime.valueOf() > lastRun.valueOf()
-            && schedule.shouldRunNext === true)
-          {
-            scheduleIds.push(schedule.id);
-          }
-        }
-        catch (e)
-        {
-          winston.warn('Error while trying to parse scheduler cron: ' + ((e as any).toString() as string));
+          scheduleIds.push(schedule.id);
         }
       });
       resolve(scheduleIds);
@@ -376,27 +413,10 @@ export class Scheduler
     });
   }
 
-  private async _select(columns: string[], filter: object, locked?: boolean): Promise<SchedulerConfig[]>
+  private async _select(columns: string[], filter: object,
+    forUpdate?: boolean, noWait?: boolean, skipLocked?: boolean, handle?: TransactionHandle): Promise<SchedulerConfig[]>
   {
-    return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
-    {
-      let rawResults: object[] = [];
-      if (locked === undefined) // all
-      {
-        rawResults = await App.DB.select(this.schedulerTable, columns, filter);
-      }
-      else if (locked === true) // currently running
-      {
-        // TODO
-      }
-      else // currently not running
-      {
-        // TODO
-      }
-
-      const results: SchedulerConfig[] = rawResults.map((result: object) => new SchedulerConfig(result as SchedulerConfig));
-      resolve(results);
-    });
+    return App.DB.select(this.schedulerTable, columns, filter, forUpdate, noWait, skipLocked, handle) as Promise<SchedulerConfig[]>;
   }
 
   private async _setStatus(id: number, status: boolean): Promise<SchedulerConfig[]>

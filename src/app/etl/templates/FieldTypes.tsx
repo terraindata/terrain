@@ -48,8 +48,8 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
-import TransformationNodeBase from 'shared/transformations/nodes/TransformationNode';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeBase from 'shared/transformations/TransformationNode';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType, NodeTypes } from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
@@ -62,7 +62,6 @@ class TemplateFieldC
   public readonly isIncluded: boolean = true;
   public readonly isHidden: boolean = false;
   public readonly fieldProps: object = {};
-  public readonly type: FieldTypes = 'object';
   public readonly etlType: ETLFieldTypes = ETLFieldTypes.Object;
   public readonly fieldId: number = -1;
   public readonly name: string = '';
@@ -73,20 +72,12 @@ class TemplateFieldC
 
   public isWildcardField(): boolean
   {
-    return EngineUtil.isWildcardField(this.inputKeyPath);
+    return EngineUtil.isWildcardField(this.outputKeyPath);
   }
 
   public isAncestorNamedField(index: number)
   {
-    const value = this.outputKeyPath.get(index);
-    if (index != null)
-    {
-      return value !== '*' && Number.isNaN(Number(value));
-    }
-    else
-    {
-      return false;
-    }
+    return EngineUtil.isNamedField(this.outputKeyPath.slice(0, index + 1).toList());
   }
 
   public canMoveField(): boolean
@@ -96,7 +87,7 @@ class TemplateFieldC
 
   public canEditField(): boolean
   {
-    return this.isNamedField() || this.isPrimitive();
+    return true;
   }
 
   public canTransformField(): boolean
@@ -111,8 +102,9 @@ class TemplateFieldC
 
   public isPrimitive(): boolean
   {
-    const repType = this.representedType();
-    return repType !== 'array' && repType !== 'object';
+    return this.etlType !== ETLFieldTypes.Array &&
+      this.etlType !== ETLFieldTypes.Object &&
+      this.etlType !== ETLFieldTypes.GeoPoint;
   }
 
   public isLocalToRoot(): boolean
@@ -121,21 +113,9 @@ class TemplateFieldC
     return areFieldsLocal(this.outputKeyPath, List(['sample_name']));
   }
 
-  public representedType(): FieldTypes
-  {
-    if (this.isWildcardField())
-    {
-      return this.fieldProps['valueType'];
-    }
-    else
-    {
-      return this.type;
-    }
-  }
-
   public isNamedField()
   {
-    return this.name !== '*' && Number.isNaN(Number(this.name));
+    return EngineUtil.isNamedField(this.outputKeyPath);
   }
 }
 export type TemplateField = WithIRecord<TemplateFieldC>;

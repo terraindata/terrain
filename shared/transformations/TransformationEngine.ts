@@ -49,15 +49,15 @@ import * as GraphLib from 'graphlib';
 import { List, Map } from 'immutable';
 import isPrimitive = require('is-primitive');
 import * as _ from 'lodash';
+import TransformationNode from 'shared/transformations/TransformationNode';
 import objectify from '../util/deepObjectify';
 import { KeyPath, keyPathPrefixMatch, updateKeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 // import * as winston from 'winston'; // TODO what to do for error logging?
 import DataStore from './DataStore';
-import TransformationNode from './nodes/TransformationNode';
 import TransformationEngineNodeVisitor from './TransformationEngineNodeVisitor';
-import { TransformationInfo } from './TransformationInfo';
 import TransformationNodeType from './TransformationNodeType';
+import TransformationRegistry from './TransformationRegistry';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
@@ -146,11 +146,11 @@ export class TransformationEngine
     {
       const raw: object = parsed['dag']['nodes'][i]['value'];
       parsed['dag']['nodes'][i]['value'] =
-        new (TransformationInfo.getType(raw['typeCode']))(
+        new (TransformationRegistry.getType(raw['typeCode']))(
           raw['id'],
           List<KeyPath>(raw['fields'].map((item) => KeyPath(item))),
           TransformationEngine.makeMetaImmutable(raw['meta']),
-          raw['typeCode'],
+          // raw['typeCode'],
         ) as TransformationNode;
     }
     return parsed;
@@ -240,7 +240,7 @@ export class TransformationEngine
   {
     // const fieldIDs: List<number> = this.parseFieldIDs(fieldNamesOrIDs);
     const node: TransformationNode =
-      new (TransformationInfo.getType(nodeType))(this.uidNode, fieldNames, options, nodeType);
+      new (TransformationRegistry.getType(nodeType))(this.uidNode, fieldNames, options /*nodeType*/);
 
     // Process fields created/disabled by this transformation
     if (options !== undefined)
@@ -250,13 +250,13 @@ export class TransformationEngine
         for (let i: number = 0; i < options['newFieldKeyPaths'].size; i++)
         {
           let inferredTypeNameOfNewFields: string;
-          if (TransformationInfo.getNewFieldType(nodeType) === 'same' && fieldNames.size > 0)
+          if (TransformationRegistry.getNewFieldType(nodeType) === 'same' && fieldNames.size > 0)
           {
             inferredTypeNameOfNewFields = this.getFieldType(this.getInputFieldID(fieldNames.get(0)));
           }
-          else if (TransformationInfo.getNewFieldType(nodeType))
+          else if (TransformationRegistry.getNewFieldType(nodeType))
           {
-            inferredTypeNameOfNewFields = TransformationInfo.getNewFieldType(nodeType);
+            inferredTypeNameOfNewFields = TransformationRegistry.getNewFieldType(nodeType);
           }
           else
           {
@@ -290,16 +290,15 @@ export class TransformationEngine
   {
     let output: object = this.rename(doc);
     this.restoreArrays(output);
-
+    const visitor = new TransformationEngineNodeVisitor();
     for (const nodeKey of this.dag.sources())
     {
       const toTraverse: string[] = GraphLib.alg.preorder(this.dag, [nodeKey]);
       for (let i = 0; i < toTraverse.length; i++)
       {
         const preprocessedNode: TransformationNode = this.preprocessNode(this.dag.node(toTraverse[i]), output);
-        const visitor: TransformationEngineNodeVisitor = new TransformationEngineNodeVisitor();
-        const transformationResult: TransformationVisitResult =
-          visitor.applyTransformationNode(preprocessedNode, output);
+
+        const transformationResult = preprocessedNode.accept(visitor, output);
         if (transformationResult.errors !== undefined)
         {
           // winston.error('Transformation encountered errors!:');
@@ -693,7 +692,7 @@ export class TransformationEngine
   private addPrimitiveField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any): List<number>
   {
     // console.log('x3 ' + currentKeyPath.push(key.toString()));
-    return ids.push(this.addField(currentKeyPath.push(key.toString()), typeof obj[key]));
+    return ids.push(this.addField(currentKeyPath.push(key), typeof obj[key]));
   }
 
   private addArrayField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any, depth: number = 1): List<number>
@@ -715,11 +714,11 @@ export class TransformationEngine
     {
       arrayType = null;
     }
-    const arrayID: number = this.addField(currentKeyPath.push(key.toString()), 'array');
+    const arrayID: number = this.addField(currentKeyPath.push(key), 'array');
     ids = ids.push(arrayID);
     this.setFieldProp(arrayID, KeyPath(['valueType']), arrayType);
     // console.log('adding awid ' + currentKeyPath.push(key.toString()).push(-1));
-    let awkp: KeyPath = currentKeyPath.push(key.toString());
+    let awkp: KeyPath = currentKeyPath.push(key);
     awkp = awkp.slice(0, awkp.size - depth + 1).toList();
     for (let i: number = 0; i < depth; i++)
     {
@@ -735,19 +734,19 @@ export class TransformationEngine
       // const arrayKey_i: any = arrayKey.push(i.toString());
       if (isPrimitive(obj[key][i]))
       {
-        ids = this.addPrimitiveField(ids, obj[key], currentKeyPath.push(key.toString()), i);
+        ids = this.addPrimitiveField(ids, obj[key], currentKeyPath.push(key), i);
         // ids = ids.push(this.addField(currentKeyPath.push(arrayKey_i), typeof obj[key]));
       } else if (Array.isArray(obj[key][i]))
       {
         // console.log('cpk2 ' + currentKeyPath.push(key.toString()) + ' ' + JSON.stringify(obj[key][i]));
-        ids = this.addArrayField(ids, obj[key], currentKeyPath.push(key.toString()), i, depth + 1);
+        ids = this.addArrayField(ids, obj[key], currentKeyPath.push(key), i, depth + 1);
       } else
       {
         // console.log('x1 ' + currentKeyPath.push(key.toString()).push(i.toString()));
-        ids = ids.push(this.addField(currentKeyPath.push(key.toString()).push(i.toString()), typeof obj[key][i]));
+        ids = ids.push(this.addField(currentKeyPath.push(key).push(i), typeof obj[key][i]));
         // console.log('foo ' + currentKeyPath.push(key.toString()).push(i.toString()));
         ids = this.addObjectField(ids, obj[key][i], awkp, true);
-        ids = this.addObjectField(ids, obj[key][i], currentKeyPath.push(key.toString()).push(i.toString()), true);
+        ids = this.addObjectField(ids, obj[key][i], currentKeyPath.push(key).push(i), true);
       }
     }
     return ids;
@@ -854,7 +853,7 @@ export class TransformationEngine
       // console.log('el = ' + el + ' for key ' + key);
       if (el !== undefined)
       {
-        if (isPrimitive(el))
+        if (isPrimitive(el) || Object.keys(el).length === 0)
         {
           yadeep.set(r, this.IDToFieldNameMap.get(value), el, { create: true });
         }
@@ -866,10 +865,16 @@ export class TransformationEngine
             const upto: KeyPath = key.slice(0, key.indexOf(-1)).toList();
             for (let j: number = 0; j < Object.keys(yadeep.get(o, upto)).length; j++)
             {
-              const newKeyReplaced: KeyPath = newKey.set(newKey.indexOf(-1), j.toString());
-              const oldKeyReplaced: KeyPath = key.set(key.indexOf(-1), j.toString());
-              // console.log('r here1');
-              this.renameHelper(r, o, newKeyReplaced, this.fieldNameToIDMap.get(newKeyReplaced), oldKeyReplaced);
+              const newKeyReplaced: KeyPath = newKey.set(newKey.indexOf(-1), j);
+              const oldKeyReplaced: KeyPath = key.set(key.indexOf(-1), j);
+              const oldKeyReplacedWithoutLast = oldKeyReplaced.butLast().toList();
+              if (oldKeyReplaced.last() === -1 ||
+                (yadeep.get(o, oldKeyReplacedWithoutLast) != null &&
+                  Object.keys(yadeep.get(o, oldKeyReplacedWithoutLast)).indexOf(oldKeyReplaced.last().toString()) !== -1))
+              {
+                // console.log('r here1');
+                this.renameHelper(r, o, newKeyReplaced, this.fieldNameToIDMap.get(newKeyReplaced), oldKeyReplaced);
+              }
             }
           }
           /*else

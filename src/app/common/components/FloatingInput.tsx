@@ -49,6 +49,7 @@ THE SOFTWARE.
 import './FloatingInputStyle.less';
 
 import * as classNames from 'classnames';
+import Autocomplete from 'common/components/Autocomplete';
 import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
@@ -101,6 +102,7 @@ export interface Props
   showEllipsis?: boolean;
   showWarning?: boolean;
   warningText?: string;
+  options?: List<string>;
 }
 
 @Radium
@@ -226,7 +228,7 @@ export class FloatingInput extends TerrainComponent<Props>
   {
     const { props, state } = this;
     const { value } = state;
-
+    const { options } = props;
     const style = [
       fontColor(Colors().active),
       {
@@ -236,6 +238,28 @@ export class FloatingInput extends TerrainComponent<Props>
 
     if (props.isTextInput)
     {
+      if (options) // Use autocomplete
+      {
+        return (
+          <div>
+            <Autocomplete
+              value={value || ''}
+              title={value || ''}
+              className='floating-input-input'
+              onChange={this._fn(this.handleChange, true)}
+              autoFocus={props.autoFocus}
+              onFocus={this.handleFocus}
+              onBlur={this.handleBlur}
+              id={state.myId}
+              ref={this.getValueRef}
+              onKeyDown={this.handleKeyDown}
+              options={options}
+              style={style}
+              disabled={!props.canEdit}
+            />
+          </div>
+        );
+      }
       // Return a text input
       return (
         <div>
@@ -244,7 +268,7 @@ export class FloatingInput extends TerrainComponent<Props>
             className='floating-input-input'
             value={value === null || value === undefined ? '' : value}
             title={value === null || value === undefined ? '' : value}
-            onChange={this.handleChange}
+            onChange={this._fn(this.handleChange, false)}
             autoFocus={props.autoFocus}
             onFocus={this.handleFocus}
             onBlur={this.handleBlur}
@@ -256,7 +280,7 @@ export class FloatingInput extends TerrainComponent<Props>
           />
           {
             props.showWarning ?
-              <div className='pf-more-nested-name-input-warning'>
+              <div className='floating-input-warning'>
                 {
                   tooltip(
                     <InfoIcon
@@ -298,9 +322,12 @@ export class FloatingInput extends TerrainComponent<Props>
     }
   }
 
-  private handleChange(e)
+  private handleChange(autocomplete, value)
   {
-    const value = e.target.value;
+    if (!autocomplete)
+    {
+      value = value.target.value;
+    }
 
     this.setState({
       value,

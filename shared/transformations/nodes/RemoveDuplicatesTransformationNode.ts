@@ -43,20 +43,70 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+const { List, Map } = Immutable;
 
-export default class RemoveDuplicatesTransformationNode extends TransformationNode
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath } from 'shared/util/KeyPath';
+
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
+
+const TYPECODE = TransformationNodeType.RemoveDuplicatesNode;
+
+export class RemoveDuplicatesTransformationNode extends SimpleTransformationType
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.RemoveDuplicatesNode)
+  public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'array';
+
+  public transformer(el: any[]): any[]
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+
+    const newArray = [];
+    const seen = {};
+    for (let i = 0; i < el.length; i++)
+    {
+      const item = el[i];
+      const hash = String(item);
+      if (seen[hash] === undefined)
+      {
+        newArray.push(item);
+        seen[hash] = true;
+      }
+    }
+    return newArray;
   }
 }
+
+class RemoveDuplicatesTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Remove Duplicates';
+  public description = 'Remove Duplicate Values from an Array';
+  public nodeClass = RemoveDuplicatesTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    const valueType = EngineUtil.getValueType(fieldId, engine);
+    return (
+      EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+      (valueType === 'number' || valueType === 'string') &&
+      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+    );
+  }
+}
+
+export const RemoveDuplicatesTransformationInfo = new RemoveDuplicatesTransformationInfoC();

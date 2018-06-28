@@ -46,6 +46,10 @@ THE SOFTWARE.
 
 import ESConverter from 'shared/database/elastic/formatter/ESConverter';
 import ESParameterFiller from 'shared/database/elastic/parser/EQLParameterFiller';
+import ESJSONType from 'shared/database/elastic/parser/ESJSONType';
+import { ESParameterType } from 'shared/database/elastic/parser/ESParameter';
+import ESParameterSubstituter from 'shared/database/elastic/parser/ESParameterSubstituter';
+import ESPropertyInfo from 'shared/database/elastic/parser/ESPropertyInfo';
 import CardsToCodeOptions from 'shared/database/types/CardsToCodeOptions';
 import ESClause from './clauses/ESClause';
 import EQLConfig from './EQLConfig';
@@ -83,11 +87,23 @@ export default class ESInterpreter
     });
     return inputMap;
   }
+
   public config: EQLConfig; // query language description
   public params: { [name: string]: null | ESClause }; // input parameter clause types
   public parser: ESParser | null; // source parser
+
+  // If isDirty is true, it means some valueInfo nodes are updated, but we haven't synchronized all nodes and re-interpreted the tree.
+  // this.reInterpreting() resets the isDirty to false by synchronizing all nodes, generating queries, and remarking the tree.
+  public isDirty: boolean;
+  // Indicating whether this instance has been updated since born.
+  public isMutated: boolean;
   public rootValueInfo: ESValueInfo;
+  // The generated query string
+  public query: string;
+  // The generated query string in which parameters are substituted with the input params.
+  public finalQuery: string;
   public errors: ESParserError[];
+
   /**
    * Runs the interpreter on the given query string. Read needed data by calling the
    * public member functions below. You can also pass in an existing ESJSONParser
@@ -107,6 +123,10 @@ export default class ESInterpreter
     this.config = config;
     this.params = params;
     this.errors = [];
+    this.finalQuery = null;
+    this.query = null;
+    this.isMutated = false;
+    this.isDirty = false;
 
     if (typeof query === 'string')
     {
@@ -130,66 +150,8 @@ export default class ESInterpreter
 
     try
     {
-      const root: ESValueInfo = this.rootValueInfo;
-      if (root.clause === undefined)
-      {
-        root.clause = this.config.getClause('body');
-      }
-
-      let alias: string | null = null;
-      if (root.value && root.value.groupJoin)
-      {
-        alias = 'parent';
-      }
-      if (root.value && root.value.groupJoin && root.value.groupJoin.parentAlias)
-      {
-        alias = root.value.groupJoin.parentAlias;
-      }
-      root.recursivelyVisit(
-        (info: ESValueInfo): boolean =>
-        {
-          if (info.parameter !== undefined)
-          {
-            const ps = info.parameter.split('.');
-            const parameterName = ps[0];
-            // meta parameters
-            if (alias !== null && parameterName === alias)
-            {
-              // give a special value to parameterValue
-              info.parameterValue = new ESJSONParser(info.value);
-            } else if (parameterName === 'TerrainDate')
-            {
-              info.parameterValue = new ESJSONParser(info.value);
-            } else
-            {
-              let value: any = this.params;
-              for (const p of ps)
-              {
-                value = value[p];
-
-                if (value === undefined)
-                {
-                  this.accumulateError(info, 'Undefined parameter: ' + info.parameter);
-                  return true;
-                }
-              }
-
-              info.parameterValue = new ESJSONParser(JSON.stringify(value));
-              if (info.parameterValue.hasError())
-              {
-                this.accumulateError(info, 'Unable to parse parameter (' + info.parameter + ':' + JSON.stringify(value) + ')');
-              }
-            }
-          }
-
-          if (info.clause !== undefined)
-          {
-            info.clause.mark(this, info);
-          }
-
-          return true;
-        },
-      );
+      this.generateQueries();
+      this.mark();
     } catch (e)
     {
       this.accumulateError(this.rootValueInfo, 'Failed to mark the json object ' + String(e.message));
@@ -235,6 +197,7 @@ export default class ESInterpreter
     }
     return ret;
   }
+
   public getErrors(): string[]
   {
     return this.getInterpretingErrorMessages().concat(this.parser.getErrorMessages());
@@ -242,24 +205,180 @@ export default class ESInterpreter
 
   public toCode(options: CardsToCodeOptions): string
   {
-    let queryString;
     if (options.replaceInputs === true)
     {
-      queryString = ESParameterFiller.generate(this.rootValueInfo, this.params);
+      return this.finalQuery;
     } else
     {
-      queryString = JSON.stringify(this.rootValueInfo.value);
+      return this.query;
     }
+  }
 
-    if (options.limit !== undefined)
+  /**
+   *
+   * @param {ESValueInfo} parent
+   * @param {string | number} index: when the index is number, delete the array element,
+   * otherwise delete the field element.
+   * NOTE: the deleted array element will be replaced with undefined
+   */
+  public deleteChild(parent: ESValueInfo, index: string | number)
+  {
+    if (typeof index === 'string')
     {
-      const o = JSON.parse(queryString);
-      if (o.size === undefined || o.size > options.limit)
+      if (parent.objectChildren[index] !== undefined)
       {
-        o['size'] = options.limit;
-        queryString = JSON.stringify(o);
+        delete parent.objectChildren[index];
+        this.isDirty = true;
+      }
+    } else
+    {
+      if (parent.arrayChildren[index] !== undefined)
+      {
+        delete parent.arrayChildren[index];
+        this.isDirty = true;
       }
     }
-    return ESConverter.formatES(new ESJSONParser(queryString));
+  }
+
+  public updateChild(parent: ESValueInfo, index: string | number, newChild: ESValueInfo | ESPropertyInfo)
+  {
+    this.deleteChild(parent, index);
+    this.addChild(parent, index, newChild);
+  }
+
+  /**
+   * NOTE: the caller should make sure that the type of the value is same as the type of node's value
+   */
+  public updateValue(node: ESValueInfo, value: any)
+  {
+    node.value = value;
+    this.isDirty = true;
+  }
+
+  public addChild(parent: ESValueInfo, index: string | number, newChild: ESValueInfo | ESPropertyInfo)
+  {
+    if (typeof index === 'string')
+    {
+      if (parent.objectChildren[index] === undefined)
+      {
+        if (newChild instanceof ESPropertyInfo)
+        {
+          parent.addObjectChild(index, newChild);
+          this.isDirty = true;
+        } else if (newChild instanceof ESValueInfo)
+        {
+          // we have to create a ESPropertyInfo
+          const childName = new ESJSONParser(JSON.stringify(index)).getValueInfo();
+          childName.card = newChild.card;
+          const propertyInfo = new ESPropertyInfo(childName, newChild);
+          parent.addObjectChild(index, propertyInfo);
+          this.isDirty = true;
+        }
+      }
+    } else
+    {
+      if (parent.arrayChildren[index] === undefined)
+      {
+        parent.addArrayChild(newChild as ESValueInfo, index);
+        this.isDirty = true;
+      }
+    }
+  }
+
+  public reInterpreting()
+  {
+    if (this.isDirty === false)
+    {
+      return;
+    }
+    this.rootValueInfo.recursivelyVisit((element) => true, this.linkValueInfo);
+    this.isDirty = false;
+    this.isMutated = true;
+    try
+    {
+      this.generateQueries();
+      this.mark();
+    }
+    catch (e)
+    {
+      this.accumulateError(this.rootValueInfo, 'Failed to re-interpret the json object ' + String(e.message));
+    }
+  }
+
+  private linkValueInfo(node: ESValueInfo)
+  {
+    let newValue;
+    switch (node.jsonType)
+    {
+      case ESJSONType.array:
+        newValue = [];
+        node.forEachElement((element: ESValueInfo) =>
+        {
+          newValue.push(element.value);
+        });
+        node.value = newValue;
+        return;
+      case ESJSONType.object:
+        newValue = {};
+        node.forEachProperty((element: ESPropertyInfo) =>
+        {
+          newValue[element.propertyName.value] = element.propertyValue.value;
+        });
+        node.value = newValue;
+        break;
+      default:
+        return;
+    }
+  }
+
+  private mark()
+  {
+    const root: ESValueInfo = this.rootValueInfo;
+    if (root.clause === undefined)
+    {
+      root.clause = this.config.getClause('body');
+    }
+    root.recursivelyVisit(
+      (info: ESValueInfo): boolean =>
+      {
+        if (info.clause !== undefined)
+        {
+          info.clause.mark(this, info);
+        }
+        return true;
+      },
+    );
+  }
+
+  private generateQueries()
+  {
+    const root = this.rootValueInfo;
+    this.query = ESParameterSubstituter.generate(root,
+      (paramValueInfo: ESValueInfo, runtimeParam?: string, inTerms?: boolean): string =>
+      {
+        return '@' + String(paramValueInfo.parameter);
+      });
+
+    // generate the final query string while marking the parameter value.
+    this.finalQuery = ESParameterFiller.generate(root, this.params,
+      (source: ESValueInfo, type: ESParameterType, value: string | Error) =>
+      {
+        if (value instanceof Error)
+        {
+          this.accumulateError(source, value.message);
+        } else
+        {
+          const parsedValue = new ESJSONParser(value);
+          if (parsedValue.hasError())
+          {
+            this.accumulateError(source, 'Failed to parse the parameter value ' + value);
+          } else
+          {
+            source.parameterType = type;
+            source.parameterValue = new ESJSONParser(value);
+          }
+        }
+        return true;
+      });
   }
 }

@@ -59,7 +59,7 @@ export default class TerrainDateParameter
     if (TerrainDateParameter.isValidTerrainDateParameter(dateString) === false)
     {
       throw new Error('The TerrainDate parameter ' + dateString + ' is not in the right format:'
-        + 'TerrainDate.{ThisWeek/NextWeek}.[0-6]{T00:00:00+00:00}.');
+        + 'TerrainDate.{ThisWeek/NextWeek}.[0-6]{T00:00:00{[+-]00:00}}.');
     }
     const dateStr = TerrainDateParameter.getDateString(dateString);
     return JSON.stringify(dateStr);

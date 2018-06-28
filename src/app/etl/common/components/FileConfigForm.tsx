@@ -68,11 +68,13 @@ export interface Props
   onChange: (config: FileConfig, isBlur?: boolean) => void;
   hideTypePicker?: boolean;
   style?: any;
+  isSource?: boolean;
 }
 
 type FormState = FileConfigI & {
   useXmlPath: boolean;
   useJsonPath: boolean;
+  isPlaFeed: boolean;
 };
 
 export default class FileConfigForm extends TerrainComponent<Props>
@@ -133,6 +135,13 @@ export default class FileConfigForm extends TerrainComponent<Props>
         widthFactor: 3,
         getDisplayState: this.jsonPathDisplay,
       },
+      isPlaFeed: {
+        type: DisplayType.CheckBox,
+        displayName: 'Google PLA Feed',
+        group: 'path',
+        widthFactor: 3,
+        getDisplayState: this.plaFeedDisplay,
+      },
     };
 
   public render()
@@ -150,6 +159,11 @@ export default class FileConfigForm extends TerrainComponent<Props>
   public xmlPathDisplay(s: FormState)
   {
     return (s.fileType === FileTypes.Xml && s.useXmlPath === true) ? DisplayState.Active : DisplayState.Hidden;
+  }
+
+  public plaFeedDisplay(s: FormState)
+  {
+    return (s.fileType === FileTypes.Xml && !this.props.isSource) ? DisplayState.Active : DisplayState.Hidden;
   }
 
   public jsonPathDisplay(s: FormState)
@@ -180,7 +194,6 @@ export default class FileConfigForm extends TerrainComponent<Props>
   public handleFormChange(formState: FormState, isBlur?: boolean)
   {
     const state = _.extend({}, formState);
-
     if (state.useXmlPath && state.xmlPath === null)
     {
       state.xmlPath = '';

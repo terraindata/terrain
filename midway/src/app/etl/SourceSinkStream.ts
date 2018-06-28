@@ -57,9 +57,11 @@ import
   SourceConfig,
 } from 'shared/etl/types/EndpointTypes';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
+import { PostProcessConfig } from 'shared/etl/types/PostProcessTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import * as Util from '../AppUtil';
 import ExportTransform from './ExportTransform';
+import { PostProcess } from './PostProcess';
 import { TemplateConfig } from './TemplateConfig';
 import Templates from './Templates';
 
@@ -72,6 +74,7 @@ import XMLTransform from '../io/streams/XMLTransform';
 import AEndpointStream from './endpoints/AEndpointStream';
 import AlgorithmEndpoint from './endpoints/AlgorithmEndpoint';
 import ElasticEndpoint from './endpoints/ElasticEndpoint';
+import FollowUpBossEndpoint from './endpoints/FollowUpBossEndpoint';
 import FSEndpoint from './endpoints/FSEndpoint';
 import GoogleAnalyticsEndpoint from './endpoints/GoogleAnalyticsEndpoint';
 import HTTPEndpoint from './endpoints/HTTPEndpoint';
@@ -80,13 +83,17 @@ import MySQLEndpoint from './endpoints/MySQLEndpoint';
 import PostgreSQLEndpoint from './endpoints/PostgreSQLEndpoint';
 import SFTPEndpoint from './endpoints/SFTPEndpoint';
 
+export const postProcessTransform: PostProcess = new PostProcess();
+
 export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[]): Promise<stream.Readable>
 {
   return new Promise<stream.Readable>(async (resolve, reject) =>
   {
     let sourceStream: stream.Readable | undefined;
+    let sourceStreams: stream.Readable[] | undefined;
     let endpoint: AEndpointStream;
     let importStream: stream.Readable;
+    const importStreams: stream.Readable[] = [];
 
     winston.info(`Processing ${source.type} source:`, JSON.stringify(source, null, 2));
 
@@ -96,7 +103,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
       {
         case 'Algorithm':
           endpoint = new AlgorithmEndpoint();
-          const algorithmStream = await endpoint.getSource(source);
+          const algorithmStream = await endpoint.getSource(source) as stream.Readable;
           sourceStream = algorithmStream.pipe(new ExportTransform());
           return resolve(sourceStream);
         case 'Upload':
@@ -108,64 +115,101 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
           break;
         case 'Sftp':
           endpoint = new SFTPEndpoint();
-          sourceStream = await endpoint.getSource(source);
+          const sourceStreamTmp: stream.Readable | stream.Readable[] = await endpoint.getSource(source);
+          if (Array.isArray(sourceStreamTmp))
+          {
+            sourceStreams = sourceStreamTmp as stream.Readable[];
+          }
+          else
+          {
+            sourceStream = sourceStreamTmp as stream.Readable;
+          }
           break;
         case 'GoogleAnalytics':
           endpoint = new GoogleAnalyticsEndpoint();
-          sourceStream = await endpoint.getSource(source);
+          sourceStream = await endpoint.getSource(source) as stream.Readable;
           break;
         case 'Http':
           endpoint = new HTTPEndpoint();
-          sourceStream = await endpoint.getSource(source);
+          sourceStream = await endpoint.getSource(source) as stream.Readable;
           break;
         case 'Fs':
           endpoint = new FSEndpoint();
-          sourceStream = await endpoint.getSource(source);
+          sourceStream = await endpoint.getSource(source) as stream.Readable;
           break;
         case 'Mysql':
           endpoint = new MySQLEndpoint();
-          sourceStream = await endpoint.getSource(source);
+          sourceStream = await endpoint.getSource(source) as stream.Readable;
           return resolve(sourceStream);
         case 'Postgresql':
           endpoint = new PostgreSQLEndpoint();
-          sourceStream = await endpoint.getSource(source);
+          sourceStream = await endpoint.getSource(source) as stream.Readable;
           return resolve(sourceStream);
         default:
-          throw new Error('not implemented.');
+          throw new Error('Source type not implemented.');
       }
 
-      if (sourceStream === undefined)
+      if (sourceStream === undefined && sourceStreams === undefined)
       {
-        throw new Error('Error finding source stream ' + name);
+        throw new Error('Error finding source stream(s) ' + name);
       }
 
-      switch (source.fileConfig.fileType)
+      if (sourceStream !== undefined && sourceStreams === undefined)
       {
-        case 'json':
-          let jsonPath: string = (source.fileConfig.jsonNewlines) ? undefined : '*';
-          if (!!source.fileConfig.jsonPath)
-          {
-            jsonPath = source.fileConfig.jsonPath;
-          }
-          importStream = sourceStream.pipe(JSONTransform.createImportStream(jsonPath));
-          break;
-        case 'csv':
-          importStream = sourceStream.pipe(CSVTransform.createImportStream());
-          break;
-        case 'tsv':
-          importStream = sourceStream.pipe(CSVTransform.createImportStream(true, '\t'));
-          break;
-        case 'xlsx':
-          importStream = sourceStream.pipe(XLSXTransform.createImportStream());
-          break;
-        case 'xml':
-          const xmlPath: string | undefined = source.fileConfig.xmlPath;
-          importStream = sourceStream.pipe(XMLTransform.createImportStream(xmlPath));
-          break;
-        default:
-          throw new Error('Download file type must be either CSV, TSV, JSON, XLSX or XML.');
+        sourceStreams = [sourceStream] as stream.Readable[];
       }
-      resolve(importStream);
+
+      sourceStreams.forEach(async (ss: stream.Readable) =>
+      {
+        switch (source.fileConfig.fileType)
+        {
+          case 'json':
+            let jsonPath: string = (source.fileConfig.jsonNewlines) ? undefined : '*';
+            if (!!source.fileConfig.jsonPath)
+            {
+              jsonPath = source.fileConfig.jsonPath;
+            }
+            importStreams.push(ss.pipe(JSONTransform.createImportStream(jsonPath)));
+            break;
+          case 'csv':
+            importStreams.push(ss.pipe(CSVTransform.createImportStream()));
+            break;
+          case 'tsv':
+            importStreams.push(ss.pipe(CSVTransform.createImportStream(true, '\t')));
+            break;
+          case 'xlsx':
+            importStreams.push(ss.pipe(XLSXTransform.createImportStream()));
+            break;
+          case 'xml':
+            const xmlPath: string | undefined = source.fileConfig.xmlPath;
+            importStreams.push(sourceStream.pipe(XMLTransform.createImportStream(xmlPath)));
+            break;
+          default:
+            throw new Error('Download file type must be either CSV, TSV, JSON, XLSX or XML.');
+        }
+      });
+
+      if (sourceStream !== undefined || importStreams.length === 1)
+      {
+        importStream = importStreams[0];
+      }
+
+      if (Array.isArray(source.options['transformations']) && source.options['transformations'].length !== 0)
+      {
+        const writeStream = new stream.Readable({ objectMode: true });
+        const postProcessedRows: object[]
+          = await postProcessTransform.process(source.options['transformations'] as PostProcessConfig[], importStreams);
+        resolve(writeStream);
+        postProcessedRows.forEach((pPR) =>
+        {
+          writeStream.push(pPR);
+        });
+        writeStream.push(null);
+      }
+      else
+      {
+        resolve(importStream);
+      }
     }
     catch (e)
     {
@@ -194,7 +238,7 @@ export async function getSinkStream(
 
     try
     {
-      if (sink.type !== 'Database' && sink.type !== 'MailChimp')
+      if (sink.type !== 'Database' && sink.type !== 'FollowUpBoss' && sink.type !== 'MailChimp')
       {
         switch (sink.fileConfig.fileType)
         {
@@ -248,7 +292,9 @@ export async function getSinkStream(
             );
             break;
           case 'xml':
-            transformStream = XMLTransform.createExportStream();
+            const xmlPath: string | undefined = sink.fileConfig.xmlPath;
+            const isPlaFeed: boolean = sink.fileConfig.isPlaFeed;
+            transformStream = XMLTransform.createExportStream(xmlPath, isPlaFeed);
             break;
           default:
             throw new Error('Export file type must be either CSV, TSV, JSON or XML.');
@@ -275,17 +321,20 @@ export async function getSinkStream(
         case 'Fs':
           endpoint = new FSEndpoint();
           break;
+        case 'FollowUpBoss':
+          endpoint = new FollowUpBossEndpoint();
+          break;
         case 'MailChimp':
           endpoint = new MailChimpEndpoint();
           break;
         default:
-          throw new Error('not implemented.');
+          throw new Error('Sink type not implemented.');
       }
 
       const sinkStream = await endpoint.getSink(sink, engine);
       if (transformStream !== undefined)
       {
-        const writableStream = transformStream.pipe(sinkStream);
+        transformStream.pipe(sinkStream);
         const progressStream = new ProgressStream(transformStream);
         resolve(progressStream);
       }

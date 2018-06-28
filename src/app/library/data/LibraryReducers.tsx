@@ -87,6 +87,10 @@ LibraryReducers[ActionTypes.categories.create] =
   }>) =>
     addCategory(state, action.payload.category);
 
+LibraryReducers[ActionTypes.categories.remove] =
+  (state, action) =>
+    removeCategory(state, action.payload.category);
+
 LibraryReducers[ActionTypes.categories.change] =
   (state, action) =>
     state.setIn(['categories', action.payload.category.id], action.payload.category);
@@ -105,6 +109,10 @@ LibraryReducers[ActionTypes.groups.create] =
       action.payload.group,
     );
   };
+
+LibraryReducers[ActionTypes.groups.remove] =
+  (state, action) =>
+    removeGroup(state, action.payload.group);
 
 LibraryReducers[ActionTypes.groups.change] =
   (state, action) =>
@@ -148,6 +156,10 @@ LibraryReducers[ActionTypes.algorithms.create] =
       state,
       action.payload.algorithm,
     );
+
+LibraryReducers[ActionTypes.algorithms.remove] =
+  (state, action) =>
+    removeAlgorithm(state, action.payload.algorithm);
 
 LibraryReducers[ActionTypes.algorithms.change] =
   (state, action) =>
@@ -270,13 +282,20 @@ function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>, api)
 {
   if (current !== previous && current !== null && previous !== null)
   {
-    current.map((curItem: any, curId: ID) =>
+    current.forEach((curItem: any, curId: ID) =>
     {
       const prevItem = previous.get(curId);
       if (curItem !== prevItem)
       {
         // should save
         api.saveItem(curItem);
+      }
+    });
+    previous.forEach((prevItem: any, prevId: ID) =>
+    {
+      if (current.get(prevId) == null)
+      {
+        api.deleteItem(prevItem);
       }
     });
   }

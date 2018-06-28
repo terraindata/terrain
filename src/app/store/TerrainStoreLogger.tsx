@@ -47,6 +47,7 @@ import { pathFinderTypeLoader } from 'builder/components/pathfinder/PathfinderTy
 import * as hdr from 'hdr-histogram-js';
 import * as TerrainLog from 'loglevel';
 import { AllRecordNameArray, RecordsSerializer, resetRecordNameArray } from 'shared/util/Classes';
+import unique from 'unique-selector';
 
 export default class TerrainStoreLogger
 {
@@ -54,6 +55,7 @@ export default class TerrainStoreLogger
 
   public static recordingActionPercentileLatency = false;
   public static printStateChange = false;
+  public static printActions = false;
 
   public static actionSerializationLog = [];
   public static serializeAction = false;
@@ -79,6 +81,13 @@ export default class TerrainStoreLogger
         }
         const actionEnd = performance.now();
         const actionLatency = actionEnd - actionStart;
+        if (TerrainStoreLogger.printActions === true)
+        {
+          if (TerrainStoreLogger.shouldPrintBuilderAction(action))
+          {
+            TerrainLog.debug(String(action.type) + ' takes ' + String(actionLatency) + ' ms');
+          }
+        }
         if (actionLatency > 100)
         {
           // print out the long latency actions
@@ -98,7 +107,12 @@ export default class TerrainStoreLogger
           if (TerrainStoreLogger.shouldLoggingBuilderAction(action))
           {
             const actionString = RecordsSerializer.stringify(action);
-            const queryJS = store.getState().get('builder').query.toJS();
+            let queryJS = '';
+            const query = store.getState().get('builder').query;
+            if (query)
+            {
+              queryJS = query.toJS();
+            }
             TerrainStoreLogger.actionSerializationLog.push({ query: queryJS, action: actionString });
           }
         }
@@ -172,6 +186,25 @@ export default class TerrainStoreLogger
       return false;
     }
     return true;
+  }
+
+  public static recordMouseClick(e: MEvent)
+  {
+    if (TerrainStoreLogger.serializeAction)
+    {
+      const selector = unique(e.target);
+      TerrainLog.debug(String(e.type) + ' on selector' + String(selector));
+      TerrainStoreLogger.actionSerializationLog.push({ eventType: e.type, selector });
+    }
+  }
+  public static recordKeyPress(e: KeyboardEvent)
+  {
+    if (TerrainStoreLogger.serializeAction)
+    {
+      const selector = unique(e.target);
+      TerrainLog.debug(String(e.type) + ' on selector' + String(selector));
+      TerrainStoreLogger.actionSerializationLog.push({ eventType: e.type, selector, key: e.key });
+    }
   }
 
   private static loadRecordTypes()

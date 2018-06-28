@@ -64,6 +64,8 @@ import { AuthActions as Actions } from '../auth/data/AuthRedux';
 import * as LibraryTypes from '../library/LibraryTypes';
 import * as UserTypes from '../users/UserTypes';
 
+import * as TerrainLog from 'loglevel';
+
 import AjaxM1 from './AjaxM1';
 
 export interface AjaxResponse
@@ -81,7 +83,7 @@ export const Ajax =
       Ajax.reduxStoreDispatch = config.reduxStoreDispatch;
     },
 
-    req(method: 'post' | 'get',
+    req(method: 'post' | 'get' | 'delete',
       url: string,
       body: object,
       onLoad: (response: object) => void,
@@ -175,27 +177,21 @@ export const Ajax =
       }
 
       const axiosInstance = axios.create();
-      let alreadyErrored = false;
 
       axiosInstance.interceptors.response.use(
         (response) => response,
         (error) =>
         {
+          // This is an route error, we have to abstract the route error to an MidwayError object
           if (error && error.response)
           {
             if (error.response.status === 401)
             {
               Ajax.reduxStoreDispatch(Actions({ actionType: 'logout' }));
             }
-
-            if (error.response.status !== 200 && !alreadyErrored)
-            {
-              alreadyErrored = true;
-              config && config.onError && config.onError(error.data !== undefined ? error.data : error);
-            }
           }
-
-          return Promise.reject(error);
+          const midwayError = MidwayError.fromAxiosErrorResponse(error, 'The Connection Has Been Lost.');
+          return Promise.reject(midwayError);
         },
       );
 
@@ -227,24 +223,17 @@ export const Ajax =
         {
           onLoad(response.data);
         })
-        .catch((err) =>
+        .catch((err: MidwayError) =>
         {
           if (axios.isCancel(err))
           {
             // Added for testing, can be removed.
-            console.error('isCanceled', err.message);
-          } else
-          {
-            if (!alreadyErrored)
-            {
-              alreadyErrored = true;
-              const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
-              config && config.onError && config.onError(routeError);
-            }
-
+            TerrainLog.debug('isCanceled', err.getDetail());
           }
-
-          return Promise.reject(err);
+          // TODO: process this routeError via the Promise catch interface.
+          // pass the error to the error handler if there is one.
+          TerrainLog.debug('Midway Route Error: ' + err.getDetail());
+          config && config.onError && config.onError(err);
         });
 
       return {
@@ -678,6 +667,28 @@ export const Ajax =
         },
       );
     },
+
+    deleteItem(item: Item,
+      onLoad?: (resp: any) => void, onError?: (ev: Event) => void)
+    {
+      const id = item.id;
+      const route = `items/${id}`;
+      onLoad = onLoad || _.noop;
+
+      return Ajax.req(
+        'delete',
+        route,
+        null,
+        (respArray) =>
+        {
+          onLoad(respArray[0]);
+        },
+        {
+          onError,
+        },
+      );
+    },
+
     /**
      * Query M2
      */
@@ -991,32 +1002,6 @@ export const Ajax =
       );
     },
 
-    checkLogin(accessToken: string, id: number, onSuccess: () => void, onError: () => void)
-    {
-      Ajax.req(
-        'post',
-        'status/loggedIn',
-        {
-          accessToken,
-          id,
-        },
-        (data: { loggedIn: boolean }) =>
-        {
-          if (data && data.loggedIn)
-          {
-            onSuccess();
-          }
-          else
-          {
-            onError();
-          }
-        },
-        {
-          onError,
-        },
-      );
-    },
-
     logout(accessToken: string, id: number)
     {
       return Ajax.req(
@@ -1026,7 +1011,11 @@ export const Ajax =
           accessToken,
           id,
         },
-        _.noop,
+        () =>
+        {
+          // successfully logged out, reload the page
+          location.reload();
+        },
         {
           noCredentials: true,
         },
@@ -1104,6 +1093,29 @@ export const Ajax =
       return Ajax.req(
         'get',
         'events/metrics',
+        {},
+        (response: any) =>
+        {
+          try
+          {
+            onLoad(response);
+          }
+          catch (e)
+          {
+            onError && onError(response as any);
+          }
+        },
+        { onError });
+    },
+
+    getLogs(
+      onLoad: (response: any) => void,
+      onError?: (ev: Event) => void,
+    )
+    {
+      return Ajax.req(
+        'get',
+        'status/logs',
         {},
         (response: any) =>
         {
