@@ -69,6 +69,11 @@ class PostgreSQLController extends DatabaseController
       new PostgreSQLDB(this.client));
   }
 
+  public async initialize()
+  {
+    return this.client.initialize();
+  }
+
   public getClient(): PostgreSQLClient
   {
     return this.client;

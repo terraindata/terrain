@@ -168,6 +168,9 @@ export class App
 
     TBLS = Schema.setupTables(config.db as string);
 
+    this.Migrations = new Migrations();
+    this.Migrations.initialize();
+
     this.EMAIL = new Email();
     EMAIL = this.EMAIL;
 

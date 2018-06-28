@@ -80,12 +80,7 @@ beforeAll(async () =>
   try
   {
     postgresController = new PostgresController(config, 0, 'PostgresExecutorTests');
-    let connected = false;
-    while (!connected)
-    {
-      connected = await postgresController.getClient().isConnected();
-      await new Promise((resolve) => setTimeout(resolve, 500));
-    }
+    await postgresController.initialize();
     tasty = postgresController.getTasty();
   }
   catch (e)
