@@ -43,34 +43,62 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import { List } from 'immutable';
 
-import { KeyPath } from '../../util/KeyPath';
-import { TransformationInfo } from '../TransformationInfo';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNodeVisitor from '../TransformationNodeVisitor';
-import TransformationVisitError from '../TransformationVisitError';
-import TransformationVisitResult from '../TransformationVisitResult';
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationNode from 'shared/transformations/TransformationNode';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import { KeyPath } from 'shared/util/KeyPath';
+import * as yadeep from 'shared/util/yadeep';
 
-export default abstract class TransformationNode
+/*
+ *  Aggregate Transformations inspect an array and output a synthesized value
+ *  Currently acceptedType is not supported
+ */
+export default abstract class AggregateTransformationType extends TransformationNode
 {
-  public id: number;
-  public typeCode: TransformationNodeType;
-  public fields: List<KeyPath>;
-  public meta: object;
+  // override this to operate on null values
+  public readonly skipNulls: boolean = true;
 
-  public constructor(id: number, fields: List<KeyPath>, options: object = {}, typeCode: TransformationNodeType)
-  {
-    this.id = id;
-    this.fields = fields;
-    this.meta = options;
-    this.typeCode = typeCode;
-  }
+  // this defines the main behavior of the transformation
+  public abstract aggregator(vals: any[]): any;
 
-  public accept(visitor: TransformationNodeVisitor, doc: object, options: object = {}): TransformationVisitResult
+  protected transformDocument(doc: object): TransformationVisitResult
   {
-    const docCopy = Object.assign({}, doc); // Preserve original doc in case of errors that would mangle it
-    return TransformationInfo.applyTargetedVisitor(visitor, this, docCopy, options);
+    const errors = [];
+    const opts = this.meta as NodeOptionsType<any>;
+    this.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+
+      if (el === null && this.skipNulls)
+      {
+        return;
+      }
+
+      if (Array.isArray(el))
+      {
+        const aggregate = this.aggregator(el);
+        yadeep.set(doc, opts.newFieldKeyPaths.get(0), aggregate, { create: true });
+      }
+      else
+      {
+        errors.push(`Error in ${this.typeCode}: Expected array but got a(n) ${typeof el}.`);
+      }
+    });
+
+    return {
+      document: doc,
+      errors,
+    } as TransformationVisitResult;
   }
 }

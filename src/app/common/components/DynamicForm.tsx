@@ -66,6 +66,8 @@ import Autocomplete from 'common/components/Autocomplete';
 import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
 import FadeInOut from 'common/components/FadeInOut';
+import ListForm from 'common/components/ListForm';
+import Switch from 'common/components/Switch';
 
 import './DynamicForm.less';
 
@@ -105,6 +107,8 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       [DisplayType.Pick]: this.renderPick,
       [DisplayType.TagsBox]: this.renderTagsBox,
       [DisplayType.Custom]: this.renderCustom,
+      [DisplayType.Delegate]: this.renderDelegate,
+      [DisplayType.Switch]: this.renderSwitch,
     };
 
   public yOffsetLookup:
@@ -116,6 +120,8 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       [DisplayType.Pick]: 0,
       [DisplayType.TagsBox]: 0,
       [DisplayType.Custom]: 0,
+      [DisplayType.Delegate]: 0,
+      [DisplayType.Switch]: 0,
     };
   constructor(props)
   {
@@ -137,6 +143,108 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
             : null
         }
         {options.render(state, disabled)}
+      </div>
+    );
+  }
+
+  public renderSwitch(inputInfo: InputDeclarationType<S>, stateName, state: S, index, disabled: boolean)
+  {
+    const options: OptionType<DisplayType.Switch> = inputInfo.options || {};
+    return (
+      <div
+        className='dynamic-form-default-block'
+        key={index}
+      >
+        <Switch
+          first={options.values.get(0) ? options.values.get(0) : 'Option 1'}
+          second={options.values.get(1) ? options.values.get(1) : 'Option 2'}
+          selected={this.props.inputState[stateName]}
+          onChange={this.setStateHOC(stateName)}
+        />
+      </div>
+    );
+  }
+
+  public renderDelegate(inputInfo: InputDeclarationType<S>, stateName, state: S, index, disabled: boolean)
+  {
+    const options: OptionType<DisplayType.Delegate> = inputInfo.options || {};
+    const value = this.props.inputState[stateName];
+    const inputKey = options.inputKey || 'inputState';
+    const onChangeKey = options.onChangeKey || 'onChange';
+
+    const Component = options.component;
+
+    const renderComponent = (item, listIndex?) =>
+    {
+      let onChange;
+      if (listIndex !== undefined)
+      {
+        onChange = (val, apply = true) =>
+        {
+          const newItems = value.slice();
+          newItems[listIndex] = val;
+          if (apply)
+          {
+            this.setStateHOC(stateName)(newItems);
+          }
+          else
+          {
+            this.setStateNoApplyHOC(stateName)(newItems);
+          }
+        };
+      }
+      else
+      {
+        onChange = (val, apply = true) =>
+        {
+          if (apply)
+          {
+            this.setStateHOC(stateName)(val);
+          }
+          else
+          {
+            this.setStateNoApplyHOC(stateName)(val);
+          }
+        };
+      }
+
+      return (
+        <Component
+          {...
+          {
+            [inputKey]: item,
+            [onChangeKey]: onChange,
+          }
+          }
+          disabled={disabled}
+        />
+      );
+    };
+
+    let formElement;
+    if (options.isList)
+    {
+      formElement = (
+        <ListForm
+          items={value}
+          onChange={this.setStateHOC(stateName)}
+          newItemDefault={options.listDefaultValue}
+          renderItem={renderComponent}
+        />
+      );
+    }
+    else
+    {
+      formElement = renderComponent(value);
+    }
+
+    return (
+      <div
+        className='dynamic-form-default-block'
+        key={index}
+      >
+        <div className='dynamic-form-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
+        {formElement}
       </div>
     );
   }

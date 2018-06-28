@@ -43,20 +43,68 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+const { List, Map } = Immutable;
 
-export default class DifferenceTransformationNode extends TransformationNode
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+
+import TransformationNode from 'shared/transformations/TransformationNode';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath } from 'shared/util/KeyPath';
+
+import CombineTransformationType from 'shared/transformations/types/CombineTransformationType';
+
+const TYPECODE = TransformationNodeType.DifferenceNode;
+
+export class DifferenceTransformationNode extends CombineTransformationType
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.DifferenceNode)
+  public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'number';
+
+  public combine(vals: number[]): number
   {
-    super(id, fields, options, typeCode);
+    if (vals.length > 0)
+    {
+      let difference: number = vals[0];
+      for (let i = 1; i < vals.length; i++)
+      {
+        difference -= vals[i];
+      }
+      return difference;
+    }
+    else
+    {
+      return null;
+    }
   }
 }
+
+class DifferenceTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Difference of Fields';
+  public description = 'Subtracts one field from another and puts the result in a new field';
+  public nodeClass = DifferenceTransformationNode;
+
+  public editable = false;
+  public creatable = true;
+  public newFieldType = 'number';
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return (
+      EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
+      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+    );
+  }
+}
+
+export const DifferenceTransformationInfo = new DifferenceTransformationInfoC();

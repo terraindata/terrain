@@ -44,19 +44,57 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { List } from 'immutable';
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
+import * as App from '../App';
+import * as Util from '../AppUtil';
+import IntegrationConfig from '../integrations/IntegrationConfig';
+import Integrations from '../integrations/Integrations';
+const Router = new KoaRouter();
+const integrations: Integrations = new Integrations();
+export const initialize = () => integrations.initialize();
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
-
-export default class FilterTransformationNode extends TransformationNode
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.FilterNode)
+  const fullBody = ctx.request.body.body;
+  const description = JSON.stringify(fullBody.description);
+  const user = JSON.stringify(fullBody.user);
+  const browserInfo = JSON.stringify(fullBody.browserInfo);
+  let subject: string = '';
+  let body: string;
+  ctx.status = 200;
+  const emailIntegrations: IntegrationConfig[] = await integrations.get(null, undefined, 'Email', true) as IntegrationConfig[];
+  winston.info('email integrations: ' + JSON.stringify(emailIntegrations));
+  if (emailIntegrations.length !== 1)
   {
-    super(id, fields, options, typeCode);
+    winston.warn(`Invalid number of email integrations, found ${emailIntegrations.length}`);
   }
-}
+  else if (emailIntegrations.length === 1 && emailIntegrations[0].name !== 'Default Failure Email')
+  {
+    winston.warn('Invalid Email found.');
+  }
+  else
+  {
+    let attachment: string;
+    if (fullBody.bug)
+    {
+      subject = 'Bug report from ' + user;
+      body = 'A user has submitted a bug report detailed below. \n \n'  + description + '\n \n Browser/OS information: ' + browserInfo;
+    }
+    else
+    {
+      subject = 'Feedback report from ' + user;
+      body = 'A user has submitted a feedback report detailed below. \n \n'  + description + '\n \n Browser/OS information: ' + browserInfo;
+    }
+    if (fullBody.screenshot)
+    {
+      attachment = fullBody.screenshot;
+    }
+    // winston.info("id: " + emailIntegrations[0].id);
+    const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body, attachment);
+    winston.info(`Feedback email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
+  }
+});
+
+export default Router;

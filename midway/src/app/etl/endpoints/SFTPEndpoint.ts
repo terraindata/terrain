@@ -43,9 +43,11 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:triple-equals
 
 import * as SSH from 'ssh2';
 import { Readable, Writable } from 'stream';
+import * as winston from 'winston';
 
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
@@ -65,14 +67,14 @@ export default class SFTPEndpoint extends AEndpointStream
 
   public async getSource(source: SourceConfig): Promise<Readable[]>
   {
-    const config: SSH.ConnectConfig = await this.getIntegrationConfig(source.integrationId);
+    const config: SSH.ConnectConfig = this._parseConfig(await this.getIntegrationConfig(source.integrationId) as object);
     const sftp: SSH.SFTPWrapper = await this.getSFTPClient(config);
     return this.getSFTPList(source, sftp);
   }
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
-    const config: SSH.ConnectConfig = await this.getIntegrationConfig(sink.integrationId);
+    const config: SSH.ConnectConfig = this._parseConfig(await this.getIntegrationConfig(sink.integrationId) as object);
     const sftp: SSH.SFTPWrapper = await this.getSFTPClient(config);
     return sftp.createWriteStream(sink.options['filepath']);
   }
@@ -105,10 +107,17 @@ export default class SFTPEndpoint extends AEndpointStream
     return new Promise<Readable[]>(async (resolve, reject) =>
     {
       const readStreams: Readable[] = [];
-
-      if (Array.isArray(source.options['inputs']))
+      if (Array.isArray(source.rootInputConfig['inputs']))
       {
-        const filenames: string[] = inputs.parseFilename(source.options['filename'], source.options['inputs']);
+        const pathToFile: string = source.options['filepath'].substring(0, (source.options['filepath'].lastIndexOf('/') as number) + 1);
+        const filesAtPath: string[] = await this._getFilesFromPath(pathToFile, sftp);
+        const options =
+          {
+            filename: source.options['filepath'],
+            inputs: source.rootInputConfig['inputs'],
+          };
+
+        const filenames: string[] = inputs.parseFilename(filesAtPath, options);
         filenames.forEach(async (filename) =>
         {
           readStreams.push(sftp.createReadStream(filename));
@@ -120,5 +129,71 @@ export default class SFTPEndpoint extends AEndpointStream
       }
       resolve(readStreams);
     });
+  }
+
+  private async _getFilesFromPath(path: string, sftp: SSH.SFTPWrapper): Promise<string[]>
+  {
+    return new Promise<string[]>(async (resolve, reject) =>
+    {
+      const files: string[] = [];
+      try
+      {
+        sftp.readdir(path, (err, list) =>
+        {
+          if (err)
+          {
+            winston.warn((err as any).toString() as string);
+            return resolve([]);
+          }
+          else
+          {
+            list.forEach((file) =>
+            {
+              if (file['longname'].substring(0, 2) === '-r')
+              {
+                files.push(file['filename']);
+              }
+            });
+          }
+          resolve(files);
+        });
+      }
+      catch (e)
+      {
+        winston.warn((e as any).toString() as string);
+        return resolve([]);
+      }
+    });
+  }
+
+  private _parseConfig(genericConfig: object): SSH.ConnectConfig
+  {
+    if (genericConfig['username'] != null && genericConfig['username'] !== ''
+      && genericConfig['password'] != null && genericConfig['password'] != '')
+    {
+      delete genericConfig['privateKey'];
+    }
+    else
+    {
+      if (genericConfig['password'] !== undefined)
+      {
+        delete genericConfig['password'];
+      }
+    }
+
+    if (genericConfig['privateKey'] !== undefined)
+    {
+      let genericConfigPrivateKey: string = '-----BEGIN RSA PRIVATE KEY-----' + ((genericConfig['privateKey'] as string)
+        .replace('-----BEGIN RSA PRIVATE KEY-----', '').replace('-----END RSA PRIVATE KEY-----', '')
+        .replace(new RegExp('\\s', 'g'), '\n').replace(new RegExp('\\n+', 'g'), '\n') as string) + '-----END RSA PRIVATE KEY-----';
+      if (genericConfig['privateKey'].indexOf('BEGIN PRIVATE KEY') !== -1 && genericConfig['privateKey'].indexOf('END PRIVATE KEY') !== -1)
+      {
+        genericConfigPrivateKey = '-----BEGIN PRIVATE KEY-----' + ((genericConfig['privateKey'] as string)
+          .replace('-----BEGIN PRIVATE KEY-----', '').replace('-----END PRIVATE KEY-----', '')
+          .replace(new RegExp('\\s', 'g'), '\n').replace(new RegExp('\\n+', 'g'), '\n') as string) + '-----END PRIVATE KEY-----';
+      }
+      genericConfig['privateKey'] = genericConfigPrivateKey;
+    }
+    return genericConfig as SSH.ConnectConfig;
   }
 }
