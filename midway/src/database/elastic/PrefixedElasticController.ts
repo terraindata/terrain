@@ -44,71 +44,84 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as Tasty from '../../tasty/Tasty';
-
-import DatabaseController from '../DatabaseController';
-import ElasticClient from './client/ElasticClient';
+import PrefixedElasticClient from './client/PrefixedElasticClient';
 import ElasticConfig from './ElasticConfig';
-import ElasticQueryHandler from './query/ElasticQueryHandler';
-import ElasticDB from './tasty/ElasticDB';
+import ElasticController from './ElasticController';
 
-/**
- * The central controller for communicating with ElasticSearch.
- */
-class ElasticController extends DatabaseController
+class PrefixedElasticController extends ElasticController
 {
-  private client: ElasticClient;
-  private tasty: Tasty.Tasty;
-  private queryHandler: ElasticQueryHandler;
-  private analyticsIndex: string;
-  private analyticsType: string;
+  private indexPrefix: string;
 
-  constructor(config: ElasticConfig, id: number, name: string, analyticsIndex?: string, analyticsType?: string,
-    Client: { new (controller: ElasticController, config: ElasticConfig): ElasticClient } = ElasticClient)
+  constructor(config: ElasticConfig, id: number, name: string, analyticsIndex?: string, analyticsType?: string, indexPrefix?: string)
   {
-    super('ElasticController', id, name);
+    super(config, id, name, analyticsIndex, analyticsType, PrefixedElasticClient);
 
-    this.client = new Client(this, config);
+    this.indexPrefix = (indexPrefix == null ? '' : indexPrefix);
+  }
 
-    this.tasty = new Tasty.Tasty(
-      this,
-      new ElasticDB(this.client));
+  public getIndexPrefix(): string
+  {
+    return this.indexPrefix;
+  }
 
-    this.queryHandler = new ElasticQueryHandler(this);
-
-    if (analyticsIndex !== undefined)
+  public prependIndexParam(obj): void
+  {
+    if (!('index' in obj))
     {
-      this.analyticsIndex = analyticsIndex;
+      obj.index = this.getIndexPrefix() + '*';
     }
-
-    if (analyticsType !== undefined)
+    else if (typeof obj.index === 'string')
     {
-      this.analyticsType = analyticsType;
+      obj.index = this.getIndexPrefix() + (obj.index as string);
+    }
+    else if (obj.index.constructor === Array)
+    {
+      obj.index = obj.index.map((s) => {
+        if (typeof s !== 'string')
+        {
+          throw new Error('Invalid index param');
+        }
+        return this.getIndexPrefix() + s;
+      });
+    }
+    else
+    {
+      throw new Error('Invalid index param');
     }
   }
 
-  public getClient(): ElasticClient
+  public prependIndexTerm(obj): void
   {
-    return this.client;
+    if (!('_index' in obj))
+    {
+      throw new Error('No _index term');
+    }
+    else if (typeof obj._index === 'string')
+    {
+      obj._index = this.getIndexPrefix() + (obj._index as string);
+    }
+    else
+    {
+      throw new Error('Invalid _index term');
+    }
   }
 
-  public getTasty(): Tasty.Tasty
+  public removeIndexPrefix(index: string): string
   {
-    return this.tasty;
+    if (index.startsWith(this.getIndexPrefix()))
+    {
+      return index.substring(this.getIndexPrefix().length);
+    }
+    else
+    {
+      throw new Error(`Index name "${index}" is missing prefix "${this.getIndexPrefix()}"`);
+    }
   }
 
-  public getQueryHandler(): ElasticQueryHandler
+  public removeDocIndexPrefix(obj): void
   {
-    return this.queryHandler;
-  }
-
-  public getAnalyticsDB(): object
-  {
-    return {
-      index: this.analyticsIndex,
-      type: this.analyticsType,
-    };
+    obj._index = this.removeIndexPrefix(obj._index);
   }
 }
 
-export default ElasticController;
+export default PrefixedElasticController;

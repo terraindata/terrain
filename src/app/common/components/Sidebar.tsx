@@ -48,22 +48,38 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import AccountDropdown from 'common/components/AccountDropdown';
+import Button from 'common/components/Button';
+import CheckBox from 'common/components/CheckBox';
+import Modal from 'common/components/Modal';
+import PopUpForm from 'common/components/PopUpForm';
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateList';
+import * as html2canvas from 'html2canvas';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
+import * as request from 'request';
+import { Ajax } from 'util/Ajax';
+import { AuthState } from '../../auth/AuthTypes';
 import { backgroundColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import TerrainComponent from '../../common/components/TerrainComponent';
+import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
 import './Sidebar.less';
-
+type User = UserTypes.User;
 const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 const linkHeight = 50; // Coordinate with Sidebar.less
 const TerrainIcon = require('images/logo_terrainLong_blue@2x.png');
 const TerrainSmallIcon = require('images/logo_terrain_mountain.png');
+const BugSmallIcon = require('images/icon-bug.png');
+const FeedbackSmallIcon = require('images/icon-feedback.png');
 const linkOffsetExpanded = 207;
 const linkOffsetCollapsed = 133;
+const topBarItemStyle = [backgroundColor(Colors().bg3, Colors().bg2), fontColor(Colors().active)];
+const topBarRunStyle = [backgroundColor(Colors().activeHover, Colors().active), fontColor(Colors().activeText)];
+const Color = require('color');
+
 export interface ILink
 {
   icon: any;
@@ -80,6 +96,7 @@ export interface Props
   expandable?: boolean;
   expanded?: boolean;
   onExpand?: () => void;
+  users?: UserTypes.UserState;
 }
 
 @Radium
@@ -87,10 +104,61 @@ export class Sidebar extends TerrainComponent<Props>
 {
   public state: {
     linkOffset: number,
+    reportBugModalOpen: boolean,
+    reportFeedbackModalOpen: boolean,
   } =
     {
       linkOffset: 0,
+      reportBugModalOpen: false,
+      reportFeedbackModalOpen: false,
     };
+
+  public renderRootLevelModals(): any[]
+  {
+    const modals = [];
+
+    if (this.state.reportBugModalOpen)
+    {
+      modals.push(
+        <PopUpForm
+          title='REPORT A BUG'
+          key='reportBug'
+          formDescription='Please describe your bug in as much detail as possible below. Your email address will be recorded.'
+          textboxPlaceholderValue='Put your bug description here.'
+          isBug={true}
+          className='bug-report'
+          open={this.state.reportBugModalOpen}
+          onClose={this.closeTemplateUI}
+          wide={true}
+          showTextbox={true}
+          closeOnConfirm={true}
+          confirm={true}
+          >
+        </PopUpForm>,
+      );
+    }
+    if (this.state.reportFeedbackModalOpen)
+    {
+      modals.push(
+        <PopUpForm
+          title='GENERAL FEEDBACK'
+          formDescription='Please submit any feedback you have below. Your email address will be recorded.'
+          textboxPlaceholderValue='Feedback description here.'
+          isBug={false}
+          key='giveFeedback'
+          className='feedback-report'
+          open={this.state.reportFeedbackModalOpen}
+          onClose={this.closeTemplateUI}
+          wide={true}
+          showTextbox={true}
+          closeOnConfirm={true}
+          confirm={true}
+        >
+        </PopUpForm>,
+      );
+    }
+    return modals;
+  }
 
   public componentWillMount()
   {
@@ -138,7 +206,7 @@ export class Sidebar extends TerrainComponent<Props>
     };
   }
 
-  public render()
+public render()
   {
     return (
       <div
@@ -148,6 +216,7 @@ export class Sidebar extends TerrainComponent<Props>
         })}
         style={backgroundColor(Colors().sidebarBg)}
       >
+      {this.renderRootLevelModals()}
         {
           this.props.expanded ?
             <img
@@ -220,6 +289,7 @@ export class Sidebar extends TerrainComponent<Props>
             )
           }
         </div>
+
         {
           this.props.expandable ?
             (
@@ -242,14 +312,51 @@ export class Sidebar extends TerrainComponent<Props>
             )
             : null
         }
+        {
+          this.props.expanded ?
+          <div className='sidebar-button sidebar-bug-button'>
+          <Button
+          text='BUGS'
+          onClick={this._toggle('reportBugModalOpen')}> </Button>
+          </div>
+          :
+          <img
+          src={BugSmallIcon} className='sidebar-button-collapsed sidebar-bug-button-collapsed'
+          onClick={this._toggle('reportBugModalOpen')}
+          key='reportImage'/>
+        }
+
+        {
+          this.props.expanded ?
+          <div className='sidebar-button sidebar-feedback-button'>
+          <Button
+          text='FEEDBACK'
+          onClick={this._toggle('reportFeedbackModalOpen')}> </Button>
+          </div>
+          :
+          <img className='sidebar-button-collapsed sidebar-feedback-button-collapsed' src={FeedbackSmallIcon}
+          onClick={this._toggle('reportFeedbackModalOpen')}
+          key='feedbackImage'/>
+        }
+
       </div>
+
     );
+}
+
+    public closeTemplateUI()
+  {
+    this.setState({
+      reportBugModalOpen: false,
+      reportFeedbackModalOpen: false,
+    });
   }
+
 }
 
 export default Util.createContainer(
   Sidebar,
-  [],
+  ['users'],
   {
     colorsActions: ColorsActions,
   },

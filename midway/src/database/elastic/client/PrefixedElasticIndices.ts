@@ -44,71 +44,86 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as Tasty from '../../tasty/Tasty';
+import * as Elastic from 'elasticsearch';
+import PrefixedElasticController from '../PrefixedElasticController';
+import ElasticIndices from './ElasticIndices';
 
-import DatabaseController from '../DatabaseController';
-import ElasticClient from './client/ElasticClient';
-import ElasticConfig from './ElasticConfig';
-import ElasticQueryHandler from './query/ElasticQueryHandler';
-import ElasticDB from './tasty/ElasticDB';
-
-/**
- * The central controller for communicating with ElasticSearch.
- */
-class ElasticController extends DatabaseController
+class PrefixedElasticIndices extends ElasticIndices<PrefixedElasticController>
 {
-  private client: ElasticClient;
-  private tasty: Tasty.Tasty;
-  private queryHandler: ElasticQueryHandler;
-  private analyticsIndex: string;
-  private analyticsType: string;
-
-  constructor(config: ElasticConfig, id: number, name: string, analyticsIndex?: string, analyticsType?: string,
-    Client: { new (controller: ElasticController, config: ElasticConfig): ElasticClient } = ElasticClient)
+  constructor(controller: PrefixedElasticController, delegate: Elastic.Client)
   {
-    super('ElasticController', id, name);
+    super(controller, delegate);
+  }
 
-    this.client = new Client(this, config);
-
-    this.tasty = new Tasty.Tasty(
-      this,
-      new ElasticDB(this.client));
-
-    this.queryHandler = new ElasticQueryHandler(this);
-
-    if (analyticsIndex !== undefined)
+  public getMapping(params: Elastic.IndicesGetMappingParams, callback: (error: any, response: any, status: any) => void): void
+  {
+    this.controller.prependIndexParam(params);
+    return super.getMapping(params, (err, res, status) =>
     {
-      this.analyticsIndex = analyticsIndex;
-    }
+      if (err)
+      {
+        if (err.statusCode === 404)
+        {
+          callback(undefined, {}, 200);
+        }
+        else
+        {
+          callback(err, undefined, status);
+        }
+      }
+      else
+      {
+        const newRes = {};
+        try
+        {
+          Object.keys(res).forEach((key) => {
+            newRes[this.controller.removeIndexPrefix(key)] = res[key];
+          });
+        }
+        catch (e)
+        {
+          this.log('error', e);
+          return callback(e, undefined, status);
+        }
+        callback(err, newRes, status);
+      }
+    });
+  }
 
-    if (analyticsType !== undefined)
+  public create(params: Elastic.IndicesCreateParams, callback: (error: any, response: any, status: any) => void): void
+  {
+    this.controller.prependIndexParam(params);
+    return super.create(params, (err, res, status) =>
     {
-      this.analyticsType = analyticsType;
-    }
+      if (err)
+      {
+        callback(err, undefined, status);
+      }
+      else
+      {
+        res.index = this.controller.removeIndexPrefix(res.index);
+        callback(err, res, status);
+      }
+    });
   }
 
-  public getClient(): ElasticClient
+  public delete(params: Elastic.IndicesDeleteParams, callback: (error: any, response: any, status: any) => void): void
   {
-    return this.client;
+    this.controller.prependIndexParam(params);
+    return super.delete(params, callback);
   }
 
-  public getTasty(): Tasty.Tasty
+  public putMapping(params: Elastic.IndicesPutMappingParams, callback: (err: any, response: any, status: any) => void): void
   {
-    return this.tasty;
+    this.controller.prependIndexParam(params);
+    return super.putMapping(params, callback);
   }
 
-  public getQueryHandler(): ElasticQueryHandler
+  public refresh(params: Elastic.IndicesRefreshParams, callback: (err: any, response: any) => void): void
   {
-    return this.queryHandler;
-  }
-
-  public getAnalyticsDB(): object
-  {
-    return {
-      index: this.analyticsIndex,
-      type: this.analyticsType,
-    };
+    this.controller.prependIndexParam(params);
+    return super.refresh(params, callback);
   }
 }
 
-export default ElasticController;
+export default PrefixedElasticIndices;

@@ -70,10 +70,12 @@ export interface RowOptions
   disabled?: boolean;
 }
 
-interface Props
+interface Props<T>
 {
-  items: any[];
-  onChange: (newValue: any[], apply?: boolean) => void;
+  items: T[];
+  onChange: (newValue: T[], apply?: boolean) => void;
+  renderItem?: (item: T, index?: number) => any;
+  newItemDefault?: T;
   label?: string;
   computeOptions?: (index: number) => RowOptions;
   noBorder?: boolean;
@@ -81,7 +83,7 @@ interface Props
 }
 
 // performance of this component can be optimized
-export default class ListForm extends TerrainComponent<Props>
+export default class ListForm<T = string> extends TerrainComponent<Props<T>>
 {
   public renderAddNewRow()
   {
@@ -111,25 +113,34 @@ export default class ListForm extends TerrainComponent<Props>
 
   public renderRow(index: number)
   {
-    let value = this.props.items[index];
-    if (typeof value !== 'string')
-    {
-      value = String(value);
-    }
+    const value = this.props.items[index];
+
     const { disabled } = this.getOptions(index);
 
-    return (
-      <div
-        key={index}
-        className='list-form-row'
-      >
+    let component: any;
+    if (this.props.renderItem !== undefined)
+    {
+      component = this.props.renderItem(value, index);
+    }
+    else
+    {
+      component = (
         <Autocomplete
-          value={value}
+          value={value as any}
           onChange={this.rowChangeFactory(index)}
           options={emptyOptions}
           onBlur={this.onBlurFactory(index)}
           disabled={disabled}
         />
+      );
+    }
+
+    return (
+      <div
+        key={index}
+        className='object-form-row'
+      >
+        {component}
         <Quarantine>
           <div
             className='list-form-row-delete'
@@ -159,7 +170,7 @@ export default class ListForm extends TerrainComponent<Props>
 
   public render()
   {
-    const indices = Immutable.Range(0, this.props.items.length);
+    const indices = this.props.items != null ? Immutable.Range(0, this.props.items.length) : null;
     return (
       <div
         className='object-form-container'
@@ -175,7 +186,7 @@ export default class ListForm extends TerrainComponent<Props>
           className='object-kv-body'
           style={this.props.noBorder ? { border: 'none' } : borderColor(Colors().border1)}
         >
-          {indices.map(this.renderRow)}
+          {indices !== null ? indices.map(this.renderRow) : null}
           {this.renderAddNewRow()}
         </div>
       </div>
@@ -217,8 +228,16 @@ export default class ListForm extends TerrainComponent<Props>
   {
     const { items, onChange } = this.props;
 
-    const newItems = items.slice();
-    newItems.push('');
+    const newItems = items != null ? items.slice() : [];
+    if (this.props.newItemDefault !== undefined)
+    {
+      newItems.push(this.props.newItemDefault);
+    }
+    else
+    {
+      newItems.push('' as any);
+    }
+
     onChange(newItems, true);
   }
 }

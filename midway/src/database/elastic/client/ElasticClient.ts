@@ -51,23 +51,48 @@ import * as request from 'request';
 import { DatabaseControllerStatus } from '../../DatabaseControllerStatus';
 import ElasticConfig from '../ElasticConfig';
 import ElasticController from '../ElasticController';
-import ElasticCluster from './ElasticCluster';
-import ElasticIndices from './ElasticIndices';
+import ElasticCluster, { IElasticCluster } from './ElasticCluster';
+import ElasticIndices, { IElasticIndices } from './ElasticIndices';
+
+// tslint:disable-next-line:interface-name
+export interface IElasticClient
+{
+  cluster: IElasticCluster;
+  indices: IElasticIndices;
+  ping(params: Elastic.PingParams, callback: (error: any, response: any) => void): void;
+  bulk(params: Elastic.BulkIndexDocumentsParams, callback: (error: any, response: any) => void): void;
+  delete(params: Elastic.DeleteDocumentParams, callback: (error: any, response: Elastic.DeleteDocumentResponse) => void): void;
+  deleteTemplate(params: Elastic.DeleteTemplateParams, callback: (error: any, response: any) => void): void;
+  deleteScript(params: Elastic.DeleteScriptParams, callback: (error: any, response: any) => void): void;
+  getTemplate(params: Elastic.GetTemplateParams, callback: (error: any, response: any) => void): void;
+  getScript(params: Elastic.GetScriptParams, callback: (error: any, response: any) => void): void;
+  index<T>(params: Elastic.IndexDocumentParams<T>, callback: (error: any, response: any) => void): void;
+  update(params: Elastic.UpdateDocumentParams, callback: (error: any, response: any) => void): void;
+  putScript(params: Elastic.PutScriptParams, callback: (err: any, response: any, status: any) => void): void;
+  putTemplate(params: Elastic.PutTemplateParams, callback: (err: any, response: any, status: any) => void): void;
+  scroll<T>(params: Elastic.ScrollParams, callback: (error: any, response: Elastic.SearchResponse<T>) => void): void;
+  clearScroll(params: Elastic.ClearScrollParams, callback: (error: any, response: any) => void): void;
+  search<T>(params: Elastic.SearchParams, callback: (error: any, response: Elastic.SearchResponse<T>) => void): void;
+  msearch<T>(params: Elastic.MSearchParams, callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void;
+  msearchTemplate<T>(params: Elastic.MSearchTemplateParams, callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void;
+}
 
 /**
  * An client which acts as a selective isomorphic wrapper around
  * the elastic.js API.
  */
-class ElasticClient
+class ElasticClient<TController extends ElasticController = ElasticController> implements IElasticClient
 {
-  public cluster: ElasticCluster;
-  public indices: ElasticIndices;
+  public cluster: IElasticCluster;
+  public indices: IElasticIndices;
 
-  private controller: ElasticController;
+  protected controller: TController;
   private config: ElasticConfig;
-  private delegate: Elastic.Client;
+  private delegate: IElasticClient;
 
-  constructor(controller: ElasticController, config: ElasticConfig)
+  constructor(controller: TController, config: ElasticConfig,
+    Cluster: { new (controller: TController, delegate: IElasticClient): IElasticCluster } = ElasticCluster,
+    Indices: { new (controller: TController, delegate: IElasticClient): IElasticIndices } = ElasticIndices)
   {
     this.controller = controller;
 
@@ -77,8 +102,8 @@ class ElasticClient
     this.controller.setStatus(DatabaseControllerStatus.CONNECTING);
     this.delegate = new Elastic.Client(_.extend(this.config));
 
-    this.cluster = new ElasticCluster(controller, this.delegate);
-    this.indices = new ElasticIndices(controller, this.delegate);
+    this.cluster = new Cluster(controller, this.delegate);
+    this.indices = new Indices(controller, this.delegate);
   }
 
   /**
@@ -245,8 +270,7 @@ class ElasticClient
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-clearscroll
    */
-  public clearScroll<T>(params: Elastic.ClearScrollParams,
-    callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
+  public clearScroll(params: Elastic.ClearScrollParams, callback: (error: any, response: any) => void): void
   {
     this.log('clearScroll', params);
     this.delegate.clearScroll(params, callback);
@@ -282,7 +306,7 @@ class ElasticClient
     this.delegate.msearchTemplate(params, callback);
   }
 
-  public getDelegate(): Elastic.Client
+  public getDelegate(): IElasticClient
   {
     return this.delegate;
   }
@@ -311,7 +335,7 @@ class ElasticClient
     });
   }
 
-  private log(methodName: string, info: any)
+  protected log(methodName: string, info: any)
   {
     this.controller.log('ElasticClient.' + methodName, info);
   }

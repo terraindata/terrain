@@ -45,10 +45,20 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as _ from 'lodash';
+import * as queryString from 'query-string';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import { PostProcessAggregationTypes, PostProcessConfig, PostProcessOptionsTypes } from 'shared/etl/types/PostProcessTypes';
+import
+{
+  PostProcessAggregationTypes,
+  PostProcessConfig,
+  PostProcessFilterTypes,
+  PostProcessOptionsTypes,
+  PostProcessParseTypes,
+  PostProcessSortObjectTypes,
+  PostProcessSortTypes,
+} from 'shared/etl/types/PostProcessTypes';
 
 import BufferTransform from '../io/streams/BufferTransform';
 
@@ -61,7 +71,6 @@ export class PostProcess
 
   public async process(transformConfigs: PostProcessConfig[], dataStreams: stream.Readable[]): Promise<object[]>
   {
-    // [{"name":"aggregate","pattern":"[0-9]{1,}-[0-9]{1,}","primaryKey":"ga:productSku","aggParams":["Item Quantity","Item Revenue"]}]
     return new Promise<object[]>(async (resolve, reject) =>
     {
       const data: object[] = [];
@@ -95,6 +104,15 @@ export class PostProcess
           {
             case 'Aggregate':
               processedData = this._aggregate(transformConfig.options, processedData);
+              break;
+            case 'Filter':
+              processedData = this._filter(transformConfig.options, processedData);
+              break;
+            case 'Parse':
+              processedData = this._parse(transformConfig.options, processedData);
+              break;
+            case 'Sort':
+              processedData = this._sort(transformConfig.options, processedData);
               break;
             default:
               break;
@@ -184,9 +202,108 @@ export class PostProcess
           }
         });
         break;
-
       default:
     }
+    return returnData;
+  }
+
+  private _parse(options: object, data: object[]): object[]
+  {
+    const returnData: object[] = [];
+    switch (options['operation'])
+    {
+      case PostProcessParseTypes.ParseURL:
+        data.forEach((row) =>
+        {
+          const newRow = _.cloneDeep(row);
+          const parsedClicks = queryString.parseUrl(newRow[options['field']]);
+          // const parsedClicksUrl = parsedClicks['url'];
+          // const parsedClicksQuery = parsedClicks['query'];
+          // const domainName = options['url'];
+          // let parsedClicksUrlArr = [];
+          // try
+          // {
+          //   parsedClicksUrlArr = parsedClicksUrl.substring(parsedClicksUrl.indexOf(domainName)
+          //     + domainName.length).split('/').filter((token) => token.length !== 0);
+          // }
+          // catch (e)
+          // {
+          //   // do nothing
+          // }
+          newRow[options['field']] = parsedClicks;
+
+          returnData.push(newRow);
+        });
+        break;
+      default:
+    }
+    return returnData;
+  }
+
+  // filter out objects by primary key matching a regex pattern
+  private _filter(options: object, data: object[]): object[]
+  {
+    let returnData: object[] = [];
+    switch (options['operation'])
+    {
+      case PostProcessFilterTypes.RemoveByPattern:
+        returnData = data.filter((row) =>
+          row[options['primaryKey']] != null && Array.isArray(row[options['primaryKey']].match(new RegExp(options['pattern'], 'g'))));
+        break;
+      case PostProcessFilterTypes.MostRecent:
+        break;
+      default:
+    }
+    return returnData;
+  }
+
+  // let's ignore this sort function for now...
+  private _sort(options: object, data: object[]): object[]
+  {
+    const returnData: object[] = data.slice();
+    // returnData.sort((a, b) =>
+    // {
+    //   let returnValue: number = 0;
+    //   options['operations'].some((operation: PostProcessSortObjectTypes) =>
+    //   {
+    //     const convertToComparableFormat = (value) =>
+    //     {
+    //       if (typeof value === 'string')
+    //       {
+    //         try
+    //         {
+    //           const valueAsDate: Date = new Date(value);
+    //           if (valueAsDate + '' !== 'Invalid Date')
+    //           {
+    //             return valueAsDate.getTime();
+    //           }
+    //         }
+    //         catch (e)
+    //         {
+    //           // do nothing
+    //         }
+    //       }
+    //       return value;
+    //     };
+    //     const aValue = convertToComparableFormat(a[operation.field]);
+    //     const bValue = convertToComparableFormat(b[operation.field]);
+    //     if (aValue === bValue)
+    //     {
+    //       return false;
+    //     }
+
+    //     switch (operation.sort)
+    //     {
+    //       case PostProcessSortTypes.Asc:
+    //         returnValue = aValue - bValue;
+    //         break;
+    //       default:
+    //         returnValue = bValue - aValue;
+    //     }
+    //   });
+    //   return returnValue;
+    // });
+
     return returnData;
   }
 }

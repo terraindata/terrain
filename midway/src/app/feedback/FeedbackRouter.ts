@@ -44,71 +44,57 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as Tasty from '../../tasty/Tasty';
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
+import * as App from '../App';
+import * as Util from '../AppUtil';
+import IntegrationConfig from '../integrations/IntegrationConfig';
+import Integrations from '../integrations/Integrations';
+const Router = new KoaRouter();
+const integrations: Integrations = new Integrations();
+export const initialize = () => integrations.initialize();
 
-import DatabaseController from '../DatabaseController';
-import ElasticClient from './client/ElasticClient';
-import ElasticConfig from './ElasticConfig';
-import ElasticQueryHandler from './query/ElasticQueryHandler';
-import ElasticDB from './tasty/ElasticDB';
-
-/**
- * The central controller for communicating with ElasticSearch.
- */
-class ElasticController extends DatabaseController
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  private client: ElasticClient;
-  private tasty: Tasty.Tasty;
-  private queryHandler: ElasticQueryHandler;
-  private analyticsIndex: string;
-  private analyticsType: string;
-
-  constructor(config: ElasticConfig, id: number, name: string, analyticsIndex?: string, analyticsType?: string,
-    Client: { new (controller: ElasticController, config: ElasticConfig): ElasticClient } = ElasticClient)
+  const fullBody = ctx.request.body.body;
+  const description = JSON.stringify(fullBody.description);
+  const user = JSON.stringify(fullBody.user);
+  const browserInfo = JSON.stringify(fullBody.browserInfo);
+  let subject: string = '';
+  let body: string;
+  ctx.status = 200;
+  const emailIntegrations: IntegrationConfig[] = await integrations.get(null, undefined, 'Email', true) as IntegrationConfig[];
+  winston.info('email integrations: ' + JSON.stringify(emailIntegrations));
+  if (emailIntegrations.length !== 1)
   {
-    super('ElasticController', id, name);
-
-    this.client = new Client(this, config);
-
-    this.tasty = new Tasty.Tasty(
-      this,
-      new ElasticDB(this.client));
-
-    this.queryHandler = new ElasticQueryHandler(this);
-
-    if (analyticsIndex !== undefined)
+    winston.warn(`Invalid number of email integrations, found ${emailIntegrations.length}`);
+  }
+  else if (emailIntegrations.length === 1 && emailIntegrations[0].name !== 'Default Failure Email')
+  {
+    winston.warn('Invalid Email found.');
+  }
+  else
+  {
+    let attachment: string;
+    if (fullBody.bug)
     {
-      this.analyticsIndex = analyticsIndex;
+      subject = 'Bug report from ' + user;
+      body = 'A user has submitted a bug report detailed below. \n \n'  + description + '\n \n Browser/OS information: ' + browserInfo;
     }
-
-    if (analyticsType !== undefined)
+    else
     {
-      this.analyticsType = analyticsType;
+      subject = 'Feedback report from ' + user;
+      body = 'A user has submitted a feedback report detailed below. \n \n'  + description + '\n \n Browser/OS information: ' + browserInfo;
     }
+    if (fullBody.screenshot)
+    {
+      attachment = fullBody.screenshot;
+    }
+    // winston.info("id: " + emailIntegrations[0].id);
+    const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body, attachment);
+    winston.info(`Feedback email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
   }
+});
 
-  public getClient(): ElasticClient
-  {
-    return this.client;
-  }
-
-  public getTasty(): Tasty.Tasty
-  {
-    return this.tasty;
-  }
-
-  public getQueryHandler(): ElasticQueryHandler
-  {
-    return this.queryHandler;
-  }
-
-  public getAnalyticsDB(): object
-  {
-    return {
-      index: this.analyticsIndex,
-      type: this.analyticsType,
-    };
-  }
-}
-
-export default ElasticController;
+export default Router;
