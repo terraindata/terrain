@@ -119,7 +119,6 @@ class PopUpForm extends TerrainComponent<Props>
   {
     this.handleSubmitForm();
     this.props.onClose();
-
   }
 
   public handleTextboxChange(evt)
@@ -168,7 +167,6 @@ class PopUpForm extends TerrainComponent<Props>
       (response) => restoreAppOpacity(),
       {
         onError: (err) => restoreAppOpacity(),
-
       });
   }
 
