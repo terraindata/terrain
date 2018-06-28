@@ -314,7 +314,9 @@ export class JobQueue
         // log job result
         const jobLogConfig: JobLogConfig[] = await App.JobL.create(getJobs[0].id, jobResult.rootLogStream,
           jobResult.status, true);
-        await this._setJobLogId(getJobs[0].id, jobLogConfig[0].id);
+
+        // await this._setJobLogId(getJobs[0].id, jobLogConfig[0].id);
+
         if (jobResult.options.outputStream === null)
         {
           await App.JobQ.setJobStatus(getJobs[0].id, false, 'FAILURE');
@@ -352,7 +354,7 @@ export class JobQueue
   }
 
   // Status codes: PENDING SUCCESS FAILURE PAUSED CANCELED RUNNING ABORTED (PAUSED/RUNNING when midway was restarted)
-  public async setJobStatus(id: number, running: boolean, status: string): Promise<boolean>
+  public async setJobStatus(id: number, running: boolean, status: string, jobLogId?: number): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>
     {
@@ -378,6 +380,11 @@ export class JobQueue
 
       jobs[0].running = running;
       jobs[0].status = status;
+      if (jobLogId !== undefined)
+      {
+        jobs[0].logId = jobLogId;
+      }
+
       const doNothing: JobConfig[] = await App.DB.upsert(this.jobTable, jobs[0]) as JobConfig[];
 
       if (status === 'FAILURE')
@@ -421,7 +428,7 @@ export class JobQueue
           this.runningJobs.delete(id);
 
           const jobLogConfig: JobLogConfig[] = await App.JobL.create(id, jobResult.rootLogStream);
-          await this._setJobLogId(id, jobLogConfig[0].id);
+          // await this._setJobLogId(id, jobLogConfig[0].id);
         }
       }
       catch (e)
@@ -501,7 +508,7 @@ export class JobQueue
           const jobStatus: string = jobResult.status === true ? 'SUCCESS' : 'FAILURE';
 
           const jobLogConfig: JobLogConfig[] = await App.JobL.create(jobId, jobResult.rootLogStream, jobResult.status, false);
-          await this._setJobLogId(jobId, jobLogConfig[0].id);
+          // await this._setJobLogId(jobId, jobLogConfig[0].id);
           if (jobResult.options.outputStream === null)
           {
             await App.JobQ.setJobStatus(jobId, false, 'FAILURE');

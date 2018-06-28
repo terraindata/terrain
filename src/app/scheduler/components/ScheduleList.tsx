@@ -208,7 +208,7 @@ class ScheduleList extends TerrainComponent<Props>
       actions = actions.push({
         text: 'Pause',
         onClick: this._fn(this.performAction, 'pauseSchedule', schedule.id),
-      })
+      });
     }
     if (schedule.shouldRunNext && !schedule.running)
     {
