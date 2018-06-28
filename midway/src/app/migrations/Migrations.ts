@@ -52,15 +52,38 @@ import * as App from '../App';
 import * as Tasty from '../../tasty/Tasty';
 
 import { MigrationRecordConfig as MigrationRecord } from './MigrationRecordConfig';
-import { CURRENT_VERSION, Version } from './MigrationTypes';
+import { CURRENT_VERSION, FIRST_VERSION, Version } from './MigrationTypes';
+
+const registeredMigrations = [
+  
+
+];
 
 export class Migrations
 {
   private migrationTable: Tasty.Table;
 
+  constructor()
+  {
+
+  }
+
   public initialize()
   {
     this.migrationTable = App.TBLS.migrationRecords;
+  }
+
+  public async runMigrations(): Promise<void>
+  {
+    return new Promise<void>(async (resolve, reject) => {
+      const currentRecord = await this.getCurrent();
+      let fromVersion = FIRST_VERSION;
+      if (currentRecord !== undefined)
+      {
+        fromVersion = currentRecord.toVersion;
+      }
+
+    });
   }
 
   public async get(id?: number, isCurrent?: boolean)
@@ -84,7 +107,7 @@ export class Migrations
   /*
    *  Create a new migration record and set it to be the (only) current one.
    */
-  public async createCurrent(record: MigrationRecord): Promise<MigrationRecord[]>
+  private async createCurrent(record: MigrationRecord): Promise<MigrationRecord[]>
   {
     return new Promise<MigrationRecord[]>(async (resolve, reject) =>
     {
@@ -101,7 +124,7 @@ export class Migrations
     });
   }
 
-  public async update(record: MigrationRecord): Promise<MigrationRecord[]>
+  private async update(record: MigrationRecord): Promise<MigrationRecord[]>
   {
     return new Promise<MigrationRecord[]>(async (resolve, reject) =>
     {
@@ -118,7 +141,7 @@ export class Migrations
     });
   }
 
-  public async upsert(record: MigrationRecord): Promise<MigrationRecord[]>
+  private async upsert(record: MigrationRecord): Promise<MigrationRecord[]>
   {
     return new Promise<MigrationRecord[]>(async (resolve, reject) =>
     {

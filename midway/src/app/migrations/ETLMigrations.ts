@@ -44,15 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-export type Version = 'v4' | 'v5';
+import * as assert from 'assert';
+import * as _ from 'lodash';
+import * as winston from 'winston';
 
-export const CURRENT_VERSION: Version = 'v5';
-export const FIRST_VERSION: Version = 'v4';
+import * as App from '../App';
+import * as Tasty from '../../tasty/Tasty';
 
-export interface Migrator
-{
-  fromPattern?: string; // not yet supported
-  fromVersion?: Version;
-  toVersion: Version;
-  migrate: (from: Version, to: Version) => Promise<boolean>;
-}
+import { MigrationRecordConfig as MigrationRecord } from './MigrationRecordConfig';
+import { CURRENT_VERSION, FIRST_VERSION, Migrator, Version } from './MigrationTypes';
+
+export const keypathMigration: Migrator = {
+  fromVersion: 'v4',
+  toVersion: 'v5',
+  migrate: async (from, to) => {
+    return true;
+  },
+};
+
