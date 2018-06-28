@@ -329,7 +329,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
   {
     let dateViewType;
     const dateProp = rawDateProp.replace(/ /g, '');
-    const elasticCheck = dateProp.slice(0,3).toLowerCase();
+    const elasticCheck = dateProp.slice(0, 3).toLowerCase();
     if (dateProp.startsWith('@TerrainDate'))
     {
       dateViewType = 'relative';

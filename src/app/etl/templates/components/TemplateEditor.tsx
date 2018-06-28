@@ -55,6 +55,7 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 const HTML5Backend = require('react-dnd-html5-backend');
 
+import Foldout from 'common/components/Foldout';
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import { ETLActions } from 'etl/ETLRedux';
 import DocumentsPreviewColumn from 'etl/templates/components/columns/DocumentsPreviewColumn';
@@ -238,7 +239,12 @@ class TemplateEditor extends TerrainComponent<Props>
         <div className='template-editor-width-spacer'>
           <div className='template-editor-columns-area'>
             {this.renderEditorSection(showEditor)}
-            {this.renderDocumentsSection()}
+            <Foldout
+              direction='right'
+              width={480}
+            >
+              {this.renderDocumentsSection()}
+            </Foldout>
           </div>
         </div>
         <MoveFieldModal

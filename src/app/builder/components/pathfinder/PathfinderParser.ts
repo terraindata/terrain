@@ -605,7 +605,7 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
     }
     if (checkElastic === 'now')
     {
-      value = value.slice(0,3).toLowerCase() + value.slice(3);
+      value = value.slice(0, 3).toLowerCase() + value.slice(3);
     }
   } else if (isNumberValue)
   {

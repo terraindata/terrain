@@ -122,7 +122,7 @@ export default class Benchmarking
       }
     }
     const stop = Date.now();
-    return 1000 * (stop - start) / ( runs * chunk);
+    return 1000 * (stop - start) / (runs * chunk);
   }
 
   public static weave(
@@ -131,7 +131,7 @@ export default class Benchmarking
     argSets: any[],
     chunk?: number,
     minTime?: number,
-  ): Array<{time1: number, time2: number, difference: number}>
+  ): Array<{ time1: number, time2: number, difference: number }>
   {
     const runs = [];
     for (const args of argSets)
@@ -160,7 +160,7 @@ export default class Benchmarking
 
     const testGet = (path) => yadeep.get(testDoc, path);
     const testSearch = (path) => yadeep.search(testDoc, path);
-    const testPaths = [ simplePath, arrayPath, complexPath1, complexPath2, complexPath3 ];
+    const testPaths = [simplePath, arrayPath, complexPath1, complexPath2, complexPath3];
     const runs = Benchmarking.weave(testGet, testSearch, testPaths, chunk, minTime);
     return runs;
   }

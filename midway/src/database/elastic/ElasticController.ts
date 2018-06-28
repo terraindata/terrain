@@ -63,10 +63,12 @@ class ElasticController extends DatabaseController
   private analyticsIndex: string;
   private analyticsType: string;
 
-  constructor(config: ElasticConfig, id: number, name: string, analyticsIndex?: string, analyticsType?: string)
+  constructor(config: ElasticConfig, id: number, name: string, analyticsIndex?: string, analyticsType?: string,
+    Client: { new (controller: ElasticController, config: ElasticConfig): ElasticClient } = ElasticClient)
   {
     super('ElasticController', id, name);
-    this.client = new ElasticClient(this, config);
+
+    this.client = new Client(this, config);
 
     this.tasty = new Tasty.Tasty(
       this,

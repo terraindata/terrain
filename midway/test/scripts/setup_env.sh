@@ -3,7 +3,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # this is the tagged version of moviedb docker image we are using
-elastic_image="terrain/moviesdb-elk:1.1a"
+elastic_image="terrain/moviesdb-elk:1.2a"
 mysql_image="terrain/moviesdb-mysql:1.0a"
 postgres_image="terrain/moviesdb-postgres:1.0a"
 sqlite_image="terrain/moviesdb-sqlite:1.0a"

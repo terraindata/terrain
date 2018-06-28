@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as winston from 'winston';
 
 import ElasticConfig from '../../src/database/elastic/ElasticConfig';
-import ElasticController from '../../src/database/elastic/ElasticController';
+import PrefixedElasticController from '../../src/database/elastic/PrefixedElasticController';
 import MySQLConfig from '../../src/database/mysql/MySQLConfig';
 import MySQLController from '../../src/database/mysql/MySQLController';
 import * as Tasty from '../../src/tasty/Tasty';
@@ -72,7 +72,7 @@ const elasticConfig: ElasticConfig =
 async function initializeDBs(): Promise<void>
 {
   mysqlController = new MySQLController(mysqlConfig, 0, 'CopyData-MySQL');
-  elasticController = new ElasticController(elasticConfig, 1, 'CopyData-Elastic');
+  elasticController = new PrefixedElasticController(elasticConfig, 1, 'CopyData-Elastic', undefined, undefined, 'abc.');
 }
 
 async function readTable(table, mysql: MySQLController): Promise<object[]>
@@ -82,7 +82,7 @@ async function readTable(table, mysql: MySQLController): Promise<object[]>
   return elements;
 }
 
-async function copyTable(table, mysql: MySQLController, elastic: ElasticController): Promise<object[]>
+async function copyTable(table, mysql: MySQLController, elastic: PrefixedElasticController): Promise<object[]>
 {
   const elements: object[] = await readTable(table, mysql);
   winston.info('Copying ' + elements.length.toString() + ' elements');

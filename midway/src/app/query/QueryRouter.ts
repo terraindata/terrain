@@ -61,62 +61,59 @@ import { QueryHandler } from './QueryHandler';
 const QueryRouter = new KoaRouter();
 export const initialize = () => { };
 
-QueryRouter.post(
-  '/',
-  passport.authenticate('access-token-local'),
-  async (ctx, next) =>
+QueryRouter.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info(JSON.stringify(ctx.request, null, 1));
+  let query: QueryRequest;
+  if (ctx.request.type === 'application/json')
   {
-    winston.info(JSON.stringify(ctx.request, null, 1));
-    let query: QueryRequest;
-    if (ctx.request.type === 'application/json')
-    {
-      query = ctx.request.body.body as QueryRequest;
-    }
-    else if (ctx.request.type === 'application/x-www-form-urlencoded')
-    {
-      query = JSON.parse(ctx.request.body.data).body as QueryRequest;
-    }
-    else
-    {
-      throw new Error('Unknown Request Type ' + String(ctx.request.body));
-    }
+    query = ctx.request.body.body as QueryRequest;
+  }
+  else if (ctx.request.type === 'application/x-www-form-urlencoded')
+  {
+    query = JSON.parse(ctx.request.body.data).body as QueryRequest;
+  }
+  else
+  {
+    throw new Error('Unknown Request Type ' + String(ctx.request.body));
+  }
 
-    winston.info(JSON.stringify(ctx.request.body, null, 1));
-    winston.info('db ' + JSON.stringify(query));
-    Util.verifyParameters(query, ['database', 'type', 'body']);
+  winston.info(JSON.stringify(ctx.request.body, null, 1));
+  winston.info('db ' + JSON.stringify(query));
+  Util.verifyParameters(query, ['database', 'type', 'body']);
 
-    winston.info('query database: ' + query.database.toString() + ' type "' + query.type + '"');
-    winston.debug('query database debug: ' + query.database.toString() + ' type "' + query.type + '"' +
-      'body: ' + JSON.stringify(query.body));
+  winston.info('query database: ' + query.database.toString() + ' type "' + query.type + '"');
+  winston.debug('query database debug: ' + query.database.toString() + ' type "' + query.type + '"' +
+    'body: ' + JSON.stringify(query.body));
 
-    if (query.streaming === true)
-    {
-      winston.info('Streaming query result to ' + String(ctx.request.body.filename));
-    }
+  if (query.streaming === true)
+  {
+    winston.info('Streaming query result to ' + String(ctx.request.body.filename));
+  }
 
-    const database: DatabaseController | undefined = DatabaseRegistry.get(query.database);
-    if (database === undefined)
-    {
-      throw new Error('Database "' + query.database.toString() + '" not found.');
-    }
+  const database: DatabaseController | undefined = DatabaseRegistry.get(query.database);
+  if (database === undefined)
+  {
+    throw new Error('Database "' + query.database.toString() + '" not found.');
+  }
 
-    if (query.streaming === true)
-    {
-      const qh: QueryHandler = database.getQueryHandler();
-      const queryStream: Readable = await qh.handleQuery(query) as Readable;
-      ctx.type = 'text/plain';
-      ctx.attachment(ctx.request.body.filename);
-      ctx.body = queryStream;
-    }
-    else
-    {
-      const qh: QueryHandler = database.getQueryHandler();
-      const result: QueryResponse = await qh.handleQuery(query) as QueryResponse;
-      result.setQueryRequest(query);
-      ctx.body = result;
-      ctx.status = 200;
-    }
-  });
+  if (query.streaming === true)
+  {
+    const qh: QueryHandler = database.getQueryHandler();
+    const queryStream: Readable = await qh.handleQuery(query) as Readable;
+    ctx.type = 'text/plain';
+    ctx.attachment(ctx.request.body.filename);
+    ctx.body = queryStream;
+  }
+  else
+  {
+    const qh: QueryHandler = database.getQueryHandler();
+    const result: QueryResponse = await qh.handleQuery(query) as QueryResponse;
+    result.setQueryRequest(query);
+    ctx.body = result;
+    ctx.status = 200;
+  }
+});
 
 QueryRouter.post('/template', passport.authenticate('access-token-local'), async (ctx, next) =>
 {

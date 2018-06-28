@@ -9,6 +9,8 @@ bundle.js
 bundle.js.map
 bundle.prod.js
 bundle.demo.js
+bundle.js.gz
+vendor.bundle.js.gz
 bundle.server.js
 src/commitlog.txt
 npm-debug.log

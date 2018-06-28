@@ -112,7 +112,7 @@ const DateUtil =
 
     formatSpecificDate(date)
     {
-      if (date.toLowerCase() === 'now') 
+      if (date.toLowerCase() === 'now')
       {
         return 'now';
       }
