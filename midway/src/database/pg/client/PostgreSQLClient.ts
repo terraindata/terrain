@@ -97,7 +97,7 @@ class PostgreSQLClient
         config.database = 'postgres';
         const client = new pg.Client(config);
         await client.connect();
-        await client.query('create database ' + newDatabase);
+        await client.query('create database ' + String(newDatabase));
         await client.end();
         await this.initialize(false);
       }
