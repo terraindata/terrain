@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 export type Version = 'v4' | 'v5';
 
-export const CURRENT_VERSION: Version = 'v5';
-export const FIRST_VERSION: Version = 'v4';
+export const CURRENT_VERSION: Version = 'v5'; // current version of midway
+export const FIRST_VERSION: Version = 'v4'; // default version if it doesn't exist
 
 export interface Migrator
 {

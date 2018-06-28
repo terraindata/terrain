@@ -51,13 +51,15 @@ import * as winston from 'winston';
 import * as App from '../App';
 import * as Tasty from '../../tasty/Tasty';
 
-import { MigrationRecordConfig as MigrationRecord } from './MigrationRecordConfig';
-import { CURRENT_VERSION, FIRST_VERSION, Migrator, Version } from './MigrationTypes';
+import { MigrationRecordConfig as MigrationRecord } from '../migrations/MigrationRecordConfig';
+import { CURRENT_VERSION, FIRST_VERSION, Migrator, Version } from '../AppVersion';
+import { templates as templatesDb} from './TemplateRouter';
 
 export const keypathMigration: Migrator = {
   fromVersion: 'v4',
   toVersion: 'v5',
   migrate: async (from, to) => {
+    const templates = await templatesDb.get();
     return true;
   },
 };

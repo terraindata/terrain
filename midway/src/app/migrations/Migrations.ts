@@ -52,7 +52,7 @@ import * as App from '../App';
 import * as Tasty from '../../tasty/Tasty';
 
 import { MigrationRecordConfig as MigrationRecord } from './MigrationRecordConfig';
-import { CURRENT_VERSION, FIRST_VERSION, Version } from './MigrationTypes';
+import { CURRENT_VERSION, FIRST_VERSION, Version } from '../AppVersion';
 
 const registeredMigrations = [
   

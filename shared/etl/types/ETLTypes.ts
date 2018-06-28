@@ -48,6 +48,7 @@ import * as _ from 'lodash';
 
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { SinkConfig, SourceConfig } from './EndpointTypes';
+import { TemplateVersion } from 'shared/etl/migrations/TemplateVersions';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
@@ -79,7 +80,7 @@ export interface TemplateBase
   sinks: any;
   process: any;
   settings: any;
-  meta: any;
+  meta: { version: TemplateVersion };
   uiData: any;
 }
 
