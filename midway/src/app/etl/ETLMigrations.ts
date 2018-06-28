@@ -44,87 +44,39 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as Elastic from 'elasticsearch';
-import PrefixedElasticController from '../PrefixedElasticController';
-import ElasticIndices from './ElasticIndices';
+import * as assert from 'assert';
+import * as _ from 'lodash';
+import * as winston from 'winston';
 
-class PrefixedElasticIndices extends ElasticIndices<PrefixedElasticController>
-{
-  constructor(controller: PrefixedElasticController, delegate: Elastic.Client)
-  {
-    super(controller, delegate);
-  }
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
 
-  public getMapping(params: Elastic.IndicesGetMappingParams, callback: (error: any, response: any, status: any) => void): void
+import { CURRENT_VERSION, FIRST_VERSION, Migrator, Version } from '../AppVersion';
+import { MigrationRecordConfig as MigrationRecord } from '../migrations/MigrationRecordConfig';
+import { templates as templatesDb } from './TemplateRouter';
+
+import { TemplateVersion, updateTemplateIfNeeded } from 'shared/etl/migrations/TemplateVersions';
+
+export const defaultETLMigration: Migrator = {
+  fromVersion: 'v4',
+  toVersion: 'v5',
+  migrate: (from, to) =>
   {
-    this.controller.prependIndexParam(params);
-    return super.getMapping(params, (err, res, status) =>
+    return new Promise<boolean>(async (resolve, reject) =>
     {
-      if (err)
+      let anyUpdated = false;
+      const templates = await templatesDb.get();
+      for (const t of templates)
       {
-        if (err.statusCode === 404)
+        const { template, updated, message } = updateTemplateIfNeeded(t);
+        await templatesDb.update(template);
+        if (updated)
         {
-          callback(undefined, {}, 200);
-        }
-        else
-        {
-          callback(err, undefined, status);
+          anyUpdated = true;
+          winston.debug(`Updated Template ${template.id}: ${message}`);
         }
       }
-      else
-      {
-        const newRes = {};
-        try
-        {
-          Object.keys(res).forEach((key) =>
-          {
-            newRes[this.controller.removeIndexPrefix(key)] = res[key];
-          });
-        }
-        catch (e)
-        {
-          this.log('error', e);
-          return callback(e, undefined, status);
-        }
-        callback(err, newRes, status);
-      }
+      resolve(anyUpdated);
     });
-  }
-
-  public create(params: Elastic.IndicesCreateParams, callback: (error: any, response: any, status: any) => void): void
-  {
-    this.controller.prependIndexParam(params);
-    return super.create(params, (err, res, status) =>
-    {
-      if (err)
-      {
-        callback(err, undefined, status);
-      }
-      else
-      {
-        res.index = this.controller.removeIndexPrefix(res.index);
-        callback(err, res, status);
-      }
-    });
-  }
-
-  public delete(params: Elastic.IndicesDeleteParams, callback: (error: any, response: any, status: any) => void): void
-  {
-    this.controller.prependIndexParam(params);
-    return super.delete(params, callback);
-  }
-
-  public putMapping(params: Elastic.IndicesPutMappingParams, callback: (err: any, response: any, status: any) => void): void
-  {
-    this.controller.prependIndexParam(params);
-    return super.putMapping(params, callback);
-  }
-
-  public refresh(params: Elastic.IndicesRefreshParams, callback: (err: any, response: any) => void): void
-  {
-    this.controller.prependIndexParam(params);
-    return super.refresh(params, callback);
-  }
-}
-
-export default PrefixedElasticIndices;
+  },
+};
