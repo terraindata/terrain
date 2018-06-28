@@ -130,7 +130,7 @@ function upgrade4To5(templateObj: object): { changes: number, template: Template
     // update keypaths for transformation nodes
     const dag = engine.dag;
     const nodes = dag.nodes();
-    if (nodes === undefined && nodes.length > 0)
+    if (nodes !== undefined && nodes.length > 0)
     {
       nodes.forEach((id) =>
       {
@@ -146,7 +146,7 @@ function upgrade4To5(templateObj: object): { changes: number, template: Template
     engine.IDToFieldNameMap = engine.IDToFieldNameMap.map((kp) => convertKeyPath(kp)).toMap();
     return edge.set('transformations', engine);
   }).toMap();
-  template = template.set('edges', edges);
+  template = template.setIn(['process', 'edges'], edges);
   return {
     template: templateForBackend(template),
     changes,
