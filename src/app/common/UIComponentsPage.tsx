@@ -56,6 +56,7 @@ import './UIComponentsPageStyle.less';
 
 import Button from './components/Button';
 import CRONEditor from './components/CRONEditor';
+import Foldout from './components/Foldout';
 
 export interface Props
 {
@@ -151,7 +152,33 @@ class UIComponentsPage extends TerrainComponent<Props>
           onChange={this._setStateWrapper('cron')}
         />
         {space}
+        <div
+          style={{
+            background: '#f5f5f5',
+            width: '100%',
+            height: '309px',
+            border: '2px solid #eee',
+            display: 'flex',
+          }}
+        >
+          <div
+            style={{
+              flexGrow: 1,
+            }}
+          >
+            I'm just a grassy field
+          </div>
 
+          <Foldout
+            direction='right'
+            width={230}
+          >
+            {space}
+            Oh me oh my it's a snake!
+            {space}
+            Go away you snake!
+          </Foldout>
+        </div>
       </div>
     );
   }

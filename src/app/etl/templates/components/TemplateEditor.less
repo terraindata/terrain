@@ -1,8 +1,9 @@
 @import "~common/Common.less";
 
-@main-column-basis: 900px;
-@preview-column-basis: 480px;
-@total-column-basis: (@main-column-basis + @preview-column-basis + 64px);
+// @main-column-basis: 900px;
+// @preview-column-basis: 480px;
+// @total-column-basis: (@main-column-basis + @preview-column-basis + 64px);
+
 .template-editor-root-container {
   position: relative;
   display: flex;
@@ -21,9 +22,14 @@
   .template-editor-columns-area {
     display: flex;
     flex-direction: row;
-    justify-content: center;
-    flex: 0 1 @total-column-basis;
+    justify-content: flex-start;
     width: 100%;
+    padding-top: 12px;
+    
+    .foldout-container {
+      // not sure why this is needed, but foldout gets too big otherwise
+      height: auto;
+    }
 
     .template-editor-column {
       position: relative;
@@ -34,7 +40,7 @@
       .transition;
 
       &.main-document-column {
-        flex: 0 1 @main-column-basis;
+        flex-grow: 1;
         overflow-x: hidden;
       }
 
@@ -43,7 +49,7 @@
       }
 
       &.preview-documents-column {
-        flex: 0 1 @preview-column-basis;
+        // flex: 0 1 @preview-column-basis;
         overflow-x: hidden;
       }
     }
