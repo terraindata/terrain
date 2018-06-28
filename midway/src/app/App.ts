@@ -72,6 +72,7 @@ import { integrations } from './integrations/IntegrationRouter';
 import { JobLog } from './jobs/JobLog';
 import { JobQueue } from './jobs/JobQueue';
 import Middleware from './Middleware';
+import { Migrations } from './migrations/Migrations';
 import NotFoundRouter from './NotFoundRouter';
 import MidwayRouter from './Router';
 import { Scheduler } from './scheduler/Scheduler';
@@ -144,6 +145,7 @@ export class App
   private JobL: JobLog;
   private JobQ: JobQueue;
   private SKDR: Scheduler;
+  private Migrations: Migrations; // for now, do not allow external access
   private app: Koa;
   private config: Config.Config;
   private heapAvail: number;
@@ -302,6 +304,14 @@ export class App
       }
     }
     winston.info('Finished creating application schema...');
+
+    // process configuration options
+    await Config.initialHandleConfig(this.config);
+    winston.debug('Finished initial processing configuration options...');
+
+    // perform migrations
+    await this.Migrations.runMigrations();
+    winston.info('Finished migration checks and updates. State is up to Date.');
 
     // process configuration options
     await Config.handleConfig(this.config);

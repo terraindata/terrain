@@ -143,7 +143,7 @@ export function getRouter()
       await send(ctx, `/midway/src/bundles/${ctx.params['bundle']}`);
     }
   };
-  
+
   if (process.env.NODE_ENV === 'fullstack-test')
   {
     // no auth for fullstack tests
