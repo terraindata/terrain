@@ -76,7 +76,8 @@ class PrefixedElasticController extends ElasticController
     }
     else if (obj.index.constructor === Array)
     {
-      obj.index = obj.index.map((s) => {
+      obj.index = obj.index.map((s) =>
+      {
         if (typeof s !== 'string')
         {
           throw new Error('Invalid index param');

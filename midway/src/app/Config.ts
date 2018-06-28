@@ -87,7 +87,7 @@ export function loadConfigFromFile(config: Config): Config
   return config;
 }
 
-export async function handleConfig(config: Config): Promise<void>
+export async function initialHandleConfig(config: Config): Promise<void>
 {
   winston.debug('Using configuration: ' + JSON.stringify(config));
   if (config.help === true)
@@ -108,7 +108,10 @@ export async function handleConfig(config: Config): Promise<void>
     // TODO: get rid of this monstrosity once @types/winston is updated.
     (winston as any).level = 'debug';
   }
+}
 
+export async function handleConfig(config: Config): Promise<void>
+{
   if (config.databases !== undefined)
   {
     const dbs = await databases.select(['id', 'name']);
