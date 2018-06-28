@@ -132,7 +132,6 @@ export function getRouter()
     ctx.body = 'authenticated as ' + (ctx.state.user[0].email as string);
   });
 
-
   const serveBundle = async (ctx, next) =>
   {
     if (process.env.NODE_ENV !== 'production')

@@ -97,7 +97,7 @@ export let TBLS: Schema.Tables;
 
 export class App
 {
-  private static initializeDB(type: string, dsn: string): Tasty.Tasty
+  private static async initializeDB(type: string, dsn: string): Promise<Tasty.Tasty>
   {
     const ctrlConfig = new DatabaseControllerConfig(type, dsn).getConfig();
     if (ctrlConfig.database !== undefined)
@@ -114,9 +114,10 @@ export class App
       dsn,
       host: '',
       isAnalytics: false,
+      isProtected: false,
     };
     winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
-    const controller = DatabaseControllerConfig.makeDatabaseController(dbConfig);
+    const controller = await DatabaseControllerConfig.makeDatabaseController(dbConfig);
     return controller.getTasty();
   }
 
@@ -164,9 +165,6 @@ export class App
     }
 
     TBLS = Schema.setupTables(config.db as string);
-
-    this.DB = App.initializeDB(config.db as string, config.dsn as string);
-    DB = this.DB;
 
     this.EMAIL = new Email();
     EMAIL = this.EMAIL;
@@ -261,6 +259,9 @@ export class App
 
   public async start(): Promise<http.Server>
   {
+    this.DB = await App.initializeDB(CFG.db as string, CFG.dsn as string);
+    DB = this.DB;
+
     const client: any = this.DB.getController().getClient();
     let isConnected = await client.isConnected();
     for (let i = 1; i <= MAX_CONN_RETRIES && !isConnected; ++i)

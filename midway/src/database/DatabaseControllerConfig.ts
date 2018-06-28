@@ -64,7 +64,7 @@ import Util from 'shared/Util';
 
 export class DatabaseControllerConfig
 {
-  public static makeDatabaseController(config: DatabaseConfig): DatabaseController
+  public static async makeDatabaseController(config: DatabaseConfig): Promise<DatabaseController>
   {
     const id = config.id as number;
     const name = config.name;
@@ -74,28 +74,34 @@ export class DatabaseControllerConfig
     const analyticsType = config.analyticsType;
     const indexPrefix = config.indexPrefix;
 
+    const init = async (controller: DatabaseController) =>
+    {
+      await controller.initialize();
+      return controller;
+    };
+
     const cfg = new DatabaseControllerConfig(type, dsn);
     if (type === 'sqlite')
     {
-      return new SQLiteController(cfg.getConfig(), id, name);
+      return init(new SQLiteController(cfg.getConfig(), id, name));
     }
     else if (type === 'mysql')
     {
-      return new MySQLController(cfg.getConfig(), id, name);
+      return init(new MySQLController(cfg.getConfig(), id, name));
     }
     else if (type === 'postgres')
     {
-      return new PostgreSQLController(cfg.getConfig(), id, name);
+      return init(new PostgreSQLController(cfg.getConfig(), id, name));
     }
     else if (type === 'elasticsearch' || type === 'elastic')
     {
       if (indexPrefix != null && indexPrefix !== '')
       {
-        return new PrefixedElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType, indexPrefix);
+        return init(new PrefixedElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType, indexPrefix));
       }
       else
       {
-        return new ElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType);
+        return init(new ElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType));
       }
     }
     else
