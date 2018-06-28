@@ -1,0 +1,43 @@
+@import "../Common.less";
+
+// all widths are set in JS
+
+.foldout-container {
+  height: 100%;
+  transition: width 0.3s ease-in-out;
+  position: relative;
+  z-index: 10;
+  
+  overflow: hidden;
+  
+  &.foldout-container-expanded {
+    .foldout-expand {
+      svg {
+        .rotate(0deg);
+      }
+    }
+  }
+  
+  .foldout-expand {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    
+    cursor: pointer;
+    
+    svg {
+      .rotate180;
+      width: 9px;
+      fill: currentColor;
+      .transition;
+    }
+  }
+  
+  .foldout-content {
+    position: absolute;
+    top: 0px;
+    height: 100%;
+    overflow: hidden;
+  }
+}
