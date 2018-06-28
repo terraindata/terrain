@@ -90,7 +90,7 @@ beforeAll(async (done) =>
   elasticController = new PrefixedElasticController(config, 0, 'ElasticClientTests', undefined, undefined, 'abc.');
   elasticClient = elasticController.getClient();
   done();
-});
+}, 15000);
 
 test('elastic health', async (done) =>
 {
