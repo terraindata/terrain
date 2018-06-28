@@ -124,7 +124,7 @@ jest.mock('scheduler/SchedulerApi', () =>
         {
           return new Promise(
             (resolve, reject) => resolve({
-              data: [{ id: 2, name: 'Schedule 2 running', running: true }],
+              data: [{ id: 2, name: 'Schedule 2 running' }],
             }),
           );
         },
@@ -383,7 +383,7 @@ describe('SchedulerActions', () =>
     {
       it('should dispatch a updateScheduleStart action followed by a updateScheduleSuccess action', () =>
       {
-        const runningSchedule = { id: 2, name: 'Schedule 2 running' };
+        const runningSchedule = { id: 2, name: 'Schedule 2 running', running: true };
 
         const expectedActions = [
           {
