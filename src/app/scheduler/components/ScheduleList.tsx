@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:strict-boolean-expressions no-var-requires
-import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import Colors, { backgroundColor, borderColor, fontColor, getStyle } from 'app/colors/Colors';
 import { ETLActions } from 'app/etl/ETLRedux';
 import EtlRouteUtil from 'app/etl/ETLRouteUtil';

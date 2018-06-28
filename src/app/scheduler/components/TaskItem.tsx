@@ -159,7 +159,7 @@ class TaskItem extends TerrainComponent<Props>
   public handleBlockingChange()
   {
     const { blocking } = this.props.task;
-    this.props.onTaskChange(this.props.task.set('blocking', blocking !== null ? !blocking : false));
+    this.props.onTaskChange(this.props.task.set('blocking', blocking === null ? true : !blocking));
   }
 
   public render()
@@ -232,7 +232,7 @@ class TaskItem extends TerrainComponent<Props>
               className='task-item-settings'
             >
               <CheckBox
-                checked={task.blocking !== false}
+                checked={task.blocking}
                 onChange={this.handleBlockingChange}
                 disabled={!TerrainTools.isAdmin()}
                 label='Complete task before starting next task'
