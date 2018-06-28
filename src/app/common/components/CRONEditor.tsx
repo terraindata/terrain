@@ -76,6 +76,7 @@ export interface Props
 {
   cron: string;
   onChange: (cron: string) => void;
+  canEdit?: boolean;
 }
 
 const timezoneOffsetHours = (new Date()).getTimezoneOffset() / 60 - 420 / 60;
@@ -212,7 +213,7 @@ class CRONEditor extends TerrainComponent<Props>
         <div key='w' style={getStyle('margin', '0px -3px')}>
           <Picker
             options={this.getCRONOptions(sched, 'weekdays', CRONWeekDayOptionsList, CRONWeekDayNames, true)}
-            canEdit={true}
+            canEdit={this.props.canEdit}
             circular={true}
             onSelect={this._fn(this.handleCRONValueSelect, 'days', 'weekdays')}
           />
@@ -223,7 +224,7 @@ class CRONEditor extends TerrainComponent<Props>
         <div key='m' style={getStyle('margin', '0px -3px')}>
           <Picker
             options={this.getCRONOptions(sched, 'days', CRONMonthDayOptionsList)}
-            canEdit={true}
+            canEdit={this.props.canEdit}
             onSelect={this._fn(this.handleCRONValueSelect, 'days', 'days')}
             rowSize={7}
           />
@@ -245,7 +246,7 @@ class CRONEditor extends TerrainComponent<Props>
           <Picker
             options={this.getCRONOptions(sched, 'minutes', LimitedCRONMinuteOptionsList,
               LimitedCRONMinuteOptionsNames)}
-            canEdit={true}
+            canEdit={this.props.canEdit}
             onSelect={this._fn(this.handleCRONValueSelect, 'hours', 'minutes')}
             optionWidth={50}
           />
@@ -256,7 +257,7 @@ class CRONEditor extends TerrainComponent<Props>
         <div key='d' style={getStyle('margin', '0px -3px')}>
           <Picker
             options={this.getCRONOptions(sched, 'hours', CRONHourOptionsList, CRONHourNames, false)}
-            canEdit={true}
+            canEdit={this.props.canEdit}
             onSelect={this._fn(this.handleCRONValueSelect, 'hours', 'hours')}
             optionWidth={70}
           />
@@ -279,7 +280,7 @@ class CRONEditor extends TerrainComponent<Props>
             onChange={this.props.onChange}
             label={'CRON Schedule'}
             isTextInput={true}
-            canEdit={true}
+            canEdit={this.props.canEdit}
           />
         </div>
       </div>,
