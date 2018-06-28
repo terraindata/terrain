@@ -79,7 +79,7 @@ export interface Props
   user?: any;
   isEditing?: boolean;
   isDisabled?: boolean;
-  sectionTitle: string;
+  sectionTitle: string | El;
   sectionType: string;
   sectionBoxes: List<any>;
   hasPhoto: boolean;
@@ -345,13 +345,16 @@ export default class Section extends TerrainComponent<Props>
 
   public onSaveChange()
   {
-    this.props.onChange(this.state.editingSections);
-    this.setState(
-      {
-        isEditing: false,
-        editingSections: {},
-      },
-    );
+    const saveSuccessful = this.props.onChange(this.state.editingSections);
+    if (saveSuccessful)
+    {
+      this.setState(
+        {
+          isEditing: false,
+          editingSections: {},
+        },
+      );
+    }
   }
 
   public onCancelChange()

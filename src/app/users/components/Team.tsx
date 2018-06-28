@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions no-unused-expression
 
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
+import TerrainTools from 'app/util/TerrainTools';
 import { AuthState } from 'auth/AuthTypes';
 import { Colors, fontColor } from 'colors/Colors';
 import { List } from 'immutable';
@@ -83,6 +84,10 @@ export interface State
   showDisabledUsers: boolean;
   errorModalOpen: boolean;
   errorModalMessage: string;
+  confirmModalOpen: boolean;
+  confirmModalMessage: string;
+  userToToggle: any;
+  sectionsToUpdate: any;
 }
 
 class Team extends TerrainComponent<Props>
@@ -94,6 +99,8 @@ class Team extends TerrainComponent<Props>
     showDisabledUsers: false,
     errorModalOpen: false,
     errorModalMessage: '',
+    confirmModalOpen: false,
+    confirmModalMessage: '',
   };
 
   public componentWillMount()
@@ -143,7 +150,6 @@ class Team extends TerrainComponent<Props>
     const email: string = editingSections.newEmail;
     const password: string = editingSections.newPassword;
     const confirmPassword: string = editingSections.confirmPassword;
-    // console.log(name + ' ' + email + ' ' + password + ' ' + confirmPassword);
 
     const emailCheck = email.length >= 5 && email.indexOf('@') > 0;
     if (!emailCheck)
@@ -152,7 +158,7 @@ class Team extends TerrainComponent<Props>
         errorModalMessage: 'Not a valid email address.',
       });
       this.toggleErrorModal();
-      return;
+      return false;
     }
 
     // TODO check that a user with that email does not already exist
@@ -171,7 +177,7 @@ class Team extends TerrainComponent<Props>
         errorModalMessage: 'Passwords should be at least six characters long',
       });
       this.toggleErrorModal();
-      return;
+      return false;
     }
 
     if (password !== confirmPassword)
@@ -180,7 +186,7 @@ class Team extends TerrainComponent<Props>
         errorModalMessage: 'Passwords do not match',
       });
       this.toggleErrorModal();
-      return;
+      return false;
     }
 
     this.setState({
@@ -199,6 +205,7 @@ class Team extends TerrainComponent<Props>
         });
         this.toggleErrorModal();
       });
+    return true;
   }
 
   public renderAddUser()
@@ -210,10 +217,11 @@ class Team extends TerrainComponent<Props>
     {
       if (this.state.addingUser)
       {
+        const createUserTitle = 'Create New User';
         return (
           <Section
             isEditing={true}
-            sectionTitle='Create New User'
+            sectionTitle={<span style={{ color: Colors().mainBlue }}>{createUserTitle}</span>}
             sectionType='password'
             sectionBoxes={
               List([
@@ -253,12 +261,30 @@ class Team extends TerrainComponent<Props>
     });
   }
 
+  public toggleConfirmModal()
+  {
+    this.setState({
+      confirmModalOpen: !this.state.confirmModalOpen,
+    });
+  }
+
   public disableUser(user, editingSections)
   {
     this.props.userActions({
       actionType: 'change',
       user: user.set('isDisabled', editingSections.isDisabledFlag),
     });
+  }
+
+  public promptDisableUser(user, editingSections)
+  {
+    const message = (user.isDisabled) ? 'Are you sure you want to enable this user?' : 'Are you sure you want to disable this user?';
+    this.setState({
+      confirmModalMessage: message,
+      userToToggle: user,
+      sectionsToUpdate: editingSections,
+    });
+    this.toggleConfirmModal();
   }
 
   public renderUser(user: User)
@@ -276,17 +302,17 @@ class Team extends TerrainComponent<Props>
         sectionType='profile'
         sectionBoxes={
           List([
-            { key: 'email', header: 'Email', info: user.email, type: 'Text' },
-            { key: 'phone', header: 'Phone', info: user.phone, type: 'Text' },
-            { key: 'skype', header: 'Skype', info: user.name, type: 'Text' },
+            { key: 'email', header: 'Email', info: user.email === '' ? 'Not set' : user.email, type: 'Text' },
+            { key: 'phone', header: 'Phone', info: user.phone === '' ? 'Not set' : user.phone, type: 'Text' },
+            { key: 'skype', header: 'Skype', info: user.skype === '' ? 'Not set' : user.skype, type: 'Text' },
           ])
         }
         hasPhoto={true}
         userImage={<UserThumbnail large={true} userId={user.id} square={true} />}
         columnNum={0}
-        onChange={this._fn(this.disableUser, user)}
+        onChange={this._fn(this.promptDisableUser, user)}
         canEdit={false}
-        canDisable={true}
+        canDisable={TerrainTools.isAdmin()}
         addingUser={false}
       />
     );
@@ -302,7 +328,10 @@ class Team extends TerrainComponent<Props>
           Team Directory
         </div>
         {users &&
-          users.keySeq().sort().map((userId) => this.renderUser(users.get(userId)))
+          users.keySeq().sort().map((userId) => !users.get(userId).isDisabled && this.renderUser(users.get(userId)))
+        }
+        {users &&
+          users.keySeq().sort().map((userId) => users.get(userId).isDisabled && this.renderUser(users.get(userId)))
         }
         {this.renderAddUser()}
         {this.renderShowDisabledUsers()}
@@ -311,6 +340,15 @@ class Team extends TerrainComponent<Props>
           onClose={this.toggleErrorModal}
           open={this.state.errorModalOpen}
           error={true}
+        />
+        <Modal
+          message={this.state.confirmModalMessage}
+          onClose={this.toggleConfirmModal}
+          open={this.state.confirmModalOpen}
+          confirm={true}
+          confirmButtonText='Yes'
+          cancelButtonText='No'
+          onConfirm={this._fn(this.disableUser, this.state.userToToggle, this.state.sectionsToUpdate)}
         />
       </div>
     );

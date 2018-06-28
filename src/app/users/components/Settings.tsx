@@ -745,6 +745,7 @@ class Settings extends TerrainComponent<Props>
       actionType: 'change',
       user: newUser as UserTypes.User,
     });
+    return true;
   }
 
   public render()

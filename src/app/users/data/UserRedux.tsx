@@ -95,7 +95,7 @@ class UserRedux extends TerrainRedux<UserActionTypes, UserState>
         {
           newState = newState.set('currentUser', user);
         }
-        Ajax.saveUser(user, () => {}, () => {});
+        Ajax.saveUser(user, () => { }, () => { });
         return newState;
       },
 
