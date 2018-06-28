@@ -1,17 +1,17 @@
 {
-    "debug": true,
-    "db": "postgres",
-    "dsn": "t3rr41n-demo:r3curs1v3$@127.0.0.1:5432/midway1",
-    "instanceId": "7904pg",
-    "databases": [
-        {
-            "name": "My ElasticSearch Instance",
-            "type": "elastic",
-            "dsn": "127.0.0.1:9200",
-            "host": "127.0.0.1:9200",
-            "isAnalytics": true,
-            "analyticsIndex": "terrain-analytics",
-            "analyticsType": "events"
-        }
-    ]
+  "debug": true,
+  "db": "postgres",
+  "dsn": "t3rr41n-demo:r3curs1v3$@127.0.0.1:5432",
+  "instanceId": "an7904",
+  "databases": [
+    {
+      "name": "My ElasticSearch Instance",
+      "type": "elastic",
+      "dsn": "127.0.0.1:9200",
+      "host": "127.0.0.1:9200",
+      "isAnalytics": true,
+      "analyticsIndex": "terrain-analytics",
+      "analyticsType": "events"
+    }
+  ]
 }
