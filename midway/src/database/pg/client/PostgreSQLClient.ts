@@ -93,6 +93,7 @@ class PostgreSQLClient
           }
 
           // create the specified database
+          this.controller.log('Creating new database ', newDatabase);
           newClient.query('create database ' + newDatabase, (queryErr) =>
           {
             if (queryErr != null)
@@ -102,7 +103,7 @@ class PostgreSQLClient
 
             // create a pg connection pool
             this.delegate = this.createPool(config);
-            newClient.end((err) => {});
+            newClient.end();
           });
         });
       }
@@ -110,7 +111,7 @@ class PostgreSQLClient
       {
         this.delegate = this.createPool(config);
       }
-      client.end((err) => {});
+      client.end();
     });
   }
 
@@ -188,10 +189,10 @@ class PostgreSQLClient
   {
     this.controller.log('PostgreSQLClient.end');
     this.controller.setStatus(DatabaseControllerStatus.DISCONNECTING);
-    return this.delegate.end(() =>
+    callback();
+    this.delegate.end(() =>
     {
       this.controller.setStatus(DatabaseControllerStatus.DISCONNECTED);
-      callback();
     });
   }
 
