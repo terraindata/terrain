@@ -101,6 +101,8 @@ class Team extends TerrainComponent<Props>
     errorModalMessage: '',
     confirmModalOpen: false,
     confirmModalMessage: '',
+    userToToggle: '',
+    sectionsToUpdate: {},
   };
 
   public componentWillMount()
