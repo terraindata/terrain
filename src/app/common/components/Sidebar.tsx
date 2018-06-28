@@ -329,7 +329,8 @@ export class Sidebar extends TerrainComponent<Props>
                 src={BugSmallIcon}
                 className='sidebar-button-collapsed sidebar-bug-button-collapsed'
                 onClick={this._toggle('reportBugModalOpen')}
-                key='reportImage' />
+                key='reportImage'
+              />
           }
 
           {
