@@ -78,25 +78,29 @@ class PostgreSQLClient
       // database does not exist, create a new one
       if (connectErr !== null && connectErr.code === '3D000')
       {
+        // checkpoint the specified database, and connect to the system 'postgres' database to
+        // be able to create the specified database
         const newDatabase = config.database;
         config.database = 'postgres';
         const newClient = new pg.Client(config);
         newClient.connect((connectErr2) =>
         {
+          // restore the specified database
+          config.database = newDatabase;
           if (connectErr2 != null)
           {
-            config.database = newDatabase;
             throw connectErr2;
           }
 
+          // create the specified database
           newClient.query('create database ' + newDatabase, (queryErr) =>
           {
-            config.database = newDatabase;
             if (queryErr != null)
             {
               throw queryErr;
             }
 
+            // create a pg connection pool
             this.delegate = this.createPool(config);
             newClient.end((err) => {});
           });
