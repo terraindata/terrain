@@ -101,7 +101,7 @@ class Team extends TerrainComponent<Props>
     errorModalMessage: '',
     confirmModalOpen: false,
     confirmModalMessage: '',
-    userToToggle: '',
+    userToToggle: null,
     sectionsToUpdate: {},
   };
 
@@ -115,13 +115,6 @@ class Team extends TerrainComponent<Props>
   public componentWillUnmount()
   {
     this.unsub && this.unsub();
-  }
-
-  public toggleAddingUser()
-  {
-    this.setState({
-      addingUser: !this.state.addingUser,
-    });
   }
 
   public toggleShowDisabledUsers()
@@ -152,6 +145,15 @@ class Team extends TerrainComponent<Props>
     const email: string = editingSections.newEmail;
     const password: string = editingSections.newPassword;
     const confirmPassword: string = editingSections.confirmPassword;
+
+    if (name === undefined || email === undefined || password === undefined || confirmPassword === undefined)
+    {
+      this.setState({
+        errorModalMessage: 'Missing fields.',
+      });
+      this.toggleErrorModal();
+      return false;
+    }
 
     const emailCheck = email.length >= 5 && email.indexOf('@') > 0;
     if (!emailCheck)
@@ -236,7 +238,7 @@ class Team extends TerrainComponent<Props>
             hasPhoto={false}
             columnNum={0}
             onChange={this.createNewUser}
-            onCancel={this.toggleAddingUser}
+            onCancel={this._toggle('addingUser')}
             canEdit={true}
             canDisable={false}
             addingUser={true}
@@ -248,7 +250,7 @@ class Team extends TerrainComponent<Props>
         <PathfinderCreateLine
           text='Create new user'
           canEdit={true}
-          onCreate={this.toggleAddingUser}
+          onCreate={this._toggle('addingUser')}
           showText={true}
         />
       );
