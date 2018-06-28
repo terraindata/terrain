@@ -1,10 +1,13 @@
-
+// Copyright 2018 Terrain Data, Inc.
 
 .settings-main-container {
   .profile-input {
-    max-height: 20px;
+    max-height: 30px;
     margin-left: -6px;
     min-width: 24px;
+    position: relative;
+    top: -5px;
+    letter-spacing: 0.7px;
   }
 }
 
@@ -58,6 +61,9 @@
   border-radius: 16px;
   margin-right: 8px;
   cursor: pointer;
+  &:hover {
+    color: #000;
+  }
 }
 
 .section-save-button {
@@ -134,14 +140,6 @@
 
 .profile-pic-and-edit {
   background: none;
-}
-
-.profile-input {
-  max-height: 30px;
-  margin-left: -6px;
-  min-width: 24px;
-  position: relative;
-  top: -5px;
 }
 
 .no-column {
