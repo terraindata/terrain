@@ -84,7 +84,6 @@ export class SplitTransformationNode extends ForkTransformationType
         field: i,
       });
     }
-
     return outputFields;
   }
 }

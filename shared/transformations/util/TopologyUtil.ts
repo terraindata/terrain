@@ -126,7 +126,7 @@ export default class TopologyUtil
     }
     if (wildcards.length === 0)
     {
-      return (kp) => kp;
+      return (kp) => kp2;
     }
     else
     {

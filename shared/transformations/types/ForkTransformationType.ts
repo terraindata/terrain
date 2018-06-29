@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
+import * as _ from 'lodash';
 
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -62,7 +63,7 @@ import * as yadeep from 'shared/util/yadeep';
 
 export interface OutputField
 {
-  field: number | KeyPath;
+  field: number;
   value: any;
 }
 
@@ -107,39 +108,40 @@ export default abstract class ForkTransformationType extends TransformationNode
     const errors = [];
     const opts = this.meta as NodeOptionsType<any>;
 
-    this.fields.forEach((field) =>
-    {
-      for (const match of yadeep.search(doc, field))
-      {
-        const { value, location } = match;
-        if (value === null && this.skipNulls)
-        {
-          return;
-        }
-        if (!this.checkType(value))
-        {
-          errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof value}.`);
-          return;
-        }
-
-        const matcher = Topology.createLocalMatcher(field, location);
-        if (matcher === null)
-        {
-          errors.push(`Error in ${this.typeCode}: Field and Match location are inconsistent`);
-          return;
-        }
-
-        const newFields = this.split(value);
-
-        for (const newField of newFields)
-        {
-          const newFieldKeyPath: KeyPath = typeof newField.field === 'number' ?
-            opts.newFieldKeyPaths.get(newField.field) :
-            newField.field;
-          yadeep.set(doc, matcher(newFieldKeyPath), newField.value, { create: true });
-        }
-      }
+    const field = this.fields.get(0);
+    const outputFields: List<KeyPath> = opts.newFieldKeyPaths;
+    const matchCacheFn = _.memoize((newFieldIndex: number) => {
+      return Topology.createOneToOneMatcher(field, outputFields.get(newFieldIndex));
     });
+    for (const match of yadeep.search(doc, field))
+    {
+      const { value, location } = match;
+      if (value === null && this.skipNulls)
+      {
+        return;
+      }
+      if (!this.checkType(value))
+      {
+        errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof value}.`);
+        return;
+      }
+
+      const matcher = Topology.createLocalMatcher(field, location);
+      if (matcher === null)
+      {
+        errors.push(`Error in ${this.typeCode}: Field and Match location are inconsistent`);
+        return;
+      }
+
+      const newFields = this.split(value);
+
+      for (const newField of newFields)
+      {
+        const newKP = matchCacheFn(newField.field)(location);
+        yadeep.set(doc, newKP, newField.value, { create: true });
+      }
+    }
+    // });
 
     return {
       document: doc,
