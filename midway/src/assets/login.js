@@ -250,6 +250,37 @@ document.getElementById("login-forgot-password").onclick = function()
 {
 	const el = document.getElementById("login-forgot-password-message");
 	el.className = el.className + " showing";
+	const email = document.getElementById("login-email").value;
+	config = {
+			route: '/midway/v1/forgotPassword/',
+			method: 'POST',
+			data: JSON.stringify({
+				"email" : email
+			}),
+		}
+		console.log(config.data);
+	var xhr = new XMLHttpRequest();
+
+	xhr.open(config.method, config.route, true);
+	xhr.setRequestHeader('Content-Type', 'application/json');
+	console.log(config.route);
+
+	xhr.onload = function () {
+		if (xhr.status == 200)
+		{
+			console.log("ok");
+		}
+		else if (xhr.status == 401)
+		{
+			console.log("status 401");
+		}
+		else
+		{
+			console.log(xhr.status);
+		}
+	};
+  xhr.send(config.data);
+
 }
 
 INTERVAL_CHECK_AUTOFILL = setInterval(function() {

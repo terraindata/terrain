@@ -55,6 +55,7 @@ import * as DatabaseRouter from './database/DatabaseRouter';
 import * as ETLRouter from './etl/ETLRouter';
 import * as EventRouter from './events/EventRouter';
 import * as FeedbackRouter from './feedback/FeedbackRouter';
+import * as ForgotPasswordRouter from './forgotPassword/ForgotPasswordRouter';
 import * as IntegrationRouter from './integrations/IntegrationRouter';
 import * as ItemRouter from './items/ItemRouter';
 import * as JobRouter from './jobs/JobRouter';
@@ -88,6 +89,7 @@ export function getRouter()
   SchemaMetadataRouter.initialize();
   ResultsConfigRouter.initialize();
   FeedbackRouter.initialize();
+  ForgotPasswordRouter.initialize();
   AppRouter.use('/auth', AuthRouter.default.routes(), AuthRouter.default.allowedMethods());
   AppRouter.use('/events', EventRouter.default.routes(), EventRouter.default.allowedMethods());
   AppRouter.use('/users', UserRouter.default.routes(), UserRouter.default.allowedMethods());
@@ -104,6 +106,7 @@ export function getRouter()
   AppRouter.use('/schemametadata', SchemaMetadataRouter.default.routes(), SchemaMetadataRouter.default.allowedMethods());
   AppRouter.use('/resultsconfig', ResultsConfigRouter.default.routes(), ResultsConfigRouter.default.allowedMethods());
   AppRouter.use('/feedback', FeedbackRouter.default.routes(), FeedbackRouter.default.allowedMethods());
+  AppRouter.use('/forgotPassword', ForgotPasswordRouter.default.routes(), ForgotPasswordRouter.default.allowedMethods());
   // Add future routes here.
 
   AppRouter.get('/time', (ctx, next) =>
