@@ -139,7 +139,7 @@ fullstack-screenshot:
     - sleep 10
     - yarn test-rr-etl-http-import
   only:
-    - v5-dev
+    - schedules
   when: manual
   stage: screenshot-tests
   allow_failure: true
