@@ -69,6 +69,7 @@ export interface Props
 {
   connection: ConnectionConfig;
   onChange: (newConfig: ConnectionFormConfig, apply?: boolean) => void;
+  onSubmit?: () => void;
 }
 
 export type ConnectionFormConfig = SharedConnectionConfig & {
@@ -189,6 +190,7 @@ export default class ConnectionForm extends TerrainComponent<Props>
           inputMap={this.connectionMap}
           inputState={this.configToState(this.props.connection)}
           onStateChange={this.handleConnectionChange}
+          onTextInputEnter={this.props.onSubmit}
         />
         <DynamicForm
           inputMap={this.analyticsMap}

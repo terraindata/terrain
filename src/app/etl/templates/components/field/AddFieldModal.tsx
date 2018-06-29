@@ -167,6 +167,7 @@ class AddFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
           inputMap={addFieldMap}
           inputState={this.state}
           onStateChange={this.handleFormChange}
+          onTextInputEnter={this.onConfirm}
         />
       </div>
     );
@@ -252,6 +253,11 @@ class AddRootFieldModalC extends TerrainComponent<RootFieldProps>
     return this._validateKeyPath(engine, engineVersion, this.state.name);
   }
 
+  public confirmAndCloseModal() {
+    this.onConfirm();
+    this.closeModal();
+  }
+
   public renderInner()
   {
     const { isValid, message } = this.validateKeyPath();
@@ -261,6 +267,7 @@ class AddRootFieldModalC extends TerrainComponent<RootFieldProps>
           inputMap={addFieldMap}
           inputState={this.state}
           onStateChange={this.handleFormChange}
+          onTextInputEnter={this.confirmAndCloseModal}
         />
       </div>
     );
