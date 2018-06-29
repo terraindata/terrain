@@ -43,9 +43,9 @@ THE SOFTWARE.
 */
 
 const Earthquakes = require('./earthquakes.json');
-// const Movies = require('./movies.json');
-// const UsersRomance = require('./Users_Romance.json');
-// const Waduhek = require('./waduhekmovies.json');
+const Movies = require('./movies.json');
+//const UsersRomance = require('./Users_Romance.json');
+const Waduhek = require('./waduhekmovies.json');
 
 export default class PathUtil
 {
@@ -57,9 +57,13 @@ export default class PathUtil
     return isArrayType;
   }
 
-  public static renderFields(objectItem)
+  public static renderFields(objectItem: object)
   {
     const keyFields = [];
+    if (objectItem === undefined || objectItem === null)
+    {
+      return keyFields;
+    }
     for (let key of Object.keys(objectItem))
     {
       keyFields.push(key);
@@ -102,9 +106,21 @@ export default class PathUtil
     return true;
   }
 
+  public static containsAllObjects(array)
+  {
+    for (let i = 0; i < array.length; i++)
+    {
+      if (typeof array[i] !== 'object')
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
   public static isPossiblePath(json, key)
   {
-    const object = json.key;
+    const object = json[key];
     if (object === undefined || object === null)
     {
       return false;
@@ -119,11 +135,14 @@ export default class PathUtil
     }
     if (PathUtil.isArray(object))
     {
-      return true;
-    }
-    if (PathUtil.matchingFieldLength(object) || PathUtil.matchingFields(object))
-    {
-      return true;
+      if (!PathUtil.containsAllObjects(object))
+      {
+        return false;
+      }
+      if (PathUtil.matchingFieldLength(object) || PathUtil.matchingFields(object))
+      {
+        return true;
+      }
     }
     else
     {
@@ -133,7 +152,7 @@ export default class PathUtil
 
   public static guessPath(json: object, possiblePaths, depth)
   {
-    if (depth > 3) // threshold for recusive calls
+    if (depth > 5) // threshold for recusive calls
     {
       return possiblePaths;
     }
@@ -153,7 +172,7 @@ export default class PathUtil
       {
         possiblePaths.push(key);
       }
-      PathUtil.guessPath(json[key], possiblePaths, depth++);
+      PathUtil.guessPath(json[key], possiblePaths, depth + 1);
     }
     return possiblePaths;
   }
@@ -166,6 +185,6 @@ export default class PathUtil
 
 //console.log(Earthquakes);
 console.log(PathUtil.guessFilePaths(Earthquakes));
-// console.log(PathUtil.guessFilePaths(Movies));
+console.log(PathUtil.guessFilePaths(Movies));
 // console.log(PathUtil.guessFilePaths(UsersRomance));
-// console.log(PathUtil.guessFilePaths(Waduhek));
+console.log(PathUtil.guessFilePaths(Waduhek));
