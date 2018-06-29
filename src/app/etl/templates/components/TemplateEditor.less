@@ -10,7 +10,7 @@
   height: 100%;
   flex-direction: column;
   align-items: center;
-  
+
   .template-editor-width-spacer {
     display: flex;
     flex-direction: row;
@@ -25,7 +25,7 @@
     justify-content: flex-start;
     width: 100%;
     padding-top: 12px;
-    
+
     .foldout-container {
       // not sure why this is needed, but foldout gets too big otherwise
       height: auto;
@@ -51,6 +51,7 @@
       &.preview-documents-column {
         // flex: 0 1 @preview-column-basis;
         overflow-x: hidden;
+        height: calc(100% - 12px);
       }
     }
   }
