@@ -1733,6 +1733,8 @@ const EQLSpec: ESClause[] =
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-query.html',
         // template: { bool: null },
         suggestions: ['term', 'terms', 'range', 'match', 'bool', 'query_string'],
+        // query body at least has one of them
+        checkers: [ESUtils.GenerateFieldSizeChecker(Object.keys(ESUtils.QueryNameMap), [1])],
       }),
     new ESArrayClause('ids',
       'string',

@@ -56,6 +56,37 @@ export default class ESUtils
   // NOTE: make sure m is the last one and mi is the second last.
   public static ESDistanceUnits = ['in', 'inch', 'yd', 'yards', 'ft', 'feet', 'km', 'kilometers',
     'NM', 'nmi', 'nauticalmiles', 'mm', 'millimeters', 'cm', 'centimeters', 'mi', 'miles', 'm', 'meters'];
+  public static QueryNameMap = {
+    geo_distance: 'geo_distance',
+    bool: 'bool_query',
+    term: 'term_query',
+    terms: 'terms_query',
+    range: 'range_query',
+    exists: 'exists_query',
+    prefix: 'prefix_query',
+    wildcard: 'wildcard_query',
+    regexp: 'regexp_query',
+    fuzzy: 'fuzzy_query',
+    match_all: 'match_all',
+    match_none: 'match_none',
+    match: 'match',
+    type: 'type',
+    ids: 'string[]',
+    match_phrase: 'match_phrase',
+    match_phrase_prefix: 'match_phrase_prefix',
+    multi_match: 'multi_match',
+    common: 'common_terms_query',
+    query_string: 'query_string_clause',
+    simple_query_string: 'simple_query_string',
+    constant_score: 'constant_score',
+    dis_max: 'dis_max',
+    function_score: 'function_score',
+    script_score: 'script_score',
+    boosting: 'boosting_query',
+    nested: 'nested_query',
+    has_child: 'has_child_query',
+    has_parent: 'has_parent_query',
+  };
 
   public static IsNumberString(val): boolean
   {
@@ -97,6 +128,10 @@ export default class ESUtils
 
   public static DistanceUnitTypeChecker(inter: ESInterpreter, valueInfo: ESValueInfo, expected: ESJSONType)
   {
+    if (expected !== ESJSONType.string)
+    {
+      return true;
+    }
     if (ESUtils.ExtractDistanceValueUnit(valueInfo.value) === null)
     {
       inter.accumulateError(valueInfo,
@@ -104,5 +139,25 @@ export default class ESUtils
       return false;
     }
     return true;
+  }
+
+  public static GenerateFieldSizeChecker(fieldList, size: number[])
+  {
+    return (inter: ESInterpreter, valueInfo: ESValueInfo, expected: ESJSONType) => {
+      if (expected !== ESJSONType.object)
+      {
+        return true;
+      }
+      const hitList = fieldList.filter((f) => valueInfo.objectChildren[f] !== undefined);
+      const matched = size.filter((s) => s === hitList.length);
+      if (matched.length === 0)
+      {
+        inter.accumulateError(valueInfo,
+          'Only allow ' + size.join(',') + ' of ' + JSON.stringify(fieldList) + ' fields, but found ' + hitList.length
+          + '(' + JSON.stringify(hitList) + ').');
+        return false;
+      }
+      return true;
+    };
   }
 }

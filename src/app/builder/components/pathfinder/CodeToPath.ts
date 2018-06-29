@@ -58,6 +58,9 @@ export default class CodeToPath
       before: CodeToPath.BodyToPathBefore,
       after: CodeToPath.BodyToPathAfter,
     },
+    query: {
+      after: CodeToPath.QueryToPath,
+    },
     term_query: {
       after: CodeToPath.TermToPathAfter,
     },
@@ -246,6 +249,25 @@ export default class CodeToPath
     const filterLine = _FilterLine(config);
     node.annotation.path = filterLine;
     console.log('Geo_distance to ' + JSON.stringify(filterLine));
+  }
+
+  //query
+  public static QueryToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+  {
+    let queryName;
+    for (const n of Object.keys(node.objectChildren))
+    {
+      if (ESUtils.QueryNameMap[n] !== undefined)
+      {
+         queryName = n;
+      }
+    }
+    const queryValue = node.objectChildren[queryName].propertyValue;
+    if (queryValue.annotation.path !== undefined)
+    {
+      node.annotation.path = queryValue.annotation.path;
+    }
+    console.log('Query copies path from ' + queryName);
   }
 
   // body

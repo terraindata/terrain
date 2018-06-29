@@ -60,6 +60,10 @@ export default class ESMapClause extends ESClause
 {
   public static CheckSingleField(inter: ESInterpreter, valueInfo: ESValueInfo, expected: ESJSONType): boolean
   {
+    if (expected !== ESJSONType.object)
+    {
+      return true;
+    }
     if (valueInfo.childrenSize() !== 1)
     {
       inter.accumulateError(valueInfo,
