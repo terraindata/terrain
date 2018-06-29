@@ -1,0 +1,1541 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "generated": 1530294117000,
+    "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/summary\/all_hour.geojson",
+    "title": "USGS All Earthquakes, Past Hour",
+    "status": 200,
+    "api": "1.5.8",
+    "count": 38
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 1.72,
+        "place": "3km SW of Volcano, Hawaii",
+        "time": 1530293873140,
+        "updated": 1530294056860,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339366",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339366.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 46,
+        "net": "hv",
+        "code": "70339366",
+        "ids": ",hv70339366,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 14,
+        "dmin": 0.008757,
+        "rms": 0.16,
+        "gap": 192,
+        "magType": "md",
+        "type": "earthquake",
+        "title": "M 1.7 - 3km SW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2613373,
+          19.4058342,
+          0
+        ]
+      },
+      "id": "hv70339366"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 1.8,
+        "place": "9km W of Templeton, CA",
+        "time": 1530293800030,
+        "updated": 1530293892731,
+        "tz": -480,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/nc73037706",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/nc73037706.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 50,
+        "net": "nc",
+        "code": "73037706",
+        "ids": ",nc73037706,",
+        "sources": ",nc,",
+        "types": ",geoserve,nearby-cities,origin,phase-data,",
+        "nst": 6,
+        "dmin": 0.09593,
+        "rms": 0.02,
+        "gap": 143,
+        "magType": "md",
+        "type": "earthquake",
+        "title": "M 1.8 - 9km W of Templeton, CA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -120.8073349,
+          35.5545006,
+          6.04
+        ]
+      },
+      "id": "nc73037706"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.63,
+        "place": "2km SSW of Volcano, Hawaii",
+        "time": 1530293771680,
+        "updated": 1530294112850,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339361",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339361.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 106,
+        "net": "hv",
+        "code": "70339361",
+        "ids": ",hv70339361,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 13,
+        "dmin": 0.01187,
+        "rms": 0.2,
+        "gap": 160,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.6 - 2km SSW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2473297,
+          19.4113331,
+          -0.16
+        ]
+      },
+      "id": "hv70339361"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.63,
+        "place": "6km SW of Volcano, Hawaii",
+        "time": 1530293758190,
+        "updated": 1530294100050,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339356",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339356.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 106,
+        "net": "hv",
+        "code": "70339356",
+        "ids": ",hv70339356,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 15,
+        "dmin": 0.006432,
+        "rms": 0.2,
+        "gap": 94,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.6 - 6km SW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2801666,
+          19.3934994,
+          0.88
+        ]
+      },
+      "id": "hv70339356"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.25,
+        "place": "3km W of Volcano, Hawaii",
+        "time": 1530293615540,
+        "updated": 1530293959740,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339351",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339351.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 78,
+        "net": "hv",
+        "code": "70339351",
+        "ids": ",hv70339351,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 28,
+        "dmin": 0.004698,
+        "rms": 0.33,
+        "gap": 58,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.3 - 3km W of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2701721,
+          19.4311676,
+          -0.04
+        ]
+      },
+      "id": "hv70339351"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.59,
+        "place": "4km SW of Volcano, Hawaii",
+        "time": 1530293605590,
+        "updated": 1530293951220,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339346",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339346.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 103,
+        "net": "hv",
+        "code": "70339346",
+        "ids": ",hv70339346,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 23,
+        "dmin": 0.003557,
+        "rms": 0.21,
+        "gap": 54,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.6 - 4km SW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2638397,
+          19.3953342,
+          0.07
+        ]
+      },
+      "id": "hv70339346"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.3,
+        "place": "5km WSW of Volcano, Hawaii",
+        "time": 1530293542830,
+        "updated": 1530293885540,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339341",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339341.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 81,
+        "net": "hv",
+        "code": "70339341",
+        "ids": ",hv70339341,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 30,
+        "dmin": 0.007325,
+        "rms": 0.16,
+        "gap": 34,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.3 - 5km WSW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2833405,
+          19.4103336,
+          0.49
+        ]
+      },
+      "id": "hv70339341"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.36,
+        "place": "3km W of Volcano, Hawaii",
+        "time": 1530293534300,
+        "updated": 1530293877220,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339336",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339336.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 86,
+        "net": "hv",
+        "code": "70339336",
+        "ids": ",hv70339336,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 16,
+        "dmin": 0.003251,
+        "rms": 0.17,
+        "gap": 142,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.4 - 3km W of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.27034,
+          19.4249992,
+          2.18
+        ]
+      },
+      "id": "hv70339336"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.58,
+        "place": "4km SW of Volcano, Hawaii",
+        "time": 1530293337030,
+        "updated": 1530293680210,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339331",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339331.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 102,
+        "net": "hv",
+        "code": "70339331",
+        "ids": ",hv70339331,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 32,
+        "dmin": 0.005382,
+        "rms": 0.25,
+        "gap": 50,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.6 - 4km SW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2708282,
+          19.4011669,
+          0.13
+        ]
+      },
+      "id": "hv70339331"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 1.05,
+        "place": "10km NW of The Geysers, CA",
+        "time": 1530293308270,
+        "updated": 1530293403351,
+        "tz": -480,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/nc73037701",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/nc73037701.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 17,
+        "net": "nc",
+        "code": "73037701",
+        "ids": ",nc73037701,",
+        "sources": ",nc,",
+        "types": ",geoserve,nearby-cities,origin,phase-data,",
+        "nst": 7,
+        "dmin": 0.003952,
+        "rms": 0.01,
+        "gap": 181,
+        "magType": "md",
+        "type": "earthquake",
+        "title": "M 1.1 - 10km NW of The Geysers, CA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.8395004,
+          38.8409996,
+          1.58
+        ]
+      },
+      "id": "nc73037701"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.25,
+        "place": "5km SW of Volcano, Hawaii",
+        "time": 1530293273750,
+        "updated": 1530293614680,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339326",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339326.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 78,
+        "net": "hv",
+        "code": "70339326",
+        "ids": ",hv70339326,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 17,
+        "dmin": 0.0045,
+        "rms": 0.3,
+        "gap": 86,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.3 - 5km SW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2783356,
+          19.3961658,
+          1.49
+        ]
+      },
+      "id": "hv70339326"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.13,
+        "place": "5km WSW of Volcano, Hawaii",
+        "time": 1530293200440,
+        "updated": 1530293541700,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339321",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339321.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 70,
+        "net": "hv",
+        "code": "70339321",
+        "ids": ",hv70339321,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 15,
+        "dmin": 0.005729,
+        "rms": 0.28,
+        "gap": 68,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.1 - 5km WSW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2891693,
+          19.4144993,
+          1.17
+        ]
+      },
+      "id": "hv70339321"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 1.97,
+        "place": "4km W of Volcano, Hawaii",
+        "time": 1530293132010,
+        "updated": 1530293472930,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339316",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339316.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 60,
+        "net": "hv",
+        "code": "70339316",
+        "ids": ",hv70339316,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 13,
+        "dmin": 0.001337,
+        "rms": 0.15,
+        "gap": 73,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.0 - 4km W of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2761688,
+          19.4246674,
+          1.01
+        ]
+      },
+      "id": "hv70339316"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 1.68,
+        "place": "19km ENE of Little Lake, CA",
+        "time": 1530292968760,
+        "updated": 1530293194312,
+        "tz": -480,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/ci37271850",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/ci37271850.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 43,
+        "net": "ci",
+        "code": "37271850",
+        "ids": ",ci37271850,",
+        "sources": ",ci,",
+        "types": ",geoserve,nearby-cities,origin,phase-data,scitech-link,",
+        "nst": 19,
+        "dmin": 0.03879,
+        "rms": 0.19,
+        "gap": 61,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 1.7 - 19km ENE of Little Lake, CA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -117.7181667,
+          36.0183333,
+          -0.11
+        ]
+      },
+      "id": "ci37271850"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.31,
+        "place": "2km SW of Volcano, Hawaii",
+        "time": 1530292933180,
+        "updated": 1530293276730,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339311",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339311.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 82,
+        "net": "hv",
+        "code": "70339311",
+        "ids": ",hv70339311,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 17,
+        "dmin": 0.005106,
+        "rms": 0.27,
+        "gap": 132,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.3 - 2km SW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2545013,
+          19.4126663,
+          -0.52
+        ]
+      },
+      "id": "hv70339311"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.1,
+        "place": "4km SW of Volcano, Hawaii",
+        "time": 1530292778350,
+        "updated": 1530293122520,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339301",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339301.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 68,
+        "net": "hv",
+        "code": "70339301",
+        "ids": ",hv70339301,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 24,
+        "dmin": 0.003713,
+        "rms": 0.25,
+        "gap": 60,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.1 - 4km SW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2696686,
+          19.3996658,
+          0.93
+        ]
+      },
+      "id": "hv70339301"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 3.18,
+        "place": "3km SW of Volcano, Hawaii",
+        "time": 1530292256800,
+        "updated": 1530293660171,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339291",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339291.geojson",
+        "felt": 3,
+        "cdi": 2,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 156,
+        "net": "hv",
+        "code": "70339291",
+        "ids": ",hv70339291,",
+        "sources": ",hv,",
+        "types": ",dyfi,geoserve,origin,phase-data,",
+        "nst": 31,
+        "dmin": 0.0002808,
+        "rms": 0.38,
+        "gap": 47,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 3.2 - 3km SW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2601624,
+          19.4121666,
+          0.43
+        ]
+      },
+      "id": "hv70339291"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.9,
+        "place": "4km WSW of Volcano, Hawaii",
+        "time": 1530292241760,
+        "updated": 1530292584410,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339286",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339286.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 129,
+        "net": "hv",
+        "code": "70339286",
+        "ids": ",hv70339286,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 30,
+        "dmin": 0.009387,
+        "rms": 0.22,
+        "gap": 32,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.9 - 4km WSW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.277832,
+          19.4103336,
+          0.51
+        ]
+      },
+      "id": "hv70339286"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 3.08,
+        "place": "3km SW of Volcano, Hawaii",
+        "time": 1530292092190,
+        "updated": 1530293916593,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339281",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339281.geojson",
+        "felt": 0,
+        "cdi": 1,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 146,
+        "net": "hv",
+        "code": "70339281",
+        "ids": ",hv70339281,",
+        "sources": ",hv,",
+        "types": ",dyfi,geoserve,origin,phase-data,",
+        "nst": 38,
+        "dmin": 0.003685,
+        "rms": 0.27,
+        "gap": 30,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 3.1 - 3km SW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2628326,
+          19.4096661,
+          0.18
+        ]
+      },
+      "id": "hv70339281"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 5,
+        "place": "190km SSW of Ndoi Island, Fiji",
+        "time": 1530292029980,
+        "updated": 1530292950040,
+        "tz": -720,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/us2000frin",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/us2000frin.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "reviewed",
+        "tsunami": 0,
+        "sig": 385,
+        "net": "us",
+        "code": "2000frin",
+        "ids": ",us2000frin,",
+        "sources": ",us,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": null,
+        "dmin": 5.02,
+        "rms": 0.98,
+        "gap": 50,
+        "magType": "mb",
+        "type": "earthquake",
+        "title": "M 5.0 - 190km SSW of Ndoi Island, Fiji"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -179.4636,
+          -22.2123,
+          583.21
+        ]
+      },
+      "id": "us2000frin"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 3.71,
+        "place": "2km SW of Volcano, Hawaii",
+        "time": 1530291955750,
+        "updated": 1530293150644,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339271",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339271.geojson",
+        "felt": 1,
+        "cdi": 2.2,
+        "mmi": 3.42,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 212,
+        "net": "hv",
+        "code": "70339271",
+        "ids": ",hv70339271,",
+        "sources": ",hv,",
+        "types": ",dyfi,geoserve,origin,phase-data,shakemap,",
+        "nst": 19,
+        "dmin": 0.009954,
+        "rms": 0.29,
+        "gap": 79,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 3.7 - 2km SW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2510071,
+          19.4174995,
+          0.27
+        ]
+      },
+      "id": "hv70339271"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 3.02,
+        "place": "3km WSW of Volcano, Hawaii",
+        "time": 1530291903800,
+        "updated": 1530293763603,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339266",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339266.geojson",
+        "felt": 0,
+        "cdi": 1,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 140,
+        "net": "hv",
+        "code": "70339266",
+        "ids": ",hv70339266,",
+        "sources": ",hv,",
+        "types": ",dyfi,geoserve,origin,phase-data,",
+        "nst": 38,
+        "dmin": 0.008977,
+        "rms": 0.39,
+        "gap": 48,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 3.0 - 3km WSW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2681732,
+          19.4165001,
+          -0.21
+        ]
+      },
+      "id": "hv70339266"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 1.32,
+        "place": "6km SSE of Home Gardens, CA",
+        "time": 1530291872060,
+        "updated": 1530293438604,
+        "tz": -480,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/ci37271842",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/ci37271842.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "reviewed",
+        "tsunami": 0,
+        "sig": 27,
+        "net": "ci",
+        "code": "37271842",
+        "ids": ",ci37271842,",
+        "sources": ",ci,",
+        "types": ",geoserve,nearby-cities,origin,phase-data,scitech-link,",
+        "nst": 31,
+        "dmin": 0.03421,
+        "rms": 0.22,
+        "gap": 66,
+        "magType": "ml",
+        "type": "quarry blast",
+        "title": "M 1.3 Quarry Blast - 6km SSE of Home Gardens, CA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -117.4838333,
+          33.8286667,
+          -0.66
+        ]
+      },
+      "id": "ci37271842"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 3.23,
+        "place": "4km W of Volcano, Hawaii",
+        "time": 1530291830680,
+        "updated": 1530293382866,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339261",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339261.geojson",
+        "felt": 3,
+        "cdi": 2,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 161,
+        "net": "hv",
+        "code": "70339261",
+        "ids": ",hv70339261,",
+        "sources": ",hv,",
+        "types": ",dyfi,geoserve,origin,phase-data,",
+        "nst": 15,
+        "dmin": 0.005096,
+        "rms": 0.17,
+        "gap": 64,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 3.2 - 4km W of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2783356,
+          19.4298325,
+          0.59
+        ]
+      },
+      "id": "hv70339261"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.47,
+        "place": "19km NW of Volcano, Hawaii",
+        "time": 1530291802470,
+        "updated": 1530292153110,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339256",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339256.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 94,
+        "net": "hv",
+        "code": "70339256",
+        "ids": ",hv70339256,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 10,
+        "dmin": 0.1094,
+        "rms": 0.25,
+        "gap": 140,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.5 - 19km NW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.3475037,
+          19.5674992,
+          19.55
+        ]
+      },
+      "id": "hv70339256"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.88,
+        "place": "5km SW of Volcano, Hawaii",
+        "time": 1530291799580,
+        "updated": 1530292141500,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339251",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339251.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 128,
+        "net": "hv",
+        "code": "70339251",
+        "ids": ",hv70339251,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 37,
+        "dmin": 0.01102,
+        "rms": 0.32,
+        "gap": 45,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.9 - 5km SW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2774963,
+          19.3961658,
+          1.79
+        ]
+      },
+      "id": "hv70339251"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 1.81,
+        "place": "8km NNE of Porterville, CA",
+        "time": 1530291710390,
+        "updated": 1530292948470,
+        "tz": -480,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/ci37271834",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/ci37271834.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "reviewed",
+        "tsunami": 0,
+        "sig": 50,
+        "net": "ci",
+        "code": "37271834",
+        "ids": ",ci37271834,",
+        "sources": ",ci,",
+        "types": ",geoserve,nearby-cities,origin,phase-data,scitech-link,",
+        "nst": 21,
+        "dmin": 0.2971,
+        "rms": 0.18,
+        "gap": 87,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 1.8 - 8km NNE of Porterville, CA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.974,
+          36.1246667,
+          7.52
+        ]
+      },
+      "id": "ci37271834"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.18,
+        "place": "7km SSW of Volcano, Hawaii",
+        "time": 1530291676430,
+        "updated": 1530292017750,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339246",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339246.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 73,
+        "net": "hv",
+        "code": "70339246",
+        "ids": ",hv70339246,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 8,
+        "dmin": 0.02221,
+        "rms": 0.16,
+        "gap": 134,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.2 - 7km SSW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2698364,
+          19.373333,
+          -1.06
+        ]
+      },
+      "id": "hv70339246"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 1.9,
+        "place": "4km WSW of Volcano, Hawaii",
+        "time": 1530291595570,
+        "updated": 1530291937840,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339241",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339241.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 56,
+        "net": "hv",
+        "code": "70339241",
+        "ids": ",hv70339241,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 12,
+        "dmin": 0.008721,
+        "rms": 0.15,
+        "gap": 79,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 1.9 - 4km WSW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2765045,
+          19.4126663,
+          0.26
+        ]
+      },
+      "id": "hv70339241"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.03,
+        "place": "4km SW of Volcano, Hawaii",
+        "time": 1530291473250,
+        "updated": 1530291815290,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339231",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339231.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 63,
+        "net": "hv",
+        "code": "70339231",
+        "ids": ",hv70339231,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 10,
+        "dmin": 0.002907,
+        "rms": 0.12,
+        "gap": 90,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.0 - 4km SW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2631683,
+          19.3971672,
+          0.28
+        ]
+      },
+      "id": "hv70339231"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 1.35,
+        "place": "12km SW of Kennewick, Washington",
+        "time": 1530291441150,
+        "updated": 1530293451220,
+        "tz": -480,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/uw61404511",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/uw61404511.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "reviewed",
+        "tsunami": 0,
+        "sig": 28,
+        "net": "uw",
+        "code": "61404511",
+        "ids": ",uw61404511,",
+        "sources": ",uw,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 12,
+        "dmin": 0.1904,
+        "rms": 0.13,
+        "gap": 169,
+        "magType": "ml",
+        "type": "explosion",
+        "title": "M 1.4 Explosion - 12km SW of Kennewick, Washington"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -119.27,
+          46.1473333,
+          -0.2
+        ]
+      },
+      "id": "uw61404511"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.56,
+        "place": "5km W of Volcano, Hawaii",
+        "time": 1530291182180,
+        "updated": 1530291525800,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339211",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339211.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 101,
+        "net": "hv",
+        "code": "70339211",
+        "ids": ",hv70339211,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 14,
+        "dmin": 0.01296,
+        "rms": 0.23,
+        "gap": 85,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.6 - 5km W of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2910004,
+          19.434,
+          -0.86
+        ]
+      },
+      "id": "hv70339211"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.42,
+        "place": "7km SW of Volcano, Hawaii",
+        "time": 1530291151440,
+        "updated": 1530291492440,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339206",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339206.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 90,
+        "net": "hv",
+        "code": "70339206",
+        "ids": ",hv70339206,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 16,
+        "dmin": 0.01129,
+        "rms": 0.2,
+        "gap": 87,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.4 - 7km SW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2906647,
+          19.3789997,
+          1.26
+        ]
+      },
+      "id": "hv70339206"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.39,
+        "place": "3km WSW of Volcano, Hawaii",
+        "time": 1530291069590,
+        "updated": 1530291409390,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339201",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339201.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 88,
+        "net": "hv",
+        "code": "70339201",
+        "ids": ",hv70339201,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 19,
+        "dmin": 0.007675,
+        "rms": 0.22,
+        "gap": 94,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.4 - 3km WSW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.272171,
+          19.4190006,
+          1.2
+        ]
+      },
+      "id": "hv70339201"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 3.22,
+        "place": "4km SW of Volcano, Hawaii",
+        "time": 1530290892380,
+        "updated": 1530291232430,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339196",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339196.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 160,
+        "net": "hv",
+        "code": "70339196",
+        "ids": ",hv70339196,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 34,
+        "dmin": 0.004102,
+        "rms": 0.16,
+        "gap": 51,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 3.2 - 4km SW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2696686,
+          19.4004993,
+          0.22
+        ]
+      },
+      "id": "hv70339196"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 3.13,
+        "place": "7km S of Volcano, Hawaii",
+        "time": 1530290807690,
+        "updated": 1530291148080,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339186",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339186.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 151,
+        "net": "hv",
+        "code": "70339186",
+        "ids": ",hv70339186,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 45,
+        "dmin": 0.01043,
+        "rms": 0.23,
+        "gap": 85,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 3.1 - 7km S of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2454987,
+          19.3641663,
+          -0.51
+        ]
+      },
+      "id": "hv70339186"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.55,
+        "place": "3km SW of Volcano, Hawaii",
+        "time": 1530290693280,
+        "updated": 1530291036050,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339181",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339181.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 100,
+        "net": "hv",
+        "code": "70339181",
+        "ids": ",hv70339181,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 26,
+        "dmin": 0.002106,
+        "rms": 0.2,
+        "gap": 59,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.6 - 3km SW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2595062,
+          19.4099998,
+          1.51
+        ]
+      },
+      "id": "hv70339181"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.45,
+        "place": "3km WSW of Volcano, Hawaii",
+        "time": 1530290662990,
+        "updated": 1530291009570,
+        "tz": -600,
+        "url": "https:\/\/earthquake.usgs.gov\/earthquakes\/eventpage\/hv70339176",
+        "detail": "https:\/\/earthquake.usgs.gov\/earthquakes\/feed\/v1.0\/detail\/hv70339176.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 92,
+        "net": "hv",
+        "code": "70339176",
+        "ids": ",hv70339176,",
+        "sources": ",hv,",
+        "types": ",geoserve,origin,phase-data,",
+        "nst": 20,
+        "dmin": 0.006551,
+        "rms": 0.16,
+        "gap": 66,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.5 - 3km WSW of Volcano, Hawaii"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.2680054,
+          19.4204998,
+          0.02
+        ]
+      },
+      "id": "hv70339176"
+    }
+  ],
+  "bbox": [
+    -179.4636,
+    -22.2123,
+    -1.06,
+    -117.4838333,
+    46.1473333,
+    583.21
+  ]
+}

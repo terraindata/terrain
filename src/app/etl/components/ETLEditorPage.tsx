@@ -71,6 +71,9 @@ import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import PathUtil from 'etl/pathselector/PathGuessTest';
+
+console.log(PathUtil);
 
 const { List } = Immutable;
 import './ETLEditorPage.less';
