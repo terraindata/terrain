@@ -60,6 +60,7 @@ import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { ETLState } from 'etl/ETLTypes';
 import ExecutionHelpers from 'etl/helpers/ExecutionHelpers';
 import Initializers from 'etl/helpers/TemplateInitializers';
+import PathUtil from 'etl/pathselector/PathGuessTest';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
@@ -71,9 +72,6 @@ import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import PathUtil from 'etl/pathselector/PathGuessTest';
-
-console.log(PathUtil);
 
 const { List } = Immutable;
 import './ETLEditorPage.less';

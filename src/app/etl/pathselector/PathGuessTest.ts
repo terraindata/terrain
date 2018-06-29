@@ -42,17 +42,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const Earthquakes = require('./earthquakes.json');
-const Movies = require('./movies.json');
-//const UsersRomance = require('./Users_Romance.json');
-const Waduhek = require('./waduhekmovies.json');
+// Copyright 2018 Terrain Data, Inc.
+
+// const Earthquakes = require('./earthquakes.json');
+// const Movies = require('./movies.json');
+// const UsersRomance = require('./Users_Romance.json');
+// const Waduhek = require('./waduhekmovies.json');
 
 export default class PathUtil
 {
   public static isArray(object)
   {
-    // const isArrayType = Object.prototype.toString.call(object) === '[object Array]'; 
-    // const isArray = json instanceof Array;
     const isArrayType = Array.isArray(object);
     return isArrayType;
   }
@@ -64,7 +64,7 @@ export default class PathUtil
     {
       return keyFields;
     }
-    for (let key of Object.keys(objectItem))
+    for (const key of Object.keys(objectItem))
     {
       keyFields.push(key);
     }
@@ -75,13 +75,13 @@ export default class PathUtil
   {
     if (typeof object !== 'object')
     {
-      return false; // the object cant be iterated through 
+      return false; // the object cant be iterated through
     }
 
-    let comparedKeys = undefined;
-    for (let key of Object.keys(object))
+    let comparedKeys;
+    for (const key of Object.keys(object))
     {
-      let keyFields = PathUtil.renderFields(object.key);
+      const keyFields = PathUtil.renderFields(object.key);
       if (comparedKeys !== undefined && keyFields !== comparedKeys)
       {
         return false;
@@ -93,10 +93,10 @@ export default class PathUtil
 
   public static matchingFieldLength(object) // check that objects in the json have the same number of key fields
   {
-    let comparedLength = undefined;
-    for (let itemKey of Object.keys(object))
+    let comparedLength;
+    for (const itemKey of Object.keys(object))
     {
-      let itemLength = (object[itemKey] !== undefined) ? object[itemKey].length : 0;
+      const itemLength = (object[itemKey] !== undefined) ? object[itemKey].length : 0;
       if (comparedLength !== undefined && itemLength !== comparedLength)
       {
         return false;
@@ -106,7 +106,7 @@ export default class PathUtil
     return true;
   }
 
-  public static containsAllObjects(array)
+  public static containsAllObjects(array: object)
   {
     for (let i = 0; i < array.length; i++)
     {
@@ -118,7 +118,7 @@ export default class PathUtil
     return true;
   }
 
-  public static isPossiblePath(json, key)
+  public static isPossiblePath(json: object, key)
   {
     const object = json[key];
     if (object === undefined || object === null)
@@ -150,7 +150,7 @@ export default class PathUtil
     }
   }
 
-  public static guessPath(json: object, possiblePaths, depth)
+  public static guessPath(json: object, possiblePaths, depth: number)
   {
     if (depth > 5) // threshold for recusive calls
     {
@@ -166,7 +166,7 @@ export default class PathUtil
     {
       return possiblePaths; // proper path already
     }
-    for (let key of Object.keys(json))
+    for (const key of Object.keys(json))
     {
       if (PathUtil.isPossiblePath(json, key))
       {
@@ -182,9 +182,3 @@ export default class PathUtil
     return PathUtil.guessPath(json, [], 0);
   }
 }
-
-//console.log(Earthquakes);
-console.log(PathUtil.guessFilePaths(Earthquakes));
-console.log(PathUtil.guessFilePaths(Movies));
-// console.log(PathUtil.guessFilePaths(UsersRomance));
-console.log(PathUtil.guessFilePaths(Waduhek));
