@@ -94,11 +94,12 @@ export type RootInputConfig = WithIRecord<RootInputConfigC>;
 export const _FileConfig = makeConstructor(FileConfigC);
 export const _RootInputConfig = makeConstructor(RootInputConfigC);
 export const _RootPostProcessConfig = makeConstructor(RootPostProcessConfigC);
+export const SOURCE_DEFAULT_NAME = 'Source';
 
 class SourceConfigC implements SourceConfigI
 {
   public type = null;
-  public name = 'Default Source';
+  public name = SOURCE_DEFAULT_NAME;
   public fileConfig = _FileConfig();
   public options = {} as any;
   public integrationId = -1;
@@ -162,10 +163,11 @@ export const _SourceConfig = makeExtendedConstructor(SourceConfigC, true, {
   },
 );
 
+export const SINK_DEFAULT_NAME = 'Destination';
 class SinkConfigC implements SinkConfigI
 {
   public type = null;
-  public name = 'Default Sink';
+  public name = SINK_DEFAULT_NAME;
   public fileConfig = _FileConfig();
   public options = {} as any;
   public integrationId = -1;

@@ -224,7 +224,8 @@ class HttpForm extends IntegrationFormBase<HttpAuthT, HttpConnectionT>
   public authMap: InputDeclarationMap<HttpAuthT> = {
     jwt: {
       type: DisplayType.TextBox,
-      displayName: 'JSON Web Token',
+      displayName: 'Authorization Header',
+      help: 'Example: Basic aCBdefGhijklMNOpQRStUVwx=',
     },
   };
 
@@ -408,14 +409,15 @@ class GoogleAnalyticsForm extends IntegrationFormBase<GoogleAnalyticsAuthT, Goog
   public authMap: InputDeclarationMap<GoogleAnalyticsAuthT> = {
     privateKey: {
       type: DisplayType.TextBox,
-      displayName: 'Private Key',
+      displayName: 'P12 key associated with the service account. Should begin with ‘-----Begin RSA PRIVATE KEY…’',
     },
   };
 
   public connectionMap: InputDeclarationMap<GoogleAnalyticsConnectionT> = {
     email: {
       type: DisplayType.TextBox,
-      displayName: 'Email',
+      displayName: 'Service Account Email',
+      help: 'Example: terrain@terrain.iam.gserviceaccount.com',
     },
     metrics: {
       type: DisplayType.Custom,
@@ -452,6 +454,7 @@ class GoogleAnalyticsForm extends IntegrationFormBase<GoogleAnalyticsAuthT, Goog
     viewId: {
       type: DisplayType.NumberBox,
       displayName: 'View Id',
+      help: 'View Id for a specific analytics dashboard',
     },
   };
 

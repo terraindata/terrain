@@ -131,7 +131,7 @@ export const _TemplateEditorState = makeExtendedConstructor(TemplateEditorStateC
 export enum ColumnOptions
 {
   Preview = 'Preview',
-  Endpoints = 'Endpoints',
+  Endpoints = 'Source/Destination',
   Steps = 'Steps',
   Options = 'Options',
 }
