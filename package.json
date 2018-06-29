@@ -247,7 +247,7 @@
     "velocity-animate": "^1.5.0",
     "velocity-react": "^1.4.1",
     "victory": "^0.26.1",
-    "winston": "^2.4.2",
+    "winston": "^3.0.0",
     "xlsx": "https://github.com/SheetJS/js-xlsx#4737d80",
     "xml-nodes": "^0.1.5",
     "xml2js": "^0.4.3",
