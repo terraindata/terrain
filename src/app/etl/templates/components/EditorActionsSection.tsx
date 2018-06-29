@@ -238,30 +238,45 @@ class EditorActionsSection extends TerrainComponent<Props>
             tip: 'Save As',
           })
         }
-        <div
-          className='editor-top-bar-item'
-          style={topBarItemStyle}
-          onClick={this.openTemplateUI}
-          key='load'
-        >
-          LOAD
-        </div>
-        <div
-          className='editor-top-bar-item'
-          style={topBarItemStyle}
-          onClick={this.handleSaveClicked}
-          key='save'
-        >
-          SAVE
-        </div>
-        <div
-          className='editor-top-bar-item'
-          style={topBarRunStyle}
-          onClick={this.handleRun}
-          key='run'
-        >
-          RUN
-        </div>
+        {
+          tooltip(
+            <div
+              className='editor-top-bar-item'
+              style={topBarItemStyle}
+              onClick={this.openTemplateUI}
+              key='load'
+            >
+              LOAD
+            </div>,
+            'Load previous template',
+          )
+        }
+        {
+          tooltip(
+            <div
+              className='editor-top-bar-item'
+              style={topBarItemStyle}
+              onClick={this.handleSaveClicked}
+              key='save'
+            >
+              SAVE
+            </div>,
+            'Save template',
+          )
+        }
+        {
+          tooltip(
+            <div
+              className='editor-top-bar-item'
+              style={topBarRunStyle}
+              onClick={this.handleRun}
+              key='run'
+            >
+              RUN
+            </div>,
+            'Run import or export',
+          )
+        }
       </div>
     );
   }
