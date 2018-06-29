@@ -119,24 +119,20 @@ export default abstract class CombineTransformationType extends TransformationNo
         matchSets[hash] = inputs;
       }
     });
+    // each item in matchSets is guaranteed to be at least length 1
 
     const opts = this.meta as NodeOptionsType<any>;
     const newFieldKeyPath = opts.newFieldKeyPaths.get(0);
 
+    const matchFn = Topology.createOneToOneMatcher(this.fields.get(0), newFieldKeyPath);
+
     for (const locale of Object.keys(matchSets))
     {
       const matchSet = matchSets[locale];
-      const matcher = Topology.createLocalMatcher(matchSet[0].field, matchSet[0].matchField);
-      if (matcher === null)
-      {
-        errors.push(`Error in ${this.typeCode}: Field and Match location are inconsistent`);
-      }
-      else
-      {
-        const destKP = matcher(newFieldKeyPath);
-        const newValue = this.combine(this.processMatchSet(matchSet));
-        yadeep.set(doc, destKP, newValue, { create: true });
-      }
+      const newValue = this.combine(this.processMatchSet(matchSet));
+
+      const destKP = matchFn(matchSet[0].matchField);
+      yadeep.set(doc, destKP, newValue, { create: true });
     }
 
     return {
@@ -146,7 +142,6 @@ export default abstract class CombineTransformationType extends TransformationNo
   }
 }
 
-// like with createLocalMatcher, matchKP should not contain -1
 function hashMatchToLocale(searchKP: KeyPath, matchKP: KeyPath): string
 {
   let hash = '';

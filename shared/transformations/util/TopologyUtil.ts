@@ -109,7 +109,8 @@ export default class TopologyUtil
 
   /*
    *  Given two keypaths that are one-to-one related, return a function that
-   *  translates singular paths that match kp1 to singular paths that match kp2.
+   *  translates singular paths that match kp1 (or any kp that is one-to-one with kp1)
+   *  to singular paths that match kp2.
    *  E.G. kp1 is [foo, -1, bar] and kp2 is [foo, -1, baz]
    *  createOneToOneMatcher(kp1, kp2)([foo, 3, bar]) ---> [foo, 3, baz]
    */

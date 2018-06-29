@@ -60,6 +60,64 @@ function wrap(kp: any[])
   return List([List<string | number>(kp)]);
 }
 
+test('join transformation where the first field does not exist', () => {
+
+  const doc = {
+    f2: 'hello',
+    f3: 'world',
+  };
+
+  const e: TransformationEngine = new TransformationEngine(doc);
+  e.addField(KeyPath(['f1']), 'string');
+  e.appendTransformation(
+    TransformationNodeType.JoinNode,
+    List([KeyPath(['f1']), KeyPath(['f2']), KeyPath(['f3'])]),
+    {
+      newFieldKeyPaths: wrap(['result']),
+      delimiter: ' ',
+    });
+  const r = e.transform(doc);
+  expect(r).toEqual({
+    f2: 'hello',
+    f3: 'world',
+    result: 'hello world',
+  });
+});
+
+test('array sum on a nested array field', () => {
+  const doc = {
+    foo: [
+      {
+        values: [1, 2, 3, 4, 5],
+      },
+      {
+        values: [3, 2, 1],
+      },
+    ],
+  };
+
+  const e: TransformationEngine = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.ArraySumNode,
+    wrap(['foo', -1, 'values']),
+    {
+      newFieldKeyPaths: wrap(['foo', -1, 'sum']),
+    });
+  const r = e.transform(doc);
+  expect(r).toEqual({
+    foo: [
+      {
+        values: [1, 2, 3, 4, 5],
+        sum: 15,
+      },
+      {
+        values: [3, 2, 1],
+        sum: 6,
+      },
+    ],
+  });
+});
+
 test('extract an array field (duplicate)', () =>
 {
   const doc = {

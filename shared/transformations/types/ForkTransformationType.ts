@@ -126,13 +126,6 @@ export default abstract class ForkTransformationType extends TransformationNode
         return;
       }
 
-      const matcher = Topology.createLocalMatcher(field, location);
-      if (matcher === null)
-      {
-        errors.push(`Error in ${this.typeCode}: Field and Match location are inconsistent`);
-        return;
-      }
-
       const newFields = this.split(value);
 
       for (const newField of newFields)
@@ -141,7 +134,6 @@ export default abstract class ForkTransformationType extends TransformationNode
         yadeep.set(doc, newKP, newField.value, { create: true });
       }
     }
-    // });
 
     return {
       document: doc,

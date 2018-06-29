@@ -49,6 +49,7 @@ import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
+import Topology from 'shared/transformations/util/TopologyUtil';
 
 import { List } from 'immutable';
 
@@ -75,26 +76,28 @@ export default abstract class AggregateTransformationType extends Transformation
   {
     const errors = [];
     const opts = this.meta as NodeOptionsType<any>;
-    this.fields.forEach((field) =>
-    {
-      const el = yadeep.get(doc, field);
+    const outputField = opts.newFieldKeyPaths.get(0);
+    const inputField = this.fields.get(0);
 
-      if (el === null && this.skipNulls)
+    const matcherFn = Topology.createOneToOneMatcher(inputField, outputField);
+    for (const match of yadeep.search(doc, inputField))
+    {
+      const { value, location } = match;
+      if (value === null && this.skipNulls)
       {
         return;
       }
 
-      if (Array.isArray(el))
+      if (Array.isArray(value))
       {
-        const aggregate = this.aggregator(el);
-        yadeep.set(doc, opts.newFieldKeyPaths.get(0), aggregate, { create: true });
+        const aggregate = this.aggregator(value);
+        yadeep.set(doc, matcherFn(location), aggregate, { create: true });
       }
       else
       {
-        errors.push(`Error in ${this.typeCode}: Expected array but got a(n) ${typeof el}.`);
+        errors.push(`Error in ${this.typeCode}: Expected array but got a(n) ${typeof value}.`);
       }
-    });
-
+    }
     return {
       document: doc,
       errors,
