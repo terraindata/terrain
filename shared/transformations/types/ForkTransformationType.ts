@@ -111,7 +111,7 @@ export default abstract class ForkTransformationType extends TransformationNode
     const field = this.fields.get(0);
     const outputFields: List<KeyPath> = opts.newFieldKeyPaths;
     const matchCacheFn = _.memoize((newFieldIndex: number) => {
-      return Topology.createOneToOneMatcher(field, outputFields.get(newFieldIndex));
+      return Topology.createBasePathMatcher(field, outputFields.get(newFieldIndex));
     });
     for (const match of yadeep.search(doc, field))
     {

@@ -79,7 +79,7 @@ export default abstract class AggregateTransformationType extends Transformation
     const outputField = opts.newFieldKeyPaths.get(0);
     const inputField = this.fields.get(0);
 
-    const matcherFn = Topology.createOneToOneMatcher(inputField, outputField);
+    const matcherFn = Topology.createBasePathMatcher(inputField, outputField);
     for (const match of yadeep.search(doc, inputField))
     {
       const { value, location } = match;

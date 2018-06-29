@@ -49,7 +49,7 @@ import * as _ from 'lodash';
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
 import { TransformationEngine } from '../../transformations/TransformationEngine';
 import TransformationNodeType from '../../transformations/TransformationNodeType';
-import { KeyPath } from '../../util/KeyPath';
+import { KeyPath, WayPoint } from '../../util/KeyPath';
 import * as yadeep from '../../util/yadeep';
 import { TestDocs } from './TestDocs';
 
@@ -118,7 +118,7 @@ test('array sum on a nested array field', () => {
   });
 });
 
-test('extract an array field (duplicate)', () =>
+test('extract an array field with duplicate', () =>
 {
   const doc = {
     fields: ['foo', 'bar', 'baz'],
@@ -143,40 +143,103 @@ test('extract an array field (duplicate)', () =>
   });
 });
 
-test('make an array of values from nested array (duplicate)', () => {
-  const doc = {
-    items: [
-      {
-        foo: 1,
-      },
-      {
-        foo: 2,
-      },
-      {
-        foo: 3,
-      },
-    ],
-  };
-  const e = new TransformationEngine(doc);
-  e.appendTransformation(
-    TransformationNodeType.DuplicateNode,
-    wrap(['items', -1, 'foo']),
-    { newFieldKeyPaths: wrap(['allFoos']) },
-  );
+describe('suite of complex duplication tests', () => {
+  function dupHelper(inKP: WayPoint[], outKP: WayPoint[], inDoc: object): object
+  {
+    const e = new TransformationEngine(inDoc);
+    e.appendTransformation(
+      TransformationNodeType.DuplicateNode,
+      wrap(inKP),
+      { newFieldKeyPaths: wrap(outKP) },
+    );
+    const r = e.transform(inDoc);
+    return r;
+  }
 
-  const r = e.transform(doc);
-  expect(r).toEqual({
-    items: [
+  test('many to one', () => {
+    expect(dupHelper(['items', -1, 'foo'], ['allFoos'], {
+      items: [
+        { foo: 1 },
+        { foo: 2 },
+        { foo: 3 },
+      ],
+    })).toEqual({
+      items: [
+        { foo: 1 },
+        { foo: 2 },
+        { foo: 3 },
+      ],
+      allFoos: [ 1, 2, 3 ],
+    });
+  });
+
+  test('nested one to one', () => {
+    expect(dupHelper(
+      ['items', -1, 'foo'],
+      ['items', -1, 'bar'],
       {
-        foo: 1,
+        items: [
+          { foo: 1 },
+          { foo: 2 },
+          { notFoo: 3 },
+        ],
       },
+    )).toEqual(
       {
-        foo: 2,
+        items: [
+          { foo: 1, bar: 1 },
+          { foo: 2, bar: 2 },
+          { notFoo: 3 },
+        ],
       },
+    );
+  });
+
+  test('super nested one to one', () => {
+    expect(dupHelper(
+      ['items', -1, 'moreItems', -1, 'foo'],
+      ['items', -1, 'moreItems', -1, 'bar'],
       {
-        foo: 3,
+        items: [
+          {
+            moreItems: [
+              { foo: 1 },
+              { foo: 2 },
+              { notFoo: 3 },
+            ],
+            decoy: 'hello',
+          },
+          {
+            moreItems: [
+              { notFoo: 4 },
+              { foo: 5 },
+              { foo: 6 },
+            ],
+            decoy: 'hey there',
+          },
+        ],
       },
-    ],
-    allFoos: [ 1, 2, 3 ],
+    )).toEqual(
+      {
+        items: [
+          {
+            moreItems: [
+              { foo: 1, bar: 1 },
+              { foo: 2, bar: 2 },
+              { notFoo: 3 },
+            ],
+            decoy: 'hello',
+          },
+          {
+            moreItems: [
+              { notFoo: 4 },
+              { foo: 5, bar: 5 },
+              { foo: 6, bar: 6 },
+            ],
+            decoy: 'hey there',
+          },
+        ],
+      },
+    );
   });
 });

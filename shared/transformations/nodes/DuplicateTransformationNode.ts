@@ -72,9 +72,12 @@ export class DuplicateTransformationNode extends TransformationNode
 {
   public readonly typeCode = TYPECODE;
 
-  protected oneToOne(doc: object, inputField: KeyPath, outputField: KeyPath)
+  /*
+   *  Returns a string if an error occured
+   */
+  protected oneToOne(doc: object, inputField: KeyPath, outputField: KeyPath): string | undefined
   {
-    const matcherFn = Topology.createOneToOneMatcher(inputField, outputField);
+    const matcherFn = Topology.createBasePathMatcher(inputField, outputField);
     for (const match of yadeep.search(doc, inputField))
     {
       let { value } = match;
@@ -84,39 +87,63 @@ export class DuplicateTransformationNode extends TransformationNode
       }
       yadeep.set(doc, matcherFn(match.location), value, { create: true });
     }
-  }
-
-  protected oneToManyHelper(doc: object, inputField: KeyPath, outputField: KeyPath)
-  {
-
+    return undefined;
   }
 
   /*
+   *  Returns a string if an error occured
    *  e.g.
    *  [A, -1, D] to [A, -1, B, -1, C]
    *  Search all [A, -1, D]
    *    Search all [B, -1]
    *    Assign D to C
    */
-  protected oneToMany(doc: object, inputField: KeyPath, outputField: KeyPath)
+  protected oneToMany(doc: object, inputField: KeyPath, outputField: KeyPath): string | undefined
   {
+    const baseIndex = Topology.getDifferingBaseIndex(inputField, outputField);
+    const basePath = inputField.slice(0, baseIndex).toList(); // [A, -1]
 
+    const inputAfterBasePath = inputField.slice(baseIndex).toList(); // [D]
+    const outputAfterBasePath = outputField.slice(baseIndex).toList(); // [B, -1, C]
+
+    const matchFn = Topology.createBasePathMatcher(inputField, outputField);
+    for (const outerMatch of yadeep.search(doc, inputField))
+    {
+      const { location , value } = outerMatch; // location is [A, i, D]
+      const valueToCopy = isPrimitive(value) ? value : _.cloneDeep(value);
+
+      // want to convert [A, i, D] to [A, i, B, -1, C] to search
+      const softDestKP = matchFn(location); // [A, i, B, -1, C]
+
+      const rsIndex = Topology.getRightSingularIndex(softDestKP);
+      const searchKP = softDestKP.slice(0, rsIndex).toList(); // [A, i, B, -1]
+      const destRightKP = softDestKP.slice(rsIndex); // [C]
+
+      for (const innerMatch of yadeep.search(doc, searchKP))
+      {
+        const { location: leftKP } = innerMatch; // leftKP [A, i, B, j]
+        const concreteDestKP = leftKP.concat(destRightKP).toList(); // [A, i, B, j, C];
+        yadeep.set(doc, concreteDestKP, valueToCopy);
+      }
+    }
+    return undefined;
   }
 
   /*
+   *  Returns a string if an error occured
    *  e.g.
    *  [A, -1, B, -1, C] to [A, -1, D]
    *  Search all [A, -1]
-   *    Search all [B, -1, C]
-   *    Assign to [D]
+   *    Search all [B, -1, C] within each result
+   *    Assign to matching [D]
    */
-  protected manyToOne(doc: object, inputField: KeyPath, outputField: KeyPath): string // errors
+  protected manyToOne(doc: object, inputField: KeyPath, outputField: KeyPath): string | undefined
   {
     const baseIndex = Topology.getDifferingBaseIndex(inputField, outputField);
     const basePath = inputField.slice(0, baseIndex).toList();
     const inputAfterBasePath = inputField.slice(baseIndex).toList();
 
-    const matchFn = Topology.createOneToOneMatcher(inputField, outputField);
+    const matchFn = Topology.createBasePathMatcher(inputField, outputField);
     for (const match of yadeep.search(doc, basePath))
     {
       // each match represents a match of the base path
@@ -139,6 +166,7 @@ export class DuplicateTransformationNode extends TransformationNode
       });
       yadeep.set(doc, destKP, values, { create: true });
     }
+    return undefined;
   }
 
   protected transformDocument(doc: object): TransformationVisitResult
@@ -154,11 +182,19 @@ export class DuplicateTransformationNode extends TransformationNode
 
     if (r1 === 'one' && r2 === 'one')
     {
-      this.oneToOne(doc, inputField, outputField);
+      const err = this.oneToOne(doc, inputField, outputField);
+      if (err !== undefined)
+      {
+        errors.push(err);
+      }
     }
     else if (r1 === 'one' && r2 === 'many')
     {
-      this.oneToMany(doc, inputField, outputField);
+      const err = this.oneToMany(doc, inputField, outputField);
+      if (err !== undefined)
+      {
+        errors.push(err);
+      }
     }
     else if (r1 === 'many' && r2 === 'one')
     {

@@ -124,7 +124,7 @@ export default abstract class CombineTransformationType extends TransformationNo
     const opts = this.meta as NodeOptionsType<any>;
     const newFieldKeyPath = opts.newFieldKeyPaths.get(0);
 
-    const matchFn = Topology.createOneToOneMatcher(this.fields.get(0), newFieldKeyPath);
+    const matchFn = Topology.createBasePathMatcher(this.fields.get(0), newFieldKeyPath);
 
     for (const locale of Object.keys(matchSets))
     {

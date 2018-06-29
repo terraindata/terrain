@@ -52,20 +52,21 @@ import EngineUtil from 'shared/transformations/util/EngineUtil';
 export type Relation = 'one' | 'many';
 
 /*
-General method for seeing if 2 keypaths are "compatible"
-Take both keypaths
-Match the fronts to find the longest match
-e.g.
-[foo, bar, -1, X, Y, Z]
-[foo, bar, -1, A, B, C]
-would have [foo, bar, -1] as the longest common match.
+ *  General method for seeing if 2 keypaths are "compatible"
+ *  Take both keypaths
+ *  Match the fronts to find the longest match
+ *  e.g.
+ *  [foo, bar, -1, X, Y, Z]
+ *  [foo, bar, -1, A, B, C]
+ *  would have [foo, bar, -1] as the longest common match.
+ *
+ *  Now take the remaining part of the keypath for each path.
+ *  In this case it would be [X, Y, Z] and [A, B, C]
+ *  As long as at least one of them is singular (no wildcards), then the two are compatible.
+ *
+ *  General rule: Compatible keypaths are anything that can be posed as a one to one, many to one, or a one to many.
+ */
 
-Now take the remaining part of the keypath for each path.
-In this case it would be [X, Y, Z] and [A, B, C]
-As long as at least one of them is singular (no wildcards), then the two are compatible.
-
-General rule: Compatible keypaths are anything that can be posed as a one to one, many to one, or a one to many.
-*/
 type LooseKP = KeyPath | Immutable.Iterable<number, WayPoint>;
 export default class TopologyUtil
 {
@@ -97,6 +98,25 @@ export default class TopologyUtil
   }
 
   /*
+   *  Return the index at (right side) which the keypath becomes singular
+   *  e.g. [A, -1, -1, C, D] would return 3 because [C, D] is the singular part
+   *  [A, B, C] returns 0
+   *  [X, Y, -1] returns 3
+   */
+  public static getRightSingularIndex(kp: KeyPath): number
+  {
+    let max = 0;
+    for (let i = 0; i < kp.size; i++)
+    {
+      if (kp.get(i) === -1)
+      {
+        max = i + 1;
+      }
+    }
+    return max;
+  }
+
+  /*
    *  do the keypaths represent one-to-one, one-to-many, many-to-one, or many-to-many relationships?
    */
   public static getRelation(kp1: LooseKP, kp2: LooseKP): [Relation, Relation]
@@ -108,13 +128,15 @@ export default class TopologyUtil
   }
 
   /*
-   *  Given two keypaths that are one-to-one related, return a function that
-   *  translates singular paths that match kp1 (or any kp that is one-to-one with kp1)
-   *  to singular paths that match kp2.
+   *  Given two keypaths, return a function that
+   *  translates paths that match kp1 (or any kp that shares the same basepath as kp1)
+   *  to paths that match kp2.
    *  E.G. kp1 is [foo, -1, bar] and kp2 is [foo, -1, baz]
-   *  createOneToOneMatcher(kp1, kp2)([foo, 3, bar]) ---> [foo, 3, baz]
+   *  createBasePathMatcher(kp1, kp2)([foo, 3, bar]) ---> [foo, 3, baz]
+   *  E.G. kp1 is [foo, -1, bar, -1, baz] and kp2 is [foo, -1, X, Y, -1]
+   *  createBasePathMatcher(kp1, kp2)([foo, 3, bar, 5, baz]) ---> [foo, 3, X, Y, -1]
    */
-  public static createOneToOneMatcher(kp1: KeyPath, kp2: KeyPath): (kp: KeyPath) => KeyPath
+  public static createBasePathMatcher(kp1: KeyPath, kp2: KeyPath): (kp: KeyPath) => KeyPath
   {
     const baseIndex = TopologyUtil.getDifferingBaseIndex(kp1, kp2);
     const wildcards = [];
@@ -125,6 +147,7 @@ export default class TopologyUtil
         wildcards.push(i);
       }
     }
+
     if (wildcards.length === 0)
     {
       return (kp) => kp2;
@@ -137,63 +160,11 @@ export default class TopologyUtil
         let ret = kp2;
         for (const i of wildcards)
         {
-          ret = kp2.set(i, kp.get(i));
+          ret = ret.set(i, kp.get(i));
         }
         return ret;
       };
     }
-  }
-
-  /*
-   * referenceKP can contain -1
-   * matchKP should not contain -1
-   */
-  public static createLocalMatcher(referenceKP: KeyPath, matchKP: KeyPath): (newKP: KeyPath) => KeyPath
-  {
-    if (referenceKP.size !== matchKP.size || referenceKP.size === 0)
-    {
-      return null;
-    }
-
-    const replacements: {
-      [k: number]: number;
-    } = {};
-
-    let maxIndex = -1;
-
-    for (let i = 0; i < referenceKP.size; i++)
-    {
-      const searchIndex = referenceKP.get(i);
-      const matchIndex = matchKP.get(i);
-      if (searchIndex !== matchIndex)
-      {
-        if (typeof searchIndex !== 'number' || typeof matchIndex !== 'number')
-        {
-          return null;
-        }
-        else
-        {
-          replacements[i] = matchIndex;
-          maxIndex = i;
-        }
-      }
-    }
-
-    const baseMatchPath = matchKP.slice(0, maxIndex + 1);
-
-    return (newKP: KeyPath) =>
-    {
-      if (maxIndex === -1)
-      {
-        return newKP;
-      }
-      else
-      {
-        const toTransplant = newKP.slice(maxIndex + 1);
-        return baseMatchPath.concat(toTransplant).toList();
-      }
-
-    };
   }
 
   // returns true if two given keypaths represent fields that are "local" to each other.
@@ -203,18 +174,23 @@ export default class TopologyUtil
   // [a] would not be local to [c, -1, d]
   public static areFieldsLocal(kp1, kp2): boolean
   {
-    const lastIndex1: number = kp1.findLastIndex((value, index) => EngineUtil.isWildcardField(kp1, index));
-    const concretePath1 = kp1.slice(0, lastIndex1 + 1);
-    const lastIndex2: number = kp2.findLastIndex((value, index) => EngineUtil.isWildcardField(kp2, index));
-    const concretePath2 = kp2.slice(0, lastIndex2 + 1);
+    // const lastIndex1: number = kp1.findLastIndex((value, index) => EngineUtil.isWildcardField(kp1, index));
+    // const concretePath1 = kp1.slice(0, lastIndex1 + 1);
+    // const lastIndex2: number = kp2.findLastIndex((value, index) => EngineUtil.isWildcardField(kp2, index));
+    // const concretePath2 = kp2.slice(0, lastIndex2 + 1);
 
-    if (lastIndex2 !== lastIndex1 || !concretePath1.equals(concretePath2))
+    // if (lastIndex2 !== lastIndex1 || !concretePath1.equals(concretePath2))
+    // {
+    //   return false;
+    // }
+    // else
+    // {
+    //   // check if fields are wildcards themselves?
+    //   return true;
+    // }
+    const [ r1, r2 ] = TopologyUtil.getRelation(kp1, kp2);
+    if (r1 === 'one' && r2 === 'one')
     {
-      return false;
-    }
-    else
-    {
-      // check if fields are wildcards themselves?
       return true;
     }
   }
