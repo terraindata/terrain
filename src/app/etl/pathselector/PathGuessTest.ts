@@ -106,7 +106,7 @@ export default class PathUtil
     return true;
   }
 
-  public static containsAllObjects(array: object)
+  public static containsAllObjects(array)
   {
     for (let i = 0; i < array.length; i++)
     {
