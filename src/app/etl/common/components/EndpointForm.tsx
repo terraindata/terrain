@@ -95,7 +95,7 @@ class EndpointForm extends TerrainComponent<Props>
     {
       type: {
         type: DisplayType.Pick,
-        displayName: 'Sink Type',
+        displayName: 'Destination Type',
         options: {
           pickOptions: (s) => this.props.isSchedule ? List(SchedulableSinks) : sinkList,
           indexResolver: (value) => (this.props.isSchedule ? List(SchedulableSinks) : sinkList).indexOf(value),

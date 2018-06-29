@@ -43,179 +43,30 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+import TransformationNode from 'shared/transformations/TransformationNode';
+import TransformationNodeType from './TransformationNodeType';
 
-import AddTransformationNode from 'shared/transformations/nodes/AddTransformationNode';
-import ArraySumTransformationNode from 'shared/transformations/nodes/ArraySumTransformationNode';
-import DecryptTransformationNode from 'shared/transformations/nodes/DecryptTransformationNode';
-import DifferenceTransformationNode from 'shared/transformations/nodes/DifferenceTransformationNode';
-import DivideTransformationNode from 'shared/transformations/nodes/DivideTransformationNode';
-import EncryptTransformationNode from 'shared/transformations/nodes/EncryptTransformationNode';
-import FindReplaceTransformationNode from 'shared/transformations/nodes/FindReplaceTransformationNode';
-import GroupByTransformationNode from 'shared/transformations/nodes/GroupByTransformationNode';
-import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
-import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
-import ProductTransformationNode from 'shared/transformations/nodes/ProductTransformationNode';
-import QuotientTransformationNode from 'shared/transformations/nodes/QuotientTransformationNode';
-import RemoveDuplicatesNode from 'shared/transformations/nodes/RemoveDuplicatesTransformationNode';
-import RoundTransformationNode from 'shared/transformations/nodes/RoundTransformationNode';
-import SetIfTransformationNode from 'shared/transformations/nodes/SetIfTransformationNode';
-import SubtractTransformationNode from 'shared/transformations/nodes/SubtractTransformationNode';
-import SumTransformationNode from 'shared/transformations/nodes/SumTransformationNode';
-import ArrayCountTransformationNode from './nodes/ArrayCountTransformationNode';
-import CaseTransformationNode from './nodes/CaseTransformationNode';
-import CastTransformationNode from './nodes/CastTransformationNode';
-import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
-import FilterArrayTransformationNode from './nodes/FilterArrayTransformationNode';
-import FilterTransformationNode from './nodes/FilterTransformationNode';
-import InsertTransformationNode from './nodes/InsertTransformationNode';
-import JoinTransformationNode from './nodes/JoinTransformationNode';
-import SplitTransformationNode from './nodes/SplitTransformationNode';
-import SubstringTransformationNode from './nodes/SubstringTransformationNode';
-import TransformationNode from './nodes/TransformationNode';
-import ZipcodeTransformationNode from './nodes/ZipcodeTransformationNode';
-import TransformationVisitResult from './TransformationVisitResult';
+export type VisitorFn<ReturnT, ArgsT = any> = (type: TransformationNodeType, node?: TransformationNode, args?: ArgsT) => ReturnT;
+export type VisitorLookupMap<ReturnT, ArgsT = any> = {
+  [K in TransformationNodeType]?: VisitorFn<ReturnT, ArgsT>;
+};
 
-export default abstract class TransformationNodeVisitor
+export default abstract class TransformationNodeVisitor<ReturnT, ArgsT = any>
 {
-  public abstract visitDefault(node: TransformationNode, doc: object, options: object): TransformationVisitResult;
+  public abstract visitorLookup: VisitorLookupMap<ReturnT, ArgsT>;
 
-  public visitDuplicateNode(node: DuplicateTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
+  public abstract visitDefault(type: TransformationNodeType, node?: TransformationNode, args?: ArgsT): ReturnT;
 
-  public visitFilterNode(node: FilterTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  public visit(type: TransformationNodeType, node?: TransformationNode, args?: ArgsT): ReturnT
   {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitJoinNode(node: JoinTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitInsertNode(node: InsertTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitSplitNode(node: SplitTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitSubstringNode(node: SubstringTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitCastNode(node: CastTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitHashNode(node: HashTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitCaseNode(node: CaseTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitRoundNode(node: RoundTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitAddNode(node: AddTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitSubtractNode(node: SubtractTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitMultiplyNode(node: MultiplyTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitDivideNode(node: DivideTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitSetIfNode(node: SetIfTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitFindReplaceNode(node: FindReplaceTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitArraySumNode(node: ArraySumTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitArrayCountNode(node: ArrayCountTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitProductNode(node: ProductTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitQuotientNode(node: QuotientTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitSumNode(node: SumTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitDifferenceNode(node: DifferenceTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitEncryptNode(node: EncryptTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitDecryptNode(node: DecryptTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitGroupByNode(node: GroupByTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitRemoveDuplicatesNode(node: RemoveDuplicatesNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitFilterArrayNode(node: FilterArrayTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitZipcodeNode(node: ZipcodeTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
+    const visitor = this.visitorLookup[type];
+    if (visitor === undefined)
+    {
+      return this.visitDefault(type, node, args);
+    }
+    else
+    {
+      return visitor(type, node, args);
+    }
   }
 }

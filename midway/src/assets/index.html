@@ -1,0 +1,66 @@
+<html>
+    <head>
+        <title> Terrain </title>
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+        <link href="/midway/v1/assets/Gilroy.css" rel="stylesheet">
+        <link href="/midway/v1/assets/login.css" rel="stylesheet">
+        <meta charset="utf-8">
+        <link rel="shortcut icon" href="/favicon.ico"/>
+        <!-- Google Tag Manager -->
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});
+        w[l].push({event: 'pageview'});
+        w[l].push({'userId':(localStorage.getItem('id')||"-1")+"-"+window.location.host});
+        var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-NDLNX86');</script>
+        <!-- End Google Tag Manager -->
+    </head>
+    <body>
+        <!-- Google Tag Manager (noscript) -->
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NDLNX86"
+        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <!-- End Google Tag Manager (noscript) -->
+        
+        <div id="app"></div>
+        
+        <div id="login">
+            <div id="login-area">
+                <img class="login-img" src="/midway/v1/assets/icon-terrain.png" srcset="/midway/v1/assets/icon-terrain@2x.png 2x, /midway/v1/assets/icon-terrain@3x.png 3x" />
+                
+                <div class='login-input-container hide-on-login' id='login-email-container'>
+                    <input type='email' id='login-email' autofocus='autofocus' />
+                    <label for='login-email'>
+                        Email
+                    </label>
+                </div>
+                
+                <div class='login-input-container hide-on-login' id='login-password-container'>
+                    <input type='password' id='login-password' />
+                    <label for='login-password'>
+                        Password
+                    </label>
+                </div>
+                
+                <div id="login-submit">
+                    Login
+                </div>
+                
+                <div id="login-forgot-password" class="hide-on-login">
+                    Forgot password?
+                </div>
+                
+                <div id="login-forgot-password-message" class="hide-on-login">
+                    Sorry to hear that! <br />
+                    Email leslie@terraindata.com to get back in.
+                </div>
+            </div>
+        </div>
+        
+
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCJWmfGt5jsesHrATBYByvXzpf8JbE5eFU&libraries=places"></script>
+        
+        <script defer type="text/javascript" src="/midway/v1/assets/login.js" charset="utf-8"></script>
+    </body>
+</html>

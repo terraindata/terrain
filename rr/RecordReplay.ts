@@ -227,7 +227,7 @@ async function rr()
       jsonfile.writeFileSync(actionFileName, actions);
     } catch (e)
     {
-      console.trace(e);
+      console.trace(e.message);
     }
   }
 

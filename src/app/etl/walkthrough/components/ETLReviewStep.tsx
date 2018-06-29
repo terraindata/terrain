@@ -129,7 +129,7 @@ class ETLReviewStep extends ETLStepComponent<Props>
     }
 
     return [
-      this.renderRow('Sink Type', sink.type),
+      this.renderRow('Destination Type', sink.type),
       ...sinkInfo,
     ];
   }

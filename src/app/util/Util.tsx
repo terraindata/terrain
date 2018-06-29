@@ -914,7 +914,12 @@ const Util = {
         handler();
       }
     }
-  }
+  },
+
+  assertUnreachable(param: never): never
+  {
+    throw new Error('Unreachable code reached');
+  },
 };
 
 export default Util;

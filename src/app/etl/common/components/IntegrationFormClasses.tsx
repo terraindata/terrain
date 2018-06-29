@@ -153,17 +153,34 @@ type SftpAuthT = AuthConfigType<Integrations.Sftp>;
 type SftpConnectionT = ConnectionConfigType<Integrations.Sftp>;
 class SftpForm extends IntegrationFormBase<SftpAuthT, SftpConnectionT>
 {
-  public authMap: InputDeclarationMap<SftpAuthT> = {
-    key: {
+  public authMap: InputDeclarationMap<SftpAuthT & { switch }> = {
+    switch: {
+      type: DisplayType.Switch,
+      displayName: '',
+      options: {
+        values: List(['Private Key', 'Password']),
+      },
+    },
+    privateKey: {
       type: DisplayType.TextBox,
       displayName: 'Private Key',
+      getDisplayState: (s) => (s.switch === undefined || s.switch === 1) ? DisplayState.Active : DisplayState.Hidden,
+    },
+    password: {
+      type: DisplayType.TextBox,
+      displayName: 'Password',
+      getDisplayState: (s) => !(s.switch === undefined || s.switch === 1) ? DisplayState.Active : DisplayState.Hidden,
     },
   };
 
   public connectionMap: InputDeclarationMap<SftpConnectionT> = {
-    ip: {
+    username: {
       type: DisplayType.TextBox,
-      displayName: 'IP Address',
+      displayName: 'Username',
+    },
+    host: {
+      type: DisplayType.TextBox,
+      displayName: 'Host',
       group: 'addr row',
       widthFactor: 3,
     },
@@ -174,6 +191,33 @@ class SftpForm extends IntegrationFormBase<SftpAuthT, SftpConnectionT>
       widthFactor: 1,
     },
   };
+
+  public authConfigToState(config)
+  {
+    if (config['switch'] === undefined)
+    {
+      let switchVal = 1;
+      if (config['password'] !== undefined)
+      {
+        switchVal = 0;
+      }
+      config['switch'] = switchVal;
+    }
+    return config;
+  }
+
+  public authStateToConfig(state)
+  {
+    if (state['switch'] !== undefined && state['switch'] !== 1)
+    {
+      delete state['privateKey'];
+    }
+    else
+    {
+      delete state['password'];
+    }
+    return state;
+  }
 }
 
 type HttpAuthT = AuthConfigType<Integrations.Http>;

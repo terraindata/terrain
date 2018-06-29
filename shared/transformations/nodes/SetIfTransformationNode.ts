@@ -43,20 +43,89 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+const { List, Map } = Immutable;
 
-export default class SetIfTransformationNode extends TransformationNode
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath } from 'shared/util/KeyPath';
+
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
+
+const TYPECODE = TransformationNodeType.SetIfNode;
+
+export class SetIfTransformationNode extends SimpleTransformationType
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.SetIfNode)
+  public readonly typeCode = TYPECODE;
+  public readonly skipNulls = false;
+
+  public transformer(el: any): any
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+
+    let condition = setIfHelper(opts, el);
+    condition = opts.invert ? !condition : condition;
+    if (condition)
+    {
+      return opts.newValue;
+    }
+    else
+    {
+      return undefined;
+    }
   }
+}
+
+class SetIfTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Set If';
+  public description = 'Checks if a field matches a certain special value, and if so, replaces that value';
+  public nodeClass = SetIfTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    const type = EngineUtil.getRepresentedType(fieldId, engine);
+    return type === 'number' || type === 'string' || type === 'boolean';
+  }
+}
+
+export const SetIfTransformationInfo = new SetIfTransformationInfoC();
+
+function setIfHelper(o: NodeOptionsType<TransformationNodeType.SetIfNode>, e: any)
+{
+  if (o.filterNaN)
+  {
+    return isNaN(e);
+  }
+  else if (o.filterUndefined)
+  {
+    return e === undefined;
+  }
+  else if (o.filterNull)
+  {
+    return e === null;
+  }
+  else if (o.filterStringNull)
+  {
+    return e === 'null';
+  }
+  else if (o.filterValue !== undefined)
+  {
+    return e === o.filterValue;
+  }
+
+  return false;
 }

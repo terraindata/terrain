@@ -59,6 +59,7 @@ import { IntegrationConfig } from './integrations/IntegrationConfig';
 import { ItemConfig } from './items/ItemConfig';
 import { JobConfig } from './jobs/JobConfig';
 import { JobLogConfig } from './jobs/JobLogConfig';
+import { MigrationRecordConfig } from './migrations/MigrationRecordConfig';
 import { ResultsConfigConfig } from './resultsConfig/ResultsConfigConfig';
 import { SchedulerConfig } from './scheduler/SchedulerConfig';
 import { SchemaMetadataConfig } from './schemaMetadata/SchemaMetadataConfig';
@@ -81,6 +82,7 @@ export class Tables
   public jobLogs: Tasty.Table;
   public jobs: Tasty.Table;
   public statusHistory: Tasty.Table;
+  public migrationRecords: Tasty.Table;
 }
 
 function verifyTableWithConfig(table: Tasty.Table, configClass: object)
@@ -156,6 +158,8 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
         'isAnalytics',
         'analyticsIndex',
         'analyticsType',
+        'indexPrefix',
+        'isProtected',
       ],
       undefined,
       {
@@ -167,6 +171,8 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
         isAnalytics: 'bool DEFAULT ' + falseValue,
         analyticsIndex: 'text',
         analyticsType: 'text',
+        indexPrefix: 'text',
+        isProtected: 'bool DEFAULT ' + falseValue,
       },
     ),
     new DatabaseConfig({}),
@@ -454,6 +460,29 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
       },
     ),
     new StatusHistoryConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
+      'migrationRecords',
+      ['id'],
+      [
+        'createdAt',
+        'lastModified',
+        'fromVersion',
+        'toVersion',
+        'isCurrent',
+      ],
+      undefined,
+      {
+        id: primaryKeyType + ' PRIMARY KEY',
+        createdAt: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+        lastModified: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+        fromVersion: 'text NOT NULL',
+        toVersion: 'text NOT NULL',
+        isCurrent: 'bool NOT NULL',
+      },
+    ),
+    new MigrationRecordConfig({}),
   );
 
   return tables as Tables;

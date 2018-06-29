@@ -336,12 +336,13 @@ export const Ajax =
       );
     },
 
-    createUser(email: string, password: string, onSave: (response: any) => void, onError: (response: any) => void)
+    createUser(name: string, email: string, password: string, onSave: (response: any) => void, onError: (response: any) => void)
     {
       return Ajax.req(
         'post',
         `users`,
         {
+          name,
           email,
           password,
         },
@@ -1002,32 +1003,6 @@ export const Ajax =
       );
     },
 
-    checkLogin(accessToken: string, id: number, onSuccess: () => void, onError: () => void)
-    {
-      Ajax.req(
-        'post',
-        'status/loggedIn',
-        {
-          accessToken,
-          id,
-        },
-        (data: { loggedIn: boolean }) =>
-        {
-          if (data && data.loggedIn)
-          {
-            onSuccess();
-          }
-          else
-          {
-            onError();
-          }
-        },
-        {
-          onError,
-        },
-      );
-    },
-
     logout(accessToken: string, id: number)
     {
       return Ajax.req(
@@ -1037,7 +1012,11 @@ export const Ajax =
           accessToken,
           id,
         },
-        _.noop,
+        () =>
+        {
+          // successfully logged out, reload the page
+          location.reload();
+        },
         {
           noCredentials: true,
         },
@@ -1115,6 +1094,29 @@ export const Ajax =
       return Ajax.req(
         'get',
         'events/metrics',
+        {},
+        (response: any) =>
+        {
+          try
+          {
+            onLoad(response);
+          }
+          catch (e)
+          {
+            onError && onError(response as any);
+          }
+        },
+        { onError });
+    },
+
+    getLogs(
+      onLoad: (response: any) => void,
+      onError?: (ev: Event) => void,
+    )
+    {
+      return Ajax.req(
+        'get',
+        'status/logs',
         {},
         (response: any) =>
         {

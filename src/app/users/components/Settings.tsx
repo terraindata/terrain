@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
+import * as Immutable from 'immutable';
 import { List } from 'immutable';
 import * as React from 'react';
 
@@ -56,6 +57,7 @@ import { notificationManager } from 'common/components/InAppNotification';
 import Modal from 'common/components/Modal';
 import Switch from 'common/components/Switch';
 import TerrainComponent from 'common/components/TerrainComponent';
+import { errorToReadable } from 'etl/ETLAjax';
 import * as momentZon from 'moment-timezone';
 import { MidwayError } from 'shared/error/MidwayError';
 import Util from 'util/Util';
@@ -65,7 +67,9 @@ import TerrainTools from '../../util/TerrainTools';
 import { UserActions as Actions } from '../data/UserRedux';
 import * as UserTypes from '../UserTypes';
 import AccountEntry from './AccountEntry';
+import Section from './AccountSection';
 import PasswordStrengthInput from './PasswordStrengthInput';
+const moment = require('moment-timezone');
 
 import './Settings.less';
 type User = UserTypes.User;
@@ -73,6 +77,9 @@ type User = UserTypes.User;
 const Select = require('react-select').default;
 const TimeZones = require('./timezones.json');
 const LogoutIcon = require('./../../../images/icon_logout.svg');
+
+const timeZonesList: List<string> = TimeZones.map((tz, i) => tz.DisplayName);
+const timeZonesImmu = Immutable.List(timeZonesList);
 
 export interface Props
 {
@@ -82,6 +89,7 @@ export interface Props
   auth?: AuthState;
   users?: UserTypes.UserState;
   userActions?: typeof Actions;
+  canEdit: boolean;
 }
 
 class Settings extends TerrainComponent<Props>
@@ -140,16 +148,12 @@ class Settings extends TerrainComponent<Props>
 
   public changeUserField(field: string, value: string)
   {
-    let newUser = this.props.users.currentUser;
+    // let newUser = this.props.users.currentUser;
+    let newUser = this.props.users.users.get(this.props.users.currentUser.id);
     newUser = newUser.set(field, value);
     this.props.userActions({
       actionType: 'change',
       user: newUser as UserTypes.User,
-    });
-
-    this.setState({
-      saving: true,
-      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
     });
   }
 
@@ -283,6 +287,66 @@ class Settings extends TerrainComponent<Props>
     );
   }
 
+  public updateUserPassword(editingSections)
+  {
+    const userId: number = localStorage['id'];
+    const currentPassword: string = editingSections.currentPassword;
+    const newPassword: string = editingSections.newPassword;
+    const confirmPassword: string = editingSections.confirmPassword;
+
+    if (currentPassword === undefined || newPassword === undefined || confirmPassword === undefined)
+    {
+      this.setState({
+        modalMessage: 'Missing input field',
+        errorModal: true,
+      });
+      this.toggleModal();
+      return;
+    }
+
+    if (newPassword.length < 6)
+    {
+      this.setState({
+        modalMessage: 'Passwords should be at least six characters long',
+        errorModal: true,
+      });
+      this.toggleModal();
+      return;
+    }
+
+    if (newPassword !== confirmPassword)
+    {
+      this.setState({
+        modalMessage: 'You entered two different passwords for your new password. \
+        Change one so that they match',
+        errorModal: true,
+      });
+      this.toggleModal();
+      return;
+    }
+
+    this.setState({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    });
+
+    Ajax.changePassword(+userId, currentPassword, newPassword, () =>
+    {
+      this.props.userActions({
+        actionType: 'fetch',
+      });
+      notificationManager.addNotification('Success', 'Updated password', 'info', 4);
+    }, (error) =>
+      {
+        this.setState({
+          modalMessage: 'Error changing your password: ' + String(errorToReadable(error)),
+          errorModal: true,
+        });
+        this.toggleModal();
+      });
+  }
+
   public setupAuthentication()
   {
     this.setState({
@@ -404,14 +468,14 @@ class Settings extends TerrainComponent<Props>
 
   public getTimeZonesList()
   {
-    const timeZonesList = TimeZones.map((tz, i) =>
+    const timeZonesListMap = TimeZones.map((tz, i) =>
     {
       return {
         value: i,
         label: tz.DisplayName,
       };
     });
-    return timeZonesList;
+    return timeZonesListMap;
   }
 
   public changeTimeZone(val)
@@ -424,16 +488,16 @@ class Settings extends TerrainComponent<Props>
 
   public renderTimeZoneContent()
   {
-    const timeZonesList = this.getTimeZonesList();
+    const timeZonesListOld = this.getTimeZonesList();
     let timeZone: number;
 
     if (this.props.users.currentUser)
     {
-      timeZone = this.props.users.currentUser.timeZone || 158;
+      timeZone = this.props.users.currentUser.timeZone || 157;
     }
     else
     {
-      timeZone = 158;
+      timeZone = 157;
     }
 
     return (
@@ -441,13 +505,29 @@ class Settings extends TerrainComponent<Props>
         <Select
           clearable={false}
           value={timeZone}
-          options={timeZonesList}
+          options={timeZonesListOld}
           onChange={this.changeTimeZone}
           className='settings-timezone-dropdown'
           searchable={false}
+          openOuterUp={true}
         />
       </div>
     );
+  }
+
+  public obtainCurrentTimeZone()
+  {
+    let timeZone: number;
+
+    if (this.props.users.currentUser)
+    {
+      timeZone = this.props.users.currentUser.timeZone || 157;
+    }
+    else
+    {
+      timeZone = 157;
+    }
+    return timeZone;
   }
 
   public changeTheme(val)
@@ -654,9 +734,93 @@ class Settings extends TerrainComponent<Props>
   //   buttonText={this.renderDeactivateButton()}
   //   lastEntry={true}
   //   />
+
+  public updateUserInfo(editingSections)
+  {
+    let newUser = this.props.users.users.get(this.props.users.currentUser.id);
+    for (const headerKey of Object.keys(editingSections))
+    {
+      newUser = newUser.set(headerKey, editingSections[headerKey]);
+    }
+    this.props.userActions({
+      actionType: 'change',
+      user: newUser as UserTypes.User,
+    });
+    return true;
+  }
+
   public render()
   {
+    const currentUser = this.props.users.users.get(this.props.users.currentUser.id);
     return (
+      <div className='settings-main-container'>
+        <div className='settings-page-title' style={{ color: Colors().mainSectionTitle }}>Account Settings</div>
+        <Section
+          user={currentUser}
+          sectionTitle='Profile'
+          sectionType='profile'
+          sectionBoxes={
+            List([
+              { key: 'name', header: 'Name', info: currentUser.name, type: 'Input' },
+              { key: 'email', header: 'Email', info: currentUser.email, type: 'Input' },
+              { key: 'phone', header: 'Phone', info: currentUser.phone, type: 'Input' },
+              { key: 'skype', header: 'Skype', info: currentUser.skype, type: 'Input' },
+            ])
+          }
+          hasPhoto={true}
+          columnNum={2}
+          onChange={this.updateUserInfo}
+          canEdit={true}
+          canDisable={false}
+          addingUser={false}
+        />
+        <Section
+          user={currentUser}
+          sectionTitle='Password'
+          sectionType='password'
+          sectionBoxes={
+            List([
+              { key: 'currentPassword', header: 'Enter Current Password', info: '', type: 'Password' },
+              { key: 'newPassword', header: 'New Password', info: '', type: 'Password' },
+              { key: 'confirmPassword', header: 'Verify Password', info: '', type: 'Password' },
+
+            ])
+          }
+          hasPhoto={false}
+          columnNum={0}
+          onChange={this.updateUserPassword}
+          canEdit={true}
+          canDisable={false}
+          addingUser={false}
+        />
+        <Section
+          user={currentUser}
+          sectionTitle='Time Zone'
+          sectionType='timezone'
+          sectionBoxes={
+            List([
+              {
+                key: 'timeZone', header: 'GMT Offset', info: (typeof (currentUser.timeZone) === 'number' ?
+                  timeZonesImmu.get(currentUser.timeZone) : currentUser.timeZone), type: 'Dropdown', options: timeZonesImmu,
+              },
+            ])
+          }
+          hasPhoto={false}
+          columnNum={0}
+          onChange={this.updateUserInfo}
+          canEdit={true}
+          canDisable={false}
+          addingUser={false}
+        />
+        <Modal
+          message={this.state.modalMessage}
+          onClose={this.toggleModal}
+          open={this.state.modalOpen}
+          error={this.state.errorModal}
+        />
+      </div>
+    );
+    /*return (
       <div>
         <div className='settings-page-title'>Update your settings</div>
         <AccountEntry
@@ -684,7 +848,7 @@ class Settings extends TerrainComponent<Props>
           error={this.state.errorModal}
         />
       </div >
-    );
+    );*/
   }
 }
 

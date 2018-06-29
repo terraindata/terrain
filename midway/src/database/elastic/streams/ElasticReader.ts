@@ -93,28 +93,21 @@ export class ElasticReader extends SafeReadable
     this.numRequested = this.size;
     this.scrolling = streaming && (this.size > this.DEFAULT_SEARCH_SIZE);
 
-    try
+    const body = {
+      body: this.query,
+    };
+
+    if (this.scrolling)
     {
-      const body = {
-        body: this.query,
-      };
-
-      if (this.scrolling)
-      {
-        body['scroll'] = this.scroll;
-      }
-
-      body['size'] = Math.min(this.size, this.MAX_SEARCH_SIZE);
-
-      this.querying = true;
-      this.client.search(
-        body,
-        this.makeSafe(this.scrollCallback.bind(this)));
+      body['scroll'] = this.scroll;
     }
-    catch (e)
-    {
-      this.emit('error', e);
-    }
+
+    body['size'] = Math.min(this.size, this.MAX_SEARCH_SIZE);
+
+    this.querying = true;
+    this.client.search(
+      body,
+      this.makeSafe(this.scrollCallback.bind(this)));
   }
 
   public _read(size: number = 1024)

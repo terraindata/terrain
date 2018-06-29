@@ -48,22 +48,38 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import AccountDropdown from 'common/components/AccountDropdown';
+import Button from 'common/components/Button';
+import CheckBox from 'common/components/CheckBox';
+import Modal from 'common/components/Modal';
+import PopUpForm from 'common/components/PopUpForm';
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateList';
+import * as html2canvas from 'html2canvas';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
+import * as request from 'request';
+import { Ajax } from 'util/Ajax';
+import { AuthState } from '../../auth/AuthTypes';
 import { backgroundColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import TerrainComponent from '../../common/components/TerrainComponent';
+import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
 import './Sidebar.less';
-
+type User = UserTypes.User;
 const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 const linkHeight = 50; // Coordinate with Sidebar.less
 const TerrainIcon = require('images/logo_terrainLong_blue@2x.png');
 const TerrainSmallIcon = require('images/logo_terrain_mountain.png');
+const BugSmallIcon = require('images/icon-bug.png');
+const FeedbackSmallIcon = require('images/icon-feedback.png');
 const linkOffsetExpanded = 207;
 const linkOffsetCollapsed = 133;
+const topBarItemStyle = [backgroundColor(Colors().bg3, Colors().bg2), fontColor(Colors().active)];
+const topBarRunStyle = [backgroundColor(Colors().activeHover, Colors().active), fontColor(Colors().activeText)];
+const Color = require('color');
+
 export interface ILink
 {
   icon: any;
@@ -80,6 +96,7 @@ export interface Props
   expandable?: boolean;
   expanded?: boolean;
   onExpand?: () => void;
+  users?: UserTypes.UserState;
 }
 
 @Radium
@@ -87,10 +104,61 @@ export class Sidebar extends TerrainComponent<Props>
 {
   public state: {
     linkOffset: number,
+    reportBugModalOpen: boolean,
+    reportFeedbackModalOpen: boolean,
   } =
     {
       linkOffset: 0,
+      reportBugModalOpen: false,
+      reportFeedbackModalOpen: false,
     };
+
+  public renderRootLevelModals(): any[]
+  {
+    const modals = [];
+
+    if (this.state.reportBugModalOpen)
+    {
+      modals.push(
+        <PopUpForm
+          title='REPORT A BUG'
+          key='reportBug'
+          formDescription='Please describe your bug in as much detail as possible below. Your email address will be recorded.'
+          textboxPlaceholderValue='Put your bug description here.'
+          isBug={true}
+          className='bug-report'
+          open={this.state.reportBugModalOpen}
+          onClose={this.closeTemplateUI}
+          wide={true}
+          showTextbox={true}
+          closeOnConfirm={true}
+          confirm={true}
+        >
+        </PopUpForm>,
+      );
+    }
+    if (this.state.reportFeedbackModalOpen)
+    {
+      modals.push(
+        <PopUpForm
+          title='GENERAL FEEDBACK'
+          formDescription='Please submit any feedback you have below. Your email address will be recorded.'
+          textboxPlaceholderValue='Feedback description here.'
+          isBug={false}
+          key='giveFeedback'
+          className='feedback-report'
+          open={this.state.reportFeedbackModalOpen}
+          onClose={this.closeTemplateUI}
+          wide={true}
+          showTextbox={true}
+          closeOnConfirm={true}
+          confirm={true}
+        >
+        </PopUpForm>,
+      );
+    }
+    return modals;
+  }
 
   public componentWillMount()
   {
@@ -148,108 +216,159 @@ export class Sidebar extends TerrainComponent<Props>
         })}
         style={backgroundColor(Colors().sidebarBg)}
       >
-        {
-          this.props.expanded ?
-            <img
-              src={TerrainIcon}
-              className='sidebar-logo'
-            />
-            :
-            <img src={TerrainSmallIcon}
-              className='sidebar-logo-small'
-            />
-        }
-        <AccountDropdown small={!this.props.expanded} />
-        {
-          // <div
-          //        className={classNames({
-          //          'sidebar-selected-square': true,
-          //          'sidebar-selected-square-hidden': this.props.selectedIndex === -1,
-          //        })}
-          //        style={{
-          //          top: (this.props.selectedIndex * linkHeight + this.state.linkOffset) + 'px',
-          //          backgroundColor: Colors().active,
-          //        }}
-          //      />
-        }
-        <div className='sidebar-links'>
+        {this.renderRootLevelModals()}
+        <div className='sidebar-top-section'>
           {
-            this.props.links.map((link, index) =>
-              <Link
-                to={link.route}
-                key={index}
-                onClick={link.enabled === false ? this.handleLinkDisabled(link) : null}
-              >
-                <div
-                  className={Util.objToClassname({
-                    'sidebar-link': true,
-                    'xr': index === this.props.selectedIndex,
-                  })}
-                  key={'sidebar-link-' + index}
+            this.props.expanded ?
+              <img
+                src={TerrainIcon}
+                className='sidebar-logo'
+              />
+              :
+              <img src={TerrainSmallIcon}
+                className='sidebar-logo-small'
+              />
+          }
+          <AccountDropdown small={!this.props.expanded} />
+          {
+            // <div
+            //        className={classNames({
+            //          'sidebar-selected-square': true,
+            //          'sidebar-selected-square-hidden': this.props.selectedIndex === -1,
+            //        })}
+            //        style={{
+            //          top: (this.props.selectedIndex * linkHeight + this.state.linkOffset) + 'px',
+            //          backgroundColor: Colors().active,
+            //        }}
+            //      />
+          }
+          <div className='sidebar-links'>
+            {
+              this.props.links.map((link, index) =>
+                <Link
+                  to={link.route}
+                  key={index}
+                  onClick={link.enabled === false ? this.handleLinkDisabled(link) : null}
                 >
-
-                  {tooltip(<div
-                    className={classNames({
-                      'sidebar-link-inner': true,
-                      'sidebar-link-inner-selected': index === this.props.selectedIndex,
-                    })
-                    }
-                    style={getStyle('fill', index === this.props.selectedIndex ? Colors().active : Colors().text1)}
+                  <div
+                    className={Util.objToClassname({
+                      'sidebar-link': true,
+                      'xr': index === this.props.selectedIndex,
+                    })}
+                    key={'sidebar-link-' + index}
                   >
-                    {
-                      link.icon
-                    }
-                    <div
+
+                    {tooltip(<div
                       className={classNames({
-                        'sidebar-link-text': true,
-                        'sidebar-link-text-hidden': !this.props.expanded,
-                      })}
-                      style={fontColor(index === this.props.selectedIndex ? Colors().active : Colors().text1)}
+                        'sidebar-link-inner': true,
+                        'sidebar-link-inner-selected': index === this.props.selectedIndex,
+                      })
+                      }
+                      style={getStyle('fill', index === this.props.selectedIndex ? Colors().active : Colors().text1)}
                     >
                       {
-                        link.text
+                        link.icon
                       }
-                    </div>
-                  </div>,
-                    {
-                      title: (!this.props.expanded ? link.text : ''),
-                      position: 'right',
-                    })}
+                      <div
+                        className={classNames({
+                          'sidebar-link-text': true,
+                          'sidebar-link-text-hidden': !this.props.expanded,
+                        })}
+                        style={fontColor(index === this.props.selectedIndex ? Colors().active : Colors().text1)}
+                      >
+                        {
+                          link.text
+                        }
+                      </div>
+                    </div>,
+                      {
+                        title: (!this.props.expanded ? link.text : ''),
+                        position: 'right',
+                      })}
+                  </div>
+                </Link>,
+              )
+            }
+          </div>
+
+          {
+            this.props.expandable ?
+              (
+                <div
+                  className='sidebar-expand' onClick={this.props.onExpand}
+                // style={backgroundColor(Colors().bg1, Colors().inactiveHover)}
+                >
+                  <div className='dead-center'>
+                    <ExpandIcon
+                      className='sidebar-expand-icon'
+                      style={{
+                        'fill': Colors().text2,
+                        ':active': {
+                          fill: Colors().active,
+                        },
+                      }}
+                    />
+                  </div>
                 </div>
-              </Link>,
-            )
+              )
+              : null
           }
         </div>
-        {
-          this.props.expandable ?
-            (
-              <div
-                className='sidebar-expand' onClick={this.props.onExpand}
-              // style={backgroundColor(Colors().bg1, Colors().inactiveHover)}
-              >
-                <div className='dead-center'>
-                  <ExpandIcon
-                    className='sidebar-expand-icon'
-                    style={{
-                      'fill': Colors().text2,
-                      ':active': {
-                        fill: Colors().active,
-                      },
-                    }}
-                  />
-                </div>
+        <div className='sidebar-bottom-section'>
+          {
+            this.props.expanded ?
+              <div className='sidebar-button sidebar-bug-button'>
+                <Button
+                  text='BUGS'
+                  onClick={this._toggle('reportBugModalOpen')}
+                  grow={true}
+                />
               </div>
-            )
-            : null
-        }
+              :
+              <img
+                src={BugSmallIcon}
+                className='sidebar-button-collapsed sidebar-bug-button-collapsed'
+                onClick={this._toggle('reportBugModalOpen')}
+                key='reportImage'
+              />
+          }
+
+          {
+            this.props.expanded ?
+              <div className='sidebar-button sidebar-feedback-button'>
+                <Button
+                  text='FEEDBACK'
+                  grow={true}
+                  onClick={this._toggle('reportFeedbackModalOpen')}
+                />
+              </div>
+              :
+              <img
+                className='sidebar-button-collapsed sidebar-feedback-button-collapsed'
+                src={FeedbackSmallIcon}
+                onClick={this._toggle('reportFeedbackModalOpen')}
+                key='feedbackImage'
+              />
+          }
+        </div>
       </div>
+
     );
   }
+
+  public closeTemplateUI()
+  {
+    this.setState({
+      reportBugModalOpen: false,
+      reportFeedbackModalOpen: false,
+    });
+  }
+
 }
 
 export default Util.createContainer(
   Sidebar,
-  [],
+  ['users'],
   {
     colorsActions: ColorsActions,
   },

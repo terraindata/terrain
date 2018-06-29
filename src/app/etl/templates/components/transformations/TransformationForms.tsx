@@ -47,9 +47,10 @@ THE SOFTWARE.
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { InfoType, TransformationInfo } from 'shared/transformations/TransformationInfo';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { TransformationFormProps } from './TransformationFormBase';
+import TransformationNodeVisitor, { VisitorLookupMap } from 'shared/transformations/TransformationNodeVisitor';
+import TransformationRegistry from 'shared/transformations/TransformationRegistry';
+import { TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
@@ -70,67 +71,72 @@ import
 } from './SimpleTransformations';
 import { SplitTFF } from './SplitTransformationForm';
 
-export function getTransformationForm(type: TransformationNodeType): React.ComponentClass<TransformationFormProps>
+const forms: Array<{ new(props): TransformationForm<any, any> }> = [
+  CaseTFF,
+  SubstringTFF,
+  DuplicateTFF,
+  SplitTFF,
+  JoinTFF,
+  CastTFF,
+  HashTFF,
+  ArraySumTFF,
+  ArrayCountTFF,
+  RoundTFF,
+  AddTFF,
+  SubtractTFF,
+  MultiplyTFF,
+  DivideTFF,
+  SetIfTFF,
+  FindReplaceTFF,
+  InsertTFF,
+  SumTFF,
+  DifferenceTFF,
+  ProductTFF,
+  QuotientTFF,
+  EncryptTFF,
+  DecryptTFF,
+  GroupByTFF,
+  FilterArrayTFF,
+  RemoveDuplicatesTFF,
+  ZipcodeTFF,
+];
+
+type FormClass = React.ComponentClass<TransformationFormProps>;
+class TransformationFormVisitor extends TransformationNodeVisitor<FormClass>
 {
-  switch (type)
+  public visitorLookup: VisitorLookupMap<FormClass> = {};
+
+  constructor()
   {
-    case TransformationNodeType.CaseNode:
-      return CaseTFF;
-    case TransformationNodeType.SubstringNode:
-      return SubstringTFF;
-    case TransformationNodeType.DuplicateNode:
-      return DuplicateTFF;
-    case TransformationNodeType.SplitNode:
-      return SplitTFF;
-    case TransformationNodeType.JoinNode:
-      return JoinTFF;
-    case TransformationNodeType.CastNode:
-      return CastTFF;
-    case TransformationNodeType.HashNode:
-      return HashTFF;
-    case TransformationNodeType.ArraySumNode:
-      return ArraySumTFF;
-    case TransformationNodeType.ArrayCountNode:
-      return ArrayCountTFF;
-    case TransformationNodeType.RoundNode:
-      return RoundTFF;
-    case TransformationNodeType.AddNode:
-      return AddTFF;
-    case TransformationNodeType.SubtractNode:
-      return SubtractTFF;
-    case TransformationNodeType.MultiplyNode:
-      return MultiplyTFF;
-    case TransformationNodeType.DivideNode:
-      return DivideTFF;
-    case TransformationNodeType.SetIfNode:
-      return SetIfTFF;
-    case TransformationNodeType.FindReplaceNode:
-      return FindReplaceTFF;
-    case TransformationNodeType.InsertNode:
-      return InsertTFF;
-    case TransformationNodeType.SumNode:
-      return SumTFF;
-    case TransformationNodeType.DifferenceNode:
-      return DifferenceTFF;
-    case TransformationNodeType.ProductNode:
-      return ProductTFF;
-    case TransformationNodeType.QuotientNode:
-      return QuotientTFF;
-    case TransformationNodeType.EncryptNode:
-      return EncryptTFF;
-    case TransformationNodeType.DecryptNode:
-      return DecryptTFF;
-    case TransformationNodeType.GroupByNode:
-      return GroupByTFF;
-    case TransformationNodeType.FilterArrayNode:
-      return FilterArrayTFF;
-    case TransformationNodeType.RemoveDuplicatesNode:
-      return RemoveDuplicatesTFF;
-    case TransformationNodeType.ZipcodeNode:
-      return ZipcodeTFF;
-    default:
-      return null;
+    super();
+    this.init();
   }
+
+  public visitDefault()
+  {
+    return null;
+  }
+
+  private addToVisitors(formClass: { new(props): any })
+  {
+    const instance = new formClass({});
+    this.visitorLookup[instance.type] = () => formClass;
+  }
+
+  private init()
+  {
+    for (const form of forms)
+    {
+      this.addToVisitors(form);
+    }
+  }
+}
+
+const transformationFormVisitor = new TransformationFormVisitor();
+
+export function getTransformationForm(type: TransformationNodeType): FormClass
+{
+  return transformationFormVisitor.visit(type);
 }
 
 export const availableTransformations: List<TransformationNodeType> = determineAvailableTransformations();
@@ -142,8 +148,8 @@ function determineAvailableTransformations(): List<TransformationNodeType>
   for (const type in TransformationNodeType)
   {
     if (
-      getTransformationForm(type as TransformationNodeType) !== null
-      && TransformationInfo.canCreate(type as TransformationNodeType)
+      transformationFormVisitor.visit(type as TransformationNodeType) !== null
+      && TransformationRegistry.canCreate(type as TransformationNodeType)
     )
     {
       typeList = typeList.push(type);
