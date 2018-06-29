@@ -108,7 +108,7 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
     preserveOldFields: false,
     delimiter: '-',
   };
-  protected readonly type = TransformationNodeType.JoinNode; // lack of type safety here
+  protected readonly type = TransformationNodeType.JoinNode;
 
   public renderFieldPicker()
   {

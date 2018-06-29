@@ -57,7 +57,10 @@ import { BuilderState } from 'builder/data/BuilderState';
 import ElasticBlockHelpers, { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
 import { SchemaState } from 'schema/SchemaTypes';
 import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
+import ESInterpreter from '../../../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
+import ESJSONType from '../../../../../shared/database/elastic/parser/ESJSONType';
+import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
@@ -477,83 +480,74 @@ export class ResultsManager extends TerrainComponent<Props>
     }
   }
 
-  private postprocessEQL(postprocessed: any, hitsPage?: number, appendResults?: boolean): string
+  private postprocessEQL(interpreter: ESInterpreter, hitsPage?: number, appendResults?: boolean): string
   {
     hitsPage = hitsPage !== undefined ? hitsPage : this.props.hitsPage;
+    const query = interpreter.rootValueInfo.value;
     if (appendResults)
     {
       let from = (hitsPage - 1) * SCROLL_SIZE;
-      if (postprocessed.hasOwnProperty('from'))
+      if (query.hasOwnProperty('from'))
       {
-        from += postprocessed['from'];
+        from += query['from'];
       }
       let size = Math.min(SCROLL_SIZE, MAX_HITS - from);
-      if (postprocessed.hasOwnProperty('size'))
+      if (query.hasOwnProperty('size'))
       {
-        size = Math.min(postprocessed['size'] - from, size);
+        size = Math.min(query['size'] - from, size);
       }
-      postprocessed['size'] = size >= 0 ? size : 0;
-      postprocessed['from'] = from;
+
+      interpreter.updateChild(interpreter.rootValueInfo, 'size', new ESValueInfo(ESJSONType.number, size >= 0 ? size : 0));
+      interpreter.updateChild(interpreter.rootValueInfo, 'from', new ESValueInfo(ESJSONType.number, from));
     }
     else
     {
       let size = Math.min(MAX_HITS, hitsPage * SCROLL_SIZE);
-      if (postprocessed.hasOwnProperty('size'))
+      if (query.hasOwnProperty('size'))
       {
-        postprocessed['size'] = Math.min(postprocessed['size'], size);
+        const updatedSize = Math.min(query['size'], size);
+        interpreter.updateChild(interpreter.rootValueInfo, 'size', new ESValueInfo(ESJSONType.number, updatedSize));
       }
     }
-    return ESConverter.formatES(new ESJSONParser(JSON.stringify(postprocessed)));
+    interpreter.reInterpreting();
+    return interpreter.finalQuery;
   }
 
   private queryM2Results(query: Query, db: BackendInstance, hitsPage: number, appendResults?: boolean)
   {
-    //
-    // if (query.parseTree === null || query.parseTree.hasError())
-    // {
-    //   return;
-    // }
     // TODO: This only allows that path to make queries ( when one exists )
-    let eql;
     if (query === this.state.lastQuery && !appendResults)
     {
       return;
     }
     let querySize; // Size set in the actual query (not imposed by postprocess)
-    if (query.path !== undefined)
+    if (!query.tql)
     {
-      try
-      {
-        const parser: ESJSONParser = new ESJSONParser(query.tql, true);
-        eql = ESParseTreeToCode(parser, { replaceInputs: true }, query.inputs);
-        const processed: object = (new ESJSONParser(eql)).getValue();
-        querySize = processed['size'];
-        eql = this.postprocessEQL(processed, hitsPage, appendResults);
-      }
-      catch (e)
-      {
-        TerrainLog.debug('Error before sending out the query: ' + e.message);
-        return;
-      }
+      TerrainLog.debug('TQL is empty.');
+      return;
     }
-    else
+    const interpreter: ESInterpreter = new ESInterpreter(query.tql, query.inputs);
+    if (interpreter.hasError())
     {
-      eql = AllBackendsMap[query.language].parseTreeToQueryString(
-        query,
-        {
-          replaceInputs: true,
-        },
-      );
-      const processed: object = (new ESJSONParser(eql)).getValue();
-      querySize = processed['size'];
-      if (query.tqlMode !== 'manual')
-      {
-        eql = this.postprocessEQL(processed, hitsPage, appendResults);
-      }
+      TerrainLog.debug('Query has errors: ' + interpreter.getErrors());
+      const errorMsg = new MidwayError(200, 'Detected ' + interpreter.getErrors().length + ' errors.', '', {});
+      this.handleM2RouteError(errorMsg, false);
+      return;
     }
+    if (interpreter.hasError())
+    {
+      TerrainLog.debug('Query has errors after updating from and size: ' + interpreter.getErrors());
+      return;
+    }
+    let eql = interpreter.finalQuery;
     if (this.state.query && this.state.query.xhr)
     {
       this.state.query.xhr.cancel();
+    }
+    eql = this.postprocessEQL(interpreter, hitsPage, appendResults);
+    if (query.path)
+    {
+      querySize = query.path.source.count;
     }
     TerrainLog.debug('Issue query ' + eql);
     this.setState({
@@ -579,40 +573,6 @@ export class ResultsManager extends TerrainComponent<Props>
       hasLoadedCount: false,
       hasLoadedTransform: false,
     });
-
-    // let allFieldsQueryCode;
-    // try
-    // {
-    //   allFieldsQueryCode = AllBackendsMap[query.language].parseTreeToQueryString(
-    //     query,
-    //     {
-    //       allFields: true,
-    //       replaceInputs: true,
-    //     },
-    //   );
-    // }
-    // catch (err)
-    // {
-    //   console.log('Could not generate all field Elastic request, reason:' + err);
-    // }
-    // if (allFieldsQueryCode)
-    // {
-    //   this.setState({
-    //     allQuery: Ajax.query(
-    //       allFieldsQueryCode,
-    //       db,
-    //       (resp) =>
-    //       {
-    //         this.handleM2QueryResponse(resp, true);
-    //       },
-    //       (err) =>
-    //       {
-    //         this.handleM2RouteError(err, true);
-    //       },
-    //     ),
-    //   });
-    //
-    // }
   }
 
   private updateResults(resultsData: any, isAllFields: boolean, appendResults?: boolean, querySize?: number)
@@ -719,7 +679,8 @@ export class ResultsManager extends TerrainComponent<Props>
       this.props.query.path.nested.get(0).minMatches
     )
     {
-      const ratio = Math.min(1, hits.size / (SCROLL_SIZE * this.props.hitsPage));
+      const denominator = Math.min(changes['estimatedTotal'], (SCROLL_SIZE * this.props.hitsPage));
+      const ratio = Math.min(1, hits.size / denominator);
       changes['estimatedTotal'] = Math.round(changes['estimatedTotal'] * ratio);
     }
 

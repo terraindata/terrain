@@ -64,7 +64,7 @@ export interface Props
 {
   text: string;
   onClick: () => void;
-
+  className?: string;
   icon?: 'next' | 'back' | 'check' | El;
   iconComesAfter?: boolean;
   size?: 'small' | 'normal' | 'large';

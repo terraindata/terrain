@@ -249,7 +249,9 @@ class ScheduleEditor extends TerrainComponent<Props>
       name: 'Task ' + String(newId + 1),
     });
     this.setState({
-      taskMap: this.state.taskMap.set(lastTask.id, lastTask.set('onSuccess', newId)).set(newId, newTask),
+      taskMap: this.state.taskMap
+        .set(lastTask.id, lastTask
+          .set('onSuccess', newId)).set(newId, newTask),
     });
   }
 
@@ -372,6 +374,7 @@ class ScheduleEditor extends TerrainComponent<Props>
           <CRONEditor
             cron={schedule.cron}
             onChange={this._fn(this.handleScheduleChange, 'cron')}
+            canEdit={TerrainTools.isAdmin()}
           />
         </div>
       </div>

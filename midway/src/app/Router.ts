@@ -47,12 +47,14 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as send from 'koa-send';
+import * as winston from 'winston'; // TODO remove when not needed
 
 import * as Util from './AppUtil';
 import * as AuthRouter from './auth/AuthRouter';
 import * as DatabaseRouter from './database/DatabaseRouter';
 import * as ETLRouter from './etl/ETLRouter';
 import * as EventRouter from './events/EventRouter';
+import * as FeedbackRouter from './feedback/FeedbackRouter';
 import * as IntegrationRouter from './integrations/IntegrationRouter';
 import * as ItemRouter from './items/ItemRouter';
 import * as JobRouter from './jobs/JobRouter';
@@ -64,6 +66,7 @@ import * as SchemaMetadataRouter from './schemaMetadata/SchemaMetadataRouter';
 import * as StatusRouter from './status/StatusRouter';
 import * as UserRouter from './users/UserRouter';
 import * as VersionRouter from './versions/VersionRouter';
+// /feedback
 
 export function getRouter()
 {
@@ -84,6 +87,7 @@ export function getRouter()
   ETLRouter.initialize();
   SchemaMetadataRouter.initialize();
   ResultsConfigRouter.initialize();
+  FeedbackRouter.initialize();
   AppRouter.use('/auth', AuthRouter.default.routes(), AuthRouter.default.allowedMethods());
   AppRouter.use('/events', EventRouter.default.routes(), EventRouter.default.allowedMethods());
   AppRouter.use('/users', UserRouter.default.routes(), UserRouter.default.allowedMethods());
@@ -99,6 +103,7 @@ export function getRouter()
   AppRouter.use('/etl', ETLRouter.default.routes(), ETLRouter.default.allowedMethods());
   AppRouter.use('/schemametadata', SchemaMetadataRouter.default.routes(), SchemaMetadataRouter.default.allowedMethods());
   AppRouter.use('/resultsconfig', ResultsConfigRouter.default.routes(), ResultsConfigRouter.default.allowedMethods());
+  AppRouter.use('/feedback', FeedbackRouter.default.routes(), FeedbackRouter.default.allowedMethods());
   // Add future routes here.
 
   AppRouter.get('/time', (ctx, next) =>
@@ -127,54 +132,20 @@ export function getRouter()
     ctx.body = 'authenticated as ' + (ctx.state.user[0].email as string);
   });
 
-  const MidwayRouter = new KoaRouter();
-  MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
-
-  MidwayRouter.get('/', async (ctx, next) =>
+  AppRouter.get('/bundles/:bundle', passport.authenticate('access-token-local'), async (ctx, next) =>
   {
-    await send(ctx, '/src/app/index.html');
-  });
-
-  MidwayRouter.get('/assets/:asset', async (ctx, next) =>
-  {
-    // Allow these specific filenames
-    const allowedNames: string[] = [
-      'bundle.js',
-      'vendor.bundle.js',
-    ];
-
-    // Allow any files matching these extensions
-    const allowedExtensions: string[] = [
-      '.woff',
-    ];
-
-    let rejectRequest: boolean = false;
-    if (!allowedNames.includes(ctx.params['asset']))
+    if (process.env.NODE_ENV !== 'production')
     {
-      rejectRequest = true;
-      allowedExtensions.forEach((ext) =>
-      {
-        if (ctx.params['asset'].endsWith(ext))
-        {
-          rejectRequest = false;
-        }
-      });
-    }
-
-    if (rejectRequest === true)
-    {
-      return;
-    }
-
-    if (process.env.NODE_ENV === 'production')
-    {
-      await send(ctx, `/midway/src/assets/${ctx.params['asset']}`);
+      ctx.body = await Util.doRequest(`http://localhost:8080/midway/v1/bundles/${ctx.params['bundle']}`);
     }
     else
     {
-      ctx.body = await Util.doRequest(`http://localhost:8080/assets/${ctx.params['asset']}`);
+      await send(ctx, `/midway/src/bundles/${ctx.params['bundle']}`);
     }
   });
+
+  const MidwayRouter = new KoaRouter();
+  MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
 
   MidwayRouter.get('/robots.txt', async (ctx, next) =>
   {

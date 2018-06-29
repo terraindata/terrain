@@ -43,20 +43,123 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+const { List, Map } = Immutable;
 
-export default class SplitTransformationNode extends TransformationNode
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath } from 'shared/util/KeyPath';
+
+import ForkTransformationType, { OutputField } from 'shared/transformations/types/ForkTransformationType';
+
+const TYPECODE = TransformationNodeType.SplitNode;
+
+export class SplitTransformationNode extends ForkTransformationType
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.SplitNode)
+  public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'string';
+
+  public split(el: string): OutputField[]
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+
+    const expectedSize = opts.newFieldKeyPaths.size;
+    const split = trimHelper(splitHelper(el, opts, expectedSize), expectedSize);
+    const outputFields = [];
+
+    for (let i = 0; i < opts.newFieldKeyPaths.size; i++)
+    {
+      const value = split[i];
+      outputFields.push({
+        value,
+        field: i,
+      });
+    }
+
+    return outputFields;
   }
+}
+
+class SplitTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Split Field';
+  public description = 'Split this field into 2 or more fields';
+  public nodeClass = SplitTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+  public newFieldType = 'string';
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return (
+      EngineUtil.getRepresentedType(fieldId, engine) === 'string' &&
+      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+    );
+  }
+
+  public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
+  {
+    const names = meta.newFieldKeyPaths.map((value) => value.last());
+    return `Split on ${meta.delimiter} into ${names.toJS()}`;
+  }
+}
+
+export const SplitTransformationInfo = new SplitTransformationInfoC();
+
+function trimHelper(splits: string[], size: number, defaultValue = ''): string[]
+{
+  const newSplits = splits.slice();
+  for (let i = newSplits.length; i < size; i++)
+  {
+    newSplits[i] = defaultValue;
+  }
+  return newSplits;
+}
+
+function splitHelper(el: string, opts: NodeOptionsType<TransformationNodeType.SplitNode>, size: number)
+{
+  let split: string[] = [];
+
+  if (typeof opts.delimiter === 'number')
+  {
+    split = [
+      (el as string).slice(0, opts.delimiter as number),
+      (el as string).slice(opts.delimiter as number),
+    ];
+  }
+  else
+  {
+    const searcher = opts.regex ? RegExp(opts.delimiter) : opts.delimiter;
+    let str = el;
+    let i;
+    for (i = 0; i < size - 1; i++)
+    {
+      const match = str.match(searcher);
+      if (match === null)
+      {
+        break;
+      }
+      else
+      {
+        const matchPosition = match.index;
+        const matchLength = match[0].length;
+        const newValue = str.slice(0, matchPosition);
+        str = str.slice(matchPosition + matchLength);
+        split[i] = newValue;
+      }
+    }
+    split[i] = str;
+  }
+  return split;
 }

@@ -43,20 +43,55 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import { List } from 'immutable';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
+import TransformationNode from 'shared/transformations/TransformationNode';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import { KeyPath } from 'shared/util/KeyPath';
+import * as yadeep from 'shared/util/yadeep';
 
-export default class ArrayCountTransformationNode extends TransformationNode
+import AggregateTransformationType from 'shared/transformations/types/AggregateTransformationType';
+
+const TYPECODE = TransformationNodeType.ArrayCountNode;
+
+export class ArrayCountTransformationNode extends AggregateTransformationType
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.ArrayCountNode)
+  public readonly typeCode = TYPECODE;
+
+  public aggregator(vals: any[]): number
   {
-    super(id, fields, options, typeCode);
+    return vals.length;
   }
 }
+
+class ArrayCountTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Array Count';
+  public description = 'Counts how many elements are in an array';
+  public nodeClass = ArrayCountTransformationNode;
+
+  public editable = false;
+  public creatable = true;
+  public newFieldType = 'number';
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return (
+      EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+    );
+  }
+}
+
+export const ArrayCountTransformationInfo = new ArrayCountTransformationInfoC();

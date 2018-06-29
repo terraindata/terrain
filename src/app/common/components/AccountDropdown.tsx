@@ -126,7 +126,7 @@ class AccountDropdown extends TerrainComponent<Props>
 
   public editProfile()
   {
-    this.go('/account/profile/edit');
+    this.go('/account/settings');
   }
 
   public showConnections()

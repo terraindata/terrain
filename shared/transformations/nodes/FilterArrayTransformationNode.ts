@@ -43,20 +43,73 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
 
-import { KeyPath } from '../../util/KeyPath';
-import TransformationNodeType from '../TransformationNodeType';
-import TransformationNode from './TransformationNode';
+const { List, Map } = Immutable;
 
-export default class FilterArrayTransformationNode extends TransformationNode
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath } from 'shared/util/KeyPath';
+
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
+
+const TYPECODE = TransformationNodeType.FilterArrayNode;
+
+export class FilterArrayTransformationNode extends SimpleTransformationType
 {
-  public constructor(id: number,
-    fields: List<KeyPath>,
-    options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.FilterArrayNode)
+  public readonly typeCode = TYPECODE;
+  public readonly acceptedType = 'array';
+
+  public transformer(el: any[]): any[]
   {
-    super(id, fields, options, typeCode);
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    const newArray = [];
+    for (let i = 0; i < el.length; i++)
+    {
+      let drop = false;
+      if (opts.filterNull && el[i] === null)
+      {
+        drop = true;
+      }
+      if (opts.filterUndefined && el[i] === undefined)
+      {
+        drop = true;
+      }
+      if (!drop)
+      {
+        newArray.push(el[i]);
+      }
+    }
+    return newArray;
   }
 }
+
+class FilterArrayTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Filter Array';
+  public description = 'Filter an array on its values';
+  public nodeClass = FilterArrayTransformationNode;
+
+  public editable = true;
+  public creatable = true;
+  public newFieldType = 'array';
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return (
+      EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+    );
+  }
+}
+
+export const FilterArrayTransformationInfo = new FilterArrayTransformationInfoC();

@@ -596,10 +596,13 @@ export class JobQueue
             const connectionConfig = emailIntegrations[0].connectionConfig;
             const authConfig = emailIntegrations[0].authConfig;
             const fullConfig = Object.assign(connectionConfig, authConfig);
-            const subject: string = `[${fullConfig['customerName']}] Schedule "${schedules[0].name}" failed at job ${jobs[0].id}`;
-            const body: string = 'Check the job log table for details'; // should we include the log contents? jobLogs[0].contents;
-            const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body);
-            winston.info(`Email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
+            if (!(fullConfig['customerName'] == null || fullConfig['customerName'] === ''))
+            {
+              const subject: string = `[${fullConfig['customerName']}] Schedule "${schedules[0].name}" failed at job ${jobs[0].id}`;
+              const body: string = 'Check the job log table for details'; // should we include the log contents? jobLogs[0].contents
+              const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body);
+              winston.info(`Email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
+            }
           }
         }
       }

@@ -118,4 +118,47 @@
      // .transition(~"all 300ms cubic-bezier(0.23, 1, 0.32, 1)");
     }
   }
+
+  .sidebar-button {
+  position: fixed;
+  bottom:100px;
+  border-radius: @spacing;
+  height: @double-spacing;
+  font-size: 12px;
+  &.sidebar-bug-button {
+    margin-left:120px;
+    margin-right:5px;
+  }
+  &.sidebar-feedback-button {
+    margin-left:5px;
+  }
 }
+}
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    margin-top:30px;
+    margin-left:30px;
+}
+
+.bug-report, .feedback-report {
+  position: fixed;
+  bottom:100px;
+  left:30px;
+}
+
+.sidebar-button-collapsed {
+  height: 20px;
+  width:20px;
+  position:fixed;
+  cursor: pointer;
+  margin-left: 10px;
+  &.sidebar-bug-button-collapsed { 
+    bottom:150;  
+  }
+  &.sidebar-feedback-button-collapsed {
+    bottom:100;
+  }
+}
+
+

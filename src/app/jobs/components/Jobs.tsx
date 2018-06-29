@@ -183,6 +183,14 @@ class Jobs extends TerrainComponent<any> {
     });
   }
 
+  public handleJobCancel(colKey, rowData)
+  {
+    this.props.jobsActions({
+      actionType: 'cancelJob',
+      jobId: rowData.id,
+    });
+  }
+
   public parseJobLogContents(jobLogs)
   {
     console.log(jobLogs);
@@ -248,6 +256,15 @@ class Jobs extends TerrainComponent<any> {
       },
     ];
 
+    const jobCancelColumn = {
+      columnKey: 'cancel',
+      columnLabel: '',
+      component: <ButtonColumn
+        label={'Cancel'}
+        onClick={this.handleJobCancel}
+      />,
+    };
+
     const defaultOrder = {
       columnKey: 'createdAt',
       direction: 'desc' as 'asc' | 'desc',
@@ -277,6 +294,7 @@ class Jobs extends TerrainComponent<any> {
           contentCount={runningJobs.count()}
         >
           <SimpleTable
+            // columnsConfig={jobsHeader.concat(jobCancelColumn)}
             columnsConfig={jobsHeader}
             data={runningJobs}
             defaultOrder={defaultOrder}

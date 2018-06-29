@@ -51,7 +51,7 @@ const NotFoundRouter = new KoaRouter();
 
 NotFoundRouter.get('*', async (ctx, next) =>
 {
-  await send(ctx, '/src/app/index.html');
+  await send(ctx, '/midway/src/assets/index.html');
 });
 
 export default NotFoundRouter;
