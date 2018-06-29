@@ -70,18 +70,45 @@ class PostgreSQLClient
     this.controller = controller;
     this.config = config;
 
-    this.controller.setStatus(DatabaseControllerStatus.CONNECTING);
-    this.delegate = new pg.Pool(config);
+    this.controller.setStatus(DatabaseControllerStatus.DISCONNECTED);
+  }
 
-    this.delegate.on('acquire', (connection: pg.PoolClient) =>
+  public async initialize(first: boolean = true)
+  {
+    const config = JSON.parse(JSON.stringify(this.config));
+    try
     {
-      this.controller.log('PostgreSQLClient', 'Connection acquired ');
-    });
+      this.controller.setStatus(DatabaseControllerStatus.CONNECTING);
+      const client = new pg.Client(config);
+      await client.connect();
+      this.controller.setStatus(DatabaseControllerStatus.CONNECTED);
+      this.delegate = this.createPool(config);
+      await client.end();
+    }
+    catch (e)
+    {
+      // database does not exist, create a new one
+      if (e.code === '3D000' && first)
+      {
+        // create the specified database
+        this.controller.log('Creating new database ', config.database);
 
-    this.delegate.on('remove' as any, (connection: pg.PoolClient) =>
-    {
-      this.controller.log('PostgreSQLClient', 'Connection released ');
-    });
+        // checkpoint the specified database, and connect to the system 'postgres' database to
+        // be able to create the specified database
+        const newDatabase = config.database;
+        config.database = 'postgres';
+        const client = new pg.Client(config);
+        await client.connect();
+        await client.query('create database ' + String(newDatabase));
+        await client.end();
+        await this.initialize(false);
+      }
+      else
+      {
+        this.controller.setStatus(DatabaseControllerStatus.DISCONNECTED);
+        throw e;
+      }
+    }
   }
 
   public async isConnected(): Promise<boolean>
@@ -90,6 +117,11 @@ class PostgreSQLClient
     return new Promise<boolean>((resolve, reject) =>
     {
       this.controller.setStatus(DatabaseControllerStatus.CONNECTING);
+      if (this.delegate === undefined)
+      {
+        return resolve(false);
+      }
+
       this.delegate.connect((err: any, client, done) =>
       {
         if (err !== null && err !== undefined)
@@ -149,20 +181,33 @@ class PostgreSQLClient
     delete this.transactionClients[handle];
   }
 
-  public end(callback: () => void): void
+  public async end(): Promise<void>
   {
     this.controller.log('PostgreSQLClient.end');
     this.controller.setStatus(DatabaseControllerStatus.DISCONNECTING);
-    return this.delegate.end(() =>
-    {
-      this.controller.setStatus(DatabaseControllerStatus.DISCONNECTED);
-      callback();
-    });
+    await this.delegate.end();
+    this.controller.setStatus(DatabaseControllerStatus.DISCONNECTED);
   }
 
   public getConfig(): PostgreSQLConfig
   {
     return this.config;
+  }
+
+  private createPool(config: PostgreSQLConfig)
+  {
+    const delegate = new pg.Pool(config);
+    delegate.on('acquire', (connection: pg.PoolClient) =>
+    {
+      this.controller.log('PostgreSQLClient', 'Connection acquired ');
+    });
+
+    delegate.on('remove' as any, (connection: pg.PoolClient) =>
+    {
+      this.controller.log('PostgreSQLClient', 'Connection released ');
+    });
+
+    return delegate;
   }
 }
 

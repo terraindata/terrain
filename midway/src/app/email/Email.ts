@@ -104,7 +104,7 @@ export class Email
           };
         if (attachment !== undefined)
         {
-          emailContents['attachments'] = [{path: attachment}];
+          emailContents['attachments'] = [{ path: attachment }];
         }
         // send the email
         currTransport.sendMail(emailContents, (err, info) =>

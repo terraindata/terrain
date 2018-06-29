@@ -112,6 +112,7 @@ export class Scheduler
       {
         delete schedules[0].id;
         schedules[0].name = schedules[0].name + ' - Copy';
+        schedules[0].running = false;
         resolve(await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[]);
       }
     });
@@ -210,13 +211,15 @@ export class Scheduler
           workerId: 1, // TODO change this for clustering support
         };
       await this.setRunning(id, true, handle);
+      const runningSched = await this.get(id);
       const jobCreateStatus: JobConfig[] | string = await App.JobQ.create(jobConfig, runNow, userId);
       if (typeof jobCreateStatus === 'string')
       {
         return reject(new Error(jobCreateStatus as string));
       }
       this.runningSchedules.delete(id);
-      return resolve(await this.get(id) as SchedulerConfig[]);
+      const sched = await this.get(id);
+      return resolve(sched as SchedulerConfig[]);
     });
   }
 
@@ -246,7 +249,8 @@ export class Scheduler
           // }
         }
         schedules[0].running = running;
-        return resolve(await App.DB.upsert(this.schedulerTable, schedules[0], handle) as SchedulerConfig[]);
+        const val = await App.DB.upsert(this.schedulerTable, schedules[0], handle) as SchedulerConfig[];
+        return resolve(val);
       }
     });
   }
@@ -296,7 +300,7 @@ export class Scheduler
         schedule.running = (schedule.running !== undefined && schedule.running !== null) ? schedule.running : false;
         schedule.shouldRunNext = (schedule.shouldRunNext !== undefined && schedule.shouldRunNext !== null)
           ? schedule.shouldRunNext : true;
-        schedule.tasks = (schedule.tasks !== undefined && schedule.tasks !== null) ? JSON.stringify(schedule.tasks) : JSON.stringify([]);
+        schedule.tasks = (schedule.tasks !== undefined && schedule.tasks !== null) ? schedule.tasks : JSON.stringify([]);
         schedule.workerId = (schedule.workerId !== undefined && schedule.workerId !== null) ? schedule.workerId : 1;
       }
       else

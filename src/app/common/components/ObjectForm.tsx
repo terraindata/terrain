@@ -71,6 +71,7 @@ interface Props
   keyName?: string;
   valueName?: string;
   onChange: (newValue: object, apply?: boolean) => void;
+  onSubmit?: () => void;
   label?: string;
 }
 
@@ -127,6 +128,7 @@ export default class ObjectForm extends TerrainComponent<Props>
             inputMap={this.rowInputMap}
             inputState={{ key, value }}
             onStateChange={this.rowChangeFactory(index)}
+            onTextInputEnter={this.props.onSubmit}
           />
           <Quarantine>
             <div
@@ -169,6 +171,7 @@ export default class ObjectForm extends TerrainComponent<Props>
             inputMap={this.rowInputMap}
             inputState={inputStateObj}
             onStateChange={this.rowChangeFactory(index)}
+            onTextInputEnter={this.props.onSubmit}
           />
           <Quarantine>
             <div

@@ -51,6 +51,8 @@ import { TaskEnum } from 'shared/types/jobs/TaskEnum';
 import { TaskInputConfig } from 'shared/types/jobs/TaskInputConfig';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 
+import LogStreamWritable from '../io/streams/LogStreamWritable';
+
 export abstract class Task
 {
   protected taskConfig: TaskConfig;
@@ -78,7 +80,7 @@ export abstract class Task
     return this.taskConfig.onSuccess;
   }
 
-  public getTaskId(): number
+  public getTaskId(): TaskEnum
   {
     return this.taskConfig.taskId;
   }
@@ -92,6 +94,11 @@ export abstract class Task
   public setInputConfigStream(inputStream: stream.Readable | stream.Readable[]): void
   {
     this.taskConfig.params['options']['inputStreams'] = Array.isArray(inputStream) ? inputStream : [inputStream];
+  }
+
+  public setRootLogStream(rootLogStream: LogStreamWritable): void
+  {
+    this.taskConfig.rootLogStream = rootLogStream;
   }
 
   public abstract async printNode(): Promise<TaskOutputConfig>;

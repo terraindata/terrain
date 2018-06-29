@@ -150,6 +150,7 @@ class UIComponentsPage extends TerrainComponent<Props>
         <CRONEditor
           cron={this.state.cron}
           onChange={this._setStateWrapper('cron')}
+          canEdit={true}
         />
         {space}
         <div

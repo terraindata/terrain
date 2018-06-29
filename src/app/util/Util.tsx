@@ -907,11 +907,19 @@ const Util = {
     return immutableMap;
   },
 
+  onEnter(handler) {
+    return (e) => {
+      if (e.key === 'Enter')
+      {
+        handler();
+      }
+    }
+  },
+
   assertUnreachable(param: never): never
   {
     throw new Error('Unreachable code reached');
   },
-
 };
 
 export default Util;

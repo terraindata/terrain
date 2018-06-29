@@ -76,7 +76,8 @@ beforeAll(async (done) =>
       {
         debug: true,
         db: 'postgres',
-        dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:65432/moviesdb',
+        dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:65432',
+        instanceId: 'moviesdb',
         port: 63000,
         databases: [
           {
@@ -1511,7 +1512,7 @@ describe('Scheduler tests', () =>
             [
               {
                 id: 1,
-                taskId: 2,
+                taskId: 'taskETL',
                 params:
                   {
                     templateId, // ETL template ID
@@ -1578,7 +1579,7 @@ describe('Scheduler tests', () =>
             [
               {
                 id: 1,
-                taskId: 0,
+                taskId: 'taskDefaultExit',
               },
             ],
         },
