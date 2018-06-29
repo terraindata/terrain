@@ -52,6 +52,9 @@ import * as Utils from '../../TestUtil';
 import ElasticClient from '../../../../src/database/elastic/client/ElasticClient';
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
+import PrefixedElasticController from '../../../../src/database/elastic/PrefixedElasticController';
+
+import { MSearchResponse, SearchResponse } from 'elasticsearch';
 
 let elasticController: ElasticController;
 let elasticClient: ElasticClient;
@@ -61,7 +64,7 @@ function getExpectedFile(): string
   return __filename.split('.')[0] + '.expected';
 }
 
-beforeAll(() =>
+beforeAll(async (done) =>
 {
   // TODO: get rid of this monstrosity once @types/winston is updated.
   (winston as any).level = 'debug';
@@ -69,9 +72,25 @@ beforeAll(() =>
     hosts: ['http://localhost:9200'],
   };
 
-  elasticController = new ElasticController(config, 0, 'ElasticClientTests');
+  await new Promise((resolve, reject) =>
+  {
+    new ElasticController(config, 0, 'ElasticClientTests2').getClient().bulk(
+      {
+        body: [
+          { index: { _index: 'bcd.secret', _type: 'data', _id: '13333337' } },
+          { msg: 'This is a secret' },
+          { index: { _index: 'bcd.secret', _type: 'data', _id: '133333372' } },
+          { msg: 'This is a secret2' },
+        ],
+      },
+      SharedUtil.promise.makeCallback(resolve, reject),
+    );
+  });
+
+  elasticController = new PrefixedElasticController(config, 0, 'ElasticClientTests', undefined, undefined, 'abc.');
   elasticClient = elasticController.getClient();
-});
+  done();
+}, 15000);
 
 test('elastic health', async (done) =>
 {
@@ -178,6 +197,102 @@ test('putScript', async (done) =>
   {
     fail(e);
   }
+
+  done();
+});
+
+test('prefix isolation', async (done) =>
+{
+  const checkHit = (hit) =>
+  {
+    expect(hit._index).not.toMatch('secret');
+    expect(hit._id).not.toMatch('13333337');
+    expect(hit._source.msg).not.toMatch('secret');
+  };
+
+  const expectNoSecret = async (method, params) =>
+  {
+    (await new Promise<SearchResponse<any>>((resolve, reject) =>
+    {
+      elasticClient[method](
+        params,
+        SharedUtil.promise.makeCallback(resolve, reject),
+      );
+    })).hits.hits.forEach(checkHit);
+  };
+
+  const expectNoSecretMsearch = async (params) =>
+  {
+    (await new Promise<MSearchResponse<any>>((resolve, reject) =>
+    {
+      elasticClient.msearch(
+        params,
+        SharedUtil.promise.makeCallback(resolve, reject),
+      );
+    })).responses.forEach((res) => res.hits.hits.forEach(checkHit));
+  };
+
+  await expectNoSecret('search',
+    {
+      body: {
+        query: {
+          term: {
+            _id: '13333337',
+          },
+        },
+      },
+    },
+  );
+
+  await expect(expectNoSecret('search',
+    {
+      index: 'bcd.secret',
+      body: {
+        query: {
+          term: {
+            _id: '13333337',
+          },
+        },
+      },
+    },
+  )).rejects.toThrow(/index_not_found_exception/g);
+
+  const scrollId = (await new Promise<SearchResponse<any>>((resolve, reject) =>
+  {
+    elasticClient.search(
+      {
+        scroll: '1m',
+        body: {
+          query: {
+            terms: {
+              _id: ['13333337', '133333372'],
+            },
+          },
+        },
+        size: 1,
+      },
+      SharedUtil.promise.makeCallback(resolve, reject));
+  }))._scroll_id;
+  await expectNoSecret('scroll',
+    {
+      scroll_id: scrollId,
+    },
+  );
+
+  await expectNoSecretMsearch(
+    {
+      body: [
+        {},
+        {
+          query: {
+            term: {
+              _id: '13333337',
+            },
+          },
+        },
+      ],
+    },
+  );
 
   done();
 });

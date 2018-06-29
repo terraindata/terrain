@@ -80,6 +80,7 @@ beforeAll(async () =>
   try
   {
     postgresController = new PostgresController(config, 0, 'PostgresExecutorTests');
+    await postgresController.initialize();
     tasty = postgresController.getTasty();
   }
   catch (e)

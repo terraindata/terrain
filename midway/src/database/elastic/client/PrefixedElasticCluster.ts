@@ -44,96 +44,28 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as winston from 'winston';
+import * as Elastic from 'elasticsearch';
+import PrefixedElasticController from '../PrefixedElasticController';
+import ElasticCluster from './ElasticCluster';
 
-import { DatabaseConfig } from '../app/database/DatabaseConfig';
-import QueryHandler from '../app/query/QueryHandler';
-import * as Tasty from '../tasty/Tasty';
-import DatabaseControllerStatus from './DatabaseControllerStatus';
-
-/**
- * An client which acts as a selective isomorphic wrapper around
- * midway databases
- */
-abstract class DatabaseController
+class PrefixedElasticCluster extends ElasticCluster<PrefixedElasticController>
 {
-  private id: number;                       // unique id
-  private lsn: number;                      // log sequence number
-  private type: string;                     // connection type
-  private name: string;                     // connection name
-  private header: string;                   // log entry header
-  private config: DatabaseConfig;           // database configuration
-  private status: DatabaseControllerStatus; // controller status
-
-  constructor(type: string, id: number, name: string)
+  constructor(controller: PrefixedElasticController, delegate: Elastic.Client)
   {
-    this.id = id;
-    this.lsn = -1;
-    this.type = type;
-    this.name = name;
-    this.header = 'DB:' + this.id.toString() + ':' + this.name + ':' + this.type + ':';
-    this.config = null;
-    this.status = DatabaseControllerStatus.UNKNOWN;
+    super(controller, delegate);
   }
 
-  public async initialize() { }
-
-  public log(methodName: string, info?: any, moreInfo?: any)
+  public health(params: Elastic.ClusterHealthParams, callback: (error: any, response: any) => void): void
   {
-    const header = this.header + (++this.lsn).toString() + ':' + methodName;
-    winston.debug(header);
-    if (info !== undefined)
-    {
-      winston.debug(header + ': ' + JSON.stringify(info, null, 1));
-    }
-    if (moreInfo !== undefined)
-    {
-      winston.debug(header + ': ' + JSON.stringify(moreInfo, null, 1));
-    }
+    this.controller.prependIndexParam(params);
+    return super.health(params, callback);
   }
 
-  public getID(): number
+  public state(params: Elastic.ClusterStateParams, callback: (error: any, response: any) => void): void
   {
-    return this.id;
+    this.controller.prependIndexParam(params);
+    return super.state(params, callback);
   }
-
-  public getType(): string
-  {
-    return this.type;
-  }
-
-  public getName(): string
-  {
-    return this.name;
-  }
-
-  public getStatus(): DatabaseControllerStatus
-  {
-    return this.status;
-  }
-
-  public getConfig(): DatabaseConfig
-  {
-    return this.config;
-  }
-
-  public setConfig(config: DatabaseConfig)
-  {
-    this.config = config;
-  }
-
-  public setStatus(status: DatabaseControllerStatus)
-  {
-    this.status = status;
-  }
-
-  public abstract getClient();
-
-  public abstract getTasty(): Tasty.Tasty;
-
-  public abstract getQueryHandler(): QueryHandler;
-
-  public abstract getAnalyticsDB();
 }
 
-export default DatabaseController;
+export default PrefixedElasticCluster;

@@ -44,96 +44,85 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as winston from 'winston';
+import PrefixedElasticClient from './client/PrefixedElasticClient';
+import ElasticConfig from './ElasticConfig';
+import ElasticController from './ElasticController';
 
-import { DatabaseConfig } from '../app/database/DatabaseConfig';
-import QueryHandler from '../app/query/QueryHandler';
-import * as Tasty from '../tasty/Tasty';
-import DatabaseControllerStatus from './DatabaseControllerStatus';
-
-/**
- * An client which acts as a selective isomorphic wrapper around
- * midway databases
- */
-abstract class DatabaseController
+class PrefixedElasticController extends ElasticController
 {
-  private id: number;                       // unique id
-  private lsn: number;                      // log sequence number
-  private type: string;                     // connection type
-  private name: string;                     // connection name
-  private header: string;                   // log entry header
-  private config: DatabaseConfig;           // database configuration
-  private status: DatabaseControllerStatus; // controller status
+  private indexPrefix: string;
 
-  constructor(type: string, id: number, name: string)
+  constructor(config: ElasticConfig, id: number, name: string, analyticsIndex?: string, analyticsType?: string, indexPrefix?: string)
   {
-    this.id = id;
-    this.lsn = -1;
-    this.type = type;
-    this.name = name;
-    this.header = 'DB:' + this.id.toString() + ':' + this.name + ':' + this.type + ':';
-    this.config = null;
-    this.status = DatabaseControllerStatus.UNKNOWN;
+    super(config, id, name, analyticsIndex, analyticsType, PrefixedElasticClient);
+
+    this.indexPrefix = (indexPrefix == null ? '' : indexPrefix);
   }
 
-  public async initialize() { }
-
-  public log(methodName: string, info?: any, moreInfo?: any)
+  public getIndexPrefix(): string
   {
-    const header = this.header + (++this.lsn).toString() + ':' + methodName;
-    winston.debug(header);
-    if (info !== undefined)
+    return this.indexPrefix;
+  }
+
+  public prependIndexParam(obj): void
+  {
+    if (!('index' in obj))
     {
-      winston.debug(header + ': ' + JSON.stringify(info, null, 1));
+      obj.index = this.getIndexPrefix() + '*';
     }
-    if (moreInfo !== undefined)
+    else if (typeof obj.index === 'string')
     {
-      winston.debug(header + ': ' + JSON.stringify(moreInfo, null, 1));
+      obj.index = this.getIndexPrefix() + (obj.index as string);
+    }
+    else if (obj.index.constructor === Array)
+    {
+      obj.index = obj.index.map((s) =>
+      {
+        if (typeof s !== 'string')
+        {
+          throw new Error('Invalid index param');
+        }
+        return this.getIndexPrefix() + s;
+      });
+    }
+    else
+    {
+      throw new Error('Invalid index param');
     }
   }
 
-  public getID(): number
+  public prependIndexTerm(obj): void
   {
-    return this.id;
+    if (!('_index' in obj))
+    {
+      throw new Error('No _index term');
+    }
+    else if (typeof obj._index === 'string')
+    {
+      obj._index = this.getIndexPrefix() + (obj._index as string);
+    }
+    else
+    {
+      throw new Error('Invalid _index term');
+    }
   }
 
-  public getType(): string
+  public removeIndexPrefix(index: string): string
   {
-    return this.type;
+    if (index.startsWith(this.getIndexPrefix()))
+    {
+      return index.substring(this.getIndexPrefix().length);
+    }
+    else
+    {
+      throw new Error(`Index name "${index}" is missing prefix "${this.getIndexPrefix()}"`);
+    }
   }
 
-  public getName(): string
+  public removeDocIndexPrefix(obj): void
   {
-    return this.name;
+    obj._index = this.removeIndexPrefix(obj._index);
   }
-
-  public getStatus(): DatabaseControllerStatus
-  {
-    return this.status;
-  }
-
-  public getConfig(): DatabaseConfig
-  {
-    return this.config;
-  }
-
-  public setConfig(config: DatabaseConfig)
-  {
-    this.config = config;
-  }
-
-  public setStatus(status: DatabaseControllerStatus)
-  {
-    this.status = status;
-  }
-
-  public abstract getClient();
-
-  public abstract getTasty(): Tasty.Tasty;
-
-  public abstract getQueryHandler(): QueryHandler;
-
-  public abstract getAnalyticsDB();
 }
 
-export default DatabaseController;
+export default PrefixedElasticController;

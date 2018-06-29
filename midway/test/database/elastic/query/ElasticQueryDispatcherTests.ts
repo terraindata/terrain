@@ -52,7 +52,7 @@ import ElasticClient from '../../../../src/database/elastic/client/ElasticClient
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
 import ElasticQueryDispatcher from '../../../../src/database/elastic/iterator/ElasticQueryDispatcher';
-import ElasticStream from '../../../../src/database/elastic/query/ElasticStream';
+import PrefixedElasticController from '../../../../src/database/elastic/PrefixedElasticController';
 
 let elasticController: ElasticController;
 let elasticClient: ElasticClient;
@@ -64,7 +64,7 @@ beforeAll(() =>
     hosts: ['http://localhost:9200'],
   };
 
-  elasticController = new ElasticController(config, 0, 'ElasticStreamTests');
+  elasticController = new PrefixedElasticController(config, 0, 'ElasticStreamTests', undefined, undefined, 'abc.');
   elasticClient = elasticController.getClient();
 });
 
@@ -92,6 +92,7 @@ test('dispatch single buffered query', async (done) =>
     const query = {
       size: 3,
       _source: ['movieid', 'title'],
+      sort: { movieid: 'asc' },
       query: {
         bool: {
           filter: [
@@ -121,23 +122,32 @@ test('dispatch single buffered query', async (done) =>
         {
           _index: 'movies',
           _type: 'data',
-          _id: '89',
-          _score: 0,
-          _source: { movieid: 89, title: 'Nick of Time (1995)' },
+          _id: '1',
+          _score: null,
+          _source: {
+            movieid: 1,
+            title: 'Toy Story (1995)',
+          },
         },
         {
           _index: 'movies',
           _type: 'data',
-          _id: '110',
-          _score: 0,
-          _source: { movieid: 110, title: 'Braveheart (1995)' },
+          _id: '2',
+          _score: null,
+          _source: {
+            movieid: 2,
+            title: 'Jumanji (1995)',
+          },
         },
         {
           _index: 'movies',
           _type: 'data',
-          _id: '116',
-          _score: 0,
-          _source: { movieid: 116, title: 'Anne Frank Remembered (1995)' },
+          _id: '3',
+          _score: null,
+          _source: {
+            movieid: 3,
+            title: 'Grumpier Old Men (1995)',
+          },
         },
       ],
     );
@@ -202,6 +212,7 @@ test('dispatch single scrolling query', async (done) =>
     const query = {
       size: 5,
       _source: ['movieid', 'title'],
+      sort: { movieid: 'asc' },
       query: {
         bool: {
           filter: [
@@ -228,37 +239,57 @@ test('dispatch single scrolling query', async (done) =>
         {
           _index: 'movies',
           _type: 'data',
-          _id: '89',
-          _score: 0,
-          _source: { movieid: 89, title: 'Nick of Time (1995)' },
+          _id: '1',
+          _score: null,
+          _source: {
+            movieid: 1,
+            title: 'Toy Story (1995)',
+          },
+          sort: [1],
         },
         {
           _index: 'movies',
           _type: 'data',
-          _id: '110',
-          _score: 0,
-          _source: { movieid: 110, title: 'Braveheart (1995)' },
+          _id: '2',
+          _score: null,
+          _source: {
+            movieid: 2,
+            title: 'Jumanji (1995)',
+          },
+          sort: [2],
         },
         {
           _index: 'movies',
           _type: 'data',
-          _id: '116',
-          _score: 0,
-          _source: { movieid: 116, title: 'Anne Frank Remembered (1995)' },
+          _id: '3',
+          _score: null,
+          _source: {
+            movieid: 3,
+            title: 'Grumpier Old Men (1995)',
+          },
+          sort: [3],
         },
         {
           _index: 'movies',
           _type: 'data',
-          _id: '60',
-          _score: 0,
-          _source: { movieid: 60, title: 'Indian in the Cupboard, The (1995)' },
+          _id: '4',
+          _score: null,
+          _source: {
+            movieid: 4,
+            title: 'Waiting to Exhale (1995)',
+          },
+          sort: [4],
         },
         {
           _index: 'movies',
           _type: 'data',
-          _id: '14',
-          _score: 0,
-          _source: { movieid: 14, title: 'Nixon (1995)' },
+          _id: '5',
+          _score: null,
+          _source: {
+            movieid: 5,
+            title: 'Father of the Bride Part II (1995)',
+          },
+          sort: [5],
         },
       ],
     );

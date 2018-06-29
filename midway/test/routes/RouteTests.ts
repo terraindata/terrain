@@ -51,11 +51,8 @@ import * as winston from 'winston';
 
 import { App, DB } from '../../src/app/App';
 import ElasticConfig from '../../src/database/elastic/ElasticConfig';
-import ElasticController from '../../src/database/elastic/ElasticController';
-import ElasticDB from '../../src/database/elastic/tasty/ElasticDB';
 import * as Tasty from '../../src/tasty/Tasty';
 
-let elasticDB: ElasticDB;
 let server;
 
 let defaultUserAccessToken: string = '';
@@ -79,17 +76,20 @@ beforeAll(async (done) =>
       {
         debug: true,
         db: 'postgres',
-        dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:65432/moviesdb',
+        dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:65432',
+        instanceId: 'moviesdb',
         port: 63000,
         databases: [
           {
             name: 'My ElasticSearch Instance',
             type: 'elastic',
-            dsn: 'http://127.0.0.1:9200',
+            dsn: 'user:pass@127.0.0.1:9200',
             host: 'http://127.0.0.1:9200',
             isAnalytics: true,
             analyticsIndex: 'terrain-analytics',
             analyticsType: 'events',
+            indexPrefix: 'abc.',
+            isProtected: true,
           },
           {
             name: 'MySQL Test Connection',
@@ -97,6 +97,7 @@ beforeAll(async (done) =>
             dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:63306/moviesdb',
             host: '127.0.0.1:63306',
             isAnalytics: false,
+            isProtected: false,
           },
         ],
       };
@@ -107,9 +108,6 @@ beforeAll(async (done) =>
     const config: ElasticConfig = {
       hosts: ['http://localhost:9200'],
     };
-
-    const elasticController: ElasticController = new ElasticController(config, 0, 'RouteTests');
-    elasticDB = elasticController.getTasty().getDB() as ElasticDB;
 
     const items = [
       {
@@ -145,9 +143,19 @@ beforeAll(async (done) =>
         'type',
       ],
     );
-    await DB.getDB().execute(
-      DB.getDB().generate(new Tasty.Query(itemTable).upsert(items)),
-    );
+    try
+    {
+      await DB.getDB().execute(
+        DB.getDB().generate(new Tasty.Query(itemTable).upsert(items)),
+      );
+    }
+    catch (e)
+    {
+      if (e.toString() !== 'error: conflicting key value violates exclusion constraint "unique_item_names"')
+      {
+        throw e;
+      }
+    }
 
     const versions = [
       {
@@ -869,9 +877,9 @@ describe('Query route tests', () =>
                 "query" : {
                   "bool" : {
                     "filter": [
+                      { "term": {"_index" : "movies"} },
                       { "term": {"movieid" : @movie.movieid} },
-                      { "match": {"_index" : "movies"} },
-                      { "match": {"_type" : "data"} }
+                      { "term": {"_type" : "data"} }
                     ]
                   }
                 }
@@ -1071,8 +1079,8 @@ describe('Query route tests', () =>
                 "query" : {
                   "bool": {
                     "filter": [
-                      { "match": {"_index" : "movies"} },
-                      { "match": {"_type" : "data"} }
+                      { "term": {"_index" : "movies"} },
+                      { "term": {"_type" : "data"} }
                     ],
                     "must_not": [
                       { "term": { "budget": 0 } },
@@ -1242,8 +1250,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: defaultUserAccessToken,
         database: 1,
-        start: new Date(2018, 2, 16, 7, 24, 4),
-        end: new Date(2018, 2, 16, 7, 36, 4),
+        start: new Date(2018, 6, 20, 7, 24, 4),
+        end: new Date(2018, 6, 20, 7, 36, 4),
         eventname: 'impression',
         algorithmid: 'bestMovies3',
         agg: 'select',
@@ -1269,8 +1277,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: defaultUserAccessToken,
         database: 1,
-        start: new Date(2018, 2, 16, 7, 24, 4),
-        end: new Date(2018, 2, 16, 7, 36, 4),
+        start: new Date(2018, 6, 20, 7, 24, 4),
+        end: new Date(2018, 6, 20, 7, 36, 4),
         eventname: 'impression',
         algorithmid: 'bestMovies3',
         agg: 'histogram',
@@ -1297,8 +1305,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: defaultUserAccessToken,
         database: 1,
-        start: new Date(2018, 3, 3, 7, 24, 4),
-        end: new Date(2018, 3, 3, 10, 24, 4),
+        start: new Date(2018, 6, 20, 7, 24, 4),
+        end: new Date(2018, 6, 20, 10, 24, 4),
         eventname: 'click,impression',
         algorithmid: 'bestMovies3',
         agg: 'rate',

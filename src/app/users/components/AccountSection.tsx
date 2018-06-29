@@ -77,12 +77,19 @@ const moment = require('moment-timezone');
 export interface Props
 {
   user?: any;
-  sectionTitle: string;
+  isEditing?: boolean;
+  isDisabled?: boolean;
+  sectionTitle: string | El;
   sectionType: string;
   sectionBoxes: List<any>;
   hasPhoto: boolean;
+  userImage?: any;
   columnNum: number;
   onChange: (value: any) => void;
+  onCancel?: () => void;
+  canEdit: boolean;
+  canDisable: boolean;
+  addingUser: boolean;
 }
 
 export default class Section extends TerrainComponent<Props>
@@ -92,7 +99,7 @@ export default class Section extends TerrainComponent<Props>
     super(props);
 
     this.state = {
-      isEditing: false,
+      isEditing: this.props.isEditing,
       sections: this.props.sectionBoxes,
       editingSections: {},
       errorModalOpen: false,
@@ -199,6 +206,12 @@ export default class Section extends TerrainComponent<Props>
     {
       return (
         <div className='section-body' style={{ background: Colors().bg }}>
+          {this.props.hasPhoto &&
+            <div
+              className='icon-pic'
+            >
+              {this.props.userImage}
+            </div>}
           {this.renderBlocks(this.props.sectionBoxes, 'no-column', 1)}
         </div>
       );
@@ -216,7 +229,7 @@ export default class Section extends TerrainComponent<Props>
 
       return (
         <div className='section-body' style={{ background: Colors().bg }}>
-          {this.props.hasPhoto ?
+          {this.props.hasPhoto &&
             <div
               className='profile-pic'
               onClick={this.handleProfilePicChange}
@@ -225,7 +238,7 @@ export default class Section extends TerrainComponent<Props>
                 cursor: (this.state.isEditing) ? 'pointer' : 'default',
               }}>
               {this.renderSelectProfilePicture()}
-            </div> : null}
+            </div>}
           <div className='profile-text'>
             {columns.map((col, i) => this.renderBlocks(col, 'profile-col', i))}
           </div>
@@ -268,6 +281,7 @@ export default class Section extends TerrainComponent<Props>
         return (
           <input
             className='profile-input'
+            ref={block.key}
             id={block.header}
             type='text'
             onChange={this._fn(this.handleInputEdit, block)}
@@ -279,6 +293,7 @@ export default class Section extends TerrainComponent<Props>
       case 'Password':
         return (
           <input
+            ref={block.key}
             id={block.header}
             type='password'
             onChange={this._fn(this.handleInputEdit, block)}
@@ -330,17 +345,24 @@ export default class Section extends TerrainComponent<Props>
 
   public onSaveChange()
   {
-    this.props.onChange(this.state.editingSections);
-    this.setState(
-      {
-        isEditing: false,
-        editingSections: {},
-      },
-    );
+    const saveSuccessful = this.props.onChange(this.state.editingSections);
+    if (saveSuccessful)
+    {
+      this.setState(
+        {
+          isEditing: false,
+          editingSections: {},
+        },
+      );
+    }
   }
 
   public onCancelChange()
   {
+    if (this.props.onCancel !== undefined)
+    {
+      this.props.onCancel();
+    }
     this.setState(
       {
         isEditing: false,
@@ -384,16 +406,36 @@ export default class Section extends TerrainComponent<Props>
     );
   }
 
+  public toggleDisable(isDisabledFlag)
+  {
+    this.props.onChange({ isDisabledFlag: !isDisabledFlag });
+  }
+
+  public renderDisableButton(isDisabledFlag)
+  {
+    return (
+      <div
+        className='section-edit-button'
+        onClick={this._fn(this.toggleDisable, isDisabledFlag)}
+        style={{ color: Colors().bg, background: (isDisabledFlag) ? Colors().mainBlue : Colors().sectionEditButton }}
+      >
+        {(isDisabledFlag) ? 'Enable' : 'Disable'}
+      </div>
+    );
+  }
+
   public render()
   {
     return (
       <div
         className='section-container'
-        style={{ background: Colors().blockBg }}
+        style={{ background: Colors().blockBg, opacity: this.props.isDisabled ? 0.5 : 1 }}
       >
         <div className='section-header-bar'>
           <div className='section-header'>{this.props.sectionTitle}</div>
-          {this.state.isEditing ? this.renderCancelAndSaveButtons() : this.renderEditButton()}
+          {(this.props.canEdit || this.props.addingUser) && (this.state.isEditing ?
+            this.renderCancelAndSaveButtons() : this.renderEditButton())}
+          {this.props.canDisable && this.renderDisableButton(this.props.isDisabled)}
         </div>
         {
           <FadeInOut

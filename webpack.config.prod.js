@@ -48,6 +48,8 @@ const path = require('path');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const CompressionPlugin = require("compression-webpack-plugin");
 
 module.exports =
 {
@@ -162,6 +164,14 @@ module.exports =
       cacheDirectory: './.cache/hard-source/dev/[confighash]',
     }),
     new ForkTsCheckerWebpackPlugin(),
+    // new BundleAnalyzerPlugin(),
+    new CompressionPlugin({
+      asset: "[path].gz[query]",
+      algorithm: "gzip",
+      test: /\.js$|\.css$|\.html$/,
+      threshold: 10240,
+      minRatio: 0.8
+    })
   ],
   optimization: {
     splitChunks: {

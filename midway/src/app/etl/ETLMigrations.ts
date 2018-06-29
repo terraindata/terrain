@@ -44,96 +44,39 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import * as assert from 'assert';
+import * as _ from 'lodash';
 import * as winston from 'winston';
 
-import { DatabaseConfig } from '../app/database/DatabaseConfig';
-import QueryHandler from '../app/query/QueryHandler';
-import * as Tasty from '../tasty/Tasty';
-import DatabaseControllerStatus from './DatabaseControllerStatus';
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
 
-/**
- * An client which acts as a selective isomorphic wrapper around
- * midway databases
- */
-abstract class DatabaseController
-{
-  private id: number;                       // unique id
-  private lsn: number;                      // log sequence number
-  private type: string;                     // connection type
-  private name: string;                     // connection name
-  private header: string;                   // log entry header
-  private config: DatabaseConfig;           // database configuration
-  private status: DatabaseControllerStatus; // controller status
+import { CURRENT_VERSION, FIRST_VERSION, Migrator, Version } from '../AppVersion';
+import { MigrationRecordConfig as MigrationRecord } from '../migrations/MigrationRecordConfig';
+import { templates as templatesDb } from './TemplateRouter';
 
-  constructor(type: string, id: number, name: string)
+import { TemplateVersion, updateTemplateIfNeeded } from 'shared/etl/migrations/TemplateVersions';
+
+export const defaultETLMigration: Migrator = {
+  fromVersion: 'v4',
+  toVersion: 'v5',
+  migrate: (from, to) =>
   {
-    this.id = id;
-    this.lsn = -1;
-    this.type = type;
-    this.name = name;
-    this.header = 'DB:' + this.id.toString() + ':' + this.name + ':' + this.type + ':';
-    this.config = null;
-    this.status = DatabaseControllerStatus.UNKNOWN;
-  }
-
-  public async initialize() { }
-
-  public log(methodName: string, info?: any, moreInfo?: any)
-  {
-    const header = this.header + (++this.lsn).toString() + ':' + methodName;
-    winston.debug(header);
-    if (info !== undefined)
+    return new Promise<boolean>(async (resolve, reject) =>
     {
-      winston.debug(header + ': ' + JSON.stringify(info, null, 1));
-    }
-    if (moreInfo !== undefined)
-    {
-      winston.debug(header + ': ' + JSON.stringify(moreInfo, null, 1));
-    }
-  }
-
-  public getID(): number
-  {
-    return this.id;
-  }
-
-  public getType(): string
-  {
-    return this.type;
-  }
-
-  public getName(): string
-  {
-    return this.name;
-  }
-
-  public getStatus(): DatabaseControllerStatus
-  {
-    return this.status;
-  }
-
-  public getConfig(): DatabaseConfig
-  {
-    return this.config;
-  }
-
-  public setConfig(config: DatabaseConfig)
-  {
-    this.config = config;
-  }
-
-  public setStatus(status: DatabaseControllerStatus)
-  {
-    this.status = status;
-  }
-
-  public abstract getClient();
-
-  public abstract getTasty(): Tasty.Tasty;
-
-  public abstract getQueryHandler(): QueryHandler;
-
-  public abstract getAnalyticsDB();
-}
-
-export default DatabaseController;
+      let anyUpdated = false;
+      const templates = await templatesDb.get();
+      for (const t of templates)
+      {
+        const { template, updated, message } = updateTemplateIfNeeded(t);
+        await templatesDb.update(template);
+        if (updated)
+        {
+          anyUpdated = true;
+          winston.debug(`Updated Template ${template.id}: ${message}`);
+        }
+      }
+      resolve(anyUpdated);
+    });
+  },
+};

@@ -44,96 +44,87 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as winston from 'winston';
+import * as Elastic from 'elasticsearch';
+import PrefixedElasticController from '../PrefixedElasticController';
+import ElasticIndices from './ElasticIndices';
 
-import { DatabaseConfig } from '../app/database/DatabaseConfig';
-import QueryHandler from '../app/query/QueryHandler';
-import * as Tasty from '../tasty/Tasty';
-import DatabaseControllerStatus from './DatabaseControllerStatus';
-
-/**
- * An client which acts as a selective isomorphic wrapper around
- * midway databases
- */
-abstract class DatabaseController
+class PrefixedElasticIndices extends ElasticIndices<PrefixedElasticController>
 {
-  private id: number;                       // unique id
-  private lsn: number;                      // log sequence number
-  private type: string;                     // connection type
-  private name: string;                     // connection name
-  private header: string;                   // log entry header
-  private config: DatabaseConfig;           // database configuration
-  private status: DatabaseControllerStatus; // controller status
-
-  constructor(type: string, id: number, name: string)
+  constructor(controller: PrefixedElasticController, delegate: Elastic.Client)
   {
-    this.id = id;
-    this.lsn = -1;
-    this.type = type;
-    this.name = name;
-    this.header = 'DB:' + this.id.toString() + ':' + this.name + ':' + this.type + ':';
-    this.config = null;
-    this.status = DatabaseControllerStatus.UNKNOWN;
+    super(controller, delegate);
   }
 
-  public async initialize() { }
-
-  public log(methodName: string, info?: any, moreInfo?: any)
+  public getMapping(params: Elastic.IndicesGetMappingParams, callback: (error: any, response: any, status: any) => void): void
   {
-    const header = this.header + (++this.lsn).toString() + ':' + methodName;
-    winston.debug(header);
-    if (info !== undefined)
+    this.controller.prependIndexParam(params);
+    return super.getMapping(params, (err, res, status) =>
     {
-      winston.debug(header + ': ' + JSON.stringify(info, null, 1));
-    }
-    if (moreInfo !== undefined)
+      if (err)
+      {
+        if (err.statusCode === 404)
+        {
+          callback(undefined, {}, 200);
+        }
+        else
+        {
+          callback(err, undefined, status);
+        }
+      }
+      else
+      {
+        const newRes = {};
+        try
+        {
+          Object.keys(res).forEach((key) =>
+          {
+            newRes[this.controller.removeIndexPrefix(key)] = res[key];
+          });
+        }
+        catch (e)
+        {
+          this.log('error', e);
+          return callback(e, undefined, status);
+        }
+        callback(err, newRes, status);
+      }
+    });
+  }
+
+  public create(params: Elastic.IndicesCreateParams, callback: (error: any, response: any, status: any) => void): void
+  {
+    this.controller.prependIndexParam(params);
+    return super.create(params, (err, res, status) =>
     {
-      winston.debug(header + ': ' + JSON.stringify(moreInfo, null, 1));
-    }
+      if (err)
+      {
+        callback(err, undefined, status);
+      }
+      else
+      {
+        res.index = this.controller.removeIndexPrefix(res.index);
+        callback(err, res, status);
+      }
+    });
   }
 
-  public getID(): number
+  public delete(params: Elastic.IndicesDeleteParams, callback: (error: any, response: any, status: any) => void): void
   {
-    return this.id;
+    this.controller.prependIndexParam(params);
+    return super.delete(params, callback);
   }
 
-  public getType(): string
+  public putMapping(params: Elastic.IndicesPutMappingParams, callback: (err: any, response: any, status: any) => void): void
   {
-    return this.type;
+    this.controller.prependIndexParam(params);
+    return super.putMapping(params, callback);
   }
 
-  public getName(): string
+  public refresh(params: Elastic.IndicesRefreshParams, callback: (err: any, response: any) => void): void
   {
-    return this.name;
+    this.controller.prependIndexParam(params);
+    return super.refresh(params, callback);
   }
-
-  public getStatus(): DatabaseControllerStatus
-  {
-    return this.status;
-  }
-
-  public getConfig(): DatabaseConfig
-  {
-    return this.config;
-  }
-
-  public setConfig(config: DatabaseConfig)
-  {
-    this.config = config;
-  }
-
-  public setStatus(status: DatabaseControllerStatus)
-  {
-    this.status = status;
-  }
-
-  public abstract getClient();
-
-  public abstract getTasty(): Tasty.Tasty;
-
-  public abstract getQueryHandler(): QueryHandler;
-
-  public abstract getAnalyticsDB();
 }
 
-export default DatabaseController;
+export default PrefixedElasticIndices;

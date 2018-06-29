@@ -44,90 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import cmdLineArgs = require('command-line-args');
-import cmdLineUsage = require('command-line-usage');
-import { Config } from './Config';
+export type Version = 'v4' | 'v5';
 
-// process command-line arguments
-const optionList = [
-  {
-    alias: 'c',
-    defaultValue: 'midway.json',
-    name: 'config',
-    type: String,
-    typeLabel: 'file',
-    description: 'Configuration file to use.',
-  },
-  {
-    alias: 'p',
-    defaultValue: 3000,
-    name: 'port',
-    type: Number,
-    typeLabel: 'number',
-    description: 'Port to listen on.',
-  },
-  {
-    alias: 'd',
-    defaultValue: 'postgres',
-    name: 'db',
-    type: String,
-    typeLabel: 'type',
-    description: 'System database backend to use.',
-  },
-  {
-    alias: 'n',
-    defaultValue: 't3rr41n-demo:r3curs1v3$@127.0.0.1:5432/midway',
-    name: 'dsn',
-    type: String,
-    description: 'Backend-specific connection parameters. (e.g. file, dsn, host)',
-  },
-  {
-    alias: 'i',
-    defaultValue: 'an7904',
-    name: 'instanceId',
-    type: String,
-    typeLabel: 'id',
-    description: 'Unique identifier to use for this instance.',
-  },
-  {
-    name: 'debug',
-    type: Boolean,
-    description: 'Turn on debug mode.',
-  },
-  {
-    name: 'help',
-    type: Boolean,
-    description: 'Show help and usage information.',
-  },
-  {
-    alias: 'v',
-    name: 'verbose',
-    type: Boolean,
-    description: 'Print verbose information.',
-  },
-  {
-    name: 'analyticsdb',
-    type: String,
-    defaultValue: 'http://127.0.0.1:9200',
-    description: 'Analytics datastore connection parameters',
-  },
-];
+export const CURRENT_VERSION: Version = 'v5'; // current version of midway
+export const FIRST_VERSION: Version = 'v4'; // default version if it doesn't exist
 
-const sections = [
-  {
-    header: 'Midway 2.0',
-    content: 'Refreshingly good.',
-  },
-  {
-    header: 'Options',
-    optionList,
-  },
-];
-
-export let CmdLineArgs: Config = cmdLineArgs(optionList,
-  {
-    partial: true,
-  });
-
-export const CmdLineUsage = cmdLineUsage(sections);
-export default CmdLineArgs;
+export interface Migrator
+{
+  fromPattern?: string; // not yet supported
+  fromVersion?: Version;
+  toVersion: Version;
+  migrate: (from: Version, to: Version) => Promise<boolean>;
+}
