@@ -76,6 +76,8 @@ abstract class DatabaseController
     this.status = DatabaseControllerStatus.UNKNOWN;
   }
 
+  public async initialize() { }
+
   public log(methodName: string, info?: any, moreInfo?: any)
   {
     const header = this.header + (++this.lsn).toString() + ':' + methodName;

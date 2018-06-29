@@ -82,6 +82,14 @@ const optionList = [
     description: 'Backend-specific connection parameters. (e.g. file, dsn, host)',
   },
   {
+    alias: 'i',
+    defaultValue: 'an7904',
+    name: 'instanceId',
+    type: String,
+    typeLabel: 'id',
+    description: 'Unique identifier to use for this instance.',
+  },
+  {
     name: 'debug',
     type: Boolean,
     description: 'Turn on debug mode.',
