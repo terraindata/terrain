@@ -72,6 +72,7 @@ export interface Props
   hidden?: boolean;
   theme?: 'active' | 'disabled'; // other ideas: | 'alt' | 'important' | 'warning';
   tooltip?: string;
+  grow?: boolean; // whether the button should grow to fill available space
 }
 
 const iconConfig: {
@@ -98,7 +99,7 @@ class Button extends TerrainComponent<Props>
 {
   public render()
   {
-    const { text, size, disabled, hidden } = this.props;
+    const { text, size, disabled, hidden, grow } = this.props;
     let { onClick, theme, iconComesAfter, icon } = this.props;
 
     if (disabled)
@@ -129,6 +130,7 @@ class Button extends TerrainComponent<Props>
           'button-large': size === 'large',
           'button-with-icon-before': icon && !iconComesAfter,
           'button-with-icon-after': icon && iconComesAfter,
+          'button-grow': grow,
         })}
         style={style}
         onClick={onClick}

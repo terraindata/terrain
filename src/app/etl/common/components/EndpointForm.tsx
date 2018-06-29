@@ -77,6 +77,7 @@ export interface Props
   isSource: boolean;
   endpoint: SourceConfig | SinkConfig;
   onChange: (newEndpoint: SourceConfig | SinkConfig, apply?: boolean) => void;
+  onSubmit?: () => void;
   hideTypePicker?: boolean;
   isSchedule?: boolean;
   integrations?: IMMap<ID, IntegrationConfig>;
@@ -207,6 +208,7 @@ class EndpointForm extends TerrainComponent<Props>
               inputMap={mapToUse}
               inputState={this.typeValueToState(endpoint)}
               onStateChange={this.handleTypeChange}
+              onTextInputEnter={this.props.onSubmit}
             />
         }
         { // integration form

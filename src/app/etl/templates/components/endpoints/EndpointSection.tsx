@@ -185,6 +185,7 @@ class EndpointSection extends TerrainComponent<Props>
           isSource={true}
           endpoint={this.state.newSource}
           onChange={this._setStateWrapper('newSource')}
+          onSubmit={this.handleAddNewSource}
         />
       </div>
     );

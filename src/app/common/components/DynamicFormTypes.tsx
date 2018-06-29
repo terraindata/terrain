@@ -79,7 +79,7 @@ export interface InputDeclarationOptionTypes<S = any>
     large?: boolean;
   };
   Pick: {
-    pickOptions: (state: S) => List<string>;
+    pickOptions: (state: S) => List<string | number>;
     indexResolver?: (option) => number;
     displayNames?: (state: S) => Immutable.Map<any, string>;
     textColor?: (index: number) => string;

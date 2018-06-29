@@ -138,6 +138,9 @@ fullstack-screenshot:
     - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
     - sleep 10
     - yarn test-rr-etl-http-import
+  only:
+    - schedules
+  when: manual
   stage: screenshot-tests
   allow_failure: true
   artifacts:

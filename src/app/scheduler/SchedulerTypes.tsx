@@ -47,8 +47,9 @@ THE SOFTWARE.
 import { List, Record } from 'immutable';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import { _SinkConfig, _SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { TaskConfig as SharedTaskConfig } from 'shared/types/jobs/TaskConfig';
+import TaskEnum from 'shared/types/jobs/TaskEnum';
 import SharedSchedulerConfig from 'shared/types/scheduler/SchedulerConfig';
 import { createRecordType } from 'shared/util/Classes';
 import Util from 'util/Util';
@@ -102,6 +103,7 @@ export const _SchedulerState = (config?: any) =>
 class TaskConfigC extends SharedTaskConfig
 {
   // Any extra functions / properties go here
+  public type: 'ROOT' | 'SUCCESS' | 'FAILURE' = 'ROOT';
 }
 
 const TaskConfig_Record = createRecordType(new TaskConfigC(), 'TaskConfigC');
@@ -113,12 +115,31 @@ export const _TaskConfig =
     task = task.set('params', task.params ? Immutable.Map(task.params) : Immutable.Map({}));
     task = task.setIn(['params', 'options'], task.getIn(['params', 'options']) ?
       Immutable.Map(task.getIn(['params', 'options'])) : Immutable.Map({}));
-    task = task.setIn(['params', 'options', 'overrideSources'],
-      Util.objectToImmutableMap(parseToObject(task, ['params', 'options', 'overrideSources']), _.partialRight(_SourceConfig, true)));
-    task = task.setIn(['params', 'options', 'overrideSinks'],
-      Util.objectToImmutableMap(parseToObject(task, ['params', 'options', 'overrideSinks']), _.partialRight(_SinkConfig, true)));
+    if (task.taskId === TaskEnum.taskETL)
+    {
+      task = task.setIn(['params', 'options', 'overrideSources'],
+        Util.objectToImmutableMap(parseToObject(task, ['params', 'options', 'overrideSources']), _.partialRight(_SourceConfig, true)));
+      task = task.setIn(['params', 'options', 'overrideSinks'],
+        Util.objectToImmutableMap(parseToObject(task, ['params', 'options', 'overrideSinks']), _.partialRight(_SinkConfig, true)));
+    }
     return task;
   };
+
+export interface ParamConfigTypes
+{
+  taskDefaultExit: {
+  };
+  taskDefaultFailure: {
+  };
+  taskETL: {
+    templateId?: string | number;
+    overrideSources?: Immutable.Map<ID, SourceConfig>;
+    overrideSinks?: Immutable.Map<ID, SinkConfig>;
+  };
+}
+
+export type TaskTypes = keyof ParamConfigTypes;
+export type ParamConfigType<key extends TaskTypes> = ParamConfigTypes[key];
 
 function parseToObject(parent, keyPath, defaultVal = {}): object
 {
@@ -143,9 +164,16 @@ function parseToObject(parent, keyPath, defaultVal = {}): object
 /* Do any work to prepare a schedule to be saved to the database */
 export function scheduleForDatabase(schedule: SchedulerConfig): object
 {
-  schedule = schedule
-    .updateIn(['tasks', 0, 'params', 'options', 'overrideSinks'], (value) => JSON.stringify(value))
-    .updateIn(['tasks', 0, 'params', 'options', 'overrideSources'], (value) => JSON.stringify(value))
-    .updateIn(['tasks'], (value) => JSON.stringify(value));
-  return schedule.toJS();
+  const tasks = schedule.tasks.map((task) =>
+  {
+    if (task.taskId === TaskEnum.taskETL)
+    {
+      task = task
+        .updateIn(['params', 'options', 'overrideSinks'], (value) => JSON.stringify(value))
+        .updateIn(['params', 'options', 'overrideSources'], (value) => JSON.stringify(value));
+    }
+    return task.toJS();
+  });
+  const scheduleObj = schedule.set('tasks', JSON.stringify(tasks.toArray())).toJS();
+  return scheduleObj;
 }

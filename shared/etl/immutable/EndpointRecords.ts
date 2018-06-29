@@ -237,7 +237,7 @@ export function getEndpointDescription(
   {
     case Sinks.Fs:
     case Sources.Fs: {
-      return `Local File System'`;
+      return `Local File System`;
     }
     case Sinks.Http:
     case Sources.Http: {

@@ -169,10 +169,7 @@ export class PostgreSQLDB implements TastyDB
 
   public async destroy(): Promise<void>
   {
-    return new Promise<void>((resolve, reject) =>
-    {
-      this.client.end(() => resolve());
-    });
+    return this.client.end();
   }
 
   public async putMapping(table: TastyTable): Promise<object>

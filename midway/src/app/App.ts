@@ -72,6 +72,7 @@ import { integrations } from './integrations/IntegrationRouter';
 import { JobLog } from './jobs/JobLog';
 import { JobQueue } from './jobs/JobQueue';
 import Middleware from './Middleware';
+import { Migrations } from './migrations/Migrations';
 import NotFoundRouter from './NotFoundRouter';
 import MidwayRouter from './Router';
 import { Scheduler } from './scheduler/Scheduler';
@@ -97,8 +98,16 @@ export let TBLS: Schema.Tables;
 
 export class App
 {
-  private static initializeDB(type: string, dsn: string): Tasty.Tasty
+  private static async initializeDB(type: string, dsn: string): Promise<Tasty.Tasty>
   {
+    const ctrlConfig = new DatabaseControllerConfig(type, dsn).getConfig();
+    if (ctrlConfig.database !== undefined)
+    {
+      winston.info(`Overriding specified database name ${ctrlConfig.database} with instance ID ${CFG.instanceId}`);
+      dsn = dsn.slice(0, dsn.lastIndexOf('/'));
+    }
+
+    dsn += '/' + CFG.instanceId;
     const dbConfig: DatabaseConfig = {
       id: 0,
       name: '[system]',
@@ -106,9 +115,10 @@ export class App
       dsn,
       host: '',
       isAnalytics: false,
+      isProtected: false,
     };
     winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
-    const controller = DatabaseControllerConfig.makeDatabaseController(dbConfig);
+    const controller = await DatabaseControllerConfig.makeDatabaseController(dbConfig);
     return controller.getTasty();
   }
 
@@ -135,6 +145,7 @@ export class App
   private JobL: JobLog;
   private JobQ: JobQueue;
   private SKDR: Scheduler;
+  private Migrations: Migrations; // for now, do not allow external access
   private app: Koa;
   private config: Config.Config;
   private heapAvail: number;
@@ -150,10 +161,15 @@ export class App
     this.config = config;
     CFG = this.config;
 
+    if (config.instanceId === undefined)
+    {
+      throw new Error('Required setting instanceId not found in the configuration.');
+    }
+
     TBLS = Schema.setupTables(config.db as string);
 
-    this.DB = App.initializeDB(config.db as string, config.dsn as string);
-    DB = this.DB;
+    this.Migrations = new Migrations();
+    this.Migrations.initialize();
 
     this.EMAIL = new Email();
     EMAIL = this.EMAIL;
@@ -248,6 +264,9 @@ export class App
 
   public async start(): Promise<http.Server>
   {
+    this.DB = await App.initializeDB(CFG.db as string, CFG.dsn as string);
+    DB = this.DB;
+
     const client: any = this.DB.getController().getClient();
     let isConnected = await client.isConnected();
     for (let i = 1; i <= MAX_CONN_RETRIES && !isConnected; ++i)
@@ -288,6 +307,14 @@ export class App
       }
     }
     winston.info('Finished creating application schema...');
+
+    // process configuration options
+    await Config.initialHandleConfig(this.config);
+    winston.debug('Finished initial processing configuration options...');
+
+    // perform migrations
+    await this.Migrations.runMigrations();
+    winston.info('Finished migration checks and updates. State is up to Date.');
 
     // process configuration options
     await Config.handleConfig(this.config);

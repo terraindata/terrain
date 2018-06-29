@@ -291,11 +291,11 @@ export default class ESInterpreter
     {
       return;
     }
-    this.rootValueInfo.recursivelyVisit((element) => true, this.linkValueInfo);
-    this.isDirty = false;
-    this.isMutated = true;
     try
     {
+      this.rootValueInfo.recursivelyVisit((element) => true, this.linkValueInfo);
+      this.isDirty = false;
+      this.isMutated = true;
       this.generateQueries();
       this.mark();
     }
