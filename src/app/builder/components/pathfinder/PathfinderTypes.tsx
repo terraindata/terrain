@@ -94,6 +94,7 @@ import { BaseClass, New } from 'shared/util/Classes';
 import { FieldType, FieldTypeMapping, ReverseFieldTypeMapping } from '../../../../../shared/builder/FieldTypes';
 import ElasticBlockHelpers, { AutocompleteMatchType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import PathfinderText from './PathfinderText';
+import {AllRecordMap} from '../../../../../shared/util/Classes';
 
 export enum PathfinderSteps
 {

@@ -396,20 +396,24 @@ const BuilderReducers =
       // TODO MOD convert
       let { query } = state;
       const tql: string = action.payload.tql;
+      // testing the code to path
       query = query.set('lastMutation', query.lastMutation + 1).set('tql', tql);
       query = query.set('tqlMode', action.payload.tqlMode);
       query = query.set('parseTree', AllBackendsMap[query.language].parseQuery(query));
       // update cards
-      query = AllBackendsMap[query.language].codeToQuery(
-        query,
-        action.payload.changeQuery,
-      );
+      //query = AllBackendsMap[query.language].codeToQuery(
+      //        query,
+      //  action.payload.changeQuery,
+      //);
       state = state.set('query', query);
       if (query.cardsAndCodeInSync === false)
       {
         TerrainLog.debug('Cards and code not synchronized (from TQL mutation).');
         return state;
       }
+      const path = CodeToPath.parseCode(tql, state.query.inputs);
+      console.log('touch path');
+      state = state.setIn(['query', 'path'], path);
       // Let's turn on tql -> path after we fix the problem
       // we might have to update the path and the card
       // const { parser, path } = CardsToPath.updatePath(query, state.db.name);
@@ -609,11 +613,6 @@ const BuilderReducersWrapper = (
         const { tql, pathErrorMap } = AllBackendsMap[state.query.language].pathToCode(path, state.query.inputs);
         state = state.setIn(['query', 'tql'], tql);
         state = state.setIn(['query', 'pathErrorMap'], pathErrorMap);
-
-        // testing the code to path
-        CodeToPath.parseCode(tql, state.query.inputs);
-        //        state = state.setIn(['query', 'path'], CodeToPath.parseCode(tql, state.query.inputs));
-
       }
     }
 

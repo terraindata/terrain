@@ -57,6 +57,8 @@ import ESJSONParser from './ESJSONParser';
 import ESParser from './ESParser';
 import ESParserError from './ESParserError';
 import ESValueInfo from './ESValueInfo';
+import * as TerrainLog from 'loglevel';
+import {default as GetCardVisitor} from 'builder/getCard/GetCardVisitor';
 
 export const ESInterpreterDefaultConfig = new EQLConfig();
 
@@ -211,6 +213,107 @@ export default class ESInterpreter
     } else
     {
       return this.query;
+    }
+  }
+
+  public searchValueInfo(pattern, valueInfo: ESValueInfo = this.rootValueInfo,
+                         returnLastMatched: boolean = false, returnAll: boolean = false)
+  {
+    TerrainLog.debug('search ' + JSON.stringify(pattern) + ' from ' + JSON.stringify(valueInfo.value));
+    switch (valueInfo.jsonType)
+    {
+      case ESJSONType.object:
+        if (typeof pattern !== 'object')
+        {
+          return null;
+        }
+        if (Object.keys(pattern).length !== 1)
+        {
+          return null;
+        }
+        const k = Object.keys(pattern)[0];
+        const q = k.split(':');
+        if (q.length !== 2)
+        {
+          return null;
+        }
+        // now try to search { "index:cardType": {}}
+        const cardKey = q[0];
+        const cardTypeName = q[1];
+        const newVal = valueInfo.objectChildren[cardKey];
+        if (newVal)
+        {
+          if (newVal.propertyValue.clause.type === cardTypeName)
+          {
+            if (pattern[k] === true)
+            {
+              if (returnAll === false)
+              {
+                return newVal.propertyValue;
+              } else
+              {
+                return [newVal.propertyValue];
+              }
+            }
+            // keep searching
+            const nextLevel = this.searchValueInfo(pattern[k], newVal.propertyValue, returnLastMatched, returnAll);
+            if (nextLevel === null && returnLastMatched === true)
+            {
+              if (returnAll === false)
+              {
+                return newVal.propertyValue;
+              } else
+              {
+                return [newVal.propertyValue];
+              }
+            }
+            return nextLevel;
+          } else
+          {
+            TerrainLog.debug('SearchCard: cardkey ' + cardKey + ' is found, but type is ' + newVal.propertyValue.card.type);
+            return null;
+          }
+        } else
+        {
+          return null;
+        }
+      case ESJSONType.array:
+        let hits = [];
+        for (const element of valueInfo.arrayChildren)
+        {
+          const v = this.searchValueInfo(pattern[0], element, returnLastMatched, returnAll);
+          if (v != null)
+          {
+            if (returnAll === false)
+            {
+              return v;
+            } else
+            {
+              hits = hits.concat(v);
+            }
+          }
+        }
+        if (hits.length > 0)
+        {
+          return hits;
+        }
+        return null;
+      default:
+        if (typeof pattern === 'object' || Array.isArray(pattern))
+        {
+          return null;
+        }
+        if (valueInfo.value === pattern)
+        {
+          if (returnAll === false)
+          {
+            return valueInfo;
+          } else
+          {
+            return [valueInfo];
+          }
+        }
+        return null;
     }
   }
 
