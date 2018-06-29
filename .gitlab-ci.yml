@@ -140,7 +140,6 @@ fullstack-screenshot:
     - yarn test-rr-etl-http-import
   only:
     - schedules
-  when: manual
   stage: screenshot-tests
   allow_failure: true
   artifacts:
