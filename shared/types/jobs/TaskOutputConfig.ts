@@ -59,6 +59,7 @@ export class TaskOutputConfig extends ATaskConfig
       logStream: null,
       outputStream: null,
     } as TaskOutputConfigTypes;
+  public rootLogStream: any = null;
 }
 
 export default TaskOutputConfig;

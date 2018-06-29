@@ -44,24 +44,93 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as stream from 'stream';
+import { EventEmitter } from 'events';
+import { Duplex, Readable, Transform, Writable } from 'stream';
+import * as winston from 'winston';
 
-import TaskEnum from 'shared/types/jobs/TaskEnum';
-import ATaskConfig from './ATaskConfig';
-
-export class TaskConfig
+/**
+ * A log stream
+ */
+export default class LogStreamWritable extends Writable
 {
-  public blocking: boolean = null;              // whether the task should resolve immediately or wait until completion before returning
-  public cancel: boolean = null;                // whether the tree of tasks should be cancelled
-  public id: number = null;                     // unique id that identifies this task to other tasks in the input array of TaskConfigs
-  public jobStatus: number = null;              // 0: not running, 1: running, 2: paused
-  public name: string = '';                     // name of the task i.e. 'import'
-  public onFailure: number = null;              // id of task to Pexecute on failure
-  public onSuccess: number = null;              // id of next task to execute (default should be next in array)
-  public params: any = null;                    // input parameters for the task
-  public paused: number = null;                 // where in the tree of tasks the tasks are paused
-  public rootLogStream: stream.Writable = null; // contains all of the logs from a TaskTree with multiple nodes that produce logStreams
-  public taskId: TaskEnum = null;               // maps to a statically declared task
-}
+  private buffers: any[];
+  private count: number;
+  private state: boolean;
 
-export default TaskConfig;
+  constructor(initialCount = 1)
+  {
+    super({ objectMode: true, highWaterMark: 0 });
+
+    this.buffers = [];
+
+    this.count = initialCount;
+
+    this.state = false;
+
+    this.on('pipe', (src) =>
+    {
+      this.increment();
+    });
+
+    this.on('finish', () =>
+    {
+      this.state = true;
+    });
+  }
+
+  public _write(chunk: any, encoding: string, callback: (err?: Error) => void): void
+  {
+    try
+    {
+      this.buffers.push(chunk);
+      callback();
+    }
+    catch (e)
+    {
+      this.emit('error', e);
+    }
+  }
+
+  public _writev(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
+  {
+    try
+    {
+      this.buffers = this.buffers.concat(chunks);
+      callback();
+    }
+    catch (e)
+    {
+      this.emit('error', e);
+    }
+  }
+
+  public getBuffers(): any[]
+  {
+    return this.buffers;
+  }
+
+  public getState(): boolean
+  {
+    return this.state;
+  }
+
+  public decrement()
+  {
+    if (this.state === false)
+    {
+      this.count--;
+      if (this.count === 0)
+      {
+        this.end();
+      }
+    }
+  }
+
+  public increment()
+  {
+    if (this.state === false)
+    {
+      this.count++;
+    }
+  }
+}

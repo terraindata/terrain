@@ -48,6 +48,7 @@ import TaskConfigTypes from './TaskConfigTypes';
 
 export abstract class ATaskConfig
 {
+  public async: boolean = null;
   public exit: boolean = null;
   public options?: TaskConfigTypes = null;
   public status: boolean = null;

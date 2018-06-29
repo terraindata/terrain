@@ -332,7 +332,6 @@ export class Sidebar extends TerrainComponent<Props>
                 key='reportImage'
               />
           }
-
           {
             this.props.expanded ?
               <div className='sidebar-button sidebar-feedback-button'>

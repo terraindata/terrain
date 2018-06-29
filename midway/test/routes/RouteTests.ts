@@ -1512,7 +1512,7 @@ describe('Scheduler tests', () =>
             [
               {
                 id: 1,
-                taskId: 2,
+                taskId: 'taskETL',
                 params:
                   {
                     templateId, // ETL template ID
@@ -1579,7 +1579,7 @@ describe('Scheduler tests', () =>
             [
               {
                 id: 1,
-                taskId: 0,
+                taskId: 'taskDefaultExit',
               },
             ],
         },
