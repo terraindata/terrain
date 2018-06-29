@@ -78,8 +78,10 @@ class PostgreSQLClient
     const config = JSON.parse(JSON.stringify(this.config));
     try
     {
+      this.controller.setStatus(DatabaseControllerStatus.CONNECTING);
       const client = new pg.Client(config);
       await client.connect();
+      this.controller.setStatus(DatabaseControllerStatus.CONNECTED);
       this.delegate = this.createPool(config);
       await client.end();
     }
@@ -103,6 +105,7 @@ class PostgreSQLClient
       }
       else
       {
+        this.controller.setStatus(DatabaseControllerStatus.DISCONNECTED);
         throw e;
       }
     }
