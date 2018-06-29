@@ -155,7 +155,6 @@ module.exports =
   plugins:
   [
     new webpack.DefinePlugin({
-      MIDWAY_HOST: JSON.stringify('http://' + (process.env.MIDWAY_HOST || 'localhost:3000')),
       DEV: true,
     }),
     new HardSourceWebpackPlugin({

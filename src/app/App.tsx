@@ -310,8 +310,9 @@ class App extends TerrainComponent<Props>
     }
   }
 
-  public specifyTitle(location)
+  public specifyTitle()
   {
+    const location = window.location.hostname;
     const base = 'Terrain';
     let customerTitle: string;
     if (location.includes('localhost'))
@@ -330,7 +331,7 @@ class App extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    document.title = this.specifyTitle(MIDWAY_HOST);
+    document.title = this.specifyTitle();
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: 'input',
