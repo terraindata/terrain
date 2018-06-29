@@ -90,7 +90,7 @@ beforeAll(async (done) =>
   elasticController = new PrefixedElasticController(config, 0, 'ElasticClientTests', undefined, undefined, 'abc.');
   elasticClient = elasticController.getClient();
   done();
-});
+}, 15000);
 
 test('elastic health', async (done) =>
 {
@@ -265,7 +265,7 @@ test('prefix isolation', async (done) =>
         body: {
           query: {
             terms: {
-              _id: [ '13333337', '133333372' ],
+              _id: ['13333337', '133333372'],
             },
           },
         },
