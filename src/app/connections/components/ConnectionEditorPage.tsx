@@ -182,6 +182,7 @@ class ConnectionEditorPage extends TerrainComponent<Props>
         <ConnectionForm
           connection={connection}
           onChange={this.handleConnectionChange}
+          onSubmit={this.save}
         />
         <div
           className='connection-buttons'

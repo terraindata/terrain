@@ -49,7 +49,7 @@ import * as winston from 'winston';
 
 import { makePromiseCallback } from './Util';
 
-export const index = 'movies';
+export const index = 'abc.movies';
 export const type = 'data';
 
 export interface Request

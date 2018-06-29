@@ -170,15 +170,7 @@ class AccountDropdown extends TerrainComponent<Props>
             <EditIcon />
           </div>
           <div className='account-dropdown-link'>
-            Edit Profile
-          </div>
-        </div>
-        <div className='account-dropdown-row' onMouseDown={this.goTeamGoTeamGo}>
-          <div className='account-dropdown-icon account-dropdown-icon-blue'>
-            <HomeIcon />
-          </div>
-          <div className='account-dropdown-link'>
-            My Team
+            Settings
           </div>
         </div>
         <div className='account-dropdown-row' onMouseDown={this.showConnections}>
@@ -187,6 +179,14 @@ class AccountDropdown extends TerrainComponent<Props>
           </div>
           <div className='account-dropdown-link'>
             Connections
+          </div>
+        </div>
+        <div className='account-dropdown-row' onMouseDown={this.goTeamGoTeamGo}>
+          <div className='account-dropdown-icon account-dropdown-icon-blue'>
+            <HomeIcon />
+          </div>
+          <div className='account-dropdown-link'>
+            Team
           </div>
         </div>
         {

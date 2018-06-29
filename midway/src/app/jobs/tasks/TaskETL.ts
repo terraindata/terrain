@@ -67,11 +67,13 @@ export class TaskETL extends Task
     {
       const taskOutputConfig: TaskOutputConfig =
         {
+          blocking: this.taskConfig.blocking,
           exit: false,
           options: {
             logStream: null,
             outputStream: null,
           },
+          rootLogStream: this.taskConfig.rootLogStream,
           status: true,
         };
 
@@ -82,7 +84,26 @@ export class TaskETL extends Task
         winston.info('finished executing ETL');
         taskOutputConfig['options']['outputStream'] = streams['outputStream'];
         taskOutputConfig['options']['logStream'] = streams['logStream'];
-        resolve(taskOutputConfig);
+
+        taskOutputConfig['options']['logStream'].pipe(this.taskConfig.rootLogStream, { end: false });
+
+        if (taskOutputConfig.blocking !== true)
+        {
+          streams['logStream'].on('end', () =>
+          {
+            this.taskConfig.rootLogStream.decrement();
+          });
+          resolve(taskOutputConfig);
+        }
+        else
+        {
+          streams['logStream'].on('end', () =>
+          {
+            this.taskConfig.rootLogStream.decrement();
+            resolve(taskOutputConfig);
+          });
+          streams['outputStream'].resume();
+        }
       }
       catch (e)
       {
@@ -91,11 +112,29 @@ export class TaskETL extends Task
         const outputStream = new stream.Readable();
         outputStream.push(null);
         const logStream = new LogStream();
+        logStream.pipe(this.taskConfig.rootLogStream, { end: false });
         logStream.log('Error while running ETL task: ' + String(e.toString()), 'error');
+        this.taskConfig.rootLogStream.push(null);
         logStream.push(null);
         taskOutputConfig['options']['logStream'] = logStream;
         taskOutputConfig['options']['outputStream'] = outputStream;
-        resolve(taskOutputConfig);
+
+        if (taskOutputConfig.blocking !== true)
+        {
+          logStream.on('end', () =>
+          {
+            this.taskConfig.rootLogStream.decrement();
+          });
+          resolve(taskOutputConfig);
+        }
+        else
+        {
+          logStream.on('end', () =>
+          {
+            this.taskConfig.rootLogStream.decrement();
+            resolve(taskOutputConfig);
+          });
+        }
       }
     });
   }

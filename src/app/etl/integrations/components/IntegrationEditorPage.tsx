@@ -156,6 +156,7 @@ class IntegrationEditorPage extends TerrainComponent<Props>
         <IntegrationForm
           integration={integration}
           onChange={this.handleIntegrationChange}
+          onSubmit={this.save}
         />
         <div
           className='integration-buttons'

@@ -92,6 +92,7 @@ export interface Props<FState>
   children?: any; // children get rendered between the buttons and the form components
   centerForm?: boolean; // if true, the form content gets centered in the container
   validate?: (state: FState) => string | undefined; // return a string if there's an error
+  onTextInputEnter?: () => void;
 }
 // if we want to allow immutable state objects, add an optional state mutator to each input declaration type
 
@@ -266,6 +267,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
           debounce={options.debounce}
+          onEnter={this.props.onTextInputEnter}
         />
       </div>
     );
@@ -289,6 +291,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
           debounce={options.debounce}
+          onEnter={this.props.onTextInputEnter}
         />
       </div>
     );
@@ -619,6 +622,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     {
       const shallowCopy = _.clone(this.props.inputState);
       shallowCopy[stateName] = value;
+
       this.props.onStateChange(shallowCopy, true);
     };
   }
@@ -630,6 +634,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     {
       const shallowCopy = _.clone(this.props.inputState);
       shallowCopy[stateName] = value;
+
       this.props.onStateChange(shallowCopy, false);
     };
   }

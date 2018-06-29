@@ -81,7 +81,9 @@ export default class LogStream extends Readable
     if (chunk === null)
     {
       this.drainLog();
-      return super.push(null);
+      const superPush = super.push(null);
+      // this.emit('end');
+      return superPush;
     }
 
     const logMsg = {
@@ -187,7 +189,10 @@ export default class LogStream extends Readable
     let buffer = this.buffers.shift();
     while (buffer !== undefined)
     {
-      this.push(buffer);
+      if (buffer !== null)
+      {
+        this.push(buffer);
+      }
       buffer = this.buffers.shift();
     }
   }
