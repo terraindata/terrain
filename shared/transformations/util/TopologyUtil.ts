@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as _ from 'lodash';
-import { KeyPath } from 'shared/util/KeyPath';
+import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
@@ -66,10 +66,10 @@ As long as at least one of them is singular (no wildcards), then the two are com
 
 General rule: Compatible keypaths are anything that can be posed as a one to one, many to one, or a one to many.
 */
-
+type LooseKP = KeyPath | Immutable.Iterable<number, WayPoint>;
 export default class TopologyUtil
 {
-  public static isKeyPathSingular(kp: KeyPath, from = 0): boolean
+  public static isKeyPathSingular(kp: LooseKP, from = 0): boolean
   {
     for (let i = from; i < kp.size; i++)
     {
@@ -82,7 +82,7 @@ export default class TopologyUtil
   }
 
   // returns the first position where the keypaths differ
-  public static getDifferingBaseIndex(kp1: KeyPath, kp2: KeyPath): number
+  public static getDifferingBaseIndex(kp1: LooseKP, kp2: LooseKP): number
   {
     let i;
     const minSize = Math.min(kp1.size, kp2.size);
@@ -99,7 +99,7 @@ export default class TopologyUtil
   /*
    *  do the keypaths represent one-to-one, one-to-many, many-to-one, or many-to-many relationships?
    */
-  public static getRelation(kp1: KeyPath, kp2: KeyPath): [Relation, Relation]
+  public static getRelation(kp1: LooseKP, kp2: LooseKP): [Relation, Relation]
   {
     const baseIndex = TopologyUtil.getDifferingBaseIndex(kp1, kp2);
     const relation1 = TopologyUtil.isKeyPathSingular(kp1, baseIndex) ? 'one' : 'many';

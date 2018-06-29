@@ -72,33 +72,106 @@ export class DuplicateTransformationNode extends TransformationNode
 {
   public readonly typeCode = TYPECODE;
 
+  protected oneToOne(doc: object, inputField: KeyPath, outputField: KeyPath)
+  {
+    const matcherFn = Topology.createOneToOneMatcher(inputField, outputField);
+    for (const match of yadeep.search(doc, inputField))
+    {
+      let { value } = match;
+      if (!isPrimitive(value))
+      {
+        value = _.cloneDeep(value);
+      }
+      yadeep.set(doc, matcherFn(match.location), value, { create: true });
+    }
+  }
+
+  protected oneToManyHelper(doc: object, inputField: KeyPath, outputField: KeyPath)
+  {
+
+  }
+
+  /*
+   *  e.g.
+   *  [A, -1, D] to [A, -1, B, -1, C]
+   *  Search all [A, -1, D]
+   *    Search all [B, -1]
+   *    Assign D to C
+   */
+  protected oneToMany(doc: object, inputField: KeyPath, outputField: KeyPath)
+  {
+
+  }
+
+  /*
+   *  e.g.
+   *  [A, -1, B, -1, C] to [A, -1, D]
+   *  Search all [A, -1]
+   *    Search all [B, -1, C]
+   *    Assign to [D]
+   */
+  protected manyToOne(doc: object, inputField: KeyPath, outputField: KeyPath): string // errors
+  {
+    const baseIndex = Topology.getDifferingBaseIndex(inputField, outputField);
+    const basePath = inputField.slice(0, baseIndex).toList();
+    const inputAfterBasePath = inputField.slice(baseIndex).toList();
+
+    const matchFn = Topology.createOneToOneMatcher(inputField, outputField);
+    for (const match of yadeep.search(doc, basePath))
+    {
+      // each match represents a match of the base path
+      const { location, value } = match;
+      if (isPrimitive(value))
+      {
+        return 'Encountered a primitive where an object should be';
+      }
+      const destKP = matchFn(outputField);
+      const matches = yadeep.search(value, inputAfterBasePath);
+      const values = matches.map((m) => {
+        if (!isPrimitive(m.value))
+        {
+          return _.cloneDeep(m.value);
+        }
+        else
+        {
+          return m.value;
+        }
+      });
+      yadeep.set(doc, destKP, values, { create: true });
+    }
+  }
+
   protected transformDocument(doc: object): TransformationVisitResult
   {
     const errors = [];
     const opts = this.meta as NodeOptionsType<any>;
 
-    this.fields.forEach((field) =>
+    const inputField = this.fields.get(0);
+    const outputField = opts.newFieldKeyPaths.get(0);
+
+    // when we implement optimizations / caching and overrideable serialization we can memoize this
+    const [r1, r2] = Topology.getRelation(inputField, outputField);
+
+    if (r1 === 'one' && r2 === 'one')
     {
-      for (const match of yadeep.search(doc, field))
+      this.oneToOne(doc, inputField, outputField);
+    }
+    else if (r1 === 'one' && r2 === 'many')
+    {
+      this.oneToMany(doc, inputField, outputField);
+    }
+    else if (r1 === 'many' && r2 === 'one')
+    {
+      const err = this.manyToOne(doc, inputField, outputField);
+      if (err !== undefined)
       {
-        let { value } = match;
-
-        const matcher = Topology.createLocalMatcher(field, match.location);
-        if (matcher === null)
-        {
-          errors.push(`Error in ${this.typeCode}: Field and Match location are inconsistent`);
-          return;
-        }
-
-        if (!isPrimitive(value))
-        {
-          value = _.cloneDeep(value);
-        }
-
-        const newFieldKeyPath = opts.newFieldKeyPaths.get(0);
-        yadeep.set(doc, matcher(newFieldKeyPath), value, { create: true });
+        errors.push(err);
       }
-    });
+    }
+    else
+    {
+      errors.push(`Error in ${this.typeCode}: Input and Output fields are incompatible`);
+    }
 
     return {
       document: doc,
