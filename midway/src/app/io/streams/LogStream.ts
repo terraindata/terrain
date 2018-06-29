@@ -82,7 +82,7 @@ export default class LogStream extends Readable
     {
       this.drainLog();
       const superPush = super.push(null);
-      this.emit('end');
+      // this.emit('end');
       return superPush;
     }
 
@@ -189,7 +189,10 @@ export default class LogStream extends Readable
     let buffer = this.buffers.shift();
     while (buffer !== undefined)
     {
-      this.push(buffer);
+      if (buffer !== null)
+      {
+        this.push(buffer);
+      }
       buffer = this.buffers.shift();
     }
   }

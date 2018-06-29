@@ -85,7 +85,7 @@ export class TaskETL extends Task
         taskOutputConfig['options']['outputStream'] = streams['outputStream'];
         taskOutputConfig['options']['logStream'] = streams['logStream'];
 
-        taskOutputConfig['options']['logStream'].pipe(this.taskConfig.rootLogStream);
+        taskOutputConfig['options']['logStream'].pipe(this.taskConfig.rootLogStream, { end: false });
 
         if (taskOutputConfig.blocking !== true)
         {
@@ -112,7 +112,7 @@ export class TaskETL extends Task
         const outputStream = new stream.Readable();
         outputStream.push(null);
         const logStream = new LogStream();
-        logStream.pipe(this.taskConfig.rootLogStream);
+        logStream.pipe(this.taskConfig.rootLogStream, { end: false });
         logStream.log('Error while running ETL task: ' + String(e.toString()), 'error');
         this.taskConfig.rootLogStream.push(null);
         logStream.push(null);

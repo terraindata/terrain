@@ -48,7 +48,6 @@ import { EventEmitter } from 'events';
 import { Duplex, Readable, Transform, Writable } from 'stream';
 import * as winston from 'winston';
 
-import { SafeWritable } from './SafeWritable';
 /**
  * A log stream
  */
@@ -60,7 +59,7 @@ export default class LogStreamWritable extends Writable
 
   constructor(initialCount = 1)
   {
-    super({ objectMode: true });
+    super({ objectMode: true, highWaterMark: 0 });
 
     this.buffers = [];
 
@@ -84,7 +83,7 @@ export default class LogStreamWritable extends Writable
     try
     {
       this.buffers.push(chunk);
-      super._write(chunk, encoding, callback);
+      callback();
     }
     catch (e)
     {
@@ -97,7 +96,7 @@ export default class LogStreamWritable extends Writable
     try
     {
       this.buffers = this.buffers.concat(chunks);
-      super._writev(chunks, callback);
+      callback();
     }
     catch (e)
     {
@@ -117,15 +116,21 @@ export default class LogStreamWritable extends Writable
 
   public decrement()
   {
-    this.count--;
-    if (this.count === 0)
+    if (this.state === false)
     {
-      this.end();
+      this.count--;
+      if (this.count === 0)
+      {
+        this.end();
+      }
     }
   }
 
   public increment()
   {
-    this.count++;
+    if (this.state === false)
+    {
+      this.count++;
+    }
   }
 }
