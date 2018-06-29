@@ -63,6 +63,7 @@ import ESStructureClause from './clauses/ESStructureClause';
 import ESTypeClause from './clauses/ESTypeClause';
 import ESVariantClause from './clauses/ESVariantClause';
 import ESWildcardStructureClause from './clauses/ESWildcardStructureClause';
+import ESUtils from 'shared/database/elastic/parser/ESUtils';
 /* tslint:disable:max-line-length */
 
 const EQLSpec: ESClause[] =
@@ -1769,6 +1770,7 @@ const EQLSpec: ESClause[] =
         name: 'distance',
         path: ['geo_distance'],
         desc: 'The distance, in various units, from a specified location',
+        checkers: [ESUtils.DistanceUnitTypeChecker],
       }),
     new ESStructureClause('bool_query',
       {

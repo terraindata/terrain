@@ -49,6 +49,7 @@ import * as TerrainLog from 'loglevel';
 import ESInterpreter from '../../../../../shared/database/elastic/parser/ESInterpreter';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import { toInputMap } from '../../../../blocks/types/Input';
+import ESUtils from '../../../../../shared/database/elastic/parser/ESUtils';
 
 export default class CodeToPath
 {
@@ -60,8 +61,20 @@ export default class CodeToPath
     term_query: {
       after: CodeToPath.TermToPathAfter,
     },
+    terms_query: {
+      after: CodeToPath.TermsToPathAfter,
+    },
+    match: {
+      after: CodeToPath.MatchToPathAfter,
+    },
     exists_query: {
       after: CodeToPath.ExistsToPathAfter,
+    },
+    range_query: {
+      after: CodeToPath.RangeToPathAfter,
+    },
+    geo_distance: {
+      after: CodeToPath.GeoDistanceToPath,
     },
   };
 
@@ -92,6 +105,31 @@ export default class CodeToPath
     const filterLine = _FilterLine(config);
     node.annotation.path = filterLine;
     console.log('term_query to ' + JSON.stringify(filterLine));
+  }
+
+  // terms
+  public static TermsToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+  {
+    const config = {};
+    const fieldKV = ESUtils.ExtractFirstField(node);
+    if (fieldKV !== null)
+    {
+      const kValueInfo = fieldKV.propertyName;
+      const vValueInfo = fieldKV.propertyValue;
+      if (vValueInfo.clause.type === 'base[]')
+      {
+        const fieldName = kValueInfo.value;
+        const fieldValue = JSON.stringify(vValueInfo.value);
+        config['field'] = fieldName;
+        config['vaue'] = fieldValue;
+      }
+    }
+
+    config['comparison'] = 'isin';
+    config['boost'] = node.value.boost === undefined ? 1 : node.value.boost;
+    const filterLine = _FilterLine(config);
+    node.annotation.path = filterLine;
+    console.log('terms_query to ' + JSON.stringify(filterLine));
   }
 
   // match
@@ -173,6 +211,43 @@ export default class CodeToPath
     console.log('range_query to ' + JSON.stringify(filterLine));
   }
 
+  public static GeoDistanceToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+  {
+    const vu = ESUtils.ExtractDistanceValueUnit(node.value.distance);
+    if (vu === null)
+    {
+      return;
+    }
+    const fieldKV = ESUtils.ExtractFirstField(node);
+    if (fieldKV === null)
+    {
+      return;
+    }
+    const fieldName = fieldKV.propertyName.value;
+    const fieldValue = fieldKV.propertyValue;
+    const distanceValue = { distance: vu.distance, units: vu.unit };
+    // fieldValue can be latlon_object {lon: number, lat: number}, number[lon, lat] , or a string 'lat, lon'
+    if (fieldValue.clause.type === 'latlon_object')
+    {
+      distanceValue['location'] = [fieldValue.value.lon, fieldValue.value.lat];
+    } else if (fieldValue.clause.type === 'number[]')
+    {
+      distanceValue['location'] = fieldValue.value;
+    } else if (fieldValue.clause.type === 'string')
+    {
+      distanceValue['address'] = fieldValue.value;
+    }
+    const config = {
+      field: fieldName,
+      value: distanceValue,
+      boost: node.value.boost === undefined ? 1 : node.value.boost,
+      comparison: 'located',
+    }
+    const filterLine = _FilterLine(config);
+    node.annotation.path = filterLine;
+    console.log('Geo_distance to ' + JSON.stringify(filterLine));
+  }
+
   // body
   public static BodyToPathBefore(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
   {
@@ -221,9 +296,9 @@ export default class CodeToPath
     {
       return CodeToPath.beforeProcessValueInfo(element, inter, key);
     }, (node, key) =>
-    {
-      CodeToPath.afterProcessValueInfo(node, inter, key);
-    });
+      {
+        CodeToPath.afterProcessValueInfo(node, inter, key);
+      });
     console.log('New Path: ' + JSON.stringify(rootValueInfo.annotation.path));
     return rootValueInfo.annotation.path;
   }
