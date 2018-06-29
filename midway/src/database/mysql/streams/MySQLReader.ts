@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 import * as mysql from 'mysql';
 import { Readable } from 'stream';
-import * as winston from 'winston';
 
 import SafeReadable from '../../../app/io/streams/SafeReadable';
 import MySQLClient from '../client/MySQLClient';

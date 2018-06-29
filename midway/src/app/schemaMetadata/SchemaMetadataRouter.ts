@@ -46,10 +46,10 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
 
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import { MidwayLogger } from '../log/MidwayLogger';
 import * as Tasty from '../../tasty/Tasty';
 import SchemaMetadata from './SchemaMetadata';
 import SchemaMetadataConfig from './SchemaMetadataConfig';
@@ -65,21 +65,21 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
   {
     getItems = schemaMetadata.get(ctx.request.body.body.id);
   }
-  winston.info('getting all schemaMetadata');
+  MidwayLogger.info('getting all schemaMetadata');
   getItems = await schemaMetadata.get();
   ctx.body = getItems;
 });
 
 Router.post('/star', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('Starring a schemaMetadata');
+  MidwayLogger.info('Starring a schemaMetadata');
   const metaData: SchemaMetadataConfig = ctx.request.body.body;
   ctx.body = await schemaMetadata.upsert(ctx.state.user, metaData);
 });
 
 Router.post('/count', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('Incrementing the count of a schemaMetadata');
+  MidwayLogger.info('Incrementing the count of a schemaMetadata');
   const { columnId, algorithmId } = ctx.request.body.body;
   ctx.body = await schemaMetadata.increment(ctx.state.user, columnId, algorithmId);
 });

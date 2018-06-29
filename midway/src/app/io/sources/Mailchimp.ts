@@ -47,10 +47,9 @@ THE SOFTWARE.
 import crypto = require('crypto');
 import jsonStream = require('JSONStream');
 
-import * as winston from 'winston';
-
 import * as request from 'request';
 import { ExportSourceConfig } from './Sources';
+import { MidwayLogger } from '../../log/MidwayLogger';
 
 export interface MailchimpSourceConfig
 {
@@ -74,7 +73,7 @@ export class Mailchimp
         exportSourceConfig.stream.pipe(jsonParser);
         jsonParser.on('data', (data) =>
         {
-          winston.debug(`Mailchimp got data (onData) with ${data.length} objects`);
+          MidwayLogger.debug(`Mailchimp got data (onData) with ${data.length} objects`);
           results = data;
           const mailchimpSourceConfig: MailchimpSourceConfig =
             {
@@ -154,7 +153,7 @@ export class Mailchimp
             json: batchBody,
           }, (error, response, body) =>
             {
-              winston.debug('Mailchimp response: ' + JSON.stringify(response));
+              MidwayLogger.debug('Mailchimp response: ' + JSON.stringify(response));
               const batchid: string = response['body']['id'];
               setTimeout(() =>
               {
@@ -166,14 +165,14 @@ export class Mailchimp
                   },
                 }, (e2, r2, b2) =>
                   {
-                    winston.debug('Mailchimp response 2: ' + JSON.stringify(r2));
+                    MidwayLogger.debug('Mailchimp response 2: ' + JSON.stringify(r2));
                   });
               }, 60000);
             });
         });
 
         const resultAsString: string = JSON.stringify(await Promise.all(resultArr));
-        winston.info('Result of Mailchimp request: ' + resultAsString);
+        MidwayLogger.info('Result of Mailchimp request: ' + resultAsString);
         resolve(resultAsString);
       }
       catch (e)

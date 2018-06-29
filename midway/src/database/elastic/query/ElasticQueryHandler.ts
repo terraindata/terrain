@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
-import * as winston from 'winston';
 
 import { getParsedQuery } from '../../../../../shared/database/elastic/ElasticUtil';
 import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
@@ -63,6 +62,7 @@ import { QueryError } from '../../../error/QueryError';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
 import ElasticReader from '../streams/ElasticReader';
+import { MidwayLogger } from '../../../app/log/MidwayLogger';
 
 /**
  * Implements the QueryHandler interface for ElasticSearch
@@ -100,7 +100,7 @@ export class ElasticQueryHandler extends QueryHandler
       {
         if (typeof response !== 'object')
         {
-          winston.error('The response from Elasticsearch is not an object, ' + JSON.stringify(response));
+          MidwayLogger.error('The response from Elasticsearch is not an object, ' + JSON.stringify(response));
           response = { response };
         }
         const res: QueryResponse = new QueryResponse(response);
@@ -119,7 +119,7 @@ export class ElasticQueryHandler extends QueryHandler
 
   public async handleQuery(request: QueryRequest): Promise<QueryResponse | SafeReadable>
   {
-    winston.debug('handleQuery ' + JSON.stringify(request, null, 2));
+    MidwayLogger.debug('handleQuery ' + JSON.stringify(request, null, 2));
     const type = request.type;
     const client: ElasticClient = this.controller.getClient();
     switch (type)

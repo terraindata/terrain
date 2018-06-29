@@ -44,68 +44,19 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
+import dateFormat = require('date-format');
+import * as winston from 'winston';
 
-import DatabaseController from '../../database/DatabaseController';
-import ElasticDB from '../../database/elastic/tasty/ElasticDB';
-import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import { MidwayLogger } from '../log/MidwayLogger';
-import { Permissions } from '../permissions/Permissions';
-
-import * as Tasty from '../../tasty/Tasty';
-import * as Util from '../AppUtil';
-import { deleteElasticIndex, getSchema, getTable } from '../Schema';
-
-const Router = new KoaRouter();
-const perm: Permissions = new Permissions();
-export const initialize = () => { };
-
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  MidwayLogger.info('getting all schema');
-  const request = ctx.request.body.body;
-  if (request !== undefined && request.database !== undefined)
-  {
-    ctx.body = await getSchema(request.database);
-  }
-  else
-  {
-    ctx.body = '';
-    // tslint:disable-next-line:no-unused-variable
-    for (const [id, database] of DatabaseRegistry.getAll())
-    {
-      ctx.body += await getSchema(id);
-    }
-  }
+export const MidwayLogger = winston.createLogger({
+    level: 'debug',
+    format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.printf((info) => {
+            const meta = (info.meta !== undefined) && (Object.keys(info.meta).length > 0) ? '\n\t' + JSON.stringify(info.meta) : '';
+            return `${dateFormat('yyyy-MM-dd hh:mm:ss.SSS')} [${process.pid}] ${info.level}: ${info.message} ${meta}`;
+        })
+    ),
+    transports: [
+        new winston.transports.Console(),
+    ],
 });
-
-Router.get('/:database', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  MidwayLogger.info('get schema');
-  ctx.body = await getSchema(ctx.params.database);
-});
-
-Router.get('/:database/:table', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  MidwayLogger.info('get schema');
-  ctx.body = await getTable(ctx.params.database, ctx.params.table);
-});
-
-Router.post('/database/delete', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  const params = ctx.request.body.body;
-  Util.verifyParameters(params, ['language', 'dbname', 'dbid']);
-  await perm.ImportPermissions.verifyDefaultRoute(ctx.state.user, params);
-  switch (params.language)
-  {
-    case 'elastic':
-      await deleteElasticIndex(params.dbid, params.dbname);
-      break;
-    default:
-      throw new Error(`Deleting database of type '${params.language}' is unsupported`);
-  }
-  ctx.body = { message: 'successfully deleted database' };
-});
-
-export default Router;

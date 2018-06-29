@@ -46,12 +46,12 @@ THE SOFTWARE.
 
 import * as crypto from 'crypto';
 import * as fs from 'fs';
-import * as winston from 'winston';
 
 import * as Util from './AppUtil';
 import { CmdLineUsage } from './CmdLineArgs';
 import DatabaseConfig from './database/DatabaseConfig';
 import { databases } from './database/DatabaseRouter';
+import { MidwayLogger } from './log/MidwayLogger';
 import UserConfig from './users/UserConfig';
 
 export interface Config
@@ -81,7 +81,7 @@ export function loadConfigFromFile(config: Config): Config
     }
     catch (e)
     {
-      winston.error('Failed to read configuration settings from ' + String(config.config));
+      MidwayLogger.error('Failed to read configuration settings from ' + String(config.config));
     }
   }
   return config;
@@ -89,7 +89,7 @@ export function loadConfigFromFile(config: Config): Config
 
 export async function initialHandleConfig(config: Config): Promise<void>
 {
-  winston.debug('Using configuration: ' + JSON.stringify(config));
+  MidwayLogger.debug('Using configuration: ' + JSON.stringify(config));
   if (config.help === true)
   {
     // tslint:disable-next-line
@@ -99,14 +99,12 @@ export async function initialHandleConfig(config: Config): Promise<void>
 
   if (config.verbose === true)
   {
-    // TODO: get rid of this monstrosity once @types/winston is updated.
-    (winston as any).level = 'verbose';
+    MidwayLogger.level = 'verbose';
   }
 
   if (config.debug === true)
   {
-    // TODO: get rid of this monstrosity once @types/winston is updated.
-    (winston as any).level = 'debug';
+    MidwayLogger.level = 'debug';
   }
 }
 
@@ -135,7 +133,7 @@ export async function handleConfig(config: Config): Promise<void>
 
       delete db['isMultitenant'];
 
-      winston.info('Registering new database item: ', db);
+      MidwayLogger.info('Registering new database item: ', db);
       await databases.upsert({} as UserConfig, db);
     }
   }

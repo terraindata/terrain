@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 import { EventEmitter } from 'events';
 import { Duplex, Readable, Transform, Writable } from 'stream';
-import * as winston from 'winston';
 
 /**
  * A log stream

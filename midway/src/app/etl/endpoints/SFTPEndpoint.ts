@@ -47,13 +47,13 @@ THE SOFTWARE.
 
 import * as SSH from 'ssh2';
 import { Readable, Writable } from 'stream';
-import * as winston from 'winston';
 
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import { Inputs } from '../../../../../shared/util/Inputs';
 import IntegrationConfig from '../../integrations/IntegrationConfig';
 import { integrations } from '../../integrations/IntegrationRouter';
+import { MidwayLogger } from '../../log/MidwayLogger';
 import AEndpointStream from './AEndpointStream';
 
 export const inputs: Inputs = new Inputs();
@@ -142,7 +142,7 @@ export default class SFTPEndpoint extends AEndpointStream
         {
           if (err)
           {
-            winston.warn((err as any).toString() as string);
+            MidwayLogger.warn((err as any).toString() as string);
             return resolve([]);
           }
           else
@@ -160,7 +160,7 @@ export default class SFTPEndpoint extends AEndpointStream
       }
       catch (e)
       {
-        winston.warn((e as any).toString() as string);
+        MidwayLogger.warn((e as any).toString() as string);
         return resolve([]);
       }
     });

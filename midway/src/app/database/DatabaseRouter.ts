@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
 
+import { MidwayLogger } from '../log/MidwayLogger';
 import * as Util from '../AppUtil';
 import DatabaseConfig from './DatabaseConfig';
 import Databases from './Databases';
@@ -60,25 +60,25 @@ export const initialize = () => databases.initialize();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('getting all databases');
+  MidwayLogger.info('getting all databases');
   ctx.body = await databases.select(['id', 'name', 'type', 'host', 'isAnalytics', 'analyticsIndex', 'analyticsType']);
 });
 
 Router.get('/status/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('getting all databases (with their statuses)');
+  MidwayLogger.info('getting all databases (with their statuses)');
   ctx.body = await databases.status(ctx.params.id);
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('getting database ID ' + String(ctx.params.id));
+  MidwayLogger.info('getting database ID ' + String(ctx.params.id));
   ctx.body = await databases.get(Number(ctx.params.id), ['id', 'name', 'type', 'host']);
 });
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('add new database');
+  MidwayLogger.info('add new database');
   const db: DatabaseConfig = ctx.request.body.body;
   Util.verifyParameters(db, ['name', 'dsn', 'host', 'isAnalytics']);
   if (db.id !== undefined)
@@ -100,7 +100,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('update existing database');
+  MidwayLogger.info('update existing database');
   const db: DatabaseConfig = ctx.request.body.body;
   if (db.id === undefined)
   {
@@ -127,19 +127,19 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
 
 Router.post('/:id/connect', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('connect to database');
+  MidwayLogger.info('connect to database');
   ctx.body = await databases.connect(ctx.state.user, Number(ctx.params.id));
 });
 
 Router.post('/:id/disconnect', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('disconnect from database');
+  MidwayLogger.info('disconnect from database');
   ctx.body = await databases.disconnect(ctx.state.user, Number(ctx.params.id));
 });
 
 Router.post('/:id/delete', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('delete a database entry');
+  MidwayLogger.info('delete a database entry');
   await databases.disconnect(ctx.state.user, Number(ctx.params.id));
   DatabaseRegistry.remove(Number(ctx.params.id));
   ctx.body = await databases.delete(ctx.state.user, Number(ctx.params.id));
@@ -147,7 +147,7 @@ Router.post('/:id/delete', passport.authenticate('access-token-local'), async (c
 
 Router.get('/:id/schema', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('get database schema');
+  MidwayLogger.info('get database schema');
   ctx.body = await databases.schema(Number(ctx.params.id));
 });
 

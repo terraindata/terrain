@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
 
+import { MidwayLogger } from '../log/MidwayLogger';
 import * as Util from '../AppUtil';
 import ItemConfig from './ItemConfig';
 import Items from './Items';
@@ -70,7 +70,7 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
   }
   else
   {
-    winston.info('getting all items');
+    MidwayLogger.info('getting all items');
     getItems = await items.get();
   }
   ctx.body = getItems;
@@ -106,19 +106,19 @@ Router.get('/live/:id', passport.authenticate('access-token-local'), async (ctx,
 
 Router.get('/status/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('getting status from DB ID ' + String(ctx.params.id));
+  MidwayLogger.info('getting status from DB ID ' + String(ctx.params.id));
   ctx.body = await items.checkStatusAlgorithms(parseInt(ctx.params.id, 10));
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('getting item ID ' + String(ctx.params.id));
+  MidwayLogger.info('getting item ID ' + String(ctx.params.id));
   ctx.body = await items.get(ctx.params.id);
 });
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('create items');
+  MidwayLogger.info('create items');
   const item: ItemConfig = ctx.request.body.body;
   Util.verifyParameters(item, ['name']);
   if (item.id !== undefined)
@@ -145,7 +145,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('modify items');
+  MidwayLogger.info('modify items');
   const item: ItemConfig = ctx.request.body.body;
   Util.verifyParameters(item, ['name']);
   if (item.id === undefined)
@@ -179,7 +179,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
 
 Router.delete('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('delete items');
+  MidwayLogger.info('delete items');
   await items.delete(ctx.params.id);
   ctx.body = '';
 });

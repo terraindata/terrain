@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as assert from 'assert';
-import * as winston from 'winston';
 import * as Tasty from '../tasty/Tasty';
 
 import DatabaseController from '../database/DatabaseController';
@@ -59,6 +58,7 @@ import { IntegrationConfig } from './integrations/IntegrationConfig';
 import { ItemConfig } from './items/ItemConfig';
 import { JobConfig } from './jobs/JobConfig';
 import { JobLogConfig } from './jobs/JobLogConfig';
+import { MidwayLogger } from './log/MidwayLogger';
 import { MigrationRecordConfig } from './migrations/MigrationRecordConfig';
 import { ResultsConfigConfig } from './resultsConfig/ResultsConfigConfig';
 import { SchedulerConfig } from './scheduler/SchedulerConfig';
@@ -500,7 +500,7 @@ export function setupTables(dbtype: string): Tables
   }
   else
   {
-    winston.warn('Auto-provisioning of app schema not supported for DB of type ' + dbtype);
+    MidwayLogger.warn('Auto-provisioning of app schema not supported for DB of type ' + dbtype);
   }
 }
 
@@ -514,10 +514,10 @@ export async function deleteElasticIndex(dbid: number, dbname: string): Promise<
       throw new Error('Database "' + dbid.toString() + '" not found.');
     }
 
-    winston.info(`Deleting Elastic Index ${dbname} of database ${dbid}`);
+    MidwayLogger.info(`Deleting Elastic Index ${dbname} of database ${dbid}`);
     const elasticDb = database.getTasty().getDB() as ElasticDB;
     await elasticDb.deleteIndex(dbname);
-    winston.info(`Deleted Elastic Index ${dbname} of database ${dbid}`);
+    MidwayLogger.info(`Deleted Elastic Index ${dbname} of database ${dbid}`);
     return resolve('ok');
   });
 }

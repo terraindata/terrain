@@ -47,11 +47,11 @@ THE SOFTWARE.
 import * as fs from 'fs';
 import * as path from 'path';
 import * as util from 'util';
-import * as winston from 'winston';
 
 import sharedUtil from '../../../shared/Util';
 import DatabaseController from '../database/DatabaseController';
 import ElasticClient from '../database/elastic/client/ElasticClient';
+import { MidwayLogger } from '../app/log/MidwayLogger';
 
 export interface ScriptConfig
 {
@@ -78,7 +78,7 @@ export async function findScripts(dir: string): Promise<ScriptConfig[]>
       }
       else
       {
-        winston.warn('Ignoring script file with unsupported extension: \"' + file + '\"');
+        MidwayLogger.warn('Ignoring script file with unsupported extension: \"' + file + '\"');
       }
     }
     resolve(scripts);
@@ -105,7 +105,7 @@ export async function provisionScripts(controller: DatabaseController)
 
         if (alive === false)
         {
-          winston.info('Skipped provisioning script ' + script.id + ' for offline database ' + controller.getName());
+          MidwayLogger.info('Skipped provisioning script ' + script.id + ' for offline database ' + controller.getName());
           continue;
         }
 
@@ -121,18 +121,18 @@ export async function provisionScripts(controller: DatabaseController)
               sharedUtil.promise.makeCallback(resolve, reject));
           });
 
-        winston.info('Provisioned script ' + script.id + ' to database ' + controller.getName());
+        MidwayLogger.info('Provisioned script ' + script.id + ' to database ' + controller.getName());
       }
       catch (e)
       {
-        winston.warn('Failed to provision script ' + script.id + ' to database '
+        MidwayLogger.warn('Failed to provision script ' + script.id + ' to database '
           + controller.getName() + ': ' + JSON.stringify(e));
       }
     }
   }
   else
   {
-    winston.warn('Script provisioning not implemented for database type: ' + controller.getType());
+    MidwayLogger.warn('Script provisioning not implemented for database type: ' + controller.getType());
   }
 }
 

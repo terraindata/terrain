@@ -47,8 +47,8 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 import * as request from 'request';
 import * as stream from 'stream';
-import * as winston from 'winston';
 
+import { MidwayLogger } from '../../log/MidwayLogger';
 import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import AEndpointStream from './AEndpointStream';
@@ -90,9 +90,9 @@ class FollowUpBossStream extends stream.Writable
 
   public _write(chunk: any, encoding: string, callback: (err?: Error) => void): void
   {
-    winston.debug(JSON.stringify(this.config));
-    winston.debug('CHUNK');
-    winston.debug(JSON.stringify(chunk));
+    MidwayLogger.debug(JSON.stringify(this.config));
+    MidwayLogger.debug('CHUNK');
+    MidwayLogger.debug(JSON.stringify(chunk));
 
     if (!isNaN(chunk['FollowUpBossId']))
     {
@@ -121,12 +121,12 @@ class FollowUpBossStream extends stream.Writable
         {
           if (error)
           {
-            winston.debug('got put error: ' + JSON.stringify(error));
+            MidwayLogger.debug('got put error: ' + JSON.stringify(error));
             callback(error);
           }
           else
           {
-            winston.debug('got put response: ' + JSON.stringify(response));
+            MidwayLogger.debug('got put response: ' + JSON.stringify(response));
           }
         });
     } else
@@ -160,12 +160,12 @@ class FollowUpBossStream extends stream.Writable
         {
           if (error)
           {
-            winston.debug('got post error: ' + JSON.stringify(error));
+            MidwayLogger.debug('got post error: ' + JSON.stringify(error));
             callback(error);
           }
           else
           {
-            winston.debug('got post response: ' + JSON.stringify(response));
+            MidwayLogger.debug('got post response: ' + JSON.stringify(response));
           }
         });
     }
