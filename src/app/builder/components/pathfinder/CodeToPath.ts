@@ -44,37 +44,201 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import { _FilterLine, _Path, Path } from 'builder/components/pathfinder/PathfinderTypes';
+import * as TerrainLog from 'loglevel';
 import ESInterpreter from '../../../../../shared/database/elastic/parser/ESInterpreter';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
+import { toInputMap } from '../../../../blocks/types/Input';
 
-namespace CodeToPath
+export default class CodeToPath
 {
-  // we can mark some useful information for the bottom up processing
-  function beforeProcessValueInfo(node: ESValueInfo, interpreter: ESInterpreter)
+  public static ClauseToPathTable = {
+    body: {
+      before: CodeToPath.BodyToPathBefore,
+      after: CodeToPath.BodyToPathAfter,
+    },
+    term_query: {
+      after: CodeToPath.TermToPathAfter,
+    },
+    exists_query: {
+      after: CodeToPath.ExistsToPathAfter,
+    },
+  };
+
+  // term
+  // [field] : { "value" : val, "boost": 1 }
+  public static TermToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
   {
+    const config = {};
+    const fieldName = Object.keys(node.objectChildren)[0];
+    const fieldValue = node.objectChildren[fieldName].propertyValue;
+    if (fieldValue.clause.type === 'term_settings')
+    {
+      config['value'] = fieldValue.value['value'];
+      if (fieldValue.value.boost === undefined)
+      {
+        config['boost'] = 1;
+      } else
+      {
+        config['boost'] = fieldValue.value['boost'];
+      }
+    } else
+    {
+      config['value'] = fieldValue.value;
+      config['boost'] = 1;
+    }
+    config['field'] = fieldName;
+    config['comparison'] = 'equal';
+    const filterLine = _FilterLine(config);
+    node.annotation.path = filterLine;
+    console.log('term_query to ' + JSON.stringify(filterLine));
+  }
+
+  // match
+  // [field] : { "value" : val, "boost": 1 }
+  public static MatchToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+  {
+    const config = {};
+    const fieldName = Object.keys(node.objectChildren)[0];
+    const fieldValue = node.objectChildren[fieldName].propertyValue;
+    if (fieldValue.clause.type === 'match_settings')
+    {
+      config['value'] = fieldValue.value['query'];
+      if (fieldValue.value.boost === undefined)
+      {
+        config['boost'] = 1;
+      } else
+      {
+        config['boost'] = fieldValue.value['boost'];
+      }
+    } else
+    {
+      config['value'] = fieldValue.value;
+      config['boost'] = 1;
+    }
+    config['field'] = fieldName;
+    config['comparison'] = 'equal';
+    const filterLine = _FilterLine(config);
+    node.annotation.path = filterLine;
+    console.log('match_query to ' + JSON.stringify(filterLine));
+  }
+
+  // exists
+  // [field] : { field: 'field', 'boost': boost }
+  public static ExistsToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+  {
+    const config = {
+      field: node.value.field,
+      boost: node.value.boost === undefined ? 1 : node.value.boost,
+      comparison: 'exists',
+    };
+    const filterLine = _FilterLine(config);
+    node.annotation.path = filterLine;
+    console.log('exists_query to ' + JSON.stringify(filterLine));
+  }
+
+  // range
+  // [field] : { "value" : val, "boost": 1 }
+  public static RangeToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+  {
+    const fieldName = Object.keys(node.objectChildren)[0];
+    const rangeValue = node.objectChildren[fieldName].propertyValue;
+    const rangeComparisonMap = {
+      gt: 'greater',
+      gte: 'greaterequal',
+      lt: 'less',
+      lte: 'lessequal',
+    };
+    let rangeOp;
+    for (const op of Object.keys(rangeComparisonMap))
+    {
+      if (rangeValue.objectChildren[op] !== undefined)
+      {
+        rangeOp = op;
+        break;
+      }
+    }
+    if (rangeOp === undefined)
+    {
+      return;
+    }
+    const config = {
+      field: fieldName,
+      value: rangeValue.value[rangeOp],
+      comparison: rangeComparisonMap[rangeOp],
+      boost: rangeValue.value['boost'] === 'undefined' ? 1 : rangeValue.value['boost'],
+    };
+    const filterLine = _FilterLine(config);
+    node.annotation.path = filterLine;
+    console.log('range_query to ' + JSON.stringify(filterLine));
+  }
+
+  // body
+  public static BodyToPathBefore(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+  {
+  }
+  public static BodyToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+  {
+    node.annotation.path = _Path();
+  }
+
+  // bool
+
+  // script
+
+  // sort
+
+  // we can mark some useful information for the bottom up processing
+  public static beforeProcessValueInfo(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+  {
+    node.annotation = {};
+    const handler = this.ClauseToPathTable[node.clause.type];
+    if (handler && handler.before)
+    {
+      handler.before(node, interpreter, key);
+    }
     return true;
   }
 
   // bottom up generating the path components
-  function afterProcessValueInfo(node: ESValueInfo, interpreter: ESInterpreter)
+  public static afterProcessValueInfo(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
   {
-    if (node.clause === interpreter.config.getClause('query'))
+    const handler = this.ClauseToPathTable[node.clause.type];
+    if (handler && handler.after)
     {
-      // this is a query
-      console.log('This is a query clause');
+      handler.after(node, interpreter, key);
     }
   }
   /**
    * @param {ESInterpreter} code
    * @returns {Path}
    */
-  function generatePath(inter: ESInterpreter): any
+  public static generatePath(inter: ESInterpreter): Path
   {
+    const currentPath = [];
     const rootValueInfo = inter.rootValueInfo;
-    rootValueInfo.recursivelyVisit((element) => {
-      return beforeProcessValueInfo(element, inter);
-    }, (node) => {
-      afterProcessValueInfo(node, inter);
+    rootValueInfo.recursivelyVisit((element, key) =>
+    {
+      return CodeToPath.beforeProcessValueInfo(element, inter, key);
+    }, (node, key) =>
+    {
+      CodeToPath.afterProcessValueInfo(node, inter, key);
     });
+    console.log('New Path: ' + JSON.stringify(rootValueInfo.annotation.path));
+    return rootValueInfo.annotation.path;
+  }
+
+  public static parseCode(query: string, inputs): Path
+  {
+    try
+    {
+      const params = toInputMap(inputs);
+      const interpreter: ESInterpreter = new ESInterpreter(query, inputs);
+      return this.generatePath(interpreter);
+    } catch (e)
+    {
+      TerrainLog.error(e);
+      return null;
+    }
   }
 }

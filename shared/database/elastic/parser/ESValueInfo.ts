@@ -197,36 +197,46 @@ export default class ESValueInfo
     this.arrayChildren.forEach(func);
   }
 
-  public recursivelyVisit(beforeRec: (element: ESValueInfo) => boolean,
-    afterRec: ((element: ESValueInfo) => void) | null = null): void
+  /**
+   * Recursively visit each child node. The key is a path shows the position of current processing node.
+   * @param {(element: ESValueInfo, key?: any[]) => boolean} beforeRec
+   * @param {((element: ESValueInfo, key?: any[]) => void) | null} afterRec
+   */
+  public recursivelyVisit(beforeRec: (element: ESValueInfo, key?: any[]) => boolean,
+    afterRec: ((element: ESValueInfo, key?: any[]) => void) | null = null,
+    key: any[] = []): void
   {
-    if (!beforeRec(this))
+    if (!beforeRec(this, key))
     {
       if (afterRec !== null)
       {
-        afterRec(this);
+        afterRec(this, key);
       }
       return;
     }
 
-    this.forEachProperty((property: ESPropertyInfo): void =>
+    this.forEachProperty((property: ESPropertyInfo, name): void =>
     {
-      property.propertyName.recursivelyVisit(beforeRec, afterRec);
+      key.push(name);
+      property.propertyName.recursivelyVisit(beforeRec, afterRec, key);
 
       if (property.propertyValue !== null)
       {
-        property.propertyValue.recursivelyVisit(beforeRec, afterRec);
+        property.propertyValue.recursivelyVisit(beforeRec, afterRec, key);
       }
+      key.pop();
     });
 
-    this.forEachElement((element: ESValueInfo): void =>
+    this.forEachElement((element: ESValueInfo, index: number): void =>
     {
-      element.recursivelyVisit(beforeRec, afterRec);
+      key.push(index);
+      element.recursivelyVisit(beforeRec, afterRec, key);
+      key.pop();
     });
 
     if (afterRec !== null)
     {
-      afterRec(this);
+      afterRec(this, key);
     }
   }
 }

@@ -58,6 +58,17 @@ import ESClause from './ESClause';
  */
 export default class ESMapClause extends ESClause
 {
+  public static CheckSingleField(inter: ESInterpreter, valueInfo: ESValueInfo, expected: ESJSONType): boolean
+  {
+    if (valueInfo.childrenSize() !== 1)
+    {
+      inter.accumulateError(valueInfo,
+        valueInfo.clause.name + ' should have one field, but found ' + valueInfo.childrenSize());
+      return false;
+    }
+    return true;
+  }
+
   public nameType: string;
   public valueType: string;
 

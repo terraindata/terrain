@@ -1849,6 +1849,7 @@ const EQLSpec: ESClause[] =
         desc: 'Matches documents that contain an exact match for the given term.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html',
         multifield: false,
+        checkers: [ESMapClause.CheckSingleField],
       }),
     new ESVariantClause('term_value',
       {

@@ -221,6 +221,16 @@ abstract class ESClause
         ESJSONType[valueInfo.jsonType] + ' instead.');
       return false;
     }
+
+    if (this.settings.checkers)
+    {
+      let ret = true;
+      this.settings.checkers.map((checker, i) =>
+      {
+        ret = ret && checker(interpreter, valueInfo, expected);
+      });
+      return ret;
+    }
     return true;
   }
 

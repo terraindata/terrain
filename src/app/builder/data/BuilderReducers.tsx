@@ -70,6 +70,7 @@ import
 } from './BuilderActionTypes';
 import { _BuilderState, BuilderState } from './BuilderState';
 const { List, Map } = Immutable;
+import CodeToPath from 'builder/components/pathfinder/CodeToPath';
 import * as TerrainLog from 'loglevel';
 
 const BuilderReducers =
@@ -608,6 +609,11 @@ const BuilderReducersWrapper = (
         const { tql, pathErrorMap } = AllBackendsMap[state.query.language].pathToCode(path, state.query.inputs);
         state = state.setIn(['query', 'tql'], tql);
         state = state.setIn(['query', 'pathErrorMap'], pathErrorMap);
+
+        // testing the code to path
+        CodeToPath.parseCode(tql, state.query.inputs);
+        //        state = state.setIn(['query', 'path'], CodeToPath.parseCode(tql, state.query.inputs));
+
       }
     }
 
