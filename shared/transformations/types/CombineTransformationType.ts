@@ -53,11 +53,11 @@ import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { List } from 'immutable';
 import * as _ from 'lodash';
 
-import Topology from 'shared/transformations/util/TopologyUtil';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationVisitError from 'shared/transformations/TransformationVisitError';
 import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import Topology from 'shared/transformations/util/TopologyUtil';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 

@@ -56,11 +56,11 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import Topology from 'shared/transformations/util/TopologyUtil';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationVisitError from 'shared/transformations/TransformationVisitError';
 import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import Topology from 'shared/transformations/util/TopologyUtil';
 import { KeyPath } from 'shared/util/KeyPath';
 
 import isPrimitive = require('is-primitive');
@@ -109,9 +109,8 @@ export class DuplicateTransformationNode extends TransformationNode
     const matchFn = Topology.createBasePathMatcher(inputField, outputField);
     for (const outerMatch of yadeep.search(doc, inputField))
     {
-      const { location , value } = outerMatch; // location is [A, i, D]
+      const { location, value } = outerMatch; // location is [A, i, D]
       const valueToCopy = isPrimitive(value) ? value : _.cloneDeep(value);
-
       // want to convert [A, i, D] to [A, i, B, -1, C] to search
       const softDestKP = matchFn(location); // [A, i, B, -1, C]
 
@@ -123,7 +122,7 @@ export class DuplicateTransformationNode extends TransformationNode
       {
         const { location: leftKP } = innerMatch; // leftKP [A, i, B, j]
         const concreteDestKP = leftKP.concat(destRightKP).toList(); // [A, i, B, j, C];
-        yadeep.set(doc, concreteDestKP, valueToCopy);
+        yadeep.set(doc, concreteDestKP, valueToCopy, { create: true });
       }
     }
     return undefined;
@@ -154,7 +153,8 @@ export class DuplicateTransformationNode extends TransformationNode
       }
       const destKP = matchFn(outputField);
       const matches = yadeep.search(value, inputAfterBasePath);
-      const values = matches.map((m) => {
+      const values = matches.map((m) =>
+      {
         if (!isPrimitive(m.value))
         {
           return _.cloneDeep(m.value);

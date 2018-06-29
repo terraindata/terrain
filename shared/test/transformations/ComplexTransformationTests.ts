@@ -60,7 +60,8 @@ function wrap(kp: any[])
   return List([List<string | number>(kp)]);
 }
 
-test('join transformation where the first field does not exist', () => {
+test('join transformation where the first field does not exist', () =>
+{
 
   const doc = {
     f2: 'hello',
@@ -84,7 +85,8 @@ test('join transformation where the first field does not exist', () => {
   });
 });
 
-test('array sum on a nested array field', () => {
+test('array sum on a nested array field', () =>
+{
   const doc = {
     foo: [
       {
@@ -143,7 +145,8 @@ test('extract an array field with duplicate', () =>
   });
 });
 
-describe('suite of complex duplication tests', () => {
+describe('suite of complex duplication tests', () =>
+{
   function dupHelper(inKP: WayPoint[], outKP: WayPoint[], inDoc: object): object
   {
     const e = new TransformationEngine(inDoc);
@@ -156,7 +159,8 @@ describe('suite of complex duplication tests', () => {
     return r;
   }
 
-  test('many to one', () => {
+  test('many to one', () =>
+  {
     expect(dupHelper(['items', -1, 'foo'], ['allFoos'], {
       items: [
         { foo: 1 },
@@ -169,11 +173,12 @@ describe('suite of complex duplication tests', () => {
         { foo: 2 },
         { foo: 3 },
       ],
-      allFoos: [ 1, 2, 3 ],
+      allFoos: [1, 2, 3],
     });
   });
 
-  test('nested one to one', () => {
+  test('nested one to one', () =>
+  {
     expect(dupHelper(
       ['items', -1, 'foo'],
       ['items', -1, 'bar'],
@@ -195,7 +200,30 @@ describe('suite of complex duplication tests', () => {
     );
   });
 
-  test('super nested one to one', () => {
+  // test('nested array one to one', () => {
+  //   expect(dupHelper(
+  //     ['items', -1, 'foo'],
+  //     ['items', -1, 'bar'],
+  //     {
+  //       items: [
+  //         { foo: [ 1, 2, 3 ] },
+  //         { foo: [ ] },
+  //         { notFoo: 3 },
+  //       ],
+  //     },
+  //   )).toEqual(
+  //     {
+  //       items: [
+  //         { foo: [ 1, 2, 3 ], bar: [ 1, 2, 3 ] },
+  //         { foo: [ ], bar: [ ] },
+  //         { notFoo: 3 },
+  //       ],
+  //     },
+  //   );
+  // });
+
+  test('super nested one to one', () =>
+  {
     expect(dupHelper(
       ['items', -1, 'moreItems', -1, 'foo'],
       ['items', -1, 'moreItems', -1, 'bar'],
@@ -238,6 +266,31 @@ describe('suite of complex duplication tests', () => {
             ],
             decoy: 'hey there',
           },
+        ],
+      },
+    );
+  });
+
+  test('one to many', () =>
+  {
+    expect(dupHelper(
+      ['foo'],
+      ['items', -1, 'bar'],
+      {
+        foo: 5,
+        items: [
+          { foo: 1 },
+          { foo: 2 },
+          { notFoo: 3 },
+        ],
+      },
+    )).toEqual(
+      {
+        foo: 5,
+        items: [
+          { foo: 1, bar: 5 },
+          { foo: 2, bar: 5 },
+          { notFoo: 3, bar: 5 },
         ],
       },
     );

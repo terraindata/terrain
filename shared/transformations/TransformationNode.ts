@@ -92,7 +92,6 @@ export default abstract class TransformationNode
           ],
         } as TransformationVisitResult;
       }
-
       return this.transformDocument(doc);
     }
     catch (e)
@@ -113,7 +112,7 @@ export default abstract class TransformationNode
   }
 
   // override to specify document transformation behavior
-  protected transformDocument(doc: object): TransformationVisitResult
+  protected transformDocument(doc: object): TransformationVisitResult | undefined
   {
     return {
       document: doc,

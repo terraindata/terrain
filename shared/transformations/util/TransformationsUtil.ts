@@ -50,8 +50,8 @@ const { List, Map } = Immutable;
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
-import { KeyPath } from 'shared/util/KeyPath';
 import Topology from 'shared/transformations/util/TopologyUtil';
+import { KeyPath } from 'shared/util/KeyPath';
 
 // return true if the given keypath would be a valid new child field under provided fieldId
 // if fieldId is not provided or -1, then it does not consider the new field as a child field

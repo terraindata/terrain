@@ -59,9 +59,9 @@ import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import Topology from 'shared/transformations/util/TopologyUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
-import Topology from 'shared/transformations/util/TopologyUtil';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;

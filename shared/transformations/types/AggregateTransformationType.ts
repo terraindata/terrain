@@ -72,7 +72,7 @@ export default abstract class AggregateTransformationType extends Transformation
   // this defines the main behavior of the transformation
   public abstract aggregator(vals: any[]): any;
 
-  protected transformDocument(doc: object): TransformationVisitResult
+  protected transformDocument(doc: object): TransformationVisitResult | undefined
   {
     const errors = [];
     const opts = this.meta as NodeOptionsType<any>;
@@ -85,7 +85,7 @@ export default abstract class AggregateTransformationType extends Transformation
       const { value, location } = match;
       if (value === null && this.skipNulls)
       {
-        return;
+        continue;
       }
 
       if (Array.isArray(value))
@@ -96,6 +96,7 @@ export default abstract class AggregateTransformationType extends Transformation
       else
       {
         errors.push(`Error in ${this.typeCode}: Expected array but got a(n) ${typeof value}.`);
+        continue;
       }
     }
     return {

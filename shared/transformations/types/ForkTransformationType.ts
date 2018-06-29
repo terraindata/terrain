@@ -53,11 +53,11 @@ import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import { List } from 'immutable';
 
-import Topology from 'shared/transformations/util/TopologyUtil';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationVisitError from 'shared/transformations/TransformationVisitError';
 import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import Topology from 'shared/transformations/util/TopologyUtil';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
@@ -103,14 +103,15 @@ export default abstract class ForkTransformationType extends TransformationNode
     return super.validate();
   }
 
-  protected transformDocument(doc: object): TransformationVisitResult
+  protected transformDocument(doc: object): TransformationVisitResult | undefined
   {
     const errors = [];
     const opts = this.meta as NodeOptionsType<any>;
 
     const field = this.fields.get(0);
     const outputFields: List<KeyPath> = opts.newFieldKeyPaths;
-    const matchCacheFn = _.memoize((newFieldIndex: number) => {
+    const matchCacheFn = _.memoize((newFieldIndex: number) =>
+    {
       return Topology.createBasePathMatcher(field, outputFields.get(newFieldIndex));
     });
     for (const match of yadeep.search(doc, field))
@@ -118,12 +119,12 @@ export default abstract class ForkTransformationType extends TransformationNode
       const { value, location } = match;
       if (value === null && this.skipNulls)
       {
-        return;
+        continue;
       }
       if (!this.checkType(value))
       {
         errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof value}.`);
-        return;
+        continue;
       }
 
       const newFields = this.split(value);

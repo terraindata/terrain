@@ -45,9 +45,9 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as _ from 'lodash';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 export type Relation = 'one' | 'many';
 
@@ -156,7 +156,8 @@ export default class TopologyUtil
     {
       // in the absence of benchmarking to find out what's most efficient
       // assume most times we only do 1 or 2 sets
-      return (kp: KeyPath) => {
+      return (kp: KeyPath) =>
+      {
         let ret = kp2;
         for (const i of wildcards)
         {
@@ -188,7 +189,7 @@ export default class TopologyUtil
     //   // check if fields are wildcards themselves?
     //   return true;
     // }
-    const [ r1, r2 ] = TopologyUtil.getRelation(kp1, kp2);
+    const [r1, r2] = TopologyUtil.getRelation(kp1, kp2);
     if (r1 === 'one' && r2 === 'one')
     {
       return true;
