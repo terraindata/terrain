@@ -200,7 +200,7 @@ export default class ESValueInfo
   public recursivelyVisit(
     beforeRec: (element: ESValueInfo, depth?: number) => boolean,
     afterRec: ((element: ESValueInfo, depth?: number) => void) | null = null,
-    depth: number = 0
+    depth: number = 0,
   ): void
   {
     if (!beforeRec(this, depth))

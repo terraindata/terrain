@@ -51,7 +51,8 @@ import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
 import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
-import {
+import
+{
   _SinkConfig,
   _SourceConfig,
   ItemWithName,
@@ -188,7 +189,8 @@ class ETLTemplateC implements ETLTemplateI
   {
     let sourceName = '';
     const source = this.getSource(key);
-    if (source) {
+    if (source)
+    {
       if (key === '_default')
       {
         sourceName = SOURCE_DEFAULT_NAME;
@@ -206,7 +208,8 @@ class ETLTemplateC implements ETLTemplateI
   {
     let sinkName = '';
     const sink = this.getSource(key);
-    if (sink) {
+    if (sink)
+    {
       if (key === '_default')
       {
         sinkName = SINK_DEFAULT_NAME;

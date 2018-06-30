@@ -44,9 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as _ from 'lodash';
 import { mergeDocument } from '../io/Common';
 import ADocumentTransform from '../io/streams/ADocumentTransform';
-import * as _ from 'lodash';
 
 export interface ExportTransformOptions
 {

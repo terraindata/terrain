@@ -908,7 +908,7 @@ const Util = {
   },
 
   onEnter(handler)
-   {
+  {
     return (e) =>
     {
       if (e.key === 'Enter')

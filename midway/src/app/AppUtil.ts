@@ -44,16 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as request from 'request';
 import * as _ from 'lodash';
+import * as request from 'request';
 
 import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
 import { ItemConfig } from '../app/items/ItemConfig';
 import { items } from '../app/items/ItemRouter';
 
 import ESScriptClause from 'shared/database/elastic/parser/clauses/ESScriptClause';
-import ESValueInfo from 'shared/database/elastic/parser/ESValueInfo';
 import ESClauseType from 'shared/database/elastic/parser/ESClauseType';
+import ESValueInfo from 'shared/database/elastic/parser/ESValueInfo';
 
 export function doRequest(url)
 {
@@ -185,10 +185,12 @@ export function computeMaximumAlgorithmScore(query: string | object): number | u
 
   const rootInfo: ESValueInfo = queryTree.rootValueInfo;
   // find all script clauses and see if they are the terrain script
-  try {
+  try
+  {
     let maxToReturn;
     let minDepth;
-    rootInfo.recursivelyVisit((element: ESValueInfo, depth: number) => {
+    rootInfo.recursivelyVisit((element: ESValueInfo, depth: number) =>
+    {
       if (element.clause.clauseType === ESClauseType.ESScriptClause)
       {
         let max = 0;

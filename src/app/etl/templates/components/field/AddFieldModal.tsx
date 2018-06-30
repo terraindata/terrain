@@ -253,7 +253,8 @@ class AddRootFieldModalC extends TerrainComponent<RootFieldProps>
     return this._validateKeyPath(engine, engineVersion, this.state.name);
   }
 
-  public confirmAndCloseModal() {
+  public confirmAndCloseModal()
+  {
     this.onConfirm();
     this.closeModal();
   }
