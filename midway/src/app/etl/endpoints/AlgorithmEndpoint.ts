@@ -50,6 +50,8 @@ import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/Endpoi
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import AEndpointStream from './AEndpointStream';
 
+import ExportTransform from '../ExportTransform';
+
 import DatabaseController from '../../../database/DatabaseController';
 import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../../AppUtil';
@@ -60,6 +62,22 @@ export class AlgorithmEndpoint extends AEndpointStream
   constructor()
   {
     super();
+  }
+
+  public async getExportTransform(source: SourceConfig): Promise<ExportTransform>
+  {
+    const algorithmId: number = source.options['algorithmId'];
+    let query: string = source.options['query'];
+
+    if (algorithmId !== undefined)
+    {
+      query = await Util.getQueryFromAlgorithm(algorithmId);
+      const scoreNormalization = Util.computeMaximumAlgorithmScore(query);
+      return new ExportTransform({
+        scoreNormalization,
+      });
+    }
+    return new ExportTransform();
   }
 
   public async getSource(source: SourceConfig): Promise<Readable>
