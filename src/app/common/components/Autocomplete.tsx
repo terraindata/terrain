@@ -241,7 +241,7 @@ class Autocomplete extends TerrainComponent<Props>
     {
       this.props.onKeyDown(event);
     }
-    if (!this.props.options ||  (this.props.options && this.props.options.count() === 0))
+    if (!this.props.options || (this.props.options && this.props.options.count() === 0))
     {
       // still be able to hit enter when there are no options
       if (event.keyCode === 13)
