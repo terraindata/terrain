@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Benchmark from './Benchmark';
 import { logger } from '../src/Logging';
+import * as Benchmark from './Benchmark';
 
 exports.runBench = async (request, response) =>
 {
