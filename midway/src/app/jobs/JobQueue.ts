@@ -48,7 +48,6 @@ import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as consume from 'stream-consume';
 
-import { MidwayLogger } from '../log/MidwayLogger';
 import { TaskConfig } from 'shared/types/jobs/TaskConfig';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 import { TaskTreeConfig } from 'shared/types/jobs/TaskTreeConfig';
@@ -56,6 +55,7 @@ import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import IntegrationConfig from '../integrations/IntegrationConfig';
 import { integrations } from '../integrations/IntegrationRouter';
+import { MidwayLogger } from '../log/MidwayLogger';
 import SchedulerConfig from '../scheduler/SchedulerConfig';
 import { Job } from './Job';
 import JobConfig from './JobConfig';

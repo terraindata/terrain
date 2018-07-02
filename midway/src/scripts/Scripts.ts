@@ -49,9 +49,9 @@ import * as path from 'path';
 import * as util from 'util';
 
 import sharedUtil from '../../../shared/Util';
+import { MidwayLogger } from '../app/log/MidwayLogger';
 import DatabaseController from '../database/DatabaseController';
 import ElasticClient from '../database/elastic/client/ElasticClient';
-import { MidwayLogger } from '../app/log/MidwayLogger';
 
 export interface ScriptConfig
 {

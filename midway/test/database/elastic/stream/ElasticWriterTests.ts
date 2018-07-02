@@ -46,12 +46,12 @@ THE SOFTWARE.
 
 import * as Stream from 'stream';
 
+import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 import ElasticClient from '../../../../src/database/elastic/client/ElasticClient';
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
 import PrefixedElasticController from '../../../../src/database/elastic/PrefixedElasticController';
 import ElasticWriter from '../../../../src/database/elastic/streams/ElasticWriter';
-import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 
 let elasticController: ElasticController;
 let elasticClient: ElasticClient;

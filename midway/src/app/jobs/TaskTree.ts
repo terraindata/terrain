@@ -47,13 +47,13 @@ THE SOFTWARE.
 import * as fs from 'fs';
 import * as stream from 'stream';
 
-import { MidwayLogger } from '../log/MidwayLogger';
 import { TaskConfig } from 'shared/types/jobs/TaskConfig';
 import { TaskEnum } from 'shared/types/jobs/TaskEnum';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 import { TaskTreeConfig } from 'shared/types/jobs/TaskTreeConfig';
 import LogStream from '../io/streams/LogStream';
 import LogStreamWritable from '../io/streams/LogStreamWritable';
+import { MidwayLogger } from '../log/MidwayLogger';
 import { Task } from './Task';
 import { TaskTreeNode } from './TaskTreeNode';
 import { TaskTreePrinter } from './TaskTreePrinter';

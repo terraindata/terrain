@@ -45,9 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import BufferTransform from '../../../../src/app/io/streams/BufferTransform';
+import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 import MySQLConfig from '../../../../src/database/mysql/MySQLConfig';
 import MySQLReader from '../../../../src/database/mysql/streams/MySQLReader';
-import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 
 MidwayLogger.level = 'debug';
 

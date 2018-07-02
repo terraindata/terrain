@@ -53,8 +53,8 @@ import * as App from '../App';
 import { CURRENT_VERSION, FIRST_VERSION, Migrator, Version } from '../AppVersion';
 import { MigrationRecordConfig as MigrationRecord } from './MigrationRecordConfig';
 
-import { MidwayLogger } from '../log/MidwayLogger';
 import { defaultETLMigration } from '../etl/ETLMigrations';
+import { MidwayLogger } from '../log/MidwayLogger';
 
 const registeredMigrations: Migrator[] = [
   defaultETLMigration,

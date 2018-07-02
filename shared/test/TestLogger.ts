@@ -47,17 +47,16 @@ THE SOFTWARE.
 import dateFormat = require('date-format');
 import * as winston from 'winston';
 
-export const MidwayLogger = winston.createLogger({
-  level: 'debug',
-  format: winston.format.combine(
-    winston.format.colorize(),
-    winston.format.printf((info) =>
-    {
-      const meta = (info.meta !== undefined) && (Object.keys(info.meta).length > 0) ? '\n\t' + JSON.stringify(info.meta) : '';
-      return `${dateFormat('yyyy-MM-dd hh:mm:ss.SSS')} [${process.pid}] ${info.level}: ${info.message} ${meta}`;
-    }),
-  ),
-  transports: [
-    new winston.transports.Console(),
-  ],
+export const TestLogger = winston.createLogger({
+    level: 'debug',
+    format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.printf((info) => {
+            const meta = (info.meta !== undefined) && (Object.keys(info.meta).length > 0) ? '\n\t' + JSON.stringify(info.meta) : '';
+            return `${dateFormat('yyyy-MM-dd hh:mm:ss.SSS')} [${process.pid}] ${info.level}: ${info.message} ${meta}`;
+        }),
+    ),
+    transports: [
+        new winston.transports.Console(),
+    ],
 });

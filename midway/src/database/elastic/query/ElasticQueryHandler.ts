@@ -57,12 +57,12 @@ import BufferTransform from '../../../app/io/streams/BufferTransform';
 import GroupJoinTransform from '../../../app/io/streams/GroupJoinTransform';
 import MergeJoinTransform from '../../../app/io/streams/MergeJoinTransform';
 import SafeReadable from '../../../app/io/streams/SafeReadable';
+import { MidwayLogger } from '../../../app/log/MidwayLogger';
 import QueryHandler from '../../../app/query/QueryHandler';
 import { QueryError } from '../../../error/QueryError';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
 import ElasticReader from '../streams/ElasticReader';
-import { MidwayLogger } from '../../../app/log/MidwayLogger';
 
 /**
  * Implements the QueryHandler interface for ElasticSearch

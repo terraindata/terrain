@@ -51,8 +51,8 @@ import util from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticController from '../../database/elastic/ElasticController';
 import * as Tasty from '../../tasty/Tasty';
-import EventConfig from './EventConfig';
 import { MidwayLogger } from '../log/MidwayLogger';
+import EventConfig from './EventConfig';
 
 export interface AggregationRequest
 {

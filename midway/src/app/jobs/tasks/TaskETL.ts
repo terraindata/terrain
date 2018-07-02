@@ -46,12 +46,12 @@ THE SOFTWARE.
 
 import * as stream from 'stream';
 
-import { MidwayLogger } from '../../log/MidwayLogger';
 import { TaskConfig } from 'shared/types/jobs/TaskConfig';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 import { templates } from '../../etl/TemplateRouter';
 import Templates from '../../etl/Templates';
 import LogStream from '../../io/streams/LogStream';
+import { MidwayLogger } from '../../log/MidwayLogger';
 import { Task } from '../Task';
 
 export class TaskETL extends Task

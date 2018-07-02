@@ -50,8 +50,8 @@ import * as stream from 'stream';
 
 import { CredentialConfig } from '../../credentials/CredentialConfig';
 import Credentials from '../../credentials/Credentials';
-import CSVTransform from '../streams/CSVTransform';
 import { MidwayLogger } from '../../log/MidwayLogger';
+import CSVTransform from '../streams/CSVTransform';
 
 export const credentials: Credentials = new Credentials();
 export const request = googleoauthjwt.requestWithJWT();

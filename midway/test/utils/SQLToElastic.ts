@@ -44,9 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import { MidwayLogger } from '../../src/app/log/MidwayLogger';
 import ElasticConfig from '../../src/database/elastic/ElasticConfig';
 import PrefixedElasticController from '../../src/database/elastic/PrefixedElasticController';
-import { MidwayLogger } from '../../src/app/log/MidwayLogger';
 import MySQLConfig from '../../src/database/mysql/MySQLConfig';
 import MySQLController from '../../src/database/mysql/MySQLController';
 import * as Tasty from '../../src/tasty/Tasty';

@@ -44,11 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
 import PrefixedElasticController from '../../../../src/database/elastic/PrefixedElasticController';
 import ElasticDB from '../../../../src/database/elastic/tasty/ElasticDB';
-import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 
 import * as Tasty from '../../../../src/tasty/Tasty';
 import * as Utils from '../../TestUtil';

@@ -48,10 +48,10 @@ import * as bcrypt from 'bcrypt';
 
 import srs = require('secure-random-string');
 
-import { MidwayLogger } from '../log/MidwayLogger';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import * as Util from '../AppUtil';
+import { MidwayLogger } from '../log/MidwayLogger';
 import UserConfig from './UserConfig';
 
 export class Users

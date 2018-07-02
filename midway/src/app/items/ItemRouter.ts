@@ -47,8 +47,8 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 
-import { MidwayLogger } from '../log/MidwayLogger';
 import * as Util from '../AppUtil';
+import { MidwayLogger } from '../log/MidwayLogger';
 import ItemConfig from './ItemConfig';
 import Items from './Items';
 export * from './Items';

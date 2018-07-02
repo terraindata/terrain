@@ -48,8 +48,8 @@ import * as Elastic from 'elasticsearch';
 
 import { ElasticQueryHit } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import SafeReadable from '../../../app/io/streams/SafeReadable';
-import ElasticClient from '../client/ElasticClient';
 import { MidwayLogger } from '../../../app/log/MidwayLogger';
+import ElasticClient from '../client/ElasticClient';
 
 export class ElasticReader extends SafeReadable
 {

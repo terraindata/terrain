@@ -55,9 +55,9 @@ import * as stream from 'stream';
 
 import * as yadeep from '../../../../../shared/util/yadeep';
 import { Credentials } from '../../credentials/Credentials';
+import { MidwayLogger } from '../../log/MidwayLogger';
 import JSONTransform from '../streams/JSONTransform';
 import { ExportSourceConfig } from './Sources';
-import { MidwayLogger } from '../../log/MidwayLogger';
 
 export const credentials: Credentials = new Credentials();
 const limiter: any = new Bottleneck({

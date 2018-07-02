@@ -47,12 +47,11 @@ THE SOFTWARE.
 import crypto = require('crypto');
 import * as stream from 'stream';
 
-
 import * as request from 'request';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { Readable, Writable } from 'stream';
-import AEndpointStream from './AEndpointStream';
 import { MidwayLogger } from '../../log/MidwayLogger';
+import AEndpointStream from './AEndpointStream';
 
 import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
 

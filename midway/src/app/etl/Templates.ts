@@ -56,8 +56,8 @@ import { Readable, Transform, Writable } from 'stream';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
-import { MidwayLogger } from '../log/MidwayLogger';
 import TransformationEngineTransform from '../io/streams/TransformationEngineTransform';
+import { MidwayLogger } from '../log/MidwayLogger';
 import UserConfig from '../users/UserConfig';
 import { versions } from '../versions/VersionRouter';
 

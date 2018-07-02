@@ -49,8 +49,8 @@ import * as KoaRouter from 'koa-router';
 
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import { MidwayLogger } from '../log/MidwayLogger';
 import * as Util from '../AppUtil';
+import { MidwayLogger } from '../log/MidwayLogger';
 import { Events } from './Events';
 import { Metrics } from './Metrics';
 

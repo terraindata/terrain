@@ -48,9 +48,9 @@ import * as _ from 'lodash';
 import * as request from 'request';
 import * as stream from 'stream';
 
-import { MidwayLogger } from '../../log/MidwayLogger';
 import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { MidwayLogger } from '../../log/MidwayLogger';
 import AEndpointStream from './AEndpointStream';
 
 /* tslint:disable:max-classes-per-file */

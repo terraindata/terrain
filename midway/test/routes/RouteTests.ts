@@ -49,8 +49,8 @@ import * as request from 'supertest';
 import { promisify } from 'util';
 
 import { App, DB } from '../../src/app/App';
-import ElasticConfig from '../../src/database/elastic/ElasticConfig';
 import { MidwayLogger } from '../../src/app/log/MidwayLogger';
+import ElasticConfig from '../../src/database/elastic/ElasticConfig';
 import * as Tasty from '../../src/tasty/Tasty';
 
 let server;

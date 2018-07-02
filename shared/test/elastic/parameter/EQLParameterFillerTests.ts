@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as winston from 'winston';
+import { TestLogger } from 'shared/test/TestLogger';
 import ESParameterFiller from '../../../database/elastic/parser/EQLParameterFiller';
 import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
 import ESParserError from '../../../database/elastic/parser/ESParserError';
@@ -54,8 +54,7 @@ import ESValueInfo from '../../../database/elastic/parser/ESValueInfo';
 
 beforeAll(async (done) =>
 {
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
+  TestLogger.level = 'debug';
   done();
 });
 
@@ -63,7 +62,7 @@ function testGeneration(testString: string,
   params: { [param: string]: any },
   expectedValue: any)
 {
-  winston.info('testing \'' + testString + '\'');
+  TestLogger.info('testing \'' + testString + '\'');
 
   const parser: ESJSONParser = new ESJSONParser(testString);
   const valueInfo: ESValueInfo = parser.getValueInfo();

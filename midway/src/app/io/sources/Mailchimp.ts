@@ -48,8 +48,8 @@ import crypto = require('crypto');
 import jsonStream = require('JSONStream');
 
 import * as request from 'request';
-import { ExportSourceConfig } from './Sources';
 import { MidwayLogger } from '../../log/MidwayLogger';
+import { ExportSourceConfig } from './Sources';
 
 export interface MailchimpSourceConfig
 {

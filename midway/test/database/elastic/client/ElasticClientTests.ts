@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 import SharedUtil from '../../../../../shared/Util';
+import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 import * as Utils from '../../TestUtil';
 
 import ElasticClient from '../../../../src/database/elastic/client/ElasticClient';

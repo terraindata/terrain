@@ -49,8 +49,8 @@ import * as KoaRouter from 'koa-router';
 
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import { MidwayLogger } from '../log/MidwayLogger';
 import * as Tasty from '../../tasty/Tasty';
+import { MidwayLogger } from '../log/MidwayLogger';
 import ResultsConfig from './ResultsConfig';
 import ResultsConfigConfig from './ResultsConfigConfig';
 

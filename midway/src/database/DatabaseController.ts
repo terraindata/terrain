@@ -45,10 +45,10 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { DatabaseConfig } from '../app/database/DatabaseConfig';
+import { MidwayLogger } from '../app/log/MidwayLogger';
 import QueryHandler from '../app/query/QueryHandler';
 import * as Tasty from '../tasty/Tasty';
 import DatabaseControllerStatus from './DatabaseControllerStatus';
-import { MidwayLogger } from '../app/log/MidwayLogger';
 
 /**
  * An client which acts as a selective isomorphic wrapper around

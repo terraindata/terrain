@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 import * as fs from 'fs';
 import * as util from 'util';
-import * as winston from 'winston';
 
+import { TestLogger } from 'shared/test/TestLogger';
 import SharedUtil from '../../../../shared/Util';
 import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
 
@@ -60,8 +60,7 @@ let expected;
 
 beforeAll(async (done) =>
 {
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
+  TestLogger.level = 'debug';
 
   const contents: any = await new Promise((resolve, reject) =>
   {
@@ -76,15 +75,15 @@ function testParse(testString: string,
   expectedValue: any,
   expectedErrors: any[] = [])
 {
-  winston.info('testing \'' + testString + '\'');
+  TestLogger.info('testing \'' + testString + '\'');
   const parser: ESJSONParser = new ESJSONParser(testString);
   const value = parser.getValue();
   const errors = parser.getErrors();
 
-  // winston.info(util.inspect(parser.getValueInfo()));
-  // winston.info(util.inspect(parser.getValueInfos()));
-  // winston.info(util.inspect(parser.getTokens()));
-  winston.info(util.inspect(errors));
+  // TestLogger.info(util.inspect(parser.getValueInfo()));
+  // TestLogger.info(util.inspect(parser.getValueInfos()));
+  // TestLogger.info(util.inspect(parser.getTokens()));
+  TestLogger.info(util.inspect(errors));
 
   expect(value).toEqual(expectedValue);
 

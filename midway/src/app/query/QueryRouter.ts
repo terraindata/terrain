@@ -53,9 +53,9 @@ import QueryResponse from '../../../../shared/database/types/QueryResponse';
 import SharedUtil from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
-import { MidwayLogger } from '../log/MidwayLogger';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../AppUtil';
+import { MidwayLogger } from '../log/MidwayLogger';
 import { QueryHandler } from './QueryHandler';
 
 const QueryRouter = new KoaRouter();
