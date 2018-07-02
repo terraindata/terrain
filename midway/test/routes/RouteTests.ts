@@ -47,10 +47,10 @@ THE SOFTWARE.
 import * as fs from 'fs';
 import * as request from 'supertest';
 import { promisify } from 'util';
-import * as winston from 'winston';
 
 import { App, DB } from '../../src/app/App';
 import ElasticConfig from '../../src/database/elastic/ElasticConfig';
+import { MidwayLogger } from '../../src/app/log/MidwayLogger';
 import * as Tasty from '../../src/tasty/Tasty';
 
 let server;
@@ -199,7 +199,7 @@ beforeAll(async (done) =>
     })
     .catch((error) =>
     {
-      winston.warn('Error while creating access token for default user: ' + String(error));
+      MidwayLogger.warn('Error while creating access token for default user: ' + String(error));
     });
 
   await request(server)
@@ -218,7 +218,7 @@ beforeAll(async (done) =>
     })
     .catch((error) =>
     {
-      winston.warn('Error while creating test user: ' + String(error));
+      MidwayLogger.warn('Error while creating test user: ' + String(error));
     });
 
   try
@@ -267,7 +267,7 @@ describe('Status tests', () =>
       .then((response) =>
       {
         const responseObject = JSON.parse(response.text);
-        winston.info(JSON.stringify(responseObject, null, 1));
+        MidwayLogger.info(JSON.stringify(responseObject, null, 1));
         expect(responseObject.uptime > 0);
         expect(responseObject.numRequests > 0);
         expect(responseObject.numRequestsCompleted > 0 && responseObject.numRequestsCompleted < responseObject.numRequests);
@@ -557,7 +557,7 @@ describe('Item route tests', () =>
       .expect(400)
       .then((response) =>
       {
-        winston.info('response: "' + String(response) + '"');
+        MidwayLogger.info('response: "' + String(response) + '"');
       })
       .catch((error) =>
       {
@@ -604,7 +604,7 @@ describe('Item route tests', () =>
       .expect(400)
       .then((response) =>
       {
-        winston.info('response: "' + String(response) + '"');
+        MidwayLogger.info('response: "' + String(response) + '"');
       })
       .catch((error) =>
       {
@@ -656,7 +656,7 @@ describe('Query route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        winston.info(response.text);
+        MidwayLogger.info(response.text);
         expect(JSON.parse(response.text))
           .toMatchObject({
             result: {
@@ -691,7 +691,7 @@ describe('Query route tests', () =>
       .expect(400)
       .then((response) =>
       {
-        winston.info(response.text);
+        MidwayLogger.info(response.text);
         expect(JSON.parse(response.text)).toMatchObject(
           {
             errors: [
@@ -740,7 +740,7 @@ describe('Query route tests', () =>
           },
         }).expect(200).then((response) =>
         {
-          winston.info(response.text);
+          MidwayLogger.info(response.text);
         }).catch((error) =>
         {
           fail(error);
@@ -760,7 +760,7 @@ describe('Query route tests', () =>
           },
         }).expect(200).then((response) =>
         {
-          winston.info(response.text);
+          MidwayLogger.info(response.text);
           expect(JSON.parse(response.text)).toMatchObject(
             {
               result: {
@@ -791,7 +791,7 @@ describe('Query route tests', () =>
           },
         }).expect(200).then((response) =>
         {
-          winston.info(response.text);
+          MidwayLogger.info(response.text);
           const respData = JSON.parse(response.text);
           expect(respData['result']).toMatchObject(
             {
@@ -813,7 +813,7 @@ describe('Query route tests', () =>
           },
         }).then((response) =>
         {
-          winston.info(response.text);
+          MidwayLogger.info(response.text);
           expect(JSON.parse(response.text)).toMatchObject(
             {
               errors: [
@@ -891,7 +891,7 @@ describe('Query route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        winston.info(response.text);
+        MidwayLogger.info(response.text);
         expect(response.text).not.toBe('');
         if (response.text === '')
         {
@@ -1018,7 +1018,7 @@ describe('Query route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        winston.info(response.text);
+        MidwayLogger.info(response.text);
         expect(response.text).not.toBe('');
         if (response.text === '')
         {
@@ -1096,7 +1096,7 @@ describe('Query route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        winston.info(response.text);
+        MidwayLogger.info(response.text);
         expect(response.text).not.toBe('');
         if (response.text === '')
         {

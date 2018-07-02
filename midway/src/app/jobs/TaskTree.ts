@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 import * as fs from 'fs';
 import * as stream from 'stream';
-import * as winston from 'winston';
 
+import { MidwayLogger } from '../log/MidwayLogger';
 import { TaskConfig } from 'shared/types/jobs/TaskConfig';
 import { TaskEnum } from 'shared/types/jobs/TaskEnum';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
@@ -186,7 +186,7 @@ export class TaskTree
     let result: TaskOutputConfig = await taskTreeNode.accept(taskTreePrinter, this.tasks[ind]);
     while (result.exit !== true)
     {
-      winston.info('-->');
+      MidwayLogger.info('-->');
       ind = this.tasks[ind].getOnSuccess();
       result = await taskTreeNode.accept(taskTreePrinter, this.tasks[ind]);
     }
@@ -233,7 +233,7 @@ export class TaskTree
         const lastStream: stream.Readable | string = await this._readFromFile(this.taskTreeConfig.filename);
         if (typeof lastStream === 'string')
         {
-          winston.warn(lastStream as string);
+          MidwayLogger.warn(lastStream as string);
         }
         this.tasks[ind].setInputConfigStream(lastStream as stream.Readable);
       }
@@ -261,11 +261,11 @@ export class TaskTree
           const saveResults: boolean | string = await this._saveToFile(result['options']['outputStream'], this.taskTreeConfig.filename);
           if (typeof saveResults === 'boolean')
           {
-            winston.info('Saved as ' + this.taskTreeConfig.filename);
+            MidwayLogger.info('Saved as ' + this.taskTreeConfig.filename);
           }
           else
           {
-            winston.warn('Error while saving file ' + this.taskTreeConfig.filename + ': ' + saveResults as string);
+            MidwayLogger.warn('Error while saving file ' + this.taskTreeConfig.filename + ': ' + saveResults as string);
           }
         }
         result = await taskTreeNode.accept(taskTreeVisitor, this.tasks[ind]);

@@ -43,10 +43,10 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import * as winston from 'winston';
 
 import ElasticConfig from '../../src/database/elastic/ElasticConfig';
 import PrefixedElasticController from '../../src/database/elastic/PrefixedElasticController';
+import { MidwayLogger } from '../../src/app/log/MidwayLogger';
 import MySQLConfig from '../../src/database/mysql/MySQLConfig';
 import MySQLController from '../../src/database/mysql/MySQLController';
 import * as Tasty from '../../src/tasty/Tasty';
@@ -78,14 +78,14 @@ async function initializeDBs(): Promise<void>
 async function readTable(table, mysql: MySQLController): Promise<object[]>
 {
   const elements: object[] = await mysql.getTasty().select(table, [], {});
-  winston.info('read ' + elements.length.toString() + ' elements');
+  MidwayLogger.info('read ' + elements.length.toString() + ' elements');
   return elements;
 }
 
 async function copyTable(table, mysql: MySQLController, elastic: PrefixedElasticController): Promise<object[]>
 {
   const elements: object[] = await readTable(table, mysql);
-  winston.info('Copying ' + elements.length.toString() + ' elements');
+  MidwayLogger.info('Copying ' + elements.length.toString() + ' elements');
   return elastic.getTasty().upsert(table, elements) as Promise<object[]>;
 }
 
@@ -97,10 +97,10 @@ export const _async = (async () =>
     await initializeDBs();
     await copyTable(DBMovies, mysqlController, elasticController);
     await readTable(DBMovies, mysqlController);
-    winston.info('Copied the table movies.');
+    MidwayLogger.info('Copied the table movies.');
   }
   catch (e)
   {
-    winston.error(e);
+    MidwayLogger.error(e);
   }
 })();

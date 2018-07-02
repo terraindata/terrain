@@ -46,13 +46,13 @@ THE SOFTWARE.
 
 import bodybuilder = require('bodybuilder');
 import * as Elastic from 'elasticsearch';
-import * as winston from 'winston';
 
 import util from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticController from '../../database/elastic/ElasticController';
 import * as Tasty from '../../tasty/Tasty';
 import EventConfig from './EventConfig';
+import { MidwayLogger } from '../log/MidwayLogger';
 
 export interface AggregationRequest
 {
@@ -247,7 +247,7 @@ export class Events
       }
       catch (e)
       {
-        winston.info('Ignoring malformed field value');
+        MidwayLogger.info('Ignoring malformed field value');
       }
     }
     return this.buildQuery(controller, body.build());

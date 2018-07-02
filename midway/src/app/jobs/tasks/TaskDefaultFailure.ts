@@ -45,8 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as stream from 'stream';
-import * as winston from 'winston';
 
+import { MidwayLogger } from '../../log/MidwayLogger';
 import { TaskConfig } from 'shared/types/jobs/TaskConfig';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 import { Task } from '../Task';
@@ -85,7 +85,7 @@ export class TaskDefaultFailure extends Task
 
   public async printNode(): Promise<TaskOutputConfig>
   {
-    winston.info('Printing Default Failure, params: ' + JSON.stringify(taskOutputConfig as object));
+    MidwayLogger.info('Printing Default Failure, params: ' + JSON.stringify(taskOutputConfig as object));
     return Promise.resolve(taskOutputConfig);
   }
 }

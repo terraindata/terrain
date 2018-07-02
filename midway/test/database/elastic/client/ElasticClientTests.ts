@@ -44,8 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as winston from 'winston';
-
+import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 import SharedUtil from '../../../../../shared/Util';
 import * as Utils from '../../TestUtil';
 
@@ -66,8 +65,7 @@ function getExpectedFile(): string
 
 beforeAll(async (done) =>
 {
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
+  MidwayLogger.level = 'debug';
   const config: ElasticConfig = {
     hosts: ['http://localhost:9200'],
   };
@@ -100,7 +98,7 @@ test('elastic health', async (done) =>
       {},
       SharedUtil.promise.makeCallback(resolve, reject));
   });
-  winston.info(JSON.stringify(result));
+  MidwayLogger.info(JSON.stringify(result));
   done();
 });
 
@@ -121,7 +119,7 @@ test('search', async (done) =>
         },
         SharedUtil.promise.makeCallback(resolve, reject));
     });
-    winston.info(JSON.stringify(result, null, 2));
+    MidwayLogger.info(JSON.stringify(result, null, 2));
     await Utils.checkResults(getExpectedFile(), 'search', result.hits);
   }
   catch (e)
@@ -142,7 +140,7 @@ test('indices.getMapping', async (done) =>
         {},
         SharedUtil.promise.makeCallback(resolve, reject));
     });
-    winston.info(JSON.stringify(result, null, 2));
+    MidwayLogger.info(JSON.stringify(result, null, 2));
     await Utils.checkResults(getExpectedFile(), 'indices.getMapping', result);
   }
   catch (e)
@@ -190,7 +188,7 @@ test('putScript', async (done) =>
         },
         SharedUtil.promise.makeCallback(resolve, reject));
     });
-    winston.info(JSON.stringify(result, null, 2));
+    MidwayLogger.info(JSON.stringify(result, null, 2));
     await Utils.checkResults(getExpectedFile(), 'putScript', result.hits);
   }
   catch (e)
