@@ -45,9 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as fs from 'fs';
-import * as winston from 'winston';
 
 import { CmdLineUsage } from './CmdLineArgs';
+import { logger } from './Logging';
 
 export interface Config
 {
@@ -85,7 +85,7 @@ export function loadConfigFromFile(config: Config): Config
     }
     catch (e)
     {
-      winston.error('Failed to read configuration settings from ' + String(config.config));
+      logger.error('Failed to read configuration settings from ' + String(config.config));
     }
   }
   return config;
@@ -93,7 +93,7 @@ export function loadConfigFromFile(config: Config): Config
 
 export async function handleConfig(config: Config): Promise<void>
 {
-  winston.debug('Using configuration: ' + JSON.stringify(config));
+  logger.debug('Using configuration: ' + JSON.stringify(config));
   if (config.help === true)
   {
     // tslint:disable-next-line
@@ -103,14 +103,12 @@ export async function handleConfig(config: Config): Promise<void>
 
   if (config.verbose === true)
   {
-    // TODO: get rid of this monstrosity once @types/winston is updated.
-    (winston as any).level = 'verbose';
+    logger.level = 'verbose';
   }
 
   if (config.debug === true)
   {
-    // TODO: get rid of this monstrosity once @types/winston is updated.
-    (winston as any).level = 'debug';
+    logger.level = 'debug';
   }
 }
 
