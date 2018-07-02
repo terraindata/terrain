@@ -121,14 +121,7 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
   // Create a field if it doesn't exist
   if (typeof waypoint === 'string' && options['create'] === true && !obj.hasOwnProperty(waypoint) && !isPrimitive(obj))
   {
-    if (typeof path.get(1) === 'number' && path.size > 1)
-    {
-      obj[waypoint] = [];
-    }
-    else
-    {
-      obj[waypoint] = {};
-    }
+    obj[waypoint] = {};
     keys.push(waypoint);
   }
 
@@ -295,4 +288,70 @@ export function search(obj: object, path: KeyPath): ContextResult[]
   const results = [];
   searchRecurse(obj, path, (result) => results.push(result));
   return results;
+}
+
+export function setSingle(obj: object, path: KeyPath, value)
+{
+  if (typeof obj !== 'object' || obj == null || path.size === 0)
+  {
+    return false;
+  }
+  let curr = obj;
+  for (let i = 0; i < path.size - 1; i++)
+  {
+    const waypoint = path.get(i);
+    const nextWaypoint = path.get(i + 1);
+    if (typeof nextWaypoint === 'number')
+    {
+      if (curr[waypoint] == null)
+      {
+        curr[waypoint] = [];
+      }
+      else if (!Array.isArray(curr[waypoint]))
+      {
+        return false;
+      }
+    }
+    else
+    {
+      if (curr[waypoint] == null)
+      {
+        curr[waypoint] = {};
+      }
+      else if (Array.isArray(curr[waypoint]))
+      {
+        return false;
+      }
+    }
+    curr = curr[waypoint];
+  }
+  curr[path.last()] = value;
+  return true;
+}
+
+export function deleteSingle(obj: object, path: KeyPath)
+{
+  if (typeof obj !== 'object' || obj == null || path.size === 0)
+  {
+    return false;
+  }
+  let curr = obj;
+  for (let i = 0; i < path.size - 1; i++)
+  {
+    const waypoint = path.get(i);
+    if (curr[waypoint] == null)
+    {
+      return false;
+    }
+    curr = curr[waypoint];
+  }
+  if (curr.hasOwnProperty(path.last()))
+  {
+    delete curr[path.last()];
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
