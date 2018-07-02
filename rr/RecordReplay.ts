@@ -51,8 +51,9 @@ import * as getUsage from 'command-line-usage';
 import * as jsonfile from 'jsonfile';
 import * as puppeteer from 'puppeteer';
 import * as sleep from 'sleep';
-import * as winston from 'winston';
+
 import { filteringRecordBuilderActions, login, replayRREvents, waitForInput } from './FullstackUtils';
+import { TestLogger } from '../shared/test/TestLogger';
 
 const COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > svg';
 const CARDS_COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > div > div.menu-options-wrapper > div:nth-child(3) > div > div.menu-text-padding';
@@ -118,11 +119,11 @@ async function startBuilder(page)
 {
   await page.waitForSelector(COLUMN_SELECTOR);
   await page.click(COLUMN_SELECTOR);
-  winston.info('Select the column.');
+  TestLogger.info('Select the column.');
   sleep.sleep(1);
   await page.waitForSelector(CARDS_COLUMN_SELECTOR);
   await page.click(CARDS_COLUMN_SELECTOR);
-  winston.info('Select the card column.');
+  TestLogger.info('Select the card column.');
   sleep.sleep(1);
   await page.waitForSelector(CARDSTARTER_SELECTOR);
   await page.click(CARDSTARTER_SELECTOR);

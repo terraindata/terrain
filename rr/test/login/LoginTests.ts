@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 // tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands max-line-length
 
@@ -53,7 +53,6 @@ import * as request from 'then-request';
 
 const USERNAME_SELECTOR = '#login-email';
 const PASSWORD_SELECTOR = '#login-password';
-import * as winston from 'winston';
 const BUTTON_SELECTOR = '#login-submit';
 const CREATE_CATEGORY_SELECTOR = '.info-area-button';
 const CATEGORY_ITEM_SELECTOR = '.category-library-info-wrapper';
@@ -64,6 +63,7 @@ const ALGORITHM_SELECTOR = ':nth-child(2) > .library-category-BUILD > .library-c
 
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
 import { getChromeDebugAddress } from '../../FullstackUtils';
+import { TestLogger } from '../../../shared/test/TestLogger';
 
 expect.extend({ toMatchImageSnapshot } as any);
 
@@ -82,9 +82,9 @@ async function loginToBuilder(page, url)
 {
   await page.goto(url);
   sleep.sleep(1);
-  winston.info('Goto the login page ' + url);
+  TestLogger.info('Goto the login page ' + url);
   await page.waitForSelector(USERNAME_SELECTOR);
-  winston.info('Username selector is ready.');
+  TestLogger.info('Username selector is ready.');
   await takeAndCompareScreenShot(page);
   await page.click(USERNAME_SELECTOR);
   await page.keyboard.type('admin@terraindata.com');
@@ -92,42 +92,42 @@ async function loginToBuilder(page, url)
   await page.keyboard.type('CnAATPys6tEB*ypTvqRRP5@2fUzTuY!C^LZP#tBQcJiC*5');
   await page.click(BUTTON_SELECTOR);
   sleep.sleep(4);
-  winston.info('Goto the starting page.');
+  TestLogger.info('Goto the starting page.');
   const selectorConfig = { visible: true, hidden: true };
 
   await page.waitForSelector(CREATE_CATEGORY_SELECTOR, selectorConfig);
   await page.click(CREATE_CATEGORY_SELECTOR);
-  winston.info('Create category');
+  TestLogger.info('Create category');
   sleep.sleep(1);
   await takeAndCompareScreenShot(page);
 
   await page.waitForSelector(CATEGORY_ITEM_SELECTOR, selectorConfig);
   await page.click(CATEGORY_ITEM_SELECTOR);
-  winston.info('Select category');
+  TestLogger.info('Select category');
   sleep.sleep(1);
   await takeAndCompareScreenShot(page);
 
   await page.waitForSelector(CREATE_GROUP_SELECTOR, selectorConfig);
   await page.click(CREATE_GROUP_SELECTOR);
-  winston.info('Select group');
+  TestLogger.info('Select group');
   sleep.sleep(1);
   await takeAndCompareScreenShot(page);
 
   await page.waitForSelector(CREATE_GROUP_BUTTON_SELECTOR, selectorConfig);
   await page.click(CREATE_GROUP_BUTTON_SELECTOR);
-  winston.info('Create group');
+  TestLogger.info('Create group');
   sleep.sleep(1);
   await takeAndCompareScreenShot(page);
 
   await page.waitForSelector(CREATE_ALGORITHM_SELECTOR, selectorConfig);
   await page.click(CREATE_ALGORITHM_SELECTOR, { clickCount: 2 });
-  winston.info('Create algorithm');
+  TestLogger.info('Create algorithm');
   sleep.sleep(1);
   await takeAndCompareScreenShot(page);
 
   await page.waitForSelector(ALGORITHM_SELECTOR, selectorConfig);
   await page.click(ALGORITHM_SELECTOR, { clickCount: 2 });
-  winston.info('Select algorithm');
+  TestLogger.info('Select algorithm');
   sleep.sleep(1);
   await takeAndCompareScreenShot(page);
 }
@@ -141,7 +141,7 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
   {
     const wsAddress = await getChromeDebugAddress();
     browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
-    winston.info('Connected to the Chrome ' + wsAddress);
+    TestLogger.info('Connected to the Chrome ' + wsAddress);
     // browser = await puppeteer.launch({headless: false});
     // page = await browser.newPage();
   });
@@ -149,7 +149,7 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
   it('login', async () =>
   {
     page = await browser.newPage();
-    winston.info('Created a new page.');
+    TestLogger.info('Created a new page.');
     await page.setViewport({ width: 1600, height: 1200 });
     const url = `http://${ip.address()}:3000`;
     await loginToBuilder(page, url);
@@ -158,6 +158,6 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
   afterAll(async () =>
   {
     await page.close();
-    winston.info('The page is closed.');
+    TestLogger.info('The page is closed.');
   });
 });
