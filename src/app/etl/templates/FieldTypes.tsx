@@ -53,7 +53,7 @@ import TransformationNodeBase from 'shared/transformations/TransformationNode';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType, NodeTypes } from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
-import { areFieldsLocal } from 'shared/transformations/util/TransformationsUtil';
+import Topology from 'shared/transformations/util/TopologyUtil';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
 // only put fields in here that are needed to track display-sensitive state
@@ -110,7 +110,7 @@ class TemplateFieldC
   public isLocalToRoot(): boolean
   {
     // we can use a placeholder name
-    return areFieldsLocal(this.outputKeyPath, List(['sample_name']));
+    return Topology.areFieldsLocal(this.outputKeyPath, List(['sample_name']));
   }
 
   public isNamedField()
