@@ -46,10 +46,10 @@ THE SOFTWARE.
 
 import * as fs from 'fs';
 import * as Immutable from 'immutable';
-import * as winston from 'winston';
 
 import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
 import ESParserError from 'shared/database/elastic/parser/ESParserError';
+import { TestLogger } from 'shared/test/TestLogger';
 import SharedUtil from '../../../../shared/Util';
 import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
 
@@ -62,8 +62,7 @@ let expected;
 
 beforeAll(async (done) =>
 {
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
+  TestLogger.level = 'debug';
 
   const contents: any = await new Promise((resolve, reject) =>
   {
@@ -79,7 +78,7 @@ function testCardParseWithInputParameter(testName: string,
   inputParameter: any,
   expectedErrors: ESParserError[] = [])
 {
-  winston.info('testing "' + testName + '": "' + testString + '"' + '": "' + JSON.stringify(inputParameter) + '"');
+  TestLogger.info('testing "' + testName + '": "' + testString + '"' + '": "' + JSON.stringify(inputParameter) + '"');
   const emptyCards = Immutable.List([]);
   const parameters = { number: 10 };
   const interpreter: ESInterpreter = new ESInterpreter(testString, parameters);

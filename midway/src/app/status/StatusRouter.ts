@@ -49,10 +49,10 @@ import * as KoaRouter from 'koa-router';
 import * as os from 'os';
 import * as process from 'process';
 import * as v8 from 'v8';
-import * as winston from 'winston';
 
 import appStats from '../AppStats';
 import { databases } from '../database/DatabaseRouter';
+import { MidwayLogger } from '../log/MidwayLogger';
 
 const Router = new KoaRouter();
 export const initialize = () => { };
@@ -118,10 +118,11 @@ Router.get('/stats', passport.authenticate('access-token-local'), async (ctx, ne
 
 Router.get('/logs', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
+  // console.log(JSON.stringify(MidwayLogger.transports[1]['name']));
   if (ctx.state.user.isSuperUser)
   {
-    const transport = winston['default'].transports['MemoryTransport'];
-    ctx.body = (transport as any).getAll();
+    const transport = MidwayLogger.transports[1];
+    ctx.body = String(transport.getAll()) + '\n';
   }
   else
   {

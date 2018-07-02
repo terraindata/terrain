@@ -44,8 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as winston from 'winston';
-
+import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
 import PrefixedElasticController from '../../../../src/database/elastic/PrefixedElasticController';
@@ -66,8 +65,7 @@ const DBMovies = new Tasty.Table('data', ['movieid'], ['title', 'releasedate'], 
 
 beforeAll(async () =>
 {
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
+  MidwayLogger.level = 'debug';
   try
   {
     const config: ElasticConfig = {

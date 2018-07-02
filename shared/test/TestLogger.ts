@@ -42,74 +42,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import * as _ from 'lodash';
+import dateFormat = require('date-format');
+import * as winston from 'winston';
 
-import { TaskConfig } from 'shared/types/jobs/TaskConfig';
-import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
-import { TaskTreeConfig } from 'shared/types/jobs/TaskTreeConfig';
-import { Task } from './Task';
-import { TaskTree } from './TaskTree';
-
-export class Job
-{
-  private tasks: TaskConfig[]; // [id]
-  private taskTree: TaskTree;
-
-  constructor()
-  {
-    this.tasks = [];
-    this.taskTree = new TaskTree();
-  }
-
-  public cancel(): void
-  {
-    this.taskTree.cancel();
-  }
-
-  public create(args: TaskConfig[], filename: string): boolean | string
-  {
-    if (args === undefined || (Array.isArray(args) && args.length === 0))
-    {
-      return false;
-    }
-    this.tasks = args;
-    const taskTreeConfig: TaskTreeConfig =
-      {
-        cancel: false,
-        filename,
-        jobStatus: 0,
-        paused: -1,
-      };
-    return this.taskTree.create(args, taskTreeConfig);
-  }
-
-  public pause(): void
-  {
-    if (this.taskTree.isCancelled() === false)
-    {
-      this.taskTree.pause();
-    }
-  }
-
-  public async unpause(): Promise<void>
-  {
-    if (this.taskTree.isCancelled() === true)
-    {
-      await this.run();
-    }
-  }
-
-  public async printTree(): Promise<void>
-  {
-    await this.taskTree.printTree();
-  }
-
-  public async run(): Promise<TaskOutputConfig>
-  {
-    return this.taskTree.visit();
-  }
-}
-
-export default Job;
+export const TestLogger = winston.createLogger({
+    level: 'debug',
+    format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.printf((info) => {
+            const meta = (info.meta !== undefined) && (Object.keys(info.meta).length > 0) ? '\n\t' + JSON.stringify(info.meta) : '';
+            return `${dateFormat('yyyy-MM-dd hh:mm:ss.SSS')} [${process.pid}] ${info.level}: ${info.message} ${meta}`;
+        }),
+    ),
+    transports: [
+        new winston.transports.Console(),
+    ],
+});

@@ -44,9 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as winston from 'winston';
-
 import { DatabaseConfig } from '../app/database/DatabaseConfig';
+import { MidwayLogger } from '../app/log/MidwayLogger';
 import QueryHandler from '../app/query/QueryHandler';
 import * as Tasty from '../tasty/Tasty';
 import DatabaseControllerStatus from './DatabaseControllerStatus';
@@ -81,14 +80,14 @@ abstract class DatabaseController
   public log(methodName: string, info?: any, moreInfo?: any)
   {
     const header = this.header + (++this.lsn).toString() + ':' + methodName;
-    winston.debug(header);
+    MidwayLogger.debug(header);
     if (info !== undefined)
     {
-      winston.debug(header + ': ' + JSON.stringify(info, null, 1));
+      MidwayLogger.debug(header + ': ' + JSON.stringify(info, null, 1));
     }
     if (moreInfo !== undefined)
     {
-      winston.debug(header + ': ' + JSON.stringify(moreInfo, null, 1));
+      MidwayLogger.debug(header + ': ' + JSON.stringify(moreInfo, null, 1));
     }
   }
 

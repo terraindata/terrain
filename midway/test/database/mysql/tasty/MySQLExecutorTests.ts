@@ -44,8 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as winston from 'winston';
-
+import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 import MySQLConfig from '../../../../src/database/mysql/MySQLConfig';
 import MySQLController from '../../../../src/database/mysql/MySQLController';
 
@@ -64,7 +63,7 @@ let mysqlController: MySQLController;
 
 beforeAll(async () =>
 {
-  (winston as any).level = 'debug';
+  MidwayLogger.level = 'debug';
   const config: MySQLConfig =
     {
       connectionLimit: 20,

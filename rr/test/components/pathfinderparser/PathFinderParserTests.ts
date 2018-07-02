@@ -42,17 +42,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 import * as fs from 'fs';
 import * as ip from 'ip';
 import * as sleep from 'sleep';
-import * as winston from 'winston';
 
 import * as jsonfile from 'jsonfile';
 
 import * as puppeteer from 'puppeteer';
+import { TestLogger } from '../../../../shared/test/TestLogger';
 import { getChromeDebugAddress, login } from '../../../FullstackUtils';
 
 const USERNAME_SELECTOR = '#login-email';
@@ -78,17 +77,17 @@ describe('Testing the pathfinder parser', () =>
     const actionFileName = getExpectedActionFile();
     const actionFileData = jsonfile.readFileSync(actionFileName);
     actions = actionFileData.actions;
-    winston.info('Testing ' + String(actions.length) + ' queries.');
+    TestLogger.info('Testing ' + String(actions.length) + ' queries.');
     const wsAddress = await getChromeDebugAddress();
     browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
     // browser = await puppeteer.launch({ headless: false });
-    winston.info('Connected to the Chrome ' + String(wsAddress));
+    TestLogger.info('Connected to the Chrome ' + String(wsAddress));
     page = await browser.newPage();
-    winston.info('Created a new browser page.');
+    TestLogger.info('Created a new browser page.');
     await page.setViewport({ width: 1600, height: 1200 });
-    winston.info('Set the page view to 1600x1200.');
+    TestLogger.info('Set the page view to 1600x1200.');
     const url = `http://${ip.address()}:3000`;
-    winston.info('Get url:' + url);
+    TestLogger.info('Get url:' + url);
     await login(page, url);
   });
 
@@ -106,7 +105,7 @@ describe('Testing the pathfinder parser', () =>
       {
         return window['TerrainTools'].terrainTests.PathFinderToQuery(theQuery);
       }, query);
-      winston.info('Parsing item' + String(i) + ':' + JSON.stringify(actions[i]));
+      TestLogger.info('Parsing item' + String(i) + ':' + JSON.stringify(actions[i]));
       expect(tql).toBe(query.tql);
     }
   }, 30000);
@@ -114,6 +113,6 @@ describe('Testing the pathfinder parser', () =>
   afterAll(async () =>
   {
     await page.close();
-    winston.info('The page is closed');
+    TestLogger.info('The page is closed');
   });
 });

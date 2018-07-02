@@ -47,7 +47,6 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import { Readable } from 'stream';
-import * as winston from 'winston';
 
 import QueryRequest from '../../../../shared/database/types/QueryRequest';
 import QueryResponse from '../../../../shared/database/types/QueryResponse';
@@ -56,6 +55,7 @@ import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../AppUtil';
+import { MidwayLogger } from '../log/MidwayLogger';
 import { QueryHandler } from './QueryHandler';
 
 const QueryRouter = new KoaRouter();
@@ -63,7 +63,7 @@ export const initialize = () => { };
 
 QueryRouter.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info(JSON.stringify(ctx.request, null, 1));
+  MidwayLogger.info(JSON.stringify(ctx.request, null, 1));
   let query: QueryRequest;
   if (ctx.request.type === 'application/json')
   {
@@ -78,17 +78,17 @@ QueryRouter.post('/', passport.authenticate('access-token-local'), async (ctx, n
     throw new Error('Unknown Request Type ' + String(ctx.request.body));
   }
 
-  winston.info(JSON.stringify(ctx.request.body, null, 1));
-  winston.info('db ' + JSON.stringify(query));
+  MidwayLogger.info(JSON.stringify(ctx.request.body, null, 1));
+  MidwayLogger.info('db ' + JSON.stringify(query));
   Util.verifyParameters(query, ['database', 'type', 'body']);
 
-  winston.info('query database: ' + query.database.toString() + ' type "' + query.type + '"');
-  winston.debug('query database debug: ' + query.database.toString() + ' type "' + query.type + '"' +
+  MidwayLogger.info('query database: ' + query.database.toString() + ' type "' + query.type + '"');
+  MidwayLogger.debug('query database debug: ' + query.database.toString() + ' type "' + query.type + '"' +
     'body: ' + JSON.stringify(query.body));
 
   if (query.streaming === true)
   {
-    winston.info('Streaming query result to ' + String(ctx.request.body.filename));
+    MidwayLogger.info('Streaming query result to ' + String(ctx.request.body.filename));
   }
 
   const database: DatabaseController | undefined = DatabaseRegistry.get(query.database);

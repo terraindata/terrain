@@ -46,7 +46,8 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+
+import { MidwayLogger } from '../log/MidwayLogger';
 import { Versions } from './Versions';
 export * from './Versions';
 
@@ -57,13 +58,13 @@ export const initialize = () => versions.initialize();
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   // return all versions
-  winston.info('get all versions');
+  MidwayLogger.info('get all versions');
   ctx.body = await versions.get();
 });
 
 Router.get('/:objtype/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('get versions by object type and id');
+  MidwayLogger.info('get versions by object type and id');
   ctx.body = await versions.get(ctx.params.objtype, ctx.params.id);
 });
 

@@ -46,11 +46,11 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
 
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../AppUtil';
+import { MidwayLogger } from '../log/MidwayLogger';
 import { Events } from './Events';
 import { Metrics } from './Metrics';
 
@@ -93,7 +93,7 @@ Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next
     );
   }
 
-  winston.info('computing aggregation on events');
+  MidwayLogger.info('computing aggregation on events');
 
   const databaseid = Number(request.database);
   const db: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
@@ -126,19 +126,19 @@ Router.get('/metrics/:id?', passport.authenticate('access-token-local'), async (
 {
   if (ctx.params.id === undefined)
   {
-    winston.info('getting all metrics');
+    MidwayLogger.info('getting all metrics');
     ctx.body = await metrics.select([], {});
   }
   else
   {
-    winston.info('getting metric ID ' + String(ctx.params.id));
+    MidwayLogger.info('getting metric ID ' + String(ctx.params.id));
     ctx.body = await metrics.select([], { id: ctx.params.id });
   }
 });
 
 Router.post('/metrics', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('add or update event');
+  MidwayLogger.info('add or update event');
   const request = ctx.request.body.body;
   Util.verifyParameters(request, ['database', 'label', 'events']);
 

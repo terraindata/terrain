@@ -46,7 +46,8 @@ THE SOFTWARE.
 
 import { EventEmitter } from 'events';
 import { Duplex, Transform, Writable } from 'stream';
-import * as winston from 'winston';
+
+import { MidwayLogger } from '../../log/MidwayLogger';
 
 /**
  * Monitors progress of the writable stream
@@ -74,7 +75,7 @@ export default class ProgressStream extends Duplex
     this.writer = writer;
     this.writer.on('error', (e) =>
     {
-      winston.error(e.toString());
+      MidwayLogger.error(e.toString());
       this.errors++;
     });
 

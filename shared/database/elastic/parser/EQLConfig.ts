@@ -81,7 +81,6 @@ export default class EQLConfig
       return; // already declared
     }
 
-    // winston.info('declare "' + id + '"');
     settings.type = type;
     let clause: ESClause | null = null;
 

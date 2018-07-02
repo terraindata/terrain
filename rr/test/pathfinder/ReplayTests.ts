@@ -53,7 +53,7 @@ import * as sleep from 'sleep';
 import * as request from 'then-request';
 
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
-import * as winston from 'winston';
+import { TestLogger } from '../../../shared/test/TestLogger';
 import TerrainTools from '../../../src/app/util/TerrainTools';
 import { replayReduxEventOnly, replayRREvents } from '../../FullstackUtils';
 
@@ -89,7 +89,7 @@ async function getChromeDebugAddress()
     return wsAddress;
   } catch (err)
   {
-    winston.error(err);
+    TestLogger.error(err);
     return undefined;
   }
 }
@@ -102,7 +102,7 @@ async function takeBuilderActionScreenshot(page)
 async function gotoStarterPage(page, url)
 {
   await page.goto(url);
-  winston.info('Start builder at : ' + String(url));
+  TestLogger.info('Start builder at : ' + String(url));
   sleep.sleep(3);
 }
 
@@ -115,7 +115,7 @@ describe('Replay a builder action', () =>
   {
     const wsAddress = await getChromeDebugAddress();
     browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
-    winston.info('Connected to the Chrome ' + wsAddress);
+    TestLogger.info('Connected to the Chrome ' + wsAddress);
     actionFileData = jsonfile.readFileSync(getExpectedActionFile());
     // loading from options['directory']/actions.json
   });
@@ -141,6 +141,6 @@ describe('Replay a builder action', () =>
   afterAll(async () =>
   {
     await page.close();
-    winston.info('The page is closed.');
+    TestLogger.info('The page is closed.');
   });
 });

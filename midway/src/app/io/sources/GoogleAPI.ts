@@ -47,10 +47,10 @@ THE SOFTWARE.
 import * as googleoauthjwt from 'google-oauth-jwt';
 import * as _ from 'lodash';
 import * as stream from 'stream';
-import * as winston from 'winston';
 
 import { CredentialConfig } from '../../credentials/CredentialConfig';
 import Credentials from '../../credentials/Credentials';
+import { MidwayLogger } from '../../log/MidwayLogger';
 import CSVTransform from '../streams/CSVTransform';
 
 export const credentials: Credentials = new Credentials();
@@ -110,7 +110,7 @@ export class GoogleAPI
       const dayInterval: number = analytics[0]['dayInterval'];
       if (dayInterval === undefined || typeof dayInterval !== 'number')
       {
-        winston.warn('Day interval must be specified in numerical format');
+        MidwayLogger.warn('Day interval must be specified in numerical format');
       }
       const currDate: any = new Date(Date.now() - 1000 * 3600 * 24);
       // @ts-ignore
@@ -137,7 +137,7 @@ export class GoogleAPI
       dateRange.push({ startDate: startDateStr, endDate: currDateStr });
       analytics[0]['dateRanges'] = dateRange;
       delete analytics[0]['dayInterval'];
-      winston.info('Retrieving analytics for date range ' + JSON.stringify(dateRange));
+      MidwayLogger.info('Retrieving analytics for date range ' + JSON.stringify(dateRange));
       const analyticsBody =
         {
           reportRequests: [analytics],
@@ -148,8 +148,8 @@ export class GoogleAPI
       let potentialError: string = '';
       const analyticsBatchGet = function(analyticsBodyPassed)
       {
-        winston.info(this.storedEmail);
-        winston.info('<redacted private key contents>');
+        MidwayLogger.info(this.storedEmail);
+        MidwayLogger.info('<redacted private key contents>');
         request({
           method: 'POST',
           url: 'https://analyticsreporting.googleapis.com/v4/reports:batchGet',
@@ -164,9 +164,9 @@ export class GoogleAPI
           {
             if (err !== null && err !== undefined)
             {
-              winston.warn(this.storedEmail);
-              winston.info('<redacted private key contents>');
-              winston.warn(err);
+              MidwayLogger.warn(this.storedEmail);
+              MidwayLogger.info('<redacted private key contents>');
+              MidwayLogger.warn(err);
             }
             try
             {
@@ -195,7 +195,7 @@ export class GoogleAPI
               constructedHeader = true;
               if (report['nextPageToken'] !== undefined)
               {
-                winston.info('Fetching the next page of reports... pageToken ' + (report['nextPageToken'] as string));
+                MidwayLogger.info('Fetching the next page of reports... pageToken ' + (report['nextPageToken'] as string));
                 analyticsBodyPassed['reportRequests'][0][0]['pageToken'] = report['nextPageToken'];
                 analyticsBatchGet(analyticsBodyPassed);
               }
@@ -224,8 +224,8 @@ export class GoogleAPI
             }
             catch (e)
             {
-              winston.warn(potentialError);
-              winston.info('Potentially incorrect credentials. Caught error: ' + (e.toString() as string));
+              MidwayLogger.warn(potentialError);
+              MidwayLogger.info('Potentially incorrect credentials. Caught error: ' + (e.toString() as string));
               reject('Potentially incorrect Google API credentials.');
             }
           });
@@ -258,7 +258,7 @@ export class GoogleAPI
           }
           catch (e)
           {
-            winston.info('Potentially incorrect credentials. Caught error: ' + (e.toString() as string));
+            MidwayLogger.info('Potentially incorrect credentials. Caught error: ' + (e.toString() as string));
             reject('Potentially incorrect Google API credentials.');
           }
         });
@@ -287,7 +287,7 @@ export class GoogleAPI
     const creds: CredentialConfig[] = await credentials.get(id, type);
     if (creds.length === 0)
     {
-      winston.info('No credential found for type ' + type + '.');
+      MidwayLogger.info('No credential found for type ' + type + '.');
     }
     else
     {
@@ -356,7 +356,7 @@ export class GoogleAPI
       }
       catch (e)
       {
-        winston.warn((JSON.stringify(step) as string) + ' error encountered: ' + ((e as any).toString() as string));
+        MidwayLogger.warn((JSON.stringify(step) as string) + ' error encountered: ' + ((e as any).toString() as string));
       }
     });
     return newData;

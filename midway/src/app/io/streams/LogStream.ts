@@ -45,7 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import { Readable, Transform, Writable } from 'stream';
-import * as winston from 'winston';
+
+import { MidwayLogger } from '../../log/MidwayLogger';
 
 /**
  * A log stream
@@ -151,15 +152,15 @@ export default class LogStream extends Readable
     const msg: string = level + ':' + message;
     if (level === 'warn')
     {
-      winston.warn(msg);
+      MidwayLogger.warn(msg);
     }
     else if (level === 'error')
     {
-      winston.error(msg);
+      MidwayLogger.error(msg);
     }
     else
     {
-      winston.info(msg);
+      MidwayLogger.info(msg);
     }
 
     this.buffers.push(JSON.stringify({
