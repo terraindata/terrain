@@ -47,6 +47,8 @@ THE SOFTWARE.
 import dateFormat = require('date-format');
 import * as winston from 'winston';
 
+import { MemoryTransport } from './MemoryTransport';
+
 export const MidwayLogger = winston.createLogger({
   level: 'debug',
   format: winston.format.combine(
@@ -58,6 +60,7 @@ export const MidwayLogger = winston.createLogger({
     }),
   ),
   transports: [
-    new winston.transports.Console(),
+      new winston.transports.Console(),
+      new MemoryTransport(),
   ],
 });
