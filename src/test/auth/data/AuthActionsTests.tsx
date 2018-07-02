@@ -48,7 +48,7 @@ import { AuthActions as Actions } from 'auth/data/AuthRedux';
 import * as Immutable from 'immutable';
 import { Ajax, createMockStore } from 'test-helpers/helpers';
 
-const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
+const MIDWAY_BASE_URL = `/midway/v1`;
 
 const loginResponse =
   {

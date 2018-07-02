@@ -51,7 +51,16 @@ import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
 import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
-import { _SinkConfig, _SourceConfig, ItemWithName, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import
+{
+  _SinkConfig,
+  _SourceConfig,
+  ItemWithName,
+  SINK_DEFAULT_NAME,
+  SinkConfig,
+  SOURCE_DEFAULT_NAME,
+  SourceConfig,
+} from 'shared/etl/immutable/EndpointRecords';
 import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'shared/etl/immutable/ETLProcessRecords';
 import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import { _TemplateSettings, TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
@@ -178,16 +187,40 @@ class ETLTemplateC implements ETLTemplateI
 
   public getSourceName(key)
   {
+    let sourceName = '';
     const source = this.getSource(key);
-    const type = (source != null && source.type != null) ? source.type : '';
-    return `${source != null ? source.name : ''} (${type})`;
+    if (source)
+    {
+      if (key === '_default')
+      {
+        sourceName = SOURCE_DEFAULT_NAME;
+      }
+      else
+      {
+        sourceName = source.name;
+      }
+    }
+
+    return sourceName;
   }
 
   public getSinkName(key)
   {
-    const sink = this.getSink(key);
-    const type = (sink != null && sink.type != null) ? sink.type : '';
-    return `${sink.name} (${type})`;
+    let sinkName = '';
+    const sink = this.getSource(key);
+    if (sink)
+    {
+      if (key === '_default')
+      {
+        sinkName = SINK_DEFAULT_NAME;
+      }
+      else
+      {
+        sinkName = sink.name;
+      }
+    }
+
+    return sinkName;
   }
 
   public getNodeName(id: number)

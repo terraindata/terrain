@@ -907,13 +907,15 @@ const Util = {
     return immutableMap;
   },
 
-  onEnter(handler) {
-    return (e) => {
+  onEnter(handler)
+  {
+    return (e) =>
+    {
       if (e.key === 'Enter')
       {
         handler();
       }
-    }
+    };
   },
 
   assertUnreachable(param: never): never

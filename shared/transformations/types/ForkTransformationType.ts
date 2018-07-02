@@ -44,26 +44,26 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
+import * as _ from 'lodash';
 
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
-import { areFieldsLocal } from 'shared/transformations/util/TransformationsUtil';
 
 import { List } from 'immutable';
 
-import { createLocalMatcher, visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationVisitError from 'shared/transformations/TransformationVisitError';
 import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import Topology from 'shared/transformations/util/TopologyUtil';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
 export interface OutputField
 {
-  field: number | KeyPath;
+  field: number;
   value: any;
 }
 
@@ -89,7 +89,7 @@ export default abstract class ForkTransformationType extends TransformationNode
     {
       opts.newFieldKeyPaths.forEach((nfkp) =>
       {
-        if (valid && !areFieldsLocal(field, nfkp))
+        if (valid && !Topology.areFieldsLocal(field, nfkp))
         {
           valid = false;
         }
@@ -103,44 +103,38 @@ export default abstract class ForkTransformationType extends TransformationNode
     return super.validate();
   }
 
-  protected transformDocument(doc: object): TransformationVisitResult
+  protected transformDocument(doc: object): TransformationVisitResult | undefined
   {
     const errors = [];
     const opts = this.meta as NodeOptionsType<any>;
 
-    this.fields.forEach((field) =>
+    const field = this.fields.get(0);
+    const outputFields: List<KeyPath> = opts.newFieldKeyPaths;
+    const matchCacheFn = _.memoize((newFieldIndex: number) =>
     {
-      for (const match of yadeep.search(doc, field))
-      {
-        const { value, location } = match;
-        if (value === null && this.skipNulls)
-        {
-          return;
-        }
-        if (!this.checkType(value))
-        {
-          errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof value}.`);
-          return;
-        }
-
-        const matcher = createLocalMatcher(field, location);
-        if (matcher === null)
-        {
-          errors.push(`Error in ${this.typeCode}: Field and Match location are inconsistent`);
-          return;
-        }
-
-        const newFields = this.split(value);
-
-        for (const newField of newFields)
-        {
-          const newFieldKeyPath: KeyPath = typeof newField.field === 'number' ?
-            opts.newFieldKeyPaths.get(newField.field) :
-            newField.field;
-          yadeep.set(doc, matcher(newFieldKeyPath), newField.value, { create: true });
-        }
-      }
+      return Topology.createBasePathMatcher(field, outputFields.get(newFieldIndex));
     });
+    for (const match of yadeep.search(doc, field))
+    {
+      const { value, location } = match;
+      if (value === null && this.skipNulls)
+      {
+        continue;
+      }
+      if (!this.checkType(value))
+      {
+        errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof value}.`);
+        continue;
+      }
+
+      const newFields = this.split(value);
+
+      for (const newField of newFields)
+      {
+        const newKP = matchCacheFn(newField.field)(location);
+        yadeep.set(doc, newKP, newField.value, { create: true });
+      }
+    }
 
     return {
       document: doc,

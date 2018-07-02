@@ -519,7 +519,7 @@ class ETLAjax
       // }
     }
 
-    xhr.open('post', MIDWAY_HOST + '/midway/v1/' + route);
+    xhr.open('post', '/midway/v1/' + route);
     xhr.send(formData);
   }
 }

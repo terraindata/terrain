@@ -49,7 +49,7 @@ import ActionTypes from 'library/data/LibraryActionTypes';
 import { Ajax, createMockStore } from 'test-helpers/helpers';
 import LibraryHelper from 'test-helpers/LibraryHelper';
 
-const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
+const MIDWAY_BASE_URL = `/midway/v1`;
 
 const mockStore = createMockStore();
 

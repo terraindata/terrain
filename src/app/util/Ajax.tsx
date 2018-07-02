@@ -119,7 +119,6 @@ export const Ajax =
         },
         _.extend({
           onError: config.onError,
-          host: MIDWAY_HOST,
           noToken: true,
           json: true,
           crossDomain: false,
@@ -142,7 +141,7 @@ export const Ajax =
         urlArgs?: object;
       } = {})
     {
-      const host = config.host || MIDWAY_HOST;
+      const host = config.host || '';
       const fullUrl = host + url;
 
       if (config.download)
