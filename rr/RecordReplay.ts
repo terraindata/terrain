@@ -52,8 +52,8 @@ import * as jsonfile from 'jsonfile';
 import * as puppeteer from 'puppeteer';
 import * as sleep from 'sleep';
 
-import { filteringRecordBuilderActions, login, replayRREvents, waitForInput } from './FullstackUtils';
 import { TestLogger } from '../shared/test/TestLogger';
+import { filteringRecordBuilderActions, login, replayRREvents, waitForInput } from './FullstackUtils';
 
 const COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > svg';
 const CARDS_COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > div > div.menu-options-wrapper > div:nth-child(3) > div > div.menu-text-padding';

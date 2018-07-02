@@ -51,8 +51,8 @@ import * as sleep from 'sleep';
 import * as jsonfile from 'jsonfile';
 
 import * as puppeteer from 'puppeteer';
-import { getChromeDebugAddress, login } from '../../../FullstackUtils';
 import { TestLogger } from '../../../../shared/test/TestLogger';
+import { getChromeDebugAddress, login } from '../../../FullstackUtils';
 
 const USERNAME_SELECTOR = '#login-email';
 

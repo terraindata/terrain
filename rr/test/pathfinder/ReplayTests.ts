@@ -53,9 +53,9 @@ import * as sleep from 'sleep';
 import * as request from 'then-request';
 
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
+import { TestLogger } from '../../../shared/test/TestLogger';
 import TerrainTools from '../../../src/app/util/TerrainTools';
 import { replayReduxEventOnly, replayRREvents } from '../../FullstackUtils';
-import { TestLogger } from '../../../shared/test/TestLogger';
 
 const COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > svg';
 const CARDS_COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > div > div.menu-options-wrapper > div:nth-child(3) > div > div.menu-text-padding';

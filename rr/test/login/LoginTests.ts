@@ -62,8 +62,8 @@ const CREATE_ALGORITHM_SELECTOR = '#app > div.app > div.app-wrapper > div > div 
 const ALGORITHM_SELECTOR = ':nth-child(2) > .library-category-BUILD > .library-category-content > :nth-child(1) > .library-item-link > .library-item-wrapper > .library-item > :nth-child(1) > .library-item-content > .flex-container > .flex-grow > .library-item-line';
 
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
-import { getChromeDebugAddress } from '../../FullstackUtils';
 import { TestLogger } from '../../../shared/test/TestLogger';
+import { getChromeDebugAddress } from '../../FullstackUtils';
 
 expect.extend({ toMatchImageSnapshot } as any);
 
