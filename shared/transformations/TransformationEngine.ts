@@ -60,6 +60,7 @@ import TransformationNodeType from './TransformationNodeType';
 import TransformationRegistry from './TransformationRegistry';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
+import Topology from 'shared/transformations/util/TopologyUtil';
 
 /**
  * A TransformationEngine performs transformations on complex JSON documents.
@@ -830,7 +831,8 @@ export class TransformationEngine
     });
     fieldToIDMap.forEach((value: number, key: KeyPath) =>
     {
-      this.renameHelper(r, o, key, value);
+      // this.renameHelper(r, o, key, value);
+      for (const match of yadeep.search(doc, key))
     });
     return r;
   }
