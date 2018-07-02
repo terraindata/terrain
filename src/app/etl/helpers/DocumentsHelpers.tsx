@@ -202,39 +202,43 @@ class DocumentsHelpers extends ETLHelpers
         {
           this.updateStateBeforeFetch(key);
         }
-        switch (source.type)
-        {
-          case Sources.Upload: {
-            const file = source.options['file'];
-            if (file == null)
-            {
-              return catchError('File not provided');
-            }
-            const config = source.fileConfig;
-            fetchDocumentsFromFile(file, config, DefaultDocumentLimit)
-              .then(onFetchLoad)
-              .catch(catchError);
-            break;
-          }
-          case Sources.Mysql:
-          case Sources.GoogleAnalytics:
-          case Sources.Postgresql:
-          case Sources.Algorithm:
-          case Sources.Fs:
-          case Sources.Http:
-          case Sources.Sftp:
-            ETLAjax.fetchPreview(source, DefaultDocumentLimit)
-              .then(onFetchLoad)
-              .catch(catchError);
-            break;
-          default: {
-            return catchError(`Failed to retrieve documents. Unsupported source type: ${source.type}`);
-          }
-        }
+        this.fetchPreview(source).then(onFetchLoad).catch(catchError);
       }
       catch (e)
       {
         return catchError(e);
+      }
+    });
+  }
+
+  public fetchPreview(
+    source: SourceConfig,
+  ): Promise<List<object>>
+  {
+    return new Promise<List<object>>((resolve, reject) =>
+    {
+      switch (source.type)
+      {
+        case Sources.Upload: {
+          const file = source.options['file'];
+          if (file == null)
+          {
+            return reject('File not provided');
+          }
+          const config = source.fileConfig;
+          return fetchDocumentsFromFile(file, config, DefaultDocumentLimit);
+        }
+        case Sources.Mysql:
+        case Sources.GoogleAnalytics:
+        case Sources.Postgresql:
+        case Sources.Algorithm:
+        case Sources.Fs:
+        case Sources.Http:
+        case Sources.Sftp:
+          return ETLAjax.fetchPreview(source, DefaultDocumentLimit);
+        default: {
+          return reject(`Failed to retrieve documents. Unsupported source type: ${source.type}`);
+        }
       }
     });
   }

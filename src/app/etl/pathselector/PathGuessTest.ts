@@ -152,7 +152,7 @@ export default class PathUtil
 
   public static guessPath(json: object, possiblePaths, depth: number)
   {
-    if (depth > 5) // threshold for recusive calls
+    if (depth > 4) // threshold for recusive calls
     {
       return possiblePaths;
     }
