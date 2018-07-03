@@ -52,6 +52,7 @@ enum TransformationNodeType
 {
   SplitNode = 'SplitNode',
   JoinNode = 'JoinNode',
+  RenameNode = 'RenameNode',
   DuplicateNode = 'DuplicateNode',
   InsertNode = 'InsertNode',
   CaseNode = 'CaseNode',
@@ -89,8 +90,13 @@ TransformationNodeType as AssertEnumValuesEqualKeys;
 // if this has errors, double check TransformationOptionTypes has a key for every TransformationNodeType
 // noinspection JSUnusedLocalSymbols
 type AssertOptionTypesExhaustive = {
-  [K in TransformationNodeType]: TransformationOptionTypes[K]
+  [K in TransformationNodeType]: TransformationOptionTypes[K];
 };
+
+export interface CommonTransformationOptions
+{
+  newFieldKeyPaths?: List<KeyPath>;
+}
 
 interface TransformationOptionTypes
 {
@@ -104,6 +110,9 @@ interface TransformationOptionTypes
     newFieldKeyPaths: List<KeyPath>;
     preserveOldFields: boolean;
     delimiter: string;
+  };
+  RenameNode: {
+    newFieldKeyPaths: List<KeyPath>;
   };
   // FilterNode: any;
   DuplicateNode: {
@@ -195,6 +204,6 @@ interface TransformationOptionTypes
 }
 
 export type NodeTypes = keyof TransformationOptionTypes;
-export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key];
+export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key] & CommonTransformationOptions;
 
 export default TransformationNodeType;

@@ -60,6 +60,9 @@ import TransformationNodeType from './TransformationNodeType';
 import TransformationRegistry from './TransformationRegistry';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
+import TransformationNodeConstructorVisitor from './TransformationNodeConstructorVisitor';
+
+const NodeConstructor = new TransformationNodeConstructorVisitor();
 
 /**
  * A TransformationEngine performs transformations on complex JSON documents.
@@ -145,13 +148,19 @@ export class TransformationEngine
     for (let i: number = 0; i < parsed['dag']['nodes'].length; i++)
     {
       const raw: object = parsed['dag']['nodes'][i]['value'];
-      parsed['dag']['nodes'][i]['value'] =
-        new (TransformationRegistry.getType(raw['typeCode']))(
-          raw['id'],
-          List<KeyPath>(raw['fields'].map((item) => KeyPath(item))),
-          TransformationEngine.makeMetaImmutable(raw['meta']),
-          // raw['typeCode'],
-        ) as TransformationNode;
+      parsed['dag']['nodes'][i]['value'] = NodeConstructor.visit(raw['typeCode'], undefined, {
+        id: raw['id'],
+        fieldIds: raw['fieldIds'],
+        fields: raw['fields'],
+        meta: raw['meta'],
+        deserialize: true,
+      });
+        // new (TransformationRegistry.getType(raw['typeCode']))(
+        //   raw['id'],
+        //   List<number>(raw['fieldIds']),
+        //   List<KeyPath>(raw['fields'].map((item) => KeyPath(item))),
+        //   TransformationEngine.makeMetaImmutable(raw['meta']),
+        // ) as TransformationNode;
     }
     return parsed;
   }
@@ -239,8 +248,13 @@ export class TransformationEngine
     options?: object, tags?: string[], weight?: number): number
   {
     // const fieldIDs: List<number> = this.parseFieldIDs(fieldNamesOrIDs);
-    const node: TransformationNode =
-      new (TransformationRegistry.getType(nodeType))(this.uidNode, fieldNames, options /*nodeType*/);
+    const node: TransformationNode = NodeConstructor.visit(nodeType, undefined, {
+      id: this.uidNode,
+      fieldIds: List([5]),
+      fields: fieldNames,
+      meta: options,
+    });
+      // new (TransformationRegistry.getType(nodeType))(this.uidNode, fieldIds, fieldNames, options);
 
     // Process fields created/disabled by this transformation
     if (options !== undefined)

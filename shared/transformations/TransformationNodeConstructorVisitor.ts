@@ -43,96 +43,71 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-
 import { List } from 'immutable';
+import * as _ from 'lodash';
+import { KeyPath, WayPoint } from '../util/KeyPath';
+import * as yadeep from '../util/yadeep';
 
-import { KeyPath } from './../util/KeyPath';
-
-import TransformationNodeType from './TransformationNodeType';
-import TransformationNodeVisitor from './TransformationNodeVisitor';
+import TransformationNode from 'shared/transformations/TransformationNode';
+import TransformationNodeType, { NodeOptionsType, CommonTransformationOptions } from './TransformationNodeType';
+import TransformationNodeVisitor, { VisitorLookupMap } from './TransformationNodeVisitor';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
+import TransformationRegistry from './TransformationRegistry';
 
-export default abstract class TransformationNode
+export interface NodeArgs
 {
-  public id: number;
-  public abstract typeCode: TransformationNodeType;
-  public fields: List<KeyPath>;
-  public fieldIds: List<number>;
-  public meta: object;
+  id: number;
+  fields: List<KeyPath>;
+  fieldIds: List<number>;
+  meta: object;
+}
 
-  // override this to only operate on a certain js type
-  public readonly acceptedType: string;
+export interface SerializedNodeArgs
+{
+  id: number;
+  fields: WayPoint[][];
+  fieldIds: number[];
+  meta: object;
+}
 
-  public constructor(id: number, fieldIds: List<number>, fields: List<KeyPath>, options: object = {})
+export type ConstructionArgs = (NodeArgs | SerializedNodeArgs) & {
+  deserialize?: boolean;
+};
+
+export default class ConstructorVisitor
+  extends TransformationNodeVisitor<TransformationNode, ConstructionArgs>
+{
+  public visitorLookup: VisitorLookupMap<TransformationNode, ConstructionArgs> = {};
+
+  public deserialize(args: SerializedNodeArgs): NodeArgs
   {
-    this.id = id;
-    this.fields = fields;
-    this.meta = options;
-  }
+    const fields = List(args.fields.map((item) => KeyPath(item)));
+    const fieldIds = List(args.fieldIds);
 
-  // override to provide static validation
-  public validate(): string | boolean
-  {
-    return true;
-  }
-
-  // override to customize entire transformation behavior
-  public transform(doc: object): TransformationVisitResult
-  {
-    try
+    const meta = _.cloneDeep(args.meta as CommonTransformationOptions);
+    if (meta.newFieldKeyPaths !== undefined)
     {
-      const valid = this.validate();
-      if (typeof valid === 'string')
-      {
-        return {
-          errors: [
-            {
-              message: `${this.typeCode} is malformed: ${String(valid)}`,
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-      return this.transformDocument(doc);
+      meta.newFieldKeyPaths = List((meta.newFieldKeyPaths as any as WayPoint[][]).map((kp) => List(kp)));
     }
-    catch (e)
-    {
-      return {
-        errors: [
-          {
-            message: `Error in ${this.typeCode}: String(e)`,
-          } as TransformationVisitError,
-        ],
-      } as TransformationVisitResult;
-    }
-  }
 
-  public accept<R, P>(visitor: TransformationNodeVisitor<R, P>, args: P): R
-  {
-    return visitor.visit(this.typeCode, this, args);
-  }
-
-  // override to specify document transformation behavior
-  protected transformDocument(doc: object): TransformationVisitResult | undefined
-  {
     return {
-      document: doc,
+      id: args.id,
+      fields,
+      fieldIds,
+      meta,
     };
   }
 
-  protected checkType(value: any): boolean
+  public visitDefault(type: TransformationNodeType, node: undefined, args: ConstructionArgs)
   {
-    if (this.acceptedType !== undefined)
-    {
-      if (this.acceptedType === 'array')
-      {
-        return Array.isArray(value);
-      }
-      else
-      {
-        return typeof value === this.acceptedType;
-      }
-    }
-    return true;
+    const ctor = TransformationRegistry.getType(type);
+
+    const { id, fields, fieldIds, meta } = args.deserialize ?
+      this.deserialize(args as SerializedNodeArgs)
+      :
+      args as NodeArgs;
+
+    return new ctor(id, fieldIds, fields, meta);
   }
 }

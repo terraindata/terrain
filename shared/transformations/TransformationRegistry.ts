@@ -64,6 +64,7 @@ import { JoinTransformationInfo, JoinTransformationNode } from './nodes/JoinTran
 import { MultiplyTransformationInfo, MultiplyTransformationNode } from './nodes/MultiplyTransformationNode';
 import { ProductTransformationInfo, ProductTransformationNode } from './nodes/ProductTransformationNode';
 import { QuotientTransformationInfo, QuotientTransformationNode } from './nodes/QuotientTransformationNode';
+import { RenameTransformationInfo, RenameTransformationNode } from './nodes/RenameTransformationNode';
 import { RemoveDuplicatesTransformationInfo, RemoveDuplicatesTransformationNode } from './nodes/RemoveDuplicatesTransformationNode';
 import { RoundTransformationInfo, RoundTransformationNode } from './nodes/RoundTransformationNode';
 import { SetIfTransformationInfo, SetIfTransformationNode } from './nodes/SetIfTransformationNode';
@@ -102,6 +103,7 @@ const infos: {
     [TransformationNodeType.ProductNode]: ProductTransformationInfo,
     [TransformationNodeType.QuotientNode]: QuotientTransformationInfo,
     [TransformationNodeType.RemoveDuplicatesNode]: RemoveDuplicatesTransformationInfo,
+    [TransformationNodeType.RenameNode]: RenameTransformationInfo,
     [TransformationNodeType.RoundNode]: RoundTransformationInfo,
     [TransformationNodeType.SetIfNode]: SetIfTransformationInfo,
     [TransformationNodeType.SplitNode]: SplitTransformationInfo,
