@@ -45,19 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:import-spacing max-classes-per-file strict-boolean-expressions
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-const { List, Map } = Immutable;
-
-import { MidwayError } from 'shared/error/MidwayError';
-import { AllBackendsMap } from 'src/database/AllBackends';
-import BackendInstance from 'src/database/types/BackendInstance';
-import MidwayQueryResponse from 'src/database/types/MidwayQueryResponse';
-import { _Query, Query, queryForSave } from 'src/items/types/Query';
-import { Ajax } from 'util/Ajax';
-
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
-
 export class UpdateChecker
 {
   private checkFns: {

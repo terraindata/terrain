@@ -45,10 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import { _SchemaMetadata, _SchemaState, Column, Database, FieldProperty, Index, SchemaState, Server, Table } from 'schema/SchemaTypes';
-const { List, Map } = Immutable;
 
 import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 import BackendInstance from 'database/types/BackendInstance';

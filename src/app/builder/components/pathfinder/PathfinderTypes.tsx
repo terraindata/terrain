@@ -85,14 +85,13 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map, Record } = Immutable;
 import Util from 'app/util/Util';
-import { _Hit, Hit } from 'builder/components/results/ResultTypes';
+import { Hit } from 'builder/components/results/ResultTypes';
 // import TerrainTools from 'util/TerrainTools';
 import { BuilderState } from 'builder/data/BuilderState';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
 import { BaseClass, New } from 'shared/util/Classes';
 import { FieldType, FieldTypeMapping, ReverseFieldTypeMapping } from '../../../../../shared/builder/FieldTypes';
-import ElasticBlockHelpers, { AutocompleteMatchType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import PathfinderText from './PathfinderText';
 
 export enum PathfinderSteps

@@ -46,11 +46,6 @@ THE SOFTWARE.
 
 // tslint:disable:no-empty max-classes-per-file strict-boolean-expressions max-line-length no-var-requires
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as Radium from 'radium';
-import './ResultsConfigStyle.less';
-const { List, Map } = Immutable;
 import { Hit } from 'app/builder/components/results/ResultTypes';
 import { BuilderState } from 'app/builder/data/BuilderState';
 import FloatingInput from 'app/common/components/FloatingInput';
@@ -58,6 +53,9 @@ import { SchemaState } from 'app/schema/SchemaTypes';
 import BuilderActions from 'builder/data/BuilderActions';
 import * as classNames from 'classnames';
 import ElasticBlockHelpers, { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
+import { List } from 'immutable';
+import * as _ from 'lodash';
+import * as Radium from 'radium';
 import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import { _Format, _ResultsConfig, Format, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
@@ -67,6 +65,7 @@ import Util from '../../../util/Util';
 import DragHandle from './../../../common/components/DragHandle';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
+import './ResultsConfigStyle.less';
 
 const Color = require('color');
 

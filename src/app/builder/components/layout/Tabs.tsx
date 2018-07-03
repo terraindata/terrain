@@ -50,7 +50,7 @@ import './Tabs.less';
 // import * as moment from 'moment';
 const moment = require('moment');
 import * as classNames from 'classnames';
-import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import createReactClass = require('create-react-class');
 import { LibraryState } from 'library/LibraryTypes';
 import * as _ from 'lodash';

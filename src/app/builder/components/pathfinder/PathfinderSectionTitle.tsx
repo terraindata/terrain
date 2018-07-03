@@ -46,11 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import { backgroundColor, Colors, fontColor } from 'app/colors/Colors';
+import { Colors, fontColor } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
 import ExpandIcon from 'common/components/ExpandIcon';
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
 

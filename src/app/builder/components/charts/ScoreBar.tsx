@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
+import { borderColor, Colors, fontColor } from '../../../colors/Colors';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './ScoreBar.less';
 import ScoreWeightSlider from './ScoreWeightSlider';

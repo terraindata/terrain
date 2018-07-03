@@ -45,27 +45,19 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires max-classes-per-file strict-boolean-expressions
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
+import { Colors, fontColor } from 'src/app/colors/Colors';
 
 import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import ObjectForm from 'common/components/ObjectForm';
+import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
-import { instanceFnDecorator } from 'shared/util/Classes';
 
 import EndpointForm from 'app/etl/common/components/EndpointForm';
 import { ParamConfigType, TaskConfig } from 'app/scheduler/SchedulerTypes';
 import FadeInOut from 'common/components/FadeInOut';
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
 
-const { List, Map } = Immutable;
+import { List, Map } from 'immutable';
 
 export interface Props
 {

@@ -47,23 +47,16 @@ THE SOFTWARE.
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
 
 import Dropdown from 'common/components/Dropdown';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { instanceFnDecorator } from 'shared/util/Classes';
-import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { Colors } from 'src/app/colors/Colors';
 
-import { DynamicForm } from 'common/components/DynamicForm';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 import './FieldPicker.less';
 

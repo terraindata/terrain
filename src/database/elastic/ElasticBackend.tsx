@@ -51,15 +51,6 @@ import { make } from '../../blocks/BlockUtils';
 import { Backend, cardsDeckToList } from '../types/Backend';
 
 import { parsePath } from 'app/builder/components/pathfinder/PathfinderParser';
-import ESConverter from '../../../shared/database/elastic/formatter/ESConverter';
-import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
-import ESJSONParser from '../../../shared/database/elastic/parser/ESJSONParser';
-import ESJSONType from '../../../shared/database/elastic/parser/ESJSONType';
-import ESQueryTransform from '../../../shared/database/elastic/parser/ESQueryTransform';
-import ESValueInfo from '../../../shared/database/elastic/parser/ESValueInfo';
-import { QueryRequest } from '../../../shared/database/types/QueryRequest';
-import { Query } from '../../items/types/Query';
-import { AllBackendsMap } from '../AllBackends';
 import { ElasticBlocks } from './blocks/ElasticBlocks';
 import ElasticCardsDeck from './blocks/ElasticCardsDeck';
 import CardsToElastic from './conversion/CardsToElastic';

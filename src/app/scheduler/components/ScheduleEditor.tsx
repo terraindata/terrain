@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:strict-boolean-expressions no-var-requires prefer-const
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
-import Colors, { backgroundColor, borderColor, fontColor, getStyle } from 'app/colors/Colors';
+import Colors, { backgroundColor, borderColor, getStyle } from 'app/colors/Colors';
 import Button from 'app/common/components/Button';
 import CRONEditor from 'app/common/components/CRONEditor';
 import FloatingInput from 'app/common/components/FloatingInput';
@@ -53,27 +53,21 @@ import TaskItem from 'app/scheduler/components/TaskItem';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
 import
 {
-  _SchedulerConfig,
   _TaskConfig,
   scheduleForDatabase,
   SchedulerConfig,
-  SchedulerState,
   TaskConfig,
 } from 'app/scheduler/SchedulerTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
-import { tooltip } from 'common/components/tooltip/Tooltips';
-import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
-import * as _ from 'lodash';
 import * as React from 'react';
 import
 {
   CSSTransition,
   TransitionGroup,
 } from 'react-transition-group';
-import SchedulerApi from 'scheduler/SchedulerApi';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
 import './ScheduleEditorStyle';

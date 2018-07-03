@@ -46,16 +46,12 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
-import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as React from 'react';
-const { List, Map } = Immutable;
-import { backgroundColor, Colors, fontColor } from 'app/colors/Colors';
-import Util from 'app/util/Util';
+import { Colors, fontColor } from 'app/colors/Colors';
 import ExpandIcon from 'common/components/ExpandIcon';
 import FadeInOut from 'common/components/FadeInOut';
+import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import * as React from 'react';
 import './Section.less';
 
 export interface SectionProps

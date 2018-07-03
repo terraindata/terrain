@@ -50,7 +50,6 @@ THE SOFTWARE.
 
 import { noop } from 'lodash';
 import * as React from 'react';
-import { Colors } from '../colors/Colors';
 import TerrainComponent from './../common/components/TerrainComponent';
 import './UIComponentsPageStyle.less';
 

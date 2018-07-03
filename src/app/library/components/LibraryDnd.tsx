@@ -46,8 +46,6 @@ THE SOFTWARE.
 import TerrainDndContext from 'common/components/TerrainDndContext';
 import Library from '../containers/LibraryContainer';
 
-import HTML5Backend = require('react-dnd-html5-backend');
-
 // ReactRouter does not like the output of DragDropContext, hence the `any` cast
 const ExportLibrary = TerrainDndContext(Library) as any;
 

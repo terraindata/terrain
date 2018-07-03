@@ -49,7 +49,6 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import { List } from 'immutable';
 import * as $ from 'jquery';
-import * as Radium from 'radium';
 import * as React from 'react';
 import Util from '../../util/Util';
 import './LibraryItem.less';

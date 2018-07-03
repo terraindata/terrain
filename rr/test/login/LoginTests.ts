@@ -49,7 +49,6 @@ THE SOFTWARE.
 import * as ip from 'ip';
 import * as puppeteer from 'puppeteer';
 import * as sleep from 'sleep';
-import * as request from 'then-request';
 
 const USERNAME_SELECTOR = '#login-email';
 const PASSWORD_SELECTOR = '#login-password';

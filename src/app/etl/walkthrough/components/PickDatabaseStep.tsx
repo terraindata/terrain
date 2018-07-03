@@ -45,19 +45,15 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires
 
-import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import * as Radium from 'radium';
 import * as React from 'react';
 
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import DatabasePicker from 'etl/common/components/DatabasePicker';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
-import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { _FileConfig, _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { _FileConfig, _SinkConfig } from 'shared/etl/immutable/EndpointRecords';
 import { SinkOptionsType, Sinks } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';

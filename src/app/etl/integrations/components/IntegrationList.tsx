@@ -44,22 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console strict-boolean-expressions no-var-requires
-import Colors, { backgroundColor, borderColor } from 'app/colors/Colors';
-import FloatingInput from 'app/common/components/FloatingInput';
 import { ETLActions } from 'app/etl/ETLRedux';
 import EtlRouteUtil from 'app/etl/ETLRouteUtil';
-import { ETLState } from 'app/etl/ETLTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
-import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
+import { ItemList } from 'etl/common/components/ItemList';
 import * as Immutable from 'immutable';
-import { List, Map } from 'immutable';
-import * as _ from 'lodash';
+import { Map } from 'immutable';
 import * as React from 'react';
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 import { User } from 'users/UserTypes';
-import XHR from 'util/XHR';
 import './IntegrationStyle.less';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 

@@ -46,7 +46,6 @@ THE SOFTWARE.
 import ActionTypes from 'analytics/data/AnalyticsActionTypes';
 import reducer from 'analytics/data/AnalyticsReducer';
 import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
-import * as Immutable from 'immutable';
 
 describe('AnalyticsReducer', () =>
 {

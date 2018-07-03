@@ -48,10 +48,9 @@ THE SOFTWARE.
 
 import './ResultsColumnStyle.less';
 
-import * as Immutable from 'immutable';
-const { Map, List } = Immutable;
 import BuilderActions from 'builder/data/BuilderActions';
 import * as classNames from 'classnames';
+import { Map } from 'immutable';
 import * as _ from 'lodash';
 import Radium = require('radium');
 import * as React from 'react';

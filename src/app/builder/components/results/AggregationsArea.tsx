@@ -46,9 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions
 
-import * as Immutable from 'immutable';
-const { Map, List } = Immutable;
-import * as classNames from 'classnames';
+import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import Radium = require('radium');
 import * as React from 'react';

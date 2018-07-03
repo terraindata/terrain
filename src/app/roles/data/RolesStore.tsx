@@ -46,10 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 const Redux = require('redux');
-import * as ReduxActions from 'redux-actions';
 
 import RolesReducers from './RolesReducers';
 

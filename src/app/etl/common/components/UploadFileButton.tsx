@@ -46,15 +46,12 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires
 
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 
 import FilePicker from 'common/components/FilePicker';
 
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
 
 const UploadIcon = require('images/icon_export.svg');
 

@@ -71,8 +71,6 @@ THE SOFTWARE.
 
 'use strict';
 
-import Util from './Util';
-
 const NORMAL_CONSTANT = 1 / Math.sqrt(2 * Math.PI);
 
 export const NUM_CURVE_POINTS = {

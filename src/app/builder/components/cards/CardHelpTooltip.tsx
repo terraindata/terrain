@@ -49,8 +49,6 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 import * as React from 'react';
 
-import * as Color from 'color';
-
 import TerrainComponent from 'common/components/TerrainComponent';
 import { backgroundColor, Colors, fontColor, getStyle } from './../../../colors/Colors';
 import './CardHelpTooltip.less';

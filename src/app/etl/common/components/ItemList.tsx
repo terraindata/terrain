@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:strict-boolean-expressions
 
-import * as classNames from 'classnames';
 import { List } from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
@@ -53,7 +52,7 @@ import * as React from 'react';
 
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import { backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
-import { Menu, MenuOption } from 'common/components/Menu';
+import { Menu } from 'common/components/Menu';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import Quarantine from 'util/RadiumQuarantine';

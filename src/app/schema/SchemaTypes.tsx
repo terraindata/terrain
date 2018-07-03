@@ -46,9 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
-import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
+import { ModalProps } from 'common/components/overlay/MultiModal';
+import { List, Map } from 'immutable';
 import { BaseClass, makeConstructor, New, WithIRecord } from 'shared/util/Classes';
 
 type stringList = string[] | List<string>;
