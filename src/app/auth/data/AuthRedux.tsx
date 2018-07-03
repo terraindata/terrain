@@ -44,15 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as _ from 'lodash';
-
 import { _AuthState, AuthState } from 'auth/AuthTypes';
 import
 {
   ConstrainedMap,
   GetType,
   TerrainRedux,
-  Unroll,
 } from 'store/TerrainRedux';
 import Ajax from 'util/Ajax';
 

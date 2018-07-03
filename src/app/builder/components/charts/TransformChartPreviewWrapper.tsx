@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions
 
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import Colors from 'app/colors/Colors';
 import * as React from 'react';

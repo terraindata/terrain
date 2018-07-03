@@ -47,27 +47,18 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
-import * as _ from 'lodash';
 
 import { notificationManager } from 'common/components/InAppNotification';
-import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import TerrainStore from 'src/app/store/TerrainStore';
-import Util from 'util/Util';
 
 import ETLAjax from 'etl/ETLAjax';
-import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { _JobConfig, JobConfig } from 'jobs/JobsTypes';
 import { getMimeType } from 'shared/etl/FileUtil';
-import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
 import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import ETLHelpers from './ETLHelpers';
-
-import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 
 class ExecutionHelpers extends ETLHelpers
 {

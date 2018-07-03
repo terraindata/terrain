@@ -47,32 +47,14 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
-import * as Radium from 'radium';
-import * as React from 'react';
-import { withRouter } from 'react-router';
 
-import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import TerrainStore from 'src/app/store/TerrainStore';
-import Util from 'util/Util';
 
 import ETLHelpers from './ETLHelpers';
 
-import { ETLActions } from 'etl/ETLRedux';
-import ETLRouteUtil from 'etl/ETLRouteUtil';
-import TemplateEditor from 'etl/templates/components/TemplateEditor';
-import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
-import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import
-{
-  _ETLEdge, _ETLNode, _ETLProcess,
-  _MergeJoinOptions, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions,
-} from 'shared/etl/immutable/ETLProcessRecords';
+import { EngineProxy } from 'etl/templates/EngineProxy';
 import { SinksMap, SourcesMap } from 'shared/etl/immutable/TemplateRecords';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { NodeTypes } from 'shared/etl/types/ETLTypes';
 import DocumentsHelpers from './DocumentsHelpers';
 
 class GraphHelpers extends ETLHelpers

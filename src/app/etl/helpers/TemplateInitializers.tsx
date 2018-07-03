@@ -47,32 +47,20 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
-import * as Radium from 'radium';
-import * as React from 'react';
-import { withRouter } from 'react-router';
 
-import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import TerrainStore from 'src/app/store/TerrainStore';
-import Util from 'util/Util';
 
 import ETLHelpers from './ETLHelpers';
-import GraphHelpers from './GraphHelpers';
 
-import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
-import TemplateEditor from 'etl/templates/components/TemplateEditor';
-import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { createFieldMap } from 'etl/templates/SyncUtil';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { FieldMap } from 'etl/templates/TemplateEditorTypes';
-import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { _ETLEdge, _ETLNode, _ETLProcess, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions } from 'shared/etl/immutable/ETLProcessRecords';
+import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { _FileConfig, _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { TemplateProxy } from 'shared/etl/immutable/TemplateProxy';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import DocumentsHelpers from './DocumentsHelpers';
 

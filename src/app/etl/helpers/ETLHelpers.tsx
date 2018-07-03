@@ -48,30 +48,20 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import TerrainStore from 'src/app/store/TerrainStore';
-import Util from 'util/Util';
 
 import { ETLActions } from 'etl/ETLRedux';
-import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { ETLState } from 'etl/ETLTypes';
-import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import
 {
-  DefaultDocumentLimit,
-  EditorDisplayState,
-  FieldMap,
   TemplateEditorState,
 } from 'etl/templates/TemplateEditorTypes';
-import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { SchemaActions } from 'schema/data/SchemaRedux';
 import { TemplateProxy } from 'shared/etl/immutable/TemplateProxy';
-import { _ETLTemplate, copyTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { copyTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { JobsActions } from 'src/app/jobs/data/JobsRedux';
 import { JobsState } from 'src/app/jobs/JobsTypes';
 

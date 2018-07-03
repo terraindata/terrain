@@ -53,7 +53,6 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import Autocomplete from 'common/components/Autocomplete';
 // import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';

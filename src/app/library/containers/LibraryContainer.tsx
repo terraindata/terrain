@@ -47,7 +47,6 @@ THE SOFTWARE.
 import AnalyticsActions from 'analytics/data/AnalyticsActions';
 import Library from 'library/components/Library';
 import LibraryActions from 'library/data/LibraryActions';
-import { LibraryState } from 'library/LibraryTypes';
 import * as _ from 'lodash';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';

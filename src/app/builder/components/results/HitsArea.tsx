@@ -60,28 +60,23 @@ import { notificationManager } from 'app/common/components/InAppNotification';
 import { SchemaState } from 'app/schema/SchemaTypes';
 import Ajax from 'app/util/Ajax';
 import Util from 'app/util/Util';
-import ElasticBlockHelpers, { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
+import ElasticBlockHelpers from 'database/elastic/blocks/ElasticBlockHelpers';
 import Radium = require('radium');
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import { AllBackendsMap } from '../../../../database/AllBackends';
 import { ESParseTreeToCode } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
-import { backgroundColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
+import { backgroundColor, Colors, fontColor, link } from '../../../colors/Colors';
 import DragHandle from '../../../common/components/DragHandle';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import InfoArea from '../../../common/components/InfoArea';
 import MapComponent from '../../../common/components/MapComponent';
-import Modal from '../../../common/components/Modal';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import MapUtil from '../../../util/MapUtil';
 import Hit from '../results/Hit';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
-
-import ETLRouteUtil from 'etl/ETLRouteUtil';
 
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
 

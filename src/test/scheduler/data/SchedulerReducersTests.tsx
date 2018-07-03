@@ -43,9 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import * as Immutable from 'immutable';
 import { SchedulerActionTypes, SchedulerReducers as reducer } from 'scheduler/data/SchedulerRedux';
-import { _SchedulerConfig, _SchedulerState, SchedulerState } from 'scheduler/SchedulerTypes';
+import { _SchedulerConfig, _SchedulerState } from 'scheduler/SchedulerTypes';
 import SchedulerHelper from 'test-helpers/SchedulerHelper';
 import Util from 'util/Util';
 

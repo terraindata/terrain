@@ -46,7 +46,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires import-spacing
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';

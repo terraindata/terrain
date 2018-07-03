@@ -43,8 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import ETLRouteUtil from 'app/etl/ETLRouteUtil';
-import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 import TerrainComponent from 'common/components/TerrainComponent';
 import TerrainTabs from 'common/components/TerrainTabs';
 import ETLNotifications from 'etl/components/ETLNotifications';
@@ -55,8 +53,7 @@ import TemplateList from 'etl/templates/components/TemplateList';
 import ETLWalkthrough from 'etl/walkthrough/components/ETLWalkthrough';
 import Jobs from 'jobs/components/Jobs';
 import * as React from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
-import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+import { Route, Switch } from 'react-router-dom';
 import ScheduleEditor from 'scheduler/components/ScheduleEditor';
 import ScheduleList from 'scheduler/components/ScheduleList';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';

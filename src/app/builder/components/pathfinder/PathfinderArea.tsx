@@ -47,11 +47,9 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
 import * as Immutable from 'immutable';
-import * as $ from 'jquery';
-import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
+import { Colors, getStyle } from '../../../colors/Colors';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 const { List } = Immutable;
 import BuilderActions from 'app/builder/data/BuilderActions';

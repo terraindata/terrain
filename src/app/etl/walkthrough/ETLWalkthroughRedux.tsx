@@ -46,16 +46,11 @@ THE SOFTWARE.
 // tslint:disable:import-spacing
 
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
-import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
-import { Ajax } from 'util/Ajax';
-import { _WalkthroughState, ViewState, WalkthroughState } from './ETLWalkthroughTypes';
-
-import { guessJsonFileOptions } from 'shared/etl/FileUtil';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
+import { FileConfig } from 'shared/etl/immutable/EndpointRecords';
+import { ConstrainedMap, GetType, TerrainRedux } from 'src/app/store/TerrainRedux';
+import { _WalkthroughState, WalkthroughState } from './ETLWalkthroughTypes';
 
 type CfgOrHandler = ((cfg: FileConfig) => FileConfig) | FileConfig;
 type OptionsOrHandler = ((options: object) => object) | object;

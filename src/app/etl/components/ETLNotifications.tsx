@@ -47,20 +47,17 @@ THE SOFTWARE.
 
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
-import * as Radium from 'radium';
 import * as React from 'react';
 
-import FilePicker from 'common/components/FilePicker';
 import Loading from 'common/components/Loading';
 import Modal from 'common/components/Modal';
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import memoizeOne from 'memoize-one';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { instanceFnDecorator } from 'shared/util/Classes';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { ETLActions, ETLReducers } from 'etl/ETLRedux';
+import { ETLActions } from 'etl/ETLRedux';
 import { ETLState } from 'etl/ETLTypes';
 import './ETLPage.less';
 

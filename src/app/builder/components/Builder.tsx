@@ -53,7 +53,6 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 const HTML5Backend = require('react-dnd-html5-backend');
-import { withRouter } from 'react-router';
 
 // Data
 import { ItemStatus } from '../../../items/types/Item';
@@ -71,7 +70,6 @@ type Algorithm = LibraryTypes.Algorithm;
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { UserState } from 'users/UserTypes';
-import { backgroundColor, Colors } from '../../colors/Colors';
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
 import { notificationManager } from './../../common/components/InAppNotification';

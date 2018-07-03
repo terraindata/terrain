@@ -46,19 +46,15 @@ THE SOFTWARE.
 
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
 import { ModalProps } from 'common/components/overlay/MultiModal';
-import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
+import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, WithIRecord } from 'shared/util/Classes';
 
 import { _HistoryStack, HistoryStack } from 'etl/common/HistoryStack';
-import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
+import { TemplateField } from 'etl/templates/FieldTypes';
+import { ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { Languages, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 export type FieldMap = Immutable.Map<number, TemplateField>;

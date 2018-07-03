@@ -47,18 +47,13 @@ THE SOFTWARE.
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import ObjectForm from 'common/components/ObjectForm';
-import { instanceFnDecorator } from 'shared/util/Classes';
 
-import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
+import { IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 import { AuthConfigType, ConnectionConfigType, Integrations } from 'shared/etl/types/IntegrationTypes';
 const { List } = Immutable;
 

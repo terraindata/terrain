@@ -56,9 +56,9 @@ import { DisplayState, DisplayType, InputDeclarationMap } from 'common/component
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import Util from 'app/util/Util';
-import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { _FileConfig, FileConfig } from 'shared/etl/immutable/EndpointRecords';
 import { FileConfig as FileConfigI } from 'shared/etl/types/EndpointTypes';
-import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 const { List } = Immutable;
 

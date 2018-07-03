@@ -46,10 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions
 
-import Button from 'common/components/Button';
 import BadgeColumn from 'common/components/simple-table/BadgeColumn';
 import ButtonColumn from 'common/components/simple-table/ButtonColumn';
-import { List } from 'immutable';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';

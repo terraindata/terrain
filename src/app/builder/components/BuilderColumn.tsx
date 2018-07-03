@@ -63,9 +63,8 @@ import PanelMixin from './layout/PanelMixin';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import Util from 'util/Util';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
+import { borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
-import DragHandle from '../../common/components/DragHandle';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
 import BuilderActions from '../data/BuilderActions';

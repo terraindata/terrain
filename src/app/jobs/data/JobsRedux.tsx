@@ -54,7 +54,6 @@ import
   JobConfig,
   JobsState,
 } from 'jobs/JobsTypes';
-import * as _ from 'lodash';
 import XHR from 'util/XHR';
 const { List, Map } = Immutable;
 import Util from 'util/Util';

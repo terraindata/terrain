@@ -47,30 +47,21 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands  strict-boolean-expressions no-console
 
 import * as Immutable from 'immutable';
-import { List, Map } from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
-import * as TerrainLog from 'loglevel';
 
 import { Colors, getCardColors } from '../../../app/colors/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { DisplayType } from '../../../blocks/displays/Display';
-import { _block, Block, BlockConfig, TQLTranslationFn } from '../../../blocks/types/Block';
+import { _block, Block, BlockConfig } from '../../../blocks/types/Block';
 import { _card, Card } from '../../../blocks/types/Card';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 
 import SpecializedCreateCardTool from 'builder/components/cards/SpecializedCreateCardTool';
 import { FieldType } from '../../../../shared/builder/FieldTypes';
-import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
-import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
-import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
-import ESParserError from '../../../../shared/database/elastic/parser/ESParserError';
-import ESPropertyInfo from '../../../../shared/database/elastic/parser/ESPropertyInfo';
-import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 import ESBoolCardParser from '../conversion/ESBoolCardParser';
-import ESCardParser from '../conversion/ESCardParser';
 import { TerrainFilterCardParser } from '../conversion/TerrainFilterCardParser';
-import { ElasticBlocks } from './ElasticBlocks';
 import { ElasticElasticCards } from './ElasticElasticCards';
 
 export class FilterUtils

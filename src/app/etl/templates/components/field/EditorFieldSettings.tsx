@@ -45,20 +45,16 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing strict-boolean-expressions
 
-import * as classNames from 'classnames';
-import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
 import { leftColumnWidth } from 'etl/templates/components/field/NestedView';
-import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { Languages } from 'shared/etl/types/ETLTypes';
 
 import LanguageUI from 'etl/templates/languages/LanguageUI';

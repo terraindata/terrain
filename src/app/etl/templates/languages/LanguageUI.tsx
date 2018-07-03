@@ -47,8 +47,7 @@ THE SOFTWARE.
 import * as React from 'react';
 
 import { TemplateEditorFieldProps } from 'etl/templates/components/field/TemplateEditorField';
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { Languages } from 'shared/etl/types/ETLTypes';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;

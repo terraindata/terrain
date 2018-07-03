@@ -44,34 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
-import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { backgroundColor, borderColor, Colors } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 const Color = require('color');
-import Dropdown from 'common/components/Dropdown';
-import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import ExpandableView from 'common/components/ExpandableView';
 import Menu from 'common/components/Menu';
 import { MenuOption } from 'common/components/Menu';
-import Modal from 'common/components/Modal';
-import { instanceFnDecorator } from 'shared/util/Classes';
-import Quarantine from 'util/RadiumQuarantine';
 
 import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { ETLEdge, ETLNode } from 'shared/etl/immutable/ETLProcessRecords';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
+import { NodeTypes } from 'shared/etl/types/ETLTypes';
 
 import './EdgeSection.less';
 

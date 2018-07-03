@@ -48,41 +48,23 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
+import { borderColor, Colors, fontColor } from 'src/app/colors/Colors';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
-import ListForm from 'common/components/ListForm';
-import ObjectForm from 'common/components/ObjectForm';
-import { EndpointFormBase } from 'etl/common/components/EndpointFormClasses.tsx';
 import
 {
-  _FileConfig,
-  _SourceConfig,
-  FileConfig,
   RootInputConfig,
-  SinkConfig,
-  SourceConfig,
 } from 'shared/etl/immutable/EndpointRecords';
-import
-{
-  FileConfig as InputFileConfig,
-  SftpOptions, SinkOptionsType, Sinks, SourceOptionsType,
-  Sources, SQLOptions,
-} from 'shared/etl/types/EndpointTypes';
-import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 import
 {
   InputConfig,
   InputFileTypes as InputFileTypes,
   InputOptionsType,
-  InputTypes,
   RootInputConfig as RootInputConfigI,
 } from 'shared/etl/types/InputTypes';
 import Quarantine from 'util/RadiumQuarantine';

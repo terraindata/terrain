@@ -47,26 +47,17 @@ THE SOFTWARE.
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { backgroundColor, Colors, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import { instanceFnDecorator } from 'shared/util/Classes';
-
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import TemplateSettingsForm from 'etl/common/components/TemplateSettingsForm';
 import EndpointSection from 'etl/templates/components/endpoints/EndpointSection';
 import EdgeSection from 'etl/templates/components/graph/EdgeSection';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
-import { _TemplateSettings, TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
+import { TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
 
 import './OptionsColumn.less';
 const { List, Map } = Immutable;

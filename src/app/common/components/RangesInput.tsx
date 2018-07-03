@@ -44,11 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires
-import { backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
+import { Colors, fontColor } from 'app/colors/Colors';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
-import * as classNames from 'classnames';
 import { List, Map } from 'immutable';
-import * as _ from 'lodash';
 import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './RangesInputStyle.less';

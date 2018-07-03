@@ -45,30 +45,20 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing strict-boolean-expressions
 
-import * as classNames from 'classnames';
-import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import FadeInOut from 'common/components/FadeInOut';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
-import Autocomplete from 'common/components/Autocomplete';
-import CheckBox from 'common/components/CheckBox';
-import Dropdown from 'common/components/Dropdown';
-import { Menu, MenuOption } from 'common/components/Menu';
-import { tooltip } from 'common/components/tooltip/Tooltips';
 
 import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { TransformationCreator } from 'etl/templates/components/transformations/TransformationCreator';
 import { TransformationEditor } from 'etl/templates/components/transformations/TransformationEditor';
-import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
-import { TemplateField, TransformationNode } from 'etl/templates/FieldTypes';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import { EngineProxy } from 'etl/templates/EngineProxy';
+import { TransformationNode } from 'etl/templates/FieldTypes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';

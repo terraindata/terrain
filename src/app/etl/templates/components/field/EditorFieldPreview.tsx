@@ -46,22 +46,20 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires import-spacing strict-boolean-expressions
 
 import * as classNames from 'classnames';
-import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
 import Menu from 'common/components/Menu';
-import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import LanguageController from 'shared/etl/languages/LanguageControllers';
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';

@@ -50,12 +50,12 @@ import './FloatingInputStyle.less';
 
 import * as classNames from 'classnames';
 import Autocomplete from 'common/components/Autocomplete';
-import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
+import { backgroundColor, Colors, fontColor } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 const InfoIcon = require('images/icon_info.svg');
 

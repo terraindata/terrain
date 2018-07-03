@@ -45,31 +45,23 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:no-var-requires
-import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
 import { instanceFnDecorator } from 'shared/util/Classes';
-import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { Colors, fontColor } from 'src/app/colors/Colors';
 import Quarantine from 'util/RadiumQuarantine';
 import Util from 'util/Util';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
-import FadeInOut from 'common/components/FadeInOut';
 
-import ExpandableView from 'common/components/ExpandableView';
 import EditorFieldNode from 'etl/templates/components/field/EditorFieldNode';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { FieldMap, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-import EditorFieldPreview from './EditorFieldPreview';
-import EditorFieldSettings from './EditorFieldSettings';
 import './TemplateEditorField.less';
 
 interface Props

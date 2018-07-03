@@ -45,23 +45,17 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires
 
-import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as Radium from 'radium';
 import * as React from 'react';
 
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
-import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { getFileType } from 'shared/etl/FileUtil';
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
-import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
-import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';
+import { SinkOptionsType, Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { ETLStepComponent, StepProps } from './ETLStepComponent';
 import './ETLStepComponent.less';
 
 const { List, Map } = Immutable;

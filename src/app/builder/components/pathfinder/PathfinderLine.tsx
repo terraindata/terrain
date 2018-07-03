@@ -50,8 +50,6 @@ import TerrainComponent from 'app/common/components/TerrainComponent';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as $ from 'jquery';
-import * as _ from 'lodash';
 import * as React from 'react';
 import { Colors } from '../../../colors/Colors';
 const { List } = Immutable;

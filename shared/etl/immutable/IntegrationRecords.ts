@@ -45,13 +45,10 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file strict-boolean-expressions import-spacing
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import { List, Map } from 'immutable';
 import { guessFileOptionsHelper } from 'shared/etl/FileUtil';
 import { FileConfig } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
+import { makeExtendedConstructor, WithIRecord } from 'shared/util/Classes';
 
 import
 {

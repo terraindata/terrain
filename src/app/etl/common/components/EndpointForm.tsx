@@ -48,18 +48,15 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { EndpointTypeNames, SchedulableSinks, SchedulableSources, Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormLookups';
 

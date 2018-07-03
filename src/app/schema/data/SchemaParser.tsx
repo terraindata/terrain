@@ -50,8 +50,7 @@ import Ajax from 'app/util/Ajax';
 import { _Hit } from 'builder/components/results/ResultTypes';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import { SchemaActionType, SchemaActionTypes } from 'schema/data/SchemaRedux';
-import BackendInstance from '../../../database/types/BackendInstance';
+import { SchemaActionType } from 'schema/data/SchemaRedux';
 import * as SchemaTypes from '../SchemaTypes';
 
 const { Map, List } = Immutable;

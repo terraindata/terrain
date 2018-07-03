@@ -49,10 +49,9 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
+import { Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 

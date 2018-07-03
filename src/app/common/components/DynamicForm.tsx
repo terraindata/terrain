@@ -54,8 +54,7 @@ import * as React from 'react';
 import * as TagsInput from 'react-tagsinput';
 import 'react-tagsinput/react-tagsinput.css';
 import { instanceFnDecorator } from 'shared/util/Classes';
-import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 
 import { DisplayState, DisplayType, InputDeclarationMap, InputDeclarationType, OptionType } from './DynamicFormTypes';
 
@@ -65,7 +64,6 @@ const { List, Map } = Immutable;
 import Autocomplete from 'common/components/Autocomplete';
 import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
-import FadeInOut from 'common/components/FadeInOut';
 import ListForm from 'common/components/ListForm';
 import Switch from 'common/components/Switch';
 

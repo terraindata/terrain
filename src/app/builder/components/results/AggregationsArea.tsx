@@ -48,7 +48,6 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
-import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import Radium = require('radium');
 import * as React from 'react';

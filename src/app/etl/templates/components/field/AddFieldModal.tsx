@@ -45,27 +45,21 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires max-classes-per-file
 
-import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
 import { instanceFnDecorator } from 'shared/util/Classes';
-import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 const { List, Map } = Immutable;
 
-import Autocomplete from 'common/components/Autocomplete';
 import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import Modal from 'common/components/Modal';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
-import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { ETLFieldTypes, etlFieldTypesList, etlFieldTypesNames, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, etlFieldTypesList, etlFieldTypesNames } from 'shared/etl/types/ETLTypes';
 import { validateNewFieldName } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';

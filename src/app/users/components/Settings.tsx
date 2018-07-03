@@ -66,7 +66,6 @@ import Ajax from '../../util/Ajax';
 import TerrainTools from '../../util/TerrainTools';
 import { UserActions as Actions } from '../data/UserRedux';
 import * as UserTypes from '../UserTypes';
-import AccountEntry from './AccountEntry';
 import Section from './AccountSection';
 import PasswordStrengthInput from './PasswordStrengthInput';
 const moment = require('moment-timezone');

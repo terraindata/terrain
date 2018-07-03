@@ -61,7 +61,7 @@ import { Block } from '../../../blocks/types/Block';
 
 import { toInputMap } from '../../../blocks/types/Input';
 
-import { default as GetCardVisitor, KEY_DISPLAY, STATIC_KEY_DISPLAY } from 'builder/getCard/GetCardVisitor';
+import { default as GetCardVisitor, STATIC_KEY_DISPLAY } from 'builder/getCard/GetCardVisitor';
 import * as Immutable from 'immutable';
 import ESStructureClause from '../../../../shared/database/elastic/parser/clauses/ESStructureClause';
 import { DisplayType } from '../../../blocks/displays/Display';
@@ -69,7 +69,6 @@ import { Card } from '../../../blocks/types/Card';
 
 import { List } from 'immutable';
 import * as _ from 'lodash';
-import Util from 'util/Util';
 import ESArrayClause from '../../../../shared/database/elastic/parser/clauses/ESArrayClause';
 import ElasticBlocks from '../blocks/ElasticBlocks';
 

@@ -54,8 +54,7 @@ import * as request from 'then-request';
 
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
 import { TestLogger } from '../../../shared/test/TestLogger';
-import TerrainTools from '../../../src/app/util/TerrainTools';
-import { login, replayInputEventOnly, replayReduxEventOnly, replayRREvents } from '../../FullstackUtils';
+import { login, replayInputEventOnly, replayRREvents } from '../../FullstackUtils';
 
 const USERNAME_SELECTOR = '#login-email';
 const PASSWORD_SELECTOR = '#login-password';

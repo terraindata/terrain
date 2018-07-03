@@ -47,12 +47,10 @@ THE SOFTWARE.
 
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
-import * as Radium from 'radium';
 import * as React from 'react';
 
 import { walkthroughFactory } from 'common/components/walkthrough/Walkthrough';
 import { WalkthroughGraphType } from 'common/components/walkthrough/WalkthroughTypes';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import ETLRouteUtil from 'etl/ETLRouteUtil';
@@ -60,8 +58,8 @@ import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { _SinkConfig } from 'shared/etl/immutable/EndpointRecords';
+import { Sinks } from 'shared/etl/types/EndpointTypes';
 
 import { TransitionParams } from './ETLStepComponent';
 

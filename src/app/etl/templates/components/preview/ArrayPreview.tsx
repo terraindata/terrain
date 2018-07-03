@@ -45,13 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:no-var-requires
-import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as _ from 'lodash';
-import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
+import { backgroundColor, Colors } from 'src/app/colors/Colors';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;

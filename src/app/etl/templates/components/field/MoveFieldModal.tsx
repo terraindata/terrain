@@ -45,23 +45,19 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires max-classes-per-file
 
-import * as classNames from 'classnames';
 import ListForm, { RowOptions } from 'common/components/ListForm';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
 import { instanceFnDecorator } from 'shared/util/Classes';
-import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 const { List, Map } = Immutable;
 
-import Autocomplete from 'common/components/Autocomplete';
 import Modal from 'common/components/Modal';
 import { TemplateField } from 'etl/templates/FieldTypes';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 

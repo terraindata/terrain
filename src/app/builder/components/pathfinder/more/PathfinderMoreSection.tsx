@@ -65,16 +65,15 @@ import ExpandIcon from 'common/components/ExpandIcon';
 import RouteSelector from 'common/components/RouteSelector';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import BuilderActions from '../../../data/BuilderActions';
-import PathfinderArea from '../PathfinderArea';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import PathfinderText from '../PathfinderText';
 import
 {
-  _AggregationLine, _ChoiceOption, _Param, _Path, _Script,
-  More, Path, PathfinderContext, Script, Source,
+  _AggregationLine, _ChoiceOption, _Param, _Script,
+  More, PathfinderContext, Script,
 } from '../PathfinderTypes';
-import DragAndDrop, { DraggableItem } from './../../../../common/components/DragAndDrop';
+import { DraggableItem } from './../../../../common/components/DragAndDrop';
 import DragHandle from './../../../../common/components/DragHandle';
 import PathfinderAggregationLine from './PathfinderAggregationLine';
 import './PathfinderMoreStyle.less';

@@ -45,15 +45,10 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires no-empty-interface max-classes-per-file
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
 
-import { instanceFnDecorator } from 'shared/util/Classes';
-
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
+import { InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { EngineProxy } from 'etl/templates/EngineProxy';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';

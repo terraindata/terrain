@@ -46,10 +46,8 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires import-spacing max-classes-per-file
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
-import Util from 'util/Util';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';

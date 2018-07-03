@@ -46,14 +46,12 @@ THE SOFTWARE.
 // tslint:disable:import-spacing max-classes-per-file
 
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { ModalProps } from 'common/components/overlay/MultiModal';
 
-import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
-import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { makeConstructor, makeExtendedConstructor, WithIRecord } from 'shared/util/Classes';
 
 class ETLStateC
 {

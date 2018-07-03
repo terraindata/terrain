@@ -46,9 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires switch-default strict-boolean-expressions
 
-import * as classNames from 'classnames';
 import * as React from 'react';
-import { Link, Route, Switch } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 
 import TerrainTools from 'app/util/TerrainTools';
 import TerrainTabs from 'common/components/TerrainTabs';
@@ -57,7 +56,6 @@ import './Account.less';
 
 import ConnectionEditorPage from 'app/connections/components/ConnectionEditorPage';
 import Connections from 'app/connections/components/Connections';
-import EditProfile from './EditProfile';
 import Logs from './Logs';
 import Notifications from './Notifications';
 import Settings from './Settings';

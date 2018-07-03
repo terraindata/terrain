@@ -47,44 +47,25 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
-import * as Radium from 'radium';
-import * as React from 'react';
-import { withRouter } from 'react-router';
 
-import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import { MidwayError } from 'shared/error/MidwayError';
 import TerrainStore from 'src/app/store/TerrainStore';
-import Util from 'util/Util';
 
 import ETLAjax from 'etl/ETLAjax';
-import { ETLActions } from 'etl/ETLRedux';
-import ETLRouteUtil from 'etl/ETLRouteUtil';
-import TemplateEditor from 'etl/templates/components/TemplateEditor';
-import { fetchDocumentsFromAlgorithm, fetchDocumentsFromFile } from 'etl/templates/DocumentRetrievalUtil';
-import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+import { fetchDocumentsFromFile } from 'etl/templates/DocumentRetrievalUtil';
 import
 {
-  _TemplateEditorState,
   DefaultDocumentLimit,
-  EditorDisplayState,
   FetchStatus,
-  FieldMap,
-  TemplateEditorState,
 } from 'etl/templates/TemplateEditorTypes';
-import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import
 {
-  _ETLEdge, _ETLNode, _ETLProcess,
-  _MergeJoinOptions, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions,
+  MergeJoinOptions,
 } from 'shared/etl/immutable/ETLProcessRecords';
-import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
-import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { Sources } from 'shared/etl/types/EndpointTypes';
+import { NodeTypes } from 'shared/etl/types/ETLTypes';
 import ETLHelpers from './ETLHelpers';
-
-import Ajax from 'util/Ajax';
 
 class DocumentsHelpers extends ETLHelpers
 {
