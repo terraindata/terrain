@@ -568,6 +568,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
         {this.renderErrors()}
         {this.props.children !== undefined ? this.props.children : null}
         {this.renderConfirmBar()}
+        hiiiiiiiii
       </div>
     );
   }

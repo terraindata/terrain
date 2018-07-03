@@ -135,6 +135,16 @@ export default class FileConfigForm extends TerrainComponent<Props>
         widthFactor: 3,
         getDisplayState: this.jsonPathDisplay,
       },
+      suggestedJsonPath: {
+        type: DisplayType.Custom,
+        displayName: 'Suggested Data Paths',
+        group: 'path',
+        widthFactor: 3,
+        options: {
+          render: (state, disabled) => <div>IMSCREAMING</div>,
+        },
+        getDisplayState: this.jsonPathDisplay,
+      },
       isPlaFeed: {
         type: DisplayType.CheckBox,
         displayName: 'Google PLA Feed',
