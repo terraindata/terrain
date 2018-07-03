@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import { Readable, Writable } from 'stream';
 
+import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import AEndpointStream from './AEndpointStream';
@@ -90,6 +91,19 @@ export class AlgorithmEndpoint extends AEndpointStream
     {
       query = await Util.getQueryFromAlgorithm(algorithmId);
       dbId = await Util.getDBFromAlgorithm(algorithmId);
+    }
+
+    if (source.options['size'] !== undefined)
+    {
+      const parser = new ESJSONParser(query, true);
+      if (parser.hasError())
+      {
+        throw parser.getErrors();
+      }
+
+      const queryObj = parser.getValue();
+      queryObj['size'] = source.options['size'];
+      query = JSON.stringify(queryObj);
     }
 
     const controller: DatabaseController | undefined = DatabaseRegistry.get(dbId);
