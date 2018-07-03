@@ -49,6 +49,12 @@ const Movies = require('./movies.json');
 // const UsersRomance = require('./Users_Romance.json');
 const Waduhek = require('./waduhekmovies.json');
 
+interface PathInfo
+{
+  name: string;
+  score: number;
+}
+
 export default class PathUtil
 {
   public static isArray(object)
@@ -71,7 +77,27 @@ export default class PathUtil
     return keyFields;
   }
 
-  public static matchingFields(object, keyObject) // check that objects in the json have the same key fields (consistent)
+  public static keyFieldsCompare(keyFieldsA, keyFieldsB, keyObject: PathInfo)
+  {
+    let commonCount = 0;
+    const lengthA = keyFieldsA.length;
+    const lengthB = keyFieldsB.length;
+    const maxLength = Math.max(lengthA, lengthB);
+    const baseKeyField = (lengthA < lengthB) ? keyFieldsA : keyFieldsB;
+    const comparedKeyField = (lengthA < lengthB) ? keyFieldsB : keyFieldsA;
+    for (let i = 0; i < baseKeyField.length; i++)
+    {
+      let specificKey = baseKeyField[i];
+      if (comparedKeyField.includes(specificKey))
+      {
+        commonCount++;
+      }
+    }
+    keyObject.score += Math.floor(commonCount/maxLength);
+    return (keyFieldsA === keyFieldsB);
+  }
+
+  public static matchingFields(object, keyObject: PathInfo) // check that objects in the json have the same key fields (consistent)
   {
     if (typeof object !== 'object')
     {
@@ -81,18 +107,18 @@ export default class PathUtil
     let comparedKeys;
     for (const key of Object.keys(object))
     {
-      const keyFields = PathUtil.renderFields(object.key);
-      if (comparedKeys !== undefined && keyFields !== comparedKeys)
+      const keyFields = PathUtil.renderFields(object[key]);
+      if (comparedKeys !== undefined && !(PathUtil.keyFieldsCompare(comparedKeys, keyFields, keyObject)))
       {
         return false;
       }
       comparedKeys = keyFields;
     }
-    keyObject['score'] += 4;
+    keyObject.score += 4;
     return true;
   }
 
-  public static matchingFieldLength(object, keyObject) // check that objects in the json have the same number of key fields
+  public static matchingFieldLength(object, keyObject: PathInfo) // check that objects in the json have the same number of key fields
   {
     let comparedLength;
     for (const itemKey of Object.keys(object))
@@ -104,11 +130,11 @@ export default class PathUtil
       }
       comparedLength = itemLength;
     }
-    keyObject['score'] += 3;
+    keyObject.score += 3;
     return true;
   }
 
-  public static containsAllObjects(array, keyObject: object)
+  public static containsAllObjects(array, keyObject: PathInfo)
   {
     for (let i = 0; i < array.length; i++)
     {
@@ -117,33 +143,33 @@ export default class PathUtil
         return false;
       }
     }
-    keyObject['score'] += 2;
+    keyObject.score += 2;
     return true;
   }
 
-  public static isPossiblePath(json: object, keyObject: object)
+  public static isPossiblePath(json: object, keyObject: PathInfo)
   {
-    const object = json[keyObject['name']];
+    const object = json[keyObject.name];
     if (object === undefined || object === null)
     {
-      keyObject['score'] = 0;
+      keyObject.score = 0;
       return false;
     }
     if (typeof object === 'string' || typeof object === 'number')
     {
-      keyObject['score'] = 0;
+      keyObject.score = 0;
       return false;
     }
     if (object.length === 0 || object.length === 1)
     {
-      keyObject['score'] = 0;
+      keyObject.score = 0;
       return false;
     }
     if (PathUtil.isArray(object))
     {
       if (!PathUtil.containsAllObjects(object, keyObject))
       {
-        keyObject['score'] = 0;
+        keyObject.score = 0;
         return false;
       }
       if (PathUtil.matchingFieldLength(object, keyObject) || PathUtil.matchingFields(object, keyObject))
@@ -168,15 +194,15 @@ export default class PathUtil
       return possiblePaths;
     }
 
-    const baseObject = {name: '*', score: 0}
+    const baseObject: PathInfo = {name: '*', score: 0}
     if (PathUtil.isArray(json) && PathUtil.containsAllObjects(json, baseObject))
     {
-      baseObject['score'] = 2;
+      baseObject.score = 2;
       return [(baseObject)]; // json itself is a proper path already
     }
     for (const key of Object.keys(json))
     {
-      let keyObject = {name: key, score: 0}; 
+      let keyObject: PathInfo = {name: key, score: 0}; 
       if (PathUtil.isPossiblePath(json, keyObject))
       {
         possiblePaths.push(keyObject);
@@ -192,6 +218,6 @@ export default class PathUtil
   }
 }
 
-// console.log(PathUtil.guessFilePaths(Earthquakes));
-// console.log(PathUtil.guessFilePaths(Movies));
-// console.log(PathUtil.guessFilePaths(Waduhek));
+console.log(PathUtil.guessFilePaths(Earthquakes));
+console.log(PathUtil.guessFilePaths(Movies));
+console.log(PathUtil.guessFilePaths(Waduhek));
