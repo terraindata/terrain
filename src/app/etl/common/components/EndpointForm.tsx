@@ -270,7 +270,6 @@ class EndpointForm extends TerrainComponent<Props>
 
   public handleEndpointChange(newEndpoint: SinkConfig | SourceConfig, apply?: boolean)
   {
-    console.log('hi');
     const newOpts = newEndpoint.guessFileOptions();
     const oldOpts = this.props.endpoint.guessFileOptions();
     const applyOpts = this.extractFileConfigDelta(oldOpts, newOpts);
@@ -278,8 +277,8 @@ class EndpointForm extends TerrainComponent<Props>
     newEndpoint = newEndpoint.set('fileConfig', newFileConfig);
 
     this.props.onChange(newEndpoint, apply);
-    console.log(DocumentsHelpers.fetchPreview(newEndpoint));
-    DocumentsHelpers.fetchPreview(newEndpoint).then((res) => console.log(res)).catch((e) =>console.log(e));
+    //console.log(DocumentsHelpers.fetchPreview(newEndpoint));
+    //DocumentsHelpers.fetchPreview(newEndpoint).then((res) => console.log(res)).catch((e) =>console.log(e));
   }
 
   public extractFileConfigDelta(oldConfig: Partial<FileConfig>, newConfig: Partial<FileConfig>): Partial<FileConfig>

@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-// const Earthquakes = require('./earthquakes.json');
-// const Movies = require('./movies.json');
+const Earthquakes = require('./earthquakes.json');
+const Movies = require('./movies.json');
 // const UsersRomance = require('./Users_Romance.json');
-// const Waduhek = require('./waduhekmovies.json');
+const Waduhek = require('./waduhekmovies.json');
 
 export default class PathUtil
 {
@@ -71,11 +71,11 @@ export default class PathUtil
     return keyFields;
   }
 
-  public static matchingFields(object) // check that objects in the json have the same key fields (consistent)
+  public static matchingFields(object, keyObject) // check that objects in the json have the same key fields (consistent)
   {
     if (typeof object !== 'object')
     {
-      return false; // the object cant be iterated through
+      return false; // the object can't be iterated through
     }
 
     let comparedKeys;
@@ -88,10 +88,11 @@ export default class PathUtil
       }
       comparedKeys = keyFields;
     }
+    keyObject['score'] += 4;
     return true;
   }
 
-  public static matchingFieldLength(object) // check that objects in the json have the same number of key fields
+  public static matchingFieldLength(object, keyObject) // check that objects in the json have the same number of key fields
   {
     let comparedLength;
     for (const itemKey of Object.keys(object))
@@ -103,10 +104,11 @@ export default class PathUtil
       }
       comparedLength = itemLength;
     }
+    keyObject['score'] += 3;
     return true;
   }
 
-  public static containsAllObjects(array)
+  public static containsAllObjects(array, keyObject: object)
   {
     for (let i = 0; i < array.length; i++)
     {
@@ -115,31 +117,36 @@ export default class PathUtil
         return false;
       }
     }
+    keyObject['score'] += 2;
     return true;
   }
 
-  public static isPossiblePath(json: object, key)
+  public static isPossiblePath(json: object, keyObject: object)
   {
-    const object = json[key];
+    const object = json[keyObject['name']];
     if (object === undefined || object === null)
     {
+      keyObject['score'] = 0;
       return false;
     }
     if (typeof object === 'string' || typeof object === 'number')
     {
+      keyObject['score'] = 0;
       return false;
     }
     if (object.length === 0 || object.length === 1)
     {
+      keyObject['score'] = 0;
       return false;
     }
     if (PathUtil.isArray(object))
     {
-      if (!PathUtil.containsAllObjects(object))
+      if (!PathUtil.containsAllObjects(object, keyObject))
       {
+        keyObject['score'] = 0;
         return false;
       }
-      if (PathUtil.matchingFieldLength(object) || PathUtil.matchingFields(object))
+      if (PathUtil.matchingFieldLength(object, keyObject) || PathUtil.matchingFields(object, keyObject))
       {
         return true;
       }
@@ -150,7 +157,7 @@ export default class PathUtil
     }
   }
 
-  public static guessPath(json: object, possiblePaths, depth: number)
+  public static guessPath(json: object, possiblePaths, depth: number): object
   {
     if (depth > 4) // threshold for recusive calls
     {
@@ -161,16 +168,18 @@ export default class PathUtil
       return possiblePaths;
     }
 
-    const isArrayType = PathUtil.isArray(json);
-    if (isArrayType)
+    const baseObject = {name: '*', score: 0}
+    if (PathUtil.isArray(json) && PathUtil.containsAllObjects(json, baseObject))
     {
-      return possiblePaths; // proper path already
+      baseObject['score'] = 2;
+      return [(baseObject)]; // json itself is a proper path already
     }
     for (const key of Object.keys(json))
     {
-      if (PathUtil.isPossiblePath(json, key))
+      let keyObject = {name: key, score: 0}; 
+      if (PathUtil.isPossiblePath(json, keyObject))
       {
-        possiblePaths.push(key);
+        possiblePaths.push(keyObject);
       }
       PathUtil.guessPath(json[key], possiblePaths, depth + 1);
     }
@@ -182,3 +191,7 @@ export default class PathUtil
     return PathUtil.guessPath(json, [], 0);
   }
 }
+
+// console.log(PathUtil.guessFilePaths(Earthquakes));
+// console.log(PathUtil.guessFilePaths(Movies));
+// console.log(PathUtil.guessFilePaths(Waduhek));

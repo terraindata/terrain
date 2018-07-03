@@ -76,6 +76,8 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 const { List } = Immutable;
 import './ETLEditorPage.less';
 
+console.log(PathUtil);
+
 export interface Props
 {
   // injected
