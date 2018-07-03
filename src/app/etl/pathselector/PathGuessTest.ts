@@ -93,7 +93,7 @@ export default class PathUtil
         commonCount++;
       }
     }
-    keyObject.score += (Math.floor(commonCount / keyCount) * 10); // bonus score based on fraction of matching keys
+    keyObject.score += (Math.floor((commonCount / keyCount) * 10)); // bonus score based on fraction of matching keys
     return (keyFieldsA === keyFieldsB);
   }
 
