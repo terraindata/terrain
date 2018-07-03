@@ -70,7 +70,7 @@ export interface EventConfig
   hash: string;
 }
 
-export const indexName = 'terrain-analytics';
+export const indexName = 'abc.terrain-analytics';
 export const typeName = 'events';
 
 export class Events
