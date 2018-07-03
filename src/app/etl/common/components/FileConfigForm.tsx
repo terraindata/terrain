@@ -60,6 +60,8 @@ import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from
 import { FileConfig as FileConfigI } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 
+import DataModal from './DataModal';
+
 const { List } = Immutable;
 
 export interface Props
@@ -137,11 +139,21 @@ export default class FileConfigForm extends TerrainComponent<Props>
       },
       suggestedJsonPath: {
         type: DisplayType.Custom,
-        displayName: 'Suggested Data Paths',
+        displayName: 'Suggested JSON Paths',
         group: 'path',
-        widthFactor: 3,
+        widthFactor: 8,
         options: {
-          render: (state, disabled) => <div>IMSCREAMING</div>,
+          render: (state, disabled) => 
+          <DataModal
+            sectionType='path'
+            sectionOptions={
+              List(['option 1', 'option 2', 'option 3'])
+            }
+            sectionBoxes={
+              List(['content 1', 'content 2', 'content 3'])
+            }
+            size='500px'
+          />,
         },
         getDisplayState: this.jsonPathDisplay,
       },

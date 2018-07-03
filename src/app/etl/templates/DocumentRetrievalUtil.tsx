@@ -43,103 +43,85 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-
-// tslint:disable:no-var-requires switch-default strict-boolean-expressions
-
+// tslint:disable:import-spacing
 import * as Immutable from 'immutable';
-import { List } from 'immutable';
-import * as React from 'react';
-import TerrainComponent from 'common/components/TerrainComponent';
-
-
 import * as _ from 'lodash';
-import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
-import { ColorsActions } from '../../../colors/data/ColorsRedux';
-import './DataModal.less';
 
-export interface Props
+import
 {
-  sectionTitle?: string | El;
-  sectionType: string;
-  sectionOptions: List<any>;
-  sectionBoxes: List<any>;
-  size: string;
-}
+  _TemplateField,
+  TemplateField,
+} from 'etl/templates/FieldTypes';
+import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+import { Algorithm } from 'library/LibraryTypes';
+import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
+import { MidwayError } from 'shared/error/MidwayError';
+import { getSampleRows } from 'shared/etl/FileUtil';
+import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 
-export default class DataModal extends TerrainComponent<Props>
+import { toInputMap } from 'src/blocks/types/Input';
+import { AllBackendsMap } from 'src/database/AllBackends';
+import MidwayQueryResponse from 'src/database/types/MidwayQueryResponse';
+
+import { _Query, Query, queryForSave } from 'src/items/types/Query';
+import { Ajax } from 'util/Ajax';
+
+const { List, Map } = Immutable;
+
+export function fetchDocumentsFromAlgorithm(
+  algorithm: Algorithm,
+  limit?: number,
+): Promise<List<object>>
 {
-  constructor(props)
+  return new Promise<List<object>>((resolve, reject) =>
   {
-    super(props);
+    let query = algorithm.query;
+    query = query.set('parseTree', new ESInterpreter(query.tql, toInputMap(query.inputs)));
 
-    this.state = {
-      currentOption: this.props.sectionOptions.get(0);
-    }
-  }
-
-  public shouldComponentUpdate(nextProps, nextState)
-  {
-    if (!_.isEqual(nextState.currentOption, this.state.currentOption))
-    {
-      return true;
-    }
-    else
-    {
-      return (this.props !== nextProps) || (this.state !== nextState);
-    }
-  }
-
-  public onTabChange(optionName)
-  {
-    this.setState(
+    const eql = AllBackendsMap[query.language].parseTreeToQueryString(
+      query,
       {
-        currentOption: optionName,
+        replaceInputs: true,
       },
     );
-  }
+    const handleResponse = (response: MidwayQueryResponse) =>
+    {
+      let hits = List(_.get(response, ['result', 'hits', 'hits'], []))
+        .map((doc, index) => doc['_source']);
+      if (limit != null && limit > 0)
+      {
+        hits = hits.slice(0, limit);
+      }
+      resolve(hits.toList());
+    };
 
-  public renderSectionTab(options)
-  {
-    return (
-      <div className='option-tabs'>
-        {this.props.sectionOptions.map((optionName, i) =>
-           <div 
-             className='option-button' 
-             key={i} 
-             onClick={this._fn(this.onTabChange, optionName)}
-             style={{ color: (this.state.currentOption === optionName) ? Colors().mainBlue : Colors().sectionEditButton, 
-                      background: Colors().bg }}
-           >
-             {optionName}
-           </div>
-          )
-        }
-      </div>
+    const { queryId, xhr } = Ajax.query(
+      eql,
+      algorithm.db,
+      handleResponse,
+      reject,
     );
-  }
+  });
+}
 
-  public renderSectionInfo()
+export function fetchDocumentsFromFile(
+  file: File,
+  config: FileConfig,
+  limit?: number,
+): Promise<List<object>>
+{
+  return new Promise<List<object>>((resolve, reject) =>
   {
-    return (
-      <div className='section-body' style={{ background: Colors().bg }}>
-        {this.props.sectionBoxes.get(this.props.sectionOptions.indexOf(this.state.currentOption))}
-      </div>
+    const handleResponse = (response: object[]) =>
+    {
+      resolve(List(response));
+    };
+    getSampleRows(
+      file,
+      handleResponse,
+      reject,
+      limit,
+      config.toJS(),
     );
-  }
-
-  public render()
-  {
-    return (
-      <div
-        className='section-container'
-        style={{ background: Colors().blockBg }}
-      >
-        <div className='section-header-bar' style={{ width: this.props.size }}>
-          <div className='section-header'>{this.props.sectionTitle}</div>
-          {this.renderSectionTab(this.props.sectionOptions)}
-        </div>
-        {this.renderSectionInfo()}
-      </div>
-    );
-  }
+  });
 }
