@@ -51,6 +51,8 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { withRouter } from 'react-router';
 
+import * as _ from 'lodash';
+
 import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import { MidwayError } from 'shared/error/MidwayError';
 import TerrainStore from 'src/app/store/TerrainStore';
@@ -227,8 +229,7 @@ class DocumentsHelpers extends ETLHelpers
             return reject('File not provided');
           }
           const config = source.fileConfig;
-          // this.fetchFromFile(source);
-          return fetchDocumentsFromFile(file, config, DefaultDocumentLimit)
+          return this.fetchFromFile(source)
             .then(resolve)
             .catch(reject);
         }
@@ -241,9 +242,9 @@ class DocumentsHelpers extends ETLHelpers
     });
   }
 
-  protected sliceFromFile(file: File, size = CHUNK_SIZE): Promise<string>
+  protected async sliceFromFile(file: File, size = CHUNK_SIZE): Promise<string>
   {
-    return new Promise<string>((resolve, reject) => {
+    return new Promise<string>(async (resolve, reject) => {
       let slice;
       if (file.size <= size)
       {
@@ -264,13 +265,39 @@ class DocumentsHelpers extends ETLHelpers
 
   protected fetchFromFile(
     source: SourceConfig
-  )
+  ): Promise<List<object>>
   {
-    const file: File = source.options['file'];
-    this.sliceFromFile(file).then((res) => {
-      console.log(res);
-    }).catch((err) => {
-      console.error(err);
+    return new Promise(async (resolve, reject) => {
+      try {
+        const file: File = source.options['file'];
+        const newOptions = _.extend({}, source.options, {
+          file: null,
+        });
+        source = source.set('options', newOptions);
+
+        let sliceString = await this.sliceFromFile(file, CHUNK_SIZE);
+
+        if (sliceString.length < CHUNK_SIZE)
+        {
+          const results = await ETLAjax.fetchPreview(source, DefaultDocumentLimit, sliceString);
+          resolve(results);
+        }
+        else
+        {
+          let results = await ETLAjax.fetchPreview(source, DefaultDocumentLimit, sliceString);
+          // currently only try increasing the size once
+          if (results.size < DefaultDocumentLimit)
+          {
+            sliceString = await this.sliceFromFile(file, 5 * CHUNK_SIZE);
+            results = await ETLAjax.fetchPreview(source, DefaultDocumentLimit, sliceString);
+            resolve(results);
+          }
+        }
+      }
+      catch (e)
+      {
+        reject(e);
+      }
     });
   }
 

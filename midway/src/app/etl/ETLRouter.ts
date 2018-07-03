@@ -71,18 +71,29 @@ interface ETLUIPreviewConfig
 {
   source: SourceConfig;
   size?: number;
+  fileString?: string;
 }
 
 Router.post('/preview', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const request: ETLUIPreviewConfig = ctx.request.body.body;
+  const previewName = 'preview';
+
   Util.verifyParameters(request, ['source']);
 
   const source: SourceConfig = request.source;
-  // it's not possible to get a preview of sources of "Upload" type
+  const files = [];
   if (source.type === 'Upload')
   {
-    throw new Error('Preview of "Upload" sources is not allowed');
+    if (request.fileString === undefined)
+    {
+      throw new Error('Preview of Upload sources require a filestring');
+    }
+    const mockStream = new stream.Readable();
+    mockStream.push(request.fileString);
+    mockStream.push(null);
+    mockStream['fieldname'] = previewName;
+    files.push(mockStream);
   }
 
   if (request.size === undefined)
@@ -91,7 +102,7 @@ Router.post('/preview', passport.authenticate('access-token-local'), async (ctx,
   }
 
   // get a preview up to "size" rows from the specified source
-  const sourceStream: stream.Readable = await getSourceStream('preview', source);
+  const sourceStream: stream.Readable = await getSourceStream(previewName, source, files);
   const results = await BufferTransform.toArray(sourceStream, request.size);
   ctx.body = JSON.stringify(results);
 });
