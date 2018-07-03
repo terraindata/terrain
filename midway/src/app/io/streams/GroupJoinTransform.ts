@@ -254,7 +254,8 @@ export default class GroupJoinTransform extends SafeReadable
               {
                 if (resp.responses[j]._shards.failed > 0)
                 {
-                  resp.responses[j]._shards.failures.forEach((f) => {
+                  resp.responses[j]._shards.failures.forEach((f) =>
+                  {
                     this.emit('error', f);
                   });
                 }
