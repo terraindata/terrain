@@ -53,10 +53,7 @@ import
   PostProcessAggregationTypes,
   PostProcessConfig,
   PostProcessFilterTypes,
-  PostProcessOptionsTypes,
   PostProcessParseTypes,
-  PostProcessSortObjectTypes,
-  PostProcessSortTypes,
 } from 'shared/etl/types/PostProcessTypes';
 
 import BufferTransform from '../io/streams/BufferTransform';

@@ -44,13 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing strict-boolean-expressions
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
 
-import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { SinkConfig } from 'shared/etl/immutable/EndpointRecords';
 import DefaultTemplateController from './DefaultTemplateController';
 import ElasticTemplateController from './ElasticTemplateController';
 

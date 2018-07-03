@@ -45,24 +45,18 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing strict-boolean-expressions
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 import * as _ from 'lodash';
 
 import { LanguageInterface } from 'shared/etl/languages/LanguageControllers';
 import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
-import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
-import TypeUtil from 'shared/etl/TypeUtil';
+import { Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
-import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
 import { DefaultController } from './DefaultTemplateController';
 
-import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-
-import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { SinkConfig } from 'shared/etl/immutable/EndpointRecords';
 
 class ElasticController extends DefaultController implements LanguageInterface
 {

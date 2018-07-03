@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import { createRecordType } from 'shared/util/Classes';
-const { List, Map } = Immutable;
+import { List, Map } from 'immutable';
 import Util from 'app/util/Util';
 
 export class Format

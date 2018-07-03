@@ -43,15 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import * as _ from 'lodash';
 import ConfigType from '../ConfigType';
 
-import { _ETLTemplate, ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
-import { DefaultSinkConfig, DefaultSourceConfig } from 'shared/etl/types/EndpointTypes';
-import { ETLProcess, TemplateBase, TemplateMeta, TemplateObject, TemplateSettings } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-
-import { CURRENT_VERSION, Version } from './MigrationTypes';
+import { Version } from './MigrationTypes';
 
 export class MigrationRecordConfig extends ConfigType
 {

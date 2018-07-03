@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as mysql from 'mysql';
 import { Readable } from 'stream';
 
 import SafeReadable from '../../../app/io/streams/SafeReadable';

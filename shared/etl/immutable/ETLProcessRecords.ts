@@ -46,23 +46,16 @@ THE SOFTWARE.
 
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-const { List, Map } = Immutable;
-import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
+import { Map } from 'immutable';
+import { makeExtendedConstructor, WithIRecord } from 'shared/util/Classes';
 
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import
 {
   ETLEdge as ETLEdgeI,
   ETLNode as ETLNodeI,
   ETLProcess as ETLProcessI,
-  Languages,
   MergeJoinOptions as MergeJoinOptionsI,
   NodeTypes,
-  TemplateBase,
-  TemplateObject,
 } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 

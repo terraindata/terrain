@@ -50,8 +50,6 @@ import * as zlib from 'zlib';
 
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
-import IntegrationConfig from '../../integrations/IntegrationConfig';
-import { integrations } from '../../integrations/IntegrationRouter';
 import AEndpointStream from './AEndpointStream';
 
 export default class HTTPEndpoint extends AEndpointStream

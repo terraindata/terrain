@@ -45,17 +45,10 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
-
-import { List } from 'immutable';
 import * as _ from 'lodash';
 
 import TransformationNode from 'shared/transformations/TransformationNode';
-import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import Topology from 'shared/transformations/util/TopologyUtil';
 import { KeyPath } from 'shared/util/KeyPath';

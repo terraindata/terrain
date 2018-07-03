@@ -46,7 +46,7 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file
 import { List } from 'immutable';
 import * as _ from 'lodash';
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 // string values for this enum are how elastic expects them
 
 export enum ElasticTypes

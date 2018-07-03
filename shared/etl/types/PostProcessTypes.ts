@@ -45,8 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file no-unused-expression
 
-import { FileTypes, Languages } from './ETLTypes';
-
 export enum PostProcessAggregationTypes
 {
   Average = 'Average',

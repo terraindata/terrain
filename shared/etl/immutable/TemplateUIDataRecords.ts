@@ -46,10 +46,8 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
 
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-const { List, Map } = Immutable;
-import { makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
+import { Map } from 'immutable';
+import { makeExtendedConstructor, WithIRecord } from 'shared/util/Classes';
 
 import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 
