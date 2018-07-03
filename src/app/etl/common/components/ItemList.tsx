@@ -78,12 +78,19 @@ export interface Props<T>
   itemsName?: string;
   canCreate?: boolean;
   onCreate?: () => void;
+  loading?: boolean;
+  loadingMessage?: string;
 }
 
 const memoize = _.memoize;
 
 export class ItemList<T> extends TerrainComponent<Props<T>>
 {
+  public static defaultProps = {
+    loading: false,
+    loadingMessage: null,
+  };
+
   constructor(props)
   {
     super(props);
@@ -159,6 +166,31 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
     );
   }
 
+  public getEmptyItemsListMessage()
+  {
+    const { loading, loadingMessage } = this.props;
+
+    let message = '';
+
+    if (loading)
+    {
+      if (loadingMessage !== null)
+      {
+        message = loadingMessage;
+      }
+      else
+      {
+        message = `Loading ${this.props.itemsName || 'item'}s...`;
+      }
+    }
+    else
+    {
+      message = `There aren't yet any ${this.props.itemsName || 'item'}s`;
+    }
+
+    return message;
+  }
+
   public render()
   {
     const { columnConfig, items, getMenuOptions } = this.props;
@@ -200,7 +232,7 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
             items.map(this.renderRow).toList()
             :
             <div className='item-list-message'>
-              There aren't yet any {this.props.itemsName || 'item'}s
+              {this.getEmptyItemsListMessage()}
             </div>
         }
 
