@@ -72,6 +72,7 @@ import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { notificationManager } from './../../common/components/InAppNotification';
 
 const { List } = Immutable;
 import './ETLEditorPage.less';
@@ -153,6 +154,12 @@ class ETLEditorPage extends TerrainComponent<Props>
         {
           ETLRouteUtil.gotoEditTemplate(savedTemplate.id);
         }
+
+        notificationManager.addNotification(
+          'Template saved',
+          savedTemplate.templateName,
+          'info',
+        );
       }
       else
       {

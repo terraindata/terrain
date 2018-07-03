@@ -129,7 +129,7 @@ export function profileUrlFor(user: User): string
     }
   }
 
-  return MIDWAY_HOST + '/midway/v1/assets/profiles/profile' + index + '.jpg';
+  return '/midway/v1/assets/profiles/profile' + index + '.jpg';
 }
 
 const numProfileImages = 9;

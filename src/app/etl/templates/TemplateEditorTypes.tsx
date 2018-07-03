@@ -131,7 +131,7 @@ export const _TemplateEditorState = makeExtendedConstructor(TemplateEditorStateC
 export enum ColumnOptions
 {
   Preview = 'Preview',
-  Endpoints = 'Endpoints',
+  Endpoints = 'Source/Destination',
   Steps = 'Steps',
   Options = 'Options',
 }
@@ -211,5 +211,3 @@ class EditorDisplayStateC
 }
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
 export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);
-
-export const DefaultDocumentLimit = 10;

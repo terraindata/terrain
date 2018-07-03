@@ -47,7 +47,6 @@ THE SOFTWARE.
 import * as pg from 'pg';
 import * as PGQueryStream from 'pg-query-stream';
 import { Readable } from 'stream';
-import * as winston from 'winston';
 
 import SafeReadable from '../../../app/io/streams/SafeReadable';
 import PostgreSQLConfig from '../PostgreSQLConfig';

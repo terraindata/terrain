@@ -43,85 +43,24 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:import-spacing
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 
-import
-{
-  _TemplateField,
-  TemplateField,
-} from 'etl/templates/FieldTypes';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { Algorithm } from 'library/LibraryTypes';
-import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
-import { MidwayError } from 'shared/error/MidwayError';
-import { getSampleRows } from 'shared/etl/FileUtil';
-import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import dateFormat = require('date-format');
+import * as winston from 'winston';
 
-import { toInputMap } from 'src/blocks/types/Input';
-import { AllBackendsMap } from 'src/database/AllBackends';
-import MidwayQueryResponse from 'src/database/types/MidwayQueryResponse';
+import { MemoryTransport } from './MemoryTransport';
 
-import { _Query, Query, queryForSave } from 'src/items/types/Query';
-import { Ajax } from 'util/Ajax';
-
-const { List, Map } = Immutable;
-
-export function fetchDocumentsFromAlgorithm(
-  algorithm: Algorithm,
-  limit?: number,
-): Promise<List<object>>
-{
-  return new Promise<List<object>>((resolve, reject) =>
-  {
-    let query = algorithm.query;
-    query = query.set('parseTree', new ESInterpreter(query.tql, toInputMap(query.inputs)));
-
-    const eql = AllBackendsMap[query.language].parseTreeToQueryString(
-      query,
-      {
-        replaceInputs: true,
-      },
-    );
-    const handleResponse = (response: MidwayQueryResponse) =>
+export const MidwayLogger = winston.createLogger({
+  level: 'debug',
+  format: winston.format.combine(
+    winston.format.colorize(),
+    winston.format.printf((info) =>
     {
-      let hits = List(_.get(response, ['result', 'hits', 'hits'], []))
-        .map((doc, index) => doc['_source']);
-      if (limit != null && limit > 0)
-      {
-        hits = hits.slice(0, limit);
-      }
-      resolve(hits.toList());
-    };
-
-    const { queryId, xhr } = Ajax.query(
-      eql,
-      algorithm.db,
-      handleResponse,
-      reject,
-    );
-  });
-}
-
-export function fetchDocumentsFromFile(
-  file: File,
-  config: FileConfig,
-  limit?: number,
-): Promise<List<object>>
-{
-  return new Promise<List<object>>((resolve, reject) =>
-  {
-    const handleResponse = (response: object[]) =>
-    {
-      resolve(List(response));
-    };
-    getSampleRows(
-      file,
-      handleResponse,
-      reject,
-      limit,
-      config.toJS(),
-    );
-  });
-}
+      const meta = (info.meta !== undefined) && (Object.keys(info.meta).length > 0) ? '\n\t' + JSON.stringify(info.meta) : '';
+      return `${dateFormat('yyyy-MM-dd hh:mm:ss.SSS')} [${process.pid}] ${info.level}: ${info.message} ${meta}`;
+    }),
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new MemoryTransport(),
+  ],
+});

@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 import * as _ from 'lodash';
 import * as stream from 'stream';
-import * as winston from 'winston';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';

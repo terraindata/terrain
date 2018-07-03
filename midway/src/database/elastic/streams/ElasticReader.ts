@@ -45,10 +45,10 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
-import * as winston from 'winston';
 
 import { ElasticQueryHit } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import SafeReadable from '../../../app/io/streams/SafeReadable';
+import { MidwayLogger } from '../../../app/log/MidwayLogger';
 import ElasticClient from '../client/ElasticClient';
 
 export class ElasticReader extends SafeReadable
@@ -140,7 +140,7 @@ export class ElasticReader extends SafeReadable
   {
     if (error !== null && error !== undefined)
     {
-      winston.error(error);
+      MidwayLogger.error(error);
       this.emit('error', error);
       return;
     }

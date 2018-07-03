@@ -46,10 +46,10 @@ THE SOFTWARE.
 
 import * as assert from 'assert';
 import * as _ from 'lodash';
-import * as winston from 'winston';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import { MidwayLogger } from '../log/MidwayLogger';
 
 import { CURRENT_VERSION, FIRST_VERSION, Migrator, Version } from '../AppVersion';
 import { MigrationRecordConfig as MigrationRecord } from '../migrations/MigrationRecordConfig';
@@ -73,7 +73,7 @@ export const defaultETLMigration: Migrator = {
         if (updated)
         {
           anyUpdated = true;
-          winston.debug(`Updated Template ${template.id}: ${message}`);
+          MidwayLogger.debug(`Updated Template ${template.id}: ${message}`);
         }
       }
       resolve(anyUpdated);

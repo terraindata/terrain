@@ -47,7 +47,6 @@ THE SOFTWARE.
 import * as fs from 'fs';
 import * as request from 'supertest';
 import { promisify } from 'util';
-import * as winston from 'winston';
 
 // import { App, Credentials, DB, Scheduler } from '../../src/app/App';
 import { App, DB } from '../../src/app/App';

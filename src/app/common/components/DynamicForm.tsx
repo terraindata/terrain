@@ -267,6 +267,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
           debounce={options.debounce}
+          help={inputInfo.help}
           onEnter={this.props.onTextInputEnter}
         />
       </div>
@@ -291,6 +292,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
           debounce={options.debounce}
+          help={inputInfo.help}
           onEnter={this.props.onTextInputEnter}
         />
       </div>

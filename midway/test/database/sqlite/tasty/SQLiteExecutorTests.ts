@@ -44,8 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as winston from 'winston';
-
+import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 import SQLiteConfig from '../../../../src/database/sqlite/SQLiteConfig';
 import SQLiteController from '../../../../src/database/sqlite/SQLiteController';
 
@@ -65,8 +64,7 @@ let sqliteController: SQLiteController;
 
 beforeAll(async () =>
 {
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
+  MidwayLogger.level = 'debug';
   const config: SQLiteConfig =
     {
       filename: 'moviesdb.db',

@@ -53,7 +53,7 @@ import { _SchemaState, SchemaState } from 'schema/SchemaTypes';
 import AnalyticsHelper from 'test-helpers/AnalyticsHelper';
 import { Ajax, createMockStore } from 'test-helpers/helpers';
 
-const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
+const MIDWAY_BASE_URL = `/midway/v1`;
 
 const serverResponseMock = AnalyticsHelper.mockServerResponses();
 

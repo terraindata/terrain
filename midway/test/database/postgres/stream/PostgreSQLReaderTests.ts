@@ -44,13 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as winston from 'winston';
-
 import BufferTransform from '../../../../src/app/io/streams/BufferTransform';
+import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 import PostgreSQLConfig from '../../../../src/database/pg/PostgreSQLConfig';
 import PostgreSQLReader from '../../../../src/database/pg/streams/PostgreSQLReader';
 
-(winston as any).level = 'debug';
+MidwayLogger.level = 'debug';
 
 const pgConfig: PostgreSQLConfig =
   {

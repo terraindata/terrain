@@ -42,117 +42,75 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import { EventEmitter } from 'events';
-import { Duplex, Transform, Writable } from 'stream';
+import dateFormat = require('date-format');
+import * as Transport from 'winston-transport';
 
-import { MidwayLogger } from '../../log/MidwayLogger';
+import tripleBeam = require('triple-beam');
 
-/**
- * Monitors progress of the writable stream
- */
-export default class ProgressStream extends Duplex
+export class MemoryTransport extends Transport
 {
-  private writer: Writable;
-  private frequency: number;
-  private asyncRead: any = null;
-  private doneWriting: boolean = false;
+  private msgs: any[];
+  private index: number;
+  private hasWrapped: boolean;
+  private maxMsgSize: number = 1000;
 
-  private count: number = 0;
-  private errors: number = 0;
-
-  constructor(writer: Writable, frequency: number = 3000)
+  constructor(options)
   {
-    super({
-      allowHalfOpen: true,
-      readableObjectMode: false,
-      writableObjectMode: true,
-      highWaterMark: writer.writableHighWaterMark,
-    });
+    super(options);
 
-    this.frequency = frequency;
-    this.writer = writer;
-    this.writer.on('error', (e) =>
+    this.name = 'MemoryTransport';
+    if (options != null && options.maxMsgSize != null)
     {
-      MidwayLogger.error(e.toString());
-      this.errors++;
-    });
-
-    this.writer.on('finish', () =>
-    {
-      this.doneWriting = true;
-      this.push(null);
-    });
-  }
-
-  public _write(chunk: any, encoding: string, callback: (err?: Error) => void)
-  {
-    this.writer.write(chunk, encoding, (err?: Error) =>
-    {
-      if (err === undefined)
-      {
-        this.count++;
-      }
-
-      callback(err);
-    });
-  }
-
-  public _writev(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
-  {
-    let numChunks = chunks.length;
-    const done = new EventEmitter();
-    done.on('done', callback);
-
-    chunks.forEach((c) => this._write(c.chunk, c.encoding, (err?: Error) =>
-    {
-      if (--numChunks === 0)
-      {
-        done.emit('done');
-      }
-    }));
-  }
-
-  public _read()
-  {
-    if (this.asyncRead === null && !this.doneWriting)
-    {
-      this.asyncRead = setTimeout(() =>
-      {
-        if (!this.doneWriting)
-        {
-          this.asyncRead = null;
-          this.push(this.progress());
-        }
-      },
-        this.frequency);
-    }
-  }
-
-  public _final(callback)
-  {
-    if (this.asyncRead !== null)
-    {
-      clearTimeout(this.asyncRead);
-      this.asyncRead = null;
-
-      if (!this.doneWriting)
-      {
-        this.doneWriting = true;
-        this.push(this.progress());
-      }
+      this.maxMsgSize = options.maxMsgSize;
     }
 
-    this.writer.end(callback);
+    this.index = 0;
+    this.hasWrapped = false;
+    this.msgs = new Array(this.maxMsgSize);
   }
 
-  public progress()
+  public log(info: object, callback)
   {
-    return JSON.stringify({
-      successful: this.count,
-      failed: this.errors,
-    }) + '\n';
+    const level = info[tripleBeam.LEVEL];
+    const msg = info.message;
+    const meta = info;
+    if (level === 'info' || level === 'warning' || level === 'error')
+    {
+      const timestamp: string = dateFormat('yyyy-MM-dd hh:mm:ss.SSS ');
+      this.msgs[this.next()] = timestamp + String(level) + ': ' + String(msg);
+    }
+    this.emit('logged');
+    callback(null, true);
   }
 
+  public getAll()
+  {
+    let msgStr;
+    if (!this.hasWrapped)
+    {
+      msgStr = this.msgs.slice(0, this.index).join('\n');
+    }
+    else
+    {
+      msgStr = this.msgs.slice(this.index + 1).join('\n') + '\n' + this.msgs.slice(0, this.index).join('\n');
+    }
+
+    return msgStr;
+  }
+
+  private next()
+  {
+    if (this.index === this.maxMsgSize - 1)
+    {
+      this.index = 0;
+      this.hasWrapped = true;
+    }
+    else
+    {
+      this.index++;
+    }
+    return this.index;
+  }
 }

@@ -44,10 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as winston from 'winston';
-
 import RecordBlock from '../../../../src/app/io/iterator/RecordBlock';
 import RecordSource from '../../../../src/app/io/iterator/RecordSource';
+import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 import ElasticClient from '../../../../src/database/elastic/client/ElasticClient';
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
@@ -59,7 +58,7 @@ let elasticClient: ElasticClient;
 
 beforeAll(() =>
 {
-  (winston as any).level = 'debug';
+  MidwayLogger.level = 'debug';
   const config: ElasticConfig = {
     hosts: ['http://localhost:9200'],
   };
@@ -75,9 +74,9 @@ async function accumulateHits(source: RecordSource): Promise<object[]>
   do
   {
     block = await source.getNext();
-    winston.info('accumulateHits recieved ' + JSON.stringify(block));
+    MidwayLogger.info('accumulateHits recieved ' + JSON.stringify(block));
     hits = hits.concat(block.records);
-    winston.info('hits: ' + JSON.stringify(hits));
+    MidwayLogger.info('hits: ' + JSON.stringify(hits));
   } while (!block.end);
   return hits;
 }

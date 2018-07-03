@@ -46,11 +46,11 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
 
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
+import { MidwayLogger } from '../log/MidwayLogger';
 import ResultsConfig from './ResultsConfig';
 import ResultsConfigConfig from './ResultsConfigConfig';
 
@@ -63,12 +63,12 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   let getItems;
   if (ctx.request.body.body !== undefined && ctx.request.body.body.index !== undefined)
   {
-    winston.info('Getting results config of a specific index');
+    MidwayLogger.info('Getting results config of a specific index');
     getItems = await resultsConfig.get(undefined, ctx.request.body.body.index);
   }
   else
   {
-    winston.info('getting all results config');
+    MidwayLogger.info('getting all results config');
     getItems = await resultsConfig.get();
   }
   ctx.body = getItems;
@@ -76,7 +76,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 
 Router.post('/update', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('Updating a results config');
+  MidwayLogger.info('Updating a results config');
   const index: string = ctx.request.body.body.index;
   const resultConfig: ResultsConfigConfig = ctx.request.body.body.resultsConfig;
   ctx.body = await resultsConfig.upsert(ctx.state.user, index, resultConfig);

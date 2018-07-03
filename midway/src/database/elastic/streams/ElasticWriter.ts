@@ -47,7 +47,6 @@ THE SOFTWARE.
 import * as Elastic from 'elasticsearch';
 import { EventEmitter } from 'events';
 import * as Stream from 'stream';
-import * as winston from 'winston';
 
 import { ElasticMapping } from '../../../../../shared/etl/mapping/ElasticMapping';
 import SafeWritable from '../../../app/io/streams/SafeWritable';

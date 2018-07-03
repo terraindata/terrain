@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
-import * as winston from 'winston';
 
 import { getParsedQuery } from '../../../../../shared/database/elastic/ElasticUtil';
 import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
@@ -58,6 +57,7 @@ import BufferTransform from '../../../app/io/streams/BufferTransform';
 import GroupJoinTransform from '../../../app/io/streams/GroupJoinTransform';
 import MergeJoinTransform from '../../../app/io/streams/MergeJoinTransform';
 import SafeReadable from '../../../app/io/streams/SafeReadable';
+import { MidwayLogger } from '../../../app/log/MidwayLogger';
 import QueryHandler from '../../../app/query/QueryHandler';
 import { QueryError } from '../../../error/QueryError';
 import ElasticClient from '../client/ElasticClient';
@@ -100,7 +100,7 @@ export class ElasticQueryHandler extends QueryHandler
       {
         if (typeof response !== 'object')
         {
-          winston.error('The response from Elasticsearch is not an object, ' + JSON.stringify(response));
+          MidwayLogger.error('The response from Elasticsearch is not an object, ' + JSON.stringify(response));
           response = { response };
         }
         const res: QueryResponse = new QueryResponse(response);
@@ -119,7 +119,7 @@ export class ElasticQueryHandler extends QueryHandler
 
   public async handleQuery(request: QueryRequest): Promise<QueryResponse | SafeReadable>
   {
-    winston.debug('handleQuery ' + JSON.stringify(request, null, 2));
+    MidwayLogger.debug('handleQuery ' + JSON.stringify(request, null, 2));
     const type = request.type;
     const client: ElasticClient = this.controller.getClient();
     switch (type)

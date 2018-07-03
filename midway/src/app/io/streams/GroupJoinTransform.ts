@@ -197,7 +197,6 @@ export default class GroupJoinTransform extends SafeReadable
         const vi = this.subqueryValueInfos[subQuery];
         if (vi !== null)
         {
-          // winston.debug('parentObject ' + JSON.stringify(hits[j]._source, null, 2));
           const header = {};
           body.push(header);
 

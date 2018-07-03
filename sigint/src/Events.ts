@@ -45,9 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
-import * as winston from 'winston';
 
 import { Config } from './Config';
+import { logger } from './Logging';
 import { makePromiseCallback } from './Util';
 
 export interface EventConfig
@@ -70,7 +70,7 @@ export interface EventConfig
   hash: string;
 }
 
-export const indexName = 'terrain-analytics';
+export const indexName = 'abc.terrain-analytics';
 export const typeName = 'events';
 
 export class Events
@@ -104,7 +104,7 @@ export class Events
 
         if (!indexExists)
         {
-          winston.info('Index ' + indexName + ' does not exist. Creating it...');
+          logger.info('Index ' + indexName + ' does not exist. Creating it...');
           this.client.indices.create({
             index: indexName,
             timeout: '5s',

@@ -46,7 +46,6 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions
 import * as _ from 'lodash';
 import * as stream from 'stream';
-import * as winston from 'winston';
 
 import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import
@@ -60,6 +59,7 @@ import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { PostProcessConfig } from 'shared/etl/types/PostProcessTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import * as Util from '../AppUtil';
+import { MidwayLogger } from '../log/MidwayLogger';
 import ExportTransform from './ExportTransform';
 import { PostProcess } from './PostProcess';
 import { TemplateConfig } from './TemplateConfig';
@@ -95,7 +95,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
     let importStream: stream.Readable;
     const importStreams: stream.Readable[] = [];
 
-    winston.info(`Processing ${source.type} source:`, JSON.stringify(source, null, 2));
+    MidwayLogger.info(`Processing ${source.type} source:`, JSON.stringify(source, null, 2));
 
     try
     {
@@ -103,8 +103,9 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
       {
         case 'Algorithm':
           endpoint = new AlgorithmEndpoint();
+          const exportTransform = await (endpoint as AlgorithmEndpoint).getExportTransform(source);
           const algorithmStream = await endpoint.getSource(source) as stream.Readable;
-          sourceStream = algorithmStream.pipe(new ExportTransform());
+          sourceStream = algorithmStream.pipe(exportTransform);
           return resolve(sourceStream);
         case 'Upload':
           if (files === undefined || files.length === 0)
@@ -240,7 +241,7 @@ export async function getSinkStream(
     let endpoint: AEndpointStream;
     let transformStream;
 
-    winston.info(`Processing ${sink.type} sink:`, JSON.stringify(sink, null, 2));
+    MidwayLogger.info(`Processing ${sink.type} sink:`, JSON.stringify(sink, null, 2));
 
     try
     {
@@ -257,7 +258,7 @@ export async function getSinkStream(
               {
                 if (wildcardIndex < path.length - 1)
                 {
-                  winston.error('Ignoring invalid JSON path: ', sink.fileConfig.jsonPath);
+                  MidwayLogger.error('Ignoring invalid JSON path: ', sink.fileConfig.jsonPath);
                   path = [];
                 }
                 else // wildCardIndex === path.length - 1
