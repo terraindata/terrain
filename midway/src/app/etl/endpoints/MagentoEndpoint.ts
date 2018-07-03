@@ -1,0 +1,425 @@
+/*
+University of Illinois/NCSA Open Source License 
+
+Copyright (c) 2018 Terrain Data, Inc. and the authors. All rights reserved.
+
+Developed by: Terrain Data, Inc. and
+              the individuals who committed the code in this file.
+              https://github.com/terraindata/terrain
+                  
+Permission is hereby granted, free of charge, to any person 
+obtaining a copy of this software and associated documentation files 
+(the "Software"), to deal with the Software without restriction, 
+including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, 
+and to permit persons to whom the Software is furnished to do so, 
+subject to the following conditions:
+
+* Redistributions of source code must retain the above copyright notice, 
+  this list of conditions and the following disclaimers.
+
+* Redistributions in binary form must reproduce the above copyright 
+  notice, this list of conditions and the following disclaimers in the 
+  documentation and/or other materials provided with the distribution.
+
+* Neither the names of Terrain Data, Inc., Terrain, nor the names of its 
+  contributors may be used to endorse or promote products derived from
+  this Software without specific prior written permission.
+
+This license supersedes any copyright notice, license, or related statement
+following this comment block.  All files in this repository are provided
+under the same license, regardless of whether a corresponding comment block
+appears in them.  This license also applies retroactively to any previous
+state of the repository, including different branches and commits, which
+were made public on or after December 8th, 2018.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
+THE SOFTWARE.
+*/
+
+// Copyright 2018 Terrain Data, Inc.
+
+const soap = require('strong-soap');
+
+const Bottleneck = require('bottleneck');
+const _ = require('lodash');
+const request = require('request');
+const stream = require('stream');
+const winston = require('winston');
+const wsdlrdr = require('wsdlrdr');
+
+import XMLTransform from '../../io/streams/XMLTransform';
+
+import
+{
+  ComplexFilter,
+  KV,
+  MagentoConfig,
+  MagentoResponse,
+  MagentoRoutes,
+  MagentoRoutesArr,
+  MagentoParamConfigType,
+  MagentoParamConfigTypes,
+  MagentoParamTypes,
+} from 'shared/etl/types/MagentoTypes';
+
+public class Magento
+{
+  private wsdlTree: object;
+
+  constructor()
+  {
+    this.wsdlTree = {};
+  }
+
+  public async call(magConf: MagentoConfig): Promise<MagentoResponse>
+  {
+    return new Promise<MagentoResponse>(async (resolve, reject) =>
+    {
+      let response: MagentoResponse = {} as object;
+      let combinedParams: object = Object.assign({}, magConf.params);
+      if (typeof magConf.sessionId === 'string')
+      {
+        combinedParams = Object.assign(combinedParams, { sessionId: magConf.sessionId }); // attach sessionId to the request object
+      }
+
+      if (MagentoRoutesArr.indexOf(magConf.route) > -1)
+      {
+        response = await this._soapCall(magConf.route, combinedParams);
+      }
+      resolve(response);
+    });
+  }
+
+  public async getWSDLTree(host): Promise<object>
+  {
+    return new Promise<object>(async (resolve, reject) =>
+    {
+      const wsdlPortTypeMessagePrepend = 'typens:';
+
+      let wsdlAsJSON: object = {};
+      const wsdlTree: object = {};
+      const wsdlMsg: object = {};
+      const wsdlPortType: object = {};
+      const wsdlTypes: object = {};
+
+      try
+      {
+        wsdlAsJSON = await this._getWSDLAsJSON({ host }, { secure: true });
+        wsdlAsJSON['message'].forEach((entry) =>
+        {
+          wsdlMsg[entry['name']] = entry['part'];
+        });
+        wsdlAsJSON['portType']['operation'].forEach((entry) =>
+        {
+          const portTypeInput = entry['input']['message'].substring(wsdlPortTypeMessagePrepend.length);
+          const portTypeOutput = entry['output']['message'].substring(wsdlPortTypeMessagePrepend.length);
+          
+          wsdlPortType[entry['name']] = { input: portTypeInput, output: portTypeOutput };
+        });
+        wsdlTree['types'] = {};
+        wsdlAsJSON['types']['schema']['complexType'].forEach((entry, i) =>
+        {
+          wsdlTree['types'][entry['name']] = entry;
+        });
+      }
+      catch (e)
+      {
+        winston.warn((e as any).toString() as string);
+      }
+      wsdlTree['message'] = wsdlMsg;
+      wsdlTree['portType'] = wsdlPortType;
+      this.wsdlTree = wsdlTree;
+      return resolve(wsdlTree as object);
+    });
+  }
+
+  private async _getWSDLAsJSON(params, options)
+  {
+    return new Promise(async (resolve, reject) =>
+    {
+      const xmlPath = 'definitions';
+      const xmlStream = request(params['host']).pipe(XMLTransform.createImportStream(xmlPath));
+      let fullData = {};
+      xmlStream.on('data', (data) =>
+        {
+          fullData = data;
+        })
+      .on('end', () =>
+        {
+          resolve(fullData);
+        });
+    });
+  }
+
+  private async _rawSoapRequest(params)
+  {
+    return new Promise(async (resolve, reject) =>
+    {
+      const options = {};
+      soap.soap.createClient(params['host'], options, async (err, client) =>
+      {
+        if (!err)
+        {
+          const clientFuncCallFunction = client[params['route']];
+          Object.keys(params['params']).forEach((param) =>
+          {
+            if (Array.isArray(params['params'][param]))
+            {
+              params['params'][param] = this._convertArrayToSOAPArray(params['params'][param]);
+            }
+          });
+
+          clientFuncCallFunction(params['params'], async (errLogin, resultLogin, envLogin, soapHeaderLogin) =>
+          {
+            if (!errLogin)
+            {
+              resolve(resultLogin);
+            }
+            else
+            {
+              reject(errLogin);
+            }
+          });
+        }
+        else
+        {
+          // throw new Error('Invalid host parameters.');
+        }
+      });
+    });
+  }
+
+  private _convertArrayToSOAPArray(arr: any[]): object
+  {
+    return { item: arr };
+  }
+
+  private async _soapCall(route: string, data?: any)
+  {
+    return new Promise(async (resolve, reject) =>
+    {
+      if (Object.keys(this.wsdlTree).length === 0)
+      {
+        return resolve({}); 
+      }
+      // preprocess data into the correct format via wsdlTree['message'][route]['input'] lookup
+
+      const params = {
+        host: 'https://www.plae.co/index.php/api/v2_soap?wsdl=1',
+        params: data,
+        route,
+      };
+
+      const rawResult = await this._rawSoapRequest(params);
+      const resultKey = this.wsdlTree['portType'][route]['output'];
+      const rawResultKey = this.wsdlTree['message'][resultKey]['name'];
+      let parsedResult = null;
+      const typeAsArr: string[] = this.wsdlTree['message'][resultKey]['type'].split(':');
+      switch (typeAsArr[0])
+      {
+        case 'xsd':
+          if (rawResult[rawResultKey] === null)
+          {
+            parsedResult = null;
+          }
+          else
+          {
+            parsedResult = rawResult[rawResultKey]['$value'];
+          }
+          break;
+        case 'typens':
+          parsedResult = this._parseJSONWithWSDL(rawResult[rawResultKey], this.wsdlTree['message'][resultKey]['type']);
+          break;
+        default:
+          break;
+      }
+      resolve(parsedResult);
+    });
+  }
+
+  private _parseJSONWithWSDL(rawJSON: object | object[], name: string): any
+  {
+    const typeAsArr: string[] = name.split(':');
+    // let isArray: boolean = false;
+    if (typeAsArr.length > 1)
+    {
+      // isArray = typeAsArr[1].indexOf('[') !== -1 ? true : false;
+      typeAsArr[1] = typeAsArr[1].replace(new RegExp('\\[.*\\]', 'g'), '');
+    }
+
+    switch (typeAsArr[0])
+    {
+      case 'typens':
+        const innerType = this.wsdlTree['types'][typeAsArr[1]];
+        if (typeof innerType['complexContent'] === 'object')
+        {
+          const innerTypeType: string = innerType['complexContent']['restriction']['base'];
+          if (innerTypeType === 'soapenc:Array')
+          {
+            if (Array.isArray(rawJSON['item']))
+            {
+              const rows: any[] = [];
+              rawJSON['item'].forEach((rowElem) =>
+              {
+                rows.push(this._parseJSONWithWSDL(rowElem, innerType['complexContent']['restriction']['attribute']['wsdl:arrayType']));
+              });
+              rawJSON = rows;
+            }
+            else if (rawJSON['item'] !== undefined)
+            {
+              if (rawJSON['item'] === null)
+              {
+                rawJSON = null;
+              }
+              else
+              {
+                rawJSON = rawJSON['item']['$value'];
+              }
+            }
+            else if (rawJSON['item'] === undefined)
+            {
+              rawJSON = [];
+            }
+          }
+        }
+        else if (typeof innerType['all'] === 'object')
+        {
+          const row: object = {};
+          const innerTypeNames: string[] = innerType['all']['element'].map(innerTypeType => innerTypeType['name']);
+          const rawJSONKeys: string[] = Object.keys(rawJSON).filter(key => key[0] !== '$');
+          const existingFields: string[] = _.intersection(innerTypeNames, rawJSONKeys);
+          const filteredInnerTypes = innerType['all']['element'].filter(innerTypeType => existingFields.indexOf(innerTypeType['name']) !== -1);
+          filteredInnerTypes.forEach((innerTypeType) =>
+          {
+            if (innerTypeType['type'].substr(0, 3) === 'xsd'
+              && innerTypeType['type'].indexOf('[') === -1 && innerTypeType['type'].indexOf(']') === -1)
+            {
+              if (rawJSON[innerTypeType['name']] === null)
+              {
+                row[innerTypeType['name']] = null;
+              }
+              else
+              {
+                row[innerTypeType['name']] = rawJSON[innerTypeType['name']]['$value'];
+              }
+            }
+            else
+            {
+              row[innerTypeType['name']] = this._parseJSONWithWSDL(rawJSON[innerTypeType['name']], innerTypeType['type']);
+            }
+          });
+          rawJSON = row;
+        }
+        break;
+      case 'xsd':
+        if (rawJSON === null)
+        {
+          rawJSON = null;
+        }
+        else
+        {
+          // console.log('attempting $value in xsd...');
+          rawJSON = rawJSON['$value'];
+          // console.log('success $value in xsd');
+        }
+      default:
+    }
+    return rawJSON;
+  }
+}
+
+/*
+async function main() {
+  // login
+
+  const magento: Magento = new Magento();
+  const magConf: MagentoConfig =
+  {
+    route: MagentoRoutes.Login,
+    params: {
+      username: 'Terrain',
+      apiKey: '01057B580550909CAD71718FB5B84499B1523702',
+    },
+  };
+
+  const wsdlTree = await magento.getWSDLTree('https://www.plae.co/index.php/api/v2_soap?wsdl=1');
+
+  const parsedResult = await magento.call( magConf);
+  winston.info(JSON.stringify(parsedResult, null, 2));
+
+  /*
+  const magConfCatalogProductList: MagentoConfig =
+  {
+    route: MagentoRoutes.CatalogProductList,
+    params: {
+      filters:
+      {
+        item: [
+          {
+            key: 'type',
+            value: 
+            {
+              key: 'in',
+              value: 'simple,configurable',
+            },
+          } as KV,
+        ] as KV[],
+      } as ComplexFilter,
+      storeView: 1,
+    },
+    sessionId: parsedResult as string,
+  };
+  const parsedResult2 = await magento.call(magConfCatalogProductList);
+  winston.info(JSON.stringify(parsedResult2, null, 2));
+  */
+
+  /*
+  const magConfCatalogProductInfo: MagentoConfig =
+  {
+    route: MagentoRoutes.CatalogProductInfo,
+    params: {
+      productId: '229',
+      storeView: 1,
+    },
+    sessionId: parsedResult as string,
+  };
+  const parsedResult3 = await magento.call(magConfCatalogProductInfo);
+  winston.info(JSON.stringify(parsedResult3, null, 2));
+  */
+
+  /*
+  const magConfCatalogProductAttributeMediaList: MagentoConfig =
+  {
+    route: MagentoRoutes.CatalogProductAttributeMediaList,
+    params: {
+      // identifierType: 'productId',
+      product: '229',
+      storeView: 1,
+    },
+    sessionId: parsedResult as string,
+  };
+  const parsedResult4 = await magento.call(magConfCatalogProductAttributeMediaList);
+  winston.info(JSON.stringify(parsedResult4, null, 2));
+  */
+
+  /*
+  const magConfCatalogInventoryStockItemList: MagentoConfig =
+  {
+    route: MagentoRoutes.CatalogInventoryStockItemList,
+    params: {
+      products: ['5447','5445','5444','5438','5437','5436','5435','5434','5433','5429','5424'],
+    },
+    sessionId: parsedResult as string,
+  };
+  const parsedResult5 = await magento.call(magConfCatalogInventoryStockItemList);
+  winston.info(JSON.stringify(parsedResult5, null, 2));
+  */
+}
+
+*/
