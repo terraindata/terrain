@@ -46,11 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires switch-default strict-boolean-expressions
 
+import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import { List } from 'immutable';
 import * as React from 'react';
-import TerrainComponent from 'common/components/TerrainComponent';
-
 
 import * as _ from 'lodash';
 import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
@@ -73,8 +72,8 @@ export default class DataModal extends TerrainComponent<Props>
     super(props);
 
     this.state = {
-      currentOption: this.props.sectionOptions.get(0);
-    }
+      currentOption: this.props.sectionOptions.get(0),
+    };
   }
 
   public shouldComponentUpdate(nextProps, nextState)
@@ -103,16 +102,18 @@ export default class DataModal extends TerrainComponent<Props>
     return (
       <div className='option-tabs'>
         {this.props.sectionOptions.map((optionName, i) =>
-           <div 
-             className='option-button' 
-             key={i} 
-             onClick={this._fn(this.onTabChange, optionName)}
-             style={{ color: (this.state.currentOption === optionName) ? Colors().mainBlue : Colors().sectionEditButton, 
-                      background: Colors().bg }}
-           >
-             {optionName}
-           </div>
-          )
+          <div
+            className='option-button'
+            key={i}
+            onClick={this._fn(this.onTabChange, optionName)}
+            style={{
+              color: (this.state.currentOption === optionName) ? Colors().mainBlue : Colors().sectionEditButton,
+              background: Colors().bg
+            }}
+          >
+            {optionName}
+          </div>,
+        )
         }
       </div>
     );

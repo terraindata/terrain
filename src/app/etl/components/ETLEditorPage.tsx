@@ -77,7 +77,7 @@ import { notificationManager } from './../../common/components/InAppNotification
 const { List } = Immutable;
 import './ETLEditorPage.less';
 
-console.log(PathUtil);
+// console.log(PathUtil);
 
 export interface Props
 {

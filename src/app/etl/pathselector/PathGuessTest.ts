@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-const Earthquakes = require('./earthquakes.json');
-const Movies = require('./movies.json');
-// const UsersRomance = require('./Users_Romance.json');
-const Waduhek = require('./waduhekmovies.json');
+// const Earthquakes = require('./earthquakes.json');
+// const Movies = require('./movies.json');
+// // const UsersRomance = require('./Users_Romance.json');
+// const Waduhek = require('./waduhekmovies.json');
 
 interface PathInfo
 {
@@ -82,18 +82,18 @@ export default class PathUtil
     let commonCount = 0;
     const lengthA = keyFieldsA.length;
     const lengthB = keyFieldsB.length;
-    const maxLength = Math.max(lengthA, lengthB);
+    const keyCount = Math.max(lengthA, lengthB);
     const baseKeyField = (lengthA < lengthB) ? keyFieldsA : keyFieldsB;
     const comparedKeyField = (lengthA < lengthB) ? keyFieldsB : keyFieldsA;
     for (let i = 0; i < baseKeyField.length; i++)
     {
-      let specificKey = baseKeyField[i];
+      const specificKey = baseKeyField[i];
       if (comparedKeyField.includes(specificKey))
       {
         commonCount++;
       }
     }
-    keyObject.score += Math.floor(commonCount/maxLength);
+    keyObject.score += (Math.floor(commonCount / keyCount) * 10); // bonus score based on fraction of matching keys
     return (keyFieldsA === keyFieldsB);
   }
 
@@ -172,7 +172,7 @@ export default class PathUtil
         keyObject.score = 0;
         return false;
       }
-      if (PathUtil.matchingFieldLength(object, keyObject) || PathUtil.matchingFields(object, keyObject))
+      if (PathUtil.matchingFields(object, keyObject) || PathUtil.matchingFieldLength(object, keyObject))
       {
         return true;
       }
@@ -194,7 +194,7 @@ export default class PathUtil
       return possiblePaths;
     }
 
-    const baseObject: PathInfo = {name: '*', score: 0}
+    const baseObject: PathInfo = { name: '*', score: 0 };
     if (PathUtil.isArray(json) && PathUtil.containsAllObjects(json, baseObject))
     {
       baseObject.score = 2;
@@ -202,7 +202,7 @@ export default class PathUtil
     }
     for (const key of Object.keys(json))
     {
-      let keyObject: PathInfo = {name: key, score: 0}; 
+      const keyObject: PathInfo = { name: key, score: 0 };
       if (PathUtil.isPossiblePath(json, keyObject))
       {
         possiblePaths.push(keyObject);
@@ -218,6 +218,6 @@ export default class PathUtil
   }
 }
 
-console.log(PathUtil.guessFilePaths(Earthquakes));
-console.log(PathUtil.guessFilePaths(Movies));
-console.log(PathUtil.guessFilePaths(Waduhek));
+// console.log(PathUtil.guessFilePaths(Earthquakes));
+// console.log(PathUtil.guessFilePaths(Movies));
+// console.log(PathUtil.guessFilePaths(Waduhek));

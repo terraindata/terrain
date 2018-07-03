@@ -67,9 +67,9 @@ import FadeInOut from 'app/common/components/FadeInOut';
 import IntegrationForm from 'etl/common/components/IntegrationForm';
 import IntegrationPicker from 'etl/common/components/IntegrationPicker';
 import { ETLActions } from 'etl/ETLRedux';
+import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 import { Integrations } from 'shared/etl/types/IntegrationTypes';
-import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
 
 const { List, Map } = Immutable;
 
@@ -277,8 +277,8 @@ class EndpointForm extends TerrainComponent<Props>
     newEndpoint = newEndpoint.set('fileConfig', newFileConfig);
 
     this.props.onChange(newEndpoint, apply);
-    //console.log(DocumentsHelpers.fetchPreview(newEndpoint));
-    //DocumentsHelpers.fetchPreview(newEndpoint).then((res) => console.log(res)).catch((e) =>console.log(e));
+    // console.log(DocumentsHelpers.fetchPreview(newEndpoint));
+    // DocumentsHelpers.fetchPreview(newEndpoint).then((res) => console.log(res)).catch((e) =>console.log(e));
   }
 
   public extractFileConfigDelta(oldConfig: Partial<FileConfig>, newConfig: Partial<FileConfig>): Partial<FileConfig>

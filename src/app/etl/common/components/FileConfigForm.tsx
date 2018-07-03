@@ -143,17 +143,17 @@ export default class FileConfigForm extends TerrainComponent<Props>
         group: 'path',
         widthFactor: 8,
         options: {
-          render: (state, disabled) => 
-          <DataModal
-            sectionType='path'
-            sectionOptions={
-              List(['option 1', 'option 2', 'option 3'])
-            }
-            sectionBoxes={
-              List(['content 1', 'content 2', 'content 3'])
-            }
-            size='500px'
-          />,
+          render: (state, disabled) =>
+            <DataModal
+              sectionType='path'
+              sectionOptions={
+                List(['option 1', 'option 2', 'option 3'])
+              }
+              sectionBoxes={
+                List(['content 1', 'content 2', 'content 3'])
+              }
+              size='500px'
+            />,
         },
         getDisplayState: this.jsonPathDisplay,
       },
