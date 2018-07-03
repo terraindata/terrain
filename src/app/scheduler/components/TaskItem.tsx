@@ -255,9 +255,9 @@ class TaskItem extends TerrainComponent<Props>
 
 const taskTypeList = List(Object.keys(TaskEnum));
 const taskTypeDisplayNames = Map({
-  taskDefaultExit: 'Default Exit',
-  taskDefaultFailure: 'Default Failure',
-  taskETL: 'ETL Task',
+  [TaskEnum.taskDefaultExit]: 'Default Exit',
+  [TaskEnum.taskDefaultFailure]: 'Default Failure',
+  [TaskEnum.taskETL]: 'ETL Task',
 });
 
 export default TaskItem;
