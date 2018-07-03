@@ -57,13 +57,7 @@ import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { ETLState } from 'etl/ETLTypes';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import
-{
-  DefaultDocumentLimit,
-  EditorDisplayState,
-  FieldMap,
-  TemplateEditorState,
-} from 'etl/templates/TemplateEditorTypes';
+import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { SchemaActions } from 'schema/data/SchemaRedux';
 import { TemplateProxy } from 'shared/etl/immutable/TemplateProxy';

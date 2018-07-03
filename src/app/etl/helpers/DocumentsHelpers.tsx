@@ -66,7 +66,6 @@ import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import
 {
   _TemplateEditorState,
-  DefaultDocumentLimit,
   EditorDisplayState,
   FetchStatus,
   FieldMap,
@@ -85,6 +84,9 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import ETLHelpers from './ETLHelpers';
 
 import Ajax from 'util/Ajax';
+
+const DefaultDocumentLimit = 10;
+const CHUNK_SIZE = 1e6;
 
 class DocumentsHelpers extends ETLHelpers
 {
@@ -202,40 +204,73 @@ class DocumentsHelpers extends ETLHelpers
         {
           this.updateStateBeforeFetch(key);
         }
-        switch (source.type)
-        {
-          case Sources.Upload: {
-            const file = source.options['file'];
-            if (file == null)
-            {
-              return catchError('File not provided');
-            }
-            const config = source.fileConfig;
-            fetchDocumentsFromFile(file, config, DefaultDocumentLimit)
-              .then(onFetchLoad)
-              .catch(catchError);
-            break;
-          }
-          case Sources.Mysql:
-          case Sources.GoogleAnalytics:
-          case Sources.Postgresql:
-          case Sources.Algorithm:
-          case Sources.Fs:
-          case Sources.Http:
-          case Sources.Sftp:
-            ETLAjax.fetchPreview(source, DefaultDocumentLimit)
-              .then(onFetchLoad)
-              .catch(catchError);
-            break;
-          default: {
-            return catchError(`Failed to retrieve documents. Unsupported source type: ${source.type}`);
-          }
-        }
+        return this.fetchPreview(source).then(onFetchLoad).catch(catchError);
       }
       catch (e)
       {
         return catchError(e);
       }
+    });
+  }
+
+  protected fetchPreview(
+    source: SourceConfig
+  ): Promise<List<object>>
+  {
+    return new Promise((resolve, reject) => {
+      switch (source.type)
+      {
+        case Sources.Upload: {
+          const file = source.options['file'];
+          if (file == null)
+          {
+            return reject('File not provided');
+          }
+          const config = source.fileConfig;
+          // this.fetchFromFile(source);
+          return fetchDocumentsFromFile(file, config, DefaultDocumentLimit)
+            .then(resolve)
+            .catch(reject);
+        }
+        default: {
+          return ETLAjax.fetchPreview(source, DefaultDocumentLimit)
+            .then(resolve)
+            .catch(reject);
+        }
+      }
+    });
+  }
+
+  protected sliceFromFile(file: File, size = CHUNK_SIZE): Promise<string>
+  {
+    return new Promise<string>((resolve, reject) => {
+      let slice;
+      if (file.size <= size)
+      {
+        slice = file;
+      }
+      else
+      {
+        slice = file.slice(0, CHUNK_SIZE);
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        resolve(event.target.result);
+      }
+      reader.onerror = (reason) => reject(reason);
+      reader.readAsText(slice);
+    });
+  }
+
+  protected fetchFromFile(
+    source: SourceConfig
+  )
+  {
+    const file: File = source.options['file'];
+    this.sliceFromFile(file).then((res) => {
+      console.log(res);
+    }).catch((err) => {
+      console.error(err);
     });
   }
 

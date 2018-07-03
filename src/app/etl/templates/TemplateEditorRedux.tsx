@@ -55,7 +55,6 @@ import
 import
 {
   _TemplateEditorState,
-  DefaultDocumentLimit,
   EditorDisplayState,
   FetchStatus,
   FieldMap,
