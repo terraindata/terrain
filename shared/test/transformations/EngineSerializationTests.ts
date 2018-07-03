@@ -50,6 +50,9 @@ import TransformationNodeType from 'shared/transformations/TransformationNodeTyp
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
 import { KeyPath } from 'shared/util/KeyPath';
 import { TestDocs } from './TestDocs';
+import TransformationNodeConstructorVisitor from 'shared/transformations/TransformationNodeConstructorVisitor';
+
+const NodeConstructor = new TransformationNodeConstructorVisitor();
 
 test('serialize to JSON', () =>
 {
@@ -66,13 +69,25 @@ test('serialize to JSON', () =>
       nodes: [
         {
           v: '0',
-          value: new (TransformationRegistry.getType(TransformationNodeType.CaseNode))
-            (0, List<KeyPath>([KeyPath(['name'])]), { format: 'uppercase' }, TransformationNodeType.CaseNode),
+          value: NodeConstructor.visit(TransformationNodeType.CaseNode, undefined, {
+            id: 0,
+            fieldIds: List<number>([0]),
+            fields: List<KeyPath>([KeyPath(['name'])]),
+            meta: {
+              format: 'uppercase',
+            },
+          }),
         },
         {
           v: '1',
-          value: new (TransformationRegistry.getType(TransformationNodeType.CaseNode))
-            (1, List<KeyPath>([KeyPath(['meta', 'school'])]), { format: 'uppercase' }, TransformationNodeType.CaseNode),
+          value: NodeConstructor.visit(TransformationNodeType.CaseNode, undefined, {
+            id: 1,
+            fieldIds: List<number>([3]),
+            fields: List<KeyPath>([KeyPath(['meta', 'school'])]),
+            meta: {
+              format: 'uppercase',
+            },
+          }),
         },
       ],
       edges: [],

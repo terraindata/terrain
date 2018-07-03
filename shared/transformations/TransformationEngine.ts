@@ -155,12 +155,6 @@ export class TransformationEngine
         meta: raw['meta'],
         deserialize: true,
       });
-        // new (TransformationRegistry.getType(raw['typeCode']))(
-        //   raw['id'],
-        //   List<number>(raw['fieldIds']),
-        //   List<KeyPath>(raw['fields'].map((item) => KeyPath(item))),
-        //   TransformationEngine.makeMetaImmutable(raw['meta']),
-        // ) as TransformationNode;
     }
     return parsed;
   }
@@ -247,14 +241,13 @@ export class TransformationEngine
   public appendTransformation(nodeType: TransformationNodeType, fieldNames: List<KeyPath>,
     options?: object, tags?: string[], weight?: number): number
   {
-    // const fieldIDs: List<number> = this.parseFieldIDs(fieldNamesOrIDs);
+    const fieldIds = fieldNames.map((kp) => this.getOutputFieldID(kp)).toList();
     const node: TransformationNode = NodeConstructor.visit(nodeType, undefined, {
       id: this.uidNode,
-      fieldIds: List([5]),
+      fieldIds,
       fields: fieldNames,
       meta: options,
     });
-      // new (TransformationRegistry.getType(nodeType))(this.uidNode, fieldIds, fieldNames, options);
 
     // Process fields created/disabled by this transformation
     if (options !== undefined)
@@ -300,43 +293,43 @@ export class TransformationEngine
    * @param {object} doc The document to transform.
    * @returns {object}   The transformed document, or possibly errors.
    */
-  public transform(doc: object): object
-  {
-    let output: object = this.rename(doc);
-    this.restoreArrays(output);
-    const visitor = new TransformationEngineNodeVisitor();
-    for (const nodeKey of this.dag.sources())
-    {
-      const toTraverse: string[] = GraphLib.alg.preorder(this.dag, [nodeKey]);
-      for (let i = 0; i < toTraverse.length; i++)
-      {
-        const preprocessedNode: TransformationNode = this.preprocessNode(this.dag.node(toTraverse[i]), output);
+  // public transform(doc: object): object
+  // {
+  //   let output: object = this.rename(doc);
+  //   this.restoreArrays(output);
+  //   const visitor = new TransformationEngineNodeVisitor();
+  //   for (const nodeKey of this.dag.sources())
+  //   {
+  //     const toTraverse: string[] = GraphLib.alg.preorder(this.dag, [nodeKey]);
+  //     for (let i = 0; i < toTraverse.length; i++)
+  //     {
+  //       const preprocessedNode: TransformationNode = this.preprocessNode(this.dag.node(toTraverse[i]), output);
 
-        const transformationResult = preprocessedNode.accept(visitor, output);
-        if (transformationResult.errors !== undefined)
-        {
-          // winston.error('Transformation encountered errors!:');
-          transformationResult.errors.forEach((error: TransformationVisitError) =>
-          {
-            // winston.error(`\t -${error.message}`);
-          });
-          // TODO abort transforming if errors occur?
-        }
-        output = transformationResult.document;
-      }
-    }
+  //       const transformationResult = preprocessedNode.accept(visitor, output);
+  //       if (transformationResult.errors !== undefined)
+  //       {
+  //         // winston.error('Transformation encountered errors!:');
+  //         transformationResult.errors.forEach((error: TransformationVisitError) =>
+  //         {
+  //           // winston.error(`\t -${error.message}`);
+  //         });
+  //         // TODO abort transforming if errors occur?
+  //       }
+  //       output = transformationResult.document;
+  //     }
+  //   }
 
-    // Exclude disabled fields (must do this as a postprocess, because e.g. join node)
-    this.fieldEnabled.map((enabled: boolean, fieldID: number) =>
-    {
-      if (!enabled)
-      {
-        yadeep.remove(output, this.getOutputKeyPath(fieldID));
-      }
-    });
+  //   // Exclude disabled fields (must do this as a postprocess, because e.g. join node)
+  //   this.fieldEnabled.map((enabled: boolean, fieldID: number) =>
+  //   {
+  //     if (!enabled)
+  //     {
+  //       yadeep.remove(output, this.getOutputKeyPath(fieldID));
+  //     }
+  //   });
 
-    return output;
-  }
+  //   return output;
+  // }
 
   /**
    * Converts the current engine to an equivalent JSON representation.
@@ -816,94 +809,94 @@ export class TransformationEngine
     return ids;
   }
 
-  private preprocessNode(rawNode: TransformationNode, ftDoc: object): TransformationNode
-  {
-    const node: TransformationNode = _.cloneDeep(rawNode);
-    node.fields = node.fields.clear();
-    rawNode.fields.forEach((item) =>
-    {
-      node.fields = node.fields.push(this.IDToFieldNameMap.get(this.fieldNameToIDMap.get(item)));
-    });
-    return node;
-  }
+  // private preprocessNode(rawNode: TransformationNode, ftDoc: object): TransformationNode
+  // {
+  //   const node: TransformationNode = _.cloneDeep(rawNode);
+  //   node.fields = node.fields.clear();
+  //   rawNode.fields.forEach((item) =>
+  //   {
+  //     node.fields = node.fields.push(this.IDToFieldNameMap.get(this.fieldNameToIDMap.get(item)));
+  //   });
+  //   return node;
+  // }
 
-  private rename(doc: object): object
-  {
-    const r: object = {};
-    const o: object = doc; // objectify(doc);
-    // sort the field map so that parent renames don't cause weird issues with children renames
-    const fieldToIDMap = this.fieldNameToIDMap.sort((valueA, valueB) =>
-    {
-      const sizeA = this.getOutputKeyPath(valueA).size;
-      const sizeB = this.getOutputKeyPath(valueB).size;
-      if (sizeA === sizeB)
-      {
-        return valueA - valueB;
-      }
-      return sizeA - sizeB;
-    });
-    fieldToIDMap.forEach((value: number, key: KeyPath) =>
-    {
-      this.renameHelper(r, o, key, value);
-    });
-    return r;
-  }
+  // private rename(doc: object): object
+  // {
+  //   const r: object = {};
+  //   const o: object = doc; // objectify(doc);
+  //   // sort the field map so that parent renames don't cause weird issues with children renames
+  //   const fieldToIDMap = this.fieldNameToIDMap.sort((valueA, valueB) =>
+  //   {
+  //     const sizeA = this.getOutputKeyPath(valueA).size;
+  //     const sizeB = this.getOutputKeyPath(valueB).size;
+  //     if (sizeA === sizeB)
+  //     {
+  //       return valueA - valueB;
+  //     }
+  //     return sizeA - sizeB;
+  //   });
+  //   fieldToIDMap.forEach((value: number, key: KeyPath) =>
+  //   {
+  //     this.renameHelper(r, o, key, value);
+  //   });
+  //   return r;
+  // }
 
-  private renameHelper(r: object, o: object, key: KeyPath, value?: number, oldKey?: KeyPath)
-  {
-    // console.log('rh key = ' + key + ' val = ' + value);
-    if (value === undefined)
-    {
-      // console.log(JSON.stringify(o));
-      // console.log(oldKey);
-      // console.log(yadeep.get(o, oldKey));
+  // private renameHelper(r: object, o: object, key: KeyPath, value?: number, oldKey?: KeyPath)
+  // {
+  //   // console.log('rh key = ' + key + ' val = ' + value);
+  //   if (value === undefined)
+  //   {
+  //     // console.log(JSON.stringify(o));
+  //     // console.log(oldKey);
+  //     // console.log(yadeep.get(o, oldKey));
 
-      // setting new array element
-      yadeep.set(r, key, yadeep.get(o, oldKey), { create: true });
-    }
-    else // if (this.fieldEnabled.has(value) === false || this.fieldEnabled.get(value) === true)
-    {
-      const el: any = yadeep.get(o, key);
-      // console.log('el = ' + el + ' for key ' + key);
-      if (el !== undefined)
-      {
-        if (isPrimitive(el) || Object.keys(el).length === 0)
-        {
-          yadeep.set(r, this.IDToFieldNameMap.get(value), el, { create: true });
-        }
-        else if (el.constructor === Array)
-        {
-          if (key.contains(-1))
-          {
-            const newKey: KeyPath = this.IDToFieldNameMap.get(value);
-            const upto: KeyPath = key.slice(0, key.indexOf(-1)).toList();
-            for (let j: number = 0; j < Object.keys(yadeep.get(o, upto)).length; j++)
-            {
-              const newKeyReplaced: KeyPath = newKey.set(newKey.indexOf(-1), j);
-              const oldKeyReplaced: KeyPath = key.set(key.indexOf(-1), j);
-              const oldKeyReplacedWithoutLast = oldKeyReplaced.butLast().toList();
-              if (oldKeyReplaced.last() === -1 ||
-                (yadeep.get(o, oldKeyReplacedWithoutLast) != null &&
-                  Object.keys(yadeep.get(o, oldKeyReplacedWithoutLast)).indexOf(oldKeyReplaced.last().toString()) !== -1))
-              {
-                // console.log('r here1');
-                this.renameHelper(r, o, newKeyReplaced, this.fieldNameToIDMap.get(newKeyReplaced), oldKeyReplaced);
-              }
-            }
-          }
-          /*else
-          {
-            for (let i: number = 0; i < Object.keys(el).length; i++)
-            {
-              const kpi: KeyPath = key.push(i.toString());
-              console.log('r here2 ' + kpi);
-              this.renameHelper(r, o, kpi);
-            }
-          }*/
-        }
-      }
-    }
-  }
+  //     // setting new array element
+  //     yadeep.set(r, key, yadeep.get(o, oldKey), { create: true });
+  //   }
+  //   else // if (this.fieldEnabled.has(value) === false || this.fieldEnabled.get(value) === true)
+  //   {
+  //     const el: any = yadeep.get(o, key);
+  //     // console.log('el = ' + el + ' for key ' + key);
+  //     if (el !== undefined)
+  //     {
+  //       if (isPrimitive(el) || Object.keys(el).length === 0)
+  //       {
+  //         yadeep.set(r, this.IDToFieldNameMap.get(value), el, { create: true });
+  //       }
+  //       else if (el.constructor === Array)
+  //       {
+  //         if (key.contains(-1))
+  //         {
+  //           const newKey: KeyPath = this.IDToFieldNameMap.get(value);
+  //           const upto: KeyPath = key.slice(0, key.indexOf(-1)).toList();
+  //           for (let j: number = 0; j < Object.keys(yadeep.get(o, upto)).length; j++)
+  //           {
+  //             const newKeyReplaced: KeyPath = newKey.set(newKey.indexOf(-1), j);
+  //             const oldKeyReplaced: KeyPath = key.set(key.indexOf(-1), j);
+  //             const oldKeyReplacedWithoutLast = oldKeyReplaced.butLast().toList();
+  //             if (oldKeyReplaced.last() === -1 ||
+  //               (yadeep.get(o, oldKeyReplacedWithoutLast) != null &&
+  //                 Object.keys(yadeep.get(o, oldKeyReplacedWithoutLast)).indexOf(oldKeyReplaced.last().toString()) !== -1))
+  //             {
+  //               // console.log('r here1');
+  //               this.renameHelper(r, o, newKeyReplaced, this.fieldNameToIDMap.get(newKeyReplaced), oldKeyReplaced);
+  //             }
+  //           }
+  //         }
+  //         /*else
+  //         {
+  //           for (let i: number = 0; i < Object.keys(el).length; i++)
+  //           {
+  //             const kpi: KeyPath = key.push(i.toString());
+  //             console.log('r here2 ' + kpi);
+  //             this.renameHelper(r, o, kpi);
+  //           }
+  //         }*/
+  //       }
+  //     }
+  //   }
+  // }
 
   private restoreArrays(output: object)
   {

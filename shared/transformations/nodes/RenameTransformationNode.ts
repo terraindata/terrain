@@ -102,8 +102,8 @@ export class RenameTransformationNode extends TransformationNode
     for (const match of yadeep.search(doc, inputField))
     {
       const { value, location } = match;
+      yadeep.deleteSingle(doc, location); // delete first, in case its an identity rename
       yadeep.set(doc, matcherFn(location), value, { create: true } );
-      yadeep.deleteSingle(doc, location);
     }
 
     return {
