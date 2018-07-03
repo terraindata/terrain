@@ -116,15 +116,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
           break;
         case 'Sftp':
           endpoint = new SFTPEndpoint();
-          const sourceStreamTmp: stream.Readable | stream.Readable[] = await endpoint.getSource(source);
-          if (Array.isArray(sourceStreamTmp))
-          {
-            sourceStreams = sourceStreamTmp as stream.Readable[];
-          }
-          else
-          {
-            sourceStream = sourceStreamTmp as stream.Readable;
-          }
+          sourceStreams = await endpoint.getSource(source) as stream.Readable[];
           break;
         case 'GoogleAnalytics':
           endpoint = new GoogleAnalyticsEndpoint();
@@ -132,15 +124,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
           break;
         case 'Http':
           endpoint = new HTTPEndpoint();
-          const sourceStreamTmp2: stream.Readable | stream.Readable[] = await endpoint.getSource(source);
-          if (Array.isArray(sourceStreamTmp2))
-          {
-            sourceStreams = sourceStreamTmp2 as stream.Readable[];
-          }
-          else
-          {
-            sourceStream = sourceStreamTmp2 as stream.Readable;
-          }
+          sourceStreams = await endpoint.getSource(source) as stream.Readable[];
           break;
         case 'Fs':
           endpoint = new FSEndpoint();
@@ -220,14 +204,14 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
       else if (importStreams.length > 1)
       {
         const merge = (streams) => {
-            let pass = new stream.PassThrough({ objectMode: true });
-            let waiting = streams.length;
-            for (const s of streams)
-            {
-                pass = s.pipe(pass, { end: false });
-                s.once('end', () => --waiting === 0 && pass.emit('end'));
-            }
-            return pass;
+          let pass = new stream.PassThrough({ objectMode: true });
+          let waiting = streams.length;
+          for (const s of streams)
+          {
+            pass = s.pipe(pass, { end: false });
+            s.once('end', () => --waiting === 0 && pass.emit('end'));
+          }
+          return pass;
         };
         resolve(merge(importStreams));
       }
