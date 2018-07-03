@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires max-classes-per-file
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import Util from 'util/Util';
@@ -77,7 +76,7 @@ import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { InputsForm } from '../../endpoints/InputForm';
 import { PostProcessForm } from '../../endpoints/PostProcessForm';
 
-const { List } = Immutable;
+import { List } from 'immutable';
 
 export interface Props
 {

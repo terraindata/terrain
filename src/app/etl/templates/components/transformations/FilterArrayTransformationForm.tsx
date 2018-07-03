@@ -50,9 +50,6 @@ import TransformationNodeType from 'shared/transformations/TransformationNodeTyp
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { TransformationForm } from './TransformationFormBase';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
-
 type FilterOptions = NodeOptionsType<TransformationNodeType.FilterArrayNode>;
 export class FilterArrayTFF extends TransformationForm<FilterOptions, TransformationNodeType.FilterArrayNode>
 {

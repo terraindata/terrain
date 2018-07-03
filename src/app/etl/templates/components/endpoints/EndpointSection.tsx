@@ -65,7 +65,7 @@ import TemplateEndpoint from './TemplateEndpoint';
 
 import './EndpointSection.less';
 
-const { List, Map } = Immutable;
+import { Map } from 'immutable';
 
 export interface Props
 {

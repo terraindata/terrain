@@ -47,7 +47,6 @@ THE SOFTWARE.
 
 import Modal from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
@@ -65,7 +64,7 @@ import { SchemaActions } from 'schema/data/SchemaRedux';
 import { ETLTemplate, getSourceFiles, restoreSourceFiles } from 'shared/etl/immutable/TemplateRecords';
 import { notificationManager } from './../../common/components/InAppNotification';
 
-const { List } = Immutable;
+import { List } from 'immutable';
 import './ETLEditorPage.less';
 
 export interface Props

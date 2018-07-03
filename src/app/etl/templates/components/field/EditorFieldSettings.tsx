@@ -51,9 +51,6 @@ import * as React from 'react';
 import { Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
-
 import { leftColumnWidth } from 'etl/templates/components/field/NestedView';
 import { Languages } from 'shared/etl/types/ETLTypes';
 

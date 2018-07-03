@@ -50,8 +50,7 @@ import { EngineProxy } from 'etl/templates/EngineProxy';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { TransformationForm } from './TransformationFormBase';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 interface DuplicateOptions
 {

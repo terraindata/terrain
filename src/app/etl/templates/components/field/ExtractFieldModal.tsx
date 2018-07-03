@@ -46,13 +46,12 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires max-classes-per-file
 
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import { Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
-const { List, Map } = Immutable;
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';

@@ -53,9 +53,6 @@ import TransformationNodeType from 'shared/transformations/TransformationNodeTyp
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { TransformationForm } from './TransformationFormBase';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
-
 type SetOptions = NodeOptionsType<TransformationNodeType.SetIfNode>;
 export class SetIfTFF extends TransformationForm<SetOptions, TransformationNodeType.SetIfNode>
 {

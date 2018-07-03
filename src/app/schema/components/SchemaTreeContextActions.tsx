@@ -45,8 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:strict-boolean-expressions no-var-requires
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
 
 import * as Radium from 'radium';
 import * as React from 'react';

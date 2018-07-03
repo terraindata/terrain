@@ -85,7 +85,7 @@ const DuplicateIcon = require('./../../../images/icon_save_as.svg?name=Duplicate
 const SaveIcon = require('./../../../images/icon_save_10x10.svg?name=SaveIcon');
 const UndoIcon = require('./../../../images/icon_undo.svg?name=UndoIcon');
 const RedoIcon = require('./../../../images/icon_redo.svg?name=RedoIcon');
-const { Map, List } = Immutable;
+import { List } from 'immutable';
 
 export interface Props
 {

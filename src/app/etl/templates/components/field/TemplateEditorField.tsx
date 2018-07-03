@@ -48,9 +48,7 @@ THE SOFTWARE.
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
 
-import * as Immutable from 'immutable';
 import memoizeOne from 'memoize-one';
-const { List, Map } = Immutable;
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { compareObjects, isVisiblyEqual, PropertyTracker, UpdateChecker } from 'etl/ETLUtil';

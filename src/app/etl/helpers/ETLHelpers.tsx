@@ -46,7 +46,7 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file
 
 import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 import TerrainStore from 'src/app/store/TerrainStore';
 

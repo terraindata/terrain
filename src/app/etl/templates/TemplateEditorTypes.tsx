@@ -45,10 +45,10 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
-import * as Immutable from 'immutable';
-import memoizeOne from 'memoize-one';
-const { List, Map } = Immutable;
 import { ModalProps } from 'common/components/overlay/MultiModal';
+import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
+import memoizeOne from 'memoize-one';
 import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, WithIRecord } from 'shared/util/Classes';
 
 import { _HistoryStack, HistoryStack } from 'etl/common/HistoryStack';

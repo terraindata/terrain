@@ -47,8 +47,6 @@ THE SOFTWARE.
 import { Languages } from 'shared/etl/types/ETLTypes';
 
 import { LanguageInterface } from 'etl/templates/languages/LanguageUI';
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
 
 export class DefaultUI implements LanguageInterface
 {

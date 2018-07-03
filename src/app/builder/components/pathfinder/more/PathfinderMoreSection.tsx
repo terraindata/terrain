@@ -46,13 +46,6 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
-import TerrainComponent from './../../../../common/components/TerrainComponent';
-const { List } = Immutable;
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import FadeInOut from 'app/common/components/FadeInOut';
 import FloatingInput from 'app/common/components/FloatingInput';
@@ -61,9 +54,14 @@ import RadioButtons from 'app/common/components/RadioButtons';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import TQLEditor from 'app/tql/components/TQLEditor';
 import Util from 'app/util/Util';
+import * as classNames from 'classnames';
 import ExpandIcon from 'common/components/ExpandIcon';
 import RouteSelector from 'common/components/RouteSelector';
+import { List } from 'immutable';
+import * as _ from 'lodash';
+import * as React from 'react';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
 import BuilderActions from '../../../data/BuilderActions';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
@@ -75,6 +73,7 @@ import
 } from '../PathfinderTypes';
 import { DraggableItem } from './../../../../common/components/DragAndDrop';
 import DragHandle from './../../../../common/components/DragHandle';
+import TerrainComponent from './../../../../common/components/TerrainComponent';
 import PathfinderAggregationLine from './PathfinderAggregationLine';
 import './PathfinderMoreStyle.less';
 

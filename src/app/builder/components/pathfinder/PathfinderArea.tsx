@@ -46,23 +46,22 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import * as Immutable from 'immutable';
-import * as Radium from 'radium';
-import * as React from 'react';
-import { Colors, getStyle } from '../../../colors/Colors';
-import TerrainComponent from './../../../common/components/TerrainComponent';
-const { List } = Immutable;
 import BuilderActions from 'app/builder/data/BuilderActions';
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { ColorsState } from 'app/colors/data/ColorsTypes';
 import FadeInOut from 'app/common/components/FadeInOut';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import { BuilderState } from 'builder/data/BuilderState';
+import { List } from 'immutable';
 import * as TerrainLog from 'loglevel';
+import * as Radium from 'radium';
+import * as React from 'react';
 import withScrolling, { createHorizontalStrength, createVerticalStrength } from 'react-dnd-scrollzone';
 import { SchemaState } from 'schema/SchemaTypes';
 import TerrainTools from 'util/TerrainTools';
 import Util from 'util/Util';
+import { Colors, getStyle } from '../../../colors/Colors';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
 import PathfinderNestedSection from './more/PathfinderNestedSection';

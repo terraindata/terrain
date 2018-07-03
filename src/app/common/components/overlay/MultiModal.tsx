@@ -45,8 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 import * as React from 'react';
 
 import Modal from 'common/components/Modal';

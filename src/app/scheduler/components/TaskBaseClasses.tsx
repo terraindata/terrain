@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires max-classes-per-file strict-boolean-expressions
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as React from 'react';
 import { Colors, fontColor } from 'src/app/colors/Colors';
 
@@ -58,7 +57,7 @@ import { ParamConfigType, TaskConfig } from 'app/scheduler/SchedulerTypes';
 import FadeInOut from 'common/components/FadeInOut';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
 
-const { List, Map } = Immutable;
+import { List, Map } from 'immutable';
 
 export interface Props
 {

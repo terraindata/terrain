@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, borderColor, Colors } from 'src/app/colors/Colors';
@@ -63,7 +62,7 @@ import { NodeTypes } from 'shared/etl/types/ETLTypes';
 
 import './EdgeSection.less';
 
-const { List, Map } = Immutable;
+import { List, Map } from 'immutable';
 
 export interface Props
 {

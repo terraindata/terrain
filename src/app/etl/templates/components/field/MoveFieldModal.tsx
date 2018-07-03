@@ -47,14 +47,13 @@ THE SOFTWARE.
 
 import ListForm, { RowOptions } from 'common/components/ListForm';
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import { Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
-const { List, Map } = Immutable;
 
 import Modal from 'common/components/Modal';
 import { TemplateField } from 'etl/templates/FieldTypes';

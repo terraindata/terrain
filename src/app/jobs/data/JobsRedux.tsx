@@ -54,9 +54,8 @@ import
   JobConfig,
   JobsState,
 } from 'jobs/JobsTypes';
-import XHR from 'util/XHR';
-const { List, Map } = Immutable;
 import Util from 'util/Util';
+import XHR from 'util/XHR';
 
 export interface JobActionTypes
 {

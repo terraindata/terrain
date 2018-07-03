@@ -54,13 +54,13 @@ import TerrainComponent from './../../../common/components/TerrainComponent';
 import CardsArea from './CardsArea';
 import './CardsColumn.less';
 const Dimensions = require('react-dimensions');
+import { List } from 'immutable';
 import { forAllCards } from '../../../../blocks/BlockUtils';
 import { Cards } from '../../../../blocks/types/Card';
 import InfoArea from '../../../common/components/InfoArea';
 import Modal from '../../../common/components/Modal';
 import Util from '../../../util/Util';
 import { BuilderState } from '../../data/BuilderState';
-const { List, Map } = Immutable;
 
 export interface Props
 {

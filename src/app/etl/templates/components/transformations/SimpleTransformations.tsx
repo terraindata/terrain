@@ -54,8 +54,7 @@ import { TransformationForm } from './TransformationFormBase';
 
 import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List, Map } from 'immutable';
 
 type SubstringOptions = NodeOptionsType<TransformationNodeType.SubstringNode>;
 export class SubstringTFF extends TransformationForm<SubstringOptions, TransformationNodeType.SubstringNode>

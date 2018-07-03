@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing max-classes-per-file
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { backgroundColor, Colors, getStyle } from 'src/app/colors/Colors';
@@ -60,7 +59,6 @@ import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
 
 import './OptionsColumn.less';
-const { List, Map } = Immutable;
 
 export class EndpointsColumn extends TerrainComponent<{}>
 {

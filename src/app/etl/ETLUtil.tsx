@@ -45,9 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:import-spacing max-classes-per-file strict-boolean-expressions
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
-
 export class UpdateChecker
 {
   private checkFns: {

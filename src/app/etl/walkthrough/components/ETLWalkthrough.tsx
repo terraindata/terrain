@@ -46,7 +46,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires
 
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as React from 'react';
 
 import { walkthroughFactory } from 'common/components/walkthrough/Walkthrough';
@@ -71,7 +70,7 @@ import PickEndpointStep from './PickEndpointStep';
 
 import './ETLWalkthrough.less';
 
-const { List } = Immutable;
+import { List } from 'immutable';
 
 export interface Props
 {

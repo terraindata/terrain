@@ -46,18 +46,17 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions no-console
 
-import * as Immutable from 'immutable';
-import * as React from 'react';
-import TerrainComponent from './../../../../common/components/TerrainComponent';
-const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
 import SingleRouteSelector from 'app/common/components/SingleRouteSelector';
+import { List } from 'immutable';
+import * as React from 'react';
 import
 {
   ChoiceOption, ElasticDataSource, PathfinderContext, PathfinderSteps,
   Source,
 } from '../PathfinderTypes';
+import TerrainComponent from './../../../../common/components/TerrainComponent';
 
 import Util from 'util/Util';
 

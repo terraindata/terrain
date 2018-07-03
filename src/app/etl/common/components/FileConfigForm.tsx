@@ -46,7 +46,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires
 
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
@@ -60,7 +59,7 @@ import { _FileConfig, FileConfig } from 'shared/etl/immutable/EndpointRecords';
 import { FileConfig as FileConfigI } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
-const { List } = Immutable;
+import { List } from 'immutable';
 
 export interface Props
 {

@@ -54,7 +54,7 @@ import EngineUtil, { ETLTypeToCastString } from 'shared/transformations/util/Eng
 import { TransformationForm } from './TransformationFormBase';
 
 import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 type CastOptions = NodeOptionsType<TransformationNodeType.CastNode>;
 export class CastTFF extends TransformationForm<CastOptions, TransformationNodeType.CastNode>

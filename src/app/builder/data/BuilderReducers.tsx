@@ -46,7 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const no-unused-expression no-shadowed-variable
 import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import { invert } from 'lodash';
+import * as TerrainLog from 'loglevel';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import BackendInstance from '../../../database/types/BackendInstance';
@@ -61,8 +63,6 @@ import
   BuilderPathActionTypes,
 } from './BuilderActionTypes';
 import { _BuilderState, BuilderState } from './BuilderState';
-const { List, Map } = Immutable;
-import * as TerrainLog from 'loglevel';
 
 const BuilderReducers =
   {

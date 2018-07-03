@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires max-classes-per-file strict-boolean-expressions
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
@@ -53,9 +52,9 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import ObjectForm from 'common/components/ObjectForm';
 
+import { List } from 'immutable';
 import { IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 import { AuthConfigType, ConnectionConfigType, Integrations } from 'shared/etl/types/IntegrationTypes';
-const { List } = Immutable;
 
 export interface Props
 {

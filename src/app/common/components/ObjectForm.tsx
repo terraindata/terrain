@@ -50,8 +50,7 @@ import * as React from 'react';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import { borderColor, Colors, fontColor } from 'src/app/colors/Colors';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import { DynamicForm } from 'common/components/DynamicForm';

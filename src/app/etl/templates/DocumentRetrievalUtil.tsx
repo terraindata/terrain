@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:import-spacing
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 
 import { Algorithm } from 'library/LibraryTypes';
@@ -58,7 +57,7 @@ import MidwayQueryResponse from 'src/database/types/MidwayQueryResponse';
 
 import { Ajax } from 'util/Ajax';
 
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 export function fetchDocumentsFromAlgorithm(
   algorithm: Algorithm,

@@ -46,11 +46,6 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as React from 'react';
-import TerrainComponent from './../../../../common/components/TerrainComponent';
-const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
 import Colors from 'app/colors/Colors';
@@ -62,6 +57,9 @@ import DropZone from 'app/common/components/DropZone';
 import { RouteSelectorOption, RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
 import Util from 'app/util/Util';
 import FadeInOut from 'common/components/FadeInOut';
+import { List } from 'immutable';
+import * as _ from 'lodash';
+import * as React from 'react';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import
@@ -69,6 +67,7 @@ import
   _FilterGroup, _FilterLine, _ScoreLine, FilterGroup, FilterLine, Path,
   PathfinderContext, PathfinderSteps,
 } from '../PathfinderTypes';
+import TerrainComponent from './../../../../common/components/TerrainComponent';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
 import './PathfinderFilterStyle.less';

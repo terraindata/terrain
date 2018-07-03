@@ -47,10 +47,9 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions
 const Dimensions = require('react-dimensions');
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
 import FadeInOut from 'common/components/FadeInOut';
 import { notificationManager } from 'common/components/InAppNotification';
+import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';

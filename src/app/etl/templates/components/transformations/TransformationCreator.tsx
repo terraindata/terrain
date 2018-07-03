@@ -49,8 +49,7 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as Radium from 'radium';
 import * as React from 'react';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';

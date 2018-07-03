@@ -46,11 +46,11 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires import-spacing
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import { borderColor, Colors, fontColor } from 'src/app/colors/Colors';
-const { List, Map } = Immutable;
 
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import Autocomplete from 'common/components/Autocomplete';

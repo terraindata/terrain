@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing max-classes-per-file
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
 
@@ -55,8 +54,6 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { _TemplateSettings, TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
 import { TemplateSettings as TemplateSettingsI } from 'shared/etl/types/ETLTypes';
-
-const { List, Map } = Immutable;
 
 export interface Props
 {

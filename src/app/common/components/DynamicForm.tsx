@@ -59,13 +59,12 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import { DisplayState, DisplayType, InputDeclarationMap, InputDeclarationType, OptionType } from './DynamicFormTypes';
 
 const Color = require('color');
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
 import Autocomplete from 'common/components/Autocomplete';
 import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
 import ListForm from 'common/components/ListForm';
 import Switch from 'common/components/Switch';
+import { List } from 'immutable';
 
 import './DynamicForm.less';
 

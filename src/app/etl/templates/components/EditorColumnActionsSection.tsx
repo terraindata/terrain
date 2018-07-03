@@ -46,7 +46,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires import-spacing
 import TerrainComponent from 'common/components/TerrainComponent';
 import { Map } from 'immutable';
-import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, Colors } from 'src/app/colors/Colors';
@@ -57,7 +56,6 @@ import { EngineProxy } from 'etl/templates/EngineProxy';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 
-const { List } = Immutable;
 
 export interface Props
 {

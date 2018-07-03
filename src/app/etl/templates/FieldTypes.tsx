@@ -44,8 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable import-spacing
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 import TransformationNodeBase from 'shared/transformations/TransformationNode';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';

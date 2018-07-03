@@ -53,7 +53,7 @@ import * as _ from 'lodash';
 import { SchemaActionType } from 'schema/data/SchemaRedux';
 import * as SchemaTypes from '../SchemaTypes';
 
-const { Map, List } = Immutable;
+import { List, Map } from 'immutable';
 
 type Server = SchemaTypes.Server;
 type Database = SchemaTypes.Database;

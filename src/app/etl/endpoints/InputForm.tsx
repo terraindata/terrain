@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires max-classes-per-file
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
@@ -72,7 +71,7 @@ import Quarantine from 'util/RadiumQuarantine';
 const DeleteIcon = require('images/icon_close.svg');
 import 'common/components/ObjectForm.less';
 
-const { List } = Immutable;
+import { List } from 'immutable';
 
 export interface Props
 {

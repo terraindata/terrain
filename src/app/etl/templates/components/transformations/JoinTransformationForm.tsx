@@ -55,8 +55,7 @@ import TransformationNodeType from 'shared/transformations/TransformationNodeTyp
 import Topology from 'shared/transformations/util/TopologyUtil';
 import { TransformationForm } from './TransformationFormBase';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 interface JoinOptions
 {

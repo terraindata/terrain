@@ -49,9 +49,6 @@ import * as React from 'react';
 import { TemplateEditorFieldProps } from 'etl/templates/components/field/TemplateEditorField';
 import { Languages } from 'shared/etl/types/ETLTypes';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
-
 import DefaultLanguageUI from 'etl/templates/languages/DefaultLanguageUI';
 import ElasticUI from 'etl/templates/languages/ElasticUI';
 

@@ -57,7 +57,7 @@ import { IntegrationFormMap } from 'etl/common/components/IntegrationFormClasses
 import { IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 import { IntegrationNames, Integrations } from 'shared/etl/types/IntegrationTypes';
 
-const { List, Map } = Immutable;
+import { List, Map } from 'immutable';
 
 export interface Props
 {

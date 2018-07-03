@@ -52,13 +52,13 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 import { backgroundColor, Colors, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import * as Immutable from 'immutable';
-import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
-import Quarantine from 'util/RadiumQuarantine';
-const { List, Map } = Immutable;
 import GraphHelpers from 'etl/helpers/GraphHelpers';
 import NestedView from 'etl/templates/components/field/NestedView';
 import { TemplateField } from 'etl/templates/FieldTypes';
+import { List } from 'immutable';
+import * as Immutable from 'immutable';
+import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
+import Quarantine from 'util/RadiumQuarantine';
 import EditorFieldPreview from './EditorFieldPreview';
 import EditorFieldSettings from './EditorFieldSettings';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';

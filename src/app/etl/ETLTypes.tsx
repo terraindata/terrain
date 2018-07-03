@@ -45,9 +45,9 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:import-spacing max-classes-per-file
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
 import { ModalProps } from 'common/components/overlay/MultiModal';
+import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
 
 import { IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';

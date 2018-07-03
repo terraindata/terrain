@@ -53,8 +53,7 @@ import * as React from 'react';
 import { Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 import Menu from 'common/components/Menu';
 import { TemplateField } from 'etl/templates/FieldTypes';

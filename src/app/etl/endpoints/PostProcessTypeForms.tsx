@@ -46,7 +46,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires max-classes-per-file
 
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as React from 'react';
 
 import { DynamicForm } from 'common/components/DynamicForm';
@@ -62,7 +61,7 @@ import
   PostProcessSortTypes as SortTypes,
 } from 'shared/etl/types/PostProcessTypes';
 
-const { List } = Immutable;
+import { List } from 'immutable';
 
 export interface FormProps<T>
 {

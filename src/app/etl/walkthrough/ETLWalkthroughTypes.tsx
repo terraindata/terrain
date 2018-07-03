@@ -45,8 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:import-spacing max-classes-per-file
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 import { makeExtendedConstructor, WithIRecord } from 'shared/util/Classes';
 
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig }

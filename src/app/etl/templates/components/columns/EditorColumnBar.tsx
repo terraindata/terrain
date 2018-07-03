@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
 
@@ -56,7 +55,6 @@ import Util from 'util/Util';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 
-const { List } = Immutable;
 const DropdownIcon = require('images/icon_carrot.svg');
 
 import './EditorColumnBar.less';

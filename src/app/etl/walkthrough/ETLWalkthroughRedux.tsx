@@ -45,9 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:import-spacing
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
-
 import { FileConfig } from 'shared/etl/immutable/EndpointRecords';
 import { ConstrainedMap, GetType, TerrainRedux } from 'src/app/store/TerrainRedux';
 import { _WalkthroughState, WalkthroughState } from './ETLWalkthroughTypes';

@@ -45,9 +45,8 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
-const { List, Map } = Immutable;
 
 import { ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import LanguageController from 'shared/etl/languages/LanguageControllers';

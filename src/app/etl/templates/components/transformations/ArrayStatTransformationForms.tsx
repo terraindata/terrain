@@ -50,8 +50,7 @@ import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { TransformationForm } from './TransformationFormBase';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 interface SimpleOptions
 {

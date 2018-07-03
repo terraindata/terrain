@@ -54,7 +54,7 @@ import { DisplayType } from 'common/components/DynamicFormTypes';
 
 import { IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 
-const { List, Map } = Immutable;
+import { List, Map } from 'immutable';
 
 export interface Props
 {

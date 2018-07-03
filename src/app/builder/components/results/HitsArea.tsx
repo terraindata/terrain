@@ -46,13 +46,13 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions prefer-const no-empty
 
-import * as Immutable from 'immutable';
-import './HitsArea.less';
-const { Map, List } = Immutable;
 import * as classNames from 'classnames';
+import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
+import './HitsArea.less';
 
 import { SCROLL_SIZE } from 'app/builder/components/results/ResultsManager';
 import { BuilderState } from 'app/builder/data/BuilderState';

@@ -45,12 +45,10 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing strict-boolean-expressions
 
-import * as Immutable from 'immutable';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import Util from 'util/Util';
-const { List, Map } = Immutable;
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';

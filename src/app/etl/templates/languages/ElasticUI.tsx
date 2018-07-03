@@ -45,9 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing strict-boolean-expressions
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
-
 import ElasticFieldSettings from 'etl/templates/components/field/ElasticFieldSettings';
 import { DefaultUI } from 'etl/templates/languages/DefaultLanguageUI';
 import { LanguageInterface } from 'etl/templates/languages/LanguageUI';

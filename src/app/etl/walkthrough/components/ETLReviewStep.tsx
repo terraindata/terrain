@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires
 
-import * as Immutable from 'immutable';
 import * as React from 'react';
 
 import { Colors, fontColor } from 'src/app/colors/Colors';
@@ -58,7 +57,7 @@ import { SinkOptionsType, Sinks, Sources } from 'shared/etl/types/EndpointTypes'
 import { ETLStepComponent, StepProps } from './ETLStepComponent';
 import './ETLStepComponent.less';
 
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 interface Props extends StepProps
 {

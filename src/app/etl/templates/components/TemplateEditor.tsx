@@ -46,7 +46,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires import-spacing
 import TerrainComponent from 'common/components/TerrainComponent';
 import TerrainDndContext from 'common/components/TerrainDndContext';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
@@ -74,7 +73,7 @@ import EditorColumnActionsSection from './EditorColumnActionsSection';
 
 import './TemplateEditor.less';
 
-const { List } = Immutable;
+import { List } from 'immutable';
 
 export interface Props
 {

@@ -69,8 +69,6 @@ import
 
 import './EndpointSection.less';
 
-const { List, Map } = Immutable;
-
 export interface Props
 {
   endpointKey: string;

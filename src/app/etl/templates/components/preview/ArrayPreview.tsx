@@ -49,8 +49,6 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as React from 'react';
 import { backgroundColor, Colors } from 'src/app/colors/Colors';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
 import './ArrayPreview.less';
 
 export interface Props

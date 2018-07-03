@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:import-spacing
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 
 import
@@ -64,7 +63,7 @@ import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'src/app/store/Ter
 
 import { createFieldMap, updateFieldFromEngine } from 'etl/templates/SyncUtil';
 
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 

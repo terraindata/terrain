@@ -45,9 +45,8 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:import-spacing
 import Util from 'app/util/Util';
-import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
 import * as _ from 'lodash';
-const { List, Map } = Immutable;
 import MidwayError from 'shared/error/MidwayError';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'src/app/store/TerrainRedux';
 

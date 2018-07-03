@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
@@ -68,7 +67,7 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import './EdgeSection.less';
 import ETLEdgeComponent from './ETLEdgeComponent';
 
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 export interface Props
 {

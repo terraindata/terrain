@@ -58,8 +58,7 @@ import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 export interface TransformationFormProps
 {

@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor } from 'src/app/colors/Colors';
@@ -56,7 +55,6 @@ import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 
 import DocumentPreview from './DocumentPreview';
 import './DocumentsPreviewColumn.less';
-const { List } = Immutable;
 
 export interface Props
 {

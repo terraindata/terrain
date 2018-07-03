@@ -49,9 +49,6 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as Radium from 'radium';
 import * as React from 'react';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
-
 import { getTransformationForm } from 'etl/templates/components/transformations/TransformationForms';
 import { EngineProxy } from 'etl/templates/EngineProxy';
 import { TransformationNode } from 'etl/templates/FieldTypes';

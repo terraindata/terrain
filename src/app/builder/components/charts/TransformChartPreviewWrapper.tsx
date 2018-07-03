@@ -46,9 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
 import Colors from 'app/colors/Colors';
+import { List } from 'immutable';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import TerrainComponent from '../../../common/components/TerrainComponent';

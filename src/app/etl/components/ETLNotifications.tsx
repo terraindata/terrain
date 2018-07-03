@@ -46,7 +46,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions
 
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as React from 'react';
 
 import Loading from 'common/components/Loading';
@@ -61,7 +60,7 @@ import { ETLActions } from 'etl/ETLRedux';
 import { ETLState } from 'etl/ETLTypes';
 import './ETLPage.less';
 
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 export interface Props
 {

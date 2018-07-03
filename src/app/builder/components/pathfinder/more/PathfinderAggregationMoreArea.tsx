@@ -46,10 +46,6 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import TerrainComponent from 'app/common/components/TerrainComponent';
-import * as Immutable from 'immutable';
-import * as React from 'react';
-const { List, Map } = Immutable;
 import PathfinderFilterSection from 'app/builder/components/pathfinder/filter/PathfinderFilterSection';
 import PathfinderAggregationLine from 'app/builder/components/pathfinder/more/PathfinderAggregationLine';
 import PathfinderAggregationMoreSection from 'app/builder/components/pathfinder/more/PathfinderAggregationMoreSection';
@@ -65,6 +61,9 @@ import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import Dropdown from 'app/common/components/Dropdown';
 import Menu from 'app/common/components/Menu';
 import RadioButtons from 'app/common/components/RadioButtons';
+import TerrainComponent from 'app/common/components/TerrainComponent';
+import { List } from 'immutable';
+import * as React from 'react';
 import Util from 'util/Util';
 
 const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');

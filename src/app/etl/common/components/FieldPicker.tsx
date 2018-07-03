@@ -56,8 +56,7 @@ import { Colors } from 'src/app/colors/Colors';
 
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 import './FieldPicker.less';
 
