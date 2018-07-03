@@ -47,7 +47,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-const { List, Map } = Immutable;
+import { List, Map } from 'immutable';
 
 import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';

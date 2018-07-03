@@ -44,11 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import aesjs = require('aes-js');
-import sha1 = require('sha1');
-
 import IntegrationConfig from './IntegrationConfig';
-import { IntegrationPermission, IntegrationPermissionLevels } from './IntegrationPermissionLevels';
+import { IntegrationPermission } from './IntegrationPermissionLevels';
 import IntegrationSimpleConfig from './IntegrationSimpleConfig';
 
 import Encryption, { Keys } from 'shared/encryption/Encryption';

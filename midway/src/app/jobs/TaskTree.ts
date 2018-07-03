@@ -51,7 +51,6 @@ import { TaskConfig } from 'shared/types/jobs/TaskConfig';
 import { TaskEnum } from 'shared/types/jobs/TaskEnum';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 import { TaskTreeConfig } from 'shared/types/jobs/TaskTreeConfig';
-import LogStream from '../io/streams/LogStream';
 import LogStreamWritable from '../io/streams/LogStreamWritable';
 import { MidwayLogger } from '../log/MidwayLogger';
 import { Task } from './Task';

@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import ESConverter from 'shared/database/elastic/formatter/ESConverter';
 import ESParameterFiller from 'shared/database/elastic/parser/EQLParameterFiller';
 import ESJSONType from 'shared/database/elastic/parser/ESJSONType';
 import { ESParameterType } from 'shared/database/elastic/parser/ESParameter';

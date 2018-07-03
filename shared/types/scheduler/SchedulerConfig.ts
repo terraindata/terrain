@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { TaskConfig } from '../jobs/TaskConfig';
-
 export class SchedulerConfig
 {
   public createdAt: Date = null;                   // when schedule was created

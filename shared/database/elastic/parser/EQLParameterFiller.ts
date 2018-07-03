@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import moment = require('moment');
 import { ESParameterType } from 'shared/database/elastic/parser/ESParameter';
 import ESParameterSubstituter from './ESParameterSubstituter';
 import ESValueInfo from './ESValueInfo';

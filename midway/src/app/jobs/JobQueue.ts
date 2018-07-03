@@ -44,13 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as consume from 'stream-consume';
 
 import { TaskConfig } from 'shared/types/jobs/TaskConfig';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
-import { TaskTreeConfig } from 'shared/types/jobs/TaskTreeConfig';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import IntegrationConfig from '../integrations/IntegrationConfig';
@@ -60,8 +58,6 @@ import SchedulerConfig from '../scheduler/SchedulerConfig';
 import { Job } from './Job';
 import JobConfig from './JobConfig';
 import JobLogConfig from './JobLogConfig';
-import { Task } from './Task';
-import { TaskTree } from './TaskTree';
 
 const INTERVAL: number = 60000;
 

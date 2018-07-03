@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Readable, Transform } from 'stream';
+import { Transform } from 'stream';
 import * as xmlNodes from 'xml-nodes';
 import * as xml2js from 'xml2js';
 

@@ -51,7 +51,6 @@ import PostgresDB from '../../../../src/database/pg/tasty/PostgreSQLDB';
 
 import * as Tasty from '../../../../src/tasty/Tasty';
 import TastyNode from '../../../../src/tasty/TastyNode';
-import TastyNodeTypes from '../../../../src/tasty/TastyNodeTypes';
 import TastyQuery from '../../../../src/tasty/TastyQuery';
 import TastyTable from '../../../../src/tasty/TastyTable';
 

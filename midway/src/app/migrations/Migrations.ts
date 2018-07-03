@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as assert from 'assert';
 import * as _ from 'lodash';
 
 import * as Tasty from '../../tasty/Tasty';

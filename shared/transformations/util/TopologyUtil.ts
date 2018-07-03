@@ -44,10 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as _ from 'lodash';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
 
 export type Relation = 'one' | 'many';
 

@@ -44,26 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:strict-boolean-expressions
-import * as _ from 'lodash';
 import * as stream from 'stream';
 
-import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import
 {
-  DefaultSinkConfig,
-  DefaultSourceConfig,
   SinkConfig,
   SourceConfig,
 } from 'shared/etl/types/EndpointTypes';
-import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { PostProcessConfig } from 'shared/etl/types/PostProcessTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import * as Util from '../AppUtil';
 import { MidwayLogger } from '../log/MidwayLogger';
 import ExportTransform from './ExportTransform';
 import { PostProcess } from './PostProcess';
-import { TemplateConfig } from './TemplateConfig';
-import Templates from './Templates';
 
 import CSVTransform from '../io/streams/CSVTransform';
 import JSONTransform from '../io/streams/JSONTransform';

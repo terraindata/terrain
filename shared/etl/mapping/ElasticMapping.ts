@@ -46,11 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:max-classes-per-file strict-boolean-expressions
 
-import { List, Map } from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 
 import { defaultProps, ElasticFieldProps, ElasticTypes, etlTypeToElastic } from 'shared/etl/types/ETLElasticTypes';
-import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil, { PathHashMap } from 'shared/transformations/util/EngineUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';

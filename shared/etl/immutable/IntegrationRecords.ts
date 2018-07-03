@@ -47,7 +47,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-const { List, Map } = Immutable;
+import { List, Map } from 'immutable';
 import { guessFileOptionsHelper } from 'shared/etl/FileUtil';
 import { FileConfig } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';

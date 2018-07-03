@@ -46,20 +46,12 @@ THE SOFTWARE.
 
 import * as googleoauthjwt from 'google-oauth-jwt';
 import * as _ from 'lodash';
-import { PassThrough, Readable, Writable } from 'stream';
+import { Readable, Writable } from 'stream';
 
 import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
-import
-{
-  PostProcessConfig,
-  PostProcessOptionsTypes,
-  PostProcessTypes,
-} from 'shared/etl/types/PostProcessTypes';
 import { MidwayLogger } from '../../log/MidwayLogger';
 
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
-import IntegrationConfig from '../../integrations/IntegrationConfig';
-import { integrations } from '../../integrations/IntegrationRouter';
 import JSONTransform from '../../io/streams/JSONTransform';
 import AEndpointStream from './AEndpointStream';
 
