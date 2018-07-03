@@ -60,7 +60,7 @@ export const MidwayLogger = winston.createLogger({
     }),
   ),
   transports: [
-      new winston.transports.Console(),
-      new MemoryTransport(),
+    new winston.transports.Console(),
+    new MemoryTransport(),
   ],
 });

@@ -62,7 +62,6 @@ import ETLAjax from 'etl/ETLAjax';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
-import { fetchDocumentsFromAlgorithm, fetchDocumentsFromFile } from 'etl/templates/DocumentRetrievalUtil';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import
@@ -216,10 +215,11 @@ class DocumentsHelpers extends ETLHelpers
   }
 
   protected fetchPreview(
-    source: SourceConfig
+    source: SourceConfig,
   ): Promise<List<object>>
   {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) =>
+    {
       switch (source.type)
       {
         case Sources.Upload: {
@@ -244,7 +244,8 @@ class DocumentsHelpers extends ETLHelpers
 
   protected async sliceFromFile(file: File, size = CHUNK_SIZE): Promise<string>
   {
-    return new Promise<string>(async (resolve, reject) => {
+    return new Promise<string>(async (resolve, reject) =>
+    {
       let slice;
       if (file.size <= size)
       {
@@ -255,20 +256,23 @@ class DocumentsHelpers extends ETLHelpers
         slice = file.slice(0, CHUNK_SIZE);
       }
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = (event) =>
+      {
         resolve(event.target.result);
-      }
+      };
       reader.onerror = (reason) => reject(reason);
       reader.readAsText(slice);
     });
   }
 
   protected fetchFromFile(
-    source: SourceConfig
+    source: SourceConfig,
   ): Promise<List<object>>
   {
-    return new Promise(async (resolve, reject) => {
-      try {
+    return new Promise(async (resolve, reject) =>
+    {
+      try
+      {
         const file: File = source.options['file'];
         const newOptions = _.extend({}, source.options, {
           file: null,
