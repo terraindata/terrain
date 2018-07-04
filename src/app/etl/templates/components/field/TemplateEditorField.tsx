@@ -57,6 +57,7 @@ import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
 import { instanceFnDecorator } from 'shared/util/Classes';
 
+import { FieldVerification } from 'shared/etl/languages/LanguageControllers';
 import { compareObjects, isVisiblyEqual, PropertyTracker, UpdateChecker } from 'etl/ETLUtil';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
@@ -270,6 +271,12 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return getEngineVersion(props);
   }
 
+  protected _getFieldVerifications(props = this.props): List<FieldVerification>
+  {
+    this.updateChecker.setChecker('fieldVerifications', getVerifications);
+    return getVerifications(props);
+  }
+
   protected _willFieldChange(nextProps)
   {
     return this._field(this.props.fieldId, this.props)
@@ -311,6 +318,12 @@ function getCurrentLanguage(props: TemplateEditorFieldProps)
 {
   const templateEditor = (props as TemplateEditorFieldProps & Injected).templateEditor;
   return templateEditor.template.getEdgeLanguage(templateEditor.getCurrentEdgeId());
+}
+
+function getVerifications(props: TemplateEditorFieldProps)
+{
+  const templateEditor = (props as TemplateEditorFieldProps & Injected).templateEditor;
+  return templateEditor.uiState.fieldVerifications.get(props.fieldId);
 }
 
 function settingsAreOpen(props: TemplateEditorFieldProps)

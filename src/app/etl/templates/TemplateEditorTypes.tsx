@@ -52,6 +52,7 @@ const { List, Map } = Immutable;
 import { ModalProps } from 'common/components/overlay/MultiModal';
 import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
+import { FieldVerification } from 'shared/etl/languages/LanguageControllers';
 import { _HistoryStack, HistoryStack } from 'etl/common/HistoryStack';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
@@ -195,6 +196,7 @@ class EditorDisplayStateC
       closeCallback: null,
     };
 
+  public fieldVerifications: Immutable.Map<number, List<FieldVerification>> = Map() as any;
   public currentEdge: number = -1;
   public engineVersion: number = 0;
   public columnState: ColumnOptions = ColumnOptions.Endpoints;

@@ -79,6 +79,11 @@ export class DefaultController implements LanguageInterface
   {
     return [];
   }
+
+  public *getFieldErrors(engine: TransformationEngine, sink, options?)
+  {
+    return;
+  }
 }
 
 export default new DefaultController();

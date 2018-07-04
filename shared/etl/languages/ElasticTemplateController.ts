@@ -49,7 +49,7 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import * as _ from 'lodash';
 
-import { LanguageInterface } from 'shared/etl/languages/LanguageControllers';
+import { FieldVerification, LanguageInterface } from 'shared/etl/languages/LanguageControllers';
 import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
@@ -133,6 +133,27 @@ class ElasticController extends DefaultController implements LanguageInterface
     }
 
     return errors;
+  }
+
+  public *getFieldErrors(engine: TransformationEngine, sink: SinkConfig, existingMapping?: object)
+  {
+    const ids = engine.getAllFieldIDs();
+    for (const id of ids.values() as IterableIterator<number>) // cannot use forEach inside iterator
+    {
+      const okp = engine.getOutputKeyPath(id);
+      const name = okp.last();
+      if (typeof name === 'string')
+      {
+        if (name.indexOf(' ') !== -1)
+        {
+          yield ({
+            fieldId: id,
+            message: 'Field name contains spaces. This is not recommended',
+            type: 'warning',
+          } as FieldVerification);
+        }
+      }
+    }
   }
 }
 

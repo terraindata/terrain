@@ -57,6 +57,7 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
+import { FieldVerification } from 'shared/etl/languages/LanguageControllers';
 import Menu from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
@@ -68,6 +69,7 @@ import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorField
 
 import './TemplateEditorField.less';
 
+const ErrorIcon = require('images/icon_info.svg');
 const KeyIcon = require('images/icon_key-2.svg');
 const MAX_STRING_LENGTH = 400;
 
@@ -224,6 +226,33 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     }
   }
 
+  public renderVerifications()
+  {
+    const verifications: List<FieldVerification> = this._getFieldVerifications();
+    if (verifications === undefined)
+    {
+      return null;
+    }
+    const elements = verifications.map((verification, key) => {
+      const { fieldId, message, type } = verification;
+      const style = type === 'error' ? getStyle(Colors().error) : getStyle(Colors().warning);
+      return (
+        <div
+          style={style}
+          className='editor-field-verification-icon'
+        >
+          <ErrorIcon/>
+        </div>
+      );
+    });
+
+    return (
+      <div className='field-preview-verifications'>
+        hi
+      </div>
+    );
+  }
+
   public renderMenu()
   {
     if (this.props.labelOnly)
@@ -301,6 +330,9 @@ class EditorFieldPreview extends TemplateEditorField<Props>
           </div>
           {
             this.renderPreviewValue()
+          }
+          {
+            this.renderVerifications()
           }
         </div>
       </div>
