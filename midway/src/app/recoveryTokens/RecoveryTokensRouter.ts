@@ -75,7 +75,7 @@ Router.post('/', async (ctx, next) =>
    let email: string;
    let userId: number;
    let userExists: boolean = false;
-   for (let index:number = 0; index < userIds.length; index++)
+   for (let index: number = 0; index < userIds.length; index++)
    {
      const usr: UserConfig[] = await users.get(userIds[index]['id']);
      if (usr !== undefined)
