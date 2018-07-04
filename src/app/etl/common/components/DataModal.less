@@ -1,24 +1,26 @@
 // Copyright 2018 Terrain Data, Inc.
 
-.section-container {
-  display: block;
+.info-container {
+  display: flex;
+  flex-direction: column;
   margin: 10px auto 10px auto;
-  padding-top: 6px;
+  padding-top: 4px;
   padding-bottom: 2px;
   border-radius: 8px;
 }
 
-.section-header-bar {
+.info-header-bar {
   display: flex;
   flex-wrap: wrap;
   margin: 2px;
-  padding-bottom: 7px;
-  padding-left: 6px;
-  padding-right: 6px;
+  padding-bottom: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
   text-align: right;
+  flex-shrink: 0;
 }
 
-.section-header {
+.info-header {
   text-transform: uppercase;
   flex-grow: 1;
   text-align: left;
@@ -42,7 +44,7 @@
   margin-left: 8px;
 }
 
-.section-body {
+.info-body {
   border-radius: 6px;
   margin-left: 2px;
   margin-right: 2px;

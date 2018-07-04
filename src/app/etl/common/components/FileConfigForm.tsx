@@ -60,6 +60,8 @@ import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from
 import { FileConfig as FileConfigI } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 
+import Modal from 'app/common/components/Modal';
+import PathUtil from 'etl/pathselector/PathGuessTest';
 import DataModal from './DataModal';
 
 const { List } = Immutable;
@@ -71,6 +73,7 @@ export interface Props
   hideTypePicker?: boolean;
   style?: any;
   isSource?: boolean;
+  source?: object;
 }
 
 type FormState = FileConfigI & {
@@ -147,12 +150,13 @@ export default class FileConfigForm extends TerrainComponent<Props>
             <DataModal
               sectionType='path'
               sectionOptions={
-                List(['option 1', 'option 2', 'option 3'])
+                List(PathUtil.guessFilePaths(this.props.source).map((key, i) => key.name + ': ' + key.score))
               }
               sectionBoxes={
-                List(['content 1', 'content 2', 'content 3'])
+                List(PathUtil.guessFilePaths(this.props.source).map((key, i) => JSON.stringify(this.props.source[key.name]))
               }
-              size='500px'
+              width='100%'
+              height='40%'
             />,
         },
         getDisplayState: this.jsonPathDisplay,
@@ -168,6 +172,8 @@ export default class FileConfigForm extends TerrainComponent<Props>
 
   public render()
   {
+    // console.log(PathUtil.guessFilePaths(this.props.source).map((key, i) => this.props.source[key.name]));
+    // console.log(PathUtil.guessFilePaths(this.props.source));
     return (
       <DynamicForm
         inputMap={this.inputMap}

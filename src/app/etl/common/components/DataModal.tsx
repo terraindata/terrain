@@ -62,7 +62,8 @@ export interface Props
   sectionType: string;
   sectionOptions: List<any>;
   sectionBoxes: List<any>;
-  size: string;
+  width?: string;
+  height?: string;
 }
 
 export default class DataModal extends TerrainComponent<Props>
@@ -70,9 +71,8 @@ export default class DataModal extends TerrainComponent<Props>
   constructor(props)
   {
     super(props);
-
     this.state = {
-      currentOption: this.props.sectionOptions.get(0),
+      currentOptionIndex: 0,
     };
   }
 
@@ -92,7 +92,7 @@ export default class DataModal extends TerrainComponent<Props>
   {
     this.setState(
       {
-        currentOption: optionName,
+        currentOptionIndex: this.props.sectionOptions.indexOf(optionName),
       },
     );
   }
@@ -107,8 +107,8 @@ export default class DataModal extends TerrainComponent<Props>
             key={i}
             onClick={this._fn(this.onTabChange, optionName)}
             style={{
-              color: (this.state.currentOption === optionName) ? Colors().mainBlue : Colors().sectionEditButton,
-              background: Colors().bg
+              color: (this.state.currentOptionIndex === this.props.sectionOptions.indexOf(optionName)) ? Colors().mainBlue : Colors().sectionEditButton,
+              background: Colors().bg,
             }}
           >
             {optionName}
@@ -122,21 +122,23 @@ export default class DataModal extends TerrainComponent<Props>
   public renderSectionInfo()
   {
     return (
-      <div className='section-body' style={{ background: Colors().bg }}>
-        {this.props.sectionBoxes.get(this.props.sectionOptions.indexOf(this.state.currentOption))}
+      <div className='info-body' style={{ background: Colors().bg }}>
+        {this.props.sectionBoxes.get(this.state.currentOptionIndex)}
       </div>
     );
   }
 
   public render()
   {
+    // console.log(this.props.sectionOptions.get(0));
+    // console.log(this.state.currentOption);
     return (
       <div
-        className='section-container'
-        style={{ background: Colors().blockBg }}
+        className='info-container'
+        style={{ background: Colors().blockBg, height: this.props.height, width: this.props.width }}
       >
-        <div className='section-header-bar' style={{ width: this.props.size }}>
-          <div className='section-header'>{this.props.sectionTitle}</div>
+        <div className='info-header-bar'>
+          <div className='info-header'>{this.props.sectionTitle}</div>
           {this.renderSectionTab(this.props.sectionOptions)}
         </div>
         {this.renderSectionInfo()}

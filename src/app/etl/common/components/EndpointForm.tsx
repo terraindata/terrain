@@ -88,6 +88,7 @@ export interface Props
 interface State
 {
   usingCustomIntegration: boolean;
+  currentObject: object;
 }
 
 class EndpointForm extends TerrainComponent<Props>
@@ -121,7 +122,20 @@ class EndpointForm extends TerrainComponent<Props>
 
   public state: State = {
     usingCustomIntegration: false,
+    currentObject: null,
   };
+
+  // public shouldComponentUpdate(nextProps, nextState)
+  // {
+  //   if (!_.isEqual(nextState.currentFile, this.state.currentFile))
+  //   {
+  //     return true;
+  //   }
+  //   else
+  //   {
+  //     return (this.props !== nextProps) || (this.state !== nextState);
+  //   }
+  // }
 
   public componentDidMount()
   {
@@ -242,6 +256,7 @@ class EndpointForm extends TerrainComponent<Props>
               <FormClass
                 endpoint={endpoint}
                 onChange={this.handleEndpointChange}
+                source={this.state.currentObject}
               />
               :
               null
@@ -277,8 +292,16 @@ class EndpointForm extends TerrainComponent<Props>
     newEndpoint = newEndpoint.set('fileConfig', newFileConfig);
 
     this.props.onChange(newEndpoint, apply);
-    // console.log(DocumentsHelpers.fetchPreview(newEndpoint));
-    // DocumentsHelpers.fetchPreview(newEndpoint).then((res) => console.log(res)).catch((e) =>console.log(e));
+
+    DocumentsHelpers.fetchPreview(newEndpoint).then((res) =>
+    {
+      this.setState(
+        {
+          currentObject: res.get(0),
+        },
+      );
+    })
+    .catch((e) => console.log(e));
   }
 
   public extractFileConfigDelta(oldConfig: Partial<FileConfig>, newConfig: Partial<FileConfig>): Partial<FileConfig>

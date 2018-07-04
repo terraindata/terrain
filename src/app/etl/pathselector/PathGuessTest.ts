@@ -183,7 +183,7 @@ export default class PathUtil
     }
   }
 
-  public static guessPath(json: object, possiblePaths, depth: number): object
+  public static guessPath(json: object, possiblePaths, depth: number): PathInfo[]
   {
     if (depth > 4) // threshold for recusive calls
     {
@@ -212,7 +212,7 @@ export default class PathUtil
     return possiblePaths;
   }
 
-  public static guessFilePaths(json)
+  public static guessFilePaths(json): PathInfo[]
   {
     return PathUtil.guessPath(json, [], 0);
   }
