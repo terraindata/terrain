@@ -50,7 +50,6 @@ THE SOFTWARE.
 // [Row1, Row2, ... block's child1, child2...]
 import { PathFinderStringToJSONArray } from 'builder/components/pathfinder/PathfinderParser';
 import * as Immutable from 'immutable';
-import { List } from 'immutable';
 import * as TerrainLog from 'loglevel';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';

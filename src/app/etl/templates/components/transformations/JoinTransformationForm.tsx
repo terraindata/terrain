@@ -44,27 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires no-empty-interface max-classes-per-file
-import TerrainComponent from 'common/components/TerrainComponent';
-import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
 
 import { instanceFnDecorator } from 'shared/util/Classes';
 
-import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { FieldPicker } from 'etl/common/components/FieldPicker.tsx';
-import { TransformationNode } from 'etl/templates/FieldTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import { areFieldsLocal } from 'shared/transformations/util/TransformationsUtil';
-import { KeyPath as EnginePath } from 'shared/util/KeyPath';
-import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
+import Topology from 'shared/transformations/util/TopologyUtil';
+import { TransformationForm } from './TransformationFormBase';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 interface JoinOptions
 {
@@ -132,7 +123,7 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
     const { engine } = this.props;
     const currentKP = engine.getOutputKeyPath(fieldId);
     return engine.getAllFieldIDs().filter((id, i) => fieldId !== id
-      && areFieldsLocal(currentKP, engine.getOutputKeyPath(id))
+      && Topology.areFieldsLocal(currentKP, engine.getOutputKeyPath(id))
       && engine.getFieldType(id) === 'string',
     ).toList();
   }

@@ -46,14 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
-import Colors, { backgroundColor, borderColor, fontColor } from 'app/colors/Colors';
+import Colors, { backgroundColor, fontColor } from 'app/colors/Colors';
 import * as classNames from 'classnames';
-import { List, Map } from 'immutable';
-import * as _ from 'lodash';
+import { List } from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
-import Util from 'util/Util';
-import BuilderActions from './../../builder/data/BuilderActions';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './PickerStyle.less';
 

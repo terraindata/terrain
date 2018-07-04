@@ -45,10 +45,9 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file strict-boolean-expressions import-spacing
 
-import * as Immutable from 'immutable';
+import { Map } from 'immutable';
 import * as _ from 'lodash';
-const { List, Map } = Immutable;
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
+import { makeConstructor, makeExtendedConstructor, WithIRecord } from 'shared/util/Classes';
 
 import { getFileType, guessFileOptionsHelper } from 'shared/etl/FileUtil';
 import
@@ -65,7 +64,6 @@ import
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { InputConfig, RootInputConfig as RootInputConfigI } from 'shared/etl/types/InputTypes';
 import { PostProcessConfig, RootPostProcessConfig as RootPostProcessConfigI } from 'shared/etl/types/PostProcessTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 class FileConfigC implements FileConfigI
 {
@@ -94,11 +92,12 @@ export type RootInputConfig = WithIRecord<RootInputConfigC>;
 export const _FileConfig = makeConstructor(FileConfigC);
 export const _RootInputConfig = makeConstructor(RootInputConfigC);
 export const _RootPostProcessConfig = makeConstructor(RootPostProcessConfigC);
+export const SOURCE_DEFAULT_NAME = 'Source';
 
 class SourceConfigC implements SourceConfigI
 {
   public type = null;
-  public name = 'Default Source';
+  public name = SOURCE_DEFAULT_NAME;
   public fileConfig = _FileConfig();
   public options = {} as any;
   public integrationId = -1;
@@ -162,10 +161,11 @@ export const _SourceConfig = makeExtendedConstructor(SourceConfigC, true, {
   },
 );
 
+export const SINK_DEFAULT_NAME = 'Destination';
 class SinkConfigC implements SinkConfigI
 {
   public type = null;
-  public name = 'Default Sink';
+  public name = SINK_DEFAULT_NAME;
   public fileConfig = _FileConfig();
   public options = {} as any;
   public integrationId = -1;
@@ -235,7 +235,7 @@ export function getEndpointDescription(
   {
     case Sinks.Fs:
     case Sources.Fs: {
-      return `Local File System'`;
+      return `Local File System`;
     }
     case Sinks.Http:
     case Sources.Http: {

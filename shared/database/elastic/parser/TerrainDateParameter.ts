@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as moment from 'moment';
-import { Moment } from 'moment';
 
 export default class TerrainDateParameter
 {

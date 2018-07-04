@@ -44,11 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-const { List, Map } = Immutable;
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import TerrainComponent from './TerrainComponent';
 

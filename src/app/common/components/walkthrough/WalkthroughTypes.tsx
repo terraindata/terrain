@@ -45,10 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires max-classes-per-file no-console
 
-import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as Radium from 'radium';
 import * as React from 'react';
 
 import './Walkthrough.less';

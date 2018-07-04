@@ -47,11 +47,7 @@ THE SOFTWARE.
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 
-import DatabaseController from '../../database/DatabaseController';
-import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import * as Scripts from '../../scripts/Scripts';
 import * as Util from '../AppUtil';
-import { metrics } from '../events/EventRouter';
 import UserConfig from '../users/UserConfig';
 import ResultsConfigConfig from './ResultsConfigConfig';
 

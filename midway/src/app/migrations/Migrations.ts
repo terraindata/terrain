@@ -44,9 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as assert from 'assert';
 import * as _ from 'lodash';
-import * as winston from 'winston';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
@@ -55,6 +53,7 @@ import { CURRENT_VERSION, FIRST_VERSION, Migrator, Version } from '../AppVersion
 import { MigrationRecordConfig as MigrationRecord } from './MigrationRecordConfig';
 
 import { defaultETLMigration } from '../etl/ETLMigrations';
+import { MidwayLogger } from '../log/MidwayLogger';
 
 const registeredMigrations: Migrator[] = [
   defaultETLMigration,
@@ -85,7 +84,7 @@ export class Migrations
       {
         fromVersion = currentRecord.toVersion;
       }
-      winston.info(`Checking migrations from version ${fromVersion} to version ${CURRENT_VERSION}`);
+      MidwayLogger.info(`Checking migrations from version ${fromVersion} to version ${CURRENT_VERSION}`);
       let anyUpdated = false;
       for (const migrator of registeredMigrations)
       {
@@ -96,12 +95,12 @@ export class Migrations
       }
       if (!anyUpdated)
       {
-        winston.info('No Migrations Occurred');
+        MidwayLogger.info('No Migrations Occurred');
       }
 
       if (fromVersion !== CURRENT_VERSION)
       {
-        winston.info('Updating Application Version Record');
+        MidwayLogger.info('Updating Application Version Record');
         await this.createCurrent(fromVersion, CURRENT_VERSION);
       }
       resolve();

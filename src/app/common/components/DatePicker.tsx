@@ -60,7 +60,7 @@ import Dropdown from './Dropdown';
 import _ = require('lodash');
 import { Moment } from 'moment';
 import TerrainDateParameter from '../../../../shared/database/elastic/parser/TerrainDateParameter';
-import { backgroundColor, Colors, fontColor, getStyle } from '../../colors/Colors';
+import { Colors, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 
 const MINUTE_INTERVAL = 30;

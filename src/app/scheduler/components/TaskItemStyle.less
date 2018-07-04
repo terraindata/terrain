@@ -1,0 +1,69 @@
+.task-item-wrapper {
+    border: 1px solid;
+    border-radius: 3px;
+    margin: 6px;
+    flex-grow: 1;
+    max-width: 300px;
+    position: relative;
+    padding-bottom: 20px;
+    margin: auto;
+    margin-top: 12px;
+    pointer-events: all;
+    .task-item-header {
+    	height: 30px;
+    	margin-bottom: 6px;
+        display: flex;
+    	.task-item-name {
+    		width: 100%;
+    		height: 100%;
+			font-size: 18px;
+    		margin-left: 6px;
+		    position: relative;
+		    top: 5px;
+    	}
+        .task-item-delete {
+            position: relative;
+            top: 10px;
+            right: 3px;
+        }
+    }
+    .task-item-error {
+        float: right;
+        position: relative;
+        cursor: pointer;
+        margin-right: 12px;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+    .task-item-body {
+    	margin-left: 6px;
+    	margin-right: 6px;
+    }
+    .task-item-subtask-buttons {
+    	display: flex;
+    	cursor: pointer;
+    	justify-content: center;
+        position: absolute;
+        bottom: 0px;
+        width: 100%;
+    	.task-item-subtask-button {
+    		padding: 6px;
+    	}
+    }
+    .task-item-sub-header {
+        cursor: pointer;
+        text-transform: capitalize;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+    .task-item-settings{
+        margin-top: 12px;
+        margin-bottom: 12px;
+        margin-left: 10px;
+        .checkbox-label {
+            margin-left: 0px;
+        }
+    }
+}

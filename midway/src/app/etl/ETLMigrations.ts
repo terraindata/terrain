@@ -44,18 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as assert from 'assert';
-import * as _ from 'lodash';
-import * as winston from 'winston';
+import { MidwayLogger } from '../log/MidwayLogger';
 
-import * as Tasty from '../../tasty/Tasty';
-import * as App from '../App';
-
-import { CURRENT_VERSION, FIRST_VERSION, Migrator, Version } from '../AppVersion';
-import { MigrationRecordConfig as MigrationRecord } from '../migrations/MigrationRecordConfig';
+import { Migrator } from '../AppVersion';
 import { templates as templatesDb } from './TemplateRouter';
 
-import { TemplateVersion, updateTemplateIfNeeded } from 'shared/etl/migrations/TemplateVersions';
+import { updateTemplateIfNeeded } from 'shared/etl/migrations/TemplateVersions';
 
 export const defaultETLMigration: Migrator = {
   fromVersion: 'v4',
@@ -73,7 +67,7 @@ export const defaultETLMigration: Migrator = {
         if (updated)
         {
           anyUpdated = true;
-          winston.debug(`Updated Template ${template.id}: ${message}`);
+          MidwayLogger.debug(`Updated Template ${template.id}: ${message}`);
         }
       }
       resolve(anyUpdated);

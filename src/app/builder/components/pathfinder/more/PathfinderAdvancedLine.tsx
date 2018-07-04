@@ -46,22 +46,19 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import TerrainComponent from 'app/common/components/TerrainComponent';
-import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as React from 'react';
-const { List, Map } = Immutable;
 import BuilderActions from 'app/builder/data/BuilderActions';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import Dropdown from 'app/common/components/Dropdown';
 import FadeInOut from 'app/common/components/FadeInOut';
-import MapComponent from 'app/common/components/MapComponent';
 import MultiInput from 'app/common/components/MultiInput';
 import RadioButtons, { RadioButtonOption } from 'app/common/components/RadioButtons';
 import RangesInput from 'app/common/components/RangesInput';
+import TerrainComponent from 'app/common/components/TerrainComponent';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import Util from 'app/util/Util';
+import * as classNames from 'classnames';
+import { List } from 'immutable';
+import * as React from 'react';
 import { ADVANCED } from '../PathfinderTypes';
 import { AdvancedDisplays } from './PathfinderAggregationDisplay';
 

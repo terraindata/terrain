@@ -50,8 +50,6 @@ import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/Endpoi
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import MySQLConfig from '../../../database/mysql/MySQLConfig';
 import MySQLReader from '../../../database/mysql/streams/MySQLReader';
-import IntegrationConfig from '../../integrations/IntegrationConfig';
-import { integrations } from '../../integrations/IntegrationRouter';
 import AEndpointStream from './AEndpointStream';
 
 export default class MySQLEndpoint extends AEndpointStream

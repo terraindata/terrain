@@ -46,20 +46,15 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-import * as $ from 'jquery';
-import * as _ from 'lodash';
-import * as React from 'react';
-import TerrainComponent from './../../../../common/components/TerrainComponent';
-const { List } = Immutable;
-import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
-import Colors, { backgroundColor, borderColor, getStyle } from 'app/colors/Colors';
+import Colors, { backgroundColor, borderColor } from 'app/colors/Colors';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import LinearSelector from 'app/common/components/LinearSelector';
 import ExpandIcon from 'common/components/ExpandIcon';
-import { PathfinderLine } from '../PathfinderLine';
+import { List } from 'immutable';
+import * as _ from 'lodash';
+import * as React from 'react';
 import { FilterGroup, FilterLine } from '../PathfinderTypes';
+import TerrainComponent from './../../../../common/components/TerrainComponent';
 const CarrotIcon = require('images/icon_carrot.svg?name=CarrotIcon');
 const CloseIcon = require('images/icon_close_8x8.svg?name=CloseIcon');
 export interface Props

@@ -43,15 +43,11 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import createHistory from 'history/createBrowserHistory';
 import * as React from 'react';
-import { Redirect as RRedirect, Route, Router } from 'react-router-dom';
+import { Route, Router } from 'react-router-dom';
 
 import App from './App';
 import TerrainComponent from './common/components/TerrainComponent';
-
-import IntegrationEditorPage from './etl/integrations/components/IntegrationEditorPage';
-import IntegrationList from './etl/integrations/components/IntegrationList';
 
 class AppRouter extends TerrainComponent<{}> {
   public render()

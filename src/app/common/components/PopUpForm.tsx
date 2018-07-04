@@ -49,13 +49,11 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import Button from 'common/components/Button';
 import CheckBox from 'common/components/CheckBox';
-import Modal from 'common/components/Modal';
 import * as html2canvas from 'html2canvas';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import { Ajax } from 'util/Ajax';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
+import { backgroundColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';

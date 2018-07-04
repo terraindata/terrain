@@ -45,8 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import { EventEmitter } from 'events';
-import { Duplex, Transform, Writable } from 'stream';
-import * as winston from 'winston';
+import { Duplex, Writable } from 'stream';
+
+import { MidwayLogger } from '../../log/MidwayLogger';
 
 /**
  * Monitors progress of the writable stream
@@ -74,7 +75,7 @@ export default class ProgressStream extends Duplex
     this.writer = writer;
     this.writer.on('error', (e) =>
     {
-      winston.error(e.toString());
+      MidwayLogger.error(e.toString());
       this.errors++;
     });
 

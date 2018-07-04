@@ -47,7 +47,6 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as send from 'koa-send';
-import * as winston from 'winston'; // TODO remove when not needed
 
 import * as Util from './AppUtil';
 import * as AuthRouter from './auth/AuthRouter';

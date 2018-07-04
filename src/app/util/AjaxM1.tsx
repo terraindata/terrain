@@ -77,7 +77,6 @@ export const Ajax =
         urlArgs?: object;
       } = {}): XMLHttpRequest
     {
-      // NOTE: OLD_MIDWAY_HOST will be replaced by the build process.
       const host = config.host || '';
       let fullUrl = host + url;
 

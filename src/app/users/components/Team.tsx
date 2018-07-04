@@ -49,15 +49,12 @@ THE SOFTWARE.
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import TerrainTools from 'app/util/TerrainTools';
 import { AuthState } from 'auth/AuthTypes';
-import { Colors, fontColor } from 'colors/Colors';
+import { Colors } from 'colors/Colors';
 import { List } from 'immutable';
 import * as React from 'react';
-import { Link } from 'react-router-dom';
 import Util from 'util/Util';
-import CreateItem from '../../common/components/CreateItem';
 import Ajax from '../../util/Ajax';
 import * as UserTypes from '../UserTypes';
-import InfoArea from './../../common/components/InfoArea';
 import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import { UserActions as Actions } from './../data/UserRedux';

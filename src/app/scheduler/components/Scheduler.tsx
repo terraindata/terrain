@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as React from 'react';
 import { SchedulerActions } from 'scheduler/data/SchedulerRedux';
 import SchedulerApi from 'scheduler/SchedulerApi';

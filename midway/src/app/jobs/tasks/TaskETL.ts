@@ -45,13 +45,12 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as stream from 'stream';
-import * as winston from 'winston';
 
 import { TaskConfig } from 'shared/types/jobs/TaskConfig';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 import { templates } from '../../etl/TemplateRouter';
-import Templates from '../../etl/Templates';
 import LogStream from '../../io/streams/LogStream';
+import { MidwayLogger } from '../../log/MidwayLogger';
 import { Task } from '../Task';
 
 export class TaskETL extends Task
@@ -67,11 +66,13 @@ export class TaskETL extends Task
     {
       const taskOutputConfig: TaskOutputConfig =
         {
+          blocking: this.taskConfig.blocking,
           exit: false,
           options: {
             logStream: null,
             outputStream: null,
           },
+          rootLogStream: this.taskConfig.rootLogStream,
           status: true,
         };
 
@@ -79,30 +80,67 @@ export class TaskETL extends Task
       {
         const streams = await templates.executeETL(this.taskConfig['params']['options'],
           this.taskConfig['params']['options']['inputStreams']);
-        winston.info('finished executing ETL');
+        MidwayLogger.info('finished executing ETL');
         taskOutputConfig['options']['outputStream'] = streams['outputStream'];
         taskOutputConfig['options']['logStream'] = streams['logStream'];
-        resolve(taskOutputConfig);
+
+        taskOutputConfig['options']['logStream'].pipe(this.taskConfig.rootLogStream, { end: false });
+
+        if (taskOutputConfig.blocking !== true)
+        {
+          streams['logStream'].on('end', () =>
+          {
+            this.taskConfig.rootLogStream.decrement();
+          });
+          resolve(taskOutputConfig);
+        }
+        else
+        {
+          streams['logStream'].on('end', () =>
+          {
+            this.taskConfig.rootLogStream.decrement();
+            resolve(taskOutputConfig);
+          });
+          streams['outputStream'].resume();
+        }
       }
       catch (e)
       {
         taskOutputConfig.status = false;
-        winston.error('Error while running ETL task: ' + String(e.toString()));
+        MidwayLogger.error('Error while running ETL task: ' + String(e.toString()));
         const outputStream = new stream.Readable();
         outputStream.push(null);
         const logStream = new LogStream();
+        logStream.pipe(this.taskConfig.rootLogStream, { end: false });
         logStream.log('Error while running ETL task: ' + String(e.toString()), 'error');
+        this.taskConfig.rootLogStream.push(null);
         logStream.push(null);
         taskOutputConfig['options']['logStream'] = logStream;
         taskOutputConfig['options']['outputStream'] = outputStream;
-        resolve(taskOutputConfig);
+
+        if (taskOutputConfig.blocking !== true)
+        {
+          logStream.on('end', () =>
+          {
+            this.taskConfig.rootLogStream.decrement();
+          });
+          resolve(taskOutputConfig);
+        }
+        else
+        {
+          logStream.on('end', () =>
+          {
+            this.taskConfig.rootLogStream.decrement();
+            resolve(taskOutputConfig);
+          });
+        }
       }
     });
   }
 
   public async printNode(): Promise<TaskOutputConfig>
   {
-    winston.info('Printing ETL Task, params: ' + JSON.stringify(this.taskConfig.params as object));
+    MidwayLogger.info('Printing ETL Task, params: ' + JSON.stringify(this.taskConfig.params as object));
     return Promise.resolve(
       {
         exit: false,

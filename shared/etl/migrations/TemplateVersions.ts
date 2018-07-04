@@ -46,22 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
 import * as GraphLib from 'graphlib';
-import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
-import { _SinkConfig, _SourceConfig, ItemWithName, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'shared/etl/immutable/ETLProcessRecords';
-import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
-import { _ETLTemplate, ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
-import { _TemplateSettings, TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
-import { _TemplateUIData, TemplateUIData } from 'shared/etl/immutable/TemplateUIDataRecords';
-import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
-import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
-import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { _ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
+import { TemplateBase } from 'shared/etl/types/ETLTypes';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import { KeyPath } from 'shared/util/KeyPath';
 

@@ -45,33 +45,20 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-const { List, Map } = Immutable;
 
-import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { ETLTemplate, SinksMap, SourcesMap } from 'shared/etl/immutable/TemplateRecords';
+import { SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import LanguageController from 'shared/etl/languages/LanguageControllers';
-import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
-import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import { SchedulableSinks, SchedulableSources, Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
-import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
 import
 {
-  _ETLEdge,
-  _ETLNode,
-  _ETLProcess,
-  _MergeJoinOptions,
   ETLEdge,
   ETLNode,
-  ETLProcess,
-  MergeJoinOptions,
 } from 'shared/etl/immutable/ETLProcessRecords';
-import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
+import { NodeTypes } from 'shared/etl/types/ETLTypes';
 
 // There's a circular dependency between this class and ETLTemplate
 export default class TemplateUtil

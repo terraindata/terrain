@@ -52,7 +52,6 @@ import * as jsonfile from 'jsonfile';
 import * as puppeteer from 'puppeteer';
 import * as sleep from 'sleep';
 import * as request from 'supertest';
-import * as winston from 'winston';
 import ESInterpreter from '../shared/database/elastic/parser/ESInterpreter';
 import { login } from './FullstackUtils';
 

@@ -46,23 +46,20 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions
 
-import * as classNames from 'classnames';
 import * as cronParser from 'cron-parser';
 import { List } from 'immutable';
 import { noop } from 'lodash';
 import * as React from 'react';
 import
 {
-  CRONDaySchedule, CRONHourNames, CRONHourOptionsList, CRONHourSchedule,
-  CRONMinuteOptionsList, CRONMonthDayOptionsList, CRONWeekDayNames, CRONWeekDayOptionsList,
+  CRONDaySchedule, CRONHourNames, CRONHourOptionsList, CRONHourSchedule, CRONMonthDayOptionsList, CRONWeekDayNames, CRONWeekDayOptionsList,
 } from 'shared/util/CRONConstants';
 import
 {
   canParseCRONSchedule, parseCRONDaySchedule, parseCRONHourSchedule, setCRONDays,
   setCRONHours, setCRONType,
 } from 'shared/util/CRONParser';
-import Util from 'util/Util';
-import { borderColor, Colors, getStyle } from './../../colors/Colors';
+import { Colors, getStyle } from './../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './CRONEditorStyle.less';
 import FadeInOut from './FadeInOut';
@@ -76,6 +73,7 @@ export interface Props
 {
   cron: string;
   onChange: (cron: string) => void;
+  canEdit?: boolean;
 }
 
 const timezoneOffsetHours = (new Date()).getTimezoneOffset() / 60 - 420 / 60;
@@ -92,32 +90,48 @@ class CRONEditor extends TerrainComponent<Props>
         {
           this.renderHours()
         }
-        {
-          this.renderCustom()
-        }
-        <div className='note'>
-          Note: All times are in Pacific (Los Angeles)
-        </div>
-        {
-          timezoneOffsetHours !== 0 &&
-          <div className='note'>
-            Tip: Your local time is {Math.abs(timezoneOffsetHours)}
-            {timezoneOffsetHours < 0 ? ' ahead ' : ' behind '}
-            of Pacific time, so adjust your local time by {timezoneOffsetHours} hours.
+        <div className='cron-editor-footer'>
+          {
+            this.renderCustom()
+          }
+          <div className='cron-editor-notes'>
+            <div className='note'>
+              Note: All times are in Pacific (Los Angeles)
             </div>
-        }
-        <div className='note'>
-          Schedule will next be executed:
-        </div>
-        <div className='note cron-editor-bottom-note'>
-          <b>
             {
-              cronParser.parseExpression(this.props.cron, { tz: 'America/Los_Angeles' }).next().toDate().toString()
+              timezoneOffsetHours !== 0 &&
+              <div className='note'>
+                Tip: Your local time is {Math.abs(timezoneOffsetHours)}
+                {timezoneOffsetHours < 0 ? ' ahead ' : ' behind '}
+                of Pacific time, so adjust your local time by {timezoneOffsetHours} hours.
+                </div>
             }
-          </b>
+            <div className='note'>
+              Schedule will next be executed:
+              </div>
+            <div className='note cron-editor-bottom-note'>
+              <b>
+                {
+                  this.parseCron(this.props.cron)
+                }
+              </b>
+            </div>
+          </div>
         </div>
       </div>
     );
+  }
+
+  private parseCron(cron)
+  {
+    try
+    {
+      return cronParser.parseExpression(this.props.cron, { tz: 'America/Los_Angeles' }).next().toDate().toString();
+    }
+    catch (e)
+    {
+      return 'Invalid CRON';
+    }
   }
 
   private handleOptionClick(daysOrHours: 'days' | 'hours', type: string)
@@ -188,7 +202,7 @@ class CRONEditor extends TerrainComponent<Props>
     const sched = this.canRenderCRONSchedule() ? parseCRONDaySchedule(cron, true) : null;
 
     return [
-      this.renderHeader('Day'),
+      this.renderHeader('Which Day?'),
       this.renderOption('Every day', 'daily', sched, 'days'),
       this.renderOption('Every weekday', 'workweek', sched, 'days'),
 
@@ -196,7 +210,7 @@ class CRONEditor extends TerrainComponent<Props>
         <div key='w' style={getStyle('margin', '0px -3px')}>
           <Picker
             options={this.getCRONOptions(sched, 'weekdays', CRONWeekDayOptionsList, CRONWeekDayNames, true)}
-            canEdit={true}
+            canEdit={this.props.canEdit}
             circular={true}
             onSelect={this._fn(this.handleCRONValueSelect, 'days', 'weekdays')}
           />
@@ -207,7 +221,7 @@ class CRONEditor extends TerrainComponent<Props>
         <div key='m' style={getStyle('margin', '0px -3px')}>
           <Picker
             options={this.getCRONOptions(sched, 'days', CRONMonthDayOptionsList)}
-            canEdit={true}
+            canEdit={this.props.canEdit}
             onSelect={this._fn(this.handleCRONValueSelect, 'days', 'days')}
             rowSize={7}
           />
@@ -222,14 +236,14 @@ class CRONEditor extends TerrainComponent<Props>
     const sched = this.canRenderCRONSchedule() ? parseCRONHourSchedule(cron, true) : null;
 
     return [
-      this.renderHeader('Time'),
+      this.renderHeader('What Time?'),
       this.renderOption('Every minute', 'minute', sched, 'hours'),
       this.renderOption('Every hour', 'hourly', sched, 'hours',
         <div key='h' style={getStyle('margin', '0px -3px')}>
           <Picker
             options={this.getCRONOptions(sched, 'minutes', LimitedCRONMinuteOptionsList,
               LimitedCRONMinuteOptionsNames)}
-            canEdit={true}
+            canEdit={this.props.canEdit}
             onSelect={this._fn(this.handleCRONValueSelect, 'hours', 'minutes')}
             optionWidth={50}
           />
@@ -240,7 +254,7 @@ class CRONEditor extends TerrainComponent<Props>
         <div key='d' style={getStyle('margin', '0px -3px')}>
           <Picker
             options={this.getCRONOptions(sched, 'hours', CRONHourOptionsList, CRONHourNames, false)}
-            canEdit={true}
+            canEdit={this.props.canEdit}
             onSelect={this._fn(this.handleCRONValueSelect, 'hours', 'hours')}
             optionWidth={70}
           />
@@ -263,7 +277,7 @@ class CRONEditor extends TerrainComponent<Props>
             onChange={this.props.onChange}
             label={'CRON Schedule'}
             isTextInput={true}
-            canEdit={true}
+            canEdit={this.props.canEdit}
           />
         </div>
       </div>,

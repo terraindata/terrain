@@ -52,7 +52,6 @@ import { DropTarget } from 'react-dnd';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import './CardDragPreview.less';
 const classNames = require('classnames');
-import Util from 'util/Util';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { CardItem } from './CardComponent';

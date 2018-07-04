@@ -43,8 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
 import { BaseClass, New } from 'shared/util/Classes';
 
 // This module will contain all of the different 'types' (i.e. models) relevant to auth

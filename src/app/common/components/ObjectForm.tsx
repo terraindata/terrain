@@ -44,22 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
-import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
 import { instanceFnDecorator } from 'shared/util/Classes';
-import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
+import { borderColor, Colors, fontColor } from 'src/app/colors/Colors';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import Quarantine from 'util/RadiumQuarantine';
 
 import './ObjectForm.less';
@@ -71,6 +66,7 @@ interface Props
   keyName?: string;
   valueName?: string;
   onChange: (newValue: object, apply?: boolean) => void;
+  onSubmit?: () => void;
   label?: string;
 }
 
@@ -127,6 +123,7 @@ export default class ObjectForm extends TerrainComponent<Props>
             inputMap={this.rowInputMap}
             inputState={{ key, value }}
             onStateChange={this.rowChangeFactory(index)}
+            onTextInputEnter={this.props.onSubmit}
           />
           <Quarantine>
             <div
@@ -169,6 +166,7 @@ export default class ObjectForm extends TerrainComponent<Props>
             inputMap={this.rowInputMap}
             inputState={inputStateObj}
             onStateChange={this.rowChangeFactory(index)}
+            onTextInputEnter={this.props.onSubmit}
           />
           <Quarantine>
             <div

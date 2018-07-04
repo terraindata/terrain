@@ -82,4 +82,9 @@ export default class ETLRouteUtil
   {
     browserHistory.push(`/data/integrations/edit/integrationId=${integrationId}`);
   }
+
+  public static gotoEditSchedule(scheduleId)
+  {
+    browserHistory.push(`/data/schedules/edit/scheduleId=${scheduleId}`);
+  }
 }

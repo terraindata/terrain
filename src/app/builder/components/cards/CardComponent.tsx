@@ -80,7 +80,7 @@ import { ColorsActions } from '../../../colors/data/ColorsRedux';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
 
-const { List } = Immutable;
+import { List } from 'immutable';
 
 const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
 const HandleIcon = require('images/icon_more_12x3.svg?name=MoreIcon');

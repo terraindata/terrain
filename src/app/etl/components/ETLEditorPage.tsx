@@ -47,12 +47,9 @@ THE SOFTWARE.
 
 import Modal from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
-import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { withRouter } from 'react-router';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import { ETLActions } from 'etl/ETLRedux';
@@ -61,18 +58,13 @@ import { ETLState } from 'etl/ETLTypes';
 import ExecutionHelpers from 'etl/helpers/ExecutionHelpers';
 import Initializers from 'etl/helpers/TemplateInitializers';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
-import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { SchemaActions } from 'schema/data/SchemaRedux';
-import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { _ETLTemplate, ETLTemplate, getSourceFiles, restoreSourceFiles } from 'shared/etl/immutable/TemplateRecords';
-import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { ETLTemplate, getSourceFiles, restoreSourceFiles } from 'shared/etl/immutable/TemplateRecords';
+import { notificationManager } from './../../common/components/InAppNotification';
 
-const { List } = Immutable;
+import { List } from 'immutable';
 import './ETLEditorPage.less';
 
 export interface Props
@@ -150,6 +142,12 @@ class ETLEditorPage extends TerrainComponent<Props>
         {
           ETLRouteUtil.gotoEditTemplate(savedTemplate.id);
         }
+
+        notificationManager.addNotification(
+          'Template saved',
+          savedTemplate.templateName,
+          'info',
+        );
       }
       else
       {

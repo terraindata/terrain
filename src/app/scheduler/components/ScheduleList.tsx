@@ -43,40 +43,55 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-console strict-boolean-expressions no-var-requires
-import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
-import Colors, { backgroundColor, borderColor, fontColor, getStyle } from 'app/colors/Colors';
-import { ETLActions } from 'app/etl/ETLRedux';
-import { ETLState } from 'app/etl/ETLTypes';
+// tslint:disable:strict-boolean-expressions no-var-requires
+import EtlRouteUtil from 'app/etl/ETLRouteUtil';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
-import { _SchedulerConfig, scheduleForDatabase, SchedulerConfig, SchedulerState } from 'app/scheduler/SchedulerTypes';
+import { _SchedulerConfig, scheduleForDatabase, SchedulerConfig } from 'app/scheduler/SchedulerTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
-import { tooltip } from 'common/components/tooltip/Tooltips';
+import cronstrue from 'cronstrue';
+import { HeaderConfig, ItemList } from 'etl/common/components/ItemList';
 import * as Immutable from 'immutable';
-import { List, Map } from 'immutable';
-import * as _ from 'lodash';
+import { List } from 'immutable';
 import * as React from 'react';
-import SchedulerApi from 'scheduler/SchedulerApi';
-import XHR from 'util/XHR';
-import Schedule from './Schedule';
+import TaskEnum from 'shared/types/jobs/TaskEnum';
 import './Schedule.less';
 const RefreshIcon = require('images/icon_refresh.svg?name=RefreshIcon');
 
 export interface Props
 {
   schedules?: Immutable.Map<ID, SchedulerConfig>;
-  templates?: any;
-  etlActions?: typeof ETLActions;
   schedulerActions?: typeof SchedulerActions;
-  algorithms: Immutable.Map<ID, Algorithm>;
 }
 
 const INTERVAL = 60000;
 
 class ScheduleList extends TerrainComponent<Props>
 {
+  public displayConfig: HeaderConfig<SchedulerConfig> = [
+    {
+      name: 'ID',
+      render: (schedule, index) => schedule.id,
+      style: { width: `5%` },
+    },
+    {
+      name: 'Name',
+      render: (schedule, index) => schedule.name,
+      style: { width: `30%` },
+    },
+    {
+      name: 'Interval',
+      render: (schedule, index) => this.getIntervalDisplayName(schedule.cron),
+      style: { width: `35%` },
+    },
+    {
+      name: 'Status',
+      render: (schedule, index) => this.getScheduleStatus(schedule),
+      style: { width: '30%' },
+    },
+  ];
+
   public interval;
 
   public state: {
@@ -88,9 +103,6 @@ class ScheduleList extends TerrainComponent<Props>
   public componentWillMount()
   {
     this.getSchedules();
-    this.props.etlActions({
-      actionType: 'fetchTemplates',
-    });
     this.interval = setInterval(this.getSchedules, INTERVAL);
   }
 
@@ -106,12 +118,25 @@ class ScheduleList extends TerrainComponent<Props>
     });
   }
 
-  public handleScheduleChange(schedule: SchedulerConfig)
+  public getIntervalDisplayName(value)
   {
-    this.props.schedulerActions({
-      actionType: 'updateSchedule',
-      schedule: scheduleForDatabase(schedule) as SchedulerConfig,
-    });
+    try
+    {
+      return cronstrue.toString(value);
+    }
+    catch
+    {
+      return value;
+    }
+  }
+
+  public getScheduleStatus(schedule)
+  {
+    if (schedule.running)
+    {
+      return 'Running';
+    }
+    return schedule.shouldRunNext ? 'Enabled' : 'Disabled';
   }
 
   public createSchedule()
@@ -126,13 +151,14 @@ class ScheduleList extends TerrainComponent<Props>
           },
         },
         id: 0,
-        taskId: 2,
+        taskId: TaskEnum.taskETL,
+        name: 'Task 1',
       }],
-      isNew: true,
     };
     this.props.schedulerActions({
       actionType: 'createSchedule',
-      schedule: blankSchedule,
+      schedule: scheduleForDatabase(_SchedulerConfig(blankSchedule)) as SchedulerConfig,
+      onLoad: (schedule) => EtlRouteUtil.gotoEditSchedule(schedule.id),
     });
   }
 
@@ -144,60 +170,76 @@ class ScheduleList extends TerrainComponent<Props>
     });
   }
 
+  public handleOnClick(index: number)
+  {
+    const { schedules } = this.props;
+    const keys = schedules.keySeq().toList().sort();
+    const id = keys.get(index);
+    if (!schedules.get(id).running)
+    {
+      EtlRouteUtil.gotoEditSchedule(keys.get(index));
+    }
+  }
+
+  public getMenuActions(schedule: SchedulerConfig)
+  {
+    let actions = List([{
+      text: 'Duplicate',
+      onClick: this._fn(this.performAction, 'duplicateSchedule', schedule.id),
+    }]);
+    if (!schedule.running)
+    {
+      actions = actions.push({
+        text: 'Run Now',
+        onClick: this._fn(this.performAction, 'runSchedule', schedule.id),
+      }).push({
+        text: 'Delete',
+        onClick: this._fn(this.performAction, 'deleteSchedule', schedule.id),
+      });
+    }
+    else
+    {
+      actions = actions.push({
+        text: 'Pause',
+        onClick: this._fn(this.performAction, 'pauseSchedule', schedule.id),
+      });
+    }
+    if (schedule.shouldRunNext && !schedule.running)
+    {
+      actions = actions.push({
+        text: 'Disable',
+        onClick: this._fn(this.performAction, 'disableSchedule', schedule.id),
+      });
+    }
+    else
+    {
+      actions = actions.push({
+        text: 'Enable',
+        onClick: this._fn(this.performAction, 'enableSchedule', schedule.id),
+      });
+    }
+    return actions;
+  }
+
   public render()
   {
     const { schedules } = this.props;
     const keys = schedules.keySeq().toList().sort();
-    const scheduleList = keys.map((id) => schedules.get(id));
+    const scheduleList = keys.map((id) => schedules.get(id)).toList();
 
     return (
       <div
         className='schedule-list-wrapper'
-        style={backgroundColor(Colors().blockBg)}
       >
-        <div
-          className='schedule-list-header'
-        >
-          <div
-            className='schedule-list-refresh-wrapper'
-          >
-            {
-              tooltip(
-                <RefreshIcon
-                  className='schedule-list-refresh'
-                  style={getStyle('fill', Colors().iconColor)}
-                  onClick={this.getSchedules}
-                />,
-                'Refresh',
-              )
-            }
-          </div>
-        </div>
-        <div className='schedule-list-schedules-wrapper'>
-          {
-            scheduleList.map((schedule, i) =>
-              <Schedule
-                key={schedule.id}
-                schedule={schedule}
-                onDelete={this._fn(this.performAction, 'deleteSchedule')}
-                onRun={this._fn(this.performAction, 'runSchedule')}
-                onPause={this._fn(this.performAction, 'pauseSchedule')}
-                onUnpause={this._fn(this.performAction, 'unpauseSchedule')}
-                onDisable={this._fn(this.performAction, 'disableSchedule')}
-                onEnable={this._fn(this.performAction, 'enableSchedule')}
-                onChange={this.handleScheduleChange}
-                templates={this.props.templates}
-                algorithms={this.props.algorithms}
-                defaultOpen={schedule.isNew}
-              />,
-            )
-          }
-        </div>
-        <PathfinderCreateLine
-          text='Add Schedule'
-          canEdit={TerrainTools.isAdmin()}
+        <ItemList
+          items={scheduleList}
+          columnConfig={this.displayConfig}
+          onRowClicked={this.handleOnClick}
+          getMenuOptions={this.getMenuActions}
+          itemsName='schedule'
+          getActions={undefined}
+          canCreate={TerrainTools.isAdmin()}
           onCreate={this.createSchedule}
-          showText={true}
         />
       </div>
     );
@@ -207,12 +249,9 @@ class ScheduleList extends TerrainComponent<Props>
 export default Util.createContainer(
   ScheduleList,
   [
-    ['etl', 'templates'],
     ['scheduler', 'schedules'],
-    ['library', 'algorithms'],
   ],
   {
-    etlActions: ETLActions,
     schedulerActions: SchedulerActions,
   },
 );

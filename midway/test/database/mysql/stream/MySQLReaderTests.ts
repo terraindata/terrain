@@ -44,13 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as winston from 'winston';
-
 import BufferTransform from '../../../../src/app/io/streams/BufferTransform';
+import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 import MySQLConfig from '../../../../src/database/mysql/MySQLConfig';
 import MySQLReader from '../../../../src/database/mysql/streams/MySQLReader';
 
-(winston as any).level = 'debug';
+MidwayLogger.level = 'debug';
 
 const mysqlConfig: MySQLConfig =
   {

@@ -55,7 +55,6 @@ import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpre
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESParser from '../../../../shared/database/elastic/parser/ESParser';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
-import * as SharedUtil from '../../../../shared/Util';
 import { Input, isInput, toInputMap } from '../../../blocks/types/Input';
 
 export interface ESQueryObject

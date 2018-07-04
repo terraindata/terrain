@@ -48,9 +48,7 @@ THE SOFTWARE.
 
 import TransformUtil, { NUM_CURVE_POINTS } from 'app/util/TransformUtil';
 import Util from 'app/util/Util';
-import PathfinderLine from 'builder/components/pathfinder/PathfinderLine';
-import { PathToCards } from 'builder/components/pathfinder/PathToCards';
-import { List, Map } from 'immutable';
+import { List } from 'immutable';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as TerrainLog from 'loglevel';
@@ -61,9 +59,7 @@ import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONPa
 import ESJSONType from '../../../../../shared/database/elastic/parser/ESJSONType';
 import { ESJSParser } from '../../../../../shared/database/elastic/parser/ESJSParser';
 import ESParserError from '../../../../../shared/database/elastic/parser/ESParserError';
-import { index } from '../../../../../sigint/src/Demo';
-import { isInput, toInputMap } from '../../../../blocks/types/Input';
-import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
+import { toInputMap } from '../../../../blocks/types/Input';
 import { _FilterGroup, DistanceValue, FilterGroup, FilterLine, More, Path, Score, Script, Source } from './PathfinderTypes';
 
 export const PathFinderDefaultSize = 101;

@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
-import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import ElasticClient from '../../../database/elastic/client/ElasticClient';
 import ElasticReader from '../../../database/elastic/streams/ElasticReader';
 import SafeReadable from './SafeReadable';

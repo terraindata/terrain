@@ -46,16 +46,14 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires max-classes-per-file
 
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { borderColor, Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { RootPostProcessConfig } from 'shared/etl/immutable/EndpointRecords';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
@@ -63,20 +61,18 @@ import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCr
 
 import
 {
-  PostProcessAggregationTypes as AggregationTypes,
   PostProcessConfig,
   PostProcessOptionsDefaults,
-  PostProcessOptionsType,
   PostProcessTypes,
   RootPostProcessConfig as RootPostProcessConfigI,
 } from 'shared/etl/types/PostProcessTypes';
 
 import
 {
-  AggregateForm, AggregateState,
-  FilterForm, FilterState,
-  ParseForm, ParseState,
-  SortForm, SortState,
+  AggregateForm,
+  FilterForm,
+  ParseForm,
+  SortForm,
 } from 'etl/endpoints/PostProcessTypeForms';
 import { FormProps } from 'etl/endpoints/PostProcessTypeForms';
 
@@ -84,7 +80,7 @@ import Quarantine from 'util/RadiumQuarantine';
 
 const DeleteIcon = require('images/icon_close.svg');
 
-const { List } = Immutable;
+import { List } from 'immutable';
 
 export interface Props
 {

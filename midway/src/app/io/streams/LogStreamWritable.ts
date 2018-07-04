@@ -42,96 +42,93 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
 
-import dateFormat = require('date-format');
-import * as winston from 'winston';
+import { Writable } from 'stream';
 
-class MemoryTransport extends winston.Transport
+/**
+ * A log stream
+ */
+export default class LogStreamWritable extends Writable
 {
-  private msgs: any[];
-  private index: number;
-  private hasWrapped: boolean;
-  private maxMsgSize: number = 1000;
+  private buffers: any[];
+  private count: number;
+  private state: boolean;
 
-  constructor(options)
+  constructor(initialCount = 1)
   {
-    super(options);
+    super({ objectMode: true, highWaterMark: 0 });
 
-    this.name = 'MemoryTransport';
-    if (options != null && options.maxMsgSize != null)
+    this.buffers = [];
+
+    this.count = initialCount;
+
+    this.state = false;
+
+    this.on('pipe', (src) =>
     {
-      this.maxMsgSize = options.maxMsgSize;
-    }
+      this.increment();
+    });
 
-    this.index = 0;
-    this.hasWrapped = false;
-    this.msgs = new Array(this.maxMsgSize);
+    this.on('finish', () =>
+    {
+      this.state = true;
+    });
   }
 
-  public log(level: string, msg, meta, callback)
+  public _write(chunk: any, encoding: string, callback: (err?: Error) => void): void
   {
-    if (level === 'info' || level === 'warning' || level === 'error')
+    try
     {
-      const timestamp: string = dateFormat('yyyy-MM-dd hh:mm:ss.SSS ');
-      this.msgs[this.next()] = timestamp + level + ': ' + String(msg);
+      this.buffers.push(chunk);
+      callback();
     }
-    this.emit('logged');
-    callback(null, true);
+    catch (e)
+    {
+      this.emit('error', e);
+    }
   }
 
-  public getAll()
+  public _writev(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
   {
-    let msgStr;
-    if (!this.hasWrapped)
+    try
     {
-      msgStr = this.msgs.slice(0, this.index).join('\n');
+      this.buffers = this.buffers.concat(chunks);
+      callback();
     }
-    else
+    catch (e)
     {
-      msgStr = this.msgs.slice(this.index + 1).join('\n') + '\n' + this.msgs.slice(0, this.index).join('\n');
+      this.emit('error', e);
     }
-
-    return msgStr;
   }
 
-  private next()
+  public getBuffers(): any[]
   {
-    if (this.index === this.maxMsgSize - 1)
+    return this.buffers;
+  }
+
+  public getState(): boolean
+  {
+    return this.state;
+  }
+
+  public decrement()
+  {
+    if (this.state === false)
     {
-      this.index = 0;
-      this.hasWrapped = true;
+      this.count--;
+      if (this.count === 0)
+      {
+        this.end();
+      }
     }
-    else
+  }
+
+  public increment()
+  {
+    if (this.state === false)
     {
-      this.index++;
+      this.count++;
     }
-    return this.index;
   }
 }
-
-winston.transports['MemoryTransport'] = MemoryTransport;
-
-winston.configure(
-  {
-    transports:
-      [
-        new winston.transports.Console(
-          {
-            formatter: (options) =>
-            {
-              const message: string = options.message;
-              const level = winston.config.colorize(options.level);
-              const meta = (options.meta !== undefined) && (Object.keys(options.meta).length > 0) ? '\n\t' + JSON.stringify(options.meta)
-                : '';
-              return `${options.timestamp()} [${process.pid}] ${level}: ${message} ${meta}`;
-            },
-            timestamp: () =>
-            {
-              return dateFormat('yyyy-MM-dd hh:mm:ss.SSS');
-            },
-          },
-        ),
-        new (winston.transports['MemoryTransport'])(),
-      ],
-  });

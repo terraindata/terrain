@@ -46,19 +46,16 @@ THE SOFTWARE.
 
 import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 import SchedulerApi from 'scheduler/SchedulerApi';
 import
 {
   _SchedulerConfig,
   _SchedulerState,
-  scheduleForDatabase,
   SchedulerConfig,
   SchedulerState,
 } from 'scheduler/SchedulerTypes';
-import XHR from 'util/XHR';
-const { List, Map } = Immutable;
 import Util from 'util/Util';
+import XHR from 'util/XHR';
 
 export interface SchedulerActionTypes
 {
@@ -80,6 +77,7 @@ export interface SchedulerActionTypes
   createSchedule?: {
     actionType: 'createSchedule';
     schedule: any;
+    onLoad?: (schedule) => void;
   };
   createScheduleStart: {
     actionType: 'createScheduleStart';
@@ -289,7 +287,10 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
           actionType: 'createScheduleSuccess',
           schedule,
         });
-
+        if (action.onLoad)
+        {
+          action.onLoad(schedule);
+        }
         return Promise.resolve(schedule);
       });
   }
@@ -406,6 +407,7 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
       .then((response) =>
       {
         const schedule: SchedulerConfig = response.data[0];
+        schedule['running'] = true;
         directDispatch({
           actionType: 'updateScheduleSuccess',
           schedule,

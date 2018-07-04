@@ -44,17 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-import * as request from 'supertest';
-import { promisify } from 'util';
-import * as winston from 'winston';
-
 // import { App, Credentials, DB, Scheduler } from '../../src/app/App';
-import { App, DB } from '../../src/app/App';
-import ElasticConfig from '../../src/database/elastic/ElasticConfig';
-import ElasticController from '../../src/database/elastic/ElasticController';
-import ElasticDB from '../../src/database/elastic/tasty/ElasticDB';
-import * as Tasty from '../../src/tasty/Tasty';
 
 // let server;
 

@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as classNames from 'classnames';
-import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
@@ -115,6 +114,9 @@ class Menu extends TerrainComponent<Props & InjectedOnClickOutProps>
         event.preventDefault();
         event.stopPropagation();
         option.onClick(index, this.props.id);
+        this.setState({
+          open: false,
+        });
       };
     }
 

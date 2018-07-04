@@ -241,7 +241,7 @@ class Autocomplete extends TerrainComponent<Props>
     {
       this.props.onKeyDown(event);
     }
-    if (!this.props.options)
+    if (!this.props.options || (this.props.options && this.props.options.count() === 0))
     {
       // still be able to hit enter when there are no options
       if (event.keyCode === 13)
@@ -251,12 +251,12 @@ class Autocomplete extends TerrainComponent<Props>
           open: false,
         });
         this.blurValue = value;
-        this.props.onChange(value);
-        this.setState({
-          value,
-        });
-        this.props.onEnter && this.props.onEnter(value);
         this.refs['input']['blur']();
+        this.props.onChange(value);
+        this.setState(
+          { value },
+          () => this.props.onEnter && this.props.onEnter(value),
+        );
       }
       return;
     }

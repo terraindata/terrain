@@ -46,11 +46,10 @@ THE SOFTWARE.
 // tslint:disable:no-empty
 
 import SimpleTable from 'app/common/components/SimpleTable';
-import { mount, shallow } from 'enzyme';
+import { shallow } from 'enzyme';
 import * as Immutable from 'immutable';
-import { List, Map, Record } from 'immutable';
+import { Record } from 'immutable';
 import * as React from 'react';
-import { _SchedulerConfig } from 'scheduler/SchedulerTypes';
 
 describe('SimpleTable', () =>
 {

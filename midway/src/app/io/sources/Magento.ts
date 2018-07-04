@@ -52,10 +52,10 @@ import soap = require('strong-soap');
 import Bottleneck from 'bottleneck';
 import * as _ from 'lodash';
 import * as stream from 'stream';
-import * as winston from 'winston';
 
 import * as yadeep from '../../../../../shared/util/yadeep';
 import { Credentials } from '../../credentials/Credentials';
+import { MidwayLogger } from '../../log/MidwayLogger';
 import JSONTransform from '../streams/JSONTransform';
 import { ExportSourceConfig } from './Sources';
 
@@ -131,7 +131,7 @@ export class Magento
       });
       jsonParser.on('error', (err) =>
       {
-        winston.error(err);
+        MidwayLogger.error(err);
         throw err;
       });
     });
@@ -167,7 +167,7 @@ export class Magento
           const creds: string[] = await credentials.getAsStrings(magentoSourceConfig.credentialId, 'magento');
           if (creds.length === 0)
           {
-            winston.info('No credentials found for that credential ID.');
+            MidwayLogger.info('No credentials found for that credential ID.');
           }
           else
           {
@@ -213,12 +213,12 @@ export class Magento
                     const aggSecondObjLst: any[] = storedResult[i - aggOffset[0]];
                     if (!Array.isArray(aggSecondObjLst))
                     {
-                      winston.warn('Previous stored element is not an array.');
+                      MidwayLogger.warn('Previous stored element is not an array.');
                     }
                     if (deepCopyMagentoSourceConfig.url[0]['primaryKey'] === undefined
                       || !Array.isArray(deepCopyMagentoSourceConfig.url[0]['aggParams']))
                     {
-                      winston.warn('Requires primaryKey and an array of aggregation params');
+                      MidwayLogger.warn('Requires primaryKey and an array of aggregation params');
                     }
                     try
                     {
@@ -264,7 +264,7 @@ export class Magento
                     }
                     catch (e)
                     {
-                      winston.warn((e as any).toString() as string);
+                      MidwayLogger.warn((e as any).toString() as string);
                     }
                     break;
                   case 'getValuesAsElements':
@@ -292,12 +292,12 @@ export class Magento
                     const returnLst: object[] = [];
                     if (!Array.isArray(sumOffsetObjLst))
                     {
-                      winston.warn('Previous stored element is not an array.');
+                      MidwayLogger.warn('Previous stored element is not an array.');
                     }
                     if (deepCopyMagentoSourceConfig.url[0]['primaryKey'] === undefined
                       || deepCopyMagentoSourceConfig.url[0]['sumParam'] === undefined)
                     {
-                      winston.warn('Requires primaryKey and an array of sum params');
+                      MidwayLogger.warn('Requires primaryKey and an array of sum params');
                     }
                     try
                     {
@@ -336,7 +336,7 @@ export class Magento
                     }
                     catch (e)
                     {
-                      winston.warn((e as any).toString() as string);
+                      MidwayLogger.warn((e as any).toString() as string);
                     }
                     break;
                   case 'trim':
@@ -353,7 +353,7 @@ export class Magento
                     // dump the untrimmed dataset into an object for quick lookup
                     if (Array.isArray(deepCopyMagentoSourceConfig.data) === false)
                     {
-                      winston.warn('data is not an array.');
+                      MidwayLogger.warn('data is not an array.');
                     }
 
                     deepCopyMagentoSourceConfig.data.forEach((row) =>
@@ -510,12 +510,12 @@ export class Magento
                   }
                   catch (e)
                   {
-                    winston.warn((e as any).toString() as string);
+                    MidwayLogger.warn((e as any).toString() as string);
                   }
                 }
               }
               i++;
-              winston.info('Moving on to ' + i.toString() as string + '...');
+              MidwayLogger.info('Moving on to ' + i.toString() as string + '...');
             }
             return resolve(storedResult[storedResult.length - 1]);
           }
@@ -563,15 +563,15 @@ export class Magento
       {
         if (err)
         {
-          winston.info(err);
+          MidwayLogger.info(err);
         }
         let sessionId: string = '';
-        winston.info('creating SOAP client.');
+        MidwayLogger.info('creating SOAP client.');
         client.on('request', (body) =>
         {
-          winston.info('XML request:');
-          winston.info(body);
-          winston.info('end XML request');
+          MidwayLogger.info('XML request:');
+          MidwayLogger.info(body);
+          MidwayLogger.info('end XML request');
         });
         client['login']({ username: soapCreds['username'], apiKey: soapCreds['apiKey'] },
           async (errLogin, resultLogin, envLogin, soapHeaderLogin) =>
@@ -636,10 +636,10 @@ export class Magento
                       });
                     }
 
-                    winston.info('Request: ' + JSON.stringify(requestArgs));
+                    MidwayLogger.info('Request: ' + JSON.stringify(requestArgs));
                     limiter.submit(method, requestArgs, (error, result, envelope, soapHeader) =>
                     {
-                      winston.info('In callback GET ' + (callbackCounter.toString() as string)
+                      MidwayLogger.info('In callback GET ' + (callbackCounter.toString() as string)
                         + ' with request ' + JSON.stringify(requestArgs));
                       const sanitizedRequestArgs = _.cloneDeep(requestArgs);
                       delete sanitizedRequestArgs['sessionId'];
@@ -713,7 +713,7 @@ export class Magento
                     requestArgs['sessionId'] = sessionId;
                     limiter.submit(method, requestArgs, (error, result, envelope, soapHeader) =>
                     {
-                      winston.info('In callback POST ' + (callbackCounter.toString() as string)
+                      MidwayLogger.info('In callback POST ' + (callbackCounter.toString() as string)
                         + ' with request ' + JSON.stringify(requestArgs));
                       if (error)
                       {

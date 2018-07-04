@@ -52,7 +52,6 @@ THE SOFTWARE.
  * on all children.
  */
 import isPrimitive = require('is-primitive');
-import * as _ from 'lodash';
 import { KeyPath, WayPoint } from './KeyPath';
 
 /**

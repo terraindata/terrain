@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const no-var-requires
 import * as SpotlightTypes from 'app/builder/data/SpotlightTypes';
-import MapUtil from 'app/util/MapUtil';
 import Util from 'app/util/Util';
 import { List } from 'immutable';
 import * as _ from 'lodash';
@@ -54,7 +53,6 @@ import * as React from 'react';
 import MapComponent from '../../common/components/MapComponent';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import BuilderActions from '../data/BuilderActions';
-import { BuilderState } from '../data/BuilderState';
 
 const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 

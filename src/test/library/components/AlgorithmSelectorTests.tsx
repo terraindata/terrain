@@ -47,12 +47,8 @@ THE SOFTWARE.
 
 import { DynamicForm } from 'app/common/components/DynamicForm';
 import { AlgorithmSelectorUncontained as AlgorithmSelector } from 'app/library/components/AlgorithmSelector';
-import Util from 'app/util/Util';
-import { mount, shallow } from 'enzyme';
-import * as Immutable from 'immutable';
+import { shallow } from 'enzyme';
 import { List, Map } from 'immutable';
-import * as LibraryTypes from 'library/LibraryTypes';
-import { _LibraryState, LibraryState } from 'library/LibraryTypes';
 import * as React from 'react';
 import LibraryHelper from 'test-helpers/LibraryHelper';
 

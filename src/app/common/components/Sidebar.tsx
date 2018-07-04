@@ -49,18 +49,11 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import AccountDropdown from 'common/components/AccountDropdown';
 import Button from 'common/components/Button';
-import CheckBox from 'common/components/CheckBox';
-import Modal from 'common/components/Modal';
 import PopUpForm from 'common/components/PopUpForm';
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateList';
-import * as html2canvas from 'html2canvas';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import * as request from 'request';
-import { Ajax } from 'util/Ajax';
-import { AuthState } from '../../auth/AuthTypes';
 import { backgroundColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import TerrainComponent from '../../common/components/TerrainComponent';
@@ -332,7 +325,6 @@ export class Sidebar extends TerrainComponent<Props>
                 key='reportImage'
               />
           }
-
           {
             this.props.expanded ?
               <div className='sidebar-button sidebar-feedback-button'>

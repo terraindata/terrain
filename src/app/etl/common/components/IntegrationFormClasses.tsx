@@ -45,27 +45,22 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires max-classes-per-file strict-boolean-expressions
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import ObjectForm from 'common/components/ObjectForm';
-import { instanceFnDecorator } from 'shared/util/Classes';
 
-import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
+import { List } from 'immutable';
+import { IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 import { AuthConfigType, ConnectionConfigType, Integrations } from 'shared/etl/types/IntegrationTypes';
-const { List } = Immutable;
 
 export interface Props
 {
   integration: IntegrationConfig;
   onChange: (newIntegration: IntegrationConfig, apply?: boolean) => void;
+  onSubmit?: () => void;
 }
 
 abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props = Props> extends TerrainComponent<P>
@@ -114,11 +109,13 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
           inputMap={this.authMap}
           inputState={authState}
           onStateChange={this.handleAuthFormChange}
+          onTextInputEnter={this.props.onSubmit}
         />
         <DynamicForm
           inputMap={this.connectionMap}
           inputState={connectionState}
           onStateChange={this.handleConnectionFormChange}
+          onTextInputEnter={this.props.onSubmit}
         />
       </div>
     );
@@ -224,7 +221,8 @@ class HttpForm extends IntegrationFormBase<HttpAuthT, HttpConnectionT>
   public authMap: InputDeclarationMap<HttpAuthT> = {
     jwt: {
       type: DisplayType.TextBox,
-      displayName: 'JSON Web Token',
+      displayName: 'Authorization Header',
+      help: 'Example: Basic aCBdefGhijklMNOpQRStUVwx=',
     },
   };
 
@@ -266,6 +264,7 @@ class HttpForm extends IntegrationFormBase<HttpAuthT, HttpConnectionT>
         object={state.headers != null ? state.headers : {}}
         onChange={this.handleHeadersChange}
         label='Headers'
+        onSubmit={this.props.onSubmit}
       />
     );
   }
@@ -285,6 +284,7 @@ class HttpForm extends IntegrationFormBase<HttpAuthT, HttpConnectionT>
         object={state.params != null ? state.params : {}}
         onChange={this.handleParamsChange}
         label='Parameters'
+        onSubmit={this.props.onSubmit}
       />
     );
   }
@@ -408,14 +408,15 @@ class GoogleAnalyticsForm extends IntegrationFormBase<GoogleAnalyticsAuthT, Goog
   public authMap: InputDeclarationMap<GoogleAnalyticsAuthT> = {
     privateKey: {
       type: DisplayType.TextBox,
-      displayName: 'Private Key',
+      displayName: 'P12 key associated with the service account. Should begin with ‘-----Begin RSA PRIVATE KEY…’',
     },
   };
 
   public connectionMap: InputDeclarationMap<GoogleAnalyticsConnectionT> = {
     email: {
       type: DisplayType.TextBox,
-      displayName: 'Email',
+      displayName: 'Service Account Email',
+      help: 'Example: terrain@terrain.iam.gserviceaccount.com',
     },
     metrics: {
       type: DisplayType.Custom,
@@ -452,6 +453,7 @@ class GoogleAnalyticsForm extends IntegrationFormBase<GoogleAnalyticsAuthT, Goog
     viewId: {
       type: DisplayType.NumberBox,
       displayName: 'View Id',
+      help: 'View Id for a specific analytics dashboard',
     },
   };
 
@@ -479,6 +481,7 @@ class GoogleAnalyticsForm extends IntegrationFormBase<GoogleAnalyticsAuthT, Goog
         valueName='expression'
         onChange={this.handleMetricsChange}
         label='Metrics'
+        onSubmit={this.props.onSubmit}
       />
     );
   }

@@ -45,12 +45,13 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as bcrypt from 'bcrypt';
-import * as winston from 'winston';
 
 import srs = require('secure-random-string');
+
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import * as Util from '../AppUtil';
+import { MidwayLogger } from '../log/MidwayLogger';
 import UserConfig from './UserConfig';
 
 export class Users
@@ -178,13 +179,13 @@ export class Users
 
   public async loginWithEmail(email: string, password: string): Promise<UserConfig | null>
   {
-    winston.info('Logging in with email ' + email);
+    MidwayLogger.info('Logging in with email ' + email);
     return new Promise<UserConfig | null>(async (resolve, reject) =>
     {
       const results = await this.select([], { email });
       if (results.length === 0)
       {
-        winston.info('None');
+        MidwayLogger.info('None');
         return resolve(null);
       }
       else
@@ -192,7 +193,7 @@ export class Users
         const user: UserConfig = results[0];
         if (user.accessToken === undefined)
         {
-          winston.info('No access token');
+          MidwayLogger.info('No access token');
           return resolve(null);
         }
         const passwordsMatch: boolean = await this.comparePassword(password, user.password);
@@ -206,12 +207,12 @@ export class Users
               });
             await this.upsert(user);
           }
-          winston.info('User');
+          MidwayLogger.info('User');
           resolve(user);
         }
         else
         {
-          winston.info('Wrong password');
+          MidwayLogger.info('Wrong password');
           resolve(null);
         }
       }

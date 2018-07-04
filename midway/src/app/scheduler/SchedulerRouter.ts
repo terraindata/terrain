@@ -51,7 +51,6 @@ import * as App from '../App';
 import * as AppUtil from '../AppUtil';
 import { Permissions } from '../permissions/Permissions';
 import UserConfig from '../users/UserConfig';
-import Scheduler from './Scheduler';
 import SchedulerConfig from './SchedulerConfig';
 
 const Router = new KoaRouter();

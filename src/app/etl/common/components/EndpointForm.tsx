@@ -45,21 +45,17 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { EndpointTypeNames, SchedulableSinks, SchedulableSources, Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormLookups';
 
@@ -70,13 +66,14 @@ import { ETLActions } from 'etl/ETLRedux';
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 import { Integrations } from 'shared/etl/types/IntegrationTypes';
 
-const { List, Map } = Immutable;
+import { List, Map } from 'immutable';
 
 export interface Props
 {
   isSource: boolean;
   endpoint: SourceConfig | SinkConfig;
   onChange: (newEndpoint: SourceConfig | SinkConfig, apply?: boolean) => void;
+  onSubmit?: () => void;
   hideTypePicker?: boolean;
   isSchedule?: boolean;
   integrations?: IMMap<ID, IntegrationConfig>;
@@ -207,6 +204,7 @@ class EndpointForm extends TerrainComponent<Props>
               inputMap={mapToUse}
               inputState={this.typeValueToState(endpoint)}
               onStateChange={this.handleTypeChange}
+              onTextInputEnter={this.props.onSubmit}
             />
         }
         { // integration form

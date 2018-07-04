@@ -44,18 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console strict-boolean-expressions
-import Colors, { backgroundColor, borderColor } from 'app/colors/Colors';
+import { backgroundColor } from 'app/colors/Colors';
 import Button from 'app/common/components/Button';
 import { ETLActions } from 'app/etl/ETLRedux';
-import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
 import IntegrationForm from 'etl/common/components/IntegrationForm';
-import { List, Map } from 'immutable';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
+import { Map } from 'immutable';
 import * as React from 'react';
-import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
+import { IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 
 export interface Props
 {
@@ -156,6 +153,7 @@ class IntegrationEditorPage extends TerrainComponent<Props>
         <IntegrationForm
           integration={integration}
           onChange={this.handleIntegrationChange}
+          onSubmit={this.save}
         />
         <div
           className='integration-buttons'

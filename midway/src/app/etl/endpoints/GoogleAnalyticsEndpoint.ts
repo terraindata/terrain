@@ -46,20 +46,12 @@ THE SOFTWARE.
 
 import * as googleoauthjwt from 'google-oauth-jwt';
 import * as _ from 'lodash';
-import { PassThrough, Readable, Writable } from 'stream';
-import * as winston from 'winston';
+import { Readable, Writable } from 'stream';
 
 import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
-import
-{
-  PostProcessConfig,
-  PostProcessOptionsTypes,
-  PostProcessTypes,
-} from 'shared/etl/types/PostProcessTypes';
+import { MidwayLogger } from '../../log/MidwayLogger';
 
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
-import IntegrationConfig from '../../integrations/IntegrationConfig';
-import { integrations } from '../../integrations/IntegrationRouter';
 import JSONTransform from '../../io/streams/JSONTransform';
 import AEndpointStream from './AEndpointStream';
 
@@ -145,7 +137,7 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
       const dayInterval: number = gaSource.options['dayInterval'];
       if (dayInterval === undefined || typeof dayInterval !== 'number')
       {
-        winston.warn('Day interval must be specified in numerical format');
+        MidwayLogger.warn('Day interval must be specified in numerical format');
       }
       const currDate: any = new Date(Date.now() - 1000 * 3600 * 24);
 
@@ -213,8 +205,8 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
 
       const analyticsBatchGet = (analyticsBodyPassed) =>
       {
-        winston.info(gaConfig['email']);
-        winston.info('<redacted private key contents>');
+        MidwayLogger.info(gaConfig['email']);
+        MidwayLogger.info('<redacted private key contents>');
         request(
           {
             method: gaConfig['method'] != null ? gaConfig['method'] : 'POST',
@@ -231,10 +223,10 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
           {
             if (err !== null && err !== undefined)
             {
-              winston.warn(gaConfig['email']);
-              winston.warn(gaConfigPrivateKey);
-              winston.warn('<redacted private key contents>');
-              winston.warn(err);
+              MidwayLogger.warn(gaConfig['email']);
+              MidwayLogger.warn(gaConfigPrivateKey);
+              MidwayLogger.warn('<redacted private key contents>');
+              MidwayLogger.warn(err);
             }
             try
             {
@@ -263,7 +255,7 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
               constructedHeader = true;
               if (report['nextPageToken'] !== undefined)
               {
-                winston.info('Fetching the next page of reports... pageToken ' + report.nextPageToken);
+                MidwayLogger.info('Fetching the next page of reports... pageToken ' + report.nextPageToken);
                 analyticsBodyPassed['reportRequests'][0]['pageToken'] = report.nextPageToken;
                 analyticsBatchGet(analyticsBodyPassed);
               }
@@ -274,8 +266,8 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
             }
             catch (e)
             {
-              winston.warn(potentialError);
-              winston.info('Potentially incorrect credentials. Caught error: ' + (e.toString() as string));
+              MidwayLogger.warn(potentialError);
+              MidwayLogger.info('Potentially incorrect credentials. Caught error: ' + (e.toString() as string));
               throw new Error('Potentially incorrect Google API credentials.');
             }
           });

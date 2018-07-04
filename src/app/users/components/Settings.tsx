@@ -66,7 +66,6 @@ import Ajax from '../../util/Ajax';
 import TerrainTools from '../../util/TerrainTools';
 import { UserActions as Actions } from '../data/UserRedux';
 import * as UserTypes from '../UserTypes';
-import AccountEntry from './AccountEntry';
 import Section from './AccountSection';
 import PasswordStrengthInput from './PasswordStrengthInput';
 const moment = require('moment-timezone');
@@ -444,6 +443,7 @@ class Settings extends TerrainComponent<Props>
             value={this.state.newEmail}
             onChange={this.updateNewEmail}
             className='settings-input password-input'
+            onKeyDown={Util.onEnter(this.changeEmail)}
           />
           <div className='settings-white-space' />
         </div>

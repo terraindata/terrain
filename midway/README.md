@@ -130,8 +130,8 @@ test('GET /midway/v1/schema', (t) =>
 
 ### Back-end
 
-* Anything from `winston.info` will logged to your terminal in the same process (you will need to
-  `import * as winston from 'winston';`).
+* Anything from `MidwayLogger.info` will logged to your terminal in the same process (you will need to
+  `import { MidwayLogger } from 'src/app/log/MidwayLogger';`).
 * Please post any other debugging tips here.
 
 ## Troubleshooting

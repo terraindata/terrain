@@ -44,13 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
-import * as Immutable from 'immutable';
 import
 {
   _SchedulerState,
-  SchedulerState,
 } from 'scheduler/SchedulerTypes';
-import { ItemType } from '../../items/types/Item';
 
 export default class SchedulerHelper
 {
