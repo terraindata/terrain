@@ -65,7 +65,7 @@ Router.post('/', async (ctx, next) =>
   recoveryTokens.initialize();
   const allRecoveryTokens: RecoveryTokensConfig[] = await recoveryTokens.select([], {}) as RecoveryTokenConfig[];
   const allUsers: UserConfig[] = await users.select([], {}) as UserConfig[];
-  for (const index in allRecoveryTokens)
+  for (let index in allRecoveryTokens)
   {
     if (allRecoveryTokens[index]['token'] === token)
     {
@@ -114,7 +114,7 @@ Router.get('/:token', async (ctx, next) =>
   let tokenFound: boolean = false;
   recoveryTokens.initialize();
   const allRecoveryTokens: RecoveryTokensConfig[] = await recoveryTokens.select([], {}) as RecoveryTokenConfig[];
-  for (const index in allRecoveryTokens)
+  for (let index in allRecoveryTokens)
   {
     if (allRecoveryTokens[index]['token'] === token)
     {
