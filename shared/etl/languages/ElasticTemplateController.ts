@@ -59,6 +59,7 @@ import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 import { DefaultController } from './DefaultTemplateController';
+import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 
 import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 
@@ -137,6 +138,15 @@ class ElasticController extends DefaultController implements LanguageInterface
 
   public *getFieldErrors(engine: TransformationEngine, sink: SinkConfig, existingMapping?: object)
   {
+    let mappingToCompare;
+    if (sink.type === Sinks.Database
+      && existingMapping !== undefined
+      && existingMapping[sink.options.table] !== undefined
+    )
+    {
+      mappingToCompare = existingMapping[sink.options.table];
+    }
+
     const ids = engine.getAllFieldIDs();
     for (const id of ids.values() as IterableIterator<number>) // cannot use forEach inside iterator
     {
@@ -153,10 +163,12 @@ class ElasticController extends DefaultController implements LanguageInterface
           } as FieldVerification);
         }
       }
-      else
+      if (existingMapping !== undefined)
       {
-        yield null; // since we can't yield like in node
+        // const { valid, message } = ElasticMapping.compareSingleField(engine, id, existingMapping);
       }
+      yield null; // since we can't yield like in node
+
     }
   }
 }

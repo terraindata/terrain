@@ -60,6 +60,8 @@ import Util from 'util/Util';
 
 import Modal from 'common/components/Modal';
 
+import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
+import { ETLActions } from 'etl/ETLRedux';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 
@@ -72,6 +74,7 @@ export interface Props
   // below from container
   templateEditor?: TemplateEditorState;
   editorAct?: typeof TemplateEditorActions;
+  etlAct?: typeof ETLActions;
 }
 
 const reverifyDelay = 500;
@@ -208,6 +211,28 @@ class VerificationManager extends TerrainComponent<Props>
     });
   }
 
+  private getMapping(sink): Promise<object>
+  {
+    return new Promise<object>((resolve, reject) => {
+      if (sink.type === Sinks.Database)
+      {
+        const serverId = sink.options.serverId;
+        const database = sink.options.database;
+        this.props.etlAct({
+          actionType: 'getMapping',
+          serverId,
+          database,
+          onLoad: resolve,
+          onError: reject,
+        });
+      }
+      else
+      {
+        resolve(undefined);
+      }
+    });
+  }
+
   private iterateOverVerifications(): Promise<List<FieldVerification>>
   {
     return new Promise<List<FieldVerification>>(async (resolve, reject) => {
@@ -218,7 +243,9 @@ class VerificationManager extends TerrainComponent<Props>
       const template = templateEditor.template;
       const sink = template.getDefaultSink();
       const verifications = [];
-      for (const verification of controller.getFieldErrors(engine, sink))
+      const mapping = await this.getMapping(sink);
+
+      for (const verification of controller.getFieldErrors(engine, sink, mapping))
       {
         if (!this.isComputing)
         {
@@ -229,6 +256,10 @@ class VerificationManager extends TerrainComponent<Props>
           verifications.push(verification);
         }
         await sleep(sleepTime);
+      }
+      if (!this.isComputing)
+      {
+        return reject('Computation was aborted');
       }
       return resolve(List(verifications));
     });
@@ -250,5 +281,6 @@ export default Util.createContainer(
   ['templateEditor'],
   {
     editorAct: TemplateEditorActions,
+    etlAct: ETLActions,
   },
 );

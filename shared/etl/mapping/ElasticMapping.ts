@@ -170,6 +170,23 @@ export class ElasticMapping
     return result;
   }
 
+  protected static getElasticProps(fieldID: number, engine: TransformationEngine): ElasticFieldProps
+  {
+    const props: Partial<ElasticFieldProps> = engine.getFieldProp(fieldID, elasticPropPath);
+    return defaultProps(props);
+  }
+
+  // converts engine keypaths to keypaths in the elastic mapping
+  // e.g. ['foo', 'bar'] to ['properties', 'foo', 'properties', 'bar']
+  // e.g. ['foo', '0', 'bar'] to ['properties', 'foo', 'properties', 'bar']
+  // e.g. ['foo', '*'] to ['properties', 'foo']
+  protected static enginePathToMappingPath(path: EnginePath): EnginePath
+  {
+    return path.flatMap(
+      (value, i) => EngineUtil.isNamedField(path, i) ? ['properties', value] : [],
+    ).toList() as EnginePath;
+  }
+
   private errors: string[] = [];
   private pathSchema: PathHashMap<{
     type: ElasticTypes,
@@ -280,21 +297,9 @@ export class ElasticMapping
     return EngineUtil.getETLFieldType(fieldID, this.engine);
   }
 
-  // converts engine keypaths to keypaths in the elastic mapping
-  // e.g. ['foo', 'bar'] to ['properties', 'foo', 'properties', 'bar']
-  // e.g. ['foo', '0', 'bar'] to ['properties', 'foo', 'properties', 'bar']
-  // e.g. ['foo', '*'] to ['properties', 'foo']
-  protected enginePathToMappingPath(path: EnginePath): EnginePath
-  {
-    return path.flatMap(
-      (value, i) => EngineUtil.isNamedField(path, i) ? ['properties', value] : [],
-    ).toList() as EnginePath;
-  }
-
   protected getElasticProps(fieldID: number): ElasticFieldProps
   {
-    const props: Partial<ElasticFieldProps> = this.engine.getFieldProp(fieldID, elasticPropPath);
-    return defaultProps(props);
+    return ElasticMapping.getElasticProps(fieldID, this.engine);
   }
 
   protected clearGeopointMappings(disabledFields: { [k: number]: boolean })
@@ -314,7 +319,7 @@ export class ElasticMapping
       else
       {
         const okp = this.engine.getOutputKeyPath(id);
-        const cleanedPath = this.enginePathToMappingPath(okp).toJS();
+        const cleanedPath = ElasticMapping.enginePathToMappingPath(okp).toJS();
         const fieldMapping = _.get(this.mapping, cleanedPath);
         const newFieldMapping = _.omit(fieldMapping, ['properties']);
         _.set(this.mapping, cleanedPath, newFieldMapping);
@@ -326,7 +331,7 @@ export class ElasticMapping
   {
     const config = this.getTypeConfig(id);
     const enginePath = this.engine.getOutputKeyPath(id);
-    const cleanedPath = this.enginePathToMappingPath(enginePath);
+    const cleanedPath = ElasticMapping.enginePathToMappingPath(enginePath);
     const hashed = EngineUtil.hashPath(cleanedPath);
 
     if (config !== null)
