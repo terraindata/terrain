@@ -82,7 +82,7 @@ export class DefaultController implements LanguageInterface
 
   public *getFieldErrors(engine: TransformationEngine, sink, options?)
   {
-    return;
+    return undefined;
   }
 }
 

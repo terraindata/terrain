@@ -53,15 +53,17 @@ import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import LanguageController, { FieldVerification } from 'shared/etl/languages/LanguageControllers';
+import { instanceFnDecorator } from 'shared/util/Classes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
-import { instanceFnDecorator } from 'shared/util/Classes';
-import LanguageController, { FieldVerification } from 'shared/etl/languages/LanguageControllers';
 
 import Modal from 'common/components/Modal';
 
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
+
+const { List } = Immutable;
 
 import './EditorActionsSection.less';
 
@@ -72,7 +74,7 @@ export interface Props
   editorAct?: typeof TemplateEditorActions;
 }
 
-const reverifyDelay = 2000;
+const reverifyDelay = 500;
 const sleepTime = 1;
 
 /*
@@ -125,30 +127,83 @@ class VerificationManager extends TerrainComponent<Props>
     this.computeVerifications();
   }
 
-  private buildVerificationMap(verifications: List<FieldVerification>): Immutable.Map<number, List<FieldVerification>>
+  private updateVerificationMap(verifications: List<FieldVerification>): Immutable.Map<number, List<FieldVerification>>
   {
-    return null;
+    const { uiState } = this.props.templateEditor;
+    let existingMap = uiState.fieldVerifications;
+    const newMap = {};
+    verifications.forEach((ver) => {
+      const currArr: FieldVerification[] = _.get(newMap, ver.fieldId, []) as any;
+      currArr.push(ver);
+      newMap[ver.fieldId] = currArr;
+    });
+
+    const compareVerLists = (existing: List<FieldVerification>, newItems: FieldVerification[]) =>
+    {
+      if (existing.size !== newItems.length)
+      {
+        return false;
+      }
+      for (let i = 0; i < existing.size; i++)
+      {
+        const v1 = existing.get(i);
+        const v2 = newItems[i];
+        if ((v1.fieldId !== v2.fieldId) ||
+          (v1.message !== v2.message) ||
+          (v1.type !== v2.type))
+        {
+          return false;
+        }
+      }
+      return true;
+    };
+
+    const idsToDelete: number[] = [];
+    const idsToUpdate: number[] = [];
+    existingMap.forEach((vers, id) => {
+      if (newMap[id] === undefined)
+      {
+        idsToDelete.push(id);
+      }
+      else if (!compareVerLists(vers, newMap[id]))
+      {
+        idsToUpdate.push(id);
+      }
+    });
+    for (const id of Object.keys(newMap))
+    {
+      if (!existingMap.has(Number(id)))
+      {
+        idsToUpdate.push(Number(id));
+      }
+    }
+
+    for (const id of idsToDelete)
+    {
+      existingMap = existingMap.delete(id);
+    }
+    for (const id of idsToUpdate)
+    {
+      existingMap = existingMap.set(id, newMap[id]);
+    }
+    return existingMap;
   }
 
   @instanceFnDecorator(_.debounce, reverifyDelay)
   private computeVerifications()
   {
-    const { templateEditor } = this.props;
-    const lang = templateEditor.template.getEdgeLanguage(templateEditor.getCurrentEdgeId());
-    const controller = LanguageController.get(lang);
+    this.isComputing = true;
     this.iterateOverVerifications().then((verifications) => {
-      const verificationMap = this.buildVerificationMap(verifications);
+      this.isComputing = false;
+      const verificationMap = this.updateVerificationMap(verifications);
       this.props.editorAct({
         actionType: 'setDisplayState',
         state: {
-          fieldVerifications: verifications,
-        }
+          fieldVerifications: verificationMap,
+        },
       });
-      this.isComputing = false;
     }).catch((ev) => {
-      // this should not happen?
-      // tslint:disable-next-line
-      console.error(ev);
+      // computation was canceled
       this.isComputing = false;
     });
   }
@@ -156,7 +211,26 @@ class VerificationManager extends TerrainComponent<Props>
   private iterateOverVerifications(): Promise<List<FieldVerification>>
   {
     return new Promise<List<FieldVerification>>(async (resolve, reject) => {
-
+      const { templateEditor } = this.props;
+      const lang = templateEditor.template.getEdgeLanguage(templateEditor.getCurrentEdgeId());
+      const controller = LanguageController.get(lang);
+      const engine = templateEditor.getCurrentEngine();
+      const template = templateEditor.template;
+      const sink = template.getDefaultSink();
+      const verifications = [];
+      for (const verification of controller.getFieldErrors(engine, sink))
+      {
+        if (!this.isComputing)
+        {
+          return reject('Computation was aborted');
+        }
+        if (verification !== null)
+        {
+          verifications.push(verification);
+        }
+        await sleep(sleepTime);
+      }
+      return resolve(List(verifications));
     });
   }
 
@@ -164,6 +238,11 @@ class VerificationManager extends TerrainComponent<Props>
   {
     (this.computeVerifications as any).cancel();
   }
+}
+
+function sleep(ms)
+{
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export default Util.createContainer(

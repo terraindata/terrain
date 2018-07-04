@@ -57,10 +57,10 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { FieldVerification } from 'shared/etl/languages/LanguageControllers';
 import Menu from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
+import { FieldVerification } from 'shared/etl/languages/LanguageControllers';
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
@@ -229,6 +229,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
   public renderVerifications()
   {
     const verifications: List<FieldVerification> = this._getFieldVerifications();
+
     if (verifications === undefined)
     {
       return null;
@@ -254,7 +255,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
                 title: `${type === 'error' ? 'Error' : 'Warning'}: ${message}`,
                 theme: type === 'error' ? 'error' : undefined,
                 key,
-              }
+              },
             )
           }
         </div>
