@@ -127,11 +127,11 @@ export const _TaskConfig =
 
 export interface ParamConfigTypes
 {
-  [TaskEnum.taskDefaultExit]: {
+  0: { // TaskEnum.taskDefaultExit
   };
-  [TaskEnum.taskDefaultFailure]: {
+  1: { // TaskEnum.taskDefaultFailure
   };
-  [TaskEnum.taskETL]: {
+  2: { // TaskEnum.taskETL
     templateId?: string | number;
     overrideSources?: Immutable.Map<ID, SourceConfig>;
     overrideSinks?: Immutable.Map<ID, SinkConfig>;
