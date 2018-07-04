@@ -49,7 +49,6 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
