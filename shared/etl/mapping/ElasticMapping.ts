@@ -151,23 +151,67 @@ export class ElasticMapping
       }
       else
       {
-        if (toCompareConfig['type'] !== existingConfig['type'])
+        const { valid, message } = ElasticMapping.compareConfigs(toCompareConfig, existingConfig, kp);
+        if (!valid)
         {
           result.hasConflicts = true;
-          const message = `Type conflict for field ${humanReadablePathName(kp, true)}. ` +
-            `Type '${toCompareConfig['type']}'' does not match type '${existingConfig['type']}'.`;
-          result.conflicts.push(message);
-        }
-        else if (toCompareConfig['analyzer'] !== toCompareConfig['analyzer'])
-        {
-          result.hasConflicts = true;
-          const message = `Type conflict for field ${humanReadablePathName(kp, true)}. ` +
-            `Analyzer '${toCompareConfig['analyzer']}' does not match Analyzer '${existingConfig['analyzer']}'.`;
           result.conflicts.push(message);
         }
       }
     }
     return result;
+  }
+
+  public static compareSingleField(fieldID: number, engine: TransformationEngine, existingMapping: MappingType)
+    : { valid: boolean, message?: string }
+  {
+    const toCompareConfig = ElasticMapping.getTypeConfig(fieldID, engine);
+    const okp = engine.getOutputKeyPath(fieldID);
+    const mappingPath = ElasticMapping.enginePathToMappingPath(okp);
+    const existingConfig = _.get(existingMapping, mappingPath.toArray());
+
+    if (existingConfig != null && toCompareConfig != null)
+    {
+      return ElasticMapping.compareConfigs(toCompareConfig, existingConfig, mappingPath);
+    }
+    else
+    {
+      return {
+        valid: true,
+      };
+    }
+  }
+
+  protected static compareConfigs(
+    toCompareConfig: TypeConfig,
+    existingConfig: TypeConfig,
+    kp: KeyPath,
+  ): { valid: boolean, message?: string }
+  {
+    if (toCompareConfig['type'] !== existingConfig['type'])
+    {
+      const message = `Type conflict for field ${humanReadablePathName(kp, true)}. ` +
+        `Type '${toCompareConfig['type']}'' does not match type '${existingConfig['type']}'.`;
+      return {
+        valid: false,
+        message,
+      };
+    }
+    else if (toCompareConfig['analyzer'] !== existingConfig['analyzer'])
+    {
+      const message = `Type conflict for field ${humanReadablePathName(kp, true)}. ` +
+        `Analyzer '${toCompareConfig['analyzer']}' does not match Analyzer '${existingConfig['analyzer']}'.`;
+      return {
+        valid: false,
+        message,
+      };
+    }
+    else
+    {
+      return {
+        valid: true,
+      };
+    }
   }
 
   protected static getElasticProps(fieldID: number, engine: TransformationEngine): ElasticFieldProps
@@ -187,45 +231,9 @@ export class ElasticMapping
     ).toList() as EnginePath;
   }
 
-  private errors: string[] = [];
-  private pathSchema: PathHashMap<{
-    type: ElasticTypes,
-    analyzer: string,
-  }> = {};
-  private engine: TransformationEngine;
-  private isMerge: boolean;
-  private mapping: MappingType = {};
-  private primaryKey: string | null = null;
-  private primaryKeyAttempts: any[] = [];
-
-  constructor(engine: TransformationEngine, isMerge: boolean = false)
+  protected static getTextConfig(elasticProps: ElasticFieldProps, isMerge: boolean): TypeConfig
   {
-    this.engine = engine;
-    this.isMerge = isMerge;
-
-    const disabledMap = this.computeDisabledFields();
-    this.createElasticMapping(disabledMap);
-    this.findPrimaryKeys(disabledMap);
-  }
-
-  public getMapping(): MappingType
-  {
-    return this.mapping;
-  }
-
-  public getErrors(): string[]
-  {
-    return this.errors;
-  }
-
-  public getPrimaryKey(): string | null
-  {
-    return this.primaryKey;
-  }
-
-  protected getTextConfig(elasticProps: ElasticFieldProps): TypeConfig
-  {
-    if (this.isMerge)
+    if (isMerge)
     {
       return {
         type: 'keyword',
@@ -265,11 +273,15 @@ export class ElasticMapping
     return config;
   }
 
-  protected getTypeConfig(fieldID: number): TypeConfig | null
+  protected static getTypeConfig(
+    fieldID: number,
+    engine: TransformationEngine,
+    isMerge: boolean = false,
+  ): TypeConfig | null
   {
-    const elasticProps = this.getElasticProps(fieldID);
+    const elasticProps = ElasticMapping.getElasticProps(fieldID, engine);
 
-    const etlType = this.getETLType(fieldID);
+    const etlType = EngineUtil.getETLFieldType(fieldID, engine);
     const elasticType = elasticProps.elasticType === ElasticTypes.Auto ?
       etlTypeToElastic(etlType)
       :
@@ -278,7 +290,7 @@ export class ElasticMapping
     switch (elasticType)
     {
       case ElasticTypes.Text:
-        return this.getTextConfig(elasticProps);
+        return ElasticMapping.getTextConfig(elasticProps, isMerge);
       case ElasticTypes.Array:
         return null;
       case ElasticTypes.Nested:
@@ -292,14 +304,45 @@ export class ElasticMapping
     }
   }
 
+  private errors: string[] = [];
+  private pathSchema: PathHashMap<{
+    type: ElasticTypes,
+    analyzer: string,
+  }> = {};
+  private engine: TransformationEngine;
+  private isMerge: boolean;
+  private mapping: MappingType = {};
+  private primaryKey: string | null = null;
+  private primaryKeyAttempts: any[] = [];
+
+  constructor(engine: TransformationEngine, isMerge: boolean = false)
+  {
+    this.engine = engine;
+    this.isMerge = isMerge;
+
+    const disabledMap = this.computeDisabledFields();
+    this.createElasticMapping(disabledMap);
+    this.findPrimaryKeys(disabledMap);
+  }
+
+  public getMapping(): MappingType
+  {
+    return this.mapping;
+  }
+
+  public getErrors(): string[]
+  {
+    return this.errors;
+  }
+
+  public getPrimaryKey(): string | null
+  {
+    return this.primaryKey;
+  }
+
   protected getETLType(fieldID: number): ETLFieldTypes
   {
     return EngineUtil.getETLFieldType(fieldID, this.engine);
-  }
-
-  protected getElasticProps(fieldID: number): ElasticFieldProps
-  {
-    return ElasticMapping.getElasticProps(fieldID, this.engine);
   }
 
   protected clearGeopointMappings(disabledFields: { [k: number]: boolean })
@@ -329,7 +372,7 @@ export class ElasticMapping
 
   protected addFieldToMapping(id: number)
   {
-    const config = this.getTypeConfig(id);
+    const config = ElasticMapping.getTypeConfig(id, this.engine, this.isMerge);
     const enginePath = this.engine.getOutputKeyPath(id);
     const cleanedPath = ElasticMapping.enginePathToMappingPath(enginePath);
     const hashed = EngineUtil.hashPath(cleanedPath);
@@ -416,7 +459,7 @@ export class ElasticMapping
 
   protected verifyAndSetPrimaryKey(id: number)
   {
-    const elasticProps = this.getElasticProps(id);
+    const elasticProps = ElasticMapping.getElasticProps(id, this.engine);
     const etlType = this.getETLType(id);
     const elasticType = elasticProps.elasticType === ElasticTypes.Auto ?
       etlTypeToElastic(etlType)
@@ -481,7 +524,7 @@ export class ElasticMapping
       {
         if (!disabledMap[id])
         {
-          const elasticProps = this.getElasticProps(id);
+          const elasticProps = ElasticMapping.getElasticProps(id, this.engine);
           if (elasticProps.isPrimaryKey)
           {
             this.verifyAndSetPrimaryKey(id);

@@ -60,10 +60,10 @@ import Util from 'util/Util';
 
 import Modal from 'common/components/Modal';
 
-import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { ETLActions } from 'etl/ETLRedux';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
+import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 
 const { List } = Immutable;
 
@@ -214,7 +214,7 @@ class VerificationManager extends TerrainComponent<Props>
   private getMapping(sink): Promise<object>
   {
     return new Promise<object>((resolve, reject) => {
-      if (sink.type === Sinks.Database)
+      if (sink != null && sink.type === Sinks.Database)
       {
         const serverId = sink.options.serverId;
         const database = sink.options.database;

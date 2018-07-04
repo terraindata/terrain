@@ -333,12 +333,12 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       setMapping: (state, action) => {
         const { serverId, database, mapping } = action.payload;
         return state.update('mappingCache',
-          (cache) => cache.set(this.hashMappingId(serverId, database), mapping)
+          (cache) => cache.set(this.hashMappingId(serverId, database), mapping),
         );
       },
       clearMappingCache: (state, action) => {
         return state.set('mappingCache', Map());
-      }
+      },
     };
 
   // TODO, add a thing to the state where we can log errors?
