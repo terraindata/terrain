@@ -7982,6 +7982,10 @@ random-bytes@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/random-bytes/-/random-bytes-1.0.0.tgz#4f68a1dc0ae58bd3fb95848c30324db75d64360b"
 
+random-key@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/random-key/-/random-key-0.3.2.tgz#a2c52a1dc13bdbf598f566efdcd9cb8897c7d933"
+
 randomatic@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/randomatic/-/randomatic-3.0.0.tgz#d35490030eb4f7578de292ce6dfb04a91a128923"

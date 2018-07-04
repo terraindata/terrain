@@ -49,54 +49,87 @@ import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 import * as App from '../App';
 import * as Util from '../AppUtil';
-import IntegrationConfig from '../integrations/IntegrationConfig';
-import Integrations from '../integrations/Integrations';
+import RecoveryTokenConfig from '../recoveryTokens/RecoveryTokenConfig';
+import RecoveryTokens from '../recoveryTokens/RecoveryTokens';
+import UserConfig from '../users/UserConfig';
+import Users from '../users/Users';
+const users: Users = new Users();
+const recoveryTokens: RecoveryTokens = new RecoveryTokens();
 const Router = new KoaRouter();
-const integrations: Integrations = new Integrations();
-export const initialize = () => integrations.initialize();
+export const initialize = () => users.initialize();
 
 Router.post('/', async (ctx, next) =>
 {
-  // const fullBody = ctx.request.body.body;
-  // const description = JSON.stringify(fullBody.description);
-  // const user = JSON.stringify(fullBody.user);
-  // const browserInfo = JSON.stringify(fullBody.browserInfo);
-  // let subject: string = '';
-  // let body: string;
-   ctx.status = 200;
-  // const emailIntegrations: IntegrationConfig[] = await integrations.get(null, undefined, 'Email', true) as IntegrationConfig[];
-  // winston.info('email integrations: ' + JSON.stringify(emailIntegrations));
-  // if (emailIntegrations.length !== 1)
-  // {
-  //   winston.warn(`Invalid number of email integrations, found ${emailIntegrations.length}`);
-  // }
-  // else if (emailIntegrations.length === 1 && emailIntegrations[0].name !== 'Default Failure Email')
-  // {
-  //   winston.warn('Invalid Email found.');
-  // }
-  // else
-  // {
-  //   let attachment: string;
-  //   if (fullBody.bug)
-  //   {
-  //     subject = 'Bug report from ' + user;
-  //     body = 'A user has submitted a bug report detailed below. \n \n' + description + '\n \n Browser/OS information: ' + browserInfo;
-  //   }
-  //   else
-  //   {
-  //     subject = 'Feedback report from ' + user;
-  //     body = 'A user has submitted a feedback report detailed below. \n \n' + description + '\n \n Browser/OS information: ' + browserInfo;
-  //   }
-  //   if (fullBody.screenshot)
-  //   {
-  //     attachment = fullBody.screenshot;
-  //   }
-  //   // winston.info("id: " + emailIntegrations[0].id);
-  //   const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body, attachment);
-  //   winston.info(`Feedback email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
-  // }
+  const token: string = ctx.request.body.recoveryToken;
+  const newPassword: string = ctx.request.body.newPassword;
+  recoveryTokens.initialize();
+  const allRecoveryTokens: RecoveryTokensConfig[] = await recoveryTokens.select([], {}) as RecoveryTokenConfig[];
+  const allUsers: UserConfig[] = await users.select([], {}) as UserConfig[];
+  for (let index in allRecoveryTokens)
+  {
+    if (allRecoveryTokens[index]['token'] === token)
+    {
+       // check token validity with timestamp
+       const timestamp: Date = allRecoveryTokens[index]['createdAt'];
+       const validWindow: Date = new Date(timestamp);
+       validWindow.setDate(timestamp.getDate() + 1);
+       const currDateTime: Date = new Date(Date.now());
+       // check that token is <= 24 hours old
+       if (timestamp.getTime() <= currDateTime.getTime() && currDateTime.getTime() <= validWindow.getTime())
+       {
+         const userIdToChange: number = allRecoveryTokens[index]['id'];
+         const user = await users.get(userIdToChange);
+         const userToUpdate = user[0];
+         userToUpdate['password'] = newPassword;
+         const updatedUser: UserConfig[] = await users.update(userToUpdate, true) as UserConfig[];
+         // delete token used
+         const newEntry = {
+           id: allRecoveryTokens[index]['id'],
+           token: null,
+           createdAt: currDateTime,
+         };
+         const updatedEntry: RecoveryTokenConfig[] = await recoveryTokens.update(newEntry) as RecoveryTokenConfig[];
+         winston.error('successfully changed password');
+         ctx.body = 'Password successfully changed.';
+         ctx.status = 200;
+       }
+       else
+       {
+         ctx.body = 'Invalid reset url.';
+         ctx.status = 401;
+       }
+     }
+     else
+     {
+       ctx.body = 'Invalid reset url.';
+       ctx.status = 401;
+     }
+   }
+ });
 
-  winston.info("EMAIL : " + JSON.stringify(ctx.request.body.email));
+Router.get('/:token', async (ctx, next) =>
+{
+  winston.error(ctx.params.token);
+  const token: string = ctx.params.token;
+  let tokenFound: boolean = false;
+  recoveryTokens.initialize();
+  const allRecoveryTokens: RecoveryTokensConfig[] = await recoveryTokens.select([], {}) as RecoveryTokenConfig[];
+  for (let index in allRecoveryTokens)
+  {
+    if (allRecoveryTokens[index]['token'] === token)
+    {
+      tokenFound = true;
+    }
+  }
+  if (tokenFound)
+  {
+    ctx.status = 200;
+  }
+  else
+  {
+    ctx.status = 404;
+  }
+
 });
 
 export default Router;

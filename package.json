@@ -187,6 +187,7 @@
     "puppeteer": "1.4.0",
     "query-string": "^6.1.0",
     "radium": "^0.24.0",
+    "random-key": "^0.3.2",
     "rc-slider": "^8.6.1",
     "react": "16.2.0",
     "react-addons-shallow-compare": "^15.6.2",

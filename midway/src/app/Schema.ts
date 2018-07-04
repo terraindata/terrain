@@ -60,6 +60,7 @@ import { ItemConfig } from './items/ItemConfig';
 import { JobConfig } from './jobs/JobConfig';
 import { JobLogConfig } from './jobs/JobLogConfig';
 import { MigrationRecordConfig } from './migrations/MigrationRecordConfig';
+import { RecoveryTokenConfig } from './recoveryTokens/RecoveryTokenConfig';
 import { ResultsConfigConfig } from './resultsConfig/ResultsConfigConfig';
 import { SchedulerConfig } from './scheduler/SchedulerConfig';
 import { SchemaMetadataConfig } from './schemaMetadata/SchemaMetadataConfig';
@@ -83,6 +84,7 @@ export class Tables
   public jobs: Tasty.Table;
   public statusHistory: Tasty.Table;
   public migrationRecords: Tasty.Table;
+  public recoveryTokens: Tasty.Table;
 }
 
 function verifyTableWithConfig(table: Tasty.Table, configClass: object)
@@ -483,6 +485,23 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
       },
     ),
     new MigrationRecordConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
+      'recoveryTokens',
+      ['id'],
+      [
+        'token',
+        'createdAt',
+      ],
+      undefined,
+      {
+        id: primaryKeyType + ' PRIMARY KEY',
+        token: 'text',
+        createdAt: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+      },
+    ),
+    new RecoveryTokenConfig({}),
   );
 
   return tables as Tables;

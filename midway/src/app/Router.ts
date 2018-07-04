@@ -60,6 +60,7 @@ import * as IntegrationRouter from './integrations/IntegrationRouter';
 import * as ItemRouter from './items/ItemRouter';
 import * as JobRouter from './jobs/JobRouter';
 import * as QueryRouter from './query/QueryRouter';
+import * as RecoveryTokensRouter from './recoveryTokens/RecoveryTokensRouter';
 import * as ResultsConfigRouter from './resultsConfig/ResultsConfigRouter';
 import * as SchedulerRouter from './scheduler/SchedulerRouter';
 import * as SchemaRouter from './schema/SchemaRouter';
@@ -90,6 +91,7 @@ export function getRouter()
   ResultsConfigRouter.initialize();
   FeedbackRouter.initialize();
   ForgotPasswordRouter.initialize();
+  RecoveryTokensRouter.initialize();
   AppRouter.use('/auth', AuthRouter.default.routes(), AuthRouter.default.allowedMethods());
   AppRouter.use('/events', EventRouter.default.routes(), EventRouter.default.allowedMethods());
   AppRouter.use('/users', UserRouter.default.routes(), UserRouter.default.allowedMethods());
@@ -107,6 +109,7 @@ export function getRouter()
   AppRouter.use('/resultsconfig', ResultsConfigRouter.default.routes(), ResultsConfigRouter.default.allowedMethods());
   AppRouter.use('/feedback', FeedbackRouter.default.routes(), FeedbackRouter.default.allowedMethods());
   AppRouter.use('/forgotPassword', ForgotPasswordRouter.default.routes(), ForgotPasswordRouter.default.allowedMethods());
+  AppRouter.use('/recoveryTokens', RecoveryTokensRouter.default.routes(), RecoveryTokensRouter.default.allowedMethods());
   // Add future routes here.
 
   AppRouter.get('/time', (ctx, next) =>

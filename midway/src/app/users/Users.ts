@@ -114,7 +114,7 @@ export class Users
     return this.upsert(newUser);
   }
 
-  public async update(user: UserConfig): Promise<UserConfig>
+  public async update(user: UserConfig, isRecovery?: boolean): Promise<UserConfig>
   {
     return new Promise<UserConfig>(async (resolve, reject) =>
     {
@@ -125,7 +125,6 @@ export class Users
       }
 
       const oldUser = results[0];
-
       // authenticate if email change or password change
       if (user.email !== oldUser.email || user.oldPassword !== undefined)
       {
@@ -133,17 +132,13 @@ export class Users
         {
           return reject('Must provide password if updating email or password');
         }
-
         const unhashedPassword: string = user.oldPassword === undefined ? user.password : user.oldPassword;
         user.password = await this.hashPassword(user.password);
-
-        if (user.oldPassword !== undefined)
+        if (user.oldPassword != null)
         {
           user.oldPassword = await this.hashPassword(user.oldPassword);
         }
-
-        const passwordsMatch: boolean = await this.comparePassword(unhashedPassword, oldUser.password);
-        if (!passwordsMatch)
+        if (!isRecovery && !await this.comparePassword(unhashedPassword, oldUser.password))
         {
           return reject('Password does not match');
         }
