@@ -233,22 +233,36 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     {
       return null;
     }
+
     const elements = verifications.map((verification, key) => {
       const { fieldId, message, type } = verification;
-      const style = type === 'error' ? getStyle(Colors().error) : getStyle(Colors().warning);
+      const style = type === 'error' ? fontColor(Colors().logLevels.error) : fontColor(Colors().logLevels.warn);
       return (
         <div
-          style={style}
-          className='editor-field-verification-icon'
+          className='field-verifiction-spacer'
+          key={key}
         >
-          <ErrorIcon/>
+          {
+            tooltip(
+              <div
+                style={style}
+                className='editor-field-verification-icon'
+              >
+                <ErrorIcon/>
+              </div>,
+              {
+                title: `${type === 'error' ? 'Error' : 'Warning'}: ${message}`,
+                theme: type === 'error' ? 'error' : undefined,
+                key,
+              }
+            )
+          }
         </div>
       );
     });
-
     return (
       <div className='field-preview-verifications'>
-        hi
+        { elements }
       </div>
     );
   }

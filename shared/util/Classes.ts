@@ -289,14 +289,14 @@ export function responseToRecordConfig(response: object): object
   return response;
 }
 
-export function instanceFnDecorator(fnToApply)
+export function instanceFnDecorator(fnToApply, ... extraArgs)
 {
   return function decoratorFn(target: any, key: string | symbol, descriptor: TypedPropertyDescriptor<any>)
   {
     const existingFn = target[key];
     descriptor.value = function(...args)
     {
-      this[key] = fnToApply(existingFn);
+      this[key] = fnToApply(existingFn, ... extraArgs);
       return this[key](...args);
     };
   };

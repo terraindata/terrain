@@ -76,7 +76,7 @@ export interface LanguageInterface
   verifyMapping: (engine: TransformationEngine, sink: SinkConfig, existingMapping?: object) => string[];
   // get potential issues for fields
   getFieldErrors: (engine: TransformationEngine, sink: SinkConfig, existingMapping?: object)
-    => IterableIterator<FieldVerification>;
+    => IterableIterator<FieldVerification | null>;
 }
 
 export default class LanguageControllers

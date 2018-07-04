@@ -153,6 +153,10 @@ class ElasticController extends DefaultController implements LanguageInterface
           } as FieldVerification);
         }
       }
+      else
+      {
+        yield null; // since we can't yield like in node
+      }
     }
   }
 }

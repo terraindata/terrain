@@ -245,8 +245,8 @@ export const TOOLTIP_THEMES: Themes = {
     fontColor: () => '#242424',
   },
   error: {
-    backgroundColor: () => Colors().error,
-    fontColor: () => Colors().text1,
+    backgroundColor: () => Colors().logLevels.error,
+    fontColor: () => Colors().fontWhite,
   },
   noStyle: {
     backgroundColor: () => 'rgba(0,0,0,0)', // none does not work
