@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file no-unused-expression
 import aesjs = require('aes-js');
-import sha1 = require('sha1');
 
 export enum Keys
 {

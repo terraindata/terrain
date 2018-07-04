@@ -46,12 +46,12 @@ THE SOFTWARE.
 
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
 import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
 import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-const { List, Map } = Immutable;
-import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
+import { makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
-import {
+import
+{
   _SinkConfig,
   _SourceConfig,
   ItemWithName,
@@ -61,14 +61,13 @@ import {
   SourceConfig,
 } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'shared/etl/immutable/ETLProcessRecords';
-import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
-import { _TemplateSettings, TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
-import { _TemplateUIData, TemplateUIData } from 'shared/etl/immutable/TemplateUIDataRecords';
+import { ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
+import { _TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
+import { _TemplateUIData } from 'shared/etl/immutable/TemplateUIDataRecords';
 import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
 import { CURRENT_TEMPLATE_VERSION } from 'shared/etl/migrations/TemplateVersions';
-import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
+import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 export type SourcesMap = Immutable.Map<string, SourceConfig>;
 export type SinksMap = Immutable.Map<string, SinkConfig>;
@@ -188,7 +187,8 @@ class ETLTemplateC implements ETLTemplateI
   {
     let sourceName = '';
     const source = this.getSource(key);
-    if (source) {
+    if (source)
+    {
       if (key === '_default')
       {
         sourceName = SOURCE_DEFAULT_NAME;
@@ -206,7 +206,8 @@ class ETLTemplateC implements ETLTemplateI
   {
     let sinkName = '';
     const sink = this.getSource(key);
-    if (sink) {
+    if (sink)
+    {
       if (key === '_default')
       {
         sinkName = SINK_DEFAULT_NAME;

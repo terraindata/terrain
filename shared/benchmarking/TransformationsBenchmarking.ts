@@ -45,11 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { List } from 'immutable';
-import * as _ from 'lodash';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import TransformationRegistry from 'shared/transformations/TransformationRegistry';
-import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
 import EngineUtil from 'shared/transformations/util/EngineUtil';

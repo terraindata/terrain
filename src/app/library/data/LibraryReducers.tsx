@@ -44,11 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
 import { ItemStatus } from '../../../items/types/Item';
-import { _LibraryState, LibraryState } from '../LibraryTypes';
+import { LibraryState } from '../LibraryTypes';
 import * as LibraryTypes from './../LibraryTypes';
-import ActionTypes, { CleanLibraryActionTypes, LibraryActionTypes } from './LibraryActionTypes';
+import ActionTypes, { CleanLibraryActionTypes } from './LibraryActionTypes';
 
 const LibraryReducers = {};
 

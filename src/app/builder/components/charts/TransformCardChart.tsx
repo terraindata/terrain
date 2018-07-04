@@ -47,10 +47,9 @@ THE SOFTWARE.
 
 // tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-const { List, Map } = Immutable;
 import { BuilderState } from 'builder/data/BuilderState';
+import { List, Map } from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { SchemaState } from 'schema/SchemaTypes';

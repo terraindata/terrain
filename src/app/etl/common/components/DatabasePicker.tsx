@@ -44,24 +44,19 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
-import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
 import { instanceFnDecorator } from 'shared/util/Classes';
-import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 
-import { Database, DatabaseMap, Server, ServerMap, Table, TableMap } from 'schema/SchemaTypes';
-import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { Database, DatabaseMap, Server, ServerMap, TableMap } from 'schema/SchemaTypes';
+import { Languages } from 'shared/etl/types/ETLTypes';
 
 interface FormState
 {

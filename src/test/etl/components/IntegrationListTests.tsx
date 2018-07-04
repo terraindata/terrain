@@ -48,9 +48,8 @@ THE SOFTWARE.
 import { ItemList } from 'app/etl/common/components/ItemList';
 import { IntegrationListUncontained as IntegrationList } from 'app/etl/integrations/components/IntegrationList';
 import Util from 'app/util/Util';
-import { mount, shallow } from 'enzyme';
-import * as Immutable from 'immutable';
-import { List, Map } from 'immutable';
+import { shallow } from 'enzyme';
+import { Map } from 'immutable';
 import * as React from 'react';
 import { _IntegrationConfig, IntegrationConfig } from '../../../../shared/etl/immutable/IntegrationRecords';
 

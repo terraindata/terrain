@@ -45,24 +45,18 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:import-spacing
 import Util from 'app/util/Util';
-import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
 import * as _ from 'lodash';
-const { List, Map } = Immutable;
 import MidwayError from 'shared/error/MidwayError';
-import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
+import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'src/app/store/TerrainRedux';
 
 import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
-import ETLAjax, { ExecuteConfig } from 'etl/ETLAjax';
+import ETLAjax from 'etl/ETLAjax';
 import { ErrorHandler } from 'etl/ETLAjax';
-import { SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
-import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
-import { AuthConfigType, ConnectionConfigType } from 'shared/etl/types/IntegrationTypes';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { _ETLState, ETLState, NotificationState } from './ETLTypes';
-
-import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 export interface ETLActionTypes
 {

@@ -56,7 +56,6 @@ import ElasticClient from '../../../database/elastic/client/ElasticClient';
 import { ElasticWriter } from '../../../database/elastic/streams/ElasticWriter';
 import { ElasticDB } from '../../../database/elastic/tasty/ElasticDB';
 import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
-import { databases } from '../../database/DatabaseRouter';
 import { QueryHandler } from '../../query/QueryHandler';
 import { SinkStreamConfig } from '../SourceSinkStream';
 

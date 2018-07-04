@@ -47,19 +47,14 @@ THE SOFTWARE.
 // tslint:disable:no-shadowed-variable
 
 import { EventEmitter } from 'events';
-import * as fs from 'fs';
 import GraphLib = require('graphlib');
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as request from 'request';
-import { Readable, Transform, Writable } from 'stream';
-import * as winston from 'winston';
+import { Readable } from 'stream';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import TransformationEngineTransform from '../io/streams/TransformationEngineTransform';
-import UserConfig from '../users/UserConfig';
-import { versions } from '../versions/VersionRouter';
+import { MidwayLogger } from '../log/MidwayLogger';
 
 import { TransformationEngine } from '../../../../shared/transformations/TransformationEngine';
 import DatabaseController from '../../database/DatabaseController';
@@ -70,10 +65,9 @@ import { destringifySavedTemplate, recordToConfig, TemplateConfig, templateForSa
 
 import { _SinkConfig, _SourceConfig, SinkConfig as SinkRecord, SourceConfig as SourceRecord } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
-import { ETLProcess, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
+import { TemplateBase } from 'shared/etl/types/ETLTypes';
 import LogStream from '../io/streams/LogStream';
 import ProgressStream from '../io/streams/ProgressStream';
-import { deleteElasticIndex } from '../Schema';
 
 export default class Templates
 {
@@ -335,8 +329,8 @@ export default class Templates
 
   public async execute(template: TemplateConfig, files?: Readable[]): Promise<{ outputStream: Readable, logStream: Readable }>
   {
-    winston.info('Executing template', template.templateName);
-    winston.debug(JSON.stringify(template, null, 2));
+    MidwayLogger.info('Executing template', template.templateName);
+    MidwayLogger.debug(JSON.stringify(template, null, 2));
 
     const numSources = Object.keys(template.sources).length;
     const numSinks = Object.keys(template.sinks).length;
@@ -347,7 +341,7 @@ export default class Templates
       throw new Error('Only single sinks are supported.');
     }
 
-    winston.info('Beginning ETL pipeline...');
+    MidwayLogger.info('Beginning ETL pipeline...');
 
     // construct a "process DAG"
     let defaultSink;
@@ -378,14 +372,14 @@ export default class Templates
       },
     );
 
-    winston.info('Finished constructing ETL pipeline graph...');
+    MidwayLogger.info('Finished constructing ETL pipeline graph...');
 
     if (defaultSink === undefined)
     {
       throw new Error('Default sink not found.');
     }
 
-    winston.info('Beginning execution of ETL pipeline graph...');
+    MidwayLogger.info('Beginning execution of ETL pipeline graph...');
     const nodes: any[] = GraphLib.alg.topsort(dag);
     const streamMap = await this.executeGraph(template, dag, nodes, files);
 
@@ -525,7 +519,7 @@ export default class Templates
               {
                 return async (e) =>
                 {
-                  winston.error(e);
+                  MidwayLogger.error(e);
                   await elasticDB.deleteIndex(index);
                   logStream.info(`Deleted temporary indices: ${JSON.stringify(index)}`);
                 };
@@ -601,7 +595,7 @@ export default class Templates
             }
             catch (e)
             {
-              winston.error(e);
+              MidwayLogger.error(e);
               await elasticDB.deleteIndex(indices);
               logStream.info(`Deleted temporary indices: ${JSON.stringify(indices)}`);
             }

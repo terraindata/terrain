@@ -46,24 +46,15 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-import * as $ from 'jquery';
-import * as _ from 'lodash';
-import * as Radium from 'radium';
-import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
-import TerrainComponent from './../../../../common/components/TerrainComponent';
-const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
-import CheckBox from 'app/common/components/CheckBox';
 import DragAndDrop from 'app/common/components/DragAndDrop';
-import DragHandle from 'app/common/components/DragHandle';
-import Dropdown from 'app/common/components/Dropdown';
 import FadeInOut from 'app/common/components/FadeInOut';
-import { RouteSelector, RouteSelectorOption, RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
-import SingleRouteSelector from 'app/common/components/SingleRouteSelector';
+import { RouteSelector, RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
+import { List } from 'immutable';
+import * as Radium from 'radium';
+import * as React from 'react';
+import { backgroundColor, Colors, fontColor } from '../../../../colors/Colors';
 import Util from '../../../../util/Util';
 import BuilderActions from '../../../data/BuilderActions';
 import PathfinderCreateLine from '../PathfinderCreateLine';
@@ -71,9 +62,9 @@ import PathfinderLine from '../PathfinderLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import
 {
-  _ScoreLine, Path, PathfinderContext, PathfinderSteps, Score, ScoreLine, ScoreType,
-  ScoreTypesChoices, Source,
+  _ScoreLine, PathfinderContext, PathfinderSteps, Score, ScoreLine, ScoreType,
 } from '../PathfinderTypes';
+import TerrainComponent from './../../../../common/components/TerrainComponent';
 import PathfinderScoreLine from './PathfinderScoreLine';
 import './PathfinderScoreStyle.less';
 

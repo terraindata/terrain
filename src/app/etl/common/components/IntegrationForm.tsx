@@ -46,24 +46,18 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires max-classes-per-file strict-boolean-expressions
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
 
 import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
-import { LibraryState } from 'library/LibraryTypes';
-
 import { IntegrationFormMap } from 'etl/common/components/IntegrationFormClasses';
-import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
+import { IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 import { IntegrationNames, Integrations } from 'shared/etl/types/IntegrationTypes';
 
-const { List, Map } = Immutable;
+import { List, Map } from 'immutable';
 
 export interface Props
 {

@@ -47,10 +47,8 @@ THE SOFTWARE.
 
 import { ScorePoint, TransformCardChart } from 'builder/components/charts/TransformCardChart';
 import { shallow } from 'enzyme';
-import * as Immutable from 'immutable';
-import { List, Map } from 'immutable';
+import { List } from 'immutable';
 import * as React from 'react';
-import { _SchemaState, SchemaState } from 'schema/SchemaTypes';
 
 jest.mock('react-dom', () => ({
   findDOMNode: () => { },

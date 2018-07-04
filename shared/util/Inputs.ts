@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as _ from 'lodash';
 import * as moment from 'moment';
 
 enum FileInputTypeEnum

@@ -45,15 +45,13 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:import-spacing max-classes-per-file
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-const { List, Map } = Immutable;
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
+import { List } from 'immutable';
+import { makeExtendedConstructor, WithIRecord } from 'shared/util/Classes';
 
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig }
   from 'shared/etl/immutable/EndpointRecords';
 
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { Sources } from 'shared/etl/types/EndpointTypes';
 
 export enum ViewState
 {

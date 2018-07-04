@@ -42,14 +42,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 // tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands
 
 import readline from 'readline-promise';
 import * as sleep from 'sleep';
 import * as request from 'then-request';
-import * as winston from 'winston';
+
+import { TestLogger } from '../shared/test/TestLogger';
 
 function ignoreBuilderAction(action: string): boolean
 {
@@ -118,7 +119,7 @@ export async function getChromeDebugAddress()
     return wsAddress;
   } catch (err)
   {
-    winston.error(err);
+    TestLogger.error(err);
     return undefined;
   }
 }
@@ -260,11 +261,11 @@ export async function login(page, url: string)
 {
   await page.goto(url);
   sleep.sleep(1);
-  winston.info('Login ' + url);
+  TestLogger.info('Login ' + url);
   try
   {
     await page.waitForSelector(USERNAME_SELECTOR, { timeout: 0 });
-    winston.info('Username selector is ready.');
+    TestLogger.info('Username selector is ready.');
     await page.click(USERNAME_SELECTOR);
     await page.keyboard.type('admin@terraindata.com');
     await page.click(PASSWORD_SELECTOR);
@@ -273,7 +274,7 @@ export async function login(page, url: string)
     sleep.sleep(5);
   } catch (e)
   {
-    winston.warn('The page might be already loaded, keep going.');
+    TestLogger.warn('The page might be already loaded, keep going.');
     sleep.sleep(4);
   }
 }

@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import aesjs = require('aes-js');
-import sha1 = require('sha1');
 
 import { EncryptionController, Keys, registerEncryptionController } from 'shared/encryption/Encryption';
 

@@ -44,29 +44,20 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:import-spacing
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 
-import
-{
-  _TemplateField,
-  TemplateField,
-} from 'etl/templates/FieldTypes';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { Algorithm } from 'library/LibraryTypes';
 import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
-import { MidwayError } from 'shared/error/MidwayError';
 import { getSampleRows } from 'shared/etl/FileUtil';
-import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { FileConfig } from 'shared/etl/immutable/EndpointRecords';
 
 import { toInputMap } from 'src/blocks/types/Input';
 import { AllBackendsMap } from 'src/database/AllBackends';
 import MidwayQueryResponse from 'src/database/types/MidwayQueryResponse';
 
-import { _Query, Query, queryForSave } from 'src/items/types/Query';
 import { Ajax } from 'util/Ajax';
 
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 export function fetchDocumentsFromAlgorithm(
   algorithm: Algorithm,

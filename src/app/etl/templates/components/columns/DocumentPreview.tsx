@@ -45,8 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
@@ -57,8 +55,8 @@ import RootFieldNode from 'etl/templates/components/field/RootFieldNode';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 
+import { List } from 'immutable';
 import './DocumentsPreviewColumn.less';
-const { List } = Immutable;
 const Color = require('color');
 const ShowIcon = require('images/icon_search.svg');
 

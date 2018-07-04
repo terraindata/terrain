@@ -45,15 +45,13 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions max-line-length member-ordering no-console
 
-import { List } from 'immutable';
 import * as TerrainLog from 'loglevel';
 import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
 import ESPropertyInfo from '../../../../shared/database/elastic/parser/ESPropertyInfo';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 import * as BlockUtils from '../../../blocks/BlockUtils';
-import Block, { BlockConfig } from '../../../blocks/types/Block';
+import Block from '../../../blocks/types/Block';
 import { ElasticBlocks } from '../blocks/ElasticBlocks';
-import { ElasticElasticCards } from '../blocks/ElasticElasticCards';
 import { FilterUtils } from '../blocks/ElasticFilterCard';
 import ESCardParser from './ESCardParser';
 

@@ -47,26 +47,21 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands radix prefer-const no-console strict-boolean-expressions max-classes-per-file no-shadowed-variable max-line-length
 
 import { List, Map, Set } from 'immutable';
-import * as Immutable from 'immutable';
 import * as TerrainLog from 'loglevel';
 
 import * as _ from 'lodash';
 import * as React from 'react';
 
 import { BuilderState } from 'builder/data/BuilderState';
-import ElasticBlockHelpers, { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
+import ElasticBlockHelpers from 'database/elastic/blocks/ElasticBlockHelpers';
 import { SchemaState } from 'schema/SchemaTypes';
-import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
 import ESInterpreter from '../../../../../shared/database/elastic/parser/ESInterpreter';
-import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESJSONType from '../../../../../shared/database/elastic/parser/ESJSONType';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import { isInput } from '../../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import Query from '../../../../items/types/Query';

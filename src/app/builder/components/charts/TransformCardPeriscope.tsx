@@ -46,14 +46,12 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands strict-boolean-expressions
 
-import * as Immutable from 'immutable';
-import './TransformCardPeriscope.less';
-const { Map, List } = Immutable;
+import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import './TransformCardPeriscope.less';
 
-import Autocomplete from 'common/components/Autocomplete';
 // import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';

@@ -52,7 +52,6 @@ import Util from 'util/Util';
 import * as UserTypes from '../UserTypes';
 import CheckBox from './../../common/components/CheckBox';
 import Modal from './../../common/components/Modal';
-import RadioButtons from './../../common/components/RadioButtons';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Ajax from './../../util/Ajax';
 import { UserActions as Actions } from './../data/UserRedux';

@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { mount, shallow } from 'enzyme';
+import { shallow } from 'enzyme';
 import * as React from 'react';
 import { DatePickerUncontained as DatePicker } from '../../../app/common/components/DatePicker';
 import Dropdown from '../../../app/common/components/Dropdown';

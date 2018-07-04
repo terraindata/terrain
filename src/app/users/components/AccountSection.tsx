@@ -46,30 +46,16 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires switch-default strict-boolean-expressions
 
-import * as Immutable from 'immutable';
 import { List } from 'immutable';
 import * as React from 'react';
 
-import { AuthState } from 'auth/AuthTypes';
-import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
-import { notificationManager } from 'common/components/InAppNotification';
 import Modal from 'common/components/Modal';
-import Switch from 'common/components/Switch';
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as momentZon from 'moment-timezone';
-import { MidwayError } from 'shared/error/MidwayError';
-import Settings from 'users/components/Settings';
-import Util from 'util/Util';
-import Ajax from '../../util/Ajax';
-import TerrainTools from '../../util/TerrainTools';
-import { UserActions as Actions } from '../data/UserRedux';
 import * as UserTypes from '../UserTypes';
-import AccountEntry from './AccountEntry';
 
 import * as _ from 'lodash';
-import { backgroundColor, Colors, fontColor, getStyle } from '../../colors/Colors';
-import { ColorsActions } from '../../colors/data/ColorsRedux';
+import { Colors } from '../../colors/Colors';
 import FadeInOut from '../../common/components/FadeInOut';
 import './AccountSection.less';
 const moment = require('moment-timezone');

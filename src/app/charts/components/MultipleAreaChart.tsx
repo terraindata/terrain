@@ -50,16 +50,12 @@ import TVictoryTooltip from 'charts/components/victory-custom/TVictoryTooltip';
 import TerrainVictoryTheme from 'charts/TerrainVictoryTheme';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
-import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
 import ContainerDimensions from 'react-container-dimensions';
 import ColorManager from 'util/ColorManager';
-import Util from 'util/Util';
 import
 {
-  Border,
   createContainer,
-  Point,
   VictoryArea,
   VictoryAxis,
   VictoryBar,
@@ -68,9 +64,7 @@ import
   VictoryGroup,
   VictoryLabel,
   VictoryLegend,
-  VictoryPortal,
   VictoryScatter,
-  VictoryTooltip,
 } from 'victory';
 
 const styles = {

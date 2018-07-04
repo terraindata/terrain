@@ -45,9 +45,11 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import dateFormat = require('date-format');
-import * as winston from 'winston';
+import * as Transport from 'winston-transport';
 
-class MemoryTransport extends winston.Transport
+import tripleBeam = require('triple-beam');
+
+export class MemoryTransport extends Transport
 {
   private msgs: any[];
   private index: number;
@@ -69,12 +71,15 @@ class MemoryTransport extends winston.Transport
     this.msgs = new Array(this.maxMsgSize);
   }
 
-  public log(level: string, msg, meta, callback)
+  public log(info: object, callback)
   {
+    const level = info[tripleBeam.LEVEL];
+    const msg = info.message;
+    const meta = info;
     if (level === 'info' || level === 'warning' || level === 'error')
     {
       const timestamp: string = dateFormat('yyyy-MM-dd hh:mm:ss.SSS ');
-      this.msgs[this.next()] = timestamp + level + ': ' + String(msg);
+      this.msgs[this.next()] = timestamp + String(level) + ': ' + String(msg);
     }
     this.emit('logged');
     callback(null, true);
@@ -109,29 +114,3 @@ class MemoryTransport extends winston.Transport
     return this.index;
   }
 }
-
-winston.transports['MemoryTransport'] = MemoryTransport;
-
-winston.configure(
-  {
-    transports:
-      [
-        new winston.transports.Console(
-          {
-            formatter: (options) =>
-            {
-              const message: string = options.message;
-              const level = winston.config.colorize(options.level);
-              const meta = (options.meta !== undefined) && (Object.keys(options.meta).length > 0) ? '\n\t' + JSON.stringify(options.meta)
-                : '';
-              return `${options.timestamp()} [${process.pid}] ${level}: ${message} ${meta}`;
-            },
-            timestamp: () =>
-            {
-              return dateFormat('yyyy-MM-dd hh:mm:ss.SSS');
-            },
-          },
-        ),
-        new (winston.transports['MemoryTransport'])(),
-      ],
-  });

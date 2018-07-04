@@ -47,10 +47,9 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as classNames from 'classnames';
-import * as _ from 'lodash';
 import * as React from 'react';
 import { ItemStatus } from '../../../items/types/Item';
-import { buttonColors, Colors, disabledButtonColors, fontColor } from '../../colors/Colors';
+import { buttonColors, disabledButtonColors } from '../../colors/Colors';
 import * as LibraryTypes from '../../library/LibraryTypes';
 import UserThumbnail from '../../users/components/UserThumbnail';
 import Util from '../../util/Util';

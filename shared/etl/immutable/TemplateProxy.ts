@@ -46,30 +46,22 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file
 
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
-import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import { ETLTemplate, SinksMap, SourcesMap } from 'shared/etl/immutable/TemplateRecords';
-import LanguageController from 'shared/etl/languages/LanguageControllers';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
-import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
 import
 {
   _ETLEdge,
   _ETLNode,
-  _ETLProcess,
   _MergeJoinOptions,
   ETLEdge,
   ETLNode,
   ETLProcess,
-  MergeJoinOptions,
 } from 'shared/etl/immutable/ETLProcessRecords';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 

@@ -46,28 +46,21 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
 import BuilderActions from '../../data/BuilderActions';
-import { scrollAction } from '../../data/BuilderScrollStore';
-import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import CardsArea from './CardsArea';
 import './CardsColumn.less';
-import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
+import { List } from 'immutable';
 import { forAllCards } from '../../../../blocks/BlockUtils';
 import { Cards } from '../../../../blocks/types/Card';
-import { AllBackendsMap } from '../../../../database/AllBackends';
-import { altStyle, backgroundColor, Colors, fontColor } from '../../../colors/Colors';
 import InfoArea from '../../../common/components/InfoArea';
 import Modal from '../../../common/components/Modal';
 import Util from '../../../util/Util';
 import { BuilderState } from '../../data/BuilderState';
-const { List, Map } = Immutable;
 
 export interface Props
 {

@@ -53,10 +53,8 @@ const moment = require('moment');
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 
-import { AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { replaceRoute } from 'library/helpers/LibraryRoutesHelper';
-import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
 import { Colors, fontColor } from '../../colors/Colors';
 import CreateLine from '../../common/components/CreateLine';
@@ -68,7 +66,6 @@ import Util from '../../util/Util';
 import Dropdown from './../../common/components/Dropdown';
 import { notificationManager } from './../../common/components/InAppNotification';
 import InfoArea from './../../common/components/InfoArea';
-import Scoreline from './../../common/components/Scoreline';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import * as LibraryTypes from './../LibraryTypes';

@@ -46,9 +46,8 @@ THE SOFTWARE.
 // tslint:disable:no-empty
 
 import { Picker } from 'app/common/components/Picker';
-import { mount, shallow } from 'enzyme';
-import * as Immutable from 'immutable';
-import { List, Map } from 'immutable';
+import { shallow } from 'enzyme';
+import { List } from 'immutable';
 import * as React from 'react';
 
 describe('Picker', () =>

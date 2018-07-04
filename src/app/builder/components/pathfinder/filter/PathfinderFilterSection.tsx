@@ -67,8 +67,9 @@ import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import
 {
   _FilterGroup, _FilterLine, _ScoreLine, FilterGroup, FilterLine, Path,
-  PathfinderContext, PathfinderSteps, Source,
+  PathfinderContext, PathfinderSteps,
 } from '../PathfinderTypes';
+import TerrainComponent from './../../../../common/components/TerrainComponent';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
 import './PathfinderFilterStyle.less';

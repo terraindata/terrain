@@ -46,14 +46,11 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
 
-import DatabaseController from '../../database/DatabaseController';
-import ElasticDB from '../../database/elastic/tasty/ElasticDB';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import { MidwayLogger } from '../log/MidwayLogger';
 import { Permissions } from '../permissions/Permissions';
 
-import * as Tasty from '../../tasty/Tasty';
 import * as Util from '../AppUtil';
 import { deleteElasticIndex, getSchema, getTable } from '../Schema';
 
@@ -63,7 +60,7 @@ export const initialize = () => { };
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('getting all schema');
+  MidwayLogger.info('getting all schema');
   const request = ctx.request.body.body;
   if (request !== undefined && request.database !== undefined)
   {
@@ -82,13 +79,13 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
 
 Router.get('/:database', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('get schema');
+  MidwayLogger.info('get schema');
   ctx.body = await getSchema(ctx.params.database);
 });
 
 Router.get('/:database/:table', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('get schema');
+  MidwayLogger.info('get schema');
   ctx.body = await getTable(ctx.params.database, ctx.params.table);
 });
 

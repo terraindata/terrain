@@ -44,24 +44,20 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as consume from 'stream-consume';
-import * as winston from 'winston';
 
 import { TaskConfig } from 'shared/types/jobs/TaskConfig';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
-import { TaskTreeConfig } from 'shared/types/jobs/TaskTreeConfig';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import IntegrationConfig from '../integrations/IntegrationConfig';
 import { integrations } from '../integrations/IntegrationRouter';
+import { MidwayLogger } from '../log/MidwayLogger';
 import SchedulerConfig from '../scheduler/SchedulerConfig';
 import { Job } from './Job';
 import JobConfig from './JobConfig';
 import JobLogConfig from './JobLogConfig';
-import { Task } from './Task';
-import { TaskTree } from './TaskTree';
 
 const INTERVAL: number = 60000;
 
@@ -136,7 +132,7 @@ export class JobQueue
       }
       catch (e)
       {
-        winston.warn('Error while trying to parse tasks: ' + ((e as any).toString() as string));
+        MidwayLogger.warn('Error while trying to parse tasks: ' + ((e as any).toString() as string));
       }
       if (!Array.isArray(tasksAsTaskConfig))
       {
@@ -272,7 +268,7 @@ export class JobQueue
       const status: boolean = await this.setJobStatus(getJobs[0].id, true, 'RUNNING');
       if (!status)
       {
-        winston.warn('Job running status was not toggled.');
+        MidwayLogger.warn('Job running status was not toggled.');
       }
       const newJob: Job = new Job();
       let newJobTasks: TaskConfig[] = [];
@@ -293,14 +289,14 @@ export class JobQueue
       }
       catch (e)
       {
-        winston.warn(((e as any).toString() as string));
+        MidwayLogger.warn(((e as any).toString() as string));
       }
 
       const jobCreationStatus: boolean | string = newJob.create(newJobTasks, 'some random filename');
-      winston.info('created run now job');
+      MidwayLogger.info('created run now job');
       if (typeof jobCreationStatus === 'string' || (jobCreationStatus as boolean) !== true)
       {
-        winston.warn('Error while creating job: ' + (jobCreationStatus as string));
+        MidwayLogger.warn('Error while creating job: ' + (jobCreationStatus as string));
       }
 
       try
@@ -347,7 +343,7 @@ export class JobQueue
     }
     catch (e)
     {
-      winston.warn((e as any).toString() as string);
+      MidwayLogger.warn((e as any).toString() as string);
       return false;
     }
     return true;
@@ -359,7 +355,7 @@ export class JobQueue
     return new Promise<boolean>(async (resolve, reject) =>
     {
       const jobs: JobConfig[] = await this._select([], { id }) as JobConfig[];
-      winston.info(`setting job status to ${running}, status ${status}`);
+      MidwayLogger.info(`setting job status to ${running}, status ${status}`);
       if (jobs.length === 0)
       {
         return resolve(false);
@@ -476,14 +472,14 @@ export class JobQueue
           }
           catch (e)
           {
-            winston.warn(((e as any).toString() as string));
+            MidwayLogger.warn(((e as any).toString() as string));
           }
 
           const jobCreationStatus: boolean | string = newJob.create(newJobTasks, 'some random filename');
-          winston.info('created job');
+          MidwayLogger.info('created job');
           if (typeof jobCreationStatus === 'string' || (jobCreationStatus as boolean) !== true)
           {
-            winston.warn('Error while creating job: ' + (jobCreationStatus as string));
+            MidwayLogger.warn('Error while creating job: ' + (jobCreationStatus as string));
           }
           // update the table to running = true
 
@@ -491,7 +487,7 @@ export class JobQueue
           const status: boolean = await this.setJobStatus(nextJob.id, true, 'RUNNING');
           if (!status)
           {
-            winston.warn('Job running status was not toggled.');
+            MidwayLogger.warn('Job running status was not toggled.');
           }
           jobIdLst.push(nextJob.id);
           ++i;
@@ -531,7 +527,7 @@ export class JobQueue
     // TODO check the job queue for unlocked rows and detect which jobs should run next
     this._checkJobTable().catch((err) =>
     {
-      winston.warn(err.toString() as string);
+      MidwayLogger.warn(err.toString() as string);
     });
     setTimeout(this._jobLoop.bind(this), INTERVAL - new Date().getTime() % INTERVAL);
   }
@@ -560,13 +556,13 @@ export class JobQueue
     else if (locked === true) // currently running
     {
       // TODO
-      winston.info('not implemented');
+      MidwayLogger.info('not implemented');
       return [];
     }
     else // currently not running
     {
       // TODO
-      winston.info('not implemented');
+      MidwayLogger.info('not implemented');
       return [];
     }
   }
@@ -576,11 +572,11 @@ export class JobQueue
     const emailIntegrations: IntegrationConfig[] = await integrations.get(null, undefined, 'Email', true) as IntegrationConfig[];
     if (emailIntegrations.length !== 1)
     {
-      winston.warn(`Invalid number of email integrations, found ${emailIntegrations.length}`);
+      MidwayLogger.warn(`Invalid number of email integrations, found ${emailIntegrations.length}`);
     }
     else if (emailIntegrations.length === 1 && emailIntegrations[0].name !== 'Default Failure Email')
     {
-      winston.warn('Invalid Email found.');
+      MidwayLogger.warn('Invalid Email found.');
     }
     else
     {
@@ -601,7 +597,7 @@ export class JobQueue
               const subject: string = `[${fullConfig['customerName']}] Schedule "${schedules[0].name}" failed at job ${jobs[0].id}`;
               const body: string = 'Check the job log table for details'; // should we include the log contents? jobLogs[0].contents
               const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body);
-              winston.info(`Email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
+              MidwayLogger.info(`Email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
             }
           }
         }

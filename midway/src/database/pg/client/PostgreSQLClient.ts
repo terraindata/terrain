@@ -51,7 +51,7 @@ import { DatabaseControllerStatus } from '../../DatabaseControllerStatus';
 import PostgreSQLConfig from '../PostgreSQLConfig';
 import PostgreSQLController from '../PostgreSQLController';
 
-import { IsolationLevel, TransactionHandle } from '../../../tasty/TastyDB';
+import { TransactionHandle } from '../../../tasty/TastyDB';
 
 /**
  * An client which acts as a selective isomorphic wrapper around

@@ -55,7 +55,6 @@ import { Colors } from '../../../colors/Colors';
 const d3 = require('d3');
 const moment = require('moment');
 
-import ElasticBlockHelpers from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import Util from '../../../util/Util';
 
 const xMargin = 45;

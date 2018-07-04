@@ -47,18 +47,13 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
-import * as Radium from 'radium';
 import * as React from 'react';
-
-import FadeInOut from 'common/components/FadeInOut';
-import { ComponentProps } from 'common/components/walkthrough/WalkthroughTypes';
 
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Quarantine from 'util/RadiumQuarantine';
 
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
-import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import './ETLStepComponent.less';
 
 export interface StepProps

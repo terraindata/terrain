@@ -43,9 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import * as Immutable from 'immutable';
 import { JobsActionTypes, JobsReducers as reducer } from 'jobs/data/JobsRedux';
-import { _JobConfig, _JobsState, JobsState } from 'jobs/JobsTypes';
+import { _JobConfig, _JobsState } from 'jobs/JobsTypes';
 import JobsHelper from 'test-helpers/JobsHelper';
 import Util from 'util/Util';
 

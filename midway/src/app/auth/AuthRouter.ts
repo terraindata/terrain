@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
 
+import { MidwayLogger } from '../log/MidwayLogger';
 import { UserConfig } from '../users/UserConfig';
 import { users } from '../users/UserRouter';
 
@@ -61,7 +61,7 @@ Router.post('/login', passport.authenticate('local'), async (ctx, next) =>
       accessToken: ctx.state.user.accessToken,
       id: ctx.state.user.id,
     };
-  winston.info('User has successfully authenticated as ' + String(ctx.state.user.email));
+  MidwayLogger.info('User has successfully authenticated as ' + String(ctx.state.user.email));
 });
 
 Router.post('/logout', async (ctx, next) =>
@@ -77,7 +77,7 @@ Router.post('/logout', async (ctx, next) =>
     ctx.body = '';
     return;
   }
-  winston.info('Logging out user ' + String((logoutStatus as UserConfig).email));
+  MidwayLogger.info('Logging out user ' + String((logoutStatus as UserConfig).email));
 
   ctx.body = await users.logout(Number(ctx.request.body['id']), ctx.request.body['accessToken']);
 });

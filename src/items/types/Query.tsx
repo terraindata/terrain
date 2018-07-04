@@ -46,10 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:variable-name strict-boolean-expressions member-access comment-format
 
-import { List, Map, Record } from 'immutable';
+import { List, Map } from 'immutable';
 
 import * as Immutable from 'immutable';
-import { BaseClass, createRecordType, New } from 'shared/util/Classes';
+import { createRecordType } from 'shared/util/Classes';
 import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
 import { _ResultsConfig } from '../../../shared/results/types/ResultsConfig';
 import { _Path, Path } from '../../app/builder/components/pathfinder/PathfinderTypes';

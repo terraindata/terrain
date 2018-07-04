@@ -45,13 +45,12 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as stream from 'stream';
-import * as winston from 'winston';
 
 import { TaskConfig } from 'shared/types/jobs/TaskConfig';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 import { templates } from '../../etl/TemplateRouter';
-import Templates from '../../etl/Templates';
 import LogStream from '../../io/streams/LogStream';
+import { MidwayLogger } from '../../log/MidwayLogger';
 import { Task } from '../Task';
 
 export class TaskETL extends Task
@@ -81,7 +80,7 @@ export class TaskETL extends Task
       {
         const streams = await templates.executeETL(this.taskConfig['params']['options'],
           this.taskConfig['params']['options']['inputStreams']);
-        winston.info('finished executing ETL');
+        MidwayLogger.info('finished executing ETL');
         taskOutputConfig['options']['outputStream'] = streams['outputStream'];
         taskOutputConfig['options']['logStream'] = streams['logStream'];
 
@@ -108,7 +107,7 @@ export class TaskETL extends Task
       catch (e)
       {
         taskOutputConfig.status = false;
-        winston.error('Error while running ETL task: ' + String(e.toString()));
+        MidwayLogger.error('Error while running ETL task: ' + String(e.toString()));
         const outputStream = new stream.Readable();
         outputStream.push(null);
         const logStream = new LogStream();
@@ -141,7 +140,7 @@ export class TaskETL extends Task
 
   public async printNode(): Promise<TaskOutputConfig>
   {
-    winston.info('Printing ETL Task, params: ' + JSON.stringify(this.taskConfig.params as object));
+    MidwayLogger.info('Printing ETL Task, params: ' + JSON.stringify(this.taskConfig.params as object));
     return Promise.resolve(
       {
         exit: false,

@@ -44,10 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { Readable } from 'stream';
-
 import { ATaskConfig } from 'shared/types/jobs/ATaskConfig';
-import { TaskConfigTypes } from 'shared/types/jobs/TaskConfigTypes';
 import { TaskOutputConfigTypes } from 'shared/types/jobs/TaskOutputConfigTypes';
 
 export class TaskOutputConfig extends ATaskConfig

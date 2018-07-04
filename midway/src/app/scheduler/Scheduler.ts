@@ -46,17 +46,13 @@ THE SOFTWARE.
 
 import * as cronParser from 'cron-parser';
 import * as momentZone from 'moment-timezone';
-import * as stream from 'stream';
-import * as winston from 'winston';
 
 import { JobConfig } from 'shared/types/jobs/JobConfig';
-import { TaskConfig } from 'shared/types/jobs/TaskConfig';
-import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 import * as Tasty from '../../tasty/Tasty';
 import { TransactionHandle } from '../../tasty/TastyDB';
 import * as App from '../App';
-import IntegrationConfig from '../integrations/IntegrationConfig';
 import { Job } from '../jobs/Job';
+import { MidwayLogger } from '../log/MidwayLogger';
 import { UserConfig } from '../users/UserConfig';
 import SchedulerConfig from './SchedulerConfig';
 
@@ -138,7 +134,7 @@ export class Scheduler
       }
       catch (e)
       {
-        winston.warn(e.toString());
+        MidwayLogger.warn(e.toString());
         return false;
       }
     });
@@ -345,7 +341,7 @@ export class Scheduler
           }
           catch (err)
           {
-            winston.warn(err.toString() as string);
+            MidwayLogger.warn(err.toString() as string);
           }
         }
 
@@ -360,7 +356,7 @@ export class Scheduler
     const result: SchedulerConfig[] | string = await this.runSchedule(scheduleId, handle);
     if (typeof result === 'string')
     {
-      winston.info(result as string);
+      MidwayLogger.info(result as string);
     }
   }
 
@@ -381,7 +377,7 @@ export class Scheduler
     }
     catch (e)
     {
-      winston.warn('Error while trying to parse scheduler cron: ' + ((e as any).toString() as string));
+      MidwayLogger.warn('Error while trying to parse scheduler cron: ' + ((e as any).toString() as string));
     }
     return false;
   }

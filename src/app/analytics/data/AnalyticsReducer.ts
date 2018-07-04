@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
-import Ajax from 'util/Ajax';
 import ActionTypes from './AnalyticsActionTypes';
 import { _AnalyticsState, AnalyticsState } from './AnalyticsStore';
 

@@ -44,12 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import MultipleAreaChart from 'charts/components/MultipleAreaChart';
-import { mount, shallow } from 'enzyme';
+import { shallow } from 'enzyme';
 import * as Immutable from 'immutable';
-import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
-import configureStore from 'redux-mock-store';
-import { ItemType } from '../../../items/types/Item';
 
 describe('MultipleAreaChart', () =>
 {

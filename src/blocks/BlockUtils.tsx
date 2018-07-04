@@ -56,7 +56,7 @@ import { createRecordType } from 'shared/util/Classes';
 import { DisplayType } from './displays/Display';
 // import { AllBackendsMap } from '../database/AllBackends';
 
-const { List, Map } = Immutable;
+import { List, Map } from 'immutable';
 
 export function getChildIds(_block: Block): IMMap<ID, boolean>
 {

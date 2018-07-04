@@ -46,9 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions variable-name
 
-import * as Immutable from 'immutable';
 import * as ReduxActions from 'redux-actions';
-import { BaseClass, createRecordType, New } from 'shared/util/Classes';
+import { BaseClass, createRecordType } from 'shared/util/Classes';
 const Redux = require('redux');
 
 export class BuilderScrollStateClass extends BaseClass
