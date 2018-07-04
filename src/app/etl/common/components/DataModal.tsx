@@ -107,7 +107,8 @@ export default class DataModal extends TerrainComponent<Props>
             key={i}
             onClick={this._fn(this.onTabChange, optionName)}
             style={{
-              color: (this.state.currentOptionIndex === this.props.sectionOptions.indexOf(optionName)) ? Colors().mainBlue : Colors().sectionEditButton,
+              color: (this.state.currentOptionIndex === this.props.sectionOptions.indexOf(optionName)) ? 
+                Colors().mainBlue : Colors().sectionEditButton,
               background: Colors().bg,
             }}
           >
