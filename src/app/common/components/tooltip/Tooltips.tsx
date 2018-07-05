@@ -245,7 +245,7 @@ export const TOOLTIP_THEMES: Themes = {
     fontColor: () => '#242424',
   },
   error: {
-    backgroundColor: () => Colors().logLevels.error,
+    backgroundColor: () => Colors().error,
     fontColor: () => Colors().fontWhite,
   },
   noStyle: {
