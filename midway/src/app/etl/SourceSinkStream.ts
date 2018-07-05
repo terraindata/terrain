@@ -203,7 +203,8 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
       }
       else if (importStreams.length > 1)
       {
-        const merge = (streams) => {
+        const merge = (streams) =>
+        {
           let pass = new stream.PassThrough({ objectMode: true });
           let waiting = streams.length;
           for (const s of streams)

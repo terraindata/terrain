@@ -57,6 +57,7 @@ import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { FieldVerification } from 'shared/etl/languages/LanguageControllers';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -195,6 +196,7 @@ class EditorDisplayStateC
       closeCallback: null,
     };
 
+  public fieldVerifications: Immutable.Map<number, List<FieldVerification>> = Map() as any;
   public currentEdge: number = -1;
   public engineVersion: number = 0;
   public columnState: ColumnOptions = ColumnOptions.Endpoints;
