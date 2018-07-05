@@ -72,7 +72,7 @@ export class SetIfTransformationNode extends SimpleTransformationType
     }
     else
     {
-      return undefined;
+      return el;
     }
   }
 }
@@ -98,25 +98,25 @@ export const SetIfTransformationInfo = new SetIfTransformationInfoC();
 
 function setIfHelper(o: NodeOptionsType<TransformationNodeType.SetIfNode>, e: any)
 {
-  if (o.filterNaN)
+  if (o.filterNaN && isNaN(e))
   {
-    return isNaN(e);
+    return true;
   }
-  else if (o.filterUndefined)
+  else if (o.filterUndefined && e === undefined)
   {
-    return e === undefined;
+    return true;
   }
-  else if (o.filterNull)
+  else if (o.filterNull && e === null)
   {
-    return e === null;
+    return true;
   }
-  else if (o.filterStringNull)
+  else if (o.filterStringNull && e === 'null')
   {
-    return e === 'null';
+    return true;
   }
-  else if (o.filterValue !== undefined)
+  else if (o.filterValue !== undefined && e === o.filterValue)
   {
-    return e === o.filterValue;
+    return true;
   }
 
   return false;

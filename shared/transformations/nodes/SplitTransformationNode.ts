@@ -131,7 +131,7 @@ function splitHelper(el: string, opts: NodeOptionsType<TransformationNodeType.Sp
   }
   else
   {
-    const searcher = opts.regex ? RegExp(opts.delimiter) : opts.delimiter;
+    const searcher = opts.regex ? RegExp(opts.delimiter) : RegExp(_.escapeRegExp(opts.delimiter));
     let str = el;
     let i;
     for (i = 0; i < size - 1; i++)

@@ -350,8 +350,8 @@ const httpMethods = List(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']);
 
 export class HttpEndpointForm extends EndpointFormBase<HttpOptions>
 {
-  public showInputConfig = false;
-  public showPostProcessConfig = false;
+  public showInputConfig = true;
+  public showPostProcessConfig = true;
 
   public inputMap: InputDeclarationMap<HttpOptions> = {
     method: {

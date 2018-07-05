@@ -191,6 +191,7 @@ class EditorDisplayStateC
       closeCallback: null,
     };
 
+  public fieldVerifications: Immutable.Map<number, List<FieldVerification>> = Map() as any;
   public currentEdge: number = -1;
   public engineVersion: number = 0;
   public columnState: ColumnOptions = ColumnOptions.Endpoints;
