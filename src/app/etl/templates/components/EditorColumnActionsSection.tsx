@@ -56,7 +56,6 @@ import { EngineProxy } from 'etl/templates/EngineProxy';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 
-
 export interface Props
 {
   // below from container

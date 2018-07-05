@@ -56,6 +56,7 @@ import Util from 'util/Util';
 import { List } from 'immutable';
 
 import Menu from 'common/components/Menu';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { FieldVerification } from 'shared/etl/languages/LanguageControllers';
 import LanguageController from 'shared/etl/languages/LanguageControllers';

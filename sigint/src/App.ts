@@ -52,7 +52,7 @@ import cors = require('kcors');
 
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
-import { logger } from  './Logging';
+import { logger } from './Logging';
 import Middleware from './Middleware';
 import { Router } from './Router';
 

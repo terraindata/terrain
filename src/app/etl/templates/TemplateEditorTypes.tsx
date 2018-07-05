@@ -55,6 +55,7 @@ import { _HistoryStack, HistoryStack } from 'etl/common/HistoryStack';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { FieldVerification } from 'shared/etl/languages/LanguageControllers';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 export type FieldMap = Immutable.Map<number, TemplateField>;
