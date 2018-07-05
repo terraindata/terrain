@@ -11,6 +11,7 @@ Usage: update_instance -n name -a address -v version-number -[p]
   -p    (optional) Run the app in production (:3000) and not staging (:7000)
   -s    (optional) Whether to make a copy of the current prod DB in a staging DB, and run that DB.
   -d    (optional) Pass in the name of a DB to use when staging, instead of [customer]_production
+  -r    (optional) Skip RSYNC
 EOF
 
 if [ $# -eq 0 ]
@@ -20,7 +21,7 @@ if [ $# -eq 0 ]
     exit 1;
 fi
 
-while getopts "n:a:v:sd:p" opt; do
+while getopts "n:a:v:sd:pr" opt; do
   case $opt in
     n)
       CUSTNAME=$OPTARG
@@ -40,6 +41,8 @@ while getopts "n:a:v:sd:p" opt; do
     s)
       STAGE_DB=true
       ;;
+    r)
+      SKIP_RSYNC=true
     \?)
       echo "Invalid option: -$OPTARG";
       echo "$HELPSTRING";
@@ -129,6 +132,8 @@ if [ "$STAGE_DB" ]
       psql -U "t3rr41n-demo" -d postgres -h localhost -p 5432 -c "create database ${MIDWAY_DB};"
       pg_dump -U "t3rr41n-demo" -d "${SOURCE_DB_NAME}" -h localhost -p 5432 | psql -U "t3rr41n-demo" -d "${MIDWAY_DB}" -h localhost -p 5432 
       ${MIGRATION_COMMAND}
+      psql -U "t3rr41n-demo" -d "${SOURCE_DB_NAME}" -h localhost -p 5432 -c 'update schedules set running = false, "shouldRunNext" = false;'
+      psql -U "t3rr41n-demo" -d "${SOURCE_DB_NAME}" -h localhost -p 5432 -c "update jobs set status='ABORTED', running=false where running=true;"
 EOM
 fi
 
@@ -138,22 +143,26 @@ fi
 echo "Beginning instance update with customer name \""$CUSTNAME"\" and IP address" $ADDRESS;
 echo "App will be running on: ${MIDWAYHOSTNAME}";
 
-# echo "removing node modules...";
-# rm -rf node_modules;
-cd ..
+if [ -z "$CUSTNAME" ]
+  then
+    cd ..
 
-(! test -d Search) && (echo "Error: could not find Search directory"; exit 1);
+    (! test -d Search) && (echo "Error: could not find Search directory"; exit 1);
 
-echo "rsyncing";
+    echo "rsyncing";
+    rsync -vrP  --exclude midway.json --exclude midway.db --exclude node_modules --delete  $PWD/Search terrain@${ADDRESS}:src-${VERSION}/ > "rsynclog.log";
+    echo "rsync complete"
+  else
+    echo "skipping rsync"
+fi
 
-# rsync -vrP  --exclude midway.json --exclude midway.db --exclude node_modules --delete  $PWD/Search terrain@${ADDRESS}:src-${VERSION}/ > "rsynclog.log";
 
 ssh terrain@${ADDRESS} << EOF
 cd src-${VERSION}/Search
 screen -S runmidway-${SCREEN_ID} -X quit;
 ${STAGE_DB_COMMAND};
 screen -d -m -S runmidway-${SCREEN_ID};
-screen -S runmidway-${SCREEN_ID} -X stuff "yarn; yarn build-prod;";
+screen -S runmidway-${SCREEN_ID} -X stuff "yarn; yarn build-prod;\r";
 screen -S runmidway-${SCREEN_ID} -X stuff "NODE_ENV=production yarn start-midway -p ${PORT} -i ${MIDWAY_DB} > >(tee -a /var/log/midway/midway_${VERSION}_${PORT}.log) 2> >(tee -a /var/log/midway/midway_error_${VERSION}_${PORT}.log >&2)\r";
 EOF
 
