@@ -2,7 +2,7 @@
 
 # Default parameters
 host="http://localhost:9200"
-index="terrain-analytics"
+index="abc.terrain-analytics"
 type="events"
 maxHitsPerBucket=5
 verbose=0
