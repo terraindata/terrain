@@ -146,7 +146,7 @@ cd ..
 
 echo "rsyncing";
 
-# rsync -vrP  --exclude midway.json --exclude midway.db --exclude node_modules --delete  $PWD/Search terrain@${ADDRESS}:src-${VERSION}/ > "rsynclog.log";
+rsync -vrP  --exclude midway.json --exclude midway.db --exclude node_modules --delete  $PWD/Search terrain@${ADDRESS}:src-${VERSION}/ > "rsynclog.log";
 
 ssh terrain@${ADDRESS} << EOF
 cd src-${VERSION}/Search
