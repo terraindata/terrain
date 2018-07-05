@@ -46,6 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as React from 'react';
+const { List } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
 import Colors from 'app/colors/Colors';
@@ -57,9 +61,6 @@ import DropZone from 'app/common/components/DropZone';
 import { RouteSelectorOption, RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
 import Util from 'app/util/Util';
 import FadeInOut from 'common/components/FadeInOut';
-import { List } from 'immutable';
-import * as _ from 'lodash';
-import * as React from 'react';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import
@@ -71,6 +72,8 @@ import TerrainComponent from './../../../../common/components/TerrainComponent';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
 import './PathfinderFilterStyle.less';
+
+import * as TerrainLog from 'loglevel';
 
 export interface Props
 {
@@ -130,13 +133,15 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if ((this.props.pathfinderContext.source.dataSource as any).index !==
-      (nextProps.pathfinderContext.source.dataSource as any).index)
+    const newOptions = this.getFieldOptionSet(nextProps);
+    if (Immutable.is(newOptions.options, this.state.fieldOptionSet.options) === false)
     {
+      TerrainLog.debug('Update options, new size ' + String(newOptions.options.size));
       this.setState({
-        fieldOptionSet: this.getFieldOptionSet(nextProps),
+        fieldOptionSet: newOptions,
       });
     }
+
     // If inputs changes, or parent query data source changes, update value possibilities
     if (nextProps.pathfinderContext.builderState.query &&
       this.props.pathfinderContext.builderState.query &&
