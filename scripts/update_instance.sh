@@ -43,6 +43,7 @@ while getopts "n:a:v:sd:pr" opt; do
       ;;
     r)
       SKIP_RSYNC=true
+      ;;
     \?)
       echo "Invalid option: -$OPTARG";
       echo "$HELPSTRING";
@@ -143,7 +144,7 @@ fi
 echo "Beginning instance update with customer name \""$CUSTNAME"\" and IP address" $ADDRESS;
 echo "App will be running on: ${MIDWAYHOSTNAME}";
 
-if [ -z "$CUSTNAME" ]
+if [ -z "$SKIP_RSYNC" ]
   then
     cd ..
 
