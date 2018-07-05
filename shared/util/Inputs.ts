@@ -117,7 +117,7 @@ export class Inputs
 
   public replaceInputs(origFilename: string, inputs: InputConfig[], inputIndex = 0): string[]
   {
-    if (inputIndex === inputs.length)
+    if (inputs == null || inputIndex === inputs.length)
     {
       return [origFilename];
     }
