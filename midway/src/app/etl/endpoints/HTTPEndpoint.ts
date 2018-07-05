@@ -65,7 +65,7 @@ export default class HTTPEndpoint extends AEndpointStream
   public async getSource(source: SourceConfig): Promise<Readable[]>
   {
     const config = await this.getIntegrationConfig(source.integrationId);
-    const urls = inputs.replaceInputs(config['url'], source.rootInputConfig['inputs'] as any);
+    const urls = inputs.replaceInputs(config['url'], source.rootInputConfig['inputs']);
     const promises = urls.map((url) =>
     {
       const newConfig = JSON.parse(JSON.stringify(config));
