@@ -330,13 +330,15 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         return state.update('blockState', action.payload.updater);
       },
       getMapping: (state, action) => state,
-      setMapping: (state, action) => {
+      setMapping: (state, action) =>
+      {
         const { serverId, database, mapping } = action.payload;
         return state.update('mappingCache',
           (cache) => cache.set(this.hashMappingId(serverId, database), mapping),
         );
       },
-      clearMappingCache: (state, action) => {
+      clearMappingCache: (state, action) =>
+      {
         return state.set('mappingCache', Map());
       },
     };

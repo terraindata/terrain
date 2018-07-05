@@ -135,7 +135,8 @@ class VerificationManager extends TerrainComponent<Props>
     const { uiState } = this.props.templateEditor;
     let existingMap = uiState.fieldVerifications;
     const newMap = {};
-    verifications.forEach((ver) => {
+    verifications.forEach((ver) =>
+    {
       const currArr: FieldVerification[] = _.get(newMap, ver.fieldId, []) as any;
       currArr.push(ver);
       newMap[ver.fieldId] = currArr;
@@ -163,7 +164,8 @@ class VerificationManager extends TerrainComponent<Props>
 
     const idsToDelete: number[] = [];
     const idsToUpdate: number[] = [];
-    existingMap.forEach((vers, id) => {
+    existingMap.forEach((vers, id) =>
+    {
       if (newMap[id] === undefined)
       {
         idsToDelete.push(id);
@@ -196,7 +198,8 @@ class VerificationManager extends TerrainComponent<Props>
   private computeVerifications()
   {
     this.isComputing = true;
-    this.iterateOverVerifications().then((verifications) => {
+    this.iterateOverVerifications().then((verifications) =>
+    {
       this.isComputing = false;
       const verificationMap = this.updateVerificationMap(verifications);
       this.props.editorAct({
@@ -205,7 +208,8 @@ class VerificationManager extends TerrainComponent<Props>
           fieldVerifications: verificationMap,
         },
       });
-    }).catch((ev) => {
+    }).catch((ev) =>
+    {
       // computation was canceled
       this.isComputing = false;
     });
@@ -213,7 +217,8 @@ class VerificationManager extends TerrainComponent<Props>
 
   private getMapping(sink): Promise<object>
   {
-    return new Promise<object>((resolve, reject) => {
+    return new Promise<object>((resolve, reject) =>
+    {
       if (sink != null && sink.type === Sinks.Database)
       {
         const serverId = sink.options.serverId;
@@ -235,7 +240,8 @@ class VerificationManager extends TerrainComponent<Props>
 
   private iterateOverVerifications(): Promise<List<FieldVerification>>
   {
-    return new Promise<List<FieldVerification>>(async (resolve, reject) => {
+    return new Promise<List<FieldVerification>>(async (resolve, reject) =>
+    {
       const { templateEditor } = this.props;
       const lang = templateEditor.template.getEdgeLanguage(templateEditor.getCurrentEdgeId());
       const controller = LanguageController.get(lang);

@@ -235,7 +235,8 @@ class EditorFieldPreview extends TemplateEditorField<Props>
       return null;
     }
 
-    const elements = verifications.map((verification, key) => {
+    const elements = verifications.map((verification, key) =>
+    {
       const { fieldId, message, type } = verification;
       const style = type === 'error' ? fontColor(Colors().logLevels.error) : fontColor(Colors().logLevels.warn);
       return (
@@ -249,7 +250,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
                 style={style}
                 className='editor-field-verification-icon'
               >
-                <ErrorIcon/>
+                <ErrorIcon />
               </div>,
               {
                 title: `${type === 'error' ? 'Error' : 'Warning'}: ${message}`,
@@ -263,7 +264,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     });
     return (
       <div className='field-preview-verifications'>
-        { elements }
+        {elements}
       </div>
     );
   }

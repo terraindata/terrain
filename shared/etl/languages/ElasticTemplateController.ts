@@ -160,8 +160,8 @@ class ElasticController extends DefaultController implements LanguageInterface
           yielded = true;
           yield ({
             fieldId: id,
-            message: 'Field name contains spaces. This is not recommended',
-            type: 'warning',
+            message: 'Field name contains spaces.',
+            type: 'error',
           } as FieldVerification);
         }
       }
