@@ -133,8 +133,8 @@ if [ "$STAGE_DB" ]
       psql -U "t3rr41n-demo" -d postgres -h localhost -p 5432 -c "create database ${MIDWAY_DB};"
       pg_dump -U "t3rr41n-demo" -d "${SOURCE_DB_NAME}" -h localhost -p 5432 | psql -U "t3rr41n-demo" -d "${MIDWAY_DB}" -h localhost -p 5432 
       ${MIGRATION_COMMAND}
-      psql -U "t3rr41n-demo" -d "${SOURCE_DB_NAME}" -h localhost -p 5432 -c 'update schedules set running = false, "shouldRunNext" = false;'
-      psql -U "t3rr41n-demo" -d "${SOURCE_DB_NAME}" -h localhost -p 5432 -c "update jobs set status='ABORTED', running=false where running=true;"
+      psql -U "t3rr41n-demo" -d "${MIDWAY_DB}" -h localhost -p 5432 -c 'update schedules set running = false, "shouldRunNext" = false;'
+      psql -U "t3rr41n-demo" -d "${MIDWAY_DB}" -h localhost -p 5432 -c "update jobs set status='ABORTED', running=false where running=true;"
 EOM
 fi
 
