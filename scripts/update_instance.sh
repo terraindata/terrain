@@ -157,7 +157,6 @@ if [ -z "$SKIP_RSYNC" ]
     echo "skipping rsync"
 fi
 
-
 ssh terrain@${ADDRESS} << EOF
 cd src-${VERSION}/Search
 screen -S runmidway-${SCREEN_ID} -X quit;

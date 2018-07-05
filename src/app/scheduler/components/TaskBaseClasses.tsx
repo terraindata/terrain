@@ -53,11 +53,11 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { instanceFnDecorator } from 'shared/util/Classes';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import ObjectForm from 'common/components/ObjectForm';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { instanceFnDecorator } from 'shared/util/Classes';
 
 import EndpointForm from 'app/etl/common/components/EndpointForm';
 import { ParamConfigType, TaskConfig } from 'app/scheduler/SchedulerTypes';
@@ -250,7 +250,7 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
       },
     },
   };
-  
+
   @instanceFnDecorator(memoizeOne)
   private getAvailableTemplates(templates: List<ETLTemplate>): List<ETLTemplate>
   {

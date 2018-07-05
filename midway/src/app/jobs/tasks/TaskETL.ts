@@ -114,7 +114,6 @@ export class TaskETL extends Task
         const logStream = new LogStream();
         logStream.pipe(this.taskConfig.rootLogStream, { end: false });
         logStream.log('Error while running ETL task: ' + String(e.toString()), 'error');
-        this.taskConfig.rootLogStream.push(null);
         logStream.push(null);
         taskOutputConfig['options']['logStream'] = logStream;
         taskOutputConfig['options']['outputStream'] = outputStream;
