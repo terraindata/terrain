@@ -201,6 +201,22 @@ export interface ETLActionTypes
     actionType: 'updateBlockers';
     updater: (block: NotificationState) => NotificationState;
   };
+  getMapping: {
+    actionType: 'getMapping';
+    serverId: string;
+    database: string;
+    onLoad?: (result: object) => void;
+    onError?: ErrorHandler;
+  };
+  setMapping: {
+    actionType: 'setMapping';
+    mapping: object;
+    serverId: string;
+    database: string;
+  };
+  clearMappingCache: {
+    actionType: 'clearMappingCache';
+  };
 }
 
 class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
@@ -312,6 +328,18 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       updateBlockers: (state, action) =>
       {
         return state.update('blockState', action.payload.updater);
+      },
+      getMapping: (state, action) => state,
+      setMapping: (state, action) =>
+      {
+        const { serverId, database, mapping } = action.payload;
+        return state.update('mappingCache',
+          (cache) => cache.set(this.hashMappingId(serverId, database), mapping),
+        );
+      },
+      clearMappingCache: (state, action) =>
+      {
+        return state.set('mappingCache', Map());
       },
     };
 
@@ -459,6 +487,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     };
   }
 
+  // todo rename this to be "beforeAsync?"
   public beforeSaveOrCreate(name, directDispatch)
   {
     directDispatch({
@@ -612,6 +641,43 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
 
+  public hashMappingId(serverId: string, database: string)
+  {
+    return `${serverId}, ${database}`;
+  }
+
+  public getMapping(action: ETLActionType<'getMapping'>, dispatch, getState)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const { mappingCache } = this._getState(getState);
+    const hash = this.hashMappingId(action.serverId, action.database);
+    if (mappingCache.has(hash))
+    {
+      if (action.onLoad !== undefined)
+      {
+        action.onLoad(mappingCache.get(hash));
+      }
+    }
+    else
+    {
+      const name = action.actionType;
+      this.beforeSaveOrCreate(name, directDispatch);
+      const onLoad = (response) =>
+      {
+        directDispatch({
+          actionType: 'setMapping',
+          mapping: response,
+          serverId: action.serverId,
+          database: action.database,
+        });
+      };
+      return ETLAjax.getMapping(action.serverId, action.database)
+        .then(this.onLoadFactory([onLoad, action.onLoad], directDispatch, name))
+        .catch(this.onErrorFactory(action.onError, directDispatch, name));
+    }
+
+  }
+
   public overrideAct(action: Unroll<ETLActionTypes>)
   {
     switch (action.actionType)
@@ -642,6 +708,8 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         return this.createIntegration.bind(this, action);
       case 'deleteIntegration':
         return this.deleteIntegration.bind(this, action);
+      case 'getMapping':
+        return this.getMapping.bind(this, action);
       default:
         return undefined;
     }

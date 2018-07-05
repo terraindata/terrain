@@ -286,7 +286,6 @@ export default class MergeJoinTransform extends SafeReadable
       }
 
       this.leftPosition++;
-      this.rightPosition++;
     }
 
     if (this.leftPosition >= left.length)

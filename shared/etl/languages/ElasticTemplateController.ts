@@ -49,8 +49,9 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import * as _ from 'lodash';
 
-import { LanguageInterface } from 'shared/etl/languages/LanguageControllers';
-import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
+import { FieldVerification, LanguageInterface } from 'shared/etl/languages/LanguageControllers';
+import { ElasticMapping, MappingType } from 'shared/etl/mapping/ElasticMapping';
+import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import TypeUtil from 'shared/etl/TypeUtil';
@@ -133,6 +134,56 @@ class ElasticController extends DefaultController implements LanguageInterface
     }
 
     return errors;
+  }
+
+  public *getFieldErrors(engine: TransformationEngine, sink: SinkConfig, mapping?: object)
+  {
+    let existingMapping: MappingType;
+    if (sink.type === Sinks.Database
+      && mapping !== undefined
+      && mapping[sink.options.table] !== undefined
+    )
+    {
+      existingMapping = { properties: mapping[sink.options.table] };
+    }
+
+    const ids = engine.getAllFieldIDs();
+    for (const id of ids.values() as IterableIterator<number>) // cannot use forEach inside iterator
+    {
+      let yielded = false; // make sure we yield at least once per field to allow async
+      const okp = engine.getOutputKeyPath(id);
+      const name = okp.last();
+      if (typeof name === 'string')
+      {
+        if (name.indexOf(' ') !== -1)
+        {
+          yielded = true;
+          yield ({
+            fieldId: id,
+            message: 'Field name contains spaces.',
+            type: 'error',
+          } as FieldVerification);
+        }
+      }
+      if (existingMapping !== undefined)
+      {
+        const { valid, message } = ElasticMapping.compareSingleField(id, engine, existingMapping);
+
+        if (!valid)
+        {
+          yielded = true;
+          yield ({
+            fieldId: id,
+            message,
+            type: 'error',
+          }) as FieldVerification;
+        }
+      }
+      if (!yielded)
+      {
+        yield null; // since we can't yield like in node
+      }
+    }
   }
 }
 
