@@ -331,6 +331,9 @@ class ExecutionHelpers extends ETLHelpers
             this.schemaAct({
               actionType: 'fetch',
             });
+            this.etlAct({
+              actionType: 'clearMappingCache',
+            });
 
             let message = '';
             let notificationType = 'info';
