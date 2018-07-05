@@ -260,7 +260,7 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
 
 type FormLookupMap =
   {
-    [k in TaskEnum]: React.ComponentClass<Props>
+    [k: number]: React.ComponentClass<Props>
   };
 
 export const TaskFormMap: FormLookupMap =
