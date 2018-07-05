@@ -80,7 +80,7 @@ export class SetIfTransformationNode extends SimpleTransformationType
     }
     else
     {
-      return undefined;
+      return el;
     }
   }
 }

@@ -54,6 +54,13 @@ import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/Endpo
 import DefaultTemplateController from './DefaultTemplateController';
 import ElasticTemplateController from './ElasticTemplateController';
 
+export interface FieldVerification
+{
+  fieldId: number;
+  message: string;
+  type: 'warning' | 'error';
+}
+
 export interface LanguageInterface
 {
   language: Languages;
@@ -67,6 +74,9 @@ export interface LanguageInterface
   changeFieldTypeSideEffects: (engine: TransformationEngine, fieldId: number, newType: ETLFieldTypes) => boolean;
   // verify if the sink mapping is compatible. Returns an empty array if there are no issues
   verifyMapping: (engine: TransformationEngine, sink: SinkConfig, existingMapping?: object) => string[];
+  // get potential issues for fields
+  getFieldErrors: (engine: TransformationEngine, sink: SinkConfig, existingMapping?: object)
+    => IterableIterator<FieldVerification | null>;
 }
 
 export default class LanguageControllers
