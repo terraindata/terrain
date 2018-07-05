@@ -1,4 +1,2 @@
-Version: v5.1
-Updates: FUB Integration
-Version: v4.1.1
-Updates: ETL Customer Ready - PLA Feed Update
+Version: v5.2
+Updates: v5 Release
