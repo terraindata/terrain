@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as fs from 'fs';
+import * as _ from 'lodash';
 import * as util from 'util';
 
 import { TestLogger } from 'shared/test/TestLogger';
@@ -103,6 +104,22 @@ function testParse(testName: string,
     const oldfrom = Number(expectedValue.from);
     interpreter.adjustQuerySize(1, 200, 2, true);
     expect(interpreter.rootValueInfo.value.from).toBe(oldfrom + 1);
+  }
+
+  const factors = _.get(interpreter.rootValueInfo.value, ['sort', '_script', 'script', 'params', 'factors']);
+  if (Array.isArray(factors) && factors.length > 0)
+  {
+    interpreter.normalizeTerrainScriptWeight();
+    const newFactors = _.get(interpreter.rootValueInfo.value, ['sort', '_script', 'script', 'params', 'factors']);
+    let newSum = 0;
+    newFactors.map((f) =>
+    {
+      newSum = newSum + Number(f.weight);
+    });
+    const sumDiff = 1 - newSum;
+    TestLogger.info('Old weights: ' + JSON.stringify(factors.map((f) => f.weight)) + ' New weights: ' +
+      JSON.stringify(newFactors.map((f) => f.weight)) + ' Weight sum diff ' + String(sumDiff));
+    expect(Math.abs(1 - newSum) < 0.001).toBe(true);
   }
 }
 
