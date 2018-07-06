@@ -142,8 +142,9 @@ fi
 # SECTION: Version 
 
 echo "Beginning instance update with customer name \""$CUSTNAME"\" and IP address" $ADDRESS;
+echo "App will use port ${PORT} on version ${VERSION}";
 echo "App will be running on: ${MIDWAYHOSTNAME}";
-
+echo "App will use database: ${MIDWAY_DB}";
 if [ -z "$SKIP_RSYNC" ]
   then
     cd ..
@@ -160,7 +161,7 @@ fi
 ssh terrain@${ADDRESS} << EOF
 cd src-${VERSION}/Search
 screen -S runmidway-${SCREEN_ID} -X quit;
-${STAGE_DB_COMMAND};
+${STAGE_DB_COMMAND}
 screen -d -m -S runmidway-${SCREEN_ID};
 screen -S runmidway-${SCREEN_ID} -X stuff "yarn; yarn build-prod;\r";
 screen -S runmidway-${SCREEN_ID} -X stuff "NODE_ENV=production yarn start-midway -p ${PORT} -i ${MIDWAY_DB} > >(tee -a /var/log/midway/midway_${VERSION}_${PORT}.log) 2> >(tee -a /var/log/midway/midway_error_${VERSION}_${PORT}.log >&2)\r";
