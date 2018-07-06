@@ -678,49 +678,49 @@ export default class EngineUtil
     }
   }
 
-  public static createTreeFromEngine(engine: TransformationEngine): Immutable.Map<number, List<number>>
-  {
-    const ids = engine.getAllFieldIDs();
-    // sort the paths to ensure we visit parents before children
-    const sortedIds = ids.sort((a, b) => engine.getOutputKeyPath(a).size - engine.getOutputKeyPath(b).size);
+  // public static createTreeFromEngine(engine: TransformationEngine): Immutable.Map<number, List<number>>
+  // {
+  //   const ids = engine.getAllFieldIDs();
+  //   // sort the paths to ensure we visit parents before children
+  //   const sortedIds = ids.sort((a, b) => engine.getOutputKeyPath(a).size - engine.getOutputKeyPath(b).size);
 
-    const enginePathToField: {
-      [kp: string]: List<number>,
-    } = {};
+  //   const enginePathToField: {
+  //     [kp: string]: List<number>,
+  //   } = {};
 
-    sortedIds.forEach((id, index) =>
-    {
-      const enginePath = engine.getOutputKeyPath(id).toJS();
-      if (enginePath.length === 0)
-      {
-        return;
-      }
-      const parentPath = enginePath.slice(0, -1);
-      const parentHash = JSON.stringify(parentPath);
-      const parentField: List<number> = enginePathToField[parentHash];
-      const newField = List([]);
+  //   sortedIds.forEach((id, index) =>
+  //   {
+  //     const enginePath = engine.getOutputKeyPath(id).toJS();
+  //     if (enginePath.length === 0)
+  //     {
+  //       return;
+  //     }
+  //     const parentPath = enginePath.slice(0, -1);
+  //     const parentHash = JSON.stringify(parentPath);
+  //     const parentField: List<number> = enginePathToField[parentHash];
+  //     const newField = List([]);
 
-      if (parentField != null)
-      {
-        enginePathToField[parentHash] = parentField.push(id);
-      }
-      enginePathToField[JSON.stringify(enginePath)] = newField;
-    });
+  //     if (parentField != null)
+  //     {
+  //       enginePathToField[parentHash] = parentField.push(id);
+  //     }
+  //     enginePathToField[JSON.stringify(enginePath)] = newField;
+  //   });
 
-    const fieldMap: { [k: number]: List<number> } = {};
-    sortedIds.forEach((id, index) =>
-    {
-      const enginePath = engine.getOutputKeyPath(id).toJS();
-      const field = enginePathToField[JSON.stringify(enginePath)];
-      if (field != null)
-      {
-        fieldMap[id] = field;
-      }
-    });
-    return Immutable.Map<number, List<number>>(fieldMap)
-      .mapKeys((key) => Number(key))
-      .toMap();
-  }
+  //   const fieldMap: { [k: number]: List<number> } = {};
+  //   sortedIds.forEach((id, index) =>
+  //   {
+  //     const enginePath = engine.getOutputKeyPath(id).toJS();
+  //     const field = enginePathToField[JSON.stringify(enginePath)];
+  //     if (field != null)
+  //     {
+  //       fieldMap[id] = field;
+  //     }
+  //   });
+  //   return Immutable.Map<number, List<number>>(fieldMap)
+  //     .mapKeys((key) => Number(key))
+  //     .toMap();
+  // }
 
   public static postorderForEach(
     engine: TransformationEngine,
@@ -728,7 +728,7 @@ export default class EngineUtil
     fn: (id: number) => void,
   )
   {
-    const tree = EngineUtil.createTreeFromEngine(engine);
+    const tree = engine.createTree();
     for (const id of EngineUtil.postorder(tree, fromId))
     {
       fn(id);
@@ -741,7 +741,7 @@ export default class EngineUtil
     fn: (id: number) => void,
   )
   {
-    const tree = EngineUtil.createTreeFromEngine(engine);
+    const tree = engine.createTree();
     for (const id of EngineUtil.preorder(tree, fromId))
     {
       fn(id);
