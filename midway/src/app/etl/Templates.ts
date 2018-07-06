@@ -244,33 +244,26 @@ export default class Templates
     files?: Readable[],
   ): Promise<{ outputStream: Readable, logStream: Readable }>
   {
-    try
+    if (fields.template !== undefined)
     {
-      if (fields.template !== undefined)
+      const template = JSON.parse(fields.template);
+      return this.execute(template, files);
+    }
+    else if (fields.templateId !== undefined)
+    {
+      const templateId = Number(fields.templateId);
+      if (fields.overrideSources !== undefined || fields.overrideSinks !== undefined)
       {
-        const template = JSON.parse(fields.template);
-        return this.execute(template, files);
-      }
-      else if (fields.templateId !== undefined)
-      {
-        const templateId = Number(fields.templateId);
-        if (fields.overrideSources !== undefined || fields.overrideSinks !== undefined)
-        {
-          return this.executeByOverride(templateId, files, fields.overrideSources, fields.overrideSinks);
-        }
-        else
-        {
-          return this.executeById(templateId, files);
-        }
+        return this.executeByOverride(templateId, files, fields.overrideSources, fields.overrideSinks);
       }
       else
       {
-        throw new Error('Missing template or template ID parameter.');
+        return this.executeById(templateId, files);
       }
     }
-    catch (e)
+    else
     {
-      return Promise.reject(e);
+      throw new Error('Missing template or template ID parameter.');
     }
   }
 
@@ -610,7 +603,7 @@ export default class Templates
     catch (e)
     {
       logStream.error(`Failed to execute ETL pipeline: ${String(e)}`);
-      throw new Error(`Failed to execute ETL pipeline: ${String(e)}`);
+      throw e;
     }
   }
 }

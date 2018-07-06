@@ -87,7 +87,7 @@ export default class HTTPEndpoint extends AEndpointStream
     {
       const method = (options !== undefined && options.method !== undefined) ? options.method : undefined;
       let headers = (httpConfig !== undefined && httpConfig['headers'] !== undefined) ? httpConfig['headers'] : undefined;
-      const params = (httpConfig !== undefined && httpConfig['params'] !== undefined) ? httpConfig['params'] : undefined;
+      const params = (httpConfig !== undefined && httpConfig['params'] !== undefined) ? JSON.stringify(httpConfig['params']) : undefined;
       const paramsKey = (method === 'GET') ? 'qs' : 'body';
       const passThrough = new PassThrough({ highWaterMark: 128 * 1024 });
       const isGzip: boolean = false;
