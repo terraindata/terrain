@@ -304,6 +304,43 @@ export default class ESInterpreter
     }
   }
 
+  public adjustQuerySize(scrollSize: number, maxHit: number, hitsPage: number, appendResults: boolean): string
+  {
+    const query = this.rootValueInfo.value;
+    if (appendResults)
+    {
+      let from = (hitsPage - 1) * scrollSize;
+      if (query.hasOwnProperty('from'))
+      {
+        from += query['from'];
+      }
+      let size = Math.min(scrollSize, maxHit - from);
+      if (query.hasOwnProperty('size'))
+      {
+        size = Math.min(query['size'] - from, size);
+      }
+
+      this.updateChild(this.rootValueInfo, 'size', new ESValueInfo(ESJSONType.number, size >= 0 ? size : 0));
+      this.updateChild(this.rootValueInfo, 'from', new ESValueInfo(ESJSONType.number, from));
+    }
+    else
+    {
+      const size = Math.min(maxHit, hitsPage * scrollSize);
+      if (query.hasOwnProperty('size'))
+      {
+        const updatedSize = Math.min(query['size'], size);
+        this.updateChild(this.rootValueInfo, 'size', new ESValueInfo(ESJSONType.number, updatedSize));
+      }
+    }
+    this.reInterpreting();
+    return this.finalQuery;
+  }
+
+  public normalizeTerrainScriptWeight()
+  {
+
+  }
+
   private linkValueInfo(node: ESValueInfo)
   {
     let newValue;

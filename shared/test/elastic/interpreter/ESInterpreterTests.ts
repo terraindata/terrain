@@ -89,7 +89,21 @@ function testParse(testName: string,
   }
 
   expect(parser.getValue()).toEqual(expectedValue);
+  expect(new ESJSONParser(interpreter.finalQuery).getValue()).toEqual(expectedValue);
   expect(parser.getErrors()).toEqual(expectedErrors);
+  // test post size manipulating
+  if (expectedValue.hasOwnProperty('size'))
+  {
+    interpreter.adjustQuerySize(1, 200, 1, false);
+    expect(interpreter.rootValueInfo.value.size).toBe(1);
+  }
+
+  if (expectedValue.hasOwnProperty('from'))
+  {
+    const oldfrom = Number(expectedValue.from);
+    interpreter.adjustQuerySize(1, 200, 2, true);
+    expect(interpreter.rootValueInfo.value.from).toBe(oldfrom + 1);
+  }
 }
 
 test('parse valid json objects', () =>
