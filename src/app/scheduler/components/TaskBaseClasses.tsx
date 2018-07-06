@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires max-classes-per-file strict-boolean-expressions
 import TerrainComponent from 'common/components/TerrainComponent';
+import memoizeOne from 'memoize-one';
 import * as React from 'react';
 import { Colors, fontColor } from 'src/app/colors/Colors';
 
@@ -58,6 +59,7 @@ import FadeInOut from 'common/components/FadeInOut';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
 
 import { List, Map } from 'immutable';
+import { instanceFnDecorator } from 'shared/util/Classes';
 
 export interface Props
 {
