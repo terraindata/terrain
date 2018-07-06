@@ -89,18 +89,8 @@ export default class EngineUtil
     {
       const fields = engine.getAllFieldIDs();
       const pathTypes: PathHashMap<FieldTypes> = {};
-      const seenOKP = {};
       fields.forEach((id) =>
       {
-        const hashedOKP = EngineUtil.hashPath(engine.getFieldPath(id));
-        if (seenOKP[hashedOKP] !== undefined)
-        {
-          errors.push(`Duplicate Output path detected: ${hashedOKP}`);
-        }
-        else
-        {
-          seenOKP[hashedOKP] = id;
-        }
         const strippedPath = EngineUtil.turnIndicesIntoValue(engine.getFieldPath(id));
         pathTypes[EngineUtil.hashPath(strippedPath)] = engine.getFieldType(id) as FieldTypes;
       });

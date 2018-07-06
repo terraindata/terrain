@@ -430,6 +430,7 @@ export class FieldProxy
         const parentId = this.engine.getFieldID(ancestorPath);
         if (parentId === undefined)
         {
+          console.log('adding field', ancestorPath.toJS());
           this.engineProxy.addField(ancestorPath, ETLFieldTypes.Object);
         }
       }

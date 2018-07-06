@@ -52,7 +52,7 @@ import TransformationRegistry from 'shared/transformations/TransformationRegistr
 import { KeyPath } from 'shared/util/KeyPath';
 import { TestDocs } from './TestDocs';
 
-const NodeConstructor = new TransformationNodeConstructorVisitor();
+// const NodeConstructor = new TransformationNodeConstructorVisitor();
 
 // test('serialize to JSON', () =>
 // {
