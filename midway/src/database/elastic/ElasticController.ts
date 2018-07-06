@@ -109,6 +109,24 @@ class ElasticController extends DatabaseController
       type: this.analyticsType,
     };
   }
+
+  public voidOrPromise(callback: (err, res, status?) => void, f: () => Promise<any>): void | Promise<any>
+  {
+    if (callback != null)
+    {
+      f().then((res) =>
+      {
+        callback(undefined, res);
+      }).catch((e) =>
+      {
+        callback(e, undefined);
+      });
+    }
+    else
+    {
+      return f();
+    }
+  }
 }
 
 export default ElasticController;

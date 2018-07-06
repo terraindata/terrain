@@ -55,72 +55,70 @@ class PrefixedElasticIndices extends ElasticIndices<PrefixedElasticController>
     super(controller, delegate);
   }
 
-  public getMapping(params: Elastic.IndicesGetMappingParams, callback: (error: any, response: any, status: any) => void): void
+  public getMapping(params: Elastic.IndicesGetMappingParams): Promise<any>;
+  public getMapping(params: Elastic.IndicesGetMappingParams, callback: (error: any, response: any, status: any) => void): void;
+  public getMapping(params: Elastic.IndicesGetMappingParams,
+    callback?: (error: any, response: any, status: any) => void): void | Promise<any>
   {
-    this.controller.prependIndexParam(params);
-    return super.getMapping(params, (err, res, status) =>
+    const getMapping = () => super.getMapping(params);
+    return this.controller.voidOrPromise(callback, async () =>
     {
-      if (err)
+      this.controller.prependIndexParam(params);
+      params.ignore = 404;
+      const res = await getMapping();
+      if (res.status === 404)
       {
-        if (err.statusCode === 404)
-        {
-          callback(undefined, {}, 200);
-        }
-        else
-        {
-          callback(err, undefined, status);
-        }
+        return {};
       }
-      else
+      const newRes = {};
+      try
       {
-        const newRes = {};
-        try
+        Object.keys(res).forEach((key) =>
         {
-          Object.keys(res).forEach((key) =>
-          {
-            newRes[this.controller.removeIndexPrefix(key)] = res[key];
-          });
-        }
-        catch (e)
-        {
-          this.log('error', e);
-          return callback(e, undefined, status);
-        }
-        callback(err, newRes, status);
+          newRes[this.controller.removeIndexPrefix(key)] = res[key];
+        });
       }
+      catch (e)
+      {
+        this.log('error', e);
+        throw e;
+      }
+      return newRes;
+    });
+  }
+  public create(params: Elastic.IndicesCreateParams): Promise<any>;
+  public create(params: Elastic.IndicesCreateParams, callback: (error: any, response: any, status: any) => void): void;
+  public create(params: Elastic.IndicesCreateParams, callback?: (error: any, response: any, status: any) => void): void | Promise<any>
+  {
+    const create = () => super.create(params);
+    return this.controller.voidOrPromise(callback, async () =>
+    {
+      this.controller.prependIndexParam(params);
+      const res = await create();
+      res.index = this.controller.removeIndexPrefix(res.index);
+      return res;
     });
   }
 
-  public create(params: Elastic.IndicesCreateParams, callback: (error: any, response: any, status: any) => void): void
-  {
-    this.controller.prependIndexParam(params);
-    return super.create(params, (err, res, status) =>
-    {
-      if (err)
-      {
-        callback(err, undefined, status);
-      }
-      else
-      {
-        res.index = this.controller.removeIndexPrefix(res.index);
-        callback(err, res, status);
-      }
-    });
-  }
-
-  public delete(params: Elastic.IndicesDeleteParams, callback: (error: any, response: any, status: any) => void): void
+  public delete(params: Elastic.IndicesDeleteParams): Promise<any>;
+  public delete(params: Elastic.IndicesDeleteParams, callback: (error: any, response: any, status: any) => void): void;
+  public delete(params: Elastic.IndicesDeleteParams, callback?: (error: any, response: any, status: any) => void): void | Promise<any>
   {
     this.controller.prependIndexParam(params);
     return super.delete(params, callback);
   }
 
-  public putMapping(params: Elastic.IndicesPutMappingParams, callback: (err: any, response: any, status: any) => void): void
+  public putMapping(params: Elastic.IndicesPutMappingParams): Promise<any>;
+  public putMapping(params: Elastic.IndicesPutMappingParams, callback: (err: any, response: any, status: any) => void): void;
+  public putMapping(params: Elastic.IndicesPutMappingParams, callback?: (err: any, response: any, status: any) => void): void | Promise<any>
   {
     this.controller.prependIndexParam(params);
     return super.putMapping(params, callback);
   }
 
-  public refresh(params: Elastic.IndicesRefreshParams, callback: (err: any, response: any) => void): void
+  public refresh(params: Elastic.IndicesRefreshParams): Promise<any>;
+  public refresh(params: Elastic.IndicesRefreshParams, callback: (err: any, response: any) => void): void;
+  public refresh(params: Elastic.IndicesRefreshParams, callback?: (err: any, response: any) => void): void | Promise<any>
   {
     this.controller.prependIndexParam(params);
     return super.refresh(params, callback);

@@ -59,34 +59,38 @@ class PrefixedElasticClient extends ElasticClient<PrefixedElasticController>
     super(controller, config, PrefixedElasticCluster, PrefixedElasticIndices);
   }
 
-  public bulk(params: Elastic.BulkIndexDocumentsParams, callback: (error: any, response: any) => void): void
+  public bulk(params: Elastic.BulkIndexDocumentsParams): Promise<any>;
+  public bulk(params: Elastic.BulkIndexDocumentsParams, callback: (error: any, response: any) => void): void;
+  public bulk(params: Elastic.BulkIndexDocumentsParams, callback?: (error: any, response: any) => void): void | Promise<any>
   {
-    const body: object[] = params.body;
-    for (let i = 0; i < body.length;)
+    const bulk = () => super.bulk(params);
+    return this.controller.voidOrPromise(callback, async () =>
     {
-      const obj = body[i];
-      const keys = Object.keys(obj);
-      if (keys.length !== 1)
+      const body: object[] = params.body;
+      for (let i = 0; i < body.length;)
       {
-        throw new Error('Bad bulk params');
-      }
-      switch (keys[0])
-      {
-        case 'index':
-        case 'create':
-        case 'update':
-          i += 2;
-          break;
-        case 'delete':
-          i++;
-          break;
-        default:
+        const obj = body[i];
+        const keys = Object.keys(obj);
+        if (keys.length !== 1)
+        {
           throw new Error('Bad bulk params');
+        }
+        switch (keys[0])
+        {
+          case 'index':
+          case 'create':
+          case 'update':
+            i += 2;
+            break;
+          case 'delete':
+            i++;
+            break;
+          default:
+            throw new Error('Bad bulk params');
+        }
+        this.controller.prependIndexTerm(obj[keys[0]]);
       }
-      this.controller.prependIndexTerm(obj[keys[0]]);
-    }
-    super.bulk(params, this.wrapCallback(callback, (res) =>
-    {
+      const res = await bulk();
       const items: any[] = res.items;
       items.forEach((item) =>
       {
@@ -97,70 +101,113 @@ class PrefixedElasticClient extends ElasticClient<PrefixedElasticController>
         const doc = item[Object.keys(item)[0]];
         this.controller.removeDocIndexPrefix(doc);
       });
-    }));
+      return res;
+    });
   }
 
+  public delete(params: Elastic.DeleteDocumentParams): Promise<Elastic.DeleteDocumentResponse>;
+  public delete(params: Elastic.DeleteDocumentParams, callback: (error: any, response: Elastic.DeleteDocumentResponse) => void): void;
   public delete(params: Elastic.DeleteDocumentParams,
-    callback: (error: any, response: Elastic.DeleteDocumentResponse) => void): void
+    callback?: (error: any, response: Elastic.DeleteDocumentResponse) => void): void | Promise<Elastic.DeleteDocumentResponse>
   {
-    this.controller.prependIndexParam(params);
-    super.delete(params, this.wrapCallback(callback, (o) => this.controller.removeDocIndexPrefix(o)));
+    const del = () => super.delete(params);
+    return this.controller.voidOrPromise(callback, async () =>
+    {
+      this.controller.prependIndexParam(params);
+      const res = await del();
+      this.controller.removeDocIndexPrefix(res);
+      return res;
+    });
   }
 
-  public index<T>(params: Elastic.IndexDocumentParams<T>, callback: (error: any, response: any) => void): void
+  public index<T>(params: Elastic.IndexDocumentParams<T>): Promise<any>;
+  public index<T>(params: Elastic.IndexDocumentParams<T>, callback: (error: any, response: any) => void): void;
+  public index<T>(params: Elastic.IndexDocumentParams<T>, callback?: (error: any, response: any) => void): void | Promise<any>
   {
-    this.controller.prependIndexParam(params);
-    super.index(params, this.wrapCallback(callback, (o) => this.controller.removeDocIndexPrefix(o)));
+    const index = () => super.index(params);
+    return this.controller.voidOrPromise(callback, async () =>
+    {
+      this.controller.prependIndexParam(params);
+      const res = await index();
+      this.controller.removeDocIndexPrefix(res);
+      return res;
+    });
   }
 
-  public update(params: Elastic.UpdateDocumentParams, callback: (error: any, response: any) => void): void
+  public update(params: Elastic.UpdateDocumentParams): Promise<any>;
+  public update(params: Elastic.UpdateDocumentParams, callback: (error: any, response: any) => void): void;
+  public update(params: Elastic.UpdateDocumentParams, callback?: (error: any, response: any) => void): void | Promise<any>
   {
-    this.controller.prependIndexParam(params);
-    super.update(params, this.wrapCallback(callback, (o) => this.controller.removeDocIndexPrefix(o)));
+    const update = () => super.update(params);
+    return this.controller.voidOrPromise(callback, async () =>
+    {
+      this.controller.prependIndexParam(params);
+      const res = await update();
+      this.controller.removeDocIndexPrefix(res);
+      return res;
+    });
   }
 
+  public scroll<T>(params: Elastic.ScrollParams): Promise<Elastic.SearchResponse<T>>;
+  public scroll<T>(params: Elastic.ScrollParams, callback: (error: any, response: Elastic.SearchResponse<T>) => void): void;
   public scroll<T>(params: Elastic.ScrollParams,
-    callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
+    callback?: (error: any, response: Elastic.SearchResponse<T>) => void): void | Promise<Elastic.SearchResponse<T>>
   {
-    super.scroll(params, this.wrapCallback(callback, (res: Elastic.SearchResponse<T>) =>
+    const scroll = () => super.scroll(params);
+    return this.controller.voidOrPromise(callback, async () =>
     {
+      const res = await scroll();
       res.hits.hits.forEach((o) => this.controller.removeDocIndexPrefix(o));
-    }));
+      return res;
+    });
   }
 
+  public search<T>(params: Elastic.SearchParams): Promise<Elastic.SearchResponse<T>>;
+  public search<T>(params: Elastic.SearchParams, callback: (error: any, response: Elastic.SearchResponse<T>) => void): void;
   public search<T>(params: Elastic.SearchParams,
-    callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
+    callback?: (error: any, response: Elastic.SearchResponse<T>) => void): void | Promise<Elastic.SearchResponse<T>>
   {
-    this.controller.prependIndexParam(params);
-    this.modifySearchQuery(params.body);
-    super.search(params, this.wrapCallback(callback, (res: Elastic.SearchResponse<T>) =>
+    const search = () => super.search(params);
+    return this.controller.voidOrPromise(callback, async () =>
     {
+      this.controller.prependIndexParam(params);
+      this.modifySearchQuery(params.body);
+      const res = await search();
       res.hits.hits.forEach((o) => this.controller.removeDocIndexPrefix(o));
-    }));
+      return res;
+    });
   }
 
+  public msearch<T>(params: Elastic.MSearchParams): Promise<Elastic.MSearchResponse<T>>;
+  public msearch<T>(params: Elastic.MSearchParams, callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void;
   public msearch<T>(params: Elastic.MSearchParams,
-    callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void
+    callback?: (error: any, response: Elastic.MSearchResponse<T>) => void): void | Promise<Elastic.MSearchResponse<T>>
   {
-    const searches: any[] = params.body;
-    for (let i = 0; i < searches.length; i += 2)
+    const msearch = () => super.msearch(params);
+    return this.controller.voidOrPromise(callback, async () =>
     {
-      const searchHeader = searches[i];
-      const searchBody = searches[i + 1];
-      this.controller.prependIndexParam(searchHeader);
-      this.modifySearchQuery(searchBody);
-    }
-    super.msearch(params, this.wrapCallback(callback, (res: Elastic.MSearchResponse<T>) =>
-    {
+      const searches: any[] = params.body;
+      for (let i = 0; i < searches.length; i += 2)
+      {
+        const searchHeader = searches[i];
+        const searchBody = searches[i + 1];
+        this.controller.prependIndexParam(searchHeader);
+        this.modifySearchQuery(searchBody);
+      }
+      const res = await msearch();
       res.responses.forEach((res2) =>
       {
         res2.hits.hits.forEach((o) => this.controller.removeDocIndexPrefix(o));
       });
-    }));
+      return res;
+    });
   }
 
+  public msearchTemplate<T>(params: Elastic.MSearchTemplateParams): Promise<Elastic.MSearchResponse<T>>;
   public msearchTemplate<T>(params: Elastic.MSearchTemplateParams,
-    callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void
+    callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void;
+  public msearchTemplate<T>(params: Elastic.MSearchTemplateParams,
+    callback?: (error: any, response: Elastic.MSearchResponse<T>) => void): void | Promise<Elastic.MSearchResponse<T>>
   {
     throw new Error();
   }
@@ -184,30 +231,6 @@ class PrefixedElasticClient extends ElasticClient<PrefixedElasticController>
         }
       }
     }
-  }
-
-  private wrapCallback(cb: (err, res) => void, f: (res) => void)
-  {
-    return (err, res) =>
-    {
-      if (err)
-      {
-        cb(err, undefined);
-      }
-      else
-      {
-        try
-        {
-          f(res);
-        }
-        catch (e)
-        {
-          this.log('error', e);
-          return cb(e, undefined);
-        }
-        cb(err, res);
-      }
-    };
   }
 }
 

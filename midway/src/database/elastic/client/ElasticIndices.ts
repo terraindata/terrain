@@ -51,10 +51,15 @@ import { IElasticClient } from './ElasticClient';
 // tslint:disable-next-line:interface-name
 export interface IElasticIndices
 {
+  getMapping(params: Elastic.IndicesGetMappingParams): Promise<any>;
   getMapping(params: Elastic.IndicesGetMappingParams, callback: (error: any, response: any, status: any) => void): void;
+  create(params: Elastic.IndicesCreateParams): Promise<any>;
   create(params: Elastic.IndicesCreateParams, callback: (error: any, response: any, status: any) => void): void;
+  delete(params: Elastic.IndicesDeleteParams): Promise<any>;
   delete(params: Elastic.IndicesDeleteParams, callback: (error: any, response: any, status: any) => void): void;
+  putMapping(params: Elastic.IndicesPutMappingParams): Promise<any>;
   putMapping(params: Elastic.IndicesPutMappingParams, callback: (err: any, response: any, status: any) => void): void;
+  refresh(params: Elastic.IndicesRefreshParams): Promise<any>;
   refresh(params: Elastic.IndicesRefreshParams, callback: (err: any, response: any) => void): void;
 }
 
@@ -78,7 +83,10 @@ class ElasticIndices<TController extends ElasticController = ElasticController> 
    * @param params
    * @param callback
    */
-  public getMapping(params: Elastic.IndicesGetMappingParams, callback: (error: any, response: any, status: any) => void): void
+  public getMapping(params: Elastic.IndicesGetMappingParams): Promise<any>;
+  public getMapping(params: Elastic.IndicesGetMappingParams, callback: (error: any, response: any, status: any) => void): void;
+  public getMapping(params: Elastic.IndicesGetMappingParams,
+    callback?: (error: any, response: any, status: any) => void): void | Promise<any>
   {
     this.log('getMapping', params);
     return this.delegate.indices.getMapping(params, callback);
@@ -89,7 +97,9 @@ class ElasticIndices<TController extends ElasticController = ElasticController> 
    * @param params
    * @param callback
    */
-  public create(params: Elastic.IndicesCreateParams, callback: (error: any, response: any, status: any) => void): void
+  public create(params: Elastic.IndicesCreateParams): Promise<any>;
+  public create(params: Elastic.IndicesCreateParams, callback: (error: any, response: any, status: any) => void): void;
+  public create(params: Elastic.IndicesCreateParams, callback?: (error: any, response: any, status: any) => void): void | Promise<any>
   {
     return this.delegate.indices.create(params, callback);
   }
@@ -99,7 +109,9 @@ class ElasticIndices<TController extends ElasticController = ElasticController> 
    * @param params
    * @param callback
    */
-  public delete(params: Elastic.IndicesDeleteParams, callback: (error: any, response: any, status: any) => void): void
+  public delete(params: Elastic.IndicesDeleteParams): Promise<any>;
+  public delete(params: Elastic.IndicesDeleteParams, callback: (error: any, response: any, status: any) => void): void;
+  public delete(params: Elastic.IndicesDeleteParams, callback?: (error: any, response: any, status: any) => void): void | Promise<any>
   {
     return this.delegate.indices.delete(params, callback);
   }
@@ -109,7 +121,9 @@ class ElasticIndices<TController extends ElasticController = ElasticController> 
    * @param params
    * @param callback
    */
-  public putMapping(params: Elastic.IndicesPutMappingParams, callback: (err: any, response: any, status: any) => void): void
+  public putMapping(params: Elastic.IndicesPutMappingParams): Promise<any>;
+  public putMapping(params: Elastic.IndicesPutMappingParams, callback: (err: any, response: any, status: any) => void): void;
+  public putMapping(params: Elastic.IndicesPutMappingParams, callback?: (err: any, response: any, status: any) => void): void | Promise<any>
   {
     this.log('putMapping', params);
     return this.delegate.indices.putMapping(params, callback);
@@ -120,7 +134,9 @@ class ElasticIndices<TController extends ElasticController = ElasticController> 
    * @param params
    * @param callback
    */
-  public refresh(params: Elastic.IndicesRefreshParams, callback: (err: any, response: any) => void): void
+  public refresh(params: Elastic.IndicesRefreshParams): Promise<any>;
+  public refresh(params: Elastic.IndicesRefreshParams, callback: (err: any, response: any) => void): void;
+  public refresh(params: Elastic.IndicesRefreshParams, callback?: (err: any, response: any) => void): void | Promise<any>
   {
     this.log('refresh', params);
     return this.delegate.indices.refresh(params, callback);
