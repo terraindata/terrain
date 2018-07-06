@@ -60,6 +60,7 @@ class PrefixedElasticIndices extends ElasticIndices<PrefixedElasticController>
   public getMapping(params: Elastic.IndicesGetMappingParams,
     callback?: (error: any, response: any, status: any) => void): void | Promise<any>
   {
+    // hack
     const getMapping = () => super.getMapping(params);
     return this.controller.voidOrPromise(callback, async () =>
     {
@@ -90,6 +91,7 @@ class PrefixedElasticIndices extends ElasticIndices<PrefixedElasticController>
   public create(params: Elastic.IndicesCreateParams, callback: (error: any, response: any, status: any) => void): void;
   public create(params: Elastic.IndicesCreateParams, callback?: (error: any, response: any, status: any) => void): void | Promise<any>
   {
+    // hack
     const create = () => super.create(params);
     return this.controller.voidOrPromise(callback, async () =>
     {
