@@ -210,10 +210,6 @@ export class TransformationEngine
       && JSON.stringify(this.doc) === JSON.stringify(other.doc)
       && this.uidField === other.uidField
       && this.uidNode === other.uidNode
-      // && JSON.stringify(this.fieldNameToIDMap.map((v: number, k: KeyPath) => [k, v]).toArray()) ===
-      // JSON.stringify(other.fieldNameToIDMap.map((v: number, k: KeyPath) => [k, v]).toArray())
-      // && JSON.stringify(this.IDToFieldNameMap.map((v: KeyPath, k: number) => [k, v]).toArray()) ===
-      // JSON.stringify(other.IDToFieldNameMap.map((v: KeyPath, k: number) => [k, v]).toArray())
       && JSON.stringify(this.fieldTypes.map((v: string, k: number) => [k, v]).toArray()) ===
       JSON.stringify(other.fieldTypes.map((v: string, k: number) => [k, v]).toArray())
       && JSON.stringify(this.fieldEnabled.map((v: boolean, k: number) => [k, v]).toArray()) ===
@@ -251,7 +247,8 @@ export class TransformationEngine
     // Process fields created/disabled by this transformation
     if (options !== undefined)
     {
-      if (options['newFieldKeyPaths'] !== undefined)
+      // todo: get rid of specific behavior for rename node
+      if (options['newFieldKeyPaths'] !== undefined && nodeType !== TransformationNodeType.RenameNode)
       {
         for (let i: number = 0; i < options['newFieldKeyPaths'].size; i++)
         {
@@ -311,10 +308,7 @@ export class TransformationEngine
           });
         }
         const document = transformationResult.document;
-        if (document !== undefined)
-        {
-          output = document;
-        }
+        output = document;
       }
     }
     // Exclude disabled fields (must do this as a postprocess, because e.g. join node)
@@ -366,8 +360,6 @@ export class TransformationEngine
       return this.getFieldID(fullKeyPath);
     }
     this.IDToPathMap = this.IDToPathMap.set(this.uidField, fullKeyPath);
-    // this.fieldNameToIDMap = this.fieldNameToIDMap.set(fullKeyPath, this.uidField);
-    // this.IDToFieldNameMap = this.IDToFieldNameMap.set(this.uidField, fullKeyPath);
     if (typeName === null)
     {
       typeName = 'object';
@@ -628,7 +620,6 @@ export class TransformationEngine
 
   private addPrimitiveField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any): List<number>
   {
-    // console.log('x3 ' + currentKeyPath.push(key.toString()));
     return ids.push(this.addField(currentKeyPath.push(key), typeof obj[key]));
   }
 
@@ -650,34 +641,26 @@ export class TransformationEngine
     const arrayID: number = this.addField(currentKeyPath.push(key), 'array');
     ids = ids.push(arrayID);
     this.setFieldProp(arrayID, KeyPath(['valueType']), arrayType);
-    // console.log('adding awid ' + currentKeyPath.push(key.toString()).push(-1));
     let awkp: KeyPath = currentKeyPath.push(key);
     awkp = awkp.slice(0, awkp.size - depth + 1).toList();
     for (let i: number = 0; i < depth; i++)
     {
       awkp = awkp.push(-1);
     }
-    // console.log('x4 ' + awkp);
     const arrayWildcardID: number = this.addField(awkp, 'array');
     this.setFieldProp(arrayWildcardID, KeyPath(['valueType']), arrayType);
     ids = ids.push(arrayWildcardID);
-    // this.setFieldProp(arrayID, KeyPath(['arrayLength']), obj[key].length);
     for (let i: number = 0; i < obj[key].length; i++)
     {
-      // const arrayKey_i: any = arrayKey.push(i.toString());
       if (isPrimitive(obj[key][i]))
       {
         ids = this.addPrimitiveField(ids, obj[key], currentKeyPath.push(key), i);
-        // ids = ids.push(this.addField(currentKeyPath.push(arrayKey_i), typeof obj[key]));
       } else if (Array.isArray(obj[key][i]))
       {
-        // console.log('cpk2 ' + currentKeyPath.push(key.toString()) + ' ' + JSON.stringify(obj[key][i]));
         ids = this.addArrayField(ids, obj[key], currentKeyPath.push(key), i, depth + 1);
       } else
       {
-        // console.log('x1 ' + currentKeyPath.push(key.toString()).push(i.toString()));
         ids = ids.push(this.addField(currentKeyPath.push(key).push(i), typeof obj[key][i]));
-        // console.log('foo ' + currentKeyPath.push(key.toString()).push(i.toString()));
         ids = this.addObjectField(ids, obj[key][i], awkp, true);
         ids = this.addObjectField(ids, obj[key][i], currentKeyPath.push(key).push(i), true);
       }

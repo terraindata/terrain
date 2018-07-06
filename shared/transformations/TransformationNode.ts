@@ -93,11 +93,20 @@ export default abstract class TransformationNode
           ],
         } as TransformationVisitResult;
       }
-      return this.transformDocument(doc);
+      const result = this.transformDocument(doc);
+      if (result === undefined)
+      {
+        return {
+          document: doc,
+        };
+      }
+      else
+      {
+        return result;
+      }
     }
     catch (e)
     {
-      console.error(e);
       return {
         errors: [
           {

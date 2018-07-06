@@ -121,6 +121,7 @@ export class EngineProxy
     config?: TransformationConfig, // if not specified, any new fields will have the same type as source field
   )
   {
+    const origFieldId = this.engine.getFieldID(fields.get(0));
     this.engine.appendTransformation(type, fields, options);
     if (config !== undefined && config.newSourceType !== undefined)
     {
@@ -128,6 +129,34 @@ export class EngineProxy
       {
         const fieldId = this.engine.getFieldID(kp);
         EngineUtil.changeFieldType(this.engine, fieldId, config.newSourceType);
+      });
+    }
+    if (options.newFieldKeyPaths !== undefined)
+    {
+      options.newFieldKeyPaths.forEach((kp) => {
+        const newId = this.engine.getFieldID(kp);
+        this.orderField(newId, origFieldId);
+
+        if (config !== undefined && config.type !== undefined)
+        {
+          EngineUtil.rawSetFieldType(
+            this.engine,
+            newId,
+            config.type,
+            config.type,
+            config.valueType,
+          );
+        }
+        else
+        {
+          const synthType = EngineUtil.getETLFieldType(origFieldId, this.engine);
+          EngineUtil.rawSetFieldType(
+            this.engine,
+            newId,
+            synthType,
+            synthType,
+          );
+        }
       });
     }
     this.requestRebuild();
@@ -293,6 +322,10 @@ export class EngineProxy
   // Reorder fieldId so that it appears after afterId
   public orderField(fieldId: number, afterId?: number, insertBefore = false)
   {
+    if (fieldId === afterId)
+    {
+      return; // noop
+    }
     let order = this.orderController.getOrder();
     order = order.insert(fieldId, afterId); // insert field after
     if (insertBefore)
@@ -430,7 +463,6 @@ export class FieldProxy
         const parentId = this.engine.getFieldID(ancestorPath);
         if (parentId === undefined)
         {
-          console.log('adding field', ancestorPath.toJS());
           this.engineProxy.addField(ancestorPath, ETLFieldTypes.Object);
         }
       }
