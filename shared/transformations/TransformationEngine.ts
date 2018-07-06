@@ -53,7 +53,7 @@ import TransformationNode from 'shared/transformations/TransformationNode';
 import objectify from '../util/deepObjectify';
 import { KeyPath, keyPathPrefixMatch, updateKeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
-// import * as winston from 'winston'; // TODO what to do for error logging?
+
 import DataStore from './DataStore';
 import TransformationEngineNodeVisitor from './TransformationEngineNodeVisitor';
 import TransformationNodeType from './TransformationNodeType';
@@ -294,7 +294,7 @@ export class TransformationEngine
    */
   public transform(doc: object): object
   {
-    let output = {};
+    let output = _.cloneDeep(doc);
     const visitor = new TransformationEngineNodeVisitor();
     for (const nodeKey of this.dag.sources())
     {
@@ -310,7 +310,11 @@ export class TransformationEngine
             // winston.error(`\t -${error.message}`);
           });
         }
-        output = transformationResult.document;
+        const document = transformationResult.document;
+        if (document !== undefined)
+        {
+          output = document;
+        }
       }
     }
     // Exclude disabled fields (must do this as a postprocess, because e.g. join node)
@@ -494,7 +498,7 @@ export class TransformationEngine
     return this.IDToPathMap.keyOf(path);
   }
 
-  public renameField(fieldID: number, newPath: KeyPath)
+  public renameField(fieldID: number, newPath: KeyPath): number
   {
     const oldPath = this.getFieldPath(fieldID);
     if (oldPath.equals(newPath))
@@ -504,13 +508,13 @@ export class TransformationEngine
     const renameId = this.appendTransformation(
       TransformationNodeType.RenameNode,
       List([oldPath]),
-      { newFieldKeyPath: newPath },
+      { newFieldKeyPaths: List([newPath]) },
     );
     // loop over children
     const transplantIndex = oldPath.size;
     EngineUtil.postorderForEach(this, fieldID, (id) => {
       const childPath = this.getFieldPath(id);
-      this.IDToPathMap.set(id, newPath.concat(childPath.slice(transplantIndex)).toList());
+      this.setFieldPath(id, newPath.concat(childPath.slice(transplantIndex)).toList());
     });
     return renameId;
   }
@@ -572,7 +576,7 @@ export class TransformationEngine
     this.fieldEnabled = this.fieldEnabled.set(fieldID, false);
   }
 
-  public createTree(): Immutable.Map<number, List<number>>
+  public createTree(): Map<number, List<number>>
   {
     const ids = this.getAllFieldIDs();
     // sort the paths to ensure we visit parents before children
@@ -611,10 +615,16 @@ export class TransformationEngine
         fieldMap[id] = field;
       }
     });
-    return Immutable.Map<number, List<number>>(fieldMap)
+    return Map<number, List<number>>(fieldMap)
       .mapKeys((key) => Number(key))
       .toMap();
   }
+
+  private setFieldPath(fieldID: number, path: KeyPath)
+  {
+    this.IDToPathMap = this.IDToPathMap.set(fieldID, path);
+  }
+
 
   private addPrimitiveField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any): List<number>
   {

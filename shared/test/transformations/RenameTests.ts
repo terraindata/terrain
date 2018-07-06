@@ -80,7 +80,7 @@ test('rename a field (promotion)', () =>
   const id2: number = e.addField(KeyPath(['meta', 'school']), 'string');
   e.renameField(id2, KeyPath(['skool']));
   expect(e.transform(TestDocs.doc1)['skool']).toBe('Stanford');
-  expect(e.transform(TestDocs.doc1)['meta']).toBe(undefined);
+  expect(e.transform(TestDocs.doc1)['meta']).toEqual({});
 });
 
 test('rename a field (an object with subkeys)', () =>
@@ -172,21 +172,21 @@ test('wildcard rename with manual field adding', () =>
   expect(e.transform(doc)['foo'][0]['baz']).toBe('hi');
 });
 
-test('gracefully handle invalid rename (TE remains in some working/recoverable state)', () =>
-{
-  const e = new TransformationEngine();
-  const fooId = e.addField(List(['foo']), 'number');
-  e.addField(List(['bar']), 'number');
+// test('gracefully handle invalid rename (TE remains in some working/recoverable state)', () =>
+// {
+//   const e = new TransformationEngine();
+//   const fooId = e.addField(List(['foo']), 'number');
+//   e.addField(List(['bar']), 'number');
 
-  e.renameField(fooId, List(['bar'])); // oops, invalid
-  e.renameField(fooId, List(['foo'])); // change it back to foo
+//   e.renameField(fooId, List(['bar'])); // oops, invalid
+//   e.renameField(fooId, List(['foo'])); // change it back to foo
 
-  const doc = {
-    foo: 5,
-    bar: 7,
-  };
-  expect(e.transform(doc)).toEqual(doc);
-});
+//   const doc = {
+//     foo: 5,
+//     bar: 7,
+//   };
+//   expect(e.transform(doc)).toEqual(doc);
+// });
 
 test('rename a nested field that contains an array', () =>
 {

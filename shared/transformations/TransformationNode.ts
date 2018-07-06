@@ -97,6 +97,7 @@ export default abstract class TransformationNode
     }
     catch (e)
     {
+      console.error(e);
       return {
         errors: [
           {

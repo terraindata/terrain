@@ -290,11 +290,15 @@ export function search(obj: object, path: KeyPath): ContextResult[]
   return results;
 }
 
-export function setSingle(obj: object, path: KeyPath, value)
+export function setSingle(obj: object, path: KeyPath, value): object
 {
-  if (typeof obj !== 'object' || obj == null || path.size === 0)
+  if (path.size === 0)
   {
-    return false;
+    return value;
+  }
+  if (typeof obj !== 'object' || obj == null)
+  {
+    return obj;
   }
   let curr = obj;
   for (let i = 0; i < path.size - 1; i++)
@@ -309,7 +313,7 @@ export function setSingle(obj: object, path: KeyPath, value)
       }
       else if (!Array.isArray(curr[waypoint]))
       {
-        return false;
+        return obj;
       }
     }
     else
@@ -320,13 +324,13 @@ export function setSingle(obj: object, path: KeyPath, value)
       }
       else if (Array.isArray(curr[waypoint]))
       {
-        return false;
+        return obj;
       }
     }
     curr = curr[waypoint];
   }
   curr[path.last()] = value;
-  return true;
+  return obj;
 }
 
 export function deleteSingle(obj: object, path: KeyPath)

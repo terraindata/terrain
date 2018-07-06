@@ -72,24 +72,6 @@ export class RenameTransformationNode extends TransformationNode
 {
   public readonly typeCode = TYPECODE;
 
-  /*
-   *  Returns a string if an error occured
-   */
-  protected oneToOne(doc: object, inputField: KeyPath, outputField: KeyPath): string | undefined
-  {
-    const matcherFn = Topology.createBasePathMatcher(inputField, outputField);
-    for (const match of yadeep.search(doc, inputField))
-    {
-      let { value } = match;
-      if (!isPrimitive(value))
-      {
-        value = _.cloneDeep(value);
-      }
-      yadeep.set(doc, matcherFn(match.location), value, { create: true });
-    }
-    return undefined;
-  }
-
   protected transformDocument(doc: object): TransformationVisitResult
   {
     const errors = [];
@@ -103,7 +85,7 @@ export class RenameTransformationNode extends TransformationNode
     {
       const { value, location } = match;
       yadeep.deleteSingle(doc, location); // delete first, in case its an identity rename
-      yadeep.set(doc, matcherFn(location), value, { create: true } );
+      doc = yadeep.setSingle(doc, matcherFn(location), value);
     }
 
     return {
