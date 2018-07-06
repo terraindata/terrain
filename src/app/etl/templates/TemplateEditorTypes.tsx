@@ -209,5 +209,3 @@ class EditorDisplayStateC
 }
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
 export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);
-
-export const DefaultDocumentLimit = 10;

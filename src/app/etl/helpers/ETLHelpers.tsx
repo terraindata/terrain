@@ -53,10 +53,7 @@ import TerrainStore from 'src/app/store/TerrainStore';
 import { ETLActions } from 'etl/ETLRedux';
 import { ETLState } from 'etl/ETLTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import
-{
-  TemplateEditorState,
-} from 'etl/templates/TemplateEditorTypes';
+import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { SchemaActions } from 'schema/data/SchemaRedux';
 import { TemplateProxy } from 'shared/etl/immutable/TemplateProxy';

@@ -368,6 +368,7 @@ class ETLAjax
   public fetchPreview(
     source: SourceConfig,
     size: number,
+    fileString?: string,
   ): Promise<List<object>>
   {
     return new Promise((resolve, reject) =>
@@ -391,6 +392,7 @@ class ETLAjax
       const payload = {
         source: recordForSave(source),
         size,
+        fileString,
       };
       return Ajax.req(
         'post',
