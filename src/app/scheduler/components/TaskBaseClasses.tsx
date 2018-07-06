@@ -190,19 +190,19 @@ abstract class TaskFormBase<FormState, P extends Props = Props> extends TerrainC
   }
 }
 
-type DefaultExitParamsT = ParamConfigType<TaskEnum.taskDefaultExit>;
+type DefaultExitParamsT = ParamConfigType<'taskDefaultExit'>;
 class DefaultExitForm extends TaskFormBase<DefaultExitParamsT>
 {
   public inputMap: InputDeclarationMap<DefaultExitParamsT> = {};
 }
 
-type DefaultFailureParamsT = ParamConfigType<TaskEnum.taskDefaultFailure>;
+type DefaultFailureParamsT = ParamConfigType<'taskDefaultFailure'>;
 class DefaultFailureForm extends TaskFormBase<DefaultFailureParamsT>
 {
   public inputMap: InputDeclarationMap<DefaultFailureParamsT> = {};
 }
 
-type ETLTaskParamsT = ParamConfigType<TaskEnum.taskETL>;
+type ETLTaskParamsT = ParamConfigType<'taskETL'>;
 class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
 {
   public inputMap: InputDeclarationMap<ETLTaskParamsT> = {
@@ -258,10 +258,9 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
   }
 }
 
-type FormLookupMap =
-  {
-    [k in TaskEnum]: React.ComponentClass<Props>
-  };
+interface FormLookupMap {
+    [k: number]: React.ComponentClass<Props>
+  }
 
 export const TaskFormMap: FormLookupMap =
   {
