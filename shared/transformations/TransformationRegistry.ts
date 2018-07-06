@@ -64,8 +64,8 @@ import { JoinTransformationInfo, JoinTransformationNode } from './nodes/JoinTran
 import { MultiplyTransformationInfo, MultiplyTransformationNode } from './nodes/MultiplyTransformationNode';
 import { ProductTransformationInfo, ProductTransformationNode } from './nodes/ProductTransformationNode';
 import { QuotientTransformationInfo, QuotientTransformationNode } from './nodes/QuotientTransformationNode';
-import { RenameTransformationInfo, RenameTransformationNode } from './nodes/RenameTransformationNode';
 import { RemoveDuplicatesTransformationInfo, RemoveDuplicatesTransformationNode } from './nodes/RemoveDuplicatesTransformationNode';
+import { RenameTransformationInfo, RenameTransformationNode } from './nodes/RenameTransformationNode';
 import { RoundTransformationInfo, RoundTransformationNode } from './nodes/RoundTransformationNode';
 import { SetIfTransformationInfo, SetIfTransformationNode } from './nodes/SetIfTransformationNode';
 import { SplitTransformationInfo, SplitTransformationNode } from './nodes/SplitTransformationNode';

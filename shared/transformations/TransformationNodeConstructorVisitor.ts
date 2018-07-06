@@ -49,11 +49,11 @@ import { KeyPath, WayPoint } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 
 import TransformationNode from 'shared/transformations/TransformationNode';
-import TransformationNodeType, { NodeOptionsType, CommonTransformationOptions } from './TransformationNodeType';
+import TransformationNodeType, { CommonTransformationOptions, NodeOptionsType } from './TransformationNodeType';
 import TransformationNodeVisitor, { VisitorLookupMap } from './TransformationNodeVisitor';
+import TransformationRegistry from './TransformationRegistry';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
-import TransformationRegistry from './TransformationRegistry';
 
 export interface NodeArgs
 {

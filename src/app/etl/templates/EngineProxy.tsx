@@ -124,7 +124,8 @@ export class EngineProxy
     this.engine.appendTransformation(type, fields, options);
     if (config !== undefined && config.newSourceType !== undefined)
     {
-      fields.forEach((kp) => {
+      fields.forEach((kp) =>
+      {
         const fieldId = this.engine.getFieldID(kp);
         EngineUtil.changeFieldType(this.engine, fieldId, config.newSourceType);
       });

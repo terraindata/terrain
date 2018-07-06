@@ -56,11 +56,11 @@ import * as yadeep from '../util/yadeep';
 
 import DataStore from './DataStore';
 import TransformationEngineNodeVisitor from './TransformationEngineNodeVisitor';
+import TransformationNodeConstructorVisitor from './TransformationNodeConstructorVisitor';
 import TransformationNodeType from './TransformationNodeType';
 import TransformationRegistry from './TransformationRegistry';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
-import TransformationNodeConstructorVisitor from './TransformationNodeConstructorVisitor';
 
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
@@ -512,7 +512,8 @@ export class TransformationEngine
     );
     // loop over children
     const transplantIndex = oldPath.size;
-    EngineUtil.postorderForEach(this, fieldID, (id) => {
+    EngineUtil.postorderForEach(this, fieldID, (id) =>
+    {
       const childPath = this.getFieldPath(id);
       this.setFieldPath(id, newPath.concat(childPath.slice(transplantIndex)).toList());
     });
@@ -624,7 +625,6 @@ export class TransformationEngine
   {
     this.IDToPathMap = this.IDToPathMap.set(fieldID, path);
   }
-
 
   private addPrimitiveField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any): List<number>
   {

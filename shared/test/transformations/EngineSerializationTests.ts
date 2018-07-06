@@ -46,11 +46,11 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeConstructorVisitor from 'shared/transformations/TransformationNodeConstructorVisitor';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
 import { KeyPath } from 'shared/util/KeyPath';
 import { TestDocs } from './TestDocs';
-import TransformationNodeConstructorVisitor from 'shared/transformations/TransformationNodeConstructorVisitor';
 
 const NodeConstructor = new TransformationNodeConstructorVisitor();
 

@@ -195,7 +195,8 @@ export default class TopologyUtil
     {
       mapper.push([indices1[i], indices2[i]]);
     }
-    return (kp: KeyPath) => {
+    return (kp: KeyPath) =>
+    {
       let ret = kp2;
       for (const [i1, i2] of mapper)
       {
