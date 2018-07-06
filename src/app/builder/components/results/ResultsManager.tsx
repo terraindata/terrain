@@ -484,7 +484,8 @@ export class ResultsManager extends TerrainComponent<Props>
   {
     hitsPage = hitsPage !== undefined ? hitsPage : this.props.hitsPage;
     appendResults = appendResults !== undefined ? appendResults : false;
-    return interpreter.adjustQuerySize(SCROLL_SIZE, MAX_HITS, hitsPage, appendResults);
+    interpreter.adjustQuerySize(SCROLL_SIZE, MAX_HITS, hitsPage, appendResults);
+    return interpreter.normalizeTerrainScriptWeight();
   }
 
   private queryM2Results(query: Query, db: BackendInstance, hitsPage: number, appendResults?: boolean)
