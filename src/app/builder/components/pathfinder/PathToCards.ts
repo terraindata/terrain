@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions max-line-length member-ordering no-console
 import { parseScore, PathFinderDefaultSize } from 'builder/components/pathfinder/PathfinderParser';
-import { _DistanceValue, _FilterGroup, DistanceValue, ElasticDataSource, FilterGroup, FilterLine, Path, Script } from 'builder/components/pathfinder/PathfinderTypes';
+import { _FilterGroup, DistanceValue, ElasticDataSource, FilterGroup, FilterLine, Path, Script } from 'builder/components/pathfinder/PathfinderTypes';
 import { List, Set } from 'immutable';
 import * as _ from 'lodash';
 import * as TerrainLog from 'loglevel';
@@ -58,7 +58,6 @@ import * as BlockUtils from '../../../../blocks/BlockUtils';
 import Block from '../../../../blocks/types/Block';
 import Card from '../../../../blocks/types/Card';
 import ElasticBlocks from '../../../../database/elastic/blocks/ElasticBlocks';
-import { parseElasticWeightBlock } from '../../../../database/elastic/conversion/ElasticToCards';
 import ESCardParser from '../../../../database/elastic/conversion/ESCardParser';
 import Query from '../../../../items/types/Query';
 

@@ -48,7 +48,6 @@ import * as stream from 'stream';
 
 import { TaskConfig } from 'shared/types/jobs/TaskConfig';
 import { TaskEnum } from 'shared/types/jobs/TaskEnum';
-import { TaskInputConfig } from 'shared/types/jobs/TaskInputConfig';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 
 import LogStreamWritable from '../io/streams/LogStreamWritable';

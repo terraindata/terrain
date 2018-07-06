@@ -46,23 +46,20 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions
 
-import * as classNames from 'classnames';
 import * as cronParser from 'cron-parser';
 import { List } from 'immutable';
 import { noop } from 'lodash';
 import * as React from 'react';
 import
 {
-  CRONDaySchedule, CRONHourNames, CRONHourOptionsList, CRONHourSchedule,
-  CRONMinuteOptionsList, CRONMonthDayOptionsList, CRONWeekDayNames, CRONWeekDayOptionsList,
+  CRONDaySchedule, CRONHourNames, CRONHourOptionsList, CRONHourSchedule, CRONMonthDayOptionsList, CRONWeekDayNames, CRONWeekDayOptionsList,
 } from 'shared/util/CRONConstants';
 import
 {
   canParseCRONSchedule, parseCRONDaySchedule, parseCRONHourSchedule, setCRONDays,
   setCRONHours, setCRONType,
 } from 'shared/util/CRONParser';
-import Util from 'util/Util';
-import { borderColor, Colors, getStyle } from './../../colors/Colors';
+import { Colors, getStyle } from './../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './CRONEditorStyle.less';
 import FadeInOut from './FadeInOut';

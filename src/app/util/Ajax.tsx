@@ -50,7 +50,6 @@ THE SOFTWARE.
 
 import axios from 'axios';
 import * as Immutable from 'immutable';
-import * as $ from 'jquery';
 import * as _ from 'lodash';
 
 import { recordForSave, responseToRecordConfig } from 'shared/util/Classes';
@@ -65,8 +64,6 @@ import * as LibraryTypes from '../library/LibraryTypes';
 import * as UserTypes from '../users/UserTypes';
 
 import * as TerrainLog from 'loglevel';
-
-import AjaxM1 from './AjaxM1';
 
 export interface AjaxResponse
 {

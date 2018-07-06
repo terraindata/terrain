@@ -47,13 +47,10 @@ THE SOFTWARE.
 
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import Modal from 'common/components/Modal';
@@ -61,8 +58,9 @@ import Modal from 'common/components/Modal';
 import TerrainTools from 'app/util/TerrainTools';
 import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateList';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
+import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
+import VerificationManager from './VerificationManager';
 
 const UndoIcon = require('images/icon_undo.svg');
 const RedoIcon = require('images/icon_redo.svg');
@@ -277,6 +275,9 @@ class EditorActionsSection extends TerrainComponent<Props>
             'Run import or export',
           )
         }
+        <div className='editor-top-bar-item'>
+          <VerificationManager />
+        </div>
       </div>
     );
   }

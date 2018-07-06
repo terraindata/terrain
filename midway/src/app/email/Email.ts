@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 import * as nodemailer from 'nodemailer';
 
-import * as App from '../App';
 import IntegrationConfig from '../integrations/IntegrationConfig';
 
 import { integrations } from '../integrations/IntegrationRouter';

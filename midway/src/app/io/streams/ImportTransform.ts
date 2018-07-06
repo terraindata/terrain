@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as _ from 'lodash';
-
 import { Import, ImportConfig } from '../Import';
 import ADocumentTransform from './ADocumentTransform';
 

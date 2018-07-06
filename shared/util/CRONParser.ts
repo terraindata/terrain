@@ -52,7 +52,7 @@ THE SOFTWARE.
  * - specific months
  */
 
-import { extend, filter, identity, isEqual, keys } from 'lodash';
+import { extend, filter, keys } from 'lodash';
 
 import
 {

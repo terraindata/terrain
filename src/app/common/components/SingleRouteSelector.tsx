@@ -46,11 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions member-access
 
-import { List, Map } from 'immutable';
-import * as $ from 'jquery';
-import * as _ from 'lodash';
+import { List } from 'immutable';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import { RouteSelector, RouteSelectorOption as _RouteSelectorOption, RouteSelectorOptionSet } from './RouteSelector';
 

@@ -47,21 +47,17 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions
 const Dimensions = require('react-dimensions');
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
 import FadeInOut from 'common/components/FadeInOut';
 import { notificationManager } from 'common/components/InAppNotification';
+import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import Query from '../../../../items/types/Query';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
-import ColorManager from '../../../util/ColorManager';
+import { borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import Util from '../../../util/Util';
 import BuilderActions from '../../data/BuilderActions';
-import Histogram from './../../../charts/components/Histogram';
 import Dropdown from './../../../common/components/Dropdown';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
@@ -71,7 +67,6 @@ import AggregationHistogram from './AggregationHistogram';
 import AggregationMap from './AggregationMap';
 import AggregationScatterPlot from './AggregationScatterPlot';
 import AggregationsTable from './AggregationsTable';
-import { Aggregation as AggregationClass } from './ResultTypes';
 
 const ClipboardIcon = require('images/icon_clipboard.svg');
 const ExportIcon = require('images/icon_import.svg');

@@ -46,14 +46,12 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands
 
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 const moment = require('moment');
 import OnClickOut, { InjectedOnClickOutProps } from 'react-onclickoutside';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
-import Dropdown from './Dropdown';
 
 import { Moment } from 'moment';
 import TerrainDateParameter from '../../../../shared/database/elastic/parser/TerrainDateParameter';

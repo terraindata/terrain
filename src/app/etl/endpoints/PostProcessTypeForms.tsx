@@ -46,33 +46,22 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires max-classes-per-file
 
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
 
 import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-
-import ListForm from 'common/components/ListForm';
+import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 
 import
 {
   PostProcessAggregationTypes as AggregationTypes,
-  PostProcessConfig,
   PostProcessFilterTypes as FilterTypes,
   PostProcessOptionsType,
   PostProcessParseTypes as ParseTypes,
   PostProcessSortObjectTypes,
   PostProcessSortTypes as SortTypes,
-  PostProcessTypes,
-  RootPostProcessConfig as RootPostProcessConfigI,
 } from 'shared/etl/types/PostProcessTypes';
 
-const { List } = Immutable;
+import { List } from 'immutable';
 
 export interface FormProps<T>
 {

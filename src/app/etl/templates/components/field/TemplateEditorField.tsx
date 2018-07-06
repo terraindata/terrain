@@ -45,27 +45,21 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
 
-import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
-import * as Radium from 'radium';
-import * as React from 'react';
-import Util from 'util/Util';
 
-import * as Immutable from 'immutable';
 import memoizeOne from 'memoize-one';
-const { List, Map } = Immutable;
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { compareObjects, isVisiblyEqual, PropertyTracker, UpdateChecker } from 'etl/ETLUtil';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
-import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
+import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { EditorDisplayState, FieldMap, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
-import { SinkConfig, SinkOptionsType, Sinks, SourceConfig, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
-import { Languages, NodeTypes } from 'shared/etl/types/ETLTypes';
+import { FieldVerification } from 'shared/etl/languages/LanguageControllers';
+import { Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 /*
@@ -270,6 +264,12 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return getEngineVersion(props);
   }
 
+  protected _getFieldVerifications(props = this.props): List<FieldVerification>
+  {
+    this.updateChecker.setChecker('fieldVerifications', getVerifications);
+    return getVerifications(props);
+  }
+
   protected _willFieldChange(nextProps)
   {
     return this._field(this.props.fieldId, this.props)
@@ -311,6 +311,12 @@ function getCurrentLanguage(props: TemplateEditorFieldProps)
 {
   const templateEditor = (props as TemplateEditorFieldProps & Injected).templateEditor;
   return templateEditor.template.getEdgeLanguage(templateEditor.getCurrentEdgeId());
+}
+
+function getVerifications(props: TemplateEditorFieldProps)
+{
+  const templateEditor = (props as TemplateEditorFieldProps & Injected).templateEditor;
+  return templateEditor.uiState.fieldVerifications.get(props.fieldId);
 }
 
 function settingsAreOpen(props: TemplateEditorFieldProps)

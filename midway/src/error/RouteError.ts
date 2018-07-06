@@ -60,6 +60,10 @@ class RouteError extends MidwayError
       const routeError = RouteError.fromRouteContext(ctx, err);
       const status = routeError.getStatus();
       MidwayLogger.info(JSON.stringify(routeError));
+      if (err.stack !== undefined)
+      {
+        MidwayLogger.error(err.stack);
+      }
       ctx.status = status;
       ctx.body = { errors: routeError.getMidwayErrors() };
     }

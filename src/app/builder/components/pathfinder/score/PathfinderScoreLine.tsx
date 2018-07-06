@@ -46,26 +46,21 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-import * as $ from 'jquery';
-import * as _ from 'lodash';
-import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
-import TerrainComponent from './../../../../common/components/TerrainComponent';
-const { List, Map } = Immutable;
 import TransformCard from 'app/builder/components/charts/TransformCard';
 import ExpandIcon from 'app/common/components/ExpandIcon';
 import LinearSelector from 'app/common/components/LinearSelector';
 import { BuilderState } from 'builder/data/BuilderState';
+import { List, Map } from 'immutable';
+import * as _ from 'lodash';
+import * as React from 'react';
 import Util from 'util/Util';
-import BuilderTextbox from '../../../../common/components/BuilderTextbox';
-import Dropdown from '../../../../common/components/Dropdown';
+import { backgroundColor, borderColor, Colors, getStyle } from '../../../../colors/Colors';
 import SearchableDropdown from '../../../../common/components/SearchableDropdown';
 import ScoreBar from '../../charts/ScoreBar';
 import TransformChartPreviewWrapper from '../../charts/TransformChartPreviewWrapper';
 import PathfinderLine from '../PathfinderLine';
-import { ChoiceOption, Path, PathfinderContext, Score, ScoreLine, Source } from '../PathfinderTypes';
+import { ChoiceOption, PathfinderContext, ScoreLine } from '../PathfinderTypes';
+import TerrainComponent from './../../../../common/components/TerrainComponent';
 import BuilderActions from './../../../data/BuilderActions';
 const SigmoidIcon = require('images/icon_sigmoid.svg?name=SigmoidIcon');
 const LinearIcon = require('images/icon_linear.svg?name=LinearIcon');

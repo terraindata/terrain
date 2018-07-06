@@ -46,15 +46,13 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
+import BuilderActions from 'app/builder/data/BuilderActions';
 import { backgroundColor, borderColor, Colors } from 'app/colors/Colors';
+import FadeInOut from 'app/common/components/FadeInOut';
 import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-const { List, Map } = Immutable;
-import BuilderActions from 'app/builder/data/BuilderActions';
-import FadeInOut from 'app/common/components/FadeInOut';
 import Util from 'util/Util';
 
 const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');

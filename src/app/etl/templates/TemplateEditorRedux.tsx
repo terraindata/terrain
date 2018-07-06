@@ -44,14 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:import-spacing
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 
-import
-{
-  _TemplateField,
-  TemplateField,
-} from 'etl/templates/FieldTypes';
 import
 {
   _TemplateEditorState,
@@ -62,19 +56,14 @@ import
   TemplateEditorHistory,
   TemplateEditorState,
 } from 'etl/templates/TemplateEditorTypes';
-import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { ETLTemplate, getSourceFiles } from 'shared/etl/immutable/TemplateRecords';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 
-import { _HistoryStack, HistoryStack } from 'etl/common/HistoryStack';
-import { Algorithm, LibraryState } from 'library/LibraryTypes';
-import { MidwayError } from 'shared/error/MidwayError';
-import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
-import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
+import { HistoryStack } from 'etl/common/HistoryStack';
+import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'src/app/store/TerrainRedux';
 
 import { createFieldMap, updateFieldFromEngine } from 'etl/templates/SyncUtil';
-import Ajax from 'util/Ajax';
 
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 

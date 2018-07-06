@@ -44,20 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as asyncBusboy from 'async-busboy';
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as stream from 'stream';
 
-import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
-import { JobConfig } from 'shared/types/jobs/JobConfig';
-import { TaskEnum } from 'shared/types/jobs/TaskEnum';
-import * as App from '../App';
+import { SourceConfig } from 'shared/etl/types/EndpointTypes';
 import * as Util from '../AppUtil';
 import BufferTransform from '../io/streams/BufferTransform';
 import { Permissions } from '../permissions/Permissions';
-import UserConfig from '../users/UserConfig';
-import { users } from '../users/UserRouter';
 import { getSourceStream } from './SourceSinkStream';
 import * as TemplateRouter from './TemplateRouter';
 

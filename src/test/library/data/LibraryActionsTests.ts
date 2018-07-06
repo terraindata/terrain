@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
 import Actions from 'library/data/LibraryActions';
 import ActionTypes from 'library/data/LibraryActionTypes';
 import { Ajax, createMockStore } from 'test-helpers/helpers';

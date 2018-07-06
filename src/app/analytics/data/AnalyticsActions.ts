@@ -46,14 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-shadowed-variable strict-boolean-expressions no-unused-expression
 
-import * as Immutable from 'immutable';
-
 import ActionTypes from 'analytics/data/AnalyticsActionTypes';
-import Util from 'util/Util';
-import BackendInstance from '../../../database/types/BackendInstance';
-import { ItemStatus } from '../../../items/types/Item';
-
-import Ajax from './../../util/Ajax';
 
 function calculateDateRange(api, dateRangeId: number, callback)
 {

@@ -66,7 +66,7 @@ import ESConverter from '../../../../shared/database/elastic/formatter/ESConvert
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 
 import { BuilderState } from 'builder/data/BuilderState';
-import { Doc, Editor } from 'codemirror';
+import { Doc } from 'codemirror';
 import * as CodeMirrorLib from 'codemirror';
 
 import './ElasticMode';

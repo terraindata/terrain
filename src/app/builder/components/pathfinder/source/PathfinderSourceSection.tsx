@@ -46,27 +46,17 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions no-console
 
-import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-import * as $ from 'jquery';
-import * as _ from 'lodash';
-import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
-import TerrainComponent from './../../../../common/components/TerrainComponent';
-const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
-import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
-import Autocomplete from 'app/common/components/Autocomplete';
-import Dropdown from 'app/common/components/Dropdown';
 import SingleRouteSelector from 'app/common/components/SingleRouteSelector';
-import LinearSelector from 'common/components/LinearSelector';
-import PathfinderSectionTitle from '../PathfinderSectionTitle';
+import { List } from 'immutable';
+import * as React from 'react';
 import
 {
-  _ElasticDataSource, ChoiceOption, ElasticDataSource, Path, PathfinderContext, PathfinderSteps,
-  Source, sourceCountDropdownOptions, sourceCountOptions,
+  ChoiceOption, ElasticDataSource, PathfinderContext, PathfinderSteps,
+  Source,
 } from '../PathfinderTypes';
+import TerrainComponent from './../../../../common/components/TerrainComponent';
 
 import Util from 'util/Util';
 

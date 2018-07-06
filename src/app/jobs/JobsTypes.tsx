@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
-import { List, Record } from 'immutable';
 import * as Immutable from 'immutable';
 import { JobConfig as SharedJobConfig } from 'shared/types/jobs/JobConfig';
 import { createRecordType } from 'shared/util/Classes';

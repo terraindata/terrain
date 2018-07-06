@@ -44,13 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as Elastic from 'elasticsearch';
-
 import { getParsedQuery } from '../../../../../shared/database/elastic/ElasticUtil';
-import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
-import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
-import ESParser from '../../../../../shared/database/elastic/parser/ESParser';
-import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import QueryRequest from '../../../../../shared/database/types/QueryRequest';
 import QueryResponse from '../../../../../shared/database/types/QueryResponse';
 import BufferTransform from '../../../app/io/streams/BufferTransform';

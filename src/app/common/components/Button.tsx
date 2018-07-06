@@ -49,12 +49,11 @@ THE SOFTWARE.
 import './ButtonStyle.less';
 
 import * as classNames from 'classnames';
-import StyleTag from 'common/components/StyleTag';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { noop } from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { buttonColors, Colors, disabledButtonColors } from '../../colors/Colors';
+import { buttonColors } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 const CheckMark = require('./../../../images/icon_checkMark.svg');

@@ -46,8 +46,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as React from 'react';
-import ColorManager from 'util/ColorManager';
-import { Point, VictoryLabel } from 'victory';
+import { Point } from 'victory';
 import Colors from '../../../colors/Colors';
 
 const PinIcon = require('images/icon_pin.svg?name=PinIcon');

@@ -46,27 +46,14 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires
 
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as Radium from 'radium';
 import * as React from 'react';
 
-import CheckBox from 'common/components/CheckBox';
-import FadeInOut from 'common/components/FadeInOut';
-import FilePicker from 'common/components/FilePicker';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
-
-import * as FileUtil from 'shared/etl/FileUtil';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import FileConfigForm from 'etl/common/components/FileConfigForm';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
-import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { SourceOptionsType } from 'shared/etl/types/EndpointTypes';
-import { Sources } from 'shared/etl/types/EndpointTypes';
-import { ETLStepComponent, TransitionParams } from './ETLStepComponent';
+import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { FileConfig } from 'shared/etl/immutable/EndpointRecords';
 import './ETLStepComponent.less';
 
 interface Props

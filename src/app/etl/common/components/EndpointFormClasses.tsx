@@ -45,19 +45,13 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires max-classes-per-file
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import { instanceFnDecorator } from 'shared/util/Classes';
+import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 
-import ObjectForm from 'common/components/ObjectForm';
 import DatabasePicker from 'etl/common/components/DatabasePicker';
 import FileConfigForm from 'etl/common/components/FileConfigForm';
 import UploadFileButton from 'etl/common/components/UploadFileButton';
@@ -65,9 +59,6 @@ import AlgorithmSelector from 'library/components/AlgorithmSelector';
 import { LibraryState } from 'library/LibraryTypes';
 import
 {
-  _FileConfig,
-  _RootPostProcessConfig,
-  _SourceConfig,
   FileConfig,
   RootInputConfig,
   RootPostProcessConfig,
@@ -76,16 +67,16 @@ import
 } from 'shared/etl/immutable/EndpointRecords';
 import
 {
-  FileConfig as FileConfigI, GoogleAnalyticsOptions, HttpOptions,
+  GoogleAnalyticsOptions, HttpOptions,
   SftpOptions, SinkOptionsType, Sinks, SourceOptionsType,
   Sources, SQLOptions,
 } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 
-import { InputForm, InputsForm } from '../../endpoints/InputForm';
-import { PostProcessForm, TransformForm } from '../../endpoints/PostProcessForm';
+import { InputsForm } from '../../endpoints/InputForm';
+import { PostProcessForm } from '../../endpoints/PostProcessForm';
 
-const { List } = Immutable;
+import { List } from 'immutable';
 
 export interface Props
 {
@@ -359,8 +350,8 @@ const httpMethods = List(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']);
 
 export class HttpEndpointForm extends EndpointFormBase<HttpOptions>
 {
-  public showInputConfig = false;
-  public showPostProcessConfig = false;
+  public showInputConfig = true;
+  public showPostProcessConfig = true;
 
   public inputMap: InputDeclarationMap<HttpOptions> = {
     method: {

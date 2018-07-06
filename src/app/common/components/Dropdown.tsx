@@ -55,7 +55,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Util from 'util/Util';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
+import { borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import FloatingInput from './FloatingInput';

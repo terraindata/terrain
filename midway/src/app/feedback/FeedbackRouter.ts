@@ -48,7 +48,6 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 
 import * as App from '../App';
-import * as Util from '../AppUtil';
 import IntegrationConfig from '../integrations/IntegrationConfig';
 import Integrations from '../integrations/Integrations';
 import { MidwayLogger } from '../log/MidwayLogger';

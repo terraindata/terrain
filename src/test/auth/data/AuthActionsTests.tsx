@@ -46,7 +46,7 @@ THE SOFTWARE.
 import { _AuthState, AuthState } from 'auth/AuthTypes';
 import { AuthActions as Actions } from 'auth/data/AuthRedux';
 import * as Immutable from 'immutable';
-import { Ajax, createMockStore } from 'test-helpers/helpers';
+import { createMockStore } from 'test-helpers/helpers';
 
 const MIDWAY_BASE_URL = `/midway/v1`;
 

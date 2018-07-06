@@ -44,14 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as _ from 'lodash';
-import * as stream from 'stream';
-
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
-import BufferTransform from '../io/streams/BufferTransform';
 import LogStreamWritable from '../io/streams/LogStreamWritable';
-import JobConfig from './JobConfig';
 
 import JobLogConfig from './JobLogConfig';
 

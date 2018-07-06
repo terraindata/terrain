@@ -51,7 +51,6 @@ import { TaskConfig } from 'shared/types/jobs/TaskConfig';
 import { TaskEnum } from 'shared/types/jobs/TaskEnum';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 import { TaskTreeConfig } from 'shared/types/jobs/TaskTreeConfig';
-import LogStream from '../io/streams/LogStream';
 import LogStreamWritable from '../io/streams/LogStreamWritable';
 import { MidwayLogger } from '../log/MidwayLogger';
 import { Task } from './Task';
@@ -101,7 +100,7 @@ export class TaskTree
         invalidIds = true;
       }
       idSet.add(task.id);
-      task.blocking = (task.blocking != null) ? task.blocking : true;
+      task.blocking = (task.blocking != null) ? task.blocking : false;
       task.cancel = (task.cancel !== undefined && task.cancel !== null) ? task.cancel : false;
       task.jobStatus = (task.jobStatus !== undefined && task.jobStatus !== null) ? task.jobStatus : 0;
       task.name = (task.name !== undefined && task.name !== null) ? task.name : '';
@@ -221,9 +220,9 @@ export class TaskTree
       }
 
       const rootLogStream: LogStreamWritable = new LogStreamWritable(1);
-      this.tasks.forEach((task, i) =>
+      this.tasks.forEach((task) =>
       {
-        this.tasks[i].setRootLogStream(rootLogStream);
+        task.setRootLogStream(rootLogStream);
       });
 
       let ind: number = 0;

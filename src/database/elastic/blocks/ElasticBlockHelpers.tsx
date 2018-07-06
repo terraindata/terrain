@@ -44,11 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:strict-boolean-expressions
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-const { Map, List } = Immutable;
 import Util from 'app/util/Util';
 import { BuilderState } from 'builder/data/BuilderState';
+import { List, Map } from 'immutable';
+import * as _ from 'lodash';
 import { SchemaState } from 'schema/SchemaTypes';
 import { FieldType, FieldTypeMapping } from '../../../../shared/builder/FieldTypes';
 import { forAllCards } from '../../../blocks/BlockUtils';
