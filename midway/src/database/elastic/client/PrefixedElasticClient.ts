@@ -63,6 +63,7 @@ class PrefixedElasticClient extends ElasticClient<PrefixedElasticController>
   public bulk(params: Elastic.BulkIndexDocumentsParams, callback: (error: any, response: any) => void): void;
   public bulk(params: Elastic.BulkIndexDocumentsParams, callback?: (error: any, response: any) => void): void | Promise<any>
   {
+    // hack
     const bulk = () => super.bulk(params);
     return this.controller.voidOrPromise(callback, async () =>
     {
@@ -110,6 +111,7 @@ class PrefixedElasticClient extends ElasticClient<PrefixedElasticController>
   public delete(params: Elastic.DeleteDocumentParams,
     callback?: (error: any, response: Elastic.DeleteDocumentResponse) => void): void | Promise<Elastic.DeleteDocumentResponse>
   {
+    // hack
     const del = () => super.delete(params);
     return this.controller.voidOrPromise(callback, async () =>
     {
@@ -124,6 +126,7 @@ class PrefixedElasticClient extends ElasticClient<PrefixedElasticController>
   public index<T>(params: Elastic.IndexDocumentParams<T>, callback: (error: any, response: any) => void): void;
   public index<T>(params: Elastic.IndexDocumentParams<T>, callback?: (error: any, response: any) => void): void | Promise<any>
   {
+    // hack
     const index = () => super.index(params);
     return this.controller.voidOrPromise(callback, async () =>
     {
@@ -138,6 +141,7 @@ class PrefixedElasticClient extends ElasticClient<PrefixedElasticController>
   public update(params: Elastic.UpdateDocumentParams, callback: (error: any, response: any) => void): void;
   public update(params: Elastic.UpdateDocumentParams, callback?: (error: any, response: any) => void): void | Promise<any>
   {
+    // hack
     const update = () => super.update(params);
     return this.controller.voidOrPromise(callback, async () =>
     {
@@ -153,6 +157,7 @@ class PrefixedElasticClient extends ElasticClient<PrefixedElasticController>
   public scroll<T>(params: Elastic.ScrollParams,
     callback?: (error: any, response: Elastic.SearchResponse<T>) => void): void | Promise<Elastic.SearchResponse<T>>
   {
+    // hack
     const scroll = () => super.scroll(params);
     return this.controller.voidOrPromise(callback, async () =>
     {
@@ -167,6 +172,7 @@ class PrefixedElasticClient extends ElasticClient<PrefixedElasticController>
   public search<T>(params: Elastic.SearchParams,
     callback?: (error: any, response: Elastic.SearchResponse<T>) => void): void | Promise<Elastic.SearchResponse<T>>
   {
+    // hack
     const search = () => super.search(params);
     return this.controller.voidOrPromise(callback, async () =>
     {
@@ -183,6 +189,7 @@ class PrefixedElasticClient extends ElasticClient<PrefixedElasticController>
   public msearch<T>(params: Elastic.MSearchParams,
     callback?: (error: any, response: Elastic.MSearchResponse<T>) => void): void | Promise<Elastic.MSearchResponse<T>>
   {
+    // hack
     const msearch = () => super.msearch(params);
     return this.controller.voidOrPromise(callback, async () =>
     {
