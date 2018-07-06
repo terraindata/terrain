@@ -118,7 +118,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   {
     // check if this field no longer exists
     const currentEngine = getCurrentEngine(nextProps);
-    if (currentEngine == null || currentEngine.getOutputKeyPath(nextProps.fieldId) === undefined)
+    if (currentEngine == null || currentEngine.getFieldPath(nextProps.fieldId) === undefined)
     {
       return false;
     }

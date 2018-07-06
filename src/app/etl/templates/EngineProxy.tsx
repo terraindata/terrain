@@ -114,75 +114,21 @@ export class EngineProxy
   public addTransformation(
     type: TransformationNodeType,
     fields: List<EnginePath>,
-    rawOptions: {
+    options: {
       newFieldKeyPaths?: List<EnginePath>;
       [k: string]: any;
     },
     config?: TransformationConfig, // if not specified, any new fields will have the same type as source field
   )
   {
-    let options = rawOptions;
-
-    const isSynthetic = options.newFieldKeyPaths !== undefined;
-    let syntheticPaths: List<EnginePath>;
-    if (isSynthetic)
-    {
-      syntheticPaths = options.newFieldKeyPaths.map((kp) => this.getSyntheticInputPath(kp)).toList();
-      options = _.extend({}, options, {
-        newFieldKeyPaths: syntheticPaths,
-      });
-    }
-
     this.engine.appendTransformation(type, fields, options);
-
     if (config !== undefined && config.newSourceType !== undefined)
     {
-      fields.forEach((kp: EnginePath) =>
-      {
-        const fieldId = this.engine.getInputFieldID(kp);
+      fields.forEach((kp) => {
+        const fieldId = this.engine.getFieldID(kp);
         EngineUtil.changeFieldType(this.engine, fieldId, config.newSourceType);
       });
     }
-
-    if (isSynthetic)
-    {
-      let sourceFieldId;
-      if (fields.size > 0)
-      {
-        sourceFieldId = this.engine.getInputFieldID(fields.get(0));
-      }
-
-      syntheticPaths.forEach((path, index) =>
-      {
-        const synthId = this.engine.getInputFieldID(path);
-        this.engine.setOutputKeyPath(synthId, rawOptions.newFieldKeyPaths.get(index));
-        if (sourceFieldId !== undefined)
-        {
-          this.orderField(synthId, sourceFieldId);
-        }
-        if (config !== undefined && config.type !== undefined)
-        {
-          EngineUtil.rawSetFieldType(
-            this.engine,
-            synthId,
-            config.type,
-            config.type,
-            config.valueType,
-          );
-        }
-        else
-        {
-          const synthType = EngineUtil.getETLFieldType(sourceFieldId, this.engine);
-          EngineUtil.rawSetFieldType(
-            this.engine,
-            synthId,
-            synthType,
-            synthType,
-          );
-        }
-      });
-    }
-
     this.requestRebuild();
   }
 
@@ -198,7 +144,7 @@ export class EngineProxy
     {
       fields.forEach((kp: EnginePath) =>
       {
-        const fieldId = this.engine.getInputFieldID(kp);
+        const fieldId = this.engine.getFieldID(kp);
         EngineUtil.changeFieldType(this.engine, fieldId, config.newSourceType);
       });
     }
@@ -228,7 +174,7 @@ export class EngineProxy
    */
   public extractIndexedArrayField(sourceId: number, index: number, destKP: KeyPath)
   {
-    const sourceKP = this.engine.getOutputKeyPath(sourceId);
+    const sourceKP = this.engine.getFieldPath(sourceId);
 
     if (sourceKP.size === 0)
     {
@@ -256,7 +202,7 @@ export class EngineProxy
     this.copyField(specifiedSourceId, destKP, true);
 
     const parentKP = sourceKP.slice(0, -1).toList();
-    this.orderField(this.engine.getOutputFieldID(destKP), this.engine.getOutputFieldID(parentKP));
+    this.orderField(this.engine.getFieldID(destKP), this.engine.getFieldID(parentKP));
     this.requestRebuild();
   }
 
@@ -267,10 +213,10 @@ export class EngineProxy
     };
     this.addTransformation(
       TransformationNodeType.DuplicateNode,
-      List([this.engine.getInputKeyPath(sourceId)]),
+      List([this.engine.getFieldPath(sourceId)]),
       optionsNew,
     );
-    const newFieldId = this.engine.getOutputFieldID(destKP);
+    const newFieldId = this.engine.getFieldID(destKP);
 
     const newFieldType = EngineUtil.getETLFieldType(sourceId, this.engine);
     this.addFieldToEngine(destKP.push(-1), ETLFieldTypes.Array, newFieldType, true);
@@ -280,31 +226,23 @@ export class EngineProxy
 
   public duplicateField(sourceId: number, destKP: KeyPath, despecify = false)
   {
-    const originalOKP = this.engine.getOutputKeyPath(sourceId);
-    this.engine.setOutputKeyPath(sourceId, originalOKP.set(-1, `_${this.randomId()}${originalOKP.last()}`));
-    const destId = this.copyField(sourceId, destKP, despecify);
-    const newOrigId = this.copyField(sourceId, originalOKP, despecify);
-    this.engine.disableField(sourceId);
-    this.setFieldHidden(sourceId, true);
+    const kp = this.engine.getFieldPath(sourceId);
+    const newId = this.copyField(sourceId, destKP, despecify);
     this.requestRebuild();
   }
 
   public copyNestedTypes(idToCopy, destKP: KeyPath)
   {
-    const rootOutputKP = this.engine.getOutputKeyPath(idToCopy);
+    const rootOutputKP = this.engine.getFieldPath(idToCopy);
     EngineUtil.preorderForEach(this.engine, idToCopy, (childId) =>
     {
       // do not copy root
       if (childId !== idToCopy)
       {
-        const toTransferKeypath = this.engine.getOutputKeyPath(childId);
+        const toTransferKeypath = this.engine.getFieldPath(childId);
         const pathAfterRoot = toTransferKeypath.slice(rootOutputKP.size);
-
         const newFieldKP = destKP.concat(pathAfterRoot).toList();
-        const newFieldSyntheticPath = this.getSyntheticInputPath(newFieldKP);
-        EngineUtil.transferField(childId, newFieldSyntheticPath, this.engine);
-        const newChildId = this.engine.getInputFieldID(newFieldSyntheticPath);
-        this.engine.setOutputKeyPath(newChildId, newFieldKP, undefined, false);
+        EngineUtil.transferField(childId, newFieldKP, this.engine);
       }
     });
     this.requestRebuild();
@@ -384,47 +322,33 @@ export class EngineProxy
     };
     this.addTransformation(
       TransformationNodeType.DuplicateNode,
-      List([this.engine.getInputKeyPath(sourceId)]),
+      List([this.engine.getFieldPath(sourceId)]),
       optionsNew,
     );
-    const newFieldId = this.engine.getOutputFieldID(destKP);
+    const newFieldId = this.engine.getFieldID(destKP);
     EngineUtil.transferFieldData(sourceId, newFieldId, this.engine, this.engine);
 
     let idToCopy = sourceId;
     if (despecify)
     {
-      const kpToCopy = EngineUtil.turnIndicesIntoValue(this.engine.getInputKeyPath(sourceId));
-      idToCopy = this.engine.getInputFieldID(kpToCopy);
+      const kpToCopy = EngineUtil.turnIndicesIntoValue(this.engine.getFieldPath(sourceId));
+      idToCopy = this.engine.getFieldID(kpToCopy);
     }
 
-    const rootOutputKP = this.engine.getOutputKeyPath(sourceId);
+    const rootOutputKP = this.engine.getFieldPath(sourceId);
     EngineUtil.preorderForEach(this.engine, idToCopy, (childId) =>
     {
       // do not copy root
       if (childId !== idToCopy)
       {
-        const toTransferKeypath = this.engine.getOutputKeyPath(childId);
+        const toTransferKeypath = this.engine.getFieldPath(childId);
         const pathAfterRoot = toTransferKeypath.slice(rootOutputKP.size);
-
         const newFieldKP = destKP.concat(pathAfterRoot).toList();
-        const newFieldSyntheticPath = this.getSyntheticInputPath(newFieldKP);
-        EngineUtil.transferField(childId, newFieldSyntheticPath, this.engine);
-        const newChildId = this.engine.getInputFieldID(newFieldSyntheticPath);
-        this.engine.setOutputKeyPath(newChildId, newFieldKP, undefined, false);
+        EngineUtil.transferField(childId, newFieldKP, this.engine);
+        const newChildId = this.engine.getFieldID(newFieldKP);
       }
     });
     return newFieldId;
-  }
-
-  // this is not deterministic
-  private getSyntheticInputPath(keypath: KeyPath): KeyPath
-  {
-    return keypath.unshift(`_synthetic_${this.randomId()}`);
-  }
-
-  private randomId(): string
-  {
-    return Math.random().toString(36).substring(2);
   }
 
   private addFieldToEngine(
@@ -469,7 +393,7 @@ export class FieldProxy
       if (dependents.size > 0)
       {
         const paths = JSON.stringify(
-          dependents.map((id) => this.engine.getOutputKeyPath(id),
+          dependents.map((id) => this.engine.getFieldPath(id),
           ).toList().toJS(), null, 2);
         throw new Error(`Cannot delete field. This field has ${dependents.size} dependent fields: ${paths}`);
       }
@@ -486,9 +410,9 @@ export class FieldProxy
       return this;
     }
     value = value.toString();
-    let outputPath = this.engine.getOutputKeyPath(this.fieldId);
+    let outputPath = this.engine.getFieldPath(this.fieldId);
     outputPath = outputPath.set(outputPath.size - 1, value);
-    this.engine.setOutputKeyPath(this.fieldId, outputPath);
+    this.engine.renameField(this.fieldId, outputPath);
     this.syncWithEngine();
   }
 
@@ -497,12 +421,12 @@ export class FieldProxy
     if (validateRename(this.engine, this.fieldId, newPath).isValid)
     {
       // Transformation Engine automatically reassigns child output paths
-      this.engine.setOutputKeyPath(this.fieldId, newPath);
+      this.engine.renameField(this.fieldId, newPath);
 
       for (let i = 1; i < newPath.size; i++)
       {
         const ancestorPath = newPath.slice(0, i).toList();
-        const parentId = this.engine.getOutputFieldID(ancestorPath);
+        const parentId = this.engine.getFieldID(ancestorPath);
         if (parentId === undefined)
         {
           this.engineProxy.addField(ancestorPath, ETLFieldTypes.Object);
@@ -515,7 +439,7 @@ export class FieldProxy
   // add a field under this field
   public addNewField(name: string, type: ETLFieldTypes)
   {
-    const newPath = this.engine.getOutputKeyPath(this.fieldId).push(name);
+    const newPath = this.engine.getFieldPath(this.fieldId).push(name);
     if (validateNewFieldName(this.engine, this.fieldId, newPath).isValid)
     {
       this.engineProxy.addField(newPath, type);
@@ -535,7 +459,7 @@ export class FieldProxy
       return;
     }
 
-    const tree = EngineUtil.createTreeFromEngine(this.engine);
+    const tree = this.engine.createTree();
     if (tree.get(this.fieldId).size > 0 && oldType === ETLFieldTypes.Array)
     {
       try
@@ -554,7 +478,7 @@ export class FieldProxy
 
     if (newType === ETLFieldTypes.Array)
     {
-      const childPath = this.engine.getOutputKeyPath(this.fieldId).push(-1);
+      const childPath = this.engine.getFieldPath(this.fieldId).push(-1);
       EngineUtil.addFieldToEngine(this.engine, childPath, ETLFieldTypes.Array, ETLFieldTypes.String, true);
       EngineUtil.rawSetFieldType(
         this.engine,

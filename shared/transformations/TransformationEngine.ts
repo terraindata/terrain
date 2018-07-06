@@ -99,8 +99,6 @@ export class TransformationEngine
     e.doc = parsedJSON['doc'];
     e.uidField = parsedJSON['uidField'];
     e.uidNode = parsedJSON['uidNode'];
-    // e.fieldNameToIDMap = Map<KeyPath, number>(parsedJSON['fieldNameToIDMap']);
-    // e.IDToFieldNameMap = Map<number, KeyPath>(parsedJSON['IDToFieldNameMap']);
     e.IDToPathMap = Map<number, KeyPath>(parsedJSON['IDToPathMap']);
     e.fieldTypes = Map<number, string>(parsedJSON['fieldTypes']);
     e.fieldEnabled = Map<number, boolean>(parsedJSON['fieldEnabled']);
@@ -146,8 +144,7 @@ export class TransformationEngine
   private static parseSerializedString(s: string): object
   {
     const parsed: object = JSON.parse(s);
-    parsed['fieldNameToIDMap'] = parsed['fieldNameToIDMap'].map((v) => [KeyPath(v[0]), v[1]]);
-    parsed['IDToFieldNameMap'] = parsed['IDToFieldNameMap'].map((v) => [v[0], KeyPath(v[1])]);
+    parsed['IDToPathMap'] = parsed['IDToPathMap'].map((v) => [v[0], KeyPath(v[1])]);
     for (let i: number = 0; i < parsed['dag']['nodes'].length; i++)
     {
       const raw: object = parsed['dag']['nodes'][i]['value'];
@@ -166,13 +163,9 @@ export class TransformationEngine
   private doc: object = {};
   private uidField: number = 0;
   private uidNode: number = 0;
-  // private fieldNameToIDMap: Map<KeyPath, number> = Map<KeyPath, number>();
-  // private IDToFieldNameMap: Map<number, KeyPath> = Map<number, KeyPath>();
   private fieldTypes: Map<number, string> = Map<number, string>();
   private fieldEnabled: Map<number, boolean> = Map<number, boolean>();
   private fieldProps: Map<number, object> = Map<number, object>();
-
-  // private pathToIDMap: Map<KeyPath, number> = Map<KeyPath, number>();
   private IDToPathMap: Map<number, KeyPath> = Map<number, KeyPath>();
 
   /**
@@ -265,7 +258,7 @@ export class TransformationEngine
           let inferredTypeNameOfNewFields: string;
           if (TransformationRegistry.getNewFieldType(nodeType) === 'same' && fieldNames.size > 0)
           {
-            inferredTypeNameOfNewFields = this.getFieldType(this.getInputFieldID(fieldNames.get(0)));
+            inferredTypeNameOfNewFields = this.getFieldType(this.getFieldID(fieldNames.get(0)));
           }
           else if (TransformationRegistry.getNewFieldType(nodeType))
           {
@@ -283,7 +276,7 @@ export class TransformationEngine
       {
         for (let i: number = 0; i < fieldNames.size; i++)
         {
-          this.disableField(this.getInputFieldID(fieldNames.get(i)));
+          this.disableField(this.getFieldID(fieldNames.get(i)));
         }
       }
     }
@@ -325,7 +318,7 @@ export class TransformationEngine
     {
       if (!enabled)
       {
-        yadeep.remove(output, this.getOutputKeyPath(fieldID));
+        yadeep.remove(output, this.getFieldPath(fieldID));
       }
     });
     return output;
@@ -345,8 +338,7 @@ export class TransformationEngine
       doc: this.doc,
       uidField: this.uidField,
       uidNode: this.uidNode,
-      fieldNameToIDMap: this.fieldNameToIDMap.map((v: number, k: KeyPath) => [k, v]).toArray(),
-      IDToFieldNameMap: this.IDToFieldNameMap.map((v: KeyPath, k: number) => [k, v]).toArray(),
+      IDToPathMap: this.IDToPathMap.map((v: KeyPath, k: number) => [k, v]).toArray(),
       fieldTypes: this.fieldTypes.map((v: string, k: number) => [k, v]).toArray(),
       fieldEnabled: this.fieldEnabled.map((v: boolean, k: number) => [k, v]).toArray(),
       fieldProps: this.fieldProps.map((v: object, k: number) => [k, v]).toArray(),
@@ -365,13 +357,13 @@ export class TransformationEngine
    */
   public addField(fullKeyPath: KeyPath, typeName: string = null, options: object = {}): number
   {
-    if (this.fieldNameToIDMap.has(fullKeyPath))
+    if (this.getFieldID(fullKeyPath) !== undefined)
     {
-      return this.fieldNameToIDMap.get(fullKeyPath);
+      return this.getFieldID(fullKeyPath);
     }
-
-    this.fieldNameToIDMap = this.fieldNameToIDMap.set(fullKeyPath, this.uidField);
-    this.IDToFieldNameMap = this.IDToFieldNameMap.set(this.uidField, fullKeyPath);
+    this.IDToPathMap = this.IDToPathMap.set(this.uidField, fullKeyPath);
+    // this.fieldNameToIDMap = this.fieldNameToIDMap.set(fullKeyPath, this.uidField);
+    // this.IDToFieldNameMap = this.IDToFieldNameMap.set(this.uidField, fullKeyPath);
     if (typeName === null)
     {
       typeName = 'object';
@@ -389,12 +381,9 @@ export class TransformationEngine
     // Order matters!  Must do this first, else getTransformations can't work because
     // it relies on the entry in fieldNameToIDMap.
     this.getTransformations(id).forEach((t: number) => this.deleteTransformation(t));
-
-    // this.fieldNameToIDMap = this.fieldNameToIDMap.delete(this.fieldNameToIDMap.keyOf(id));
     this.IDToPathMap = this.IDToPathMap.delete(id);
     this.fieldProps = this.fieldProps.delete(id);
     this.fieldEnabled = this.fieldEnabled.delete(id);
-    // this.IDToFieldNameMap = this.IDToFieldNameMap.delete(id);
     this.fieldTypes = this.fieldTypes.delete(id);
   }
 
@@ -504,26 +493,6 @@ export class TransformationEngine
   {
     return this.IDToPathMap.keyOf(path);
   }
-
-  // public getInputKeyPath(fieldID: number): KeyPath
-  // {
-  //   return this.fieldNameToIDMap.keyOf(fieldID);
-  // }
-
-  // public getInputFieldID(path: KeyPath): number
-  // {
-  //   return this.fieldNameToIDMap.get(path);
-  // }
-
-  // public getOutputKeyPath(fieldID: number): KeyPath
-  // {
-  //   return this.IDToFieldNameMap.get(fieldID);
-  // }
-
-  // public getOutputFieldID(path: KeyPath): number
-  // {
-  //   return this.IDToFieldNameMap.keyOf(path);
-  // }
 
   public renameField(fieldID: number, newPath: KeyPath)
   {
@@ -655,10 +624,6 @@ export class TransformationEngine
 
   private addArrayField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any, depth: number = 1): List<number>
   {
-    // console.log('cpk = ' + currentKeyPath);
-    // const arrayKey: any = [key.toString()];
-    // const arrayID: number = this.addField(currentKeyPath.push(arrayKey), 'array');
-    // console.log('x2 ' + currentKeyPath.push(key.toString()));
     let arrayType;
     try
     {
@@ -716,21 +681,21 @@ export class TransformationEngine
     {
       if (isPrimitive(obj[key]))
       {
-        if (prevArray && !this.fieldNameToIDMap.has(currentKeyPath.butLast().toList().push(-1).push(key)))
+        if (prevArray && this.getFieldID(currentKeyPath.butLast().toList().push(-1).push(key)) === undefined)
         {
           ids = this.addPrimitiveField(ids, obj, currentKeyPath.butLast().toList().push(-1), key);
         }
         ids = this.addPrimitiveField(ids, obj, currentKeyPath, key);
       } else if (obj[key].constructor === Array)
       {
-        if (prevArray && !this.fieldNameToIDMap.has(currentKeyPath.butLast().toList().push(-1).push(key)))
+        if (prevArray && this.getFieldID(currentKeyPath.butLast().toList().push(-1).push(key)) === undefined)
         {
           ids = this.addArrayField(ids, obj, currentKeyPath.butLast().toList().push(-1), key);
         }
         ids = this.addArrayField(ids, obj, currentKeyPath, key);
       } else
       {
-        if (prevArray && !this.fieldNameToIDMap.has(currentKeyPath.butLast().toList().push(-1).push(key)))
+        if (prevArray && this.getFieldID(currentKeyPath.butLast().toList().push(-1).push(key)) === undefined)
         {
           // current children
           ids = ids.push(this.addField(currentKeyPath.butLast().toList().push(-1).push(key), typeof obj[key]));

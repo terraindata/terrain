@@ -216,7 +216,7 @@ export default class TemplateUtil
             if (fieldVer !== null && fieldVer.type === 'error')
             {
               hasFieldErrors = true;
-              errors.push(`Issue with field "${edge.transformations.getOutputKeyPath(fieldVer.fieldId).toJS()}": ${fieldVer.message}`);
+              errors.push(`Issue with field "${edge.transformations.getFieldPath(fieldVer.fieldId).toJS()}": ${fieldVer.message}`);
             }
           }
           return mappingErrors.length > 0 || hasFieldErrors;

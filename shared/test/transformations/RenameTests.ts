@@ -54,10 +54,10 @@ test('rename a field (no structural changes)', () =>
   const e: TransformationEngine = new TransformationEngine();
   const id1: number = e.addField(KeyPath(['name']), 'string');
   e.addField(KeyPath(['meta', 'school']), 'string');
-  e.setOutputKeyPath(id1, KeyPath(['firstname']));
+  e.renameField(id1, KeyPath(['firstname']));
   expect(e.transform(TestDocs.doc1)['name']).toBe(undefined);
   expect(e.transform(TestDocs.doc1)['firstname']).toBe('Bob');
-  e.setOutputKeyPath(id1, KeyPath(['professor']));
+  e.renameField(id1, KeyPath(['professor']));
   expect(e.transform(TestDocs.doc1)['name']).toBe(undefined);
   expect(e.transform(TestDocs.doc1)['firstname']).toBe(undefined);
   expect(e.transform(TestDocs.doc1)['professor']).toBe('Bob');
@@ -68,7 +68,7 @@ test('rename a field (subjugation)', () =>
   const e: TransformationEngine = new TransformationEngine();
   const id1: number = e.addField(KeyPath(['name']), 'string');
   e.addField(KeyPath(['meta', 'school']), 'string');
-  e.setOutputKeyPath(id1, KeyPath(['meta', 'firstname']));
+  e.renameField(id1, KeyPath(['meta', 'firstname']));
   expect(e.transform(TestDocs.doc1)['name']).toBe(undefined);
   expect(e.transform(TestDocs.doc1)['meta']['firstname']).toBe('Bob');
 });
@@ -78,7 +78,7 @@ test('rename a field (promotion)', () =>
   const e: TransformationEngine = new TransformationEngine();
   e.addField(KeyPath(['name']), 'string');
   const id2: number = e.addField(KeyPath(['meta', 'school']), 'string');
-  e.setOutputKeyPath(id2, KeyPath(['skool']));
+  e.renameField(id2, KeyPath(['skool']));
   expect(e.transform(TestDocs.doc1)['skool']).toBe('Stanford');
   expect(e.transform(TestDocs.doc1)['meta']).toBe(undefined);
 });
@@ -90,7 +90,7 @@ test('rename a field (an object with subkeys)', () =>
   const id2: number = e.addField(KeyPath(['meta']), 'object');
   e.addField(KeyPath(['meta', 'school']), 'string');
   e.addField(KeyPath(['meta', 'sport']), 'string');
-  e.setOutputKeyPath(id2, KeyPath());
+  e.renameField(id2, KeyPath());
   expect(e.transform(TestDocs.doc2)['meta']).toBe(undefined);
   expect(e.transform(TestDocs.doc2)['school']).toBe('Stanford');
   expect(e.transform(TestDocs.doc2)['sport']).toBe('bobsled');
@@ -100,7 +100,7 @@ test('rename a field (deeply nested property in array)', () =>
 {
   {
     const e: TransformationEngine = new TransformationEngine(TestDocs.doc3);
-    e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr', 1, -1, 'a'])), KeyPath(['arr', 1, -1, 'cool']));
+    e.renameField(e.getFieldID(KeyPath(['arr', 1, -1, 'a'])), KeyPath(['arr', 1, -1, 'cool']));
     expect(e.transform(TestDocs.doc3)['arr'][1][0]['a']).toBe(undefined);
     expect(e.transform(TestDocs.doc3)['arr'][1][0]['cool']).toBe('dog');
     expect(e.transform(TestDocs.doc3)['arr'][1][1]['a']).toBe(undefined);
@@ -110,14 +110,14 @@ test('rename a field (deeply nested property in array)', () =>
   {
     const doc = { d: [[{ b: 2 }, { b: 3 }]] };
     const e: TransformationEngine = new TransformationEngine(doc);
-    e.setOutputKeyPath(e.getInputFieldID(KeyPath(['d', 0, -1, 'b'])), KeyPath(['d', 0, -1, 'c']));
+    e.renameField(e.getFieldID(KeyPath(['d', 0, -1, 'b'])), KeyPath(['d', 0, -1, 'c']));
     expect(e.transform(doc)).toEqual({ d: [[{ c: 2 }, { c: 3 }]] });
   }
 
   {
     const doc = { a: [[{ b: 2 }, { b: 3 }]] };
     const e: TransformationEngine = new TransformationEngine(doc);
-    e.setOutputKeyPath(e.getInputFieldID(KeyPath(['a', 0, -1, 'b'])), KeyPath(['a', 0, -1, 'c']));
+    e.renameField(e.getFieldID(KeyPath(['a', 0, -1, 'b'])), KeyPath(['a', 0, -1, 'c']));
     expect(e.transform(doc)).toEqual({ a: [[{ c: 2 }, { c: 3 }]] });
   }
 });
@@ -128,7 +128,7 @@ test('structural rename with array', () =>
   const arrId = e.addField(List(['foo']), 'array');
   e.addField(List(['foo', -1]), 'array');
 
-  e.setOutputKeyPath(arrId, List(['bar', 'baz']));
+  e.renameField(arrId, List(['bar', 'baz']));
 
   const doc = {
     foo: [1, 2, 3],
@@ -141,7 +141,7 @@ test('structural rename with array', () =>
 test('proper wildcard behavior in rename stage', () =>
 {
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc4);
-  e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['car']));
+  e.renameField(e.getFieldID(KeyPath(['arr'])), KeyPath(['car']));
   expect(e.transform(TestDocs.doc5)).toEqual(
     {
       car: ['a', 'b', 'c', 'd'],
@@ -167,7 +167,7 @@ test('wildcard rename with manual field adding', () =>
   };
   expect(e.transform(doc)).toEqual(doc);
 
-  e.setOutputKeyPath(bar, List(['foo', -1, 'baz']));
+  e.renameField(bar, List(['foo', -1, 'baz']));
 
   expect(e.transform(doc)['foo'][0]['baz']).toBe('hi');
 });
@@ -178,8 +178,8 @@ test('gracefully handle invalid rename (TE remains in some working/recoverable s
   const fooId = e.addField(List(['foo']), 'number');
   e.addField(List(['bar']), 'number');
 
-  e.setOutputKeyPath(fooId, List(['bar'])); // oops, invalid
-  e.setOutputKeyPath(fooId, List(['foo'])); // change it back to foo
+  e.renameField(fooId, List(['bar'])); // oops, invalid
+  e.renameField(fooId, List(['foo'])); // change it back to foo
 
   const doc = {
     foo: 5,
@@ -194,7 +194,7 @@ test('rename a nested field that contains an array', () =>
   e.addField(List(['nested']), 'object');
   const id1 = e.addField(List(['nested', 'foo']), 'array', { valueType: 'number' });
   const id2 = e.addField(List(['nested', 'foo', -1]), 'array', { valueType: 'number' });
-  e.setOutputKeyPath(id1, List(['foo']));
-  expect(e.getOutputKeyPath(id1)).toEqual(KeyPath(['foo']));
-  expect(e.getOutputKeyPath(id2)).toEqual(KeyPath(['foo', -1]));
+  e.renameField(id1, List(['foo']));
+  expect(e.getFieldPath(id1)).toEqual(KeyPath(['foo']));
+  expect(e.getFieldPath(id2)).toEqual(KeyPath(['foo', -1]));
 });

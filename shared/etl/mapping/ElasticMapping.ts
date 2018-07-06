@@ -166,7 +166,7 @@ export class ElasticMapping
     : { valid: boolean, message?: string }
   {
     const toCompareConfig = ElasticMapping.getTypeConfig(fieldID, engine);
-    const okp = engine.getOutputKeyPath(fieldID);
+    const okp = engine.getFieldPath(fieldID);
     const mappingPath = ElasticMapping.enginePathToMappingPath(okp);
     const existingConfig = _.get(existingMapping, mappingPath.toArray());
 
@@ -361,7 +361,7 @@ export class ElasticMapping
       }
       else
       {
-        const okp = this.engine.getOutputKeyPath(id);
+        const okp = this.engine.getFieldPath(id);
         const cleanedPath = ElasticMapping.enginePathToMappingPath(okp).toJS();
         const fieldMapping = _.get(this.mapping, cleanedPath);
         const newFieldMapping = _.omit(fieldMapping, ['properties']);
@@ -373,7 +373,7 @@ export class ElasticMapping
   protected addFieldToMapping(id: number)
   {
     const config = ElasticMapping.getTypeConfig(id, this.engine, this.isMerge);
-    const enginePath = this.engine.getOutputKeyPath(id);
+    const enginePath = this.engine.getFieldPath(id);
     const cleanedPath = ElasticMapping.enginePathToMappingPath(enginePath);
     const hashed = EngineUtil.hashPath(cleanedPath);
 
@@ -411,7 +411,7 @@ export class ElasticMapping
   {
     const ids = this.engine.getAllFieldIDs();
     const disabledMap: { [k: number]: boolean } = {};
-    const tree = EngineUtil.createTreeFromEngine(this.engine);
+    const tree = this.engine.createTree();
     const disabledFields = ids.filter((id) => !this.engine.getFieldEnabled(id)).toSet();
     const shouldExplore = (id) => disabledMap[id] === undefined;
     disabledFields.forEach((id) =>
@@ -465,7 +465,7 @@ export class ElasticMapping
       etlTypeToElastic(etlType)
       :
       elasticProps.elasticType;
-    const enginePath = this.engine.getOutputKeyPath(id);
+    const enginePath = this.engine.getFieldPath(id);
     if (enginePath.size > 1)
     {
       this.errors.push(

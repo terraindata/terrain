@@ -104,7 +104,7 @@ class RemoveDuplicatesTransformationInfoC extends TransformationNodeInfo
     return (
       EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
       (valueType === 'number' || valueType === 'string') &&
-      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+      EngineUtil.isNamedField(engine.getFieldPath(fieldId))
     );
   }
 }

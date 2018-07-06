@@ -80,7 +80,7 @@ export function validateNewFieldName(
       message: 'Invalid Name. Name cannot be \'*\'',
     };
   }
-  const otherId = engine.getOutputFieldID(newKeyPath);
+  const otherId = engine.getFieldID(newKeyPath);
   if (otherId !== undefined && otherId !== fieldId)
   {
     return {
@@ -117,7 +117,7 @@ export function validateRename(
     message: string,
   }
 {
-  const existingKp = engine.getOutputKeyPath(fieldId);
+  const existingKp = engine.getFieldPath(fieldId);
   const failIndex = newKeyPath.findIndex((value) => value === '');
   if (failIndex !== -1)
   {
@@ -133,7 +133,7 @@ export function validateRename(
       message: 'Invalid Rename. Name cannot end with a number',
     };
   }
-  const otherId = engine.getOutputFieldID(newKeyPath);
+  const otherId = engine.getFieldID(newKeyPath);
   if (otherId !== undefined && otherId !== fieldId)
   {
     return {
@@ -160,7 +160,7 @@ export function validateRename(
   for (let i = 1; i < newKeyPath.size; i++)
   {
     const kpToTest = newKeyPath.slice(0, i).toList();
-    const parentId = engine.getOutputFieldID(kpToTest);
+    const parentId = engine.getFieldID(kpToTest);
     if (parentId !== undefined)
     {
       const parentType = engine.getFieldType(parentId);

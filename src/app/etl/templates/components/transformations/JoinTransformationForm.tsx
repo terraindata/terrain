@@ -130,9 +130,9 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
   public computeAvailableFields(fieldId: number): List<number>
   {
     const { engine } = this.props;
-    const currentKP = engine.getOutputKeyPath(fieldId);
+    const currentKP = engine.getFieldPath(fieldId);
     return engine.getAllFieldIDs().filter((id, i) => fieldId !== id
-      && Topology.areFieldsLocal(currentKP, engine.getOutputKeyPath(id))
+      && Topology.areFieldsLocal(currentKP, engine.getFieldPath(id))
       && engine.getFieldType(id) === 'string',
     ).toList();
   }
@@ -142,7 +142,7 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
     const { engine, fieldId } = this.props;
     const { otherFieldIds, outputName, delimiter, preserveOldFields } = this.state;
 
-    const currentKeyPath = engine.getOutputKeyPath(fieldId);
+    const currentKeyPath = engine.getFieldPath(fieldId);
     const changeIndex = currentKeyPath.size - 1;
     const newFieldKeyPaths = List([
       currentKeyPath.set(changeIndex, outputName),
@@ -150,7 +150,7 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
 
     const inputFields = List([fieldId])
       .concat(otherFieldIds)
-      .map((id) => engine.getInputKeyPath(id))
+      .map((id) => engine.getFieldPath(id))
       .toList();
 
     return {

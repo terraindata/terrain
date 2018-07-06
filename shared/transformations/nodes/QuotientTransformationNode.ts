@@ -102,7 +102,7 @@ class QuotientTransformationInfoC extends TransformationNodeInfo
   {
     return (
       EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
-      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+      EngineUtil.isNamedField(engine.getFieldPath(fieldId))
     );
   }
 }

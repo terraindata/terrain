@@ -92,12 +92,12 @@ function SimpleStatFactory<T extends TransformationNodeType>(type: T, startingNa
       const { engine, fieldId } = this.props;
       const { outputName } = this.state;
 
-      const currentKeyPath = engine.getOutputKeyPath(fieldId);
+      const currentKeyPath = engine.getFieldPath(fieldId);
       const newFieldKeyPaths = List([
         currentKeyPath.set(currentKeyPath.size - 1, outputName),
       ]);
 
-      const inputFields = List([engine.getInputKeyPath(fieldId)]);
+      const inputFields = List([engine.getFieldPath(fieldId)]);
 
       return {
         options: {

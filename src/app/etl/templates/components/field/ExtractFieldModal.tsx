@@ -215,7 +215,7 @@ class ExtractFieldModal extends TerrainComponent<Props>
     {
       const { templateEditor } = this.props;
       const engine = templateEditor.getCurrentEngine();
-      const okp = engine.getOutputKeyPath(fieldId);
+      const okp = engine.getFieldPath(fieldId);
 
       if (okp === undefined)
       {

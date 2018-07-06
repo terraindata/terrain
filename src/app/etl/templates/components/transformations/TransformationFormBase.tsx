@@ -172,7 +172,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   {
     const { transformation, isCreate, engine, fieldId } = this.props;
     const fields = isCreate ?
-      List([engine.getInputKeyPath(fieldId)]) :
+      List([engine.getFieldPath(fieldId)]) :
       transformation.fields;
 
     return {

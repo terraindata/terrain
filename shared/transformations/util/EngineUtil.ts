@@ -89,20 +89,10 @@ export default class EngineUtil
     {
       const fields = engine.getAllFieldIDs();
       const pathTypes: PathHashMap<FieldTypes> = {};
-      const seenIKP = {};
       const seenOKP = {};
       fields.forEach((id) =>
       {
-        const hashedOKP = EngineUtil.hashPath(engine.getOutputKeyPath(id));
-        const hashedIKP = EngineUtil.hashPath(engine.getInputKeyPath(id));
-        if (seenIKP[hashedIKP] !== undefined)
-        {
-          errors.push(`Duplicate Input path detected: ${hashedIKP}`);
-        }
-        else
-        {
-          seenIKP[hashedIKP] = id;
-        }
+        const hashedOKP = EngineUtil.hashPath(engine.getFieldPath(id));
         if (seenOKP[hashedOKP] !== undefined)
         {
           errors.push(`Duplicate Output path detected: ${hashedOKP}`);
@@ -111,16 +101,16 @@ export default class EngineUtil
         {
           seenOKP[hashedOKP] = id;
         }
-        const strippedPath = EngineUtil.turnIndicesIntoValue(engine.getOutputKeyPath(id));
+        const strippedPath = EngineUtil.turnIndicesIntoValue(engine.getFieldPath(id));
         pathTypes[EngineUtil.hashPath(strippedPath)] = engine.getFieldType(id) as FieldTypes;
       });
       fields.forEach((id) =>
       {
-        const okp = engine.getOutputKeyPath(id);
+        const okp = engine.getFieldPath(id);
         if (okp.size > 1)
         {
           const parentPath = okp.slice(0, -1).toList();
-          const parentID = engine.getOutputFieldID(parentPath);
+          const parentID = engine.getFieldID(parentPath);
           if (engine.getFieldType(parentID) !== 'array' && engine.getFieldType(parentID) !== 'object')
           {
             errors.push(`Field ${okp.toJS()} has a parent that is not an array or object`);
@@ -187,7 +177,7 @@ export default class EngineUtil
       {
         return nfkp;
       }
-    }).map((kp) => engine.getOutputFieldID(kp))
+    }).map((kp) => engine.getFieldID(kp))
       .toList()
       .toSet();
     return List(asSet);
@@ -259,10 +249,10 @@ export default class EngineUtil
   // returns the first child field
   public static findChildField(fieldId: number, engine: TransformationEngine): number | undefined
   {
-    const myKP = engine.getOutputKeyPath(fieldId);
+    const myKP = engine.getFieldPath(fieldId);
     const key = engine.getAllFieldIDs().findKey((id: number) =>
     {
-      const childKP = engine.getOutputKeyPath(id);
+      const childKP = engine.getFieldPath(id);
       if (childKP.size === myKP.size + 1)
       {
         return childKP.slice(0, -1).equals(myKP);
@@ -375,7 +365,7 @@ export default class EngineUtil
     newType: ETLFieldTypes,
   )
   {
-    if (EngineUtil.isWildcardField(engine.getOutputKeyPath(fieldId)))
+    if (EngineUtil.isWildcardField(engine.getFieldPath(fieldId)))
     {
       engine.setFieldProp(fieldId, valueTypeKeyPath, getJSFromETL(newType));
     }
@@ -390,7 +380,7 @@ export default class EngineUtil
   // get the JS type of a field. If it represents an array wildcard, get the valueType
   public static getRepresentedType(id: number, engine: TransformationEngine): FieldTypes
   {
-    const kp = engine.getOutputKeyPath(id);
+    const kp = engine.getFieldPath(id);
     if (EngineUtil.isWildcardField(kp))
     {
       return engine.getFieldProp(id, valueTypeKeyPath) as FieldTypes;
@@ -425,7 +415,7 @@ export default class EngineUtil
     const newEngine = new TransformationEngine();
     leftEngine.getAllFieldIDs().forEach((id) =>
     {
-      const keypath = leftEngine.getOutputKeyPath(id);
+      const keypath = leftEngine.getFieldPath(id);
       const newId = EngineUtil.transferField(id, keypath, leftEngine, newEngine);
     });
     const outputKeyPathBase = List([outputKey, -1]);
@@ -436,7 +426,7 @@ export default class EngineUtil
 
     rightEngine.getAllFieldIDs().forEach((id) =>
     {
-      const newKeyPath = outputKeyPathBase.concat(rightEngine.getOutputKeyPath(id)).toList();
+      const newKeyPath = outputKeyPathBase.concat(rightEngine.getFieldPath(id)).toList();
       const newId = EngineUtil.transferField(id, newKeyPath, rightEngine, newEngine);
     });
     return newEngine;
@@ -468,14 +458,14 @@ export default class EngineUtil
 
     const ignoreFields: { [k: number]: boolean } = {};
     const docs = EngineUtil.preprocessDocuments(options.documents, engine);
-    engine.getAllFieldIDs().sortBy((id) => engine.getOutputKeyPath(id).size).forEach((id) =>
+    engine.getAllFieldIDs().sortBy((id) => engine.getFieldPath(id).size).forEach((id) =>
     {
       if (ignoreFields[id])
       {
         return;
       }
-      const ikp = engine.getInputKeyPath(id);
-      const okp = engine.getOutputKeyPath(id);
+      // const ikp = engine.getInputKeyPath(id);
+      const okp = engine.getFieldPath(id);
 
       const repType = EngineUtil.getRepresentedType(id, engine);
 
@@ -506,8 +496,8 @@ export default class EngineUtil
         {
           EngineUtil.changeFieldType(engine, id, ETLFieldTypes.GeoPoint);
           EngineUtil.castField(engine, id, ETLFieldTypes.GeoPoint);
-          const latId = engine.getOutputFieldID(okp.push('lat'));
-          const lonId = engine.getOutputFieldID(okp.push('lon'));
+          const latId = engine.getFieldID(okp.push('lat'));
+          const lonId = engine.getFieldID(okp.push('lon'));
           EngineUtil.changeFieldType(engine, latId, ETLFieldTypes.Number);
           EngineUtil.changeFieldType(engine, lonId, ETLFieldTypes.Number);
           EngineUtil.castField(engine, latId, ETLFieldTypes.Number);
@@ -535,7 +525,7 @@ export default class EngineUtil
   // cast the field to the specified type (or the field's current type if type is not specified)
   public static castField(engine: TransformationEngine, fieldId: number, type?: ETLFieldTypes, format?: DateFormats)
   {
-    const ikp = engine.getInputKeyPath(fieldId);
+    const ikp = engine.getFieldPath(fieldId);
     const etlType: ETLFieldTypes = type === undefined ? EngineUtil.getETLFieldType(fieldId, engine) : type;
     const castType = ETLTypeToCastString[etlType];
 
@@ -594,7 +584,7 @@ export default class EngineUtil
       fieldIds.forEach((id, j) =>
       {
         const currentType: FieldTypes = EngineUtil.getRepresentedType(id, e);
-        const deIndexedPath = EngineUtil.turnIndicesIntoValue(e.getOutputKeyPath(id), -1);
+        const deIndexedPath = EngineUtil.turnIndicesIntoValue(e.getFieldPath(id), -1);
         const path = EngineUtil.hashPath(deIndexedPath);
 
         if (pathTypes[path] !== undefined)
@@ -677,50 +667,6 @@ export default class EngineUtil
       e2.disableField(id2);
     }
   }
-
-  // public static createTreeFromEngine(engine: TransformationEngine): Immutable.Map<number, List<number>>
-  // {
-  //   const ids = engine.getAllFieldIDs();
-  //   // sort the paths to ensure we visit parents before children
-  //   const sortedIds = ids.sort((a, b) => engine.getOutputKeyPath(a).size - engine.getOutputKeyPath(b).size);
-
-  //   const enginePathToField: {
-  //     [kp: string]: List<number>,
-  //   } = {};
-
-  //   sortedIds.forEach((id, index) =>
-  //   {
-  //     const enginePath = engine.getOutputKeyPath(id).toJS();
-  //     if (enginePath.length === 0)
-  //     {
-  //       return;
-  //     }
-  //     const parentPath = enginePath.slice(0, -1);
-  //     const parentHash = JSON.stringify(parentPath);
-  //     const parentField: List<number> = enginePathToField[parentHash];
-  //     const newField = List([]);
-
-  //     if (parentField != null)
-  //     {
-  //       enginePathToField[parentHash] = parentField.push(id);
-  //     }
-  //     enginePathToField[JSON.stringify(enginePath)] = newField;
-  //   });
-
-  //   const fieldMap: { [k: number]: List<number> } = {};
-  //   sortedIds.forEach((id, index) =>
-  //   {
-  //     const enginePath = engine.getOutputKeyPath(id).toJS();
-  //     const field = enginePathToField[JSON.stringify(enginePath)];
-  //     if (field != null)
-  //     {
-  //       fieldMap[id] = field;
-  //     }
-  //   });
-  //   return Immutable.Map<number, List<number>>(fieldMap)
-  //     .mapKeys((key) => Number(key))
-  //     .toMap();
-  // }
 
   public static postorderForEach(
     engine: TransformationEngine,
@@ -846,7 +792,7 @@ export default class EngineUtil
       {
         return;
       }
-      const value = yadeep.get(doc, engine.getOutputKeyPath(id));
+      const value = yadeep.get(doc, engine.getFieldPath(id));
       if (Array.isArray(value))
       {
         let allNull = true;
@@ -869,7 +815,7 @@ export default class EngineUtil
     });
     _.forEach(fieldsToDelete, (id) =>
     {
-      const deIndexedPath = EngineUtil.turnIndicesIntoValue(engine.getOutputKeyPath(id), -1);
+      const deIndexedPath = EngineUtil.turnIndicesIntoValue(engine.getFieldPath(id), -1);
       const path = EngineUtil.hashPath(deIndexedPath);
       engine.deleteField(id);
       if (pathTypes[path] === undefined)
@@ -890,13 +836,12 @@ export default class EngineUtil
       {
         return;
       }
-      const okp = engine.getOutputKeyPath(id);
-      const ikp = engine.getInputKeyPath(id);
-      const values = EngineUtil.getValuesToAnalyze(docs, okp);
+      const kp = engine.getFieldPath(id);
+      const values = EngineUtil.getValuesToAnalyze(docs, kp);
       const bestType = TypeUtil.getCommonJsType(values);
       if (bestType !== EngineUtil.getRepresentedType(id, engine))
       {
-        if (!EngineUtil.isWildcardField(ikp))
+        if (!EngineUtil.isWildcardField(kp))
         {
           engine.setFieldType(id, bestType);
         }

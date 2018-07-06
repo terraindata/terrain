@@ -211,7 +211,7 @@ test('nested transform with wildcard', () =>
 test('proper wildcard behavior across multiple docs', () =>
 {
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc4);
-  e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['car']));
+  e.renameField(e.getFieldID(KeyPath(['arr'])), KeyPath(['car']));
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['arr', -1])]), { format: 'uppercase' });
   expect(e.transform(TestDocs.doc5)).toEqual(
     {
@@ -223,11 +223,11 @@ test('proper wildcard behavior across multiple docs', () =>
 test('(deep) clone a TransformationEngine', () =>
 {
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc4);
-  e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['car']));
+  e.renameField(e.getFieldID(KeyPath(['arr'])), KeyPath(['car']));
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['arr', -1])]), { format: 'uppercase' });
   const clone: TransformationEngine = e.clone();
   expect(clone.equals(e)).toBe(true);
-  e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['dog']));
+  e.renameField(e.getFieldID(KeyPath(['arr'])), KeyPath(['dog']));
   expect(clone.equals(e)).toBe(false);
 });
 
@@ -657,7 +657,7 @@ test('cast on a field inside a nested object inside an array', () =>
   const id3 = e.addField(List(['foo', -1, 'bar']), 'string');
   e.appendTransformation(
     TransformationNodeType.CastNode,
-    List([e.getInputKeyPath(id3)]),
+    List([e.getFieldPath(id3)]),
     {
       toTypename: 'string',
     },
@@ -714,7 +714,7 @@ test('duplicate a wildcard array of fields', () =>
   const id3 = e.addField(List(['foo', -1, 'bar']), 'string');
   e.appendTransformation(
     TransformationNodeType.DuplicateNode,
-    List([e.getInputKeyPath(id3)]),
+    List([e.getFieldPath(id3)]),
     {
       newFieldKeyPaths: List<KeyPath>([KeyPath(['foo', -1, 'baz'])]),
     },
@@ -810,7 +810,7 @@ test('duplicate a field and then rename that field', () =>
       newFieldKeyPaths: List<KeyPath>([KeyPath(['foo', 0, 'baz'])]),
     },
   );
-  e.setOutputKeyPath(e.getOutputFieldID(KeyPath(['foo', 0, 'baz'])), KeyPath(['foo', 0, 'nice']));
+  e.renameField(e.getFieldID(KeyPath(['foo', 0, 'baz'])), KeyPath(['foo', 0, 'nice']));
   expect(e.transform(doc)).toEqual({
     foo: [
       {
@@ -1015,7 +1015,7 @@ test('duplicate a disabled array', () =>
   e.appendTransformation(TransformationNodeType.DuplicateNode, List([kp]), {
     newFieldKeyPaths: List([List(['copy of foo'])]),
   });
-  e.disableField(e.getInputFieldID(kp));
+  e.disableField(e.getFieldID(kp));
   expect(e.transform(doc)).toEqual({
     'copy of foo': [1, 2, 3],
   });
@@ -1252,8 +1252,8 @@ test('numeric keys', () =>
   {
     const doc = { 0: { '5': 3, '-1': ['a', 'b'] } };
     const e = new TransformationEngine(doc);
-    e.setOutputKeyPath(e.getOutputFieldID(KeyPath(['0', '5'])), KeyPath(['0', '1']));
-    e.setOutputKeyPath(e.getOutputFieldID(KeyPath(['0', '-1'])), KeyPath(['0', '0']));
+    e.renameField(e.getFieldID(KeyPath(['0', '5'])), KeyPath(['0', '1']));
+    e.renameField(e.getFieldID(KeyPath(['0', '-1'])), KeyPath(['0', '0']));
     e.appendTransformation(TransformationNodeType.CaseNode, List([List(['0', '-1', -1])]), { format: 'uppercase' });
     expect(e.transform(doc)).toEqual({ 0: { 1: 3, 0: ['A', 'B'] } });
   }

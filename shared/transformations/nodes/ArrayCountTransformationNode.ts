@@ -88,7 +88,7 @@ class ArrayCountTransformationInfoC extends TransformationNodeInfo
   {
     return (
       EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
-      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+      EngineUtil.isNamedField(engine.getFieldPath(fieldId))
     );
   }
 }

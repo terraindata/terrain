@@ -66,7 +66,7 @@ import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 const hiddenPath = List(['uiState', 'hidden']);
 export function createFieldMap(engine: TransformationEngine): FieldMap
 {
-  const treeMap = EngineUtil.createTreeFromEngine(engine)
+  const treeMap = engine.createTree()
     .map((children, id) => createFieldFromEngine(engine, id).set('childrenIds', children))
     .toMap();
   return treeMap;
@@ -78,7 +78,7 @@ export function createFieldFromEngine(
   id: number,
 ): TemplateField
 {
-  const enginePath = engine.getOutputKeyPath(id);
+  const enginePath = engine.getFieldPath(id);
   const transformationIds = engine.getTransformations(id);
 
   const transformations: List<TransformationNode> = transformationIds.map((transformationId, index) =>
@@ -97,8 +97,7 @@ export function createFieldFromEngine(
     isHidden: engine.getFieldProp(id, hiddenPath) === true,
     fieldId: id,
     fieldProps: engine.getFieldProps(id),
-    inputKeyPath: engine.getInputKeyPath(id),
-    outputKeyPath: engine.getOutputKeyPath(id),
+    outputKeyPath: engine.getFieldPath(id),
     etlType: EngineUtil.getETLFieldType(id, engine),
     transformations,
     name: enginePath.last().toString(),

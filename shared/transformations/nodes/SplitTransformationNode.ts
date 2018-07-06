@@ -103,7 +103,7 @@ class SplitTransformationInfoC extends TransformationNodeInfo
   {
     return (
       EngineUtil.getRepresentedType(fieldId, engine) === 'string' &&
-      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+      EngineUtil.isNamedField(engine.getFieldPath(fieldId))
     );
   }
 

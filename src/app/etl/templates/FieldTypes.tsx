@@ -65,7 +65,6 @@ class TemplateFieldC
   public readonly etlType: ETLFieldTypes = ETLFieldTypes.Object;
   public readonly fieldId: number = -1;
   public readonly name: string = '';
-  public readonly inputKeyPath: KeyPath = List([]);
   public readonly childrenIds: List<number> = List([]);
   public readonly transformations: List<TransformationNode> = List([]);
   public readonly outputKeyPath: KeyPath = List([]);

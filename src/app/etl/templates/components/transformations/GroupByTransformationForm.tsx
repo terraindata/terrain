@@ -133,7 +133,7 @@ export class GroupByTFF extends TransformationForm<GroupByOptions, Transformatio
       groupValues,
       subkey,
     };
-    const fields = List([engine.getInputKeyPath(fieldId)]);
+    const fields = List([engine.getFieldPath(fieldId)]);
     proxy.addTransformation(this.type, fields, options, {
       type: ETLFieldTypes.Array,
       valueType: ETLFieldTypes.Object,

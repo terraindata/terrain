@@ -78,7 +78,7 @@ class ElasticController extends DefaultController implements LanguageInterface
   public canSetPrimaryKey(engine: TransformationEngine, fieldId: number)
   {
     const jsType = EngineUtil.getRepresentedType(fieldId, engine);
-    const isRootField = engine.getOutputKeyPath(fieldId).size === 1;
+    const isRootField = engine.getFieldPath(fieldId).size === 1;
     return (jsType === 'string' || jsType === 'number') && isRootField;
   }
 
@@ -151,7 +151,7 @@ class ElasticController extends DefaultController implements LanguageInterface
     for (const id of ids.values() as IterableIterator<number>) // cannot use forEach inside iterator
     {
       let yielded = false; // make sure we yield at least once per field to allow async
-      const okp = engine.getOutputKeyPath(id);
+      const okp = engine.getFieldPath(id);
       const name = okp.last();
       if (typeof name === 'string')
       {

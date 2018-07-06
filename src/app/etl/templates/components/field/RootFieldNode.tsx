@@ -104,7 +104,7 @@ class RootFieldNode extends TerrainComponent<Props>
 
     const rootFields = fieldMap.filter((field, id) =>
     {
-      const outputKP = engine.getOutputKeyPath(id);
+      const outputKP = engine.getFieldPath(id);
       return outputKP !== undefined && outputKP.size === 1;
     });
 

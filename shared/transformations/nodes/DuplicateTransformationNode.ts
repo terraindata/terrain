@@ -231,7 +231,7 @@ class DuplicateTransformationInfoC extends TransformationNodeInfo
   {
     const etlType = EngineUtil.getETLFieldType(fieldId, engine);
     return (
-      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId)) &&
+      EngineUtil.isNamedField(engine.getFieldPath(fieldId)) &&
       etlType !== ETLFieldTypes.Object && etlType !== ETLFieldTypes.Array
     );
   }

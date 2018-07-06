@@ -130,7 +130,7 @@ class GroupByTransformationInfoC extends TransformationNodeInfo
     return (
       EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
       EngineUtil.getValueType(fieldId, engine) === 'object' &&
-      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+      EngineUtil.isNamedField(engine.getFieldPath(fieldId))
     );
   }
 }

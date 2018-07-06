@@ -144,7 +144,7 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
     const { leftName, rightName, delimiter, preserveOldFields, regex } = this.state;
     const args = super.computeArgs();
 
-    const currentKeyPath = engine.getOutputKeyPath(fieldId);
+    const currentKeyPath = engine.getFieldPath(fieldId);
     const changeIndex = currentKeyPath.size - 1;
 
     const newFieldKeyPaths = List([
