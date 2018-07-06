@@ -1512,7 +1512,7 @@ describe('Scheduler tests', () =>
             [
               {
                 id: 1,
-                taskId: 'taskETL',
+                taskId: 2,
                 params:
                   {
                     templateId, // ETL template ID

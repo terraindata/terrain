@@ -231,6 +231,88 @@ describe('SimpleTable', () =>
       expect(tableRows.at(1).find('.simple-table-cell').at(1).text())
         .toEqual('ITEM 2');
     });
+
+    describe('when props.data is empty', () =>
+    {
+      describe('and props.noResultsMessage is not set', () =>
+      {
+        it('should display the default no results message', () =>
+        {
+          const _tableState = Object.assign({}, tableState, { data: Immutable.Map<ID, any>({}) });
+          tableComponent = tableComponent = shallow(
+            <SimpleTable
+              {..._tableState}
+            />,
+          );
+
+          const tableRows = tableComponent.find('.simple-table-body .simple-table-row');
+
+          expect(tableRows.at(0).find('.simple-table-cell').at(0).text())
+            .toEqual('No results');
+        });
+      });
+
+      describe('and props.noResultsMessage is set', () =>
+      {
+        it('should display props.noResultsMessage', () =>
+        {
+          const _tableState = Object.assign({}, tableState, { data: Immutable.Map<ID, any>({}) });
+          tableComponent = tableComponent = shallow(
+            <SimpleTable
+              {..._tableState}
+              noResultsMessage={'Nothing to see here'}
+            />,
+          );
+
+          const tableRows = tableComponent.find('.simple-table-body .simple-table-row');
+
+          expect(tableRows.at(0).find('.simple-table-cell').at(0).text())
+            .toEqual('Nothing to see here');
+        });
+      });
+    });
+
+    describe('when props.loading is set to true', () =>
+    {
+      describe('and props.loadingMessage is not set', () =>
+      {
+        it('should display the default loading message', () =>
+        {
+          const _tableState = Object.assign({}, tableState, { data: Immutable.Map<ID, any>({}) });
+          tableComponent = tableComponent = shallow(
+            <SimpleTable
+              {..._tableState}
+              loading={true}
+            />,
+          );
+
+          const tableRows = tableComponent.find('.simple-table-body .simple-table-row');
+
+          expect(tableRows.at(0).find('.simple-table-cell').at(0).text())
+            .toEqual('Loading...');
+        });
+      });
+
+      describe('and props.loadingMessage is set', () =>
+      {
+        it('should display the default loading message', () =>
+        {
+          const _tableState = Object.assign({}, tableState, { data: Immutable.Map<ID, any>({}) });
+          tableComponent = tableComponent = shallow(
+            <SimpleTable
+              {..._tableState}
+              loading={true}
+              loadingMessage={'Please wait, results will show up soon...'}
+            />,
+          );
+
+          const tableRows = tableComponent.find('.simple-table-body .simple-table-row');
+
+          expect(tableRows.at(0).find('.simple-table-cell').at(0).text())
+            .toEqual('Please wait, results will show up soon...');
+        });
+      });
+    });
   });
 
   describe('#handlePageChange', () =>
