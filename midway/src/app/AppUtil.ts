@@ -53,6 +53,7 @@ import { items } from '../app/items/ItemRouter';
 
 import ESScriptClause from 'shared/database/elastic/parser/clauses/ESScriptClause';
 import ESClauseType from 'shared/database/elastic/parser/ESClauseType';
+import ESJSONType from 'shared/database/elastic/parser/ESJSONType';
 import ESValueInfo from 'shared/database/elastic/parser/ESValueInfo';
 
 export function doRequest(url)
@@ -105,7 +106,7 @@ export function verifyParameters(parameters: any, required: string[]): void
   }
 }
 
-export async function getQueryFromAlgorithm(algorithmId: number): Promise<string>
+export async function getQueryFromAlgorithm(algorithmId: number, size?: number): Promise<string>
 {
   return new Promise<string>(async (resolve, reject) =>
   {
@@ -129,6 +130,12 @@ export async function getQueryFromAlgorithm(algorithmId: number): Promise<string
 
         try
         {
+          if (size !== undefined)
+          {
+            queryTree.updateChild(queryTree.rootValueInfo, 'size', new ESValueInfo(ESJSONType.number, size));
+            queryTree.reInterpreting();
+          }
+
           const queryString = queryTree.toCode({ replaceInputs: true });
           return resolve(queryString);
         }
