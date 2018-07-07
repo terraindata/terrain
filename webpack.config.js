@@ -122,12 +122,21 @@ module.exports =
       {
         test: /\.ts(x?)$/,
         exclude: [/midway/, /analytics.js/, /sigint/, /node_modules/],
-        loader:
-        'babel-loader!thread-loader!ts-loader?happyPackMode=true'
-        + JSON.stringify({
-          compilerOptions: {
-          },
-        }),
+        use: [
+            {
+                loader: 'thread-loader',
+                options: {
+                    // there should be 1 cpu for the fork-ts-checker-webpack-plugin
+                    workers: require('os').cpus().length - 2,
+                },
+            },
+            {
+                loader: 'ts-loader',
+                options: {
+                    happyPackMode: true,
+                }
+            }
+        ],
       },
       {
         test: /\.js(x?)$/,
@@ -160,9 +169,11 @@ module.exports =
     new HardSourceWebpackPlugin({
       cacheDirectory: './.cache/hard-source/dev/[confighash]',
     }),
-    new ForkTsCheckerWebpackPlugin(),
+    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true, workers: 2 }),
   ],
   optimization: {
+    removeAvailableModules: false,
+    removeEmptyChunks: false,
     splitChunks: {
       cacheGroups: {
         vendor: {
