@@ -478,34 +478,9 @@ export class ResultsManager extends TerrainComponent<Props>
   private postprocessEQL(interpreter: ESInterpreter, hitsPage?: number, appendResults?: boolean): string
   {
     hitsPage = hitsPage !== undefined ? hitsPage : this.props.hitsPage;
-    const query = interpreter.rootValueInfo.value;
-    if (appendResults)
-    {
-      let from = (hitsPage - 1) * SCROLL_SIZE;
-      if (query.hasOwnProperty('from'))
-      {
-        from += query['from'];
-      }
-      let size = Math.min(SCROLL_SIZE, MAX_HITS - from);
-      if (query.hasOwnProperty('size'))
-      {
-        size = Math.min(query['size'] - from, size);
-      }
-
-      interpreter.updateChild(interpreter.rootValueInfo, 'size', new ESValueInfo(ESJSONType.number, size >= 0 ? size : 0));
-      interpreter.updateChild(interpreter.rootValueInfo, 'from', new ESValueInfo(ESJSONType.number, from));
-    }
-    else
-    {
-      let size = Math.min(MAX_HITS, hitsPage * SCROLL_SIZE);
-      if (query.hasOwnProperty('size'))
-      {
-        const updatedSize = Math.min(query['size'], size);
-        interpreter.updateChild(interpreter.rootValueInfo, 'size', new ESValueInfo(ESJSONType.number, updatedSize));
-      }
-    }
-    interpreter.reInterpreting();
-    return interpreter.finalQuery;
+    appendResults = appendResults !== undefined ? appendResults : false;
+    interpreter.adjustQuerySize(SCROLL_SIZE, MAX_HITS, hitsPage, appendResults);
+    return interpreter.normalizeTerrainScriptWeight();
   }
 
   private queryM2Results(query: Query, db: BackendInstance, hitsPage: number, appendResults?: boolean)
