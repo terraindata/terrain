@@ -43,79 +43,113 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+import * as Immutable from 'immutable';
 
 export interface MagentoConfig
 {
-  route: MagentoRoutes,
-  params: MagentoParamConfigType<MagentoParamTypes>,
-  sessionId?: string,
+  host: string;
+  params?: MagentoParamConfigType<MagentoParamTypes>;
+  route: MagentoRoutes;
+  sessionId?: string;
 }
 
 export interface MagentoParamConfigTypes
 {
   CatalogInventoryStockItemList: {
-    products: string[],
-  },
+    products: string[];
+  };
   CatalogProductAttributeMediaList: {
-    product: string,
-    storeView: number,
-  },
+    product: string;
+    storeView: number;
+  };
   CatalogProductInfo: {
-    productId: string,
-    storeView: number,
-  },
+    productId: string;
+    storeView: number;
+  };
   CatalogProductList: {
-    filters: ComplexFilter,
-    storeView: number,
-  },
-  Login: {
-    apiKey: string,
-    username: string,
-  },
+    filters: KV[];
+    storeView: number;
+  };
 }
 
-export interface ComplexFilter
+export const MagentoParamConfigDefaults: MagentoParamConfigTypes =
 {
-  item: KV[];
-}
+  CatalogInventoryStockItemList: {
+    products: [],
+  },
+  CatalogProductAttributeMediaList: {
+    product: '',
+    storeView: -1,
+  },
+  CatalogProductInfo: {
+    productId: '',
+    storeView: -1,
+  },
+  CatalogProductList: {
+    filters: [],
+    storeView: -1,
+  },
+};
 
 export interface KV
 {
-  key: string,
+  key: string;
   value: {
-    key: 'in',
-    value: string,
+    key: 'in';
+    value: string;
   }
+}
+
+export interface PartialMagentoConfig
+{
+  host: string;
+  sessionId: string;
+}
+
+export interface WSDLTree
+{
+  message: object;
+  portType: object;
+  types: object;
 }
 
 export type MagentoResponse = string | object | object[];
 
 export enum MagentoRoutes
 {
+  CatalogProductAttributeMediaList = 'CatalogProductAttributeMediaList',
+  CatalogProductInfo = 'CatalogProductInfo',
+  CatalogInventoryStockItemList = 'CatalogInventoryStockItemList',
+  CatalogProductList = 'CatalogProductList',
+}
+
+export const MagentoRoutesNames = Immutable.Map<string, string>({
+  [MagentoRoutes.CatalogProductAttributeMediaList]: 'Catalog Product Attribute Media List',
+  [MagentoRoutes.CatalogProductInfo]: 'Catalog Product Info',
+  [MagentoRoutes.CatalogInventoryStockItemList]: 'Catalog Inventory Stock Item List',
+  [MagentoRoutes.CatalogProductList]: 'Catalog Product List',
+});
+
+export enum MagentoRoutesRaw
+{
   CatalogProductAttributeMediaList = 'catalogProductAttributeMediaList',
   CatalogProductInfo = 'catalogProductInfo',
   CatalogInventoryStockItemList = 'catalogInventoryStockItemList',
   CatalogProductList = 'catalogProductList',
-  Login = 'login',
 }
 
-export const MagentoRoutesArr: MagentoRoutes[] =
-  [
-    MagentoRoutes.CatalogInventoryStockItemList,
-    MagentoRoutes.CatalogProductAttributeMediaList,
-    MagentoRoutes.CatalogProductInfo,
-    MagentoRoutes.CatalogProductList,
-    MagentoRoutes.Login,
-  ];
+export const MagentoRoutesArr: List<MagentoRoutes> = Immutable.List([
+  MagentoRoutes.CatalogInventoryStockItemList,
+  MagentoRoutes.CatalogProductAttributeMediaList,
+  MagentoRoutes.CatalogProductInfo,
+  MagentoRoutes.CatalogProductList,
+]);
 
-// export const MagentoRoutesName =
-// {
-//   Login: 'Login',
-// };
+// export const MagentoRoutesNamesArr: List<string> = MagentoRoutesNames.valueSeq().toList();
 
 export type MagentoParamTypes = keyof MagentoParamConfigTypes;
 export type MagentoParamConfigType<key extends MagentoParamTypes> = MagentoParamConfigTypes[key];
 type MagentoAssertTypesExhaustive =
 {
-  [K in MagentoRoutesNames]: MagentoParamConfigTypes[K];
+  [K in MagentoRoutes]: MagentoParamConfigTypes[K];
 }

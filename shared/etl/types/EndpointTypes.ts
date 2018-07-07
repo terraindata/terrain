@@ -47,6 +47,14 @@ THE SOFTWARE.
 
 import { FileTypes, Languages } from './ETLTypes';
 import { RootInputConfig } from './InputTypes';
+import {
+  KV,
+  MagentoParamConfigType,
+  MagentoParamConfigTypes,
+  MagentoParamTypes,
+  MagentoRoutes,
+} from './MagentoTypes';
+
 import { RootPostProcessConfig } from './PostProcessTypes';
 
 export interface FileConfig
@@ -69,6 +77,7 @@ export enum Sources
   Http = 'Http',
   Fs = 'Fs',
   Mysql = 'Mysql',
+  Magento = 'Magento',
   Postgresql = 'Postgresql',
 }
 
@@ -81,6 +90,7 @@ export enum Sinks
   Fs = 'Fs',
   FollowUpBoss = 'FollowUpBoss',
   MailChimp = 'MailChimp',
+  Magento = 'Magento',
 }
 
 export const EndpointTypeNames =
@@ -101,10 +111,19 @@ export const EndpointTypeNames =
   };
 
 export const SchedulableSinks: Sinks[] =
-  [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs, Sinks.FollowUpBoss, Sinks.MailChimp];
+  [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs, Sinks.FollowUpBoss, Sinks.MailChimp, Sinks.Magento];
 
 export const SchedulableSources: Sources[] =
-  [Sources.Algorithm, Sources.Sftp, Sources.GoogleAnalytics, Sources.Http, Sources.Fs, Sources.Mysql, Sources.Postgresql];
+  [
+    Sources.Algorithm,
+    Sources.Sftp,
+    Sources.GoogleAnalytics,
+    Sources.Http,
+    Sources.Fs,
+    Sources.Mysql,
+    Sources.Magento,
+    Sources.Postgresql,
+  ];
 
 export interface SourceConfig
 {
@@ -154,6 +173,7 @@ export interface SourceOptionsTypes // TODO check that these are right
   Http: HttpOptions;
   Fs: {};
   Mysql: SQLOptions;
+  Magento: MagentoOptions;
   Postgresql: SQLOptions;
 }
 
@@ -178,6 +198,10 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
     Fs: {},
     Mysql: {
     },
+    Magento: {
+      route: null,
+      params: null,
+    },
     Postgresql: {
     },
   };
@@ -198,6 +222,7 @@ export interface SinkOptionsTypes
   Fs: {};
   FollowUpBoss: FollowUpBossOptions;
   MailChimp: {};
+  Magento: MagentoOptions;
 }
 
 export const SinkOptionsDefaults: SinkOptionsTypes =
@@ -222,6 +247,10 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
     FollowUpBoss: {
     },
     MailChimp: {},
+    Magento: {
+      route: null,
+      params: null,
+    },
   };
 
 export interface SftpOptions
@@ -242,6 +271,12 @@ export interface FollowUpBossOptions { }
 export interface GoogleAnalyticsOptions
 {
   dayInterval: number;
+}
+
+export interface MagentoOptions
+{
+  params: MagentoParamConfigType<MagentoParamTypes>;
+  route: MagentoRoutes;
 }
 
 export interface SQLOptions

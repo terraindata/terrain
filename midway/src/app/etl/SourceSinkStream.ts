@@ -130,6 +130,10 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
           endpoint = new FSEndpoint();
           sourceStream = await endpoint.getSource(source) as stream.Readable;
           break;
+        case 'Magento':
+          endpoint = new MagentoEndpoint();
+          sourceStream = await endpoint.getSource(source) as stream.Readable;
+          break;
         case 'Mysql':
           endpoint = new MySQLEndpoint();
           sourceStream = await endpoint.getSource(source) as stream.Readable;

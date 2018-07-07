@@ -44,14 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-const soap = require('strong-soap');
-
-const Bottleneck = require('bottleneck');
-const _ = require('lodash');
-const request = require('request');
-const stream = require('stream');
-const winston = require('winston');
-const wsdlrdr = require('wsdlrdr');
+import Bottleneck from 'bottleneck';
+import * as _ from 'lodash';
+import * as request from 'request';
+import { Readable } from 'stream';
+import soap = require('strong-soap');
+import * as winston from 'winston';
 
 import XMLTransform from '../../io/streams/XMLTransform';
 
@@ -66,47 +64,66 @@ import
   MagentoParamConfigType,
   MagentoParamConfigTypes,
   MagentoParamTypes,
+  PartialMagentoConfig,
+  WSDLTree,
 } from 'shared/etl/types/MagentoTypes';
 
-public class Magento
+public class Magento extends AEndpointStream
 {
-  private wsdlTree: object;
+  private wsdlTree: WSDLTree;
 
   constructor()
   {
-    this.wsdlTree = {};
+    super();
   }
 
-  public async call(magConf: MagentoConfig): Promise<MagentoResponse>
+  public async call(magConf: MagentoConfig, host: string): Promise<MagentoResponse>
   {
     return new Promise<MagentoResponse>(async (resolve, reject) =>
     {
+      if (this.wsdlTree === undefined)
+      {
+        await this.getWSDLTree(host); 
+      }
       let response: MagentoResponse = {} as object;
       let combinedParams: object = Object.assign({}, magConf.params);
-      if (typeof magConf.sessionId === 'string')
+      if (typeof magConf.sessionId === 'string' && magConf.sessionId.length > 0)
       {
         combinedParams = Object.assign(combinedParams, { sessionId: magConf.sessionId }); // attach sessionId to the request object
       }
 
       if (MagentoRoutesArr.indexOf(magConf.route) > -1)
       {
-        response = await this._soapCall(magConf.route, combinedParams);
+        response = await this._soapCall(magConf.route, host, combinedParams);
       }
       resolve(response);
     });
   }
 
-  public async getWSDLTree(host): Promise<object>
+  public async getSource(sourceConfig: SourceConfig): Promise<Readable>
   {
-    return new Promise<object>(async (resolve, reject) =>
+    return new Promise<Readable>(async (resolve, reject) =>
+    {
+      const magentoConfig: MagentoConfig = await this._parseConfig(sourceConfig);
+
+    });
+  }
+
+  public async getWSDLTree(host): Promise<void>
+  {
+    return new Promise<void>(async (resolve, reject) =>
     {
       const wsdlPortTypeMessagePrepend = 'typens:';
 
       let wsdlAsJSON: object = {};
-      const wsdlTree: object = {};
+      const wsdlTree: WSDLTree =
+      {
+        message: {},
+        portType: {},
+        types: {},
+      };
       const wsdlMsg: object = {};
       const wsdlPortType: object = {};
-      const wsdlTypes: object = {};
 
       try
       {
@@ -122,21 +139,58 @@ public class Magento
           
           wsdlPortType[entry['name']] = { input: portTypeInput, output: portTypeOutput };
         });
-        wsdlTree['types'] = {};
+        wsdlTree.types = {};
         wsdlAsJSON['types']['schema']['complexType'].forEach((entry, i) =>
         {
-          wsdlTree['types'][entry['name']] = entry;
+          wsdlTree.types[entry['name']] = entry;
         });
       }
       catch (e)
       {
         winston.warn((e as any).toString() as string);
       }
-      wsdlTree['message'] = wsdlMsg;
-      wsdlTree['portType'] = wsdlPortType;
+      wsdlTree.message = wsdlMsg;
+      wsdlTree.portType = wsdlPortType;
       this.wsdlTree = wsdlTree;
-      return resolve(wsdlTree as object);
+      return resolve();
     });
+  }
+
+  public async login(endpointConfig: SourceConfig | SinkConfig): Promise<PartialMagentoConfig>
+  {
+    return new Promise<PartialMagentoConfig>(async (resolve, reject) =>
+    {
+      const magentoIntegrationConfig: object = await this.getIntegrationConfig(endpointConfig.integrationId) as object;
+      const magConf: MagentoConfig =
+      {
+        host: magentoIntegrationConfig['host'],
+        route: 'login',
+        params: {
+          username: magentoIntegrationConfig['username'],
+          apiKey: magentoIntegrationConfig['apiKey'],
+        },
+      };
+      try
+      {
+        const partialMagentoConfig: PartialMagentoConfig =
+        {
+          host: '',
+          sessionId: '',
+        }
+        partialMagentoConfig.host = magentoIntegrationConfig['host'];
+        partialMagentoConfig.sessionId = await magento.call(magConf) as string);
+        resolve(partialMagentoConfig);
+      }
+      catch (e)
+      {
+        resolve(e);
+      }
+    });
+  }
+
+  private _convertArrayToSOAPArray(arr: any[]): object
+  {
+    return { item: arr };
   }
 
   private async _getWSDLAsJSON(params, options)
@@ -157,99 +211,27 @@ public class Magento
     });
   }
 
-  private async _rawSoapRequest(params)
+  private async _parseConfig(sourceConfig: SourceConfig | SinkConfig): Promise<MagentoConfig>
   {
-    return new Promise(async (resolve, reject) =>
+    return new Promise<MagentoConfig>(async (resolve, reject) =>
     {
-      const options = {};
-      soap.soap.createClient(params['host'], options, async (err, client) =>
+      const partialMagConf: PartialMagentoConfig = await this.login(sourceConfig);
+      const magentoConfig: MagentoConfig =
       {
-        if (!err)
-        {
-          const clientFuncCallFunction = client[params['route']];
-          Object.keys(params['params']).forEach((param) =>
-          {
-            if (Array.isArray(params['params'][param]))
-            {
-              params['params'][param] = this._convertArrayToSOAPArray(params['params'][param]);
-            }
-          });
-
-          clientFuncCallFunction(params['params'], async (errLogin, resultLogin, envLogin, soapHeaderLogin) =>
-          {
-            if (!errLogin)
-            {
-              resolve(resultLogin);
-            }
-            else
-            {
-              reject(errLogin);
-            }
-          });
-        }
-        else
-        {
-          // throw new Error('Invalid host parameters.');
-        }
-      });
-    });
-  }
-
-  private _convertArrayToSOAPArray(arr: any[]): object
-  {
-    return { item: arr };
-  }
-
-  private async _soapCall(route: string, data?: any)
-  {
-    return new Promise(async (resolve, reject) =>
-    {
-      if (Object.keys(this.wsdlTree).length === 0)
-      {
-        return resolve({}); 
-      }
-      // preprocess data into the correct format via wsdlTree['message'][route]['input'] lookup
-
-      const params = {
-        host: 'https://www.plae.co/index.php/api/v2_soap?wsdl=1',
-        params: data,
-        route,
+        host: partialMagConf.host,
+        params: sourceConfig['options'],
+        sessionId: partialMagConf.sessionId,
       };
 
-      const rawResult = await this._rawSoapRequest(params);
-      const resultKey = this.wsdlTree['portType'][route]['output'];
-      const rawResultKey = this.wsdlTree['message'][resultKey]['name'];
-      let parsedResult = null;
-      const typeAsArr: string[] = this.wsdlTree['message'][resultKey]['type'].split(':');
-      switch (typeAsArr[0])
-      {
-        case 'xsd':
-          if (rawResult[rawResultKey] === null)
-          {
-            parsedResult = null;
-          }
-          else
-          {
-            parsedResult = rawResult[rawResultKey]['$value'];
-          }
-          break;
-        case 'typens':
-          parsedResult = this._parseJSONWithWSDL(rawResult[rawResultKey], this.wsdlTree['message'][resultKey]['type']);
-          break;
-        default:
-          break;
-      }
-      resolve(parsedResult);
+      resolve(magentoConfig);
     });
   }
 
   private _parseJSONWithWSDL(rawJSON: object | object[], name: string): any
   {
     const typeAsArr: string[] = name.split(':');
-    // let isArray: boolean = false;
     if (typeAsArr.length > 1)
     {
-      // isArray = typeAsArr[1].indexOf('[') !== -1 ? true : false;
       typeAsArr[1] = typeAsArr[1].replace(new RegExp('\\[.*\\]', 'g'), '');
     }
 
@@ -324,13 +306,93 @@ public class Magento
         }
         else
         {
-          // console.log('attempting $value in xsd...');
           rawJSON = rawJSON['$value'];
-          // console.log('success $value in xsd');
         }
       default:
     }
     return rawJSON;
+  }
+
+  private async _rawSoapRequest(params): Promise<any>
+  {
+    return new Promise<any>(async (resolve, reject) =>
+    {
+      const options = {};
+      soap.soap.createClient(params['host'], options, async (err, client) =>
+      {
+        if (!err)
+        {
+          const clientFuncCallFunction = client[params['route']];
+          Object.keys(params['params']).forEach((param) =>
+          {
+            if (Array.isArray(params['params'][param]))
+            {
+              params['params'][param] = this._convertArrayToSOAPArray(params['params'][param]);
+            }
+          });
+
+          clientFuncCallFunction(params['params'], async (errLogin, resultLogin, envLogin, soapHeaderLogin) =>
+          {
+            if (!errLogin)
+            {
+              resolve(resultLogin);
+            }
+            else
+            {
+              resolve(new Error(errLogin));
+            }
+          });
+        }
+        else
+        {
+          resolve(new Error('Invalid host parameters.'));
+        }
+      });
+    });
+  }
+
+  private async _soapCall(route: string, host: string, data?: any)
+  {
+    return new Promise(async (resolve, reject) =>
+    {
+      if (this.wsdlTree === undefined
+        || (typeof this.wsdlTree === 'object' && Object.keys(this.wsdlTree).length === 0)
+      {
+        return resolve({}); 
+      }
+      // preprocess data into the correct format via wsdlTree['message'][route]['input'] lookup
+
+      const params = {
+        host,
+        params: data,
+        route,
+      };
+
+      const rawResult = await this._rawSoapRequest(params);
+      const resultKey = this.wsdlTree['portType'][route]['output'];
+      const rawResultKey = this.wsdlTree['message'][resultKey]['name'];
+      let parsedResult = null;
+      const typeAsArr: string[] = this.wsdlTree['message'][resultKey]['type'].split(':');
+      switch (typeAsArr[0])
+      {
+        case 'xsd':
+          if (rawResult[rawResultKey] === null)
+          {
+            parsedResult = null;
+          }
+          else
+          {
+            parsedResult = rawResult[rawResultKey]['$value'];
+          }
+          break;
+        case 'typens':
+          parsedResult = this._parseJSONWithWSDL(rawResult[rawResultKey], this.wsdlTree['message'][resultKey]['type']);
+          break;
+        default:
+          break;
+      }
+      resolve(parsedResult);
+    });
   }
 }
 
