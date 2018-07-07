@@ -124,6 +124,12 @@ module.exports =
         exclude: [/midway/, /analytics.js/, /sigint/, /node_modules/],
         use: [
             {
+                loader: 'babel-loader',
+                options: {
+                    cacheDirectory: true,
+                },
+            },
+            {
                 loader: 'thread-loader',
                 options: {
                     // there should be 1 cpu for the fork-ts-checker-webpack-plugin
