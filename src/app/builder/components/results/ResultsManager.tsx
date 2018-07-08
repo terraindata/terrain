@@ -64,7 +64,7 @@ import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueIn
 import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import { isInput } from '../../../../blocks/types/Input';
+import { isInput, toInputMap } from '../../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import BackendInstance from '../../../../database/types/BackendInstance';
@@ -526,7 +526,7 @@ export class ResultsManager extends TerrainComponent<Props>
       TerrainLog.debug('TQL is empty.');
       return;
     }
-    const interpreter: ESInterpreter = new ESInterpreter(query.tql, query.inputs);
+    const interpreter: ESInterpreter = new ESInterpreter(query.tql, toInputMap(query.inputs));
     if (interpreter.hasError())
     {
       TerrainLog.debug('Query has errors: ' + interpreter.getErrors());
