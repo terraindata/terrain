@@ -44,78 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import passportHeaderAPIKey = require('passport-headerapikey');
-import passportLocal = require('passport-local');
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
 
-import { apikeys } from '../apikeys/APIKeyRouter';
-import Middleware from '../Middleware';
-import { users } from '../users/UserRouter';
+import * as Util from '../AppUtil';
+import { MidwayLogger } from '../log/MidwayLogger';
+import APIKeyConfig from './APIKeyConfig';
+import APIKeys from './APIKeys';
+export * from './APIKeys';
 
-// authenticate with id and accessToken
-Middleware.passport.use('access-token-local', new passportLocal.Strategy(
-  {
-    passReqToCallback: true,
-    passwordField: 'accessToken',
-    usernameField: 'id',
-  },
-  (req: any, id: string, accessToken: string, done) =>
-  {
-    users.loginWithAccessToken(Number(id), accessToken).then((user) =>
-    {
-      done(null, user);
-    }).catch((e) =>
-    {
-      done(e, null);
-    });
-  }));
+const Router = new KoaRouter();
+export const apikeys = new APIKeys();
+export const initialize = () => apikeys.initialize();
 
-// authenticate with email and password
-Middleware.passport.use('local', new passportLocal.Strategy(
-  {
-    passReqToCallback: true,
-    usernameField: 'email',
-  },
-  (req: any, email: string, password: string, done) =>
-  {
-    users.loginWithEmail(email, password).then((user) =>
-    {
-      done(null, user);
-    }).catch((e) =>
-    {
-      done(e, null);
-    });
-  }));
-
-// authenticate with API key (only for API routes)
-Middleware.passport.use('api-key', new passportHeaderAPIKey.HeaderAPIKeyStrategy(
-    { header: 'Authorization', prefix: 'APIKey ' },
-    true,
-    (key: string, done) =>
-    {
-        apikeys.validate(key).then((apikey) =>
-        {
-            done(null, apikey);
-        }).catch((e) =>
-        {
-            done(e, null);
-        });
-    }));
-
-Middleware.passport.serializeUser((user, done) =>
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  if (user !== undefined)
-  {
-    done(null, user['id']);
-  }
+    MidwayLogger.info('getting all users');
+    ctx.body = await apikeys.select(['id', 'key', 'createdAt', 'enabled'], {});
 });
-
-Middleware.passport.deserializeUser((id: number, done) =>
-{
-  users.get(id).then((user) =>
-  {
-    done(null, user);
-  }).catch((e) =>
-  {
-    done(e, null);
-  });
-});
+export default Router;

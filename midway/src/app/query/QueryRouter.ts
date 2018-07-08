@@ -60,8 +60,7 @@ import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../AppUtil';
 import ItemConfig from '../items/ItemConfig';
-import {items} from '../items/ItemRouter';
-import Items from '../items/Items';
+import { items } from '../items/ItemRouter';
 import { MidwayLogger } from '../log/MidwayLogger';
 import { QueryHandler } from './QueryHandler';
 
@@ -87,7 +86,7 @@ function toInputMap(inputs: Immutable.List<Input>): object
     return inputMap;
 }
 
-QueryRouter.post('/algorithm/:id', async (ctx, next) =>
+QueryRouter.post('/algorithm/:id', passport.authenticate('api-key'), async (ctx, next) =>
 {
     const options: object = ctx.request.body;
     let overridingInputs = options['inputs'];
@@ -211,7 +210,7 @@ QueryRouter.post('/', passport.authenticate('access-token-local'), async (ctx, n
 QueryRouter.post('/template', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   // parse ctx.request.body.body as an Array
-  const reqArr: object[] = ctx.request.body.body as object[];
+  const reqArr: object[] = ctx.request.body['body'] as object[];
   const bodyArr: object[] = [];
   const indexSet: Set<string> = new Set();
   const typeSet: Set<string> = new Set();
