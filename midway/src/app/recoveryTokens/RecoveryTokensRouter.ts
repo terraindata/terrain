@@ -46,11 +46,10 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
+import * as srs from 'secure-random-string';
 import * as winston from 'winston';
 import * as App from '../App';
 import * as Util from '../AppUtil';
-import * as rand from 'random-key';
-import * as srs from 'secure-random-string';
 import RecoveryTokenConfig from '../recoveryTokens/RecoveryTokenConfig';
 import RecoveryTokens from '../recoveryTokens/RecoveryTokens';
 import UserConfig from '../users/UserConfig';
@@ -94,7 +93,6 @@ Router.post('/', async (ctx, next) =>
    {
      email = ctx.request.body['email'];
      // generate token
-     //const userToken: string = rand.generate();
      const userToken: string = srs();
      // generate timestamp
      const currDateTime: Date = new Date(Date.now());
