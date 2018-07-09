@@ -44,78 +44,93 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import passportHeaderAPIKey = require('passport-headerapikey');
-import passportLocal = require('passport-local');
+import srs = require('secure-random-string');
 
-import { apikeys } from '../apikeys/APIKeyRouter';
-import Middleware from '../Middleware';
-import { users } from '../users/UserRouter';
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
+import * as Util from '../AppUtil';
 
-// authenticate with id and accessToken
-Middleware.passport.use('access-token-local', new passportLocal.Strategy(
-  {
-    passReqToCallback: true,
-    passwordField: 'accessToken',
-    usernameField: 'id',
-  },
-  (req: any, id: string, accessToken: string, done) =>
-  {
-    users.loginWithAccessToken(Number(id), accessToken).then((user) =>
-    {
-      done(null, user);
-    }).catch((e) =>
-    {
-      done(e, null);
-    });
-  }));
+import APIKeyConfig from './APIKeyConfig';
 
-// authenticate with email and password
-Middleware.passport.use('local', new passportLocal.Strategy(
-  {
-    passReqToCallback: true,
-    usernameField: 'email',
-  },
-  (req: any, email: string, password: string, done) =>
-  {
-    users.loginWithEmail(email, password).then((user) =>
-    {
-      done(null, user);
-    }).catch((e) =>
-    {
-      done(e, null);
-    });
-  }));
-
-// authenticate with API key (only for API routes)
-Middleware.passport.use('api-key', new passportHeaderAPIKey.HeaderAPIKeyStrategy(
-    { header: 'Authorization', prefix: 'APIKey ' },
-    true,
-    (key: string, done) =>
-    {
-        apikeys.validate(key).then((apikey) =>
-        {
-            done(null, apikey);
-        }).catch((e) =>
-        {
-            done(e, null);
-        });
-    }));
-
-Middleware.passport.serializeUser((user, done) =>
+export class APIKeys
 {
-  if (user !== undefined)
+  private apiKeyTable: Tasty.Table;
+
+  public initialize()
   {
-    done(null, user['id']);
+    this.apiKeyTable = App.TBLS.apiKeys;
   }
-});
 
-Middleware.passport.deserializeUser((id: number, done) =>
-{
-  users.get(id).then((user) =>
+  public async validate(key: string): Promise<APIKeyConfig | null>
   {
-    done(null, user);
-  }).catch((e) =>
+      const results: APIKeyConfig[] = await this.select([], { key }) as APIKeyConfig[];
+      if (results.length > 0 && results[0]['enabled'])
+      {
+          return results[0];
+      }
+      else
+      {
+          return null;
+      }
+  }
+
+    public async create(): Promise<APIKeyConfig>
+    {
+        try
+        {
+            const cfg: APIKeyConfig = {
+                key: srs({ length: 20, alphanumeric: true }),
+                createdAt: new Date(Date.now()),
+                enabled: true,
+            };
+
+            return this.upsert(cfg);
+        }
+        catch (e)
+        {
+            throw new Error('Problem creating default API key: ' + String(e));
+        }
+    }
+
+  public async delete(key: string): Promise<object>
   {
-    done(e, null);
-  });
-});
+    return App.DB.delete(this.apiKeyTable, { key } as APIKeyConfig);
+  }
+
+  public async select(columns: string[], filter?: object): Promise<APIKeyConfig[]>
+  {
+    return App.DB.select(this.apiKeyTable, columns, filter) as Promise<APIKeyConfig[]>;
+  }
+
+  public async get(key: string, fields?: string[]): Promise<APIKeyConfig[]>
+  {
+    if (key !== undefined)
+    {
+      if (fields !== undefined)
+      {
+        return this.select(fields, { key });
+      }
+      return this.select([], { key });
+    }
+    if (fields !== undefined)
+    {
+      return this.select(fields, {});
+    }
+    return this.select([], {});
+  }
+
+  public async upsert(apikey: APIKeyConfig): Promise<APIKeyConfig>
+  {
+    if (apikey.key !== undefined)
+    {
+      const results: APIKeyConfig[] = await this.get(apikey.key);
+      if (results.length !== 0)
+      {
+        apikey = Util.updateObject(results[0], apikey);
+      }
+    }
+    return App.DB.upsert(this.apiKeyTable, apikey) as Promise<APIKeyConfig>;
+  }
+}
+
+export default APIKeys;

@@ -51,6 +51,7 @@ import DatabaseController from '../database/DatabaseController';
 import ElasticDB from '../database/elastic/tasty/ElasticDB';
 import DatabaseRegistry from '../databaseRegistry/DatabaseRegistry';
 
+import { APIKeyConfig } from './apikeys/APIKeyConfig';
 import { DatabaseConfig } from './database/DatabaseConfig';
 import { TemplateConfig } from './etl/TemplateConfig';
 import { MetricConfig } from './events/MetricConfig';
@@ -83,6 +84,7 @@ export class Tables
   public jobs: Tasty.Table;
   public statusHistory: Tasty.Table;
   public migrationRecords: Tasty.Table;
+  public apiKeys: Tasty.Table;
 }
 
 function verifyTableWithConfig(table: Tasty.Table, configClass: object)
@@ -484,6 +486,25 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
     ),
     new MigrationRecordConfig({}),
   );
+    addTable(
+        new Tasty.Table(
+            'apiKeys',
+            ['id'],
+            [
+                'key',
+                'createdAt',
+                'enabled',
+            ],
+            undefined,
+            {
+                id: primaryKeyType + ' PRIMARY KEY',
+                key: 'text NOT NULL',
+                createdAt: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+                enabled: 'bool NOT NULL DEFAULT TRUE',
+            },
+        ),
+        new APIKeyConfig({}),
+    );
 
   return tables as Tables;
 };

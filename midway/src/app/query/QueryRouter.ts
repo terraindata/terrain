@@ -48,18 +48,110 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import { Readable } from 'stream';
 
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
 import QueryRequest from '../../../../shared/database/types/QueryRequest';
 import QueryResponse from '../../../../shared/database/types/QueryResponse';
 import SharedUtil from '../../../../shared/Util';
+import Input from '../../../../src/blocks/types/Input';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../AppUtil';
+import ItemConfig from '../items/ItemConfig';
+import { items } from '../items/ItemRouter';
 import { MidwayLogger } from '../log/MidwayLogger';
 import { QueryHandler } from './QueryHandler';
 
 const QueryRouter = new KoaRouter();
 export const initialize = () => { };
+
+function toInputMap(inputs: Immutable.List<Input>): object
+{
+    const inputMap: object = {};
+    inputs.map((input: Input) =>
+    {
+        let value: any;
+        try
+        {
+            value = JSON.parse(input.value);
+        }
+        catch (e)
+        {
+            value = input.value;
+        }
+        inputMap[input.key] = value;
+    });
+    return inputMap;
+}
+
+QueryRouter.post('/algorithm/:id', passport.authenticate('api-key'), async (ctx, next) =>
+{
+    const options: object = ctx.request.body;
+    let overridingInputs = options['inputs'];
+    if (overridingInputs === undefined)
+    {
+        overridingInputs = {};
+    }
+
+    const getItems: ItemConfig[] = await items.get(ctx.params.id);
+    const item = getItems[0];
+    const meta = JSON.parse(item.meta);
+    const query = meta['query'];
+
+    const inputMap: object = toInputMap(query.inputs);
+    for (const key of Object.keys(overridingInputs))
+    {
+        inputMap[key] = overridingInputs[key];
+    }
+
+    const q: QueryRequest = {
+        database: meta['db']['id'],
+        streaming: false,
+        type: 'search',
+        body: new ESInterpreter(query.tql, inputMap).finalQuery,
+    };
+
+    const database: DatabaseController | undefined = DatabaseRegistry.get(q.database);
+
+    const qh: QueryHandler = database.getQueryHandler();
+    const result: QueryResponse = await qh.handleQuery(q) as QueryResponse;
+    result.setQueryRequest(q);
+
+    const hits = result.result.hits.hits.map((hit) =>
+    {
+        const hitTemp = _.cloneDeep(hit);
+        let rootKeys: string[] = [];
+        rootKeys = _.without(Object.keys(hitTemp), '_index', '_type', '_id', '_score', '_source', 'sort', '', 'fields');
+        if (rootKeys.length > 0) // there were group join objects
+        {
+            rootKeys.forEach((rootKey) =>
+            {
+                hitTemp['_source'][rootKey] = hitTemp[rootKey];
+                delete hitTemp[rootKey];
+            });
+        }
+        const sort = hitTemp.sort !== undefined ? { _sort: hitTemp.sort[0] } : {};
+        const fields = {};
+        if (hitTemp.fields !== undefined)
+        {
+            _.keys(hitTemp.fields).forEach((field) =>
+            {
+                fields[field] = hitTemp.fields[field][0];
+            });
+        }
+        return _.extend({}, hitTemp._source, sort, fields, {
+            _index: hitTemp._index,
+            _type: hitTemp._type,
+            _score: hitTemp._score,
+            _id: hitTemp._id,
+        });
+    });
+
+    ctx.body = hits;
+    ctx.status = 200;
+});
 
 QueryRouter.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
@@ -71,7 +163,7 @@ QueryRouter.post('/', passport.authenticate('access-token-local'), async (ctx, n
   }
   else if (ctx.request.type === 'application/x-www-form-urlencoded')
   {
-    query = JSON.parse(ctx.request.body.data).body as QueryRequest;
+    query = JSON.parse(ctx.request.body['data']).body as QueryRequest;
   }
   else
   {
@@ -88,7 +180,7 @@ QueryRouter.post('/', passport.authenticate('access-token-local'), async (ctx, n
 
   if (query.streaming === true)
   {
-    MidwayLogger.info('Streaming query result to ' + String(ctx.request.body.filename));
+    MidwayLogger.info('Streaming query result to ' + String(ctx.request.body['filename']));
   }
 
   const database: DatabaseController | undefined = DatabaseRegistry.get(query.database);
@@ -102,7 +194,7 @@ QueryRouter.post('/', passport.authenticate('access-token-local'), async (ctx, n
     const qh: QueryHandler = database.getQueryHandler();
     const queryStream: Readable = await qh.handleQuery(query) as Readable;
     ctx.type = 'text/plain';
-    ctx.attachment(ctx.request.body.filename);
+    ctx.attachment(ctx.request.body['filename']);
     ctx.body = queryStream;
   }
   else
@@ -118,7 +210,7 @@ QueryRouter.post('/', passport.authenticate('access-token-local'), async (ctx, n
 QueryRouter.post('/template', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   // parse ctx.request.body.body as an Array
-  const reqArr: object[] = ctx.request.body.body as object[];
+  const reqArr: object[] = ctx.request.body['body'] as object[];
   const bodyArr: object[] = [];
   const indexSet: Set<string> = new Set();
   const typeSet: Set<string> = new Set();

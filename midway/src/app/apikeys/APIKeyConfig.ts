@@ -44,78 +44,20 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import passportHeaderAPIKey = require('passport-headerapikey');
-import passportLocal = require('passport-local');
+import ConfigType from '../ConfigType';
 
-import { apikeys } from '../apikeys/APIKeyRouter';
-import Middleware from '../Middleware';
-import { users } from '../users/UserRouter';
-
-// authenticate with id and accessToken
-Middleware.passport.use('access-token-local', new passportLocal.Strategy(
-  {
-    passReqToCallback: true,
-    passwordField: 'accessToken',
-    usernameField: 'id',
-  },
-  (req: any, id: string, accessToken: string, done) =>
-  {
-    users.loginWithAccessToken(Number(id), accessToken).then((user) =>
-    {
-      done(null, user);
-    }).catch((e) =>
-    {
-      done(e, null);
-    });
-  }));
-
-// authenticate with email and password
-Middleware.passport.use('local', new passportLocal.Strategy(
-  {
-    passReqToCallback: true,
-    usernameField: 'email',
-  },
-  (req: any, email: string, password: string, done) =>
-  {
-    users.loginWithEmail(email, password).then((user) =>
-    {
-      done(null, user);
-    }).catch((e) =>
-    {
-      done(e, null);
-    });
-  }));
-
-// authenticate with API key (only for API routes)
-Middleware.passport.use('api-key', new passportHeaderAPIKey.HeaderAPIKeyStrategy(
-    { header: 'Authorization', prefix: 'APIKey ' },
-    true,
-    (key: string, done) =>
-    {
-        apikeys.validate(key).then((apikey) =>
-        {
-            done(null, apikey);
-        }).catch((e) =>
-        {
-            done(e, null);
-        });
-    }));
-
-Middleware.passport.serializeUser((user, done) =>
+export class APIKeyConfig extends ConfigType
 {
-  if (user !== undefined)
-  {
-    done(null, user['id']);
-  }
-});
+    public id?: number = undefined;
+    public key: string = '';
+    public createdAt: Date = null;
+    public enabled: boolean = true;
 
-Middleware.passport.deserializeUser((id: number, done) =>
-{
-  users.get(id).then((user) =>
-  {
-    done(null, user);
-  }).catch((e) =>
-  {
-    done(e, null);
-  });
-});
+    constructor(props: object)
+    {
+        super();
+        ConfigType.initialize(this, props);
+    }
+}
+
+export default APIKeyConfig;
