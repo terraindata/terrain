@@ -305,7 +305,7 @@ export default class MagentoEndpoint extends AEndpointStream
               }
               else
               {
-                rawJSON = rawJSON['item']['$value'];
+                rawJSON = [rawJSON['item']['$value']];
               }
             }
             else if (rawJSON['item'] === undefined)
