@@ -259,7 +259,6 @@ class DocumentsHelpers extends ETLHelpers
         source = source.set('options', newOptions);
 
         let sliceString = await this.sliceFromFile(file, CHUNK_SIZE);
-
         if (sliceString.length < CHUNK_SIZE)
         {
           const results = await ETLAjax.fetchPreview(source, DefaultDocumentLimit, sliceString);
@@ -273,8 +272,8 @@ class DocumentsHelpers extends ETLHelpers
           {
             sliceString = await this.sliceFromFile(file, 5 * CHUNK_SIZE);
             results = await ETLAjax.fetchPreview(source, DefaultDocumentLimit, sliceString);
-            resolve(results);
           }
+          resolve(results);
         }
       }
       catch (e)
