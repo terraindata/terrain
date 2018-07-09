@@ -48,6 +48,7 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 
 import { MidwayLogger } from '../log/MidwayLogger';
+import APIKeyConfig from './APIKeyConfig';
 import APIKeys from './APIKeys';
 export * from './APIKeys';
 
@@ -68,4 +69,20 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
         throw new Error('Only superusers can list API keys.');
     }
 });
+
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+    const isSuperUser: boolean = ctx.state.user.isSuperUser;
+    if (isSuperUser)
+    {
+        MidwayLogger.info('creating API key');
+        const newKey: APIKeyConfig = (await apikeys.create())[0];
+        ctx.body = newKey.key;
+    }
+    else
+    {
+        throw new Error('Only superusers can create API keys.');
+    }
+});
+
 export default Router;

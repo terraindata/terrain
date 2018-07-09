@@ -58,7 +58,6 @@ import './auth/Passport';
 import DatabaseControllerConfig from '../database/DatabaseControllerConfig';
 import RouteError from '../error/RouteError';
 import * as Tasty from '../tasty/Tasty';
-import { apikeys } from './apikeys/APIKeyRouter';
 import appStats from './AppStats';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
@@ -327,10 +326,6 @@ export class App
     // create a default seed user
     await users.initializeDefaultUser();
     MidwayLogger.debug('Finished creating a default user...');
-
-    // create a default API key
-    await apikeys.initializeDefaultAPIKey();
-    MidwayLogger.debug('Finished creating a default API key...');
 
     // create default integrations
     await integrations.initializeDefaultIntegrations();

@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import srs = require('secure-random-string');
+
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import * as Util from '../AppUtil';
@@ -72,25 +74,21 @@ export class APIKeys
       }
   }
 
-    public async initializeDefaultAPIKey(): Promise<void>
+    public async create(): Promise<APIKeyConfig>
     {
-        const keyExists = await this.select(['key'], { key: 'ye1c8Wfkvg39jpirVYk6' });
-        if (keyExists.length === 0)
+        try
         {
-            try
-            {
-                const cfg: APIKeyConfig = {
-                    key: 'ye1c8Wfkvg39jpirVYk6',
-                    createdAt: new Date(Date.now()),
-                    enabled: true,
-                };
+            const cfg: APIKeyConfig = {
+                key: srs({ length: 20, alphanumeric: true }),
+                createdAt: new Date(Date.now()),
+                enabled: true,
+            };
 
-                await this.upsert(cfg);
-            }
-            catch (e)
-            {
-                throw new Error('Problem creating default API key: ' + String(e));
-            }
+            return this.upsert(cfg);
+        }
+        catch (e)
+        {
+            throw new Error('Problem creating default API key: ' + String(e));
         }
     }
 
