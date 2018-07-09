@@ -51,7 +51,9 @@ import { IElasticClient } from './ElasticClient';
 // tslint:disable-next-line:interface-name
 export interface IElasticCluster
 {
+  health(params: Elastic.ClusterHealthParams): Promise<any>;
   health(params: Elastic.ClusterHealthParams, callback: (error: any, response: any) => void): void;
+  state(params: Elastic.ClusterStateParams): Promise<any>;
   state(params: Elastic.ClusterStateParams, callback: (error: any, response: any) => void): void;
 }
 
@@ -75,7 +77,9 @@ class ElasticCluster<TController extends ElasticController = ElasticController> 
    * @param params
    * @param callback
    */
-  public health(params: Elastic.ClusterHealthParams, callback: (error: any, response: any) => void): void
+  public health(params: Elastic.ClusterHealthParams): Promise<any>;
+  public health(params: Elastic.ClusterHealthParams, callback: (error: any, response: any) => void): void;
+  public health(params: Elastic.ClusterHealthParams, callback?: (error: any, response: any) => void): void | Promise<any>
   {
     this.log('health', params);
     return this.delegate.cluster.health(params, callback);
@@ -86,7 +90,9 @@ class ElasticCluster<TController extends ElasticController = ElasticController> 
    * @param params
    * @param callback
    */
-  public state(params: Elastic.ClusterStateParams, callback: (error: any, response: any) => void): void
+  public state(params: Elastic.ClusterStateParams): Promise<any>;
+  public state(params: Elastic.ClusterStateParams, callback: (error: any, response: any) => void): void;
+  public state(params: Elastic.ClusterStateParams, callback?: (error: any, response: any) => void): void | Promise<any>
   {
     this.log('state', params);
     return this.delegate.cluster.state(params, callback);
