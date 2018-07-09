@@ -64,6 +64,7 @@ export interface Props
   sectionBoxes: List<any>;
   width?: string;
   height?: string;
+  strictFormatting: boolean;
 }
 
 export default class DataModal extends TerrainComponent<Props>
@@ -122,11 +123,22 @@ export default class DataModal extends TerrainComponent<Props>
 
   public renderSectionInfo()
   {
-    return (
-      <div className='info-body' style={{ background: Colors().bg }}>
-        {this.props.sectionBoxes.get(this.state.currentOptionIndex)}
-      </div>
-    );
+    if (this.props.strictFormatting)
+    {
+      return (
+        <div className='info-body' style={{ background: Colors().bg }}>
+          <pre>{this.props.sectionBoxes.get(this.state.currentOptionIndex)}</pre>
+        </div>
+      );
+    }
+    else
+    {
+      return (
+        <div className='info-body' style={{ background: Colors().bg }}>
+          {this.props.sectionBoxes.get(this.state.currentOptionIndex)}
+        </div>
+      );
+    }
   }
 
   public render()

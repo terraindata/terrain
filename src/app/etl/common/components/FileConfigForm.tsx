@@ -191,6 +191,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
           }
           width='100%'
           height='40%'
+          strictFormatting={true}
         />
       );
     }
