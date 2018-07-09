@@ -45,24 +45,20 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:no-var-requires
-import * as classNames from 'classnames';
-import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
 import { instanceFnDecorator } from 'shared/util/Classes';
-import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { backgroundColor, Colors, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import * as Immutable from 'immutable';
-import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
-import Quarantine from 'util/RadiumQuarantine';
-const { List, Map } = Immutable;
-import FadeInOut from 'common/components/FadeInOut';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
 import NestedView from 'etl/templates/components/field/NestedView';
 import { TemplateField } from 'etl/templates/FieldTypes';
+import { List } from 'immutable';
+import * as Immutable from 'immutable';
+import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
+import Quarantine from 'util/RadiumQuarantine';
 import EditorFieldPreview from './EditorFieldPreview';
 import EditorFieldSettings from './EditorFieldSettings';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';

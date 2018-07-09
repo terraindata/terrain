@@ -47,13 +47,10 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 
-import DatabaseController from '../../database/DatabaseController';
-import ElasticDB from '../../database/elastic/tasty/ElasticDB';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import { MidwayLogger } from '../log/MidwayLogger';
 import { Permissions } from '../permissions/Permissions';
 
-import * as Tasty from '../../tasty/Tasty';
 import * as Util from '../AppUtil';
 import { deleteElasticIndex, getSchema, getTable } from '../Schema';
 

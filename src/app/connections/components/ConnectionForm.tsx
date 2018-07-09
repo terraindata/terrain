@@ -48,22 +48,18 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { _ConnectionConfig, ConnectionConfig } from 'app/connections/ConnectionTypes';
-import Autocomplete from 'common/components/Autocomplete';
+import { ConnectionConfig } from 'app/connections/ConnectionTypes';
 import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import FadeInOut from 'common/components/FadeInOut';
 import Switch from 'common/components/Switch';
 import SharedConnectionConfig from 'shared/types/connections/ConnectionConfig';
 import SharedUtil from 'shared/Util';
 import { instanceFnDecorator } from 'shared/util/Classes';
-
-import { LibraryState } from 'library/LibraryTypes';
 
 export interface Props
 {

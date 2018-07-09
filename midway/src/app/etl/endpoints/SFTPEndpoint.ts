@@ -51,8 +51,6 @@ import { Readable, Writable } from 'stream';
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import { Inputs } from '../../../../../shared/util/Inputs';
-import IntegrationConfig from '../../integrations/IntegrationConfig';
-import { integrations } from '../../integrations/IntegrationRouter';
 import { MidwayLogger } from '../../log/MidwayLogger';
 import AEndpointStream from './AEndpointStream';
 

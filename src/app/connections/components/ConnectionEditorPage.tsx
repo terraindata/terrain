@@ -44,19 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console strict-boolean-expressions
-import { List, Map } from 'immutable';
-import * as _ from 'lodash';
+import { Map } from 'immutable';
 import * as React from 'react';
 
-import Colors, { backgroundColor, borderColor } from 'app/colors/Colors';
+import { backgroundColor } from 'app/colors/Colors';
 import Button from 'app/common/components/Button';
 import { _ConnectionConfig, ConnectionConfig } from 'app/connections/ConnectionTypes';
 import { ConnectionsActions } from 'app/connections/data/ConnectionsRedux';
-import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
-import Dropdown from 'common/components/Dropdown';
-import FadeInOut from 'common/components/FadeInOut';
-import Switch from 'common/components/Switch';
 import TerrainComponent from 'common/components/TerrainComponent';
 import ConnectionForm from './ConnectionForm';
 

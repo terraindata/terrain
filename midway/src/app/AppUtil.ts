@@ -129,6 +129,7 @@ export async function getQueryFromAlgorithm(algorithmId: number): Promise<string
 
         try
         {
+          queryTree.normalizeTerrainScriptWeight();
           const queryString = queryTree.toCode({ replaceInputs: true });
           return resolve(queryString);
         }
@@ -167,76 +168,4 @@ export async function getDBFromAlgorithm(algorithmId: number): Promise<number>
       return reject('Malformed algorithm');
     }
   });
-}
-
-export function computeMaximumAlgorithmScore(query: string | object): number | undefined
-{
-  if (typeof query === 'object')
-  {
-    query = JSON.stringify(query);
-  }
-
-  const queryTree = new ESInterpreter(query);
-
-  if (queryTree.hasError())
-  {
-    throw new Error('Errors when interpreting the query:' + JSON.stringify(queryTree.getErrors()));
-  }
-
-  const rootInfo: ESValueInfo = queryTree.rootValueInfo;
-  // find all script clauses and see if they are the terrain script
-  try
-  {
-    let maxToReturn;
-    let minDepth;
-    rootInfo.recursivelyVisit((element: ESValueInfo, depth: number) =>
-    {
-      if (element.clause.clauseType === ESClauseType.ESScriptClause)
-      {
-        let max = 0;
-        const clause = element.clause as ESScriptClause;
-        if (clause.getScriptName(element) === 'Terrain.Score.PWL')
-        {
-          if (_.get(element.value, ['params', 'factors']) !== undefined)
-          {
-            const factors = element.value.params.factors;
-            if (Array.isArray(factors))
-            {
-              for (const { weight } of factors)
-              {
-                if (typeof weight === 'number')
-                {
-                  max += weight;
-                }
-                else
-                {
-                  throw new Error('weight of Terrain.Score.PWL script malformed');
-                }
-              }
-            }
-          }
-          else
-          {
-            throw new Error('Could not find factors in Terrain.Score.PWL script');
-          }
-          if (maxToReturn === undefined)
-          {
-            minDepth = depth;
-            maxToReturn = max;
-          }
-          else if (depth < minDepth)
-          {
-            minDepth = depth;
-            maxToReturn = max;
-          }
-        }
-      }
-      return true;
-    });
-    return maxToReturn;
-  }
-  catch (e)
-  {
-    throw new Error('Error while attempting to compute maximum algorithm score ' + String(e));
-  }
 }

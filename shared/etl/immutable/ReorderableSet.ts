@@ -46,15 +46,11 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
 
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-const { List, Map } = Immutable;
+import { List, Map } from 'immutable';
 
 import
 {
   ConfigType,
-  instanceFnDecorator,
-  makeConstructor,
   makeExtendedConstructor,
   WithIRecord,
 } from 'shared/util/Classes';

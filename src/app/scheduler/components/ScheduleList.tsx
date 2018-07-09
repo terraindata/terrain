@@ -44,24 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:strict-boolean-expressions no-var-requires
-import Colors, { backgroundColor, borderColor, fontColor, getStyle } from 'app/colors/Colors';
-import { ETLActions } from 'app/etl/ETLRedux';
 import EtlRouteUtil from 'app/etl/ETLRouteUtil';
-import { ETLState } from 'app/etl/ETLTypes';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
-import { _SchedulerConfig, scheduleForDatabase, SchedulerConfig, SchedulerState } from 'app/scheduler/SchedulerTypes';
+import { _SchedulerConfig, scheduleForDatabase, SchedulerConfig } from 'app/scheduler/SchedulerTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
-import { tooltip } from 'common/components/tooltip/Tooltips';
 import cronstrue from 'cronstrue';
-import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
+import { HeaderConfig, ItemList } from 'etl/common/components/ItemList';
 import * as Immutable from 'immutable';
-import { List, Map } from 'immutable';
-import * as _ from 'lodash';
+import { List } from 'immutable';
 import * as React from 'react';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
-import XHR from 'util/XHR';
 import './Schedule.less';
 const RefreshIcon = require('images/icon_refresh.svg?name=RefreshIcon');
 
@@ -69,6 +63,7 @@ export interface Props
 {
   schedules?: Immutable.Map<ID, SchedulerConfig>;
   schedulerActions?: typeof SchedulerActions;
+  loading?: boolean;
 }
 
 const INTERVAL = 60000;
@@ -103,8 +98,8 @@ class ScheduleList extends TerrainComponent<Props>
   public state: {
     confirmModalOpen: boolean,
   } = {
-      confirmModalOpen: false,
-    };
+    confirmModalOpen: false,
+  };
 
   public componentWillMount()
   {
@@ -229,7 +224,7 @@ class ScheduleList extends TerrainComponent<Props>
 
   public render()
   {
-    const { schedules } = this.props;
+    const { schedules, loading } = this.props;
     const keys = schedules.keySeq().toList().sort();
     const scheduleList = keys.map((id) => schedules.get(id)).toList();
 
@@ -246,6 +241,8 @@ class ScheduleList extends TerrainComponent<Props>
           getActions={undefined}
           canCreate={TerrainTools.isAdmin()}
           onCreate={this.createSchedule}
+          loading={loading}
+          loadingMessage={'Loading Schedules...'}
         />
       </div>
     );
@@ -256,6 +253,7 @@ export default Util.createContainer(
   ScheduleList,
   [
     ['scheduler', 'schedules'],
+    ['scheduler', 'loading'],
   ],
   {
     schedulerActions: SchedulerActions,

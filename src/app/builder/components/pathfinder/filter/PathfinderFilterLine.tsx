@@ -46,20 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-import * as $ from 'jquery';
-import * as _ from 'lodash';
-import * as Radium from 'radium';
-import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
-import TerrainComponent from './../../../../common/components/TerrainComponent';
-const { List, Map } = Immutable;
 import ScoreBar from 'app/builder/components/charts/ScoreBar';
 import PathfinderMapComponent from 'app/builder/components/pathfinder/filter/PathfinderMapComponent';
 import PahfinderText from 'app/builder/components/pathfinder/PathfinderText';
-import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
-import Autocomplete from 'app/common/components/Autocomplete';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import CheckBox from 'app/common/components/CheckBox';
 import DatePicker from 'app/common/components/DatePicker';
@@ -69,15 +58,19 @@ import { RouteSelector, RouteSelectorOption, RouteSelectorOptionSet } from 'app/
 import DateUtil from 'app/util/DateUtil';
 import MapUtil from 'app/util/MapUtil';
 import Util from 'app/util/Util';
+import * as classNames from 'classnames';
 import ElasticBlockHelpers from 'database/elastic/blocks/ElasticBlockHelpers';
-import * as TerrainLog from 'loglevel';
+import { List, Map } from 'immutable';
+import * as _ from 'lodash';
+import * as Radium from 'radium';
+import * as React from 'react';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
-import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
+import { backgroundColor, Colors, getStyle } from '../../../../colors/Colors';
 import
 {
-  _DistanceValue, _Param, _Script, BoostOptions, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext,
-  Script, Source,
+  _DistanceValue, FilterGroup, FilterLine, PathfinderContext,
 } from '../PathfinderTypes';
+import TerrainComponent from './../../../../common/components/TerrainComponent';
 
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
@@ -213,7 +206,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           valueValue,
           fieldType: props.filterLine.fieldType,
         }}
-        // optionSets={this.getOptionSets() /* TODO store in state? */}
+        optionSets={this.getOptionSets() /* TODO store in state? */}
         values={values}
         onChange={this.handleFilterPickerChange}
         canEdit={props.canEdit}

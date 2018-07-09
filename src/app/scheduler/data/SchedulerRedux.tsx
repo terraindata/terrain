@@ -46,19 +46,16 @@ THE SOFTWARE.
 
 import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 import SchedulerApi from 'scheduler/SchedulerApi';
 import
 {
   _SchedulerConfig,
   _SchedulerState,
-  scheduleForDatabase,
   SchedulerConfig,
   SchedulerState,
 } from 'scheduler/SchedulerTypes';
-import XHR from 'util/XHR';
-const { List, Map } = Immutable;
 import Util from 'util/Util';
+import XHR from 'util/XHR';
 
 export interface SchedulerActionTypes
 {

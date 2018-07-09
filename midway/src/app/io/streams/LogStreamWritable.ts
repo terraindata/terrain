@@ -44,8 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { EventEmitter } from 'events';
-import { Duplex, Readable, Transform, Writable } from 'stream';
+import { Writable } from 'stream';
 
 /**
  * A log stream

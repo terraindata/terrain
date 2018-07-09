@@ -53,10 +53,7 @@ import { Colors } from '../../../colors/Colors';
 // consider upgrading to v4 which has types
 const d3 = require('d3');
 // import * as d3 from 'd3';
-import * as $ from 'jquery';
-import * as _ from 'lodash';
 import TransformUtil, { NUM_CURVE_POINTS } from '../../../util/TransformUtil';
-import Util from '../../../util/Util';
 
 const xMargin = 0;
 const yMargin = 0;

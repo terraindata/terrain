@@ -46,28 +46,20 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions
 
-import * as classNames from 'classnames';
 import { List } from 'immutable';
-import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
 import Util from 'util/Util';
 
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'app/colors/Colors';
 import Button from 'app/common/components/Button';
 import FloatingInput from 'app/common/components/FloatingInput';
 import TerrainTools from 'app/util/TerrainTools';
-import { notificationManager } from 'common/components/InAppNotification';
-import { Menu, MenuOption } from 'common/components/Menu';
-import Modal from 'common/components/Modal';
+import { MenuOption } from 'common/components/Menu';
 import TerrainComponent from 'common/components/TerrainComponent';
-import { tooltip } from 'common/components/tooltip/Tooltips';
-import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
+import { HeaderConfig, ItemList } from 'etl/common/components/ItemList';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import Initializers from 'etl/helpers/TemplateInitializers';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { MidwayError } from 'shared/error/MidwayError';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import './TemplateList.less';

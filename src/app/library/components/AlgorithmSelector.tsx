@@ -45,15 +45,11 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:no-var-requires strict-boolean-expressions
-import * as classNames from 'classnames';
 import { List, Map } from 'immutable';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
 import * as React from 'react';
 
 import { DynamicForm } from 'app/common/components/DynamicForm';
-import Dropdown from 'common/components/Dropdown';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { DisplayType } from 'common/components/DynamicFormTypes';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { LibraryState } from 'library/LibraryTypes';
 import { LibraryItem } from 'library/LibraryTypes';

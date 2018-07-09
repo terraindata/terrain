@@ -47,10 +47,7 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions member-access no-var-requires
 
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
-import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
-import * as $ from 'jquery';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
@@ -58,8 +55,7 @@ import * as ReactDOM from 'react-dom';
 import onClickOutside, { InjectedOnClickOutProps } from 'react-onclickoutside';
 import Util from 'util/Util';
 import BuilderActions from '../../builder/data/BuilderActions';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
-import KeyboardFocus from './../../common/components/KeyboardFocus';
+import { borderColor, Colors, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Dropdown.less';
 

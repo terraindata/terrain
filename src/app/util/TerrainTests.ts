@@ -54,7 +54,6 @@ import CardsToElastic from '../../database/elastic/conversion/CardsToElastic';
 import { ElasticValueInfoToCards } from '../../database/elastic/conversion/ElasticToCards';
 import ESCardParser from '../../database/elastic/conversion/ESCardParser';
 import { _Query, default as Query } from '../../items/types/Query';
-import ETLRouteUtil from '../etl/ETLRouteUtil';
 
 export default class TerrainTests
 {

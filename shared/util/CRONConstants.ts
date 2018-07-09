@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2019 Terrain Data, Inc.
 
-import { keys, range } from 'lodash';
+import { range } from 'lodash';
 
 export interface CRONMap
 {

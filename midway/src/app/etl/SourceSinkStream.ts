@@ -44,26 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:strict-boolean-expressions
-import * as _ from 'lodash';
 import * as stream from 'stream';
 
-import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import
 {
-  DefaultSinkConfig,
-  DefaultSourceConfig,
   SinkConfig,
   SourceConfig,
 } from 'shared/etl/types/EndpointTypes';
-import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { PostProcessConfig } from 'shared/etl/types/PostProcessTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import * as Util from '../AppUtil';
 import { MidwayLogger } from '../log/MidwayLogger';
 import ExportTransform from './ExportTransform';
 import { PostProcess } from './PostProcess';
-import { TemplateConfig } from './TemplateConfig';
-import Templates from './Templates';
 
 import CSVTransform from '../io/streams/CSVTransform';
 import JSONTransform from '../io/streams/JSONTransform';
@@ -116,15 +108,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
           break;
         case 'Sftp':
           endpoint = new SFTPEndpoint();
-          const sourceStreamTmp: stream.Readable | stream.Readable[] = await endpoint.getSource(source);
-          if (Array.isArray(sourceStreamTmp))
-          {
-            sourceStreams = sourceStreamTmp as stream.Readable[];
-          }
-          else
-          {
-            sourceStream = sourceStreamTmp as stream.Readable;
-          }
+          sourceStreams = await endpoint.getSource(source) as stream.Readable[];
           break;
         case 'GoogleAnalytics':
           endpoint = new GoogleAnalyticsEndpoint();
@@ -132,7 +116,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
           break;
         case 'Http':
           endpoint = new HTTPEndpoint();
-          sourceStream = await endpoint.getSource(source) as stream.Readable;
+          sourceStreams = await endpoint.getSource(source) as stream.Readable[];
           break;
         case 'Fs':
           endpoint = new FSEndpoint();
@@ -211,7 +195,18 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
       }
       else if (importStreams.length > 1)
       {
-        throw new Error('Too many streams without post process transformations');
+        const merge = (streams) =>
+        {
+          let pass = new stream.PassThrough({ objectMode: true });
+          let waiting = streams.length;
+          for (const s of streams)
+          {
+            pass = s.pipe(pass, { end: false });
+            s.once('end', () => --waiting === 0 && pass.emit('end'));
+          }
+          return pass;
+        };
+        resolve(merge(importStreams));
       }
       else
       {

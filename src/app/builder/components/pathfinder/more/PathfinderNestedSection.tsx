@@ -46,35 +46,24 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as React from 'react';
-import { backgroundColor, borderColor, Colors, getStyle } from '../../../../colors/Colors';
-import TerrainComponent from './../../../../common/components/TerrainComponent';
-const { List } = Immutable;
-import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import FadeInOut from 'app/common/components/FadeInOut';
 import FloatingInput from 'app/common/components/FloatingInput';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
-import TQLEditor from 'app/tql/components/TQLEditor';
 import Util from 'app/util/Util';
 import ExpandIcon from 'common/components/ExpandIcon';
-import RouteSelector from 'common/components/RouteSelector';
-import { FieldType } from '../../../../../../shared/builder/FieldTypes';
+import { List } from 'immutable';
+import * as _ from 'lodash';
+import * as React from 'react';
+import { backgroundColor, borderColor, Colors } from '../../../../colors/Colors';
 import BuilderActions from '../../../data/BuilderActions';
 import PathfinderArea from '../PathfinderArea';
 import PathfinderCreateLine from '../PathfinderCreateLine';
-import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import PathfinderText from '../PathfinderText';
 import
 {
-  _ChoiceOption, _Path,
-  More, Path, PathfinderContext, Source,
+  _Path, Path, PathfinderContext,
 } from '../PathfinderTypes';
-import DragAndDrop, { DraggableItem } from './../../../../common/components/DragAndDrop';
-import DragHandle from './../../../../common/components/DragHandle';
-import PathfinderAggregationLine from './PathfinderAggregationLine';
+import TerrainComponent from './../../../../common/components/TerrainComponent';
 import './PathfinderMoreStyle.less';
 
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');

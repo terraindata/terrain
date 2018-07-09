@@ -46,17 +46,12 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires max-classes-per-file no-console
 
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as Radium from 'radium';
 import * as React from 'react';
 
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
 import Quarantine from 'util/RadiumQuarantine';
 import
 {
-  ComponentProps,
-  WalkthroughComponentClass,
   WalkthroughGraphNode,
   WalkthroughGraphType,
   WalkthroughNodeOption,

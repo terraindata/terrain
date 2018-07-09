@@ -47,15 +47,10 @@ THE SOFTWARE.
 
 import AnalyticsSelector from 'analytics/components/AnalyticsSelector';
 import Loading from 'common/components/Loading';
-import RadioButtons from 'common/components/RadioButtons';
-import * as Immutable from 'immutable';
 import { loadLastRoute, saveLastRoute } from 'library/helpers/LibraryRoutesHelper';
-import * as _ from 'lodash';
 import * as React from 'react';
 import MultipleAreaChart from '../../charts/components/MultipleAreaChart';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import RolesActions from './../../roles/data/RolesActions';
-import { LibraryState } from './../LibraryTypes';
 import * as LibraryTypes from './../LibraryTypes';
 import AlgorithmsColumn from './AlgorithmsColumn';
 import CategoriesColumn from './CategoriesColumn';

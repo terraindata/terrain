@@ -46,26 +46,15 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires import-spacing
 import TerrainComponent from 'common/components/TerrainComponent';
 import { Map } from 'immutable';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { backgroundColor, Colors } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import Modal from 'common/components/Modal';
-import { instanceFnDecorator } from 'shared/util/Classes';
-
 import GraphHelpers from 'etl/helpers/GraphHelpers';
-import TemplateList from 'etl/templates/components/TemplateList';
-import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
+import { EngineProxy } from 'etl/templates/EngineProxy';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
-
-const { List } = Immutable;
 
 export interface Props
 {

@@ -44,11 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
-const { List, Map } = Immutable;
 
 import LanguageController from 'shared/etl/languages/LanguageControllers';
-import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import
 {
   DateFormats, ETLFieldTypes, ETLToJSType, FieldTypes, getJSFromETL, JSToETLType, Languages, validJSTypes,
@@ -56,7 +55,6 @@ import
 import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import objectify from 'shared/util/deepObjectify';
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 

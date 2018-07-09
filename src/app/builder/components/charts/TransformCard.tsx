@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression
 
 import { List } from 'immutable';
-import * as _ from 'lodash';
 import * as React from 'react';
 import * as Dimensions from 'react-dimensions';
 
@@ -70,7 +69,6 @@ import Switch from 'common/components/Switch';
 import { ElasticQueryResult } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import { MidwayError } from '../../../../../shared/error/MidwayError';
 import { isInput } from '../../../../blocks/types/Input';
-import { AllBackendsMap } from '../../../../database/AllBackends';
 import { getIndex, getType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';

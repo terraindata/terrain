@@ -49,8 +49,7 @@ import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { backgroundColor, buttonColors, Colors, disabledButtonColors, fontColor } from 'src/app/colors/Colors';
+import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
 
 import './FilePicker.less';
 

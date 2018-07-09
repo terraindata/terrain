@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:strict-boolean-expressions
 
-import * as classNames from 'classnames';
 import { List } from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
@@ -53,7 +52,7 @@ import * as React from 'react';
 
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import { backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
-import { Menu, MenuOption } from 'common/components/Menu';
+import { Menu } from 'common/components/Menu';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import Quarantine from 'util/RadiumQuarantine';
@@ -78,12 +77,19 @@ export interface Props<T>
   itemsName?: string;
   canCreate?: boolean;
   onCreate?: () => void;
+  loading?: boolean;
+  loadingMessage?: string;
 }
 
 const memoize = _.memoize;
 
 export class ItemList<T> extends TerrainComponent<Props<T>>
 {
+  public static defaultProps = {
+    loading: false,
+    loadingMessage: null,
+  };
+
   constructor(props)
   {
     super(props);
@@ -159,6 +165,31 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
     );
   }
 
+  public getEmptyItemsListMessage()
+  {
+    const { loading, loadingMessage } = this.props;
+
+    let message = '';
+
+    if (loading)
+    {
+      if (loadingMessage !== null)
+      {
+        message = loadingMessage;
+      }
+      else
+      {
+        message = `Loading ${this.props.itemsName || 'item'}s...`;
+      }
+    }
+    else
+    {
+      message = `There aren't yet any ${this.props.itemsName || 'item'}s`;
+    }
+
+    return message;
+  }
+
   public render()
   {
     const { columnConfig, items, getMenuOptions } = this.props;
@@ -200,7 +231,7 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
             items.map(this.renderRow).toList()
             :
             <div className='item-list-message'>
-              There aren't yet any {this.props.itemsName || 'item'}s
+              {this.getEmptyItemsListMessage()}
             </div>
         }
 

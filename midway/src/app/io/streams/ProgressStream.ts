@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import { EventEmitter } from 'events';
-import { Duplex, Transform, Writable } from 'stream';
+import { Duplex, Writable } from 'stream';
 
 import { MidwayLogger } from '../../log/MidwayLogger';
 

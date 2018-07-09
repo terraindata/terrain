@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 import * as Deque from 'double-ended-queue';
 
-import { ElasticQueryHit } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';

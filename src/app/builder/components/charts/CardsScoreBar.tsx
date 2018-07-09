@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands
 
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors } from '../../../colors/Colors';
+import { borderColor, Colors } from '../../../colors/Colors';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './CardsScoreBar.less';
 

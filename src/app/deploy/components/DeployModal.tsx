@@ -54,7 +54,6 @@ import './DeployModal.less';
 import Modal from 'common/components/Modal';
 import LibraryActions from 'library/data/LibraryActions';
 import * as LibraryTypes from 'library/LibraryTypes';
-import TerrainStore from 'store/TerrainStore';
 import Util from 'util/Util';
 import { ItemStatus } from '../../../items/types/Item';
 import TQLEditor from '../../tql/components/TQLEditor';

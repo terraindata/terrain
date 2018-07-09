@@ -49,9 +49,7 @@ THE SOFTWARE.
 import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import MapUtil from '../../../util/MapUtil';
 import MapComponent from './../../../common/components/MapComponent';
 export interface Props
 {

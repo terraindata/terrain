@@ -47,19 +47,14 @@ THE SOFTWARE.
 // tslint:disable:no-shadowed-variable
 
 import { EventEmitter } from 'events';
-import * as fs from 'fs';
 import GraphLib = require('graphlib');
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as request from 'request';
-import { Readable, Transform, Writable } from 'stream';
+import { Readable } from 'stream';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import TransformationEngineTransform from '../io/streams/TransformationEngineTransform';
 import { MidwayLogger } from '../log/MidwayLogger';
-import UserConfig from '../users/UserConfig';
-import { versions } from '../versions/VersionRouter';
 
 import { TransformationEngine } from '../../../../shared/transformations/TransformationEngine';
 import DatabaseController from '../../database/DatabaseController';
@@ -70,10 +65,9 @@ import { destringifySavedTemplate, recordToConfig, TemplateConfig, templateForSa
 
 import { _SinkConfig, _SourceConfig, SinkConfig as SinkRecord, SourceConfig as SourceRecord } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
-import { ETLProcess, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
+import { TemplateBase } from 'shared/etl/types/ETLTypes';
 import LogStream from '../io/streams/LogStream';
 import ProgressStream from '../io/streams/ProgressStream';
-import { deleteElasticIndex } from '../Schema';
 
 export default class Templates
 {
@@ -250,33 +244,26 @@ export default class Templates
     files?: Readable[],
   ): Promise<{ outputStream: Readable, logStream: Readable }>
   {
-    try
+    if (fields.template !== undefined)
     {
-      if (fields.template !== undefined)
+      const template = JSON.parse(fields.template);
+      return this.execute(template, files);
+    }
+    else if (fields.templateId !== undefined)
+    {
+      const templateId = Number(fields.templateId);
+      if (fields.overrideSources !== undefined || fields.overrideSinks !== undefined)
       {
-        const template = JSON.parse(fields.template);
-        return this.execute(template, files);
-      }
-      else if (fields.templateId !== undefined)
-      {
-        const templateId = Number(fields.templateId);
-        if (fields.overrideSources !== undefined || fields.overrideSinks !== undefined)
-        {
-          return this.executeByOverride(templateId, files, fields.overrideSources, fields.overrideSinks);
-        }
-        else
-        {
-          return this.executeById(templateId, files);
-        }
+        return this.executeByOverride(templateId, files, fields.overrideSources, fields.overrideSinks);
       }
       else
       {
-        throw new Error('Missing template or template ID parameter.');
+        return this.executeById(templateId, files);
       }
     }
-    catch (e)
+    else
     {
-      return Promise.reject(e);
+      throw new Error('Missing template or template ID parameter.');
     }
   }
 
@@ -616,7 +603,7 @@ export default class Templates
     catch (e)
     {
       logStream.error(`Failed to execute ETL pipeline: ${String(e)}`);
-      throw new Error(`Failed to execute ETL pipeline: ${String(e)}`);
+      throw e;
     }
   }
 }

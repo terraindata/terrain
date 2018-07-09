@@ -47,7 +47,6 @@ THE SOFTWARE.
 import * as stream from 'stream';
 
 import TaskEnum from 'shared/types/jobs/TaskEnum';
-import ATaskConfig from './ATaskConfig';
 
 export class TaskConfig
 {

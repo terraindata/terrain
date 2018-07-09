@@ -48,7 +48,6 @@ import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { shallow } from 'enzyme';
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import configureStore from 'redux-mock-store';
 import { _Server } from 'schema/SchemaTypes';
 import { connect } from 'test-helpers/helpers';
 

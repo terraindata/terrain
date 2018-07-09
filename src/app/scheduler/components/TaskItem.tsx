@@ -44,25 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console strict-boolean-expressions no-var-requires
-import Colors, { backgroundColor, borderColor, fontColor, getStyle } from 'app/colors/Colors';
+import Colors, { backgroundColor, borderColor, fontColor } from 'app/colors/Colors';
 import CheckBox from 'app/common/components/CheckBox';
-import FloatingInput from 'app/common/components/FloatingInput';
-import { ETLActions } from 'app/etl/ETLRedux';
-import { ETLState } from 'app/etl/ETLTypes';
-import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
 import
 {
-  _TaskConfig,
   TaskConfig,
 } from 'app/scheduler/SchedulerTypes';
 import TerrainTools from 'app/util/TerrainTools';
-import Util from 'app/util/Util';
 import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { DisplayType } from 'common/components/DynamicFormTypes';
 import TerrainComponent from 'common/components/TerrainComponent';
-import { tooltip } from 'common/components/tooltip/Tooltips';
 import { List, Map } from 'immutable';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
@@ -253,11 +245,15 @@ class TaskItem extends TerrainComponent<Props>
   }
 }
 
-const taskTypeList = List(Object.keys(TaskEnum));
+const taskTypeList = List([
+  TaskEnum.taskDefaultExit,
+  TaskEnum.taskDefaultFailure,
+  TaskEnum.taskETL,
+]);
 const taskTypeDisplayNames = Map({
-  taskDefaultExit: 'Default Exit',
-  taskDefaultFailure: 'Default Failure',
-  taskETL: 'ETL Task',
+  [TaskEnum.taskDefaultExit]: 'Default Exit',
+  [TaskEnum.taskDefaultFailure]: 'Default Failure',
+  [TaskEnum.taskETL]: 'ETL Task',
 });
 
 export default TaskItem;

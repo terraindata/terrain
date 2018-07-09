@@ -46,31 +46,28 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires switch-default strict-boolean-expressions restrict-plus-operands
 
+import { BuilderState } from 'app/builder/data/BuilderState';
+import ExpandIcon from 'app/common/components/ExpandIcon';
+import FadeInOut from 'app/common/components/FadeInOut';
+import { SchemaState } from 'app/schema/SchemaTypes';
 import * as classNames from 'classnames';
+import { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
+import { List, Map } from 'immutable';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import './Hit.less';
-const { List, Map } = Immutable;
-import { BuilderState } from 'app/builder/data/BuilderState';
-import ExpandIcon from 'app/common/components/ExpandIcon';
-import FadeInOut from 'app/common/components/FadeInOut';
-import { SchemaState } from 'app/schema/SchemaTypes';
-import { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
 import Draggable from 'react-draggable';
 import { _Format, _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
-import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
-import MapUtil from '../../../util/MapUtil';
 import { SpotlightActions } from '../../data/SpotlightRedux';
 import * as SpotlightTypes from '../../data/SpotlightTypes';
-import MapComponent from './../../../common/components/MapComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import Util from './../../../util/Util';
+import './Hit.less';
 import { _Hit, Hit } from './ResultTypes';
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');

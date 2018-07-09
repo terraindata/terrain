@@ -45,27 +45,15 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires
 
-import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
 
-import FadeInOut from 'common/components/FadeInOut';
-
-import { instanceFnDecorator } from 'shared/util/Classes';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormLookups';
+import { SourceFormMap } from 'etl/common/components/EndpointFormLookups';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
-import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { getFileType } from 'shared/etl/FileUtil';
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { _SourceConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { Sources } from 'shared/etl/types/EndpointTypes';
-import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';
+import { ETLStepComponent, TransitionParams } from './ETLStepComponent';
 import './ETLStepComponent.less';
 
 class PickAlgorithmStep extends ETLStepComponent

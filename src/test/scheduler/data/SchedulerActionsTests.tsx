@@ -44,9 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:object-literal-shorthand only-arrow-functions
-import * as Immutable from 'immutable';
 import { SchedulerActions, SchedulerActionTypes } from 'scheduler/data/SchedulerRedux';
-import SchedulerApi from 'scheduler/SchedulerApi';
 import { SchedulerConfig } from 'scheduler/SchedulerTypes';
 import { createMockStore } from 'test-helpers/helpers';
 import SchedulerHelper from 'test-helpers/SchedulerHelper';

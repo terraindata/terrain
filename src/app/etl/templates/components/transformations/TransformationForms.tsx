@@ -45,15 +45,12 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires no-empty-interface max-classes-per-file
 
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import TransformationNodeVisitor, { VisitorLookupMap } from 'shared/transformations/TransformationNodeVisitor';
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
 import { TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 import { ArrayCountTFF, ArraySumTFF } from './ArrayStatTransformationForms';
 import { CastTFF } from './CastTransformationForm';

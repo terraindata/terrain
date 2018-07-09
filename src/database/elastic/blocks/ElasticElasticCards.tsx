@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
 import GetCardVisitor from '../../../app/builder/getCard/GetCardVisitor';
-import { FilterUtils } from './ElasticFilterCard';
 
 const getCardVisitor: GetCardVisitor =
   new GetCardVisitor(ESInterpreterDefaultConfig);

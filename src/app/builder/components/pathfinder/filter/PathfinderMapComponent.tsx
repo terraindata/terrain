@@ -48,14 +48,13 @@ THE SOFTWARE.
 import BuilderActions from 'app/builder/data/BuilderActions';
 import { BuilderState } from 'app/builder/data/BuilderState';
 import * as SpotlightTypes from 'app/builder/data/SpotlightTypes';
-import MapComponent, { units } from 'app/common/components/MapComponent';
+import MapComponent from 'app/common/components/MapComponent';
 import TerrainComponent from 'app/common/components/TerrainComponent';
-import MapUtil from 'app/util/MapUtil';
 import Util from 'app/util/Util';
 import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { _DistanceValue, DistanceValue, FilterLine } from '../PathfinderTypes';
+import { _DistanceValue, FilterLine } from '../PathfinderTypes';
 
 export interface Props
 {

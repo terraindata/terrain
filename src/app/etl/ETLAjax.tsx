@@ -44,9 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
-const { List, Map } = Immutable;
 
 import * as download from 'downloadjs';
 import MidwayError from 'shared/error/MidwayError';

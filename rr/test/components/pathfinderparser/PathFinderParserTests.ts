@@ -44,9 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as fs from 'fs';
 import * as ip from 'ip';
-import * as sleep from 'sleep';
 
 import * as jsonfile from 'jsonfile';
 

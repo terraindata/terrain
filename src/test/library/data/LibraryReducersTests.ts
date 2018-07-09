@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
 import ActionTypes from 'library/data/LibraryActionTypes';
 import reducer from 'library/data/LibraryReducers';
 import * as LibraryTypes from 'library/LibraryTypes';

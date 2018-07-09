@@ -50,15 +50,13 @@ import { List } from 'immutable';
 import { divIcon, point } from 'leaflet';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { Circle, Map, Marker, Polygon, Polyline, Popup, Rectangle, TileLayer, ZoomControl } from 'react-leaflet';
+import { Circle, Map, Marker, Popup, Rectangle, TileLayer } from 'react-leaflet';
 import onClickOutside, { InjectedOnClickOutProps } from 'react-onclickoutside';
 
 import Switch from 'common/components/Switch';
 import { backgroundColor, Colors, fontColor } from '../../colors/Colors';
 import MapUtil from '../../util/MapUtil';
-import Autocomplete from './Autocomplete';
 import BuilderTextbox from './BuilderTextbox';
-import FadeInOut from './FadeInOut';
 import './MapComponentStyle.less';
 import PlacesAutocomplete from './PlacesAutocomplete';
 import TerrainComponent from './TerrainComponent';

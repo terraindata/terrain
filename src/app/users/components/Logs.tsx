@@ -51,7 +51,7 @@ import * as React from 'react';
 import Util from 'util/Util';
 
 import TerrainTools from 'app/util/TerrainTools';
-import { Colors, fontColor } from 'colors/Colors';
+import { Colors } from 'colors/Colors';
 import { MidwayError } from '../../../../shared/error/MidwayError';
 import Ajax from '../../util/Ajax';
 import InfoArea from './../../common/components/InfoArea';
