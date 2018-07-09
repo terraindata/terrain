@@ -57,7 +57,7 @@ import { templates as templatesDb } from './TemplateRouter';
 
 import { TemplateVersion, updateTemplateIfNeeded } from 'shared/etl/migrations/TemplateVersions';
 
-export const defaultETLMigration: Migrator = {
+export const templateMigration: Migrator = {
   fromVersion: 'v4',
   toVersion: 'v5',
   migrate: (from, to) =>

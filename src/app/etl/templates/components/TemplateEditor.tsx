@@ -68,7 +68,7 @@ import RootFieldNode from 'etl/templates/components/field/RootFieldNode';
 import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import Quarantine from 'util/RadiumQuarantine';
@@ -117,6 +117,7 @@ class TemplateEditor extends TerrainComponent<Props>
     }
     try
     {
+      console.log(templateForBackend(this.props.templateEditor.template));
       // do this to show disabled fields
       previewDocument = _.cloneDeep(previewDocument);
       const resetEngine = TransformationEngine.load(JSON.stringify(engine.toJSON()));

@@ -50,7 +50,7 @@ import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
+import * as yadeep from 'shared/util/yadeep';
 
 import { _SinkConfig, _SourceConfig, ItemWithName, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'shared/etl/immutable/ETLProcessRecords';
@@ -63,11 +63,22 @@ import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, SourceOpt
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNode from 'shared/transformations/TransformationNode';
+import { TransformationEngine as V5TransformationEngine } from 'shared/transformations/V5TransformationEngine';
 import { KeyPath } from 'shared/util/KeyPath';
 
-export const CURRENT_TEMPLATE_VERSION: TemplateVersion = 'tv5';
+export const CURRENT_TEMPLATE_VERSION: TemplateVersion = 'tv5.1';
 export const FIRST_TEMPLATE_VERSION: TemplateVersion = 'tv4';
-export type TemplateVersion = 'tv4' | 'tv5';
+
+export type TemplateVersion = 'tv4' | 'tv5' | 'tv5.1';
+export const TemplateVersions = ['tv4', 'tv5', 'tv5.1'];
+
+function isBefore(v1, v2)
+{
+  if (TemplateVersions.indexOf(v1) < TemplateVersions.indexOf(v2))
+  {
+    return true;
+  }
+}
 
 export function getTemplateVersion(templateObj: object): TemplateVersion
 {
@@ -82,7 +93,7 @@ export function getTemplateVersion(templateObj: object): TemplateVersion
   }
 }
 
-function upgrade4To5(templateObj: object): { changes: number, template: TemplateBase }
+function upgrade4To5(templateObj: TemplateBase): { changes: number, template: TemplateBase }
 {
   let changes = 0;
   const convertKeyPath = (kp: KeyPath) =>
@@ -113,11 +124,11 @@ function upgrade4To5(templateObj: object): { changes: number, template: Template
   };
   const convertAll = (kps: List<KeyPath>) => kps.map((kp) => convertKeyPath(kp)).toList();
 
-  let template = _ETLTemplate(templateObj, true);
-  let edges = template.process.edges;
-  edges = edges.map((edge) =>
+  let template = _.cloneDeep(templateObj);
+  for (const match of yadeep.search(template, List(['process', 'edges', -1, 'transformations'])))
   {
-    const engine = edge.transformations as any as {
+    const { value, location } = match;
+    const engine = V5TransformationEngine.load(value) as any as {
       dag: GraphLib.Graph;
       uidField: number;
       uidNode: number;
@@ -126,8 +137,8 @@ function upgrade4To5(templateObj: object): { changes: number, template: Template
       fieldTypes: Map<number, string>;
       fieldEnabled: Map<number, boolean>;
       fieldProps: Map<number, object>;
+      toJSON: () => object;
     };
-    // update keypaths for transformation nodes
     const dag = engine.dag;
     const nodes = dag.nodes();
     if (nodes !== undefined && nodes.length > 0)
@@ -144,18 +155,22 @@ function upgrade4To5(templateObj: object): { changes: number, template: Template
     }
     engine.fieldNameToIDMap = engine.fieldNameToIDMap.mapKeys((kp) => convertKeyPath(kp)).toMap();
     engine.IDToFieldNameMap = engine.IDToFieldNameMap.map((kp) => convertKeyPath(kp)).toMap();
-    return edge.set('transformations', engine);
-  }).toMap();
-  template = template.setIn(['process', 'edges'], edges);
+    template = yadeep.setSingle(template, location, JSON.stringify(engine.toJSON())) as TemplateBase;
+  }
   return {
-    template: templateForBackend(template),
+    template,
     changes,
   };
 }
 
+function upgrade5To51(templateObj: object)
+{
+
+}
+
 export function updateTemplateIfNeeded(templateObj: TemplateBase): { template: TemplateBase, updated: boolean, message: string }
 {
-  const version = getTemplateVersion(templateObj);
+  let version = getTemplateVersion(templateObj);
   let template = templateObj;
   let message = '';
   let updated = false;
@@ -167,6 +182,16 @@ export function updateTemplateIfNeeded(templateObj: TemplateBase): { template: T
     template = upgrade.template;
     changes += upgrade.changes;
     updated = true;
+    version = 'tv5';
+  }
+
+  if (version === 'tv5')
+  {
+    const upgrade = upgrade5To51;
+    template = upgrade.template;
+    changes += upgrade.changes;
+    updated = true;
+    version = 'tv5.1';
   }
 
   if (getTemplateVersion(template) !== CURRENT_TEMPLATE_VERSION)

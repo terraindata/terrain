@@ -110,7 +110,6 @@ export class EngineProxy
     return new FieldProxy(this, fieldId);
   }
 
-  // automatically orders synthetic fields to be after the current field
   public addTransformation(
     type: TransformationNodeType,
     fields: List<EnginePath>,
@@ -133,7 +132,8 @@ export class EngineProxy
     }
     if (options.newFieldKeyPaths !== undefined)
     {
-      options.newFieldKeyPaths.forEach((kp) => {
+      options.newFieldKeyPaths.forEach((kp) =>
+      {
         const newId = this.engine.getFieldID(kp);
         this.orderField(newId, origFieldId);
 
