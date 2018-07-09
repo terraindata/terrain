@@ -98,8 +98,8 @@ class ScheduleList extends TerrainComponent<Props>
   public state: {
     confirmModalOpen: boolean,
   } = {
-    confirmModalOpen: false,
-  };
+      confirmModalOpen: false,
+    };
 
   public componentWillMount()
   {

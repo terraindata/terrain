@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-console strict-boolean-expressions no-var-requires
+// tslint:disable:strict-boolean-expressions no-var-requires
 import Colors, { backgroundColor, borderColor, fontColor } from 'app/colors/Colors';
 import CheckBox from 'app/common/components/CheckBox';
 import
@@ -102,6 +102,16 @@ class TaskItem extends TerrainComponent<Props>
     },
   };
 
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (this.state.name !== nextProps.task.name)
+    {
+      this.setState({
+        name: nextProps.task.name,
+      });
+    }
+  }
+
   public handleTextKeyDown(e)
   {
     if (e.keyCode === 13)
@@ -126,6 +136,22 @@ class TaskItem extends TerrainComponent<Props>
     this.props.onTaskChange(this.props.task.set('taskId', s.taskId));
   }
 
+  public handleTaskSettingsChange(newTask: TaskConfig)
+  {
+    const { task, templates } = this.props;
+    if (newTask.taskId === TaskEnum.taskETL &&
+      newTask.getIn(['params', 'options', 'templateId']) !== task.getIn(['params', 'options', 'templateId'])
+    )
+    {
+      // Get name of template
+      const templateName = templates.find((t) =>
+        t.id === newTask.getIn(['params', 'options', 'templateId']),
+      ).templateName;
+      newTask = newTask.set('name', templateName);
+    }
+    this.props.onTaskChange(newTask);
+  }
+
   public renderTaskSettings(task: TaskConfig)
   {
     const FormClass = TaskFormMap[task.taskId];
@@ -140,7 +166,7 @@ class TaskItem extends TerrainComponent<Props>
           FormClass &&
           <FormClass
             task={task}
-            onChange={this.props.onTaskChange}
+            onChange={this.handleTaskSettingsChange}
             templates={this.props.templates}
           />
         }
