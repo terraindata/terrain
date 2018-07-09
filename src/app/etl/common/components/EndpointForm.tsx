@@ -297,7 +297,7 @@ class EndpointForm extends TerrainComponent<Props>
         },
       );
     })
-    .catch((e) => e);
+      .catch((e) => e);
   }
 
   public extractFileConfigDelta(oldConfig: Partial<FileConfig>, newConfig: Partial<FileConfig>): Partial<FileConfig>

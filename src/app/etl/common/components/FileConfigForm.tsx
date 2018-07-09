@@ -61,8 +61,8 @@ import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import Modal from 'app/common/components/Modal';
 import PathUtil from 'etl/pathselector/PathGuessTest';
-import DataModal from './DataModal';
 import { List } from 'immutable';
+import DataModal from './DataModal';
 
 export interface Props
 {
@@ -144,18 +144,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
         group: 'path',
         widthFactor: 8,
         options: {
-          render: (state, disabled) =>
-            <DataModal
-              sectionType='path'
-              sectionOptions={
-                List(PathUtil.guessFilePaths(this.props.source).map((key, i) => key.name + ': ' + key.score))
-              }
-              sectionBoxes={
-                List(PathUtil.guessFilePaths(this.props.source).map((key, i) => JSON.stringify(this.props.source[key.name]))
-              }
-              width='100%'
-              height='40%'
-            />,
+          render: this.renderSuggestedJsonPaths,
         },
         getDisplayState: this.jsonPathDisplay,
       },
@@ -182,6 +171,30 @@ export default class FileConfigForm extends TerrainComponent<Props>
     );
   }
 
+  public renderSuggestedJsonPaths(state, disabled)
+  {
+    if (this.props.source == null)
+    {
+      return undefined;
+    }
+    else
+    {
+      return (
+        <DataModal
+          sectionType='path'
+          sectionOptions={
+            List(PathUtil.guessFilePaths(this.props.source).map((key, i) => key.name + ': ' + key.score.toString()))
+          }
+          sectionBoxes={
+            List(PathUtil.guessFilePaths(this.props.source).map((key, i) => JSON.stringify(this.props.source[key.name], null, 2)))
+          }
+          width='100%'
+          height='40%'
+        />
+      );
+    }
+  }
+
   public xmlPathDisplay(s: FormState)
   {
     return (s.fileType === FileTypes.Xml && s.useXmlPath === true) ? DisplayState.Active : DisplayState.Hidden;
@@ -194,7 +207,8 @@ export default class FileConfigForm extends TerrainComponent<Props>
 
   public jsonPathDisplay(s: FormState)
   {
-    return (s.fileType === FileTypes.Json && s.useJsonPath === true) ? DisplayState.Active : DisplayState.Hidden;
+    return (s.fileType === FileTypes.Json && s.useJsonPath === true && this.props.source !== null) ?
+      DisplayState.Active : DisplayState.Hidden;
   }
 
   public fileTypeDisplayState(s: FormState)
