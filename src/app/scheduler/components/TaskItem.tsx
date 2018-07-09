@@ -147,7 +147,11 @@ class TaskItem extends TerrainComponent<Props>
       const templateName = templates.find((t) =>
         t.id === newTask.getIn(['params', 'options', 'templateId']),
       ).templateName;
-      newTask = newTask.set('name', templateName);
+      newTask = newTask
+        .set('name', templateName)
+        .setIn(['params', 'options', 'overrideSources'], Map())
+        .setIn(['params', 'options', 'overrideSinks'], Map());
+      // Clear overrides
     }
     this.props.onTaskChange(newTask);
   }
