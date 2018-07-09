@@ -49,6 +49,8 @@ import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 import * as App from '../App';
 import * as Util from '../AppUtil';
+import * as rand from 'random-key';
+import * as srs from 'secure-random-string';
 import RecoveryTokenConfig from '../recoveryTokens/RecoveryTokenConfig';
 import RecoveryTokens from '../recoveryTokens/RecoveryTokens';
 import UserConfig from '../users/UserConfig';
@@ -57,14 +59,13 @@ const users: Users = new Users();
 export const initialize = () => users.initialize();
 const Router = new KoaRouter();
 const recoveryTokens: RecoveryTokens = new RecoveryTokens();
-import * as rand from 'random-key';
 import IntegrationConfig from '../integrations/IntegrationConfig';
 import Integrations from '../integrations/Integrations';
 const integrations: Integrations = new Integrations();
 Router.post('/', async (ctx, next) =>
 {
    let hostNameValid: boolean = false;
-   const hostName: string = ctx.request.body.url;
+   const hostName: string = ctx.request.body['url'];
    // check that hostname is either .terraindata.com or localhost
    if (hostName.indexOf('terraindata.com') !== -1 || hostName.indexOf('localhost') !== -1)
    {
@@ -80,10 +81,10 @@ Router.post('/', async (ctx, next) =>
      const usr: UserConfig[] = await users.get(userIds[index]['id']);
      if (usr !== undefined)
      {
-       if (usr[0]['email'] === ctx.request.body.email)
+       if (usr[0]['email'] === ctx.request.body['email'])
        {
          userExists = true;
-         email = ctx.request.body.email;
+         email = ctx.request.body['email'];
          userId = usr[0]['id'];
        }
      }
@@ -91,9 +92,10 @@ Router.post('/', async (ctx, next) =>
 
    if (userExists && hostNameValid)
    {
-     email = ctx.request.body.email;
+     email = ctx.request.body['email'];
      // generate token
-     const userToken: string = rand.generate();
+     //const userToken: string = rand.generate();
+     const userToken: string = srs();
      // generate timestamp
      const currDateTime: Date = new Date(Date.now());
 
@@ -108,11 +110,11 @@ Router.post('/', async (ctx, next) =>
        };
      if (checkRecoveryTokens[0] !== undefined)
      {
-       const updatedEntry: RecoveryTokenConfig[] = await recoveryTokens.update(newEntry) as RecoveryTokenConfig[];
+       const updatedEntry: RecoveryTokenConfig = await recoveryTokens.update(newEntry) as RecoveryTokenConfig;
      }
      else
      {
-       const createdEntry: RecoveryTokenConfig[] = await recoveryTokens.create(newEntry) as RecoveryTokenConfig[];
+       const createdEntry: RecoveryTokenConfig = await recoveryTokens.create(newEntry) as RecoveryTokenConfig;
      }
 
      // construct URL
@@ -123,7 +125,7 @@ Router.post('/', async (ctx, next) =>
      const subject: string = 'Password reset link from notifications@terraindata.com';
      const body: string = 'Please click on the link below to reset your password. \n \n' + route;
      const emailSendStatus: boolean = await App.EMAIL.send(email, emailIntegrations[0].id, subject, body);
-     winston.info(`Feedback email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
+     winston.info(`email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
      ctx.body = 'Password reset email sent to ' + email + '.';
      ctx.status = 200;
 

@@ -60,12 +60,13 @@ export const initialize = () => users.initialize();
 
 Router.post('/', async (ctx, next) =>
 {
-  const token: string = ctx.request.body.recoveryToken;
-  const newPassword: string = ctx.request.body.newPassword;
+  ctx.status = 401;
+  const token: string = ctx.request.body['recoveryToken'];
+  const newPassword: string = ctx.request.body['newPassword'];
   recoveryTokens.initialize();
-  const allRecoveryTokens: RecoveryTokensConfig[] = await recoveryTokens.select([], {}) as RecoveryTokenConfig[];
+  const allRecoveryTokens: RecoveryTokenConfig[] = await recoveryTokens.select([], {}) as RecoveryTokenConfig[];
   const allUsers: UserConfig[] = await users.select([], {}) as UserConfig[];
-  for (let index in allRecoveryTokens)
+  for (const index in allRecoveryTokens)
   {
     if (allRecoveryTokens[index]['token'] === token)
     {
@@ -75,46 +76,39 @@ Router.post('/', async (ctx, next) =>
        validWindow.setDate(timestamp.getDate() + 1);
        const currDateTime: Date = new Date(Date.now());
        // check that token is <= 24 hours old
-       if (timestamp.getTime() <= currDateTime.getTime() && currDateTime.getTime() <= validWindow.getTime())
+       if (currDateTime.getTime() <= validWindow.getTime())
        {
          const userIdToChange: number = allRecoveryTokens[index]['id'];
          const user = await users.get(userIdToChange);
          const userToUpdate = user[0];
          userToUpdate['password'] = newPassword;
-         const updatedUser: UserConfig[] = await users.update(userToUpdate, true) as UserConfig[];
+         const updatedUser: UserConfig = await users.update(userToUpdate, true) as UserConfig;
          // delete token used
          const newEntry = {
            id: allRecoveryTokens[index]['id'],
            token: null,
            createdAt: currDateTime,
          };
-         const updatedEntry: RecoveryTokenConfig[] = await recoveryTokens.update(newEntry) as RecoveryTokenConfig[];
-         winston.error('successfully changed password');
+         const updatedEntry: RecoveryTokenConfig = await recoveryTokens.update(newEntry) as RecoveryTokenConfig;
          ctx.body = 'Password successfully changed.';
          ctx.status = 200;
        }
        else
        {
-         ctx.body = 'Invalid reset url.';
-         ctx.status = 401;
+         ctx.body = 'Invalid reset url - token expired.';
        }
      }
-     else
-     {
-       ctx.body = 'Invalid reset url.';
-       ctx.status = 401;
-     }
    }
+   ctx.body = 'Invalid reset url.';
  });
 
 Router.get('/:token', async (ctx, next) =>
 {
-  winston.error(ctx.params.token);
   const token: string = ctx.params.token;
   let tokenFound: boolean = false;
   recoveryTokens.initialize();
-  const allRecoveryTokens: RecoveryTokensConfig[] = await recoveryTokens.select([], {}) as RecoveryTokenConfig[];
-  for (let index in allRecoveryTokens)
+  const allRecoveryTokens: RecoveryTokenConfig[] = await recoveryTokens.select([], {}) as RecoveryTokenConfig[];
+  for (const index in allRecoveryTokens)
   {
     if (allRecoveryTokens[index]['token'] === token)
     {

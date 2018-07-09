@@ -70,7 +70,7 @@ export class RecoveryTokens
     const existingUsers = await this.select(['id'], { id: entry.id });
     if (existingUsers.length !== 0)
     {
-      throw new Error('User with email ' + String(user.email) + ' already exists.');
+      throw new Error('User already exists.');
     }
     const newRecoveryToken: RecoveryTokenConfig =
       {
@@ -98,12 +98,12 @@ export class RecoveryTokens
     });
   }
 
-  public async select(columns: string[], filter: object): Promise<RecoveryTokenConfig>
+  public async select(columns: string[], filter: object): Promise<RecoveryTokenConfig[]>
   {
     return App.DB.select(this.recoveryTokensTable, columns, filter) as Promise<RecoveryTokenConfig[]>;
   }
 
-  public async get(id?: number): Promise<RecoveryTokenConfig>
+  public async get(id?: number): Promise<RecoveryTokenConfig[]>
   {
     if (id !== undefined)
     {
