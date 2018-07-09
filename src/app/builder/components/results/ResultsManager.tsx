@@ -61,7 +61,7 @@ import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueIn
 import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import { toInputMap } from '../../../../blocks/types/Input';
+import { isInput, toInputMap } from '../../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
