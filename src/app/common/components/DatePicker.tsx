@@ -165,7 +165,6 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     sign: '-',
     unit: 'M',
     amount: '',
-    promptTime: false,
   };
   public componentDidMount()
   {
@@ -370,11 +369,6 @@ export class DatePickerUncontained extends TerrainComponent<Props>
 
   public handleDayClick(day: Date, modifiers, e)
   {
-    this.setState(
-      {
-        promptTime: true,
-      },
-    );
     const date = this.getDate();
     date.date(day.getDate());
     date.month(day.getMonth());
@@ -392,7 +386,8 @@ export class DatePickerUncontained extends TerrainComponent<Props>
       const timeStr = moment().hour(newHour).minute(newMinute).format('HH:mm:ssZ');
       const date = TerrainDateParameter.setTimePart(this.props.date, timeStr);
       this.props.onChange(date);
-    } else
+    }
+    else
     {
       const date = this.getDate();
       date.hour(Math.floor(hourIndex / MINUTE_RATIO));
@@ -403,17 +398,13 @@ export class DatePickerUncontained extends TerrainComponent<Props>
 
   public handleDateParameterChange(dateParameterIndex)
   {
-    this.setState(
-      {
-        promptTime: true,
-      },
-    );
     const indexName = DateParameterArray[dateParameterIndex];
     let date = DateParameterMap[indexName];
     if (TerrainDateParameter.isValidTerrainDateParameter(this.props.date))
     {
       date = TerrainDateParameter.setDayPart(this.props.date, date);
-    } else
+    }
+    else
     {
       const now = this.getDate().format('HH:mm:ssZ');
       date = date + '.T' + now;
@@ -499,10 +490,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
           onDayClick={this.handleDayClick}
           initialMonth={dateArg.toDate()}
         />
-        <FadeInOut
-          open={this.state.promptTime}
-          children={this.renderTimePicker(dateArg)}
-        />
+        {this.renderTimePicker(dateArg)}
       </div>
     );
   }
@@ -513,7 +501,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
       <div className='date-time-time-top'>
         {this.renderRelativeTimePicker(dateArg)}
         <FadeInOut
-          open={this.state.promptTime}
+          open={this.state.dateViewType === 'relative' && this.props.date.includes('@TerrainDate')}
           children={this.renderTimePicker(dateArg)}
         />
       </div>
@@ -562,7 +550,6 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     this.setState(
       {
         dateViewType: changedDateView,
-        promptTime: false,
       },
     );
   }
