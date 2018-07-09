@@ -46,6 +46,8 @@ THE SOFTWARE.
 
 import { Readable, Writable } from 'stream';
 
+import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
+import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import AEndpointStream from './AEndpointStream';
@@ -88,7 +90,7 @@ export class AlgorithmEndpoint extends AEndpointStream
 
     if (algorithmId !== undefined)
     {
-      query = await Util.getQueryFromAlgorithm(algorithmId);
+      query = await Util.getQueryFromAlgorithm(algorithmId, source.options['size']);
       dbId = await Util.getDBFromAlgorithm(algorithmId);
     }
 

@@ -108,13 +108,12 @@ export class TaskETL extends Task
       catch (e)
       {
         taskOutputConfig.status = false;
-        winston.error('Error while running ETL task: ' + String(e.toString()));
+        winston.error('Error while running ETL task: ' + String(e.toString()) + (e.stack != null ? ('\n' + String(e.stack)) : ''));
         const outputStream = new stream.Readable();
         outputStream.push(null);
         const logStream = new LogStream();
         logStream.pipe(this.taskConfig.rootLogStream, { end: false });
         logStream.log('Error while running ETL task: ' + String(e.toString()), 'error');
-        this.taskConfig.rootLogStream.push(null);
         logStream.push(null);
         taskOutputConfig['options']['logStream'] = logStream;
         taskOutputConfig['options']['outputStream'] = outputStream;

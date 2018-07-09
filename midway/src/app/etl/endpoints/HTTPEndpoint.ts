@@ -67,7 +67,7 @@ export default class HTTPEndpoint extends AEndpointStream
   public async getSource(source: SourceConfig): Promise<Readable[]>
   {
     const config = await this.getIntegrationConfig(source.integrationId);
-    const urls = inputs.replaceInputs(config['url'], source.rootInputConfig['inputs'] as any);
+    const urls = inputs.replaceInputs(config['url'], source.rootInputConfig['inputs']);
     const promises = urls.map((url) =>
     {
       const newConfig = JSON.parse(JSON.stringify(config));
@@ -89,7 +89,7 @@ export default class HTTPEndpoint extends AEndpointStream
     {
       const method = (options !== undefined && options.method !== undefined) ? options.method : undefined;
       let headers = (httpConfig !== undefined && httpConfig['headers'] !== undefined) ? httpConfig['headers'] : undefined;
-      const params = (httpConfig !== undefined && httpConfig['params'] !== undefined) ? httpConfig['params'] : undefined;
+      const params = (httpConfig !== undefined && httpConfig['params'] !== undefined) ? JSON.stringify(httpConfig['params']) : undefined;
       const paramsKey = (method === 'GET') ? 'qs' : 'body';
       const passThrough = new PassThrough({ highWaterMark: 128 * 1024 });
       const isGzip: boolean = false;
