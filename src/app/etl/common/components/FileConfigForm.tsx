@@ -78,6 +78,7 @@ type FormState = FileConfigI & {
   useXmlPath: boolean;
   useJsonPath: boolean;
   isPlaFeed: boolean;
+  suggestedJsonPath: any;
 };
 
 export default class FileConfigForm extends TerrainComponent<Props>

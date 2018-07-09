@@ -193,7 +193,7 @@ class DocumentsHelpers extends ETLHelpers
     });
   }
 
-  protected fetchPreview(
+  public fetchPreview(
     source: SourceConfig,
   ): Promise<List<object>>
   {
