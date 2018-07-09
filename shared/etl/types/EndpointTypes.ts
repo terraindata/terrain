@@ -47,7 +47,8 @@ THE SOFTWARE.
 
 import { FileTypes, Languages } from './ETLTypes';
 import { RootInputConfig } from './InputTypes';
-import {
+import
+{
   KV,
   MagentoParamConfigType,
   MagentoParamConfigTypes,

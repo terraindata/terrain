@@ -73,23 +73,23 @@ export interface MagentoParamConfigTypes
 }
 
 export const MagentoParamConfigDefaults: MagentoParamConfigTypes =
-{
-  CatalogInventoryStockItemList: {
-    products: [],
-  },
-  CatalogProductAttributeMediaList: {
-    product: '',
-    storeView: -1,
-  },
-  CatalogProductInfo: {
-    productId: '',
-    storeView: -1,
-  },
-  CatalogProductList: {
-    filters: [],
-    storeView: -1,
-  },
-};
+  {
+    CatalogInventoryStockItemList: {
+      products: [],
+    },
+    CatalogProductAttributeMediaList: {
+      product: '',
+      storeView: -1,
+    },
+    CatalogProductInfo: {
+      productId: '',
+      storeView: -1,
+    },
+    CatalogProductList: {
+      filters: [],
+      storeView: -1,
+    },
+  };
 
 export interface KV
 {
@@ -97,7 +97,7 @@ export interface KV
   value: {
     key: 'in';
     value: string;
-  }
+  };
 }
 
 export interface PartialMagentoConfig
@@ -130,12 +130,12 @@ export const MagentoRoutesNames = Immutable.Map<string, string>({
   [MagentoRoutes.CatalogProductList]: 'Catalog Product List',
 });
 
-export enum MagentoRoutesRaw
+export const MagentoRoutesRaw =
 {
-  CatalogProductAttributeMediaList = 'catalogProductAttributeMediaList',
-  CatalogProductInfo = 'catalogProductInfo',
-  CatalogInventoryStockItemList = 'catalogInventoryStockItemList',
-  CatalogProductList = 'catalogProductList',
+  CatalogProductAttributeMediaList: 'catalogProductAttributeMediaList',
+  CatalogProductInfo: 'catalogProductInfo',
+  CatalogInventoryStockItemList: 'catalogInventoryStockItemList',
+  CatalogProductList: 'catalogProductList',
 }
 
 export const MagentoRoutesArr: List<MagentoRoutes> = Immutable.List([
@@ -150,6 +150,6 @@ export const MagentoRoutesArr: List<MagentoRoutes> = Immutable.List([
 export type MagentoParamTypes = keyof MagentoParamConfigTypes;
 export type MagentoParamConfigType<key extends MagentoParamTypes> = MagentoParamConfigTypes[key];
 type MagentoAssertTypesExhaustive =
-{
-  [K in MagentoRoutes]: MagentoParamConfigTypes[K];
-}
+  {
+    [K in MagentoRoutes]: MagentoParamConfigTypes[K];
+  };

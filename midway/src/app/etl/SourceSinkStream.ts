@@ -78,6 +78,7 @@ import FollowUpBossEndpoint from './endpoints/FollowUpBossEndpoint';
 import FSEndpoint from './endpoints/FSEndpoint';
 import GoogleAnalyticsEndpoint from './endpoints/GoogleAnalyticsEndpoint';
 import HTTPEndpoint from './endpoints/HTTPEndpoint';
+import MagentoEndpoint from './endpoints/MagentoEndpoint';
 import MailChimpEndpoint from './endpoints/MailChimpEndpoint';
 import MySQLEndpoint from './endpoints/MySQLEndpoint';
 import PostgreSQLEndpoint from './endpoints/PostgreSQLEndpoint';

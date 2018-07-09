@@ -80,18 +80,19 @@ import
 } from 'shared/etl/types/EndpointTypes';
 
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
-import {
- MagentoRoutesNames,
- MagentoRoutesArr,
- MagentoRoutes,
- KV,
- MagentoParamConfigType,
- MagentoParamTypes,
- MagentoParamConfigDefaults,
+import
+{
+  KV,
+  MagentoParamConfigDefaults,
+  MagentoParamConfigType,
+  MagentoParamTypes,
+  MagentoRoutes,
+  MagentoRoutesArr,
+  MagentoRoutesNames,
 } from 'shared/etl/types/MagentoTypes';
-import { EndpointFormBase } from './EndpointFormClasses';
 import { InputForm, InputsForm } from '../../endpoints/InputForm';
 import { PostProcessForm, TransformForm } from '../../endpoints/PostProcessForm';
+import { EndpointFormBase } from './EndpointFormClasses';
 
 const { List } = Immutable;
 
@@ -123,7 +124,7 @@ export class MagentoEndpoint extends EndpointFormBase<MagentoState>
     if (newState.route !== this.props.endpoint.options.route)
     {
       return _.extend({}, newState, {
-        params: MagentoParamConfigDefaults[newState.route]
+        params: MagentoParamConfigDefaults[newState.route],
       };
     }
     return newState;
@@ -132,7 +133,7 @@ export class MagentoEndpoint extends EndpointFormBase<MagentoState>
   public renderParams(state: MagentoState, disabled: boolean)
   {
     const route = state.route;
-    switch(route)
+    switch (route)
     {
       case MagentoRoutes.CatalogInventoryStockItemList:
         return null;
@@ -165,7 +166,7 @@ export class MagentoEndpoint extends EndpointFormBase<MagentoState>
   public onChangeParams(newParams: object)
   {
     const newOptions = _.extend({}, this.props.endpoint.options, {
-      params: newParams
+      params: newParams,
     });
     this.handleOptionsFormChange(newOptions);
   }
@@ -177,7 +178,7 @@ interface ParamProps<T>
   inputState: T;
 }
 
-type CatalogProductListType = MagentoParamConfigType<MagentoRoutes.CatalogProductList>
+type CatalogProductListType = MagentoParamConfigType<MagentoRoutes.CatalogProductList>;
 class ProductListForm extends TerrainComponent<ParamProps<CatalogProductListType>>
 {
   public inputMap: InputDeclarationMap<CatalogProductListType> = {
@@ -196,11 +197,11 @@ class ProductListForm extends TerrainComponent<ParamProps<CatalogProductListType
           value: {
             key: 'in',
             value: 'value',
-          }
-        }
-      }
-    }
-  }
+          },
+        },
+      },
+    },
+  };
 
   public render()
   {
@@ -219,16 +220,16 @@ class KVForm extends TerrainComponent<{ onChange: (val) => void; inputState: KV 
   public inputMap: InputDeclarationMap<KV> = {
     key: {
       type: DisplayType.TextBox,
-      displayName: 'Key'
+      displayName: 'Key',
     },
     value: {
       type: DisplayType.Delegate,
       displayName: 'Value',
       options: {
         component: KVValueForm,
-      }
-    }
-  }
+      },
+    },
+  };
 
   public render()
   {
@@ -242,9 +243,9 @@ class KVForm extends TerrainComponent<{ onChange: (val) => void; inputState: KV 
   }
 }
 
-class KVValueForm extends TerrainComponent<{inputState: {key: string, value: string}; onChange: (val) => void}>
+class KVValueForm extends TerrainComponent<{ inputState: { key: string, value: string }; onChange: (val) => void }>
 {
-  public inputMap: InputDeclarationMap<{ key: string, value: string}> = {
+  public inputMap: InputDeclarationMap<{ key: string, value: string }> = {
     key: {
       type: DisplayType.TextBox,
       displayName: 'Key',
@@ -252,7 +253,7 @@ class KVValueForm extends TerrainComponent<{inputState: {key: string, value: str
     value: {
       type: DisplayType.TextBox,
       displayName: 'Value',
-    }
+    },
   };
 
   public render()
@@ -267,14 +268,14 @@ class KVValueForm extends TerrainComponent<{inputState: {key: string, value: str
   }
 }
 
-type CatalogProductInfoType = MagentoParamConfigType<MagentoRoutes.CatalogProductInfo>
+type CatalogProductInfoType = MagentoParamConfigType<MagentoRoutes.CatalogProductInfo>;
 class ProductInfoForm extends TerrainComponent<ParamProps<CatalogProductInfoType>>
 {
   public inputMap: InputDeclarationMap<CatalogProductInfoType> = {
     storeView: {
       type: DisplayType.NumberBox,
       displayName: 'Store View',
-    }
+    },
   };
 
   public render()
@@ -289,14 +290,14 @@ class ProductInfoForm extends TerrainComponent<ParamProps<CatalogProductInfoType
   }
 }
 
-type AttributeMediaListType = MagentoParamConfigType<MagentoRoutes.CatalogProductAttributeMediaList>
+type AttributeMediaListType = MagentoParamConfigType<MagentoRoutes.CatalogProductAttributeMediaList>;
 class AttributeMediaListForm extends TerrainComponent<ParamProps<AttributeMediaListType>>
 {
   public inputMap: InputDeclarationMap<AttributeMediaListType> = {
     storeView: {
       type: DisplayType.NumberBox,
       displayName: 'Store View',
-    }
+    },
   };
 
   public render()
@@ -310,9 +311,6 @@ class AttributeMediaListForm extends TerrainComponent<ParamProps<AttributeMediaL
     );
   }
 }
-
-
-
 
 // export interface MagentoOptions
 // {
@@ -346,7 +344,6 @@ class AttributeMediaListForm extends TerrainComponent<ParamProps<AttributeMediaL
 //     storeView: number;
 //   };
 // }
-
 
 // export interface ComplexFilter
 // {

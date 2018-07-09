@@ -217,6 +217,7 @@ class DocumentsHelpers extends ETLHelpers
             break;
           }
           case Sources.Mysql:
+          case Sources.Magento:
           case Sources.GoogleAnalytics:
           case Sources.Postgresql:
           case Sources.Algorithm:

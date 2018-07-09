@@ -51,24 +51,27 @@ import { Readable } from 'stream';
 import soap = require('strong-soap');
 import * as winston from 'winston';
 
-import XMLTransform from '../../io/streams/XMLTransform';
-
 import
 {
   ComplexFilter,
   KV,
   MagentoConfig,
-  MagentoResponse,
-  MagentoRoutes,
-  MagentoRoutesArr,
   MagentoParamConfigType,
   MagentoParamConfigTypes,
   MagentoParamTypes,
+  MagentoResponse,
+  MagentoRoutes,
+  MagentoRoutesArr,
+  MagentoRoutesRaw,
   PartialMagentoConfig,
   WSDLTree,
 } from 'shared/etl/types/MagentoTypes';
 
-public class Magento extends AEndpointStream
+import JSONTransform from '../../io/streams/JSONTransform';
+import XMLTransform from '../../io/streams/XMLTransform';
+import AEndpointStream from './AEndpointStream';
+
+export default class MagentoEndpoint extends AEndpointStream
 {
   private wsdlTree: WSDLTree;
 
@@ -77,13 +80,14 @@ public class Magento extends AEndpointStream
     super();
   }
 
-  public async call(magConf: MagentoConfig, host: string): Promise<MagentoResponse>
+  public async call(magConf: MagentoConfig): Promise<MagentoResponse>
   {
     return new Promise<MagentoResponse>(async (resolve, reject) =>
     {
+      const host: string = magConf.host;
       if (this.wsdlTree === undefined)
       {
-        await this.getWSDLTree(host); 
+        await this.getWSDLTree(host);
       }
       let response: MagentoResponse = {} as object;
       let combinedParams: object = Object.assign({}, magConf.params);
@@ -91,12 +95,36 @@ public class Magento extends AEndpointStream
       {
         combinedParams = Object.assign(combinedParams, { sessionId: magConf.sessionId }); // attach sessionId to the request object
       }
+      const translatedRoute: string = magConf.route === 'login' ? 'login' : MagentoRoutesRaw[magConf.route];
 
-      if (MagentoRoutesArr.indexOf(magConf.route) > -1)
+      if (translatedRoute !== undefined)
       {
-        response = await this._soapCall(magConf.route, host, combinedParams);
+        response = await this._soapCall(translatedRoute, host, combinedParams);
       }
       resolve(response);
+    });
+  }
+
+  public async getSink(sinkConfig: SinkConfig): Promise<Readable>
+  {
+    return new Promise<Readable>(async (resolve, reject) =>
+    {
+      const writeStream = JSONTransform.createExportStream();
+      const magentoConfig: MagentoConfig = await this._parseConfig(sinkConfig);
+      const parsedResult = await this.call(magentoConfig);
+      if (Array.isArray(parsedResult))
+      {
+        parsedResult.forEach((elem) =>
+        {
+          writeStream.write(elem);
+        });
+      }
+      else
+      {
+        writeStream.write(parsedResult);
+      }
+      writeStream.end();
+      resolve(writeStream);
     });
   }
 
@@ -104,8 +132,23 @@ public class Magento extends AEndpointStream
   {
     return new Promise<Readable>(async (resolve, reject) =>
     {
+      const writeStream = JSONTransform.createExportStream();
       const magentoConfig: MagentoConfig = await this._parseConfig(sourceConfig);
 
+      const parsedResult = await this.call(magentoConfig);
+      if (Array.isArray(parsedResult))
+      {
+        parsedResult.forEach((elem) =>
+        {
+          writeStream.write(elem);
+        });
+      }
+      else
+      {
+        writeStream.write(parsedResult);
+      }
+      writeStream.end();
+      resolve(writeStream);
     });
   }
 
@@ -136,7 +179,7 @@ public class Magento extends AEndpointStream
         {
           const portTypeInput = entry['input']['message'].substring(wsdlPortTypeMessagePrepend.length);
           const portTypeOutput = entry['output']['message'].substring(wsdlPortTypeMessagePrepend.length);
-          
+
           wsdlPortType[entry['name']] = { input: portTypeInput, output: portTypeOutput };
         });
         wsdlTree.types = {};
@@ -176,9 +219,9 @@ public class Magento extends AEndpointStream
         {
           host: '',
           sessionId: '',
-        }
+        };
         partialMagentoConfig.host = magentoIntegrationConfig['host'];
-        partialMagentoConfig.sessionId = await magento.call(magConf) as string);
+        partialMagentoConfig.sessionId = await this.call(magConf) as string;
         resolve(partialMagentoConfig);
       }
       catch (e)
@@ -219,7 +262,8 @@ public class Magento extends AEndpointStream
       const magentoConfig: MagentoConfig =
       {
         host: partialMagConf.host,
-        params: sourceConfig['options'],
+        params: sourceConfig['options']['params'],
+        route: sourceConfig['options']['route'],
         sessionId: partialMagConf.sessionId,
       };
 
@@ -273,10 +317,11 @@ public class Magento extends AEndpointStream
         else if (typeof innerType['all'] === 'object')
         {
           const row: object = {};
-          const innerTypeNames: string[] = innerType['all']['element'].map(innerTypeType => innerTypeType['name']);
-          const rawJSONKeys: string[] = Object.keys(rawJSON).filter(key => key[0] !== '$');
+          const innerTypeNames: string[] = innerType['all']['element'].map((innerTypeType) => innerTypeType['name']);
+          const rawJSONKeys: string[] = Object.keys(rawJSON).filter((key) => key[0] !== '$');
           const existingFields: string[] = _.intersection(innerTypeNames, rawJSONKeys);
-          const filteredInnerTypes = innerType['all']['element'].filter(innerTypeType => existingFields.indexOf(innerTypeType['name']) !== -1);
+          const filteredInnerTypes = innerType['all']['element'].filter((innerTypeType)
+            => existingFields.indexOf(innerTypeType['name']) !== -1);
           filteredInnerTypes.forEach((innerTypeType) =>
           {
             if (innerTypeType['type'].substr(0, 3) === 'xsd'
@@ -308,6 +353,7 @@ public class Magento extends AEndpointStream
         {
           rawJSON = rawJSON['$value'];
         }
+        break;
       default:
     }
     return rawJSON;
@@ -356,9 +402,9 @@ public class Magento extends AEndpointStream
     return new Promise(async (resolve, reject) =>
     {
       if (this.wsdlTree === undefined
-        || (typeof this.wsdlTree === 'object' && Object.keys(this.wsdlTree).length === 0)
+        || (typeof this.wsdlTree === 'object' && Object.keys(this.wsdlTree).length === 0))
       {
-        return resolve({}); 
+        return resolve({});
       }
       // preprocess data into the correct format via wsdlTree['message'][route]['input'] lookup
 
@@ -395,93 +441,3 @@ public class Magento extends AEndpointStream
     });
   }
 }
-
-/*
-async function main() {
-  // login
-
-  const magento: Magento = new Magento();
-  const magConf: MagentoConfig =
-  {
-    route: MagentoRoutes.Login,
-    params: {
-      username: 'Terrain',
-      apiKey: '01057B580550909CAD71718FB5B84499B1523702',
-    },
-  };
-
-  const wsdlTree = await magento.getWSDLTree('https://www.plae.co/index.php/api/v2_soap?wsdl=1');
-
-  const parsedResult = await magento.call( magConf);
-  winston.info(JSON.stringify(parsedResult, null, 2));
-
-  /*
-  const magConfCatalogProductList: MagentoConfig =
-  {
-    route: MagentoRoutes.CatalogProductList,
-    params: {
-      filters:
-      {
-        item: [
-          {
-            key: 'type',
-            value: 
-            {
-              key: 'in',
-              value: 'simple,configurable',
-            },
-          } as KV,
-        ] as KV[],
-      } as ComplexFilter,
-      storeView: 1,
-    },
-    sessionId: parsedResult as string,
-  };
-  const parsedResult2 = await magento.call(magConfCatalogProductList);
-  winston.info(JSON.stringify(parsedResult2, null, 2));
-  */
-
-  /*
-  const magConfCatalogProductInfo: MagentoConfig =
-  {
-    route: MagentoRoutes.CatalogProductInfo,
-    params: {
-      productId: '229',
-      storeView: 1,
-    },
-    sessionId: parsedResult as string,
-  };
-  const parsedResult3 = await magento.call(magConfCatalogProductInfo);
-  winston.info(JSON.stringify(parsedResult3, null, 2));
-  */
-
-  /*
-  const magConfCatalogProductAttributeMediaList: MagentoConfig =
-  {
-    route: MagentoRoutes.CatalogProductAttributeMediaList,
-    params: {
-      // identifierType: 'productId',
-      product: '229',
-      storeView: 1,
-    },
-    sessionId: parsedResult as string,
-  };
-  const parsedResult4 = await magento.call(magConfCatalogProductAttributeMediaList);
-  winston.info(JSON.stringify(parsedResult4, null, 2));
-  */
-
-  /*
-  const magConfCatalogInventoryStockItemList: MagentoConfig =
-  {
-    route: MagentoRoutes.CatalogInventoryStockItemList,
-    params: {
-      products: ['5447','5445','5444','5438','5437','5436','5435','5434','5433','5429','5424'],
-    },
-    sessionId: parsedResult as string,
-  };
-  const parsedResult5 = await magento.call(magConfCatalogInventoryStockItemList);
-  winston.info(JSON.stringify(parsedResult5, null, 2));
-  */
-}
-
-*/
