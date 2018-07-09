@@ -379,7 +379,8 @@ export class DatePickerUncontained extends TerrainComponent<Props>
   public handleHourChange(hourIndex)
   {
     if (this.props.date.startsWith('@TerrainDate') &&
-      TerrainDateParameter.isValidTerrainDateParameter(this.props.date))
+      TerrainDateParameter.isValidTerrainDateParameter(this.props.date) &&
+      this.state.dateViewType === 'relative')
     {
       const newHour = Math.floor(hourIndex / MINUTE_RATIO);
       const newMinute = (hourIndex % MINUTE_RATIO) * MINUTE_INTERVAL;
