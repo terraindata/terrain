@@ -389,17 +389,15 @@ export class TransformationEngine
    * @param {KeyPath | number} field   The field whose associated transformations should be identified
    * @returns {Immutable.List<number>} A list of the associated transformations, sorted properly
    */
-  public getTransformations(field: KeyPath | number): List<number>
+  public getTransformations(field: number): List<number>
   {
     // Note: This function is O(n) in number of nodes.  Future work
     // could be adding a map e.g. (field ID => List<transformation ID>)
     // to make this function O(1), if it's ever a performance issue.
-
-    const target: KeyPath = typeof field === 'number' ? this.getFieldPath(field) : field;
     const nodes: TransformationNode[] = [];
     _.each(this.dag.nodes(), (node) =>
     {
-      if ((this.dag.node(node) as TransformationNode).fields.includes(target))
+      if ((this.dag.node(node) as TransformationNode).fieldIds.includes(field))
       {
         nodes.push(this.dag.node(node) as TransformationNode);
       }

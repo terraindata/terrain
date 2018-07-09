@@ -68,6 +68,7 @@ export default abstract class TransformationNode
   {
     this.id = id;
     this.fields = fields;
+    this.fieldIds = fieldIds;
     this.meta = options;
   }
 

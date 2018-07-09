@@ -93,6 +93,9 @@ export function getTemplateVersion(templateObj: object): TemplateVersion
   }
 }
 
+/*
+ *  This migration updates keypaths that use '*' as wildcards to use -1, and numeric keys to be actual numbers
+ */
 function upgrade4To5(templateObj: TemplateBase): { changes: number, template: TemplateBase }
 {
   let changes = 0;
@@ -163,9 +166,41 @@ function upgrade4To5(templateObj: TemplateBase): { changes: number, template: Te
   };
 }
 
-function upgrade5To51(templateObj: object)
+/*
+ *  Change fieldNameToIDMap and IDToFieldNameMap to use IDToPathMap
+ *  Refactor all differences in paths to use rename nodes
+ *
+ *  For each field, if the input and output keypaths are different, append a rename transformation
+ *
+ */
+function upgrade5To51(templateObj: TemplateBase): { changes: number, template: TemplateBase }
 {
+  let changes = 0;
+  const convertEngine = (oldEngine: V5TransformationEngine): TransformationEngine => {
+    const newEngine = new TransformationEngine();
+    return newEngine;
+  };
 
+  let template = _.cloneDeep(templateObj);
+  for (const match of yadeep.search(template, List(['process', 'edges', -1, 'transformations'])))
+  {
+    const { value, location } = match;
+    const oldEngine = V5TransformationEngine.load(value) as any as {
+      dag: GraphLib.Graph;
+      uidField: number;
+      uidNode: number;
+      fieldNameToIDMap: Map<KeyPath, number>;
+      IDToFieldNameMap: Map<number, KeyPath>;
+      fieldTypes: Map<number, string>;
+      fieldEnabled: Map<number, boolean>;
+      fieldProps: Map<number, object>;
+      toJSON: () => object;
+    };
+  }
+  return {
+    template,
+    changes,
+  };
 }
 
 export function updateTemplateIfNeeded(templateObj: TemplateBase): { template: TemplateBase, updated: boolean, message: string }
@@ -187,7 +222,7 @@ export function updateTemplateIfNeeded(templateObj: TemplateBase): { template: T
 
   if (version === 'tv5')
   {
-    const upgrade = upgrade5To51;
+    const upgrade = upgrade5To51(template);
     template = upgrade.template;
     changes += upgrade.changes;
     updated = true;
