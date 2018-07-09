@@ -47,9 +47,7 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 
-import * as Util from '../AppUtil';
 import { MidwayLogger } from '../log/MidwayLogger';
-import APIKeyConfig from './APIKeyConfig';
 import APIKeys from './APIKeys';
 export * from './APIKeys';
 
@@ -59,7 +57,15 @@ export const initialize = () => apikeys.initialize();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-    MidwayLogger.info('getting all users');
-    ctx.body = await apikeys.select(['id', 'key', 'createdAt', 'enabled'], {});
+    const isSuperUser: boolean = ctx.state.user.isSuperUser;
+    if (isSuperUser)
+    {
+        MidwayLogger.info('getting all API keys');
+        ctx.body = await apikeys.select(['id', 'key', 'createdAt', 'enabled'], {});
+    }
+    else
+    {
+        throw new Error('Only superusers can list API keys.');
+    }
 });
 export default Router;
