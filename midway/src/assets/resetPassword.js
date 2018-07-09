@@ -128,8 +128,10 @@ function handleKeyDown(e)
 	}
 }
 
+
 checkTokenValidity();
 document.getElementById("reset-password-submit").onclick = handleResetPasswordSubmit;
 document.getElementById("reset-password-confirm").onkeydown = handleKeyDown;
+
 
 

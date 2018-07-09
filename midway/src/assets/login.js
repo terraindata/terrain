@@ -248,6 +248,14 @@ document.getElementById("login-password").onblur = checkForBlur.bind(this, "logi
 
 document.getElementById("login-forgot-password").onclick = function()
 {
+	document.getElementById("login-password-container").style.display = "none";
+	document.getElementById("login-submit").style.display = "none";
+	document.getElementById("reset-password-request-submit").style.visibility = "visible";
+	document.getElementById("login-forgot-password").style.display = "none";
+}
+
+document.getElementById("reset-password-request-submit").onclick = function() 
+{
 	const el = document.getElementById("login-forgot-password-message");
 	el.className = el.className + " showing";
 	const email = document.getElementById("login-email").value;
@@ -258,7 +266,6 @@ document.getElementById("login-forgot-password").onclick = function()
 		{
 			host += ":" + location.port;
 		}
-		console.log("host: " + location.port);
 		//send url
 		config = {
 			route: '/midway/v1/recoveryTokens/',
@@ -272,7 +279,6 @@ document.getElementById("login-forgot-password").onclick = function()
 
 		xhr.open(config.method, config.route, true);
 		xhr.setRequestHeader('Content-Type', 'application/json');
-		console.log(config.route);
 
 		xhr.onload = function () {
 			document.getElementById("login-forgot-password-message").innerHTML = xhr.responseText;
@@ -283,8 +289,8 @@ document.getElementById("login-forgot-password").onclick = function()
 	{
 		document.getElementById("login-forgot-password-message").innerHTML = "Please enter your email above.";
 	}
-
 }
+
 
 INTERVAL_CHECK_AUTOFILL = setInterval(function() {
 	checkForBlur("login-email");
