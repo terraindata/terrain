@@ -62,6 +62,7 @@ import { Moment } from 'moment';
 import TerrainDateParameter from '../../../../shared/database/elastic/parser/TerrainDateParameter';
 import { Colors, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
+import FadeInOut from '../../common/components/FadeInOut';
 
 const MINUTE_INTERVAL = 30;
 const MINUTE_RATIO = (60 / MINUTE_INTERVAL);
@@ -164,6 +165,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     sign: '-',
     unit: 'M',
     amount: '',
+    promptTime: false,
   };
   public componentDidMount()
   {
@@ -368,6 +370,11 @@ export class DatePickerUncontained extends TerrainComponent<Props>
 
   public handleDayClick(day: Date, modifiers, e)
   {
+    this.setState(
+      {
+        promptTime: true,
+      },
+    );
     const date = this.getDate();
     date.date(day.getDate());
     date.month(day.getMonth());
@@ -396,6 +403,11 @@ export class DatePickerUncontained extends TerrainComponent<Props>
 
   public handleDateParameterChange(dateParameterIndex)
   {
+    this.setState(
+      {
+        promptTime: true,
+      },
+    );
     const indexName = DateParameterArray[dateParameterIndex];
     let date = DateParameterMap[indexName];
     if (TerrainDateParameter.isValidTerrainDateParameter(this.props.date))
@@ -487,7 +499,10 @@ export class DatePickerUncontained extends TerrainComponent<Props>
           onDayClick={this.handleDayClick}
           initialMonth={dateArg.toDate()}
         />
-        {this.renderTimePicker(dateArg)}
+        <FadeInOut
+          open={this.state.promptTime}
+          children={this.renderTimePicker(dateArg)}
+        />
       </div>
     );
   }
@@ -497,7 +512,10 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     return (
       <div className='date-time-time-top'>
         {this.renderRelativeTimePicker(dateArg)}
-        {this.renderTimePicker(dateArg)}
+        <FadeInOut
+          open={this.state.promptTime}
+          children={this.renderTimePicker(dateArg)}
+        />
       </div>
     );
   }
@@ -544,6 +562,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     this.setState(
       {
         dateViewType: changedDateView,
+        promptTime: false,
       },
     );
   }
