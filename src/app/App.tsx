@@ -77,6 +77,7 @@ import ManualWrapper from './manual/components/ManualWrapper';
 import SchemaPage from './schema/components/SchemaPage';
 import Account from './users/components/Account';
 import X from './x/components/X';
+import ConnectionsStatus from 'connections/components/ConnectionsStatus';
 
 require('velocity-animate');
 require('velocity-animate/velocity.ui');
@@ -633,6 +634,8 @@ class App extends TerrainComponent<Props>
             <InAppNotification />
 
             <EasterEggs />
+
+            <ConnectionsStatus />
           </div>
         )}
       </ContainerDimensions>

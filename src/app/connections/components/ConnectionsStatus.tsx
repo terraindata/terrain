@@ -47,15 +47,74 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 import { List, Map } from 'immutable';
 import * as React from 'react';
+import {
+  ConnectionState,
+} from 'connections/ConnectionTypes';
 
 import TerrainComponent, { browserHistory } from '../../common/components/TerrainComponent';
+import Util from 'util/Util';
+import { notificationManager } from './../../common/components/InAppNotification';
+import { ConnectionsActions } from 'connections/data/ConnectionsRedux';
 
-class ConnectionsStatus extends TerrainComponent<Props>
+interface ConnectionsStatusProps
 {
+  connections?: ConnectionState;
+  connectionsActions?: typeof ConnectionsActions;
+}
+
+export class ConnectionsStatus extends TerrainComponent<ConnectionsStatusProps>
+{
+  private interval = null;
+
+  public componentDidMount()
+  {
+    this.interval = setInterval(
+      () =>
+      {
+        this.props.connectionsActions(
+        {
+          actionType: 'getConnections'
+        })
+        .then((response) =>
+        {
+          this.forceUpdate();
+        });
+      },
+      10000
+    );
+  }
+
+  public componentWillUnmount()
+  {
+    clearInterval(this.interval);
+  }
+
   public render()
   {
-    return <div />;
+    const { connections } = this.props.connections;
+
+    connections.keySeq()
+      .forEach(key =>
+      {
+        const connection = connections.get(key);
+        if (connection.status === 'DISCONNECTED' || connection.status === 'CONN_TIMEOUT')
+        {
+          setTimeout(() => {
+            notificationManager.addNotification(
+              'Disconnected connections',
+              connection.name,
+              'error',
+            );
+          }, 1000); //
+        }
+      });
+
+    return null;
   }
 }
 
-export default ConnectionsStatus;
+export default Util.createTypedContainer(
+  ConnectionsStatus,
+  ['connections'],
+  { connectionsActions: ConnectionsActions }
+);

@@ -77,6 +77,7 @@
       "^builder/(.*)$": "<rootDir>/src/app/builder/$1",
       "^charts/(.*)$": "<rootDir>/src/app/charts/$1",
       "^common/(.*)$": "<rootDir>/src/app/common/$1",
+      "^connections/(.*)$": "<rootDir>/src/app/connections/$1",
       "^control/(.*)$": "<rootDir>/src/app/control/$1",
       "^database/(.*)$": "<rootDir>/src/database/$1",
       "^deploy/(.*)$": "<rootDir>/src/app/deploy/$1",
