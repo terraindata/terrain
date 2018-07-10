@@ -239,6 +239,7 @@ document.getElementById("login-submit").onclick = function()
 {
 	onLoginSubmit(false);
 }
+document.getElementById("reset-password-request-submit").onclick = handleResetPasswordRequest;
 document.getElementById("login-email").onkeydown = handleKeyDown;
 document.getElementById("login-password").onkeydown = handleKeyDown;
 document.getElementById("login-email").onfocus = handleFocus.bind(this, "login-email");
@@ -254,7 +255,7 @@ document.getElementById("login-forgot-password").onclick = function()
 	document.getElementById("login-forgot-password").style.display = "none";
 }
 
-document.getElementById("reset-password-request-submit").onclick = function() 
+function handleResetPasswordRequest() 
 {
 	const el = document.getElementById("login-forgot-password-message");
 	el.className = el.className + " showing";

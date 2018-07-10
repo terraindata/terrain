@@ -66,7 +66,7 @@ Router.post('/', async (ctx, next) =>
   const newPassword: string = ctx.request.body['newPassword'];
   recoveryTokens.initialize();
   const recoveryTokenEntry = await recoveryTokens.select([], {token: ctx.request.body['recoveryToken']}) as RecoveryTokenConfig[];
-  if (recoveryTokenEntry.length === 1) 
+  if (recoveryTokenEntry.length === 1)
   {
     const timestamp: Date = recoveryTokenEntry[0]['createdAt'];
     const validWindow: Date = new Date(timestamp);
@@ -99,7 +99,7 @@ Router.post('/', async (ctx, next) =>
 Router.get('/:token', async (ctx, next) =>
 {
   const token: string = ctx.params.token;
-  let tokenFound: boolean = false;
+  const tokenFound: boolean = false;
   recoveryTokens.initialize();
   const allRecoveryTokens: RecoveryTokenConfig[] = await recoveryTokens.select([], {}) as RecoveryTokenConfig[];
   const recoveryTokenEntry = await recoveryTokens.select([], {token: ctx.params.token}) as RecoveryTokenConfig[];
@@ -107,10 +107,10 @@ Router.get('/:token', async (ctx, next) =>
   {
     ctx.status = 200;
   }
-  else 
+  else
   {
     ctx.status = 401;
-    MidwayLogger.error("Token not found.");
+    MidwayLogger.error('Token not found.');
   }
 });
 

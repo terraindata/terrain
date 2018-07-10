@@ -97,13 +97,13 @@ Router.post('/', async (ctx, next) =>
       token: userToken,
       createdAt: currDateTime,
     };
-    try 
+    try
     {
       const entry = await recoveryTokens.upsert(newEntry) as RecoveryTokenConfig;
     }
-    catch 
+    catch
     {
-      MidwayLogger.error("unable to upsert user into recovery tokens table.");
+      MidwayLogger.error('unable to upsert user into recovery tokens table.');
     }
     const route: string = hostName + '/resetPassword.html?token=' + userToken;
     integrations.initialize();

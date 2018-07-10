@@ -46,83 +46,90 @@ THE SOFTWARE.
 //check that token is valid before sending to reset password page
 function checkTokenValidity() 
 {
-	var fullUrl = window.location + '';
-	var splitUrl = fullUrl.split("?token=");
-	const token = splitUrl[1];
-	const newPassword = document.getElementById('reset-password-new-password').value;
-	const confirmNewPassword = document.getElementById('reset-password-confirm').value;
+  let fullUrl = window.location + '';
+  let splitUrl = fullUrl.split("?token=");
+  const token = splitUrl[1];
 
-	config = {
-		route: '/midway/v1/forgotPassword/' + token,
-		method: 'GET',
-	}
-	var xhr = new XMLHttpRequest();
+  config = {
+    route: '/midway/v1/forgotPassword/' + token,
+    method: 'GET',
+  }
+  let xhr = new XMLHttpRequest();
 
-	xhr.open(config.method, config.route, true);
-	xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.open(config.method, config.route, true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
 
-	xhr.onload = function () 
-	{
-		if (xhr.status !== 200)
-		{
-			document.getElementById('reset-password-area').innerHTML = "Invalid reset url.";
-		}
-	};
-	xhr.send(config.data);
+  xhr.onload = function () 
+  {
+    if (xhr.status !== 200)
+    {
+      document.getElementById('reset-password-area').innerHTML = "Invalid reset url.";
+    }
+  };
+  xhr.send(config.data);
 
 }
 
 function handleResetPasswordSubmit()
 {
-	var fullUrl = window.location + '';
-	var splitUrl = fullUrl.split("?token=");
-	const token = splitUrl[1];
-	const newPassword = document.getElementById('reset-password-new-password').value;
-	const confirmNewPassword = document.getElementById('reset-password-confirm').value;
+  let fullUrl = window.location + '';
+  let splitUrl = fullUrl.split("?token=");
+  const token = splitUrl[1];
+  const newPassword = document.getElementById('reset-password-new-password').value;
+  const confirmNewPassword = document.getElementById('reset-password-confirm').value;
 
-	//check that new password and confirm password are same value
-	if (newPassword !== confirmNewPassword)
-	{
-		document.getElementById('reset-password-mismatch-message').innerHTML = "Passwords don't match.";
-	}
-	else {
-	//POST request to reset password router
-		config = {
-			route: '/midway/v1/forgotPassword/',
-			method: 'POST',
-			data: JSON.stringify({
-				"newPassword" : newPassword,
-				"recoveryToken" : token,
-			}),
-		}
-		var xhr = new XMLHttpRequest();
+  //check that new password and confirm password are same value
+  if (newPassword !== confirmNewPassword)
+  {
+    document.getElementById('reset-password-mismatch-message').innerHTML = "Passwords don't match.";
+  }
+  //minimum password length = 6
+  else if (newPassword.length < 6)
+  {
+    document.getElementById('reset-password-mismatch-message').innerHTML = "Password must be at least 6 characters.";
+  }
+  else {
+  //POST request to reset password router
+    config = {
+      route: '/midway/v1/forgotPassword/',
+      method: 'POST',
+      data: JSON.stringify({
+        "newPassword" : newPassword,
+        "recoveryToken" : token,
+      }),
+    }
+    let xhr = new XMLHttpRequest();
 
-		xhr.open(config.method, config.route, true);
-		xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.open(config.method, config.route, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
 
-		xhr.onload = function () {
-			document.getElementById('reset-password-area').innerHTML = xhr.responseText;
-			if (xhr.status === 200) 
-			{
-				//redirect to login page
-				let host = window.location.protocol + "//" + window.location.hostname;
-				if (location.port !== "")
-				{
-					host += ":" + location.port;
-				}
-				window.location = host;
-			}
-		};
-		xhr.send(config.data);
-	}
+    xhr.onload = function () {
+      document.getElementById('reset-password-area').innerHTML = xhr.responseText;
+      if (xhr.status === 200) 
+      {
+        setTimeout(function() 
+        {
+          //redirect to login page
+        let host = window.location.protocol + "//" + window.location.hostname;
+        if (location.port !== "")
+        {
+          host += ":" + location.port;
+        }
+        window.location = host;
+        }, 2000)
+        
+      }
+    };
+    xhr.send(config.data);
+  }
 }
 
 function handleKeyDown(e)
 {
-	if (e.keyCode === 13)
-	{
-		handleResetPasswordSubmit();
-	}
+  if (e.keyCode === 13)
+  {
+    handleResetPasswordSubmit();
+  }
 }
 
 
