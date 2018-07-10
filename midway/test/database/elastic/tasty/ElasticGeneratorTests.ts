@@ -170,5 +170,5 @@ test('t9', () =>
   query.filter(DBMovies['releasedate'].gt('2007-03-24').or(DBMovies['releasedate'].lt('2017-03-24')));
   const qstr = elasticDB.generateString(query);
   // tslint:disable-next-line:max-line-length
-  expect(qstr).toEqual('[{"index":"movies","table":"data","primaryKeys":["movieid"],"fields":["movieid","releasedate","title"],"op":"select","params":[{"index":"movies","type":"data","body":{"query":{"bool":{"filter":{"bool":{"should":[{"range":{"releasedate":{"gt":"2007-03-24"}}},{"range":{"releasedate":{"lt":"2017-03-24"}}}]}}}}}}]}]');
+  expect(qstr).toEqual('[{"index":"movies","table":"data","primaryKeys":["movieid"],"fields":["movieid","releasedate","title"],"op":"select","params":[{"index":"movies","type":"data","body":{"query":{"bool":{"filter":{"bool":{"should":[{"bool":{"filter":{"range":{"releasedate":{"gt":"2007-03-24"}}}}},{"bool":{"filter":{"range":{"releasedate":{"lt":"2017-03-24"}}}}}]}}}}}}]}]');
 });
