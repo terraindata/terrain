@@ -88,15 +88,15 @@ import
   MagentoParamConfigType,
   MagentoParamTypes,
   MagentoRoutes,
-  MagentoRoutesArr,
   MagentoRoutesNames,
+  MagentoSinkRoutesArr,
+  MagentoSourceRoutesArr,
 } from 'shared/etl/types/MagentoTypes';
 import { InputForm, InputsForm } from '../../endpoints/InputForm';
 import { PostProcessForm, TransformForm } from '../../endpoints/PostProcessForm';
 import { EndpointFormBase } from './EndpointFormClasses';
 
 const { List } = Immutable;
-
 
 type MagentoState = SinkOptionsType<Sinks.Magento>;
 export class MagentoEndpoint extends EndpointFormBase<MagentoState>
@@ -106,8 +106,8 @@ export class MagentoEndpoint extends EndpointFormBase<MagentoState>
       type: DisplayType.Pick,
       displayName: 'Route',
       options: {
-        pickOptions: (s) => MagentoRoutesArr,
-        indexResolver: (value) => MagentoRoutesArr.indexOf(value),
+        pickOptions: this.computeMagentoRoutes,
+        indexResolver: (value) => this.computeMagentoRoutes().indexOf(value),
         displayNames: (s) => MagentoRoutesNames,
       },
     },
@@ -141,8 +141,13 @@ export class MagentoEndpoint extends EndpointFormBase<MagentoState>
     includedFields: {
       type: DisplayType.TagsBox,
       displayName: 'Included Fields',
-    }
+    },
   };
+
+  public computeMagentoRoutes(s?)
+  {
+    return this.props.isSource === true ? MagentoSourceRoutesArr : MagentoSinkRoutesArr;
+  }
 
   public renderDatabasePicker(state: MagentoState, disabled: boolean)
   {
@@ -208,6 +213,27 @@ export class MagentoEndpoint extends EndpointFormBase<MagentoState>
     const route = state.route;
     switch (route)
     {
+      case MagentoRoutes.CatalogCategoryAssignedProducts:
+        return (
+          <CategoryAssignedProductsForm
+            onChange={this.onChangeParams}
+            inputState={state.params as MagentoParamConfigType<typeof route>}
+          />
+        );
+      case MagentoRoutes.CatalogCategoryAssignProduct:
+        return (
+          <CategoryAssignProductForm
+            onChange={this.onChangeParams}
+            inputState={state.params as MagentoParamConfigType<typeof route>}
+          />
+        );
+      case MagentoRoutes.CatalogCategoryRemoveProduct:
+        return (
+          <CategoryRemoveProductForm
+            onChange={this.onChangeParams}
+            inputState={state.params as MagentoParamConfigType<typeof route>}
+          />
+        );
       case MagentoRoutes.CatalogInventoryStockItemList:
         return null;
       case MagentoRoutes.CatalogProductAttributeMediaList:
@@ -326,6 +352,80 @@ class KVValueForm extends TerrainComponent<{ inputState: { key: string, value: s
     value: {
       type: DisplayType.TextBox,
       displayName: 'Value',
+    },
+  };
+
+  public render()
+  {
+    return (
+      <DynamicForm
+        inputMap={this.inputMap}
+        onStateChange={this.props.onChange}
+        inputState={this.props.inputState}
+      />
+    );
+  }
+}
+
+type CatalogCategoryAssignedProductsType = MagentoParamConfigType<MagentoRoutes.CatalogCategoryAssignedProducts>;
+class CategoryAssignedProductsForm extends TerrainComponent<ParamProps<CatalogCategoryAssignedProductsType>>
+{
+  public inputMap: InputDeclarationMap<CatalogCategoryAssignedProductsType> = {
+    categoryId: {
+      type: DisplayType.TextBox,
+      displayName: 'Category ID',
+    },
+    storeView: {
+      type: DisplayType.NumberBox,
+      displayName: 'Store View',
+    },
+  };
+
+  public render()
+  {
+    return (
+      <DynamicForm
+        inputMap={this.inputMap}
+        onStateChange={this.props.onChange}
+        inputState={this.props.inputState}
+      />
+    );
+  }
+}
+
+type CatalogCategoryAssignProductType = MagentoParamConfigType<MagentoRoutes.CatalogCategoryAssignProduct>;
+class CategoryAssignProductForm extends TerrainComponent<ParamProps<CatalogCategoryAssignProductType>>
+{
+  public inputMap: InputDeclarationMap<CatalogCategoryAssignProductType> = {
+    categoryId: {
+      type: DisplayType.TextBox,
+      displayName: 'Category ID',
+    },
+  };
+
+  public render()
+  {
+    return (
+      <DynamicForm
+        inputMap={this.inputMap}
+        onStateChange={this.props.onChange}
+        inputState={this.props.inputState}
+      />
+    );
+  }
+}
+
+type CatalogCategoryRemoveProductType = MagentoParamConfigType<MagentoRoutes.CatalogCategoryRemoveProduct>;
+class CategoryRemoveProductForm extends TerrainComponent<ParamProps<CatalogCategoryRemoveProductType>>
+{
+  public inputMap: InputDeclarationMap<CatalogCategoryRemoveProductType> = {
+    categoryId: {
+      type: DisplayType.TextBox,
+      displayName: 'Category ID',
+    },
+    storeView: {
+      type: DisplayType.NumberBox,
+      displayName: 'Store View',
     },
   };
 

@@ -125,7 +125,7 @@ class DatabasePicker extends TerrainComponent<Props>
   {
     if (this.props.allowEmpty === true)
     {
-      return;
+      return undefined;
     }
 
     const db = state.database;
