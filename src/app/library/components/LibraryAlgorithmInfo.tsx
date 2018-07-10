@@ -245,16 +245,6 @@ class LibraryInfoColumn extends TerrainComponent<Props>
                 />
               </div>
             </div>
-            <div className='biv-row'>
-              <div className='biv-cell-first'>
-                Deployed Status
-              </div>
-              <div className='biv-cell-second'>
-                {
-                  this.state.algorithmStatus
-                }
-              </div>
-            </div>
           </div>
         </div>
         <Modal
@@ -266,6 +256,18 @@ class LibraryInfoColumn extends TerrainComponent<Props>
       </div>
     );
   }
+  
+  // component for displaying status on ES cluster:
+  //   <div className='biv-row'>
+  //   <div className='biv-cell-first'>
+  //     Deployed Status
+  //   </div>
+  //   <div className='biv-cell-second'>
+  //     {
+  //       this.state.algorithmStatus
+  //     }
+  //   </div>
+  // </div>
 }
 
 export default Util.createTypedContainer(
