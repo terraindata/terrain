@@ -48,6 +48,7 @@ import * as _ from 'lodash';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
+import { TransformationGraph } from 'shared/transformations/TypedGraph';
 
 export type Relation = 'one' | 'many';
 
@@ -213,20 +214,6 @@ export default class TopologyUtil
   // [a] would not be local to [c, -1, d]
   public static areFieldsLocal(kp1, kp2): boolean
   {
-    // const lastIndex1: number = kp1.findLastIndex((value, index) => EngineUtil.isWildcardField(kp1, index));
-    // const concretePath1 = kp1.slice(0, lastIndex1 + 1);
-    // const lastIndex2: number = kp2.findLastIndex((value, index) => EngineUtil.isWildcardField(kp2, index));
-    // const concretePath2 = kp2.slice(0, lastIndex2 + 1);
-
-    // if (lastIndex2 !== lastIndex1 || !concretePath1.equals(concretePath2))
-    // {
-    //   return false;
-    // }
-    // else
-    // {
-    //   // check if fields are wildcards themselves?
-    //   return true;
-    // }
     const [r1, r2] = TopologyUtil.getRelation(kp1, kp2);
     if (r1 === 'one' && r2 === 'one')
     {

@@ -61,7 +61,9 @@ import TransformationNodeType from './TransformationNodeType';
 import TransformationRegistry from './TransformationRegistry';
 import TransformationVisitError from './visitors/TransformationVisitError';
 import TransformationVisitResult from './visitors/TransformationVisitResult';
+import CreateTransformationVisitor from './visitors/CreateTransformationVisitor';
 
+import { TransformationGraph } from 'shared/transformations/TypedGraph';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 const NodeConstructor = new TransformationNodeConstructorVisitor();
@@ -158,7 +160,7 @@ export class TransformationEngine
     return parsed;
   }
 
-  private dag: GraphLib.Graph = new GraphLib.Graph({ directed: true });
+  private dag: TransformationGraph = new GraphLib.Graph({ directed: true }) as TransformationGraph;
   private doc: object = {};
   private uidField: number = 0;
   private uidNode: number = 0;

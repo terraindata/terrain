@@ -217,10 +217,10 @@ export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[k
 /*
  *  For each edge (u, v) whose nodes operate on fields u and v (u and v could be multiple fields),
  *  the Edge Labels mean the following:
- *  Synthesis
+ *  Synthetic
  *    - fields v1, v2... are synthetic and depend on u1, u2...
  *    - Forks, Combines, Aggregations and Duplicate create these edges
-  *  InPlace
+ *  InPlace
  *    - v and u are the same field and have no structural differences
  *    - Simple Transformations fall into this category
  *  Restructure
@@ -253,7 +253,7 @@ export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[k
  */
 export enum TransformationEdgeTypes
 {
-  Synthesis = 'Synthesis',
+  Synthetic = 'Synthetic',
   InPlace = 'InPlace',
   Restructure = 'Restructure',
   Rename = 'Rename',

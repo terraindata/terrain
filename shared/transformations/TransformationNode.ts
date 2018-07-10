@@ -48,7 +48,7 @@ import { List } from 'immutable';
 
 import { KeyPath } from './../util/KeyPath';
 
-import TransformationNodeType from './TransformationNodeType';
+import TransformationNodeType, { CommonTransformationOptions } from './TransformationNodeType';
 import TransformationNodeVisitor from 'shared/transformations/visitors/TransformationNodeVisitor';
 import TransformationVisitError from 'shared/transformations/visitors/TransformationVisitError';
 import TransformationVisitResult from 'shared/transformations/visitors/TransformationVisitResult';
@@ -58,7 +58,7 @@ export default abstract class TransformationNode
   public id: number;
   public abstract typeCode: TransformationNodeType;
   public fields: List<{ path: KeyPath, id: number }>;
-  public meta: object;
+  public meta: object & CommonTransformationOptions;
 
   // override this to only operate on a certain js type
   public readonly acceptedType: string;
