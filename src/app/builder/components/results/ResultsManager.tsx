@@ -735,7 +735,7 @@ export class ResultsManager extends TerrainComponent<Props>
           delete hitTemp[rootKey];
         });
       }
-      const sort = hitTemp.sort !== undefined ? { _sort: hitTemp.sort[0] } : {};
+      const sort = hitTemp.sort !== undefined ? { TerrainScore: hitTemp.sort[0] } : {};
       let fields = {};
       if (hitTemp.fields !== undefined)
       {

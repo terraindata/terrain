@@ -132,8 +132,9 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
   public handleFieldChange(index)
   {
-    const value = this.props.dropdownOptions.map((v) => v.value).toList().get(index);
-    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'field'), value, false, true);
+    const value = this.props.dropdownOptions.get(index);
+    const newLine = this.props.line.set('field', value.value).set('fieldType', value.meta.fieldType);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath), newLine, false, true);
     this.setState((state) => ({ editingField: false }));
   }
 

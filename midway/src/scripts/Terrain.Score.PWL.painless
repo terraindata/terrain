@@ -79,7 +79,16 @@ for (int i = 0; i < factors.length; ++i)
   {
     continue;
   }
-  double numerator = accumulateFactors(doc, factor['numerators'], factor['a'], _score);
+  def numerator;
+  if (factor['isDistance'])
+  {
+    def location = doc[factor['numerators'][0][0]];
+    numerator = location.planeDistance(factor['lat'], factor['lon']) * 0.000621371;
+  }
+  else
+  {
+    numerator = accumulateFactors(doc, factor['numerators'], factor['a'], _score);
+  }
   double denominator = accumulateFactors(doc, factor['denominators'], factor['b'], _score);
   double input = numerator / denominator;
   double output = pwlTransform(factor.ranges, factor.outputs, input);

@@ -45,6 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:strict-boolean-expressions
+import { createRecordType } from 'shared/util/Classes';
+import { BaseClass, New } from 'shared/util/Classes';
 
 export enum InputType
 {
@@ -56,14 +58,17 @@ export enum InputType
 
 export const InputPrefix: string = '@';
 
-export interface Input extends IRecord<Input>
+class InputC extends BaseClass
 {
-  type: string;
-  key: string;
-  value: string;
-  inputType: InputType;
-  meta?: any; // Meta data (this is used for the map component, related to value but does not go in elastic query)
+  public type: string = 'elasticType';
+  public value: any = null;
+  public inputType: InputType = InputType.TEXT;
+  public meta?: any = {}; // Meta data (this is used for the map component, related to value but does not go in elastic query)
+  public key: string = '';
 }
+export type Input = InputC & IRecord<InputC>;
+export const _Input = (config?: { [key: string]: any }) =>
+  New<Input>(new InputC(config), config);
 
 export function isRuntimeInput(name: string)
 {
