@@ -55,18 +55,19 @@ import { KeyPath, keyPathPrefixMatch, updateKeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 
 import DataStore from './DataStore';
-import TransformationEngineNodeVisitor from './visitors/TransformationEngineNodeVisitor';
-import TransformationNodeConstructorVisitor from './visitors/TransformationNodeConstructorVisitor';
 import TransformationNodeType from './TransformationNodeType';
 import TransformationRegistry from './TransformationRegistry';
+import CreateTransformationVisitor from './visitors/CreateTransformationVisitor';
+import TransformationEngineNodeVisitor from './visitors/TransformationEngineNodeVisitor';
+import TransformationNodeConstructorVisitor from './visitors/TransformationNodeConstructorVisitor';
 import TransformationVisitError from './visitors/TransformationVisitError';
 import TransformationVisitResult from './visitors/TransformationVisitResult';
-import CreateTransformationVisitor from './visitors/CreateTransformationVisitor';
 
 import { TransformationGraph } from 'shared/transformations/TypedGraph';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 const NodeConstructor = new TransformationNodeConstructorVisitor();
+const TransformationCreator = new CreateTransformationVisitor();
 
 /**
  * A TransformationEngine performs transformations on complex JSON documents.
@@ -235,7 +236,8 @@ export class TransformationEngine
   public appendTransformation(nodeType: TransformationNodeType, inFields: List<KeyPath | number>,
     options?: object): number
   {
-    const fields = inFields.map((val) => {
+    const fields = inFields.map((val) =>
+    {
       if (typeof val === 'number')
       {
         return {
@@ -252,49 +254,17 @@ export class TransformationEngine
       }
     }).toList();
 
+    const nodeId = this.uidNode;
+    this.uidNode++;
     const node: TransformationNode = NodeConstructor.visit(nodeType, undefined, {
-      id: this.uidNode,
+      id: nodeId,
       fields,
       meta: options,
     });
+    this.dag.setNode(nodeId.toString(), node);
+    node.accept(TransformationCreator, { engine: this, graph: this.dag });
 
-    // Process fields created/disabled by this transformation
-    if (options !== undefined)
-    {
-      // todo: get rid of specific behavior for rename node
-      if (options['newFieldKeyPaths'] !== undefined && nodeType !== TransformationNodeType.RenameNode)
-      {
-        for (let i: number = 0; i < options['newFieldKeyPaths'].size; i++)
-        {
-          let inferredTypeNameOfNewFields: string;
-          if (TransformationRegistry.getNewFieldType(nodeType) === 'same' && fields.size > 0)
-          {
-            inferredTypeNameOfNewFields = this.getFieldType(fields.get(0).id);
-          }
-          else if (TransformationRegistry.getNewFieldType(nodeType))
-          {
-            inferredTypeNameOfNewFields = TransformationRegistry.getNewFieldType(nodeType);
-          }
-          else
-          {
-            // TODO add warning here
-            inferredTypeNameOfNewFields = 'string'; // for lack of a better guess...
-          }
-          this.addField(options['newFieldKeyPaths'].get(i), inferredTypeNameOfNewFields);
-        }
-      }
-      if (options['preserveOldFields'] === false)
-      {
-        for (let i: number = 0; i < fields.size; i++)
-        {
-          this.disableField(fields.get(i).id);
-        }
-      }
-    }
-
-    this.dag.setNode(this.uidNode.toString(), node);
-    this.uidNode++;
-    return this.uidNode - 1;
+    return nodeId;
   }
 
   /**
@@ -307,23 +277,21 @@ export class TransformationEngine
   {
     let output = _.cloneDeep(doc);
     const visitor = new TransformationEngineNodeVisitor();
-    for (const nodeKey of this.dag.sources())
+    const ordered = GraphLib.alg.topsort(this.dag);
+
+    for (const nodeKey of ordered)
     {
-      const toTraverse: string[] = GraphLib.alg.preorder(this.dag, [nodeKey]);
-      for (let i = 0; i < toTraverse.length; i++)
+      const node: TransformationNode = this.dag.node(nodeKey);
+      const transformationResult = node.accept(visitor, output);
+      if (transformationResult.errors !== undefined)
       {
-        const node: TransformationNode = this.dag.node(toTraverse[i]);
-        const transformationResult = node.accept(visitor, output);
-        if (transformationResult.errors !== undefined)
+        transformationResult.errors.forEach((error: TransformationVisitError) =>
         {
-          transformationResult.errors.forEach((error: TransformationVisitError) =>
-          {
-            // winston.error(`\t -${error.message}`);
-          });
-        }
-        const document = transformationResult.document;
-        output = document;
+          // winston.error(`\t -${error.message}`);
+        });
       }
+      const document = transformationResult.document;
+      output = document;
     }
     // Exclude disabled fields (must do this as a postprocess, because e.g. join node)
     this.fieldEnabled.map((enabled: boolean, fieldID: number) =>
@@ -370,7 +338,7 @@ export class TransformationEngine
   public addField(fullKeyPath: KeyPath, typeName: string = null, options: object = {}, synthetic = false): number
   {
     const id = this.uidField;
-    this.uidField ++;
+    this.uidField++;
 
     if (this.getFieldID(fullKeyPath) !== undefined)
     {

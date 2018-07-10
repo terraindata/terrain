@@ -48,10 +48,10 @@ import { List } from 'immutable';
 
 import { KeyPath } from './../util/KeyPath';
 
-import TransformationNodeType, { CommonTransformationOptions } from './TransformationNodeType';
 import TransformationNodeVisitor from 'shared/transformations/visitors/TransformationNodeVisitor';
 import TransformationVisitError from 'shared/transformations/visitors/TransformationVisitError';
 import TransformationVisitResult from 'shared/transformations/visitors/TransformationVisitResult';
+import TransformationNodeType, { CommonTransformationOptions } from './TransformationNodeType';
 
 export default abstract class TransformationNode
 {
@@ -63,7 +63,7 @@ export default abstract class TransformationNode
   // override this to only operate on a certain js type
   public readonly acceptedType: string;
 
-  public constructor(id: number, fields: List<{path: KeyPath, id: number}>, options: object = {})
+  public constructor(id: number, fields: List<{ path: KeyPath, id: number }>, options: object = {})
   {
     this.id = id;
     this.fields = fields;

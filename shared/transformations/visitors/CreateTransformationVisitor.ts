@@ -43,11 +43,11 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+import * as GraphLib from 'graphlib';
 import { List } from 'immutable';
 import * as _ from 'lodash';
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
-import * as GraphLib from 'graphlib';
 
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNode from 'shared/transformations/TransformationNode';
@@ -56,12 +56,12 @@ import TransformationNodeType, {
   NodeOptionsType,
   TransformationEdgeTypes as EdgeTypes,
 } from 'shared/transformations/TransformationNodeType';
-import TransformationNodeVisitor, { VisitorLookupMap } from './TransformationNodeVisitor';
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
+import TransformationNodeVisitor, { VisitorLookupMap } from './TransformationNodeVisitor';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
-import { TransformationGraph, Edge } from 'shared/transformations/TypedGraph';
+import { Edge, TransformationGraph } from 'shared/transformations/TypedGraph';
 
 /*
  *  This visitor will be called after the transformation engine creates the node in the dag.
@@ -79,7 +79,14 @@ export default class CreationVisitor
   public visitorLookup: VisitorLookupMap<void, Args> = {
     [TransformationNodeType.RenameNode]: this.visitRenameNode,
     [TransformationNodeType.CastNode]: this.visitCastNode,
+    [TransformationNodeType.IdentityNode]: this.visitIdentityNode,
   };
+
+  constructor()
+  {
+    super();
+    this.bindVisitors();
+  }
 
   public visitDefault(type: TransformationNodeType, node: TransformationNode, args: Args)
   {
@@ -90,13 +97,15 @@ export default class CreationVisitor
       edgeType = EdgeTypes.Synthetic;
     }
 
-    node.fields.forEach((field) => {
+    node.fields.forEach((field) =>
+    {
       this.appendNodeToField(args, field.id, node.id, edgeType);
     });
 
     if (edgeType === EdgeTypes.Synthetic)
     {
-      node.meta.newFieldKeyPaths.forEach((kp) => {
+      node.meta.newFieldKeyPaths.forEach((kp) =>
+      {
         if (engine.getFieldID(kp) === undefined)
         {
           let newType = this.getNewType(type);
@@ -176,6 +185,11 @@ export default class CreationVisitor
       }
     }
     return -1;
+  }
+
+  protected visitIdentityNode(type: TransformationNodeType, node: TransformationNode, args: Args): void
+  {
+
   }
 
   protected visitRenameNode(type: TransformationNodeType, node: TransformationNode, args: Args): void

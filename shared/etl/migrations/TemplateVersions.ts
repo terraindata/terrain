@@ -63,7 +63,10 @@ import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, SourceOpt
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNode from 'shared/transformations/TransformationNode';
-import { TransformationEngine as V5TransformationEngine, TransformationNode as V5Node } from 'shared/transformations/V5TransformationEngine';
+import {
+  TransformationEngine as V5TransformationEngine,
+  TransformationNode as V5Node
+} from 'shared/transformations/V5TransformationEngine';
 import { KeyPath } from 'shared/util/KeyPath';
 
 export const CURRENT_TEMPLATE_VERSION: TemplateVersion = 'tv5.1';
@@ -175,13 +178,14 @@ function upgrade4To5(templateObj: TemplateBase): { changes: number, template: Te
  */
 function upgrade5To51(templateObj: TemplateBase): { changes: number, template: TemplateBase }
 {
-  let changes = 0;
-  const convertEngine = (oldEngine: V5TransformationEngine): TransformationEngine => {
+  const changes = 0;
+  const convertEngine = (oldEngine: V5TransformationEngine): TransformationEngine =>
+  {
     const newEngine = new TransformationEngine();
     return newEngine;
   };
 
-  let template = _.cloneDeep(templateObj);
+  const template = _.cloneDeep(templateObj);
   for (const match of yadeep.search(template, List(['process', 'edges', -1, 'transformations'])))
   {
     const { value, location } = match;

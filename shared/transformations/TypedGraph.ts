@@ -49,7 +49,8 @@ import * as GraphLib from 'graphlib';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import { TransformationEdgeTypes } from './TransformationNodeType';
 
-export interface Edge {
+export interface Edge
+{
   v: string;
   w: string;
   /** The name that uniquely identifies a multi-edge. */

@@ -50,8 +50,8 @@ import * as yadeep from 'shared/util/yadeep';
 
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { CommonTransformationOptions, NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationNodeVisitor, { VisitorLookupMap } from './TransformationNodeVisitor';
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
+import TransformationNodeVisitor, { VisitorLookupMap } from './TransformationNodeVisitor';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
@@ -80,7 +80,8 @@ export default class ConstructorVisitor
 
   public deserialize(args: SerializedNodeArgs): NodeArgs
   {
-    const fields = List(args.fields.map((item) => {
+    const fields = List(args.fields.map((item) =>
+    {
       return {
         id: item.id,
         path: List(item.path),

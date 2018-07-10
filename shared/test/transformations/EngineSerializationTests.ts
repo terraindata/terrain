@@ -46,9 +46,9 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeConstructorVisitor from 'shared/transformations/visitors/TransformationNodeConstructorVisitor';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
+import TransformationNodeConstructorVisitor from 'shared/transformations/visitors/TransformationNodeConstructorVisitor';
 import { KeyPath } from 'shared/util/KeyPath';
 import { TestDocs } from './TestDocs';
 
@@ -178,7 +178,7 @@ test('split a field (regex delimiter) after serialize/deserialize trip', () =>
   const e: TransformationEngine = new TransformationEngine(doc);
   const opts = {
     newFieldKeyPaths: List<KeyPath>([KeyPath(['s1']), KeyPath(['s2']), KeyPath(['s3'])]),
-    preserveOldFields: false,
+    // preserveOldFields: false,
     delimiter: '[\\s,]+',
     regex: true,
   };

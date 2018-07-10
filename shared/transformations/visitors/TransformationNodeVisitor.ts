@@ -69,4 +69,12 @@ export default abstract class TransformationNodeVisitor<ReturnT, ArgsT = any>
       return visitor(type, node, args);
     }
   }
+
+  protected bindVisitors()
+  {
+    for (const key of Object.keys(this.visitorLookup))
+    {
+      this.visitorLookup[key] = this.visitorLookup[key].bind(this);
+    }
+  }
 }

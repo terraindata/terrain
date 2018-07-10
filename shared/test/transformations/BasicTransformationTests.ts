@@ -239,13 +239,13 @@ test('join two fields', () =>
     List<KeyPath>([KeyPath(['meta', 'school']), KeyPath(['meta', 'sport'])]),
     {
       newFieldKeyPaths: List<KeyPath>([KeyPath(['meta', 'fullTeam'])]),
-      preserveOldFields: false,
+      // preserveOldFields: false,
       delimiter: ' ',
     });
   const r = e.transform(TestDocs.doc2);
   expect(r['meta']['fullTeam']).toBe('Stanford bobsled');
-  expect(r['meta']['sport']).toBe(undefined);
-  expect(r['meta']['school']).toBe(undefined);
+  expect(r['meta']['sport']).toBe('bobsled');
+  expect(r['meta']['school']).toBe('Stanford');
 });
 
 test('join multiple fields in a nested array', () =>
@@ -273,7 +273,6 @@ test('join multiple fields in a nested array', () =>
     List([KeyPath(['fields', -1, 'foo']), KeyPath(['fields', -1, 'bar']), KeyPath(['fields', -1, 'baz'])]),
     {
       newFieldKeyPaths: List<KeyPath>([KeyPath(['fields', -1, 'combo'])]),
-      preserveOldFields: false,
       delimiter: ' ',
     });
   const r = e.transform(doc);
@@ -304,7 +303,6 @@ test('split a field (string delimiter)', () =>
     List<KeyPath>([KeyPath(['meta', 'sport'])]),
     {
       newFieldKeyPaths: List<KeyPath>([KeyPath(['s1']), KeyPath(['s2']), KeyPath(['s3'])]),
-      preserveOldFields: false,
       delimiter: 'b',
       regex: false,
     });
@@ -322,7 +320,6 @@ test('split a field (numeric index)', () =>
     List<KeyPath>([KeyPath(['meta', 'sport'])]),
     {
       newFieldKeyPaths: List<KeyPath>([KeyPath(['s1']), KeyPath(['s2'])]),
-      preserveOldFields: false,
       delimiter: 3,
       regex: false,
     });
@@ -343,7 +340,6 @@ test('split a field (regex delimiter)', () =>
     List<KeyPath>([KeyPath(['foo'])]),
     {
       newFieldKeyPaths: List<KeyPath>([KeyPath(['s1']), KeyPath(['s2']), KeyPath(['s3'])]),
-      preserveOldFields: false,
       delimiter: '[\\s,]+',
       regex: true,
     });

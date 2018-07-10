@@ -55,9 +55,9 @@ import * as _ from 'lodash';
 
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import Topology from 'shared/transformations/util/TopologyUtil';
 import TransformationVisitError from 'shared/transformations/visitors/TransformationVisitError';
 import TransformationVisitResult from 'shared/transformations/visitors/TransformationVisitResult';
-import Topology from 'shared/transformations/util/TopologyUtil';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
