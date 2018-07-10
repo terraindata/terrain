@@ -109,13 +109,12 @@ function handleResetPasswordSubmit()
       {
         setTimeout(function() 
         {
-          //redirect to login page
-        let host = window.location.protocol + "//" + window.location.hostname;
-        if (location.port !== "")
-        {
-          host += ":" + location.port;
-        }
-        window.location = host;
+          let host = window.location.protocol + "//" + window.location.hostname;
+          if (location.port !== "")
+          {
+            host += ":" + location.port;
+          }
+          window.location = host;
         }, 2000)
         
       }
