@@ -194,7 +194,7 @@ if [ "$SKIP_RSYNC" = "y" ] || [ "$SKIP_RSYNC" = "Y" ]
     (! test -d Search) && (echo "Error: could not find Search directory"; exit 1);
 
     echo "rsyncing";
-    rsync -vrP --progress  --exclude midway.json --exclude midway.db --exclude node_modules --delete  $PWD/Search terrain@${ADDRESS}:src-${VERSION}/ > "rsynclog.log";
+    rsync -vrP --progress  --exclude midway.json --exclude midway.db --exclude node_modules --exclude .cache --delete  $PWD/Search terrain@${ADDRESS}:src-${VERSION}/ > "rsynclog.log";
     echo "rsync complete"
 fi
 
