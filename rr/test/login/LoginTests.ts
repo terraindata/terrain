@@ -84,7 +84,7 @@ async function loginToBuilder(page, url)
   await page.click(PASSWORD_SELECTOR);
   await page.keyboard.type('CnAATPys6tEB*ypTvqRRP5@2fUzTuY!C^LZP#tBQcJiC*5');
   await page.click(BUTTON_SELECTOR);
-  sleep.sleep(4);
+  sleep.sleep(6);
   await takeAndCompareScreenShot(page);
   await page.evaluate(() =>
   {
