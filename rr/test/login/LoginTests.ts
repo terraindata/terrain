@@ -53,12 +53,6 @@ import * as sleep from 'sleep';
 const USERNAME_SELECTOR = '#login-email';
 const PASSWORD_SELECTOR = '#login-password';
 const BUTTON_SELECTOR = '#login-submit';
-const CREATE_CATEGORY_SELECTOR = '.info-area-button';
-const CATEGORY_ITEM_SELECTOR = '.category-library-info-wrapper';
-const CREATE_GROUP_SELECTOR = '.info-area-button';
-const CREATE_GROUP_BUTTON_SELECTOR = '.modal-confirm-button';
-const CREATE_ALGORITHM_SELECTOR = '.info-area-button';
-const ALGORITHM_SELECTOR = ':nth-child(2) > .library-category-BUILD > .library-category-content > :nth-child(1) > .library-item-link > .library-item-wrapper > .library-item > :nth-child(1) > .library-item-content > .flex-container > .flex-grow > .library-item-line';
 
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
 import { TestLogger } from '../../../shared/test/TestLogger';
@@ -91,44 +85,49 @@ async function loginToBuilder(page, url)
   await page.keyboard.type('CnAATPys6tEB*ypTvqRRP5@2fUzTuY!C^LZP#tBQcJiC*5');
   await page.click(BUTTON_SELECTOR);
   sleep.sleep(4);
-  TestLogger.info('Goto the starting page.');
-  const selectorConfig = { visible: true, hidden: true };
-
-  await page.waitForSelector(CREATE_CATEGORY_SELECTOR, selectorConfig);
-  await page.click(CREATE_CATEGORY_SELECTOR);
-  TestLogger.info('Create category');
+  await takeAndCompareScreenShot(page);
+  await page.evaluate(() =>
+  {
+    window['TerrainTools'].terrainTests.testCreateCategory();
+  });
   sleep.sleep(1);
+  const catid = await page.evaluate(() =>
+  {
+    return window['TerrainTools'].terrainTests.lastCategoryId;
+  });
+  TestLogger.info('Create a new category, ID:' + String(catid));
   await takeAndCompareScreenShot(page);
 
-  await page.waitForSelector(CATEGORY_ITEM_SELECTOR, selectorConfig);
-  await page.click(CATEGORY_ITEM_SELECTOR);
-  TestLogger.info('Select category');
+  await page.evaluate(() =>
+  {
+    window['TerrainTools'].terrainTests.testCreateGroup();
+  });
   sleep.sleep(1);
+  const groupid = await page.evaluate(() =>
+  {
+    return window['TerrainTools'].terrainTests.lastGroupId;
+  });
+  TestLogger.info('Create a new group, ID:' + String(groupid));
   await takeAndCompareScreenShot(page);
 
-  await page.waitForSelector(CREATE_GROUP_SELECTOR, selectorConfig);
-  await page.click(CREATE_GROUP_SELECTOR);
-  TestLogger.info('Select group');
+  await page.evaluate(() =>
+  {
+    window['TerrainTools'].terrainTests.testCreateAlgorithm();
+  });
   sleep.sleep(1);
+  const algid = await page.evaluate(() =>
+  {
+    return window['TerrainTools'].terrainTests.lastAlgorithmId;
+  });
+  TestLogger.info('Create a new algorithm, ID:' + String(algid));
   await takeAndCompareScreenShot(page);
 
-  await page.waitForSelector(CREATE_GROUP_BUTTON_SELECTOR, selectorConfig);
-  await page.click(CREATE_GROUP_BUTTON_SELECTOR);
-  TestLogger.info('Create group');
+  await page.evaluate(() =>
+  {
+    window['TerrainTools'].terrainTests.gotoAlgorithm();
+  });
   sleep.sleep(1);
-  await takeAndCompareScreenShot(page);
-
-  await page.waitForSelector(CREATE_ALGORITHM_SELECTOR, selectorConfig);
-  await page.click(CREATE_ALGORITHM_SELECTOR);
-  await page.click(CREATE_ALGORITHM_SELECTOR);
-  TestLogger.info('Create algorithm');
-  sleep.sleep(1);
-  await takeAndCompareScreenShot(page);
-
-  await page.waitForSelector(ALGORITHM_SELECTOR, selectorConfig);
-  await page.click(ALGORITHM_SELECTOR, { clickCount: 2 });
-  TestLogger.info('Select algorithm');
-  sleep.sleep(1);
+  TestLogger.info('Load algorithm ' + String(algid));
   await takeAndCompareScreenShot(page);
 }
 
