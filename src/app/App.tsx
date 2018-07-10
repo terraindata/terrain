@@ -61,6 +61,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { Redirect as RRedirect, Route, Switch } from 'react-router-dom';
 
+import ConnectionsStatus from 'connections/components/ConnectionsStatus';
 import DataTabs from 'etl/components/DataTabs';
 import TemplateList from 'etl/templates/components/TemplateList';
 import Jobs from 'jobs/components/Jobs';
@@ -77,7 +78,6 @@ import ManualWrapper from './manual/components/ManualWrapper';
 import SchemaPage from './schema/components/SchemaPage';
 import Account from './users/components/Account';
 import X from './x/components/X';
-import ConnectionsStatus from 'connections/components/ConnectionsStatus';
 
 require('velocity-animate');
 require('velocity-animate/velocity.ui');

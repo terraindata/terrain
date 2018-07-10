@@ -45,16 +45,17 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
-import { List, Map } from 'immutable';
-import * as React from 'react';
-import {
+import
+{
   ConnectionState,
 } from 'connections/ConnectionTypes';
+import { List, Map } from 'immutable';
+import * as React from 'react';
 
-import TerrainComponent, { browserHistory } from '../../common/components/TerrainComponent';
-import Util from 'util/Util';
-import { notificationManager } from './../../common/components/InAppNotification';
 import { ConnectionsActions } from 'connections/data/ConnectionsRedux';
+import Util from 'util/Util';
+import TerrainComponent, { browserHistory } from '../../common/components/TerrainComponent';
+import { notificationManager } from './../../common/components/InAppNotification';
 
 interface ConnectionsStatusProps
 {
@@ -72,15 +73,15 @@ export class ConnectionsStatus extends TerrainComponent<ConnectionsStatusProps>
       () =>
       {
         this.props.connectionsActions(
-        {
-          actionType: 'getConnections'
-        })
-        .then((response) =>
-        {
-          this.forceUpdate();
-        });
+          {
+            actionType: 'getConnections',
+          })
+          .then((response) =>
+          {
+            this.forceUpdate();
+          });
       },
-      10000
+      10000,
     );
   }
 
@@ -94,12 +95,13 @@ export class ConnectionsStatus extends TerrainComponent<ConnectionsStatusProps>
     const { connections } = this.props.connections;
 
     connections.keySeq()
-      .forEach(key =>
+      .forEach((key) =>
       {
         const connection = connections.get(key);
         if (connection.status === 'DISCONNECTED' || connection.status === 'CONN_TIMEOUT')
         {
-          setTimeout(() => {
+          setTimeout(() =>
+          {
             notificationManager.addNotification(
               'Disconnected connections',
               connection.name,
@@ -116,5 +118,5 @@ export class ConnectionsStatus extends TerrainComponent<ConnectionsStatusProps>
 export default Util.createTypedContainer(
   ConnectionsStatus,
   ['connections'],
-  { connectionsActions: ConnectionsActions }
+  { connectionsActions: ConnectionsActions },
 );
