@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as Elastic from 'elasticsearch';
 import RecordBlock from '../../../app/io/iterator/RecordBlock';
 import ElasticClient from '../client/ElasticClient';
 import ElasticRecordSource from './AElasticRecordSource';
@@ -85,7 +86,7 @@ export default class ElasticQueryDispatcher
   /**
    * Pushes the given query, and then calls flush() to make sure it's been sent to the server.
    */
-  public send(query: object): ElasticRecordSource
+  public send(query: { size: number }): ElasticRecordSource
   {
     const result: ElasticRecordSource = this.push(query);
     this.flush();
@@ -96,7 +97,7 @@ export default class ElasticQueryDispatcher
    * Buffers the given query for dispatch, periodically flushing buffered queries.
    * To make sure a query is actually flushed, call flush() after pushing the query.
    */
-  public push(query: object): ElasticRecordSource
+  public push(query: { size: number }): ElasticRecordSource
   {
     // get & set size (no size => default size)
     query.size = (typeof query.size === 'number') ? query.size : this.defaultQuerySize;
@@ -175,7 +176,7 @@ export default class ElasticQueryDispatcher
       const info: ElasticSourceInfo = infos[0];
       this.client.search(
         { body: info.query },
-        (error: any, response: any): object[] =>
+        (error: any, response: any) =>
         {
           info.resolve(this.recieveBufferedResponse(info.query, error, response));
         });
@@ -308,7 +309,7 @@ export default class ElasticQueryDispatcher
 
     if (typeof response === 'object' && typeof response.hits === 'object')
     {
-      const hits: object = response.hits as object;
+      const hits = response.hits;
       if (Array.isArray(hits.hits))
       {
         recordBlock.records = hits.hits as object[];

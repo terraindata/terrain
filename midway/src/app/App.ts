@@ -44,6 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+// tslint:disable-next-line
+/// <reference path="../../../shared/typings/tsd.d.ts" />
+
 import * as http from 'http';
 import * as Koa from 'koa';
 import * as winston from 'winston';
