@@ -84,13 +84,10 @@ class ArrayCountTransformationInfoC extends TransformationNodeInfo
   public creatable = true;
   public newFieldType = 'number';
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    return (
-      EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
-      EngineUtil.isNamedField(engine.getFieldPath(fieldId))
-    );
-  }
+  public availInfo = {
+    allowedTypes: [ETLFieldTypes.Array],
+    isNamed: true,
+  };
 }
 
 export const ArrayCountTransformationInfo = new ArrayCountTransformationInfoC();

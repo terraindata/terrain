@@ -62,7 +62,7 @@ import { DisplayState, DisplayType, InputDeclarationMap } from 'common/component
 
 import { availableTransformations, getTransformationForm } from 'etl/templates/components/transformations/TransformationForms';
 import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
-import { TransformationNode } from 'etl/templates/FieldTypes';
+import { TemplateField, TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
@@ -104,10 +104,11 @@ export class TransformationCreator extends TerrainComponent<Props>
 
   public getValidOptions(): List<TransformationNodeType>
   {
+    const tree = this.props.engine.createTree();
     return availableTransformations.filter(
       (type, index) =>
       {
-        return TransformationRegistry.isAvailable(type, this.props.engine, this.props.fieldID);
+        return TransformationRegistry.isAvailable(type, this.props.engine, this.props.fieldID, tree);
       },
     ).toList();
   }

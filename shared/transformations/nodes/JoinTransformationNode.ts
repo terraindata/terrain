@@ -109,13 +109,10 @@ class JoinTransformationInfoC extends TransformationNodeInfo
   public creatable = true;
   public newFieldType = 'string';
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    return (
-      EngineUtil.getRepresentedType(fieldId, engine) === 'string' &&
-      EngineUtil.isNamedField(engine.getFieldPath(fieldId))
-    );
-  }
+  public availInfo = {
+    allowedTypes: [ETLFieldTypes.String],
+    isNamed: true,
+  };
 
   public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
   {

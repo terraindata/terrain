@@ -160,9 +160,14 @@ class TransformationRegistryLookup
     return registryVisitor.visit(type).description;
   }
 
-  public isAvailable(type: TransformationNodeType, engine: TransformationEngine, field: number)
+  public isAvailable(
+    type: TransformationNodeType,
+    engine: TransformationEngine,
+    field: number,
+    tree: ReturnType<TransformationEngine['createTree']>,
+  )
   {
-    return registryVisitor.visit(type).isAvailable(engine, field);
+    return registryVisitor.visit(type).isAvailable(engine, field, tree);
   }
 
   public canCreate(type: TransformationNodeType): boolean

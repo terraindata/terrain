@@ -89,14 +89,11 @@ class ArraySumTransformationInfoC extends TransformationNodeInfo
   public creatable = true;
   public newFieldType = 'number';
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    return (
-      EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
-      EngineUtil.getValueType(fieldId, engine) === 'number' &&
-      EngineUtil.isNamedField(engine.getFieldPath(fieldId))
-    );
-  }
+  public availInfo = {
+    allowedTypes: [ETLFieldTypes.Array],
+    arrayOf: [ETLFieldTypes.Number, ETLFieldTypes.Integer],
+    isNamed: true,
+  };
 }
 
 export const ArraySumTransformationInfo = new ArraySumTransformationInfoC();

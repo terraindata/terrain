@@ -110,30 +110,6 @@ export class TransformationEngine
   }
 
   /**
-   * A helper function to process a Transformation Node's meta object
-   * from a raw JS object into an object whose newFieldKeyPaths field
-   * is properly turned into an immutable list of keypaths
-   *
-   * @param {object} meta The deserialized meta object
-   * @returns {object} The converted meta object
-   */
-  private static makeMetaImmutable(meta: object): object
-  {
-    if (meta['newFieldKeyPaths'] !== undefined)
-    {
-      const newFieldKeyPaths = List(meta['newFieldKeyPaths'])
-        .map((val: string[]) => KeyPath(val)).toList();
-      return _.extend({}, meta, {
-        newFieldKeyPaths,
-      });
-    }
-    else
-    {
-      return meta;
-    }
-  }
-
-  /**
    * A helper function to parse a string representation of a
    * `TransformationEngine` into a working, fully-typed engine
    * (stringified JS objects lose all type information, so it
@@ -206,18 +182,7 @@ export class TransformationEngine
    */
   public equals(other: TransformationEngine): boolean
   {
-    // Note: dealing with a lot of Immutable data structures so some
-    // slightly verbose syntax is required to convert to plain JS arrays
-    return JSON.stringify(GraphLib.json.write(this.dag)) === JSON.stringify(GraphLib.json.write(other.dag))
-      && JSON.stringify(this.doc) === JSON.stringify(other.doc)
-      && this.uidField === other.uidField
-      && this.uidNode === other.uidNode
-      && JSON.stringify(this.fieldTypes.map((v: string, k: number) => [k, v]).toArray()) ===
-      JSON.stringify(other.fieldTypes.map((v: string, k: number) => [k, v]).toArray())
-      && JSON.stringify(this.fieldEnabled.map((v: boolean, k: number) => [k, v]).toArray()) ===
-      JSON.stringify(other.fieldEnabled.map((v: boolean, k: number) => [k, v]).toArray())
-      && JSON.stringify(this.fieldProps.map((v: object, k: number) => [k, v]).toArray()) ===
-      JSON.stringify(other.fieldProps.map((v: object, k: number) => [k, v]).toArray());
+    return JSON.stringify(this.toJSON()) === JSON.stringify(other.toJSON());
   }
 
   /**
@@ -360,6 +325,7 @@ export class TransformationEngine
     return id;
   }
 
+  // todo make this respect the dag
   public deleteField(id: number): void
   {
     // Order matters!  Must do this first, else getTransformations can't work because

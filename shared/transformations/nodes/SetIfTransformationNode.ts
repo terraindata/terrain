@@ -95,11 +95,9 @@ class SetIfTransformationInfoC extends TransformationNodeInfo
   public editable = true;
   public creatable = true;
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    const type = EngineUtil.getRepresentedType(fieldId, engine);
-    return type === 'number' || type === 'string' || type === 'boolean';
-  }
+  public availInfo = {
+    allowedTypes: [ETLFieldTypes.Number, ETLFieldTypes.Integer, ETLFieldTypes.String],
+  };
 }
 
 export const SetIfTransformationInfo = new SetIfTransformationInfoC();

@@ -103,13 +103,10 @@ class FilterArrayTransformationInfoC extends TransformationNodeInfo
   public creatable = true;
   public newFieldType = 'array';
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    return (
-      EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
-      EngineUtil.isNamedField(engine.getFieldPath(fieldId))
-    );
-  }
+  public availInfo = {
+    allowedTypes: [ETLFieldTypes.Array],
+    isNamed: true,
+  };
 }
 
 export const FilterArrayTransformationInfo = new FilterArrayTransformationInfoC();

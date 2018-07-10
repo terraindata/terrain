@@ -44,10 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { List } from 'immutable';
+import { List, Map } from 'immutable';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 export default abstract class TransformationNodeInfo
 {
@@ -62,9 +64,48 @@ export default abstract class TransformationNodeInfo
   public visible: boolean = true;
   public newFieldType: string = 'string';
 
-  public isAvailable(engine: TransformationEngine, fieldId: number): boolean
+  // override this
+  public availInfo: {
+    allowedTypes?: ETLFieldTypes[];
+    arrayOf?: ETLFieldTypes[]; // if the field is an array
+    isNamed?: boolean; // if undefined, don't check. if false, ensure not named, if true, ensure named
+  };
+
+  public isAvailable(engine: TransformationEngine, fieldId: number, tree: Map<number, List<number>>): boolean
   {
-    return false;
+    if (this.availInfo !== undefined)
+    {
+      const { allowedTypes, arrayOf, isNamed } = this.availInfo;
+      const etlType = EngineUtil.getETLFieldType(fieldId, engine);
+      if (allowedTypes !== undefined)
+      {
+        if (allowedTypes.indexOf(etlType) === -1)
+        {
+          return false;
+        }
+      }
+      if (arrayOf !== undefined)
+      {
+        if (etlType !== ETLFieldTypes.Array || tree.get(fieldId) == null || tree.get(fieldId).size === 0)
+        {
+          return false;
+        }
+        const childType = EngineUtil.getETLFieldType(tree.get(fieldId).get(0), engine);
+        if (arrayOf.indexOf(childType) === -1)
+        {
+          return false;
+        }
+      }
+      if (isNamed !== undefined)
+      {
+        if (EngineUtil.isNamedField(engine.getFieldPath(fieldId)) !== isNamed)
+        {
+          return false;
+        }
+      }
+      return true;
+    }
+    return true;
   }
 
   public shortSummary(meta: object): string

@@ -111,10 +111,9 @@ class InsertTransformationInfoC extends TransformationNodeInfo
   public editable = true;
   public creatable = true;
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
-  }
+  public availInfo = {
+    allowedTypes: [ETLFieldTypes.String],
+  };
 
   public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
   {

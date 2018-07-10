@@ -143,7 +143,6 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
         return -1;
       }
     });
-
   }
 
   // TODO, if there are special index children that match get those

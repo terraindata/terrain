@@ -95,10 +95,9 @@ class SubtractTransformationInfoC extends TransformationNodeInfo
   public editable = true;
   public creatable = true;
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    return EngineUtil.getRepresentedType(fieldId, engine) === 'number';
-  }
+  public availInfo = {
+    allowedTypes: [ETLFieldTypes.Number, ETLFieldTypes.Integer],
+  };
 
   public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
   {

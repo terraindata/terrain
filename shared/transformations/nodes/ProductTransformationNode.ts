@@ -98,13 +98,10 @@ class ProductTransformationInfoC extends TransformationNodeInfo
   public creatable = true;
   public newFieldType = 'number';
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    return (
-      EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
-      EngineUtil.isNamedField(engine.getFieldPath(fieldId))
-    );
-  }
+  public availInfo = {
+    allowedTypes: [ETLFieldTypes.Number, ETLFieldTypes.Integer],
+    isNamed: true,
+  };
 }
 
 export const ProductTransformationInfo = new ProductTransformationInfoC();

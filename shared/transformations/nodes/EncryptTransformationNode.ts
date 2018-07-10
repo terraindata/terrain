@@ -86,10 +86,9 @@ class EncryptTransformationInfoC extends TransformationNodeInfo
   public editable = true;
   public creatable = true;
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
-  }
+  public availInfo = {
+    allowedTypes: [ETLFieldTypes.String],
+  };
 }
 
 export const EncryptTransformationInfo = new EncryptTransformationInfoC();

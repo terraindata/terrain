@@ -72,10 +72,6 @@ export class GroupByTransformationNode extends ForkTransformationType
   {
     const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
 
-    // const mapper: {
-    //   [k: string]: KeyPath,
-    // } = {};
-
     const mapper: {
       [k: string]: number,
     } = {};
@@ -125,14 +121,11 @@ class GroupByTransformationInfoC extends TransformationNodeInfo
   public creatable = true;
   public newFieldType = 'array';
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    return (
-      EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
-      EngineUtil.getValueType(fieldId, engine) === 'object' &&
-      EngineUtil.isNamedField(engine.getFieldPath(fieldId))
-    );
-  }
+  public availInfo = {
+    allowedTypes: [ETLFieldTypes.Array],
+    arrayOf: [ETLFieldTypes.Object],
+    isNamed: true,
+  };
 }
 
 export const GroupByTransformationInfo = new GroupByTransformationInfoC();

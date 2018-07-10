@@ -107,11 +107,9 @@ class FindReplaceTransformationInfoC extends TransformationNodeInfo
   public editable = true;
   public creatable = true;
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    const type = EngineUtil.getRepresentedType(fieldId, engine);
-    return type === 'string';
-  }
+  public availInfo = {
+    allowedTypes: [ETLFieldTypes.String],
+  };
 }
 
 export const FindReplaceTransformationInfo = new FindReplaceTransformationInfoC();

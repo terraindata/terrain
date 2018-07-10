@@ -98,15 +98,11 @@ class RemoveDuplicatesTransformationInfoC extends TransformationNodeInfo
   public editable = true;
   public creatable = true;
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    const valueType = EngineUtil.getValueType(fieldId, engine);
-    return (
-      EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
-      (valueType === 'number' || valueType === 'string') &&
-      EngineUtil.isNamedField(engine.getFieldPath(fieldId))
-    );
-  }
+  public availInfo = {
+    allowedTypes: [ETLFieldTypes.Array],
+    arrayOf: [ETLFieldTypes.String, ETLFieldTypes.Number],
+    isNamed: true,
+  };
 }
 
 export const RemoveDuplicatesTransformationInfo = new RemoveDuplicatesTransformationInfoC();
