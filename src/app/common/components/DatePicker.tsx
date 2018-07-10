@@ -62,6 +62,7 @@ import { Moment } from 'moment';
 import TerrainDateParameter from '../../../../shared/database/elastic/parser/TerrainDateParameter';
 import { Colors, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
+import FadeInOut from '../../common/components/FadeInOut';
 
 const MINUTE_INTERVAL = 30;
 const MINUTE_RATIO = (60 / MINUTE_INTERVAL);
@@ -378,14 +379,16 @@ export class DatePickerUncontained extends TerrainComponent<Props>
   public handleHourChange(hourIndex)
   {
     if (this.props.date.startsWith('@TerrainDate') &&
-      TerrainDateParameter.isValidTerrainDateParameter(this.props.date))
+      TerrainDateParameter.isValidTerrainDateParameter(this.props.date) &&
+      this.state.dateViewType === 'relative')
     {
       const newHour = Math.floor(hourIndex / MINUTE_RATIO);
       const newMinute = (hourIndex % MINUTE_RATIO) * MINUTE_INTERVAL;
       const timeStr = moment().hour(newHour).minute(newMinute).format('HH:mm:ssZ');
       const date = TerrainDateParameter.setTimePart(this.props.date, timeStr);
       this.props.onChange(date);
-    } else
+    }
+    else
     {
       const date = this.getDate();
       date.hour(Math.floor(hourIndex / MINUTE_RATIO));
@@ -401,7 +404,8 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     if (TerrainDateParameter.isValidTerrainDateParameter(this.props.date))
     {
       date = TerrainDateParameter.setDayPart(this.props.date, date);
-    } else
+    }
+    else
     {
       const now = this.getDate().format('HH:mm:ssZ');
       date = date + '.T' + now;
@@ -497,7 +501,10 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     return (
       <div className='date-time-time-top'>
         {this.renderRelativeTimePicker(dateArg)}
-        {this.renderTimePicker(dateArg)}
+        <FadeInOut
+          open={this.state.dateViewType === 'relative' && this.props.date.includes('@TerrainDate')}
+          children={this.renderTimePicker(dateArg)}
+        />
       </div>
     );
   }
