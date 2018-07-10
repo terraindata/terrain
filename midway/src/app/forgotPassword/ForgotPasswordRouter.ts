@@ -72,7 +72,6 @@ Router.post('/', async (ctx, next) =>
     const validWindow: Date = new Date(timestamp);
     validWindow.setDate(timestamp.getDate() + 1);
     const currDateTime: Date = new Date(Date.now());
-
     if (currDateTime.getTime() <= validWindow.getTime())
     {
       const userIdToChange: number = recoveryTokenEntry[0]['id'];
@@ -80,6 +79,7 @@ Router.post('/', async (ctx, next) =>
       const userToUpdate = user[0];
       userToUpdate['password'] = newPassword;
       const updatedUser: UserConfig = await users.update(userToUpdate, true) as UserConfig;
+
       const newEntry = {
         id: recoveryTokenEntry[0]['id'],
         token: null,
@@ -91,7 +91,7 @@ Router.post('/', async (ctx, next) =>
     }
     else
     {
-      ctx.body = 'Invalid reset url - token expired.';
+      ctx.body = 'Reset link expired. Please request another link.';
     }
   }
 });

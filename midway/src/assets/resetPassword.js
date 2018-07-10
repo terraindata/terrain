@@ -61,8 +61,9 @@ function checkTokenValidity()
 	xhr.open(config.method, config.route, true);
 	xhr.setRequestHeader('Content-Type', 'application/json');
 
-	xhr.onload = function () {
-		if (xhr.status != 200)
+	xhr.onload = function () 
+	{
+		if (xhr.status !== 200)
 		{
 			document.getElementById('reset-password-area').innerHTML = "Invalid reset url.";
 		}
