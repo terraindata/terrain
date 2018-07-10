@@ -77,7 +77,7 @@ export class RenameTransformationNode extends TransformationNode
     const errors = [];
     const opts = this.meta as NodeOptionsType<any>;
 
-    const inputField = this.fields.get(0);
+    const inputField = this.fields.get(0).path;
     const outputField = opts.newFieldKeyPaths.get(0);
 
     const matcherFn = Topology.createBasePathMatcher(inputField, outputField);

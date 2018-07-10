@@ -126,7 +126,7 @@ class TransformationNodeC
 {
   public id: number = 0;
   public typeCode: TransformationNodeType = TransformationNodeType.SplitNode;
-  public fields: List<KeyPath> = List([]);
+  public fields: List<{ id: number, path: KeyPath }> = List([]);
   public meta: object = {};
 }
 export type TransformationNode = WithIRecord<TransformationNodeC>;

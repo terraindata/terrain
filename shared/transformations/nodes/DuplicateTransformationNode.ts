@@ -174,7 +174,7 @@ export class DuplicateTransformationNode extends TransformationNode
     const errors = [];
     const opts = this.meta as NodeOptionsType<any>;
 
-    const inputField = this.fields.get(0);
+    const inputField = this.fields.get(0).path;
     const outputField = opts.newFieldKeyPaths.get(0);
 
     // when we implement optimizations / caching and overrideable serialization we can memoize this

@@ -77,7 +77,7 @@ export default abstract class AggregateTransformationType extends Transformation
     const errors = [];
     const opts = this.meta as NodeOptionsType<any>;
     const outputField = opts.newFieldKeyPaths.get(0);
-    const inputField = this.fields.get(0);
+    const inputField = this.fields.get(0).path;
 
     const matcherFn = Topology.createBasePathMatcher(inputField, outputField);
     for (const match of yadeep.search(doc, inputField))

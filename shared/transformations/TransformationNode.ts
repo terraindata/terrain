@@ -57,18 +57,18 @@ export default abstract class TransformationNode
 {
   public id: number;
   public abstract typeCode: TransformationNodeType;
-  public fields: List<KeyPath>;
-  public fieldIds: List<number>;
+  // public fields: List<KeyPath>;
+  // public fieldIds: List<number>;
+  public fields: List<{ path: KeyPath, id: number }>;
   public meta: object;
 
   // override this to only operate on a certain js type
   public readonly acceptedType: string;
 
-  public constructor(id: number, fieldIds: List<number>, fields: List<KeyPath>, options: object = {})
+  public constructor(id: number, fields: List<{path: KeyPath, id: number}>, options: object = {})
   {
     this.id = id;
     this.fields = fields;
-    this.fieldIds = fieldIds;
     this.meta = options;
   }
 

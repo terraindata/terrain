@@ -89,7 +89,7 @@ export default abstract class ForkTransformationType extends TransformationNode
     {
       opts.newFieldKeyPaths.forEach((nfkp) =>
       {
-        if (valid && !Topology.areFieldsLocal(field, nfkp))
+        if (valid && !Topology.areFieldsLocal(field.path, nfkp))
         {
           valid = false;
         }
@@ -108,7 +108,7 @@ export default abstract class ForkTransformationType extends TransformationNode
     const errors = [];
     const opts = this.meta as NodeOptionsType<any>;
 
-    const field = this.fields.get(0);
+    const field = this.fields.get(0).path;
     const outputFields: List<KeyPath> = opts.newFieldKeyPaths;
     const matchCacheFn = _.memoize((newFieldIndex: number) =>
     {

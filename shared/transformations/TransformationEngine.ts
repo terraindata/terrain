@@ -150,7 +150,6 @@ export class TransformationEngine
       const raw: object = parsed['dag']['nodes'][i]['value'];
       parsed['dag']['nodes'][i]['value'] = NodeConstructor.visit(raw['typeCode'], undefined, {
         id: raw['id'],
-        fieldIds: raw['fieldIds'],
         fields: raw['fields'],
         meta: raw['meta'],
         deserialize: true,
@@ -229,18 +228,31 @@ export class TransformationEngine
    * @param {object} options                     Any options for the transformation;
    *                                             different transformation types have
    *                                             various specialized options available
-   * @param {string[]} tags                      Any special tags for the node in the DAG
-   * @param {number} weight                      A weight for new edges in the DAG
    * @returns {number}                           The ID of the newly-created transformation
    */
-  public appendTransformation(nodeType: TransformationNodeType, fieldNames: List<KeyPath>,
-    options?: object, tags?: string[], weight?: number): number
+  public appendTransformation(nodeType: TransformationNodeType, inFields: List<KeyPath | number>,
+    options?: object): number
   {
-    const fieldIds = fieldNames.map((kp) => this.getFieldID(kp)).toList();
+    const fields = inFields.map((val) => {
+      if (typeof val === 'number')
+      {
+        return {
+          id: val,
+          path: this.getFieldPath(val),
+        };
+      }
+      else
+      {
+        return {
+          id: this.getFieldID(val),
+          path: val,
+        }
+      }
+    }).toList();
+
     const node: TransformationNode = NodeConstructor.visit(nodeType, undefined, {
       id: this.uidNode,
-      fieldIds,
-      fields: fieldNames,
+      fields,
       meta: options,
     });
 
@@ -253,9 +265,9 @@ export class TransformationEngine
         for (let i: number = 0; i < options['newFieldKeyPaths'].size; i++)
         {
           let inferredTypeNameOfNewFields: string;
-          if (TransformationRegistry.getNewFieldType(nodeType) === 'same' && fieldNames.size > 0)
+          if (TransformationRegistry.getNewFieldType(nodeType) === 'same' && fields.size > 0)
           {
-            inferredTypeNameOfNewFields = this.getFieldType(this.getFieldID(fieldNames.get(0)));
+            inferredTypeNameOfNewFields = this.getFieldType(fields.get(0).id);
           }
           else if (TransformationRegistry.getNewFieldType(nodeType))
           {
@@ -271,9 +283,9 @@ export class TransformationEngine
       }
       if (options['preserveOldFields'] === false)
       {
-        for (let i: number = 0; i < fieldNames.size; i++)
+        for (let i: number = 0; i < fields.size; i++)
         {
-          this.disableField(this.getFieldID(fieldNames.get(i)));
+          this.disableField(fields.get(i).id);
         }
       }
     }
@@ -397,7 +409,7 @@ export class TransformationEngine
     const nodes: TransformationNode[] = [];
     _.each(this.dag.nodes(), (node) =>
     {
-      if ((this.dag.node(node) as TransformationNode).fieldIds.includes(field))
+      if ((this.dag.node(node) as TransformationNode).fields.findIndex((f) => f.id === field) !== -1)
       {
         nodes.push(this.dag.node(node) as TransformationNode);
       }
@@ -437,17 +449,11 @@ export class TransformationEngine
    * @param {Immutable.List<KeyPath>} fieldNames New field names
    * @param {object} options New options
    */
-  public editTransformation(transformationID: number, fieldNames?: List<KeyPath>,
-    options?: object): void
+  public editTransformation(transformationID: number, options?: object): void
   {
     if (!this.dag.nodes().includes(transformationID.toString()))
     {
       return;
-    }
-
-    if (fieldNames !== undefined)
-    {
-      (this.dag.node(transformationID.toString()) as TransformationNode).fields = fieldNames;
     }
 
     if (options !== undefined)

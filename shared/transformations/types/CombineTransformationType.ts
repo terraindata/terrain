@@ -94,8 +94,9 @@ export default abstract class CombineTransformationType extends TransformationNo
       [k: string]: InputField[],
     } = {};
 
-    this.fields.forEach((field) =>
+    this.fields.forEach((fieldObj) =>
     {
+      const field = fieldObj.path;
       for (const match of yadeep.search(doc, field))
       {
         const { value, location } = match;
@@ -124,7 +125,7 @@ export default abstract class CombineTransformationType extends TransformationNo
     const opts = this.meta as NodeOptionsType<any>;
     const newFieldKeyPath = opts.newFieldKeyPaths.get(0);
 
-    const matchFn = Topology.createBasePathMatcher(this.fields.get(0), newFieldKeyPath);
+    const matchFn = Topology.createBasePathMatcher(this.fields.get(0).path, newFieldKeyPath);
 
     for (const locale of Object.keys(matchSets))
     {

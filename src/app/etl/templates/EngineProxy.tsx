@@ -164,20 +164,11 @@ export class EngineProxy
 
   public editTransformation(
     id: number,
-    fields: List<EnginePath>,
     options,
     config?: TransformationConfig,
   )
   {
-    this.engine.editTransformation(id, fields, options);
-    if (config !== undefined && config.newSourceType !== undefined)
-    {
-      fields.forEach((kp: EnginePath) =>
-      {
-        const fieldId = this.engine.getFieldID(kp);
-        EngineUtil.changeFieldType(this.engine, fieldId, config.newSourceType);
-      });
-    }
+    this.engine.editTransformation(id, options);
     this.requestRebuild(id);
   }
 

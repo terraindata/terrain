@@ -58,16 +58,14 @@ import TransformationVisitResult from './TransformationVisitResult';
 export interface NodeArgs
 {
   id: number;
-  fields: List<KeyPath>;
-  fieldIds: List<number>;
+  fields: List<{ path: KeyPath, id: number }>;
   meta: object;
 }
 
 export interface SerializedNodeArgs
 {
   id: number;
-  fields: WayPoint[][];
-  fieldIds: number[];
+  fields: Array<{ path: WayPoint[], id: number }>;
   meta: object;
 }
 
@@ -82,8 +80,12 @@ export default class ConstructorVisitor
 
   public deserialize(args: SerializedNodeArgs): NodeArgs
   {
-    const fields = List(args.fields.map((item) => KeyPath(item)));
-    const fieldIds = List(args.fieldIds);
+    const fields = List(args.fields.map((item) => {
+      return {
+        id: item.id,
+        path: List(item.path),
+      };
+    }));
 
     const meta = _.cloneDeep(args.meta as CommonTransformationOptions);
     if (meta.newFieldKeyPaths !== undefined)
@@ -94,7 +96,6 @@ export default class ConstructorVisitor
     return {
       id: args.id,
       fields,
-      fieldIds,
       meta,
     };
   }
@@ -103,11 +104,11 @@ export default class ConstructorVisitor
   {
     const ctor = TransformationRegistry.getType(type);
 
-    const { id, fields, fieldIds, meta } = args.deserialize ?
+    const { id, fields, meta } = args.deserialize ?
       this.deserialize(args as SerializedNodeArgs)
       :
       args as NodeArgs;
 
-    return new ctor(id, fieldIds, fields, meta);
+    return new ctor(id, fields, meta);
   }
 }

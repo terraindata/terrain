@@ -206,4 +206,49 @@ interface TransformationOptionTypes
 export type NodeTypes = keyof TransformationOptionTypes;
 export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key] & CommonTransformationOptions;
 
+/*
+ *  For each edge (u, v) whose nodes operate on fields u and v (u and v could be multiple fields),
+ *  the Edge Labels mean the following:
+ *  Synthesis
+ *    - fields v1, v2... are synthetic and depend on u1, u2...
+ *    - Forks, Combines, Aggregations and Duplicate create these edges
+  *  InPlace
+ *    - v and u are the same field and have no structural differences
+ *    - Simple Transformations fall into this category
+ *  Restructure
+ *    - v and u are the same field but may have different types
+ *    - so far, only Cast Transformation
+ *  Rename
+ *    - v and u are the same field but have different locations
+ *    - so far, only rename node falls into this category
+ *
+ *  Restructure and Rename only have 1 associated transformation,
+ *  but they're special enough cases they should have their own type.
+ *
+ *  Generally, InPlace transformations can be freely edited, deleted, or created.
+ *  When we append transformations to the DAG for some field f, we should find the source node
+ *  associated with f (there should only be one). Provided we construct the DAG properly, every node
+ *  in the DAG should only ever have 1 non-synthetic edge. We can then traverse from f down all non-synthetic edges
+ *  until we reach a sink. We can then append the transformation node to this sink node and label it
+ *  with the appropriate label. If there are multiple input fields we do this for all input fields.
+ *
+ *  If a transformation would create a new field, we add a synthetic identity node, which gets connected to all
+ *  associated input fields.
+ *
+ *  When adding new fields we can easily identify if it should be synthetic or organic by finding an ancestor of the field
+ *  and analyzing the graph. For example, when adding [foo, bar, -1, baz], we check if [foo, bar, -1] exists.
+ *  If not, we check [foo, bar] and so on. For the existing ancestor, based on the source node and the edge labels we can
+ *  determine if the new field should be synthetic or not.
+ *
+ *  Traversing the DAG to get the execution order should be simple.
+ *  We do a topological sort of the DAG and execute them in order.
+ */
+export enum TransformationEdgeTypes
+{
+  Synthesis = 'Synthesis',
+  InPlace = 'InPlace',
+  Restructure = 'Restructure',
+  Rename = 'Rename',
+}
+
 export default TransformationNodeType;

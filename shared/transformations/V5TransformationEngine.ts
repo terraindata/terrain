@@ -43,28 +43,42 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-
-import arrayTypeOfValues = require('array-typeof-values');
-import * as GraphLib from 'graphlib';
-import { List, Map } from 'immutable';
-import isPrimitive = require('is-primitive');
-import * as _ from 'lodash';
-import TransformationNode from 'shared/transformations/TransformationNode';
-import { KeyPath, keyPathPrefixMatch, updateKeyPath } from '../util/KeyPath';
-import * as yadeep from '../util/yadeep';
-import DataStore from './DataStore';
-import TransformationEngineNodeVisitor from './TransformationEngineNodeVisitor';
-import TransformationNodeType from './TransformationNodeType';
-import TransformationRegistry from './TransformationRegistry';
-import TransformationVisitError from './TransformationVisitError';
+// tslint:disable:max-classes-per-file
 
 /**
  *  Keep this file around as long as there are customer instances on template versions v4 or v5
  */
+
+import * as GraphLib from 'graphlib';
+import { List, Map } from 'immutable';
+import * as _ from 'lodash';
+
+type WayPoint = string | number;
+type KeyPath = List<WayPoint>;
+const KeyPath = (args: WayPoint[] = []) => List<WayPoint>(args);
+
+export class TransformationNode
+{
+  public id: number;
+  public typeCode: any;
+  public fields: List<KeyPath>;
+  public meta: object;
+
+  public constructor(
+    id: number,
+    fields: List<KeyPath>,
+    options: object = {},
+    typeCode: any,
+  )
+  {
+    this.id = id;
+    this.fields = fields;
+    this.meta = options;
+  }
+}
+
 export class TransformationEngine
 {
-  public static datastore = new DataStore();
-
   /**
    * Creates a TransformationEngine from a serialized representation
    * (either a JSON object or stringified JSON object).
@@ -133,12 +147,12 @@ export class TransformationEngine
     {
       const raw: object = parsed['dag']['nodes'][i]['value'];
       parsed['dag']['nodes'][i]['value'] =
-        new (TransformationRegistry.getType(raw['typeCode']))(
+        new TransformationNode(
           raw['id'],
           List<KeyPath>(raw['fields'].map((item) => KeyPath(item))),
           TransformationEngine.makeMetaImmutable(raw['meta']),
-          // raw['typeCode'],
-        ) as TransformationNode;
+          raw['typeCode'],
+        );
     }
     return parsed;
   }

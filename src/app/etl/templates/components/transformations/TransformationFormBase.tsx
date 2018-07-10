@@ -173,7 +173,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
     const { transformation, isCreate, engine, fieldId } = this.props;
     const fields = isCreate ?
       List([engine.getFieldPath(fieldId)]) :
-      transformation.fields;
+      transformation.fields.map((field) => field.path).toList();
 
     return {
       options: this.state,
@@ -213,7 +213,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   {
     const { transformation } = this.props;
     const args = this.computeArgs();
-    proxy.editTransformation(transformation.id, args.fields, args.options, this.overrideTransformationConfig());
+    proxy.editTransformation(transformation.id, args.options, this.overrideTransformationConfig());
   }
 
   // override this to customize how the state object changes when a form element changes
