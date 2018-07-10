@@ -91,7 +91,7 @@ test-sigint:
     - schedules
   stage: standard-tests
 
-build-frontend:
+build-backend:
   script:
    - yarn build-server
   except:
