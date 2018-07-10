@@ -46,9 +46,9 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
 import * as App from '../App';
 import * as Util from '../AppUtil';
+import { MidwayLogger } from '../log/MidwayLogger';
 import RecoveryTokenConfig from '../recoveryTokens/RecoveryTokenConfig';
 import RecoveryTokens from '../recoveryTokens/RecoveryTokens';
 import UserConfig from '../users/UserConfig';
@@ -61,46 +61,40 @@ export const initialize = () => users.initialize();
 Router.post('/', async (ctx, next) =>
 {
   ctx.status = 401;
+  ctx.body = 'Error changing password.';
   const token: string = ctx.request.body['recoveryToken'];
   const newPassword: string = ctx.request.body['newPassword'];
   recoveryTokens.initialize();
-  const allRecoveryTokens: RecoveryTokenConfig[] = await recoveryTokens.select([], {}) as RecoveryTokenConfig[];
-  const allUsers: UserConfig[] = await users.select([], {}) as UserConfig[];
-  for (let index: number = 0; index < allRecoveryTokens.length; index++)
+  const recoveryTokenEntry = await recoveryTokens.select([], {token: ctx.request.body['recoveryToken']}) as RecoveryTokenConfig[];
+  if (recoveryTokenEntry.length === 1) 
   {
-    if (allRecoveryTokens[index]['token'] === token)
+    const timestamp: Date = recoveryTokenEntry[0]['createdAt'];
+    const validWindow: Date = new Date(timestamp);
+    validWindow.setDate(timestamp.getDate() + 1);
+    const currDateTime: Date = new Date(Date.now());
+
+    if (currDateTime.getTime() <= validWindow.getTime())
     {
-       // check token validity with timestamp
-       const timestamp: Date = allRecoveryTokens[index]['createdAt'];
-       const validWindow: Date = new Date(timestamp);
-       validWindow.setDate(timestamp.getDate() + 1);
-       const currDateTime: Date = new Date(Date.now());
-       // check that token is <= 24 hours old
-       if (currDateTime.getTime() <= validWindow.getTime())
-       {
-         const userIdToChange: number = allRecoveryTokens[index]['id'];
-         const user = await users.get(userIdToChange);
-         const userToUpdate = user[0];
-         userToUpdate['password'] = newPassword;
-         const updatedUser: UserConfig = await users.update(userToUpdate, true) as UserConfig;
-         // delete token used
-         const newEntry = {
-           id: allRecoveryTokens[index]['id'],
-           token: null,
-           createdAt: currDateTime,
-         };
-         const updatedEntry: RecoveryTokenConfig = await recoveryTokens.update(newEntry) as RecoveryTokenConfig;
-         ctx.body = 'Password successfully changed.';
-         ctx.status = 200;
-       }
-       else
-       {
-         ctx.body = 'Invalid reset url - token expired.';
-       }
-     }
-   }
-   ctx.body = 'Error changing password.';
- });
+      const userIdToChange: number = recoveryTokenEntry[0]['id'];
+      const user = await users.get(userIdToChange);
+      const userToUpdate = user[0];
+      userToUpdate['password'] = newPassword;
+      const updatedUser: UserConfig = await users.update(userToUpdate, true) as UserConfig;
+      const newEntry = {
+        id: recoveryTokenEntry[0]['id'],
+        token: null,
+        createdAt: currDateTime,
+      };
+      const updatedEntry: RecoveryTokenConfig = await recoveryTokens.update(newEntry) as RecoveryTokenConfig;
+      ctx.body = 'Password successfully changed.';
+      ctx.status = 200;
+    }
+    else
+    {
+      ctx.body = 'Invalid reset url - token expired.';
+    }
+  }
+});
 
 Router.get('/:token', async (ctx, next) =>
 {
@@ -108,22 +102,16 @@ Router.get('/:token', async (ctx, next) =>
   let tokenFound: boolean = false;
   recoveryTokens.initialize();
   const allRecoveryTokens: RecoveryTokenConfig[] = await recoveryTokens.select([], {}) as RecoveryTokenConfig[];
-  for (let index: number = 0; index < allRecoveryTokens.length; index++)
-  {
-    if (allRecoveryTokens[index]['token'] === token)
-    {
-      tokenFound = true;
-    }
-  }
-  if (tokenFound)
+  const recoveryTokenEntry = await recoveryTokens.select([], {token: ctx.params.token}) as RecoveryTokenConfig[];
+  if (recoveryTokenEntry.length === 1)
   {
     ctx.status = 200;
   }
-  else
+  else 
   {
-    ctx.status = 404;
+    ctx.status = 401;
+    MidwayLogger.error("Token not found.");
   }
-
 });
 
 export default Router;

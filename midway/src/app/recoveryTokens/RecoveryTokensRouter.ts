@@ -47,9 +47,9 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as srs from 'secure-random-string';
-import * as winston from 'winston';
 import * as App from '../App';
 import * as Util from '../AppUtil';
+import { MidwayLogger } from '../log/MidwayLogger';
 import RecoveryTokenConfig from '../recoveryTokens/RecoveryTokenConfig';
 import RecoveryTokens from '../recoveryTokens/RecoveryTokens';
 import UserConfig from '../users/UserConfig';
@@ -63,65 +63,59 @@ import Integrations from '../integrations/Integrations';
 const integrations: Integrations = new Integrations();
 Router.post('/', async (ctx, next) =>
 {
-   let hostNameValid: boolean = false;
-   const hostName: string = ctx.request.body['url'];
-   // check that hostname is either .terraindata.com or localhost
-   if (/https*:\/\/[a-z\-]*\.terraindata\.com$/.test(hostName) || /https*:\/\/localhost[:0-9]*$/.test(hostName))
-   {
-     hostNameValid = true;
-   }
-   // check that user exists in db
-   let user: UserConfig[];
-   let userId: number;
-   let userExists: boolean = false;
-   let email: string;
-   try {
-     user = await users.select(['id'], {email: ctx.request.body['email']}) as UserConfig[];
-     userId = user[0]['id'];
-     userExists = (userId !== undefined && userId !== '' && userId !== null);
-   }
-   catch (error) {
-     winston.error("user doesn't exist: " + JSON.stringify(ctx.request.body['email']));
-     winston.error(error);
-   }
+  let hostNameValid: boolean = false;
+  const hostName: string = ctx.request.body['url'];
+  if (/https*:\/\/[a-z\-]*\.terraindata\.com$/.test(hostName) || /https*:\/\/localhost[:0-9]*$/.test(hostName))
+  {
+    hostNameValid = true;
+  }
+  let userId: number;
+  let userExists: boolean = false;
+  let email: string;
+  const user: UserConfig[] = await users.select(['id'], {email: ctx.request.body['email']}) as UserConfig[];
+  if (user.length === 1)
+  {
+    userId = user[0]['id'];
+    userExists = (userId !== undefined && userId !== '' && userId !== null);
+  }
+  else
+  {
+    MidwayLogger.error("user doesn't exist: " + JSON.stringify(ctx.request.body['email']));
+  }
+  if (userExists && hostNameValid)
+  {
+    email = ctx.request.body['email'];
 
-   if (userExists && hostNameValid)
-   {
-     email = ctx.request.body['email'];
-     // generate token
-     const userToken: string = srs();
-     // generate timestamp
-     const currDateTime: Date = new Date(Date.now());
-     // put timestamp and token into DB with user
-     recoveryTokens.initialize();
-     const checkRecoveryTokens: RecoveryTokenConfig[] = await recoveryTokens.get(userId) as RecoveryTokenConfig[];
-     const newEntry = {
-         id: userId,
-         token: userToken,
-         createdAt: currDateTime,
-       };
+    const userToken: string = srs();
 
-       try {
+    const currDateTime: Date = new Date(Date.now());
 
-         const entry = await recoveryTokens.upsert(newEntry) as RecoveryTokenConfig;
-       }
-       catch {
-         winston.error('unable to upsert user into recovery tokens table.');
-       }
+    recoveryTokens.initialize();
+    const checkRecoveryTokens: RecoveryTokenConfig[] = await recoveryTokens.get(userId) as RecoveryTokenConfig[];
+    const newEntry = {
+      id: userId,
+      token: userToken,
+      createdAt: currDateTime,
+    };
+    try 
+    {
+      const entry = await recoveryTokens.upsert(newEntry) as RecoveryTokenConfig;
+    }
+    catch 
+    {
+      MidwayLogger.error("unable to upsert user into recovery tokens table.");
+    }
+    const route: string = hostName + '/resetPassword.html?token=' + userToken;
+    integrations.initialize();
+    const emailIntegrations: IntegrationConfig[] = await integrations.get(null, undefined, 'Email', true) as IntegrationConfig[];
+    const subject: string = 'Password reset link from notifications@terraindata.com';
+    const body: string = 'Please click on the link below to reset your password. \n \n' + route;
+    const emailSendStatus: boolean = await App.EMAIL.send(email, emailIntegrations[0].id, subject, body);
+    MidwayLogger.info(`email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
+  }
 
-     // construct URL
-     const route: string = hostName + '/resetPassword.html?token=' + userToken;
-     // send email with reset url
-     integrations.initialize();
-     const emailIntegrations: IntegrationConfig[] = await integrations.get(null, undefined, 'Email', true) as IntegrationConfig[];
-     const subject: string = 'Password reset link from notifications@terraindata.com';
-     const body: string = 'Please click on the link below to reset your password. \n \n' + route;
-     const emailSendStatus: boolean = await App.EMAIL.send(email, emailIntegrations[0].id, subject, body);
-     winston.info(`email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
-   }
-   ctx.body = "Password reset email sent. If you don't receive an email in 30 minutes, please contact Terrain support.";
-   ctx.status = 200;
-
+  ctx.body = "Password reset email sent. If you don't receive an email in 30 minutes, please contact Terrain support.";
+  ctx.status = 200;
 });
 
 export default Router;
