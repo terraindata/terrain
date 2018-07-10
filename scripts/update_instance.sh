@@ -32,9 +32,6 @@ while getopts "n:a:v:d:" opt; do
     d)
       SOURCE_DB_NAME=$OPTARG
       ;;
-    r)
-      SKIP_RSYNC=true
-      ;;
     \?)
       echo "Invalid option: -$OPTARG";
       echo "$HELPSTRING";
@@ -197,7 +194,7 @@ if [ "$SKIP_RSYNC" = "y" ] || [ "$SKIP_RSYNC" = "Y" ]
     (! test -d Search) && (echo "Error: could not find Search directory"; exit 1);
 
     echo "rsyncing";
-    rsync -vrP  --exclude midway.json --exclude midway.db --exclude node_modules --delete  $PWD/Search terrain@${ADDRESS}:src-${VERSION}/ > "rsynclog.log";
+    rsync -vrP --progress  --exclude midway.json --exclude midway.db --exclude node_modules --delete  $PWD/Search terrain@${ADDRESS}:src-${VERSION}/ > "rsynclog.log";
     echo "rsync complete"
 fi
 
@@ -215,11 +212,12 @@ echo ""
 START_SCREEN_COMMAND=""
 if [ "${HAS_SCREEN}" = "y" ]
   then
-    START_SCREEN_COMMAND="screen -d -m -S runmidway-3000;"
+    START_SCREEN_COMMAND="screen -d -m -S runmidway-${SCREEN_ID};"
 fi
 
 
 ssh terrain@${ADDRESS} << EOF
+cd /home/terrain/src-${VERSION}/Search;
 ${STAGE_DB_COMMAND}
 ${START_SCREEN_COMMAND}
 screen -S runmidway-${SCREEN_ID} -X stuff "cd /home/terrain/src-${VERSION}/Search;\r";
