@@ -215,7 +215,7 @@ echo ""
 START_SCREEN_COMMAND=""
 if [ "${HAS_SCREEN}" = "y" ]
   then
-    START_SCREEN_COMMAND="screen -d -m -S runmidway-3000;"
+    START_SCREEN_COMMAND="screen -d -m -S runmidway-${SCREEN_ID};"
 fi
 
 
