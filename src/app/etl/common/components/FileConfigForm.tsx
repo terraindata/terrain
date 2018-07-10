@@ -143,7 +143,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
         type: DisplayType.Custom,
         displayName: 'Suggested JSON Paths',
         group: 'path',
-        widthFactor: 8,
+        widthFactor: 9,
         options: {
           render: this.renderSuggestedJsonPaths,
         },
@@ -190,7 +190,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
             List(PathUtil.guessFilePaths(this.props.source).map((key, i) => JSON.stringify(this.props.source[key.name], null, 2)))
           }
           width='100%'
-          height='40%'
+          height='45%'
           strictFormatting={true}
         />
       );
