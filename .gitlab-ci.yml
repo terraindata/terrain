@@ -93,6 +93,13 @@ test-sigint:
 
 build-frontend:
   script:
+   - yarn build-server
+  except:
+   - schedules
+  stage: style-and-compilation
+
+build-frontend:
+  script:
    - yarn build
   except:
    - schedules
