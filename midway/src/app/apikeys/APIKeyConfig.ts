@@ -44,49 +44,20 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import MidwayError from '../../../shared/error/MidwayError';
-import { MidwayLogger } from '../app/log/MidwayLogger';
+import ConfigType from '../ConfigType';
 
-class RouteError extends MidwayError
+export class APIKeyConfig extends ConfigType
 {
-  public static async RouteErrorHandler(ctx, next)
-  {
-    try
-    {
-      await next();
-    }
-    catch (err)
-    {
-      const routeError = RouteError.fromRouteContext(ctx, err);
-      const status = routeError.getStatus();
-      MidwayLogger.info(JSON.stringify(routeError));
-      if (err.stack !== undefined)
-      {
-        MidwayLogger.error(err.stack);
-      }
-      ctx.status = status;
-      ctx.body = { errors: routeError.getMidwayErrors() };
-    }
-  }
+    public id?: number = undefined;
+    public key: string = '';
+    public createdAt: Date = null;
+    public enabled: boolean = true;
 
-  public static fromRouteContext(ctx, err: string | object): RouteError
-  {
-    if (typeof err !== 'object')
+    constructor(props: object)
     {
-      err = new Error(err);
+        super();
+        ConfigType.initialize(this, props);
     }
-
-    const status: number = 'status' in err ? err['status'] : 400;
-    const title: string = 'title' in err ? err['title'] : 'Route ' + String(ctx.url) + ' has an error.';
-    const detail: string = 'detail' in err ? err['detail'] : ('message' in err ? err['message'] : JSON.stringify(err));
-    const source: object = { ctx, err };
-    return new RouteError(status, title, detail, source);
-  }
-
-  public constructor(status: number, title: string, detail: string, source: object)
-  {
-    super(status, title, detail, source);
-  }
 }
 
-export default RouteError;
+export default APIKeyConfig;

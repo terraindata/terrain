@@ -42,80 +42,95 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import { Readable, Writable } from 'stream';
+import srs = require('secure-random-string');
 
-import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
-import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
-import AEndpointStream from './AEndpointStream';
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
+import * as Util from '../AppUtil';
 
-import ExportTransform from '../ExportTransform';
+import APIKeyConfig from './APIKeyConfig';
 
-import DatabaseController from '../../../database/DatabaseController';
-import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
-import * as Util from '../../AppUtil';
-import { QueryHandler } from '../../query/QueryHandler';
-
-export class AlgorithmEndpoint extends AEndpointStream
+export class APIKeys
 {
-  constructor()
+  private apiKeyTable: Tasty.Table;
+
+  public initialize()
   {
-    super();
+    this.apiKeyTable = App.TBLS.apiKeys;
   }
 
-  public async getExportTransform(source: SourceConfig): Promise<ExportTransform>
+  public async validate(key: string): Promise<APIKeyConfig | null>
   {
-    const algorithmId: number = source.options['algorithmId'];
-    let query: string = source.options['query'];
-
-    if (algorithmId !== undefined)
-    {
-      query = await Util.getQueryFromAlgorithm(algorithmId);
-      return new ExportTransform({
-      });
-    }
-    return new ExportTransform();
+      const results: APIKeyConfig[] = await this.select([], { key }) as APIKeyConfig[];
+      if (results.length > 0 && results[0]['enabled'])
+      {
+          return results[0];
+      }
+      else
+      {
+          return null;
+      }
   }
 
-  public async getSource(source: SourceConfig): Promise<Readable>
+    public async create(): Promise<APIKeyConfig>
+    {
+        try
+        {
+            const cfg: APIKeyConfig = {
+                key: srs({ length: 20, alphanumeric: true }),
+                createdAt: new Date(Date.now()),
+                enabled: true,
+            };
+
+            return this.upsert(cfg);
+        }
+        catch (e)
+        {
+            throw new Error('Problem creating default API key: ' + String(e));
+        }
+    }
+
+  public async delete(key: string): Promise<object>
   {
-    const algorithmId: number = source.options['algorithmId'];
-    let dbId: number = source.options['dbId'];
-    let query: string = source.options['query'];
-
-    if (algorithmId !== undefined)
-    {
-      query = await Util.getQueryFromAlgorithm(algorithmId);
-      dbId = await Util.getDBFromAlgorithm(algorithmId);
-    }
-
-    const controller: DatabaseController | undefined = DatabaseRegistry.get(dbId);
-    if (controller === undefined)
-    {
-      throw new Error(`Database ${String(dbId)} not found.`);
-    }
-
-    if (controller.getType() !== 'ElasticController')
-    {
-      throw new Error('Query endpoint only supports Elastic databases');
-    }
-
-    const qh: QueryHandler = controller.getQueryHandler();
-    const payload = {
-      database: dbId,
-      type: 'search',
-      streaming: true,
-      body: query,
-    };
-
-    return qh.handleQuery(payload) as Promise<Readable>;
+    return App.DB.delete(this.apiKeyTable, { key } as APIKeyConfig);
   }
 
-  public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
+  public async select(columns: string[], filter?: object): Promise<APIKeyConfig[]>
   {
-    throw new Error('Algorithm sink endpoint not implemented');
+    return App.DB.select(this.apiKeyTable, columns, filter) as Promise<APIKeyConfig[]>;
+  }
+
+  public async get(key: string, fields?: string[]): Promise<APIKeyConfig[]>
+  {
+    if (key !== undefined)
+    {
+      if (fields !== undefined)
+      {
+        return this.select(fields, { key });
+      }
+      return this.select([], { key });
+    }
+    if (fields !== undefined)
+    {
+      return this.select(fields, {});
+    }
+    return this.select([], {});
+  }
+
+  public async upsert(apikey: APIKeyConfig): Promise<APIKeyConfig>
+  {
+    if (apikey.key !== undefined)
+    {
+      const results: APIKeyConfig[] = await this.get(apikey.key);
+      if (results.length !== 0)
+      {
+        apikey = Util.updateObject(results[0], apikey);
+      }
+    }
+    return App.DB.upsert(this.apiKeyTable, apikey) as Promise<APIKeyConfig>;
   }
 }
 
-export default AlgorithmEndpoint;
+export default APIKeys;

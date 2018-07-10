@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires max-classes-per-file strict-boolean-expressions
 import TerrainComponent from 'common/components/TerrainComponent';
+import memoizeOne from 'memoize-one';
 import * as React from 'react';
 import { Colors, fontColor } from 'src/app/colors/Colors';
 
@@ -58,6 +59,7 @@ import FadeInOut from 'common/components/FadeInOut';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
 
 import { List, Map } from 'immutable';
+import { instanceFnDecorator } from 'shared/util/Classes';
 
 export interface Props
 {
@@ -182,19 +184,19 @@ abstract class TaskFormBase<FormState, P extends Props = Props> extends TerrainC
   }
 }
 
-type DefaultExitParamsT = ParamConfigType<TaskEnum.taskDefaultExit>;
+type DefaultExitParamsT = ParamConfigType<'taskDefaultExit'>;
 class DefaultExitForm extends TaskFormBase<DefaultExitParamsT>
 {
   public inputMap: InputDeclarationMap<DefaultExitParamsT> = {};
 }
 
-type DefaultFailureParamsT = ParamConfigType<TaskEnum.taskDefaultFailure>;
+type DefaultFailureParamsT = ParamConfigType<'taskDefaultFailure'>;
 class DefaultFailureForm extends TaskFormBase<DefaultFailureParamsT>
 {
   public inputMap: InputDeclarationMap<DefaultFailureParamsT> = {};
 }
 
-type ETLTaskParamsT = ParamConfigType<TaskEnum.taskETL>;
+type ETLTaskParamsT = ParamConfigType<'taskETL'>;
 class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
 {
   public inputMap: InputDeclarationMap<ETLTaskParamsT> = {
@@ -202,9 +204,10 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
       type: DisplayType.Pick,
       displayName: 'Template',
       options: {
-        pickOptions: (state) => !this.props.templates ? List() :
-          this.props.templates.filter((t) => t.canSchedule()).map((t) => t.id).toList(),
-        indexResolver: (option) => this.props.templates.findIndex((t) => t.id === option),
+        pickOptions: (state) => this.getAvailableTemplates(this.props.templates)
+          .map((t) => t.id).toList(),
+        indexResolver: (option) => this.getAvailableTemplates(this.props.templates)
+          .findIndex((t) => t.id === option),
         displayNames: (state) =>
         {
           if (!this.props.templates)
@@ -241,12 +244,18 @@ class ETLTaskForm extends TaskFormBase<ETLTaskParamsT>
       },
     },
   };
+
+  @instanceFnDecorator(memoizeOne)
+  private getAvailableTemplates(templates: List<ETLTemplate>): List<ETLTemplate>
+  {
+    return !templates ? List() : templates.filter((t) => t.canSchedule()).toList();
+  }
 }
 
-type FormLookupMap =
-  {
-    [k in TaskEnum]: React.ComponentClass<Props>
-  };
+interface FormLookupMap
+{
+  [k: number]: React.ComponentClass<Props>;
+}
 
 export const TaskFormMap: FormLookupMap =
   {

@@ -57,7 +57,7 @@ const CREATE_CATEGORY_SELECTOR = '.info-area-button';
 const CATEGORY_ITEM_SELECTOR = '.category-library-info-wrapper';
 const CREATE_GROUP_SELECTOR = '.info-area-button';
 const CREATE_GROUP_BUTTON_SELECTOR = '.modal-confirm-button';
-const CREATE_ALGORITHM_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-3 > div.library-column-content > div.info-area > div.info-area-buttons-container > div';
+const CREATE_ALGORITHM_SELECTOR = '.info-area-button';
 const ALGORITHM_SELECTOR = ':nth-child(2) > .library-category-BUILD > .library-category-content > :nth-child(1) > .library-item-link > .library-item-wrapper > .library-item > :nth-child(1) > .library-item-content > .flex-container > .flex-grow > .library-item-line';
 
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
@@ -119,7 +119,8 @@ async function loginToBuilder(page, url)
   await takeAndCompareScreenShot(page);
 
   await page.waitForSelector(CREATE_ALGORITHM_SELECTOR, selectorConfig);
-  await page.click(CREATE_ALGORITHM_SELECTOR, { clickCount: 2 });
+  await page.click(CREATE_ALGORITHM_SELECTOR);
+  await page.click(CREATE_ALGORITHM_SELECTOR);
   TestLogger.info('Create algorithm');
   sleep.sleep(1);
   await takeAndCompareScreenShot(page);

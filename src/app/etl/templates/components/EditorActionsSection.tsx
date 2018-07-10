@@ -60,6 +60,7 @@ import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateL
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
+import VerificationManager from './VerificationManager';
 
 const UndoIcon = require('images/icon_undo.svg');
 const RedoIcon = require('images/icon_redo.svg');
@@ -274,6 +275,9 @@ class EditorActionsSection extends TerrainComponent<Props>
             'Run import or export',
           )
         }
+        <div className='editor-top-bar-item'>
+          <VerificationManager />
+        </div>
       </div>
     );
   }

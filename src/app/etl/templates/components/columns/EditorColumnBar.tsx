@@ -115,6 +115,7 @@ class EditorColumnBar extends TerrainComponent<Props>
           <Menu
             registerButton={(button) => this.menu = button}
             options={this.menuOptions}
+            overrideMultiplier={7}
           />
           <DropdownIcon />
         </div>

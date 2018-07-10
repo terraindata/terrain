@@ -193,7 +193,6 @@ class Jobs extends TerrainComponent<any> {
 
   public parseJobLogContents(jobLogs)
   {
-    console.log(jobLogs);
     let contents = [];
     if (jobLogs.contents !== '' && jobLogs.contents !== undefined)
     {
@@ -215,6 +214,7 @@ class Jobs extends TerrainComponent<any> {
       completedJobs,
       pendingJobs,
       runningJobs,
+      loading,
     } = this.props;
     const { id, logsModalOpen, jobLogs } = this.state;
 
@@ -283,6 +283,8 @@ class Jobs extends TerrainComponent<any> {
             columnsConfig={jobsHeader}
             data={pendingJobs}
             defaultOrder={defaultOrder}
+            loading={loading}
+            loadingMessage={'Loading your jobs...'}
           />
         </Section>
 
@@ -298,6 +300,8 @@ class Jobs extends TerrainComponent<any> {
             columnsConfig={jobsHeader}
             data={runningJobs}
             defaultOrder={defaultOrder}
+            loading={loading}
+            loadingMessage={'Loading your jobs...'}
           />
         </Section>
 
@@ -312,6 +316,8 @@ class Jobs extends TerrainComponent<any> {
             columnsConfig={jobsHeader}
             data={completedJobs}
             defaultOrder={defaultOrder}
+            loading={loading}
+            loadingMessage={'Loading your jobs...'}
           />
         </Section>
 
@@ -350,6 +356,7 @@ export default Util.createTypedContainer(
     completedJobs: getCompletedJobs,
     pendingJobs: getPendingJobs,
     runningJobs: getRunningJobs,
+    loading: (state) => state.get('jobs').loading,
   },
   { jobsActions: JobsActions },
 );

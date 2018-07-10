@@ -55,13 +55,17 @@ class PrefixedElasticCluster extends ElasticCluster<PrefixedElasticController>
     super(controller, delegate);
   }
 
-  public health(params: Elastic.ClusterHealthParams, callback: (error: any, response: any) => void): void
+  public health(params: Elastic.ClusterHealthParams): Promise<any>;
+  public health(params: Elastic.ClusterHealthParams, callback: (error: any, response: any) => void): void;
+  public health(params: Elastic.ClusterHealthParams, callback?: (error: any, response: any) => void): void | Promise<any>
   {
     this.controller.prependIndexParam(params);
     return super.health(params, callback);
   }
 
-  public state(params: Elastic.ClusterStateParams, callback: (error: any, response: any) => void): void
+  public state(params: Elastic.ClusterStateParams): Promise<any>;
+  public state(params: Elastic.ClusterStateParams, callback: (error: any, response: any) => void): void;
+  public state(params: Elastic.ClusterStateParams, callback?: (error: any, response: any) => void): void | Promise<any>
   {
     this.controller.prependIndexParam(params);
     return super.state(params, callback);

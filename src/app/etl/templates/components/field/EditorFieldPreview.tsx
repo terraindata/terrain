@@ -56,7 +56,9 @@ import Util from 'util/Util';
 import { List } from 'immutable';
 
 import Menu from 'common/components/Menu';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
+import { FieldVerification } from 'shared/etl/languages/LanguageControllers';
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
@@ -65,6 +67,7 @@ import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorField
 
 import './TemplateEditorField.less';
 
+const ErrorIcon = require('images/icon_info.svg');
 const KeyIcon = require('images/icon_key-2.svg');
 const MAX_STRING_LENGTH = 400;
 
@@ -221,6 +224,49 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     }
   }
 
+  public renderVerifications()
+  {
+    const verifications: List<FieldVerification> = this._getFieldVerifications();
+
+    if (verifications === undefined)
+    {
+      return null;
+    }
+
+    const elements = verifications.map((verification, key) =>
+    {
+      const { fieldId, message, type } = verification;
+      const style = type === 'error' ? fontColor(Colors().logLevels.error) : fontColor(Colors().logLevels.warn);
+      return (
+        <div
+          className='field-verifiction-spacer'
+          key={key}
+        >
+          {
+            tooltip(
+              <div
+                style={style}
+                className='editor-field-verification-icon'
+              >
+                <ErrorIcon />
+              </div>,
+              {
+                title: `${type === 'error' ? 'Error' : 'Warning'}: ${message}`,
+                theme: type === 'error' ? 'error' : undefined,
+                key,
+              },
+            )
+          }
+        </div>
+      );
+    });
+    return (
+      <div className='field-preview-verifications'>
+        {elements}
+      </div>
+    );
+  }
+
   public renderMenu()
   {
     if (this.props.labelOnly)
@@ -298,6 +344,9 @@ class EditorFieldPreview extends TemplateEditorField<Props>
           </div>
           {
             this.renderPreviewValue()
+          }
+          {
+            this.renderVerifications()
           }
         </div>
       </div>

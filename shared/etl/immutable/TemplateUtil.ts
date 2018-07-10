@@ -196,7 +196,17 @@ export default class TemplateUtil
           const mapping = options !== undefined ? _.get(options, ['mappings', key]) : undefined;
           const mappingErrors = LanguageController.get(sink.options.language).verifyMapping(edge.transformations, sink, mapping);
           errors = errors.concat(mappingErrors);
-          return mappingErrors.length > 0;
+          let hasFieldErrors = false;
+          const fieldErrorsIterator = LanguageController.get(sink.options.language).getFieldErrors(edge.transformations, sink, mapping);
+          for (const fieldVer of fieldErrorsIterator)
+          {
+            if (fieldVer !== null && fieldVer.type === 'error')
+            {
+              hasFieldErrors = true;
+              errors.push(`Issue with field "${edge.transformations.getOutputKeyPath(fieldVer.fieldId).toJS()}": ${fieldVer.message}`);
+            }
+          }
+          return mappingErrors.length > 0 || hasFieldErrors;
         });
       if (invalidSink !== undefined)
       {

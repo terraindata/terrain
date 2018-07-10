@@ -46,15 +46,14 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file import-spacing
 
 import { List } from 'immutable';
+import * as _ from 'lodash';
 
 import { MidwayError } from 'shared/error/MidwayError';
 import TerrainStore from 'src/app/store/TerrainStore';
 
 import ETLAjax from 'etl/ETLAjax';
-import { fetchDocumentsFromFile } from 'etl/templates/DocumentRetrievalUtil';
 import
 {
-  DefaultDocumentLimit,
   FetchStatus,
 } from 'etl/templates/TemplateEditorTypes';
 import { SourceConfig } from 'shared/etl/immutable/EndpointRecords';
@@ -65,6 +64,9 @@ import
 import { Sources } from 'shared/etl/types/EndpointTypes';
 import { NodeTypes } from 'shared/etl/types/ETLTypes';
 import ETLHelpers from './ETLHelpers';
+
+const DefaultDocumentLimit = 10;
+const CHUNK_SIZE = 1e6;
 
 class DocumentsHelpers extends ETLHelpers
 {
@@ -182,39 +184,101 @@ class DocumentsHelpers extends ETLHelpers
         {
           this.updateStateBeforeFetch(key);
         }
-        switch (source.type)
-        {
-          case Sources.Upload: {
-            const file = source.options['file'];
-            if (file == null)
-            {
-              return catchError('File not provided');
-            }
-            const config = source.fileConfig;
-            fetchDocumentsFromFile(file, config, DefaultDocumentLimit)
-              .then(onFetchLoad)
-              .catch(catchError);
-            break;
-          }
-          case Sources.Mysql:
-          case Sources.GoogleAnalytics:
-          case Sources.Postgresql:
-          case Sources.Algorithm:
-          case Sources.Fs:
-          case Sources.Http:
-          case Sources.Sftp:
-            ETLAjax.fetchPreview(source, DefaultDocumentLimit)
-              .then(onFetchLoad)
-              .catch(catchError);
-            break;
-          default: {
-            return catchError(`Failed to retrieve documents. Unsupported source type: ${source.type}`);
-          }
-        }
+        return this.fetchPreview(source).then(onFetchLoad).catch(catchError);
       }
       catch (e)
       {
         return catchError(e);
+      }
+    });
+  }
+
+  protected fetchPreview(
+    source: SourceConfig,
+  ): Promise<List<object>>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      switch (source.type)
+      {
+        case Sources.Upload: {
+          const file = source.options['file'];
+          if (file == null)
+          {
+            return reject('File not provided');
+          }
+          const config = source.fileConfig;
+          return this.fetchFromFile(source)
+            .then(resolve)
+            .catch(reject);
+        }
+        default: {
+          return ETLAjax.fetchPreview(source, DefaultDocumentLimit)
+            .then(resolve)
+            .catch(reject);
+        }
+      }
+    });
+  }
+
+  protected async sliceFromFile(file: File, size = CHUNK_SIZE): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      let slice;
+      if (file.size <= size)
+      {
+        slice = file;
+      }
+      else
+      {
+        slice = file.slice(0, CHUNK_SIZE);
+      }
+      const reader = new FileReader();
+      reader.onload = (event) =>
+      {
+        resolve(event.target.result);
+      };
+      reader.onerror = (reason) => reject(reason);
+      reader.readAsText(slice);
+    });
+  }
+
+  protected fetchFromFile(
+    source: SourceConfig,
+  ): Promise<List<object>>
+  {
+    return new Promise(async (resolve, reject) =>
+    {
+      try
+      {
+        const file: File = source.options['file'];
+        const newOptions = _.extend({}, source.options, {
+          file: null,
+        });
+        source = source.set('options', newOptions);
+
+        let sliceString = await this.sliceFromFile(file, CHUNK_SIZE);
+        if (sliceString.length < CHUNK_SIZE)
+        {
+          const results = await ETLAjax.fetchPreview(source, DefaultDocumentLimit, sliceString);
+          resolve(results);
+        }
+        else
+        {
+          let results = await ETLAjax.fetchPreview(source, DefaultDocumentLimit, sliceString);
+          // currently only try increasing the size once
+          if (results.size < DefaultDocumentLimit)
+          {
+            sliceString = await this.sliceFromFile(file, 5 * CHUNK_SIZE);
+            results = await ETLAjax.fetchPreview(source, DefaultDocumentLimit, sliceString);
+          }
+          resolve(results);
+        }
+      }
+      catch (e)
+      {
+        reject(e);
       }
     });
   }

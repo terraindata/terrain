@@ -50,7 +50,10 @@ import * as zlib from 'zlib';
 
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
+import { Inputs } from '../../../../../shared/util/Inputs';
 import AEndpointStream from './AEndpointStream';
+
+export const inputs: Inputs = new Inputs();
 
 export default class HTTPEndpoint extends AEndpointStream
 {
@@ -59,10 +62,17 @@ export default class HTTPEndpoint extends AEndpointStream
     super();
   }
 
-  public async getSource(source: SourceConfig): Promise<Readable>
+  public async getSource(source: SourceConfig): Promise<Readable[]>
   {
     const config = await this.getIntegrationConfig(source.integrationId);
-    return this.getRequestStream(config, source.options) as Promise<Readable>;
+    const urls = inputs.replaceInputs(config['url'], source.rootInputConfig['inputs']);
+    const promises = urls.map((url) =>
+    {
+      const newConfig = JSON.parse(JSON.stringify(config));
+      newConfig['url'] = url;
+      return this.getRequestStream(newConfig, source.options) as Promise<Readable>;
+    });
+    return Promise.all(promises);
   }
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
@@ -77,7 +87,7 @@ export default class HTTPEndpoint extends AEndpointStream
     {
       const method = (options !== undefined && options.method !== undefined) ? options.method : undefined;
       let headers = (httpConfig !== undefined && httpConfig['headers'] !== undefined) ? httpConfig['headers'] : undefined;
-      const params = (httpConfig !== undefined && httpConfig['params'] !== undefined) ? httpConfig['params'] : undefined;
+      const params = (httpConfig !== undefined && httpConfig['params'] !== undefined) ? JSON.stringify(httpConfig['params']) : undefined;
       const paramsKey = (method === 'GET') ? 'qs' : 'body';
       const passThrough = new PassThrough({ highWaterMark: 128 * 1024 });
       const isGzip: boolean = false;

@@ -72,6 +72,9 @@ export interface Props
   data: Immutable.Map<ID, any>;
   defaultOrder?: { columnKey: string, direction: 'asc' | 'desc' };
   displayRowCount?: number;
+  loading?: boolean;
+  loadingMessage?: string;
+  noResultsMessage?: string;
 }
 
 export interface State
@@ -85,6 +88,9 @@ export class SimpleTable extends TerrainComponent<Props>
   public static defaultProps = {
     displayRowCount: 10,
     defaultOrder: {},
+    loading: false,
+    loadingMessage: null,
+    noResultsMessage: null,
   };
   public state: State = null;
   public columnWidths = this.calculateColumnWidths();
@@ -200,6 +206,23 @@ export class SimpleTable extends TerrainComponent<Props>
     return orderedData;
   }
 
+  public getEmptyTableMessage()
+  {
+    const { loading, loadingMessage, noResultsMessage } = this.props;
+
+    let message = '';
+    if (loading)
+    {
+      message = loadingMessage !== null ? loadingMessage : 'Loading...';
+    }
+    else
+    {
+      message = noResultsMessage !== null ? noResultsMessage : 'No results';
+    }
+
+    return message;
+  }
+
   public render()
   {
     const { displayRowCount, columnsConfig } = this.props;
@@ -253,9 +276,9 @@ export class SimpleTable extends TerrainComponent<Props>
                 );
               })
               : (
-                <tr>
+                <tr className='simple-table-row'>
                   <td colSpan={columnKeys.length} className='simple-table-cell'>
-                    No results
+                    {this.getEmptyTableMessage()}
                   </td>
                 </tr>
               )

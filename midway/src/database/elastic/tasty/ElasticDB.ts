@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 import * as Elastic from 'elasticsearch';
 
-import util from '../../../../../shared/Util';
 import { IsolationLevel, TastyDB, TransactionHandle } from '../../../tasty/TastyDB';
 import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
@@ -76,22 +75,14 @@ export class ElasticDB implements TastyDB
 
   public async schema(skipHidden: boolean = true): Promise<TastySchema>
   {
-    const result = await new Promise((resolve, reject) =>
+    const result = await this.client.indices.getMapping({});
+    let filteredResponse = result;
+    if (skipHidden)
     {
-      this.client.indices.getMapping(
-        {},
-        util.promise.makeCallback((response) =>
-        {
-          let filteredResponse = response;
-          if (skipHidden)
-          {
-            filteredResponse = this.filterHiddenIndexes(filteredResponse);
-          }
-          return resolve(filteredResponse);
-        }, reject));
-    });
+      filteredResponse = this.filterHiddenIndexes(filteredResponse);
+    }
 
-    return TastySchema.fromElasticTree(result);
+    return TastySchema.fromElasticTree(filteredResponse);
   }
 
   /**
@@ -106,12 +97,7 @@ export class ElasticDB implements TastyDB
 
     for (let i = 0; ; ++i)
     {
-      const result = new Promise<object>((resolve, reject) =>
-      {
-        this.client.search(
-          queries[i],
-          util.promise.makeCallback(resolve, reject));
-      });
+      const result = await this.client.search(queries[i]);
 
       if (i === queries.length - 1)
       {
@@ -154,13 +140,7 @@ export class ElasticDB implements TastyDB
 
   public async storeProcedure(procedure)
   {
-    return new Promise(
-      (resolve, reject) =>
-      {
-        this.client.putScript(
-          procedure,
-          util.promise.makeCallback(resolve, reject));
-      });
+    return this.client.putScript(procedure);
   }
 
   /**
@@ -199,11 +179,7 @@ export class ElasticDB implements TastyDB
    */
   public async createIndex(index: string)
   {
-    return new Promise((resolve, reject) =>
-    {
-      this.client.indices.create({ index },
-        util.promise.makeCallback(resolve, reject));
-    });
+    return this.client.indices.create({ index });
   }
 
   /*
@@ -211,11 +187,7 @@ export class ElasticDB implements TastyDB
    */
   public async refreshIndex(index: string | string[])
   {
-    return new Promise((resolve, reject) =>
-    {
-      this.client.indices.refresh({ index },
-        util.promise.makeCallback(resolve, reject));
-    });
+    return this.client.indices.refresh({ index });
   }
 
   /*
@@ -223,11 +195,7 @@ export class ElasticDB implements TastyDB
    */
   public async deleteIndex(index: string | string[])
   {
-    return new Promise((resolve, reject) =>
-    {
-      this.client.indices.delete({ index },
-        util.promise.makeCallback(resolve, reject));
-    });
+    return this.client.indices.delete({ index });
   }
 
   public async putMapping(table: TastyTable): Promise<object>
@@ -246,16 +214,13 @@ export class ElasticDB implements TastyDB
       await this.createIndex(index);
     }
 
-    return new Promise((resolve, reject) =>
-    {
-      this.client.indices.putMapping(
-        {
-          index,
-          type,
-          body: mapping,
-        },
-        util.promise.makeCallback(resolve, reject));
-    });
+    return this.client.indices.putMapping(
+      {
+        index,
+        type,
+        body: mapping,
+      },
+    );
   }
 
   /*
@@ -267,19 +232,14 @@ export class ElasticDB implements TastyDB
     for (const element of elements)
     {
       promises.push(
-        new Promise((resolve, reject) =>
-        {
-          const params =
-            {
-              id: this.makeID(table, element),
-              index: table.getDatabaseName(),
-              type: table.getTableName(),
-            };
-
-          this.client.delete(
-            params,
-            util.promise.makeCallback(resolve, reject));
-        }));
+        this.client.delete(
+          {
+            id: this.makeID(table, element),
+            index: table.getDatabaseName(),
+            type: table.getTableName(),
+          },
+        ),
+      );
     }
     return Promise.all(promises);
   }
@@ -287,18 +247,9 @@ export class ElasticDB implements TastyDB
   /*
    * Refreshes the given index
    */
-  public async refresh(indexName: string)
+  public async refresh(index: string)
   {
-    return new Promise((resolve, reject) =>
-    {
-      const params = {
-        index: indexName,
-      };
-
-      this.client.indices.refresh(
-        params,
-        util.promise.makeCallback(resolve, reject));
-    });
+    return this.client.indices.refresh({ index });
   }
 
   private async update_(table: TastyTable, elements: object[], upsert: boolean)
@@ -332,48 +283,31 @@ export class ElasticDB implements TastyDB
     const promises: Array<Promise<any>> = [];
     for (const element of elements)
     {
-      promises.push(
-        new Promise((resolve, reject) =>
-        {
-          let body = {};
-          if (upsert)
-          {
-            body = element;
-          }
-          else
-          {
-            body = {
-              doc: element,
-              doc_as_upsert: true,
-            };
-          }
+      let body = {};
+      if (upsert)
+      {
+        body = element;
+      }
+      else
+      {
+        body = {
+          doc: element,
+          doc_as_upsert: true,
+        };
+      }
 
-          const query = {
-            body,
-            index: table.getDatabaseName(),
-            type: table.getTableName(),
-          };
+      const query = {
+        body,
+        index: table.getDatabaseName(),
+        type: table.getTableName(),
+      };
 
-          const compositePrimaryKey = this.makeID(table, element);
-          if (compositePrimaryKey !== '')
-          {
-            query['id'] = compositePrimaryKey;
-          }
-
-          if (upsert)
-          {
-            this.client.index(
-              query as any,
-              util.promise.makeCallback(resolve, reject));
-          }
-          else
-          {
-            this.client.update(
-              query as any,
-              util.promise.makeCallback(resolve, reject));
-          }
-        }),
-      );
+      const compositePrimaryKey = this.makeID(table, element);
+      if (compositePrimaryKey !== '')
+      {
+        query['id'] = compositePrimaryKey;
+      }
+      promises.push(upsert ? this.client.index(query) : this.client.update(query as any));
     }
     return Promise.all(promises);
   }
@@ -415,14 +349,7 @@ export class ElasticDB implements TastyDB
       body.push(obj);
     }
 
-    return new Promise((resolve, reject) =>
-    {
-      this.client.bulk(
-        {
-          body,
-        },
-        util.promise.makeCallback(resolve, reject));
-    });
+    return this.client.bulk({ body });
   }
 
   private makeID(table: TastyTable, element: object): string

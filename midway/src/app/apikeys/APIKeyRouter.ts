@@ -43,76 +43,46 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:import-spacing
-import * as _ from 'lodash';
 
-import { Algorithm } from 'library/LibraryTypes';
-import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
-import { getSampleRows } from 'shared/etl/FileUtil';
-import { FileConfig } from 'shared/etl/immutable/EndpointRecords';
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
 
-import { toInputMap } from 'src/blocks/types/Input';
-import { AllBackendsMap } from 'src/database/AllBackends';
-import MidwayQueryResponse from 'src/database/types/MidwayQueryResponse';
+import { MidwayLogger } from '../log/MidwayLogger';
+import APIKeyConfig from './APIKeyConfig';
+import APIKeys from './APIKeys';
+export * from './APIKeys';
 
-import { Ajax } from 'util/Ajax';
+const Router = new KoaRouter();
+export const apikeys = new APIKeys();
+export const initialize = () => apikeys.initialize();
 
-import { List } from 'immutable';
-
-export function fetchDocumentsFromAlgorithm(
-  algorithm: Algorithm,
-  limit?: number,
-): Promise<List<object>>
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  return new Promise<List<object>>((resolve, reject) =>
-  {
-    let query = algorithm.query;
-    query = query.set('parseTree', new ESInterpreter(query.tql, toInputMap(query.inputs)));
-
-    const eql = AllBackendsMap[query.language].parseTreeToQueryString(
-      query,
-      {
-        replaceInputs: true,
-      },
-    );
-    const handleResponse = (response: MidwayQueryResponse) =>
+    const isSuperUser: boolean = ctx.state.user.isSuperUser;
+    if (isSuperUser)
     {
-      let hits = List(_.get(response, ['result', 'hits', 'hits'], []))
-        .map((doc, index) => doc['_source']);
-      if (limit != null && limit > 0)
-      {
-        hits = hits.slice(0, limit);
-      }
-      resolve(hits.toList());
-    };
+        MidwayLogger.info('getting all API keys');
+        ctx.body = await apikeys.select(['id', 'key', 'createdAt', 'enabled'], {});
+    }
+    else
+    {
+        throw new Error('Only superusers can list API keys.');
+    }
+});
 
-    const { queryId, xhr } = Ajax.query(
-      eql,
-      algorithm.db,
-      handleResponse,
-      reject,
-    );
-  });
-}
-
-export function fetchDocumentsFromFile(
-  file: File,
-  config: FileConfig,
-  limit?: number,
-): Promise<List<object>>
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  return new Promise<List<object>>((resolve, reject) =>
-  {
-    const handleResponse = (response: object[]) =>
+    const isSuperUser: boolean = ctx.state.user.isSuperUser;
+    if (isSuperUser)
     {
-      resolve(List(response));
-    };
-    getSampleRows(
-      file,
-      handleResponse,
-      reject,
-      limit,
-      config.toJS(),
-    );
-  });
-}
+        MidwayLogger.info('creating API key');
+        const newKey: APIKeyConfig = (await apikeys.create())[0];
+        ctx.body = newKey.key;
+    }
+    else
+    {
+        throw new Error('Only superusers can create API keys.');
+    }
+});
+
+export default Router;

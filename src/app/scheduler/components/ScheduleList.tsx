@@ -63,6 +63,7 @@ export interface Props
 {
   schedules?: Immutable.Map<ID, SchedulerConfig>;
   schedulerActions?: typeof SchedulerActions;
+  loading?: boolean;
 }
 
 const INTERVAL = 60000;
@@ -97,8 +98,8 @@ class ScheduleList extends TerrainComponent<Props>
   public state: {
     confirmModalOpen: boolean,
   } = {
-      confirmModalOpen: false,
-    };
+    confirmModalOpen: false,
+  };
 
   public componentWillMount()
   {
@@ -223,7 +224,7 @@ class ScheduleList extends TerrainComponent<Props>
 
   public render()
   {
-    const { schedules } = this.props;
+    const { schedules, loading } = this.props;
     const keys = schedules.keySeq().toList().sort();
     const scheduleList = keys.map((id) => schedules.get(id)).toList();
 
@@ -240,6 +241,8 @@ class ScheduleList extends TerrainComponent<Props>
           getActions={undefined}
           canCreate={TerrainTools.isAdmin()}
           onCreate={this.createSchedule}
+          loading={loading}
+          loadingMessage={'Loading Schedules...'}
         />
       </div>
     );
@@ -250,6 +253,7 @@ export default Util.createContainer(
   ScheduleList,
   [
     ['scheduler', 'schedules'],
+    ['scheduler', 'loading'],
   ],
   {
     schedulerActions: SchedulerActions,

@@ -693,17 +693,17 @@ class ElasticDataSourceC extends DataSource
               displayName: 'Match Quality',
               value: '_score',
               sampleData: List([]),
-              meta: {
+              meta: Immutable.Map({
                 fieldType: FieldType.Numerical,
-              },
+              }),
             }),
             _ChoiceOption({
               displayName: '_size',
               value: '_size',
               sampleData: List([]),
-              meta: {
+              meta: Immutable.Map({
                 fieldType: FieldType.Numerical,
-              },
+              }),
             }),
           ]);
           acceptableFieldTypes =
@@ -732,7 +732,6 @@ class ElasticDataSourceC extends DataSource
         }
 
         const theDatabaseId = `${server}/${index}`;
-
         const acceptableCols = context.schemaState.columns.filter(
           (column) => column.serverId === String(server) &&
             column.databaseId === theDatabaseId &&
@@ -765,9 +764,9 @@ class ElasticDataSourceC extends DataSource
         return _ChoiceOption({
           displayName: option === '_score' ? 'Match Quality' : option,
           value: option,
-          meta: {
+          meta: Immutable.Map({
             fieldType: ['_score', '_size'].indexOf(option) !== -1 ? FieldType.Numerical : FieldType.Text,
-          },
+          }),
           icon: fieldTypeToIcon[FieldType.Any], // TODO
         });
       }));
@@ -794,10 +793,10 @@ class ElasticDataSourceC extends DataSource
                   displayName: col.name + '.' + property,
                   value: col.name + '.' + property,
                   icon: fieldTypeToIcon[type],
-                  meta: {
+                  meta: Immutable.Map({
                     fieldType: ReverseFieldTypeMapping[type],
                     analyzed: analyzer !== undefined,
-                  },
+                  }),
                 }),
               );
             });
@@ -806,10 +805,10 @@ class ElasticDataSourceC extends DataSource
             displayName: col.name,
             value: col.name,
             icon: fieldTypeToIcon[fieldType],
-            meta: {
+            meta: Immutable.Map({
               fieldType,
               analyzed: col.analyzed,
-            },
+            }),
           }));
         });
         fields = fields.toSet().toList(); // remove duplicates (can happen w/ multiple types in same index)

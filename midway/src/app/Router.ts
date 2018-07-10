@@ -48,6 +48,7 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as send from 'koa-send';
 
+import * as APIKeyRouter from './apikeys/APIKeyRouter';
 import * as Util from './AppUtil';
 import * as AuthRouter from './auth/AuthRouter';
 import * as DatabaseRouter from './database/DatabaseRouter';
@@ -91,6 +92,7 @@ export function getRouter()
   FeedbackRouter.initialize();
   ForgotPasswordRouter.initialize();
   RecoveryTokensRouter.initialize();
+  APIKeyRouter.initialize();
   AppRouter.use('/auth', AuthRouter.default.routes(), AuthRouter.default.allowedMethods());
   AppRouter.use('/events', EventRouter.default.routes(), EventRouter.default.allowedMethods());
   AppRouter.use('/users', UserRouter.default.routes(), UserRouter.default.allowedMethods());
@@ -109,6 +111,7 @@ export function getRouter()
   AppRouter.use('/feedback', FeedbackRouter.default.routes(), FeedbackRouter.default.allowedMethods());
   AppRouter.use('/forgotPassword', ForgotPasswordRouter.default.routes(), ForgotPasswordRouter.default.allowedMethods());
   AppRouter.use('/recoveryTokens', RecoveryTokensRouter.default.routes(), RecoveryTokensRouter.default.allowedMethods());
+  AppRouter.use('/apikeys', APIKeyRouter.default.routes(), APIKeyRouter.default.allowedMethods());
   // Add future routes here.
 
   AppRouter.get('/time', (ctx, next) =>
