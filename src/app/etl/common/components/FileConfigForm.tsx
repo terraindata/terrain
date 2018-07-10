@@ -63,6 +63,7 @@ import Modal from 'app/common/components/Modal';
 import PathUtil from 'etl/pathselector/PathGuessTest';
 import { List } from 'immutable';
 import DataModal from './DataModal';
+import Button from 'app/common/components/Button';
 
 export interface Props
 {
@@ -83,6 +84,10 @@ type FormState = FileConfigI & {
 
 export default class FileConfigForm extends TerrainComponent<Props>
 {
+  public state = {
+    suggestedPathsOpen: false,
+  }
+
   public inputMap: InputDeclarationMap<FormState> =
     {
       fileType: {
@@ -187,25 +192,41 @@ export default class FileConfigForm extends TerrainComponent<Props>
     else
     {
       return (
-        <Modal
-          open={(state.fileType === FileTypes.Json && state.useJsonPath === true && this.props.source !== null)}
-          title='Suggested JSON Paths (Select One)'
-          wide={true}
-          onClose={this.closeSuggestedPaths()}
-          noFooterPadding={true}
-        >
-          {this.renderSuggestedPathsModal()}
-        </Modal>
+        <div>
+          <Button
+            text='View suggested paths'
+            onClick={this._fn(this.toggleSuggestedPaths, state)}
+            size='small'
+          />
+          <Modal
+            open={this.state.suggestedPathsOpen}
+            title='Suggested JSON Paths (Select One)'
+            wide={true}
+            onClose={this._fn(this.closeSuggestedPaths, state)}
+            noFooterPadding={true}
+          >
+            {this.renderSuggestedPathsData()}
+          </Modal>
+        </div>
       );
     }
   }
 
-  public closeSuggestedPaths()
+  public toggleSuggestedPaths(state)
   {
-    this.inputMap.suggestedJsonPath.getDisplayState = DisplayState.Hidden;
+    this.setState({
+      suggestedPathsOpen: true && (this.jsonPathDisplay(state) === DisplayState.Active),
+    });
   }
 
-  public renderSuggestedPathsModal()
+  public closeSuggestedPaths(state)
+  {
+    this.setState({
+      suggestedPathsOpen: false;
+    });
+  }
+
+  public renderSuggestedPathsData()
   {
     return (
       <DataModal
