@@ -59,21 +59,37 @@ export interface IElasticClient
 {
   cluster: IElasticCluster;
   indices: IElasticIndices;
+  ping(params: Elastic.PingParams): Promise<any>;
   ping(params: Elastic.PingParams, callback: (error: any, response: any) => void): void;
+  bulk(params: Elastic.BulkIndexDocumentsParams): Promise<any>;
   bulk(params: Elastic.BulkIndexDocumentsParams, callback: (error: any, response: any) => void): void;
+  delete(params: Elastic.DeleteDocumentParams): Promise<Elastic.DeleteDocumentResponse>;
   delete(params: Elastic.DeleteDocumentParams, callback: (error: any, response: Elastic.DeleteDocumentResponse) => void): void;
+  deleteTemplate(params: Elastic.DeleteTemplateParams): Promise<any>;
   deleteTemplate(params: Elastic.DeleteTemplateParams, callback: (error: any, response: any) => void): void;
+  deleteScript(params: Elastic.DeleteScriptParams): Promise<any>;
   deleteScript(params: Elastic.DeleteScriptParams, callback: (error: any, response: any) => void): void;
+  getTemplate(params: Elastic.GetTemplateParams): Promise<any>;
   getTemplate(params: Elastic.GetTemplateParams, callback: (error: any, response: any) => void): void;
+  getScript(params: Elastic.GetScriptParams): Promise<any>;
   getScript(params: Elastic.GetScriptParams, callback: (error: any, response: any) => void): void;
+  index<T>(params: Elastic.IndexDocumentParams<T>): Promise<any>;
   index<T>(params: Elastic.IndexDocumentParams<T>, callback: (error: any, response: any) => void): void;
+  update(params: Elastic.UpdateDocumentParams): Promise<any>;
   update(params: Elastic.UpdateDocumentParams, callback: (error: any, response: any) => void): void;
+  putScript(params: Elastic.PutScriptParams): Promise<any>;
   putScript(params: Elastic.PutScriptParams, callback: (err: any, response: any, status: any) => void): void;
+  putTemplate(params: Elastic.PutTemplateParams): Promise<any>;
   putTemplate(params: Elastic.PutTemplateParams, callback: (err: any, response: any, status: any) => void): void;
+  scroll<T>(params: Elastic.ScrollParams): Promise<Elastic.SearchResponse<T>>;
   scroll<T>(params: Elastic.ScrollParams, callback: (error: any, response: Elastic.SearchResponse<T>) => void): void;
+  clearScroll(params: Elastic.ClearScrollParams): Promise<any>;
   clearScroll(params: Elastic.ClearScrollParams, callback: (error: any, response: any) => void): void;
+  search<T>(params: Elastic.SearchParams): Promise<Elastic.SearchResponse<T>>;
   search<T>(params: Elastic.SearchParams, callback: (error: any, response: Elastic.SearchResponse<T>) => void): void;
+  msearch<T>(params: Elastic.MSearchParams): Promise<Elastic.MSearchResponse<T>>;
   msearch<T>(params: Elastic.MSearchParams, callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void;
+  msearchTemplate<T>(params: Elastic.MSearchTemplateParams): Promise<Elastic.MSearchResponse<T>>;
   msearchTemplate<T>(params: Elastic.MSearchTemplateParams, callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void;
 }
 
@@ -109,35 +125,43 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-ping
    */
-  public ping(params: Elastic.PingParams, callback: (error: any, response: any) => void): void
+  public ping(params: Elastic.PingParams): Promise<any>;
+  public ping(params: Elastic.PingParams, callback: (error: any, response: any) => void): any;
+  public ping(params: Elastic.PingParams, callback?: (error: any, response: any) => void): void | Promise<any>
   {
     this.log('ping', params);
-    this.delegate.ping(params, callback);
+    return this.delegate.ping(params, callback);
   }
 
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-bulk
    */
-  public bulk(params: Elastic.BulkIndexDocumentsParams, callback: (error: any, response: any) => void): void
+  public bulk(params: Elastic.BulkIndexDocumentsParams): Promise<any>;
+  public bulk(params: Elastic.BulkIndexDocumentsParams, callback: (error: any, response: any) => void): void;
+  public bulk(params: Elastic.BulkIndexDocumentsParams, callback?: (error: any, response: any) => void): void | Promise<any>
   {
     this.log('bulk', params);
-    this.delegate.bulk(params, callback);
+    return this.delegate.bulk(params, callback);
   }
 
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-delete
    */
+  public delete(params: Elastic.DeleteDocumentParams): Promise<Elastic.DeleteDocumentResponse>;
+  public delete(params: Elastic.DeleteDocumentParams, callback: (error: any, response: Elastic.DeleteDocumentResponse) => void): void;
   public delete(params: Elastic.DeleteDocumentParams,
-    callback: (error: any, response: Elastic.DeleteDocumentResponse) => void): void
+    callback?: (error: any, response: Elastic.DeleteDocumentResponse) => void): void | Promise<Elastic.DeleteDocumentResponse>
   {
     this.log('delete', params);
-    this.delegate.delete(params, callback);
+    return this.delegate.delete(params, callback);
   }
 
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-deletetemplate
    */
-  public deleteTemplate(params: Elastic.DeleteTemplateParams, callback: (error: any, response: any) => void): void
+  public deleteTemplate(params: Elastic.DeleteTemplateParams): Promise<any>;
+  public deleteTemplate(params: Elastic.DeleteTemplateParams, callback: (error: any, response: any) => void): void;
+  public deleteTemplate(params: Elastic.DeleteTemplateParams, callback?: (error: any, response: any) => void): void | Promise<any>
   {
     this.log('deleteTemplate', params);
     const scriptParams: Elastic.DeleteScriptParams =
@@ -145,19 +169,27 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
         id: params.id,
         lang: 'mustache',
       };
-    this.deleteScript(scriptParams, callback);
+    return this.deleteScript(scriptParams, callback);
   }
 
   /**
    */
-  public deleteScript(params: Elastic.DeleteScriptParams, callback: (error: any, response: any) => void): void
+  public deleteScript(params: Elastic.DeleteScriptParams): Promise<any>;
+  public deleteScript(params: Elastic.DeleteScriptParams, callback: (error: any, response: any) => void): void;
+  public deleteScript(params: Elastic.DeleteScriptParams, callback?: (error: any, response: any) => void): void | Promise<any>
   {
-    this.log('deleteScript', params);
-    const host = this.getHostFromConfig();
-    request({
-      method: 'DELETE',
-      url: String(host) + '/_scripts/' + params.id,
-    }, (err, resp, body) => callback(err, JSON.parse(body)));
+    return this.controller.voidOrPromise(callback, () =>
+    {
+      return new Promise((res, rej) =>
+      {
+        this.log('deleteScript', params);
+        const host = this.getHostFromConfig();
+        request({
+          method: 'DELETE',
+          url: String(host) + '/_scripts/' + params.id,
+        }, (err, resp, body) => err == null ? res(JSON.parse(body)) : rej(err));
+      });
+    });
 
     // FIXME: Uncomment when putScript in elasticsearch.js is fixed to use the changed stored script body format in 6.1
     // https://www.elastic.co/guide/en/elasticsearch/reference/6.1/modules-scripting-using.html
@@ -167,30 +199,43 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-gettemplate
    */
-  public getTemplate(params: Elastic.GetTemplateParams, callback: (error: any, response: any) => void): void
+  public getTemplate(params: Elastic.GetTemplateParams): Promise<any>;
+  public getTemplate(params: Elastic.GetTemplateParams, callback: (error: any, response: any) => void): void;
+  public getTemplate(params: Elastic.GetTemplateParams, callback?: (error: any, response: any) => void): void | Promise<any>
   {
-    this.log('getTemplate', params);
-    const scriptParams: Elastic.GetScriptParams =
-      {
-        id: params.id,
-        lang: 'mustache',
-      };
-    this.getScript(scriptParams, callback);
+    return this.controller.voidOrPromise(callback, () =>
+    {
+      this.log('getTemplate', params);
+      const scriptParams: Elastic.GetScriptParams =
+        {
+          id: params.id,
+          lang: 'mustache',
+        };
+      return this.getScript(scriptParams);
+    });
   }
 
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-getscript
    */
+  public getScript(params: Elastic.GetScriptParams): Promise<any>;
+  public getScript(params: Elastic.GetScriptParams, callback: (error: any, response: any) => void): void;
   public getScript(params: Elastic.GetScriptParams,
-    callback: (error: any, response: any) => void): void
+    callback?: (error: any, response: any) => void): void | Promise<any>
   {
-    this.log('get script', params);
-    const host = this.getHostFromConfig();
-    request({
-      method: 'GET',
-      json: true,
-      url: String(host) + '/_scripts/' + params.id,
-    }, (err, res, body) => callback(err, body));
+    return this.controller.voidOrPromise(callback, () =>
+    {
+      return new Promise((res, rej) =>
+      {
+        this.log('get script', params);
+        const host = this.getHostFromConfig();
+        request({
+          method: 'GET',
+          json: true,
+          url: String(host) + '/_scripts/' + params.id,
+        }, (err, resp, body) => err == null ? res(body) : rej(err));
+      });
+    });
 
     // FIXME: Uncomment when putScript in elasticsearch.js is fixed to use the changed stored script body format in 6.1
     // https://www.elastic.co/guide/en/elasticsearch/reference/6.1/modules-scripting-using.html
@@ -200,42 +245,51 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-index
    */
-  public index<T>(params: Elastic.IndexDocumentParams<T>, callback: (error: any, response: any) => void): void
+  public index<T>(params: Elastic.IndexDocumentParams<T>): Promise<any>;
+  public index<T>(params: Elastic.IndexDocumentParams<T>, callback: (error: any, response: any) => void): void;
+  public index<T>(params: Elastic.IndexDocumentParams<T>, callback?: (error: any, response: any) => void): void | Promise<any>
   {
     this.log('index', params);
-    this.delegate.index(params, callback);
+    return this.delegate.index(params, callback);
   }
 
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-update
    */
-  public update(params: Elastic.UpdateDocumentParams, callback: (error: any, response: any) => void): void
+  public update(params: Elastic.UpdateDocumentParams): Promise<any>;
+  public update(params: Elastic.UpdateDocumentParams, callback: (error: any, response: any) => void): void;
+  public update(params: Elastic.UpdateDocumentParams, callback?: (error: any, response: any) => void): void | Promise<any>
   {
     this.log('update', params);
-    this.delegate.update(params, callback);
+    return this.delegate.update(params, callback);
   }
 
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-putscript
    */
-  public putScript(params: Elastic.PutScriptParams, callback: (err: any, response: any, status: any) => void): void
+  public putScript(params: Elastic.PutScriptParams): Promise<any>;
+  public putScript(params: Elastic.PutScriptParams, callback: (err: any, response: any, status: any) => void): void;
+  public putScript(params: Elastic.PutScriptParams, callback?: (err: any, response: any, status: any) => void): void | Promise<any>
   {
-    this.log('putScript', params);
-    const host = this.getHostFromConfig();
-    request({
-      method: 'POST',
-      url: String(host) + '/_scripts/' + params.id,
-      json: true,
-      body: {
-        script: {
-          lang: params.lang,
-          source: params.body,
-        },
-      },
-    }, (err, res, body) =>
+    return this.controller.voidOrPromise(callback, () =>
+    {
+      return new Promise((res, rej) =>
       {
-        callback(err, body, res.statusCode);
+        this.log('putScript', params);
+        const host = this.getHostFromConfig();
+        request({
+          method: 'POST',
+          url: String(host) + '/_scripts/' + params.id,
+          json: true,
+          body: {
+            script: {
+              lang: params.lang,
+              source: params.body,
+            },
+          },
+        }, (err, resp, body) => err == null ? res(body) : rej(err));
       });
+    });
 
     // FIXME: Uncomment when putScript in elasticsearch.js is fixed to use the changed stored script body format in 6.1
     // https://www.elastic.co/guide/en/elasticsearch/reference/6.1/modules-scripting-using.html
@@ -245,65 +299,81 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-puttemplate
    */
-  public putTemplate(params: Elastic.PutTemplateParams, callback: (err: any, response: any, status: any) => void): void
+  public putTemplate(params: Elastic.PutTemplateParams): Promise<any>;
+  public putTemplate(params: Elastic.PutTemplateParams, callback: (err: any, response: any, status: any) => void): void;
+  public putTemplate(params: Elastic.PutTemplateParams, callback?: (err: any, response: any, status: any) => void): void | Promise<any>
   {
-    this.log('putTemplate', params);
-    const scriptParams: Elastic.PutScriptParams =
-      {
-        id: params.id,
-        lang: 'mustache',
-        body: params.body,
-      };
-    this.putScript(scriptParams, callback);
+    return this.controller.voidOrPromise(callback, () =>
+    {
+      this.log('putTemplate', params);
+      const scriptParams: Elastic.PutScriptParams =
+        {
+          id: params.id,
+          lang: 'mustache',
+          body: params.body,
+        };
+      return this.putScript(scriptParams);
+    });
   }
 
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-scroll
    */
+  public scroll<T>(params: Elastic.ScrollParams): Promise<Elastic.SearchResponse<T>>;
+  public scroll<T>(params: Elastic.ScrollParams, callback: (error: any, response: Elastic.SearchResponse<T>) => void): void;
   public scroll<T>(params: Elastic.ScrollParams,
-    callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
+    callback?: (error: any, response: Elastic.SearchResponse<T>) => void): void | Promise<Elastic.SearchResponse<T>>
   {
     this.log('scroll', params);
-    this.delegate.scroll(params, callback);
+    return this.delegate.scroll(params, callback);
   }
 
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-clearscroll
    */
-  public clearScroll(params: Elastic.ClearScrollParams, callback: (error: any, response: any) => void): void
+  public clearScroll(params: Elastic.ClearScrollParams): Promise<any>;
+  public clearScroll(params: Elastic.ClearScrollParams, callback: (error: any, response: any) => void): void;
+  public clearScroll(params: Elastic.ClearScrollParams, callback?: (error: any, response: any) => void): void | Promise<any>
   {
     this.log('clearScroll', params);
-    this.delegate.clearScroll(params, callback);
+    return this.delegate.clearScroll(params, callback);
   }
 
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-search
    */
+  public search<T>(params: Elastic.SearchParams): Promise<Elastic.SearchResponse<T>>;
+  public search<T>(params: Elastic.SearchParams, callback: (error: any, response: Elastic.SearchResponse<T>) => void): void;
   public search<T>(params: Elastic.SearchParams,
-    callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
+    callback?: (error: any, response: Elastic.SearchResponse<T>) => void): void | Promise<Elastic.SearchResponse<T>>
   {
     this.log('search', params);
-    this.delegate.search(params, callback);
+    return this.delegate.search(params, callback);
   }
 
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-msearch
    */
+  public msearch<T>(params: Elastic.MSearchParams): Promise<Elastic.MSearchResponse<T>>;
+  public msearch<T>(params: Elastic.MSearchParams, callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void;
   public msearch<T>(params: Elastic.MSearchParams,
-    callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void
+    callback?: (error: any, response: Elastic.MSearchResponse<T>) => void): void | Promise<Elastic.MSearchResponse<T>>
   {
     this.log('msearch', params);
-    this.delegate.msearch(params, callback);
+    return this.delegate.msearch(params, callback);
   }
 
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-msearchtemplate
    */
+  public msearchTemplate<T>(params: Elastic.MSearchTemplateParams): Promise<Elastic.MSearchResponse<T>>;
   public msearchTemplate<T>(params: Elastic.MSearchTemplateParams,
-    callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void
+    callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void;
+  public msearchTemplate<T>(params: Elastic.MSearchTemplateParams,
+    callback?: (error: any, response: Elastic.MSearchResponse<T>) => void): void | Promise<Elastic.MSearchResponse<T>>
   {
     this.log('msearchTemplate', params);
-    this.delegate.msearchTemplate(params, callback);
+    return this.delegate.msearchTemplate(params, callback);
   }
 
   public getDelegate(): IElasticClient

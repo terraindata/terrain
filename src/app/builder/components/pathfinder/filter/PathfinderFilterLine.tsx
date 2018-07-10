@@ -551,9 +551,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
               </div>
             );
           }
-
         );
-      )
       case FieldType.Ip:
         return () => (
           <div>IP not supported yet</div>

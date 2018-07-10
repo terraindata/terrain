@@ -44,32 +44,20 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as Elastic from 'elasticsearch';
-import PrefixedElasticController from '../PrefixedElasticController';
-import ElasticCluster from './ElasticCluster';
+import ConfigType from '../ConfigType';
 
-class PrefixedElasticCluster extends ElasticCluster<PrefixedElasticController>
+export class APIKeyConfig extends ConfigType
 {
-  constructor(controller: PrefixedElasticController, delegate: Elastic.Client)
-  {
-    super(controller, delegate);
-  }
+    public id?: number = undefined;
+    public key: string = '';
+    public createdAt: Date = null;
+    public enabled: boolean = true;
 
-  public health(params: Elastic.ClusterHealthParams): Promise<any>;
-  public health(params: Elastic.ClusterHealthParams, callback: (error: any, response: any) => void): void;
-  public health(params: Elastic.ClusterHealthParams, callback?: (error: any, response: any) => void): void | Promise<any>
-  {
-    this.controller.prependIndexParam(params);
-    return super.health(params, callback);
-  }
-
-  public state(params: Elastic.ClusterStateParams): Promise<any>;
-  public state(params: Elastic.ClusterStateParams, callback: (error: any, response: any) => void): void;
-  public state(params: Elastic.ClusterStateParams, callback?: (error: any, response: any) => void): void | Promise<any>
-  {
-    this.controller.prependIndexParam(params);
-    return super.state(params, callback);
-  }
+    constructor(props: object)
+    {
+        super();
+        ConfigType.initialize(this, props);
+    }
 }
 
-export default PrefixedElasticCluster;
+export default APIKeyConfig;

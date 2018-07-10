@@ -44,32 +44,93 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as Elastic from 'elasticsearch';
-import PrefixedElasticController from '../PrefixedElasticController';
-import ElasticCluster from './ElasticCluster';
+import srs = require('secure-random-string');
 
-class PrefixedElasticCluster extends ElasticCluster<PrefixedElasticController>
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
+import * as Util from '../AppUtil';
+
+import APIKeyConfig from './APIKeyConfig';
+
+export class APIKeys
 {
-  constructor(controller: PrefixedElasticController, delegate: Elastic.Client)
+  private apiKeyTable: Tasty.Table;
+
+  public initialize()
   {
-    super(controller, delegate);
+    this.apiKeyTable = App.TBLS.apiKeys;
   }
 
-  public health(params: Elastic.ClusterHealthParams): Promise<any>;
-  public health(params: Elastic.ClusterHealthParams, callback: (error: any, response: any) => void): void;
-  public health(params: Elastic.ClusterHealthParams, callback?: (error: any, response: any) => void): void | Promise<any>
+  public async validate(key: string): Promise<APIKeyConfig | null>
   {
-    this.controller.prependIndexParam(params);
-    return super.health(params, callback);
+      const results: APIKeyConfig[] = await this.select([], { key }) as APIKeyConfig[];
+      if (results.length > 0 && results[0]['enabled'])
+      {
+          return results[0];
+      }
+      else
+      {
+          return null;
+      }
   }
 
-  public state(params: Elastic.ClusterStateParams): Promise<any>;
-  public state(params: Elastic.ClusterStateParams, callback: (error: any, response: any) => void): void;
-  public state(params: Elastic.ClusterStateParams, callback?: (error: any, response: any) => void): void | Promise<any>
+    public async create(): Promise<APIKeyConfig>
+    {
+        try
+        {
+            const cfg: APIKeyConfig = {
+                key: srs({ length: 20, alphanumeric: true }),
+                createdAt: new Date(Date.now()),
+                enabled: true,
+            };
+
+            return this.upsert(cfg);
+        }
+        catch (e)
+        {
+            throw new Error('Problem creating default API key: ' + String(e));
+        }
+    }
+
+  public async delete(key: string): Promise<object>
   {
-    this.controller.prependIndexParam(params);
-    return super.state(params, callback);
+    return App.DB.delete(this.apiKeyTable, { key } as APIKeyConfig);
+  }
+
+  public async select(columns: string[], filter?: object): Promise<APIKeyConfig[]>
+  {
+    return App.DB.select(this.apiKeyTable, columns, filter) as Promise<APIKeyConfig[]>;
+  }
+
+  public async get(key: string, fields?: string[]): Promise<APIKeyConfig[]>
+  {
+    if (key !== undefined)
+    {
+      if (fields !== undefined)
+      {
+        return this.select(fields, { key });
+      }
+      return this.select([], { key });
+    }
+    if (fields !== undefined)
+    {
+      return this.select(fields, {});
+    }
+    return this.select([], {});
+  }
+
+  public async upsert(apikey: APIKeyConfig): Promise<APIKeyConfig>
+  {
+    if (apikey.key !== undefined)
+    {
+      const results: APIKeyConfig[] = await this.get(apikey.key);
+      if (results.length !== 0)
+      {
+        apikey = Util.updateObject(results[0], apikey);
+      }
+    }
+    return App.DB.upsert(this.apiKeyTable, apikey) as Promise<APIKeyConfig>;
   }
 }
 
-export default PrefixedElasticCluster;
+export default APIKeys;

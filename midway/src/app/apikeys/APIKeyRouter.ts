@@ -44,32 +44,45 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as Elastic from 'elasticsearch';
-import PrefixedElasticController from '../PrefixedElasticController';
-import ElasticCluster from './ElasticCluster';
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
 
-class PrefixedElasticCluster extends ElasticCluster<PrefixedElasticController>
+import { MidwayLogger } from '../log/MidwayLogger';
+import APIKeyConfig from './APIKeyConfig';
+import APIKeys from './APIKeys';
+export * from './APIKeys';
+
+const Router = new KoaRouter();
+export const apikeys = new APIKeys();
+export const initialize = () => apikeys.initialize();
+
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  constructor(controller: PrefixedElasticController, delegate: Elastic.Client)
-  {
-    super(controller, delegate);
-  }
+    const isSuperUser: boolean = ctx.state.user.isSuperUser;
+    if (isSuperUser)
+    {
+        MidwayLogger.info('getting all API keys');
+        ctx.body = await apikeys.select(['id', 'key', 'createdAt', 'enabled'], {});
+    }
+    else
+    {
+        throw new Error('Only superusers can list API keys.');
+    }
+});
 
-  public health(params: Elastic.ClusterHealthParams): Promise<any>;
-  public health(params: Elastic.ClusterHealthParams, callback: (error: any, response: any) => void): void;
-  public health(params: Elastic.ClusterHealthParams, callback?: (error: any, response: any) => void): void | Promise<any>
-  {
-    this.controller.prependIndexParam(params);
-    return super.health(params, callback);
-  }
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+    const isSuperUser: boolean = ctx.state.user.isSuperUser;
+    if (isSuperUser)
+    {
+        MidwayLogger.info('creating API key');
+        const newKey: APIKeyConfig = (await apikeys.create())[0];
+        ctx.body = newKey.key;
+    }
+    else
+    {
+        throw new Error('Only superusers can create API keys.');
+    }
+});
 
-  public state(params: Elastic.ClusterStateParams): Promise<any>;
-  public state(params: Elastic.ClusterStateParams, callback: (error: any, response: any) => void): void;
-  public state(params: Elastic.ClusterStateParams, callback?: (error: any, response: any) => void): void | Promise<any>
-  {
-    this.controller.prependIndexParam(params);
-    return super.state(params, callback);
-  }
-}
-
-export default PrefixedElasticCluster;
+export default Router;
