@@ -63,6 +63,8 @@ import Integrations from '../integrations/Integrations';
 const integrations: Integrations = new Integrations();
 Router.post('/', async (ctx, next) =>
 {
+   ctx.body = "Password reset email sent. If you don't receive an email in 30 minutes, please contact Terrain support.";
+   ctx.status = 200;
    let hostNameValid: boolean = false;
    const hostName: string = ctx.request.body['url'];
    // check that hostname is either .terraindata.com or localhost
@@ -92,7 +94,7 @@ Router.post('/', async (ctx, next) =>
          token: userToken,
          createdAt: currDateTime,
        };
-       
+
      const entry = await recoveryTokens.upsert(newEntry) as RecoveryTokenConfig;
 
      // construct URL
@@ -104,23 +106,6 @@ Router.post('/', async (ctx, next) =>
      const body: string = 'Please click on the link below to reset your password. \n \n' + route;
      const emailSendStatus: boolean = await App.EMAIL.send(email, emailIntegrations[0].id, subject, body);
      winston.info(`email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
-     ctx.body = "Password reset email sent. If you don't receive an email in 30 minutes, please contact Terrain support.";
-     ctx.status = 200;
-
-   }
-
-   else
-   {
-     if (!userExists)
-     {
-       ctx.body = 'User not found.';
-       ctx.status = 404;
-     }
-     if (!hostNameValid)
-     {
-       ctx.body = 'Host name invalid.';
-       ctx.status = 404;
-     }
    }
 
 });
