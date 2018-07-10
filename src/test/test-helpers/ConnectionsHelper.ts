@@ -44,12 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
-import * as Immutable from 'immutable';
-import {
+import
+{
   _ConnectionState,
   ConnectionConfig,
   ConnectionState,
 } from 'connections/ConnectionTypes';
+import * as Immutable from 'immutable';
 
 export default class ConnectionsHelper
 {
@@ -72,8 +73,16 @@ class ConnectionsStateMock
 
   public addConnection(connection: ConnectionConfig)
   {
-    this.state.set(connection.id, connection);
+    this.state = this.state.setIn(
+      ['connections', connection.id],
+      connection,
+    );
 
     return this;
+  }
+
+  public getState()
+  {
+    return this.state;
   }
 }

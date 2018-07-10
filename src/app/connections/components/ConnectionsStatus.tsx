@@ -45,10 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
-import
-{
-  ConnectionState,
-} from 'connections/ConnectionTypes';
+import { ConnectionState } from 'connections/ConnectionTypes';
 import { List, Map } from 'immutable';
 import * as React from 'react';
 

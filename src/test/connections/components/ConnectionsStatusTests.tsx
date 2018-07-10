@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-empty
 
-import ConnectionsStatus from 'app/connections/components/ConnectionsStatus';
+import { ConnectionsStatus } from 'app/connections/components/ConnectionsStatus';
 import { shallow } from 'enzyme';
 import * as React from 'react';
 import ConnectionsHelper from 'test-helpers/ConnectionsHelper';
@@ -55,42 +55,47 @@ describe('ConnectionsStatus', () =>
   const connectionsStateMock = ConnectionsHelper.mockState();
   const connections = connectionsStateMock
     .addConnection({
-      id: -1,
-      name:  'Connection 1',
-      type:  'ElasticSearch',
-      dsn:  '',
-      host:  'localhost:9200',
-      status:  'DISCONNECTED',
+      id: 1,
+      name: 'Connection 1',
+      type: 'ElasticSearch',
+      dsn: '',
+      host: 'localhost:9200',
+      status: 'DISCONNECTED',
       isAnalytics: false,
     })
     .addConnection({
-      id: -1,
-      name:  'Connection 2',
-      type:  'ElasticSearch',
-      dsn:  '',
-      host:  'localhost:9200',
-      status:  'CONNECTED',
+      id: 2,
+      name: 'Connection 2',
+      type: 'ElasticSearch',
+      dsn: '',
+      host: 'localhost:9200',
+      status: 'CONNECTED',
       isAnalytics: false,
     })
     .addConnection({
-      id: -1,
-      name:  'Connection 3',
-      type:  'Mysql',
-      dsn:  '',
-      host:  'localhost:9200',
-      status:  'DISCONNECTED',
+      id: 3,
+      name: 'Connection 3',
+      type: 'Mysql',
+      dsn: '',
+      host: 'localhost:9200',
+      status: 'DISCONNECTED',
       isAnalytics: false,
-    });
+    })
+    .getState();
 
   let componentWrapper = null;
+
   beforeEach(() =>
   {
-    componentWrapper = shallow(<ConnectionsStatus
-      connections={connections}
-    />);
-  })
+    componentWrapper = shallow(
+      <ConnectionsStatus
+        connections={connections}
+      />,
+    );
+  });
 
-  it('should render correctly', () => {
-    expect(componentWrapper.find('div')).toHaveLength(1);
+  it('should render nothing', () =>
+  {
+    expect(componentWrapper.getElement()).toBe(null);
   });
 });
