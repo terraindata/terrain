@@ -178,7 +178,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
       const updatedState = this.updateElasticState(this.props.date);
       this.setState(
         {
-          sign: updatedState[0];
+          sign: updatedState[0],
           unit: updatedState[1],
           amount: updatedState[2],
         },
