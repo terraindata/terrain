@@ -55,12 +55,12 @@ import { KeyPath, keyPathPrefixMatch, updateKeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 
 import DataStore from './DataStore';
-import TransformationEngineNodeVisitor from './TransformationEngineNodeVisitor';
-import TransformationNodeConstructorVisitor from './TransformationNodeConstructorVisitor';
+import TransformationEngineNodeVisitor from './visitors/TransformationEngineNodeVisitor';
+import TransformationNodeConstructorVisitor from './visitors/TransformationNodeConstructorVisitor';
 import TransformationNodeType from './TransformationNodeType';
 import TransformationRegistry from './TransformationRegistry';
-import TransformationVisitError from './TransformationVisitError';
-import TransformationVisitResult from './TransformationVisitResult';
+import TransformationVisitError from './visitors/TransformationVisitError';
+import TransformationVisitResult from './visitors/TransformationVisitResult';
 
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
@@ -246,7 +246,7 @@ export class TransformationEngine
         return {
           id: this.getFieldID(val),
           path: val,
-        }
+        };
       }
     }).toList();
 
@@ -365,23 +365,29 @@ export class TransformationEngine
    * @param {object} options      Any field options (e.g., Elastic analyzers)
    * @returns {number}            The ID of the newly-added field
    */
-  public addField(fullKeyPath: KeyPath, typeName: string = null, options: object = {}): number
+  public addField(fullKeyPath: KeyPath, typeName: string = null, options: object = {}, synthetic = false): number
   {
+    const id = this.uidField;
+    this.uidField ++;
+
     if (this.getFieldID(fullKeyPath) !== undefined)
     {
       return this.getFieldID(fullKeyPath);
     }
-    this.IDToPathMap = this.IDToPathMap.set(this.uidField, fullKeyPath);
+    this.IDToPathMap = this.IDToPathMap.set(id, fullKeyPath);
     if (typeName === null)
     {
       typeName = 'object';
     }
-    this.fieldTypes = this.fieldTypes.set(this.uidField, typeName);
-    this.fieldEnabled = this.fieldEnabled.set(this.uidField, true);
-    this.fieldProps = this.fieldProps.set(this.uidField, options);
-
-    this.uidField++;
-    return this.uidField - 1;
+    this.fieldTypes = this.fieldTypes.set(id, typeName);
+    this.fieldEnabled = this.fieldEnabled.set(id, true);
+    this.fieldProps = this.fieldProps.set(id, options);
+    this.appendTransformation(
+      TransformationNodeType.IdentityNode,
+      List([id]),
+      { synthetic },
+    );
+    return id;
   }
 
   public deleteField(id: number): void

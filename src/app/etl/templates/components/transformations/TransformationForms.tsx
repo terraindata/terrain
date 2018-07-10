@@ -48,7 +48,7 @@ THE SOFTWARE.
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import TransformationNodeVisitor, { VisitorLookupMap } from 'shared/transformations/TransformationNodeVisitor';
+import TransformationNodeVisitor, { VisitorLookupMap } from 'shared/transformations/visitors/TransformationNodeVisitor';
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
 import { TransformationForm, TransformationFormProps } from './TransformationFormBase';
 

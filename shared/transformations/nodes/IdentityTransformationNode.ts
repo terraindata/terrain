@@ -45,66 +45,44 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
+
+const { List, Map } = Immutable;
+
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import { List } from 'immutable';
-
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/visitors/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/visitors/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
 
-/*
- *  Simple Transformations mutate a value of a document in-place
- */
-export default abstract class SimpleTransformationType extends TransformationNode
+const TYPECODE = TransformationNodeType.IdentityNode;
+
+export class IdentityTransformationNode extends TransformationNode
 {
-  // override this to operate on null values
-  public readonly skipNulls: boolean = true;
+  public readonly typeCode = TYPECODE;
 
-  // override this transformation to prevent transformation from occuring
-  public shouldTransform(el: any): boolean
+}
+
+class IdentityTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Identity';
+  public description = 'Mark Fields In the DAG';
+  public nodeClass = IdentityTransformationNode;
+
+  public visible = false;
+
+  public transform(doc: object)
   {
-    return true;
-  }
-
-  public abstract transformer(val: any): any;
-
-  protected transformDocument(doc: object): TransformationVisitResult
-  {
-    const errors = [];
-
-    this.fields.forEach((field) =>
-    {
-      for (const match of yadeep.search(doc, field.path))
-      {
-        const { value, location } = match;
-        if (value === null && this.skipNulls)
-        {
-          continue;
-        }
-        if (!this.checkType(value))
-        {
-          errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof value}.`);
-          continue;
-        }
-        if (!this.shouldTransform(value))
-        {
-          continue;
-        }
-        const newValue = this.transformer(value);
-        yadeep.set(doc, location, newValue, { create: true });
-      }
-    });
-
     return {
       document: doc,
-      errors,
-    } as TransformationVisitResult;
+    };
   }
 }
+
+export const IdentityTransformationInfo = new IdentityTransformationInfoC();

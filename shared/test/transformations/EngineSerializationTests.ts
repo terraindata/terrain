@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeConstructorVisitor from 'shared/transformations/TransformationNodeConstructorVisitor';
+import TransformationNodeConstructorVisitor from 'shared/transformations/visitors/TransformationNodeConstructorVisitor';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
 import { KeyPath } from 'shared/util/KeyPath';

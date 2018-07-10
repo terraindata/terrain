@@ -131,7 +131,7 @@ test('get transformations for a field', () =>
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['name'])]), { format: 'uppercase' });
   e.appendTransformation(TransformationNodeType.SubstringNode, List<KeyPath>([KeyPath(['name'])]), { from: 0, length: 2 });
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]), { format: 'uppercase' });
-  expect(e.getTransformations(id1)).toEqual(List<number>([0, 1]));
+  expect(e.getTransformations(id1)).toEqual(List<number>([0, 2, 3]));
 });
 
 test('array in array in object: identity transformation', () =>

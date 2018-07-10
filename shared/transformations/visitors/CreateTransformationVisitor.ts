@@ -43,68 +43,33 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file
-
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
-
 import { List } from 'immutable';
+import * as _ from 'lodash';
+import { KeyPath, WayPoint } from '../util/KeyPath';
+import * as yadeep from '../util/yadeep';
+import * as GraphLib from 'graphlib';
 
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNode from 'shared/transformations/TransformationNode';
-import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/visitors/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/visitors/TransformationVisitResult';
-import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
+import TransformationNodeType, { CommonTransformationOptions, NodeOptionsType } from './TransformationNodeType';
+import TransformationNodeVisitor, { VisitorLookupMap } from './TransformationNodeVisitor';
+import TransformationRegistry from './TransformationRegistry';
+import TransformationVisitError from './TransformationVisitError';
+import TransformationVisitResult from './TransformationVisitResult';
 
-/*
- *  Simple Transformations mutate a value of a document in-place
- */
-export default abstract class SimpleTransformationType extends TransformationNode
+interface Args
 {
-  // override this to operate on null values
-  public readonly skipNulls: boolean = true;
+  engine: TransformationEngine;
+  graph: GraphLib.Graph;
+}
 
-  // override this transformation to prevent transformation from occuring
-  public shouldTransform(el: any): boolean
+export default class CreationVisitor
+  extends TransformationNodeVisitor<void, Args>
+{
+  public visitorLookup: VisitorLookupMap<TransformationNode, Args> = {};
+
+  public visitDefault(type: TransformationNodeType, node: TransformationNode, args: Args)
   {
-    return true;
-  }
-
-  public abstract transformer(val: any): any;
-
-  protected transformDocument(doc: object): TransformationVisitResult
-  {
-    const errors = [];
-
-    this.fields.forEach((field) =>
-    {
-      for (const match of yadeep.search(doc, field.path))
-      {
-        const { value, location } = match;
-        if (value === null && this.skipNulls)
-        {
-          continue;
-        }
-        if (!this.checkType(value))
-        {
-          errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof value}.`);
-          continue;
-        }
-        if (!this.shouldTransform(value))
-        {
-          continue;
-        }
-        const newValue = this.transformer(value);
-        yadeep.set(doc, location, newValue, { create: true });
-      }
-    });
-
-    return {
-      document: doc,
-      errors,
-    } as TransformationVisitResult;
+    // do the stuff
   }
 }

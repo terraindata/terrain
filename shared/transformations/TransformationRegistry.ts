@@ -59,6 +59,7 @@ import { FilterArrayTransformationInfo, FilterArrayTransformationNode } from './
 import { FindReplaceTransformationInfo, FindReplaceTransformationNode } from './nodes/FindReplaceTransformationNode';
 import { GroupByTransformationInfo, GroupByTransformationNode } from './nodes/GroupByTransformationNode';
 import { HashTransformationInfo, HashTransformationNode } from './nodes/HashTransformationNode';
+import { IdentityTransformationInfo, IdentityTransformationNode } from './nodes/IdentityTransformationNode';
 import { InsertTransformationInfo, InsertTransformationNode } from './nodes/InsertTransformationNode';
 import { JoinTransformationInfo, JoinTransformationNode } from './nodes/JoinTransformationNode';
 import { MultiplyTransformationInfo, MultiplyTransformationNode } from './nodes/MultiplyTransformationNode';
@@ -78,7 +79,7 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import TransformationNodeVisitor, { VisitorLookupMap } from 'shared/transformations/TransformationNodeVisitor';
+import TransformationNodeVisitor, { VisitorLookupMap } from 'shared/transformations/visitors/TransformationNodeVisitor';
 
 const infos: {
   [k in TransformationNodeType]: TransformationNodeInfo & { typeCode: k }
@@ -97,6 +98,7 @@ const infos: {
     [TransformationNodeType.FindReplaceNode]: FindReplaceTransformationInfo,
     [TransformationNodeType.GroupByNode]: GroupByTransformationInfo,
     [TransformationNodeType.HashNode]: HashTransformationInfo,
+    [TransformationNodeType.IdentityNode]: IdentityTransformationInfo,
     [TransformationNodeType.InsertNode]: InsertTransformationInfo,
     [TransformationNodeType.JoinNode]: JoinTransformationInfo,
     [TransformationNodeType.MultiplyNode]: MultiplyTransformationInfo,
@@ -171,6 +173,11 @@ class TransformationRegistryLookup
   public canEdit(type: TransformationNodeType): boolean
   {
     return registryVisitor.visit(type).editable;
+  }
+
+  public isVisible(type: TransformationNodeType): boolean
+  {
+    return registryVisitor.visit(type).visible;
   }
 
   public getType(type: TransformationNodeType): any

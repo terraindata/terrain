@@ -43,30 +43,72 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import TransformationNode from 'shared/transformations/TransformationNode';
-import TransformationNodeType from './TransformationNodeType';
+import { List } from 'immutable';
+import * as _ from 'lodash';
+import { KeyPath, WayPoint } from 'shared/util/KeyPath';
+import * as yadeep from 'shared/util/yadeep';
 
-export type VisitorFn<ReturnT, ArgsT = any> = (type: TransformationNodeType, node?: TransformationNode, args?: ArgsT) => ReturnT;
-export type VisitorLookupMap<ReturnT, ArgsT = any> = {
-  [K in TransformationNodeType]?: VisitorFn<ReturnT, ArgsT>;
+import TransformationNode from 'shared/transformations/TransformationNode';
+import TransformationNodeType, { CommonTransformationOptions, NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import TransformationNodeVisitor, { VisitorLookupMap } from './TransformationNodeVisitor';
+import TransformationRegistry from 'shared/transformations/TransformationRegistry';
+import TransformationVisitError from './TransformationVisitError';
+import TransformationVisitResult from './TransformationVisitResult';
+
+export interface NodeArgs
+{
+  id: number;
+  fields: List<{ path: KeyPath, id: number }>;
+  meta: object;
+}
+
+export interface SerializedNodeArgs
+{
+  id: number;
+  fields: Array<{ path: WayPoint[], id: number }>;
+  meta: object;
+}
+
+export type ConstructionArgs = (NodeArgs | SerializedNodeArgs) & {
+  deserialize?: boolean;
 };
 
-export default abstract class TransformationNodeVisitor<ReturnT, ArgsT = any>
+export default class ConstructorVisitor
+  extends TransformationNodeVisitor<TransformationNode, ConstructionArgs>
 {
-  public abstract visitorLookup: VisitorLookupMap<ReturnT, ArgsT>;
+  public visitorLookup: VisitorLookupMap<TransformationNode, ConstructionArgs> = {};
 
-  public abstract visitDefault(type: TransformationNodeType, node?: TransformationNode, args?: ArgsT): ReturnT;
-
-  public visit(type: TransformationNodeType, node?: TransformationNode, args?: ArgsT): ReturnT
+  public deserialize(args: SerializedNodeArgs): NodeArgs
   {
-    const visitor = this.visitorLookup[type];
-    if (visitor === undefined)
+    const fields = List(args.fields.map((item) => {
+      return {
+        id: item.id,
+        path: List(item.path),
+      };
+    }));
+
+    const meta = _.cloneDeep(args.meta as CommonTransformationOptions);
+    if (meta.newFieldKeyPaths !== undefined)
     {
-      return this.visitDefault(type, node, args);
+      meta.newFieldKeyPaths = List((meta.newFieldKeyPaths as any as WayPoint[][]).map((kp) => List(kp)));
     }
-    else
-    {
-      return visitor(type, node, args);
-    }
+
+    return {
+      id: args.id,
+      fields,
+      meta,
+    };
+  }
+
+  public visitDefault(type: TransformationNodeType, node: undefined, args: ConstructionArgs)
+  {
+    const ctor = TransformationRegistry.getType(type);
+
+    const { id, fields, meta } = args.deserialize ?
+      this.deserialize(args as SerializedNodeArgs)
+      :
+      args as NodeArgs;
+
+    return new ctor(id, fields, meta);
   }
 }

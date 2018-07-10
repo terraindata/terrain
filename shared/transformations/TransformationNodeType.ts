@@ -50,6 +50,7 @@ import { KeyPath } from 'shared/util/KeyPath';
 
 enum TransformationNodeType
 {
+  IdentityNode = 'IdentityNode',
   SplitNode = 'SplitNode',
   JoinNode = 'JoinNode',
   RenameNode = 'RenameNode',
@@ -98,8 +99,15 @@ export interface CommonTransformationOptions
   newFieldKeyPaths?: List<KeyPath>;
 }
 
-interface TransformationOptionTypes
+type HasCommon<T extends object> = {
+  [k in keyof T]: T[k] & CommonTransformationOptions;
+};
+
+interface TransformationOptionTypes extends HasCommon<TransformationOptionTypes>
 {
+  IdentityNode: {
+    synthetic: boolean;
+  };
   SplitNode: {
     newFieldKeyPaths: List<KeyPath>;
     preserveOldFields: boolean;
@@ -204,7 +212,7 @@ interface TransformationOptionTypes
 }
 
 export type NodeTypes = keyof TransformationOptionTypes;
-export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key] & CommonTransformationOptions;
+export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key];
 
 /*
  *  For each edge (u, v) whose nodes operate on fields u and v (u and v could be multiple fields),

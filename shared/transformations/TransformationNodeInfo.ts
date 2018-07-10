@@ -59,6 +59,7 @@ export default abstract class TransformationNodeInfo
 
   public editable: boolean = false;
   public creatable: boolean = false;
+  public visible: boolean = true;
   public newFieldType: string = 'string';
 
   public isAvailable(engine: TransformationEngine, fieldId: number): boolean
