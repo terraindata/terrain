@@ -47,8 +47,15 @@ import * as Immutable from 'immutable';
 
 export interface MagentoConfig
 {
+  esdbid: string;
+  esindex: string;
   host: string;
+  includedFields: string[];
   params?: MagentoParamConfigType<MagentoParamTypes>;
+  payloadIndex: string;
+  remapping: {
+    [k: string]: any;
+  };
   route: MagentoRoutes;
   sessionId?: string;
 }
@@ -71,6 +78,25 @@ export interface MagentoParamConfigTypes
     storeView: number;
   };
 }
+
+export const MagentoParamPayloadTypes =
+{
+  CatalogInventoryStockItemList: {
+    paramName: 'products',
+    type: 'string',
+    isArray: true,
+  },
+  CatalogProductAttributeMediaList: {
+    paramName: 'product',
+    type: 'string',
+    isArray: false,
+  },
+  CatalogProductInfo: {
+    paramName: 'productId',
+    type: 'string',
+    isArray: false,
+  },
+};
 
 export const MagentoParamConfigDefaults: MagentoParamConfigTypes =
   {
@@ -124,19 +150,19 @@ export enum MagentoRoutes
 }
 
 export const MagentoRoutesNames = Immutable.Map<string, string>({
-  [MagentoRoutes.CatalogProductAttributeMediaList]: 'Catalog Product Attribute Media List',
+  [MagentoRoutes.CatalogProductAttributeMediaList]: 'Catalog Product Attr Media List',
   [MagentoRoutes.CatalogProductInfo]: 'Catalog Product Info',
   [MagentoRoutes.CatalogInventoryStockItemList]: 'Catalog Inventory Stock Item List',
   [MagentoRoutes.CatalogProductList]: 'Catalog Product List',
 });
 
 export const MagentoRoutesRaw =
-{
-  CatalogProductAttributeMediaList: 'catalogProductAttributeMediaList',
-  CatalogProductInfo: 'catalogProductInfo',
-  CatalogInventoryStockItemList: 'catalogInventoryStockItemList',
-  CatalogProductList: 'catalogProductList',
-}
+  {
+    CatalogProductAttributeMediaList: 'catalogProductAttributeMediaList',
+    CatalogProductInfo: 'catalogProductInfo',
+    CatalogInventoryStockItemList: 'catalogInventoryStockItemList',
+    CatalogProductList: 'catalogProductList',
+  };
 
 export const MagentoRoutesArr: List<MagentoRoutes> = Immutable.List([
   MagentoRoutes.CatalogInventoryStockItemList,

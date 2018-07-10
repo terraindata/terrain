@@ -200,8 +200,13 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
     Mysql: {
     },
     Magento: {
-      route: null,
+      esdbid: null,
+      esindex: null,
+      includedFields: [],
       params: null,
+      payloadIndex: '*',
+      route: null,
+      remapping: {},
     },
     Postgresql: {
     },
@@ -249,8 +254,13 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
     },
     MailChimp: {},
     Magento: {
-      route: null,
+      esdbid: null,
+      esindex: null,
+      includedFields: [],
       params: null,
+      payloadIndex: '*',
+      route: null,
+      remapping: {},
     },
   };
 
@@ -276,7 +286,12 @@ export interface GoogleAnalyticsOptions
 
 export interface MagentoOptions
 {
+  esdbid: string;
+  esindex: string;
+  includedFields: string[];
   params: MagentoParamConfigType<MagentoParamTypes>;
+  payloadIndex: string;
+  remapping: object;
   route: MagentoRoutes;
 }
 

@@ -58,6 +58,7 @@ import
   MagentoConfig,
   MagentoParamConfigType,
   MagentoParamConfigTypes,
+  MagentoParamPayloadTypes,
   MagentoParamTypes,
   MagentoResponse,
   MagentoRoutes,
@@ -67,8 +68,13 @@ import
   WSDLTree,
 } from 'shared/etl/types/MagentoTypes';
 
+import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
+import DatabaseController from '../../../database/DatabaseController';
+import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
+import * as App from '../../App';
 import JSONTransform from '../../io/streams/JSONTransform';
 import XMLTransform from '../../io/streams/XMLTransform';
+import { QueryHandler } from '../../query/QueryHandler';
 import AEndpointStream from './AEndpointStream';
 
 export default class MagentoEndpoint extends AEndpointStream
@@ -105,7 +111,7 @@ export default class MagentoEndpoint extends AEndpointStream
     });
   }
 
-  public async getSink(sinkConfig: SinkConfig): Promise<Readable>
+  public async getSink(sinkConfig: SinkConfig, engine?: TransformationEngine): Promise<Readable>
   {
     return new Promise<Readable>(async (resolve, reject) =>
     {
@@ -135,20 +141,154 @@ export default class MagentoEndpoint extends AEndpointStream
       const writeStream = JSONTransform.createExportStream();
       const magentoConfig: MagentoConfig = await this._parseConfig(sourceConfig);
 
-      const parsedResult = await this.call(magentoConfig);
-      if (Array.isArray(parsedResult))
+      if (magentoConfig.esdbid !== null && magentoConfig.esdbindex !== null)
       {
-        parsedResult.forEach((elem) =>
+        const controller: DatabaseController = await this._getController(magentoConfig.esdbid);
+        const qh: QueryHandler = controller.getQueryHandler();
+        const payload = {
+          database: controller.getID(),
+          type: 'search',
+          streaming: true,
+          body: JSON.stringify(
+          {
+            query: {
+              bool: {
+                filter:
+                [
+                  {
+                    term: {
+                      _index: magentoConfig.esindex,
+                    },
+                  },
+                  {
+                    bool: {
+                      filter: [],
+                      should: [],
+                    },
+                  },
+                ],
+              should: 
+              [
+                {
+                  bool: {
+                    filter:
+                    [
+                      {
+                        exists: {
+                          field: '_id',
+                        },
+                      },
+                    ],
+                    should: [],
+                  },
+                },
+              ]
+              }
+            },
+            from: 0,
+            track_scores: true,
+            _source: true,
+            script_fields: {},
+            size: 5000,
+          }),
+        };
+        const readStream: Readable = await qh.handleQuery(payload) as Readable;
+        let doneReading: boolean = false;
+
+        readStream.on('data', async (data) =>
         {
-          writeStream.write(elem);
+          if (data['hits'] !== undefined && data['hits']['hits'] !== undefined && Array.isArray(data['hits']['hits']))
+          {
+            for(let i = 0; i < data['hits']['hits'].length; ++i)
+            {
+              try
+              {
+                const row = data['hits']['hits'][i]['_source'];
+                const payloadType: object = MagentoParamPayloadTypes[magentoConfig.route];
+                const newRow: object = {};
+                Object.keys(magentoConfig['remapping']).forEach((oldKey) =>
+                {
+                  const newKey = magentoConfig['remapping'][oldKey];
+                  if (!payloadType['isArray'] && row[oldKey] !== undefined && Array.isArray(row[oldKey])) // TODO: make this more robust
+                  {
+                    try
+                    {
+                      newRow[newKey] = row[oldKey][parseInt(magentoConfig.payloadIndex, 10)];
+                    }
+                    catch (e1)
+                    {
+                      newRow[newKey] = _.cloneDeep(row[oldKey]);
+                    }
+                  }
+                  else
+                  {
+                    newRow[newKey] = _.cloneDeep(row[oldKey]);
+                  }
+                });
+
+                if (newRow !== undefined && typeof newRow === 'object' && Array.isArray(Object.keys(newRow)))
+                {
+                  Object.keys(newRow).forEach((nrKey) =>
+                  {
+                    magentoConfig.params[nrKey] = newRow[nrKey];
+                  });
+                }
+
+                const parsedResult = await this.call(magentoConfig);
+                if (parsedResult !== undefined && Array.isArray(parsedResult))
+                {
+                  parsedResult.forEach((elem) =>
+                  {
+                    magentoConfig.includedFields.forEach((field) =>
+                    {
+                      elem['original_' + field] = row[field];
+                    });
+                    writeStream.write(elem);
+                  });
+                }
+                else
+                {
+                  magentoConfig.includedFields.forEach((field) =>
+                  {
+                    parsedResult['original_' + field] = row[field];
+                  });
+                  writeStream.write(parsedResult);
+                }
+              }
+              catch (e)
+              {
+                // do nothing
+              }
+            }
+          }
+          if (doneReading)
+          {
+            writeStream.end();
+            resolve(writeStream);
+          }
+        });
+        readStream.on('end', () =>
+        {
+          doneReading = true;
         });
       }
       else
       {
-        writeStream.write(parsedResult);
+        const parsedResult = await this.call(magentoConfig);
+        if (Array.isArray(parsedResult))
+        {
+          parsedResult.forEach((elem) =>
+          {
+            writeStream.write(elem);
+          });
+        }
+        else
+        {
+          writeStream.write(parsedResult);
+        }
+        writeStream.end();
+        resolve(writeStream);
       }
-      writeStream.end();
-      resolve(writeStream);
     });
   }
 
@@ -160,11 +300,11 @@ export default class MagentoEndpoint extends AEndpointStream
 
       let wsdlAsJSON: object = {};
       const wsdlTree: WSDLTree =
-      {
-        message: {},
-        portType: {},
-        types: {},
-      };
+        {
+          message: {},
+          portType: {},
+          types: {},
+        };
       const wsdlMsg: object = {};
       const wsdlPortType: object = {};
 
@@ -205,21 +345,21 @@ export default class MagentoEndpoint extends AEndpointStream
     {
       const magentoIntegrationConfig: object = await this.getIntegrationConfig(endpointConfig.integrationId) as object;
       const magConf: MagentoConfig =
-      {
-        host: magentoIntegrationConfig['host'],
-        route: 'login',
-        params: {
-          username: magentoIntegrationConfig['username'],
-          apiKey: magentoIntegrationConfig['apiKey'],
-        },
-      };
+        {
+          host: magentoIntegrationConfig['host'],
+          route: 'login',
+          params: {
+            username: magentoIntegrationConfig['username'],
+            apiKey: magentoIntegrationConfig['apiKey'],
+          },
+        };
       try
       {
         const partialMagentoConfig: PartialMagentoConfig =
-        {
-          host: '',
-          sessionId: '',
-        };
+          {
+            host: '',
+            sessionId: '',
+          };
         partialMagentoConfig.host = magentoIntegrationConfig['host'];
         partialMagentoConfig.sessionId = await this.call(magConf) as string;
         resolve(partialMagentoConfig);
@@ -236,6 +376,32 @@ export default class MagentoEndpoint extends AEndpointStream
     return { item: arr };
   }
 
+
+  private async _getController(id: number | string | null): Promise<DatabaseController>
+  {
+    let controller: DatabaseController | undefined;
+    if (typeof id === 'string')
+    {
+      controller = DatabaseRegistry.getByName(id);
+    }
+    else if (typeof id === 'number')
+    {
+      controller = DatabaseRegistry.get(id);
+    }
+
+    if (controller === undefined)
+    {
+      throw new Error('Database or server id ' + String(id) + ' is invalid.');
+    }
+
+    if (controller.getType() !== 'ElasticController')
+    {
+      throw new Error('Invalid controller for Elastic endpoint');
+    }
+
+    return controller;
+  }
+
   private async _getWSDLAsJSON(params, options)
   {
     return new Promise(async (resolve, reject) =>
@@ -244,10 +410,10 @@ export default class MagentoEndpoint extends AEndpointStream
       const xmlStream = request(params['host']).pipe(XMLTransform.createImportStream(xmlPath));
       let fullData = {};
       xmlStream.on('data', (data) =>
-        {
-          fullData = data;
-        })
-      .on('end', () =>
+      {
+        fullData = data;
+      })
+        .on('end', () =>
         {
           resolve(fullData);
         });
@@ -260,12 +426,17 @@ export default class MagentoEndpoint extends AEndpointStream
     {
       const partialMagConf: PartialMagentoConfig = await this.login(sourceConfig);
       const magentoConfig: MagentoConfig =
-      {
-        host: partialMagConf.host,
-        params: sourceConfig['options']['params'],
-        route: sourceConfig['options']['route'],
-        sessionId: partialMagConf.sessionId,
-      };
+        {
+          esdbid: sourceConfig['options']['esdbid'],
+          esindex: sourceConfig['options']['esindex'],
+          host: partialMagConf.host,
+          includedFields: sourceConfig['options']['includedFields'],
+          params: sourceConfig['options']['params'],
+          payloadIndex: sourceConfig['options']['payloadIndex'],
+          remapping: sourceConfig['options']['remapping'],
+          route: sourceConfig['options']['route'],
+          sessionId: partialMagConf.sessionId,
+        };
 
       resolve(magentoConfig);
     });
@@ -376,8 +547,7 @@ export default class MagentoEndpoint extends AEndpointStream
               params['params'][param] = this._convertArrayToSOAPArray(params['params'][param]);
             }
           });
-
-          clientFuncCallFunction(params['params'], async (errLogin, resultLogin, envLogin, soapHeaderLogin) =>
+          App.Limiter.submit(clientFuncCallFunction, params['params'], (errLogin, resultLogin, envLogin, soapHeaderLogin) =>
           {
             if (!errLogin)
             {

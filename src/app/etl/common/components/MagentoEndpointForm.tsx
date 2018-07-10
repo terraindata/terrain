@@ -58,6 +58,7 @@ import { DisplayState, DisplayType, InputDeclarationMap } from 'common/component
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import ObjectForm from 'common/components/ObjectForm';
+import DatabasePicker from 'etl/common/components/DatabasePicker';
 import FileConfigForm from 'etl/common/components/FileConfigForm';
 import UploadFileButton from 'etl/common/components/UploadFileButton';
 import { LibraryState } from 'library/LibraryTypes';
@@ -96,6 +97,7 @@ import { EndpointFormBase } from './EndpointFormClasses';
 
 const { List } = Immutable;
 
+
 type MagentoState = SinkOptionsType<Sinks.Magento>;
 export class MagentoEndpoint extends EndpointFormBase<MagentoState>
 {
@@ -117,7 +119,78 @@ export class MagentoEndpoint extends EndpointFormBase<MagentoState>
         render: this.renderParams,
       },
     },
+    esdbid: {
+      type: DisplayType.Custom,
+      widthFactor: 5,
+      style: { padding: '0px' },
+      options: {
+        render: this.renderDatabasePicker,
+      },
+    },
+    remapping: {
+      type: DisplayType.Custom,
+      widthFactor: -1,
+      options: {
+        render: this.renderRemappingForm,
+      },
+    },
+    payloadIndex: {
+      type: DisplayType.TextBox,
+      displayName: 'Data Payload Index (* for all)',
+    },
+    includedFields: {
+      type: DisplayType.TagsBox,
+      displayName: 'Included Fields',
+    }
   };
+
+  public renderDatabasePicker(state: MagentoState, disabled: boolean)
+  {
+    const { esdbid, esindex } = state;
+    return (
+      <DatabasePicker
+        allowEmpty={true}
+        language={Languages.Elastic}
+        serverId={esdbid != null ? esdbid : -1}
+        database={esindex != null ? esindex : ''}
+        table={'data'}
+        onChange={this.handleDbPickerChange}
+        constantHeight={true}
+      />
+    );
+  }
+
+  public handleDbPickerChange(serverId: ID, database: string, table: string, language: Languages)
+  {
+    const { onChange, endpoint } = this.props;
+    const newOptions = _.extend({}, endpoint.options, { esdbid: serverId, esindex: database });
+    onChange(endpoint.set('options', newOptions));
+  }
+
+  public renderRemappingForm(state: MagentoState, disabled)
+  {
+    return (
+      <ObjectForm
+        object={state.remapping != null ? state.remapping : {}}
+        onChange={this.handleRemappingChange}
+        label='Remap Fields'
+        onSubmit={this.onSubmit}
+      />
+    );
+  }
+
+  public onSubmit()
+  {
+    // do nothing
+  }
+
+  public handleRemappingChange(newRemapping, apply?: boolean)
+  {
+    const newOptions = _.extend({}, this.props.endpoint.options, {
+      remapping: newRemapping,
+    });
+    this.handleOptionsFormChange(newOptions);
+  }
 
   public formStateToOptions(newState: MagentoState): MagentoState
   {
