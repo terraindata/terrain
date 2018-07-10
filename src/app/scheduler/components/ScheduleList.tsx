@@ -44,6 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:strict-boolean-expressions no-var-requires
+
+import * as Immutable from 'immutable';
+import { List } from 'immutable';
+import * as React from 'react';
+
 import EtlRouteUtil from 'app/etl/ETLRouteUtil';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
 import { _SchedulerConfig, scheduleForDatabase, SchedulerConfig } from 'app/scheduler/SchedulerTypes';
@@ -52,9 +57,7 @@ import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
 import cronstrue from 'cronstrue';
 import { HeaderConfig, ItemList } from 'etl/common/components/ItemList';
-import * as Immutable from 'immutable';
-import { List } from 'immutable';
-import * as React from 'react';
+import { ETLActions } from 'etl/ETLRedux';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
 import './Schedule.less';
 const RefreshIcon = require('images/icon_refresh.svg?name=RefreshIcon');
