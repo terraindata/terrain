@@ -159,7 +159,7 @@ QueryRouter.post('/', passport.authenticate('access-token-local'), async (ctx, n
   let query: QueryRequest;
   if (ctx.request.type === 'application/json')
   {
-    query = ctx.request.body.body as QueryRequest;
+    query = ctx.request.body['body'] as QueryRequest;
   }
   else if (ctx.request.type === 'application/x-www-form-urlencoded')
   {
@@ -209,7 +209,7 @@ QueryRouter.post('/', passport.authenticate('access-token-local'), async (ctx, n
 
 QueryRouter.post('/template', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  // parse ctx.request.body.body as an Array
+  // parse ctx.request.body['body'] as an Array
   const reqArr: object[] = ctx.request.body['body'] as object[];
   const bodyArr: object[] = [];
   const indexSet: Set<string> = new Set();

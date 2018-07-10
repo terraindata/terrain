@@ -52,6 +52,7 @@ import * as v8 from 'v8';
 
 import appStats from '../AppStats';
 import { databases } from '../database/DatabaseRouter';
+import { MemoryTransport } from '../log/MemoryTransport';
 import { MidwayLogger } from '../log/MidwayLogger';
 
 const Router = new KoaRouter();
@@ -121,7 +122,7 @@ Router.get('/logs', passport.authenticate('access-token-local'), async (ctx, nex
   // console.log(JSON.stringify(MidwayLogger.transports[1]['name']));
   if (ctx.state.user.isSuperUser)
   {
-    const transport = MidwayLogger.transports[1];
+    const transport = MidwayLogger.transports[1] as MemoryTransport;
     ctx.body = String(transport.getAll()) + '\n';
   }
   else

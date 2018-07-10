@@ -119,7 +119,7 @@ Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   MidwayLogger.info('create items');
-  const item: ItemConfig = ctx.request.body.body;
+  const item: ItemConfig = ctx.request.body['body'];
   Util.verifyParameters(item, ['name']);
   if (item.id !== undefined)
   {
@@ -146,7 +146,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   MidwayLogger.info('modify items');
-  const item: ItemConfig = ctx.request.body.body;
+  const item: ItemConfig = ctx.request.body['body'];
   Util.verifyParameters(item, ['name']);
   if (item.id === undefined)
   {
