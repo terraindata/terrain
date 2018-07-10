@@ -92,17 +92,11 @@ Router.post('/', async (ctx, next) =>
          token: userToken,
          createdAt: currDateTime,
        };
-     if (checkRecoveryTokens[0] !== undefined)
-     {
-       const updatedEntry: RecoveryTokenConfig = await recoveryTokens.update(newEntry) as RecoveryTokenConfig;
-     }
-     else
-     {
-       const createdEntry: RecoveryTokenConfig = await recoveryTokens.create(newEntry) as RecoveryTokenConfig;
-     }
+       
+     const entry = await recoveryTokens.upsert(newEntry) as RecoveryTokenConfig;
 
      // construct URL
-     const route: string = hostName + '/resetPassword.html?=' + userToken;
+     const route: string = hostName + '/resetPassword.html?token=' + userToken;
      // send email with reset url
      integrations.initialize();
      const emailIntegrations: IntegrationConfig[] = await integrations.get(null, undefined, 'Email', true) as IntegrationConfig[];
@@ -110,7 +104,7 @@ Router.post('/', async (ctx, next) =>
      const body: string = 'Please click on the link below to reset your password. \n \n' + route;
      const emailSendStatus: boolean = await App.EMAIL.send(email, emailIntegrations[0].id, subject, body);
      winston.info(`email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
-     ctx.body = 'Password reset email sent to ' + email + '.';
+     ctx.body = "Password reset email sent. If you don't receive an email in 30 minutes, please contact Terrain support.";
      ctx.status = 200;
 
    }

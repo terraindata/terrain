@@ -47,10 +47,8 @@ THE SOFTWARE.
 function checkTokenValidity() 
 {
 	var fullUrl = window.location + '';
-	var splitUrl = fullUrl.split("?=");
+	var splitUrl = fullUrl.split("?token=");
 	const token = splitUrl[1];
-	console.log("token: " + token);
-
 	const newPassword = document.getElementById('reset-password-new-password').value;
 	const confirmNewPassword = document.getElementById('reset-password-confirm').value;
 
@@ -62,7 +60,6 @@ function checkTokenValidity()
 
 	xhr.open(config.method, config.route, true);
 	xhr.setRequestHeader('Content-Type', 'application/json');
-	console.log(config.route);
 
 	xhr.onload = function () {
 		if (xhr.status != 200)
@@ -77,7 +74,7 @@ function checkTokenValidity()
 function handleResetPasswordSubmit()
 {
 	var fullUrl = window.location + '';
-	var splitUrl = fullUrl.split("?=");
+	var splitUrl = fullUrl.split("?token=");
 	const token = splitUrl[1];
 	const newPassword = document.getElementById('reset-password-new-password').value;
 	const confirmNewPassword = document.getElementById('reset-password-confirm').value;
@@ -101,7 +98,6 @@ function handleResetPasswordSubmit()
 
 		xhr.open(config.method, config.route, true);
 		xhr.setRequestHeader('Content-Type', 'application/json');
-		console.log(config.route);
 
 		xhr.onload = function () {
 			document.getElementById('reset-password-area').innerHTML = xhr.responseText;
