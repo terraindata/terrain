@@ -141,9 +141,9 @@ export default class FileConfigForm extends TerrainComponent<Props>
       },
       suggestedJsonPath: {
         type: DisplayType.Custom,
-        displayName: 'Suggested JSON Paths',
+        displayName: '',
         group: 'path',
-        widthFactor: 9,
+        widthFactor: -1,
         options: {
           render: this.renderSuggestedJsonPaths,
         },
@@ -160,8 +160,6 @@ export default class FileConfigForm extends TerrainComponent<Props>
 
   public render()
   {
-    // console.log(PathUtil.guessFilePaths(this.props.source).map((key, i) => this.props.source[key.name]));
-    // console.log(PathUtil.guessFilePaths(this.props.source));
     return (
       <DynamicForm
         inputMap={this.inputMap}
@@ -174,7 +172,9 @@ export default class FileConfigForm extends TerrainComponent<Props>
 
   public updateJsonPath(possiblePath)
   {
-    const updatedFileConfig = this.props.fileConfig.set('jsonPath', possiblePath);
+    const pathName = possiblePath.split(':')[0];
+    const formattedPath = '*.' + pathName;
+    const updatedFileConfig = this.props.fileConfig.set('jsonPath', formattedPath);
     this.props.onChange(updatedFileConfig);
   }
 
@@ -187,22 +187,47 @@ export default class FileConfigForm extends TerrainComponent<Props>
     else
     {
       return (
-        <DataModal
-          sectionType='path'
-          sectionOptions={
-            List(PathUtil.guessFilePaths(this.props.source).map((key, i) => key.name + ': ' + key.score.toString()))
-          }
-          sectionBoxes={
-            List(PathUtil.guessFilePaths(this.props.source).map((key, i) => JSON.stringify(this.props.source[key.name], null, 2)))
-          }
-          width='100%'
-          height='45%'
-          strictFormatting={true}
-          onChange={this.updateJsonPath}
-        />
+        <Modal
+          open={(state.fileType === FileTypes.Json && state.useJsonPath === true && this.props.source !== null)}
+          title='Suggested JSON Paths (Select One)'
+          wide={true}
+          onClose={this.closeSuggestedPaths()}
+          noFooterPadding={true}
+        >
+          {this.renderSuggestedPathsModal()}
+        </Modal>
       );
     }
   }
+
+  public closeSuggestedPaths()
+  {
+    this.inputMap.suggestedJsonPath.getDisplayState = DisplayState.Hidden;
+  }
+
+  public renderSuggestedPathsModal()
+  {
+    return (
+      <DataModal
+        sectionType='path'
+        sectionOptions={
+          List(PathUtil.guessFilePaths(this.props.source).map((key, i) => key.name + ': ' + key.score.toString()))
+        }
+        sectionBoxes={
+          List(PathUtil.guessFilePaths(this.props.source).map((key, i) => JSON.stringify(this.props.source[key.name], null, 2)))
+        }
+        sectionTitles={
+          List(PathUtil.guessFilePaths(this.props.source).map((key, i) => '*.' + key.name))
+        }
+        width='100%'
+        height='80%'
+        strictFormatting={true}
+        dynamicTitle={true}
+        onChange={this.updateJsonPath}
+      />
+    );
+  }
+
 
   public xmlPathDisplay(s: FormState)
   {

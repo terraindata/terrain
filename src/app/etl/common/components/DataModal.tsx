@@ -62,9 +62,11 @@ export interface Props
   sectionType: string;
   sectionOptions: List<any>;
   sectionBoxes: List<any>;
-  width?: string;
-  height?: string;
+  sectionTitles?: List<any>;
+  width: string;
+  height: string;
   strictFormatting?: boolean;
+  dynamicTitle: boolean;
   onChange?: (value: any) => void;
 }
 
@@ -146,6 +148,17 @@ export default class DataModal extends TerrainComponent<Props>
     }
   }
 
+  public renderTitle()
+  {
+    const visualTitle = this.props.dynamicTitle ? this.props.sectionTitles.get(this.state.currentOptionIndex) :
+      this.props.sectionTitle;
+    return (
+      <div className='info-header' style={{ color: Colors().mainSectionTitle }}>
+        {visualTitle}
+      </div>
+    );
+  }
+
   public render()
   {
     // console.log(this.props.sectionOptions.get(0));
@@ -156,7 +169,7 @@ export default class DataModal extends TerrainComponent<Props>
         style={{ background: Colors().blockBg, height: this.props.height, width: this.props.width }}
       >
         <div className='info-header-bar'>
-          <div className='info-header'>{this.props.sectionTitle}</div>
+          {this.renderTitle()}
           {this.renderSectionTab(this.props.sectionOptions)}
         </div>
         {this.renderSectionInfo()}
