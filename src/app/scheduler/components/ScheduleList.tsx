@@ -63,6 +63,7 @@ export interface Props
 {
   schedules?: Immutable.Map<ID, SchedulerConfig>;
   schedulerActions?: typeof SchedulerActions;
+  etlActions?: typeof ETLActions;
   loading?: boolean;
 }
 
@@ -182,6 +183,28 @@ class ScheduleList extends TerrainComponent<Props>
     }
   }
 
+  public deleteSchedule(scheduleId: ID, e?)
+  {
+    const onConfirm = () =>
+    {
+      this.props.schedulerActions({
+        actionType: 'deleteSchedule',
+        scheduleId,
+      });
+    };
+    this.props.etlActions({
+      actionType: 'addModal',
+      props: {
+        title: 'Delete Schedule',
+        message: 'Are you sure you want to delete this schedule?',
+        closeOnConfirm: true,
+        confirm: true,
+        confirmButtonText: 'Delete',
+        onConfirm,
+      },
+    });
+  }
+
   public getMenuActions(schedule: SchedulerConfig)
   {
     let actions = List([{
@@ -195,7 +218,7 @@ class ScheduleList extends TerrainComponent<Props>
         onClick: this._fn(this.performAction, 'runSchedule', schedule.id),
       }).push({
         text: 'Delete',
-        onClick: this._fn(this.performAction, 'deleteSchedule', schedule.id),
+        onClick: this._fn(this.deleteSchedule, schedule.id),
       });
     }
     else
@@ -257,5 +280,6 @@ export default Util.createContainer(
   ],
   {
     schedulerActions: SchedulerActions,
+    etlActions: ETLActions,
   },
 );

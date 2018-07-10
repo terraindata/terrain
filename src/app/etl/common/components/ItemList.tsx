@@ -184,7 +184,7 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
     }
     else
     {
-      message = `There aren't yet any ${this.props.itemsName || 'item'}s`;
+      message = `There aren't any ${this.props.itemsName || 'item'}s yet`;
     }
 
     return message;
