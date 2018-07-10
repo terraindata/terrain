@@ -63,8 +63,6 @@ import Integrations from '../integrations/Integrations';
 const integrations: Integrations = new Integrations();
 Router.post('/', async (ctx, next) =>
 {
-   ctx.body = "Password reset email sent. If you don't receive an email in 30 minutes, please contact Terrain support.";
-   ctx.status = 200;
    let hostNameValid: boolean = false;
    const hostName: string = ctx.request.body['url'];
    // check that hostname is either .terraindata.com or localhost
@@ -73,10 +71,20 @@ Router.post('/', async (ctx, next) =>
      hostNameValid = true;
    }
    // check that user exists in db
-   const user = await users.select(['id'], {email: ctx.request.body['email']}) as UserConfig[];
-   const userId: number = user[0]['id'];
-   const userExists: boolean = userId !== undefined;
+   let user: UserConfig[];
+   let userId: number;
+   let userExists: boolean = false;
    let email: string;
+   try {
+     user = await users.select(['id'], {email: ctx.request.body['email']}) as UserConfig[];
+     userId = user[0]['id'];
+     userExists = (userId !== undefined && userId !== '' && userId !== null);
+   }
+   catch (error) {
+     winston.error("user doesn't exist: " + JSON.stringify(ctx.request.body['email']));
+     winston.error(error);
+   }
+
    if (userExists && hostNameValid)
    {
      email = ctx.request.body['email'];
@@ -84,9 +92,7 @@ Router.post('/', async (ctx, next) =>
      const userToken: string = srs();
      // generate timestamp
      const currDateTime: Date = new Date(Date.now());
-
      // put timestamp and token into DB with user
-     // check if user already exists in recovery tokens table and update token + timestamp
      recoveryTokens.initialize();
      const checkRecoveryTokens: RecoveryTokenConfig[] = await recoveryTokens.get(userId) as RecoveryTokenConfig[];
      const newEntry = {
@@ -95,7 +101,13 @@ Router.post('/', async (ctx, next) =>
          createdAt: currDateTime,
        };
 
-     const entry = await recoveryTokens.upsert(newEntry) as RecoveryTokenConfig;
+       try {
+
+         const entry = await recoveryTokens.upsert(newEntry) as RecoveryTokenConfig;
+       }
+       catch {
+         winston.error('unable to upsert user into recovery tokens table.');
+       }
 
      // construct URL
      const route: string = hostName + '/resetPassword.html?token=' + userToken;
@@ -107,6 +119,8 @@ Router.post('/', async (ctx, next) =>
      const emailSendStatus: boolean = await App.EMAIL.send(email, emailIntegrations[0].id, subject, body);
      winston.info(`email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
    }
+   ctx.body = "Password reset email sent. If you don't receive an email in 30 minutes, please contact Terrain support.";
+   ctx.status = 200;
 
 });
 
