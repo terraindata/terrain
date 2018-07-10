@@ -136,7 +136,7 @@ fullstack-meta:
     - timeout 240 yarn test-fullstack-teardown
     - pkill node || true;
 
-fullstack-screenshot:
+fullstack-screenshot-login-pathfinder:
   script:
     - pkill node || true;
     - timeout 240 yarn test-fullstack-setup
@@ -146,8 +146,27 @@ fullstack-screenshot:
     - sleep 10
     - yarn test-fullstack-login
     - yarn test-rr-pathfinder
+  only:
+    - schedules
+  stage: screenshot-tests
+  allow_failure: true
+  artifacts:
+    when: on_failure
+    expire_in: 1 week
+    paths:
+    - rr/test/pathfinder/__image_snapshots__/__diff_output__
+    - rr/test/login/__image_snapshots__/__diff_output__
+  after_script:
+    - tail -n20 ./midwayConsole.log || true
+    - timeout 240 yarn test-fullstack-teardown
+    - pkill node || true;
+
+fullstack-screenshot-http-import:
+  script:
     - pkill node || true;
     - timeout 240 yarn test-fullstack-setup
+    - yarn clean
+    - MIDWAY_HOST=`hostname`:3000 yarn build
     - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
     - sleep 10
     - yarn test-rr-etl-http-import
@@ -160,8 +179,6 @@ fullstack-screenshot:
     expire_in: 1 week
     paths:
     - rr/test/etl/__image_snapshots__/__diff_output__
-    - rr/test/pathfinder/__image_snapshots__/__diff_output__
-    - rr/test/login/__image_snapshots__/__diff_output__
   after_script:
     - tail -n20 ./midwayConsole.log || true
     - timeout 240 yarn test-fullstack-teardown
