@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 import ConfigType from '../ConfigType';
 
-import { Version } from './MigrationTypes';
+import { Version } from '../AppVersion';
 
 export class MigrationRecordConfig extends ConfigType
 {

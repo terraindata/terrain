@@ -77,7 +77,8 @@ import SFTPEndpoint from './endpoints/SFTPEndpoint';
 
 export const postProcessTransform: PostProcess = new PostProcess();
 
-export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[]): Promise<stream.Readable>
+export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[],
+  size?: number): Promise<stream.Readable>
 {
   return new Promise<stream.Readable>(async (resolve, reject) =>
   {
@@ -96,6 +97,8 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
         case 'Algorithm':
           endpoint = new AlgorithmEndpoint();
           const exportTransform = await (endpoint as AlgorithmEndpoint).getExportTransform(source);
+          exportTransform.on('error', (e) => algorithmStream.emit('error', e));
+          source.options['size'] = size;
           const algorithmStream = await endpoint.getSource(source) as stream.Readable;
           sourceStream = algorithmStream.pipe(exportTransform);
           return resolve(sourceStream);

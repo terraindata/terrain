@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as stream from 'stream';
+import { Writable } from 'stream';
 
 import TaskEnum from 'shared/types/jobs/TaskEnum';
 
@@ -59,7 +59,7 @@ export class TaskConfig
   public onSuccess: number = null;              // id of next task to execute (default should be next in array)
   public params: any = null;                    // input parameters for the task
   public paused: number = null;                 // where in the tree of tasks the tasks are paused
-  public rootLogStream: stream.Writable = null; // contains all of the logs from a TaskTree with multiple nodes that produce logStreams
+  public rootLogStream: any = null;             // contains all of the logs from a TaskTree with multiple nodes that produce logStreams
   public taskId: TaskEnum = null;               // maps to a statically declared task
 }
 
