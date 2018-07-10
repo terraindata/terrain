@@ -68,10 +68,6 @@ export class RecoveryTokens
       throw new Error('Requires ID for recovery token creation');
     }
     const existingUsers = await this.select(['id'], { id: entry.id });
-    if (existingUsers.length !== 0)
-    {
-      throw new Error('User already exists.');
-    }
     const newRecoveryToken: RecoveryTokenConfig =
       {
         id: entry.id === undefined ? '' : entry.id,
@@ -114,8 +110,6 @@ export class RecoveryTokens
 
   public async upsert(newEntry: RecoveryTokenConfig): Promise<RecoveryTokenConfig>
   {
-    winston.error('create: ' + JSON.stringify(newEntry));
-    winston.error(typeof(newEntry));
     return App.DB.upsert(this.recoveryTokensTable, newEntry) as Promise<RecoveryTokenConfig>;
   }
 }

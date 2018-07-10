@@ -66,7 +66,7 @@ Router.post('/', async (ctx, next) =>
   recoveryTokens.initialize();
   const allRecoveryTokens: RecoveryTokenConfig[] = await recoveryTokens.select([], {}) as RecoveryTokenConfig[];
   const allUsers: UserConfig[] = await users.select([], {}) as UserConfig[];
-  for (const index in allRecoveryTokens)
+  for (let index: number = 0; index < allRecoveryTokens.length; index++)
   {
     if (allRecoveryTokens[index]['token'] === token)
     {
@@ -99,7 +99,7 @@ Router.post('/', async (ctx, next) =>
        }
      }
    }
-   ctx.body = 'Invalid reset url.';
+   ctx.body = 'Error changing password.';
  });
 
 Router.get('/:token', async (ctx, next) =>
@@ -108,7 +108,7 @@ Router.get('/:token', async (ctx, next) =>
   let tokenFound: boolean = false;
   recoveryTokens.initialize();
   const allRecoveryTokens: RecoveryTokenConfig[] = await recoveryTokens.select([], {}) as RecoveryTokenConfig[];
-  for (const index in allRecoveryTokens)
+  for (let index: number = 0; index < allRecoveryTokens.length; index++)
   {
     if (allRecoveryTokens[index]['token'] === token)
     {

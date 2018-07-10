@@ -66,29 +66,15 @@ Router.post('/', async (ctx, next) =>
    let hostNameValid: boolean = false;
    const hostName: string = ctx.request.body['url'];
    // check that hostname is either .terraindata.com or localhost
-   if (hostName.indexOf('terraindata.com') !== -1 || hostName.indexOf('localhost') !== -1)
+   if (/https*:\/\/[a-z\-]*\.terraindata\.com$/.test(hostName) || /https*:\/\/localhost[:0-9]*$/.test(hostName))
    {
      hostNameValid = true;
    }
    // check that user exists in db
-   const userIds: UserConfig[] = await users.select(['id'], {}) as UserConfig[];
+   const user = await users.select(['id'], {email: ctx.request.body['email']}) as UserConfig[];
+   const userId: number = user[0]['id'];
+   const userExists: boolean = userId !== undefined;
    let email: string;
-   let userId: number;
-   let userExists: boolean = false;
-   for (let index: number = 0; index < userIds.length; index++)
-   {
-     const usr: UserConfig[] = await users.get(userIds[index]['id']);
-     if (usr !== undefined)
-     {
-       if (usr[0]['email'] === ctx.request.body['email'])
-       {
-         userExists = true;
-         email = ctx.request.body['email'];
-         userId = usr[0]['id'];
-       }
-     }
-   }
-
    if (userExists && hostNameValid)
    {
      email = ctx.request.body['email'];
@@ -133,7 +119,7 @@ Router.post('/', async (ctx, next) =>
    {
      if (!userExists)
      {
-       ctx.body = 'User does not exist.';
+       ctx.body = 'User not found.';
        ctx.status = 404;
      }
      if (!hostNameValid)
