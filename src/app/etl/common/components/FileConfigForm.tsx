@@ -172,6 +172,12 @@ export default class FileConfigForm extends TerrainComponent<Props>
     );
   }
 
+  public updateJsonPath(possiblePath)
+  {
+    const updatedFileConfig = this.props.fileConfig.set('jsonPath', possiblePath);
+    this.props.onChange(updatedFileConfig);
+  }
+
   public renderSuggestedJsonPaths(state, disabled)
   {
     if (this.props.source == null)
@@ -192,6 +198,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
           width='100%'
           height='45%'
           strictFormatting={true}
+          onChange={this.updateJsonPath}
         />
       );
     }

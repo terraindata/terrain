@@ -289,6 +289,24 @@ class EndpointForm extends TerrainComponent<Props>
 
     this.props.onChange(newEndpoint, apply);
 
+    console.log(newEndpoint.toJS());
+
+    newEndpoint = newEndpoint.setIn(['fileConfig', 'jsonPath'], '');
+
+// x = x.setIn(['a', 'b', 'c'], 5);
+// x.a.b.c = 5
+// const x = {
+//   y: {
+//     hello: 'hi'
+//   }
+// }
+// x = x .setIn(['y', 'hello'], 'bye')
+// {
+//   y: {
+//     hello: 'bye'
+//   }
+// }
+
     DocumentsHelpers.fetchPreview(newEndpoint).then((res) =>
     {
       this.setState(

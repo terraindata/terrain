@@ -64,7 +64,8 @@ export interface Props
   sectionBoxes: List<any>;
   width?: string;
   height?: string;
-  strictFormatting: boolean;
+  strictFormatting?: boolean;
+  onChange?: (value: any) => void;
 }
 
 export default class DataModal extends TerrainComponent<Props>
@@ -91,6 +92,10 @@ export default class DataModal extends TerrainComponent<Props>
 
   public onTabChange(optionName)
   {
+    if (this.props.onChange !== null)
+    {
+      this.props.onChange(optionName);
+    }
     this.setState(
       {
         currentOptionIndex: this.props.sectionOptions.indexOf(optionName),
