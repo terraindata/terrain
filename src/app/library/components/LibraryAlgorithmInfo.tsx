@@ -256,7 +256,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   // component for displaying status on ES cluster:
   //   <div className='biv-row'>
   //   <div className='biv-cell-first'>
