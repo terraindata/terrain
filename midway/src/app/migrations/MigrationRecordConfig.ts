@@ -51,7 +51,7 @@ import { DefaultSinkConfig, DefaultSourceConfig } from 'shared/etl/types/Endpoin
 import { ETLProcess, TemplateBase, TemplateMeta, TemplateObject, TemplateSettings } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-import { CURRENT_VERSION, Version } from './MigrationTypes';
+import { CURRENT_VERSION, Version } from '../AppVersion';
 
 export class MigrationRecordConfig extends ConfigType
 {

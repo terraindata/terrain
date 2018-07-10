@@ -126,14 +126,14 @@ export class JobLog
     return this._select([], { id });
   }
 
-  private async _consumeLogStreamWritable(logStream: LogStreamWritable): Promise<string[] | Error>
+  private async _consumeLogStreamWritable(logStream: LogStreamWritable): Promise<string[]>
   {
-    return new Promise<string[] | Error>(async (resolve, reject) =>
+    return new Promise<string[]>(async (resolve, reject) =>
     {
       const result: string[] = [];
       logStream.on('error', (e) =>
       {
-        return resolve(e);
+        return reject(e);
       });
 
       if (logStream.getState() === true)

@@ -233,7 +233,7 @@ export class Scheduler
     return Promise.reject(new Error('Schedule not found.'));
   }
 
-  public async setRunning(id: number, running: boolean, handle: TransactionHandle): Promise<SchedulerConfig[]>
+  public async setRunning(id: number, running: boolean, handle?: TransactionHandle): Promise<SchedulerConfig[]>
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
