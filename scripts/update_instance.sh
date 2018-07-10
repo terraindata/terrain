@@ -220,6 +220,7 @@ fi
 
 
 ssh terrain@${ADDRESS} << EOF
+cd /home/terrain/src-${VERSION}/Search;
 ${STAGE_DB_COMMAND}
 ${START_SCREEN_COMMAND}
 screen -S runmidway-${SCREEN_ID} -X stuff "cd /home/terrain/src-${VERSION}/Search;\r";
