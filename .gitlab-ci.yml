@@ -126,7 +126,7 @@ fullstack-meta:
     - yarn clean
     - MIDWAY_HOST=`hostname`:3000 yarn build
     - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
-    - sleep 10
+    - sleep 25
 # TODO: enable this after update it to the ETL
 #    - yarn test-fullstack-import
     - yarn test-fullstack-component
@@ -143,7 +143,7 @@ fullstack-screenshot-login-pathfinder:
     - yarn clean
     - MIDWAY_HOST=`hostname`:3000 yarn build
     - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
-    - sleep 10
+    - sleep 25
     - yarn test-fullstack-login
     - yarn test-rr-pathfinder
   only:
@@ -168,7 +168,7 @@ fullstack-screenshot-http-import:
     - yarn clean
     - MIDWAY_HOST=`hostname`:3000 yarn build
     - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
-    - sleep 10
+    - sleep 25
     - yarn test-rr-etl-http-import
   only:
     - schedules
