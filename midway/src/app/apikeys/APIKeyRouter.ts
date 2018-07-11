@@ -58,31 +58,31 @@ export const initialize = () => apikeys.initialize();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-    const isSuperUser: boolean = ctx.state.user.isSuperUser;
-    if (isSuperUser)
-    {
-        MidwayLogger.info('getting all API keys');
-        ctx.body = await apikeys.select(['id', 'key', 'createdAt', 'enabled'], {});
-    }
-    else
-    {
-        throw new Error('Only superusers can list API keys.');
-    }
+  const isSuperUser: boolean = ctx.state.user.isSuperUser;
+  if (isSuperUser)
+  {
+    MidwayLogger.info('getting all API keys');
+    ctx.body = await apikeys.select(['id', 'key', 'createdAt', 'enabled'], {});
+  }
+  else
+  {
+    throw new Error('Only superusers can list API keys.');
+  }
 });
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-    const isSuperUser: boolean = ctx.state.user.isSuperUser;
-    if (isSuperUser)
-    {
-        MidwayLogger.info('creating API key');
-        const newKey: APIKeyConfig = (await apikeys.create())[0];
-        ctx.body = newKey.key;
-    }
-    else
-    {
-        throw new Error('Only superusers can create API keys.');
-    }
+  const isSuperUser: boolean = ctx.state.user.isSuperUser;
+  if (isSuperUser)
+  {
+    MidwayLogger.info('creating API key');
+    const newKey: APIKeyConfig = (await apikeys.create())[0];
+    ctx.body = newKey.key;
+  }
+  else
+  {
+    throw new Error('Only superusers can create API keys.');
+  }
 });
 
 export default Router;

@@ -505,25 +505,25 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
     ),
     new RecoveryTokenConfig({}),
   );
-    addTable(
-        new Tasty.Table(
-            'apiKeys',
-            ['id'],
-            [
-                'key',
-                'createdAt',
-                'enabled',
-            ],
-            undefined,
-            {
-                id: primaryKeyType + ' PRIMARY KEY',
-                key: 'text NOT NULL',
-                createdAt: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
-                enabled: 'bool NOT NULL DEFAULT TRUE',
-            },
-        ),
-        new APIKeyConfig({}),
-    );
+  addTable(
+    new Tasty.Table(
+      'apiKeys',
+      ['id'],
+      [
+        'key',
+        'createdAt',
+        'enabled',
+      ],
+      undefined,
+      {
+        id: primaryKeyType + ' PRIMARY KEY',
+        key: 'text NOT NULL',
+        createdAt: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+        enabled: 'bool NOT NULL DEFAULT TRUE',
+      },
+    ),
+    new APIKeyConfig({}),
+  );
   return tables as Tables;
 };
 
