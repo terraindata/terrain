@@ -23,7 +23,7 @@
     "exclude": [
         "../node_modules",
         "../src",
-        "../rr",
+        "../midway",
         "build",
         "../coverage",
         "../analytics.js",

@@ -139,7 +139,7 @@ Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, nex
 // Create job
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const job: JobConfig = ctx.request.body.body;
+  const job: JobConfig = ctx.request.body['body'];
   if (job.id !== undefined)
   {
     delete job.id;

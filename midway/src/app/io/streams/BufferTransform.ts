@@ -63,7 +63,6 @@ export default class BufferTransform
 
   private arr: any[];
   private stream: Readable;
-  private callback: (err, arr) => void;
 
   constructor(stream: Readable, callback: (err: Error | null, arr: any[]) => void, size?: number)
   {
@@ -72,7 +71,7 @@ export default class BufferTransform
 
     const done = () => callback(null, this.arr);
 
-    this.stream.on('end', done);
+    this.stream.once('end', done);
     this.stream.on('data', (doc) =>
     {
       if (this.arr.length >= (size as number))
@@ -92,10 +91,5 @@ export default class BufferTransform
       e['logs'] = this.arr;
       callback(e, null);
     });
-  }
-
-  private onEvent(err: any): void
-  {
-    this.callback(err, this.arr);
   }
 }

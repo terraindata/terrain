@@ -48,16 +48,16 @@ import ConfigType from '../ConfigType';
 
 export class APIKeyConfig extends ConfigType
 {
-    public id?: number = undefined;
-    public key: string = '';
-    public createdAt: Date = null;
-    public enabled: boolean = true;
+  public id?: number = undefined;
+  public key: string = '';
+  public createdAt: Date = null;
+  public enabled: boolean = true;
 
-    constructor(props: object)
-    {
-        super();
-        ConfigType.initialize(this, props);
-    }
+  constructor(props: object)
+  {
+    super();
+    ConfigType.initialize(this, props);
+  }
 }
 
 export default APIKeyConfig;

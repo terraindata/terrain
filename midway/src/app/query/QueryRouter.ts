@@ -69,88 +69,88 @@ export const initialize = () => { };
 
 function toInputMap(inputs: Immutable.List<Input>): object
 {
-    const inputMap: object = {};
-    inputs.map((input: Input) =>
+  const inputMap: object = {};
+  inputs.map((input: Input) =>
+  {
+    let value: any;
+    try
     {
-        let value: any;
-        try
-        {
-            value = JSON.parse(input.value);
-        }
-        catch (e)
-        {
-            value = input.value;
-        }
-        inputMap[input.key] = value;
-    });
-    return inputMap;
+      value = JSON.parse(input.value);
+    }
+    catch (e)
+    {
+      value = input.value;
+    }
+    inputMap[input.key] = value;
+  });
+  return inputMap;
 }
 
 QueryRouter.post('/algorithm/:id', passport.authenticate('api-key'), async (ctx, next) =>
 {
-    const options: object = ctx.request.body;
-    let overridingInputs = options['inputs'];
-    if (overridingInputs === undefined)
+  const options: object = ctx.request.body;
+  let overridingInputs = options['inputs'];
+  if (overridingInputs === undefined)
+  {
+    overridingInputs = {};
+  }
+
+  const getItems: ItemConfig[] = await items.get(ctx.params.id);
+  const item = getItems[0];
+  const meta = JSON.parse(item.meta);
+  const query = meta['query'];
+
+  const inputMap: object = toInputMap(query.inputs);
+  for (const key of Object.keys(overridingInputs))
+  {
+    inputMap[key] = overridingInputs[key];
+  }
+
+  const q: QueryRequest = {
+    database: meta['db']['id'],
+    streaming: false,
+    type: 'search',
+    body: new ESInterpreter(query.tql, inputMap).finalQuery,
+  };
+
+  const database: DatabaseController | undefined = DatabaseRegistry.get(q.database);
+
+  const qh: QueryHandler = database.getQueryHandler();
+  const result: QueryResponse = await qh.handleQuery(q) as QueryResponse;
+  result.setQueryRequest(q);
+
+  const hits = result.result.hits.hits.map((hit) =>
+  {
+    const hitTemp = _.cloneDeep(hit);
+    let rootKeys: string[] = [];
+    rootKeys = _.without(Object.keys(hitTemp), '_index', '_type', '_id', '_score', '_source', 'sort', '', 'fields');
+    if (rootKeys.length > 0) // there were group join objects
     {
-        overridingInputs = {};
+      rootKeys.forEach((rootKey) =>
+      {
+        hitTemp['_source'][rootKey] = hitTemp[rootKey];
+        delete hitTemp[rootKey];
+      });
     }
-
-    const getItems: ItemConfig[] = await items.get(ctx.params.id);
-    const item = getItems[0];
-    const meta = JSON.parse(item.meta);
-    const query = meta['query'];
-
-    const inputMap: object = toInputMap(query.inputs);
-    for (const key of Object.keys(overridingInputs))
+    const sort = hitTemp.sort !== undefined ? { _sort: hitTemp.sort[0] } : {};
+    const fields = {};
+    if (hitTemp.fields !== undefined)
     {
-        inputMap[key] = overridingInputs[key];
+      _.keys(hitTemp.fields).forEach((field) =>
+      {
+        fields[field] = hitTemp.fields[field][0];
+      });
     }
-
-    const q: QueryRequest = {
-        database: meta['db']['id'],
-        streaming: false,
-        type: 'search',
-        body: new ESInterpreter(query.tql, inputMap).finalQuery,
-    };
-
-    const database: DatabaseController | undefined = DatabaseRegistry.get(q.database);
-
-    const qh: QueryHandler = database.getQueryHandler();
-    const result: QueryResponse = await qh.handleQuery(q) as QueryResponse;
-    result.setQueryRequest(q);
-
-    const hits = result.result.hits.hits.map((hit) =>
-    {
-        const hitTemp = _.cloneDeep(hit);
-        let rootKeys: string[] = [];
-        rootKeys = _.without(Object.keys(hitTemp), '_index', '_type', '_id', '_score', '_source', 'sort', '', 'fields');
-        if (rootKeys.length > 0) // there were group join objects
-        {
-            rootKeys.forEach((rootKey) =>
-            {
-                hitTemp['_source'][rootKey] = hitTemp[rootKey];
-                delete hitTemp[rootKey];
-            });
-        }
-        const sort = hitTemp.sort !== undefined ? { _sort: hitTemp.sort[0] } : {};
-        const fields = {};
-        if (hitTemp.fields !== undefined)
-        {
-            _.keys(hitTemp.fields).forEach((field) =>
-            {
-                fields[field] = hitTemp.fields[field][0];
-            });
-        }
-        return _.extend({}, hitTemp._source, sort, fields, {
-            _index: hitTemp._index,
-            _type: hitTemp._type,
-            _score: hitTemp._score,
-            _id: hitTemp._id,
-        });
+    return _.extend({}, hitTemp._source, sort, fields, {
+      _index: hitTemp._index,
+      _type: hitTemp._type,
+      _score: hitTemp._score,
+      _id: hitTemp._id,
     });
+  });
 
-    ctx.body = hits;
-    ctx.status = 200;
+  ctx.body = hits;
+  ctx.status = 200;
 });
 
 QueryRouter.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -159,7 +159,7 @@ QueryRouter.post('/', passport.authenticate('access-token-local'), async (ctx, n
   let query: QueryRequest;
   if (ctx.request.type === 'application/json')
   {
-    query = ctx.request.body.body as QueryRequest;
+    query = ctx.request.body['body'] as QueryRequest;
   }
   else if (ctx.request.type === 'application/x-www-form-urlencoded')
   {
@@ -209,7 +209,7 @@ QueryRouter.post('/', passport.authenticate('access-token-local'), async (ctx, n
 
 QueryRouter.post('/template', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  // parse ctx.request.body.body as an Array
+  // parse ctx.request.body['body'] as an Array
   const reqArr: object[] = ctx.request.body['body'] as object[];
   const bodyArr: object[] = [];
   const indexSet: Set<string> = new Set();

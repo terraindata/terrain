@@ -58,7 +58,7 @@ export const initialize = () => integrations.initialize();
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const fullBody = ctx.request.body.body;
+  const fullBody = ctx.request.body['body'];
   const description = JSON.stringify(fullBody.description);
   const user = JSON.stringify(fullBody.user);
   const browserInfo = JSON.stringify(fullBody.browserInfo);

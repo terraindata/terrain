@@ -139,7 +139,7 @@ Router.get('/metrics/:id?', passport.authenticate('access-token-local'), async (
 Router.post('/metrics', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   MidwayLogger.info('add or update event');
-  const request = ctx.request.body.body;
+  const request = ctx.request.body['body'];
   Util.verifyParameters(request, ['database', 'label', 'events']);
 
   const databaseid = Number(request.database);

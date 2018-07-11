@@ -65,7 +65,7 @@ Router.post('/', async (ctx, next) =>
   const token: string = ctx.request.body['recoveryToken'];
   const newPassword: string = ctx.request.body['newPassword'];
   recoveryTokens.initialize();
-  const recoveryTokenEntry = await recoveryTokens.select([], {token: ctx.request.body['recoveryToken']}) as RecoveryTokenConfig[];
+  const recoveryTokenEntry = await recoveryTokens.select([], { token: ctx.request.body['recoveryToken'] }) as RecoveryTokenConfig[];
   if (recoveryTokenEntry.length === 1)
   {
     const timestamp: Date = recoveryTokenEntry[0]['createdAt'];
@@ -102,7 +102,7 @@ Router.get('/:token', async (ctx, next) =>
   const tokenFound: boolean = false;
   recoveryTokens.initialize();
   const allRecoveryTokens: RecoveryTokenConfig[] = await recoveryTokens.select([], {}) as RecoveryTokenConfig[];
-  const recoveryTokenEntry = await recoveryTokens.select([], {token: ctx.params.token}) as RecoveryTokenConfig[];
+  const recoveryTokenEntry = await recoveryTokens.select([], { token: ctx.params.token }) as RecoveryTokenConfig[];
   if (recoveryTokenEntry.length === 1)
   {
     ctx.status = 200;

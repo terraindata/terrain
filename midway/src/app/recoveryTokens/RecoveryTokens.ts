@@ -70,7 +70,7 @@ export class RecoveryTokens
     const existingUsers = await this.select(['id'], { id: entry.id });
     const newRecoveryToken: RecoveryTokenConfig =
       {
-        id: entry.id === undefined ? '' : entry.id,
+        id: entry.id,
         token: entry.token,
         createdAt: entry.createdAt,
       };

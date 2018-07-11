@@ -45,6 +45,10 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
+
+// tslint:disable-next-line
+/// <reference path="../../../shared/typings/tsd.d.ts" />
+
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';

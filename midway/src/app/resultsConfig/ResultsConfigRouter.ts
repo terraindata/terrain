@@ -58,10 +58,10 @@ export const initialize = () => resultsConfig.initialize();
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   let getItems;
-  if (ctx.request.body.body !== undefined && ctx.request.body.body.index !== undefined)
+  if (ctx.request.body['body'] !== undefined && ctx.request.body['body'].index !== undefined)
   {
     MidwayLogger.info('Getting results config of a specific index');
-    getItems = await resultsConfig.get(undefined, ctx.request.body.body.index);
+    getItems = await resultsConfig.get(undefined, ctx.request.body['body'].index);
   }
   else
   {
@@ -74,8 +74,8 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 Router.post('/update', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   MidwayLogger.info('Updating a results config');
-  const index: string = ctx.request.body.body.index;
-  const resultConfig: ResultsConfigConfig = ctx.request.body.body.resultsConfig;
+  const index: string = ctx.request.body['body'].index;
+  const resultConfig: ResultsConfigConfig = ctx.request.body['body'].resultsConfig;
   ctx.body = await resultsConfig.upsert(ctx.state.user, index, resultConfig);
 });
 

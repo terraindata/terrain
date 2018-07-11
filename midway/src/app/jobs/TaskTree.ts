@@ -207,6 +207,7 @@ export class TaskTree
       {
         const taskOutputConfig: TaskOutputConfig =
           {
+            blocking: null,
             exit: true,
             options:
               {
@@ -302,6 +303,8 @@ export class TaskTree
             },
           paused: null,
           taskId: TaskEnum.taskDefaultExit,
+          blocking: null,
+          rootLogStream: null,
         },
         {
           cancel: false,
@@ -322,6 +325,8 @@ export class TaskTree
             },
           paused: null,
           taskId: TaskEnum.taskDefaultFailure,
+          blocking: null,
+          rootLogStream: null,
         },
       ];
     tasks = tasks.concat(defaults);

@@ -68,7 +68,7 @@ Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, nex
 // Create a new template
 Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const template: TemplateConfig = ctx.request.body.body;
+  const template: TemplateConfig = ctx.request.body['body'];
   const requiredParams = [
     'templateName',
     'process',
@@ -86,7 +86,7 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
 // Delete a template
 Router.post('/delete', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const params = ctx.request.body.body;
+  const params = ctx.request.body['body'];
   const requiredParams = [
     'templateId',
   ];
@@ -104,7 +104,7 @@ Router.post('/delete', passport.authenticate('access-token-local'), async (ctx, 
 
 Router.post('/update/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const template: TemplateConfig = ctx.request.body.body;
+  const template: TemplateConfig = ctx.request.body['body'];
   const requiredParams = [
     'id',
     'templateName',

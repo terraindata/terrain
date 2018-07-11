@@ -59,6 +59,7 @@ const taskOutputConfig: TaskOutputConfig =
         outputStream: null,
       },
     status: true,
+    rootLogStream: null,
   };
 
 export class TaskDefaultExit extends Task

@@ -72,11 +72,11 @@ Router.post('/', async (ctx, next) =>
   let userId: number;
   let userExists: boolean = false;
   let email: string;
-  const user: UserConfig[] = await users.select(['id'], {email: ctx.request.body['email']}) as UserConfig[];
+  const user: UserConfig[] = await users.select(['id'], { email: ctx.request.body['email'] }) as UserConfig[];
   if (user.length === 1)
   {
-    userId = user[0]['id'];
-    userExists = (userId !== undefined && userId !== '' && userId !== null);
+    userId = user[0].id;
+    userExists = (userId !== undefined && userId !== null);
   }
   else
   {
@@ -110,7 +110,7 @@ Router.post('/', async (ctx, next) =>
     const emailIntegrations: IntegrationConfig[] = await integrations.get(null, undefined, 'Email', true) as IntegrationConfig[];
     const subject: string = 'Password reset link from notifications@terraindata.com';
     const body: string = 'Please click on the link below to reset your password. \n \n' + route;
-    const emailSendStatus: boolean = await App.EMAIL.send(email, emailIntegrations[0].id, subject, body);
+    const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body, undefined, email);
     MidwayLogger.info(`email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
   }
 

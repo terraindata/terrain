@@ -58,9 +58,9 @@ export const initialize = () => schemaMetadata.initialize();
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   let getItems;
-  if (ctx.request.body.body !== undefined && ctx.request.body.body.id !== undefined)
+  if (ctx.request.body['body'] !== undefined && ctx.request.body['body'].id !== undefined)
   {
-    getItems = schemaMetadata.get(ctx.request.body.body.id);
+    getItems = schemaMetadata.get(ctx.request.body['body'].id);
   }
   MidwayLogger.info('getting all schemaMetadata');
   getItems = await schemaMetadata.get();
@@ -70,14 +70,14 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
 Router.post('/star', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   MidwayLogger.info('Starring a schemaMetadata');
-  const metaData: SchemaMetadataConfig = ctx.request.body.body;
+  const metaData: SchemaMetadataConfig = ctx.request.body['body'];
   ctx.body = await schemaMetadata.upsert(ctx.state.user, metaData);
 });
 
 Router.post('/count', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   MidwayLogger.info('Incrementing the count of a schemaMetadata');
-  const { columnId, algorithmId } = ctx.request.body.body;
+  const { columnId, algorithmId } = ctx.request.body['body'];
   ctx.body = await schemaMetadata.increment(ctx.state.user, columnId, algorithmId);
 });
 
