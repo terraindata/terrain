@@ -51,7 +51,7 @@ import { KeyPathUtil } from 'shared/util/KeyPath';
 
 const Utils = {
   engine: EngineUtil,
-  keypath: KeyPathUtil,
+  path: KeyPathUtil,
   topology: TopologyUtil,
   construction: ConstructionUtil,
   type: TypeUtil,

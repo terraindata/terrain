@@ -364,7 +364,7 @@ export function deleteIn(obj: object, path: KeyPath)
   }
 }
 
-export function * wander(obj: any, path: KeyPath = KeyPath([])): IterableIterator<ContextResult>
+export function * postorder(obj: any, path: KeyPath = KeyPath([])): IterableIterator<ContextResult>
 {
   if (isPrimitive(obj))
   {
@@ -377,14 +377,22 @@ export function * wander(obj: any, path: KeyPath = KeyPath([])): IterableIterato
   {
     for (let i = 0; i < obj.length; i++)
     {
-      yield * wander(obj[i], path.push(i));
+      yield * postorder(obj[i], path.push(i));
     }
+    yield {
+      location: path,
+      value: obj,
+    };
   }
   else
   {
     for (const key of Object.keys(obj))
     {
-      yield * wander(obj[key], path.push(key));
+      yield * postorder(obj[key], path.push(key));
     }
+    yield {
+      location: path,
+      value: obj,
+    };
   }
 }

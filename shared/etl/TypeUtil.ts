@@ -49,8 +49,26 @@ import * as _ from 'lodash';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 
+import isPrimitive = require('is-primitive');
+
 export default class TypeUtil
 {
+  public static getSimpleType(value: any): 'string' | 'number' | 'boolean' | 'array' | 'object' | 'null'
+  {
+    if (isPrimitive(value))
+    {
+      return value == null ? 'null' : typeof value as any;
+    }
+    else if (Array.isArray(value))
+    {
+      return 'array';
+    }
+    else
+    {
+      return 'object';
+    }
+  }
+
   // return the most specific primitive type of the provided values
   public static getCommonJsType(values: string[]): string
   {
@@ -177,23 +195,6 @@ export default class TypeUtil
     }
     return allGeopoints && someGeopoints;
   }
-
-  // public static areValuesNull(values: any[]): boolean
-  // {
-  //   if (values.length === 0)
-  //   {
-  //     return false;
-  //   }
-
-  //   let allNull = true;
-  //   for (const val of values)
-  //   {
-  //     if (val !== null)
-  //     {
-  //       allNull
-  //     }
-  //   }
-  // }
 
   public static numberIsInteger(value: number): boolean
   {

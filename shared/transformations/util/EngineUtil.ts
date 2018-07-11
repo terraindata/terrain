@@ -60,6 +60,9 @@ import objectify from 'shared/util/deepObjectify';
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
+import Utils from 'shared/etl/util/XYZUtil';
+const x = Utils.construction;
+
 import * as TerrainLog from 'loglevel';
 
 export type PathHash = string;
