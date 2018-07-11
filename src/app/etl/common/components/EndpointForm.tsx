@@ -280,10 +280,10 @@ class EndpointForm extends TerrainComponent<Props>
 
     DocumentsHelpers.fetchPreview(newEndpoint).then((res) =>
     {
-      let currentObjectSource = (typeof res.get(0) !== 'object') ? res.get(0) : res;
+      // console.log(res.get(0));
       this.setState(
         {
-          currentObject: currentObjectSource,
+          currentObject: res.get(0),
         },
       );
     })
