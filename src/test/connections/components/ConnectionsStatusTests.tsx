@@ -46,9 +46,16 @@ THE SOFTWARE.
 // tslint:disable:no-empty
 
 import { ConnectionsStatus } from 'app/connections/components/ConnectionsStatus';
+import * as InAppNotification from 'common/components/InAppNotification';
 import { shallow } from 'enzyme';
 import * as React from 'react';
 import ConnectionsHelper from 'test-helpers/ConnectionsHelper';
+
+jest.mock('common/components/InAppNotification', () =>
+  Object.assign(require.requireActual('common/components/InAppNotification'), {
+    notificationManager: { addNotification: jest.fn() },
+  }),
+);
 
 describe('ConnectionsStatus', () =>
 {
@@ -78,7 +85,7 @@ describe('ConnectionsStatus', () =>
       type: 'Mysql',
       dsn: '',
       host: 'localhost:9200',
-      status: 'DISCONNECTED',
+      status: 'CONN_TIMEOUT',
       isAnalytics: false,
     })
     .getState();
@@ -97,5 +104,16 @@ describe('ConnectionsStatus', () =>
   it('should render nothing', () =>
   {
     expect(componentWrapper.getElement()).toBe(null);
+  });
+
+  it('should call notificationManager.addNotification twice', (done) =>
+  {
+    setTimeout(() =>
+    {
+      expect(InAppNotification.notificationManager.addNotification).toHaveBeenCalledTimes(2);
+      done();
+    },
+      1500,
+    );
   });
 });

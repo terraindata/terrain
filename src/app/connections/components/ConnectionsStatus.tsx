@@ -79,7 +79,7 @@ export class ConnectionsStatus extends TerrainComponent<ConnectionsStatusProps>
           });
       },
       10000,
-    );
+    ); // Check every 10 seconds
   }
 
   public componentWillUnmount()
@@ -97,14 +97,11 @@ export class ConnectionsStatus extends TerrainComponent<ConnectionsStatusProps>
         const connection = connections.get(key);
         if (connection.status === 'DISCONNECTED' || connection.status === 'CONN_TIMEOUT')
         {
-          setTimeout(() =>
-          {
-            notificationManager.addNotification(
-              'Disconnected connections',
-              connection.name,
-              'error',
-            );
-          }, 1000); //
+          notificationManager.addNotification(
+            'Disconnected connections',
+            connection.name,
+            'error',
+          );
         }
       });
 
