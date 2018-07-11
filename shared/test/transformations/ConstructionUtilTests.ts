@@ -67,6 +67,7 @@ function testHelper(values: any[], interpret = false): ETLFieldTypes
   return tracker.getType();
 }
 
+// delete these tests if they become inconvenient
 describe('simple primitive type tracker tests', () =>
 {
   test('all strings test', () => {
@@ -247,4 +248,3 @@ describe('check coersion callback', () =>
     expect(msg.length).toBeGreaterThan(0);
   });
 });
-

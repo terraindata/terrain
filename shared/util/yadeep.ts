@@ -364,7 +364,7 @@ export function deleteIn(obj: object, path: KeyPath)
   }
 }
 
-export function * postorder(obj: any, path: KeyPath = KeyPath([])): IterableIterator<ContextResult>
+function * explore(obj: any, path: KeyPath, options: TraverseOptions): IterableIterator<ContextResult>
 {
   if (isPrimitive(obj))
   {
@@ -375,24 +375,47 @@ export function * postorder(obj: any, path: KeyPath = KeyPath([])): IterableIter
   }
   else if (Array.isArray(obj))
   {
-    for (let i = 0; i < obj.length; i++)
+    const limit = options.arrayLimit !== -1 ? Math.min(options.arrayLimit, obj.length) : obj.length;
+    for (let i = 0; i < limit; i++)
     {
-      yield * postorder(obj[i], path.push(i));
+      yield * explore(obj[i], path.push(i), options);
     }
-    yield {
-      location: path,
-      value: obj,
-    };
+    if (!options.primitivesOnly)
+    {
+      yield {
+        location: path,
+        value: obj,
+      };
+    }
   }
   else
   {
     for (const key of Object.keys(obj))
     {
-      yield * postorder(obj[key], path.push(key));
+      yield * explore(obj[key], path.push(key), options);
     }
-    yield {
-      location: path,
-      value: obj,
-    };
+    if (!options.primitivesOnly)
+    {
+      yield {
+        location: path,
+        value: obj,
+      };
+    }
   }
+}
+
+export interface TraverseOptions
+{
+  primitivesOnly: boolean; // yield only primitives?
+  arrayLimit: number; // limit exploration of arrays
+}
+
+export function traverse(obj: any, opts: Partial<TraverseOptions> = {}): IterableIterator<ContextResult>
+{
+  const defaults: TraverseOptions = {
+    primitivesOnly: false,
+    arrayLimit: -1,
+  };
+  const options: TraverseOptions = _.extend({}, defaults, opts);
+  return explore(obj, KeyPath([]), options);
 }

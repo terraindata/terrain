@@ -79,6 +79,7 @@ export class TypeTracker
   protected readonly onConflict;
   protected readonly interpretStrings: boolean;
 
+  protected valuesSeen = 0;
   protected lastValue: any;
   protected simpleType: SimpleType = 'null';
   protected type: ETLFieldTypes = null;
@@ -98,6 +99,11 @@ export class TypeTracker
     this.path = path;
     this.onConflict = onConflict;
     this.interpretStrings = interpretStrings;
+  }
+
+  public numSeen(): number
+  {
+    return this.valuesSeen;
   }
 
   public getType(): ETLFieldTypes
@@ -150,6 +156,7 @@ export class TypeTracker
   {
     this.simpleType = this.processType(value);
     this.lastValue = value;
+    this.valuesSeen++;
   }
 
   protected processType(value: any): SimpleType
@@ -260,25 +267,148 @@ export class TypeTracker
   }
 }
 
+interface FieldNode {
+  path: KeyPath;
+  name: WayPoint; // null if root
+  type?: ETLFieldTypes;
+  arrChild?: FieldNode;
+  fields: { [k: string]: FieldNode };
+}
+
 export default abstract class ConstructionUtil
 {
-  public static createEngineFromDocuments(documents: List<object>)
+  public static createEngineFromDocuments(documents: List<object>, interpretText = false):
+    { engine: TransformationEngine, errors: string[]}
   {
     const pathTypes: PathHashMap<TypeTracker> = {};
-
+    const errAccumulator = ConstructionUtil.errorAccumulator();
     documents.forEach((doc, docIndex) => {
-      for (const leaf of yadeep.postorder(doc))
+      for (const leaf of yadeep.traverse(doc, { primitivesOnly: true, arrayLimit: 20 }))
       {
         const { location, value } = leaf;
         const path = Utils.path.convertIndices(location);
         const hash = Utils.path.hash(path);
         if (pathTypes[hash] === undefined)
         {
-          pathTypes[hash] = new TypeTracker(path);
+          pathTypes[hash] = new TypeTracker(path, errAccumulator.fn, interpretText);
         }
         pathTypes[hash].push(value);
       }
     });
 
+    const tree = ConstructionUtil.buildTreeFromPathTypes(pathTypes, errAccumulator.fn);
+
+    const engine = new TransformationEngine();
+    for (const match of yadeep.traverse(tree, { primitivesOnly: true }))
+    {
+      const { value, location } = match;
+      if (location.last() === 'type')
+      {
+        const kp = location.set(-1, 'path');
+        const type = value;
+        engine.addField(kp, getJSFromETL(type), { etlType: type });
+      }
+    }
+
+    return {
+      engine,
+      errors: errAccumulator.errors,
+    };
+  }
+
+  private static buildTreeFromPathTypes(pathTypes: PathHashMap<TypeTracker>, onConflict: (msg: string) => void): FieldNode
+  {
+    const tree: FieldNode = {
+      path: KeyPath([]),
+      name: null,
+      fields: {},
+    };
+    // foo, bar, -1, baz |||| size 4
+    const walk = (kp: KeyPath, desiredType: ETLFieldTypes) =>
+    {
+      let node: FieldNode = tree;
+      for (let i = 0; i < kp.size; i++)
+      {
+        const waypoint = kp.get(i);
+        if (waypoint === -1)
+        {
+          if (node.type !== undefined && node.type !== ETLFieldTypes.Array)
+          {
+            const message = `Encountered a ${node.type} field where an array field was expected`;
+            node.type = ETLFieldTypes.String;
+            return message;
+          }
+          else
+          {
+            node.type = ETLFieldTypes.Array;
+            node.arrChild = {
+              path: node.path.push(-1),
+              name: -1,
+              fields: {},
+            };
+            node = node.arrChild;
+          }
+        }
+        else
+        {
+          if (node.type !== undefined && node.type !== ETLFieldTypes.Object)
+          {
+            const message = `Encountered a ${node.type} field where an object field was expected`;
+            node.type = ETLFieldTypes.String;
+            return message;
+          }
+          else
+          {
+            node.type = ETLFieldTypes.Object;
+            node.fields[waypoint] = {
+              path: node.path.push(waypoint),
+              name: waypoint,
+              fields: {},
+            };
+            node = node.fields[waypoint];
+          }
+        }
+      }
+      if (Object.keys(node.fields).length > 0 || node.arrChild !== undefined)
+      {
+        node.type = ETLFieldTypes.String;
+        node.fields = {};
+        node.arrChild = undefined;
+        return `Field with primitive type cannot be an array or object`;
+      }
+      else
+      {
+        node.type = desiredType;
+      }
+      return true;
+    };
+
+    for (const key of Object.keys(pathTypes))
+    {
+      const kp = Utils.path.unhash(key);
+      const errors = walk(kp, pathTypes[key].getType());
+      if (errors !== true)
+      {
+        onConflict(errors);
+      }
+    }
+    return tree;
+  }
+
+  private static errorAccumulator(maxErrors: number = 5): { numErrors: number, errors: string[], fn: (err) => void }
+  {
+    const errors = [];
+    let total = 0;
+    return {
+      errors,
+      numErrors: total,
+      fn: (err) => {
+        total++;
+        if (errors.length <= maxErrors)
+        {
+          errors.push(err);
+        }
+      },
+    };
   }
 }
