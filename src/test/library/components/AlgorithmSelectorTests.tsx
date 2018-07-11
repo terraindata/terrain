@@ -125,7 +125,7 @@ describe('AlgorithmSelector', () =>
       const groupNames = Map();
       expect(state.groupNames).toEqual(groupNames.set(3, 'Group 1'));
       const algorithmNames = Map();
-      expect(state.algorithmNames).toEqual(algorithmNames.set(5: 'Algorithm 1'));
+      expect(state.algorithmNames).toEqual(algorithmNames.set(5, 'Algorithm 1'));
     });
   });
 

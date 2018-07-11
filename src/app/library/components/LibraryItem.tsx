@@ -58,6 +58,7 @@ import { DragSource, DropTarget } from 'react-dnd';
 import { Link } from 'react-router-dom';
 import './LibraryItem.less';
 
+import Modal from 'common/components/Modal';
 import { backgroundColor, Colors, fontColor } from '../../colors/Colors';
 import { ColorsActions } from './../../colors/data/ColorsRedux';
 import Menu from './../../common/components/Menu';
@@ -141,6 +142,7 @@ class LibraryItem extends TerrainComponent<Props>
     focusField: false,
     mounted: false,
     timeout: null,
+    confirmDeleteModalOpen: false,
   };
 
   public menuOptions =
@@ -330,7 +332,24 @@ class LibraryItem extends TerrainComponent<Props>
 
   public handleDelete()
   {
+    this.setState({
+      confirmDeleteModalOpen: true,
+    });
+  }
+
+  public confirmDelete()
+  {
+    this.setState({
+      confirmDeleteModalOpen: false,
+    });
     this.props.onDelete(this.props.id);
+  }
+
+  public cancelDelete()
+  {
+    this.setState({
+      confirmDeleteModalOpen: false,
+    });
   }
 
   public handleKeyDown(event)
@@ -609,6 +628,15 @@ class LibraryItem extends TerrainComponent<Props>
             )}
           </div>
         </Link>
+        <Modal
+          open={this.state.confirmDeleteModalOpen}
+          message={'Are you sure you want to delete this item?'}
+          title={'Delete Item'}
+          confirm={true}
+          onConfirm={this.confirmDelete}
+          onClose={this.cancelDelete}
+          confirmButtonText={'Yes'}
+        />
       </div>
     ));
   }

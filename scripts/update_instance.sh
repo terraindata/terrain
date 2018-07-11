@@ -32,9 +32,6 @@ while getopts "n:a:v:d:" opt; do
     d)
       SOURCE_DB_NAME=$OPTARG
       ;;
-    r)
-      SKIP_RSYNC=true
-      ;;
     \?)
       echo "Invalid option: -$OPTARG";
       echo "$HELPSTRING";
@@ -185,7 +182,8 @@ echo "App will use port ${PORT} on version ${VERSION}";
 echo "App will be running on: ${MIDWAYHOSTNAME}";
 echo "App will use database: ${MIDWAY_DB}";
 
-read -n1 -p "Skip RSYNC? [y\N]" SKIP_RSYNC
+read -n1 -p "Skip RSYNC? [y\N] " SKIP_RSYNC
+echo ""
 
 if [ "$SKIP_RSYNC" = "y" ] || [ "$SKIP_RSYNC" = "Y" ]
   then
@@ -196,14 +194,33 @@ if [ "$SKIP_RSYNC" = "y" ] || [ "$SKIP_RSYNC" = "Y" ]
     (! test -d Search) && (echo "Error: could not find Search directory"; exit 1);
 
     echo "rsyncing";
-    rsync -vrP  --exclude midway.json --exclude midway.db --exclude node_modules --delete  $PWD/Search terrain@${ADDRESS}:src-${VERSION}/ > "rsynclog.log";
+    rsync -vrP --progress  --exclude midway.json --exclude midway.db --exclude node_modules --exclude .cache --delete  $PWD/Search terrain@${ADDRESS}:src-${VERSION}/ > "rsynclog.log";
     echo "rsync complete"
 fi
 
 ssh terrain@${ADDRESS} << EOF
-cd src-${VERSION}/Search
-screen -S runmidway-${SCREEN_ID} -X stuff $'\cc\r';
+screen -S runmidway-${SCREEN_ID} -X stuff $'\cc';
+EOF
+
+echo "One last thing: did you just now see a message saying 'No screen found' ?"
+HAS_SCREEN=""
+while [ "$HAS_SCREEN" != "y" ] && [ "$HAS_SCREEN" != "n" ]; do
+  read -n1 -p "Did you? [y\n] " HAS_SCREEN
+done
+echo ""
+
+START_SCREEN_COMMAND=""
+if [ "${HAS_SCREEN}" = "y" ]
+  then
+    START_SCREEN_COMMAND="screen -d -m -S runmidway-${SCREEN_ID};"
+fi
+
+
+ssh terrain@${ADDRESS} << EOF
+cd /home/terrain/src-${VERSION}/Search;
 ${STAGE_DB_COMMAND}
+${START_SCREEN_COMMAND}
+screen -S runmidway-${SCREEN_ID} -X stuff "cd /home/terrain/src-${VERSION}/Search;\r";
 screen -S runmidway-${SCREEN_ID} -X stuff "yarn; yarn build-prod;\r";
 screen -S runmidway-${SCREEN_ID} -X stuff "NODE_ENV=production yarn start-midway -p ${PORT} -i ${MIDWAY_DB} > >(tee -a /var/log/midway/midway_${VERSION}_${PORT}.log) 2> >(tee -a /var/log/midway/midway_error_${VERSION}_${PORT}.log >&2)\r";
 EOF
