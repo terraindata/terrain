@@ -80,7 +80,7 @@ type FormState = FileConfigI & {
   useXmlPath: boolean;
   useJsonPath: boolean;
   isPlaFeed: boolean;
-  suggestedJsonPath: any;
+  previewDataSource: any;
 };
 
 export default class FileConfigForm extends TerrainComponent<Props>
@@ -145,7 +145,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
         widthFactor: 3,
         getDisplayState: this.jsonPathDisplay,
       },
-      suggestedJsonPath: {
+      previewDataSource: {
         type: DisplayType.Custom,
         displayName: '',
         group: 'path',
@@ -166,10 +166,11 @@ export default class FileConfigForm extends TerrainComponent<Props>
 
   public render()
   {
+    // console.log(this.props.source);
     return (
       <DynamicForm
         inputMap={this.inputMap}
-        inputState={this.configToState(this.props.fileConfig)}
+        inputState={this.configToState(this.props.fileConfig, this.props.source)}
         onStateChange={this.handleFormChange}
         style={this.props.style}
       />
@@ -250,7 +251,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
   }
 
   @instanceFnDecorator(memoizeOne)
-  public configToState(config: FileConfig): FormState
+  public configToState(config: FileConfig, previewDataSource?: any): FormState
   {
     const state = Util.asJS(config) as FormState;
     if (state.xmlPath !== null)
@@ -261,6 +262,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
     {
       state.useJsonPath = true;
     }
+    state.previewDataSource = previewDataSource;
     return state;
   }
 
