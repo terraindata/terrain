@@ -71,7 +71,7 @@ const etlTypeKeyPath = List(['etlType']);
 
 type SimpleType = ReturnType<typeof Utils['type']['getSimpleType']>;
 
-class TypeTracker
+export class TypeTracker
 {
   public static messageValueLength = 20;
 
@@ -82,6 +82,9 @@ class TypeTracker
   protected lastValue: any;
   protected simpleType: SimpleType = 'null';
   protected type: ETLFieldTypes = null;
+  protected stringsWereChecked = false;
+  protected numbersWereChecked = false;
+  protected stringNumbersWereChecked = false;
   protected couldBeInt = true;
   protected couldBeDate = true;
   protected couldBeGeo = true;
@@ -112,8 +115,12 @@ class TypeTracker
       case 'boolean':
         return ETLFieldTypes.Boolean;
       case 'number':
-        return this.couldBeInt ? ETLFieldTypes.Integer : ETLFieldTypes.Number;
+        return (this.numbersWereChecked && this.couldBeInt) ? ETLFieldTypes.Integer : ETLFieldTypes.Number;
       case 'string':
+        if (!this.stringsWereChecked)
+        {
+          return ETLFieldTypes.String;
+        }
         if (this.couldBeDate)
         {
           return ETLFieldTypes.Date;
@@ -126,7 +133,7 @@ class TypeTracker
         {
           if (this.couldBeStringNumber)
           {
-            return this.couldBeStringInteger ? ETLFieldTypes.Integer : ETLFieldTypes.Number;
+            return (this.stringNumbersWereChecked && this.couldBeStringInteger) ? ETLFieldTypes.Integer : ETLFieldTypes.Number;
           }
           if (this.couldBeStringBoolean)
           {
@@ -157,6 +164,10 @@ class TypeTracker
     {
       return this.processString(value);
     }
+    else
+    {
+      return baseType;
+    }
   }
 
   protected processString(value: string): SimpleType
@@ -165,6 +176,7 @@ class TypeTracker
     {
       return 'string';
     }
+    this.stringsWereChecked = true;
     if (this.couldBeDate)
     {
       this.couldBeDate = Utils.type.isDateHelper(value);
@@ -176,12 +188,13 @@ class TypeTracker
     if (this.interpretStrings && this.couldBeStringNumber)
     {
       const asNumber = Number(value);
-      if (isNaN(asNumber))
+      if (isNaN(asNumber) && value !== 'NaN')
       {
         this.couldBeStringNumber = false;
       }
-      else if (this.couldBeStringInteger)
+      else if (this.couldBeStringInteger && value !== 'NaN')
       {
+        this.stringNumbersWereChecked = true;
         this.couldBeStringInteger = Utils.type.numberIsInteger(asNumber);
       }
     }
@@ -198,6 +211,7 @@ class TypeTracker
     {
       return 'number';
     }
+    this.numbersWereChecked = true;
     if (this.couldBeInt)
     {
       this.couldBeInt = Utils.type.numberIsInteger(value);
