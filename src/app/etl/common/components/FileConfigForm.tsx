@@ -180,7 +180,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
   public updateJsonPath(possiblePath)
   {
     const pathName: string = possiblePath.split(':')[0];
-    const formattedPath = '*.' + pathName;
+    const formattedPath = (pathName === '*') ? '*' : '*.' + pathName;
     const updatedFileConfig = this.props.fileConfig.set('jsonPath', formattedPath);
     this.props.onChange(updatedFileConfig);
   }
@@ -218,7 +218,8 @@ export default class FileConfigForm extends TerrainComponent<Props>
           List(PathUtil.guessFilePaths(this.props.source).map((key, i) => JSON.stringify(this.props.source[key.name], null, 2)))
         }
         sectionTitles={
-          List(PathUtil.guessFilePaths(this.props.source).map((key, i) => 'Currently selected: *.' + key.name))
+          List(PathUtil.guessFilePaths(this.props.source).map((key, i) => 
+            (key.name === '*') ? 'Currently selected: *' : 'Currently selected: *.' + key.name))
         }
         width='100%'
         height='80%'
