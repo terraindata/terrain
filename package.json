@@ -46,7 +46,7 @@
     "test-rr-pathfinder": "jest ./rr/test/pathfinder --forceExit",
     "test-rr-etl-http-import": "jest ./rr/test/etl --forceExit",
     "test-fullstack-component": "jest ./rr/test/components --forceExit",
-    "clean": "rm -rf .cache && rm -rf .cache-loader && rm -rf midway/src/assets/.cache"
+    "clean": "rm -rf .cache && rm -rf .cache-loader && rm -rf midway/src/bundles/.cache"
   },
   "repository": {
     "type": "git",
@@ -63,7 +63,7 @@
     "transform": {
       ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
-    "testPathIgnorePatterns": ["node_modules", "midway/build"],
+    "testPathIgnorePatterns": ["node_modules", "midway/build", "rr/build"],
     "testRegex": "/test/.+Tests\\.(ts|tsx|js)$",
     "moduleFileExtensions": [
       "ts",
