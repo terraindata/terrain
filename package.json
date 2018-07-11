@@ -7,8 +7,8 @@
   "scripts": {
     "start": "yarn start-postgres && yarn start-midway",
     "start-minified": "yarn start-postgres && yarn start-midway-minified",
-    "start-midway": "nodemon --exec node -r tsconfig-paths/register -r ts-node/register $NODE_DEBUG_OPTION --harmony --max_old_space_size=8192 ./midway/src/Midway.ts",
-    "start-midway-minified": "node ./midway/src/assets/bundle.server.js",
+    "start-midway": "nodemon --exec node -r tsconfig-paths/register -r ts-node/register $NODE_DEBUG_OPTION --harmony --max_old_space_size=8192 -- ./midway/src/Midway.ts",
+    "start-midway-minified": "node -- ./midway/src/assets/bundle.server.js",
     "start-postgres": "docker-compose -f midway-postgres-docker.yml up -d",
     "start-front": "yarn commit-log && webpack-dev-server --config webpack.config.js --inline --content-base midway/src/assets --history-api-fallback --compress --progress --info --mode development",
     "stop-postgres": "docker-compose -f midway-postgres-docker.yml down",
