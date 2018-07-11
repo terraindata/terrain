@@ -120,6 +120,7 @@
     "bluebird": "^3.5.1",
     "bodybuilder": "^2.2.10",
     "bottleneck": "^2.4.0",
+    "clarinet": "^0.12.0",
     "classnames": "^2.2.6",
     "codemirror": "^5.38.0",
     "color": "^3.0.0",
