@@ -53,7 +53,7 @@ import { defaultProps, ElasticFieldProps, ElasticTypes, etlTypeToElastic } from 
 import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil, { PathHashMap } from 'shared/transformations/util/EngineUtil';
-import { KeyPath as EnginePath } from 'shared/util/KeyPath';
+import { KeyPath, KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 import * as TerrainLog from 'loglevel';
 

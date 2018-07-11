@@ -213,7 +213,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           valueValue,
           fieldType: props.filterLine.fieldType,
         }}
-        // optionSets={this.getOptionSets() /* TODO store in state? */}
+        optionSets={this.getOptionSets() /* TODO store in state? */}
         values={values}
         onChange={this.handleFilterPickerChange}
         canEdit={props.canEdit}
@@ -558,9 +558,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
               </div>
             );
           }
-
         );
-      )
       case FieldType.Ip:
         return () => (
           <div>IP not supported yet</div>

@@ -7,11 +7,8 @@ Script to Update a Customer Instance.
 Usage: update_instance -n name -a address -v version-number -[p]
   -n    name of the customer
   -a    IP address of instance
-  -v    Release version number. e.g., 5.1
-  -p    (optional) Run the app in production (:3000) and not staging (:7000)
-  -s    (optional) Whether to make a copy of the current prod DB in a staging DB, and run that DB.
-  -d    (optional) Pass in the name of a DB to use when staging, instead of [customer]_production
-  -r    (optional) Skip RSYNC
+  -v    Release version number. e.g., 5.1. CURRENT DEFAULT is 5
+  -d    (optional) Pass in the name of a DB to use when staging, instead of [customer]_production (midway for v5)
 EOF
 
 if [ $# -eq 0 ]
@@ -21,7 +18,7 @@ if [ $# -eq 0 ]
     exit 1;
 fi
 
-while getopts "n:a:v:sd:pr" opt; do
+while getopts "n:a:v:d:" opt; do
   case $opt in
     n)
       CUSTNAME=$OPTARG
@@ -32,17 +29,8 @@ while getopts "n:a:v:sd:pr" opt; do
     v)
       VERSION=$OPTARG
       ;;
-    p)
-      PRODUCTION=true
-      ;;
     d)
       SOURCE_DB_NAME=$OPTARG
-      ;;
-    s)
-      STAGE_DB=true
-      ;;
-    r)
-      SKIP_RSYNC=true
       ;;
     \?)
       echo "Invalid option: -$OPTARG";
@@ -65,8 +53,61 @@ fi
 
 if [ -z "$VERSION" ]
   then
-    echo "Error: Version Not Supplied";
-    exit 1;
+    VERSION=5
+    echo "IMPORTANT: No version supplied, assuming version 5";
+fi
+
+
+
+echo "Default is to deploy to staging."
+read -n1 -p "Deploy to production instead? [y/N] " PRODUCTION
+echo ""
+
+if [ "$PRODUCTION" = "y" ] || [ "$PRODUCTION" = "Y" ]
+  then
+    read -n1 -p "Please confirm you want to eploy to production? [y/N] " PRODUCTION
+    echo ""
+    if [ "$PRODUCTION" = "y" ] || [ "$PRODUCTION" = "Y" ]
+      then
+        PRODUCTION=true
+      else
+        echo "Mismatched input, aborting!"
+        exit 1;
+    fi
+  else
+    PRODUCTION=""
+    read -n1 -p "Stage production DB? [Y/n] " STAGE_DB
+    echo ""
+    if [ "$STAGE_DB" = "y" ] || [ "$STAGE_DB" = "Y" ]
+      then
+        STAGE_DB=true
+        
+        if [ -z "$SOURCE_DB_NAME" ]
+          then
+            # provide default
+            if [ "$VERSION" = "5" ]
+              then
+                SOURCE_DB_NAME="midway"
+              else
+                SOURCE_DB_NAME="${CUSTNAME}_production"
+            fi
+            
+            echo "Default source DB for version ${VERSION} to copy is ${SOURCE_DB_NAME}"
+            read -n1 -p "Is this ok? [y\N] " STAGE_DB_CONFIRM
+            echo ""
+            if [ "$STAGE_DB_CONFIRM" = "y" ] || [ "$STAGE_DB_CONFIRM" = "Y" ]
+              then
+                echo "Thanks for confirming."
+              else
+                echo "Aborting!"
+                exit 1;
+            fi
+        fi
+        
+      else
+        STAGE_DB=""
+    fi
+    
 fi
 
 
@@ -103,11 +144,6 @@ if [ "$STAGE_DB" ]
         exit 1;
     fi
     
-    if [ -z "$SOURCE_DB_NAME" ]
-      then
-        SOURCE_DB_NAME="${CUSTNAME}_production"
-    fi
-    
     echo "Will stage DB: from ${SOURCE_DB_NAME} to ${MIDWAY_DB}"
 
     # SECTION: Migration Scripts
@@ -118,7 +154,7 @@ if [ "$STAGE_DB" ]
     #  need to do that yourself.
 
     MIGRATION_COMMAND=""
-    if [ "$VERSION"="5" ]
+    if [ "$VERSION" = "5" ]
       then
         MIGRATION_COMMAND="psql -U 't3rr41n-demo' -d ${MIDWAY_DB} -h localhost -f scripts/MIDWAY_PG_MIGRATION.sql"
         echo "Version 5 migrations applied."
@@ -145,24 +181,46 @@ echo "Beginning instance update with customer name \""$CUSTNAME"\" and IP addres
 echo "App will use port ${PORT} on version ${VERSION}";
 echo "App will be running on: ${MIDWAYHOSTNAME}";
 echo "App will use database: ${MIDWAY_DB}";
-if [ -z "$SKIP_RSYNC" ]
+
+read -n1 -p "Skip RSYNC? [y\N] " SKIP_RSYNC
+echo ""
+
+if [ "$SKIP_RSYNC" = "y" ] || [ "$SKIP_RSYNC" = "Y" ]
   then
+    echo "Skipping RSYNC."
+  else
     cd ..
 
     (! test -d Search) && (echo "Error: could not find Search directory"; exit 1);
 
     echo "rsyncing";
-    rsync -vrP  --exclude midway.json --exclude midway.db --exclude node_modules --delete  $PWD/Search terrain@${ADDRESS}:src-${VERSION}/ > "rsynclog.log";
+    rsync -vrP --progress  --exclude midway.json --exclude midway.db --exclude node_modules --exclude .cache --delete  $PWD/Search terrain@${ADDRESS}:src-${VERSION}/ > "rsynclog.log";
     echo "rsync complete"
-  else
-    echo "skipping rsync"
 fi
 
 ssh terrain@${ADDRESS} << EOF
-cd src-${VERSION}/Search
-screen -S runmidway-${SCREEN_ID} -X quit;
+screen -S runmidway-${SCREEN_ID} -X stuff $'\cc';
+EOF
+
+echo "One last thing: did you just now see a message saying 'No screen found' ?"
+HAS_SCREEN=""
+while [ "$HAS_SCREEN" != "y" ] && [ "$HAS_SCREEN" != "n" ]; do
+  read -n1 -p "Did you? [y\n] " HAS_SCREEN
+done
+echo ""
+
+START_SCREEN_COMMAND=""
+if [ "${HAS_SCREEN}" = "y" ]
+  then
+    START_SCREEN_COMMAND="screen -d -m -S runmidway-${SCREEN_ID};"
+fi
+
+
+ssh terrain@${ADDRESS} << EOF
+cd /home/terrain/src-${VERSION}/Search;
 ${STAGE_DB_COMMAND}
-screen -d -m -S runmidway-${SCREEN_ID};
+${START_SCREEN_COMMAND}
+screen -S runmidway-${SCREEN_ID} -X stuff "cd /home/terrain/src-${VERSION}/Search;\r";
 screen -S runmidway-${SCREEN_ID} -X stuff "yarn; yarn build-prod;\r";
 screen -S runmidway-${SCREEN_ID} -X stuff "NODE_ENV=production yarn start-midway -p ${PORT} -i ${MIDWAY_DB} > >(tee -a /var/log/midway/midway_${VERSION}_${PORT}.log) 2> >(tee -a /var/log/midway/midway_error_${VERSION}_${PORT}.log >&2)\r";
 EOF

@@ -45,10 +45,14 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
+
+// tslint:disable-next-line
+/// <reference path="../../../shared/typings/tsd.d.ts" />
+
 import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
-const { List, Map } = Immutable;
 import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
 import
