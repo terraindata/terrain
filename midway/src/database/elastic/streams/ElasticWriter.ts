@@ -65,7 +65,7 @@ export class ElasticWriter extends SafeWritable
   {
     super({
       objectMode: true,
-      highWaterMark: 1 * 8,
+      highWaterMark: 1024 * 8,
     });
 
     this.client = client;
