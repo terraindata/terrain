@@ -435,16 +435,22 @@ const TransformChart = {
     overlay.on('mouseover', this._overlayMouseoverFactory(el));
   },
 
-  _drawAxes(el, scales, width, height, inputKey, isDate)
+  _drawAxes(el, scales, width, height, inputKey, isDate, isGeo)
   {
     const numSideTicks = height > 200 ? 10 : 5;
     let numBottomTicks = width > 500 ? 6 : 4;
     let bottomTickFormatFn = Util.formatNumber;
-
+    let bottomAxesName = () => inputKey === '_score' ? 'Match Quality' : inputKey;
     if (isDate)
     {
       numBottomTicks = 3;
       bottomTickFormatFn = (n: number): string => moment(new Date(n)).format('YYYY-MM-DD');
+    }
+
+    if (isGeo)
+    {
+      bottomTickFormatFn = (n: number): string => Util.formatNumber(n) + ' mi';
+      bottomAxesName = () => 'Distance from ' + inputKey;
     }
 
     const yLeftAxis = d3.svg.axis()
@@ -501,7 +507,7 @@ const TransformChart = {
       .attr('text-anchor', 'middle')
       .attr('transform', 'translate(' + width / 2 + ',80)')
       .style('fill', Colors().fontColorLightest)
-      .text(inputKey === '_score' ? 'Match Quality' : inputKey);
+      .text(bottomAxesName);
 
     d3.select(el).select('.yLeftAxis')
       .append('text')
@@ -1795,8 +1801,10 @@ const TransformChart = {
       .attr('height', scaleMin(scales.realBarY));
 
     this._drawBg(el, scales);
-    const isDate = ElasticBlockHelpers.getTypeOfField(schema, builder, inputKey, true, index) === 'date';
-    this._drawAxes(el, scales, width, height, inputKey, isDate);
+    const fieldType = ElasticBlockHelpers.getTypeOfField(schema, builder, inputKey, true, index);
+    const isDate = fieldType === 'date';
+    const isGeo = fieldType === 'geo_point';
+    this._drawAxes(el, scales, width, height, inputKey, isDate, isGeo);
 
     if (inputKey === '' || inputKey === undefined)
     {
