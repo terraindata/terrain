@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
+import * as TerrainLog from 'loglevel';
 
 import { defaultProps, ElasticFieldProps, ElasticTypes, etlTypeToElastic } from 'shared/etl/types/ETLElasticTypes';
 import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
@@ -55,7 +56,7 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import EngineUtil, { PathHashMap } from 'shared/transformations/util/EngineUtil';
 import { KeyPath, KeyPath as EnginePath } from 'shared/util/KeyPath';
 
-import * as TerrainLog from 'loglevel';
+import * as Utils from 'shared/etl/util/XYZUtil';
 
 export interface TypeConfig
 {
@@ -227,7 +228,7 @@ export class ElasticMapping
   protected static enginePathToMappingPath(path: EnginePath): EnginePath
   {
     return path.flatMap(
-      (value, i) => EngineUtil.isNamedField(path, i) ? ['properties', value] : [],
+      (value, i) => Utils.path.isNamed(path, i) ? ['properties', value] : [],
     ).toList() as EnginePath;
   }
 
@@ -375,7 +376,7 @@ export class ElasticMapping
     const config = ElasticMapping.getTypeConfig(id, this.engine, this.isMerge);
     const enginePath = this.engine.getFieldPath(id);
     const cleanedPath = ElasticMapping.enginePathToMappingPath(enginePath);
-    const hashed = EngineUtil.hashPath(cleanedPath);
+    const hashed = Utils.path.hash(cleanedPath);
 
     if (config !== null)
     {

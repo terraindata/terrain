@@ -51,6 +51,8 @@ import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
+import * as Utils from 'shared/etl/util/XYZUtil';
+
 export default abstract class TransformationNodeInfo
 {
   public abstract typeCode: TransformationNodeType;
@@ -98,7 +100,7 @@ export default abstract class TransformationNodeInfo
       }
       if (isNamed !== undefined)
       {
-        if (EngineUtil.isNamedField(engine.getFieldPath(fieldId)) !== isNamed)
+        if (Utils.path.isNamed(engine.getFieldPath(fieldId)) !== isNamed)
         {
           return false;
         }

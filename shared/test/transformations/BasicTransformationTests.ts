@@ -648,8 +648,8 @@ test('delete a field that has transformations', () =>
 test('cast on a field inside a nested object inside an array', () =>
 {
   const e = new TransformationEngine();
-  e.addField(List(['foo']), 'array', { valueType: 'object' });
-  e.addField(List(['foo', -1]), 'array', { valueType: 'object' });
+  e.addField(List(['foo']), 'array');
+  e.addField(List(['foo', -1]), 'array');
   const id3 = e.addField(List(['foo', -1, 'bar']), 'string');
   e.appendTransformation(
     TransformationNodeType.CastNode,
@@ -705,8 +705,8 @@ test('array sum transformation', () =>
 test('duplicate a wildcard array of fields', () =>
 {
   const e = new TransformationEngine();
-  e.addField(List(['foo']), 'array', { valueType: 'object' });
-  e.addField(List(['foo', -1]), 'array', { valueType: 'object' });
+  e.addField(List(['foo']), 'array');
+  e.addField(List(['foo', -1]), 'array');
   const id3 = e.addField(List(['foo', -1, 'bar']), 'string');
   e.appendTransformation(
     TransformationNodeType.DuplicateNode,
@@ -744,8 +744,8 @@ test('test casting objects to string', () =>
   const e = new TransformationEngine();
 
   e.addField(List(['foo']), 'string');
-  e.addField(List(['foo', 'bar']), 'array', { valueType: 'number' });
-  e.addField(List(['foo', 'bar', -1]), 'array', { valueType: 'number' });
+  e.addField(List(['foo', 'bar']), 'array');
+  e.addField(List(['foo', 'bar', -1]), 'array');
   e.addField(List(['foo', 'baz']), 'object');
   e.addField(List(['foo', 'baz', 'hey']), 'string');
 

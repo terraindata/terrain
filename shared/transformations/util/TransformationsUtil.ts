@@ -51,7 +51,7 @@ import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import Topology from 'shared/transformations/util/TopologyUtil';
-import { KeyPath } from 'shared/util/KeyPath';
+import { KeyPath, KeyPathUtil as PathUtil } from 'shared/util/KeyPath';
 
 // return true if the given keypath would be a valid new child field under provided fieldId
 // if fieldId is not provided or -1, then it does not consider the new field as a child field
@@ -141,7 +141,7 @@ export function validateRename(
       message: 'Invalid Rename. This field already exists',
     };
   }
-  else if (!EngineUtil.isNamedField(existingKp))
+  else if (!PathUtil.isNamed(existingKp))
   {
     return {
       isValid: false,

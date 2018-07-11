@@ -154,9 +154,7 @@ test('wildcard rename with manual field adding', () =>
   // manually creating an engine that matches doc, but only using wildcards
   const e: TransformationEngine = new TransformationEngine();
   const foo = e.addField(List(['foo']), 'array');
-  e.setFieldProp(foo, List(['valueType']), 'object');
   const wildcard = e.addField(List(['foo', -1]), 'array');
-  e.setFieldProp(wildcard, List(['valueType']), 'object');
   const bar = e.addField(List(['foo', -1, 'bar']), 'string');
 
   const doc = {
@@ -192,8 +190,8 @@ test('rename a nested field that contains an array', () =>
 {
   const e = new TransformationEngine();
   e.addField(List(['nested']), 'object');
-  const id1 = e.addField(List(['nested', 'foo']), 'array', { valueType: 'number' });
-  const id2 = e.addField(List(['nested', 'foo', -1]), 'array', { valueType: 'number' });
+  const id1 = e.addField(List(['nested', 'foo']), 'array');
+  const id2 = e.addField(List(['nested', 'foo', -1]), 'array');
   e.renameField(id1, List(['foo']));
   expect(e.getFieldPath(id1)).toEqual(KeyPath(['foo']));
   expect(e.getFieldPath(id2)).toEqual(KeyPath(['foo', -1]));

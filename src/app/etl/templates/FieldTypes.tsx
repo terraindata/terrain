@@ -52,9 +52,9 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNodeBase from 'shared/transformations/TransformationNode';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType, NodeTypes } from 'shared/transformations/TransformationNodeType';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
-import Topology from 'shared/transformations/util/TopologyUtil';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
+
+import * as Utils from 'shared/etl/util/XYZUtil';
 
 // only put fields in here that are needed to track display-sensitive state
 class TemplateFieldC
@@ -71,12 +71,12 @@ class TemplateFieldC
 
   public isWildcardField(): boolean
   {
-    return EngineUtil.isWildcardField(this.outputKeyPath);
+    return Utils.path.isWildcard(this.outputKeyPath);
   }
 
   public isAncestorNamedField(index: number)
   {
-    return EngineUtil.isNamedField(this.outputKeyPath.slice(0, index + 1).toList());
+    return Utils.path.isNamed(this.outputKeyPath.slice(0, index + 1).toList());
   }
 
   public canMoveField(): boolean
@@ -109,12 +109,12 @@ class TemplateFieldC
   public isLocalToRoot(): boolean
   {
     // we can use a placeholder name
-    return Topology.areFieldsLocal(this.outputKeyPath, List(['sample_name']));
+    return Utils.topology.areFieldsLocal(this.outputKeyPath, List(['sample_name']));
   }
 
   public isNamedField()
   {
-    return EngineUtil.isNamedField(this.outputKeyPath);
+    return Utils.path.isNamed(this.outputKeyPath);
   }
 }
 export type TemplateField = WithIRecord<TemplateFieldC>;

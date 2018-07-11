@@ -586,7 +586,6 @@ export class TransformationEngine
     }
     const arrayID: number = this.addField(currentKeyPath.push(key), 'array');
     ids = ids.push(arrayID);
-    this.setFieldProp(arrayID, KeyPath(['valueType']), arrayType);
     let awkp: KeyPath = currentKeyPath.push(key);
     awkp = awkp.slice(0, awkp.size - depth + 1).toList();
     for (let i: number = 0; i < depth; i++)
@@ -594,7 +593,6 @@ export class TransformationEngine
       awkp = awkp.push(-1);
     }
     const arrayWildcardID: number = this.addField(awkp, 'array');
-    this.setFieldProp(arrayWildcardID, KeyPath(['valueType']), arrayType);
     ids = ids.push(arrayWildcardID);
     for (let i: number = 0; i < obj[key].length; i++)
     {

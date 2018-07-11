@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+
+// rename this file when other util files get cleaned up
+
 import TypeUtil from 'shared/etl/TypeUtil';
 import ConstructionUtil from 'shared/transformations/util/ConstructionUtil';
 import EngineUtil from 'shared/transformations/util/EngineUtil';

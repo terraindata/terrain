@@ -55,7 +55,7 @@ import { KeyPath, WayPoint } from '../../util/KeyPath';
 import * as yadeep from '../../util/yadeep';
 import { TestDocs } from './TestDocs';
 
-import * as Utils from 'shared/etl/util/XYZUtil';
+import ConstructionUtil from 'shared/transformations/util/ConstructionUtil';
 
 import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 
@@ -280,7 +280,7 @@ describe('create engine test', () =>
       ],
     },
   ]);
-  const { engine, errors } = Utils.construction.createEngineFromDocuments(docs);
+  const { engine, errors } = ConstructionUtil.createEngineFromDocuments(docs);
 
   test('test identity transformation', () => {
     expect(engine.transform(docs.get(2))).toEqual(docs.get(2));

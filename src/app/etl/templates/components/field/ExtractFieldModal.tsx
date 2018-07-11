@@ -68,10 +68,11 @@ import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { validateNewFieldName } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+
+import * as Utils from 'shared/etl/util/XYZUtil';
 
 import './EditorFieldModal.less';
 
@@ -223,7 +224,7 @@ class ExtractFieldModal extends TerrainComponent<Props>
       }
       else
       {
-        const lastIndex = okp.findLastIndex((val, i) => EngineUtil.isNamedField(okp, i));
+        const lastIndex = okp.findLastIndex((val, i) => Utils.path.isNamed(okp, i));
         if (lastIndex === -1)
         {
           return List([name]);

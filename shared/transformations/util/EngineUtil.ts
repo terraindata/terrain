@@ -58,7 +58,7 @@ import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import objectify from 'shared/util/deepObjectify';
-import { KeyPath, WayPoint } from 'shared/util/KeyPath';
+import { KeyPath, WayPoint, KeyPathUtil as PathUtil } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
 import * as TerrainLog from 'loglevel';
@@ -68,20 +68,11 @@ export interface PathHashMap<T>
 {
   [k: string]: T;
 }
-const valueTypeKeyPath = List(['valueType']);
 const etlTypeKeyPath = List(['etlType']);
 export default class EngineUtil
 {
   /*
-   *  Verify
-   *  Fields:
-   *  1: All fields have valid names (no * or number names)
-   *  2: No dangling fields (fields without parents, or fields with children that aren't arrays or objects)
-   *  3: All fields have valid types & value types if applicable
-   *  4: No duplicate output key paths or input key paths
-   *  Transformations:
-   *  1: TODO All newFieldKeyPaths point to some field's outputKeyPath
-   *  2: TODO All field's current type matches the most recent cast
+   *  Removed documentation because IT BECAME LIES (todo redo it)
    */
   public static verifyIntegrity(engine: TransformationEngine)
   {
@@ -92,8 +83,8 @@ export default class EngineUtil
       const pathTypes: PathHashMap<FieldTypes> = {};
       fields.forEach((id) =>
       {
-        const strippedPath = EngineUtil.turnIndicesIntoValue(engine.getFieldPath(id));
-        pathTypes[EngineUtil.hashPath(strippedPath)] = engine.getFieldType(id) as FieldTypes;
+        const strippedPath = PathUtil.convertIndices(engine.getFieldPath(id));
+        pathTypes[PathUtil.hash(strippedPath)] = engine.getFieldType(id) as FieldTypes;
       });
       fields.forEach((id) =>
       {
@@ -129,7 +120,6 @@ export default class EngineUtil
     return errors;
   }
 
-  // check to make sure the field's types exist and if its an array that it has a valid valueType
   public static fieldHasValidType(engine: TransformationEngine, id: number): string[]
   {
     const fieldType = engine.getFieldType(id) as FieldTypes;
@@ -163,68 +153,6 @@ export default class EngineUtil
     return List(asSet);
   }
 
-  // root is considered to be a named field
-  // TODO USE KEYPATH
-  public static isNamedField(
-    keypath: KeyPath,
-    index?: number,
-  ): boolean
-  {
-    const last: WayPoint = index === undefined ? keypath.last() : keypath.get(index);
-    return typeof last !== 'number';
-  }
-
-  // TODO USE KEYPATH
-  public static isWildcardField(
-    keypath: KeyPath,
-    index?: number,
-  ): boolean
-  {
-    const last = index === undefined ? keypath.last() : keypath.get(index);
-    return last as number === -1;
-  }
-
-  // TODO USE KEYPATH
-  public static hashPath(keypath: KeyPath): PathHash
-  {
-    return JSON.stringify(keypath.toJS());
-  }
-
-  // TODO USE KEYPATH
-  public static unhashPath(keypath: PathHash): KeyPath
-  {
-    return KeyPath(JSON.parse(keypath));
-  }
-
-  // TODO USE KEYPATH
-  // turn all indices into a particular value, based on
-  // an existing engine that has fields with indices in them
-  public static turnIndicesIntoValue(
-    keypath: KeyPath,
-    value = -1,
-  ): KeyPath
-  {
-    if (keypath.size === 0)
-    {
-      return keypath;
-    }
-    const arrayIndices = {};
-    for (const i of _.range(1, keypath.size))
-    {
-      const path = keypath.slice(0, i + 1).toList();
-      if (!EngineUtil.isNamedField(path))
-      {
-        arrayIndices[i] = true;
-      }
-    }
-
-    const scrubbed = keypath.map((key, i) =>
-    {
-      return arrayIndices[i] === true ? value : key;
-    }).toList();
-    return scrubbed;
-  }
-
   // returns the first child field
   public static findChildField(fieldId: number, engine: TransformationEngine): number | undefined
   {
@@ -244,71 +172,10 @@ export default class EngineUtil
     return key;
   }
 
-  // takes an engine path and the path type mapping and returns true if
-  // all of the path's parent paths represent array or object fields
-  public static isAValidField(keypath: KeyPath, pathTypes: PathHashMap<FieldTypes>): boolean
-  {
-    if (keypath.size === 0)
-    {
-      return true;
-    }
-    for (const i of _.range(1, keypath.size))
-    {
-      const parentPath = keypath.slice(0, i).toList();
-      const parentType = pathTypes[EngineUtil.hashPath(parentPath)];
-      if (parentType !== undefined && parentType !== 'object' && parentType !== 'array')
-      {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  // Add the fields in the pathTypes and pathValueTypes map to the given engine
-  public static addFieldsToEngine(
-    pathTypes: PathHashMap<FieldTypes>,
-    pathValueTypes: PathHashMap<FieldTypes>,
-    engine: TransformationEngine,
-  )
-  {
-    const hashedPaths = List(Object.keys(pathTypes));
-    hashedPaths.forEach((hashedPath, i) =>
-    {
-      const unhashedPath = EngineUtil.unhashPath(hashedPath);
-      if (EngineUtil.isAValidField(unhashedPath, pathTypes))
-      {
-        let fieldType = pathTypes[hashedPath];
-        if (fieldType === null)
-        {
-          fieldType = 'string';
-        }
-
-        let valueType = pathValueTypes[hashedPath];
-        if (valueType !== undefined)
-        {
-          fieldType = 'array';
-        }
-        if (valueType === undefined && EngineUtil.isWildcardField(unhashedPath))
-        {
-          valueType = fieldType;
-          fieldType = 'array';
-        }
-
-        const id = engine.addField(unhashedPath, fieldType);
-        if (valueType !== undefined)
-        {
-          engine.setFieldProp(id, valueTypeKeyPath, valueType !== null ? valueType : 'string');
-        }
-      }
-    });
-  }
-
   public static addFieldToEngine(
     engine: TransformationEngine,
     keypath: KeyPath,
     type: ETLFieldTypes,
-    // valueType?: ETLFieldTypes,
-    // useValueType?: boolean,
   ): number
   {
     const cfg = {
@@ -335,7 +202,7 @@ export default class EngineUtil
     newType: ETLFieldTypes,
   )
   {
-    if (!EngineUtil.isWildcardField(engine.getFieldPath(fieldId)))
+    if (!PathUtil.isWildcard(engine.getFieldPath(fieldId)))
     {
       engine.setFieldType(fieldId, getJSFromETL(newType));
     }
@@ -348,7 +215,8 @@ export default class EngineUtil
     const etlType = engine.getFieldProp(id, etlTypeKeyPath) as ETLFieldTypes;
     if (etlType == null)
     {
-      return JSToETLType[EngineUtil.getRepresentedType(id, engine)];
+      // return JSToETLType[EngineUtil.getRepresentedType(id, engine)];
+      return ETLFieldTypes.String; // default
     }
     else
     {
@@ -370,7 +238,6 @@ export default class EngineUtil
       const newId = EngineUtil.transferField(id, keypath, leftEngine, newEngine);
     });
     const outputKeyPathBase = List([outputKey, -1]);
-    const valueTypePath = List(['valueType']);
     const outputFieldId = EngineUtil.addFieldToEngine(newEngine, List([outputKey]), ETLFieldTypes.Array);
     const outputFieldWildcardId = EngineUtil.addFieldToEngine(newEngine, outputKeyPathBase, ETLFieldTypes.Object);
 
@@ -380,88 +247,6 @@ export default class EngineUtil
       const newId = EngineUtil.transferField(id, newKeyPath, rightEngine, newEngine);
     });
     return newEngine;
-  }
-
-  public static interpretETLTypes(
-    engine: TransformationEngine,
-    options?: {
-      documents: List<object>,
-      castStringsToPrimitives?: boolean,
-    },
-  )
-  {
-    if (options === undefined || options.documents === undefined)
-    {
-      engine.getAllFieldIDs().forEach((id) =>
-      {
-        const repType = EngineUtil.getRepresentedType(id, engine);
-        const type = JSToETLType[repType];
-        engine.setFieldProp(id, etlTypeKeyPath, type);
-      });
-      return;
-    }
-
-    if (options.castStringsToPrimitives)
-    {
-      EngineUtil.interpretTextFields(engine, options.documents);
-    }
-
-    const ignoreFields: { [k: number]: boolean } = {};
-    const docs = EngineUtil.preprocessDocuments(options.documents, engine);
-    engine.getAllFieldIDs().sortBy((id) => engine.getFieldPath(id).size).forEach((id) =>
-    {
-      if (ignoreFields[id])
-      {
-        return;
-      }
-      // const ikp = engine.getInputKeyPath(id);
-      const okp = engine.getFieldPath(id);
-
-      const repType = EngineUtil.getRepresentedType(id, engine);
-
-      if (repType === 'string')
-      {
-        const values = EngineUtil.getValuesToAnalyze(docs, okp);
-        const type = TypeUtil.getCommonETLStringType(values);
-        EngineUtil.changeFieldType(engine, id, type);
-        if (type === ETLFieldTypes.GeoPoint)
-        {
-          EngineUtil.castField(engine, id, ETLFieldTypes.GeoPoint);
-        }
-        else if (type === ETLFieldTypes.Date)
-        {
-          EngineUtil.castField(engine, id, ETLFieldTypes.Date);
-        }
-      }
-      else if (repType === 'number')
-      {
-        const values = EngineUtil.getValuesToAnalyze(docs, okp);
-        const type = TypeUtil.getCommonETLNumberType(values);
-        EngineUtil.changeFieldType(engine, id, type);
-      }
-      else if (repType === 'object')
-      {
-        const values = EngineUtil.getValuesToAnalyze(docs, okp);
-        if (TypeUtil.areValuesGeoPoints(values))
-        {
-          EngineUtil.changeFieldType(engine, id, ETLFieldTypes.GeoPoint);
-          EngineUtil.castField(engine, id, ETLFieldTypes.GeoPoint);
-          const latId = engine.getFieldID(okp.push('lat'));
-          const lonId = engine.getFieldID(okp.push('lon'));
-          EngineUtil.changeFieldType(engine, latId, ETLFieldTypes.Number);
-          EngineUtil.changeFieldType(engine, lonId, ETLFieldTypes.Number);
-          EngineUtil.castField(engine, latId, ETLFieldTypes.Number);
-          EngineUtil.castField(engine, lonId, ETLFieldTypes.Number);
-          ignoreFields[latId] = true;
-          ignoreFields[lonId] = true;
-        }
-      }
-      else
-      {
-        const type = JSToETLType[repType];
-        engine.setFieldProp(id, etlTypeKeyPath, type);
-      }
-    });
   }
 
   public static changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType: ETLFieldTypes)
@@ -599,71 +384,6 @@ export default class EngineUtil
       {
         yield* EngineUtil.preorder(tree, children.get(i), shouldExplore);
       }
-    }
-  }
-
-  private static preprocessDocuments(documents: List<object>, engine: TransformationEngine): List<object>
-  {
-    return documents.map((doc) => engine.transform(doc)).toList();
-  }
-
-  private static getValuesToAnalyze(
-    docs: List<object>,
-    okp: KeyPath,
-  ): any[]
-  {
-    let values = [];
-    docs.forEach((doc) =>
-    {
-      const vals = yadeep.get(doc, okp);
-      if (vals !== undefined)
-      {
-        values = values.concat(vals);
-      }
-    });
-    return values;
-  }
-
-  // attempt to convert fields from text and guess if they should be numbers or booleans
-  // adds type casts
-  private static interpretTextFields(engine: TransformationEngine, documents: List<object>)
-  {
-    const docs = EngineUtil.preprocessDocuments(documents, engine);
-    engine.getAllFieldIDs().forEach((id) =>
-    {
-      if (EngineUtil.getRepresentedType(id, engine) !== 'string')
-      {
-        return;
-      }
-      const kp = engine.getFieldPath(id);
-      const values = EngineUtil.getValuesToAnalyze(docs, kp);
-      const bestType = TypeUtil.getCommonJsType(values);
-      if (bestType !== EngineUtil.getRepresentedType(id, engine))
-      {
-        if (!EngineUtil.isWildcardField(kp))
-        {
-          engine.setFieldType(id, bestType);
-        }
-        else
-        {
-          engine.setFieldProp(id, valueTypeKeyPath, bestType);
-        }
-        EngineUtil.castField(engine, id, ETLToJSType[bestType]);
-      }
-    });
-  }
-
-  // get the JS type of a field. If it represents an array wildcard, get the valueType
-  private static getRepresentedType(id: number, engine: TransformationEngine): FieldTypes
-  {
-    const kp = engine.getFieldPath(id);
-    if (EngineUtil.isWildcardField(kp))
-    {
-      return engine.getFieldProp(id, valueTypeKeyPath) as FieldTypes;
-    }
-    else
-    {
-      return engine.getFieldType(id) as FieldTypes;
     }
   }
 }

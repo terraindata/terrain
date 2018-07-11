@@ -58,6 +58,8 @@ import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
+import * as Utils from 'shared/etl/util/XYZUtil';
+
 export interface TransformationConfig
 {
   type?: ETLFieldTypes; // specify new field type
@@ -340,7 +342,7 @@ export class EngineProxy
     let idToCopy = sourceId;
     if (despecify)
     {
-      const kpToCopy = EngineUtil.turnIndicesIntoValue(this.engine.getFieldPath(sourceId));
+      const kpToCopy = Utils.path.convertIndices(this.engine.getFieldPath(sourceId));
       idToCopy = this.engine.getFieldID(kpToCopy);
     }
 
