@@ -128,15 +128,16 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
 
   public showPrimaryKey(s: ElasticFieldProps)
   {
-    const jsType = EngineUtil.getRepresentedType(this.props.fieldId, this._currentEngine());
-    return ((jsType === 'string' || jsType === 'number') && this._isRootField()) ?
+    const etlType = EngineUtil.getETLFieldType(this.props.fieldId, this._currentEngine());
+    return (etlType === ETLFieldTypes.String || etlType === ETLFieldTypes.Number || etlType === ETLFieldTypes.Integer)
+      && this._isRootField() ?
       DisplayState.Active : DisplayState.Inactive;
   }
 
   public showIsAnalyzed(s: ElasticFieldProps)
   {
-    const jsType = EngineUtil.getRepresentedType(this.props.fieldId, this._currentEngine());
-    return (jsType === 'string' && !s.isPrimaryKey) ?
+    const etlType = EngineUtil.getETLFieldType(this.props.fieldId, this._currentEngine());
+    return (etlType === ETLFieldTypes.String && !s.isPrimaryKey) ?
       DisplayState.Active : DisplayState.Inactive;
   }
 

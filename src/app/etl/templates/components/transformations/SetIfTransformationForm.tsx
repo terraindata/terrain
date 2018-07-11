@@ -53,6 +53,7 @@ import * as React from 'react';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
+import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -116,9 +117,15 @@ export class SetIfTFF extends TransformationForm<SetOptions, TransformationNodeT
     newValue: '',
   };
 
+  protected isNumber()
+  {
+    const type = EngineUtil.getETLFieldType(this.props.fieldId, this.props.engine);
+    return type === ETLFieldTypes.Number || type === ETLFieldTypes.Integer;
+  }
+
   protected numberDisplayState(state: SetOptions)
   {
-    if (EngineUtil.getRepresentedType(this.props.fieldId, this.props.engine) === 'number')
+    if (this.isNumber())
     {
       return DisplayState.Active;
     }
@@ -130,7 +137,8 @@ export class SetIfTFF extends TransformationForm<SetOptions, TransformationNodeT
 
   protected stringDisplayState(state: SetOptions)
   {
-    if (EngineUtil.getRepresentedType(this.props.fieldId, this.props.engine) === 'string')
+    const type = EngineUtil.getETLFieldType(this.props.fieldId, this.props.engine);
+    if (type === ETLFieldTypes.String)
     {
       return DisplayState.Active;
     }
@@ -143,7 +151,7 @@ export class SetIfTFF extends TransformationForm<SetOptions, TransformationNodeT
   protected computeArgs()
   {
     const { newValue } = this.state;
-    const isNumber = EngineUtil.getRepresentedType(this.props.fieldId, this.props.engine) === 'number';
+    const isNumber = this.isNumber();
     const args = super.computeArgs();
     const options = _.extend({}, args.options, {
       newValue: isNumber ? Number(newValue) : newValue,

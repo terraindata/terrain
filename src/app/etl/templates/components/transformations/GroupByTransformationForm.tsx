@@ -136,7 +136,6 @@ export class GroupByTFF extends TransformationForm<GroupByOptions, Transformatio
     const fields = List([engine.getFieldPath(fieldId)]);
     proxy.addTransformation(this.type, fields, options, {
       type: ETLFieldTypes.Array,
-      valueType: ETLFieldTypes.Object,
     });
     for (const key of Object.keys(outputMapping))
     {

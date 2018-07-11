@@ -182,7 +182,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   }
 
   // override this to customize the newFieldInfo object that gets passed to addTransformation
-  protected overrideTransformationConfig(): { type?: ETLFieldTypes, valueType?: ETLFieldTypes, newSourceType?: ETLFieldTypes }
+  protected overrideTransformationConfig(): { type?: ETLFieldTypes, newSourceType?: ETLFieldTypes }
   {
     return undefined;
   }

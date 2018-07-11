@@ -77,9 +77,11 @@ class ElasticController extends DefaultController implements LanguageInterface
 
   public canSetPrimaryKey(engine: TransformationEngine, fieldId: number)
   {
-    const jsType = EngineUtil.getRepresentedType(fieldId, engine);
+    const etlType = EngineUtil.getETLFieldType(fieldId, engine);
     const isRootField = engine.getFieldPath(fieldId).size === 1;
-    return (jsType === 'string' || jsType === 'number') && isRootField;
+    return (
+      etlType === ETLFieldTypes.String || etlType === ETLFieldTypes.Number || etlType === ETLFieldTypes.Integer
+    ) && isRootField;
   }
 
   public setFieldPrimaryKey(engine: TransformationEngine, fieldId: number, value: boolean)

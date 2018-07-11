@@ -61,7 +61,6 @@ import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 export interface TransformationConfig
 {
   type?: ETLFieldTypes; // specify new field type
-  valueType?: ETLFieldTypes; // specify new field value type
   newSourceType?: ETLFieldTypes; // if the source field changes types due to transformation
 }
 
@@ -144,7 +143,6 @@ export class EngineProxy
             newId,
             config.type,
             config.type,
-            config.valueType,
           );
         }
         else
@@ -240,8 +238,8 @@ export class EngineProxy
     const newFieldId = this.engine.getFieldID(destKP);
 
     const newFieldType = EngineUtil.getETLFieldType(sourceId, this.engine);
-    this.addFieldToEngine(destKP.push(-1), ETLFieldTypes.Array, newFieldType, true);
-    EngineUtil.rawSetFieldType(this.engine, newFieldId, ETLFieldTypes.Array, ETLFieldTypes.Array, newFieldType);
+    this.addFieldToEngine(destKP.push(-1), newFieldType);
+    EngineUtil.rawSetFieldType(this.engine, newFieldId, ETLFieldTypes.Array, ETLFieldTypes.Array);
     this.requestRebuild();
   }
 
@@ -269,14 +267,13 @@ export class EngineProxy
     this.requestRebuild();
   }
 
-  public addField(keypath: KeyPath, type: ETLFieldTypes, valueType: ETLFieldTypes = ETLFieldTypes.String)
+  public addField(keypath: KeyPath, type: ETLFieldTypes, childType = ETLFieldTypes.String)
   {
     let newId: number;
     if (type === ETLFieldTypes.Array)
     {
-      newId = this.addFieldToEngine(keypath, type, valueType);
-      const wildId = this.addFieldToEngine(keypath.push(-1), ETLFieldTypes.Array, valueType, true);
-      EngineUtil.castField(this.engine, wildId, valueType);
+      newId = this.addFieldToEngine(keypath, type);
+      const wildId = this.addFieldToEngine(keypath.push(-1), childType);
     }
     else
     {
@@ -326,19 +323,6 @@ export class EngineProxy
     this.orderController.setOrder(order);
   }
 
-  public debug()
-  {
-    // this.engine.getAllFieldIDs().forEach((id) =>
-    // {
-    //   console.log('--fieldId--', id);
-    //   console.log('paths', this.engine.getInputKeyPath(id).toJS(), this.engine.getOutputKeyPath(id).toJS());
-    //   console.log('types', this.engine.getFieldType(id),
-    //     this.engine.getFieldProps(id)['valueType'],
-    //     this.engine.getFieldProps(id)['etlType']
-    //   );
-    // });
-  }
-
   // if despecify is true, then strip away specific indices
   private copyField(sourceId: number, destKP: KeyPath, despecify = false): number
   {
@@ -379,11 +363,9 @@ export class EngineProxy
   private addFieldToEngine(
     keypath: KeyPath,
     etlType: ETLFieldTypes,
-    valueType?: ETLFieldTypes,
-    useValueType?: boolean,
   ): number
   {
-    return EngineUtil.addFieldToEngine(this.engine, keypath, etlType, valueType, useValueType);
+    return EngineUtil.addFieldToEngine(this.engine, keypath, etlType);
   }
 }
 
@@ -504,13 +486,12 @@ export class FieldProxy
     if (newType === ETLFieldTypes.Array)
     {
       const childPath = this.engine.getFieldPath(this.fieldId).push(-1);
-      EngineUtil.addFieldToEngine(this.engine, childPath, ETLFieldTypes.Array, ETLFieldTypes.String, true);
+      EngineUtil.addFieldToEngine(this.engine, childPath, ETLFieldTypes.String);
       EngineUtil.rawSetFieldType(
         this.engine,
         this.fieldId,
         ETLFieldTypes.Array,
         ETLFieldTypes.Array,
-        ETLFieldTypes.String,
       );
     }
 

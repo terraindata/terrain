@@ -133,20 +133,9 @@ export default class EngineUtil
   {
     const fieldType = engine.getFieldType(id) as FieldTypes;
     const etlType = EngineUtil.getETLFieldType(id, engine);
-    const valueType = engine.getFieldProp(id, valueTypeKeyPath) as FieldTypes;
     if (validJSTypes.indexOf(fieldType) === -1)
     {
       return [`Field Type ${fieldType} is not a valid js type`];
-    }
-    if (fieldType === 'array' && validJSTypes.indexOf(valueType) === -1)
-    {
-      return [`Field Type is an Array, but valueType: ${valueType} is invalid.`];
-    }
-
-    const jsType = EngineUtil.getRepresentedType(id, engine);
-    if (ETLToJSType[etlType].indexOf(jsType) === -1)
-    {
-      return [`Field JS Type and ETL Type are Incompatible. ${jsType} is incompatible with ${etlType}`];
     }
     return [];
   }
@@ -201,11 +190,6 @@ export default class EngineUtil
   public static unhashPath(keypath: PathHash): KeyPath
   {
     return KeyPath(JSON.parse(keypath));
-  }
-
-  public static getValueType(fieldId: number, engine: TransformationEngine): FieldTypes
-  {
-    return engine.getFieldProp(fieldId, valueTypeKeyPath);
   }
 
   // turn all indices into a particular value, based on
@@ -318,17 +302,13 @@ export default class EngineUtil
     engine: TransformationEngine,
     keypath: KeyPath,
     type: ETLFieldTypes,
-    valueType?: ETLFieldTypes,
-    useValueType?: boolean,
+    // valueType?: ETLFieldTypes,
+    // useValueType?: boolean,
   ): number
   {
     const cfg = {
-      etlType: useValueType ? valueType : type,
+      etlType: type,
     };
-    if (valueType !== undefined)
-    {
-      cfg['valueType'] = getJSFromETL(valueType);
-    }
     return engine.addField(keypath, getJSFromETL(type), cfg);
   }
 
@@ -338,15 +318,10 @@ export default class EngineUtil
     fieldId: number,
     etlType: ETLFieldTypes,
     type: ETLFieldTypes,
-    valueType?: ETLFieldTypes,
   )
   {
     engine.setFieldProp(fieldId, etlTypeKeyPath, etlType);
     engine.setFieldType(fieldId, getJSFromETL(type));
-    if (valueType !== undefined)
-    {
-      engine.setFieldProp(fieldId, valueTypeKeyPath, getJSFromETL(valueType));
-    }
   }
 
   public static changeFieldType(
@@ -355,30 +330,11 @@ export default class EngineUtil
     newType: ETLFieldTypes,
   )
   {
-    if (EngineUtil.isWildcardField(engine.getFieldPath(fieldId)))
-    {
-      engine.setFieldProp(fieldId, valueTypeKeyPath, getJSFromETL(newType));
-    }
-    else
+    if (!EngineUtil.isWildcardField(engine.getFieldPath(fieldId)))
     {
       engine.setFieldType(fieldId, getJSFromETL(newType));
     }
-
     engine.setFieldProp(fieldId, etlTypeKeyPath, newType);
-  }
-
-  // get the JS type of a field. If it represents an array wildcard, get the valueType
-  public static getRepresentedType(id: number, engine: TransformationEngine): FieldTypes
-  {
-    const kp = engine.getFieldPath(id);
-    if (EngineUtil.isWildcardField(kp))
-    {
-      return engine.getFieldProp(id, valueTypeKeyPath) as FieldTypes;
-    }
-    else
-    {
-      return engine.getFieldType(id) as FieldTypes;
-    }
   }
 
   // get the ETL type of a field
@@ -410,9 +366,8 @@ export default class EngineUtil
     });
     const outputKeyPathBase = List([outputKey, -1]);
     const valueTypePath = List(['valueType']);
-    const outputFieldId = EngineUtil.addFieldToEngine(newEngine, List([outputKey]), ETLFieldTypes.Array, ETLFieldTypes.Object);
-    const outputFieldWildcardId = EngineUtil.addFieldToEngine(
-      newEngine, outputKeyPathBase, ETLFieldTypes.Array, ETLFieldTypes.Object, true);
+    const outputFieldId = EngineUtil.addFieldToEngine(newEngine, List([outputKey]), ETLFieldTypes.Array);
+    const outputFieldWildcardId = EngineUtil.addFieldToEngine(newEngine, outputKeyPathBase, ETLFieldTypes.Object);
 
     rightEngine.getAllFieldIDs().forEach((id) =>
     {
@@ -842,6 +797,20 @@ export default class EngineUtil
         EngineUtil.castField(engine, id, ETLToJSType[bestType]);
       }
     });
+  }
+
+  // get the JS type of a field. If it represents an array wildcard, get the valueType
+  private static getRepresentedType(id: number, engine: TransformationEngine): FieldTypes
+  {
+    const kp = engine.getFieldPath(id);
+    if (EngineUtil.isWildcardField(kp))
+    {
+      return engine.getFieldProp(id, valueTypeKeyPath) as FieldTypes;
+    }
+    else
+    {
+      return engine.getFieldType(id) as FieldTypes;
+    }
   }
 }
 
