@@ -155,7 +155,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
         sourceStreams = [sourceStream] as stream.Readable[];
       }
 
-      sourceStreams.forEach(async (ss: stream.Readable) =>
+      sourceStreams.forEach((ss: stream.Readable) =>
       {
         switch (source.fileConfig.fileType)
         {
@@ -178,7 +178,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
             break;
           case 'xml':
             const xmlPath: string | undefined = source.fileConfig.xmlPath;
-            importStreams.push(sourceStream.pipe(XMLTransform.createImportStream(xmlPath)));
+            importStreams.push(ss.pipe(XMLTransform.createImportStream(xmlPath)));
             break;
           default:
             throw new Error('Download file type must be either CSV, TSV, JSON, XLSX or XML.');
