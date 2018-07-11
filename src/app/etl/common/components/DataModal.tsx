@@ -77,6 +77,7 @@ export default class DataModal extends TerrainComponent<Props>
     super(props);
     this.state = {
       currentOptionIndex: 0,
+      optionHasBeenClicked: false,
     };
   }
 
@@ -100,6 +101,7 @@ export default class DataModal extends TerrainComponent<Props>
     }
     this.setState(
       {
+        optionHasBeenClicked: true,
         currentOptionIndex: this.props.sectionOptions.indexOf(optionName),
       },
     );
@@ -150,8 +152,8 @@ export default class DataModal extends TerrainComponent<Props>
 
   public renderTitle()
   {
-    const visualTitle = this.props.dynamicTitle ? this.props.sectionTitles.get(this.state.currentOptionIndex) :
-      this.props.sectionTitle;
+    const visualTitle = (this.props.dynamicTitle && this.state.optionHasBeenClicked) ?
+      this.props.sectionTitles.get(this.state.currentOptionIndex) : this.props.sectionTitle;
     return (
       <div className='info-header' style={{ color: Colors().mainSectionTitle }}>
         {visualTitle}
@@ -161,8 +163,6 @@ export default class DataModal extends TerrainComponent<Props>
 
   public render()
   {
-    // console.log(this.props.sectionOptions.get(0));
-    // console.log(this.state.currentOption);
     return (
       <div
         className='info-container'

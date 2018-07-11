@@ -59,11 +59,12 @@ import { _FileConfig, FileConfig } from 'shared/etl/immutable/EndpointRecords';
 import { FileConfig as FileConfigI } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
+import Button from 'app/common/components/Button';
 import Modal from 'app/common/components/Modal';
 import PathUtil from 'etl/pathselector/PathGuessTest';
 import { List } from 'immutable';
+import ButtonModal from './ButtonModal';
 import DataModal from './DataModal';
-import Button from 'app/common/components/Button';
 
 export interface Props
 {
@@ -86,7 +87,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
 {
   public state = {
     suggestedPathsOpen: false,
-  }
+  };
 
   public inputMap: InputDeclarationMap<FormState> =
     {
@@ -177,7 +178,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
 
   public updateJsonPath(possiblePath)
   {
-    const pathName = possiblePath.split(':')[0];
+    const pathName: string = possiblePath.split(':')[0];
     const formattedPath = '*.' + pathName;
     const updatedFileConfig = this.props.fileConfig.set('jsonPath', formattedPath);
     this.props.onChange(updatedFileConfig);
@@ -192,44 +193,22 @@ export default class FileConfigForm extends TerrainComponent<Props>
     else
     {
       return (
-        <div>
-          <Button
-            text='View suggested paths'
-            onClick={this._fn(this.toggleSuggestedPaths, state)}
-            size='small'
-          />
-          <Modal
-            open={this.state.suggestedPathsOpen}
-            title='Suggested JSON Paths (Select One)'
-            wide={true}
-            onClose={this._fn(this.closeSuggestedPaths, state)}
-            noFooterPadding={true}
-          >
-            {this.renderSuggestedPathsData()}
-          </Modal>
-        </div>
+        <ButtonModal
+          button='View Suggested Paths'
+          modal='Suggested JSON Paths (Select One)'
+          wide={true}
+          noFooterPadding={true}
+          modalContent={this.renderSuggestedPathsData()}
+        />
       );
     }
-  }
-
-  public toggleSuggestedPaths(state)
-  {
-    this.setState({
-      suggestedPathsOpen: true && (this.jsonPathDisplay(state) === DisplayState.Active),
-    });
-  }
-
-  public closeSuggestedPaths(state)
-  {
-    this.setState({
-      suggestedPathsOpen: false;
-    });
   }
 
   public renderSuggestedPathsData()
   {
     return (
       <DataModal
+        sectionTitle='Currently selected: N/A'
         sectionType='path'
         sectionOptions={
           List(PathUtil.guessFilePaths(this.props.source).map((key, i) => key.name + ': ' + key.score.toString()))
@@ -238,7 +217,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
           List(PathUtil.guessFilePaths(this.props.source).map((key, i) => JSON.stringify(this.props.source[key.name], null, 2)))
         }
         sectionTitles={
-          List(PathUtil.guessFilePaths(this.props.source).map((key, i) => '*.' + key.name))
+          List(PathUtil.guessFilePaths(this.props.source).map((key, i) => 'Currently selected: *.' + key.name))
         }
         width='100%'
         height='80%'
@@ -248,7 +227,6 @@ export default class FileConfigForm extends TerrainComponent<Props>
       />
     );
   }
-
 
   public xmlPathDisplay(s: FormState)
   {
