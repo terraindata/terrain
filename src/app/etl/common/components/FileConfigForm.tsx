@@ -148,8 +148,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
       previewDataSource: {
         type: DisplayType.Custom,
         displayName: '',
-        group: 'path',
-        widthFactor: -1,
+        widthFactor: 3,
         options: {
           render: this.renderSuggestedJsonPaths,
         },
