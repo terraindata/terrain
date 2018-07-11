@@ -52,8 +52,6 @@ import TransformationRegistry from 'shared/transformations/TransformationRegistr
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
-import EngineUtil from 'shared/transformations/util/EngineUtil';
-
 /*
  *  Using Date.now() as a placeholder until we figure out an actual package to do benchmarking
  */
@@ -165,22 +163,22 @@ export default class Benchmarking
     return runs;
   }
 
-  public static transformationBenchmark(chunk: number = 100, minTime: number = 1000)
-  {
-    const documents = List([Benchmarking.doc1]);
-    const engine1 = EngineUtil.createEngineFromDocuments(documents).engine;
-    const engine2 = EngineUtil.createEngineFromDocuments(documents).engine;
+  // public static transformationBenchmark(chunk: number = 100, minTime: number = 1000)
+  // {
+  //   const documents = List([Benchmarking.doc1]);
+  //   const engine1 = EngineUtil.createEngineFromDocuments(documents).engine;
+  //   const engine2 = EngineUtil.createEngineFromDocuments(documents).engine;
 
-    EngineUtil.interpretETLTypes(engine2, {
-      documents,
-    });
-    EngineUtil.addInitialTypeCasts(engine2);
+  //   EngineUtil.interpretETLTypes(engine2, {
+  //     documents,
+  //   });
+  //   EngineUtil.addInitialTypeCasts(engine2);
 
-    const testEngine1 = (doc) => engine1.transform(doc);
-    const testEngine2 = (doc) => engine2.transform(doc);
+  //   const testEngine1 = (doc) => engine1.transform(doc);
+  //   const testEngine2 = (doc) => engine2.transform(doc);
 
-    const testDocs = [Benchmarking.doc1];
-    const runs = Benchmarking.weave(testEngine1, testEngine2, testDocs, chunk, minTime);
-    return runs;
-  }
+  //   const testDocs = [Benchmarking.doc1];
+  //   const runs = Benchmarking.weave(testEngine1, testEngine2, testDocs, chunk, minTime);
+  //   return runs;
+  // }
 }

@@ -61,8 +61,6 @@ import objectify from 'shared/util/deepObjectify';
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
-import Utils from 'shared/etl/util/XYZUtil';
-
 import * as TerrainLog from 'loglevel';
 
 export type PathHash = string;
@@ -515,82 +513,6 @@ export default class EngineUtil
     });
   }
 
-  // return the best guess engine from the given documents
-  public static createEngineFromDocuments(documents: List<object>):
-    {
-      engine: TransformationEngine,
-      warnings: string[],
-      softWarnings: string[],
-    }
-  {
-    const warnings: string[] = [];
-    const softWarnings: string[] = [];
-    const pathTypes: PathHashMap<FieldTypes> = {};
-    const pathValueTypes: PathHashMap<FieldTypes> = {};
-    documents.forEach((doc, i) =>
-    {
-      const e: TransformationEngine = new TransformationEngine(doc);
-      EngineUtil.stripMalformedFields(e, doc, pathTypes); // is pretty slow, any better ways?
-      const fieldIds = e.getAllFieldIDs();
-
-      fieldIds.forEach((id, j) =>
-      {
-        const currentType: FieldTypes = EngineUtil.getRepresentedType(id, e);
-        const deIndexedPath = EngineUtil.turnIndicesIntoValue(e.getFieldPath(id), -1);
-        const path = EngineUtil.hashPath(deIndexedPath);
-
-        if (pathTypes[path] !== undefined)
-        {
-          const existingType = pathTypes[path];
-          const newType = EngineUtil.mergeTypes(currentType, existingType);
-          if (newType === 'warning' || newType === 'softWarning')
-          {
-            if (newType === 'warning')
-            {
-              warnings.push(
-                `path: ${path} has incompatible types.` +
-                ` Interpreted types ${currentType} and ${existingType} are incompatible.` +
-                ` The resultant type will be coerced to a string.` +
-                ` Details: document ${i}`,
-              );
-            }
-            else
-            {
-              softWarnings.push(
-                `path: ${path} has different types, but can be resolved.` +
-                ` Interpreted types ${currentType} and ${existingType} are different.` +
-                ` The resultant type will be coerced to a string.` +
-                ` Details: document ${i}`,
-              );
-            }
-            pathTypes[path] = 'string';
-            pathValueTypes[path] = undefined;
-          }
-          else if (existingType === null && newType !== null)
-          {
-            pathTypes[path] = newType;
-            pathValueTypes[path] = e.getFieldProp(id, valueTypeKeyPath);
-          }
-        }
-        else
-        {
-          pathTypes[path] = currentType;
-          pathValueTypes[path] = e.getFieldProp(id, valueTypeKeyPath);
-        }
-      });
-    });
-    const engine = new TransformationEngine();
-    EngineUtil.addFieldsToEngine(pathTypes, pathValueTypes, engine);
-
-    TerrainLog.debug('Add all fields: ' + JSON.stringify(engine.getAllFieldNames()) + ' to the engine');
-
-    return {
-      engine,
-      warnings,
-      softWarnings,
-    };
-  }
-
   // copy a field from e1 to e2 with specified keypath
   // if e2 is not provided, then transfer from e1 to itself
   // does not transfer transformations
@@ -685,35 +607,6 @@ export default class EngineUtil
     return documents.map((doc) => engine.transform(doc)).toList();
   }
 
-  // warning types get typed as strings, but should emit a warning
-  private static mergeTypes(type1: FieldTypes = null, type2: FieldTypes = null): FieldTypes | 'warning' | 'softWarning'
-  {
-    if (type1 === 'undefined' as any)
-    {
-      type1 = null;
-    }
-    if (type2 === 'undefined' as any)
-    {
-      type2 = null;
-    }
-    if (type1 === null)
-    {
-      return type2;
-    }
-    else if (type2 === null)
-    {
-      return type1;
-    }
-    else if (CompatibilityMatrix[type1][type2] !== undefined)
-    {
-      return CompatibilityMatrix[type1][type2];
-    }
-    else
-    {
-      return CompatibilityMatrix[type2][type1];
-    }
-  }
-
   private static getValuesToAnalyze(
     docs: List<object>,
     okp: KeyPath,
@@ -729,52 +622,6 @@ export default class EngineUtil
       }
     });
     return values;
-  }
-
-  // remove fields that the engine thinks are object but are actually null
-  private static stripMalformedFields(
-    engine: TransformationEngine,
-    doc: object,
-    pathTypes: PathHashMap<FieldTypes>)
-  {
-    const fieldsToDelete = [];
-    engine.getAllFieldIDs().forEach((id) =>
-    {
-      if (EngineUtil.getRepresentedType(id, engine) !== 'object')
-      {
-        return;
-      }
-      const value = yadeep.get(doc, engine.getFieldPath(id));
-      if (Array.isArray(value))
-      {
-        let allNull = true;
-        for (const val of value)
-        {
-          if (val !== null && value !== undefined)
-          {
-            allNull = false;
-          }
-        }
-        if (allNull)
-        {
-          fieldsToDelete.push(id);
-        }
-      }
-      else if (value === null || value === undefined)
-      {
-        fieldsToDelete.push(id);
-      }
-    });
-    _.forEach(fieldsToDelete, (id) =>
-    {
-      const deIndexedPath = EngineUtil.turnIndicesIntoValue(engine.getFieldPath(id), -1);
-      const path = EngineUtil.hashPath(deIndexedPath);
-      engine.deleteField(id);
-      if (pathTypes[path] === undefined)
-      {
-        pathTypes[path] = null;
-      }
-    });
   }
 
   // attempt to convert fields from text and guess if they should be numbers or booleans
@@ -832,36 +679,4 @@ export const ETLTypeToCastString: {
     [ETLFieldTypes.Integer]: 'number',
     [ETLFieldTypes.Boolean]: 'boolean',
     [ETLFieldTypes.String]: 'string',
-  };
-
-const CompatibilityMatrix: {
-  [x in FieldTypes]: {
-    [y in FieldTypes]?: FieldTypes | 'warning' | 'softWarning'
-  }
-} = {
-    array: {
-      array: 'array',
-      object: 'warning',
-      string: 'warning',
-      number: 'warning',
-      boolean: 'warning',
-    },
-    object: {
-      object: 'object',
-      string: 'warning',
-      number: 'warning',
-      boolean: 'warning',
-    },
-    string: {
-      string: 'string',
-      number: 'softWarning',
-      boolean: 'softWarning',
-    },
-    number: {
-      number: 'number',
-      boolean: 'softWarning',
-    },
-    boolean: {
-      boolean: 'boolean',
-    },
   };

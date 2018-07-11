@@ -49,12 +49,8 @@ import EngineUtil from 'shared/transformations/util/EngineUtil';
 import TopologyUtil from 'shared/transformations/util/TopologyUtil';
 import { KeyPathUtil } from 'shared/util/KeyPath';
 
-const Utils = {
-  engine: EngineUtil,
-  path: KeyPathUtil,
-  topology: TopologyUtil,
-  construction: ConstructionUtil,
-  type: TypeUtil,
-};
-
-export default Utils;
+export { TypeUtil as type };
+export { KeyPathUtil as path };
+export { TopologyUtil as topology};
+export { ConstructionUtil as construction };
+export { EngineUtil as engine };

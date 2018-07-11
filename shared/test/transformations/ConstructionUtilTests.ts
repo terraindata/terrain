@@ -48,12 +48,14 @@ import { List } from 'immutable';
 import * as _ from 'lodash';
 
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
-import ConstructionUtil, { TypeTracker } from 'shared/transformations/util/ConstructionUtil';
+import { TypeTracker } from 'shared/transformations/util/ConstructionUtil';
 import { TransformationEngine } from '../../transformations/TransformationEngine';
 import TransformationNodeType from '../../transformations/TransformationNodeType';
 import { KeyPath, WayPoint } from '../../util/KeyPath';
 import * as yadeep from '../../util/yadeep';
 import { TestDocs } from './TestDocs';
+
+import * as Utils from 'shared/etl/util/XYZUtil';
 
 import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 
@@ -246,5 +248,62 @@ describe('check coersion callback', () =>
     const msg = messageHelper([{}, []]);
     expect(typeof msg).toBe('string');
     expect(msg.length).toBeGreaterThan(0);
+  });
+});
+
+describe('create engine test', () =>
+{
+  const docs = List([
+    {
+      foo: 'bar',
+      someArr: [1, 2, 3],
+      nestedArr: [
+        { strField: 'hello', numField: 5},
+      ],
+      coercedField1: 'hello',
+      coercedField2: {
+        baz: 'hello',
+      },
+    },
+    {
+      foo: 'car',
+      someArr: [10, 3, 2],
+      nestedArr: [],
+      coercedField1: ['blah'],
+      coercedField2: 3.5,
+    },
+    {
+      foo: 'hmm',
+      someArr: [5, 4, 3],
+      nestedArr: [
+        { strField: 'world', numField: 0 },
+      ],
+    },
+  ]);
+  const { engine, errors } = Utils.construction.createEngineFromDocuments(docs);
+
+  test('test identity transformation', () => {
+    expect(engine.transform(docs.get(2))).toEqual(docs.get(2));
+  });
+
+  test('test existence of fields', () => {
+    expect(engine.getFieldID(KeyPath(['foo']))).toBeDefined();
+    expect(engine.getFieldID(KeyPath(['someArr']))).toBeDefined();
+    expect(engine.getFieldID(KeyPath(['someArr', -1]))).toBeDefined();
+    expect(engine.getFieldID(KeyPath(['nestedArr', -1, 'numField']))).toBeDefined();
+    expect(engine.getFieldID(KeyPath(['nestedArr']))).toBeDefined();
+    expect(engine.getFieldID(KeyPath(['coercedField1']))).toBeDefined();
+    expect(engine.getFieldID(KeyPath(['coercedField2']))).toBeDefined();
+  });
+
+  test('nonexistence of fields', () => {
+    expect(engine.getFieldID(KeyPath(['someArr', 0]))).toBeUndefined();
+    expect(engine.getFieldID(KeyPath(['nestedArr', 0]))).toBeUndefined();
+    expect(engine.getFieldID(KeyPath(['coercedField1', -1]))).toBeUndefined();
+    expect(engine.getFieldID(KeyPath(['coercedField2', 'baz']))).toBeUndefined();
+  });
+
+  test('check coersion errors', () => {
+    expect(errors.length).toBeGreaterThan(0);
   });
 });

@@ -60,6 +60,8 @@ import TransformationNodeType from 'shared/transformations/TransformationNodeTyp
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
+import * as Utils from 'shared/etl/util/XYZUtil';
+
 import
 {
   _ETLEdge,
@@ -193,9 +195,9 @@ export class TemplateProxy
     return this.createEdge(edge);
   }
 
-  public createInitialEdgeEngine(edgeId: number, documents: List<object>)
+  public createInitialEdgeEngine(edgeId: number, documents: List<object>): string[]
   {
-    const { engine, warnings, softWarnings } = EngineUtil.createEngineFromDocuments(documents);
+    const { engine, errors } = Utils.construction.createEngineFromDocuments(documents);
     let castStringsToPrimitives = false;
     const fromNode = this.template.getNode(this.template.getEdge(edgeId).from);
     if (fromNode.type === NodeTypes.Source)
@@ -217,7 +219,7 @@ export class TemplateProxy
         castStringsToPrimitives,
       });
     this.cleanFieldOrdering(edgeId);
-    return { warnings, softWarnings };
+    return errors;
   }
 
   public setEdgeTransformations(edgeId: number, transformations: TransformationEngine)
@@ -305,7 +307,7 @@ export class TemplateProxy
   {
     const engine = this.template.getTransformationEngine(edgeId);
 
-    EngineUtil.interpretETLTypes(engine, documentConfig);
+    // EngineUtil.interpretETLTypes(engine, documentConfig);
     EngineUtil.addInitialTypeCasts(engine);
   }
 

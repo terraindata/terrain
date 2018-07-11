@@ -53,7 +53,7 @@ import { KeyPath } from '../../util/KeyPath';
 import * as yadeep from '../../util/yadeep';
 import { TestDocs } from './TestDocs';
 
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+import * as Utils from 'shared/etl/util/XYZUtil';
 
 function wrap(kp: any[])
 {
@@ -1357,7 +1357,7 @@ test('filter array test null', () =>
   const doc = {
     fields: [3, 2, null, 5, null, undefined],
   };
-  const e = EngineUtil.createEngineFromDocuments(List([doc])).engine;
+  const e = Utils.construction.createEngineFromDocuments(List([doc])).engine;
 
   e.appendTransformation(
     TransformationNodeType.FilterArrayNode,

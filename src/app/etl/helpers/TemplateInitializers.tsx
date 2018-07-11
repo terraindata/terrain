@@ -230,8 +230,7 @@ class Initializers extends ETLHelpers
           template: _ETLTemplate(),
           sourceKey: '',
           fieldMap: Map(),
-          warnings: ['No documents provided for initial Template construction'],
-          softWarnings: [],
+          errors: ['No documents provided for initial Template construction'],
           initialEdge: 0,
         });
       }
@@ -248,16 +247,15 @@ class Initializers extends ETLHelpers
       const sourceIds = proxy.addSource(sourceToAdd);
       const sinkIds = proxy.addSink(sinkToAdd);
       const initialEdge = proxy.addEdge(sourceIds.nodeId, sinkIds.nodeId);
-      const { warnings, softWarnings } = proxy.createInitialEdgeEngine(initialEdge, documents);
+      const errors = proxy.createInitialEdgeEngine(initialEdge, documents);
       await this._logUpdate('Finishing Up');
       const fieldMap = createFieldMap(template.getTransformationEngine(initialEdge));
       return resolve({
         template,
         sourceKey: sourceIds.sourceKey,
         fieldMap,
-        warnings,
-        softWarnings,
         initialEdge,
+        errors,
       });
     });
   }
@@ -269,7 +267,6 @@ interface InitialTemplateInfo
   sourceKey: string;
   fieldMap: FieldMap;
   initialEdge: number;
-  warnings: string[];
-  softWarnings: string[];
+  errors: string[];
 }
 export default new Initializers(TerrainStore);

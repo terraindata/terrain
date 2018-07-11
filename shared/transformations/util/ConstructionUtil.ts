@@ -50,7 +50,9 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
 import isPrimitive = require('is-primitive');
-import Utils from 'shared/etl/util/XYZUtil';
+
+import TypeUtil from 'shared/etl/TypeUtil';
+import { KeyPathUtil as PathUtil } from 'shared/util/KeyPath';
 
 import
 {
@@ -69,7 +71,7 @@ export interface PathHashMap<T>
 }
 const etlTypeKeyPath = List(['etlType']);
 
-type SimpleType = ReturnType<typeof Utils['type']['getSimpleType']>;
+type SimpleType = ReturnType<typeof TypeUtil['getSimpleType']>;
 
 export class TypeTracker
 {
@@ -161,7 +163,7 @@ export class TypeTracker
 
   protected processType(value: any): SimpleType
   {
-    let baseType = Utils.type.getSimpleType(value);
+    let baseType = TypeUtil.getSimpleType(value);
     baseType = this.mergeType(baseType, value);
     if (baseType === 'number')
     {
@@ -186,11 +188,11 @@ export class TypeTracker
     this.stringsWereChecked = true;
     if (this.couldBeDate)
     {
-      this.couldBeDate = Utils.type.isDateHelper(value);
+      this.couldBeDate = TypeUtil.isDateHelper(value);
     }
     if (this.couldBeGeo)
     {
-      this.couldBeGeo = Utils.type.isGeoHelper(value);
+      this.couldBeGeo = TypeUtil.isGeoHelper(value);
     }
     if (this.interpretStrings && this.couldBeStringNumber)
     {
@@ -202,12 +204,12 @@ export class TypeTracker
       else if (this.couldBeStringInteger && value !== 'NaN')
       {
         this.stringNumbersWereChecked = true;
-        this.couldBeStringInteger = Utils.type.numberIsInteger(asNumber);
+        this.couldBeStringInteger = TypeUtil.numberIsInteger(asNumber);
       }
     }
     if (this.interpretStrings && this.couldBeStringBoolean)
     {
-      this.couldBeStringBoolean = Utils.type.isBooleanHelper(value);
+      this.couldBeStringBoolean = TypeUtil.isBooleanHelper(value);
     }
     return 'string';
   }
@@ -221,7 +223,7 @@ export class TypeTracker
     this.numbersWereChecked = true;
     if (this.couldBeInt)
     {
-      this.couldBeInt = Utils.type.numberIsInteger(value);
+      this.couldBeInt = TypeUtil.numberIsInteger(value);
     }
     return 'number';
   }
@@ -286,8 +288,8 @@ export default abstract class ConstructionUtil
       for (const leaf of yadeep.traverse(doc, { primitivesOnly: true, arrayLimit: 20 }))
       {
         const { location, value } = leaf;
-        const path = Utils.path.convertIndices(location);
-        const hash = Utils.path.hash(path);
+        const path = PathUtil.convertIndices(location);
+        const hash = PathUtil.hash(path);
         if (pathTypes[hash] === undefined)
         {
           pathTypes[hash] = new TypeTracker(path, errAccumulator.fn, interpretText);
@@ -304,7 +306,7 @@ export default abstract class ConstructionUtil
       const { value, location } = match;
       if (location.last() === 'type')
       {
-        const kp = location.set(-1, 'path');
+        const kp = yadeep.get(tree, location.set(-1, 'path'));
         const type = value;
         engine.addField(kp, getJSFromETL(type), { etlType: type });
       }
@@ -323,7 +325,7 @@ export default abstract class ConstructionUtil
       name: null,
       fields: {},
     };
-    // foo, bar, -1, baz |||| size 4
+
     const walk = (kp: KeyPath, desiredType: ETLFieldTypes) =>
     {
       let node: FieldNode = tree;
@@ -332,13 +334,19 @@ export default abstract class ConstructionUtil
         const waypoint = kp.get(i);
         if (waypoint === -1)
         {
-          if (node.type !== undefined && node.type !== ETLFieldTypes.Array)
+          if (node.type === undefined)
+          {
+            node.type = ETLFieldTypes.Array;
+          }
+          if (node.type !== ETLFieldTypes.Array)
           {
             const message = `Encountered a ${node.type} field where an array field was expected`;
             node.type = ETLFieldTypes.String;
+            node.arrChild = undefined;
+            node.fields = {};
             return message;
           }
-          else
+          else if (node.arrChild === undefined)
           {
             node.type = ETLFieldTypes.Array;
             node.arrChild = {
@@ -348,16 +356,26 @@ export default abstract class ConstructionUtil
             };
             node = node.arrChild;
           }
+          else
+          {
+            node = node.arrChild;
+          }
         }
         else
         {
-          if (node.type !== undefined && node.type !== ETLFieldTypes.Object)
+          if (node.type === undefined)
+          {
+            node.type = ETLFieldTypes.Object;
+          }
+          if (node.type !== ETLFieldTypes.Object)
           {
             const message = `Encountered a ${node.type} field where an object field was expected`;
             node.type = ETLFieldTypes.String;
+            node.arrChild = undefined;
+            node.fields = {};
             return message;
           }
-          else
+          else if (node.fields[waypoint] === undefined)
           {
             node.type = ETLFieldTypes.Object;
             node.fields[waypoint] = {
@@ -365,6 +383,10 @@ export default abstract class ConstructionUtil
               name: waypoint,
               fields: {},
             };
+            node = node.fields[waypoint];
+          }
+          else
+          {
             node = node.fields[waypoint];
           }
         }
@@ -385,7 +407,7 @@ export default abstract class ConstructionUtil
 
     for (const key of Object.keys(pathTypes))
     {
-      const kp = Utils.path.unhash(key);
+      const kp = PathUtil.unhash(key);
       const errors = walk(kp, pathTypes[key].getType());
       if (errors !== true)
       {

@@ -53,7 +53,7 @@ import { KeyPath, WayPoint } from '../../util/KeyPath';
 import * as yadeep from '../../util/yadeep';
 import { TestDocs } from './TestDocs';
 
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+import * as Utils from 'shared/etl/util/XYZUtil';
 
 function wrap(kp: any[])
 {
@@ -99,7 +99,7 @@ test('identity transformation for ui-constructed nested arrays', () =>
   };
 
   const copyOfDoc = _.cloneDeep(doc);
-  const e = EngineUtil.createEngineFromDocuments(List([doc])).engine;
+  const e = Utils.construction.createEngineFromDocuments(List([doc])).engine;
   const r = e.transform(doc);
   expect(r).toEqual(copyOfDoc);
 });
