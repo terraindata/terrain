@@ -33,6 +33,8 @@ lint:
     - yarn add npm-run-all tslint typescript-formatter
   script:
    - yarn lint-parallel
+  except:
+   - schedules
   stage: style-and-compilation
 
 diff-style:
@@ -44,6 +46,7 @@ diff-style:
   stage: style-and-compilation
   except:
    - master
+   - schedules
 
 style:
   before_script:
@@ -60,6 +63,8 @@ test-frontend:
    - yarn test-front
   stage: standard-tests
   when: always
+  except:
+     - schedules
 
 test-backend:
   script:
@@ -68,6 +73,8 @@ test-backend:
   after_script:
    - timeout 240 yarn test-back-teardown
   stage: standard-tests
+  except:
+   - schedules
   artifacts:
     paths:
       - coverage
@@ -80,11 +87,15 @@ test-sigint:
     - .monorepo.gitlab/build_if_changed.sh sigint "( cd sigint && yarn test )"
   after_script:
     - .monorepo.gitlab/build_if_changed.sh sigint "timeout 240 yarn test-sigint-teardown"
+  except:
+    - schedules
   stage: standard-tests
 
 build-frontend:
   script:
    - yarn build
+  except:
+   - schedules
   stage: style-and-compilation
 
 build-analytics-js:
@@ -93,6 +104,8 @@ build-analytics-js:
   script:
    - .monorepo.gitlab/build_if_changed.sh analytics.js "( cd analytics.js && yarn )"
    - .monorepo.gitlab/build_if_changed.sh analytics.js "( cd analytics.js && yarn build )"
+  except:
+   - schedules
   stage: style-and-compilation
 
 # Dummy task that will push new cache while all other jobs have `policy: pull` set
@@ -123,7 +136,7 @@ fullstack-meta:
     - timeout 240 yarn test-fullstack-teardown
     - pkill node || true;
 
-fullstack-screenshot:
+fullstack-screenshot-login-pathfinder:
   script:
     - pkill node || true;
     - timeout 240 yarn test-fullstack-setup
@@ -133,8 +146,27 @@ fullstack-screenshot:
     - sleep 10
     - yarn test-fullstack-login
     - yarn test-rr-pathfinder
+  only:
+    - schedules
+  stage: screenshot-tests
+  allow_failure: true
+  artifacts:
+    when: on_failure
+    expire_in: 1 week
+    paths:
+    - rr/test/pathfinder/__image_snapshots__/__diff_output__
+    - rr/test/login/__image_snapshots__/__diff_output__
+  after_script:
+    - tail -n20 ./midwayConsole.log || true
+    - timeout 240 yarn test-fullstack-teardown
+    - pkill node || true;
+
+fullstack-screenshot-http-import:
+  script:
     - pkill node || true;
     - timeout 240 yarn test-fullstack-setup
+    - yarn clean
+    - MIDWAY_HOST=`hostname`:3000 yarn build
     - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
     - sleep 10
     - yarn test-rr-etl-http-import
@@ -147,8 +179,6 @@ fullstack-screenshot:
     expire_in: 1 week
     paths:
     - rr/test/etl/__image_snapshots__/__diff_output__
-    - rr/test/pathfinder/__image_snapshots__/__diff_output__
-    - rr/test/login/__image_snapshots__/__diff_output__
   after_script:
     - tail -n20 ./midwayConsole.log || true
     - timeout 240 yarn test-fullstack-teardown
