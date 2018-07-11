@@ -205,6 +205,10 @@ export function remove(obj: object, path: KeyPath): void
   set(obj, path, undefined, { delete: true });
 }
 
+/*
+ *  yayadeep!
+ */
+
 interface ContextResult
 {
   value: any;
@@ -290,7 +294,7 @@ export function search(obj: object, path: KeyPath): ContextResult[]
   return results;
 }
 
-export function setSingle(obj: object, path: KeyPath, value): object
+export function setIn(obj: object, path: KeyPath, value): object
 {
   if (path.size === 0)
   {
@@ -333,7 +337,7 @@ export function setSingle(obj: object, path: KeyPath, value): object
   return obj;
 }
 
-export function deleteSingle(obj: object, path: KeyPath)
+export function deleteIn(obj: object, path: KeyPath)
 {
   if (typeof obj !== 'object' || obj == null || path.size === 0)
   {
@@ -357,5 +361,30 @@ export function deleteSingle(obj: object, path: KeyPath)
   else
   {
     return false;
+  }
+}
+
+export function * wander(obj: any, path: KeyPath = KeyPath([])): IterableIterator<ContextResult>
+{
+  if (isPrimitive(obj))
+  {
+    yield {
+      location: path,
+      value: obj,
+    };
+  }
+  else if (Array.isArray(obj))
+  {
+    for (let i = 0; i < obj.length; i++)
+    {
+      yield * wander(obj[i], path.push(i));
+    }
+  }
+  else
+  {
+    for (const key of Object.keys(obj))
+    {
+      yield * wander(obj[key], path.push(key));
+    }
   }
 }

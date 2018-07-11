@@ -43,68 +43,18 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file
-
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as yadeep from 'shared/util/yadeep';
-
-const { List, Map } = Immutable;
-
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import TypeUtil from 'shared/etl/TypeUtil';
+import ConstructionUtil from 'shared/transformations/util/ConstructionUtil';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
+import TopologyUtil from 'shared/transformations/util/TopologyUtil';
+import { KeyPathUtil } from 'shared/util/KeyPath';
 
-import TransformationNode from 'shared/transformations/TransformationNode';
-import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import Topology from 'shared/transformations/util/TopologyUtil';
-import TransformationVisitError from 'shared/transformations/visitors/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/visitors/TransformationVisitResult';
-import { KeyPath } from 'shared/util/KeyPath';
+const Utils = {
+  engine: EngineUtil,
+  keypath: KeyPathUtil,
+  topology: TopologyUtil,
+  construction: ConstructionUtil,
+  type: TypeUtil,
+};
 
-import isPrimitive = require('is-primitive');
-
-const TYPECODE = TransformationNodeType.RenameNode;
-
-// Duplicate is not categorized yet
-export class RenameTransformationNode extends TransformationNode
-{
-  public readonly typeCode = TYPECODE;
-
-  protected transformDocument(doc: object): TransformationVisitResult
-  {
-    const errors = [];
-    const opts = this.meta as NodeOptionsType<any>;
-
-    const inputField = this.fields.get(0).path;
-    const outputField = opts.newFieldKeyPaths.get(0);
-
-    const matcherFn = Topology.createBasePathMatcher(inputField, outputField);
-    for (const match of yadeep.search(doc, inputField))
-    {
-      const { value, location } = match;
-      yadeep.deleteIn(doc, location); // delete first, in case its an identity rename
-      doc = yadeep.setIn(doc, matcherFn(location), value);
-    }
-
-    return {
-      document: doc,
-      errors,
-    } as TransformationVisitResult;
-  }
-}
-
-class RenameTransformationInfoC extends TransformationNodeInfo
-{
-  public readonly typeCode = TYPECODE;
-  public humanName = 'Rename';
-  public description = 'Rename or move this field';
-  public nodeClass = RenameTransformationNode;
-
-  public editable = false;
-  public creatable = false;
-  public newFieldType = 'same';
-}
-
-export const RenameTransformationInfo = new RenameTransformationInfoC();
+export default Utils;

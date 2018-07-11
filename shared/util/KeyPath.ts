@@ -50,67 +50,52 @@ export type WayPoint = string | number;
 export type KeyPath = List<WayPoint>;
 export const KeyPath = (args: WayPoint[] = []) => List<WayPoint>(args);
 
-/**
- * A utility function to see if two KeyPaths are equal.
- * Just loops over the waypoints.  "Deep equals."
- *
- * @param {KeyPath} toCheck One of two KeyPaths to compare
- * @param {KeyPath} toMatch The other KeyPath to compare
- * @returns {boolean} Whether `toCheck` is equal to `toMatch`
- */
-export function keyPathPrefixMatch(toCheck: KeyPath, toMatch: KeyPath): boolean
+export class KeyPathUtil
 {
-  if (toMatch.size === 0)
+  public static isNamed(keypath: KeyPath, index?: number): boolean
   {
-    return true;
+    const last: WayPoint = index === undefined ? keypath.last() : keypath.get(index);
+    return typeof last !== 'number';
   }
 
-  if (toCheck.size < toMatch.size)
+  public static isWildcard(keypath: KeyPath, index?: number): boolean
   {
-    return false;
+    const last = index === undefined ? keypath.last() : keypath.get(index);
+    return last as number === -1;
   }
 
-  for (let i: number = 0; i < toMatch.size; i++)
+  public static hash(keypath: KeyPath): string
   {
-    if (toMatch.get(i) !== toCheck.get(i) && toCheck.get(i) !== -1 && toMatch.get(i) !== -1) // match * regardless
+    return JSON.stringify(keypath.toJS());
+  }
+
+  public static unhash(keypath: string): KeyPath
+  {
+    return KeyPath(JSON.parse(keypath));
+  }
+
+  // turn all indices into a particular value, based on
+  // an existing engine that has fields with indices in them
+  public static convertIndices(keypath: KeyPath, value = -1): KeyPath
+  {
+    if (keypath.size === 0)
     {
-      return false;
+      return keypath;
     }
-  }
-  return true;
-}
-
-/**
- * A utility function for replacing a prefix of a KeyPath
- * (first few `Waypoint`s) with another KeyPath.  This is
- * useful, for example, when doing a nested rename of some
- * deep field, when several `Waypoint`s of the field may
- * change or be removed.
- *
- * @param {KeyPath} toUpdate    The original KeyPath to update
- * @param {KeyPath} toReplace   The "subset" of `toUpdate` that
- *                              will be replaced.
- * @param {KeyPath} replaceWith What to replace `toReplace` with
- * @returns {KeyPath} The updated `KeyPath`
- */
-export function updateKeyPath(toUpdate: KeyPath, toReplace: KeyPath, replaceWith: KeyPath, isArray: boolean = false): KeyPath
-{
-  let updated: KeyPath = replaceWith;
-  for (let i: number = toReplace.size; i < toUpdate.size; i++)
-  {
-    updated = updated.push(toUpdate.get(i));
-  }
-
-  if (!isArray)
-  {
-    for (let i: number = 0; i < updated.size; i++)
+    const arrayIndices = {};
+    for (let i = 1; i < keypath.size; i++)
     {
-      if (updated.get(i) === -1 && toUpdate.get(i) !== -1)
+      const path = keypath.slice(0, i + 1).toList();
+      if (!KeyPathUtil.isNamed(path))
       {
-        updated = updated.set(i, toUpdate.get(i));
+        arrayIndices[i] = true;
       }
     }
-  }
 
-  return updated;
+    const scrubbed = keypath.map((key, i) =>
+    {
+      return arrayIndices[i] === true ? value : key;
+    }).toList();
+    return scrubbed;
+  }
 }

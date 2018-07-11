@@ -43,68 +43,41 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file
-
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import * as yadeep from 'shared/util/yadeep';
-
 const { List, Map } = Immutable;
 
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
-
-import TransformationNode from 'shared/transformations/TransformationNode';
-import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import Topology from 'shared/transformations/util/TopologyUtil';
-import TransformationVisitError from 'shared/transformations/visitors/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/visitors/TransformationVisitResult';
-import { KeyPath } from 'shared/util/KeyPath';
-
-import isPrimitive = require('is-primitive');
-
-const TYPECODE = TransformationNodeType.RenameNode;
-
-// Duplicate is not categorized yet
-export class RenameTransformationNode extends TransformationNode
+import
 {
-  public readonly typeCode = TYPECODE;
+  DateFormats, ETLFieldTypes, ETLToJSType, FieldTypes, getJSFromETL, JSToETLType, Languages, validJSTypes,
+} from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath, WayPoint } from 'shared/util/KeyPath';
+import * as yadeep from 'shared/util/yadeep';
 
-  protected transformDocument(doc: object): TransformationVisitResult
+import * as TerrainLog from 'loglevel';
+
+export type PathHash = string;
+export interface PathHashMap<T>
+{
+  [k: string]: T;
+}
+
+const etlTypeKeyPath = List(['etlType']);
+
+export default abstract class ConstructionUtil
+{
+
+  public static createEngineFromDocuments(documents: List<object>)
   {
-    const errors = [];
-    const opts = this.meta as NodeOptionsType<any>;
+    documents.forEach((doc, docIndex) => {
+      for (const leaf of yadeep.wander(doc))
+      {
+        const { location, value } = leaf;
 
-    const inputField = this.fields.get(0).path;
-    const outputField = opts.newFieldKeyPaths.get(0);
+      }
+    });
 
-    const matcherFn = Topology.createBasePathMatcher(inputField, outputField);
-    for (const match of yadeep.search(doc, inputField))
-    {
-      const { value, location } = match;
-      yadeep.deleteIn(doc, location); // delete first, in case its an identity rename
-      doc = yadeep.setIn(doc, matcherFn(location), value);
-    }
-
-    return {
-      document: doc,
-      errors,
-    } as TransformationVisitResult;
   }
 }
-
-class RenameTransformationInfoC extends TransformationNodeInfo
-{
-  public readonly typeCode = TYPECODE;
-  public humanName = 'Rename';
-  public description = 'Rename or move this field';
-  public nodeClass = RenameTransformationNode;
-
-  public editable = false;
-  public creatable = false;
-  public newFieldType = 'same';
-}
-
-export const RenameTransformationInfo = new RenameTransformationInfoC();

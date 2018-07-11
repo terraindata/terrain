@@ -53,9 +53,9 @@ import * as React from 'react';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
-import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
+import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';

@@ -163,6 +163,7 @@ export default class EngineUtil
   }
 
   // root is considered to be a named field
+  // TODO USE KEYPATH
   public static isNamedField(
     keypath: KeyPath,
     index?: number,
@@ -172,6 +173,7 @@ export default class EngineUtil
     return typeof last !== 'number';
   }
 
+  // TODO USE KEYPATH
   public static isWildcardField(
     keypath: KeyPath,
     index?: number,
@@ -181,17 +183,19 @@ export default class EngineUtil
     return last as number === -1;
   }
 
-  // document merge logic
+  // TODO USE KEYPATH
   public static hashPath(keypath: KeyPath): PathHash
   {
     return JSON.stringify(keypath.toJS());
   }
 
+  // TODO USE KEYPATH
   public static unhashPath(keypath: PathHash): KeyPath
   {
     return KeyPath(JSON.parse(keypath));
   }
 
+  // TODO USE KEYPATH
   // turn all indices into a particular value, based on
   // an existing engine that has fields with indices in them
   public static turnIndicesIntoValue(

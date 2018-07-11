@@ -51,7 +51,7 @@ import isPrimitive = require('is-primitive');
 import * as _ from 'lodash';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import objectify from '../util/deepObjectify';
-import { KeyPath, keyPathPrefixMatch, updateKeyPath } from '../util/KeyPath';
+import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 
 import DataStore from './DataStore';

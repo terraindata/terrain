@@ -132,7 +132,7 @@ export default abstract class ForkTransformationType extends TransformationNode
       for (const newField of newFields)
       {
         const newKP = matchCacheFn(newField.field)(location);
-        yadeep.set(doc, newKP, newField.value, { create: true });
+        yadeep.setIn(doc, newKP, newField.value);
       }
     }
 

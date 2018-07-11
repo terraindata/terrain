@@ -91,7 +91,7 @@ export default abstract class AggregateTransformationType extends Transformation
       if (Array.isArray(value))
       {
         const aggregate = this.aggregator(value);
-        yadeep.set(doc, matcherFn(location), aggregate, { create: true });
+        yadeep.setIn(doc, matcherFn(location), aggregate);
       }
       else
       {

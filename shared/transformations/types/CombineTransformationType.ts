@@ -133,7 +133,7 @@ export default abstract class CombineTransformationType extends TransformationNo
       const newValue = this.combine(this.processMatchSet(matchSet));
 
       const destKP = matchFn(matchSet[0].matchField);
-      yadeep.set(doc, destKP, newValue, { create: true });
+      yadeep.setIn(doc, destKP, newValue);
     }
 
     return {

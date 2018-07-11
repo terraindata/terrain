@@ -54,7 +54,6 @@ import { ElasticMapping, MappingType } from 'shared/etl/mapping/ElasticMapping';
 import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
-import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath } from 'shared/util/KeyPath';

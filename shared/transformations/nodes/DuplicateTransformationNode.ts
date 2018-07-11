@@ -85,7 +85,7 @@ export class DuplicateTransformationNode extends TransformationNode
       {
         value = _.cloneDeep(value);
       }
-      yadeep.set(doc, matcherFn(match.location), value, { create: true });
+      yadeep.setIn(doc, matcherFn(match.location), value);
     }
     return undefined;
   }
@@ -122,7 +122,7 @@ export class DuplicateTransformationNode extends TransformationNode
       {
         const { location: leftKP } = innerMatch; // leftKP [A, i, B, j]
         const concreteDestKP = leftKP.concat(destRightKP).toList(); // [A, i, B, j, C];
-        yadeep.set(doc, concreteDestKP, valueToCopy, { create: true });
+        yadeep.setIn(doc, concreteDestKP, valueToCopy);
       }
     }
     return undefined;
@@ -164,7 +164,7 @@ export class DuplicateTransformationNode extends TransformationNode
           return m.value;
         }
       });
-      yadeep.set(doc, destKP, values, { create: true });
+      yadeep.setIn(doc, destKP, values);
     }
     return undefined;
   }

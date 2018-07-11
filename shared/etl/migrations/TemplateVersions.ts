@@ -162,7 +162,7 @@ function upgrade4To5(templateObj: TemplateBase): { changes: number, template: Te
     }
     engine.fieldNameToIDMap = engine.fieldNameToIDMap.mapKeys((kp) => convertKeyPath(kp)).toMap();
     engine.IDToFieldNameMap = engine.IDToFieldNameMap.map((kp) => convertKeyPath(kp)).toMap();
-    template = yadeep.setSingle(template, location, JSON.stringify(engine.toJSON())) as TemplateBase;
+    template = yadeep.setIn(template, location, JSON.stringify(engine.toJSON())) as TemplateBase;
   }
   return {
     template,
