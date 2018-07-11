@@ -50,20 +50,8 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
 
-import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import { instanceFnDecorator } from 'shared/util/Classes';
-
-import Util from 'app/util/Util';
-import { _FileConfig, FileConfig } from 'shared/etl/immutable/EndpointRecords';
-import { FileConfig as FileConfigI } from 'shared/etl/types/EndpointTypes';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
-
 import Button from 'app/common/components/Button';
 import Modal from 'app/common/components/Modal';
-import PathUtil from 'etl/pathselector/PathGuessTest';
-import { List } from 'immutable';
-import DataModal from './DataModal';
 
 export interface Props
 {
@@ -96,16 +84,6 @@ export default class ButtonModal extends TerrainComponent<Props>
     this.setState({
       modalOpen: false,
     });
-  }
-
-  public renderButton()
-  {
-    return this.props.button;
-  }
-
-  public renderModal()
-  {
-    return this.props.modal;
   }
 
   public render()

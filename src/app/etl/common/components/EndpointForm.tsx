@@ -84,7 +84,7 @@ export interface Props
 interface State
 {
   usingCustomIntegration: boolean;
-  currentObject: object;
+  currentObject?: object;
 }
 
 class EndpointForm extends TerrainComponent<Props>
@@ -118,20 +118,7 @@ class EndpointForm extends TerrainComponent<Props>
 
   public state: State = {
     usingCustomIntegration: false,
-    currentObject: null,
   };
-
-  // public shouldComponentUpdate(nextProps, nextState)
-  // {
-  //   if (!_.isEqual(nextState.currentFile, this.state.currentFile))
-  //   {
-  //     return true;
-  //   }
-  //   else
-  //   {
-  //     return (this.props !== nextProps) || (this.state !== nextState);
-  //   }
-  // }
 
   public componentDidMount()
   {
@@ -252,7 +239,7 @@ class EndpointForm extends TerrainComponent<Props>
               <FormClass
                 endpoint={endpoint}
                 onChange={this.handleEndpointChange}
-                source={this.state.currentObject}
+                previewSource={this.state.currentObject}
               />
               :
               null

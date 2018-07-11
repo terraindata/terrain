@@ -72,25 +72,17 @@ export interface Props
 
 export default class DataModal extends TerrainComponent<Props>
 {
-  constructor(props)
-  {
-    super(props);
-    this.state = {
+  public state: {
+    currentOptionIndex: number,
+    optionHasBeenClicked: boolean,
+  } = {
       currentOptionIndex: 0,
       optionHasBeenClicked: false,
     };
-  }
 
-  public shouldComponentUpdate(nextProps, nextState)
+  constructor(props)
   {
-    if (!_.isEqual(nextState.currentOption, this.state.currentOption))
-    {
-      return true;
-    }
-    else
-    {
-      return (this.props !== nextProps) || (this.state !== nextState);
-    }
+    super(props);
   }
 
   public onTabChange(optionName)
