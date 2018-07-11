@@ -27,7 +27,7 @@ html, body {
 	min-height: 100%;
 }
 
-#login {
+#login, #reset-password {
 	position: fixed;
 	top: 0px;
 	left: 0px;
@@ -52,7 +52,7 @@ html, body {
 	opacity: 0;
 }
 
-#login-area {
+#login-area, #reset-password-area {
 	width: 100%;
 	max-width: 328px;
 	
@@ -65,13 +65,13 @@ html, body {
 
 /* Inputs */
 
-.login-input-container {
+.login-input-container, .reset-password-input-container {
   position: relative;
   margin-bottom: 10px;
   width: 100%;
 }
 
-.login-input-container label {
+.login-input-container label, .reset-password-input-container label {
   position: absolute;
   left: 18px;
   top: 15px;
@@ -81,7 +81,7 @@ html, body {
   text-transform: uppercase;
 }
 
-.login-input-container input {
+.login-input-container input, .reset-password-input-container input {
   padding-right: 6px;
   padding-left: 18px;
   padding-top: 20px;
@@ -102,12 +102,12 @@ html, body {
 	padding-bottom: 12px;
 }
 
-.login-input-container.login-input-container-active label {
+.login-input-container.login-input-container-active label, .reset-password-input-container label {
   font-size: 10px;
   top: 6px;
 }
 
-#login-submit {
+#login-submit, #reset-password-request-submit, #reset-password-submit {
 	font-size: 14px;
 	padding: 14px 0px;
 	border-radius: 3px;
@@ -119,11 +119,16 @@ html, body {
   margin-bottom: 20px;
 }
 
-#login-submit:hover {
+
+#login-submit:hover, #reset-password-request-submit:hover, #reset-password-submit:hover {
 	background:  rgba(255,255,255,0.15);
 	cursor: pointer;
   letter-spacing: 10px;
   transition: background 0.15s, letter-spacing 3s 5s;
+}
+
+#reset-password-request-submit {
+	visibility: hidden;
 }
 
 
@@ -137,7 +142,6 @@ html, body {
 	opacity: 0;
 	transition: all 0.3s;
 }
-
 
 
 #login-forgot-password {
