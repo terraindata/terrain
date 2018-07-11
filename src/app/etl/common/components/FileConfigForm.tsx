@@ -73,7 +73,7 @@ export interface Props
   hideTypePicker?: boolean;
   style?: any;
   isSource?: boolean;
-  source?: object;
+  source?: any;
 }
 
 type FormState = FileConfigI & {
@@ -216,7 +216,8 @@ export default class FileConfigForm extends TerrainComponent<Props>
         }
         sectionBoxes={
           List(PathUtil.guessFilePaths(this.props.source).map((key, i) =>
-            (key.name === '*') ? JSON.stringify(this.props.source, null, 2) : JSON.stringify(this.props.source[key.name], null, 2)))
+            (key.name === '*') ? JSON.stringify(this.props.source.slice(0, 50), null, 2) :
+              JSON.stringify(this.props.source[key.name].slice(0, 50), null, 2)))
         }
         sectionTitles={
           List(PathUtil.guessFilePaths(this.props.source).map((key, i) =>
