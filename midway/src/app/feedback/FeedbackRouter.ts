@@ -77,7 +77,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   }
   else
   {
-    let attachment: string;
+    let attachment: object;
     if (fullBody.bug)
     {
       subject = 'Bug report from ' + user;
@@ -90,10 +90,12 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     }
     if (fullBody.screenshot)
     {
-      attachment = fullBody.screenshot;
+      attachment = [{
+        path: fullBody.screenshot,
+      }];
     }
     // MidwayLogger.info("id: " + emailIntegrations[0].id);
-    const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body, attachment);
+    const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body, attachment, undefined, undefined);
     MidwayLogger.info(`Feedback email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
   }
 });

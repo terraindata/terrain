@@ -109,8 +109,15 @@ Router.post('/', async (ctx, next) =>
     integrations.initialize();
     const emailIntegrations: IntegrationConfig[] = await integrations.get(null, undefined, 'Email', true) as IntegrationConfig[];
     const subject: string = 'Password reset link from notifications@terraindata.com';
-    const body: string = 'Please click on the link below to reset your password. \n \n' + route;
-    const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body, undefined, email);
+    const body: string = '';
+    const html: string = '<img style="background-color: #1eb4fa" src="cid:terrainlogo"/>' 
+    +  '<br> <br> Please click on the link below to reset your password. <br> <br>' + route;
+    const attachment: object = [{
+      filename: 'icon-terrain.png',
+      path: process.cwd() + '/midway/src/app/recoveryTokens/icon-terrain.png',
+      cid: 'terrainlogo',
+    }];
+    const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body, attachment, email, html);
     MidwayLogger.info(`email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
   }
 

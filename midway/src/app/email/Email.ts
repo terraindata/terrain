@@ -66,7 +66,8 @@ export class Email
    * Creates and sends an email.
    * PARAMS: integration ID, subject, body (number, string, string ==> Promise<boolean>)
    */
-  public async send(integrationId: number, subject: string, body: string, attachment?: string, recipient?: string): Promise<boolean>
+  public async send(integrationId: number, subject: string, body: string, 
+    attachment?: object, recipient?: string, html?: string): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>
     {
@@ -103,11 +104,15 @@ export class Email
           };
         if (attachment !== undefined)
         {
-          emailContents['attachments'] = [{ path: attachment }];
+          emailContents['attachments'] = attachment;
         }
         if (recipient !== undefined)
         {
           emailContents['to'] = recipient;
+        }
+        if (html !== undefined)
+        {
+          emailContents['html'] = html;
         }
 
         // send the email
