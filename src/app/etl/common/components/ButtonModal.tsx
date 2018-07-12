@@ -52,6 +52,9 @@ import * as React from 'react';
 
 import Button from 'app/common/components/Button';
 import Modal from 'app/common/components/Modal';
+import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
+import { ColorsActions } from '../../../colors/data/ColorsRedux';
+import './ButtonModal.less';
 
 export interface Props
 {
@@ -59,6 +62,7 @@ export interface Props
   modal: string;
   wide: boolean;
   noFooterPadding: boolean;
+  smallTextButton: boolean;
   modalContent?: any;
 }
 
@@ -86,14 +90,34 @@ export default class ButtonModal extends TerrainComponent<Props>
     });
   }
 
+  public renderButton()
+  {
+    return (
+      <Button
+        text={this.props.button}
+        onClick={this.handleModalOpen}
+      />
+    );
+  }
+
+  public renderSmallTextButton()
+  {
+    return (
+      <div
+        className='small-text-button'
+        onClick={this.handleModalOpen}
+        style={{ color: Colors().mainBlue }}
+      >
+        {this.props.button}
+      </div>
+    );
+  }
+
   public render()
   {
     return (
       <div>
-        <Button
-          text={this.props.button}
-          onClick={this.handleModalOpen}
-        />
+        {(this.props.smallTextButton ? this.renderSmallTextButton() : this.renderButton())}
         <Modal
           open={this.state.modalOpen}
           title={this.props.modal}

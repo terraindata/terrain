@@ -64,6 +64,7 @@ import Modal from 'app/common/components/Modal';
 import PathUtil from 'etl/pathselector/PathGuessTest';
 import { List } from 'immutable';
 import ButtonModal from './ButtonModal';
+import './ButtonModal.less';
 import DataModal from './DataModal';
 
 export interface Props
@@ -198,29 +199,65 @@ export default class FileConfigForm extends TerrainComponent<Props>
           modal='Suggested JSON Paths (Select One)'
           wide={true}
           noFooterPadding={true}
+          smallTextButton={false}
           modalContent={this.renderSuggestedPathsData()}
         />
       );
     }
   }
 
+  public formatSectionTabs(key, i)
+  {
+    return `${key.name}: ${key.score}`;
+    // return key.name + ': ' + key.score.toString();
+  }
+
+  public formatSectionData(key, i)
+  {
+    const jsonPath = (key.name === '*') ? JSON.stringify(this.props.source.slice(0, 50), null, 2) :
+      JSON.stringify(this.props.source[key.name].slice(0, 50), null, 2);
+    return jsonPath;
+  }
+
+  public formatSectionTitles(key, i)
+  {
+    const selectedText = (key.name === '*') ? 'Currently selected: *' : `Currently selected: *.${key.name}`;
+    const scoreButton = `(${key.score})`;
+    const pathScoreMessage = 'The suggested path scoring is calculated upon the JSON object\'s key meeting \
+      certain requirements of expected behavior, such as corresponding values not being numbers or strings, \
+      values being a list of objects, and objects containing identical inner keys or the same number of \
+      inner keys. A higher score indicates a stronger confidence of that key being the correct path, unless \
+      there is only one suggested key, then the score is incomparable.';
+    return (
+      <div className='path-with-score'>
+        <div className='path-title-buffer'>{selectedText}</div>
+        <ButtonModal
+          button={scoreButton}
+          modal='Path Scoring'
+          wide={false}
+          noFooterPadding={true}
+          smallTextButton={true}
+          modalContent={pathScoreMessage}
+        />
+      </div>
+    );
+  }
+
   public renderSuggestedPathsData()
   {
+    const suggestedFilePaths = PathUtil.guessFilePaths(this.props.source);
     return (
       <DataModal
         sectionTitle='Currently selected: N/A'
         sectionType='path'
         sectionOptions={
-          List(PathUtil.guessFilePaths(this.props.source).map((key, i) => key.name + ': ' + key.score.toString()))
+          List(suggestedFilePaths.map((key, i) => this.formatSectionTabs(key, i)))
         }
         sectionBoxes={
-          List(PathUtil.guessFilePaths(this.props.source).map((key, i) =>
-            (key.name === '*') ? JSON.stringify(this.props.source.slice(0, 50), null, 2) :
-              JSON.stringify(this.props.source[key.name].slice(0, 50), null, 2)))
+          List(suggestedFilePaths.map((key, i) => this.formatSectionData(key, i)))
         }
         sectionTitles={
-          List(PathUtil.guessFilePaths(this.props.source).map((key, i) =>
-            (key.name === '*') ? 'Currently selected: *' : 'Currently selected: *.' + key.name))
+          List(suggestedFilePaths.map((key, i) => this.formatSectionTitles(key, i)))
         }
         width='100%'
         height='80%'
