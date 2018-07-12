@@ -70,6 +70,7 @@ export interface Props
   distanceUnit?: string; // Unit for above distance
   inputs?: any; // inputs so that it can tell what is an input
   onChange?: (coordinates, inputValue) => void;
+  onSubmit?: (coordinates, inputValue) => void;
   onMapClick?: (e) => void;
   canEdit: boolean;
   markers?: List<LocationMarker> | List<{}>; // A list of additional markers to add to the map
@@ -176,7 +177,7 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
     return !(_.isEqual(nextProps, this.props) && this.state === nextState);
   }
 
-  public onChange(coordinates, inputValue)
+  public onChange(coordinates, inputValue, submit=false)
   {
     this.setState({
       inputValue,
@@ -184,6 +185,10 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
     if (this.props.onChange !== undefined)
     {
       this.debouncedExecuteChange(coordinates, inputValue);
+    }
+    if (submit && this.props.onSubmit)
+    {
+      this.props.onSubmit(coordinates, inputValue);
     }
   }
 
@@ -286,6 +291,10 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
     if (address.charAt(0) === '@')
     {
       // Just an input, dont geocode it
+      if (this.props.onSubmit)
+      {
+        this.props.onSubmit(undefined, address);
+      }
       return;
     }
     if (this.geoCache[address] !== undefined)
@@ -297,14 +306,14 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
     {
       MapUtil.geocodeByAddress('photon', address, (result) =>
       {
-        this.onChange({ lat: result[1], lon: result[0] }, address);
+        this.onChange({ lat: result[1], lon: result[0] }, address, true);
       });
     }
     else
     {
       MapUtil.geocodeByAddress('google', address)
         .then((results) => MapUtil.getLatLng(results[0]))
-        .then((latLng: any) => this.onChange({ lat: latLng.lat, lon: latLng.lng }, address))
+        .then((latLng: any) => this.onChange({ lat: latLng.lat, lon: latLng.lng }, address, true))
         .catch((error) => this.setState({ error }));
     }
   }
@@ -622,7 +631,6 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
       </div>
     );
   }
-
   // Render search bar - either a single input for address/value or 2 inputs for coordinates
   public renderSearchBar()
   {

@@ -320,8 +320,8 @@ function parseTerrainScore(score: Score, simpleParser: boolean = false)
         mode: line.transformData.mode,
         isDistance: line.fieldType === FieldType.Geopoint,
         // TODO
-        lat: 37.444900,
-        lon: -122.161750,
+        lat: line.transformData.distanceValue.location[0],
+        lon: line.transformData.distanceValue.location[1],
         visiblePoints: {
           ranges: line.transformData.visiblePoints.map((scorePt) => scorePt.value).toArray(),
           outputs: line.transformData.visiblePoints.map((scorePt) => scorePt.score).toArray(),

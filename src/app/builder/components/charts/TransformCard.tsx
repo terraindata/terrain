@@ -143,6 +143,7 @@ class TransformCard extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
+    console.log('will receive props ', nextProps.data.distanceValue);
     if ((nextProps.builder.query.tql !== this.props.builder.query.tql ||
       nextProps.builder.query.inputs !== this.props.builder.query.inputs)
       && !this.props.data.closed && nextProps.data.input === '_score')
@@ -169,6 +170,7 @@ class TransformCard extends TerrainComponent<Props>
     if (nextProps.data.input !== this.props.data.input ||
       nextProps.data.distanceValue !== nextProps.data.distanceValue)
     {
+      console.log('HERE');
       this.computeBars(nextProps.data, this.state.maxDomain, true);
     }
   }
@@ -570,7 +572,7 @@ class TransformCard extends TerrainComponent<Props>
   private computeGeoRanges(interval, min, max)
   {
     const ranges = [];
-    for (let val = min; val < max; val += interval)
+    for (let val = min; val <= max + 0.000001; val += interval)
     {
       ranges.push({
         to: val + interval,
@@ -621,7 +623,7 @@ class TransformCard extends TerrainComponent<Props>
         },
       });
     }
-
+    console.log('distance value is ', distanceValue);
     if (recomputeDomain)
     {
       let domainQuery;
@@ -629,7 +631,7 @@ class TransformCard extends TerrainComponent<Props>
       {
         domainQuery = this.computeScoreElasticBars(maxDomain, recomputeDomain, overrideQuery);
       }
-      else if (distanceValue)
+      else if (distanceValue && distanceValue.location)
       {
         domainQuery = {
           query: {

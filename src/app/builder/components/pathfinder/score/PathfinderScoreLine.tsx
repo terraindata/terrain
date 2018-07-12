@@ -63,6 +63,8 @@ import PathfinderLine from '../PathfinderLine';
 import { ChoiceOption, PathfinderContext, ScoreLine } from '../PathfinderTypes';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 import BuilderActions from './../../../data/BuilderActions';
+import MapComponent from 'common/components/MapComponent';
+import MapUtil from 'util/MapUtil';
 const SigmoidIcon = require('images/icon_sigmoid.svg?name=SigmoidIcon');
 const LinearIcon = require('images/icon_linear.svg?name=LinearIcon');
 const ExponentialIcon = require('images/icon_exponential.svg?name=ExponentialIcon');
@@ -135,13 +137,13 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   {
     const value = this.props.dropdownOptions.get(index);
     const fieldType = value.meta.fieldType;
-    const newLine = this.props.line
+    let newLine = this.props.line
       .set('field', value.value)
-      .set('fieldType', fieldType)
-      .setIn(['transformData', 'distanceValue'],
-        fieldType === FieldType.Geopoint ?
-          { location: [37.444900, -122.161750], address: '' } :
-          null);
+      .set('fieldType', fieldType);
+    if (fieldType !== FieldType.Geopoint)
+    {
+      newLine = newLine.setIn(['transformData', 'distanceValue'], null);
+    }
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath), newLine, false, true);
     this.setState((state) => ({ editingField: false }));
   }
@@ -258,28 +260,79 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     });
   }
 
+  public handleMapChange(location, address)
+  {
+    console.log('HANDLE MAP CHANGE');
+    const newLine = this.props.line.setIn(
+      ['transformData', 'distanceValue'],
+      {location: MapUtil.getCoordinatesFromGeopoint(location), address}
+    );
+    this.props.builderActions.changePath(
+      this.props.keyPath,
+      newLine,
+    );
+  }
+
+  public renderEditingComponent()
+  {
+    const { fieldIndex } = this.state;
+    const { field, fieldType, transformData } = this.props.line;
+    if (fieldType !== FieldType.Geopoint)
+    {
+      return (
+        <SearchableDropdown
+          options={this.props.dropdownOptions.map((v) => v.displayName as string).toList()}
+          selectedIndex={fieldIndex}
+          canEdit={this.props.pathfinderContext.canEdit}
+          placeholder={'Field...'}
+          onChange={this.handleFieldChange}
+          width={fieldIndex > -1 ? '33.33%' : '100%'}
+          open={this.state.editingField || fieldIndex === -1}
+          onClose={this.handleDropdownClose}
+        />
+      );
+    }
+    const { distanceValue } = transformData;
+    return (
+      <div>
+        <SearchableDropdown
+          options={this.props.dropdownOptions.map((v) => v.displayName as string).toList()}
+          selectedIndex={fieldIndex}
+          canEdit={this.props.pathfinderContext.canEdit}
+          placeholder={'Field...'}
+          onChange={this.handleFieldChange}
+          width={'50%'}
+          open={this.state.editingField || fieldIndex === -1}
+          onClose={this.handleDropdownClose}
+        />
+        <MapComponent
+          geocoder='google'
+          inputValue={distanceValue && distanceValue.address || ''}
+          coordinates={distanceValue && distanceValue.location !== undefined ? distanceValue.location : undefined}
+          wrapperClassName={'pf-score-map-component-wrapper'}
+          onSubmit={this.handleMapChange}
+          debounce={true}
+          canEdit={this.props.pathfinderContext.canEdit}
+          hideZoomControl={true}
+        />
+      </div>
+    );
+  }
+
   public renderLineContents()
   {
     const { fieldIndex } = this.state;
+    const { transformData, fieldType } = this.props.line;
+    const editing = this.state.editingField || fieldIndex === -1 ||
+      (fieldType === FieldType.Geopoint && !transformData.distanceValue);
     return (
       <div
         className='pf-line pf-score-line-inner'
       >
         {this.renderExpandIcon()}
         <EditableField
-          editing={this.state.editingField || fieldIndex === -1}
-          editComponent={
-            <SearchableDropdown
-              options={this.props.dropdownOptions.map((v) => v.displayName as string).toList()}
-              selectedIndex={fieldIndex}
-              canEdit={this.props.pathfinderContext.canEdit}
-              placeholder={'Field...'}
-              onChange={this.handleFieldChange}
-              width={fieldIndex > -1 ? '33.33%' : '100%'}
-              open={this.state.editingField || fieldIndex === -1}
-              onClose={this.handleDropdownClose}
-            />
-          }
+          editing={editing}
+          editComponent={this.renderEditingComponent()}
           readOnlyComponent={
             <div className='field-name' onClick={this.editingField}>
               {this.props.dropdownOptions.get(fieldIndex).displayName as string}
@@ -288,7 +341,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
         />
 
         {
-          fieldIndex > -1 ?
+          (fieldIndex > -1 && !(fieldType === FieldType.Geopoint && !transformData.distanceValue)) ?
             (
               <div style={getStyle('width', '66.66%')} >
                 <ScoreBar
@@ -300,9 +353,8 @@ class PathfinderScoreLine extends TerrainComponent<Props>
               </div>
             ) : null
         }
-
         {
-          this.props.line.field &&
+          (fieldIndex > -1 && !(fieldType === FieldType.Geopoint && !transformData.distanceValue)) &&
           this.renderTransformChartPreview()
         }
       </div>
@@ -311,8 +363,10 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
   public render()
   {
-    const expandableContent = this.props.line.field ?
-      this.renderTransformChart() : null;
+    const { field, fieldType, transformData } = this.props.line;
+    const hasExpandable = fieldType !== FieldType.Geopoint ? field != null && field !== '' :
+      field != null && field !== '' && transformData.distanceValue != null;
+    const expandableContent = hasExpandable ? this.renderTransformChart() : null;
     return (
       <PathfinderLine
         canDrag={true}
