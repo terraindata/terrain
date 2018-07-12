@@ -66,7 +66,7 @@ export class Email
    * Creates and sends an email.
    * PARAMS: integration ID, subject, body (number, string, string ==> Promise<boolean>)
    */
-  public async send(integrationId: number, subject: string, body: string, 
+  public async send(integrationId: number, subject: string, body: string,
     attachment?: object, recipient?: string, html?: string): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>

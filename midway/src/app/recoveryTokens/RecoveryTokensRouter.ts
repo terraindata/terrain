@@ -110,7 +110,7 @@ Router.post('/', async (ctx, next) =>
     const emailIntegrations: IntegrationConfig[] = await integrations.get(null, undefined, 'Email', true) as IntegrationConfig[];
     const subject: string = 'Password reset link from notifications@terraindata.com';
     const body: string = '';
-    const html: string = '<img style="background-color: #1eb4fa" src="cid:terrainlogo"/>' 
+    const html: string = '<img style="background-color: #1eb4fa" src="cid:terrainlogo"/>'
     +  '<br> <br> Please click on the link below to reset your password. <br> <br>' + route;
     const attachment: object = [{
       filename: 'icon-terrain.png',
