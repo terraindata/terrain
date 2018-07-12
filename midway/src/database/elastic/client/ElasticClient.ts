@@ -350,7 +350,7 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
     this.log('search', params);
     if (params.index == null)
     {
-      const index = this.getIndex(params);
+      const index = this.getIndex(params.body);
       if (index == null)
       {
         throw new Error('search query does not specify an index');
