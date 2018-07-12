@@ -42,91 +42,75 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-// tslint:disable:no-invalid-this no-var-requires strict-boolean-expressions
-
-/*
-How to use Notifications:
-In App.tsx:
-import {InAppNotification} from './common/components/InAppNotification'
-render()
-  ...
-  <InAppNotification />
-  ...
-
-Anywhere you want to trigger notifications from:
-import {notificationManager} from 'path/InAppNotification'
-
-addNotification()
-  notificationManager.addNotification("message", type ("info" or "error"), timeOut (optional, 0=no timeout));
-
-render()
-  ...
-  <div onClick={this.addNotification} >Trigger notification!</div>
-  ...
-*/
-
+// tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
+import { ConnectionState } from 'connections/ConnectionTypes';
+import { List, Map } from 'immutable';
 import * as React from 'react';
-import TerrainComponent from './../../common/components/TerrainComponent';
-const NotificationSystem = require('./notification-system/NotificationSystem');
-const styles = require('./notification-system/styles.js');
 
-export interface Props
+import { ConnectionsActions } from 'connections/data/ConnectionsRedux';
+import Util from 'util/Util';
+import TerrainComponent, { browserHistory } from '../../common/components/TerrainComponent';
+import { notificationManager } from './../../common/components/InAppNotification';
+
+interface ConnectionsStatusProps
 {
-  params?: any;
-  history?: any;
-  location?: {
-    pathname: string;
-  };
+  connections?: ConnectionState;
+  connectionsActions?: typeof ConnectionsActions;
 }
 
-const notificationManager = {
-  system: null,
-
-  addNotification(title: string, message: string, level: string, timeOut?: number)
-  {
-    if (this.system)
-    {
-      this.system.addNotification({
-        uid: `${title}-${message}`,
-        title,
-        message,
-        level,
-        autoDismiss: timeOut || 5000,
-        dismissible: true,
-      });
-    }
-  },
-};
-
-class InAppNotification extends TerrainComponent<Props>
+export class ConnectionsStatus extends TerrainComponent<ConnectionsStatusProps>
 {
-
-  constructor(props)
-  {
-    super(props);
-    this.state = {
-      notificationManager: null,
-    };
-  }
+  private interval = null;
 
   public componentDidMount()
   {
-    notificationManager.system = this.refs['notificationSystem'];
-    this.setState({
-      notificationManager,
-    });
+    this.interval = setInterval(
+      () =>
+      {
+        this.props.connectionsActions(
+          {
+            actionType: 'getConnections',
+          })
+          .then((response) =>
+          {
+            this.forceUpdate();
+          });
+      },
+      10000,
+    ); // Check every 10 seconds
+  }
+
+  public componentWillUnmount()
+  {
+    clearInterval(this.interval);
   }
 
   public render()
   {
-    return (
-      <div>
-        <NotificationSystem allowHTML={true} style={styles} ref='notificationSystem' />
-      </div>
-    );
+    const { connections } = this.props.connections;
+
+    connections.keySeq()
+      .forEach((key) =>
+      {
+        const connection = connections.get(key);
+        if (connection.status === 'DISCONNECTED' || connection.status === 'CONN_TIMEOUT')
+        {
+          notificationManager.addNotification(
+            'Disconnected connections',
+            connection.name,
+            'error',
+          );
+        }
+      });
+
+    return null;
   }
 }
 
-export { InAppNotification, notificationManager };
+export default Util.createTypedContainer(
+  ConnectionsStatus,
+  ['connections'],
+  { connectionsActions: ConnectionsActions },
+);

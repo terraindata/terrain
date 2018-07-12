@@ -42,91 +42,47 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-
-// tslint:disable:no-invalid-this no-var-requires strict-boolean-expressions
-
-/*
-How to use Notifications:
-In App.tsx:
-import {InAppNotification} from './common/components/InAppNotification'
-render()
-  ...
-  <InAppNotification />
-  ...
-
-Anywhere you want to trigger notifications from:
-import {notificationManager} from 'path/InAppNotification'
-
-addNotification()
-  notificationManager.addNotification("message", type ("info" or "error"), timeOut (optional, 0=no timeout));
-
-render()
-  ...
-  <div onClick={this.addNotification} >Trigger notification!</div>
-  ...
-*/
-
-import * as React from 'react';
-import TerrainComponent from './../../common/components/TerrainComponent';
-const NotificationSystem = require('./notification-system/NotificationSystem');
-const styles = require('./notification-system/styles.js');
-
-export interface Props
+// Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+import
 {
-  params?: any;
-  history?: any;
-  location?: {
-    pathname: string;
-  };
+  _ConnectionState,
+  ConnectionConfig,
+  ConnectionState,
+} from 'connections/ConnectionTypes';
+import * as Immutable from 'immutable';
+
+export default class ConnectionsHelper
+{
+  public static mockState()
+  {
+    return new ConnectionsStateMock();
+  }
 }
 
-const notificationManager = {
-  system: null,
-
-  addNotification(title: string, message: string, level: string, timeOut?: number)
-  {
-    if (this.system)
-    {
-      this.system.addNotification({
-        uid: `${title}-${message}`,
-        title,
-        message,
-        level,
-        autoDismiss: timeOut || 5000,
-        dismissible: true,
-      });
-    }
-  },
-};
-
-class InAppNotification extends TerrainComponent<Props>
+class ConnectionsStateMock
 {
+  public state;
 
-  constructor(props)
+  public constructor()
   {
-    super(props);
-    this.state = {
-      notificationManager: null,
-    };
-  }
-
-  public componentDidMount()
-  {
-    notificationManager.system = this.refs['notificationSystem'];
-    this.setState({
-      notificationManager,
+    this.state = _ConnectionState({
+      connections: Immutable.Map<ID, ConnectionConfig>({}),
     });
   }
 
-  public render()
+  public addConnection(connection: ConnectionConfig)
   {
-    return (
-      <div>
-        <NotificationSystem allowHTML={true} style={styles} ref='notificationSystem' />
-      </div>
+    this.state = this.state.setIn(
+      ['connections', connection.id],
+      connection,
     );
+
+    return this;
+  }
+
+  public getState()
+  {
+    return this.state;
   }
 }
-
-export { InAppNotification, notificationManager };

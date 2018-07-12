@@ -42,91 +42,79 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+// tslint:disable:no-empty
 
-// tslint:disable:no-invalid-this no-var-requires strict-boolean-expressions
-
-/*
-How to use Notifications:
-In App.tsx:
-import {InAppNotification} from './common/components/InAppNotification'
-render()
-  ...
-  <InAppNotification />
-  ...
-
-Anywhere you want to trigger notifications from:
-import {notificationManager} from 'path/InAppNotification'
-
-addNotification()
-  notificationManager.addNotification("message", type ("info" or "error"), timeOut (optional, 0=no timeout));
-
-render()
-  ...
-  <div onClick={this.addNotification} >Trigger notification!</div>
-  ...
-*/
-
+import * as InAppNotification from 'common/components/InAppNotification';
+import { ConnectionsStatus } from 'connections/components/ConnectionsStatus';
+import { _ConnectionConfig } from 'connections/ConnectionTypes';
+import { shallow } from 'enzyme';
 import * as React from 'react';
-import TerrainComponent from './../../common/components/TerrainComponent';
-const NotificationSystem = require('./notification-system/NotificationSystem');
-const styles = require('./notification-system/styles.js');
+import ConnectionsHelper from 'test-helpers/ConnectionsHelper';
 
-export interface Props
+jest.mock('common/components/InAppNotification', () =>
+  Object.assign(require.requireActual('common/components/InAppNotification'), {
+    notificationManager: { addNotification: jest.fn() },
+  }),
+);
+
+describe('ConnectionsStatus', () =>
 {
-  params?: any;
-  history?: any;
-  location?: {
-    pathname: string;
-  };
-}
+  const connectionsStateMock = ConnectionsHelper.mockState();
+  const connections = connectionsStateMock
+    .addConnection(_ConnectionConfig({
+      id: 1,
+      name: 'Connection 1',
+      type: 'ElasticSearch',
+      dsn: '',
+      host: 'localhost:9200',
+      status: 'DISCONNECTED',
+      isAnalytics: false,
+    }))
+    .addConnection(_ConnectionConfig({
+      id: 2,
+      name: 'Connection 2',
+      type: 'ElasticSearch',
+      dsn: '',
+      host: 'localhost:9200',
+      status: 'CONNECTED',
+      isAnalytics: false,
+    }))
+    .addConnection(_ConnectionConfig({
+      id: 3,
+      name: 'Connection 3',
+      type: 'Mysql',
+      dsn: '',
+      host: 'localhost:9200',
+      status: 'CONN_TIMEOUT',
+      isAnalytics: false,
+    }))
+    .getState();
 
-const notificationManager = {
-  system: null,
+  let componentWrapper = null;
 
-  addNotification(title: string, message: string, level: string, timeOut?: number)
+  beforeEach(() =>
   {
-    if (this.system)
-    {
-      this.system.addNotification({
-        uid: `${title}-${message}`,
-        title,
-        message,
-        level,
-        autoDismiss: timeOut || 5000,
-        dismissible: true,
-      });
-    }
-  },
-};
-
-class InAppNotification extends TerrainComponent<Props>
-{
-
-  constructor(props)
-  {
-    super(props);
-    this.state = {
-      notificationManager: null,
-    };
-  }
-
-  public componentDidMount()
-  {
-    notificationManager.system = this.refs['notificationSystem'];
-    this.setState({
-      notificationManager,
-    });
-  }
-
-  public render()
-  {
-    return (
-      <div>
-        <NotificationSystem allowHTML={true} style={styles} ref='notificationSystem' />
-      </div>
+    componentWrapper = shallow(
+      <ConnectionsStatus
+        connections={connections}
+      />,
     );
-  }
-}
+  });
 
-export { InAppNotification, notificationManager };
+  it('should render nothing', () =>
+  {
+    expect(componentWrapper.getElement()).toBe(null);
+  });
+
+  it('should call notificationManager.addNotification twice', (done) =>
+  {
+    setTimeout(() =>
+    {
+      expect(InAppNotification.notificationManager.addNotification).toHaveBeenCalledTimes(2);
+      done();
+    },
+      1500,
+    );
+  });
+});

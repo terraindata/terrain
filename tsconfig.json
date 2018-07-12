@@ -22,6 +22,7 @@
             "charts/*": ["src/app/charts/*"],
             "colors/*": ["src/app/colors/*"],
             "common/*": ["src/app/common/*"],
+            "connections/*": ["src/app/connections/*"],
             "control/*": ["src/app/control/*"],
             "database/*": ["src/database/*"],
             "deploy/*": ["src/app/deploy/*"],
