@@ -63,34 +63,34 @@ export class APIKeys
 
   public async validate(key: string): Promise<APIKeyConfig | null>
   {
-      const results: APIKeyConfig[] = await this.select([], { key }) as APIKeyConfig[];
-      if (results.length > 0 && results[0]['enabled'])
-      {
-          return results[0];
-      }
-      else
-      {
-          return null;
-      }
+    const results: APIKeyConfig[] = await this.select([], { key }) as APIKeyConfig[];
+    if (results.length > 0 && results[0]['enabled'])
+    {
+      return results[0];
+    }
+    else
+    {
+      return null;
+    }
   }
 
-    public async create(): Promise<APIKeyConfig>
+  public async create(): Promise<APIKeyConfig>
+  {
+    try
     {
-        try
-        {
-            const cfg: APIKeyConfig = {
-                key: srs({ length: 20, alphanumeric: true }),
-                createdAt: new Date(Date.now()),
-                enabled: true,
-            };
+      const cfg: APIKeyConfig = {
+        key: srs({ length: 20, alphanumeric: true }),
+        createdAt: new Date(Date.now()),
+        enabled: true,
+      };
 
-            return this.upsert(cfg);
-        }
-        catch (e)
-        {
-            throw new Error('Problem creating default API key: ' + String(e));
-        }
+      return this.upsert(cfg);
     }
+    catch (e)
+    {
+      throw new Error('Problem creating default API key: ' + String(e));
+    }
+  }
 
   public async delete(key: string): Promise<object>
   {

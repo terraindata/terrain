@@ -228,7 +228,7 @@ export const Ajax =
           }
           // TODO: process this routeError via the Promise catch interface.
           // pass the error to the error handler if there is one.
-          TerrainLog.debug('Midway Route Error: ' + err.getDetail());
+          TerrainLog.debug('Midway Route Error: ' + err.getDetail ? err.getDetail() : err);
           config && config.onError && config.onError(err);
         });
 

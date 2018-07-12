@@ -257,6 +257,8 @@ class TransformDataC extends BaseClass
   public hasCustomDomain: boolean = false;
   public mode: string = 'linear';
   public autoBound: boolean = false;
+  // Extra data for distance score lines
+  public distanceValue: { location: [number, number], address: string } = null;
 }
 
 export type TransformData = TransformDataC & IRecord<TransformDataC>;

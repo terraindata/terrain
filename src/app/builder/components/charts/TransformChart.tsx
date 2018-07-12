@@ -58,6 +58,7 @@ import * as $ from 'jquery';
 import * as _ from 'lodash';
 
 import ElasticBlockHelpers from '../../../../database/elastic/blocks/ElasticBlockHelpers';
+import MapUtil from '../../../util/MapUtil';
 import TransformUtil, { NUM_CURVE_POINTS } from '../../../util/TransformUtil';
 import Util from '../../../util/Util';
 
@@ -607,7 +608,7 @@ const TransformChart = {
     bar.exit().remove();
   },
 
-  _drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData, pointFn, mode, domainMin, domainMax, isDate)
+  _drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData, pointFn, mode, domainMin, domainMax, isDate, isGeo)
   {
     const g = d3.select(el).selectAll('.spotlights');
 
@@ -634,6 +635,12 @@ const TransformChart = {
       if (isDate)
       {
         return Util.valueMinMax(Date.parse(d['fields'][inputKey]), minX, maxX);
+      }
+      else if (isGeo)
+      {
+        const loc = MapUtil.getCoordinatesFromGeopoint(d['fields'][inputKey]);
+        const distance = MapUtil.distance(loc, [37.444900, -122.161750]);
+        return Util.valueMinMax(distance, minX, maxX);
       }
       return Util.valueMinMax(d['fields'][inputKey], minX, maxX);
     };
@@ -1847,7 +1854,7 @@ const TransformChart = {
     {
       this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
     }
-    this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData, pointFn, mode, domain.x[0], domain.x[1], isDate);
+    this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData, pointFn, mode, domain.x[0], domain.x[1], isDate, isGeo);
 
     if (mode === 'linear'
       || (mode === 'exponential' && numPoints === NUM_CURVE_POINTS.exponential)

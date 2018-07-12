@@ -88,18 +88,18 @@ Middleware.passport.use('local', new passportLocal.Strategy(
 
 // authenticate with API key (only for API routes)
 Middleware.passport.use('api-key', new passportHeaderAPIKey.HeaderAPIKeyStrategy(
-    { header: 'Authorization', prefix: 'APIKey ' },
-    true,
-    (key: string, done) =>
+  { header: 'Authorization', prefix: 'APIKey ' },
+  true,
+  (key: string, done) =>
+  {
+    apikeys.validate(key).then((apikey) =>
     {
-        apikeys.validate(key).then((apikey) =>
-        {
-            done(null, apikey);
-        }).catch((e) =>
-        {
-            done(e, null);
-        });
-    }));
+      done(null, apikey);
+    }).catch((e) =>
+    {
+      done(e, null);
+    });
+  }));
 
 Middleware.passport.serializeUser((user, done) =>
 {

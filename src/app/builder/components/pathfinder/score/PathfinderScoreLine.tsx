@@ -54,6 +54,7 @@ import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import Util from 'util/Util';
+import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { backgroundColor, borderColor, Colors, getStyle } from '../../../../colors/Colors';
 import SearchableDropdown from '../../../../common/components/SearchableDropdown';
 import ScoreBar from '../../charts/ScoreBar';
@@ -133,7 +134,14 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   public handleFieldChange(index)
   {
     const value = this.props.dropdownOptions.get(index);
-    const newLine = this.props.line.set('field', value.value).set('fieldType', value.meta.fieldType);
+    const fieldType = value.meta.fieldType;
+    const newLine = this.props.line
+      .set('field', value.value)
+      .set('fieldType', fieldType)
+      .setIn(['transformData', 'distanceValue'],
+        fieldType === FieldType.Geopoint ?
+          { location: [37.444900, -122.161750], address: '' } :
+          null);
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath), newLine, false, true);
     this.setState((state) => ({ editingField: false }));
   }
@@ -154,6 +162,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
       dataDomain: line.transformData.dataDomain,
       closed: !line.expanded,
       autoBound: line.transformData.autoBound,
+      distanceValue: line.transformData.distanceValue,
     };
     return (
       <div
