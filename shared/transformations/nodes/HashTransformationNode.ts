@@ -52,7 +52,7 @@ import * as yadeep from 'shared/util/yadeep';
 
 const { List, Map } = Immutable;
 
-import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
@@ -97,7 +97,7 @@ class HashTransformationInfoC extends TransformationNodeInfo
   public creatable = true;
 
   public availInfo = {
-    allowedTypes: [ETLFieldTypes.String],
+    allowedTypes: [FieldTypes.String],
   };
 
   public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)

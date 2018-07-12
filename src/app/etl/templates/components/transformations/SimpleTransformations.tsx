@@ -61,7 +61,7 @@ import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
 import { DynamicForm } from 'common/components/DynamicForm';
-import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 import * as Immutable from 'immutable';
@@ -340,13 +340,13 @@ export class ZipcodeTFF extends TransformationForm<ZipcodeOptions, Transformatio
     if (this.state.format === 'loc')
     {
       return {
-        newSourceType: ETLFieldTypes.GeoPoint,
+        newSourceType: FieldTypes.GeoPoint,
       };
     }
     else
     {
       return {
-        newSourceType: ETLFieldTypes.String,
+        newSourceType: FieldTypes.String,
       };
     }
   }

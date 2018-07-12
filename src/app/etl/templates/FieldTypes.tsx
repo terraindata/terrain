@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
-import { ETLFieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeBase from 'shared/transformations/TransformationNode';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
@@ -62,7 +62,7 @@ class TemplateFieldC
   public readonly isIncluded: boolean = true;
   public readonly isHidden: boolean = false;
   public readonly fieldProps: object = {};
-  public readonly etlType: ETLFieldTypes = ETLFieldTypes.Object;
+  public readonly etlType: FieldTypes = FieldTypes.Object;
   public readonly fieldId: number = -1;
   public readonly name: string = '';
   public readonly childrenIds: List<number> = List([]);
@@ -101,9 +101,9 @@ class TemplateFieldC
 
   public isPrimitive(): boolean
   {
-    return this.etlType !== ETLFieldTypes.Array &&
-      this.etlType !== ETLFieldTypes.Object &&
-      this.etlType !== ETLFieldTypes.GeoPoint;
+    return this.etlType !== FieldTypes.Array &&
+      this.etlType !== FieldTypes.Object &&
+      this.etlType !== FieldTypes.GeoPoint;
   }
 
   public isLocalToRoot(): boolean

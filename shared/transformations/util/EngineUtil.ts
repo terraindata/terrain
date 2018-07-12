@@ -50,10 +50,7 @@ import * as _ from 'lodash';
 
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
-import
-{
-  DateFormats, ETLFieldTypes, ETLToJSType, getJSFromETL, JSToETLType, Languages, validJSTypes,
-} from 'shared/etl/types/ETLTypes';
+import { DateFormats, FieldTypes, getJSFromETL, Languages } from 'shared/etl/types/ETLTypes';
 import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -63,11 +60,6 @@ import * as yadeep from 'shared/util/yadeep';
 
 import * as TerrainLog from 'loglevel';
 
-export type PathHash = string;
-export interface PathHashMap<T>
-{
-  [k: string]: T;
-}
 const etlTypeKeyPath = List(['etlType']);
 export default class EngineUtil
 {
@@ -88,7 +80,7 @@ export default class EngineUtil
           const parentPath = okp.slice(0, -1).toList();
           const parentID = engine.getFieldID(parentPath);
           const type = EngineUtil.fieldType(parentID, engine);
-          if (type !== ETLFieldTypes.Array && type !== ETLFieldTypes.Object)
+          if (type !== FieldTypes.Array && type !== FieldTypes.Object)
           {
             errors.push(`Field ${okp.toJS()} has a parent that is not an array or object`);
           }
@@ -146,7 +138,7 @@ export default class EngineUtil
   public static addFieldToEngine(
     engine: TransformationEngine,
     keypath: KeyPath,
-    type: ETLFieldTypes,
+    type: FieldTypes,
   ): number
   {
     const cfg = {
@@ -159,24 +151,24 @@ export default class EngineUtil
    *  Difference between setType and changeType is that changeType should be on fields that a user
    *  may have set options on (such as elastic props).
    */
-  public static setType(engine: TransformationEngine, fieldId: number, type: ETLFieldTypes)
+  public static setType(engine: TransformationEngine, fieldId: number, type: FieldTypes)
   {
     engine.setFieldProp(fieldId, etlTypeKeyPath, type);
     const jsType = PathUtil.isWildcard(engine.getFieldPath(fieldId)) ? 'array' : getJSFromETL(type);
     engine.setFieldType(fieldId, jsType);
   }
 
-  public static changeType(engine: TransformationEngine, fieldId: number, type: ETLFieldTypes)
+  public static changeType(engine: TransformationEngine, fieldId: number, type: FieldTypes)
   {
     EngineUtil.changeFieldTypeSideEffects(engine, fieldId, type);
     EngineUtil.setType(engine, fieldId, type);
   }
 
   // get the ETL type of a field
-  public static fieldType(id: number, engine: TransformationEngine): ETLFieldTypes
+  public static fieldType(id: number, engine: TransformationEngine): FieldTypes
   {
-    const etlType = engine.getFieldProp(id, etlTypeKeyPath) as ETLFieldTypes;
-    return etlType == null ? ETLFieldTypes.String : etlType;
+    const etlType = engine.getFieldProp(id, etlTypeKeyPath) as FieldTypes;
+    return etlType == null ? FieldTypes.String : etlType;
   }
 
   // take two engines and return an engine whose fields most closely resembles the result of the merge
@@ -193,8 +185,8 @@ export default class EngineUtil
       const newId = EngineUtil.transferField(id, keypath, leftEngine, newEngine);
     });
     const outputKeyPathBase = List([outputKey, -1]);
-    const outputFieldId = EngineUtil.addFieldToEngine(newEngine, List([outputKey]), ETLFieldTypes.Array);
-    const outputFieldWildcardId = EngineUtil.addFieldToEngine(newEngine, outputKeyPathBase, ETLFieldTypes.Object);
+    const outputFieldId = EngineUtil.addFieldToEngine(newEngine, List([outputKey]), FieldTypes.Array);
+    const outputFieldWildcardId = EngineUtil.addFieldToEngine(newEngine, outputKeyPathBase, FieldTypes.Object);
 
     rightEngine.getAllFieldIDs().forEach((id) =>
     {
@@ -204,7 +196,7 @@ export default class EngineUtil
     return newEngine;
   }
 
-  public static changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType: ETLFieldTypes)
+  public static changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType: FieldTypes)
   {
     LanguageController.get(Languages.Elastic)
       .changeFieldTypeSideEffects(engine, fieldId, newType);
@@ -213,13 +205,13 @@ export default class EngineUtil
   }
 
   // cast the field to the specified type (or the field's current type if type is not specified)
-  public static castField(engine: TransformationEngine, fieldId: number, type?: ETLFieldTypes, format?: DateFormats)
+  public static castField(engine: TransformationEngine, fieldId: number, type?: FieldTypes, format?: DateFormats)
   {
     const ikp = engine.getFieldPath(fieldId);
-    const etlType: ETLFieldTypes = type === undefined ? EngineUtil.fieldType(fieldId, engine) : type;
+    const etlType: FieldTypes = type === undefined ? EngineUtil.fieldType(fieldId, engine) : type;
     const castType = ETLTypeToCastString[etlType];
 
-    if (etlType === ETLFieldTypes.Date && format === undefined)
+    if (etlType === FieldTypes.Date && format === undefined)
     {
       format = DateFormats.ISOstring;
     }
@@ -344,14 +336,14 @@ export default class EngineUtil
 }
 
 export const ETLTypeToCastString: {
-  [k in ETLFieldTypes]: string
+  [k in FieldTypes]: string
 } = {
-    [ETLFieldTypes.Array]: 'array',
-    [ETLFieldTypes.Object]: 'object',
-    [ETLFieldTypes.Date]: 'date',
-    [ETLFieldTypes.GeoPoint]: 'object',
-    [ETLFieldTypes.Number]: 'number',
-    [ETLFieldTypes.Integer]: 'number',
-    [ETLFieldTypes.Boolean]: 'boolean',
-    [ETLFieldTypes.String]: 'string',
+    [FieldTypes.Array]: 'array',
+    [FieldTypes.Object]: 'object',
+    [FieldTypes.Date]: 'date',
+    [FieldTypes.GeoPoint]: 'object',
+    [FieldTypes.Number]: 'number',
+    [FieldTypes.Integer]: 'number',
+    [FieldTypes.Boolean]: 'boolean',
+    [FieldTypes.String]: 'string',
   };

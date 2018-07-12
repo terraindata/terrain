@@ -55,7 +55,7 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
-import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -120,7 +120,7 @@ export class SetIfTFF extends TransformationForm<SetOptions, TransformationNodeT
   protected isNumber()
   {
     const type = EngineUtil.fieldType(this.props.fieldId, this.props.engine);
-    return type === ETLFieldTypes.Number || type === ETLFieldTypes.Integer;
+    return type === FieldTypes.Number || type === FieldTypes.Integer;
   }
 
   protected numberDisplayState(state: SetOptions)
@@ -138,7 +138,7 @@ export class SetIfTFF extends TransformationForm<SetOptions, TransformationNodeT
   protected stringDisplayState(state: SetOptions)
   {
     const type = EngineUtil.fieldType(this.props.fieldId, this.props.engine);
-    if (type === ETLFieldTypes.String)
+    if (type === FieldTypes.String)
     {
       return DisplayState.Active;
     }

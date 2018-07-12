@@ -58,7 +58,7 @@ import ObjectForm from 'common/components/ObjectForm';
 import { FieldPicker } from 'etl/common/components/FieldPicker.tsx';
 import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
 import { TransformationNode } from 'etl/templates/FieldTypes';
-import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -135,7 +135,7 @@ export class GroupByTFF extends TransformationForm<GroupByOptions, Transformatio
     };
     const fields = List([engine.getFieldPath(fieldId)]);
     proxy.addTransformation(this.type, fields, options, {
-      type: ETLFieldTypes.Array,
+      type: FieldTypes.Array,
     });
     for (const key of Object.keys(outputMapping))
     {

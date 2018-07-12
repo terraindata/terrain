@@ -51,7 +51,7 @@ import * as yadeep from 'shared/util/yadeep';
 
 const { List, Map } = Immutable;
 
-import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
@@ -122,8 +122,8 @@ class GroupByTransformationInfoC extends TransformationNodeInfo
   public newFieldType = 'array';
 
   public availInfo = {
-    allowedTypes: [ETLFieldTypes.Array],
-    arrayOf: [ETLFieldTypes.Object],
+    allowedTypes: [FieldTypes.Array],
+    arrayOf: [FieldTypes.Object],
     isNamed: true,
   };
 }

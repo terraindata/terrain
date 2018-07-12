@@ -67,7 +67,7 @@ import
   TemplateField,
 } from 'etl/templates/FieldTypes';
 import { defaultProps, ElasticAnalyzers, ElasticFieldProps, ElasticTypes, ETLToElasticOptions } from 'shared/etl/types/ETLElasticTypes';
-import { ETLFieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
@@ -129,7 +129,7 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
   public showPrimaryKey(s: ElasticFieldProps)
   {
     const etlType = EngineUtil.fieldType(this.props.fieldId, this._currentEngine());
-    return (etlType === ETLFieldTypes.String || etlType === ETLFieldTypes.Number || etlType === ETLFieldTypes.Integer)
+    return (etlType === FieldTypes.String || etlType === FieldTypes.Number || etlType === FieldTypes.Integer)
       && this._isRootField() ?
       DisplayState.Active : DisplayState.Inactive;
   }
@@ -137,7 +137,7 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
   public showIsAnalyzed(s: ElasticFieldProps)
   {
     const etlType = EngineUtil.fieldType(this.props.fieldId, this._currentEngine());
-    return (etlType === ETLFieldTypes.String && !s.isPrimaryKey) ?
+    return (etlType === FieldTypes.String && !s.isPrimaryKey) ?
       DisplayState.Active : DisplayState.Inactive;
   }
 
@@ -148,7 +148,7 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
   }
 
   @instanceFnDecorator(memoizeOne)
-  public _getTypeOptions(etlType: ETLFieldTypes): List<string>
+  public _getTypeOptions(etlType: FieldTypes): List<string>
   {
     return List(ETLToElasticOptions[etlType]);
   }

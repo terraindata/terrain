@@ -51,7 +51,7 @@ import * as yadeep from 'shared/util/yadeep';
 
 const { List, Map } = Immutable;
 
-import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
@@ -99,8 +99,8 @@ class RemoveDuplicatesTransformationInfoC extends TransformationNodeInfo
   public creatable = true;
 
   public availInfo = {
-    allowedTypes: [ETLFieldTypes.Array],
-    arrayOf: [ETLFieldTypes.String, ETLFieldTypes.Number],
+    allowedTypes: [FieldTypes.Array],
+    arrayOf: [FieldTypes.String, FieldTypes.Number],
     isNamed: true,
   };
 }

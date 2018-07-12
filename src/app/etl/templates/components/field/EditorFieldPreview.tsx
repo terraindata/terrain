@@ -62,7 +62,7 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { FieldVerification } from 'shared/etl/languages/LanguageControllers';
 import LanguageController from 'shared/etl/languages/LanguageControllers';
-import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
@@ -103,7 +103,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
         onClick: this.openSettings,
       });
     }
-    if (field.etlType === ETLFieldTypes.Object)
+    if (field.etlType === FieldTypes.Object)
     {
       options.push({
         text: 'Add a subfield',
@@ -177,8 +177,8 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     const field = this._field();
 
     const hidePreviewValue =
-      field.etlType === ETLFieldTypes.Array ||
-      field.etlType === ETLFieldTypes.Object ||
+      field.etlType === FieldTypes.Array ||
+      field.etlType === FieldTypes.Object ||
       labelOnly;
 
     if (hidePreviewValue)
@@ -190,7 +190,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
       let previewText: string;
       switch (field.etlType)
       {
-        case ETLFieldTypes.GeoPoint:
+        case FieldTypes.GeoPoint:
           if (preview == null)
           {
             previewText = 'N/A';
@@ -498,16 +498,16 @@ const GeoTypeIcon = require('./../../../../../images/icon_type_geo.svg?name=GeoT
 const BooleanTypeIcon = require('./../../../../../images/icon_type_boolean.svg?name=BooleanTypeIcon');
 
 const typeToIcon: {
-  [k in ETLFieldTypes]: any;
+  [k in FieldTypes]: any;
 } = {
-    [ETLFieldTypes.String]: TextTypeIcon,
-    [ETLFieldTypes.Object]: ObjectTypeIcon,
-    [ETLFieldTypes.Number]: NumberTypeIcon,
-    [ETLFieldTypes.Integer]: NumberTypeIcon,
-    [ETLFieldTypes.Boolean]: BooleanTypeIcon,
-    [ETLFieldTypes.Array]: ArrayTypeIcon,
-    [ETLFieldTypes.Date]: DateTypeIcon,
-    [ETLFieldTypes.GeoPoint]: GeoTypeIcon,
+    [FieldTypes.String]: TextTypeIcon,
+    [FieldTypes.Object]: ObjectTypeIcon,
+    [FieldTypes.Number]: NumberTypeIcon,
+    [FieldTypes.Integer]: NumberTypeIcon,
+    [FieldTypes.Boolean]: BooleanTypeIcon,
+    [FieldTypes.Array]: ArrayTypeIcon,
+    [FieldTypes.Date]: DateTypeIcon,
+    [FieldTypes.GeoPoint]: GeoTypeIcon,
   };
 
 const emptyOptions = List([]);

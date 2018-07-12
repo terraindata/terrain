@@ -54,7 +54,7 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
-import { DateFormats, ETLFieldTypes, etlFieldTypesNames } from 'shared/etl/types/ETLTypes';
+import { DateFormats, FieldTypes, etlFieldTypesNames } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -110,7 +110,7 @@ export class CastTFF extends TransformationForm<CastOptions, TransformationNodeT
       const state: CastOptions = {
         toTypename: ETLTypeToCastString[etlType],
       };
-      if (etlType === ETLFieldTypes.Date)
+      if (etlType === FieldTypes.Date)
       {
         state.format = DateFormats.ISOstring;
       }

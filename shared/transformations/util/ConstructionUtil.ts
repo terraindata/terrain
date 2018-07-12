@@ -56,7 +56,7 @@ import { KeyPathUtil as PathUtil } from 'shared/util/KeyPath';
 
 import
 {
-  DateFormats, ETLFieldTypes, ETLToJSType, getJSFromETL, JSToETLType, Languages, validJSTypes,
+  DateFormats, FieldTypes, getJSFromETL, Languages,
 } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -65,10 +65,6 @@ import * as yadeep from 'shared/util/yadeep';
 
 import * as TerrainLog from 'loglevel';
 
-export interface PathHashMap<T>
-{
-  [k: string]: T;
-}
 const etlTypeKeyPath = List(['etlType']);
 
 type SimpleType = ReturnType<typeof TypeUtil['getSimpleType']>;
@@ -84,7 +80,7 @@ export class TypeTracker
   protected valuesSeen = 0;
   protected lastValue: any;
   protected simpleType: SimpleType = 'null';
-  protected type: ETLFieldTypes = null;
+  protected type: FieldTypes = null;
   protected stringsWereChecked = false;
   protected numbersWereChecked = false;
   protected stringNumbersWereChecked = false;
@@ -108,49 +104,49 @@ export class TypeTracker
     return this.valuesSeen;
   }
 
-  public getType(): ETLFieldTypes
+  public getType(): FieldTypes
   {
     if (this.wasCoerced)
     {
-      return ETLFieldTypes.String;
+      return FieldTypes.String;
     }
     switch (this.simpleType)
     {
       case 'array':
-        return ETLFieldTypes.Array;
+        return FieldTypes.Array;
       case 'object':
-        return ETLFieldTypes.Object;
+        return FieldTypes.Object;
       case 'boolean':
-        return ETLFieldTypes.Boolean;
+        return FieldTypes.Boolean;
       case 'number':
-        return (this.numbersWereChecked && this.couldBeInt) ? ETLFieldTypes.Integer : ETLFieldTypes.Number;
+        return (this.numbersWereChecked && this.couldBeInt) ? FieldTypes.Integer : FieldTypes.Number;
       case 'string':
         if (!this.stringsWereChecked)
         {
-          return ETLFieldTypes.String;
+          return FieldTypes.String;
         }
         if (this.couldBeDate)
         {
-          return ETLFieldTypes.Date;
+          return FieldTypes.Date;
         }
         if (this.couldBeGeo)
         {
-          return ETLFieldTypes.GeoPoint;
+          return FieldTypes.GeoPoint;
         }
         if (this.interpretStrings)
         {
           if (this.couldBeStringNumber)
           {
-            return (this.stringNumbersWereChecked && this.couldBeStringInteger) ? ETLFieldTypes.Integer : ETLFieldTypes.Number;
+            return (this.stringNumbersWereChecked && this.couldBeStringInteger) ? FieldTypes.Integer : FieldTypes.Number;
           }
           if (this.couldBeStringBoolean)
           {
-            return ETLFieldTypes.Boolean;
+            return FieldTypes.Boolean;
           }
         }
-        return ETLFieldTypes.String;
+        return FieldTypes.String;
       default:
-        return ETLFieldTypes.String;
+        return FieldTypes.String;
     }
   }
 
@@ -273,7 +269,7 @@ interface FieldNode
 {
   path: KeyPath;
   name: WayPoint; // null if root
-  type?: ETLFieldTypes;
+  type?: FieldTypes;
   arrChild?: FieldNode;
   fields: { [k: string]: FieldNode };
 }
@@ -283,7 +279,7 @@ export default abstract class ConstructionUtil
   public static createEngineFromDocuments(documents: List<object>, interpretText = false):
     { engine: TransformationEngine, errors: string[] }
   {
-    const pathTypes: PathHashMap<TypeTracker> = {};
+    const pathTypes: { [k: string]: TypeTracker } = {};
     const errAccumulator = ConstructionUtil.errorAccumulator();
     documents.forEach((doc, docIndex) =>
     {
@@ -320,7 +316,7 @@ export default abstract class ConstructionUtil
     };
   }
 
-  private static buildTreeFromPathTypes(pathTypes: PathHashMap<TypeTracker>, onConflict: (msg: string) => void): FieldNode
+  private static buildTreeFromPathTypes(pathTypes: { [k: string]: TypeTracker }, onConflict: (msg: string) => void): FieldNode
   {
     const tree: FieldNode = {
       path: KeyPath([]),
@@ -328,7 +324,7 @@ export default abstract class ConstructionUtil
       fields: {},
     };
 
-    const walk = (kp: KeyPath, desiredType: ETLFieldTypes) =>
+    const walk = (kp: KeyPath, desiredType: FieldTypes) =>
     {
       let node: FieldNode = tree;
       for (let i = 0; i < kp.size; i++)
@@ -338,19 +334,19 @@ export default abstract class ConstructionUtil
         {
           if (node.type === undefined)
           {
-            node.type = ETLFieldTypes.Array;
+            node.type = FieldTypes.Array;
           }
-          if (node.type !== ETLFieldTypes.Array)
+          if (node.type !== FieldTypes.Array)
           {
             const message = `Encountered a ${node.type} field where an array field was expected`;
-            node.type = ETLFieldTypes.String;
+            node.type = FieldTypes.String;
             node.arrChild = undefined;
             node.fields = {};
             return message;
           }
           else if (node.arrChild === undefined)
           {
-            node.type = ETLFieldTypes.Array;
+            node.type = FieldTypes.Array;
             node.arrChild = {
               path: node.path.push(-1),
               name: -1,
@@ -367,19 +363,19 @@ export default abstract class ConstructionUtil
         {
           if (node.type === undefined)
           {
-            node.type = ETLFieldTypes.Object;
+            node.type = FieldTypes.Object;
           }
-          if (node.type !== ETLFieldTypes.Object)
+          if (node.type !== FieldTypes.Object)
           {
             const message = `Encountered a ${node.type} field where an object field was expected`;
-            node.type = ETLFieldTypes.String;
+            node.type = FieldTypes.String;
             node.arrChild = undefined;
             node.fields = {};
             return message;
           }
           else if (node.fields[waypoint] === undefined)
           {
-            node.type = ETLFieldTypes.Object;
+            node.type = FieldTypes.Object;
             node.fields[waypoint] = {
               path: node.path.push(waypoint),
               name: waypoint,
@@ -395,7 +391,7 @@ export default abstract class ConstructionUtil
       }
       if (Object.keys(node.fields).length > 0 || node.arrChild !== undefined)
       {
-        node.type = ETLFieldTypes.String;
+        node.type = FieldTypes.String;
         node.fields = {};
         node.arrChild = undefined;
         return `Field with primitive type cannot be an array or object`;

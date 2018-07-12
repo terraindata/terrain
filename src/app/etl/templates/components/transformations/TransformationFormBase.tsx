@@ -55,7 +55,7 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
 import { TransformationNode } from 'etl/templates/FieldTypes';
-import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -182,7 +182,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   }
 
   // override this to customize the newFieldInfo object that gets passed to addTransformation
-  protected overrideTransformationConfig(): { type?: ETLFieldTypes, newSourceType?: ETLFieldTypes }
+  protected overrideTransformationConfig(): { type?: FieldTypes, newSourceType?: FieldTypes }
   {
     return undefined;
   }

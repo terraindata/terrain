@@ -46,7 +46,7 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file
 import { List } from 'immutable';
 import * as _ from 'lodash';
-import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 // string values for this enum are how elastic expects them
 
 export enum ElasticTypes
@@ -103,32 +103,32 @@ export function defaultProps(obj: Partial<ElasticFieldProps> = {}): ElasticField
 }
 
 export const ETLToElasticOptions: {
-  [k in ETLFieldTypes]: ElasticTypes[]
+  [k in FieldTypes]: ElasticTypes[]
 } = {
-    [ETLFieldTypes.Array]: [ElasticTypes.Auto, ElasticTypes.Array],
-    [ETLFieldTypes.Object]: [ElasticTypes.Auto, ElasticTypes.Nested],
-    [ETLFieldTypes.String]: [ElasticTypes.Auto, ElasticTypes.Text],
-    [ETLFieldTypes.Number]: [ElasticTypes.Auto, ElasticTypes.Double, ElasticTypes.Float, ElasticTypes.HalfFloat],
-    [ETLFieldTypes.Boolean]: [ElasticTypes.Auto, ElasticTypes.Boolean],
-    [ETLFieldTypes.Date]: [ElasticTypes.Auto, ElasticTypes.Date],
-    [ETLFieldTypes.Integer]: [ElasticTypes.Auto, ElasticTypes.Long, ElasticTypes.Integer, ElasticTypes.Short, ElasticTypes.Byte],
-    [ETLFieldTypes.GeoPoint]: [ElasticTypes.Auto, ElasticTypes.GeoPoint],
+    [FieldTypes.Array]: [ElasticTypes.Auto, ElasticTypes.Array],
+    [FieldTypes.Object]: [ElasticTypes.Auto, ElasticTypes.Nested],
+    [FieldTypes.String]: [ElasticTypes.Auto, ElasticTypes.Text],
+    [FieldTypes.Number]: [ElasticTypes.Auto, ElasticTypes.Double, ElasticTypes.Float, ElasticTypes.HalfFloat],
+    [FieldTypes.Boolean]: [ElasticTypes.Auto, ElasticTypes.Boolean],
+    [FieldTypes.Date]: [ElasticTypes.Auto, ElasticTypes.Date],
+    [FieldTypes.Integer]: [ElasticTypes.Auto, ElasticTypes.Long, ElasticTypes.Integer, ElasticTypes.Short, ElasticTypes.Byte],
+    [FieldTypes.GeoPoint]: [ElasticTypes.Auto, ElasticTypes.GeoPoint],
   };
 
 export const ETLTypeAutoMap: {
-  [k in ETLFieldTypes]: ElasticTypes
+  [k in FieldTypes]: ElasticTypes
 } = {
-    [ETLFieldTypes.Array]: ElasticTypes.Array,
-    [ETLFieldTypes.Object]: ElasticTypes.Nested,
-    [ETLFieldTypes.String]: ElasticTypes.Text,
-    [ETLFieldTypes.Number]: ElasticTypes.Double,
-    [ETLFieldTypes.Boolean]: ElasticTypes.Boolean,
-    [ETLFieldTypes.Date]: ElasticTypes.Date,
-    [ETLFieldTypes.Integer]: ElasticTypes.Long,
-    [ETLFieldTypes.GeoPoint]: ElasticTypes.GeoPoint,
+    [FieldTypes.Array]: ElasticTypes.Array,
+    [FieldTypes.Object]: ElasticTypes.Nested,
+    [FieldTypes.String]: ElasticTypes.Text,
+    [FieldTypes.Number]: ElasticTypes.Double,
+    [FieldTypes.Boolean]: ElasticTypes.Boolean,
+    [FieldTypes.Date]: ElasticTypes.Date,
+    [FieldTypes.Integer]: ElasticTypes.Long,
+    [FieldTypes.GeoPoint]: ElasticTypes.GeoPoint,
   };
 
-export function etlTypeToElastic(type: ETLFieldTypes): ElasticTypes
+export function etlTypeToElastic(type: FieldTypes): ElasticTypes
 {
   return ETLTypeAutoMap[type];
 }

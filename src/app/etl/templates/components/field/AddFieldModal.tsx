@@ -65,7 +65,7 @@ import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { ETLFieldTypes, etlFieldTypesList, etlFieldTypesNames } from 'shared/etl/types/ETLTypes';
+import { FieldTypes, etlFieldTypesList, etlFieldTypesNames } from 'shared/etl/types/ETLTypes';
 import { validateNewFieldName } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
@@ -103,7 +103,7 @@ export default class Injector extends TerrainComponent<TemplateEditorFieldProps>
 interface FormState
 {
   name: string;
-  type: ETLFieldTypes;
+  type: FieldTypes;
 }
 
 const addFieldMap: InputDeclarationMap<FormState> =
@@ -129,7 +129,7 @@ class AddFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
 {
   public state: FormState = {
     name: 'new_field',
-    type: ETLFieldTypes.String,
+    type: FieldTypes.String,
   };
 
   @instanceFnDecorator(memoizeOne)
@@ -234,7 +234,7 @@ class AddRootFieldModalC extends TerrainComponent<RootFieldProps>
 {
   public state: FormState = {
     name: 'new_field',
-    type: ETLFieldTypes.String,
+    type: FieldTypes.String,
   };
 
   @instanceFnDecorator(memoizeOne)

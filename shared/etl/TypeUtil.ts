@@ -47,7 +47,7 @@ THE SOFTWARE.
 
 import * as _ from 'lodash';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
-import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 
 import isPrimitive = require('is-primitive');
 
@@ -95,11 +95,11 @@ export default class TypeUtil
     return type === null ? 'string' : type;
   }
 
-  public static getCommonETLStringType(values: string[]): ETLFieldTypes
+  public static getCommonETLStringType(values: string[]): FieldTypes
   {
     if (values.length === 0)
     {
-      return ETLFieldTypes.String;
+      return FieldTypes.String;
     }
 
     let allNull = true;
@@ -124,23 +124,23 @@ export default class TypeUtil
 
     if (allDate && !allNull)
     {
-      return ETLFieldTypes.Date;
+      return FieldTypes.Date;
     }
     else if (allGeo && !allNull)
     {
-      return ETLFieldTypes.GeoPoint;
+      return FieldTypes.GeoPoint;
     }
     else
     {
-      return ETLFieldTypes.String;
+      return FieldTypes.String;
     }
   }
 
-  public static getCommonETLNumberType(values: number[]): ETLFieldTypes
+  public static getCommonETLNumberType(values: number[]): FieldTypes
   {
     if (values.length === 0)
     {
-      return ETLFieldTypes.Number;
+      return FieldTypes.Number;
     }
 
     let allIntegers = true;
@@ -160,11 +160,11 @@ export default class TypeUtil
 
     if (allIntegers && !allNull)
     {
-      return ETLFieldTypes.Integer;
+      return FieldTypes.Integer;
     }
     else
     {
-      return ETLFieldTypes.Number;
+      return FieldTypes.Number;
     }
   }
 
