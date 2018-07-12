@@ -348,15 +348,7 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
     callback?: (error: any, response: Elastic.SearchResponse<T>) => void): void | Promise<Elastic.SearchResponse<T>>
   {
     this.log('search', params);
-    if (params.index == null)
-    {
-      const index = this.getIndex(params.body);
-      if (index == null)
-      {
-        throw new Error('search query does not specify an index');
-      }
-      params.index = index;
-    }
+    this.addIndexToSearchParams(params);
     return this.delegate.search(params, callback);
   }
 
@@ -369,18 +361,7 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
     callback?: (error: any, response: Elastic.MSearchResponse<T>) => void): void | Promise<Elastic.MSearchResponse<T>>
   {
     this.log('msearch', params);
-    for (let i = 0; i < params.body.length; i += 2)
-    {
-      if (params.body[i].index == null)
-      {
-        const index = this.getIndex(params.body[i + 1]);
-        if (index == null)
-        {
-          throw new Error(`msearch query #${i / 2} does not specify an index`);
-        }
-        params.body[i].index = index;
-      }
-    }
+    this.addIndexToMSearchParams(params);
     return this.delegate.msearch(params, callback);
   }
 
@@ -429,6 +410,35 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
   protected log(methodName: string, info: any)
   {
     this.controller.log('ElasticClient.' + methodName, info);
+  }
+
+  protected addIndexToSearchParams(params)
+  {
+    if (params.index == null)
+    {
+      const index = this.getIndex(params.body);
+      if (index == null)
+      {
+        throw new Error('search query does not specify an index');
+      }
+      params.index = index;
+    }
+  }
+
+  protected addIndexToMSearchParams(params)
+  {
+    for (let i = 0; i < params.body.length; i += 2)
+    {
+      if (params.body[i].index == null)
+      {
+        const index = this.getIndex(params.body[i + 1]);
+        if (index == null)
+        {
+          throw new Error(`msearch query #${i / 2} does not specify an index`);
+        }
+        params.body[i].index = index;
+      }
+    }
   }
 
   private getHostFromConfig(): string

@@ -650,6 +650,19 @@ describe('Query route tests', () =>
           body: JSON.stringify({
             from: 0,
             size: 0,
+            query:
+              {
+                bool:
+                  {
+                    filter:
+                      {
+                        term:
+                          {
+                            _index: 'movies',
+                          },
+                      },
+                  },
+              },
           }),
         },
       })
