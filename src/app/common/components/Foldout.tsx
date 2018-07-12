@@ -136,14 +136,14 @@ export class Foldout extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   private toggle()
   {
     const expanded = !this.state.expanded;
     this.setState({
       expanded,
     });
-    
+
     if (this.props.uniqueId !== undefined)
     {
       localStorage.setItem('foldout-' + this.props.uniqueId, expanded ? 'expanded' : 'closed');

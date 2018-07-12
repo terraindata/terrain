@@ -97,7 +97,7 @@ export let EMAIL: Email;
 export let HA: number;
 export let JobL: JobLog;
 export let JobQ: JobQueue;
-export let Limiter: Bottleneck;
+export let Limiter: Bottleneck; // TODO: for clustering, ensure total limit is matched
 export let SKDR: Scheduler;
 export let TBLS: Schema.Tables;
 

@@ -170,7 +170,7 @@ export default class MagentoEndpoint extends AEndpointStream
               track_scores: true,
               _source: true,
               script_fields: {},
-              size: 5,
+              size: 9999,
             }),
         };
         const readStream: Readable = await qh.handleQuery(payload) as Readable;
@@ -280,7 +280,7 @@ export default class MagentoEndpoint extends AEndpointStream
         }
         catch (e)
         {
-          // do nothing
+          winston.error(e);
         }
       }
       resolve();
@@ -340,27 +340,27 @@ export default class MagentoEndpoint extends AEndpointStream
     {
       const magentoIntegrationConfig: object = await this.getIntegrationConfig(endpointConfig.integrationId) as object;
       const magConf: MagentoConfig =
-      {
-        esdbid: null,
-        esindex: null,
-        host: magentoIntegrationConfig['host'],
-        includedFields: [],
-        onlyFirst: false,
-        params: {
-          username: magentoIntegrationConfig['username'],
-          apiKey: magentoIntegrationConfig['apiKey'],
-        },
-        remapping: {},
-        route: MagentoRoutes.Login,
-      };
+        {
+          esdbid: null,
+          esindex: null,
+          host: magentoIntegrationConfig['host'],
+          includedFields: [],
+          onlyFirst: false,
+          params: {
+            username: magentoIntegrationConfig['username'],
+            apiKey: magentoIntegrationConfig['apiKey'],
+          },
+          remapping: {},
+          route: MagentoRoutes.Login,
+        };
 
       try
       {
         const partialMagentoConfig: PartialMagentoConfig =
-        {
-          host: '',
-          sessionId: '',
-        };
+          {
+            host: '',
+            sessionId: '',
+          };
         partialMagentoConfig.host = magentoIntegrationConfig['host'];
         partialMagentoConfig.sessionId = await this.call(magConf) as string;
         resolve(partialMagentoConfig);
@@ -617,55 +617,66 @@ class MagentoStream extends Writable
 
   private config: MagentoConfig;
   private parent: MagentoEndpoint;
-  private bulk: object[];
+  private batches: object[][];
+  private currentBatch: number;
+  private batchSize: number;
+
   constructor(config, parent)
   {
     super({
       objectMode: true,
-      highWaterMark: 1024 * 128,
+      highWaterMark: 1024 * 8,
     });
     this.parent = parent;
     this.config = config;
-    this.bulk = [];
+    this.batches = [];
+    this.currentBatch = 0;
+    this.batchSize = 100;
   }
 
   public _write(chunk: any, encoding: string, callback: (err?: Error) => void): void
   {
-    if (Array.isArray(chunk))
+    if (this.batches.length === this.currentBatch)
     {
-      this.bulk = this.bulk.concat(chunk as object[]) as object[];
+      this.batches.push([]);
     }
-    else
+    this.batches[this.currentBatch].push(chunk as object);
+    if (this.batches[this.currentBatch].length >= this.batchSize)
     {
-      this.bulk.push(chunk as object);
+      // do the post request
+      this.sendToMagento(this.batches[this.currentBatch] as object[], this.currentBatch);
     }
-    callback();
-  }
-  public _final(callback: any)
-  {
-    this.sendToMagento();
     callback();
   }
 
-  private sendToMagento()
+  public _final(callback: any)
   {
+    this.sendToMagento(this.batches[this.currentBatch] as object[], this.currentBatch);
+    callback();
+  }
+
+  private sendToMagento(bulk: object[], currBatch)
+  {
+    this.currentBatch++;
     try
     {
-      this.parent.callWithData(this.config, this.bulk).then((res) =>
+      if (bulk !== undefined)
       {
-        winston.info('Magento endpoint ended with status success');
-      })
-        .catch((err) =>
+        this.parent.callWithData(this.config, bulk).then((res) =>
         {
-          winston.info('Magento endpoint ended with status error');
-          throw new Error(err);
-        });
+          winston.info('Magento endpoint successfully processed data chunk payload');
+        })
+          .catch((err) =>
+          {
+            winston.info('Magento endpoint had an error while processing data chunk payload');
+            throw new Error(err);
+          });
+      }
     }
     catch (e)
     {
       winston.error('Magento endpoint error: ');
       winston.error(e);
     }
-
   }
 }

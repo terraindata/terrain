@@ -240,6 +240,7 @@ class EndpointForm extends TerrainComponent<Props>
             FormClass ?
               <FormClass
                 endpoint={endpoint}
+                isSource={this.props.isSource}
                 onChange={this.handleEndpointChange}
               />
               :

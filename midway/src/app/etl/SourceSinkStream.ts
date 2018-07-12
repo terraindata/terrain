@@ -256,7 +256,7 @@ export async function getSinkStream(
 
     try
     {
-      if (sink.type !== 'Database' && sink.type !== 'FollowUpBoss' && sink.type !== 'MailChimp')
+      if (sink.type !== 'Database' && sink.type !== 'FollowUpBoss' && sink.type !== 'MailChimp' && sink.type !== 'Magento')
       {
         switch (sink.fileConfig.fileType)
         {
@@ -344,6 +344,9 @@ export async function getSinkStream(
           break;
         case 'MailChimp':
           endpoint = new MailChimpEndpoint();
+          break;
+        case 'Magento':
+          endpoint = new MagentoEndpoint();
           break;
         default:
           throw new Error('Sink type not implemented.');
