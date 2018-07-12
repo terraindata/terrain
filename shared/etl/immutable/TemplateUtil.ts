@@ -57,7 +57,7 @@ import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, Sources }
 import { Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+import * as Utils from 'shared/etl/util/ETLUtils';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
 import
@@ -91,7 +91,7 @@ export default class TemplateUtil
     {
       template.getEdges().forEach((edge: ETLEdge, key) =>
       {
-        const engineErrors = EngineUtil.verifyIntegrity(edge.transformations);
+        const engineErrors = Utils.engine.verifyIntegrity(edge.transformations);
         if (engineErrors.length > 0)
         {
           errors = errors.concat(engineErrors);

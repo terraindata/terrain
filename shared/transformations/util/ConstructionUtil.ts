@@ -65,8 +65,6 @@ import * as yadeep from 'shared/util/yadeep';
 
 import * as TerrainLog from 'loglevel';
 
-const etlTypeKeyPath = List(['etlType']);
-
 type SimpleType = ReturnType<typeof TypeUtil['getSimpleType']>;
 
 export class TypeTracker

@@ -49,8 +49,6 @@ import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
-
 import * as Utils from 'shared/etl/util/ETLUtils';
 
 export default abstract class TransformationNodeInfo
@@ -78,7 +76,7 @@ export default abstract class TransformationNodeInfo
     if (this.availInfo !== undefined)
     {
       const { allowedTypes, arrayOf, isNamed } = this.availInfo;
-      const etlType = EngineUtil.fieldType(fieldId, engine);
+      const etlType = Utils.engine.fieldType(fieldId, engine);
       if (allowedTypes !== undefined)
       {
         if (allowedTypes.indexOf(etlType) === -1)
@@ -92,7 +90,7 @@ export default abstract class TransformationNodeInfo
         {
           return false;
         }
-        const childType = EngineUtil.fieldType(tree.get(fieldId).get(0), engine);
+        const childType = Utils.engine.fieldType(tree.get(fieldId).get(0), engine);
         if (arrayOf.indexOf(childType) === -1)
         {
           return false;

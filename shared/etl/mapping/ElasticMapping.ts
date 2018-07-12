@@ -53,7 +53,6 @@ import * as TerrainLog from 'loglevel';
 import { defaultProps, ElasticFieldProps, ElasticTypes, etlTypeToElastic } from 'shared/etl/types/ETLElasticTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath, KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 import * as Utils from 'shared/etl/util/ETLUtils';
@@ -287,7 +286,7 @@ export class ElasticMapping
   {
     const elasticProps = ElasticMapping.getElasticProps(fieldID, engine);
 
-    const etlType = EngineUtil.fieldType(fieldID, engine);
+    const etlType = Utils.engine.fieldType(fieldID, engine);
     const elasticType = elasticProps.elasticType === ElasticTypes.Auto ?
       etlTypeToElastic(etlType)
       :
@@ -348,7 +347,7 @@ export class ElasticMapping
 
   protected getETLType(fieldID: number): FieldTypes
   {
-    return EngineUtil.fieldType(fieldID, this.engine);
+    return Utils.engine.fieldType(fieldID, this.engine);
   }
 
   protected clearGeopointMappings(disabledFields: { [k: number]: boolean })
@@ -422,7 +421,7 @@ export class ElasticMapping
     const shouldExplore = (id) => disabledMap[id] === undefined;
     disabledFields.forEach((id) =>
     {
-      for (const childId of EngineUtil.preorder(tree, id, shouldExplore))
+      for (const childId of Utils.traversal.preorder(tree, id, shouldExplore))
       {
         disabledMap[childId] = true;
       }

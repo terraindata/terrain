@@ -50,7 +50,7 @@ import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
 
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+import * as Utils from 'shared/etl/util/ETLUtils';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
@@ -119,7 +119,7 @@ export class SetIfTFF extends TransformationForm<SetOptions, TransformationNodeT
 
   protected isNumber()
   {
-    const type = EngineUtil.fieldType(this.props.fieldId, this.props.engine);
+    const type = Utils.engine.fieldType(this.props.fieldId, this.props.engine);
     return type === FieldTypes.Number || type === FieldTypes.Integer;
   }
 
@@ -137,7 +137,7 @@ export class SetIfTFF extends TransformationForm<SetOptions, TransformationNodeT
 
   protected stringDisplayState(state: SetOptions)
   {
-    const type = EngineUtil.fieldType(this.props.fieldId, this.props.engine);
+    const type = Utils.engine.fieldType(this.props.fieldId, this.props.engine);
     if (type === FieldTypes.String)
     {
       return DisplayState.Active;

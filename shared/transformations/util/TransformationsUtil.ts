@@ -49,7 +49,7 @@ const { List, Map } = Immutable;
 
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+import * as Utils from 'shared/etl/util/ETLUtils';
 import Topology from 'shared/transformations/util/TopologyUtil';
 import { KeyPath, KeyPathUtil as PathUtil } from 'shared/util/KeyPath';
 
@@ -91,7 +91,7 @@ export function validateNewFieldName(
 
   if (fieldId !== undefined && fieldId !== -1)
   {
-    const parentType = EngineUtil.fieldType(fieldId, engine);
+    const parentType = Utils.engine.fieldType(fieldId, engine);
     if (parentType !== FieldTypes.Object && parentType !== FieldTypes.Array)
     {
       return {
@@ -163,7 +163,7 @@ export function validateRename(
     const parentId = engine.getFieldID(kpToTest);
     if (parentId !== undefined)
     {
-      const parentType = EngineUtil.fieldType(parentId, engine);
+      const parentType = Utils.engine.fieldType(parentId, engine);
       if (parentType !== FieldTypes.Object && parentType !== FieldTypes.Array)
       {
         return {

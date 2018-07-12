@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import { TransformationGraph } from 'shared/transformations/TypedGraph';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 

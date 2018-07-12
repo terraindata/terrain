@@ -53,7 +53,7 @@ import * as React from 'react';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+import * as Utils from 'shared/etl/util/ETLUtils';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
@@ -136,7 +136,7 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
     const currentKP = engine.getFieldPath(fieldId);
     return engine.getAllFieldIDs().filter((id, i) => fieldId !== id
       && Topology.areFieldsLocal(currentKP, engine.getFieldPath(id))
-      && EngineUtil.fieldType(id, engine) === FieldTypes.String,
+      && Utils.engine.fieldType(id, engine) === FieldTypes.String,
     ).toList();
   }
 

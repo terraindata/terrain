@@ -273,66 +273,6 @@ export default class EngineUtil
       e2.disableField(id2);
     }
   }
-
-  public static postorderForEach(
-    engine: TransformationEngine,
-    fromId: number,
-    fn: (id: number) => void,
-  )
-  {
-    const tree = engine.createTree();
-    for (const id of EngineUtil.postorder(tree, fromId))
-    {
-      fn(id);
-    }
-  }
-
-  public static preorderForEach(
-    engine: TransformationEngine,
-    fromId: number,
-    fn: (id: number) => void,
-  )
-  {
-    const tree = engine.createTree();
-    for (const id of EngineUtil.preorder(tree, fromId))
-    {
-      fn(id);
-    }
-  }
-
-  public static * postorder(
-    tree: Immutable.Map<number, List<number>>,
-    id: number,
-    shouldExplore: (id) => boolean = () => true,
-  )
-  {
-    const children = tree.get(id);
-    if (children !== undefined)
-    {
-      for (let i = 0; i < children.size; i++)
-      {
-        yield* EngineUtil.postorder(tree, children.get(i), shouldExplore);
-      }
-      yield id;
-    }
-  }
-
-  public static * preorder(
-    tree: Immutable.Map<number, List<number>>,
-    id: number,
-    shouldExplore: (id) => boolean = () => true,
-  )
-  {
-    const children = tree.get(id);
-    if (children !== undefined && shouldExplore(id))
-    {
-      yield id;
-      for (let i = 0; i < children.size; i++)
-      {
-        yield* EngineUtil.preorder(tree, children.get(i), shouldExplore);
-      }
-    }
-  }
 }
 
 export const ETLTypeToCastString: {

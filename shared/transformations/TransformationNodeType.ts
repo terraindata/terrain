@@ -255,7 +255,6 @@ export enum TransformationEdgeTypes
 {
   Synthetic = 'Synthetic',
   InPlace = 'InPlace',
-  Restructure = 'Restructure',
   Rename = 'Rename',
 }
 

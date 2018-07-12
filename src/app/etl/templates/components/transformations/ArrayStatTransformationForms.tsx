@@ -60,7 +60,7 @@ import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 

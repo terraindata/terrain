@@ -58,9 +58,10 @@ import { DateFormats, etlFieldTypesNames, FieldTypes } from 'shared/etl/types/ET
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import EngineUtil, { ETLTypeToCastString } from 'shared/transformations/util/EngineUtil';
+import * as Utils from 'shared/etl/util/ETLUtils';
 import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
+import { ETLTypeToCastString } from 'shared/transformations/util/EngineUtil';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
@@ -106,7 +107,7 @@ export class CastTFF extends TransformationForm<CastOptions, TransformationNodeT
     const { fieldId, isCreate, engine } = this.props;
     if (isCreate)
     {
-      const etlType = EngineUtil.fieldType(fieldId, engine);
+      const etlType = Utils.engine.fieldType(fieldId, engine);
       const state: CastOptions = {
         toTypename: ETLTypeToCastString[etlType],
       };

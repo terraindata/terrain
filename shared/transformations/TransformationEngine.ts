@@ -64,7 +64,7 @@ import TransformationVisitError from './visitors/TransformationVisitError';
 import TransformationVisitResult from './visitors/TransformationVisitResult';
 
 import { TransformationGraph } from 'shared/transformations/TypedGraph';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+import * as Utils from 'shared/etl/util/ETLUtils';
 
 const NodeConstructor = new TransformationNodeConstructorVisitor();
 const TransformationCreator = new CreateTransformationVisitor();
@@ -191,7 +191,7 @@ export class TransformationEngine
    * appended to the engine's transformation DAG in the appropriate place.
    *
    * @param {TransformationNodeType} nodeType    The type of transformation to create
-   * @param {Immutable.List<KeyPath>} fieldNames A list of field names (not IDs)
+   * @param {Immutable.List<KeyPath>} inFields A list of field names (not IDs)
    *                                             on which to apply the new transformation
    * @param {object} options                     Any options for the transformation;
    *                                             different transformation types have
@@ -227,7 +227,7 @@ export class TransformationEngine
       meta: options,
     });
     this.dag.setNode(nodeId.toString(), node);
-    node.accept(TransformationCreator, { engine: this, graph: this.dag });
+    node.accept(TransformationCreator, this);
 
     return nodeId;
   }
@@ -317,6 +317,8 @@ export class TransformationEngine
     this.fieldTypes = this.fieldTypes.set(id, typeName);
     this.fieldEnabled = this.fieldEnabled.set(id, true);
     this.fieldProps = this.fieldProps.set(id, options);
+
+
     this.appendTransformation(
       TransformationNodeType.IdentityNode,
       List([id]),
@@ -450,7 +452,7 @@ export class TransformationEngine
     );
     // loop over children
     const transplantIndex = oldPath.size;
-    EngineUtil.postorderForEach(this, fieldID, (id) =>
+    Utils.traversal.postorderFields(this, fieldID, (id) =>
     {
       const childPath = this.getFieldPath(id);
       this.setFieldPath(id, newPath.concat(childPath.slice(transplantIndex)).toList());

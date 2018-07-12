@@ -50,6 +50,7 @@ import TypeUtil from 'shared/etl/TypeUtil';
 import ConstructionUtil from 'shared/transformations/util/ConstructionUtil';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import TopologyUtil from 'shared/transformations/util/TopologyUtil';
+import TraversalUtil from 'shared/transformations/util/TraversalUtil';
 import { KeyPathUtil } from 'shared/util/KeyPath';
 
 export { TypeUtil as type };
@@ -57,3 +58,4 @@ export { KeyPathUtil as path };
 export { TopologyUtil as topology };
 export { ConstructionUtil as construction };
 export { EngineUtil as engine };
+export { TraversalUtil as traversal } ;

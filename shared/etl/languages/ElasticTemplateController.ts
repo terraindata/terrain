@@ -55,7 +55,7 @@ import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/t
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+import * as Utils from 'shared/etl/util/ETLUtils';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 import { DefaultController } from './DefaultTemplateController';
@@ -76,7 +76,7 @@ class ElasticController extends DefaultController implements LanguageInterface
 
   public canSetPrimaryKey(engine: TransformationEngine, fieldId: number)
   {
-    const etlType = EngineUtil.fieldType(fieldId, engine);
+    const etlType = Utils.engine.fieldType(fieldId, engine);
     const isRootField = engine.getFieldPath(fieldId).size === 1;
     return (
       etlType === FieldTypes.String || etlType === FieldTypes.Number || etlType === FieldTypes.Integer

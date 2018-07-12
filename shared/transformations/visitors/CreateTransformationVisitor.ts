@@ -63,22 +63,17 @@ import TransformationVisitResult from './TransformationVisitResult';
 
 import { Edge, TransformationGraph } from 'shared/transformations/TypedGraph';
 
+import * as Utils from 'shared/etl/util/ETLUtils';
+
 /*
  *  This visitor will be called after the transformation engine creates the node in the dag.
  */
 
-interface Args
-{
-  engine: TransformationEngine;
-  graph: TransformationGraph;
-}
-
 export default class CreationVisitor
-  extends TransformationNodeVisitor<void, Args>
+  extends TransformationNodeVisitor<void, TransformationEngine>
 {
-  public visitorLookup: VisitorLookupMap<void, Args> = {
+  public visitorLookup: VisitorLookupMap<void, TransformationEngine> = {
     [TransformationNodeType.RenameNode]: this.visitRenameNode,
-    [TransformationNodeType.CastNode]: this.visitCastNode,
     [TransformationNodeType.IdentityNode]: this.visitIdentityNode,
   };
 
@@ -88,9 +83,8 @@ export default class CreationVisitor
     this.bindVisitors();
   }
 
-  public visitDefault(type: TransformationNodeType, node: TransformationNode, args: Args)
+  public visitDefault(type: TransformationNodeType, node: TransformationNode, engine: TransformationEngine)
   {
-    const { engine, graph } = args;
     let edgeType: EdgeTypes = EdgeTypes.InPlace;
     if (node.meta.newFieldKeyPaths !== undefined && node.meta.newFieldKeyPaths.size > 0)
     {
@@ -99,7 +93,7 @@ export default class CreationVisitor
 
     node.fields.forEach((field) =>
     {
-      this.appendNodeToField(args, field.id, node.id, edgeType);
+      Utils.traversal.appendNodeToField(engine, field.id, node.id, edgeType);
     });
 
     if (edgeType === EdgeTypes.Synthetic)
@@ -113,8 +107,8 @@ export default class CreationVisitor
           {
             newType = engine.getFieldType(node.fields.get(0).id);
           }
-          const synthId = engine.addField(kp, newType, {}, edgeType === EdgeTypes.Synthetic);
-          this.prependNodeToField(args, synthId, node.id, edgeType);
+          const synthId = engine.addField(kp, newType, {}, true);
+          Utils.traversal.prependNodeToField(engine, synthId, node.id, edgeType);
         }
       });
     }
@@ -125,80 +119,13 @@ export default class CreationVisitor
     return TransformationRegistry.getNewFieldType(type);
   }
 
-  protected appendNodeToField(args: Args, fieldId: number, nodeId: number, edgeType: EdgeTypes)
-  {
-    const endNode = this.findEndTransformation(args, fieldId);
-    if (endNode === -1)
-    {
-      return;
-    }
-    args.graph.setEdge(String(endNode), String(nodeId), edgeType);
-  }
-
-  protected prependNodeToField(args: Args, fieldId: number, nodeId: number, edgeType: EdgeTypes)
-  {
-    const startNode = this.findStartTransformation(args, fieldId);
-    if (startNode === -1)
-    {
-      return;
-    }
-    args.graph.setEdge(String(nodeId), String(startNode), edgeType);
-  }
-
-  protected findStartTransformation(args: Args, field: number): number
-  {
-    for (const nId of args.graph.nodes())
-    {
-      const node = args.graph.node(nId);
-      if (node.typeCode === TransformationNodeType.IdentityNode && node.fields.get(0).id === field)
-      {
-        return node.id;
-      }
-    }
-    return -1;
-  }
-
-  protected findEndTransformation(args: Args, field: number): number
-  {
-    const startId = this.findStartTransformation(args, field);
-    if (startId === -1)
-    {
-      return -1;
-    }
-
-    let node = String(startId);
-    for (let i = 0; i < args.graph.nodeCount(); i++)
-    {
-      const edges = args.graph.outEdges(node);
-      if (!Array.isArray(edges))
-      {
-        return Number(node);
-      }
-      else
-      {
-        const edge = edges.find((e) => args.graph.edge(e) !== EdgeTypes.Synthetic);
-        if (edge == null)
-        {
-          return Number(node);
-        }
-        node = edge.w;
-      }
-    }
-    return -1;
-  }
-
-  protected visitIdentityNode(type: TransformationNodeType, node: TransformationNode, args: Args): void
+  protected visitIdentityNode(type, node: TransformationNode, engine: TransformationEngine): void
   {
 
   }
 
-  protected visitRenameNode(type: TransformationNodeType, node: TransformationNode, args: Args): void
+  protected visitRenameNode(type, node: TransformationNode, engine: TransformationEngine): void
   {
-    this.appendNodeToField(args, node.fields.get(0).id, node.id, EdgeTypes.Rename);
-  }
-
-  protected visitCastNode(type: TransformationNodeType, node: TransformationNode, args: Args): void
-  {
-    this.appendNodeToField(args, node.fields.get(0).id, node.id, EdgeTypes.Restructure);
+    Utils.traversal.appendNodeToField(engine, node.fields.get(0).id, node.id, EdgeTypes.Rename);
   }
 }
