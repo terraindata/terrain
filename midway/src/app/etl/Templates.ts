@@ -444,7 +444,7 @@ export default class Templates
             for (const e of outEdges)
             {
               const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
-              const transformStream = new TransformationEngineTransform([], transformationEngine);
+              const transformStream = new TransformationEngineTransform(transformationEngine);
               streamMap[nodeId][e.w] = sourceStream.pipe(transformStream);
 
               // log all errors to the log stream
@@ -570,7 +570,7 @@ export default class Templates
               for (const e of outEdges)
               {
                 const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
-                const transformStream = new TransformationEngineTransform([], transformationEngine);
+                const transformStream = new TransformationEngineTransform(transformationEngine);
                 const mergeJoinStream = await getMergeJoinStream(dbName, tempIndices, node.options);
                 streamMap[nodeId][e.w] = mergeJoinStream.pipe(transformStream);
                 streamMap[nodeId][e.w].on('end', async () =>

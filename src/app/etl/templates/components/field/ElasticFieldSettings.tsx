@@ -60,7 +60,7 @@ const { List, Map } = Immutable;
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import { compareObjects } from 'etl/ETLUtil';
+import { compareObjects } from 'etl/ComponentUtil';
 import
 {
   _TemplateField,

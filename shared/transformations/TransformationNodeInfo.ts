@@ -51,7 +51,7 @@ import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import * as Utils from 'shared/etl/util/XYZUtil';
+import * as Utils from 'shared/etl/util/ETLUtils';
 
 export default abstract class TransformationNodeInfo
 {

@@ -57,7 +57,7 @@ import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
 import { instanceFnDecorator } from 'shared/util/Classes';
 
-import { compareObjects, isVisiblyEqual, PropertyTracker, UpdateChecker } from 'etl/ETLUtil';
+import { compareObjects, isVisiblyEqual, PropertyTracker, UpdateChecker } from 'etl/ComponentUtil';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';

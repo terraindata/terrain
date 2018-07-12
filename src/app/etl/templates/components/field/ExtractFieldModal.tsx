@@ -71,7 +71,7 @@ import { validateNewFieldName } from 'shared/transformations/util/Transformation
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
-import * as Utils from 'shared/etl/util/XYZUtil';
+import * as Utils from 'shared/etl/util/ETLUtils';
 
 import './EditorFieldModal.less';
 

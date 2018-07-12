@@ -58,7 +58,7 @@ import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
-import * as Utils from 'shared/etl/util/XYZUtil';
+import * as Utils from 'shared/etl/util/ETLUtils';
 
 export interface TransformationConfig
 {

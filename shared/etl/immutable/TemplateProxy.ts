@@ -60,7 +60,7 @@ import TransformationNodeType from 'shared/transformations/TransformationNodeTyp
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
-import * as Utils from 'shared/etl/util/XYZUtil';
+import * as Utils from 'shared/etl/util/ETLUtils';
 
 import
 {

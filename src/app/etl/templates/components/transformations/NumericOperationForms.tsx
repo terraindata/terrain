@@ -136,7 +136,7 @@ export class NumericFormBase<NodeType extends TransformationNodeType>
       && (
         EngineUtil.fieldType(id, engine) === FieldTypes.Number ||
         EngineUtil.fieldType(id, engine) === FieldTypes.Integer
-      )
+      ),
     ).toList();
   }
 

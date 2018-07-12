@@ -56,7 +56,7 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath, KeyPath as EnginePath } from 'shared/util/KeyPath';
 
-import * as Utils from 'shared/etl/util/XYZUtil';
+import * as Utils from 'shared/etl/util/ETLUtils';
 
 interface PathHashMap<T>
 {

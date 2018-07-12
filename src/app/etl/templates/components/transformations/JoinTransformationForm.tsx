@@ -66,7 +66,6 @@ import Topology from 'shared/transformations/util/TopologyUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
-
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
