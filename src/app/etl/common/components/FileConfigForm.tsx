@@ -262,7 +262,6 @@ export default class FileConfigForm extends TerrainComponent<Props>
 
   public renderSuggestedPathsData(suggestedFilePaths)
   {
-    // const suggestedFilePaths = PathUtil.guessFilePaths(this.props.source);
     return (
       <DataModal
         sectionTitle='CURRENTLY SELECTED: N/A'

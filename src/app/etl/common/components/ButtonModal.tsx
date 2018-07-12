@@ -107,7 +107,7 @@ export default class ButtonModal extends TerrainComponent<Props>
       <div
         className={(this.props.helpCursor) ? 'small-text-button' : 'small-help-button'}
         onClick={this.handleModalOpen}
-        style={{ color: Colors().mainBlue }}
+        style={{ color: Colors().mainBlue, fontWeight: 200 }}
       >
         {this.props.button}
       </div>
