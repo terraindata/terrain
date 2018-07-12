@@ -45,8 +45,9 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-empty
 
-import { ConnectionsStatus } from 'app/connections/components/ConnectionsStatus';
 import * as InAppNotification from 'common/components/InAppNotification';
+import { ConnectionsStatus } from 'connections/components/ConnectionsStatus';
+import { _ConnectionConfig } from 'connections/ConnectionTypes';
 import { shallow } from 'enzyme';
 import * as React from 'react';
 import ConnectionsHelper from 'test-helpers/ConnectionsHelper';
@@ -61,7 +62,7 @@ describe('ConnectionsStatus', () =>
 {
   const connectionsStateMock = ConnectionsHelper.mockState();
   const connections = connectionsStateMock
-    .addConnection({
+    .addConnection(_ConnectionConfig({
       id: 1,
       name: 'Connection 1',
       type: 'ElasticSearch',
@@ -69,8 +70,8 @@ describe('ConnectionsStatus', () =>
       host: 'localhost:9200',
       status: 'DISCONNECTED',
       isAnalytics: false,
-    })
-    .addConnection({
+    }))
+    .addConnection(_ConnectionConfig({
       id: 2,
       name: 'Connection 2',
       type: 'ElasticSearch',
@@ -78,8 +79,8 @@ describe('ConnectionsStatus', () =>
       host: 'localhost:9200',
       status: 'CONNECTED',
       isAnalytics: false,
-    })
-    .addConnection({
+    }))
+    .addConnection(_ConnectionConfig({
       id: 3,
       name: 'Connection 3',
       type: 'Mysql',
@@ -87,7 +88,7 @@ describe('ConnectionsStatus', () =>
       host: 'localhost:9200',
       status: 'CONN_TIMEOUT',
       isAnalytics: false,
-    })
+    }))
     .getState();
 
   let componentWrapper = null;
