@@ -251,7 +251,7 @@ export class TypeTracker
     if (this.onConflict !== null)
     {
       this.onConflict(`Conflict between type '${type}' and type '${this.simpleType}' from values ` +
-      `${this.formatMessageValue(value)} and ${this.formatMessageValue(this.lastValue)}`);
+        `${this.formatMessageValue(value)} and ${this.formatMessageValue(this.lastValue)}`);
     }
   }
 
@@ -269,7 +269,8 @@ export class TypeTracker
   }
 }
 
-interface FieldNode {
+interface FieldNode
+{
   path: KeyPath;
   name: WayPoint; // null if root
   type?: ETLFieldTypes;
@@ -280,11 +281,12 @@ interface FieldNode {
 export default abstract class ConstructionUtil
 {
   public static createEngineFromDocuments(documents: List<object>, interpretText = false):
-    { engine: TransformationEngine, errors: string[]}
+    { engine: TransformationEngine, errors: string[] }
   {
     const pathTypes: PathHashMap<TypeTracker> = {};
     const errAccumulator = ConstructionUtil.errorAccumulator();
-    documents.forEach((doc, docIndex) => {
+    documents.forEach((doc, docIndex) =>
+    {
       for (const leaf of yadeep.traverse(doc, { primitivesOnly: true, arrayLimit: 20 }))
       {
         const { location, value } = leaf;
@@ -424,7 +426,8 @@ export default abstract class ConstructionUtil
     return {
       errors,
       numErrors: total,
-      fn: (err) => {
+      fn: (err) =>
+      {
         total++;
         if (errors.length <= maxErrors)
         {

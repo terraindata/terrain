@@ -364,7 +364,7 @@ export function deleteIn(obj: object, path: KeyPath)
   }
 }
 
-function * explore(obj: any, path: KeyPath, options: TraverseOptions): IterableIterator<ContextResult>
+function* explore(obj: any, path: KeyPath, options: TraverseOptions): IterableIterator<ContextResult>
 {
   if (isPrimitive(obj))
   {
@@ -378,7 +378,7 @@ function * explore(obj: any, path: KeyPath, options: TraverseOptions): IterableI
     const limit = options.arrayLimit !== -1 ? Math.min(options.arrayLimit, obj.length) : obj.length;
     for (let i = 0; i < limit; i++)
     {
-      yield * explore(obj[i], path.push(i), options);
+      yield* explore(obj[i], path.push(i), options);
     }
     if (!options.primitivesOnly)
     {
@@ -392,7 +392,7 @@ function * explore(obj: any, path: KeyPath, options: TraverseOptions): IterableI
   {
     for (const key of Object.keys(obj))
     {
-      yield * explore(obj[key], path.push(key), options);
+      yield* explore(obj[key], path.push(key), options);
     }
     if (!options.primitivesOnly)
     {

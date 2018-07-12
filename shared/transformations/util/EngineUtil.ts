@@ -58,7 +58,7 @@ import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import objectify from 'shared/util/deepObjectify';
-import { KeyPath, WayPoint, KeyPathUtil as PathUtil } from 'shared/util/KeyPath';
+import { KeyPath, KeyPathUtil as PathUtil, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
 import * as TerrainLog from 'loglevel';
@@ -76,16 +76,10 @@ export default class EngineUtil
    */
   public static verifyIntegrity(engine: TransformationEngine)
   {
-    let errors = [];
+    const errors = [];
     try
     {
       const fields = engine.getAllFieldIDs();
-      const pathTypes: PathHashMap<FieldTypes> = {};
-      fields.forEach((id) =>
-      {
-        const strippedPath = PathUtil.convertIndices(engine.getFieldPath(id));
-        pathTypes[PathUtil.hash(strippedPath)] = engine.getFieldType(id) as FieldTypes;
-      });
       fields.forEach((id) =>
       {
         const okp = engine.getFieldPath(id);
@@ -93,23 +87,11 @@ export default class EngineUtil
         {
           const parentPath = okp.slice(0, -1).toList();
           const parentID = engine.getFieldID(parentPath);
-          if (engine.getFieldType(parentID) !== 'array' && engine.getFieldType(parentID) !== 'object')
+          const type = EngineUtil.getETLFieldType(parentID, engine);
+          if (type !== ETLFieldTypes.Array && type !== ETLFieldTypes.Object)
           {
             errors.push(`Field ${okp.toJS()} has a parent that is not an array or object`);
           }
-        }
-        if (okp.last() === -1)
-        {
-          if (engine.getFieldType(id) !== 'array')
-          {
-            errors.push(`Field ${okp.toJS()} is not of type array, but has name -1. This is not allowed`);
-          }
-        }
-        const fieldTypeErrors = EngineUtil.fieldHasValidType(engine, id);
-        if (fieldTypeErrors.length > 0)
-        {
-          errors.push(`Errors Encountered with field ${id} (${okp.toJS()})`);
-          errors = errors.concat(fieldTypeErrors);
         }
       });
     }
@@ -118,17 +100,6 @@ export default class EngineUtil
       errors.push(`Error while trying to verify transformation engine integrity: ${String(e)}`);
     }
     return errors;
-  }
-
-  public static fieldHasValidType(engine: TransformationEngine, id: number): string[]
-  {
-    const fieldType = engine.getFieldType(id) as FieldTypes;
-    const etlType = EngineUtil.getETLFieldType(id, engine);
-    if (validJSTypes.indexOf(fieldType) === -1)
-    {
-      return [`Field Type ${fieldType} is not a valid js type`];
-    }
-    return [];
   }
 
   // get all fields that are computed from this field

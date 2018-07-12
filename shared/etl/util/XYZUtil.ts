@@ -54,6 +54,6 @@ import { KeyPathUtil } from 'shared/util/KeyPath';
 
 export { TypeUtil as type };
 export { KeyPathUtil as path };
-export { TopologyUtil as topology};
+export { TopologyUtil as topology };
 export { ConstructionUtil as construction };
 export { EngineUtil as engine };

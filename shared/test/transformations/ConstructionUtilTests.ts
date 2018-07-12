@@ -72,43 +72,52 @@ function testHelper(values: any[], interpret = false): ETLFieldTypes
 // delete these tests if they become inconvenient
 describe('simple primitive type tracker tests', () =>
 {
-  test('all strings test', () => {
+  test('all strings test', () =>
+  {
     expect(testHelper(['hello', 'there', 'friend'])).toBe(ETLFieldTypes.String);
     expect(testHelper(['whoa!'])).toBe(ETLFieldTypes.String);
   });
-  test('all strings with nulls', () => {
+  test('all strings with nulls', () =>
+  {
     expect(testHelper([null, null, 'friend'])).toBe(ETLFieldTypes.String);
     expect(testHelper(['hello', null, 'friend'])).toBe(ETLFieldTypes.String);
     expect(testHelper(['hello', null])).toBe(ETLFieldTypes.String);
   });
-  test('all strings with undefined', () => {
+  test('all strings with undefined', () =>
+  {
     expect(testHelper([undefined, 'hello', 'friend'])).toBe(ETLFieldTypes.String);
     expect(testHelper(['hello', undefined, 'friend'])).toBe(ETLFieldTypes.String);
     expect(testHelper(['hello', undefined])).toBe(ETLFieldTypes.String);
   });
-  test('all strings with empty strings', () => {
+  test('all strings with empty strings', () =>
+  {
     expect(testHelper(['', 'hello', 'friend'])).toBe(ETLFieldTypes.String);
     expect(testHelper(['hello', '', 'friend'])).toBe(ETLFieldTypes.String);
     expect(testHelper(['hello', ''])).toBe(ETLFieldTypes.String);
   });
-  test('all numbers', () => {
+  test('all numbers', () =>
+  {
     expect(testHelper([5, 4.5, 1e5])).toBe(ETLFieldTypes.Number);
     expect(testHelper([0, -1.5])).toBe(ETLFieldTypes.Number);
   });
-  test('all integers', () => {
+  test('all integers', () =>
+  {
     expect(testHelper([5, 1e5])).toBe(ETLFieldTypes.Integer);
     expect(testHelper([0, -4])).toBe(ETLFieldTypes.Integer);
   });
-  test('numbers with nulls', () => {
+  test('numbers with nulls', () =>
+  {
     expect(testHelper([null, 5.3, 10])).toBe(ETLFieldTypes.Number);
     expect(testHelper([3, null, -1.5])).toBe(ETLFieldTypes.Number);
     expect(testHelper([3, 4, null])).toBe(ETLFieldTypes.Integer);
   });
-  test('all booleans', () => {
+  test('all booleans', () =>
+  {
     expect(testHelper([false])).toBe(ETLFieldTypes.Boolean);
     expect(testHelper([false, true, false])).toBe(ETLFieldTypes.Boolean);
   });
-  test('booleans with nulls', () => {
+  test('booleans with nulls', () =>
+  {
     expect(testHelper([null, false])).toBe(ETLFieldTypes.Boolean);
     expect(testHelper([false, true, null, false])).toBe(ETLFieldTypes.Boolean);
   });
@@ -116,48 +125,58 @@ describe('simple primitive type tracker tests', () =>
 
 describe('special type tracker tests', () =>
 {
-  test('arrays', () => {
+  test('arrays', () =>
+  {
     expect(testHelper([[], [1, 2]])).toBe(ETLFieldTypes.Array);
     expect(testHelper([null, [1, 2]])).toBe(ETLFieldTypes.Array);
   });
-  test('objects', () => {
-    expect(testHelper([{hello: 'world'}, {}])).toBe(ETLFieldTypes.Object);
-    expect(testHelper([{hello: 'world'}, null])).toBe(ETLFieldTypes.Object);
+  test('objects', () =>
+  {
+    expect(testHelper([{ hello: 'world' }, {}])).toBe(ETLFieldTypes.Object);
+    expect(testHelper([{ hello: 'world' }, null])).toBe(ETLFieldTypes.Object);
   });
-  test('dates', () => {
+  test('dates', () =>
+  {
     expect(testHelper([null, '2011-05-11T00:00:00.000Z'])).toBe(ETLFieldTypes.Date);
     expect(testHelper(['2011-05-11T00:00:00.000', null])).toBe(ETLFieldTypes.Date);
     expect(testHelper(['07/04/2018', '2018-07-04'])).toBe(ETLFieldTypes.Date);
   });
-  test('geopoints', () => {
+  test('geopoints', () =>
+  {
     expect(testHelper(['', `{"lat":0.63,"lon":0.43}`])).toBe(ETLFieldTypes.GeoPoint);
   });
 });
 
 describe('negative special type tracker tests', () =>
 {
-  test('incorrect arrays', () => {
+  test('incorrect arrays', () =>
+  {
     expect(testHelper([[], [1, 2], {}])).toBe(ETLFieldTypes.String);
     expect(testHelper([null, [], '[]'])).toBe(ETLFieldTypes.String);
   });
-  test('incorrect objects', () => {
-    expect(testHelper([{hello: 'world'}, 5])).toBe(ETLFieldTypes.String);
-    expect(testHelper([{hello: 'world'}, '{}'])).toBe(ETLFieldTypes.String);
+  test('incorrect objects', () =>
+  {
+    expect(testHelper([{ hello: 'world' }, 5])).toBe(ETLFieldTypes.String);
+    expect(testHelper([{ hello: 'world' }, '{}'])).toBe(ETLFieldTypes.String);
   });
-  test('incorrect dates', () => {
+  test('incorrect dates', () =>
+  {
     expect(testHelper([123456, '2011-05-11T00:00:00.000Z'])).toBe(ETLFieldTypes.String);
     expect(testHelper(['2011-05-11T00:00:00.000', 'hello'])).toBe(ETLFieldTypes.String);
     expect(testHelper(['07/04/2018', '', 'hmm'])).toBe(ETLFieldTypes.String);
   });
-  test('incorrect geopoint', () => {
+  test('incorrect geopoint', () =>
+  {
     expect(testHelper([`{"lat":0.63,"lon":0.43}`, {}])).toBe(ETLFieldTypes.String);
     expect(testHelper([`{"lat":0.63,"lon":0.43}`, 'hello'])).toBe(ETLFieldTypes.String);
   });
-  test('nothing special strings', () => {
+  test('nothing special strings', () =>
+  {
     expect(testHelper([null, ''])).toBe(ETLFieldTypes.String);
     expect(testHelper(['', '', ''])).toBe(ETLFieldTypes.String);
   });
-  test('nothing special numbers', () => {
+  test('nothing special numbers', () =>
+  {
     expect(testHelper([NaN])).toBe(ETLFieldTypes.Number);
     expect(testHelper([NaN, null])).toBe(ETLFieldTypes.Number);
   });
@@ -165,14 +184,17 @@ describe('negative special type tracker tests', () =>
 
 describe('mix and match', () =>
 {
-  test('strings and numbers', () => {
+  test('strings and numbers', () =>
+  {
     expect(testHelper(['hi', 5])).toBe(ETLFieldTypes.String);
     expect(testHelper([null, 1.5, '5'])).toBe(ETLFieldTypes.String);
   });
-  test('geopoints and dates', () => {
+  test('geopoints and dates', () =>
+  {
     expect(testHelper([`{"lat":0.63,"lon":0.43}`, '2011-05-11T00:00:00.000'])).toBe(ETLFieldTypes.String);
   });
-  test('bools and things', () => {
+  test('bools and things', () =>
+  {
     expect(testHelper([true, 'false'])).toBe(ETLFieldTypes.String);
     expect(testHelper([false, 0])).toBe(ETLFieldTypes.String);
     expect(testHelper([true, NaN, true])).toBe(ETLFieldTypes.String);
@@ -181,23 +203,27 @@ describe('mix and match', () =>
 
 describe('interpret strings', () =>
 {
-  test('interpret numbers', () => {
+  test('interpret numbers', () =>
+  {
     expect(testHelper(['5', '1e3', '2'], true)).toBe(ETLFieldTypes.Integer);
     expect(testHelper([null, '100.5'], true)).toBe(ETLFieldTypes.Number);
   });
-  test('interpret numbers with NaN', () => {
+  test('interpret numbers with NaN', () =>
+  {
     expect(testHelper(['NaN', '100.5'], true)).toBe(ETLFieldTypes.Number);
     expect(testHelper(['NaN'], true)).toBe(ETLFieldTypes.Number);
     expect(testHelper(['NaN', '5'], true)).toBe(ETLFieldTypes.Integer);
     expect(testHelper(['5', null, 'NaN'], true)).toBe(ETLFieldTypes.Integer);
     expect(testHelper(['5.5', 'NaN'], true)).toBe(ETLFieldTypes.Number);
   });
-  test('interpret numbers with decoy real numbers', () => {
+  test('interpret numbers with decoy real numbers', () =>
+  {
     expect(testHelper(['5', 15, '2'], true)).toBe(ETLFieldTypes.String);
     expect(testHelper([NaN, '5'], true)).toBe(ETLFieldTypes.String);
     expect(testHelper(['NaN', NaN], true)).toBe(ETLFieldTypes.String);
   });
-  test('interpret booleans', () => {
+  test('interpret booleans', () =>
+  {
     expect(testHelper(['true', 'false'], true)).toBe(ETLFieldTypes.Boolean);
     expect(testHelper([null, 'true', ''], true)).toBe(ETLFieldTypes.Boolean);
     expect(testHelper([false, true, 'true'], true)).toBe(ETLFieldTypes.String);
@@ -207,17 +233,20 @@ describe('interpret strings', () =>
 
 describe('weird cases with no meaningful types', () =>
 {
-  test('check nulls', () => {
+  test('check nulls', () =>
+  {
     expect(testHelper([null, null])).toBe(ETLFieldTypes.String);
   });
-  test('no values pushed', () => {
+  test('no values pushed', () =>
+  {
     expect(testHelper([], true)).toBe(ETLFieldTypes.String);
   });
 });
 
 describe('check coersion callback', () =>
 {
-  const messageHelper = (values: any[]): string => {
+  const messageHelper = (values: any[]): string =>
+  {
     let cbCall = null;
     const tracker = new TypeTracker(List(['samplePath']), (msg) => { cbCall = msg; });
     for (const val of values)
@@ -227,24 +256,28 @@ describe('check coersion callback', () =>
     return cbCall;
   };
 
-  test('coersion check 1', () => {
+  test('coersion check 1', () =>
+  {
     const msg = messageHelper(['hello', 5]);
     expect(typeof msg).toBe('string');
     expect(msg.length).toBeGreaterThan(0);
   });
 
-  test('coersion check 2', () => {
+  test('coersion check 2', () =>
+  {
     const msg = messageHelper([5, 'hello']);
     expect(typeof msg).toBe('string');
     expect(msg.length).toBeGreaterThan(0);
   });
 
-  test('coersion check 3', () => {
+  test('coersion check 3', () =>
+  {
     const msg = messageHelper([null, 5]);
     expect(msg).toBe(null);
   });
 
-  test('coersion check 4', () => {
+  test('coersion check 4', () =>
+  {
     const msg = messageHelper([{}, []]);
     expect(typeof msg).toBe('string');
     expect(msg.length).toBeGreaterThan(0);
@@ -258,7 +291,7 @@ describe('create engine test', () =>
       foo: 'bar',
       someArr: [1, 2, 3],
       nestedArr: [
-        { strField: 'hello', numField: 5},
+        { strField: 'hello', numField: 5 },
       ],
       coercedField1: 'hello',
       coercedField2: {
@@ -282,11 +315,13 @@ describe('create engine test', () =>
   ]);
   const { engine, errors } = ConstructionUtil.createEngineFromDocuments(docs);
 
-  test('test identity transformation', () => {
+  test('test identity transformation', () =>
+  {
     expect(engine.transform(docs.get(2))).toEqual(docs.get(2));
   });
 
-  test('test existence of fields', () => {
+  test('test existence of fields', () =>
+  {
     expect(engine.getFieldID(KeyPath(['foo']))).toBeDefined();
     expect(engine.getFieldID(KeyPath(['someArr']))).toBeDefined();
     expect(engine.getFieldID(KeyPath(['someArr', -1]))).toBeDefined();
@@ -296,14 +331,16 @@ describe('create engine test', () =>
     expect(engine.getFieldID(KeyPath(['coercedField2']))).toBeDefined();
   });
 
-  test('nonexistence of fields', () => {
+  test('nonexistence of fields', () =>
+  {
     expect(engine.getFieldID(KeyPath(['someArr', 0]))).toBeUndefined();
     expect(engine.getFieldID(KeyPath(['nestedArr', 0]))).toBeUndefined();
     expect(engine.getFieldID(KeyPath(['coercedField1', -1]))).toBeUndefined();
     expect(engine.getFieldID(KeyPath(['coercedField2', 'baz']))).toBeUndefined();
   });
 
-  test('check coersion errors', () => {
+  test('check coersion errors', () =>
+  {
     expect(errors.length).toBeGreaterThan(0);
   });
 });
