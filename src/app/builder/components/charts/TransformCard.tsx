@@ -289,6 +289,7 @@ class TransformCard extends TerrainComponent<Props>
           mode={this.props.data.mode}
           builder={this.props.builder}
           index={this.props.index || getIndex('', this.props.builder)}
+          distanceValue={data.distanceValue}
         />
         <TransformCardPeriscope
           onChange={this.props.onChange}

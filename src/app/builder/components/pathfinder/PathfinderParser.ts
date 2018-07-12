@@ -312,6 +312,7 @@ function parseTerrainScore(score: Score, simpleParser: boolean = false)
       ranges = data.ranges;
       outputs = data.outputs;
     }
+    const { distanceValue } = line.transformData; 
     if (simpleParser)
     {
       return {
@@ -319,9 +320,8 @@ function parseTerrainScore(score: Score, simpleParser: boolean = false)
         b: 1,
         mode: line.transformData.mode,
         isDistance: line.fieldType === FieldType.Geopoint,
-        // TODO
-        lat: line.transformData.distanceValue.location[0],
-        lon: line.transformData.distanceValue.location[1],
+        lat: distanceValue && distanceValue.location ? line.transformData.distanceValue.location[0] : 0,
+        lon: distanceValue && distanceValue.location ? line.transformData.distanceValue.location[1] : 0,
         visiblePoints: {
           ranges: line.transformData.visiblePoints.map((scorePt) => scorePt.value).toArray(),
           outputs: line.transformData.visiblePoints.map((scorePt) => scorePt.score).toArray(),
@@ -343,8 +343,8 @@ function parseTerrainScore(score: Score, simpleParser: boolean = false)
       visiblePoints: line.transformData.visiblePoints,
       weight: line.weight,
       isDistance: line.fieldType === FieldType.Geopoint,
-      lat: 37.444900,
-      lon: -122.161750,
+      lat: distanceValue && distanceValue.location ? line.transformData.distanceValue.location[0] : 0,
+      lon: distanceValue && distanceValue.location ? line.transformData.distanceValue.location[1] : 0,
     };
   }).toArray();
   sortObj._script.script.params.factors = factors;

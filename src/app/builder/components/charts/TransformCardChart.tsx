@@ -92,6 +92,7 @@ export interface Props
   index?: string;
   schema?: SchemaState;
   builder?: BuilderState;
+  distanceValue?: {location: number[], address: ''};
 }
 
 // http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
@@ -604,6 +605,7 @@ export class TransformCardChart extends TerrainComponent<Props>
       index: this.props.index,
       schema: this.props.schema,
       builder: this.props.builder,
+      distanceValue: overrideState.distanceValue || this.props.distanceValue,
     };
   }
 

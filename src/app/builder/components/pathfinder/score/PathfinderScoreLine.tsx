@@ -145,7 +145,11 @@ class PathfinderScoreLine extends TerrainComponent<Props>
       newLine = newLine.setIn(['transformData', 'distanceValue'], null);
     }
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath), newLine, false, true);
-    this.setState((state) => ({ editingField: false }));
+    if (fieldType !== FieldType.Geopoint)
+    {
+      console.log('set editing field false');
+      this.setState((state) => ({ editingField: false }));
+    }
   }
 
   public renderTransformChart()
@@ -255,14 +259,17 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
   public handleDropdownClose()
   {
-    this.setState({
-      editingField: false,
-    });
+    console.log('handle dropdown close');
+    if (this.props.line.fieldType !== FieldType.Geopoint)
+    {
+      this.setState({
+        editingField: false,
+      });   
+    }
   }
 
   public handleMapChange(location, address)
   {
-    console.log('HANDLE MAP CHANGE');
     const newLine = this.props.line.setIn(
       ['transformData', 'distanceValue'],
       {location: MapUtil.getCoordinatesFromGeopoint(location), address}
@@ -271,6 +278,8 @@ class PathfinderScoreLine extends TerrainComponent<Props>
       this.props.keyPath,
       newLine,
     );
+    console.log('handle map submit close');
+    this.setState((state) => ({ editingField: false }));
   }
 
   public renderEditingComponent()
@@ -294,7 +303,9 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     }
     const { distanceValue } = transformData;
     return (
-      <div>
+      <div
+        className='pf-score-line-geo-wrapper'
+      >
         <SearchableDropdown
           options={this.props.dropdownOptions.map((v) => v.displayName as string).toList()}
           selectedIndex={fieldIndex}
@@ -325,6 +336,15 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     const { transformData, fieldType } = this.props.line;
     const editing = this.state.editingField || fieldIndex === -1 ||
       (fieldType === FieldType.Geopoint && !transformData.distanceValue);
+    let fieldName = '';
+    if (fieldIndex !== -1)
+    {
+      fieldName = this.props.dropdownOptions.get(fieldIndex).displayName as string;
+      if (fieldType === FieldType.Geopoint && transformData.distanceValue && transformData.distanceValue.address)
+      {
+        fieldName += ' ' + transformData.distanceValue.address;
+      }
+    }
     return (
       <div
         className='pf-line pf-score-line-inner'
@@ -335,13 +355,15 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           editComponent={this.renderEditingComponent()}
           readOnlyComponent={
             <div className='field-name' onClick={this.editingField}>
-              {this.props.dropdownOptions.get(fieldIndex).displayName as string}
+              {
+                fieldName
+              }
             </div>
           }
         />
 
         {
-          (fieldIndex > -1 && !(fieldType === FieldType.Geopoint && !transformData.distanceValue)) ?
+          (fieldIndex > -1 && !(fieldType === FieldType.Geopoint && editing)) ?
             (
               <div style={getStyle('width', '66.66%')} >
                 <ScoreBar
@@ -354,7 +376,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
             ) : null
         }
         {
-          (fieldIndex > -1 && !(fieldType === FieldType.Geopoint && !transformData.distanceValue)) &&
+          (fieldIndex > -1 && !(fieldType === FieldType.Geopoint && editing)) &&
           this.renderTransformChartPreview()
         }
       </div>

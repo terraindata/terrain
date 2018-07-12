@@ -542,7 +542,6 @@ class PlacesAutocomplete extends TerrainComponent<Props>
               }
 
             </div>
-
             :
             null
         }

@@ -154,6 +154,28 @@
 				flex-basis: 50px;
 				margin: 0px 4px;
 			}
+			.pf-score-line-geo-wrapper {
+				display: flex;
+				position: absolute;
+				top: 0px;
+				left: 30px;
+				width: 100%;
+				.pf-score-map-component-wrapper {
+					width: 50%;
+					.map-component-search-bar {
+						width: 100%;
+					}
+					#PlacesAutocomplete__root {
+						margin-bottom: 0px;
+					}
+					.leaflet-container  {
+						min-height: 250px;
+					}
+					#PlacesAutocomplete__autocomplete-container {
+				    	font-size: 16px;
+					}
+				}
+			}
 			@t: 6px;
 		}
 		.pf-score-line-text {
@@ -186,8 +208,9 @@
 				padding-left: 15px;
 				min-width: 150px;
 				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
+			    line-height: 20px;
+			    max-height: 40px;
+				cursor: pointer;
 			}
 			.field-weight {
 				display: none;
