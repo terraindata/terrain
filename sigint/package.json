@@ -28,13 +28,13 @@
   ],
   "jest": {
     "transform": {
-      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      ".ts": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
     "testPathIgnorePatterns": [
       "node_modules",
       "build"
     ],
-    "testRegex": "/test/.+Tests\\.(ts)$",
+    "testRegex": "/test/.+Tests\\.ts$",
     "moduleFileExtensions": [
       "ts",
       "tsx",
@@ -42,6 +42,9 @@
       "json"
     ],
     "globals": {
+      "ts-jest": {
+        "enableTsDiagnostics": true
+      },
       "DEV": true
     },
     "testURL": "http://localhost"
