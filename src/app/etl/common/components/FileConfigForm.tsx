@@ -66,6 +66,7 @@ import { List } from 'immutable';
 import ButtonModal from './ButtonModal';
 import './ButtonModal.less';
 import DataModal from './DataModal';
+import FadeInOut from 'app/common/components/FadeInOut';
 
 export interface Props
 {
@@ -166,7 +167,6 @@ export default class FileConfigForm extends TerrainComponent<Props>
 
   public render()
   {
-    // console.log(this.props.source);
     return (
       <DynamicForm
         inputMap={this.inputMap}
@@ -193,14 +193,21 @@ export default class FileConfigForm extends TerrainComponent<Props>
     }
     else
     {
+      const suggestedFilePaths = PathUtil.guessFilePaths(this.props.source);
+      //console.log(suggestedFilePaths);
       return (
-        <ButtonModal
-          button='View Suggested Paths'
-          modal='Suggested JSON Paths (Select One)'
-          wide={true}
-          noFooterPadding={true}
-          smallTextButton={false}
-          modalContent={this.renderSuggestedPathsData()}
+        <FadeInOut
+          open={suggestedFilePaths.length !== 0}
+          children={
+            <ButtonModal
+              button='View Suggested Paths'
+              modal='Suggested JSON Paths (Select One)'
+              wide={true}
+              noFooterPadding={true}
+              smallTextButton={true}
+              modalContent={this.renderSuggestedPathsData(suggestedFilePaths)}
+            />
+          }
         />
       );
     }
@@ -209,7 +216,6 @@ export default class FileConfigForm extends TerrainComponent<Props>
   public formatSectionTabs(key, i)
   {
     return `${key.name}: ${key.score}`;
-    // return key.name + ': ' + key.score.toString();
   }
 
   public formatSectionData(key, i)
@@ -238,14 +244,15 @@ export default class FileConfigForm extends TerrainComponent<Props>
           noFooterPadding={true}
           smallTextButton={true}
           modalContent={pathScoreMessage}
+          helpCursor={true}
         />
       </div>
     );
   }
 
-  public renderSuggestedPathsData()
+  public renderSuggestedPathsData(suggestedFilePaths)
   {
-    const suggestedFilePaths = PathUtil.guessFilePaths(this.props.source);
+    // const suggestedFilePaths = PathUtil.guessFilePaths(this.props.source);
     return (
       <DataModal
         sectionTitle='Currently selected: N/A'

@@ -64,6 +64,7 @@ export interface Props
   noFooterPadding: boolean;
   smallTextButton: boolean;
   modalContent?: any;
+  helpCursor?: boolean;
 }
 
 export default class ButtonModal extends TerrainComponent<Props>
@@ -104,7 +105,7 @@ export default class ButtonModal extends TerrainComponent<Props>
   {
     return (
       <div
-        className='small-text-button'
+        className={(this.props.helpCursor) ? 'small-text-button' : 'small-help-button'}
         onClick={this.handleModalOpen}
         style={{ color: Colors().mainBlue }}
       >
