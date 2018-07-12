@@ -254,11 +254,12 @@ export default class MagentoEndpoint extends AEndpointStream
           Object.keys(magentoConfig['remapping']).forEach((oldKey) =>
           {
             const newKey = magentoConfig['remapping'][oldKey];
-            if (!payloadType['isArray'] && row[oldKey] !== undefined && Array.isArray(row[oldKey])) // TODO: make this more robust
+            // TODO: make this more robust
+            if (!payloadType['isArray'] && row[oldKey] !== undefined && Array.isArray(row[oldKey]) && magentoConfig.onlyFirst !== true)
             {
               try
               {
-                newRow[newKey] = row[oldKey][parseInt(magentoConfig.payloadIndex, 10)];
+                newRow[newKey] = row[oldKey][0];
               }
               catch (e1)
               {
@@ -451,7 +452,7 @@ export default class MagentoEndpoint extends AEndpointStream
           host: partialMagConf.host,
           includedFields: sourceConfig['options']['includedFields'],
           params: sourceConfig['options']['params'],
-          payloadIndex: sourceConfig['options']['payloadIndex'],
+          onlyFirst: sourceConfig['options']['onlyFirst'],
           remapping: sourceConfig['options']['remapping'],
           route: sourceConfig['options']['route'],
           sessionId: partialMagConf.sessionId,

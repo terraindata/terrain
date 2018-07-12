@@ -204,7 +204,7 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
       esindex: null,
       includedFields: [],
       params: null,
-      payloadIndex: '*',
+      onlyFirst: true,
       route: null,
       remapping: {},
     },
@@ -258,7 +258,7 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
       esindex: null,
       includedFields: [],
       params: null,
-      payloadIndex: '*',
+      onlyFirst: true,
       route: null,
       remapping: {},
     },
@@ -290,7 +290,7 @@ export interface MagentoOptions
   esindex: string;
   includedFields: string[];
   params: MagentoParamConfigType<MagentoParamTypes>;
-  payloadIndex: string;
+  onlyFirst: boolean;
   remapping: object;
   route: MagentoRoutes;
 }

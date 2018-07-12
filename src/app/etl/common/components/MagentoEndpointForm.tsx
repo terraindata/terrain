@@ -84,8 +84,11 @@ import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 import
 {
   KV,
+  KVConditionsArr,
+  KVConditionsNames,
   MagentoParamConfigDefaults,
   MagentoParamConfigType,
+  MagentoParamPayloadTypes,
   MagentoParamTypes,
   MagentoRoutes,
   MagentoRoutesNames,
@@ -123,6 +126,7 @@ export class MagentoEndpoint extends EndpointFormBase<MagentoState>
       type: DisplayType.Custom,
       widthFactor: 5,
       style: { padding: '0px' },
+      getDisplayState: this.computeDBPickerDisplayState,
       options: {
         render: this.renderDatabasePicker,
       },
@@ -134,9 +138,9 @@ export class MagentoEndpoint extends EndpointFormBase<MagentoState>
         render: this.renderRemappingForm,
       },
     },
-    payloadIndex: {
-      type: DisplayType.TextBox,
-      displayName: 'Data Payload Index (* for all)',
+    onlyFirst: {
+      type: DisplayType.CheckBox,
+      displayName: 'Only First Product',
     },
     includedFields: {
       type: DisplayType.TagsBox,
@@ -144,9 +148,15 @@ export class MagentoEndpoint extends EndpointFormBase<MagentoState>
     },
   };
 
+  public computeDBPickerDisplayState(state: MagentoState)
+  {
+    return state.route != null && MagentoParamPayloadTypes[state.route] !== undefined
+      && MagentoParamPayloadTypes[state.route]['dbPicker'] ? DisplayState.Active : DisplayState.Hidden;
+  }
+
   public computeMagentoRoutes(s?)
   {
-    return this.props.isSource === true ? MagentoSourceRoutesArr : MagentoSinkRoutesArr;
+    return this.props.isSource === true ? MagentoSourceRoutesArr : MagentoSourceRoutesArr;
   }
 
   public renderDatabasePicker(state: MagentoState, disabled: boolean)
@@ -203,7 +213,7 @@ export class MagentoEndpoint extends EndpointFormBase<MagentoState>
     {
       return _.extend({}, newState, {
         params: MagentoParamConfigDefaults[newState.route],
-      };
+      });
     }
     return newState;
   }
@@ -292,7 +302,7 @@ class ProductListForm extends TerrainComponent<ParamProps<CatalogProductListType
         component: KVForm,
         isList: true,
         listDefaultValue: {
-          key: 'new key',
+          key: 'type',
           value: {
             key: 'in',
             value: 'value',
@@ -319,11 +329,11 @@ class KVForm extends TerrainComponent<{ onChange: (val) => void; inputState: KV 
   public inputMap: InputDeclarationMap<KV> = {
     key: {
       type: DisplayType.TextBox,
-      displayName: 'Key',
+      displayName: 'Data Field',
     },
     value: {
       type: DisplayType.Delegate,
-      displayName: 'Value',
+      displayName: '',
       options: {
         component: KVValueForm,
       },
@@ -346,14 +356,24 @@ class KVValueForm extends TerrainComponent<{ inputState: { key: string, value: s
 {
   public inputMap: InputDeclarationMap<{ key: string, value: string }> = {
     key: {
-      type: DisplayType.TextBox,
-      displayName: 'Key',
+      type: DisplayType.Pick,
+      displayName: 'Condition',
+      options: {
+        pickOptions: this.computeKVCondition,
+        indexResolver: (value) => this.computeKVCondition().indexOf(value),
+        displayNames: (s) => KVConditionsNames,
+      },
     },
     value: {
       type: DisplayType.TextBox,
       displayName: 'Value',
     },
   };
+
+  public computeKVCondition(s?)
+  {
+    return KVConditionsArr;
+  }
 
   public render()
   {

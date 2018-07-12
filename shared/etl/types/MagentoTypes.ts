@@ -52,7 +52,7 @@ export interface MagentoConfig
   host: string;
   includedFields: string[];
   params?: MagentoParamConfigType<MagentoParamTypes>;
-  payloadIndex: string;
+  onlyFirst: boolean;
   remapping: {
     [k: string]: any;
   };
@@ -95,30 +95,41 @@ export interface MagentoParamConfigTypes
 
 export const MagentoParamPayloadTypes =
   {
+    CatalogCategoryAssignedProducts: {
+      dbPicker: false,
+    },
     CatalogCategoryAssignProduct: {
+      dbPicker: false,
       paramName: 'product',
       type: 'string',
       isArray: false,
     },
     CatalogCategoryRemoveProduct: {
+      dbPicker: false,
       paramName: 'product',
       type: 'string',
       isArray: false,
     },
     CatalogInventoryStockItemList: {
+      dbPicker: true,
       paramName: 'products',
       type: 'string',
       isArray: true,
     },
     CatalogProductAttributeMediaList: {
+      dbPicker: true,
       paramName: 'product',
       type: 'string',
       isArray: false,
     },
     CatalogProductInfo: {
+      dbPicker: true,
       paramName: 'productId',
       type: 'string',
       isArray: false,
+    },
+    CatalogProductList: {
+      dbPicker: false,
     },
   };
 
@@ -159,10 +170,26 @@ export interface KV
 {
   key: string;
   value: {
-    key: 'in';
+    key: string;
     value: string;
   };
 }
+
+export enum KVConditions
+{
+  in = 'in',
+  nin = 'nin',
+}
+
+export const KVConditionsArr: List<KVConditions> = Immutable.List([
+  KVConditions.in,
+  KVConditions.nin,
+]);
+
+export const KVConditionsNames = Immutable.Map<string, string>({
+  [KVConditions.in]: 'in',
+  [KVConditions.nin]: 'not in',
+});
 
 export interface PartialMagentoConfig
 {
