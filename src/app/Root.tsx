@@ -96,12 +96,10 @@ if (!DEV)
 
     return false;
   };
-} else
-{
-  // TerrainTools.setLogLevel('info');
-  window.TerrainTools = TerrainTools;
-  TerrainTools.welcome();
 }
+// TerrainTools.setLogLevel('info');
+window.TerrainTools = TerrainTools;
+TerrainTools.welcome();
 
 Ajax.config({
   reduxStoreDispatch: TerrainStore.dispatch,
