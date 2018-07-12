@@ -91,6 +91,10 @@ export interface MagentoParamConfigTypes
     filters: KV[];
     storeView: number;
   };
+  Login: {
+    apiKey: string;
+    username: string;
+  };
 }
 
 export const MagentoParamPayloadTypes =
@@ -164,6 +168,10 @@ export const MagentoParamConfigDefaults: MagentoParamConfigTypes =
       filters: [],
       storeView: 1,
     },
+    Login: {
+      apiKey: '',
+      username: '',
+    },
   };
 
 export interface KV
@@ -215,6 +223,7 @@ export enum MagentoRoutes
   CatalogProductAttributeMediaList = 'CatalogProductAttributeMediaList',
   CatalogProductInfo = 'CatalogProductInfo',
   CatalogProductList = 'CatalogProductList',
+  Login = 'Login',
 }
 
 export const MagentoRoutesNames = Immutable.Map<string, string>({
@@ -236,6 +245,7 @@ export const MagentoRoutesRaw =
     CatalogProductInfo: 'catalogProductInfo',
     CatalogInventoryStockItemList: 'catalogInventoryStockItemList',
     CatalogProductList: 'catalogProductList',
+    Login: 'login',
   };
 
 // export const MagentoRoutesArr: List<MagentoRoutes> = Immutable.List([

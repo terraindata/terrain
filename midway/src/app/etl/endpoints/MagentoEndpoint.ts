@@ -51,9 +51,10 @@ import { Readable, Writable } from 'stream';
 import soap = require('strong-soap');
 import * as winston from 'winston';
 
+import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
+
 import
 {
-  ComplexFilter,
   KV,
   MagentoConfig,
   MagentoParamConfigType,
@@ -62,7 +63,6 @@ import
   MagentoParamTypes,
   MagentoResponse,
   MagentoRoutes,
-  MagentoRoutesArr,
   MagentoRoutesRaw,
   PartialMagentoConfig,
   WSDLTree,
@@ -103,17 +103,13 @@ export default class MagentoEndpoint extends AEndpointStream
       {
         combinedParams = Object.assign(combinedParams, { sessionId: magConf.sessionId }); // attach sessionId to the request object
       }
-      const translatedRoute: string = magConf.route === 'login' ? 'login' : MagentoRoutesRaw[magConf.route];
 
-      if (translatedRoute !== undefined)
-      {
-        response = await this._soapCall(translatedRoute, host, combinedParams);
-      }
+      response = await this._soapCall(MagentoRoutesRaw[magConf.route], host, combinedParams);
       resolve(response);
     });
   }
 
-  public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
+  public async getSink(sinkConfig: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
     const magentoConfig: MagentoConfig = await this._parseConfig(sinkConfig);
     return new MagentoStream(magentoConfig, this);
@@ -126,7 +122,7 @@ export default class MagentoEndpoint extends AEndpointStream
       const writeStream = JSONTransform.createExportStream();
       const magentoConfig: MagentoConfig = await this._parseConfig(sourceConfig);
 
-      if (magentoConfig.esdbid !== null && magentoConfig.esdbindex !== null)
+      if (magentoConfig.esdbid !== null && magentoConfig.esindex !== null)
       {
         const controller: DatabaseController = await this._getController(magentoConfig.esdbid);
         const qh: QueryHandler = controller.getQueryHandler();
@@ -344,21 +340,27 @@ export default class MagentoEndpoint extends AEndpointStream
     {
       const magentoIntegrationConfig: object = await this.getIntegrationConfig(endpointConfig.integrationId) as object;
       const magConf: MagentoConfig =
-        {
-          host: magentoIntegrationConfig['host'],
-          route: 'login',
-          params: {
-            username: magentoIntegrationConfig['username'],
-            apiKey: magentoIntegrationConfig['apiKey'],
-          },
-        };
+      {
+        esdbid: null,
+        esindex: null,
+        host: magentoIntegrationConfig['host'],
+        includedFields: [],
+        onlyFirst: false,
+        params: {
+          username: magentoIntegrationConfig['username'],
+          apiKey: magentoIntegrationConfig['apiKey'],
+        },
+        remapping: {},
+        route: MagentoRoutes.Login,
+      };
+
       try
       {
         const partialMagentoConfig: PartialMagentoConfig =
-          {
-            host: '',
-            sessionId: '',
-          };
+        {
+          host: '',
+          sessionId: '',
+        };
         partialMagentoConfig.host = magentoIntegrationConfig['host'];
         partialMagentoConfig.sessionId = await this.call(magConf) as string;
         resolve(partialMagentoConfig);
@@ -489,8 +491,8 @@ export default class MagentoEndpoint extends AEndpointStream
           const innerTypeNames: string[] = innerType['all']['element'].map((innerTypeType) => innerTypeType['name']);
           const rawJSONKeys: string[] = Object.keys(rawJSON).filter((key) => key[0] !== '$');
           const existingFields: string[] = _.intersection(innerTypeNames, rawJSONKeys);
-          const filteredInnerTypes = innerType['all']['element'].filter((innerTypeType)
-            => existingFields.indexOf(innerTypeType['name']) !== -1);
+          const filteredInnerTypes = innerType['all']['element'].filter((innerTypeType) =>
+            existingFields.indexOf(innerTypeType['name']) !== -1);
           filteredInnerTypes.forEach((innerTypeType) =>
           {
             if (innerTypeType['type'].substr(0, 3) === 'xsd'
@@ -545,7 +547,7 @@ export default class MagentoEndpoint extends AEndpointStream
               params['params'][param] = this._convertArrayToSOAPArray(params['params'][param]);
             }
           });
-          App.Limiter.submit(clientFuncCallFunction, params['params'], (errLogin, resultLogin, envLogin, soapHeaderLogin) =>
+          App.Limiter.submit(clientFuncCallFunction, params['params'], (errLogin, resultLogin, envLogin?, soapHeaderLogin?) =>
           {
             if (!errLogin)
             {
@@ -649,7 +651,7 @@ class MagentoStream extends Writable
   {
     try
     {
-      parent.callWithData(this.config, this.bulk).then((res) =>
+      this.parent.callWithData(this.config, this.bulk).then((res) =>
       {
         winston.info('Magento endpoint ended with status success');
       })

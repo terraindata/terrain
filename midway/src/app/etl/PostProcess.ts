@@ -273,24 +273,24 @@ export class PostProcess
           });
         }
         break;
-      case PostProcessAggregationTypes.MergeByPattern: // given the pattern, extract {{@<field name>}}
-        Object.keys(newDataDict).forEach((nDDKey) =>
-        {
-          if (Array.isArray(newDataDict[nDDKey]) && newDataDict[nDDKey].length > 0)
-          {
-            const nDDValue: object = _.cloneDeep(newDataDict[nDDKey][0]);
-            for (let i = 1; i < newDataDict[nDDKey].length; ++i)
-            {
-              options['fields'].forEach((aggField) =>
-              {
-                nDDValue[aggField] = parseFloat(nDDValue[aggField]) + parseFloat(newDataDict[nDDKey][i][aggField]);
-              });
-            }
-            nDDValue[options['primaryKey']] = nDDKey;
-            returnData.push(nDDValue);
-          }
-        });
-        break;
+      // case PostProcessAggregationTypes.MergeByPattern: // given the pattern, extract {{@<field name>}}
+      //   Object.keys(newDataDict).forEach((nDDKey) =>
+      //   {
+      //     if (Array.isArray(newDataDict[nDDKey]) && newDataDict[nDDKey].length > 0)
+      //     {
+      //       const nDDValue: object = _.cloneDeep(newDataDict[nDDKey][0]);
+      //       for (let i = 1; i < newDataDict[nDDKey].length; ++i)
+      //       {
+      //         options['fields'].forEach((aggField) =>
+      //         {
+      //           nDDValue[aggField] = parseFloat(nDDValue[aggField]) + parseFloat(newDataDict[nDDKey][i][aggField]);
+      //         });
+      //       }
+      //       nDDValue[options['primaryKey']] = nDDKey;
+      //       returnData.push(nDDValue);
+      //     }
+      //   });
+      //   break;
       default:
     }
     return returnData;
