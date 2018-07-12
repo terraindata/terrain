@@ -1,4 +1,3 @@
-// Copyright 2018 Terrain Data, Inc.
 /*
 University of Illinois/NCSA Open Source License 
 
@@ -43,3 +42,61 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2018 Terrain Data, Inc.
+
+import clarinet = require('clarinet');
+const parser = clarinet.createStream();
+
+let bracketStack = [];
+
+parser.on('openarray', function() {
+  bracketStack.push('[');
+});
+
+parser.on('closearray', function() {
+  let recent = bracketStack.pop();
+  if (recent !== '[')
+  {
+    ERROR;
+  }
+});
+
+parser.on('openobject', function(key) {
+  bracketStack.push('{');
+});
+
+parser.on('closeobject', function() {
+  let recent = bracketStack.pop();
+  if (recent !== '{')
+  {
+    ERROR;
+  }
+});
+
+let jsonString;
+// parse the string with clarinet
+
+function formatJsonString(jsonString)
+{
+  // apply clarinet parsing to jsonString
+  if (bracketStack === [])
+  {
+    return jsonString; // no incomplete parens
+  }
+  else
+  {
+    while (bracketStack.length > 0)
+    {
+      let unclosedBracket = bracketStack.pop();
+      if (unclosedBracket === '[')
+      {
+        jsonString += ']';
+      }
+      else // unclosed object, unclosedBracket === '{'
+      {
+        jsonString += '}';
+      }
+    }
+    return jsonString;
+  }
+}
