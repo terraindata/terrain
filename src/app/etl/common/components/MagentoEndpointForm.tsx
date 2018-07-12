@@ -211,8 +211,14 @@ export class MagentoEndpoint extends EndpointFormBase<MagentoState>
   {
     if (newState.route !== this.props.endpoint.options.route)
     {
+      const defaultParam = _.get(MagentoParamPayloadTypes, [newState.route, 'paramName'], undefined);
+      const defaultMap = defaultParam !== undefined ? { '': defaultParam } : {};
+      const isOnlyFirst = _.get(MagentoParamPayloadTypes, [newState.route, 'isArray'], true);
+
       return _.extend({}, newState, {
         params: MagentoParamConfigDefaults[newState.route],
+        remapping: defaultMap,
+        onlyFirst: !isOnlyFirst,
       });
     }
     return newState;

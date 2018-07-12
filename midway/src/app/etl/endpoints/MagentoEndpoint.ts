@@ -77,6 +77,8 @@ import XMLTransform from '../../io/streams/XMLTransform';
 import { QueryHandler } from '../../query/QueryHandler';
 import AEndpointStream from './AEndpointStream';
 
+/* tslint:disable:max-classes-per-file */
+
 export default class MagentoEndpoint extends AEndpointStream
 {
   private wsdlTree: WSDLTree;
@@ -110,30 +112,6 @@ export default class MagentoEndpoint extends AEndpointStream
       resolve(response);
     });
   }
-
-  // public async getSink(sinkConfig: SinkConfig, engine?: TransformationEngine): Promise<Readable>
-  // {
-  //   return new Promise<Readable>(async (resolve, reject) =>
-  //   {
-  //     const writeStream = JSONTransform.createExportStream();
-  //     const passThrough = new PassThrough({ highWaterMark: 128 * 1024 });
-  //     const magentoConfig: MagentoConfig = await this._parseConfig(sinkConfig);
-  //     const parsedResult = await this.call(magentoConfig);
-  //     if (Array.isArray(parsedResult))
-  //     {
-  //       parsedResult.forEach((elem) =>
-  //       {
-  //         writeStream.write(elem);
-  //       });
-  //     }
-  //     else
-  //     {
-  //       writeStream.write(parsedResult);
-  //     }
-  //     writeStream.end();
-  //     resolve(writeStream);
-  //   });
-  // }
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
@@ -189,14 +167,14 @@ export default class MagentoEndpoint extends AEndpointStream
                           should: [],
                         },
                       },
-                    ]
-                }
+                    ],
+                },
               },
               from: 0,
               track_scores: true,
               _source: true,
               script_fields: {},
-              size: 5000,
+              size: 5,
             }),
         };
         const readStream: Readable = await qh.handleQuery(payload) as Readable;
@@ -207,7 +185,7 @@ export default class MagentoEndpoint extends AEndpointStream
           if (data['hits'] !== undefined && data['hits']['hits'] !== undefined && Array.isArray(data['hits']['hits']))
           {
             const rows: object[] = data['hits']['hits'].map((hit) => hit['_source']);
-            await this.callWithData(magentoConfig, writeStream, rows);
+            await this.callWithData(magentoConfig, rows, writeStream);
           }
           if (doneReading)
           {
@@ -255,7 +233,7 @@ export default class MagentoEndpoint extends AEndpointStream
           {
             const newKey = magentoConfig['remapping'][oldKey];
             // TODO: make this more robust
-            if (!payloadType['isArray'] && row[oldKey] !== undefined && Array.isArray(row[oldKey]) && magentoConfig.onlyFirst !== true)
+            if (!payloadType['isArray'] && row[oldKey] !== undefined && Array.isArray(row[oldKey]) && magentoConfig.onlyFirst === true)
             {
               try
               {

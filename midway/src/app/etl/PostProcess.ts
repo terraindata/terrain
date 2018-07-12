@@ -251,7 +251,7 @@ export class PostProcess
         }
         else
         {
-          const childKeys = Object.keys(newDataDict);
+          const childKeysSum = Object.keys(newDataDict);
           parentRows.forEach((row) =>
           {
             const nDDValue: object = _.cloneDeep(row);
@@ -259,7 +259,7 @@ export class PostProcess
             {
               nDDValue[aggField] = parseFloat(row[aggField]);
             });
-            childKeys.forEach((ck) =>
+            childKeysSum.forEach((ck) =>
             {
               if (new RegExp((row[options['primaryKey']] as string) + (options['pattern'] as string)).test(ck))
               {

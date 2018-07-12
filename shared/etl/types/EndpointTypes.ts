@@ -202,7 +202,7 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
     Magento: {
       esdbid: null,
       esindex: null,
-      includedFields: [],
+      includedFields: ['sku'],
       params: null,
       onlyFirst: true,
       route: null,
