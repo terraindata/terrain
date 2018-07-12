@@ -265,7 +265,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
     // const suggestedFilePaths = PathUtil.guessFilePaths(this.props.source);
     return (
       <DataModal
-        sectionTitle='Currently selected: N/A'
+        sectionTitle='CURRENTLY SELECTED: N/A'
         sectionType='path'
         sectionOptions={
           List(suggestedFilePaths.map((key, i) => this.formatSectionTabs(key, i)))
