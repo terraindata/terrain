@@ -60,13 +60,15 @@ import { FileConfig as FileConfigI } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import Button from 'app/common/components/Button';
+import FadeInOut from 'app/common/components/FadeInOut';
 import Modal from 'app/common/components/Modal';
 import PathUtil from 'etl/pathselector/PathGuessTest';
 import { List } from 'immutable';
+import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
+import { ColorsActions } from '../../../colors/data/ColorsRedux';
 import ButtonModal from './ButtonModal';
 import './ButtonModal.less';
 import DataModal from './DataModal';
-import FadeInOut from 'app/common/components/FadeInOut';
 
 export interface Props
 {
@@ -194,7 +196,6 @@ export default class FileConfigForm extends TerrainComponent<Props>
     else
     {
       const suggestedFilePaths = PathUtil.guessFilePaths(this.props.source);
-      //console.log(suggestedFilePaths);
       return (
         <FadeInOut
           open={suggestedFilePaths.length !== 0}
@@ -227,13 +228,22 @@ export default class FileConfigForm extends TerrainComponent<Props>
 
   public formatSectionTitles(key, i)
   {
-    const selectedText = (key.name === '*') ? 'Currently selected: *' : `Currently selected: *.${key.name}`;
+    const selectedText = (key.name === '*') ? 'CURRENTLY SELECTED: *' : `CURRENTLY SELECTED: *.${key.name}`;
     const scoreButton = `(${key.score})`;
-    const pathScoreMessage = 'The suggested path scoring is calculated upon the JSON object\'s key meeting \
-      certain requirements of expected behavior, such as corresponding values not being numbers or strings, \
-      values being a list of objects, and objects containing identical inner keys or the same number of \
-      inner keys. A higher score indicates a stronger confidence of that key being the correct path, unless \
-      there is only one suggested key, then the score is incomparable.';
+    const pathScoreMessage = (
+      <div className='path-score-message' style={{ color: Colors().mainSectionTitle }}>
+        The suggested path scoring is calculated upon the JSON object's key meeting
+        certain requirements of expected behavior, such as:
+        <ul>
+          <li>corresponding values not being numbers or strings</li>
+          <li>values being a list of objects</li>
+          <li>objects contain identical inner keys</li>
+          <li>objects contain equal amounts of inner keys</li>
+        </ul>
+        A higher score indicates a stronger confidence of that key being the correct path, unless
+        there is only one suggested key, then the score can be disregarded.
+      </div>
+    );
     return (
       <div className='path-with-score'>
         <div className='path-title-buffer'>{selectedText}</div>
