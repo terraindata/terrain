@@ -51,7 +51,7 @@ import * as _ from 'lodash';
 import * as TerrainLog from 'loglevel';
 
 import { defaultProps, ElasticFieldProps, ElasticTypes, etlTypeToElastic } from 'shared/etl/types/ETLElasticTypes';
-import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil, { PathHashMap } from 'shared/transformations/util/EngineUtil';
 import { KeyPath, KeyPath as EnginePath } from 'shared/util/KeyPath';
@@ -282,7 +282,7 @@ export class ElasticMapping
   {
     const elasticProps = ElasticMapping.getElasticProps(fieldID, engine);
 
-    const etlType = EngineUtil.getETLFieldType(fieldID, engine);
+    const etlType = EngineUtil.fieldType(fieldID, engine);
     const elasticType = elasticProps.elasticType === ElasticTypes.Auto ?
       etlTypeToElastic(etlType)
       :
@@ -343,7 +343,7 @@ export class ElasticMapping
 
   protected getETLType(fieldID: number): ETLFieldTypes
   {
-    return EngineUtil.getETLFieldType(fieldID, this.engine);
+    return EngineUtil.fieldType(fieldID, this.engine);
   }
 
   protected clearGeopointMappings(disabledFields: { [k: number]: boolean })

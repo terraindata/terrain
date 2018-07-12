@@ -99,8 +99,8 @@ export type TemplateObject = {
   [k in keyof TemplateBase]: any;
 };
 
-export type FieldTypes = 'array' | 'object' | 'string' | 'number' | 'boolean';
-export const validJSTypes: FieldTypes[] = ['array', 'object', 'string', 'number', 'boolean'];
+type JSTypes = 'array' | 'object' | 'string' | 'number' | 'boolean';
+export const validJSTypes: JSTypes[] = ['array', 'object', 'string', 'number', 'boolean'];
 
 export enum ETLFieldTypes
 {
@@ -138,7 +138,7 @@ export const etlFieldTypesNames = Immutable.Map<string, string>({
 });
 
 export const JSToETLType: {
-  [k in FieldTypes]: ETLFieldTypes;
+  [k in JSTypes]: ETLFieldTypes;
 } = {
     array: ETLFieldTypes.Array,
     object: ETLFieldTypes.Object,
@@ -149,7 +149,7 @@ export const JSToETLType: {
 
 // its an array because geo point could eventually also be a string
 export const ETLToJSType: {
-  [k in ETLFieldTypes]: FieldTypes[]
+  [k in ETLFieldTypes]: JSTypes[]
 } = {
     [ETLFieldTypes.Array]: ['array'],
     [ETLFieldTypes.Object]: ['object'],
@@ -161,7 +161,7 @@ export const ETLToJSType: {
     [ETLFieldTypes.GeoPoint]: ['object'],
   };
 
-export function getJSFromETL(type: ETLFieldTypes): FieldTypes
+export function getJSFromETL(type: ETLFieldTypes): JSTypes
 {
   return ETLToJSType[type][0];
 }

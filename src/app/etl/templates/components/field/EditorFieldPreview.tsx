@@ -62,7 +62,7 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { FieldVerification } from 'shared/etl/languages/LanguageControllers';
 import LanguageController from 'shared/etl/languages/LanguageControllers';
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
@@ -476,7 +476,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
 
   private renderTypeIcon()
   {
-    const type = EngineUtil.getETLFieldType(this.props.fieldId, this._currentEngine());
+    const type = EngineUtil.fieldType(this.props.fieldId, this._currentEngine());
     const Icon = typeToIcon[type];
     return (
       <div

@@ -119,7 +119,7 @@ export class SetIfTFF extends TransformationForm<SetOptions, TransformationNodeT
 
   protected isNumber()
   {
-    const type = EngineUtil.getETLFieldType(this.props.fieldId, this.props.engine);
+    const type = EngineUtil.fieldType(this.props.fieldId, this.props.engine);
     return type === ETLFieldTypes.Number || type === ETLFieldTypes.Integer;
   }
 
@@ -137,7 +137,7 @@ export class SetIfTFF extends TransformationForm<SetOptions, TransformationNodeT
 
   protected stringDisplayState(state: SetOptions)
   {
-    const type = EngineUtil.getETLFieldType(this.props.fieldId, this.props.engine);
+    const type = EngineUtil.fieldType(this.props.fieldId, this.props.engine);
     if (type === ETLFieldTypes.String)
     {
       return DisplayState.Active;

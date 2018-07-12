@@ -106,7 +106,7 @@ export class CastTFF extends TransformationForm<CastOptions, TransformationNodeT
     const { fieldId, isCreate, engine } = this.props;
     if (isCreate)
     {
-      const etlType = EngineUtil.getETLFieldType(fieldId, engine);
+      const etlType = EngineUtil.fieldType(fieldId, engine);
       const state: CastOptions = {
         toTypename: ETLTypeToCastString[etlType],
       };

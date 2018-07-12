@@ -61,7 +61,7 @@ import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
 import { DynamicForm } from 'common/components/DynamicForm';
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 import * as Immutable from 'immutable';

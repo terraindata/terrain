@@ -53,7 +53,7 @@ import { FieldVerification, LanguageInterface } from 'shared/etl/languages/Langu
 import { ElasticMapping, MappingType } from 'shared/etl/mapping/ElasticMapping';
 import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
-import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath } from 'shared/util/KeyPath';
@@ -76,7 +76,7 @@ class ElasticController extends DefaultController implements LanguageInterface
 
   public canSetPrimaryKey(engine: TransformationEngine, fieldId: number)
   {
-    const etlType = EngineUtil.getETLFieldType(fieldId, engine);
+    const etlType = EngineUtil.fieldType(fieldId, engine);
     const isRootField = engine.getFieldPath(fieldId).size === 1;
     return (
       etlType === ETLFieldTypes.String || etlType === ETLFieldTypes.Number || etlType === ETLFieldTypes.Integer

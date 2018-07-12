@@ -54,7 +54,7 @@ import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/Reorderabl
 import { ETLTemplate, SinksMap, SourcesMap } from 'shared/etl/immutable/TemplateRecords';
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';

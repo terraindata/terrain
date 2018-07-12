@@ -51,7 +51,7 @@ const { List, Map } = Immutable;
 
 import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import LanguageController from 'shared/etl/languages/LanguageControllers';
-import { ETLFieldTypes, FieldTypes, getJSFromETL, Languages } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
@@ -128,7 +128,7 @@ export class EngineProxy
       fields.forEach((kp) =>
       {
         const fieldId = this.engine.getFieldID(kp);
-        EngineUtil.changeFieldType(this.engine, fieldId, config.newSourceType);
+        EngineUtil.changeType(this.engine, fieldId, config.newSourceType);
       });
     }
     if (options.newFieldKeyPaths !== undefined)
@@ -140,22 +140,12 @@ export class EngineProxy
 
         if (config !== undefined && config.type !== undefined)
         {
-          EngineUtil.rawSetFieldType(
-            this.engine,
-            newId,
-            config.type,
-            config.type,
-          );
+          EngineUtil.setType(this.engine, newId, config.type);
         }
         else
         {
-          const synthType = EngineUtil.getETLFieldType(origFieldId, this.engine);
-          EngineUtil.rawSetFieldType(
-            this.engine,
-            newId,
-            synthType,
-            synthType,
-          );
+          const synthType = EngineUtil.fieldType(origFieldId, this.engine);
+          EngineUtil.setType(this.engine, newId, synthType);
         }
       });
     }
@@ -202,7 +192,7 @@ export class EngineProxy
       throw new Error('Cannot extract array field, source keypath is empty');
     }
     const specifiedSourceKP = sourceKP.set(sourceKP.size - 1, index);
-    const specifiedSourceType = EngineUtil.getETLFieldType(sourceId, this.engine);
+    const specifiedSourceType = EngineUtil.fieldType(sourceId, this.engine);
 
     let specifiedSourceId: number;
 
@@ -213,7 +203,7 @@ export class EngineProxy
       {
         throw new Error('Field type is array, but could not find any children in the Transformation Engine');
       }
-      const childType = EngineUtil.getETLFieldType(anyChildId, this.engine);
+      const childType = EngineUtil.fieldType(anyChildId, this.engine);
       specifiedSourceId = this.addField(specifiedSourceKP, ETLFieldTypes.Array, childType);
     }
     else
@@ -239,9 +229,9 @@ export class EngineProxy
     );
     const newFieldId = this.engine.getFieldID(destKP);
 
-    const newFieldType = EngineUtil.getETLFieldType(sourceId, this.engine);
+    const newFieldType = EngineUtil.fieldType(sourceId, this.engine);
     this.addFieldToEngine(destKP.push(-1), newFieldType);
-    EngineUtil.rawSetFieldType(this.engine, newFieldId, ETLFieldTypes.Array, ETLFieldTypes.Array);
+    EngineUtil.setType(this.engine, newFieldId, ETLFieldTypes.Array);
     this.requestRebuild();
   }
 
@@ -462,7 +452,7 @@ export class FieldProxy
 
   public changeType(newType: ETLFieldTypes)
   {
-    const oldType = EngineUtil.getETLFieldType(this.fieldId, this.engine);
+    const oldType = EngineUtil.fieldType(this.fieldId, this.engine);
     if (oldType === newType)
     {
       return;
@@ -481,20 +471,14 @@ export class FieldProxy
       }
     }
 
-    EngineUtil.changeFieldType(this.engine, this.fieldId, newType);
-    EngineUtil.changeFieldTypeSideEffects(this.engine, this.fieldId, newType);
+    EngineUtil.changeType(this.engine, this.fieldId, newType);
     EngineUtil.castField(this.engine, this.fieldId, newType);
 
     if (newType === ETLFieldTypes.Array)
     {
       const childPath = this.engine.getFieldPath(this.fieldId).push(-1);
       EngineUtil.addFieldToEngine(this.engine, childPath, ETLFieldTypes.String);
-      EngineUtil.rawSetFieldType(
-        this.engine,
-        this.fieldId,
-        ETLFieldTypes.Array,
-        ETLFieldTypes.Array,
-      );
+      EngineUtil.setType(this.engine, this.fieldId, ETLFieldTypes.Array);
     }
 
     this.syncWithEngine(true);

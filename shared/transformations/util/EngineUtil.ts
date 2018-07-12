@@ -52,7 +52,7 @@ import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import
 {
-  DateFormats, ETLFieldTypes, ETLToJSType, FieldTypes, getJSFromETL, JSToETLType, Languages, validJSTypes,
+  DateFormats, ETLFieldTypes, ETLToJSType, getJSFromETL, JSToETLType, Languages, validJSTypes,
 } from 'shared/etl/types/ETLTypes';
 import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -87,7 +87,7 @@ export default class EngineUtil
         {
           const parentPath = okp.slice(0, -1).toList();
           const parentID = engine.getFieldID(parentPath);
-          const type = EngineUtil.getETLFieldType(parentID, engine);
+          const type = EngineUtil.fieldType(parentID, engine);
           if (type !== ETLFieldTypes.Array && type !== ETLFieldTypes.Object)
           {
             errors.push(`Field ${okp.toJS()} has a parent that is not an array or object`);
@@ -155,44 +155,28 @@ export default class EngineUtil
     return engine.addField(keypath, getJSFromETL(type), cfg);
   }
 
-  // set the field type with no validation
-  public static rawSetFieldType(
-    engine: TransformationEngine,
-    fieldId: number,
-    etlType: ETLFieldTypes,
-    type: ETLFieldTypes,
-  )
+  /*
+   *  Difference between setType and changeType is that changeType should be on fields that a user
+   *  may have set options on (such as elastic props).
+   */
+  public static setType(engine: TransformationEngine, fieldId: number, type: ETLFieldTypes)
   {
-    engine.setFieldProp(fieldId, etlTypeKeyPath, etlType);
-    engine.setFieldType(fieldId, getJSFromETL(type));
+    engine.setFieldProp(fieldId, etlTypeKeyPath, type);
+    const jsType = PathUtil.isWildcard(engine.getFieldPath(fieldId)) ? 'array' : getJSFromETL(type);
+    engine.setFieldType(fieldId, jsType);
   }
 
-  public static changeFieldType(
-    engine: TransformationEngine,
-    fieldId: number,
-    newType: ETLFieldTypes,
-  )
+  public static changeType(engine: TransformationEngine, fieldId: number, type: ETLFieldTypes)
   {
-    if (!PathUtil.isWildcard(engine.getFieldPath(fieldId)))
-    {
-      engine.setFieldType(fieldId, getJSFromETL(newType));
-    }
-    engine.setFieldProp(fieldId, etlTypeKeyPath, newType);
+    EngineUtil.changeFieldTypeSideEffects(engine, fieldId, type);
+    EngineUtil.setType(engine, fieldId, type);
   }
 
   // get the ETL type of a field
-  public static getETLFieldType(id: number, engine: TransformationEngine): ETLFieldTypes
+  public static fieldType(id: number, engine: TransformationEngine): ETLFieldTypes
   {
     const etlType = engine.getFieldProp(id, etlTypeKeyPath) as ETLFieldTypes;
-    if (etlType == null)
-    {
-      // return JSToETLType[EngineUtil.getRepresentedType(id, engine)];
-      return ETLFieldTypes.String; // default
-    }
-    else
-    {
-      return etlType;
-    }
+    return etlType == null ? ETLFieldTypes.String : etlType;
   }
 
   // take two engines and return an engine whose fields most closely resembles the result of the merge
@@ -232,7 +216,7 @@ export default class EngineUtil
   public static castField(engine: TransformationEngine, fieldId: number, type?: ETLFieldTypes, format?: DateFormats)
   {
     const ikp = engine.getFieldPath(fieldId);
-    const etlType: ETLFieldTypes = type === undefined ? EngineUtil.getETLFieldType(fieldId, engine) : type;
+    const etlType: ETLFieldTypes = type === undefined ? EngineUtil.fieldType(fieldId, engine) : type;
     const castType = ETLTypeToCastString[etlType];
 
     if (etlType === ETLFieldTypes.Date && format === undefined)

@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing strict-boolean-expressions
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 import * as Immutable from 'immutable';

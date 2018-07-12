@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { List, Map } from 'immutable';
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -78,7 +78,7 @@ export default abstract class TransformationNodeInfo
     if (this.availInfo !== undefined)
     {
       const { allowedTypes, arrayOf, isNamed } = this.availInfo;
-      const etlType = EngineUtil.getETLFieldType(fieldId, engine);
+      const etlType = EngineUtil.fieldType(fieldId, engine);
       if (allowedTypes !== undefined)
       {
         if (allowedTypes.indexOf(etlType) === -1)
@@ -92,7 +92,7 @@ export default abstract class TransformationNodeInfo
         {
           return false;
         }
-        const childType = EngineUtil.getETLFieldType(tree.get(fieldId).get(0), engine);
+        const childType = EngineUtil.fieldType(tree.get(fieldId).get(0), engine);
         if (arrayOf.indexOf(childType) === -1)
         {
           return false;

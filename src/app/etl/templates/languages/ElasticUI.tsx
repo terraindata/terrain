@@ -52,7 +52,7 @@ import * as _ from 'lodash';
 import ElasticFieldSettings from 'etl/templates/components/field/ElasticFieldSettings';
 import { DefaultUI } from 'etl/templates/languages/DefaultLanguageUI';
 import { LanguageInterface } from 'etl/templates/languages/LanguageUI';
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { Languages } from 'shared/etl/types/ETLTypes';
 
 class ElasticUI extends DefaultUI implements LanguageInterface
 {

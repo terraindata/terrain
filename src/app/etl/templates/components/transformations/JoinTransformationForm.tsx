@@ -52,7 +52,7 @@ import * as React from 'react';
 
 import { instanceFnDecorator } from 'shared/util/Classes';
 
-import { ETLFieldTypes, FieldTypes, getJSFromETL, Languages } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import { DynamicForm } from 'common/components/DynamicForm';
@@ -137,7 +137,7 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
     const currentKP = engine.getFieldPath(fieldId);
     return engine.getAllFieldIDs().filter((id, i) => fieldId !== id
       && Topology.areFieldsLocal(currentKP, engine.getFieldPath(id))
-      && EngineUtil.getETLFieldType(id, engine) === ETLFieldTypes.String,
+      && EngineUtil.fieldType(id, engine) === ETLFieldTypes.String,
     ).toList();
   }
 

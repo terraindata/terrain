@@ -56,7 +56,7 @@ import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle
 import Util from 'util/Util';
 
 import * as Immutable from 'immutable';
-import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import Quarantine from 'util/RadiumQuarantine';
 const { List, Map } = Immutable;
 import FadeInOut from 'common/components/FadeInOut';

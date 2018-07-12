@@ -56,7 +56,7 @@ import { KeyPathUtil as PathUtil } from 'shared/util/KeyPath';
 
 import
 {
-  DateFormats, ETLFieldTypes, ETLToJSType, FieldTypes, getJSFromETL, JSToETLType, Languages, validJSTypes,
+  DateFormats, ETLFieldTypes, ETLToJSType, getJSFromETL, JSToETLType, Languages, validJSTypes,
 } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';

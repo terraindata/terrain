@@ -47,7 +47,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
-import { FieldTypes, ETLFieldTypes } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import Topology from 'shared/transformations/util/TopologyUtil';
@@ -91,7 +91,7 @@ export function validateNewFieldName(
 
   if (fieldId !== undefined && fieldId !== -1)
   {
-    const parentType = EngineUtil.getETLFieldType(fieldId, engine);
+    const parentType = EngineUtil.fieldType(fieldId, engine);
     if (parentType !== ETLFieldTypes.Object && parentType !== ETLFieldTypes.Array)
     {
       return {
@@ -163,7 +163,7 @@ export function validateRename(
     const parentId = engine.getFieldID(kpToTest);
     if (parentId !== undefined)
     {
-      const parentType = EngineUtil.getETLFieldType(parentId, engine);
+      const parentType = EngineUtil.fieldType(parentId, engine);
       if (parentType !== ETLFieldTypes.Object && parentType !== ETLFieldTypes.Array)
       {
         return {

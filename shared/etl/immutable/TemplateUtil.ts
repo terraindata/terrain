@@ -54,7 +54,7 @@ import { ETLTemplate, SinksMap, SourcesMap } from 'shared/etl/immutable/Template
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';

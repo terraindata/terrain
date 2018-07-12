@@ -66,7 +66,7 @@ import
 } from 'etl/templates/FieldTypes';
 import LanguageUI from 'etl/templates/languages/LanguageUI';
 import LanguageController from 'shared/etl/languages/LanguageControllers';
-import { ETLFieldTypes, etlFieldTypesList, etlFieldTypesNames, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, etlFieldTypesList, etlFieldTypesNames, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 

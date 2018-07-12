@@ -58,7 +58,6 @@ import
 import { FieldMap } from 'etl/templates/TemplateEditorTypes';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
@@ -98,7 +97,7 @@ export function createFieldFromEngine(
     fieldId: id,
     fieldProps: engine.getFieldProps(id),
     outputKeyPath: engine.getFieldPath(id),
-    etlType: EngineUtil.getETLFieldType(id, engine),
+    etlType: EngineUtil.fieldType(id, engine),
     transformations,
     name: enginePath.last().toString(),
   });
