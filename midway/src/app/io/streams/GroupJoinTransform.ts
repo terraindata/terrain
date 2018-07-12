@@ -209,10 +209,8 @@ export default class GroupJoinTransform extends SafeReadable
                 [this.parentAlias]: inputs[i]['_source'],
               });
             const queryObj = JSON.parse(queryStr);
-            const index = queryObj.query.bool.filter.constructor === Array ? queryObj.query.bool.filter[0].term._index :
-              queryObj.query.bool.filter.term._index;
 
-            const header = { index };
+            const header = {};
             body.push(header);
 
             body.push(queryObj);
