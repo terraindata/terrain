@@ -240,23 +240,6 @@ export class EngineProxy
     this.requestRebuild();
   }
 
-  public copyNestedTypes(idToCopy, destKP: KeyPath)
-  {
-    const rootOutputKP = this.engine.getFieldPath(idToCopy);
-    Utils.traversal.preorderFields(this.engine, idToCopy, (childId) =>
-    {
-      // do not copy root
-      if (childId !== idToCopy)
-      {
-        const toTransferKeypath = this.engine.getFieldPath(childId);
-        const pathAfterRoot = toTransferKeypath.slice(rootOutputKP.size);
-        const newFieldKP = destKP.concat(pathAfterRoot).toList();
-        Utils.engine.transferField(childId, newFieldKP, this.engine);
-      }
-    });
-    this.requestRebuild();
-  }
-
   public addField(keypath: KeyPath, type: FieldTypes, childType = FieldTypes.String)
   {
     let newId: number;
@@ -327,26 +310,6 @@ export class EngineProxy
     const newFieldId = this.engine.getFieldID(destKP);
     Utils.engine.transferFieldData(sourceId, newFieldId, this.engine, this.engine);
 
-    let idToCopy = sourceId;
-    if (despecify)
-    {
-      const kpToCopy = Utils.path.convertIndices(this.engine.getFieldPath(sourceId));
-      idToCopy = this.engine.getFieldID(kpToCopy);
-    }
-
-    const rootOutputKP = this.engine.getFieldPath(sourceId);
-    Utils.traversal.preorderFields(this.engine, idToCopy, (childId) =>
-    {
-      // do not copy root
-      if (childId !== idToCopy)
-      {
-        const toTransferKeypath = this.engine.getFieldPath(childId);
-        const pathAfterRoot = toTransferKeypath.slice(rootOutputKP.size);
-        const newFieldKP = destKP.concat(pathAfterRoot).toList();
-        Utils.engine.transferField(childId, newFieldKP, this.engine);
-        const newChildId = this.engine.getFieldID(newFieldKP);
-      }
-    });
     return newFieldId;
   }
 

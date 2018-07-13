@@ -259,6 +259,13 @@ export default class EngineUtil
     return id2;
   }
 
+  public static copyField(e1: TransformationEngine, id1: number, keypath: KeyPath, node?: number, e2 = e1)
+  {
+    const id2 = e2.addField(keypath, e1.getFieldType(id1), {}, node);
+    EngineUtil.transferFieldData(id1, id2, e1, e2);
+    return id2;
+  }
+
   // copies a field's configuration from e1 to e2. id1 and id2 should both exist in e1 and e2 respectively
   public static transferFieldData(id1: number, id2: number, e1: TransformationEngine, e2: TransformationEngine)
   {

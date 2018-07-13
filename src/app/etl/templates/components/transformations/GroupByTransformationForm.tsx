@@ -137,10 +137,10 @@ export class GroupByTFF extends TransformationForm<GroupByOptions, Transformatio
     proxy.addTransformation(this.type, fields, options, {
       type: FieldTypes.Array,
     });
-    for (const key of Object.keys(outputMapping))
-    {
-      const newFieldKP = List([outputMapping[key]]);
-      proxy.copyNestedTypes(fieldId, newFieldKP);
-    }
+    // for (const key of Object.keys(outputMapping))
+    // {
+    //   const newFieldKP = List([outputMapping[key]]);
+    //   proxy.copyNestedTypes(fieldId, newFieldKP);
+    // }
   }
 }

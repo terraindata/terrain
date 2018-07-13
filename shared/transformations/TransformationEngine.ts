@@ -55,7 +55,7 @@ import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 
 import DataStore from './DataStore';
-import TransformationNodeType from './TransformationNodeType';
+import TransformationNodeType, { TransformationEdgeTypes as EdgeTypes } from './TransformationNodeType';
 import TransformationRegistry from './TransformationRegistry';
 import CreateTransformationVisitor from './visitors/CreateTransformationVisitor';
 import TransformationEngineNodeVisitor from './visitors/TransformationEngineNodeVisitor';
@@ -300,7 +300,7 @@ export class TransformationEngine
    * @param {object} options      Any field options (e.g., Elastic analyzers)
    * @returns {number}            The ID of the newly-added field
    */
-  public addField(fullKeyPath: KeyPath, typeName: string = null, options: object = {}, synthetic = false): number
+  public addField(fullKeyPath: KeyPath, typeName: string = null, options: object = {}, sourceNode?: number): number
   {
     const id = this.uidField;
     this.uidField++;
@@ -318,12 +318,15 @@ export class TransformationEngine
     this.fieldEnabled = this.fieldEnabled.set(id, true);
     this.fieldProps = this.fieldProps.set(id, options);
 
-
-    this.appendTransformation(
+    const identityId = this.appendTransformation(
       TransformationNodeType.IdentityNode,
       List([id]),
-      { synthetic },
+      { synthetic: sourceNode !== undefined },
     );
+    if (sourceNode !== undefined)
+    {
+      this.dag.setEdge(String(sourceNode), String(identityId), EdgeTypes.Synthetic);
+    }
     return id;
   }
 

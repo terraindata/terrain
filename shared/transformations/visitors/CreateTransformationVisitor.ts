@@ -75,6 +75,7 @@ export default class CreationVisitor
   public visitorLookup: VisitorLookupMap<void, TransformationEngine> = {
     [TransformationNodeType.RenameNode]: this.visitRenameNode,
     [TransformationNodeType.IdentityNode]: this.visitIdentityNode,
+    [TransformationNodeType.DuplicateNode]: this.visitDuplicateNode,
   };
 
   constructor()
@@ -107,8 +108,7 @@ export default class CreationVisitor
           {
             newType = engine.getFieldType(node.fields.get(0).id);
           }
-          const synthId = engine.addField(kp, newType, {}, true);
-          Utils.traversal.prependNodeToField(engine, synthId, node.id, edgeType);
+          engine.addField(kp, newType, {}, node.id);
         }
       });
     }
@@ -119,6 +119,26 @@ export default class CreationVisitor
     return TransformationRegistry.getNewFieldType(type);
   }
 
+  protected visitGroupByNode(type, node: TransformationNode, engine: TransformationEngine): void
+  {
+    this.visitDefault(type, node, engine);
+
+    const sourceId = node.fields.get(0).id;
+    node.meta.newFieldKeyPaths.forEach((kp) => {
+      this.duplicateChildFields(engine, sourceId, kp, node.id);
+    });
+  }
+
+  protected visitDuplicateNode(type, node: TransformationNode, engine: TransformationEngine): void
+  {
+    this.visitDefault(type, node, engine); // do all the normal stuff
+    // add all child fields of the original field
+
+    const sourceId = node.fields.get(0).id;
+    const destPath = node.meta.newFieldKeyPaths.get(0);
+    this.duplicateChildFields(engine, sourceId, destPath, node.id);
+  }
+
   protected visitIdentityNode(type, node: TransformationNode, engine: TransformationEngine): void
   {
 
@@ -127,5 +147,20 @@ export default class CreationVisitor
   protected visitRenameNode(type, node: TransformationNode, engine: TransformationEngine): void
   {
     Utils.traversal.appendNodeToField(engine, node.fields.get(0).id, node.id, EdgeTypes.Rename);
+  }
+
+  protected duplicateChildFields(engine: TransformationEngine, sourceId: number, rootPath: KeyPath, node?: number)
+  {
+    const sourcePath = Utils.path.convertIndices(engine.getFieldPath(sourceId));
+    sourceId = engine.getFieldID(sourcePath);
+
+    Utils.traversal.preorderFields(engine, sourceId, (childId) => {
+      if (childId !== sourceId)
+      {
+        const pathAfterRoot = engine.getFieldPath(childId).slice(sourcePath.size);
+        const newFieldPath = rootPath.concat(pathAfterRoot).toList();
+        Utils.engine.copyField(engine, childId, newFieldPath, node);
+      }
+    });
   }
 }

@@ -223,16 +223,10 @@ export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[k
  *  InPlace
  *    - v and u are the same field and have no structural differences
  *    - Simple Transformations fall into this category
- *  Restructure
- *    - v and u are the same field but may have different types
- *    - so far, only Cast Transformation
  *  Rename
  *    - v and u are the same field but have different locations
  *    - so far, only rename node falls into this category
- *
- *  Restructure and Rename only have 1 associated transformation,
- *  but they're special enough cases they should have their own type.
- *
+
  *  Generally, InPlace transformations can be freely edited, deleted, or created.
  *  When we append transformations to the DAG for some field f, we should find the source node
  *  associated with f (there should only be one). Provided we construct the DAG properly, every node

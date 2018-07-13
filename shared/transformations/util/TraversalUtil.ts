@@ -176,7 +176,7 @@ export default abstract class Traversal
   )
   {
     const children = tree.get(id);
-    if (children !== undefined)
+    if (children !== undefined && shouldExplore(id))
     {
       for (let i = 0; i < children.size; i++)
       {
