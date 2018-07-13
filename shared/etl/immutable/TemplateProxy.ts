@@ -154,7 +154,7 @@ export class TemplateProxy
     this.setEdgeTo(rightEdgeId, mergeNodeId);
 
     const newEdgeId = this.addEdge(mergeNodeId, leftEdge.to);
-    const newEngine = Utils.engine.mergeJoinEngines(
+    const newEngine = Utils.construction.mergeJoinEngines(
       leftEdge.transformations,
       rightEdge.transformations,
       options.outputKey,

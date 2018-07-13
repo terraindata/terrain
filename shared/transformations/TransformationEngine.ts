@@ -50,7 +50,6 @@ import { List, Map } from 'immutable';
 import isPrimitive = require('is-primitive');
 import * as _ from 'lodash';
 import TransformationNode from 'shared/transformations/TransformationNode';
-import objectify from '../util/deepObjectify';
 import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 

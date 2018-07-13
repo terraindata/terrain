@@ -47,53 +47,18 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import { List } from 'immutable';
 import * as _ from 'lodash';
+import * as Utils from 'shared/etl/util/ETLUtils';
 
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { DateFormats, FieldTypes, getJSFromETL, Languages } from 'shared/etl/types/ETLTypes';
-import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import objectify from 'shared/util/deepObjectify';
-import { KeyPath, KeyPathUtil as PathUtil, WayPoint } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
-
-import * as TerrainLog from 'loglevel';
+import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 
 const etlTypeKeyPath = List(['etlType']);
 export default class EngineUtil
 {
-  /*
-   *  Removed documentation because IT BECAME LIES (todo redo it)
-   */
-  public static verifyIntegrity(engine: TransformationEngine)
-  {
-    const errors = [];
-    try
-    {
-      const fields = engine.getAllFieldIDs();
-      fields.forEach((id) =>
-      {
-        const okp = engine.getFieldPath(id);
-        if (okp.size > 1)
-        {
-          const parentPath = okp.slice(0, -1).toList();
-          const parentID = engine.getFieldID(parentPath);
-          const type = EngineUtil.fieldType(parentID, engine);
-          if (type !== FieldTypes.Array && type !== FieldTypes.Object)
-          {
-            errors.push(`Field ${okp.toJS()} has a parent that is not an array or object`);
-          }
-        }
-      });
-    }
-    catch (e)
-    {
-      errors.push(`Error while trying to verify transformation engine integrity: ${String(e)}`);
-    }
-    return errors;
-  }
-
   // get all fields that are computed from this field
   public static getFieldDependents(engine: TransformationEngine, fieldId: number): List<number>
   {
@@ -116,25 +81,6 @@ export default class EngineUtil
     return List(asSet);
   }
 
-  // returns the first child field
-  public static findChildField(fieldId: number, engine: TransformationEngine): number | undefined
-  {
-    const myKP = engine.getFieldPath(fieldId);
-    const key = engine.getAllFieldIDs().findKey((id: number) =>
-    {
-      const childKP = engine.getFieldPath(id);
-      if (childKP.size === myKP.size + 1)
-      {
-        return childKP.slice(0, -1).equals(myKP);
-      }
-      else
-      {
-        return false;
-      }
-    });
-    return key;
-  }
-
   public static addFieldToEngine(
     engine: TransformationEngine,
     keypath: KeyPath,
@@ -154,7 +100,7 @@ export default class EngineUtil
   public static setType(engine: TransformationEngine, fieldId: number, type: FieldTypes)
   {
     engine.setFieldProp(fieldId, etlTypeKeyPath, type);
-    const jsType = PathUtil.isWildcard(engine.getFieldPath(fieldId)) ? 'array' : getJSFromETL(type);
+    const jsType = Utils.path.isWildcard(engine.getFieldPath(fieldId)) ? 'array' : getJSFromETL(type);
     engine.setFieldType(fieldId, jsType);
   }
 
@@ -169,31 +115,6 @@ export default class EngineUtil
   {
     const etlType = engine.getFieldProp(id, etlTypeKeyPath) as FieldTypes;
     return etlType == null ? FieldTypes.String : etlType;
-  }
-
-  // take two engines and return an engine whose fields most closely resembles the result of the merge
-  public static mergeJoinEngines(
-    leftEngine: TransformationEngine,
-    rightEngine: TransformationEngine,
-    outputKey: string,
-  ): TransformationEngine
-  {
-    const newEngine = new TransformationEngine();
-    leftEngine.getAllFieldIDs().forEach((id) =>
-    {
-      const keypath = leftEngine.getFieldPath(id);
-      const newId = EngineUtil.copyField(leftEngine, id, keypath, undefined, newEngine);
-    });
-    const outputKeyPathBase = List([outputKey, -1]);
-    const outputFieldId = EngineUtil.addFieldToEngine(newEngine, List([outputKey]), FieldTypes.Array);
-    const outputFieldWildcardId = EngineUtil.addFieldToEngine(newEngine, outputKeyPathBase, FieldTypes.Object);
-
-    rightEngine.getAllFieldIDs().forEach((id) =>
-    {
-      const newKeyPath = outputKeyPathBase.concat(rightEngine.getFieldPath(id)).toList();
-      const newId = EngineUtil.copyField(rightEngine, id, newKeyPath, undefined, newEngine);
-    });
-    return newEngine;
   }
 
   public static changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType: FieldTypes)
@@ -224,7 +145,7 @@ export default class EngineUtil
     engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), transformOptions);
   }
 
-  // for each field make an initial type cast based on the js type
+  // TODO move this to an "analysis" or "Transformations util"
   public static addInitialTypeCasts(engine: TransformationEngine)
   {
     engine.getAllFieldIDs().forEach((id) =>

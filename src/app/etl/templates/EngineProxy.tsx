@@ -192,7 +192,7 @@ export class EngineProxy
 
     if (specifiedSourceType === FieldTypes.Array)
     {
-      const anyChildId = Utils.engine.findChildField(sourceId, this.engine);
+      const anyChildId = Utils.traversal.findChildField(sourceId, this.engine);
       if (anyChildId === undefined)
       {
         throw new Error('Field type is array, but could not find any children in the Transformation Engine');

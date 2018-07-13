@@ -49,219 +49,16 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
-import isPrimitive = require('is-primitive');
+import * as Utils from 'shared/etl/util/ETLUtils';
 
-import TypeUtil from 'shared/etl/TypeUtil';
-import { KeyPathUtil as PathUtil } from 'shared/util/KeyPath';
-
-import
-{
-  DateFormats, FieldTypes, getJSFromETL, Languages,
-} from 'shared/etl/types/ETLTypes';
+import { FieldTypes, getJSFromETL } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
 import * as TerrainLog from 'loglevel';
 
-type SimpleType = ReturnType<typeof TypeUtil['getSimpleType']>;
-
-export class TypeTracker
-{
-  public static messageValueLength = 20;
-
-  protected readonly path: KeyPath;
-  protected readonly onConflict;
-  protected readonly interpretStrings: boolean;
-
-  protected valuesSeen = 0;
-  protected lastValue: any;
-  protected simpleType: SimpleType = 'null';
-  protected type: FieldTypes = null;
-  protected stringsWereChecked = false;
-  protected numbersWereChecked = false;
-  protected stringNumbersWereChecked = false;
-  protected couldBeInt = true;
-  protected couldBeDate = true;
-  protected couldBeGeo = true;
-  protected couldBeStringNumber = true;
-  protected couldBeStringInteger = true;
-  protected couldBeStringBoolean = true;
-  protected wasCoerced = false; // if true, then plain string
-
-  constructor(path: KeyPath, onConflict: (msg: string) => void = null, interpretStrings = false)
-  {
-    this.path = path;
-    this.onConflict = onConflict;
-    this.interpretStrings = interpretStrings;
-  }
-
-  public numSeen(): number
-  {
-    return this.valuesSeen;
-  }
-
-  public getType(): FieldTypes
-  {
-    if (this.wasCoerced)
-    {
-      return FieldTypes.String;
-    }
-    switch (this.simpleType)
-    {
-      case 'array':
-        return FieldTypes.Array;
-      case 'object':
-        return FieldTypes.Object;
-      case 'boolean':
-        return FieldTypes.Boolean;
-      case 'number':
-        return (this.numbersWereChecked && this.couldBeInt) ? FieldTypes.Integer : FieldTypes.Number;
-      case 'string':
-        if (!this.stringsWereChecked)
-        {
-          return FieldTypes.String;
-        }
-        if (this.couldBeDate)
-        {
-          return FieldTypes.Date;
-        }
-        if (this.couldBeGeo)
-        {
-          return FieldTypes.GeoPoint;
-        }
-        if (this.interpretStrings)
-        {
-          if (this.couldBeStringNumber)
-          {
-            return (this.stringNumbersWereChecked && this.couldBeStringInteger) ? FieldTypes.Integer : FieldTypes.Number;
-          }
-          if (this.couldBeStringBoolean)
-          {
-            return FieldTypes.Boolean;
-          }
-        }
-        return FieldTypes.String;
-      default:
-        return FieldTypes.String;
-    }
-  }
-
-  public push(value: any)
-  {
-    this.simpleType = this.processType(value);
-    this.lastValue = value;
-    this.valuesSeen++;
-  }
-
-  protected processType(value: any): SimpleType
-  {
-    let baseType = TypeUtil.getSimpleType(value);
-    baseType = this.mergeType(baseType, value);
-    if (baseType === 'number')
-    {
-      return this.processNumber(value);
-    }
-    else if (baseType === 'string')
-    {
-      return this.processString(value);
-    }
-    else
-    {
-      return baseType;
-    }
-  }
-
-  protected processString(value: string): SimpleType
-  {
-    if (value == null || value === '' || this.wasCoerced)
-    {
-      return 'string';
-    }
-    this.stringsWereChecked = true;
-    if (this.couldBeDate)
-    {
-      this.couldBeDate = TypeUtil.isDateHelper(value);
-    }
-    if (this.couldBeGeo)
-    {
-      this.couldBeGeo = TypeUtil.isGeoHelper(value);
-    }
-    if (this.interpretStrings && this.couldBeStringNumber)
-    {
-      const asNumber = Number(value);
-      if (isNaN(asNumber) && value !== 'NaN')
-      {
-        this.couldBeStringNumber = false;
-      }
-      else if (this.couldBeStringInteger && value !== 'NaN')
-      {
-        this.stringNumbersWereChecked = true;
-        this.couldBeStringInteger = TypeUtil.numberIsInteger(asNumber);
-      }
-    }
-    if (this.interpretStrings && this.couldBeStringBoolean)
-    {
-      this.couldBeStringBoolean = TypeUtil.isBooleanHelper(value);
-    }
-    return 'string';
-  }
-
-  protected processNumber(value: number): SimpleType
-  {
-    if (value == null || isNaN(value))
-    {
-      return 'number';
-    }
-    this.numbersWereChecked = true;
-    if (this.couldBeInt)
-    {
-      this.couldBeInt = TypeUtil.numberIsInteger(value);
-    }
-    return 'number';
-  }
-
-  protected mergeType(type: SimpleType, value: any): SimpleType
-  {
-    if (type === 'null')
-    {
-      return this.simpleType;
-    }
-    else if (type === this.simpleType || this.simpleType === 'null')
-    {
-      return type;
-    }
-    else
-    {
-      this.pushConflict(type, value);
-      this.wasCoerced = true;
-      return 'string';
-    }
-  }
-
-  protected pushConflict(type: SimpleType, value: any)
-  {
-    if (this.onConflict !== null)
-    {
-      this.onConflict(`Conflict between type '${type}' and type '${this.simpleType}' from values ` +
-        `${this.formatMessageValue(value)} and ${this.formatMessageValue(this.lastValue)}`);
-    }
-  }
-
-  protected formatMessageValue(value: any): string
-  {
-    const str = String(value);
-    if (str.length > TypeTracker.messageValueLength)
-    {
-      return `"${str.slice(0, TypeTracker.messageValueLength)}..."`;
-    }
-    else
-    {
-      return `"${str}"`;
-    }
-  }
-}
+import { TypeTracker } from './TypeTracker';
 
 interface FieldNode
 {
@@ -274,6 +71,31 @@ interface FieldNode
 
 export default abstract class ConstructionUtil
 {
+  // take two engines and return an engine whose fields most closely resembles the result of the merge
+  public static mergeJoinEngines(
+    leftEngine: TransformationEngine,
+    rightEngine: TransformationEngine,
+    outputKey: string,
+  ): TransformationEngine
+  {
+    const newEngine = new TransformationEngine();
+    leftEngine.getAllFieldIDs().forEach((id) =>
+    {
+      const keypath = leftEngine.getFieldPath(id);
+      const newId = Utils.engine.copyField(leftEngine, id, keypath, undefined, newEngine);
+    });
+    const outputKeyPathBase = List([outputKey, -1]);
+    const outputFieldId = Utils.engine.addFieldToEngine(newEngine, List([outputKey]), FieldTypes.Array);
+    const outputFieldWildcardId = Utils.engine.addFieldToEngine(newEngine, outputKeyPathBase, FieldTypes.Object);
+
+    rightEngine.getAllFieldIDs().forEach((id) =>
+    {
+      const newKeyPath = outputKeyPathBase.concat(rightEngine.getFieldPath(id)).toList();
+      const newId = Utils.engine.copyField(rightEngine, id, newKeyPath, undefined, newEngine);
+    });
+    return newEngine;
+  }
+
   public static createEngineFromDocuments(documents: List<object>, interpretText = false):
     { engine: TransformationEngine, errors: string[] }
   {
@@ -284,8 +106,8 @@ export default abstract class ConstructionUtil
       for (const leaf of yadeep.traverse(doc, { primitivesOnly: true, arrayLimit: 20 }))
       {
         const { location, value } = leaf;
-        const path = PathUtil.convertIndices(location);
-        const hash = PathUtil.hash(path);
+        const path = Utils.path.convertIndices(location);
+        const hash = Utils.path.hash(path);
         if (pathTypes[hash] === undefined)
         {
           pathTypes[hash] = new TypeTracker(path, errAccumulator.fn, interpretText);
@@ -403,7 +225,7 @@ export default abstract class ConstructionUtil
 
     for (const key of Object.keys(pathTypes))
     {
-      const kp = PathUtil.unhash(key);
+      const kp = Utils.path.unhash(key);
       const errors = walk(kp, pathTypes[key].getType());
       if (errors !== true)
       {

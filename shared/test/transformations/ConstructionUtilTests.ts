@@ -48,7 +48,7 @@ import { List } from 'immutable';
 import * as _ from 'lodash';
 
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
-import { TypeTracker } from 'shared/transformations/util/ConstructionUtil';
+import { TypeTracker } from 'shared/transformations/util/TypeTracker';
 import { TransformationEngine } from '../../transformations/TransformationEngine';
 import TransformationNodeType from '../../transformations/TransformationNodeType';
 import { KeyPath, WayPoint } from '../../util/KeyPath';

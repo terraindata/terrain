@@ -49,12 +49,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
-import isPrimitive = require('is-primitive');
-
-import TypeUtil from 'shared/etl/TypeUtil';
-import { KeyPathUtil as PathUtil } from 'shared/util/KeyPath';
-
-import { DateFormats, FieldTypes, getJSFromETL, Languages } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
@@ -201,5 +196,24 @@ export default abstract class Traversal
         yield* Traversal.preorder(tree, children.get(i), shouldExplore);
       }
     }
+  }
+
+  // returns the first child field
+  public static findChildField(fieldId: number, engine: TransformationEngine): number | undefined
+  {
+    const myKP = engine.getFieldPath(fieldId);
+    const key = engine.getAllFieldIDs().findKey((id: number) =>
+    {
+      const childKP = engine.getFieldPath(id);
+      if (childKP.size === myKP.size + 1)
+      {
+        return childKP.slice(0, -1).equals(myKP);
+      }
+      else
+      {
+        return false;
+      }
+    });
+    return key;
   }
 }
