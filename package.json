@@ -335,7 +335,6 @@
     "json-loader": "^0.5.4",
     "less": "^3.0.4",
     "less-loader": "^4.1.0",
-    "nodemon": "^1.17.5",
     "pre-commit": "^1.2.2",
     "raw-loader": "^0.5.1",
     "react-test-renderer": "^16.4.1",
