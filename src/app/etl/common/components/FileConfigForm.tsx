@@ -342,7 +342,16 @@ export default class FileConfigForm extends TerrainComponent<Props>
 
     if (state.useJsonPath && state.jsonPath === null)
     {
-      state.jsonPath = '';
+      const suggestedPath = PathUtil.guessFilePaths(this.props.source)[0];
+      if (suggestedPath != null)
+      {
+        const currentPath = (suggestedPath.name === '*') ? '*' : '*: ' + suggestedPath.name;
+        state.jsonPath = currentPath;
+      }
+      else
+      {
+        state.jsonPath = '*';
+      }
     }
     else if (!state.useJsonPath && state.jsonPath !== null)
     {
