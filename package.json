@@ -7,7 +7,7 @@
   "scripts": {
     "start": "yarn start-postgres && yarn start-midway",
     "start-minified": "yarn start-postgres && yarn start-midway-minified",
-    "start-midway": "rm -rf midway/build; mkdir midway/build; ( NODE_PATH=${NODE_PATH}:./midway/build tsc-watch -p midway/tsconfig.json --onSuccess \"node -r source-map-support/register --max_old_space_size=8192 ./midway/build/midway/src/Midway.js `echo $npm_config_argv | jq '.original[1:] | .[]' | tr '\"\\n' ' '`\" ); ",
+    "start-midway": "rm -rf midway/build; mkdir midway/build; ( NODE_PATH=${NODE_PATH}:./midway/build tsc-watch -p midway/tsconfig.json --onSuccess \"node -r source-map-support/register --max_old_space_size=8192 ./midway/build/midway/src/Midway.js `command -v jq > /dev/null && echo $npm_config_argv | jq '.original[1:] | .[]' | tr '\"\\n' ' '`\" ); ",
     "start-midway-minified": "node -- ./midway/src/assets/bundle.server.js",
     "start-postgres": "docker-compose -f midway-postgres-docker.yml up -d",
     "start-front": "yarn commit-log && webpack-dev-server --config webpack.config.js --inline --content-base midway/src/assets --history-api-fallback --compress --progress --info --mode development",
