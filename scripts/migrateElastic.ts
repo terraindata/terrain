@@ -129,13 +129,7 @@ const unused = (async () =>
     catch (e)
     {
     }
-    try
-    {
-      await dstElasticClient.indices.create({ index });
-    }
-    catch (e)
-    {
-    }
+    await dstElasticClient.indices.create({ index });
     for (const type of Object.keys(mappings))
     {
       await dstElasticClient.indices.putMapping(
@@ -187,7 +181,8 @@ class OneToManyReader extends Readable
     });
   }
 
-  public _read() {
+  public _read()
+  {
     this.canPush = true;
     while (this.queue.length > 0 && this.push(this.queue.shift()))
     {
