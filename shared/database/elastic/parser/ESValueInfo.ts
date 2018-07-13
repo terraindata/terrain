@@ -198,33 +198,32 @@ export default class ESValueInfo
   }
 
   public recursivelyVisit(
-    beforeRec: (element: ESValueInfo, depth?: number) => boolean,
-    afterRec: ((element: ESValueInfo, depth?: number) => void) | null = null,
-    depth: number = 0,
+    beforeRec: (element: ESValueInfo) => boolean,
+    afterRec: ((element: ESValueInfo) => void) | null = null,
   ): void
   {
-    if (!beforeRec(this, depth))
+    if (!beforeRec(this))
     {
       if (afterRec !== null)
       {
-        afterRec(this, depth);
+        afterRec(this);
       }
       return;
     }
 
     this.forEachProperty((property: ESPropertyInfo): void =>
     {
-      property.propertyName.recursivelyVisit(beforeRec, afterRec, depth + 1);
+      property.propertyName.recursivelyVisit(beforeRec, afterRec);
 
       if (property.propertyValue !== null)
       {
-        property.propertyValue.recursivelyVisit(beforeRec, afterRec, depth + 1);
+        property.propertyValue.recursivelyVisit(beforeRec, afterRec);
       }
     });
 
     this.forEachElement((element: ESValueInfo): void =>
     {
-      element.recursivelyVisit(beforeRec, afterRec, depth + 1);
+      element.recursivelyVisit(beforeRec, afterRec);
     });
 
     if (afterRec !== null)
