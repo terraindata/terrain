@@ -81,7 +81,7 @@ function unhandledRejectionHandler(err: Error): void
 process.on('uncaughtException', uncaughtExceptionHandler);
 process.on('unhandledRejection', unhandledRejectionHandler);
 
-(async () =>
+const unused = (async () =>
 {
   if (process.argv.length !== 5)
   {
@@ -156,7 +156,7 @@ process.on('unhandledRejection', unhandledRejectionHandler);
           }),
       );
       const writer = new ElasticWriter(dstElasticClient, index, type, '_id');
-      writer.on('error', (e) => console.log(e + '\n' + e.stack));
+      writer.on('error', (e) => console.log(String(e) + '\n' + String(e.stack)));
       reader.pipe(writer);
       let cnt = 0;
       reader.on('data', () => cnt++);
