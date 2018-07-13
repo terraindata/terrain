@@ -146,15 +146,17 @@ export default class FileConfigForm extends TerrainComponent<Props>
       jsonPath: {
         type: DisplayType.TextBox,
         displayName: 'JSON Path',
-        group: 'path',
+        group: 'suggested path',
         widthFactor: 3,
+        style: { marginTop: '10px' },
         getDisplayState: this.jsonPathDisplay,
       },
       previewDataSource: {
         type: DisplayType.Custom,
         displayName: '',
-        group: 'path',
+        group: 'suggested path',
         widthFactor: 1,
+        style: { marginTop: '10px' },
         options: {
           render: this.renderSuggestedJsonPaths,
         },
@@ -198,23 +200,21 @@ export default class FileConfigForm extends TerrainComponent<Props>
     else
     {
       const suggestedFilePaths = PathUtil.guessFilePaths(this.props.source);
-      // return <InfoIcon />;
+      if (suggestedFilePaths.length === 0)
+      {
+        return undefined;
+      }
       return (
-        <FadeInOut
-          open={suggestedFilePaths.length !== 0}
-          children={
-            <ButtonModal
-              buttonIcon={
-                <InfoIcon />
-              }
-              iconColor={Colors().mainBlue}
-              modal='Suggested JSON Paths (Select One)'
-              wide={true}
-              noFooterPadding={true}
-              smallIconButton={true}
-              modalContent={this.renderSuggestedPathsData(suggestedFilePaths)}
-            />
+        <ButtonModal
+          buttonIcon={
+            <InfoIcon />
           }
+          iconColor={Colors().mainBlue}
+          modal='Suggested JSON Paths (Select One)'
+          wide={true}
+          noFooterPadding={true}
+          smallIconButton={true}
+          modalContent={this.renderSuggestedPathsData(suggestedFilePaths)}
         />
       );
     }
@@ -351,7 +351,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
       const suggestedPath = PathUtil.guessFilePaths(this.props.source)[0];
       if (suggestedPath != null)
       {
-        const currentPath = (suggestedPath.name === '*') ? '*' : '*: ' + suggestedPath.name;
+        const currentPath = (suggestedPath.name === '*') ? '*' : '*. ' + suggestedPath.name;
         state.jsonPath = currentPath;
       }
       else

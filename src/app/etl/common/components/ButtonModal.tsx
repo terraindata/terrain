@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
+// tslint:disable:no-var-requires strict-boolean-expressions
 
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
@@ -121,7 +121,7 @@ export default class ButtonModal extends TerrainComponent<Props>
   public renderSmallIconButton()
   {
     return (
-      <div 
+      <div
         className='button-icon-div'
         style={{ fill: this.props.iconColor }}
         onClick={this.handleModalOpen}
