@@ -67,6 +67,7 @@ export interface Props
   height: string;
   strictFormatting?: boolean;
   dynamicTitle: boolean;
+  preselected: boolean;
   onChange?: (value: any) => void;
 }
 
@@ -144,7 +145,7 @@ export default class DataModal extends TerrainComponent<Props>
 
   public renderTitle()
   {
-    const visualTitle = (this.props.dynamicTitle && this.state.optionHasBeenClicked) ?
+    const visualTitle = (this.props.dynamicTitle && (this.props.preselected || this.state.optionHasBeenClicked)) ?
       this.props.sectionTitles.get(this.state.currentOptionIndex) : this.props.sectionTitle;
     return (
       <div className='info-header' style={{ color: Colors().mainSectionTitle }}>

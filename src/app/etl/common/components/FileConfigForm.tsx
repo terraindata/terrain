@@ -232,16 +232,23 @@ export default class FileConfigForm extends TerrainComponent<Props>
     const scoreButton = `(${key.score})`;
     const pathScoreMessage = (
       <div className='path-score-message' style={{ color: Colors().mainSectionTitle }}>
-        The suggested path scoring is calculated upon the JSON object's key meeting
-        certain requirements of expected behavior, such as:
+        <p>
+          The suggested path scoring is calculated upon the JSON object's key meeting
+          certain requirements of expected behavior, such as:
+        </p>
         <ul>
           <li>corresponding values not being numbers or strings</li>
           <li>values being a list of objects</li>
           <li>objects contain identical inner keys</li>
           <li>objects contain equal amounts of inner keys</li>
         </ul>
-        A higher score indicates a stronger confidence of that key being the correct path, unless
-        there is only one suggested key, then the score can be disregarded.
+        <p>
+          A higher score indicates a stronger confidence of that key being the correct path, on
+          a 0-10 point scale.
+        </p>
+        <p>
+          If there is only one suggested key, then its score is automatically 10 as there is no comparison.
+        </p>
       </div>
     );
     return (
@@ -264,7 +271,6 @@ export default class FileConfigForm extends TerrainComponent<Props>
   {
     return (
       <DataModal
-        sectionTitle='CURRENTLY SELECTED: N/A'
         sectionType='path'
         sectionOptions={
           List(suggestedFilePaths.map((key, i) => this.formatSectionTabs(key, i)))
@@ -279,6 +285,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
         height='80%'
         strictFormatting={true}
         dynamicTitle={true}
+        preselected={true}
         onChange={this.updateJsonPath}
       />
     );

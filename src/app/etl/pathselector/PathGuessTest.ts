@@ -214,7 +214,11 @@ export default class PathUtil
 
   public static guessFilePaths(json): PathInfo[]
   {
-    return PathUtil.guessPath(json, [], 0);
+    const suggestedPathInfo = PathUtil.guessPath(json, [], 0);
+    const sortedPathInfo = suggestedPathInfo.sort((keyA, keyB) => keyB.score - keyA.score);
+    const maxScore = Math.max(...suggestedPathInfo.map((key, i) => key.score));
+    sortedPathInfo.forEach((key) => key.score = (key.score / maxScore) * 10);
+    return sortedPathInfo;
   }
 }
 
