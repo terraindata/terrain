@@ -30,10 +30,6 @@
     "transform": {
       ".ts": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
-    "testPathIgnorePatterns": [
-      "node_modules",
-      "build"
-    ],
     "testRegex": "/test/.+Tests\\.ts$",
     "moduleFileExtensions": [
       "ts",
