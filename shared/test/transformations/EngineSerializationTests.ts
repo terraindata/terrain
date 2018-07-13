@@ -142,7 +142,7 @@ test('JSON serialize/deserialize round trip', () =>
   const j = e.toJSON();
   const e2 = TransformationEngine.load(j);
   expect(e.equals(e2)).toBe(true);
-  e2.addField(KeyPath(['i']), 'number');
+  e2.addField(KeyPath(['i']));
   expect(e.equals(e2)).toBe(false);
 });
 
@@ -155,7 +155,7 @@ test('String serialize/deserialize round trip', () =>
   const e2 = TransformationEngine.load(j);
   expect(e.equals(e2)).toBe(true);
   expect(e2.transform(TestDocs.doc1)['name']).toBe('BOB');
-  e2.addField(KeyPath(['i']), 'number');
+  e2.addField(KeyPath(['i']));
   expect(e.equals(e2)).toBe(false);
 });
 

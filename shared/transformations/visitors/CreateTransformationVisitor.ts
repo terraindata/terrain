@@ -103,12 +103,7 @@ export default class CreationVisitor
       {
         if (engine.getFieldID(kp) === undefined)
         {
-          let newType = this.getNewType(type);
-          if (newType === 'same')
-          {
-            newType = engine.getFieldType(node.fields.get(0).id);
-          }
-          engine.addField(kp, newType, {}, node.id);
+          engine.addField(kp, {}, node.id);
         }
       });
     }

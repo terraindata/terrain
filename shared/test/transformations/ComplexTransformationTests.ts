@@ -113,7 +113,7 @@ test('join transformation where the first field does not exist', () =>
   };
 
   const e: TransformationEngine = new TransformationEngine(doc);
-  e.addField(KeyPath(['f1']), 'string');
+  e.addField(KeyPath(['f1']));
   e.appendTransformation(
     TransformationNodeType.JoinNode,
     List([KeyPath(['f1']), KeyPath(['f2']), KeyPath(['f3'])]),
@@ -175,7 +175,7 @@ test('extract an array field with duplicate', () =>
     wrap(['fields', 0]),
     { newFieldKeyPaths: wrap(['zeroth']) },
   );
-  e.addField(List(['fields', 5]), 'string');
+  e.addField(List(['fields', 5]));
   e.appendTransformation(
     TransformationNodeType.DuplicateNode,
     wrap(['fields', 5]),

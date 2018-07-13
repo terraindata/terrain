@@ -67,6 +67,7 @@ import { TransformationGraph } from 'shared/transformations/TypedGraph';
 
 const NodeConstructor = new TransformationNodeConstructorVisitor();
 const TransformationCreator = new CreateTransformationVisitor();
+const ExecutionVisitor = new TransformationEngineNodeVisitor();
 
 /**
  * A TransformationEngine performs transformations on complex JSON documents.
@@ -102,7 +103,6 @@ export class TransformationEngine
     e.uidField = parsedJSON['uidField'];
     e.uidNode = parsedJSON['uidNode'];
     e.IDToPathMap = Map<number, KeyPath>(parsedJSON['IDToPathMap']);
-    e.fieldTypes = Map<number, string>(parsedJSON['fieldTypes']);
     e.fieldEnabled = Map<number, boolean>(parsedJSON['fieldEnabled']);
     e.fieldProps = Map<number, object>(parsedJSON['fieldProps']);
     return e;
@@ -140,7 +140,6 @@ export class TransformationEngine
   private doc: object = {};
   private uidField: number = 0;
   private uidNode: number = 0;
-  private fieldTypes: Map<number, string> = Map<number, string>();
   private fieldEnabled: Map<number, boolean> = Map<number, boolean>();
   private fieldProps: Map<number, object> = Map<number, object>();
   private IDToPathMap: Map<number, KeyPath> = Map<number, KeyPath>();
@@ -240,13 +239,12 @@ export class TransformationEngine
   public transform(doc: object): object
   {
     let output = _.cloneDeep(doc);
-    const visitor = new TransformationEngineNodeVisitor();
     const ordered = GraphLib.alg.topsort(this.dag);
 
     for (const nodeKey of ordered)
     {
       const node: TransformationNode = this.dag.node(nodeKey);
-      const transformationResult = node.accept(visitor, output);
+      const transformationResult = node.accept(ExecutionVisitor, output);
       if (transformationResult.errors !== undefined)
       {
         transformationResult.errors.forEach((error: TransformationVisitError) =>
@@ -283,7 +281,6 @@ export class TransformationEngine
       uidField: this.uidField,
       uidNode: this.uidNode,
       IDToPathMap: this.IDToPathMap.map((v: KeyPath, k: number) => [k, v]).toArray(),
-      fieldTypes: this.fieldTypes.map((v: string, k: number) => [k, v]).toArray(),
       fieldEnabled: this.fieldEnabled.map((v: boolean, k: number) => [k, v]).toArray(),
       fieldProps: this.fieldProps.map((v: object, k: number) => [k, v]).toArray(),
     };
@@ -299,7 +296,7 @@ export class TransformationEngine
    * @param {object} options      Any field options (e.g., Elastic analyzers)
    * @returns {number}            The ID of the newly-added field
    */
-  public addField(fullKeyPath: KeyPath, typeName: string = null, options: object = {}, sourceNode?: number): number
+  public addField(fullKeyPath: KeyPath, options: object = {}, sourceNode?: number): number
   {
     const id = this.uidField;
     this.uidField++;
@@ -309,11 +306,6 @@ export class TransformationEngine
       return this.getFieldID(fullKeyPath);
     }
     this.IDToPathMap = this.IDToPathMap.set(id, fullKeyPath);
-    if (typeName === null)
-    {
-      typeName = 'object';
-    }
-    this.fieldTypes = this.fieldTypes.set(id, typeName);
     this.fieldEnabled = this.fieldEnabled.set(id, true);
     this.fieldProps = this.fieldProps.set(id, options);
 
@@ -338,7 +330,6 @@ export class TransformationEngine
     this.IDToPathMap = this.IDToPathMap.delete(id);
     this.fieldProps = this.fieldProps.delete(id);
     this.fieldEnabled = this.fieldEnabled.delete(id);
-    this.fieldTypes = this.fieldTypes.delete(id);
   }
 
   /**
@@ -462,16 +453,6 @@ export class TransformationEngine
     return renameId;
   }
 
-  public getFieldType(fieldID: number): string
-  {
-    return this.fieldTypes.get(fieldID);
-  }
-
-  public setFieldType(fieldID: number, typename: string): void
-  {
-    this.fieldTypes = this.fieldTypes.set(fieldID, typename);
-  }
-
   public getFieldEnabled(fieldID: number): boolean
   {
     return this.fieldEnabled.get(fieldID) === true;
@@ -570,7 +551,7 @@ export class TransformationEngine
 
   private addPrimitiveField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any): List<number>
   {
-    return ids.push(this.addField(currentKeyPath.push(key), typeof obj[key]));
+    return ids.push(this.addField(currentKeyPath.push(key)));
   }
 
   private addArrayField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any, depth: number = 1): List<number>
@@ -588,7 +569,7 @@ export class TransformationEngine
     {
       arrayType = null;
     }
-    const arrayID: number = this.addField(currentKeyPath.push(key), 'array');
+    const arrayID: number = this.addField(currentKeyPath.push(key));
     ids = ids.push(arrayID);
     let awkp: KeyPath = currentKeyPath.push(key);
     awkp = awkp.slice(0, awkp.size - depth + 1).toList();
@@ -596,7 +577,7 @@ export class TransformationEngine
     {
       awkp = awkp.push(-1);
     }
-    const arrayWildcardID: number = this.addField(awkp, 'array');
+    const arrayWildcardID: number = this.addField(awkp);
     ids = ids.push(arrayWildcardID);
     for (let i: number = 0; i < obj[key].length; i++)
     {
@@ -608,7 +589,7 @@ export class TransformationEngine
         ids = this.addArrayField(ids, obj[key], currentKeyPath.push(key), i, depth + 1);
       } else
       {
-        ids = ids.push(this.addField(currentKeyPath.push(key).push(i), typeof obj[key][i]));
+        ids = ids.push(this.addField(currentKeyPath.push(key).push(i)));
         ids = this.addObjectField(ids, obj[key][i], awkp, true);
         ids = this.addObjectField(ids, obj[key][i], currentKeyPath.push(key).push(i), true);
       }
@@ -639,11 +620,11 @@ export class TransformationEngine
         if (prevArray && this.getFieldID(currentKeyPath.butLast().toList().push(-1).push(key)) === undefined)
         {
           // current children
-          ids = ids.push(this.addField(currentKeyPath.butLast().toList().push(-1).push(key), typeof obj[key]));
+          ids = ids.push(this.addField(currentKeyPath.butLast().toList().push(-1).push(key)));
           // recursive call with wildcard
           ids = this.addObjectField(ids, obj[key], currentKeyPath.butLast().toList().push(-1).push(key));
         }
-        ids = ids.push(this.addField(currentKeyPath.push(key), typeof obj[key]));
+        ids = ids.push(this.addField(currentKeyPath.push(key)));
         // recursive call without wildcard
         ids = this.addObjectField(ids, obj[key], currentKeyPath.push(key));
       }

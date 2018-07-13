@@ -63,7 +63,7 @@ function wrap(kp: any[])
 test('add fields manually', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
-  e.addField(KeyPath(['meta', 'school']), 'string');
+  e.addField(KeyPath(['meta', 'school']));
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]), { format: 'uppercase' });
   const r = e.transform(TestDocs.doc1);
   expect(yadeep.get(r, KeyPath(['meta', 'school']))).toBe('STANFORD');
@@ -126,8 +126,8 @@ test('linear chain of transformations', () =>
 test('get transformations for a field', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
-  const id1: number = e.addField(KeyPath(['name']), 'string');
-  e.addField(KeyPath(['meta', 'school']), 'string');
+  const id1: number = e.addField(KeyPath(['name']));
+  e.addField(KeyPath(['meta', 'school']));
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['name'])]), { format: 'uppercase' });
   e.appendTransformation(TransformationNodeType.SubstringNode, List<KeyPath>([KeyPath(['name'])]), { from: 0, length: 2 });
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]), { format: 'uppercase' });
@@ -631,8 +631,8 @@ test('cast array to array should be no-op', () =>
 test('delete a field that has transformations', () =>
 {
   const e = new TransformationEngine();
-  const id1 = e.addField(List(['foo']), 'string');
-  e.addField(List(['bar']), 'string');
+  const id1 = e.addField(List(['foo']));
+  e.addField(List(['bar']));
   e.appendTransformation(TransformationNodeType.CastNode, List([List(['foo'])]),
     {
       toTypename: 'string',
@@ -648,9 +648,9 @@ test('delete a field that has transformations', () =>
 test('cast on a field inside a nested object inside an array', () =>
 {
   const e = new TransformationEngine();
-  e.addField(List(['foo']), 'array');
-  e.addField(List(['foo', -1]), 'array');
-  const id3 = e.addField(List(['foo', -1, 'bar']), 'string');
+  e.addField(List(['foo']));
+  e.addField(List(['foo', -1]));
+  const id3 = e.addField(List(['foo', -1, 'bar']));
   e.appendTransformation(
     TransformationNodeType.CastNode,
     List([e.getFieldPath(id3)]),
@@ -705,9 +705,9 @@ test('array sum transformation', () =>
 test('duplicate a wildcard array of fields', () =>
 {
   const e = new TransformationEngine();
-  e.addField(List(['foo']), 'array');
-  e.addField(List(['foo', -1]), 'array');
-  const id3 = e.addField(List(['foo', -1, 'bar']), 'string');
+  e.addField(List(['foo']));
+  e.addField(List(['foo', -1]));
+  const id3 = e.addField(List(['foo', -1, 'bar']));
   e.appendTransformation(
     TransformationNodeType.DuplicateNode,
     List([e.getFieldPath(id3)]),
@@ -743,11 +743,11 @@ test('test casting objects to string', () =>
 {
   const e = new TransformationEngine();
 
-  e.addField(List(['foo']), 'string');
-  e.addField(List(['foo', 'bar']), 'array');
-  e.addField(List(['foo', 'bar', -1]), 'array');
-  e.addField(List(['foo', 'baz']), 'object');
-  e.addField(List(['foo', 'baz', 'hey']), 'string');
+  e.addField(List(['foo']));
+  e.addField(List(['foo', 'bar']));
+  e.addField(List(['foo', 'bar', -1]));
+  e.addField(List(['foo', 'baz']));
+  e.addField(List(['foo', 'baz', 'hey']));
 
   e.appendTransformation(TransformationNodeType.CastNode, List([List(['foo'])]), { toTypename: 'string' });
 
@@ -766,8 +766,8 @@ test('test casting objects to string', () =>
 test('test casting strings to objects', () =>
 {
   const e = new TransformationEngine();
-  e.addField(List(['foo']), 'object');
-  e.addField(List(['bar']), 'object');
+  e.addField(List(['foo']));
+  e.addField(List(['bar']));
 
   e.appendTransformation(TransformationNodeType.CastNode, List([List(['foo'])]), { toTypename: 'object' });
   e.appendTransformation(TransformationNodeType.CastNode, List([List(['bar'])]), { toTypename: 'object' });
@@ -976,7 +976,7 @@ test('test set if transformation', () =>
 {
   const e = new TransformationEngine(TestDocs.doc1);
 
-  e.addField(List(['bleep']), 'string');
+  e.addField(List(['bleep']));
 
   e.appendTransformation(
     TransformationNodeType.SetIfNode,
@@ -1155,7 +1155,7 @@ test('Duplicate a nested field', () =>
     newFieldKeyPaths: wrap(['copy1']),
   });
 
-  const sub1 = e.addField(List(['copy1', 'subField']), 'object');
+  const sub1 = e.addField(List(['copy1', 'subField']));
   e.disableField(sub1);
 
   const r = e.transform(doc);
@@ -1298,9 +1298,9 @@ test('transform a zipcode', () =>
 test('simple transformation on deep array', () =>
 {
   const e = new TransformationEngine();
-  e.addField(KeyPath(['numbers']), 'array');
-  e.addField(KeyPath(['numbers', -1]), 'array');
-  e.addField(KeyPath(['numbers', -1, -1]), 'array');
+  e.addField(KeyPath(['numbers']));
+  e.addField(KeyPath(['numbers', -1]));
+  e.addField(KeyPath(['numbers', -1, -1]));
   e.appendTransformation(TransformationNodeType.AddNode, List([KeyPath(['numbers', -1, -1])]), { shift: 1 });
   const r = e.transform(TestDocs.doc10);
   expect(r['numbers']).toEqual([

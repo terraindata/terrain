@@ -136,25 +136,6 @@ export const etlFieldTypesNames = Immutable.Map<string, string>({
   [FieldTypes.GeoPoint]: 'Geo Point',
 });
 
-// its an array because geo point could eventually also be a string
-const ETLToJSType: {
-  [k in FieldTypes]: JSTypes[]
-} = {
-    [FieldTypes.Array]: ['array'],
-    [FieldTypes.Object]: ['object'],
-    [FieldTypes.String]: ['string'],
-    [FieldTypes.Number]: ['number'],
-    [FieldTypes.Boolean]: ['boolean'],
-    [FieldTypes.Date]: ['string'],
-    [FieldTypes.Integer]: ['number'],
-    [FieldTypes.GeoPoint]: ['object'],
-  };
-
-export function getJSFromETL(type: FieldTypes): JSTypes
-{
-  return ETLToJSType[type][0];
-}
-
 export enum NodeTypes
 {
   MergeJoin = 'MergeJoin',

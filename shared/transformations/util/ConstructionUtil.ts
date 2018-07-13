@@ -51,7 +51,7 @@ const { List, Map } = Immutable;
 
 import * as Utils from 'shared/etl/util/ETLUtils';
 
-import { FieldTypes, getJSFromETL } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
@@ -126,7 +126,7 @@ export default abstract class ConstructionUtil
       {
         const kp = yadeep.get(tree, location.set(-1, 'path'));
         const type = value;
-        engine.addField(kp, getJSFromETL(type), { etlType: type });
+        engine.addField(kp, { etlType: type });
       }
     }
 

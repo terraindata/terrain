@@ -51,7 +51,7 @@ import * as Utils from 'shared/etl/util/ETLUtils';
 
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
-import { DateFormats, FieldTypes, getJSFromETL, Languages } from 'shared/etl/types/ETLTypes';
+import { DateFormats, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
@@ -90,7 +90,7 @@ export default class EngineUtil
     const cfg = {
       etlType: type,
     };
-    return engine.addField(keypath, getJSFromETL(type), cfg);
+    return engine.addField(keypath, cfg);
   }
 
   /*
@@ -100,8 +100,6 @@ export default class EngineUtil
   public static setType(engine: TransformationEngine, fieldId: number, type: FieldTypes)
   {
     engine.setFieldProp(fieldId, etlTypeKeyPath, type);
-    const jsType = Utils.path.isWildcard(engine.getFieldPath(fieldId)) ? 'array' : getJSFromETL(type);
-    engine.setFieldType(fieldId, jsType);
   }
 
   public static changeType(engine: TransformationEngine, fieldId: number, type: FieldTypes)
@@ -168,7 +166,7 @@ export default class EngineUtil
 
   public static copyField(e1: TransformationEngine, id1: number, keypath: KeyPath, node?: number, e2 = e1)
   {
-    const id2 = e2.addField(keypath, e1.getFieldType(id1), {}, node);
+    const id2 = e2.addField(keypath, {}, node);
     EngineUtil.transferFieldData(id1, id2, e1, e2);
     return id2;
   }
@@ -176,7 +174,6 @@ export default class EngineUtil
   // copies a field's configuration from e1 to e2. id1 and id2 should both exist in e1 and e2 respectively
   public static transferFieldData(id1: number, id2: number, e1: TransformationEngine, e2: TransformationEngine)
   {
-    e2.setFieldType(id2, e1.getFieldType(id1));
     e2.setFieldProps(id2, _.cloneDeep(e1.getFieldProps(id1)));
     if (e1.getFieldEnabled(id1))
     {
