@@ -129,7 +129,7 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
 
   protected handleAuthFormChange(state: AuthState, apply?: boolean)
   {
-    if (apply)
+    if (apply !== false)
     {
       const { onChange, integration } = this.props;
       const newConfig = this.authStateToConfig(state);
@@ -140,7 +140,7 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
 
   protected handleConnectionFormChange(state: ConnectionState, apply?: boolean)
   {
-    if (apply)
+    if (apply !== false)
     {
       const { onChange, integration } = this.props;
       const newConfig = this.connectionStateToConfig(state);
