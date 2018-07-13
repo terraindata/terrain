@@ -5,7 +5,7 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "start": "yarn start-postgres && yarn start-midway",
+    "start": "yarn start-postgres && yarn start-midway-dev",
     "start-minified": "yarn start-postgres && yarn start-midway-minified",
     "run-midway": "NODE_PATH=${NODE_PATH}:./midway/build node -r source-map-support/register --max_old_space_size=8192 -- ./midway/build/midway/src/Midway.js",
     "start-midway-dev": "rm -rf midway/build; mkdir midway/build; ( NODE_PATH=${NODE_PATH}:./midway/build tsc-watch -p midway/tsconfig.json --onSuccess \"yarn run-midway -- `command -v jq > /dev/null && echo $npm_config_argv | jq '.original[1:] | .[]' | tr '\"\\n' ' '`\" ); ",
