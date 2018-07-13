@@ -69,6 +69,7 @@ import { ColorsActions } from '../../../colors/data/ColorsRedux';
 import ButtonModal from './ButtonModal';
 import './ButtonModal.less';
 import DataModal from './DataModal';
+const InfoIcon = require('../../../../images/icon_info.svg?name=InfoIcon');
 
 export interface Props
 {
@@ -152,7 +153,8 @@ export default class FileConfigForm extends TerrainComponent<Props>
       previewDataSource: {
         type: DisplayType.Custom,
         displayName: '',
-        widthFactor: 3,
+        group: 'path',
+        widthFactor: 1,
         options: {
           render: this.renderSuggestedJsonPaths,
         },
@@ -196,16 +198,20 @@ export default class FileConfigForm extends TerrainComponent<Props>
     else
     {
       const suggestedFilePaths = PathUtil.guessFilePaths(this.props.source);
+      // return <InfoIcon />;
       return (
         <FadeInOut
           open={suggestedFilePaths.length !== 0}
           children={
             <ButtonModal
-              button='View Suggested Paths'
+              buttonIcon={
+                <InfoIcon />
+              }
+              iconColor={Colors().mainBlue}
               modal='Suggested JSON Paths (Select One)'
               wide={true}
               noFooterPadding={true}
-              smallTextButton={true}
+              smallIconButton={true}
               modalContent={this.renderSuggestedPathsData(suggestedFilePaths)}
             />
           }

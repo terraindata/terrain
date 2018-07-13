@@ -58,11 +58,15 @@ import './ButtonModal.less';
 
 export interface Props
 {
-  button: string;
+  button?: string;
+  buttonIcon?: any;
+  iconColor?: any;
   modal: string;
   wide: boolean;
   noFooterPadding: boolean;
-  smallTextButton: boolean;
+  normalTextButton?: boolean;
+  smallTextButton?: boolean;
+  smallIconButton?: boolean;
   modalContent?: any;
   helpCursor?: boolean;
 }
@@ -114,11 +118,26 @@ export default class ButtonModal extends TerrainComponent<Props>
     );
   }
 
+  public renderSmallIconButton()
+  {
+    return (
+      <div 
+        className='button-icon-div'
+        style={{ fill: this.props.iconColor }}
+        onClick={this.handleModalOpen}
+      >
+        {this.props.buttonIcon}
+      </div>
+    );
+  }
+
   public render()
   {
     return (
       <div>
-        {(this.props.smallTextButton ? this.renderSmallTextButton() : this.renderButton())}
+        {this.props.smallIconButton && this.renderSmallIconButton()}
+        {this.props.smallTextButton && this.renderSmallTextButton()}
+        {this.props.normalTextButton && this.renderButton()}
         <Modal
           open={this.state.modalOpen}
           title={this.props.modal}
