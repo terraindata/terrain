@@ -194,17 +194,32 @@ test('prefix isolation', async (done) =>
     (await elasticClient.msearch(params)).responses.forEach((res) => res.hits.hits.forEach(checkHit));
   };
 
-  await expectNoSecret('search',
+  await expect(expectNoSecret('search',
     {
       body: {
         query: {
-          term: {
-            _id: '13333337',
-          },
+          bool:
+            {
+              filter:
+                [
+                  {
+                    term:
+                      {
+                        _index: 'bcd.secret',
+                      },
+                  },
+                  {
+                    term:
+                      {
+                        _id: '13333337',
+                      },
+                  },
+                ],
+            },
         },
       },
     },
-  );
+  )).rejects.toThrow(/index_not_found_exception/g);
 
   await expect(expectNoSecret('search',
     {
@@ -219,7 +234,7 @@ test('prefix isolation', async (done) =>
     },
   )).rejects.toThrow(/index_not_found_exception/g);
 
-  const scrollId = (await elasticClient.search(
+  /*const scrollId = (await elasticClient.search(
     {
       scroll: '1m',
       body: {
@@ -236,22 +251,67 @@ test('prefix isolation', async (done) =>
     {
       scroll_id: scrollId,
     },
-  );
+  );*/
+  await expect(elasticClient.search(
+    {
+      index: 'bcd.secret',
+      scroll: '1m',
+      body: {
+        query: {
+          terms: {
+            _id: ['13333337', '133333372'],
+          },
+        },
+      },
+      size: 1,
+    },
+  )).rejects.toThrow(/index_not_found_exception/g);
 
-  await expectNoSecretMsearch(
+  await expect(expectNoSecretMsearch(
+    {
+      body: [
+        { index: 'bcd.secret' },
+        {
+          query: {
+            term:
+              {
+                _id: '13333337',
+              },
+          },
+        },
+      ],
+    },
+  )).rejects.toThrow(/index_not_found_exception|'hits' of undefined/g);
+
+  await expect(expectNoSecretMsearch(
     {
       body: [
         {},
         {
           query: {
-            term: {
-              _id: '13333337',
-            },
+            bool:
+              {
+                filter:
+                  [
+                    {
+                      term:
+                        {
+                          _index: 'bcd.secret',
+                        },
+                    },
+                    {
+                      term:
+                        {
+                          _id: '13333337',
+                        },
+                    },
+                  ],
+              },
           },
         },
       ],
     },
-  );
+  )).rejects.toThrow(/index_not_found_exception|'hits' of undefined/g);
 
   done();
 });

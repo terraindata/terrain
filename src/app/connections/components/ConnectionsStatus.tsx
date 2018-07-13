@@ -42,99 +42,75 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import * as request from 'supertest';
+// tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
+import { ConnectionState } from 'connections/ConnectionTypes';
+import { List, Map } from 'immutable';
+import * as React from 'react';
 
-import App from '../src/App';
+import { ConnectionsActions } from 'connections/data/ConnectionsRedux';
+import Util from 'util/Util';
+import TerrainComponent, { browserHistory } from '../../common/components/TerrainComponent';
+import { notificationManager } from './../../common/components/InAppNotification';
 
-let server;
-
-beforeAll(async (done) =>
+interface ConnectionsStatusProps
 {
-  try
-  {
-    const options =
-    {
-      debug: true,
-      demo: true,
-      db: 'http://127.0.0.1:9200',
-      port: 43003,
-    };
+  connections?: ConnectionState;
+  connectionsActions?: typeof ConnectionsActions;
+}
 
-    const app = new App(options);
-    server = await app.start();
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-  done();
-});
-
-describe('Demo website tests', () =>
+export class ConnectionsStatus extends TerrainComponent<ConnectionsStatusProps>
 {
-  test('GET /demo/search', async () =>
-  {
-    await request(server)
-      .get('/demo/search')
-      .query({
-        s: 'http://localhost:9200',
-        q: '',
-        p: 0,
-        v: 'MovieDemoAlgorithm',
-      })
-      .expect(200)
-      .then((response) =>
-      {
-        expect(response.text).not.toBe('');
-        if (response.text === '')
-        {
-          fail('GET /demo/search request returned empty response body');
-        }
-        const result = JSON.parse(response.text);
-        expect(Array.isArray(result)).toBe(true);
-        expect(result.length).toBeGreaterThan(0);
-      });
-  });
+  private interval = null;
 
-  test('GET /demo/search', async () =>
+  public componentDidMount()
   {
-    await request(server)
-      .get('/demo/search')
-      .query({
-        s: 'http://localhost:9200',
-        q: 'Whiplash',
-        p: 0,
-        v: 'MovieDemoAlgorithm',
-      })
-      .expect(200)
-      .then((response) =>
+    this.interval = setInterval(
+      () =>
       {
-        expect(response.text).not.toBe('');
-        if (response.text === '')
-        {
-          fail('GET /demo/search request returned empty response body');
-        }
-        const result = JSON.parse(response.text);
-        expect(Array.isArray(result)).toBe(true);
-        expect(result.length).toEqual(1);
-      });
-  });
+        this.props.connectionsActions(
+          {
+            actionType: 'getConnections',
+          })
+          .then((response) =>
+          {
+            this.forceUpdate();
+          });
+      },
+      10000,
+    ); // Check every 10 seconds
+  }
 
-  test('Invalid GET /demo/search', async () =>
+  public componentWillUnmount()
   {
-    await request(server)
-      .get('/demo/search')
-      .query({
-        s: '',
-        q: 123456,
-        p: 1,
-      })
-      .expect(200)
-      .then((response) =>
+    clearInterval(this.interval);
+  }
+
+  public render()
+  {
+    const { connections } = this.props.connections;
+
+    connections.keySeq()
+      .forEach((key) =>
       {
-        expect(response.text).toBe('[]');
+        const connection = connections.get(key);
+        if (connection.status === 'DISCONNECTED' || connection.status === 'CONN_TIMEOUT')
+        {
+          notificationManager.addNotification(
+            'Disconnected connections',
+            connection.name,
+            'error',
+          );
+        }
       });
-  });
-});
+
+    return null;
+  }
+}
+
+export default Util.createTypedContainer(
+  ConnectionsStatus,
+  ['connections'],
+  { connectionsActions: ConnectionsActions },
+);

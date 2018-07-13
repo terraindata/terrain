@@ -42,99 +42,47 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-
-import * as request from 'supertest';
-
-import App from '../src/App';
-
-let server;
-
-beforeAll(async (done) =>
+// Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+import
 {
-  try
-  {
-    const options =
-    {
-      debug: true,
-      demo: true,
-      db: 'http://127.0.0.1:9200',
-      port: 43003,
-    };
+  _ConnectionState,
+  ConnectionConfig,
+  ConnectionState,
+} from 'connections/ConnectionTypes';
+import * as Immutable from 'immutable';
 
-    const app = new App(options);
-    server = await app.start();
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-  done();
-});
-
-describe('Demo website tests', () =>
+export default class ConnectionsHelper
 {
-  test('GET /demo/search', async () =>
+  public static mockState()
   {
-    await request(server)
-      .get('/demo/search')
-      .query({
-        s: 'http://localhost:9200',
-        q: '',
-        p: 0,
-        v: 'MovieDemoAlgorithm',
-      })
-      .expect(200)
-      .then((response) =>
-      {
-        expect(response.text).not.toBe('');
-        if (response.text === '')
-        {
-          fail('GET /demo/search request returned empty response body');
-        }
-        const result = JSON.parse(response.text);
-        expect(Array.isArray(result)).toBe(true);
-        expect(result.length).toBeGreaterThan(0);
-      });
-  });
+    return new ConnectionsStateMock();
+  }
+}
 
-  test('GET /demo/search', async () =>
-  {
-    await request(server)
-      .get('/demo/search')
-      .query({
-        s: 'http://localhost:9200',
-        q: 'Whiplash',
-        p: 0,
-        v: 'MovieDemoAlgorithm',
-      })
-      .expect(200)
-      .then((response) =>
-      {
-        expect(response.text).not.toBe('');
-        if (response.text === '')
-        {
-          fail('GET /demo/search request returned empty response body');
-        }
-        const result = JSON.parse(response.text);
-        expect(Array.isArray(result)).toBe(true);
-        expect(result.length).toEqual(1);
-      });
-  });
+class ConnectionsStateMock
+{
+  public state;
 
-  test('Invalid GET /demo/search', async () =>
+  public constructor()
   {
-    await request(server)
-      .get('/demo/search')
-      .query({
-        s: '',
-        q: 123456,
-        p: 1,
-      })
-      .expect(200)
-      .then((response) =>
-      {
-        expect(response.text).toBe('[]');
-      });
-  });
-});
+    this.state = _ConnectionState({
+      connections: Immutable.Map<ID, ConnectionConfig>({}),
+    });
+  }
+
+  public addConnection(connection: ConnectionConfig)
+  {
+    this.state = this.state.setIn(
+      ['connections', connection.id],
+      connection,
+    );
+
+    return this;
+  }
+
+  public getState()
+  {
+    return this.state;
+  }
+}

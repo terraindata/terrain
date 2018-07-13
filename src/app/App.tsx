@@ -61,6 +61,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { Redirect as RRedirect, Route, Switch } from 'react-router-dom';
 
+import ConnectionsStatus from 'connections/components/ConnectionsStatus';
 import DataTabs from 'etl/components/DataTabs';
 import Builder from './builder/components/Builder';
 import Logout from './common/components/Logout';
@@ -627,6 +628,8 @@ class App extends TerrainComponent<Props>
             <InAppNotification />
 
             <EasterEggs />
+
+            <ConnectionsStatus />
           </div>
         )}
       </ContainerDimensions>

@@ -7,8 +7,8 @@
   "scripts": {
     "start": "yarn start-postgres && yarn start-midway",
     "start-minified": "yarn start-postgres && yarn start-midway-minified",
-    "start-midway": "rm -rf midway/build; mkdir midway/build; touch midway/build/build.log; ( yarn build-server-live & ) && while ! grep -q \"Compilation complete. Watching for file changes.\" midway/build/build.log; do sleep 1; done && NODE_PATH=${NODE_PATH}:./midway/build nodemon -e js --watch midway/build -r source-map-support/register --max_old_space_size=8192 ./midway/build/midway/src/Midway.js",
-    "start-midway-minified": "node ./midway/src/assets/bundle.server.js",
+    "start-midway": "rm -rf midway/build; mkdir midway/build; touch midway/build/build.log; ( yarn build-server-live & ) && while ! grep -q \"Compilation complete. Watching for file changes.\" midway/build/build.log; do sleep 1; done && NODE_PATH=${NODE_PATH}:./midway/build nodemon -e js --watch midway/build -r source-map-support/register --max_old_space_size=8192 -- ./midway/build/midway/src/Midway.js",
+    "start-midway-minified": "node -- ./midway/src/assets/bundle.server.js",
     "start-postgres": "docker-compose -f midway-postgres-docker.yml up -d",
     "start-front": "yarn commit-log && webpack-dev-server --config webpack.config.js --inline --content-base midway/src/assets --history-api-fallback --compress --progress --info --mode development",
     "stop-postgres": "docker-compose -f midway-postgres-docker.yml down",
@@ -63,7 +63,11 @@
     "transform": {
       ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
-    "testPathIgnorePatterns": ["node_modules", "midway/build", "rr/build"],
+    "testPathIgnorePatterns": [
+      "node_modules",
+      "midway/build",
+      "rr/build"
+    ],
     "testRegex": "/test/.+Tests\\.(ts|tsx|js)$",
     "moduleFileExtensions": [
       "ts",
@@ -80,6 +84,7 @@
       "^builder/(.*)$": "<rootDir>/src/app/builder/$1",
       "^charts/(.*)$": "<rootDir>/src/app/charts/$1",
       "^common/(.*)$": "<rootDir>/src/app/common/$1",
+      "^connections/(.*)$": "<rootDir>/src/app/connections/$1",
       "^control/(.*)$": "<rootDir>/src/app/control/$1",
       "^database/(.*)$": "<rootDir>/src/database/$1",
       "^deploy/(.*)$": "<rootDir>/src/app/deploy/$1",

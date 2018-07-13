@@ -47,7 +47,6 @@ THE SOFTWARE.
 import * as Elastic from 'elasticsearch';
 
 import { logger } from './Logging';
-import { makePromiseCallback } from './Util';
 
 export const index = 'abc.movies';
 export const type = 'data';
@@ -68,11 +67,8 @@ export async function search(req: Request): Promise<object[]>
 
   try
   {
-    await new Promise((resolve, reject) =>
-    {
-      client.ping({
-        requestTimeout: 500,
-      }, makePromiseCallback(resolve, reject));
+    await client.ping({
+      requestTimeout: 500,
     });
   }
   catch (e)
@@ -83,44 +79,42 @@ export async function search(req: Request): Promise<object[]>
 
   try
   {
-    const resp: any = await new Promise((resolve, reject) =>
-    {
-      const from = Number(req.p) * 30;
-      const size = 30;
+    const from = Number(req.p) * 30;
+    const size = 30;
 
-      if (req.v === undefined || req.v === 'MovieDemoAlgorithm')
-      {
-        logger.info('Calling ES query: (from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
-        client.search({
-          index,
-          type,
-          from,
-          size,
-          body: {
-            query: {
-              prefix: {
-                'title.keyword': req.q,
-              },
+    let resp;
+    if (req.v === undefined || req.v === 'MovieDemoAlgorithm')
+    {
+      logger.info('Calling ES query: (from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
+      resp = await client.search({
+        index,
+        type,
+        from,
+        size,
+        body: {
+          query: {
+            prefix: {
+              'title.keyword': req.q,
             },
           },
-        }, makePromiseCallback(resolve, reject));
-      }
-      else
-      {
-        logger.info('Calling Terrain variant: ' + req.v +
-          '(from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
-        client.searchTemplate({
-          body: {
-            id: req.v,
-            params: {
-              from: (Number(req.p) * 30),
-              size: 30,
-              title: '\"' + req.q + '\"',
-            },
+        },
+      });
+    }
+    else
+    {
+      logger.info('Calling Terrain variant: ' + req.v +
+        '(from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
+      resp = await client.searchTemplate({
+        body: {
+          id: req.v,
+          params: {
+            from: (Number(req.p) * 30),
+            size: 30,
+            title: '\"' + req.q + '\"',
           },
-        } as any, makePromiseCallback(resolve, reject));
-      }
-    });
+        },
+      } as any);
+    }
 
     if (resp.hits.hits === undefined)
     {

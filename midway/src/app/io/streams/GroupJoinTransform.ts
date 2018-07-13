@@ -201,9 +201,6 @@ export default class GroupJoinTransform extends SafeReadable
         const vi = this.subqueryValueInfos[subQuery];
         if (vi !== null)
         {
-          const header = {};
-          body.push(header);
-
           try
           {
             const queryStr = ESParameterFiller.generate(
@@ -211,7 +208,12 @@ export default class GroupJoinTransform extends SafeReadable
               {
                 [this.parentAlias]: inputs[i]['_source'],
               });
-            body.push(JSON.parse(queryStr));
+            const queryObj = JSON.parse(queryStr);
+
+            const header = {};
+            body.push(header);
+
+            body.push(queryObj);
           }
           catch (e)
           {

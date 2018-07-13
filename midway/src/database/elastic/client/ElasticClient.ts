@@ -348,6 +348,7 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
     callback?: (error: any, response: Elastic.SearchResponse<T>) => void): void | Promise<Elastic.SearchResponse<T>>
   {
     this.log('search', params);
+    this.addIndexToSearchParams(params);
     return this.delegate.search(params, callback);
   }
 
@@ -360,6 +361,7 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
     callback?: (error: any, response: Elastic.MSearchResponse<T>) => void): void | Promise<Elastic.MSearchResponse<T>>
   {
     this.log('msearch', params);
+    this.addIndexToMSearchParams(params);
     return this.delegate.msearch(params, callback);
   }
 
@@ -410,6 +412,35 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
     this.controller.log('ElasticClient.' + methodName, info);
   }
 
+  protected addIndexToSearchParams(params)
+  {
+    if (params.index == null)
+    {
+      const index = this.getIndex(params.body);
+      if (index == null)
+      {
+        throw new Error('search query does not specify an index');
+      }
+      params.index = index;
+    }
+  }
+
+  protected addIndexToMSearchParams(params)
+  {
+    for (let i = 0; i < params.body.length; i += 2)
+    {
+      if (params.body[i].index == null)
+      {
+        const index = this.getIndex(params.body[i + 1]);
+        if (index == null)
+        {
+          throw new Error(`msearch query #${i / 2} does not specify an index`);
+        }
+        params.body[i].index = index;
+      }
+    }
+  }
+
   private getHostFromConfig(): string
   {
     let host: string = this.getConfig().host;
@@ -432,6 +463,28 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
     }
 
     return host;
+  }
+
+  private getIndex(body): string
+  {
+    if (body.query && body.query.bool && body.query.bool.filter)
+    {
+      if (body.query.bool.filter.constructor === Array)
+      {
+        if (body.query.bool.filter.length > 0 && body.query.bool.filter[0].term)
+        {
+          return body.query.bool.filter[0].term._index;
+        }
+      }
+      else
+      {
+        if (body.query.bool.filter.term)
+        {
+          return body.query.bool.filter.term._index;
+        }
+      }
+    }
+    return undefined;
   }
 }
 

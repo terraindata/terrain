@@ -173,6 +173,11 @@ export class Router
     this.appRouter.use('/v1', this.router.routes(), this.router.allowedMethods());
   }
 
+  public async initialize()
+  {
+    return this.events.initialize();
+  }
+
   public routes(): any
   {
     return this.appRouter.routes();

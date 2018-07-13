@@ -42,19 +42,79 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+// tslint:disable:no-empty
 
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
+import * as InAppNotification from 'common/components/InAppNotification';
+import { ConnectionsStatus } from 'connections/components/ConnectionsStatus';
+import { _ConnectionConfig } from 'connections/ConnectionTypes';
+import { shallow } from 'enzyme';
+import * as React from 'react';
+import ConnectionsHelper from 'test-helpers/ConnectionsHelper';
+
+jest.mock('common/components/InAppNotification', () =>
+  Object.assign(require.requireActual('common/components/InAppNotification'), {
+    notificationManager: { addNotification: jest.fn() },
+  }),
+);
+
+describe('ConnectionsStatus', () =>
 {
-  return (error: Error, response: T) =>
+  const connectionsStateMock = ConnectionsHelper.mockState();
+  const connections = connectionsStateMock
+    .addConnection(_ConnectionConfig({
+      id: 1,
+      name: 'Connection 1',
+      type: 'ElasticSearch',
+      dsn: '',
+      host: 'localhost:9200',
+      status: 'DISCONNECTED',
+      isAnalytics: false,
+    }))
+    .addConnection(_ConnectionConfig({
+      id: 2,
+      name: 'Connection 2',
+      type: 'ElasticSearch',
+      dsn: '',
+      host: 'localhost:9200',
+      status: 'CONNECTED',
+      isAnalytics: false,
+    }))
+    .addConnection(_ConnectionConfig({
+      id: 3,
+      name: 'Connection 3',
+      type: 'Mysql',
+      dsn: '',
+      host: 'localhost:9200',
+      status: 'CONN_TIMEOUT',
+      isAnalytics: false,
+    }))
+    .getState();
+
+  let componentWrapper = null;
+
+  beforeEach(() =>
   {
-    if (error !== null && error !== undefined)
+    componentWrapper = shallow(
+      <ConnectionsStatus
+        connections={connections}
+      />,
+    );
+  });
+
+  it('should render nothing', () =>
+  {
+    expect(componentWrapper.getElement()).toBe(null);
+  });
+
+  it('should call notificationManager.addNotification twice', (done) =>
+  {
+    setTimeout(() =>
     {
-      reject(error);
-    }
-    else
-    {
-      resolve(response);
-    }
-  };
-}
+      expect(InAppNotification.notificationManager.addNotification).toHaveBeenCalledTimes(2);
+      done();
+    },
+      1500,
+    );
+  });
+});
