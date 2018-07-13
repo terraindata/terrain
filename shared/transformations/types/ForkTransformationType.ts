@@ -50,7 +50,6 @@ import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 
-
 import { List } from 'immutable';
 
 import TransformationNode from 'shared/transformations/TransformationNode';

@@ -58,8 +58,8 @@ import
 import { FieldMap } from 'etl/templates/TemplateEditorTypes';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import * as Utils from 'shared/etl/util/ETLUtils';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
 const hiddenPath = List(['uiState', 'hidden']);

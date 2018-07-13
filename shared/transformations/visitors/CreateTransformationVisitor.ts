@@ -124,7 +124,8 @@ export default class CreationVisitor
     this.visitDefault(type, node, engine);
 
     const sourceId = node.fields.get(0).id;
-    node.meta.newFieldKeyPaths.forEach((kp) => {
+    node.meta.newFieldKeyPaths.forEach((kp) =>
+    {
       this.duplicateChildFields(engine, sourceId, kp, node.id);
     });
   }
@@ -154,7 +155,8 @@ export default class CreationVisitor
     const sourcePath = Utils.path.convertIndices(engine.getFieldPath(sourceId));
     sourceId = engine.getFieldID(sourcePath);
 
-    Utils.traversal.preorderFields(engine, sourceId, (childId) => {
+    Utils.traversal.preorderFields(engine, sourceId, (childId) =>
+    {
       if (childId !== sourceId)
       {
         const pathAfterRoot = engine.getFieldPath(childId).slice(sourcePath.size);

@@ -52,9 +52,9 @@ const { List, Map } = Immutable;
 import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import * as Utils from 'shared/etl/util/ETLUtils';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import * as Utils from 'shared/etl/util/ETLUtils';
 import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
@@ -150,11 +150,7 @@ export class EngineProxy
     this.requestRebuild();
   }
 
-  public editTransformation(
-    id: number,
-    options,
-    config?: TransformationConfig,
-  )
+  public editTransformation(id: number, options)
   {
     this.engine.editTransformation(id, options);
     this.requestRebuild(id);
@@ -208,7 +204,7 @@ export class EngineProxy
     {
       specifiedSourceId = this.addField(specifiedSourceKP, specifiedSourceType);
     }
-    this.copyField(specifiedSourceId, destKP, true);
+    this.duplicateField(specifiedSourceId, destKP);
 
     const parentKP = sourceKP.slice(0, -1).toList();
     this.orderField(this.engine.getFieldID(destKP), this.engine.getFieldID(parentKP));
@@ -230,13 +226,6 @@ export class EngineProxy
     const newFieldType = Utils.engine.fieldType(sourceId, this.engine);
     this.addFieldToEngine(destKP.push(-1), newFieldType);
     Utils.engine.setType(this.engine, newFieldId, FieldTypes.Array);
-    this.requestRebuild();
-  }
-
-  public duplicateField(sourceId: number, destKP: KeyPath, despecify = false)
-  {
-    const kp = this.engine.getFieldPath(sourceId);
-    const newId = this.copyField(sourceId, destKP, despecify);
     this.requestRebuild();
   }
 
@@ -297,7 +286,7 @@ export class EngineProxy
   }
 
   // if despecify is true, then strip away specific indices
-  private copyField(sourceId: number, destKP: KeyPath, despecify = false): number
+  public duplicateField(sourceId: number, destKP: KeyPath): number
   {
     const optionsNew: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
       newFieldKeyPaths: List([destKP]),
@@ -309,7 +298,7 @@ export class EngineProxy
     );
     const newFieldId = this.engine.getFieldID(destKP);
     Utils.engine.transferFieldData(sourceId, newFieldId, this.engine, this.engine);
-
+    this.requestRebuild();
     return newFieldId;
   }
 

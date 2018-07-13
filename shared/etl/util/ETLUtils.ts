@@ -58,4 +58,4 @@ export { KeyPathUtil as path };
 export { TopologyUtil as topology };
 export { ConstructionUtil as construction };
 export { EngineUtil as engine };
-export { TraversalUtil as traversal } ;
+export { TraversalUtil as traversal };

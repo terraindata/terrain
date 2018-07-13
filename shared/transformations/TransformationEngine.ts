@@ -63,8 +63,8 @@ import TransformationNodeConstructorVisitor from './visitors/TransformationNodeC
 import TransformationVisitError from './visitors/TransformationVisitError';
 import TransformationVisitResult from './visitors/TransformationVisitResult';
 
-import { TransformationGraph } from 'shared/transformations/TypedGraph';
 import * as Utils from 'shared/etl/util/ETLUtils';
+import { TransformationGraph } from 'shared/transformations/TypedGraph';
 
 const NodeConstructor = new TransformationNodeConstructorVisitor();
 const TransformationCreator = new CreateTransformationVisitor();

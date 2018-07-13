@@ -46,10 +46,10 @@ THE SOFTWARE.
 
 import { List, Map } from 'immutable';
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import * as Utils from 'shared/etl/util/ETLUtils';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import * as Utils from 'shared/etl/util/ETLUtils';
 
 export default abstract class TransformationNodeInfo
 {

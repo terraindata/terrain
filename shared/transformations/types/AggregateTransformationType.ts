@@ -46,9 +46,9 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file
 
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import * as Utils from 'shared/etl/util/ETLUtils';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
-import * as Utils from 'shared/etl/util/ETLUtils';
 import Topology from 'shared/transformations/util/TopologyUtil';
 
 import { List } from 'immutable';

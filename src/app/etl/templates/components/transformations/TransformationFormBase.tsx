@@ -213,7 +213,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   {
     const { transformation } = this.props;
     const args = this.computeArgs();
-    proxy.editTransformation(transformation.id, args.options, this.overrideTransformationConfig());
+    proxy.editTransformation(transformation.id, args.options);
   }
 
   // override this to customize how the state object changes when a form element changes

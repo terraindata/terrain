@@ -48,8 +48,8 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import * as Utils from 'shared/etl/util/ETLUtils';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import Topology from 'shared/transformations/util/TopologyUtil';
 import { KeyPath, KeyPathUtil as PathUtil } from 'shared/util/KeyPath';
 

@@ -182,7 +182,7 @@ export default class EngineUtil
     leftEngine.getAllFieldIDs().forEach((id) =>
     {
       const keypath = leftEngine.getFieldPath(id);
-      const newId = EngineUtil.transferField(id, keypath, leftEngine, newEngine);
+      const newId = EngineUtil.copyField(leftEngine, id, keypath, undefined, newEngine);
     });
     const outputKeyPathBase = List([outputKey, -1]);
     const outputFieldId = EngineUtil.addFieldToEngine(newEngine, List([outputKey]), FieldTypes.Array);
@@ -191,7 +191,7 @@ export default class EngineUtil
     rightEngine.getAllFieldIDs().forEach((id) =>
     {
       const newKeyPath = outputKeyPathBase.concat(rightEngine.getFieldPath(id)).toList();
-      const newId = EngineUtil.transferField(id, newKeyPath, rightEngine, newEngine);
+      const newId = EngineUtil.copyField(rightEngine, id, newKeyPath, undefined, newEngine);
     });
     return newEngine;
   }
@@ -243,20 +243,6 @@ export default class EngineUtil
 
       EngineUtil.castField(engine, id);
     });
-  }
-
-  // copy a field from e1 to e2 with specified keypath
-  // if e2 is not provided, then transfer from e1 to itself
-  // does not transfer transformations
-  public static transferField(id1: number, keypath: KeyPath, e1: TransformationEngine, e2?: TransformationEngine)
-  {
-    if (e2 === undefined)
-    {
-      e2 = e1;
-    }
-    const id2 = e2.addField(keypath, e1.getFieldType(id1));
-    EngineUtil.transferFieldData(id1, id2, e1, e2);
-    return id2;
   }
 
   public static copyField(e1: TransformationEngine, id1: number, keypath: KeyPath, node?: number, e2 = e1)
