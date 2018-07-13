@@ -350,7 +350,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
       }
       else
       {
-        state.jsonPath = '*';
+        state.jsonPath = '';
       }
     }
     else if (!state.useJsonPath && state.jsonPath !== null)
