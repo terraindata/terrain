@@ -58,11 +58,11 @@ export async function startServer()
   try
   {
     const options =
-      {
-        debug: false,
-        db,
-        port: 43002,
-      };
+    {
+      debug: false,
+      db,
+      port: 43002,
+    };
 
     const app = new App(options);
     return app.start();
