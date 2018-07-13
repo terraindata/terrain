@@ -49,11 +49,9 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
-import { withRouter } from 'react-router';
 import { Colors } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import TerrainComponent from '../../common/components/TerrainComponent';
-import UserThumbnail from '../../users/components/UserThumbnail';
 import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
 import './AccountDropdown.less';
@@ -69,8 +67,6 @@ const HomeIcon = require('./../../../images/icon_profile_16x16.svg?name=HomeIcon
 const ConnectionsIcon = require('./../../../images/icon_gear.svg?name=ConnectionsIcon');
 const InfoIcon = require('../../../images/icon_info.svg?name=InfoIcon');
 const CreditsIcon = require('../../../images/icon_group.svg?name=CreditsIcon');
-
-import createHistory from 'history/createBrowserHistory';
 
 export interface Props
 {
@@ -170,15 +166,7 @@ class AccountDropdown extends TerrainComponent<Props>
             <EditIcon />
           </div>
           <div className='account-dropdown-link'>
-            Edit Profile
-          </div>
-        </div>
-        <div className='account-dropdown-row' onMouseDown={this.goTeamGoTeamGo}>
-          <div className='account-dropdown-icon account-dropdown-icon-blue'>
-            <HomeIcon />
-          </div>
-          <div className='account-dropdown-link'>
-            My Team
+            Settings
           </div>
         </div>
         <div className='account-dropdown-row' onMouseDown={this.showConnections}>
@@ -187,6 +175,14 @@ class AccountDropdown extends TerrainComponent<Props>
           </div>
           <div className='account-dropdown-link'>
             Connections
+          </div>
+        </div>
+        <div className='account-dropdown-row' onMouseDown={this.goTeamGoTeamGo}>
+          <div className='account-dropdown-icon account-dropdown-icon-blue'>
+            <HomeIcon />
+          </div>
+          <div className='account-dropdown-link'>
+            Team
           </div>
         </div>
         {

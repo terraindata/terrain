@@ -46,9 +46,9 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
 
 import * as Util from '../AppUtil';
+import { MidwayLogger } from '../log/MidwayLogger';
 import UserConfig from './UserConfig';
 import Users from './Users';
 export * from './Users';
@@ -59,21 +59,21 @@ export const initialize = () => users.initialize();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('getting all users');
+  MidwayLogger.info('getting all users');
   ctx.body = await users.select(['email', 'id', 'isDisabled', 'isSuperUser', 'name', 'timezone', 'meta'], {});
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('getting user ID ' + String(ctx.params.id));
+  MidwayLogger.info('getting user ID ' + String(ctx.params.id));
   ctx.body = await users.select(['email', 'id', 'isDisabled', 'isSuperUser', 'name', 'timezone', 'meta'], { id: ctx.params.id });
 });
 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   // update user, must be super user or authenticated user updating own info
-  winston.info('user update');
-  const user: UserConfig = ctx.request.body.body;
+  MidwayLogger.info('user update');
+  const user: UserConfig = ctx.request.body['body'];
 
   if (user.id === undefined)
   {
@@ -88,7 +88,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   }
 
   // if superuser or id to be updated is current user
-  if (ctx.state.user.isSuperUser || ctx.request.body.id === user.id)
+  if (ctx.state.user.isSuperUser || ctx.request.body['id'] === user.id)
   {
     ctx.body = await users.update(user);
   }
@@ -97,8 +97,8 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   // create a user, must be admin
-  winston.info('create user');
-  const user: UserConfig = ctx.request.body.body;
+  MidwayLogger.info('create user');
+  const user: UserConfig = ctx.request.body['body'];
   Util.verifyParameters(user, ['email', 'password']);
   if (user.id !== undefined)
   {

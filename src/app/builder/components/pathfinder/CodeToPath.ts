@@ -44,21 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import PathfinderLine from 'builder/components/pathfinder/PathfinderLine';
 import {
   _FilterGroup, _FilterLine, _Path, _Source, FilterLine,
-  Path
+  Path,
 } from 'builder/components/pathfinder/PathfinderTypes';
-import * as TerrainLog from 'loglevel';
-import ESInterpreter from '../../../../../shared/database/elastic/parser/ESInterpreter';
-import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
-import { toInputMap } from '../../../../blocks/types/Input';
-import ESUtils from '../../../../../shared/database/elastic/parser/ESUtils';
 import { List, Map } from 'immutable';
-import PathfinderLine from 'builder/components/pathfinder/PathfinderLine';
 import * as _ from 'lodash';
-import ESPropertyInfo from '../../../../../shared/database/elastic/parser/ESPropertyInfo';
+import * as TerrainLog from 'loglevel';
 import {Classes} from 'react-modal';
+import ESInterpreter from '../../../../../shared/database/elastic/parser/ESInterpreter';
+import ESPropertyInfo from '../../../../../shared/database/elastic/parser/ESPropertyInfo';
+import ESUtils from '../../../../../shared/database/elastic/parser/ESUtils';
+import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import {AllRecordMap} from '../../../../../shared/util/Classes';
+import { toInputMap } from '../../../../blocks/types/Input';
 
 export default class CodeToPath
 {
@@ -99,7 +99,6 @@ export default class CodeToPath
     isin: 'isnotin',
     exists: 'notexists',
   };
-
 
   public static TermToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
   {
@@ -263,13 +262,13 @@ export default class CodeToPath
       value: distanceValue,
       boost: node.value.boost === undefined ? 1 : node.value.boost,
       comparison: 'located',
-    }
+    };
     const filterLine = _FilterLine(config);
     node.annotation.path = filterLine;
     TerrainLog.debug('Geo_distance to ' + JSON.stringify(filterLine));
   }
 
-  //query
+  // query
   public static QueryToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
   {
     let queryName;
@@ -435,7 +434,7 @@ export default class CodeToPath
         {
           if (query.annotation.path)
           {
-            lines.push(query.annotation.path)
+            lines.push(query.annotation.path);
           }
         });
         if (lines.length > 0)
@@ -464,8 +463,8 @@ export default class CodeToPath
       // soft filter group?
       if (node.value.filter.length === 1 && _.isEqual(node.value.filter[0], {
           exists: {
-            field: "_id"
-          }
+            field: '_id',
+          },
         }) === true)
       {
         if (Array.isArray(node.value.should) && node.value.should.length > 0)
@@ -500,7 +499,7 @@ export default class CodeToPath
     const sourceBool = interpreter.searchValueInfo({'query:query': {'bool:bool_query': true}});
     if (sourceBool)
     {
-      TerrainLog.debug('Found Source Bool '+ JSON.stringify(sourceBool.value));
+      TerrainLog.debug('Found Source Bool ' + JSON.stringify(sourceBool.value));
       sourceBool.annotation = {isSourceBool: true};
       node.annotation.sourceBool = sourceBool;
     }
@@ -508,14 +507,14 @@ export default class CodeToPath
 
   public static BodyToSource(node: ESValueInfo, index: string)
   {
-    const start = node.value.hasOwnProperty('from')? node.value.from : 0;
-    const count = node.value.hasOwnProperty('size')? node.value.size : 'all';
+    const start = node.value.hasOwnProperty('from') ? node.value.from : 0;
+    const count = node.value.hasOwnProperty('size') ? node.value.size : 'all';
     const source = _Source({
       count,
       start,
       dataSource: {
         index,
-      }
+      },
     });
     return source;
   }
@@ -546,7 +545,6 @@ export default class CodeToPath
     node.annotation.path = path;
     TerrainLog.debug('Body to Path' + JSON.stringify(node.annotation.path));
   }
-
 
   // bool
 

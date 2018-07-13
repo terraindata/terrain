@@ -44,8 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as winston from 'winston';
-
+import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 import PostgreSQLClient from '../../../../src/database/pg/client/PostgreSQLClient';
 import PostgresConfig from '../../../../src/database/pg/PostgreSQLConfig';
 import PostgresController from '../../../../src/database/pg/PostgreSQLController';
@@ -66,8 +65,7 @@ let postgresController: PostgresController;
 
 beforeAll(async () =>
 {
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
+  MidwayLogger.level = 'debug';
   const config: PostgresConfig =
     {
       database: 'moviesdb',
@@ -80,6 +78,7 @@ beforeAll(async () =>
   try
   {
     postgresController = new PostgresController(config, 0, 'PostgresExecutorTests');
+    await postgresController.initialize();
     tasty = postgresController.getTasty();
   }
   catch (e)

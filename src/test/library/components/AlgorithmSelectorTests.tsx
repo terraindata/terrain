@@ -47,12 +47,8 @@ THE SOFTWARE.
 
 import { DynamicForm } from 'app/common/components/DynamicForm';
 import { AlgorithmSelectorUncontained as AlgorithmSelector } from 'app/library/components/AlgorithmSelector';
-import Util from 'app/util/Util';
-import { mount, shallow } from 'enzyme';
-import * as Immutable from 'immutable';
+import { shallow } from 'enzyme';
 import { List, Map } from 'immutable';
-import * as LibraryTypes from 'library/LibraryTypes';
-import { _LibraryState, LibraryState } from 'library/LibraryTypes';
 import * as React from 'react';
 import LibraryHelper from 'test-helpers/LibraryHelper';
 
@@ -125,7 +121,7 @@ describe('AlgorithmSelector', () =>
       const groupNames = Map();
       expect(state.groupNames).toEqual(groupNames.set(3, 'Group 1'));
       const algorithmNames = Map();
-      expect(state.algorithmNames).toEqual(algorithmNames.set(5: 'Algorithm 1'));
+      expect(state.algorithmNames).toEqual(algorithmNames.set(5, 'Algorithm 1'));
     });
   });
 

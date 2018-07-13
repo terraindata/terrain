@@ -54,7 +54,6 @@ import CreateLine from '../../../common/components/CreateLine';
 import DatePicker from '../../../common/components/DatePicker';
 import Dropdown from '../../../common/components/Dropdown';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import MapUtil from '../../../util/MapUtil';
 import Util from '../../../util/Util';
 import BuilderActions from '../../data/BuilderActions';
 import './InputStyle.less';

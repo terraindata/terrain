@@ -47,12 +47,10 @@ THE SOFTWARE.
 
 import * as _ from 'lodash';
 
-import * as Papa from 'papaparse';
 import { FileTypes } from './types/ETLTypes';
 
 import { FileConfig } from 'shared/etl/types/EndpointTypes';
 import Util from 'shared/Util';
-import * as xlsx from 'xlsx';
 
 export const mimeToFileType: { [k: string]: FileTypes } = {
   'text/csv': FileTypes.Csv,
@@ -135,137 +133,6 @@ export function getMimeType(type: FileTypes): string
     return 'application/json';
   }
 }
-
-export function getSampleRows(
-  file: File,
-  onLoad: (result) => void,
-  onError?: (msg: string) => void,
-  numRows?: number,
-  opts?: {
-    hasCsvHeader?: boolean;
-    jsonNewlines?: boolean;
-    xmlPath?: string;
-    isPlaFeed?: boolean;
-  },
-)
-{
-  const options = _.extend(
-    {
-      hasCsvHeader: true,
-      jsonNewlines: false,
-    },
-    opts,
-  );
-  const fileType = getFileType(file);
-  if (fileType === FileTypes.Csv || fileType === FileTypes.Tsv)
-  {
-    const handleError = (err) =>
-    {
-      if (onError)
-      {
-        onError(JSON.stringify(err));
-      }
-    };
-
-    const handleResults = (results) =>
-    {
-      onLoad(results.data);
-    };
-
-    Papa.parse(file as any, {
-      header: options.hasCsvHeader,
-      preview: numRows != null ? numRows : 0,
-      complete: handleResults,
-      error: handleError,
-      dynamicTyping: true,
-      delimiter: fileType === FileTypes.Csv ? ',' : '\t',
-    });
-  }
-  else if (fileType === FileTypes.Json)
-  {
-    const fileChunk = file.slice(0, ChunkSize);
-    const fr = new FileReader();
-    fr.onloadend = () =>
-    {
-      let items;
-      try
-      {
-        items = options.jsonNewlines ?
-          Util.json.parseNewlineJSON(fr.result, numRows)
-          :
-          Util.json.parseObjectListJSON(fr.result, numRows);
-      }
-      catch (e)
-      {
-        if (onError)
-        {
-          onError(`JSON Parse Caught an Exception: ${e}`);
-        }
-        return;
-      }
-
-      if (items == null || typeof items === 'string')
-      {
-        if (onError)
-        {
-          onError(`JSON Parse Failed: ${items}`);
-        }
-      }
-      else
-      {
-        onLoad(items);
-      }
-    };
-    fr.readAsText(fileChunk);
-  }
-  else if (fileType === FileTypes.Xml)
-  {
-    const fileChunk = file.slice(0, ChunkSize);
-    const fr = new FileReader();
-    fr.onloadend = () =>
-    {
-      Util.xml.parseXMLFile(
-        fr.result,
-        options.xmlPath,
-        onLoad,
-        onError,
-      );
-    };
-    fr.readAsText(fileChunk);
-  }
-  else if (fileType === FileTypes.Xlsx)
-  {
-    const fr = new FileReader();
-    fr.onloadend = () =>
-    {
-      try
-      {
-        const workbook = xlsx.read(fr.result, { type: 'array' });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        if (!sheet)
-        {
-          onError('XLSX Parse Failed: Workbook has no sheets');
-        }
-        // Set the range to be all of the columns and just 10 rows
-        const positions = sheet['!ref'].split(':');
-        // Separate starting row and column
-        const startCol: string = positions[0].match(/[A-Z][a-z]*/)[0];
-        const startRow = positions[0].match(/[0-9]/)[0];
-        const lastCol = positions[1].match(/[A-Z]/)[0];
-        const lastRow = parseFloat(startRow) + 9;
-        const range = startCol + startRow + ':' + lastCol + String(lastRow);
-        const json = xlsx.utils.sheet_to_json(sheet, { range });
-        onLoad(json);
-      }
-      catch (e)
-      {
-        onError(`XLSX Parse Failed: ${e}`);
-      }
-    };
-    fr.readAsArrayBuffer(file);
-  }
-}
-// TODO for json, use a streaming implementation
 
 export function guessFileOptions(file: File): Promise<FileConfig>
 {

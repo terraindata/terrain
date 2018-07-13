@@ -46,18 +46,19 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+
 import * as App from '../App';
-import * as Util from '../AppUtil';
 import IntegrationConfig from '../integrations/IntegrationConfig';
 import Integrations from '../integrations/Integrations';
+import { MidwayLogger } from '../log/MidwayLogger';
+
 const Router = new KoaRouter();
 const integrations: Integrations = new Integrations();
 export const initialize = () => integrations.initialize();
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const fullBody = ctx.request.body.body;
+  const fullBody = ctx.request.body['body'];
   const description = JSON.stringify(fullBody.description);
   const user = JSON.stringify(fullBody.user);
   const browserInfo = JSON.stringify(fullBody.browserInfo);
@@ -65,14 +66,14 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   let body: string;
   ctx.status = 200;
   const emailIntegrations: IntegrationConfig[] = await integrations.get(null, undefined, 'Email', true) as IntegrationConfig[];
-  winston.info('email integrations: ' + JSON.stringify(emailIntegrations));
+  MidwayLogger.info('email integrations: ' + JSON.stringify(emailIntegrations));
   if (emailIntegrations.length !== 1)
   {
-    winston.warn(`Invalid number of email integrations, found ${emailIntegrations.length}`);
+    MidwayLogger.warn(`Invalid number of email integrations, found ${emailIntegrations.length}`);
   }
   else if (emailIntegrations.length === 1 && emailIntegrations[0].name !== 'Default Failure Email')
   {
-    winston.warn('Invalid Email found.');
+    MidwayLogger.warn('Invalid Email found.');
   }
   else
   {
@@ -80,20 +81,20 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     if (fullBody.bug)
     {
       subject = 'Bug report from ' + user;
-      body = 'A user has submitted a bug report detailed below. \n \n'  + description + '\n \n Browser/OS information: ' + browserInfo;
+      body = 'A user has submitted a bug report detailed below. \n \n' + description + '\n \n Browser/OS information: ' + browserInfo;
     }
     else
     {
       subject = 'Feedback report from ' + user;
-      body = 'A user has submitted a feedback report detailed below. \n \n'  + description + '\n \n Browser/OS information: ' + browserInfo;
+      body = 'A user has submitted a feedback report detailed below. \n \n' + description + '\n \n Browser/OS information: ' + browserInfo;
     }
     if (fullBody.screenshot)
     {
       attachment = fullBody.screenshot;
     }
-    // winston.info("id: " + emailIntegrations[0].id);
+    // MidwayLogger.info("id: " + emailIntegrations[0].id);
     const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body, attachment);
-    winston.info(`Feedback email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
+    MidwayLogger.info(`Feedback email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
   }
 });
 

@@ -49,7 +49,6 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import Util from '../../util/Util';
@@ -287,6 +286,7 @@ class Modal extends TerrainComponent<Props>
                     onChange={this.handleTextboxChange} // see CardsDeck.tsx for example function
                     autoFocus
                     onFocus={this.handleFocus}
+                    onKeyPress={Util.onEnter(this.closeModalSuccess)}
                   />
                 }
                 {

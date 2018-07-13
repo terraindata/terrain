@@ -45,7 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import { Readable, Transform, Writable } from 'stream';
-import * as winston from 'winston';
+
+import { MidwayLogger } from '../../log/MidwayLogger';
 
 /**
  * A log stream
@@ -81,7 +82,9 @@ export default class LogStream extends Readable
     if (chunk === null)
     {
       this.drainLog();
-      return super.push(null);
+      const superPush = super.push(null);
+      // this.emit('end');
+      return superPush;
     }
 
     const logMsg = {
@@ -149,15 +152,15 @@ export default class LogStream extends Readable
     const msg: string = level + ':' + message;
     if (level === 'warn')
     {
-      winston.warn(msg);
+      MidwayLogger.warn(msg);
     }
     else if (level === 'error')
     {
-      winston.error(msg);
+      MidwayLogger.error(msg);
     }
     else
     {
-      winston.info(msg);
+      MidwayLogger.info(msg);
     }
 
     this.buffers.push(JSON.stringify({
@@ -187,7 +190,10 @@ export default class LogStream extends Readable
     let buffer = this.buffers.shift();
     while (buffer !== undefined)
     {
-      this.push(buffer);
+      if (buffer !== null)
+      {
+        this.push(buffer);
+      }
       buffer = this.buffers.shift();
     }
   }

@@ -45,12 +45,13 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as bcrypt from 'bcrypt';
-import * as winston from 'winston';
 
 import srs = require('secure-random-string');
+
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import * as Util from '../AppUtil';
+import { MidwayLogger } from '../log/MidwayLogger';
 import UserConfig from './UserConfig';
 
 export class Users
@@ -114,7 +115,7 @@ export class Users
     return this.upsert(newUser);
   }
 
-  public async update(user: UserConfig): Promise<UserConfig>
+  public async update(user: UserConfig, isRecovery?: boolean): Promise<UserConfig>
   {
     return new Promise<UserConfig>(async (resolve, reject) =>
     {
@@ -125,7 +126,6 @@ export class Users
       }
 
       const oldUser = results[0];
-
       // authenticate if email change or password change
       if (user.email !== oldUser.email || user.oldPassword !== undefined)
       {
@@ -133,17 +133,13 @@ export class Users
         {
           return reject('Must provide password if updating email or password');
         }
-
         const unhashedPassword: string = user.oldPassword === undefined ? user.password : user.oldPassword;
         user.password = await this.hashPassword(user.password);
-
-        if (user.oldPassword !== undefined)
+        if (user.oldPassword != null)
         {
           user.oldPassword = await this.hashPassword(user.oldPassword);
         }
-
-        const passwordsMatch: boolean = await this.comparePassword(unhashedPassword, oldUser.password);
-        if (!passwordsMatch)
+        if (!isRecovery && !await this.comparePassword(unhashedPassword, oldUser.password))
         {
           return reject('Password does not match');
         }
@@ -183,13 +179,13 @@ export class Users
 
   public async loginWithEmail(email: string, password: string): Promise<UserConfig | null>
   {
-    winston.info('Logging in with email ' + email);
+    MidwayLogger.info('Logging in with email ' + email);
     return new Promise<UserConfig | null>(async (resolve, reject) =>
     {
       const results = await this.select([], { email });
       if (results.length === 0)
       {
-        winston.info('None');
+        MidwayLogger.info('None');
         return resolve(null);
       }
       else
@@ -197,7 +193,7 @@ export class Users
         const user: UserConfig = results[0];
         if (user.accessToken === undefined)
         {
-          winston.info('No access token');
+          MidwayLogger.info('No access token');
           return resolve(null);
         }
         const passwordsMatch: boolean = await this.comparePassword(password, user.password);
@@ -211,12 +207,12 @@ export class Users
               });
             await this.upsert(user);
           }
-          winston.info('User');
+          MidwayLogger.info('User');
           resolve(user);
         }
         else
         {
-          winston.info('Wrong password');
+          MidwayLogger.info('Wrong password');
           resolve(null);
         }
       }

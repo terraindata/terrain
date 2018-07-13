@@ -44,26 +44,28 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import * as crypto from 'crypto';
 import * as fs from 'fs';
-import * as winston from 'winston';
 
 import * as Util from './AppUtil';
 import { CmdLineUsage } from './CmdLineArgs';
 import DatabaseConfig from './database/DatabaseConfig';
 import { databases } from './database/DatabaseRouter';
+import { MidwayLogger } from './log/MidwayLogger';
 import UserConfig from './users/UserConfig';
 
 export interface Config
 {
-  config?: string;
-  port?: number;
-  db?: string;
-  dsn?: string;
-  debug?: boolean;
-  help?: boolean;
-  verbose?: boolean;
-  databases?: object[];
-  analyticsdb?: string;
+  config?: string;               // path to the configuration file to use
+  port?: number;                 // port to listen on
+  db?: string;                   // type of system database to use (e.g. postgres, mysql, sqlite, etc.)
+  dsn?: string;                  // dsn (data source name) of the system database
+  debug?: boolean;               // enable/disable debug mode
+  help?: boolean;                // show help and usage information
+  verbose?: boolean;             // print verbose information
+  instanceId?: string;           // unique identifier to use for this midway instance
+  databases?: DatabaseConfig[];  // list of databases to connect to on startup
+  analyticsdb?: string;          // dsn (data source name) of analytics database to use
 }
 
 export function loadConfigFromFile(config: Config): Config
@@ -79,15 +81,15 @@ export function loadConfigFromFile(config: Config): Config
     }
     catch (e)
     {
-      winston.error('Failed to read configuration settings from ' + String(config.config));
+      MidwayLogger.error('Failed to read configuration settings from ' + String(config.config));
     }
   }
   return config;
 }
 
-export async function handleConfig(config: Config): Promise<void>
+export async function initialHandleConfig(config: Config): Promise<void>
 {
-  winston.debug('Using configuration: ' + JSON.stringify(config));
+  MidwayLogger.debug('Using configuration: ' + JSON.stringify(config));
   if (config.help === true)
   {
     // tslint:disable-next-line
@@ -97,29 +99,41 @@ export async function handleConfig(config: Config): Promise<void>
 
   if (config.verbose === true)
   {
-    // TODO: get rid of this monstrosity once @types/winston is updated.
-    (winston as any).level = 'verbose';
+    MidwayLogger.level = 'verbose';
   }
 
   if (config.debug === true)
   {
-    // TODO: get rid of this monstrosity once @types/winston is updated.
-    (winston as any).level = 'debug';
+    MidwayLogger.level = 'debug';
   }
+}
 
+export async function handleConfig(config: Config): Promise<void>
+{
   if (config.databases !== undefined)
   {
     const dbs = await databases.select(['id', 'name']);
     for (const database of config.databases)
     {
-      const db = database as DatabaseConfig;
+      const db: DatabaseConfig = database;
       const foundDB = dbs.filter((d) => d.name === db.name);
       if (foundDB.length > 0)
       {
         db.id = foundDB[0].id;
       }
 
-      winston.info('Registering new database item: ', db);
+      if (db.id === undefined && db['isMultitenant'])
+      {
+        db.isProtected = true;
+        if (db.indexPrefix === undefined)
+        {
+          db.indexPrefix = crypto.randomBytes(32).toString('hex') + '.';
+        }
+      }
+
+      delete db['isMultitenant'];
+
+      MidwayLogger.info('Registering new database item: ', db);
       await databases.upsert({} as UserConfig, db);
     }
   }

@@ -66,7 +66,6 @@ import Ajax from '../../util/Ajax';
 import TerrainTools from '../../util/TerrainTools';
 import { UserActions as Actions } from '../data/UserRedux';
 import * as UserTypes from '../UserTypes';
-import AccountEntry from './AccountEntry';
 import Section from './AccountSection';
 import PasswordStrengthInput from './PasswordStrengthInput';
 const moment = require('moment-timezone');
@@ -154,11 +153,6 @@ class Settings extends TerrainComponent<Props>
     this.props.userActions({
       actionType: 'change',
       user: newUser as UserTypes.User,
-    });
-
-    this.setState({
-      saving: true,
-      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
     });
   }
 
@@ -449,6 +443,7 @@ class Settings extends TerrainComponent<Props>
             value={this.state.newEmail}
             onChange={this.updateNewEmail}
             className='settings-input password-input'
+            onKeyDown={Util.onEnter(this.changeEmail)}
           />
           <div className='settings-white-space' />
         </div>
@@ -750,11 +745,7 @@ class Settings extends TerrainComponent<Props>
       actionType: 'change',
       user: newUser as UserTypes.User,
     });
-
-    this.setState({
-      saving: true,
-      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
-    });
+    return true;
   }
 
   public render()
@@ -772,12 +763,14 @@ class Settings extends TerrainComponent<Props>
               { key: 'name', header: 'Name', info: currentUser.name, type: 'Input' },
               { key: 'email', header: 'Email', info: currentUser.email, type: 'Input' },
               { key: 'phone', header: 'Phone', info: currentUser.phone, type: 'Input' },
-              { key: 'whatIDo', header: 'What I Do', info: currentUser.whatIDo, type: 'Input' },
+              { key: 'skype', header: 'Skype', info: currentUser.skype, type: 'Input' },
             ])
           }
           hasPhoto={true}
           columnNum={2}
           onChange={this.updateUserInfo}
+          canEdit={true}
+          addingUser={false}
         />
         <Section
           user={currentUser}
@@ -794,6 +787,8 @@ class Settings extends TerrainComponent<Props>
           hasPhoto={false}
           columnNum={0}
           onChange={this.updateUserPassword}
+          canEdit={true}
+          addingUser={false}
         />
         <Section
           user={currentUser}
@@ -810,6 +805,8 @@ class Settings extends TerrainComponent<Props>
           hasPhoto={false}
           columnNum={0}
           onChange={this.updateUserInfo}
+          canEdit={true}
+          addingUser={false}
         />
         <Modal
           message={this.state.modalMessage}

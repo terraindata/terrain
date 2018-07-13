@@ -46,15 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands strict-boolean-expressions
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-
 import Options from '../../../../shared/database/types/CardsToCodeOptions';
 import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
 import Query from '../../../items/types/Query';
 
 import { isInput, isRuntimeInput } from '../../../blocks/types/Input';
-import ESCardParser from './ESCardParser';
 import { ESQueryObject, ESQueryToCode } from './ParseElasticQuery';
 
 class CardsToElastic

@@ -45,19 +45,8 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
-
-import { List } from 'immutable';
-
-import { visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
 import TransformationNode from 'shared/transformations/TransformationNode';
-import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/TransformationVisitError';
 import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
-import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
 /*
@@ -87,16 +76,16 @@ export default abstract class SimpleTransformationType extends TransformationNod
         const { value, location } = match;
         if (value === null && this.skipNulls)
         {
-          return;
+          continue;
         }
         if (!this.checkType(value))
         {
           errors.push(`Error in ${this.typeCode}: Expected type ${this.acceptedType}. Got ${typeof value}.`);
-          return;
+          continue;
         }
         if (!this.shouldTransform(value))
         {
-          return;
+          continue;
         }
         const newValue = this.transformer(value);
         yadeep.set(doc, location, newValue, { create: true });

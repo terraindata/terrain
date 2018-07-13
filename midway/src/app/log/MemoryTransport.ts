@@ -43,85 +43,75 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:import-spacing
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 
-import
+import dateFormat = require('date-format');
+import * as Transport from 'winston-transport';
+
+import tripleBeam = require('triple-beam');
+
+export class MemoryTransport extends Transport
 {
-  _TemplateField,
-  TemplateField,
-} from 'etl/templates/FieldTypes';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { Algorithm } from 'library/LibraryTypes';
-import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
-import { MidwayError } from 'shared/error/MidwayError';
-import { getSampleRows } from 'shared/etl/FileUtil';
-import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+  private name: string;
+  private msgs: any[];
+  private index: number;
+  private hasWrapped: boolean;
+  private maxMsgSize: number = 1000;
 
-import { toInputMap } from 'src/blocks/types/Input';
-import { AllBackendsMap } from 'src/database/AllBackends';
-import MidwayQueryResponse from 'src/database/types/MidwayQueryResponse';
-
-import { _Query, Query, queryForSave } from 'src/items/types/Query';
-import { Ajax } from 'util/Ajax';
-
-const { List, Map } = Immutable;
-
-export function fetchDocumentsFromAlgorithm(
-  algorithm: Algorithm,
-  limit?: number,
-): Promise<List<object>>
-{
-  return new Promise<List<object>>((resolve, reject) =>
+  constructor(options)
   {
-    let query = algorithm.query;
-    query = query.set('parseTree', new ESInterpreter(query.tql, toInputMap(query.inputs)));
+    super(options);
 
-    const eql = AllBackendsMap[query.language].parseTreeToQueryString(
-      query,
-      {
-        replaceInputs: true,
-      },
-    );
-    const handleResponse = (response: MidwayQueryResponse) =>
+    this.name = 'MemoryTransport';
+    if (options != null && options.maxMsgSize != null)
     {
-      let hits = List(_.get(response, ['result', 'hits', 'hits'], []))
-        .map((doc, index) => doc['_source']);
-      if (limit != null && limit > 0)
-      {
-        hits = hits.slice(0, limit);
-      }
-      resolve(hits.toList());
-    };
+      this.maxMsgSize = options.maxMsgSize;
+    }
 
-    const { queryId, xhr } = Ajax.query(
-      eql,
-      algorithm.db,
-      handleResponse,
-      reject,
-    );
-  });
-}
+    this.index = 0;
+    this.hasWrapped = false;
+    this.msgs = new Array(this.maxMsgSize);
+  }
 
-export function fetchDocumentsFromFile(
-  file: File,
-  config: FileConfig,
-  limit?: number,
-): Promise<List<object>>
-{
-  return new Promise<List<object>>((resolve, reject) =>
+  public log(info: object, callback)
   {
-    const handleResponse = (response: object[]) =>
+    const level = info[tripleBeam.LEVEL];
+    const msg = info['message'];
+    const meta = info;
+    if (level === 'info' || level === 'warning' || level === 'error')
     {
-      resolve(List(response));
-    };
-    getSampleRows(
-      file,
-      handleResponse,
-      reject,
-      limit,
-      config.toJS(),
-    );
-  });
+      const timestamp: string = dateFormat('yyyy-MM-dd hh:mm:ss.SSS ');
+      this.msgs[this.next()] = timestamp + String(level) + ': ' + String(msg);
+    }
+    this.emit('logged');
+    callback(null, true);
+  }
+
+  public getAll()
+  {
+    let msgStr;
+    if (!this.hasWrapped)
+    {
+      msgStr = this.msgs.slice(0, this.index).join('\n');
+    }
+    else
+    {
+      msgStr = this.msgs.slice(this.index + 1).join('\n') + '\n' + this.msgs.slice(0, this.index).join('\n');
+    }
+
+    return msgStr;
+  }
+
+  private next()
+  {
+    if (this.index === this.maxMsgSize - 1)
+    {
+      this.index = 0;
+      this.hasWrapped = true;
+    }
+    else
+    {
+      this.index++;
+    }
+    return this.index;
+  }
 }

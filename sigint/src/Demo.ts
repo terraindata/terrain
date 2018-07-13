@@ -45,11 +45,11 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
-import * as winston from 'winston';
 
+import { logger } from './Logging';
 import { makePromiseCallback } from './Util';
 
-export const index = 'movies';
+export const index = 'abc.movies';
 export const type = 'data';
 
 export interface Request
@@ -77,7 +77,7 @@ export async function search(req: Request): Promise<object[]>
   }
   catch (e)
   {
-    winston.error('creating ES client for host: ' + String(req.s) + ': ' + String(e));
+    logger.error('creating ES client for host: ' + String(req.s) + ': ' + String(e));
     return [];
   }
 
@@ -90,7 +90,7 @@ export async function search(req: Request): Promise<object[]>
 
       if (req.v === undefined || req.v === 'MovieDemoAlgorithm')
       {
-        winston.info('Calling ES query: (from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
+        logger.info('Calling ES query: (from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
         client.search({
           index,
           type,
@@ -107,7 +107,7 @@ export async function search(req: Request): Promise<object[]>
       }
       else
       {
-        winston.info('Calling Terrain variant: ' + req.v +
+        logger.info('Calling Terrain variant: ' + req.v +
           '(from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
         client.searchTemplate({
           body: {
@@ -131,7 +131,7 @@ export async function search(req: Request): Promise<object[]>
   }
   catch (e)
   {
-    winston.error('querying ES: ' + String(req.q) + ': ' + String(e));
+    logger.error('querying ES: ' + String(req.q) + ': ' + String(e));
     return [];
   }
 }

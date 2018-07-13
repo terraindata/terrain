@@ -44,23 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as _ from 'lodash';
 import * as moment from 'moment';
-
-enum FileInputTypeEnum
-{
-  Date = 'Date',
-  Number = 'Number',
-  Text = 'Text',
-}
-
-interface FileInputConfig
-{
-  format: string;
-  name: string;
-  type: FileInputTypeEnum;
-  dayInterval: number;
-}
+import { InputConfig, InputFileTypes, InputOptionsType, InputTypes } from 'shared/etl/types/InputTypes';
 
 export class Inputs
 {
@@ -73,12 +58,12 @@ export class Inputs
       if (Array.isArray(options['inputs']))
       {
         filenameWithoutInputs = options['filename'];
-        options['inputs'].forEach((input: FileInputConfig) =>
+        options['inputs'].forEach((input: InputOptionsType<InputTypes>) =>
         {
           const wrappedName: string = '{{' + input.name + '}}';
           switch (input.type)
           {
-            case FileInputTypeEnum.Date:
+            case InputFileTypes.Date:
               let nextIndexOf: number = filenameWithoutInputs.search(new RegExp(wrappedName, 'g'));
               while (nextIndexOf !== -1)
               {
@@ -116,9 +101,9 @@ export class Inputs
                 nextIndexOf = filenameWithoutInputs.search(new RegExp(wrappedName, 'g'));
               }
               break;
-            case FileInputTypeEnum.Number:
+            case InputFileTypes.Number:
               break;
-            case FileInputTypeEnum.Text:
+            case InputFileTypes.Text:
               break;
             default:
               break;
@@ -127,6 +112,40 @@ export class Inputs
       }
       return isValidFilename;
     });
+  }
+
+  public replaceInputs(origFilename: string, inputs: InputConfig[], inputIndex = 0): string[]
+  {
+    if (inputs == null || inputIndex === inputs.length)
+    {
+      return [origFilename];
+    }
+    const input: InputOptionsType<InputTypes> = inputs[inputIndex].options;
+    const filenames = this.replaceInputs(origFilename, inputs, inputIndex + 1).reduce((acc, filename) =>
+    {
+      const wrappedName: string = '{{' + input.name + '}}';
+      switch (input.type)
+      {
+        case InputFileTypes.Date:
+          let date = moment();
+          for (let i = 0; i <= input.dayInterval; i++)
+          {
+            let filename2 = filename;
+            let nextIndexOf: number = filename2.search(new RegExp(wrappedName, 'g'));
+            while (nextIndexOf !== -1)
+            {
+              filename2 = filename2.replace(new RegExp(wrappedName), date.format(input.format));
+              nextIndexOf = filename2.search(new RegExp(wrappedName, 'g'));
+            }
+            acc.push(filename2);
+            date = date.subtract(1, 'days');
+          }
+          return acc;
+        default:
+          return acc.concat([filename]);
+      }
+    }, []);
+    return filenames;
   }
 }
 

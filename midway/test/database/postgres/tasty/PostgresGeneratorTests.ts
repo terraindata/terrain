@@ -44,15 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as winston from 'winston';
-
+import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 import PostgresConfig from '../../../../src/database/pg/PostgreSQLConfig';
 import PostgresController from '../../../../src/database/pg/PostgreSQLController';
 import PostgresDB from '../../../../src/database/pg/tasty/PostgreSQLDB';
 
 import * as Tasty from '../../../../src/tasty/Tasty';
 import TastyNode from '../../../../src/tasty/TastyNode';
-import TastyNodeTypes from '../../../../src/tasty/TastyNodeTypes';
 import TastyQuery from '../../../../src/tasty/TastyQuery';
 import TastyTable from '../../../../src/tasty/TastyTable';
 
@@ -64,8 +62,7 @@ let pgDB: PostgresDB;
 
 beforeAll(async () =>
 {
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
+  MidwayLogger.level = 'debug';
   const config: PostgresConfig =
     {
       database: 'moviesdb',

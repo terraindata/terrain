@@ -54,20 +54,17 @@ import * as React from 'react';
 import * as TagsInput from 'react-tagsinput';
 import 'react-tagsinput/react-tagsinput.css';
 import { instanceFnDecorator } from 'shared/util/Classes';
-import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 
 import { DisplayState, DisplayType, InputDeclarationMap, InputDeclarationType, OptionType } from './DynamicFormTypes';
 
 const Color = require('color');
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
 import Autocomplete from 'common/components/Autocomplete';
 import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
-import FadeInOut from 'common/components/FadeInOut';
 import ListForm from 'common/components/ListForm';
 import Switch from 'common/components/Switch';
+import { List } from 'immutable';
 
 import './DynamicForm.less';
 
@@ -92,6 +89,7 @@ export interface Props<FState>
   children?: any; // children get rendered between the buttons and the form components
   centerForm?: boolean; // if true, the form content gets centered in the container
   validate?: (state: FState) => string | undefined; // return a string if there's an error
+  onTextInputEnter?: () => void;
 }
 // if we want to allow immutable state objects, add an optional state mutator to each input declaration type
 
@@ -266,6 +264,8 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
           debounce={options.debounce}
+          help={inputInfo.help}
+          onEnter={this.props.onTextInputEnter}
         />
       </div>
     );
@@ -289,6 +289,8 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
           debounce={options.debounce}
+          help={inputInfo.help}
+          onEnter={this.props.onTextInputEnter}
         />
       </div>
     );
@@ -619,6 +621,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     {
       const shallowCopy = _.clone(this.props.inputState);
       shallowCopy[stateName] = value;
+
       this.props.onStateChange(shallowCopy, true);
     };
   }
@@ -630,6 +633,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     {
       const shallowCopy = _.clone(this.props.inputState);
       shallowCopy[stateName] = value;
+
       this.props.onStateChange(shallowCopy, false);
     };
   }

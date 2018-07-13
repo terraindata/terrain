@@ -55,7 +55,6 @@ import { DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card } from '../../../blocks/types/Card';
 
-import { _ScoreLine } from 'builder/components/pathfinder/PathfinderTypes';
 import TransformCard from '../../../app/builder/components/charts/TransformCard';
 import TransformUtil, { NUM_CURVE_POINTS } from '../../../app/util/TransformUtil';
 import { AutocompleteMatchType, ElasticBlockHelpers } from './ElasticBlockHelpers';

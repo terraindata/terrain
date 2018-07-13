@@ -44,9 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+// tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands max-line-length
+
 import { parsePath } from 'builder/components/pathfinder/PathfinderParser';
+import { browserHistory } from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
+import LibraryActions from 'library/data/LibraryActions';
+import { replaceRoute } from 'library/helpers/LibraryRoutesHelper';
 import * as _ from 'lodash';
+import TerrainStore from 'store/TerrainStore';
+import Ajax from 'util/Ajax';
 import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../shared/database/elastic/parser/ESJSONParser';
 import ESParserError from '../../../shared/database/elastic/parser/ESParserError';
@@ -54,10 +61,64 @@ import CardsToElastic from '../../database/elastic/conversion/CardsToElastic';
 import { ElasticValueInfoToCards } from '../../database/elastic/conversion/ElasticToCards';
 import ESCardParser from '../../database/elastic/conversion/ESCardParser';
 import { _Query, default as Query } from '../../items/types/Query';
-import ETLRouteUtil from '../etl/ETLRouteUtil';
 
 export default class TerrainTests
 {
+  public static lastCategoryId;
+  public static lastGroupId;
+  public static lastAlgorithmId;
+  public static testCreateCategory(baseUrl = 'library')
+  {
+    const createActionHandler = LibraryActions.categories.create(undefined, (id) =>
+    {
+      TerrainTests.lastCategoryId = id;
+      replaceRoute(
+        {
+          basePath: baseUrl,
+          categoryId: id,
+        },
+      );
+    });
+    createActionHandler(TerrainStore.dispatch, TerrainStore.getState, Ajax);
+  }
+  public static testCreateGroup(baseUrl = 'library', categoryId = TerrainTests.lastCategoryId)
+  {
+    const db = JSON.parse('{\"id\":1,\"name\":\"My ElasticSearch Instance\",\"type\":\"elastic\",\"host\":\"127.0.0.1:9200\",\"isAnalytics\":true,\"analyticsIndex\":\"terrain-analytics\",\"analyticsType\":\"events\",\"source\":\"m2\"}');
+    const createActionHandler = LibraryActions.groups.createAs(categoryId, 'newGroup', db, (id) =>
+    {
+      TerrainTests.lastGroupId = id;
+      replaceRoute(
+        {
+          basePath: baseUrl,
+          categoryId,
+          groupId: id,
+        },
+      );
+    });
+    createActionHandler(TerrainStore.dispatch, TerrainStore.getState);
+  }
+
+  public static testCreateAlgorithm(baseUrl = 'library', categoryId = TerrainTests.lastCategoryId, groupId = TerrainTests.lastGroupId)
+  {
+    const createActionHandler = LibraryActions.algorithms.create(categoryId, groupId, undefined, (r, a) =>
+    {
+      TerrainTests.lastAlgorithmId = r.id;
+      replaceRoute(
+        {
+          basePath: baseUrl,
+          categoryId,
+          groupId,
+          algorithmId: r.id,
+        });
+    });
+    createActionHandler(TerrainStore.dispatch, TerrainStore.getState);
+  }
+
+  public static gotoAlgorithm(algorithmId = TerrainTests.lastAlgorithmId)
+  {
+    browserHistory.push(`/builder/?o=${algorithmId}`);
+  }
+
   public static testCardParser(
     testString: string,
     expectedValue: any,

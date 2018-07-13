@@ -57,7 +57,7 @@ export default class RecordBlock
   public end: boolean; // true if this is the last block in the iteration
   public records: object[]; // records in the block
   public errors: any[][]; // errors for each record (undefined if none are present)
-  public extra: { string: object; }; // extra data associated with this block
+  public extra: { [x: string]: object; }; // extra data associated with this block
 
   /**
    * Makes an empty record block
@@ -67,7 +67,7 @@ export default class RecordBlock
     this.end = true;
     this.records = [];
     this.errors = [];
-    this.extra = {} as { string: object; };
+    this.extra = {};
   }
 
 }
@@ -81,5 +81,5 @@ export default class RecordBlock
 //   public values: any[][];
 //   public errors: any[];
 //
-//   public extra: { string: object; };
+//   public extra: { [x: string]: object; };
 // }

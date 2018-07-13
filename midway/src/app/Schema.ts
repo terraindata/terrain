@@ -45,13 +45,13 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as assert from 'assert';
-import * as winston from 'winston';
 import * as Tasty from '../tasty/Tasty';
 
 import DatabaseController from '../database/DatabaseController';
 import ElasticDB from '../database/elastic/tasty/ElasticDB';
 import DatabaseRegistry from '../databaseRegistry/DatabaseRegistry';
 
+import { APIKeyConfig } from './apikeys/APIKeyConfig';
 import { DatabaseConfig } from './database/DatabaseConfig';
 import { TemplateConfig } from './etl/TemplateConfig';
 import { MetricConfig } from './events/MetricConfig';
@@ -59,6 +59,9 @@ import { IntegrationConfig } from './integrations/IntegrationConfig';
 import { ItemConfig } from './items/ItemConfig';
 import { JobConfig } from './jobs/JobConfig';
 import { JobLogConfig } from './jobs/JobLogConfig';
+import { MidwayLogger } from './log/MidwayLogger';
+import { MigrationRecordConfig } from './migrations/MigrationRecordConfig';
+import { RecoveryTokenConfig } from './recoveryTokens/RecoveryTokenConfig';
 import { ResultsConfigConfig } from './resultsConfig/ResultsConfigConfig';
 import { SchedulerConfig } from './scheduler/SchedulerConfig';
 import { SchemaMetadataConfig } from './schemaMetadata/SchemaMetadataConfig';
@@ -81,6 +84,9 @@ export class Tables
   public jobLogs: Tasty.Table;
   public jobs: Tasty.Table;
   public statusHistory: Tasty.Table;
+  public migrationRecords: Tasty.Table;
+  public recoveryTokens: Tasty.Table;
+  public apiKeys: Tasty.Table;
 }
 
 function verifyTableWithConfig(table: Tasty.Table, configClass: object)
@@ -156,6 +162,8 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
         'isAnalytics',
         'analyticsIndex',
         'analyticsType',
+        'indexPrefix',
+        'isProtected',
       ],
       undefined,
       {
@@ -167,6 +175,8 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
         isAnalytics: 'bool DEFAULT ' + falseValue,
         analyticsIndex: 'text',
         analyticsType: 'text',
+        indexPrefix: 'text',
+        isProtected: 'bool DEFAULT ' + falseValue,
       },
     ),
     new DatabaseConfig({}),
@@ -455,7 +465,65 @@ const setupTablesHelper = (datetimeTypeName: string, falseValue: string, stringT
     ),
     new StatusHistoryConfig({}),
   );
-
+  addTable(
+    new Tasty.Table(
+      'migrationRecords',
+      ['id'],
+      [
+        'createdAt',
+        'lastModified',
+        'fromVersion',
+        'toVersion',
+        'isCurrent',
+      ],
+      undefined,
+      {
+        id: primaryKeyType + ' PRIMARY KEY',
+        createdAt: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+        lastModified: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+        fromVersion: 'text NOT NULL',
+        toVersion: 'text NOT NULL',
+        isCurrent: 'bool NOT NULL',
+      },
+    ),
+    new MigrationRecordConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
+      'recoveryTokens',
+      ['id'],
+      [
+        'token',
+        'createdAt',
+      ],
+      undefined,
+      {
+        id: primaryKeyType + ' PRIMARY KEY',
+        token: 'text',
+        createdAt: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+      },
+    ),
+    new RecoveryTokenConfig({}),
+  );
+  addTable(
+    new Tasty.Table(
+      'apiKeys',
+      ['id'],
+      [
+        'key',
+        'createdAt',
+        'enabled',
+      ],
+      undefined,
+      {
+        id: primaryKeyType + ' PRIMARY KEY',
+        key: 'text NOT NULL',
+        createdAt: datetimeTypeName + ' DEFAULT CURRENT_TIMESTAMP',
+        enabled: 'bool NOT NULL DEFAULT TRUE',
+      },
+    ),
+    new APIKeyConfig({}),
+  );
   return tables as Tables;
 };
 
@@ -471,7 +539,7 @@ export function setupTables(dbtype: string): Tables
   }
   else
   {
-    winston.warn('Auto-provisioning of app schema not supported for DB of type ' + dbtype);
+    MidwayLogger.warn('Auto-provisioning of app schema not supported for DB of type ' + dbtype);
   }
 }
 
@@ -485,10 +553,10 @@ export async function deleteElasticIndex(dbid: number, dbname: string): Promise<
       throw new Error('Database "' + dbid.toString() + '" not found.');
     }
 
-    winston.info(`Deleting Elastic Index ${dbname} of database ${dbid}`);
+    MidwayLogger.info(`Deleting Elastic Index ${dbname} of database ${dbid}`);
     const elasticDb = database.getTasty().getDB() as ElasticDB;
     await elasticDb.deleteIndex(dbname);
-    winston.info(`Deleted Elastic Index ${dbname} of database ${dbid}`);
+    MidwayLogger.info(`Deleted Elastic Index ${dbname} of database ${dbid}`);
     return resolve('ok');
   });
 }

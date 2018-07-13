@@ -47,15 +47,12 @@ THE SOFTWARE.
 import * as fs from 'fs';
 import * as request from 'supertest';
 import { promisify } from 'util';
-import * as winston from 'winston';
 
 import { App, DB } from '../../src/app/App';
+import { MidwayLogger } from '../../src/app/log/MidwayLogger';
 import ElasticConfig from '../../src/database/elastic/ElasticConfig';
-import ElasticController from '../../src/database/elastic/ElasticController';
-import ElasticDB from '../../src/database/elastic/tasty/ElasticDB';
 import * as Tasty from '../../src/tasty/Tasty';
 
-let elasticDB: ElasticDB;
 let server;
 
 let defaultUserAccessToken: string = '';
@@ -79,17 +76,20 @@ beforeAll(async (done) =>
       {
         debug: true,
         db: 'postgres',
-        dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:65432/moviesdb',
+        dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:65432',
+        instanceId: 'moviesdb',
         port: 63000,
         databases: [
           {
             name: 'My ElasticSearch Instance',
             type: 'elastic',
-            dsn: 'http://127.0.0.1:9200',
+            dsn: 'user:pass@127.0.0.1:9200',
             host: 'http://127.0.0.1:9200',
             isAnalytics: true,
             analyticsIndex: 'terrain-analytics',
             analyticsType: 'events',
+            indexPrefix: 'abc.',
+            isProtected: true,
           },
           {
             name: 'MySQL Test Connection',
@@ -97,6 +97,7 @@ beforeAll(async (done) =>
             dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:63306/moviesdb',
             host: '127.0.0.1:63306',
             isAnalytics: false,
+            isProtected: false,
           },
         ],
       };
@@ -107,9 +108,6 @@ beforeAll(async (done) =>
     const config: ElasticConfig = {
       hosts: ['http://localhost:9200'],
     };
-
-    const elasticController: ElasticController = new ElasticController(config, 0, 'RouteTests');
-    elasticDB = elasticController.getTasty().getDB() as ElasticDB;
 
     const items = [
       {
@@ -145,9 +143,19 @@ beforeAll(async (done) =>
         'type',
       ],
     );
-    await DB.getDB().execute(
-      DB.getDB().generate(new Tasty.Query(itemTable).upsert(items)),
-    );
+    try
+    {
+      await DB.getDB().execute(
+        DB.getDB().generate(new Tasty.Query(itemTable).upsert(items)),
+      );
+    }
+    catch (e)
+    {
+      if (e.toString() !== 'error: conflicting key value violates exclusion constraint "unique_item_names"')
+      {
+        throw e;
+      }
+    }
 
     const versions = [
       {
@@ -191,7 +199,7 @@ beforeAll(async (done) =>
     })
     .catch((error) =>
     {
-      winston.warn('Error while creating access token for default user: ' + String(error));
+      MidwayLogger.warn('Error while creating access token for default user: ' + String(error));
     });
 
   await request(server)
@@ -210,7 +218,7 @@ beforeAll(async (done) =>
     })
     .catch((error) =>
     {
-      winston.warn('Error while creating test user: ' + String(error));
+      MidwayLogger.warn('Error while creating test user: ' + String(error));
     });
 
   try
@@ -259,7 +267,7 @@ describe('Status tests', () =>
       .then((response) =>
       {
         const responseObject = JSON.parse(response.text);
-        winston.info(JSON.stringify(responseObject, null, 1));
+        MidwayLogger.info(JSON.stringify(responseObject, null, 1));
         expect(responseObject.uptime > 0);
         expect(responseObject.numRequests > 0);
         expect(responseObject.numRequestsCompleted > 0 && responseObject.numRequestsCompleted < responseObject.numRequests);
@@ -549,7 +557,7 @@ describe('Item route tests', () =>
       .expect(400)
       .then((response) =>
       {
-        winston.info('response: "' + String(response) + '"');
+        MidwayLogger.info('response: "' + String(response) + '"');
       })
       .catch((error) =>
       {
@@ -596,7 +604,7 @@ describe('Item route tests', () =>
       .expect(400)
       .then((response) =>
       {
-        winston.info('response: "' + String(response) + '"');
+        MidwayLogger.info('response: "' + String(response) + '"');
       })
       .catch((error) =>
       {
@@ -642,13 +650,26 @@ describe('Query route tests', () =>
           body: JSON.stringify({
             from: 0,
             size: 0,
+            query:
+              {
+                bool:
+                  {
+                    filter:
+                      {
+                        term:
+                          {
+                            _index: 'movies',
+                          },
+                      },
+                  },
+              },
           }),
         },
       })
       .expect(200)
       .then((response) =>
       {
-        winston.info(response.text);
+        MidwayLogger.info(response.text);
         expect(JSON.parse(response.text))
           .toMatchObject({
             result: {
@@ -683,7 +704,7 @@ describe('Query route tests', () =>
       .expect(400)
       .then((response) =>
       {
-        winston.info(response.text);
+        MidwayLogger.info(response.text);
         expect(JSON.parse(response.text)).toMatchObject(
           {
             errors: [
@@ -732,7 +753,7 @@ describe('Query route tests', () =>
           },
         }).expect(200).then((response) =>
         {
-          winston.info(response.text);
+          MidwayLogger.info(response.text);
         }).catch((error) =>
         {
           fail(error);
@@ -752,7 +773,7 @@ describe('Query route tests', () =>
           },
         }).expect(200).then((response) =>
         {
-          winston.info(response.text);
+          MidwayLogger.info(response.text);
           expect(JSON.parse(response.text)).toMatchObject(
             {
               result: {
@@ -783,7 +804,7 @@ describe('Query route tests', () =>
           },
         }).expect(200).then((response) =>
         {
-          winston.info(response.text);
+          MidwayLogger.info(response.text);
           const respData = JSON.parse(response.text);
           expect(respData['result']).toMatchObject(
             {
@@ -805,7 +826,7 @@ describe('Query route tests', () =>
           },
         }).then((response) =>
         {
-          winston.info(response.text);
+          MidwayLogger.info(response.text);
           expect(JSON.parse(response.text)).toMatchObject(
             {
               errors: [
@@ -869,9 +890,9 @@ describe('Query route tests', () =>
                 "query" : {
                   "bool" : {
                     "filter": [
+                      { "term": {"_index" : "movies"} },
                       { "term": {"movieid" : @movie.movieid} },
-                      { "match": {"_index" : "movies"} },
-                      { "match": {"_type" : "data"} }
+                      { "term": {"_type" : "data"} }
                     ]
                   }
                 }
@@ -883,7 +904,7 @@ describe('Query route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        winston.info(response.text);
+        MidwayLogger.info(response.text);
         expect(response.text).not.toBe('');
         if (response.text === '')
         {
@@ -1010,7 +1031,7 @@ describe('Query route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        winston.info(response.text);
+        MidwayLogger.info(response.text);
         expect(response.text).not.toBe('');
         if (response.text === '')
         {
@@ -1071,8 +1092,8 @@ describe('Query route tests', () =>
                 "query" : {
                   "bool": {
                     "filter": [
-                      { "match": {"_index" : "movies"} },
-                      { "match": {"_type" : "data"} }
+                      { "term": {"_index" : "movies"} },
+                      { "term": {"_type" : "data"} }
                     ],
                     "must_not": [
                       { "term": { "budget": 0 } },
@@ -1088,7 +1109,7 @@ describe('Query route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        winston.info(response.text);
+        MidwayLogger.info(response.text);
         expect(response.text).not.toBe('');
         if (response.text === '')
         {
@@ -1242,8 +1263,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: defaultUserAccessToken,
         database: 1,
-        start: new Date(2018, 2, 16, 7, 24, 4),
-        end: new Date(2018, 2, 16, 7, 36, 4),
+        start: new Date(2018, 6, 20, 7, 24, 4),
+        end: new Date(2018, 6, 20, 7, 36, 4),
         eventname: 'impression',
         algorithmid: 'bestMovies3',
         agg: 'select',
@@ -1269,8 +1290,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: defaultUserAccessToken,
         database: 1,
-        start: new Date(2018, 2, 16, 7, 24, 4),
-        end: new Date(2018, 2, 16, 7, 36, 4),
+        start: new Date(2018, 6, 20, 7, 24, 4),
+        end: new Date(2018, 6, 20, 7, 36, 4),
         eventname: 'impression',
         algorithmid: 'bestMovies3',
         agg: 'histogram',
@@ -1297,8 +1318,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: defaultUserAccessToken,
         database: 1,
-        start: new Date(2018, 3, 3, 7, 24, 4),
-        end: new Date(2018, 3, 3, 10, 24, 4),
+        start: new Date(2018, 6, 20, 7, 24, 4),
+        end: new Date(2018, 6, 20, 10, 24, 4),
         eventname: 'click,impression',
         algorithmid: 'bestMovies3',
         agg: 'rate',
@@ -1571,7 +1592,7 @@ describe('Scheduler tests', () =>
             [
               {
                 id: 1,
-                taskId: 0,
+                taskId: 'taskDefaultExit',
               },
             ],
         },

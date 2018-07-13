@@ -79,7 +79,7 @@ export interface InputDeclarationOptionTypes<S = any>
     large?: boolean;
   };
   Pick: {
-    pickOptions: (state: S) => List<string>;
+    pickOptions: (state: S) => List<string | number>;
     indexResolver?: (option) => number;
     displayNames?: (state: S) => Immutable.Map<any, string>;
     textColor?: (index: number) => string;
@@ -115,6 +115,7 @@ export interface InputDeclarationType<S>
   getDisplayState?: (state: S) => DisplayState;
   widthFactor?: number; // defaults to 4, set to -1 to have no set width
   style?: object; // extend the cell style
+  help?: string;
 }
 
 export type OptionType<K extends keyof InputDeclarationOptionTypes, S = any> = InputDeclarationOptionTypes<S>[K];

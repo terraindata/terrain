@@ -46,17 +46,13 @@ THE SOFTWARE.
 
 import * as cronParser from 'cron-parser';
 import * as momentZone from 'moment-timezone';
-import * as stream from 'stream';
-import * as winston from 'winston';
 
 import { JobConfig } from 'shared/types/jobs/JobConfig';
-import { TaskConfig } from 'shared/types/jobs/TaskConfig';
-import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 import * as Tasty from '../../tasty/Tasty';
 import { TransactionHandle } from '../../tasty/TastyDB';
 import * as App from '../App';
-import IntegrationConfig from '../integrations/IntegrationConfig';
 import { Job } from '../jobs/Job';
+import { MidwayLogger } from '../log/MidwayLogger';
 import { UserConfig } from '../users/UserConfig';
 import SchedulerConfig from './SchedulerConfig';
 
@@ -112,6 +108,7 @@ export class Scheduler
       {
         delete schedules[0].id;
         schedules[0].name = schedules[0].name + ' - Copy';
+        schedules[0].running = false;
         resolve(await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[]);
       }
     });
@@ -137,7 +134,7 @@ export class Scheduler
       }
       catch (e)
       {
-        winston.warn(e.toString());
+        MidwayLogger.warn(e.toString());
         return false;
       }
     });
@@ -210,13 +207,15 @@ export class Scheduler
           workerId: 1, // TODO change this for clustering support
         };
       await this.setRunning(id, true, handle);
+      const runningSched = await this.get(id);
       const jobCreateStatus: JobConfig[] | string = await App.JobQ.create(jobConfig, runNow, userId);
       if (typeof jobCreateStatus === 'string')
       {
         return reject(new Error(jobCreateStatus as string));
       }
       this.runningSchedules.delete(id);
-      return resolve(await this.get(id) as SchedulerConfig[]);
+      const sched = await this.get(id);
+      return resolve(sched as SchedulerConfig[]);
     });
   }
 
@@ -230,7 +229,7 @@ export class Scheduler
     return Promise.reject(new Error('Schedule not found.'));
   }
 
-  public async setRunning(id: number, running: boolean, handle: TransactionHandle): Promise<SchedulerConfig[]>
+  public async setRunning(id: number, running: boolean, handle?: TransactionHandle): Promise<SchedulerConfig[]>
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
@@ -246,7 +245,8 @@ export class Scheduler
           // }
         }
         schedules[0].running = running;
-        return resolve(await App.DB.upsert(this.schedulerTable, schedules[0], handle) as SchedulerConfig[]);
+        const val = await App.DB.upsert(this.schedulerTable, schedules[0], handle) as SchedulerConfig[];
+        return resolve(val);
       }
     });
   }
@@ -296,7 +296,7 @@ export class Scheduler
         schedule.running = (schedule.running !== undefined && schedule.running !== null) ? schedule.running : false;
         schedule.shouldRunNext = (schedule.shouldRunNext !== undefined && schedule.shouldRunNext !== null)
           ? schedule.shouldRunNext : true;
-        schedule.tasks = (schedule.tasks !== undefined && schedule.tasks !== null) ? JSON.stringify(schedule.tasks) : JSON.stringify([]);
+        schedule.tasks = (schedule.tasks !== undefined && schedule.tasks !== null) ? schedule.tasks : JSON.stringify([]);
         schedule.workerId = (schedule.workerId !== undefined && schedule.workerId !== null) ? schedule.workerId : 1;
       }
       else
@@ -341,7 +341,7 @@ export class Scheduler
           }
           catch (err)
           {
-            winston.warn(err.toString() as string);
+            MidwayLogger.warn(err.toString() as string);
           }
         }
 
@@ -356,7 +356,7 @@ export class Scheduler
     const result: SchedulerConfig[] | string = await this.runSchedule(scheduleId, handle);
     if (typeof result === 'string')
     {
-      winston.info(result as string);
+      MidwayLogger.info(result as string);
     }
   }
 
@@ -377,7 +377,7 @@ export class Scheduler
     }
     catch (e)
     {
-      winston.warn('Error while trying to parse scheduler cron: ' + ((e as any).toString() as string));
+      MidwayLogger.warn('Error while trying to parse scheduler cron: ' + ((e as any).toString() as string));
     }
     return false;
   }

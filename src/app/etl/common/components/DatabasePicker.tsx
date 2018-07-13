@@ -44,24 +44,19 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
-import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
 import { instanceFnDecorator } from 'shared/util/Classes';
-import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 
-import { Database, DatabaseMap, Server, ServerMap, Table, TableMap } from 'schema/SchemaTypes';
-import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { Database, DatabaseMap, Server, ServerMap, TableMap } from 'schema/SchemaTypes';
+import { Languages } from 'shared/etl/types/ETLTypes';
 
 interface FormState
 {
@@ -95,14 +90,14 @@ class DatabasePicker extends TerrainComponent<Props>
     this.inputMap = {
       serverIndex: {
         type: DisplayType.Pick,
-        displayName: 'Server',
+        displayName: 'Instance',
         options: {
           pickOptions: this.getServerOptions,
         },
       },
       database: {
         type: DisplayType.TextBox,
-        displayName: 'ES Index',
+        displayName: 'Dataset Name',
         getDisplayState: this.getDisplayStateBoxes,
         options: {
           acOptions: this.getDatabaseOptions,
@@ -125,15 +120,15 @@ class DatabasePicker extends TerrainComponent<Props>
     const db = state.database;
     if (db === '')
     {
-      return 'Database name cannot be empty.';
+      return 'Dataset name cannot be empty.';
     }
     if (db.search(/[^a-z0-9\-\_]/) !== -1 && db.substr(0, 1) !== '-')
     {
-      return 'Invalid database name. You must use lowercase letters, numbers, - and _.';
+      return 'Invalid Dataset name. You must use lowercase letters, numbers, - and _.';
     }
     if (db[0] === '_' || db[0] === '-')
     {
-      return 'Invalid database name. Database name cannot start with - or _.';
+      return 'Invalid Dataset name. Dataset name cannot start with - or _.';
     }
     const table = state.table;
     if (table === '')
@@ -228,7 +223,7 @@ class DatabasePicker extends TerrainComponent<Props>
   {
     const index = this._getSortedServers(servers)
       .findIndex((server, k) => server.id === serverId);
-    return index != null ? index : -1;
+    return index != null ? index : 0;
   }
 
   public computeFormState(): FormState

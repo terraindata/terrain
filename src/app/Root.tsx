@@ -89,19 +89,17 @@ if (!DEV)
       ${(error != null && error.stack != null) ? error.stack : ''}
     `;
 
-    $.post('http://lukeknepper.com/email.php', {
+    $.post('https://lukeknepper.com/email.php', {
       msg,
       secret: '11235813',
     });
 
     return false;
   };
-} else
-{
-  // TerrainTools.setLogLevel('info');
-  window.TerrainTools = TerrainTools;
-  TerrainTools.welcome();
 }
+// TerrainTools.setLogLevel('info');
+window.TerrainTools = TerrainTools;
+TerrainTools.welcome();
 
 Ajax.config({
   reduxStoreDispatch: TerrainStore.dispatch,

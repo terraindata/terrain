@@ -48,26 +48,24 @@ THE SOFTWARE.
 
 import { BuilderState } from 'builder/data/BuilderState';
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
 import InfoArea from '../../../common/components/InfoArea';
 import Util from '../../../util/Util';
 import BuilderActions from '../../data/BuilderActions';
 import { scrollAction } from '../../data/BuilderScrollStore';
-import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import CardDropArea from './CardDropArea';
 import CardsArea from './CardsArea';
 import './CardsColumn.less';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
+import { List } from 'immutable';
 import { Cards } from '../../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { ElasticBlocks } from '../../../../database/elastic/blocks/ElasticBlocks';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
+import { altStyle, borderColor, Colors, fontColor } from '../../../colors/Colors';
 import { ColorsActions } from './../../../colors/data/ColorsRedux';
-const { List, Map } = Immutable;
 const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 
 export interface Props

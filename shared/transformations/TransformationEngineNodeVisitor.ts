@@ -44,14 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as _ from 'lodash';
-import { KeyPath } from '../util/KeyPath';
-import * as yadeep from '../util/yadeep';
-
 import TransformationNode from 'shared/transformations/TransformationNode';
-import TransformationNodeType, { NodeOptionsType } from './TransformationNodeType';
+import TransformationNodeType from './TransformationNodeType';
 import TransformationNodeVisitor, { VisitorLookupMap } from './TransformationNodeVisitor';
-import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
 export default class TransformationEngineNodeVisitor
@@ -62,112 +57,5 @@ export default class TransformationEngineNodeVisitor
   public visitDefault(type: TransformationNodeType, node: TransformationNode, doc: object)
   {
     return node.transform(doc);
-  }
-}
-
-/*
- * referenceKP can contain -1
- * matchKP should not contain -1
- */
-export function createLocalMatcher(referenceKP: KeyPath, matchKP: KeyPath): (newKP: KeyPath) => KeyPath
-{
-  if (referenceKP.size !== matchKP.size || referenceKP.size === 0)
-  {
-    return null;
-  }
-
-  const replacements: {
-    [k: number]: number;
-  } = {};
-
-  let maxIndex = -1;
-
-  for (let i = 0; i < referenceKP.size; i++)
-  {
-    const searchIndex = referenceKP.get(i);
-    const matchIndex = matchKP.get(i);
-    if (searchIndex !== matchIndex)
-    {
-      if (typeof searchIndex !== 'number' || typeof matchIndex !== 'number')
-      {
-        return null;
-      }
-      else
-      {
-        replacements[i] = matchIndex;
-        maxIndex = i;
-      }
-    }
-  }
-
-  const baseMatchPath = matchKP.slice(0, maxIndex + 1);
-
-  return (newKP: KeyPath) =>
-  {
-    if (maxIndex === -1)
-    {
-      return newKP;
-    }
-    else
-    {
-      const toTransplant = newKP.slice(maxIndex + 1);
-      return baseMatchPath.concat(toTransplant).toList();
-    }
-
-  };
-}
-
-export function visitHelper(fields: List<KeyPath>, doc: object, defaultResult: TransformationVisitResult,
-  cb: (kp: KeyPath, el: any) => TransformationVisitResult | void,
-  shouldTransform: (kp: KeyPath, el: any) => boolean = (kp, el) => true): TransformationVisitResult
-{
-  const reducedResult = fields.reduce((accumulator, field) =>
-  {
-    if (accumulator)
-    {
-      return accumulator;
-    }
-    const el = yadeep.get(doc, field);
-    if (!shouldTransform(field, el))
-    {
-      return accumulator;
-    }
-    if (Array.isArray(el) && field.contains(-1))
-    {
-      for (let i: number = 0; i < el.length; i++)
-      {
-        let kp: KeyPath = field;
-        if (kp.contains(-1))
-        {
-          kp = kp.set(kp.indexOf(-1), i.toString());
-        }
-        else
-        {
-          kp = kp.push(i.toString());
-        }
-        const result = cb(kp, yadeep.get(doc, kp));
-        if (result !== undefined)
-        {
-          return result;
-        }
-      }
-    }
-    else
-    {
-      const result = cb(field, el);
-      if (result !== undefined)
-      {
-        return result;
-      }
-    }
-    return accumulator;
-  }, undefined);
-  if (reducedResult !== undefined)
-  {
-    return reducedResult;
-  }
-  else
-  {
-    return defaultResult;
   }
 }

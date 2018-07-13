@@ -51,70 +51,87 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const CompressionPlugin = require("compression-webpack-plugin");
 const nodeExternals = require('webpack-node-externals');
 
-const nodeEnv = process.env.NODE_ENV;
-const isProduction = nodeEnv !== 'development';
-
-module.exports =
+module.exports = (env, argv) =>
 {
-  entry: './midway/src/Midway.ts',
+  const mode = argv.mode;
+  const isProduction = mode !== 'development';
 
-  output:
-  {
-    path: __dirname,
-    publicPath: '/assets/',
-    filename: 'bundle.server.js',
-  },
-  externals: [
-    nodeExternals()
-  ],
-  target: 'node',
+  const config = {
+    entry: './midway/src/Midway.ts',
 
-  resolve:
-  {
-    extensions: ['.ts', '.tsx', '.js'],
-    alias: {
-      shared: path.resolve(__dirname, 'shared'),
-      database: path.resolve(__dirname, 'src/database'),
-    }
-  },
+    output:
+    {
+      path: __dirname,
+      publicPath: '/assets/',
+      filename: 'bundle.server.js',
+    },
+    externals: [
+      nodeExternals()
+    ],
+    target: 'node',
 
-  module:
-  {
-    rules:
-    [
-      // note: this first loader string gets updated in webpack.config.prod.js
-      //  keep it first in this list
-      {
-        test: /\.ts(x?)$/,
-        exclude: [/analytics.js/, /sigint/, /node_modules/, /assets/],
-        loader:
-        'babel-loader!thread-loader!ts-loader?happyPackMode=true'
-        + JSON.stringify({
-          compilerOptions: {
+    resolve:
+    {
+      extensions: ['.ts', '.tsx', '.js'],
+      alias: {
+        shared: path.resolve(__dirname, 'shared'),
+        database: path.resolve(__dirname, 'midway/src/database'),
+      }
+    },
+
+    module:
+    {
+      rules:
+      [
+        {
+          test: /\.ts(x?)$/,
+          exclude: [/analytics.js/, /sigint/, /node_modules/, /assets/],
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                cacheDirectory: true,
+              },
+            },
+            {
+              loader: 'thread-loader',
+              options: {
+                // there should be 1 cpu for the fork-ts-checker-webpack-plugin
+                workers: require('os').cpus().length - 1,
+              },
+            },
+            {
+              loader: 'ts-loader',
+              options: {
+                happyPackMode: true,
+              }
+            }
+          ],
+        },
+      ],
+    },
+
+    plugins: [
+      new ForkTsCheckerWebpackPlugin({ tslint: true, tsconfig: './midway/tsconfig.json', checkSyntacticErrors: true, workers: 2 }),
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify(mode),
+        },
+      }),
+      new webpack.NamedModulesPlugin(),
+    ],
+    optimization: {
+      minimizer: [
+        new UglifyJSPlugin({
+          cache: true,
+          parallel: true,
+          uglifyOptions: {
+            keep_fnames: true,
           },
         }),
-      },
-    ],
-  },
+      ],
+    },
+  };
 
-  plugins: [
-    new webpack.DefinePlugin({
-      'process.env': {
-      NODE_ENV: JSON.stringify(nodeEnv),
-      },
-    }),
-    new webpack.NamedModulesPlugin()
-  ],
-  optimization: {
-    minimizer: [
-      new UglifyJSPlugin({
-        // sourceMap: true,
-        cache: true,
-        parallel: true,
-        uglifyOptions: {
-          keep_fnames: true,
-        }
-      })
-    ],
-  },
+  return config;
 };

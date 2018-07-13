@@ -44,13 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
-import * as _ from 'lodash';
 
+import { TemplateVersion } from 'shared/etl/migrations/TemplateVersions';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { SinkConfig, SourceConfig } from './EndpointTypes';
 
 import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 // languages and filetypes don't follow the same capitalization conventions because of legacy reasons (?)
 export enum Languages
@@ -79,7 +78,7 @@ export interface TemplateBase
   sinks: any;
   process: any;
   settings: any;
-  meta: any;
+  meta: TemplateMeta;
   uiData: any;
 }
 
@@ -91,7 +90,7 @@ export interface TemplateSettings
 // currently unused
 export interface TemplateMeta
 {
-  placeholder?: any;
+  version: TemplateVersion;
 }
 
 export type TemplateObject = {

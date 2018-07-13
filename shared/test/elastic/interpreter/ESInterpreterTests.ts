@@ -45,9 +45,10 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as fs from 'fs';
+import * as _ from 'lodash';
 import * as util from 'util';
-import * as winston from 'winston';
 
+import { TestLogger } from 'shared/test/TestLogger';
 import SharedUtil from '../../../../shared/Util';
 import ESInterpreter from '../../../database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
@@ -62,8 +63,7 @@ let expected;
 
 beforeAll(async (done) =>
 {
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
+  TestLogger.level = 'debug';
 
   const expectedString: any = await new Promise((resolve, reject) =>
   {
@@ -79,18 +79,48 @@ function testParse(testName: string,
   expectedValue: any,
   expectedErrors: ESParserError[] = [])
 {
-  winston.info('testing "' + testName + '": "' + testString + '"');
+  TestLogger.info('testing "' + testName + '": "' + testString + '"');
   const interpreter: ESInterpreter = new ESInterpreter(testString);
   const parser: ESJSONParser = interpreter.parser as ESJSONParser;
 
   if (parser.getErrors().length > 0)
   {
-    winston.info(util.inspect(parser.getErrors(), false, 16));
-    winston.info(util.inspect(parser.getValueInfo(), false, 16));
+    TestLogger.info(util.inspect(parser.getErrors(), false, 16));
+    TestLogger.info(util.inspect(parser.getValueInfo(), false, 16));
   }
 
   expect(parser.getValue()).toEqual(expectedValue);
+  expect(new ESJSONParser(interpreter.finalQuery).getValue()).toEqual(expectedValue);
   expect(parser.getErrors()).toEqual(expectedErrors);
+  // test post size manipulating
+  if (expectedValue.hasOwnProperty('size'))
+  {
+    interpreter.adjustQuerySize(1, 200, 1, false);
+    expect(interpreter.rootValueInfo.value.size).toBe(1);
+  }
+
+  if (expectedValue.hasOwnProperty('from'))
+  {
+    const oldfrom = Number(expectedValue.from);
+    interpreter.adjustQuerySize(1, 200, 2, true);
+    expect(interpreter.rootValueInfo.value.from).toBe(oldfrom + 1);
+  }
+
+  const factors = _.get(interpreter.rootValueInfo.value, ['sort', '_script', 'script', 'params', 'factors']);
+  if (Array.isArray(factors) && factors.length > 0)
+  {
+    interpreter.normalizeTerrainScriptWeight();
+    const newFactors = _.get(interpreter.rootValueInfo.value, ['sort', '_script', 'script', 'params', 'factors']);
+    let newSum = 0;
+    newFactors.map((f) =>
+    {
+      newSum = newSum + Number(f.weight);
+    });
+    const sumDiff = 1 - newSum;
+    TestLogger.info('Old weights: ' + JSON.stringify(factors.map((f) => f.weight)) + ' New weights: ' +
+      JSON.stringify(newFactors.map((f) => f.weight)) + ' Weight sum diff ' + String(sumDiff));
+    expect(Math.abs(1 - newSum) < 0.001).toBe(true);
+  }
 }
 
 test('parse valid json objects', () =>

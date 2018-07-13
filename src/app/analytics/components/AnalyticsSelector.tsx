@@ -50,7 +50,6 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import { Server } from 'schema/SchemaTypes';
-import Ajax from 'util/Ajax';
 import './AnalyticsSelector.less';
 
 interface Props

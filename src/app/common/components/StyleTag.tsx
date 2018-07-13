@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import TerrainComponent from '../../common/components/TerrainComponent';

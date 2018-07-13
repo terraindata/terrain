@@ -44,10 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-empty
-import { shallow } from 'enzyme';
-import * as Immutable from 'immutable';
-import { List, Map } from 'immutable';
-import * as React from 'react';
 import TransformUtil from 'util/TransformUtil';
 
 describe('TransformUtil', () =>

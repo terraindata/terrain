@@ -45,12 +45,11 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as nodemailer from 'nodemailer';
-import * as winston from 'winston';
 
-import * as App from '../App';
 import IntegrationConfig from '../integrations/IntegrationConfig';
 
 import { integrations } from '../integrations/IntegrationRouter';
+import { MidwayLogger } from '../log/MidwayLogger';
 
 // currently a root level member of App: App.EMAIL
 export class Email
@@ -67,7 +66,7 @@ export class Email
    * Creates and sends an email.
    * PARAMS: integration ID, subject, body (number, string, string ==> Promise<boolean>)
    */
-  public async send(integrationId: number, subject: string, body: string, attachment?: string): Promise<boolean>
+  public async send(integrationId: number, subject: string, body: string, attachment?: string, recipient?: string): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>
     {
@@ -77,7 +76,7 @@ export class Email
         const connectionConfig = integrationConfigs[0].connectionConfig;
         const authConfig = integrationConfigs[0].authConfig;
         const fullConfig: object = Object.assign(connectionConfig, authConfig);
-        // winston.info(fullConfig);
+        // MidwayLogger.info(fullConfig);
         // if this integration hasn't been loaded into memory yet as a nodemailer transport
         if (!this.transports.has(integrationId))
         {
@@ -104,19 +103,24 @@ export class Email
           };
         if (attachment !== undefined)
         {
-          emailContents['attachments'] = [{path: attachment}];
+          emailContents['attachments'] = [{ path: attachment }];
         }
+        if (recipient !== undefined)
+        {
+          emailContents['to'] = recipient;
+        }
+
         // send the email
         currTransport.sendMail(emailContents, (err, info) =>
         {
           if (err)
           {
-            winston.warn('Email send status: ' + JSON.stringify(err, null, 2));
+            MidwayLogger.warn('Email send status: ' + JSON.stringify(err, null, 2));
             resolve(false);
           }
           else
           {
-            winston.info('Email send status: ' + JSON.stringify(info, null, 2));
+            MidwayLogger.info('Email send status: ' + JSON.stringify(info, null, 2));
             resolve(true);
           }
         });

@@ -45,19 +45,12 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
-
-import { List } from 'immutable';
 import * as _ from 'lodash';
 
-import { createLocalMatcher, visitHelper } from 'shared/transformations/TransformationEngineNodeVisitor';
 import TransformationNode from 'shared/transformations/TransformationNode';
-import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import Topology from 'shared/transformations/util/TopologyUtil';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
@@ -119,24 +112,20 @@ export default abstract class CombineTransformationType extends TransformationNo
         matchSets[hash] = inputs;
       }
     });
+    // each item in matchSets is guaranteed to be at least length 1
 
     const opts = this.meta as NodeOptionsType<any>;
     const newFieldKeyPath = opts.newFieldKeyPaths.get(0);
 
+    const matchFn = Topology.createBasePathMatcher(this.fields.get(0), newFieldKeyPath);
+
     for (const locale of Object.keys(matchSets))
     {
       const matchSet = matchSets[locale];
-      const matcher = createLocalMatcher(matchSet[0].field, matchSet[0].matchField);
-      if (matcher === null)
-      {
-        errors.push(`Error in ${this.typeCode}: Field and Match location are inconsistent`);
-      }
-      else
-      {
-        const destKP = matcher(newFieldKeyPath);
-        const newValue = this.combine(this.processMatchSet(matchSet));
-        yadeep.set(doc, destKP, newValue, { create: true });
-      }
+      const newValue = this.combine(this.processMatchSet(matchSet));
+
+      const destKP = matchFn(matchSet[0].matchField);
+      yadeep.set(doc, destKP, newValue, { create: true });
     }
 
     return {
@@ -146,7 +135,6 @@ export default abstract class CombineTransformationType extends TransformationNo
   }
 }
 
-// like with createLocalMatcher, matchKP should not contain -1
 function hashMatchToLocale(searchKP: KeyPath, matchKP: KeyPath): string
 {
   let hash = '';

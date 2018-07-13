@@ -51,7 +51,6 @@ import * as App from '../App';
 import * as AppUtil from '../AppUtil';
 import { Permissions } from '../permissions/Permissions';
 import UserConfig from '../users/UserConfig';
-import Scheduler from './Scheduler';
 import SchedulerConfig from './SchedulerConfig';
 
 const Router = new KoaRouter();
@@ -111,7 +110,7 @@ Router.post('/unpause/:id', passport.authenticate('access-token-local'), async (
 Router.post('/status/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.SchedulerPermissions.verifyStatusRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.SKDR.setStatus(ctx.params.id, ctx.request.body.body.status);
+  ctx.body = await App.SKDR.setStatus(ctx.params.id, ctx.request.body['body'].status);
 });
 
 // returns current timezone that Midway is using
@@ -130,7 +129,7 @@ Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, nex
 // Create schedule
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const schedule: SchedulerConfig = ctx.request.body.body;
+  const schedule: SchedulerConfig = ctx.request.body['body'];
   if (schedule.id !== undefined)
   {
     delete schedule.id;
@@ -142,7 +141,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 // Update schedule
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const schedule: SchedulerConfig = ctx.request.body.body;
+  const schedule: SchedulerConfig = ctx.request.body['body'];
   schedule['id'] = parseInt(ctx.params.id, 10) as number;
   AppUtil.verifyParameters(schedule, ['id']);
   await perm.SchedulerPermissions.verifyUpdateRoute(ctx.state.user as UserConfig, ctx.req);

@@ -49,21 +49,18 @@ import
 {
   _FilterGroup,
   _FilterLine,
-  _Param,
   _Path,
   _ScoreLine,
   _Script,
   ElasticDataSource,
   FilterGroup,
   FilterLine,
-  Param,
   Path,
   PathfinderSteps,
   Score,
   ScoreLine,
   Script,
   Source,
-  sourceCountOptions,
 } from 'builder/components/pathfinder/PathfinderTypes';
 import { List } from 'immutable';
 import * as _ from 'lodash';

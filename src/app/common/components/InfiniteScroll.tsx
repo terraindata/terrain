@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands
 
-import { List, Map } from 'immutable';
+import { List } from 'immutable';
 import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
 

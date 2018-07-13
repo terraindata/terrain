@@ -44,14 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as _ from 'lodash';
-import * as stream from 'stream';
-import * as winston from 'winston';
-
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
-import BufferTransform from '../io/streams/BufferTransform';
-import JobConfig from './JobConfig';
+import LogStreamWritable from '../io/streams/LogStreamWritable';
 
 import JobLogConfig from './JobLogConfig';
 
@@ -68,7 +63,7 @@ export class JobLog
    * PARAMS: jobId, logStream (number, stream.Readable ==> number)
    *
    */
-  public async create(jobId: number, logStream: stream.Readable, jobStatus?: boolean, runNow?: boolean): Promise<JobLogConfig[]>
+  public async create(jobId: number, logStream: LogStreamWritable, jobStatus?: boolean, runNow?: boolean): Promise<JobLogConfig[]>
   {
     return new Promise<JobLogConfig[]>(async (resolve, reject) =>
     {
@@ -91,13 +86,13 @@ export class JobLog
       let jobStatusMsg: string = 'SUCCESS';
       try
       {
-        const accumulatedLog: string[] = await BufferTransform.toArray(logStream);
+        const accumulatedLog: string[] = await this._consumeLogStreamWritable(logStream);
         updatedContentJobLog.contents = accumulatedLog.join('\n');
         if (jobStatus === false)
         {
           jobStatusMsg = 'FAILURE';
         }
-        await App.JobQ.setJobStatus(jobId, false, jobStatusMsg);
+        await App.JobQ.setJobStatus(jobId, false, jobStatusMsg, jobId);
         await App.DB.upsert(this.jobLogTable, updatedContentJobLog);
       }
       catch (e)
@@ -123,6 +118,58 @@ export class JobLog
   public async get(id?: number): Promise<JobLogConfig[]>
   {
     return this._select([], { id });
+  }
+
+  private async _consumeLogStreamWritable(logStream: LogStreamWritable): Promise<string[]>
+  {
+    return new Promise<string[]>(async (resolve, reject) =>
+    {
+      const result: string[] = [];
+      logStream.on('error', (e) =>
+      {
+        return reject(e);
+      });
+
+      if (logStream.getState() === true)
+      {
+        const chunks: any[] = logStream.getBuffers();
+        chunks.forEach((chunk) =>
+        {
+          let stringifiedChunk: string = '';
+          try
+          {
+            stringifiedChunk = chunk.toString();
+          }
+          catch (e)
+          {
+            // do nothing
+          }
+          result.push(stringifiedChunk);
+        });
+        return resolve(result);
+      }
+      else
+      {
+        logStream.on('finish', () =>
+        {
+          const chunks: any[] = logStream.getBuffers();
+          chunks.forEach((chunk) =>
+          {
+            let stringifiedChunk: string = '';
+            try
+            {
+              stringifiedChunk = chunk.toString();
+            }
+            catch (e)
+            {
+              // do nothing
+            }
+            result.push(stringifiedChunk);
+          });
+          return resolve(result);
+        });
+      }
+    });
   }
 
   private async _select(columns: string[], filter: object): Promise<JobLogConfig[]>

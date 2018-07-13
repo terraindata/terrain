@@ -44,8 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as winston from 'winston';
-
+import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
 import ElasticDB from '../../../../src/database/elastic/tasty/ElasticDB';
@@ -58,8 +57,7 @@ let elasticDB: ElasticDB;
 
 beforeAll(() =>
 {
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
+  MidwayLogger.level = 'debug';
   const elasticConfig: ElasticConfig = {
     hosts: ['http://localhost:9200'],
   };
@@ -155,4 +153,22 @@ test('t7', () =>
   expect(qstr)
     // tslint:disable-next-line:max-line-length
     .toEqual('[{"index":"movies","table":"data","primaryKeys":["movieid"],"fields":["movieid","releasedate","title"],"op":"select","params":[{"index":"movies","type":"data","from":20,"size":10,"body":{"_source":["movieid","title","releasedate"],"sort":[{"movieid":{"order":"desc"}},{"releasedate":{"order":"asc"}}],"query":{"bool":{"filter":{"bool":{"must":[{"range":{"releasedate":{"gte":"2007-03-24"}}},{"range":{"releasedate":{"lt":"2017-03-24"}}}]}},"must_not":[{"match":{"movieid":2134}}]}}}}]}]');
+});
+
+test('t8', () =>
+{
+  const query = new Tasty.Query(DBMovies);
+  query.filter(DBMovies['releasedate'].gt('2007-03-24').and(DBMovies['releasedate'].lt('2017-03-24')));
+  const qstr = elasticDB.generateString(query);
+  // tslint:disable-next-line:max-line-length
+  expect(qstr).toEqual('[{"index":"movies","table":"data","primaryKeys":["movieid"],"fields":["movieid","releasedate","title"],"op":"select","params":[{"index":"movies","type":"data","body":{"query":{"bool":{"filter":{"bool":{"must":[{"range":{"releasedate":{"gt":"2007-03-24"}}},{"range":{"releasedate":{"lt":"2017-03-24"}}}]}}}}}}]}]');
+});
+
+test('t9', () =>
+{
+  const query = new Tasty.Query(DBMovies);
+  query.filter(DBMovies['releasedate'].gt('2007-03-24').or(DBMovies['releasedate'].lt('2017-03-24')));
+  const qstr = elasticDB.generateString(query);
+  // tslint:disable-next-line:max-line-length
+  expect(qstr).toEqual('[{"index":"movies","table":"data","primaryKeys":["movieid"],"fields":["movieid","releasedate","title"],"op":"select","params":[{"index":"movies","type":"data","body":{"query":{"bool":{"filter":{"bool":{"should":[{"bool":{"filter":{"range":{"releasedate":{"gt":"2007-03-24"}}}}},{"bool":{"filter":{"range":{"releasedate":{"lt":"2017-03-24"}}}}}]}}}}}}]}]');
 });

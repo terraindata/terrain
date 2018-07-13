@@ -129,7 +129,7 @@ export class Databases
       throw new Error('Database does not have an ID');
     }
 
-    const controller: DatabaseController = DatabaseControllerConfig.makeDatabaseController(db);
+    const controller: DatabaseController = await DatabaseControllerConfig.makeDatabaseController(db);
     controller.setConfig(db);
     const connected: boolean = await controller.getClient().isConnected();
 
@@ -181,13 +181,17 @@ export class Databases
     return schema.toString();
   }
 
-  public async status(id?: number): Promise<Array<DatabaseConfig & string>>
+  public async status(id?: number, removeProtectedDSN: boolean = true): Promise<Array<DatabaseConfig & string> | DatabaseConfig>
   {
     if (id !== undefined)
     {
       const controller = DatabaseRegistry.get(id);
       await controller.getClient().isConnected();
       const config = controller.getConfig();
+      if (removeProtectedDSN && config.isProtected)
+      {
+        delete config.dsn;
+      }
       config['status'] = controller.getStatus();
       return config;
     }
@@ -197,7 +201,7 @@ export class Databases
       for (const entry of DatabaseRegistry.getAll())
       {
         const _id = entry[0];
-        promises.push(this.status(_id));
+        promises.push(this.status(_id, removeProtectedDSN));
       }
       return Promise.all(promises);
     }

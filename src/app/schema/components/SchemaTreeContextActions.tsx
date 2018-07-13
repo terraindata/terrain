@@ -45,8 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:strict-boolean-expressions no-var-requires
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
 
 import * as Radium from 'radium';
 import * as React from 'react';
@@ -54,17 +52,14 @@ import { SchemaActions } from 'schema/data/SchemaRedux';
 import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
-import { borderColor, Colors, fontColor } from 'app/colors/Colors';
+import { Colors, fontColor } from 'app/colors/Colors';
 import CheckBox from 'common/components/CheckBox';
-import ExpandableView from 'common/components/ExpandableView';
-import FadeInOut from 'common/components/FadeInOut';
 import Modal from 'common/components/Modal';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import Util from 'util/Util';
 
 const DeleteIcon = require('images/icon_trash');
 import './SchemaTreeContextActions.less';
-import Styles from './SchemaTreeStyles';
 
 export interface Props
 {

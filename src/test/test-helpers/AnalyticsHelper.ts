@@ -45,8 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
-import * as Immutable from 'immutable';
-import { ItemType } from '../../items/types/Item';
 
 export default class AnalyticsHelper
 {

@@ -46,12 +46,12 @@ THE SOFTWARE.
 
 import bodybuilder = require('bodybuilder');
 import * as Elastic from 'elasticsearch';
-import * as winston from 'winston';
 
 import util from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticController from '../../database/elastic/ElasticController';
 import * as Tasty from '../../tasty/Tasty';
+import { MidwayLogger } from '../log/MidwayLogger';
 import EventConfig from './EventConfig';
 
 export interface AggregationRequest
@@ -148,19 +148,19 @@ export class Events
       .aggregation(
         'date_histogram',
         'timestamp',
-        'histogram',
         {
           interval: request.interval,
         },
+        'histogram',
         (agg) => agg.aggregation(
           'filter',
           undefined,
-          numerator,
           {
             term: {
               eventname: eventnames[0],
             },
           },
+          numerator,
           (agg1) => agg1.aggregation(
             'value_count',
             'eventname.keyword',
@@ -170,12 +170,12 @@ export class Events
           .aggregation(
             'filter',
             undefined,
-            denominator,
             {
               term: {
                 eventname: eventnames[1],
               },
             },
+            denominator,
             (agg1) => agg1.aggregation(
               'value_count',
               'eventname.keyword',
@@ -185,14 +185,14 @@ export class Events
           .aggregation(
             'bucket_script',
             undefined,
-            rate,
             {
               buckets_path: {
                 [numerator]: numerator + '>count',
                 [denominator]: denominator + '>count',
               },
               script: 'params.' + numerator + ' / params.' + denominator,
-            }),
+            },
+            rate),
     );
 
     return this.buildQuery(controller, body.build());
@@ -247,7 +247,7 @@ export class Events
       }
       catch (e)
       {
-        winston.info('Ignoring malformed field value');
+        MidwayLogger.info('Ignoring malformed field value');
       }
     }
     return this.buildQuery(controller, body.build());

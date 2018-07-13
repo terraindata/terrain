@@ -44,46 +44,30 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
-import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { backgroundColor, borderColor, Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 const Color = require('color');
-import Dropdown from 'common/components/Dropdown';
 import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import ExpandableView from 'common/components/ExpandableView';
+import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import Modal from 'common/components/Modal';
 import { instanceFnDecorator } from 'shared/util/Classes';
-import Quarantine from 'util/RadiumQuarantine';
 
-import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import
-{
-  _FileConfig,
-  _SourceConfig,
-  FileConfig,
-  SinkConfig,
-  SourceConfig,
-} from 'shared/etl/immutable/EndpointRecords';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 import './EdgeSection.less';
 import ETLEdgeComponent from './ETLEdgeComponent';
 
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 export interface Props
 {

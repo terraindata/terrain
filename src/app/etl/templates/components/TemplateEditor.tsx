@@ -46,17 +46,15 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires import-spacing
 import TerrainComponent from 'common/components/TerrainComponent';
 import TerrainDndContext from 'common/components/TerrainDndContext';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { backgroundColor, Colors, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 const HTML5Backend = require('react-dnd-html5-backend');
 
+import Foldout from 'common/components/Foldout';
 import { MultiModal } from 'common/components/overlay/MultiModal';
-import { ETLActions } from 'etl/ETLRedux';
 import DocumentsPreviewColumn from 'etl/templates/components/columns/DocumentsPreviewColumn';
 import EditorColumnBar from 'etl/templates/components/columns/EditorColumnBar';
 import { EndpointsColumn, OptionsColumn, StepsColumn } from 'etl/templates/components/columns/OptionsColumn';
@@ -66,20 +64,16 @@ import MoveFieldModal from 'etl/templates/components/field/MoveFieldModal';
 import RootFieldNode from 'etl/templates/components/field/RootFieldNode';
 import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
+import { ColumnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import Quarantine from 'util/RadiumQuarantine';
 
 import EditorActionsSection from './EditorActionsSection';
 import EditorColumnActionsSection from './EditorColumnActionsSection';
 
 import './TemplateEditor.less';
 
-import * as yadeep from 'shared/util/yadeep';
-
-const { List } = Immutable;
+import { List } from 'immutable';
 
 export interface Props
 {
@@ -238,7 +232,13 @@ class TemplateEditor extends TerrainComponent<Props>
         <div className='template-editor-width-spacer'>
           <div className='template-editor-columns-area'>
             {this.renderEditorSection(showEditor)}
-            {this.renderDocumentsSection()}
+            <Foldout
+              direction='right'
+              width={480}
+              uniqueId='template-editor'
+            >
+              {this.renderDocumentsSection()}
+            </Foldout>
           </div>
         </div>
         <MoveFieldModal

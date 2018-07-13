@@ -45,12 +45,12 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as Stream from 'stream';
-import * as winston from 'winston';
 
+import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 import ElasticClient from '../../../../src/database/elastic/client/ElasticClient';
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
-import ElasticReader from '../../../../src/database/elastic/streams/ElasticReader';
+import PrefixedElasticController from '../../../../src/database/elastic/PrefixedElasticController';
 import ElasticWriter from '../../../../src/database/elastic/streams/ElasticWriter';
 
 let elasticController: ElasticController;
@@ -58,12 +58,12 @@ let elasticClient: ElasticClient;
 
 beforeAll(() =>
 {
-  (winston as any).level = 'debug';
+  MidwayLogger.level = 'debug';
   const config: ElasticConfig = {
     hosts: ['http://localhost:9200'],
   };
 
-  elasticController = new ElasticController(config, 0, 'ElasticWriterTests');
+  elasticController = new PrefixedElasticController(config, 0, 'ElasticWriterTests', undefined, undefined, 'abc.');
   elasticClient = elasticController.getClient();
 });
 

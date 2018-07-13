@@ -44,9 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
-const { List, Map } = Immutable;
 
 import * as download from 'downloadjs';
 import MidwayError from 'shared/error/MidwayError';
@@ -369,6 +368,7 @@ class ETLAjax
   public fetchPreview(
     source: SourceConfig,
     size: number,
+    fileString?: string,
   ): Promise<List<object>>
   {
     return new Promise((resolve, reject) =>
@@ -392,6 +392,7 @@ class ETLAjax
       const payload = {
         source: recordForSave(source),
         size,
+        fileString,
       };
       return Ajax.req(
         'post',
@@ -519,7 +520,7 @@ class ETLAjax
       // }
     }
 
-    xhr.open('post', MIDWAY_HOST + '/midway/v1/' + route);
+    xhr.open('post', '/midway/v1/' + route);
     xhr.send(formData);
   }
 }

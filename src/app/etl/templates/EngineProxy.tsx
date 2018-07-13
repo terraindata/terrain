@@ -45,18 +45,17 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
-const { List, Map } = Immutable;
 
-import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
+import { ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import LanguageController from 'shared/etl/languages/LanguageControllers';
-import { ETLFieldTypes, FieldTypes, getJSFromETL, Languages } from 'shared/etl/types/ETLTypes';
+import { ETLFieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
-import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
+import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 export interface TransformationConfig
 {
@@ -456,10 +455,15 @@ export class FieldProxy
   }
 
   // delete this field and all child fields
-  public deleteField(rootId: number)
+  public deleteField(rootId: number, childrenOnly?: boolean)
   {
     EngineUtil.postorderForEach(this.engine, rootId, (fieldId) =>
     {
+      if (childrenOnly && fieldId === rootId)
+      {
+        return;
+      }
+
       const dependents: List<number> = EngineUtil.getFieldDependents(this.engine, fieldId);
       if (dependents.size > 0)
       {
@@ -524,9 +528,42 @@ export class FieldProxy
 
   public changeType(newType: ETLFieldTypes)
   {
+    const oldType = EngineUtil.getETLFieldType(this.fieldId, this.engine);
+    if (oldType === newType)
+    {
+      return;
+    }
+
+    const tree = EngineUtil.createTreeFromEngine(this.engine);
+    if (tree.get(this.fieldId).size > 0 && oldType === ETLFieldTypes.Array)
+    {
+      try
+      {
+        this.deleteField(this.fieldId, true);
+      }
+      catch (e)
+      {
+        throw new Error(`Could not remove dependent fields: ${String(e)}`);
+      }
+    }
+
     EngineUtil.changeFieldType(this.engine, this.fieldId, newType);
     EngineUtil.changeFieldTypeSideEffects(this.engine, this.fieldId, newType);
     EngineUtil.castField(this.engine, this.fieldId, newType);
+
+    if (newType === ETLFieldTypes.Array)
+    {
+      const childPath = this.engine.getOutputKeyPath(this.fieldId).push(-1);
+      EngineUtil.addFieldToEngine(this.engine, childPath, ETLFieldTypes.Array, ETLFieldTypes.String, true);
+      EngineUtil.rawSetFieldType(
+        this.engine,
+        this.fieldId,
+        ETLFieldTypes.Array,
+        ETLFieldTypes.Array,
+        ETLFieldTypes.String,
+      );
+    }
+
     this.syncWithEngine(true);
   }
 

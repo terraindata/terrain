@@ -46,24 +46,17 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
-import * as classNames from 'classnames';
-import { List, Map } from 'immutable';
 import * as React from 'react';
 
-import { _ConnectionConfig, ConnectionConfig, ConnectionState } from 'app/connections/ConnectionTypes';
+import { ConnectionConfig, ConnectionState } from 'app/connections/ConnectionTypes';
 import { ConnectionsActions } from 'app/connections/data/ConnectionsRedux';
 import TerrainTools from 'app/util/TerrainTools';
 import { Colors, fontColor } from 'colors/Colors';
 import Badge from 'common/components/Badge';
 import { MultiModal } from 'common/components/overlay/MultiModal';
-import { tooltip } from 'common/components/tooltip/Tooltips';
 import Util from 'util/Util';
-import CreateItem from '../../common/components/CreateItem';
-import Dropdown from '../../common/components/Dropdown';
-import InfoArea from '../../common/components/InfoArea';
-import Modal from '../../common/components/Modal';
 import TerrainComponent, { browserHistory } from '../../common/components/TerrainComponent';
-import { HeaderConfig, HeaderConfigItem, ItemList } from '../../etl/common/components/ItemList';
+import { ItemList } from '../../etl/common/components/ItemList';
 
 const CheckIcon = require('images/icon_checkMark.svg');
 const CloseIcon = require('images/icon_close_8x8.svg');
@@ -246,6 +239,7 @@ class Connections extends TerrainComponent<Props>
             itemsName='connection'
             canCreate={TerrainTools.isAdmin()}
             onCreate={this.createConnection}
+            loading={connections.loading}
           />
         </div>
         <MultiModal

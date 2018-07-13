@@ -43,13 +43,10 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-const { List, Map } = Immutable;
 
-import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
+import Topology from 'shared/transformations/util/TopologyUtil';
 import { KeyPath } from 'shared/util/KeyPath';
 
 // return true if the given keypath would be a valid new child field under provided fieldId
@@ -148,7 +145,7 @@ export function validateRename(
     };
   }
 
-  if (!areFieldsLocal(existingKp, newKeyPath))
+  if (!Topology.areFieldsLocal(existingKp, newKeyPath))
   {
     return {
       isValid: false,
@@ -177,27 +174,4 @@ export function validateRename(
     isValid: true,
     message: '',
   };
-}
-
-// returns true if two given keypaths represent fields that are "local" to each other.
-// fields are local if they are unambiguously traversable to each other.
-// e.g. [a] is local to [b] and [c, d]
-// [a, -1, b] would be local to [a, -1, c]
-// [a] would not be local to [c, -1, d]
-export function areFieldsLocal(kp1, kp2): boolean
-{
-  const lastIndex1: number = kp1.findLastIndex((value, index) => !EngineUtil.isNamedField(kp1, index));
-  const concretePath1 = kp1.slice(0, lastIndex1 + 1);
-  const lastIndex2: number = kp2.findLastIndex((value, index) => !EngineUtil.isNamedField(kp2, index));
-  const concretePath2 = kp2.slice(0, lastIndex2 + 1);
-
-  if (lastIndex2 !== lastIndex1 || !concretePath1.equals(concretePath2))
-  {
-    return false;
-  }
-  else
-  {
-    // check if fields are wildcards themselves?
-    return true;
-  }
 }

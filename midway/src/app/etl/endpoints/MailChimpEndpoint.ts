@@ -47,11 +47,10 @@ THE SOFTWARE.
 import crypto = require('crypto');
 import * as stream from 'stream';
 
-import * as winston from 'winston';
-
 import * as request from 'request';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { Readable, Writable } from 'stream';
+import { MidwayLogger } from '../../log/MidwayLogger';
 import AEndpointStream from './AEndpointStream';
 
 import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
@@ -147,7 +146,7 @@ class MailChimpStream extends stream.Writable
         json: batchBody,
       }, (error, response, body) =>
         {
-          winston.debug('Mailchimp response: ' + JSON.stringify(response));
+          MidwayLogger.debug('Mailchimp response: ' + JSON.stringify(response));
           const batchid: string = response['body']['id'];
           setTimeout(() =>
           {
@@ -159,7 +158,7 @@ class MailChimpStream extends stream.Writable
               },
             }, (e2, r2, b2) =>
               {
-                winston.debug('Mailchimp response 2: ' + JSON.stringify(r2));
+                MidwayLogger.debug('Mailchimp response 2: ' + JSON.stringify(r2));
               });
           }, 60000);
           this.batches[batchId] = [];
@@ -167,8 +166,8 @@ class MailChimpStream extends stream.Writable
     }
     catch (e)
     {
-      winston.error('MailChimp endpoint error: ');
-      winston.error(e);
+      MidwayLogger.error('MailChimp endpoint error: ');
+      MidwayLogger.error(e);
     }
 
   }

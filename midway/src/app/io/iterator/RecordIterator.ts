@@ -73,7 +73,7 @@ export default class RecordIterator
       }
 
       // get next block
-      this.block = await source.getNext();
+      this.block = await this.source.getNext();
       this.blockIndex = 0;
     }
 
@@ -94,7 +94,7 @@ export default class RecordIterator
   {
     if (this.block === undefined)
     {
-      this.block = await source.getNext();
+      this.block = await this.source.getNext();
     }
 
     return this.block;

@@ -45,21 +45,33 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-const { List, Map } = Immutable;
-import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
-import { _SinkConfig, _SourceConfig, ItemWithName, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+// tslint:disable-next-line
+/// <reference path="../../../shared/typings/tsd.d.ts" />
+
+import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
+import * as _ from 'lodash';
+import { makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
+
+import
+{
+  _SinkConfig,
+  _SourceConfig,
+  ItemWithName,
+  SINK_DEFAULT_NAME,
+  SinkConfig,
+  SOURCE_DEFAULT_NAME,
+  SourceConfig,
+} from 'shared/etl/immutable/EndpointRecords';
 import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'shared/etl/immutable/ETLProcessRecords';
-import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
-import { _TemplateSettings, TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
-import { _TemplateUIData, TemplateUIData } from 'shared/etl/immutable/TemplateUIDataRecords';
+import { ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
+import { _TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
+import { _TemplateUIData } from 'shared/etl/immutable/TemplateUIDataRecords';
 import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
-import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
+import { CURRENT_TEMPLATE_VERSION } from 'shared/etl/migrations/TemplateVersions';
+import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 export type SourcesMap = Immutable.Map<string, SourceConfig>;
 export type SinksMap = Immutable.Map<string, SinkConfig>;
@@ -82,7 +94,7 @@ class ETLTemplateC implements ETLTemplateI
   public sources = Map<string, SourceConfig>();
   public sinks = Map<string, SinkConfig>();
   public settings = _TemplateSettings();
-  public meta = {};
+  public meta = { version: CURRENT_TEMPLATE_VERSION };
   public uiData = _TemplateUIData();
 
   // Returns true if and only if there is 1 sink and it is a database
@@ -177,16 +189,40 @@ class ETLTemplateC implements ETLTemplateI
 
   public getSourceName(key)
   {
+    let sourceName = '';
     const source = this.getSource(key);
-    const type = (source != null && source.type != null) ? source.type : '';
-    return `${source != null ? source.name : ''} (${type})`;
+    if (source)
+    {
+      if (key === '_default')
+      {
+        sourceName = SOURCE_DEFAULT_NAME;
+      }
+      else
+      {
+        sourceName = source.name;
+      }
+    }
+
+    return sourceName;
   }
 
   public getSinkName(key)
   {
-    const sink = this.getSink(key);
-    const type = (sink != null && sink.type != null) ? sink.type : '';
-    return `${sink.name} (${type})`;
+    let sinkName = '';
+    const sink = this.getSource(key);
+    if (sink)
+    {
+      if (key === '_default')
+      {
+        sinkName = SINK_DEFAULT_NAME;
+      }
+      else
+      {
+        sinkName = sink.name;
+      }
+    }
+
+    return sinkName;
   }
 
   public getNodeName(id: number)

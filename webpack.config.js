@@ -66,7 +66,7 @@ module.exports =
     headers: {
       'Access-Control-Allow-Origin': '*'
     },
-    
+
     // proxy midway requests to dev midway
     proxy: {
       '/midway/**': {
@@ -90,6 +90,7 @@ module.exports =
       charts: path.resolve(__dirname, 'src/app/charts'),
       colors: path.resolve(__dirname, 'src/app/colors'),
       common: path.resolve(__dirname, 'src/app/common'),
+      connections: path.resolve(__dirname, 'src/app/connections'),
       control: path.resolve(__dirname, 'src/app/control'),
       database: path.resolve(__dirname, 'src/database'),
       deploy: path.resolve(__dirname, 'src/app/deploy'),
@@ -122,12 +123,27 @@ module.exports =
       {
         test: /\.ts(x?)$/,
         exclude: [/midway/, /analytics.js/, /sigint/, /node_modules/],
-        loader:
-        'babel-loader!thread-loader!ts-loader?happyPackMode=true'
-        + JSON.stringify({
-          compilerOptions: {
-          },
-        }),
+        use: [
+            {
+                loader: 'babel-loader',
+                options: {
+                    cacheDirectory: true,
+                },
+            },
+            {
+                loader: 'thread-loader',
+                options: {
+                    // there should be 1 cpu for the fork-ts-checker-webpack-plugin
+                    workers: require('os').cpus().length - 2,
+                },
+            },
+            {
+                loader: 'ts-loader',
+                options: {
+                    happyPackMode: true,
+                }
+            }
+        ],
       },
       {
         test: /\.js(x?)$/,
@@ -151,19 +167,20 @@ module.exports =
       { test: /\.txt$/, exclude: /midway/, loader: 'raw-loader' },
     ],
   },
-  
+
   plugins:
   [
     new webpack.DefinePlugin({
-      MIDWAY_HOST: JSON.stringify('http://' + (process.env.MIDWAY_HOST || 'localhost:3000')),
       DEV: true,
     }),
     new HardSourceWebpackPlugin({
       cacheDirectory: './.cache/hard-source/dev/[confighash]',
     }),
-    new ForkTsCheckerWebpackPlugin(),
+    new ForkTsCheckerWebpackPlugin({ tslint: true, checkSyntacticErrors: true, workers: 2 }),
   ],
   optimization: {
+    removeAvailableModules: false,
+    removeEmptyChunks: false,
     splitChunks: {
       cacheGroups: {
         vendor: {

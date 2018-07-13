@@ -45,10 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file import-spacing
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-const { List, Map } = Immutable;
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { List } from 'immutable';
 
 import
 {
@@ -56,12 +53,8 @@ import
   TemplateField, TransformationNode,
 } from 'etl/templates/FieldTypes';
 import { FieldMap } from 'etl/templates/TemplateEditorTypes';
-import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
-import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
 const hiddenPath = List(['uiState', 'hidden']);
 export function createFieldMap(engine: TransformationEngine): FieldMap

@@ -49,7 +49,6 @@ import TerrainComponent from 'app/common/components/TerrainComponent';
 import { Map } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { DragLayer } from 'react-dnd';
 import PerformantDragLayer from './DragLayer.js';
 
 interface Props

@@ -44,26 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:strict-boolean-expressions
-import * as _ from 'lodash';
 import * as stream from 'stream';
-import * as winston from 'winston';
 
-import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import
 {
-  DefaultSinkConfig,
-  DefaultSourceConfig,
   SinkConfig,
   SourceConfig,
 } from 'shared/etl/types/EndpointTypes';
-import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { PostProcessConfig } from 'shared/etl/types/PostProcessTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import * as Util from '../AppUtil';
+import { MidwayLogger } from '../log/MidwayLogger';
 import ExportTransform from './ExportTransform';
 import { PostProcess } from './PostProcess';
-import { TemplateConfig } from './TemplateConfig';
-import Templates from './Templates';
 
 import CSVTransform from '../io/streams/CSVTransform';
 import JSONTransform from '../io/streams/JSONTransform';
@@ -85,7 +77,8 @@ import SFTPEndpoint from './endpoints/SFTPEndpoint';
 
 export const postProcessTransform: PostProcess = new PostProcess();
 
-export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[]): Promise<stream.Readable>
+export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[],
+  size?: number): Promise<stream.Readable>
 {
   return new Promise<stream.Readable>(async (resolve, reject) =>
   {
@@ -95,7 +88,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
     let importStream: stream.Readable;
     const importStreams: stream.Readable[] = [];
 
-    winston.info(`Processing ${source.type} source:`, JSON.stringify(source, null, 2));
+    MidwayLogger.info(`Processing ${source.type} source:`, JSON.stringify(source, null, 2));
 
     try
     {
@@ -103,8 +96,11 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
       {
         case 'Algorithm':
           endpoint = new AlgorithmEndpoint();
+          const exportTransform = await (endpoint as AlgorithmEndpoint).getExportTransform(source);
+          exportTransform.on('error', (e) => algorithmStream.emit('error', e));
+          source.options['size'] = size;
           const algorithmStream = await endpoint.getSource(source) as stream.Readable;
-          sourceStream = algorithmStream.pipe(new ExportTransform());
+          sourceStream = algorithmStream.pipe(exportTransform);
           return resolve(sourceStream);
         case 'Upload':
           if (files === undefined || files.length === 0)
@@ -115,15 +111,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
           break;
         case 'Sftp':
           endpoint = new SFTPEndpoint();
-          const sourceStreamTmp: stream.Readable | stream.Readable[] = await endpoint.getSource(source);
-          if (Array.isArray(sourceStreamTmp))
-          {
-            sourceStreams = sourceStreamTmp as stream.Readable[];
-          }
-          else
-          {
-            sourceStream = sourceStreamTmp as stream.Readable;
-          }
+          sourceStreams = await endpoint.getSource(source) as stream.Readable[];
           break;
         case 'GoogleAnalytics':
           endpoint = new GoogleAnalyticsEndpoint();
@@ -131,7 +119,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
           break;
         case 'Http':
           endpoint = new HTTPEndpoint();
-          sourceStream = await endpoint.getSource(source) as stream.Readable;
+          sourceStreams = await endpoint.getSource(source) as stream.Readable[];
           break;
         case 'Fs':
           endpoint = new FSEndpoint();
@@ -159,7 +147,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
         sourceStreams = [sourceStream] as stream.Readable[];
       }
 
-      sourceStreams.forEach(async (ss: stream.Readable) =>
+      sourceStreams.forEach((ss: stream.Readable) =>
       {
         switch (source.fileConfig.fileType)
         {
@@ -182,7 +170,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
             break;
           case 'xml':
             const xmlPath: string | undefined = source.fileConfig.xmlPath;
-            importStreams.push(sourceStream.pipe(XMLTransform.createImportStream(xmlPath)));
+            importStreams.push(ss.pipe(XMLTransform.createImportStream(xmlPath)));
             break;
           default:
             throw new Error('Download file type must be either CSV, TSV, JSON, XLSX or XML.');
@@ -210,7 +198,18 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
       }
       else if (importStreams.length > 1)
       {
-        throw new Error('Too many streams without post process transformations');
+        const merge = (streams) =>
+        {
+          let pass = new stream.PassThrough({ objectMode: true });
+          let waiting = streams.length;
+          for (const s of streams)
+          {
+            pass = s.pipe(pass, { end: false });
+            s.once('end', () => --waiting === 0 && pass.emit('end'));
+          }
+          return pass;
+        };
+        resolve(merge(importStreams));
       }
       else
       {
@@ -240,7 +239,7 @@ export async function getSinkStream(
     let endpoint: AEndpointStream;
     let transformStream;
 
-    winston.info(`Processing ${sink.type} sink:`, JSON.stringify(sink, null, 2));
+    MidwayLogger.info(`Processing ${sink.type} sink:`, JSON.stringify(sink, null, 2));
 
     try
     {
@@ -257,7 +256,7 @@ export async function getSinkStream(
               {
                 if (wildcardIndex < path.length - 1)
                 {
-                  winston.error('Ignoring invalid JSON path: ', sink.fileConfig.jsonPath);
+                  MidwayLogger.error('Ignoring invalid JSON path: ', sink.fileConfig.jsonPath);
                   path = [];
                 }
                 else // wildCardIndex === path.length - 1

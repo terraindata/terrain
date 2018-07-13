@@ -208,7 +208,10 @@ function handleFocus(id)
 {
 	clearInterval(INTERVAL_CHECK_AUTOFILL);
 	const el = document.getElementById(id + "-container");
-	el.className = el.className + " login-input-container-active";
+	if (el)
+	{
+		el.className = el.className + " login-input-container-active";
+	}
 }
 
 function checkForBlur(id)
@@ -236,6 +239,7 @@ document.getElementById("login-submit").onclick = function()
 {
 	onLoginSubmit(false);
 }
+document.getElementById("reset-password-request-submit").onclick = handleResetPasswordRequest;
 document.getElementById("login-email").onkeydown = handleKeyDown;
 document.getElementById("login-password").onkeydown = handleKeyDown;
 document.getElementById("login-email").onfocus = handleFocus.bind(this, "login-email");
@@ -245,9 +249,49 @@ document.getElementById("login-password").onblur = checkForBlur.bind(this, "logi
 
 document.getElementById("login-forgot-password").onclick = function()
 {
+	document.getElementById("login-password-container").style.display = "none";
+	document.getElementById("login-submit").style.display = "none";
+	document.getElementById("reset-password-request-submit").style.visibility = "visible";
+	document.getElementById("login-forgot-password").style.display = "none";
+}
+
+function handleResetPasswordRequest() 
+{
 	const el = document.getElementById("login-forgot-password-message");
 	el.className = el.className + " showing";
+	const email = document.getElementById("login-email").value;
+	if (email !== "") 
+	{
+		let host = window.location.protocol + "//" + window.location.hostname;
+		if (location.port !== "")
+		{
+			host += ":" + location.port;
+		}
+		//send url
+		config = {
+			route: '/midway/v1/recoveryTokens/',
+			method: 'POST',
+			data: JSON.stringify({
+				"email" : email,
+				"url" : host,
+			}),
+		}
+		var xhr = new XMLHttpRequest();
+
+		xhr.open(config.method, config.route, true);
+		xhr.setRequestHeader('Content-Type', 'application/json');
+
+		xhr.onload = function () {
+			document.getElementById("login-forgot-password-message").innerHTML = xhr.responseText;
+		};
+		xhr.send(config.data);
+	}
+	else 
+	{
+		document.getElementById("login-forgot-password-message").innerHTML = "Please enter your email above.";
+	}
 }
+
 
 INTERVAL_CHECK_AUTOFILL = setInterval(function() {
 	checkForBlur("login-email");

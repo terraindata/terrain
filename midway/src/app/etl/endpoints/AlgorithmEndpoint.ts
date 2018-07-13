@@ -46,9 +46,13 @@ THE SOFTWARE.
 
 import { Readable, Writable } from 'stream';
 
+import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
+import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import AEndpointStream from './AEndpointStream';
+
+import ExportTransform from '../ExportTransform';
 
 import DatabaseController from '../../../database/DatabaseController';
 import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
@@ -62,6 +66,20 @@ export class AlgorithmEndpoint extends AEndpointStream
     super();
   }
 
+  public async getExportTransform(source: SourceConfig): Promise<ExportTransform>
+  {
+    const algorithmId: number = source.options['algorithmId'];
+    let query: string = source.options['query'];
+
+    if (algorithmId !== undefined)
+    {
+      query = await Util.getQueryFromAlgorithm(algorithmId);
+      return new ExportTransform({
+      });
+    }
+    return new ExportTransform();
+  }
+
   public async getSource(source: SourceConfig): Promise<Readable>
   {
     const algorithmId: number = source.options['algorithmId'];
@@ -70,7 +88,7 @@ export class AlgorithmEndpoint extends AEndpointStream
 
     if (algorithmId !== undefined)
     {
-      query = await Util.getQueryFromAlgorithm(algorithmId);
+      query = await Util.getQueryFromAlgorithm(algorithmId, source.options['size']);
       dbId = await Util.getDBFromAlgorithm(algorithmId);
     }
 

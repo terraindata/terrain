@@ -44,76 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { Export, ExportConfig } from '../Export';
-import ADocumentTransform from './ADocumentTransform';
+export type Version = 'v4' | 'v5';
 
-/**
- * Applies export transformations to a result stream
- */
-export default class ExportTransform extends ADocumentTransform
+export const CURRENT_VERSION: Version = 'v5'; // current version of midway
+export const FIRST_VERSION: Version = 'v4'; // default version if it doesn't exist
+
+export interface Migrator
 {
-  private exportt: Export;
-  private config: ExportConfig;
-  private rank: number;
-  private mapping: object;
-
-  constructor(exportt: Export, config: ExportConfig)
-  {
-    super();
-    this.rank = 1;
-    this.exportt = exportt;
-
-    if (config.rank === true)
-    {
-      config.columnTypes['TERRAINRANK'] = { type: 'long' };
-    }
-
-    config.transformations.forEach((transformation) =>
-    {
-      if (transformation['name'] === 'rename')
-      {
-        config.columnTypes[transformation['colName']] = config.columnTypes[transformation['args']['newName']];
-      }
-    });
-
-    this.config = config;
-  }
-
-  protected transform(input: object, chunkNumber: number): object | object[]
-  {
-    if (input['hits'] === undefined)
-    {
-      return input;
-    }
-
-    return input['hits'].hits.map((hit) => this.process(hit['_source']));
-  }
-
-  private process(doc: object): object
-  {
-    if (this.config.rank === true && doc['TERRAINRANK'] === undefined)
-    {
-      doc['TERRAINRANK'] = this.rank++;
-    }
-
-    // fields in document not in mapping
-    for (const field of Object.keys(doc))
-    {
-      if (this.config.columnTypes[field] === undefined)
-      {
-        delete doc[field];
-      }
-    }
-
-    // fields in mapping not in document
-    for (const field of Object.keys(this.config.columnTypes))
-    {
-      if (doc[field] === undefined)
-      {
-        doc[field] = null;
-      }
-    }
-
-    return this.exportt._postProcessDoc(doc, this.config);
-  }
+  fromPattern?: string; // not yet supported
+  fromVersion?: Version;
+  toVersion: Version;
+  migrate: (from: Version, to: Version) => Promise<boolean>;
 }

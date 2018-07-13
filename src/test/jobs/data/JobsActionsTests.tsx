@@ -44,9 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:object-literal-shorthand only-arrow-functions
-import * as Immutable from 'immutable';
 import { JobsActions, JobsActionTypes } from 'jobs/data/JobsRedux';
-import JobsApi from 'jobs/JobsApi';
 import { createMockStore } from 'test-helpers/helpers';
 import JobsHelper from 'test-helpers/JobsHelper';
 

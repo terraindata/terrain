@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 // parser imports
-import ESJSONParser from '../parser/ESJSONParser';
 import ESParserToken from '../parser/ESParserToken';
 import ESPropertyInfo from '../parser/ESPropertyInfo';
 import ESValueInfo from '../parser/ESValueInfo';

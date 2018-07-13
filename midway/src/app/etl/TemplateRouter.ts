@@ -50,7 +50,6 @@ import * as KoaRouter from 'koa-router';
 import * as App from '../App';
 import * as Util from '../AppUtil';
 import { SchedulerConfig } from '../scheduler/SchedulerConfig';
-import UserConfig from '../users/UserConfig';
 import { TemplateConfig } from './TemplateConfig';
 import Templates from './Templates';
 
@@ -69,7 +68,7 @@ Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, nex
 // Create a new template
 Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const template: TemplateConfig = ctx.request.body.body;
+  const template: TemplateConfig = ctx.request.body['body'];
   const requiredParams = [
     'templateName',
     'process',
@@ -87,7 +86,7 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
 // Delete a template
 Router.post('/delete', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const params = ctx.request.body.body;
+  const params = ctx.request.body['body'];
   const requiredParams = [
     'templateId',
   ];
@@ -105,7 +104,7 @@ Router.post('/delete', passport.authenticate('access-token-local'), async (ctx, 
 
 Router.post('/update/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const template: TemplateConfig = ctx.request.body.body;
+  const template: TemplateConfig = ctx.request.body['body'];
   const requiredParams = [
     'id',
     'templateName',

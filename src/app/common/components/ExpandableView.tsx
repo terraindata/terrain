@@ -48,13 +48,11 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as _ from 'lodash';
-import * as Radium from 'radium';
 import * as React from 'react';
 
 import CheckBox from 'common/components/CheckBox';
 import FadeInOut from 'common/components/FadeInOut';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { Colors, fontColor } from 'src/app/colors/Colors';
 import './ExpandableView.less';
 
 const ArrowIcon = require('images/icon_arrow.svg');

@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import ESUtils from 'shared/database/elastic/parser/ESUtils';
 import ESArrayClause from './clauses/ESArrayClause';
 import ESBaseClause from './clauses/ESBaseClause';
 import ESBooleanClause from './clauses/ESBooleanClause';
@@ -63,7 +64,6 @@ import ESStructureClause from './clauses/ESStructureClause';
 import ESTypeClause from './clauses/ESTypeClause';
 import ESVariantClause from './clauses/ESVariantClause';
 import ESWildcardStructureClause from './clauses/ESWildcardStructureClause';
-import ESUtils from 'shared/database/elastic/parser/ESUtils';
 /* tslint:disable:max-line-length */
 
 const EQLSpec: ESClause[] =

@@ -45,9 +45,9 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
-import ESValueInfo from 'shared/database/elastic/parser/ESValueInfo';
 import ESJSONType from 'shared/database/elastic/parser/ESJSONType';
 import ESPropertyInfo from 'shared/database/elastic/parser/ESPropertyInfo';
+import ESValueInfo from 'shared/database/elastic/parser/ESValueInfo';
 
 export default class ESUtils
 {

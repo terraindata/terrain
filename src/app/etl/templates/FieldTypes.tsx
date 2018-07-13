@@ -44,17 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable import-spacing
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-const { List, Map } = Immutable;
-import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { List } from 'immutable';
+import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
 import TransformationNodeBase from 'shared/transformations/TransformationNode';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { NodeOptionsType, NodeTypes } from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
-import { areFieldsLocal } from 'shared/transformations/util/TransformationsUtil';
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
+import Topology from 'shared/transformations/util/TopologyUtil';
+import { makeConstructor, makeExtendedConstructor, WithIRecord } from 'shared/util/Classes';
 
 // only put fields in here that are needed to track display-sensitive state
 class TemplateFieldC
@@ -110,7 +106,7 @@ class TemplateFieldC
   public isLocalToRoot(): boolean
   {
     // we can use a placeholder name
-    return areFieldsLocal(this.outputKeyPath, List(['sample_name']));
+    return Topology.areFieldsLocal(this.outputKeyPath, List(['sample_name']));
   }
 
   public isNamedField()

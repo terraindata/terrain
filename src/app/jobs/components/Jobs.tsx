@@ -165,7 +165,7 @@ class Jobs extends TerrainComponent<any> {
       {
         const parsedJobLogs = this.parseJobLogContents(jobLogs);
 
-        let logLines = Immutable.Map({});
+        let logLines = Immutable.Map();
         parsedJobLogs.map((line, index) => logLines = logLines.set(index, line));
 
         this.setState({
@@ -193,8 +193,19 @@ class Jobs extends TerrainComponent<any> {
 
   public parseJobLogContents(jobLogs)
   {
-    return jobLogs.contents !== '' && jobLogs.contents !== undefined ?
-      jobLogs.contents.split('\n').map((logLine) => JSON.parse(logLine)) : [];
+    let contents = [];
+    if (jobLogs.contents !== '' && jobLogs.contents !== undefined)
+    {
+      try
+      {
+        contents = jobLogs.contents.split('\n').map(((logLine) => JSON.parse(logLine)));
+      }
+      catch (e)
+      {
+        contents = [jobLogs.contents];
+      }
+    }
+    return contents;
   }
 
   public render()
@@ -203,6 +214,7 @@ class Jobs extends TerrainComponent<any> {
       completedJobs,
       pendingJobs,
       runningJobs,
+      loading,
     } = this.props;
     const { id, logsModalOpen, jobLogs } = this.state;
 
@@ -271,6 +283,8 @@ class Jobs extends TerrainComponent<any> {
             columnsConfig={jobsHeader}
             data={pendingJobs}
             defaultOrder={defaultOrder}
+            loading={loading}
+            loadingMessage={'Loading your jobs...'}
           />
         </Section>
 
@@ -286,6 +300,8 @@ class Jobs extends TerrainComponent<any> {
             columnsConfig={jobsHeader}
             data={runningJobs}
             defaultOrder={defaultOrder}
+            loading={loading}
+            loadingMessage={'Loading your jobs...'}
           />
         </Section>
 
@@ -300,6 +316,8 @@ class Jobs extends TerrainComponent<any> {
             columnsConfig={jobsHeader}
             data={completedJobs}
             defaultOrder={defaultOrder}
+            loading={loading}
+            loadingMessage={'Loading your jobs...'}
           />
         </Section>
 
@@ -338,6 +356,7 @@ export default Util.createTypedContainer(
     completedJobs: getCompletedJobs,
     pendingJobs: getPendingJobs,
     runningJobs: getRunningJobs,
+    loading: (state) => state.get('jobs').loading,
   },
   { jobsActions: JobsActions },
 );

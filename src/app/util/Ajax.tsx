@@ -50,7 +50,6 @@ THE SOFTWARE.
 
 import axios from 'axios';
 import * as Immutable from 'immutable';
-import * as $ from 'jquery';
 import * as _ from 'lodash';
 
 import { recordForSave, responseToRecordConfig } from 'shared/util/Classes';
@@ -65,8 +64,6 @@ import * as LibraryTypes from '../library/LibraryTypes';
 import * as UserTypes from '../users/UserTypes';
 
 import * as TerrainLog from 'loglevel';
-
-import AjaxM1 from './AjaxM1';
 
 export interface AjaxResponse
 {
@@ -119,7 +116,6 @@ export const Ajax =
         },
         _.extend({
           onError: config.onError,
-          host: MIDWAY_HOST,
           noToken: true,
           json: true,
           crossDomain: false,
@@ -142,7 +138,7 @@ export const Ajax =
         urlArgs?: object;
       } = {})
     {
-      const host = config.host || MIDWAY_HOST;
+      const host = config.host || '';
       const fullUrl = host + url;
 
       if (config.download)
@@ -336,12 +332,13 @@ export const Ajax =
       );
     },
 
-    createUser(email: string, password: string, onSave: (response: any) => void, onError: (response: any) => void)
+    createUser(name: string, email: string, password: string, onSave: (response: any) => void, onError: (response: any) => void)
     {
       return Ajax.req(
         'post',
         `users`,
         {
+          name,
           email,
           password,
         },

@@ -44,11 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as winston from 'winston';
-
+import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 import ElasticClient from '../../../../src/database/elastic/client/ElasticClient';
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
+import PrefixedElasticController from '../../../../src/database/elastic/PrefixedElasticController';
 import ElasticReader from '../../../../src/database/elastic/streams/ElasticReader';
 
 import BufferTransform from '../../../../src/app/io/streams/BufferTransform';
@@ -58,12 +58,12 @@ let elasticClient: ElasticClient;
 
 beforeAll(() =>
 {
-  (winston as any).level = 'debug';
+  MidwayLogger.level = 'debug';
   const config: ElasticConfig = {
     hosts: ['http://localhost:9200'],
   };
 
-  elasticController = new ElasticController(config, 0, 'ElasticReaderTests');
+  elasticController = new PrefixedElasticController(config, 0, 'ElasticReaderTests', undefined, undefined, 'abc.');
   elasticClient = elasticController.getClient();
 });
 
@@ -126,7 +126,7 @@ test('simple elastic stream', async (done) =>
 {
   try
   {
-    const stream = new ElasticReader(elasticClient, query);
+    const stream = new ElasticReader(elasticClient, JSON.parse(JSON.stringify(query)));
     let results = [];
     stream.on('data', (chunk) =>
     {
@@ -153,7 +153,7 @@ test('elastic stream (buffer transform)', async (done) =>
 {
   try
   {
-    const stream = new ElasticReader(elasticClient, query);
+    const stream = new ElasticReader(elasticClient, JSON.parse(JSON.stringify(query)));
     const bufferTransform = new BufferTransform(stream,
       (err, response) =>
       {

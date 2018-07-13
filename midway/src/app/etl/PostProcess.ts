@@ -47,20 +47,17 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 import * as queryString from 'query-string';
 import * as stream from 'stream';
-import * as winston from 'winston';
 
 import
 {
   PostProcessAggregationTypes,
   PostProcessConfig,
   PostProcessFilterTypes,
-  PostProcessOptionsTypes,
   PostProcessParseTypes,
-  PostProcessSortObjectTypes,
-  PostProcessSortTypes,
 } from 'shared/etl/types/PostProcessTypes';
 
 import BufferTransform from '../io/streams/BufferTransform';
+import { MidwayLogger } from '../log/MidwayLogger';
 
 export class PostProcess
 {
@@ -85,7 +82,7 @@ export class PostProcess
           }
           catch (e)
           {
-            winston.warn((e as any).toString() as string);
+            MidwayLogger.warn((e as any).toString() as string);
           }
         });
       });
@@ -93,7 +90,7 @@ export class PostProcess
       let processedData: object[] = _.cloneDeep(data);
       if (!Array.isArray(transformConfigs))
       {
-        winston.warn('Transforms is not an array');
+        MidwayLogger.warn('Transforms is not an array');
         return resolve(data);
       }
       transformConfigs.forEach((transformConfig) =>
@@ -120,7 +117,7 @@ export class PostProcess
         }
         catch (e)
         {
-          winston.warn(((e as any).toString() as string));
+          MidwayLogger.warn(((e as any).toString() as string));
         }
       });
       return resolve(processedData);

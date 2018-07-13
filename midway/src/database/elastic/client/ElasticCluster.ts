@@ -46,17 +46,27 @@ THE SOFTWARE.
 
 import * as Elastic from 'elasticsearch';
 import ElasticController from '../ElasticController';
+import { IElasticClient } from './ElasticClient';
+
+// tslint:disable-next-line:interface-name
+export interface IElasticCluster
+{
+  health(params: Elastic.ClusterHealthParams): Promise<any>;
+  health(params: Elastic.ClusterHealthParams, callback: (error: any, response: any) => void): void;
+  state(params: Elastic.ClusterStateParams): Promise<any>;
+  state(params: Elastic.ClusterStateParams, callback: (error: any, response: any) => void): void;
+}
 
 /**
  * An client which acts as a selective isomorphic wrapper around
  * the elastic.js cluster API.
  */
-class ElasticCluster
+class ElasticCluster<TController extends ElasticController = ElasticController> implements IElasticCluster
 {
-  private controller: ElasticController;
-  private delegate: Elastic.Client;
+  protected controller: TController;
+  private delegate: IElasticClient;
 
-  constructor(controller: ElasticController, delegate: Elastic.Client)
+  constructor(controller: TController, delegate: IElasticClient)
   {
     this.controller = controller;
     this.delegate = delegate;
@@ -67,7 +77,9 @@ class ElasticCluster
    * @param params
    * @param callback
    */
-  public health(params: Elastic.ClusterHealthParams, callback: (error: any, response: any) => void): void
+  public health(params: Elastic.ClusterHealthParams): Promise<any>;
+  public health(params: Elastic.ClusterHealthParams, callback: (error: any, response: any) => void): void;
+  public health(params: Elastic.ClusterHealthParams, callback?: (error: any, response: any) => void): void | Promise<any>
   {
     this.log('health', params);
     return this.delegate.cluster.health(params, callback);
@@ -78,13 +90,15 @@ class ElasticCluster
    * @param params
    * @param callback
    */
-  public state(params: Elastic.ClusterStateParams, callback: (error: any, response: any) => void): void
+  public state(params: Elastic.ClusterStateParams): Promise<any>;
+  public state(params: Elastic.ClusterStateParams, callback: (error: any, response: any) => void): void;
+  public state(params: Elastic.ClusterStateParams, callback?: (error: any, response: any) => void): void | Promise<any>
   {
     this.log('state', params);
     return this.delegate.cluster.state(params, callback);
   }
 
-  private log(methodName: string, info: any)
+  protected log(methodName: string, info: any)
   {
     this.controller.log('ElasticCluster.' + methodName, info);
   }

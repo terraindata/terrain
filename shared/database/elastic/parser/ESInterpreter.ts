@@ -44,7 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import ESConverter from 'shared/database/elastic/formatter/ESConverter';
+import { default as GetCardVisitor } from 'builder/getCard/GetCardVisitor';
+import * as TerrainLog from 'loglevel';
+import * as TerrainLog from 'loglevel';
 import ESParameterFiller from 'shared/database/elastic/parser/EQLParameterFiller';
 import ESJSONType from 'shared/database/elastic/parser/ESJSONType';
 import { ESParameterType } from 'shared/database/elastic/parser/ESParameter';
@@ -57,8 +59,9 @@ import ESJSONParser from './ESJSONParser';
 import ESParser from './ESParser';
 import ESParserError from './ESParserError';
 import ESValueInfo from './ESValueInfo';
-import * as TerrainLog from 'loglevel';
-import {default as GetCardVisitor} from 'builder/getCard/GetCardVisitor';
+
+import * as _ from 'lodash';
+import ESScriptClause from 'shared/database/elastic/parser/clauses/ESScriptClause';
 
 export const ESInterpreterDefaultConfig = new EQLConfig();
 
@@ -217,9 +220,8 @@ export default class ESInterpreter
   }
 
   public searchValueInfo(pattern, valueInfo: ESValueInfo = this.rootValueInfo,
-                         returnLastMatched: boolean = false, returnAll: boolean = false)
+    returnLastMatched: boolean = false, returnAll: boolean = false)
   {
-    TerrainLog.debug('search ' + JSON.stringify(pattern) + ' from ' + JSON.stringify(valueInfo.value));
     switch (valueInfo.jsonType)
     {
       case ESJSONType.object:
@@ -241,7 +243,7 @@ export default class ESInterpreter
         const cardKey = q[0];
         const cardTypeName = q[1];
         const newVal = valueInfo.objectChildren[cardKey];
-        if (newVal)
+        if (newVal !== undefined)
         {
           if (newVal.propertyValue.clause.type === cardTypeName)
           {
@@ -270,7 +272,7 @@ export default class ESInterpreter
             return nextLevel;
           } else
           {
-            TerrainLog.debug('SearchCard: cardkey ' + cardKey + ' is found, but type is ' + newVal.propertyValue.card.type);
+            TerrainLog.debug('SearchCard: cardkey ' + String(cardKey) + ' is found, but type is ' + newVal.propertyValue.clause.type);
             return null;
           }
         } else
@@ -405,6 +407,114 @@ export default class ESInterpreter
     catch (e)
     {
       this.accumulateError(this.rootValueInfo, 'Failed to re-interpret the json object ' + String(e.message));
+    }
+  }
+
+  public adjustQuerySize(scrollSize: number, maxHit: number, hitsPage: number, appendResults: boolean): string
+  {
+    const query = this.rootValueInfo.value;
+    if (appendResults)
+    {
+      let from = (hitsPage - 1) * scrollSize;
+      if (query.hasOwnProperty('from'))
+      {
+        from += query['from'];
+      }
+      let size = Math.min(scrollSize, maxHit - from);
+      if (query.hasOwnProperty('size'))
+      {
+        size = Math.min(query['size'] - from, size);
+      }
+
+      this.updateChild(this.rootValueInfo, 'size', new ESValueInfo(ESJSONType.number, size >= 0 ? size : 0));
+      this.updateChild(this.rootValueInfo, 'from', new ESValueInfo(ESJSONType.number, from));
+    }
+    else
+    {
+      const size = Math.min(maxHit, hitsPage * scrollSize);
+      if (query.hasOwnProperty('size'))
+      {
+        const updatedSize = Math.min(query['size'], size);
+        this.updateChild(this.rootValueInfo, 'size', new ESValueInfo(ESJSONType.number, updatedSize));
+      }
+    }
+    this.reInterpreting();
+    return this.finalQuery;
+  }
+
+  /**
+   * Normalize the weight of each line in the Terrain.Score.PWL script to the sum of lines in the same script object, so that
+   * the final _sort result is between [0, 1].
+   * NOTE: parent and children normalize their script object independently.
+   * @returns {string}: The query string after the normalization.
+   */
+  public normalizeTerrainScriptWeight(): string
+  {
+    const root = this.rootValueInfo;
+    root.recursivelyVisit((element: ESValueInfo) =>
+    {
+      if (element.clause.type === 'body')
+      {
+        const scriptInfo = this.searchValueInfo({
+          'sort:script_sort': {
+            '_script:script_sort_object': {
+              'script:script': true,
+            },
+          },
+        }, element);
+
+        if (scriptInfo === null)
+        {
+          return true;
+        } else
+        {
+          const scriptClause: ESScriptClause = scriptInfo.clause as ESScriptClause;
+          if (scriptClause.getScriptName(scriptInfo) !== 'Terrain.Score.PWL')
+          {
+            return true;
+          }
+          this.normalizeTSWeight(scriptInfo);
+        }
+      }
+      return true;
+    });
+    this.reInterpreting();
+    return this.finalQuery;
+  }
+  private normalizeTSWeight(scriptInfo: ESValueInfo)
+  {
+    const factorValues = _.get(scriptInfo.value, ['params', 'factors']);
+    if (factorValues === undefined)
+    {
+      return;
+    }
+    const factorInfos = scriptInfo.objectChildren.params.propertyValue.objectChildren.factors.propertyValue;
+    if (factorInfos.jsonType !== ESJSONType.array)
+    {
+      TerrainLog.debug('Params is not an array, do nothing');
+      return;
+    }
+    let sumWeight = 0;
+    const weightInfos = [];
+    factorInfos.forEachElement((line: ESValueInfo) =>
+    {
+      if (line.objectChildren.hasOwnProperty('weight'))
+      {
+        const weightInfo = line.objectChildren.weight.propertyValue;
+        if (weightInfo.jsonType === ESJSONType.number)
+        {
+          sumWeight += weightInfo.value;
+          weightInfos.push(weightInfo);
+        }
+      }
+    });
+    if (sumWeight > 0)
+    {
+      weightInfos.map((weight: ESValueInfo) =>
+      {
+        const updateValue = Number((weight.value / sumWeight).toFixed(3));
+        this.updateValue(weight, updateValue);
+      });
     }
   }
 

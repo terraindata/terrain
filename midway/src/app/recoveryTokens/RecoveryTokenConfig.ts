@@ -42,45 +42,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import * as _ from 'lodash';
+import ConfigType from '../ConfigType';
 
-import { Import, ImportConfig } from '../Import';
-import ADocumentTransform from './ADocumentTransform';
-
-/**
- * Applies import transformations to a result stream
- */
-export default class ImportTransform extends ADocumentTransform
+export class RecoveryTokenConfig extends ConfigType
 {
-  private importt: Import;
-  private config: ImportConfig;
-  private mapping: object;
+  public id: number = undefined;
+  public token: string = undefined;
+  public createdAt: Date = null;
 
-  constructor(importt: Import, config: ImportConfig)
+  constructor(props: object)
   {
     super();
-    this.importt = importt;
-    this.config = config;
-  }
-
-  protected transform(input: object | object[], chunkNumber: number): object | object[]
-  {
-    if (Array.isArray(input))
-    {
-      return input.map((i) => this.transform(i, chunkNumber++));
-    }
-
-    let transformed;
-    try
-    {
-      transformed = this.importt._transformAndCheck(input, this.config);
-    }
-    catch (e)
-    {
-      this.emit('error', e);
-    }
-    return transformed;
+    ConfigType.initialize(this, props);
   }
 }
+
+export default RecoveryTokenConfig;

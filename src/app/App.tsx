@@ -61,17 +61,13 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { Redirect as RRedirect, Route, Switch } from 'react-router-dom';
 
+import ConnectionsStatus from 'connections/components/ConnectionsStatus';
 import DataTabs from 'etl/components/DataTabs';
-import TemplateList from 'etl/templates/components/TemplateList';
-import Jobs from 'jobs/components/Jobs';
-import ScheduleList from 'scheduler/components/ScheduleList';
 import Builder from './builder/components/Builder';
 import Logout from './common/components/Logout';
 import Placeholder from './common/components/Placeholder';
 import Redirect from './common/components/Redirect';
 import UIComponentsPage from './common/UIComponentsPage';
-import ETLEditorPage from './etl/components/ETLEditorPage';
-import ETLWalkthrough from './etl/walkthrough/components/ETLWalkthrough';
 import Library from './library/components/LibraryDnd';
 import ManualWrapper from './manual/components/ManualWrapper';
 import SchemaPage from './schema/components/SchemaPage';
@@ -101,12 +97,11 @@ import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 
 // data that needs to be loaded
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
-import { _ColorsState, ColorsState } from 'app/colors/data/ColorsTypes';
+import { ColorsState } from 'app/colors/data/ColorsTypes';
 import { AuthState } from 'auth/AuthTypes';
 import { LibraryState } from 'library/LibraryTypes';
 import ContainerDimensions from 'react-container-dimensions';
 import { SchemaActions } from 'schema/data/SchemaRedux';
-import { injectGlobal } from 'styled-components';
 import { UserState } from 'users/UserTypes';
 import TerrainTools from 'util/TerrainTools';
 import { AuthActions } from './auth/data/AuthRedux';
@@ -310,8 +305,9 @@ class App extends TerrainComponent<Props>
     }
   }
 
-  public specifyTitle(location)
+  public specifyTitle()
   {
+    const location = window.location.hostname;
     const base = 'Terrain';
     let customerTitle: string;
     if (location.includes('localhost'))
@@ -330,7 +326,7 @@ class App extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    document.title = this.specifyTitle(MIDWAY_HOST);
+    document.title = this.specifyTitle();
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: 'input',
@@ -632,6 +628,8 @@ class App extends TerrainComponent<Props>
             <InAppNotification />
 
             <EasterEggs />
+
+            <ConnectionsStatus />
           </div>
         )}
       </ContainerDimensions>

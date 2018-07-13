@@ -45,22 +45,16 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
 
-import Dropdown from 'common/components/Dropdown';
 import Menu from 'common/components/Menu';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { instanceFnDecorator } from 'shared/util/Classes';
+import { columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 
-const { List } = Immutable;
 const DropdownIcon = require('images/icon_carrot.svg');
 
 import './EditorColumnBar.less';
@@ -121,6 +115,7 @@ class EditorColumnBar extends TerrainComponent<Props>
           <Menu
             registerButton={(button) => this.menu = button}
             options={this.menuOptions}
+            overrideMultiplier={7}
           />
           <DropdownIcon />
         </div>

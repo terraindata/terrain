@@ -46,12 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions member-access
 
-import * as classNames from 'classnames';
-import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
-import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
+import { getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Dropdown from './Dropdown';
 

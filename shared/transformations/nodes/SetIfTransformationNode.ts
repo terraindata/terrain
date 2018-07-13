@@ -45,19 +45,11 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as yadeep from 'shared/util/yadeep';
-
-const { List, Map } = Immutable;
-
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import { KeyPath } from 'shared/util/KeyPath';
 
 import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
 
@@ -80,7 +72,7 @@ export class SetIfTransformationNode extends SimpleTransformationType
     }
     else
     {
-      return undefined;
+      return el;
     }
   }
 }
@@ -106,25 +98,25 @@ export const SetIfTransformationInfo = new SetIfTransformationInfoC();
 
 function setIfHelper(o: NodeOptionsType<TransformationNodeType.SetIfNode>, e: any)
 {
-  if (o.filterNaN)
+  if (o.filterNaN && isNaN(e))
   {
-    return isNaN(e);
+    return true;
   }
-  else if (o.filterUndefined)
+  else if (o.filterUndefined && e === undefined)
   {
-    return e === undefined;
+    return true;
   }
-  else if (o.filterNull)
+  else if (o.filterNull && e === null)
   {
-    return e === null;
+    return true;
   }
-  else if (o.filterStringNull)
+  else if (o.filterStringNull && e === 'null')
   {
-    return e === 'null';
+    return true;
   }
-  else if (o.filterValue !== undefined)
+  else if (o.filterValue !== undefined && e === o.filterValue)
   {
-    return e === o.filterValue;
+    return true;
   }
 
   return false;

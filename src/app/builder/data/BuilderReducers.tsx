@@ -45,33 +45,25 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 // tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const no-unused-expression no-shadowed-variable
-import { CardsToPath } from 'builder/components/pathfinder/CardsToPath';
-import { ElasticDataSource } from 'builder/components/pathfinder/PathfinderTypes';
-import { PathToCards } from 'builder/components/pathfinder/PathToCards';
+import CodeToPath from 'builder/components/pathfinder/CodeToPath';
 import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
 import { invert } from 'lodash';
+import * as TerrainLog from 'loglevel';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../database/AllBackends';
-import ESCardParser from '../../../database/elastic/conversion/ESCardParser';
-import { ElasticBackend } from '../../../database/elastic/ElasticBackend';
-import { MySQLBackend } from '../../../database/mysql/MySQLBackend';
 import BackendInstance from '../../../database/types/BackendInstance';
 import Query from '../../../items/types/Query';
-import TerrainTools from '../../util/TerrainTools';
 import Util from '../../util/Util';
 import Ajax, { AjaxResponse } from './../../util/Ajax';
 import ActionTypes from './BuilderActionTypes';
 import
 {
-  BuilderActionTypes,
   BuilderCardActionTypes,
   BuilderDirtyActionTypes,
   BuilderPathActionTypes,
 } from './BuilderActionTypes';
 import { _BuilderState, BuilderState } from './BuilderState';
-const { List, Map } = Immutable;
-import CodeToPath from 'builder/components/pathfinder/CodeToPath';
-import * as TerrainLog from 'loglevel';
 
 const BuilderReducers =
   {
@@ -401,10 +393,10 @@ const BuilderReducers =
       query = query.set('tqlMode', action.payload.tqlMode);
       query = query.set('parseTree', AllBackendsMap[query.language].parseQuery(query));
       // update cards
-      //query = AllBackendsMap[query.language].codeToQuery(
+      // query = AllBackendsMap[query.language].codeToQuery(
       //        query,
       //  action.payload.changeQuery,
-      //);
+      // );
       state = state.set('query', query);
       if (query.cardsAndCodeInSync === false)
       {

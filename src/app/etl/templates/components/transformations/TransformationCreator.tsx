@@ -45,24 +45,17 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
 
-import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { borderColor, Colors, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
 import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 
 import { availableTransformations, getTransformationForm } from 'etl/templates/components/transformations/TransformationForms';
-import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
-import { TransformationNode } from 'etl/templates/FieldTypes';
+import { EngineProxy } from 'etl/templates/EngineProxy';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';

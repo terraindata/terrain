@@ -43,10 +43,10 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import * as winston from 'winston';
 
+import { MidwayLogger } from '../../src/app/log/MidwayLogger';
 import ElasticConfig from '../../src/database/elastic/ElasticConfig';
-import ElasticController from '../../src/database/elastic/ElasticController';
+import PrefixedElasticController from '../../src/database/elastic/PrefixedElasticController';
 import MySQLConfig from '../../src/database/mysql/MySQLConfig';
 import MySQLController from '../../src/database/mysql/MySQLController';
 import * as Tasty from '../../src/tasty/Tasty';
@@ -72,20 +72,20 @@ const elasticConfig: ElasticConfig =
 async function initializeDBs(): Promise<void>
 {
   mysqlController = new MySQLController(mysqlConfig, 0, 'CopyData-MySQL');
-  elasticController = new ElasticController(elasticConfig, 1, 'CopyData-Elastic');
+  elasticController = new PrefixedElasticController(elasticConfig, 1, 'CopyData-Elastic', undefined, undefined, 'abc.');
 }
 
 async function readTable(table, mysql: MySQLController): Promise<object[]>
 {
   const elements: object[] = await mysql.getTasty().select(table, [], {});
-  winston.info('read ' + elements.length.toString() + ' elements');
+  MidwayLogger.info('read ' + elements.length.toString() + ' elements');
   return elements;
 }
 
-async function copyTable(table, mysql: MySQLController, elastic: ElasticController): Promise<object[]>
+async function copyTable(table, mysql: MySQLController, elastic: PrefixedElasticController): Promise<object[]>
 {
   const elements: object[] = await readTable(table, mysql);
-  winston.info('Copying ' + elements.length.toString() + ' elements');
+  MidwayLogger.info('Copying ' + elements.length.toString() + ' elements');
   return elastic.getTasty().upsert(table, elements) as Promise<object[]>;
 }
 
@@ -97,10 +97,10 @@ export const _async = (async () =>
     await initializeDBs();
     await copyTable(DBMovies, mysqlController, elasticController);
     await readTable(DBMovies, mysqlController);
-    winston.info('Copied the table movies.');
+    MidwayLogger.info('Copied the table movies.');
   }
   catch (e)
   {
-    winston.error(e);
+    MidwayLogger.error(e);
   }
 })();

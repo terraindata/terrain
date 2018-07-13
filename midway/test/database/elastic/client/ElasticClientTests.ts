@@ -44,14 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as winston from 'winston';
-
-import SharedUtil from '../../../../../shared/Util';
+import { MidwayLogger } from '../../../../src/app/log/MidwayLogger';
 import * as Utils from '../../TestUtil';
 
 import ElasticClient from '../../../../src/database/elastic/client/ElasticClient';
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
+import PrefixedElasticController from '../../../../src/database/elastic/PrefixedElasticController';
+
+import { MSearchResponse, SearchResponse } from 'elasticsearch';
 
 let elasticController: ElasticController;
 let elasticClient: ElasticClient;
@@ -61,27 +62,33 @@ function getExpectedFile(): string
   return __filename.split('.')[0] + '.expected';
 }
 
-beforeAll(() =>
+beforeAll(async (done) =>
 {
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
+  MidwayLogger.level = 'debug';
   const config: ElasticConfig = {
     hosts: ['http://localhost:9200'],
   };
 
-  elasticController = new ElasticController(config, 0, 'ElasticClientTests');
+  await new ElasticController(config, 0, 'ElasticClientTests2').getClient().bulk(
+    {
+      body: [
+        { index: { _index: 'bcd.secret', _type: 'data', _id: '13333337' } },
+        { msg: 'This is a secret' },
+        { index: { _index: 'bcd.secret', _type: 'data', _id: '133333372' } },
+        { msg: 'This is a secret2' },
+      ],
+    },
+  );
+
+  elasticController = new PrefixedElasticController(config, 0, 'ElasticClientTests', undefined, undefined, 'abc.');
   elasticClient = elasticController.getClient();
-});
+  done();
+}, 15000);
 
 test('elastic health', async (done) =>
 {
-  const result = await new Promise((resolve, reject) =>
-  {
-    elasticClient.cluster.health(
-      {},
-      SharedUtil.promise.makeCallback(resolve, reject));
-  });
-  winston.info(JSON.stringify(result));
+  const result = await elasticClient.cluster.health({});
+  MidwayLogger.info(JSON.stringify(result));
   done();
 });
 
@@ -89,20 +96,17 @@ test('search', async (done) =>
 {
   try
   {
-    const result: any = await new Promise((resolve, reject) =>
-    {
-      elasticClient.search(
-        {
-          index: 'movies',
-          type: 'data',
-          body: {
-            sort: [{ revenue: 'desc' }, { movieid: 'asc' }],
-          },
-          size: 1,
+    const result: any = await elasticClient.search(
+      {
+        index: 'movies',
+        type: 'data',
+        body: {
+          sort: [{ revenue: 'desc' }, { movieid: 'asc' }],
         },
-        SharedUtil.promise.makeCallback(resolve, reject));
-    });
-    winston.info(JSON.stringify(result, null, 2));
+        size: 1,
+      },
+    );
+    MidwayLogger.info(JSON.stringify(result, null, 2));
     await Utils.checkResults(getExpectedFile(), 'search', result.hits);
   }
   catch (e)
@@ -117,13 +121,8 @@ test('indices.getMapping', async (done) =>
 {
   try
   {
-    const result = await new Promise((resolve, reject) =>
-    {
-      elasticClient.indices.getMapping(
-        {},
-        SharedUtil.promise.makeCallback(resolve, reject));
-    });
-    winston.info(JSON.stringify(result, null, 2));
+    const result = await elasticClient.indices.getMapping({});
+    MidwayLogger.info(JSON.stringify(result, null, 2));
     await Utils.checkResults(getExpectedFile(), 'indices.getMapping', result);
   }
   catch (e)
@@ -138,46 +137,181 @@ test('putScript', async (done) =>
 {
   try
   {
-    await new Promise((resolve, reject) =>
-    {
-      elasticClient.putScript(
-        {
-          id: 'terrain_test_movie_profit',
-          lang: 'painless',
-          body: `return doc['revenue'].value - doc['budget'].value;`,
-        },
-        SharedUtil.promise.makeCallback(resolve, reject));
-    });
+    await elasticClient.putScript(
+      {
+        id: 'terrain_test_movie_profit',
+        lang: 'painless',
+        body: `return doc['revenue'].value - doc['budget'].value;`,
+      },
+    );
 
-    const result: any = await new Promise((resolve, reject) =>
-    {
-      elasticClient.search(
-        {
-          index: 'movies',
-          type: 'data',
-          body: {
-            sort: {
-              _script: {
-                type: 'number',
-                order: 'desc',
-                script: {
-                  id: 'terrain_test_movie_profit',
-                  params: {},
-                },
+    const result: any = await elasticClient.search(
+      {
+        index: 'movies',
+        type: 'data',
+        body: {
+          sort: {
+            _script: {
+              type: 'number',
+              order: 'desc',
+              script: {
+                id: 'terrain_test_movie_profit',
+                params: {},
               },
             },
           },
-          size: 1,
         },
-        SharedUtil.promise.makeCallback(resolve, reject));
-    });
-    winston.info(JSON.stringify(result, null, 2));
+        size: 1,
+      },
+    );
+    MidwayLogger.info(JSON.stringify(result, null, 2));
     await Utils.checkResults(getExpectedFile(), 'putScript', result.hits);
   }
   catch (e)
   {
     fail(e);
   }
+
+  done();
+});
+
+test('prefix isolation', async (done) =>
+{
+  const checkHit = (hit) =>
+  {
+    expect(hit._index).not.toMatch('secret');
+    expect(hit._id).not.toMatch('13333337');
+    expect(hit._source.msg).not.toMatch('secret');
+  };
+
+  const expectNoSecret = async (method, params) =>
+  {
+    (await elasticClient[method](params)).hits.hits.forEach(checkHit);
+  };
+
+  const expectNoSecretMsearch = async (params) =>
+  {
+    (await elasticClient.msearch(params)).responses.forEach((res) => res.hits.hits.forEach(checkHit));
+  };
+
+  await expect(expectNoSecret('search',
+    {
+      body: {
+        query: {
+          bool:
+            {
+              filter:
+                [
+                  {
+                    term:
+                      {
+                        _index: 'bcd.secret',
+                      },
+                  },
+                  {
+                    term:
+                      {
+                        _id: '13333337',
+                      },
+                  },
+                ],
+            },
+        },
+      },
+    },
+  )).rejects.toThrow(/index_not_found_exception/g);
+
+  await expect(expectNoSecret('search',
+    {
+      index: 'bcd.secret',
+      body: {
+        query: {
+          term: {
+            _id: '13333337',
+          },
+        },
+      },
+    },
+  )).rejects.toThrow(/index_not_found_exception/g);
+
+  /*const scrollId = (await elasticClient.search(
+    {
+      scroll: '1m',
+      body: {
+        query: {
+          terms: {
+            _id: ['13333337', '133333372'],
+          },
+        },
+      },
+      size: 1,
+    },
+  ))._scroll_id;
+  await expectNoSecret('scroll',
+    {
+      scroll_id: scrollId,
+    },
+  );*/
+  await expect(elasticClient.search(
+    {
+      index: 'bcd.secret',
+      scroll: '1m',
+      body: {
+        query: {
+          terms: {
+            _id: ['13333337', '133333372'],
+          },
+        },
+      },
+      size: 1,
+    },
+  )).rejects.toThrow(/index_not_found_exception/g);
+
+  await expect(expectNoSecretMsearch(
+    {
+      body: [
+        { index: 'bcd.secret' },
+        {
+          query: {
+            term:
+              {
+                _id: '13333337',
+              },
+          },
+        },
+      ],
+    },
+  )).rejects.toThrow(/index_not_found_exception|'hits' of undefined/g);
+
+  await expect(expectNoSecretMsearch(
+    {
+      body: [
+        {},
+        {
+          query: {
+            bool:
+              {
+                filter:
+                  [
+                    {
+                      term:
+                        {
+                          _index: 'bcd.secret',
+                        },
+                    },
+                    {
+                      term:
+                        {
+                          _id: '13333337',
+                        },
+                    },
+                  ],
+              },
+          },
+        },
+      ],
+    },
+  )).rejects.toThrow(/index_not_found_exception|'hits' of undefined/g);
 
   done();
 });

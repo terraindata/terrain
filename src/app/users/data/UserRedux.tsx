@@ -88,7 +88,16 @@ class UserRedux extends TerrainRedux<UserActionTypes, UserState>
   public reducers: ConstrainedMap<UserActionTypes, UserState> =
     {
       change: (state, action) =>
-        state.setIn(['users', action.payload.user.id], action.payload.user),
+      {
+        const { user } = action.payload;
+        let newState = state.setIn(['users', user.id], user);
+        if (user.id === state.currentUser.id)
+        {
+          newState = newState.set('currentUser', user);
+        }
+        Ajax.saveUser(user, () => { }, () => { });
+        return newState;
+      },
 
       fetch: (state, action) =>
       {

@@ -44,8 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as _ from 'lodash';
 import { mergeDocument } from '../io/Common';
 import ADocumentTransform from '../io/streams/ADocumentTransform';
+
+export interface ExportTransformOptions
+{
+  includeRank?: boolean;
+  scoreNormalization?: number;
+  startingRank?: number;
+}
+
+const optionsDefaults: ExportTransformOptions = {
+  includeRank: true,
+  startingRank: 1,
+};
 
 /**
  * Applies export transformations to a result stream
@@ -53,11 +66,17 @@ import ADocumentTransform from '../io/streams/ADocumentTransform';
 export default class ExportTransform extends ADocumentTransform
 {
   private rank: number = 0;
+  private includeRank: boolean = true;
+  private normalizeScore: boolean = false;
 
-  constructor(includeRank: boolean = true)
+  constructor(cfg: ExportTransformOptions = {})
   {
     super();
-    this.rank = 1;
+    const options: ExportTransformOptions = _.extend({}, optionsDefaults, cfg);
+    const { includeRank, startingRank } = options;
+
+    this.includeRank = includeRank;
+    this.rank = startingRank;
   }
 
   protected transform(input: object, chunkNumber: number): object | object[]
@@ -69,14 +88,14 @@ export default class ExportTransform extends ADocumentTransform
 
     return input['hits'].hits.map((hit) =>
     {
-      const doc = mergeDocument(hit);
-      return this.process(doc['_source']);
+      const doc = mergeDocument(hit)['_source'];
+      return this.process(doc);
     });
   }
 
   private process(doc: object): object
   {
-    if (this.rank > 0 && doc['TERRAINRANK'] === undefined)
+    if (this.includeRank && doc['TERRAINRANK'] === undefined)
     {
       doc['TERRAINRANK'] = this.rank++;
     }

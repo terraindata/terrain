@@ -46,10 +46,10 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 import ConfigType from '../ConfigType';
 
-import { _ETLTemplate, ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
+import { ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
+import { CURRENT_TEMPLATE_VERSION } from 'shared/etl/migrations/TemplateVersions';
 import { DefaultSinkConfig, DefaultSourceConfig } from 'shared/etl/types/EndpointTypes';
 import { ETLProcess, TemplateBase, TemplateMeta, TemplateObject, TemplateSettings } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 export class TemplateConfig extends ConfigType implements TemplateBase
 {
@@ -67,7 +67,9 @@ export class TemplateConfig extends ConfigType implements TemplateBase
   public sources: DefaultSourceConfig = {};
   public sinks: DefaultSinkConfig = {};
   public settings: TemplateSettings = {};
-  public meta: TemplateMeta = {};
+  public meta: TemplateMeta = {
+    version: CURRENT_TEMPLATE_VERSION,
+  };
   public uiData = {};
 
   constructor(props: object)

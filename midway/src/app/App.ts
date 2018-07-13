@@ -44,9 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+// tslint:disable-next-line
+/// <reference path="../../../shared/typings/tsd.d.ts" />
+
 import * as http from 'http';
 import * as Koa from 'koa';
-import * as winston from 'winston';
 
 import cors = require('kcors');
 import session = require('koa-session');
@@ -55,7 +57,6 @@ import srs = require('secure-random-string');
 import v8 = require('v8');
 
 import './auth/Passport';
-import './Logging';
 
 import DatabaseControllerConfig from '../database/DatabaseControllerConfig';
 import RouteError from '../error/RouteError';
@@ -71,7 +72,9 @@ import { events } from './events/EventRouter';
 import { integrations } from './integrations/IntegrationRouter';
 import { JobLog } from './jobs/JobLog';
 import { JobQueue } from './jobs/JobQueue';
+import { MidwayLogger } from './log/MidwayLogger';
 import Middleware from './Middleware';
+import { Migrations } from './migrations/Migrations';
 import NotFoundRouter from './NotFoundRouter';
 import MidwayRouter from './Router';
 import { Scheduler } from './scheduler/Scheduler';
@@ -97,8 +100,16 @@ export let TBLS: Schema.Tables;
 
 export class App
 {
-  private static initializeDB(type: string, dsn: string): Tasty.Tasty
+  private static async initializeDB(type: string, dsn: string): Promise<Tasty.Tasty>
   {
+    const ctrlConfig = new DatabaseControllerConfig(type, dsn).getConfig();
+    if (ctrlConfig.database !== undefined)
+    {
+      MidwayLogger.info(`Overriding specified database name ${ctrlConfig.database} with instance ID ${CFG.instanceId}`);
+      dsn = dsn.slice(0, dsn.lastIndexOf('/'));
+    }
+
+    dsn += '/' + CFG.instanceId;
     const dbConfig: DatabaseConfig = {
       id: 0,
       name: '[system]',
@@ -106,27 +117,28 @@ export class App
       dsn,
       host: '',
       isAnalytics: false,
+      isProtected: false,
     };
-    winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
-    const controller = DatabaseControllerConfig.makeDatabaseController(dbConfig);
+    MidwayLogger.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
+    const controller = await DatabaseControllerConfig.makeDatabaseController(dbConfig);
     return controller.getTasty();
   }
 
   private static uncaughtExceptionHandler(err: Error): void
   {
-    winston.error('Uncaught Exception: ' + err.toString());
+    MidwayLogger.error('Uncaught Exception: ' + err.toString());
     if (err.stack !== undefined)
     {
-      winston.error(err.stack);
+      MidwayLogger.error(err.stack);
     }
   }
 
   private static unhandledRejectionHandler(err: Error): void
   {
-    winston.error('Unhandled Promise Rejection: ' + err.toString());
+    MidwayLogger.error('Unhandled Promise Rejection: ' + err.toString());
     if (err.stack !== undefined)
     {
-      winston.error(err.stack);
+      MidwayLogger.error(err.stack);
     }
   }
 
@@ -135,6 +147,7 @@ export class App
   private JobL: JobLog;
   private JobQ: JobQueue;
   private SKDR: Scheduler;
+  private Migrations: Migrations; // for now, do not allow external access
   private app: Koa;
   private config: Config.Config;
   private heapAvail: number;
@@ -146,14 +159,19 @@ export class App
 
     // first, load config from a config file, if one is specified
     config = Config.loadConfigFromFile(config);
-    winston.debug('Using configuration: ' + JSON.stringify(config));
+    MidwayLogger.debug('Using configuration: ' + JSON.stringify(config));
     this.config = config;
     CFG = this.config;
 
+    if (config.instanceId === undefined)
+    {
+      throw new Error('Required setting instanceId not found in the configuration.');
+    }
+
     TBLS = Schema.setupTables(config.db as string);
 
-    this.DB = App.initializeDB(config.db as string, config.dsn as string);
-    DB = this.DB;
+    this.Migrations = new Migrations();
+    this.Migrations.initialize();
 
     this.EMAIL = new Email();
     EMAIL = this.EMAIL;
@@ -184,7 +202,7 @@ export class App
       }
       catch (e)
       {
-        winston.error(e);
+        MidwayLogger.error(e);
         throw e;
       }
     });
@@ -204,7 +222,7 @@ export class App
           ctx.request.length,
           ctx.request.href,
         ]);
-      winston.info(logPrefix + JSON.stringify(appStats.getRequestCounts()) + ': BEGIN : ' + info);
+      MidwayLogger.info(logPrefix + JSON.stringify(appStats.getRequestCounts()) + ': BEGIN : ' + info);
 
       let err: any = null;
       try
@@ -215,12 +233,12 @@ export class App
       {
         err = e;
         appStats.numRequestsThatThrew++;
-        winston.info(logPrefix + JSON.stringify(appStats.getRequestCounts()) + ': ERROR : ' + info);
+        MidwayLogger.info(logPrefix + JSON.stringify(appStats.getRequestCounts()) + ': ERROR : ' + info);
       }
 
       appStats.numRequestsCompleted++;
       const ms = Date.now() - start;
-      winston.info(logPrefix + JSON.stringify(appStats.getRequestCounts()) + ': END (' + ms.toString() + 'ms): ' + info);
+      MidwayLogger.info(logPrefix + JSON.stringify(appStats.getRequestCounts()) + ': END (' + ms.toString() + 'ms): ' + info);
 
       if (err !== null)
       {
@@ -233,8 +251,8 @@ export class App
     this.app.use(session(undefined, this.app));
 
     this.app.use(Middleware.bodyParser({ jsonLimit: '10gb', formLimit: '10gb' }));
-    this.app.use(Middleware.favicon(__dirname + './midway/src/assets/favicon.ico'));
-    this.app.use(Middleware.logger(winston));
+    this.app.use(Middleware.favicon(__dirname + '/../assets/favicon.ico'));
+    this.app.use(Middleware.logger(MidwayLogger));
     this.app.use(Middleware.responseTime());
     this.app.use(Middleware.passport.initialize());
     this.app.use(Middleware.passport.session());
@@ -248,14 +266,17 @@ export class App
 
   public async start(): Promise<http.Server>
   {
+    this.DB = await App.initializeDB(CFG.db as string, CFG.dsn as string);
+    DB = this.DB;
+
     const client: any = this.DB.getController().getClient();
     let isConnected = await client.isConnected();
     for (let i = 1; i <= MAX_CONN_RETRIES && !isConnected; ++i)
     {
-      winston.warn('Failed to establish database connection');
+      MidwayLogger.warn('Failed to establish database connection');
 
-      winston.info('Retrying in ' + String(CONN_RETRY_TIMEOUT * i) + ' ms....');
-      winston.info('Attempt ' + String(i) + ' of ' + String(MAX_CONN_RETRIES));
+      MidwayLogger.info('Retrying in ' + String(CONN_RETRY_TIMEOUT * i) + ' ms....');
+      MidwayLogger.info('Attempt ' + String(i) + ' of ' + String(MAX_CONN_RETRIES));
 
       await new Promise((resolve) => setTimeout(resolve, CONN_RETRY_TIMEOUT * i));
       isConnected = await client.isConnected();
@@ -287,23 +308,31 @@ export class App
         throw e;
       }
     }
-    winston.info('Finished creating application schema...');
+    MidwayLogger.info('Finished creating application schema...');
+
+    // process configuration options
+    await Config.initialHandleConfig(this.config);
+    MidwayLogger.debug('Finished initial processing configuration options...');
+
+    // perform migrations
+    await this.Migrations.runMigrations();
+    MidwayLogger.info('Finished migration checks and updates. State is up to Date.');
 
     // process configuration options
     await Config.handleConfig(this.config);
-    winston.debug('Finished processing configuration options...');
+    MidwayLogger.debug('Finished processing configuration options...');
 
     // initialize system encryption keys
     registerMidwayEncryption();
-    winston.debug('Finished Registering System Private Keys');
+    MidwayLogger.debug('Finished Registering System Private Keys');
 
     // create a default seed user
     await users.initializeDefaultUser();
-    winston.debug('Finished creating a default user...');
+    MidwayLogger.debug('Finished creating a default user...');
 
     // create default integrations
     await integrations.initializeDefaultIntegrations();
-    winston.debug('Finished creating default integrations...');
+    MidwayLogger.debug('Finished creating default integrations...');
 
     // initialize job queue
     await this.JobQ.initializeJobQueue();
@@ -327,18 +356,18 @@ export class App
         await events.initializeEventMetadata(DB, db.analyticsIndex, db.analyticsType);
       }
     }
-    winston.debug('Finished connecting to configured databases...');
+    MidwayLogger.debug('Finished connecting to configured databases...');
 
     // setup stored users
     // await scheduler.initializeJobs();
     // await scheduler.initializeSchedules();
-    winston.debug('Finished initializing scheduler jobs and schedules...');
+    MidwayLogger.debug('Finished initializing scheduler jobs and schedules...');
 
     const heapStats: object = v8.getHeapStatistics();
     this.heapAvail = Math.floor(0.8 * (heapStats['heap_size_limit'] - heapStats['used_heap_size']));
     HA = this.heapAvail;
 
-    winston.info('Listening on port ' + String(this.config.port));
+    MidwayLogger.info('Listening on port ' + String(this.config.port));
     return this.app.listen(this.config.port);
   }
 

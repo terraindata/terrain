@@ -47,13 +47,12 @@ THE SOFTWARE.
 import * as http from 'http';
 import * as Koa from 'koa';
 import serve = require('koa-static-server');
-import * as winston from 'winston';
 
 import cors = require('kcors');
 
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
-import './Logging';
+import { logger } from './Logging';
 import Middleware from './Middleware';
 import { Router } from './Router';
 
@@ -63,14 +62,14 @@ class App
 {
   private static uncaughtExceptionHandler(err: Error): void
   {
-    winston.error('Uncaught Exception: ' + err.toString());
+    logger.error('Uncaught Exception: ' + err.toString());
     // this is a good place to clean tangled resources
     process.abort();
   }
 
   private static unhandledRejectionHandler(err: Error): void
   {
-    winston.error('Unhandled Promise Rejection: ' + err.toString());
+    logger.error('Unhandled Promise Rejection: ' + err.toString());
   }
 
   private app: Koa;
@@ -84,7 +83,7 @@ class App
     // first, load config from a config file, if one is specified
     config = Config.loadConfigFromFile(config);
 
-    winston.info('Using configuration: ' + JSON.stringify(config));
+    logger.info('Using configuration: ' + JSON.stringify(config));
     this.config = config;
     CFG = this.config;
 
@@ -99,7 +98,7 @@ class App
     this.app.use(cors());
 
     this.app.use(Middleware.bodyParser({ jsonLimit: '10gb', formLimit: '10gb' }));
-    this.app.use(Middleware.logger(winston));
+    this.app.use(Middleware.logger(logger));
     this.app.use(Middleware.responseTime());
 
     const router = new Router(config);
@@ -107,7 +106,7 @@ class App
 
     if (config.demo === true)
     {
-      winston.info('Demo mode enabled. Demo website will be served at /demo');
+      logger.info('Demo mode enabled. Demo website will be served at /demo');
 
       /**
        * @api {get} /demo Serve the Terrain Analytics demo website
@@ -122,7 +121,7 @@ class App
   {
     await Config.handleConfig(this.config);
 
-    winston.info('Listening on port ' + String(this.config.port));
+    logger.info('Listening on port ' + String(this.config.port));
     return this.app.listen(this.config.port);
   }
 

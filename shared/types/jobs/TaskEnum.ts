@@ -46,9 +46,9 @@ THE SOFTWARE.
 
 export enum TaskEnum
 {
-  taskDefaultExit,
-  taskDefaultFailure,
-  taskETL,
+  taskDefaultExit = 0,
+  taskDefaultFailure = 1,
+  taskETL = 2,
 }
 
 export default TaskEnum;

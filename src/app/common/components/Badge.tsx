@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import TerrainComponent from 'common/components/TerrainComponent';
 import * as React from 'react';
 import './Badge.less';
 

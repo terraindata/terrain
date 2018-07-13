@@ -47,18 +47,14 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import * as yadeep from 'shared/util/yadeep';
 
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import { KeyPath } from 'shared/util/KeyPath';
 
 import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
 

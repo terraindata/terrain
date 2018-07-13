@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires max-classes-per-file
 
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
@@ -60,7 +59,7 @@ import './CardsDeck.less';
 
 import { AllBackendsMap } from '../../../../database/AllBackends';
 
-const { List, Map } = Immutable;
+import { List } from 'immutable';
 const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 import { DragSource } from 'react-dnd';
 

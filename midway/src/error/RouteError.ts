@@ -43,9 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import * as winston from 'winston';
 
 import MidwayError from '../../../shared/error/MidwayError';
+import { MidwayLogger } from '../app/log/MidwayLogger';
 
 class RouteError extends MidwayError
 {
@@ -59,7 +59,11 @@ class RouteError extends MidwayError
     {
       const routeError = RouteError.fromRouteContext(ctx, err);
       const status = routeError.getStatus();
-      winston.info(JSON.stringify(routeError));
+      MidwayLogger.info(JSON.stringify(routeError));
+      if (err.stack !== undefined)
+      {
+        MidwayLogger.error(err.stack);
+      }
       ctx.status = status;
       ctx.body = { errors: routeError.getMidwayErrors() };
     }

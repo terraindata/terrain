@@ -49,6 +49,7 @@ import DatabaseController from './DatabaseController';
 
 import ElasticConfig from './elastic/ElasticConfig';
 import ElasticController from './elastic/ElasticController';
+import PrefixedElasticController from './elastic/PrefixedElasticController';
 
 import MySQLConfig from './mysql/MySQLConfig';
 import MySQLController from './mysql/MySQLController';
@@ -63,7 +64,7 @@ import Util from 'shared/Util';
 
 export class DatabaseControllerConfig
 {
-  public static makeDatabaseController(config: DatabaseConfig): DatabaseController
+  public static async makeDatabaseController(config: DatabaseConfig): Promise<DatabaseController>
   {
     const id = config.id as number;
     const name = config.name;
@@ -71,23 +72,37 @@ export class DatabaseControllerConfig
     const dsn = config.dsn;
     const analyticsIndex = config.analyticsIndex;
     const analyticsType = config.analyticsType;
+    const indexPrefix = config.indexPrefix;
+
+    const init = async (controller: DatabaseController) =>
+    {
+      await controller.initialize();
+      return controller;
+    };
 
     const cfg = new DatabaseControllerConfig(type, dsn);
     if (type === 'sqlite')
     {
-      return new SQLiteController(cfg.getConfig(), id, name);
+      return init(new SQLiteController(cfg.getConfig(), id, name));
     }
     else if (type === 'mysql')
     {
-      return new MySQLController(cfg.getConfig(), id, name);
+      return init(new MySQLController(cfg.getConfig(), id, name));
     }
     else if (type === 'postgres')
     {
-      return new PostgreSQLController(cfg.getConfig(), id, name);
+      return init(new PostgreSQLController(cfg.getConfig(), id, name));
     }
     else if (type === 'elasticsearch' || type === 'elastic')
     {
-      return new ElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType);
+      if (indexPrefix != null && indexPrefix !== '')
+      {
+        return init(new PrefixedElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType, indexPrefix));
+      }
+      else
+      {
+        return init(new ElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType));
+      }
     }
     else
     {
@@ -111,8 +126,10 @@ export class DatabaseControllerConfig
     }
     else if (type === 'elasticsearch' || type === 'elastic')
     {
+      const config = Util.dsn.parseDSNConfig(dsnString);
       this.config = {
-        hosts: [dsnString],
+        hosts: [config.host + ':' + String(config.port)],
+        httpAuth: config.user + ':' + config.password,
         keepAlive: false,
         requestTimeout: 600000,
       } as ElasticConfig;
