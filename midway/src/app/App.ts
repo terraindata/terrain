@@ -310,10 +310,6 @@ export class App
     }
     MidwayLogger.info('Finished creating application schema...');
 
-    // process configuration options
-    await Config.initialHandleConfig(this.config);
-    MidwayLogger.debug('Finished initial processing configuration options...');
-
     // perform migrations
     await this.Migrations.runMigrations();
     MidwayLogger.info('Finished migration checks and updates. State is up to Date.');
