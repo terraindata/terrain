@@ -118,7 +118,7 @@ function testParse(testName: string,
       newSum = newSum + Number(f.weight);
     });
     const sumDiff = 1 - newSum;
-    TestLogger.info('Old weights: ' + JSON.stringify(factors.map((f) => f.weight)) + ' New weights: ' +
+    winston.info('Old weights: ' + JSON.stringify(factors.map((f) => f.weight)) + ' New weights: ' +
       JSON.stringify(newFactors.map((f) => f.weight)) + ' Weight sum diff ' + String(sumDiff));
     expect(Math.abs(1 - newSum) < 0.001).toBe(true);
   }
