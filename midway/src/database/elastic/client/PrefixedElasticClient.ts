@@ -172,11 +172,12 @@ class PrefixedElasticClient extends ElasticClient<PrefixedElasticController>
   public search<T>(params: Elastic.SearchParams,
     callback?: (error: any, response: Elastic.SearchResponse<T>) => void): void | Promise<Elastic.SearchResponse<T>>
   {
+    this.addIndexToSearchParams(params);
     // hack
     const search = () => super.search(params);
     return this.controller.voidOrPromise(callback, async () =>
     {
-      this.controller.prependIndexParam(params);
+      this.controller.prependIndexParam(params, false);
       this.modifySearchQuery(params.body);
       const res = await search();
       res.hits.hits.forEach((o) => this.controller.removeDocIndexPrefix(o));
@@ -189,6 +190,7 @@ class PrefixedElasticClient extends ElasticClient<PrefixedElasticController>
   public msearch<T>(params: Elastic.MSearchParams,
     callback?: (error: any, response: Elastic.MSearchResponse<T>) => void): void | Promise<Elastic.MSearchResponse<T>>
   {
+    this.addIndexToMSearchParams(params);
     // hack
     const msearch = () => super.msearch(params);
     return this.controller.voidOrPromise(callback, async () =>
@@ -198,7 +200,7 @@ class PrefixedElasticClient extends ElasticClient<PrefixedElasticController>
       {
         const searchHeader = searches[i];
         const searchBody = searches[i + 1];
-        this.controller.prependIndexParam(searchHeader);
+        this.controller.prependIndexParam(searchHeader, false);
         this.modifySearchQuery(searchBody);
       }
       const res = await msearch();
