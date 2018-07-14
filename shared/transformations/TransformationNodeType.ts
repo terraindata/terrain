@@ -45,39 +45,41 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable no-unused-expression
 import { List } from 'immutable';
-import { DateFormats } from 'shared/etl/types/ETLTypes';
+import { DateFormats, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { KeyPath } from 'shared/util/KeyPath';
 
 enum TransformationNodeType
 {
-  IdentityNode = 'IdentityNode',
-  SplitNode = 'SplitNode',
-  JoinNode = 'JoinNode',
-  RenameNode = 'RenameNode',
-  DuplicateNode = 'DuplicateNode',
-  InsertNode = 'InsertNode',
-  CaseNode = 'CaseNode',
-  SubstringNode = 'SubstringNode',
-  CastNode = 'CastNode',
-  HashNode = 'HashNode',
-  RoundNode = 'RoundNode',
   AddNode = 'AddNode',
-  SubtractNode = 'SubtractNode',
-  MultiplyNode = 'MultiplyNode',
-  DivideNode = 'DivideNode',
-  SetIfNode = 'SetIfNode',
-  FindReplaceNode = 'FindReplaceNode',
-  ArraySumNode = 'ArraySumNode',
   ArrayCountNode = 'ArrayCountNode',
+  ArraySumNode = 'ArraySumNode',
+  CaseNode = 'CaseNode',
+  CastNode = 'CastNode',
+  DecryptNode = 'DecryptNode',
+  DeprecatedNode = 'DeprecatedNode',
+  DifferenceNode = 'DifferenceNode',
+  DivideNode = 'DivideNode',
+  DuplicateNode = 'DuplicateNode',
+  EncryptNode = 'EncryptNode',
+  FilterArrayNode = 'FilterArrayNode',
+  FindReplaceNode = 'FindReplaceNode',
+  GroupByNode = 'GroupByNode',
+  HashNode = 'HashNode',
+  IdentityNode = 'IdentityNode',
+  InsertNode = 'InsertNode',
+  JoinNode = 'JoinNode',
+  MultiplyNode = 'MultiplyNode',
+  ParseNode = 'ParseNode',
   ProductNode = 'ProductNode',
   QuotientNode = 'QuotientNode',
-  SumNode = 'SumNode',
-  DifferenceNode = 'DifferenceNode',
-  EncryptNode = 'EncryptNode',
-  DecryptNode = 'DecryptNode',
-  GroupByNode = 'GroupByNode',
-  FilterArrayNode = 'FilterArrayNode',
   RemoveDuplicatesNode = 'RemoveDuplicatesNode',
+  RenameNode = 'RenameNode',
+  RoundNode = 'RoundNode',
+  SetIfNode = 'SetIfNode',
+  SplitNode = 'SplitNode',
+  SubstringNode = 'SubstringNode',
+  SubtractNode = 'SubtractNode',
+  SumNode = 'SumNode',
   ZipcodeNode = 'ZipcodeNode',
 }
 
@@ -138,7 +140,7 @@ interface TransformationOptionTypes extends HasCommon<TransformationOptionTypes>
     length: number;
   };
   CastNode: {
-    toTypename: string;
+    toTypename: FieldTypes;
     format?: DateFormats;
   };
   HashNode: {
@@ -179,6 +181,9 @@ interface TransformationOptionTypes extends HasCommon<TransformationOptionTypes>
   ArrayCountNode: {
     newFieldKeyPaths: List<KeyPath>;
   };
+  ParseNode: {
+    to: 'array' | 'object';
+  };
   ProductNode: {
     newFieldKeyPaths: List<KeyPath>;
   };
@@ -209,41 +214,17 @@ interface TransformationOptionTypes extends HasCommon<TransformationOptionTypes>
   ZipcodeNode: {
     format: string;
   };
+  DeprecatedNode: {
+    deprecatedType: 'CastNode';
+    [k: string]: any;
+  };
 }
 
 export type NodeTypes = keyof TransformationOptionTypes;
 export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key];
 
 /*
- *  For each edge (u, v) whose nodes operate on fields u and v (u and v could be multiple fields),
- *  the Edge Labels mean the following:
- *  Synthetic
- *    - fields v1, v2... are synthetic and depend on u1, u2...
- *    - Forks, Combines, Aggregations and Duplicate create these edges
- *  InPlace
- *    - v and u are the same field and have no structural differences
- *    - Simple Transformations fall into this category
- *  Rename
- *    - v and u are the same field but have different locations
- *    - so far, only rename node falls into this category
-
- *  Generally, InPlace transformations can be freely edited, deleted, or created.
- *  When we append transformations to the DAG for some field f, we should find the source node
- *  associated with f (there should only be one). Provided we construct the DAG properly, every node
- *  in the DAG should only ever have 1 non-synthetic edge. We can then traverse from f down all non-synthetic edges
- *  until we reach a sink. We can then append the transformation node to this sink node and label it
- *  with the appropriate label. If there are multiple input fields we do this for all input fields.
- *
- *  If a transformation would create a new field, we add a synthetic identity node, which gets connected to all
- *  associated input fields.
- *
- *  When adding new fields we can easily identify if it should be synthetic or organic by finding an ancestor of the field
- *  and analyzing the graph. For example, when adding [foo, bar, -1, baz], we check if [foo, bar, -1] exists.
- *  If not, we check [foo, bar] and so on. For the existing ancestor, based on the source node and the edge labels we can
- *  determine if the new field should be synthetic or not.
- *
- *  Traversing the DAG to get the execution order should be simple.
- *  We do a topological sort of the DAG and execute them in order.
+ * TODO document
  */
 export enum TransformationEdgeTypes
 {

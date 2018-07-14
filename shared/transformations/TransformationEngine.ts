@@ -351,7 +351,6 @@ export class TransformationEngine
    * the associated id.
    *
    * @param {KeyPath} fullKeyPath The path of the field to add
-   * @param {string} typeName     The JS type of the field
    * @param {object} options      Any field options (e.g., Elastic analyzers)
    * @returns {number}            The ID of the newly-added field
    */
@@ -369,11 +368,8 @@ export class TransformationEngine
     this.fieldProps = this.fieldProps.set(id, options);
 
     const synthetic = sourceNode !== undefined;
-    const identityId = this.appendTransformation(
-      TransformationNodeType.IdentityNode,
-      List([id]),
-      { type: synthetic ? 'Organic' : 'Synthetic' } as NodeOptionsType<TransformationNodeType.IdentityNode>,
-    );
+    const identityId = this.addIdentity(id, { type: synthetic ? 'Organic' : 'Synthetic' });
+
     if (synthetic)
     {
       this.dag.setEdge(String(sourceNode), String(identityId), EdgeTypes.Synthetic);
@@ -510,13 +506,10 @@ export class TransformationEngine
     {
       const childPath = this.getFieldPath(id);
       this.setFieldPath(id, newPath.concat(childPath.slice(transplantIndex)).toList());
-      const identityNode = this.appendTransformation(TransformationNodeType.IdentityNode, List([id]), { type: 'Rename' });
+      const identityNode = this.addIdentity(id, { type: 'Rename' });
       Utils.traversal.appendNodeToField(this, id, identityNode, EdgeTypes.Rename);
       this.dag.setEdge(String(renameId), String(identityNode), EdgeTypes.Synthetic);
     });
-
-    // there is now a rename edge pointing from the field to the rename field.
-    // need to create an identity node for the original id and all the children. connect those identity nodes to the rename
 
     return renameId;
   }
@@ -612,9 +605,14 @@ export class TransformationEngine
       .toMap();
   }
 
-  private setFieldPath(fieldID: number, path: KeyPath)
+  protected setFieldPath(fieldID: number, path: KeyPath)
   {
     this.IDToPathMap = this.IDToPathMap.set(fieldID, path);
+  }
+
+  protected addIdentity(fieldId: number, options: NodeOptionsType<TransformationNodeType.IdentityNode>): number
+  {
+    return this.appendTransformation(TransformationNodeType.IdentityNode, List([fieldId]), options);
   }
 
   private addPrimitiveField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any): List<number>

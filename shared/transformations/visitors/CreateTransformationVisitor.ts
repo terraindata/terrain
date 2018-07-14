@@ -109,11 +109,6 @@ export default class CreationVisitor
     }
   }
 
-  protected getNewType(type: TransformationNodeType): string
-  {
-    return TransformationRegistry.getNewFieldType(type);
-  }
-
   protected visitGroupByNode(type, node: TransformationNode, engine: TransformationEngine): void
   {
     this.visitDefault(type, node, engine);

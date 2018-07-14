@@ -63,6 +63,7 @@ import { GroupByTFF } from './GroupByTransformationForm';
 import { InsertTFF } from './InsertTransformationForm';
 import { JoinTFF } from './JoinTransformationForm';
 import { DifferenceTFF, ProductTFF, QuotientTFF, SumTFF } from './NumericOperationForms';
+import { ParseTFF } from './ParseTransformationForm';
 import { SetIfTFF } from './SetIfTransformationForm';
 import
 {
@@ -72,32 +73,33 @@ import
 import { SplitTFF } from './SplitTransformationForm';
 
 const forms: Array<{ new(props): TransformationForm<any, any> }> = [
-  CaseTFF,
-  SubstringTFF,
-  DuplicateTFF,
-  SplitTFF,
-  JoinTFF,
-  CastTFF,
-  HashTFF,
-  ArraySumTFF,
-  ArrayCountTFF,
-  RoundTFF,
   AddTFF,
-  SubtractTFF,
-  MultiplyTFF,
-  DivideTFF,
-  SetIfTFF,
-  FindReplaceTFF,
-  InsertTFF,
-  SumTFF,
+  ArrayCountTFF,
+  ArraySumTFF,
+  CaseTFF,
+  CastTFF,
+  DecryptTFF,
   DifferenceTFF,
+  DivideTFF,
+  DuplicateTFF,
+  EncryptTFF,
+  FilterArrayTFF,
+  FindReplaceTFF,
+  GroupByTFF,
+  HashTFF,
+  InsertTFF,
+  JoinTFF,
+  MultiplyTFF,
+  ParseTFF,
   ProductTFF,
   QuotientTFF,
-  EncryptTFF,
-  DecryptTFF,
-  GroupByTFF,
-  FilterArrayTFF,
   RemoveDuplicatesTFF,
+  RoundTFF,
+  SetIfTFF,
+  SplitTFF,
+  SubstringTFF,
+  SubtractTFF,
+  SumTFF,
   ZipcodeTFF,
 ];
 

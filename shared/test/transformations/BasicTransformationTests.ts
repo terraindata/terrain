@@ -53,6 +53,7 @@ import { KeyPath } from '../../util/KeyPath';
 import * as yadeep from '../../util/yadeep';
 import { TestDocs } from './TestDocs';
 
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import * as Utils from 'shared/etl/util/ETLUtils';
 
 function wrap(kp: any[])
@@ -454,19 +455,19 @@ test('cast node tests', () =>
     TransformationNodeType.CastNode,
     List<KeyPath>([KeyPath(['age'])]),
     {
-      toTypename: 'string',
+      toTypename: FieldTypes.String,
     });
   e.appendTransformation(
     TransformationNodeType.CastNode,
     List<KeyPath>([KeyPath(['meta', 'school'])]),
     {
-      toTypename: 'object',
+      toTypename: FieldTypes.Object,
     });
   e.appendTransformation(
     TransformationNodeType.CastNode,
     List<KeyPath>([KeyPath(['meta', 'sport'])]),
     {
-      toTypename: 'array',
+      toTypename: FieldTypes.Array,
     });
   const r = e.transform(TestDocs.doc2);
   expect(r['age']).toBe('17');
@@ -481,49 +482,49 @@ test('boolean cast tests', () =>
     TransformationNodeType.CastNode,
     List<KeyPath>([KeyPath(['t'])]),
     {
-      toTypename: 'number',
+      toTypename: FieldTypes.Number,
     });
   e.appendTransformation(
     TransformationNodeType.CastNode,
     List<KeyPath>([KeyPath(['t'])]),
     {
-      toTypename: 'boolean',
+      toTypename: FieldTypes.Boolean,
     });
   e.appendTransformation(
     TransformationNodeType.CastNode,
     List<KeyPath>([KeyPath(['f'])]),
     {
-      toTypename: 'number',
+      toTypename: FieldTypes.Number,
     });
   e.appendTransformation(
     TransformationNodeType.CastNode,
     List<KeyPath>([KeyPath(['f'])]),
     {
-      toTypename: 'boolean',
+      toTypename: FieldTypes.Boolean,
     });
   e.appendTransformation(
     TransformationNodeType.CastNode,
     List<KeyPath>([KeyPath(['tb'])]),
     {
-      toTypename: 'number',
+      toTypename: FieldTypes.Number,
     });
   e.appendTransformation(
     TransformationNodeType.CastNode,
     List<KeyPath>([KeyPath(['tb'])]),
     {
-      toTypename: 'string',
+      toTypename: FieldTypes.String,
     });
   e.appendTransformation(
     TransformationNodeType.CastNode,
     List<KeyPath>([KeyPath(['fb'])]),
     {
-      toTypename: 'number',
+      toTypename: FieldTypes.Number,
     });
   e.appendTransformation(
     TransformationNodeType.CastNode,
     List<KeyPath>([KeyPath(['fb'])]),
     {
-      toTypename: 'string',
+      toTypename: FieldTypes.String,
     });
   const r = e.transform(TestDocs.doc8);
   expect(r['t']).toBe(true);
@@ -543,14 +544,14 @@ test('date cast tests', () =>
     TransformationNodeType.CastNode,
     List<KeyPath>([KeyPath(['foo'])]),
     {
-      toTypename: 'date',
+      toTypename: FieldTypes.Date,
       format: 'ISOstring',
     });
   e.appendTransformation(
     TransformationNodeType.CastNode,
     List<KeyPath>([KeyPath(['bar'])]),
     {
-      toTypename: 'date',
+      toTypename: FieldTypes.Date,
       format: 'MMDDYYYY',
     });
   expect(e.transform(doc)['foo'].substr(0, 11)).toEqual('2018-05-18T');
@@ -621,7 +622,7 @@ test('cast array to array should be no-op', () =>
     TransformationNodeType.CastNode,
     List([List(['foo'])]),
     {
-      toTypename: 'array',
+      toTypename: FieldTypes.Array,
     },
   );
 
@@ -635,7 +636,7 @@ test('delete a field that has transformations', () =>
   e.addField(List(['bar']));
   e.appendTransformation(TransformationNodeType.CastNode, List([List(['foo'])]),
     {
-      toTypename: 'string',
+      toTypename: FieldTypes.String,
     });
   e.deleteField(id1);
   const doc = {
@@ -655,7 +656,7 @@ test('cast on a field inside a nested object inside an array', () =>
     TransformationNodeType.CastNode,
     List([e.getFieldPath(id3)]),
     {
-      toTypename: 'string',
+      toTypename: FieldTypes.String,
     },
   );
   const doc = {
@@ -749,7 +750,7 @@ test('test casting objects to string', () =>
   e.addField(List(['foo', 'baz']));
   e.addField(List(['foo', 'baz', 'hey']));
 
-  e.appendTransformation(TransformationNodeType.CastNode, List([List(['foo'])]), { toTypename: 'string' });
+  e.appendTransformation(TransformationNodeType.CastNode, List([List(['foo'])]), { toTypename: FieldTypes.String });
 
   const doc = {
     foo: {
@@ -769,8 +770,8 @@ test('test casting strings to objects', () =>
   e.addField(List(['foo']));
   e.addField(List(['bar']));
 
-  e.appendTransformation(TransformationNodeType.CastNode, List([List(['foo'])]), { toTypename: 'object' });
-  e.appendTransformation(TransformationNodeType.CastNode, List([List(['bar'])]), { toTypename: 'object' });
+  e.appendTransformation(TransformationNodeType.ParseNode, List([List(['foo'])]), { to: 'object' });
+  e.appendTransformation(TransformationNodeType.CastNode, List([List(['bar'])]), { toTypename: FieldTypes.Object });
 
   const doc = {
     foo: '{"bar":[1,2,3],"baz":{"hey":"doggo"}}',

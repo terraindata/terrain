@@ -59,7 +59,7 @@ import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 const etlTypeKeyPath = List(['etlType']);
 export default class EngineUtil
 {
-  // get all fields that are computed from this field
+  // refactor this
   public static getFieldDependents(engine: TransformationEngine, fieldId: number): List<number>
   {
     const transformations = engine.getTransformations(fieldId);
@@ -128,7 +128,6 @@ export default class EngineUtil
   {
     const ikp = engine.getFieldPath(fieldId);
     const etlType: FieldTypes = type === undefined ? EngineUtil.fieldType(fieldId, engine) : type;
-    const castType = ETLTypeToCastString[etlType];
 
     if (etlType === FieldTypes.Date && format === undefined)
     {
@@ -136,7 +135,7 @@ export default class EngineUtil
     }
 
     const transformOptions: NodeOptionsType<TransformationNodeType.CastNode> = {
-      toTypename: castType,
+      toTypename: etlType,
       format,
     };
 
@@ -185,16 +184,3 @@ export default class EngineUtil
     }
   }
 }
-
-export const ETLTypeToCastString: {
-  [k in FieldTypes]: string
-} = {
-    [FieldTypes.Array]: 'array',
-    [FieldTypes.Object]: 'object',
-    [FieldTypes.Date]: 'date',
-    [FieldTypes.GeoPoint]: 'object',
-    [FieldTypes.Number]: 'number',
-    [FieldTypes.Integer]: 'number',
-    [FieldTypes.Boolean]: 'boolean',
-    [FieldTypes.String]: 'string',
-  };

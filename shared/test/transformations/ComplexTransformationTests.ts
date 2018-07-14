@@ -244,27 +244,28 @@ describe('suite of complex duplication tests', () =>
     );
   });
 
-  // test('nested array one to one', () => {
-  //   expect(dupHelper(
-  //     ['items', -1, 'foo'],
-  //     ['items', -1, 'bar'],
-  //     {
-  //       items: [
-  //         { foo: [ 1, 2, 3 ] },
-  //         { foo: [ ] },
-  //         { notFoo: 3 },
-  //       ],
-  //     },
-  //   )).toEqual(
-  //     {
-  //       items: [
-  //         { foo: [ 1, 2, 3 ], bar: [ 1, 2, 3 ] },
-  //         { foo: [ ], bar: [ ] },
-  //         { notFoo: 3 },
-  //       ],
-  //     },
-  //   );
-  // });
+  test('nested array one to one', () =>
+  {
+    expect(dupHelper(
+      ['items', -1, 'foo'],
+      ['items', -1, 'bar'],
+      {
+        items: [
+          { foo: [1, 2, 3] },
+          { foo: [] },
+          { notFoo: 3 },
+        ],
+      },
+    )).toEqual(
+      {
+        items: [
+          { foo: [1, 2, 3], bar: [1, 2, 3] },
+          { foo: [], bar: [] },
+          { notFoo: 3 },
+        ],
+      },
+    );
+  });
 
   test('super nested one to one', () =>
   {

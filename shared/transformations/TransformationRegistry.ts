@@ -51,6 +51,7 @@ import { ArraySumTransformationInfo, ArraySumTransformationNode } from './nodes/
 import { CaseTransformationInfo, CaseTransformationNode } from './nodes/CaseTransformationNode';
 import { CastTransformationInfo, CastTransformationNode } from './nodes/CastTransformationNode';
 import { DecryptTransformationInfo, DecryptTransformationNode } from './nodes/DecryptTransformationNode';
+import { DeprecatedTransformationInfo, DeprecatedTransformationNode } from './nodes/DeprecatedTransformationNode';
 import { DifferenceTransformationInfo, DifferenceTransformationNode } from './nodes/DifferenceTransformationNode';
 import { DivideTransformationInfo, DivideTransformationNode } from './nodes/DivideTransformationNode';
 import { DuplicateTransformationInfo, DuplicateTransformationNode } from './nodes/DuplicateTransformationNode';
@@ -63,6 +64,7 @@ import { IdentityTransformationInfo, IdentityTransformationNode } from './nodes/
 import { InsertTransformationInfo, InsertTransformationNode } from './nodes/InsertTransformationNode';
 import { JoinTransformationInfo, JoinTransformationNode } from './nodes/JoinTransformationNode';
 import { MultiplyTransformationInfo, MultiplyTransformationNode } from './nodes/MultiplyTransformationNode';
+import { ParseTransformationInfo, ParseTransformationNode } from './nodes/ParseTransformationNode';
 import { ProductTransformationInfo, ProductTransformationNode } from './nodes/ProductTransformationNode';
 import { QuotientTransformationInfo, QuotientTransformationNode } from './nodes/QuotientTransformationNode';
 import { RemoveDuplicatesTransformationInfo, RemoveDuplicatesTransformationNode } from './nodes/RemoveDuplicatesTransformationNode';
@@ -90,6 +92,7 @@ const infos: {
     [TransformationNodeType.CaseNode]: CaseTransformationInfo,
     [TransformationNodeType.CastNode]: CastTransformationInfo,
     [TransformationNodeType.DecryptNode]: DecryptTransformationInfo,
+    [TransformationNodeType.DeprecatedNode]: DeprecatedTransformationInfo,
     [TransformationNodeType.DifferenceNode]: DifferenceTransformationInfo,
     [TransformationNodeType.DivideNode]: DivideTransformationInfo,
     [TransformationNodeType.DuplicateNode]: DuplicateTransformationInfo,
@@ -102,6 +105,7 @@ const infos: {
     [TransformationNodeType.InsertNode]: InsertTransformationInfo,
     [TransformationNodeType.JoinNode]: JoinTransformationInfo,
     [TransformationNodeType.MultiplyNode]: MultiplyTransformationInfo,
+    [TransformationNodeType.ParseNode]: ParseTransformationInfo,
     [TransformationNodeType.ProductNode]: ProductTransformationInfo,
     [TransformationNodeType.QuotientNode]: QuotientTransformationInfo,
     [TransformationNodeType.RemoveDuplicatesNode]: RemoveDuplicatesTransformationInfo,

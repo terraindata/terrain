@@ -50,12 +50,12 @@ import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
 
+import * as Utils from 'shared/etl/util/ETLUtils';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
-import { DateFormats, etlFieldTypesList, etlFieldTypesNames, FieldTypes } from 'shared/etl/types/ETLTypes';
-import * as Utils from 'shared/etl/util/ETLUtils';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -67,74 +67,26 @@ import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-type CastOptions = NodeOptionsType<TransformationNodeType.CastNode>;
-export class CastTFF extends TransformationForm<CastOptions, TransformationNodeType.CastNode>
+const TYPECODE = TransformationNodeType.ParseNode;
+
+type Options = NodeOptionsType<typeof TYPECODE>;
+export class ParseTFF extends TransformationForm<Options, typeof TYPECODE>
 {
-  protected readonly type = TransformationNodeType.CastNode;
-  protected readonly inputMap: InputDeclarationMap<CastOptions> = {
-    toTypename: {
+  protected readonly type = TYPECODE;
+  protected readonly inputMap: InputDeclarationMap<Options> = {
+    to: {
       type: DisplayType.Pick,
-      displayName: 'Cast to Type',
+      displayName: 'Parse To',
       options: {
-        pickOptions: (s) => etlFieldTypesList,
-        indexResolver: (value) => etlFieldTypesList.indexOf(value),
-        displayNames: (s) => etlFieldTypesNames,
-      },
-    },
-    format: {
-      type: DisplayType.Pick,
-      displayName: 'Date Format',
-      getDisplayState: this.formatDisplayState,
-      options: {
-        pickOptions: (s) => dateOptions,
-        indexResolver: (value) => dateOptions.indexOf(value),
+        pickOptions: (s) => optionsList,
+        indexResolver: (value) => optionsList.indexOf(value),
       },
     },
   };
 
-  protected readonly initialState = {
-    toTypename: FieldTypes.String,
-  }; // this should be overriden by computeInitialState
-
-  public formatDisplayState(state: CastOptions)
-  {
-    return state.toTypename === FieldTypes.Date ? DisplayState.Active : DisplayState.Hidden;
-  }
-
-  protected computeInitialState()
-  {
-    const { fieldId, isCreate, engine } = this.props;
-    if (isCreate)
-    {
-      const etlType = Utils.engine.fieldType(fieldId, engine);
-      const state: CastOptions = {
-        toTypename: etlType,
-      };
-      if (etlType === FieldTypes.Date)
-      {
-        state.format = DateFormats.ISOstring;
-      }
-      return state;
-    }
-    else
-    {
-      return super.computeInitialState();
-    }
-  }
-
-  protected transformFormOnChange(state: CastOptions)
-  {
-    if (state.toTypename === FieldTypes.Date && state.format === undefined)
-    {
-      return _.extend({}, state, {
-        format: DateFormats.ISOstring,
-      });
-    }
-    else
-    {
-      return state;
-    }
-  }
+  protected readonly initialState: Options = {
+    to: 'array',
+  };
 }
 
-const dateOptions: List<DateFormats> = List([DateFormats.ISOstring, DateFormats.MMDDYYYY]);
+const optionsList = List(['array', 'object']);
