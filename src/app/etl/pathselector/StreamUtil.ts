@@ -129,10 +129,7 @@ export default class StreamUtil
     let correctedString;
     const checkBracketOrKey = rawStringStream.slice(-1);
     const checkValue = rawStringStream.slice(-2);
-    if (checkValue === ', ')
-    {
-      correctedString = rawStringStream.slice(0, -2);
-    }
+    console.log(checkBracketOrKey);
     switch (checkBracketOrKey)
     {
       case '[':
@@ -160,7 +157,14 @@ export default class StreamUtil
         }
         break;
       default:
-        throw new Error('Error parsing');
+        if (checkValue === ', ')
+        {
+          correctedString = rawStringStream.slice(0, -2);
+        }
+        else
+        {
+          throw new Error('Error parsing');
+        }
         break;
     }
     return correctedString;
@@ -169,6 +173,7 @@ export default class StreamUtil
   public static formatJsonString(jsonString)
   {
     const results: object = this.completeStream(jsonString);
+    console.log(results);
     const bracketStack: string[] = results[0];
     const rawStringStream: string = results[1];
     let fixedStringStream: string = this.fixStringStream(rawStringStream);
