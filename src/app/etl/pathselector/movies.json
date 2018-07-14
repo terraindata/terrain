@@ -1,0 +1,421 @@
+[{
+  "page": 1,
+  "total_results": 367048,
+  "total_pages": 18353,
+  "results": [
+    {
+      "vote_count": 1178,
+      "id": 351286,
+      "video": false,
+      "vote_average": 6.7,
+      "title": "Jurassic World: Fallen Kingdom",
+      "popularity": 278.107758,
+      "poster_path": "\/c9XxwwhPHdaImA2f1WEfEsbhaFB.jpg",
+      "original_language": "en",
+      "original_title": "Jurassic World: Fallen Kingdom",
+      "genre_ids": [
+        28,
+        12,
+        878
+      ],
+      "backdrop_path": "\/gBmrsugfWpiXRh13Vo3j0WW55qD.jpg",
+      "adult": false,
+      "overview": "A volcanic eruption threatens the remaining dinosaurs on the island of Isla Nublar, where the creatures have freely roamed for several years after the demise of an animal theme park known as Jurassic World. Claire Dearing, the former park manager, has now founded the Dinosaur Protection Group, an organization dedicated to protecting the dinosaurs. To help with her cause, Claire has recruited Owen Grady, a former dinosaur trainer who worked at the park, to prevent the extinction of the dinosaurs once again.",
+      "release_date": "2018-06-06"
+    },
+    {
+      "vote_count": 403,
+      "id": 260513,
+      "video": false,
+      "vote_average": 7.6,
+      "title": "Incredibles 2",
+      "popularity": 171.840079,
+      "poster_path": "\/hL9Uz2vq93vi20oxZEBBaSs4w8U.jpg",
+      "original_language": "en",
+      "original_title": "Incredibles 2",
+      "genre_ids": [
+        28,
+        12,
+        16,
+        10751
+      ],
+      "backdrop_path": "\/mabuNsGJgRuCTuGqjFkWe1xdu19.jpg",
+      "adult": false,
+      "overview": "Elastigirl springs into action to save the day, while Mr. Incredible faces his greatest challenge yet \u2013 taking care of the problems of his three children.",
+      "release_date": "2018-06-14"
+    },
+    {
+      "vote_count": 2613,
+      "id": 383498,
+      "video": false,
+      "vote_average": 7.6,
+      "title": "Deadpool 2",
+      "popularity": 115.842564,
+      "poster_path": "\/to0spRl1CMDvyUbOnbb4fTk3VAd.jpg",
+      "original_language": "en",
+      "original_title": "Deadpool 2",
+      "genre_ids": [
+        28,
+        35,
+        878
+      ],
+      "backdrop_path": "\/3P52oz9HPQWxcwHOwxtyrVV1LKi.jpg",
+      "adult": false,
+      "overview": "Wisecracking mercenary Deadpool battles the evil and powerful Cable and other bad guys to save a boy's life.",
+      "release_date": "2018-05-15"
+    },
+    {
+      "vote_count": 6985,
+      "id": 284053,
+      "video": false,
+      "vote_average": 7.5,
+      "title": "Thor: Ragnarok",
+      "popularity": 108.359258,
+      "poster_path": "\/rzRwTcFvttcN1ZpX2xv4j3tSdJu.jpg",
+      "original_language": "en",
+      "original_title": "Thor: Ragnarok",
+      "genre_ids": [
+        28,
+        12,
+        14,
+        878,
+        35
+      ],
+      "backdrop_path": "\/kaIfm5ryEOwYg8mLbq8HkPuM1Fo.jpg",
+      "adult": false,
+      "overview": "Thor is on the other side of the universe and finds himself in a race against time to get back to Asgard to stop Ragnarok, the prophecy of destruction to his homeworld and the end of Asgardian civilization, at the hands of an all-powerful new threat, the ruthless Hela.",
+      "release_date": "2017-10-25"
+    },
+    {
+      "vote_count": 5192,
+      "id": 299536,
+      "video": false,
+      "vote_average": 8.4,
+      "title": "Avengers: Infinity War",
+      "popularity": 102.043596,
+      "poster_path": "\/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg",
+      "original_language": "en",
+      "original_title": "Avengers: Infinity War",
+      "genre_ids": [
+        12,
+        878,
+        14,
+        28
+      ],
+      "backdrop_path": "\/bOGkgRGdhrBYJSLpXaxhXVstddV.jpg",
+      "adult": false,
+      "overview": "As the Avengers and their allies have continued to protect the world from threats too large for any one hero to handle, a new danger has emerged from the cosmic shadows: Thanos. A despot of intergalactic infamy, his goal is to collect all six Infinity Stones, artifacts of unimaginable power, and use them to inflict his twisted will on all of reality. Everything the Avengers have fought for has led up to this moment - the fate of Earth and existence itself has never been more uncertain.",
+      "release_date": "2018-04-25"
+    },
+    {
+      "vote_count": 11281,
+      "id": 135397,
+      "video": false,
+      "vote_average": 6.5,
+      "title": "Jurassic World",
+      "popularity": 93.068814,
+      "poster_path": "\/jjBgi2r5cRt36xF6iNUEhzscEcb.jpg",
+      "original_language": "en",
+      "original_title": "Jurassic World",
+      "genre_ids": [
+        28,
+        12,
+        878,
+        53
+      ],
+      "backdrop_path": "\/t5KONotASgVKq4N19RyhIthWOPG.jpg",
+      "adult": false,
+      "overview": "Twenty-two years after the events of Jurassic Park, Isla Nublar now features a fully functioning dinosaur theme park, Jurassic World, as originally envisioned by John Hammond.",
+      "release_date": "2015-06-06"
+    },
+    {
+      "vote_count": 942,
+      "id": 427641,
+      "video": false,
+      "vote_average": 5.9,
+      "title": "Rampage",
+      "popularity": 92.522531,
+      "poster_path": "\/3gIO6mCd4Q4PF1tuwcyI3sjFrtI.jpg",
+      "original_language": "en",
+      "original_title": "Rampage",
+      "genre_ids": [
+        28,
+        12,
+        878,
+        14
+      ],
+      "backdrop_path": "\/wrqUiMXttHE4UBFMhLHlN601MZh.jpg",
+      "adult": false,
+      "overview": "Primatologist Davis Okoye shares an unshakable bond with George, the extraordinarily intelligent, silverback gorilla who has been in his care since birth.  But a rogue genetic experiment gone awry mutates this gentle ape into a raging creature of enormous size.  To make matters worse, it\u2019s soon discovered there are other similarly altered animals.  As these newly created alpha predators tear across North America, destroying everything in their path, Okoye teams with a discredited genetic engineer to secure an antidote, fighting his way through an ever-changing battlefield, not only to halt a global catastrophe but to save the fearsome creature that was once his friend.",
+      "release_date": "2018-04-12"
+    },
+    {
+      "vote_count": 2153,
+      "id": 337167,
+      "video": false,
+      "vote_average": 6,
+      "title": "Fifty Shades Freed",
+      "popularity": 90.061088,
+      "poster_path": "\/jjPJ4s3DWZZvI4vw8Xfi4Vqa1Q8.jpg",
+      "original_language": "en",
+      "original_title": "Fifty Shades Freed",
+      "genre_ids": [
+        18,
+        10749
+      ],
+      "backdrop_path": "\/9ywA15OAiwjSTvg3cBs9B7kOCBF.jpg",
+      "adult": false,
+      "overview": "Believing they have left behind shadowy figures from their past, newlyweds Christian and Ana fully embrace an inextricable connection and shared life of luxury. But just as she steps into her role as Mrs. Grey and he relaxes into an unfamiliar stability, new threats could jeopardize their happy ending before it even begins.",
+      "release_date": "2018-01-17"
+    },
+    {
+      "vote_count": 1869,
+      "id": 338970,
+      "video": false,
+      "vote_average": 6.2,
+      "title": "Tomb Raider",
+      "popularity": 83.235657,
+      "poster_path": "\/ePyN2nX9t8SOl70eRW47Q29zUFO.jpg",
+      "original_language": "en",
+      "original_title": "Tomb Raider",
+      "genre_ids": [
+        28,
+        12,
+        14,
+        18,
+        9648,
+        53
+      ],
+      "backdrop_path": "\/bLJTjfbZ1c5zSNiAvGYs1Uc82ir.jpg",
+      "adult": false,
+      "overview": "Lara Croft, the fiercely independent daughter of a missing adventurer, must push herself beyond her limits when she finds herself on the island where her father disappeared.",
+      "release_date": "2018-03-08"
+    },
+    {
+      "vote_count": 6429,
+      "id": 284054,
+      "video": false,
+      "vote_average": 7.3,
+      "title": "Black Panther",
+      "popularity": 78.710147,
+      "poster_path": "\/uxzzxijgPIY7slzFvMotPv8wjKA.jpg",
+      "original_language": "en",
+      "original_title": "Black Panther",
+      "genre_ids": [
+        28,
+        12,
+        14,
+        878
+      ],
+      "backdrop_path": "\/6ELJEzQJ3Y45HczvreC3dg0GV5R.jpg",
+      "adult": false,
+      "overview": "King T'Challa returns home from America to the reclusive, technologically advanced African nation of Wakanda to serve as his country's new leader. However, T'Challa soon finds that he is challenged for the throne by factions within his own country as well as without. Using powers reserved to Wakandan kings, T'Challa assumes the Black Panther mantel to join with girlfriend Nakia, the queen-mother, his princess-kid sister, members of the Dora Milaje (the Wakandan 'special forces') and an American secret agent, to prevent Wakanda from being dragged into a world war.",
+      "release_date": "2018-02-13"
+    },
+    {
+      "vote_count": 947,
+      "id": 268896,
+      "video": false,
+      "vote_average": 5.9,
+      "title": "Pacific Rim: Uprising",
+      "popularity": 78.095105,
+      "poster_path": "\/v5HlmJK9bdeHxN2QhaFP1ivjX3U.jpg",
+      "original_language": "en",
+      "original_title": "Pacific Rim: Uprising",
+      "genre_ids": [
+        28,
+        14,
+        878,
+        12
+      ],
+      "backdrop_path": "\/6pT73ACl5N1VekdK3wQI8PLfz1E.jpg",
+      "adult": false,
+      "overview": "It has been ten years since The Battle of the Breach and the oceans are still, but restless. Vindicated by the victory at the Breach, the Jaeger program has evolved into the most powerful global defense force in human history. The PPDC now calls upon the best and brightest to rise up and become the next generation of heroes when the Kaiju threat returns.",
+      "release_date": "2018-03-21"
+    },
+    {
+      "vote_count": 1574,
+      "id": 447332,
+      "video": false,
+      "vote_average": 7.2,
+      "title": "A Quiet Place",
+      "popularity": 76.621168,
+      "poster_path": "\/nAU74GmpUk7t5iklEp3bufwDq4n.jpg",
+      "original_language": "en",
+      "original_title": "A Quiet Place",
+      "genre_ids": [
+        18,
+        27,
+        53,
+        878
+      ],
+      "backdrop_path": "\/roYyPiQDQKmIKUEhO912693tSja.jpg",
+      "adult": false,
+      "overview": "A family is forced to live in silence while hiding from creatures that hunt by sound.",
+      "release_date": "2018-04-04"
+    },
+    {
+      "vote_count": 1096,
+      "id": 348350,
+      "video": false,
+      "vote_average": 6.8,
+      "title": "Solo: A Star Wars Story",
+      "popularity": 72.834996,
+      "poster_path": "\/4oD6VEccFkorEBTEDXtpLAaz0Rl.jpg",
+      "original_language": "en",
+      "original_title": "Solo: A Star Wars Story",
+      "genre_ids": [
+        28,
+        12,
+        878
+      ],
+      "backdrop_path": "\/7LZ0K4FsALrt7OeNIGOVLNuKQRU.jpg",
+      "adult": false,
+      "overview": "Through a series of daring escapades deep within a dark and dangerous criminal underworld, Han Solo meets his mighty future copilot Chewbacca and encounters the notorious gambler Lando Calrissian.",
+      "release_date": "2018-05-23"
+    },
+    {
+      "vote_count": 2429,
+      "id": 333339,
+      "video": false,
+      "vote_average": 7.8,
+      "title": "Ready Player One",
+      "popularity": 68.287518,
+      "poster_path": "\/pU1ULUq8D3iRxl1fdX2lZIzdHuI.jpg",
+      "original_language": "en",
+      "original_title": "Ready Player One",
+      "genre_ids": [
+        12,
+        878,
+        28
+      ],
+      "backdrop_path": "\/q7fXcrDPJcf6t3rzutaNwTzuKP1.jpg",
+      "adult": false,
+      "overview": "When the creator of a popular video game system dies, a virtual contest is created to compete for his fortune.",
+      "release_date": "2018-03-28"
+    },
+    {
+      "vote_count": 383,
+      "id": 460019,
+      "video": false,
+      "vote_average": 6,
+      "title": "Truth or Dare",
+      "popularity": 58.275857,
+      "poster_path": "\/vLLLHnHi3RICK0GHAffwx5UExQZ.jpg",
+      "original_language": "en",
+      "original_title": "Truth or Dare",
+      "genre_ids": [
+        53,
+        27
+      ],
+      "backdrop_path": "\/eQ5xu2pQ5Kergubto5PbbUzey28.jpg",
+      "adult": false,
+      "overview": "A harmless game of \"Truth or Dare\" among friends turns deadly when someone\u2014or something\u2014begins to punish those who tell a lie\u2014or refuse the dare.",
+      "release_date": "2018-04-12"
+    },
+    {
+      "vote_count": 4895,
+      "id": 291805,
+      "video": false,
+      "vote_average": 6.7,
+      "title": "Now You See Me 2",
+      "popularity": 55.511878,
+      "poster_path": "\/hU0E130tsGdsYa4K9lc3Xrn5Wyt.jpg",
+      "original_language": "en",
+      "original_title": "Now You See Me 2",
+      "genre_ids": [
+        28,
+        12,
+        35,
+        80,
+        9648,
+        53
+      ],
+      "backdrop_path": "\/zrAO2OOa6s6dQMQ7zsUbDyIBrAP.jpg",
+      "adult": false,
+      "overview": "One year after outwitting the FBI and winning the public\u2019s adulation with their mind-bending spectacles, the Four Horsemen resurface only to find themselves face to face with a new enemy who enlists them to pull off their most dangerous heist yet.",
+      "release_date": "2016-06-02"
+    },
+    {
+      "vote_count": 5828,
+      "id": 181808,
+      "video": false,
+      "vote_average": 7.1,
+      "title": "Star Wars: The Last Jedi",
+      "popularity": 53.04305,
+      "poster_path": "\/kOVEVeg59E0wsnXmF9nrh6OmWII.jpg",
+      "original_language": "en",
+      "original_title": "Star Wars: The Last Jedi",
+      "genre_ids": [
+        14,
+        12,
+        878
+      ],
+      "backdrop_path": "\/oVdLj5JVqNWGY0LEhBfHUuMrvWJ.jpg",
+      "adult": false,
+      "overview": "Rey develops her newly discovered abilities with the guidance of Luke Skywalker, who is unsettled by the strength of her powers. Meanwhile, the Resistance prepares to do battle with the First Order.",
+      "release_date": "2017-12-13"
+    },
+    {
+      "vote_count": 13581,
+      "id": 118340,
+      "video": false,
+      "vote_average": 7.9,
+      "title": "Guardians of the Galaxy",
+      "popularity": 52.596438,
+      "poster_path": "\/y31QB9kn3XSudA15tV7UWQ9XLuW.jpg",
+      "original_language": "en",
+      "original_title": "Guardians of the Galaxy",
+      "genre_ids": [
+        28,
+        878,
+        12
+      ],
+      "backdrop_path": "\/bHarw8xrmQeqf3t8HpuMY7zoK4x.jpg",
+      "adult": false,
+      "overview": "Light years from Earth, 26 years after being abducted, Peter Quill finds himself the prime target of a manhunt after discovering an orb wanted by Ronan the Accuser.",
+      "release_date": "2014-07-30"
+    },
+    {
+      "vote_count": 1483,
+      "id": 274855,
+      "video": false,
+      "vote_average": 5.7,
+      "title": "Geostorm",
+      "popularity": 52.539512,
+      "poster_path": "\/nrsx0jEaBgXq4PWo7SooSnYJTv.jpg",
+      "original_language": "en",
+      "original_title": "Geostorm",
+      "genre_ids": [
+        28,
+        878,
+        53
+      ],
+      "backdrop_path": "\/79X8JkGxzc1tJMi0KxUSaPLooVg.jpg",
+      "adult": false,
+      "overview": "After an unprecedented series of natural disasters threatened the planet, the world's leaders came together to create an intricate network of satellites to control the global climate and keep everyone safe. But now, something has gone wrong: the system built to protect Earth is attacking it, and it becomes a race against the clock to uncover the real threat before a worldwide geostorm wipes out everything and everyone along with it.",
+      "release_date": "2017-10-13"
+    },
+    {
+      "vote_count": 364,
+      "id": 402900,
+      "video": false,
+      "vote_average": 6.8,
+      "title": "Ocean's 8",
+      "popularity": 52.214807,
+      "poster_path": "\/MvYpKlpFukTivnlBhizGbkAe3v.jpg",
+      "original_language": "en",
+      "original_title": "Ocean's 8",
+      "genre_ids": [
+        80,
+        35,
+        28,
+        53
+      ],
+      "backdrop_path": "\/zBIfBeStaDdDdhBrSx8InhgFUVa.jpg",
+      "adult": false,
+      "overview": "Debbie Ocean, a criminal mastermind, gathers a crew of seven other female thieves to pull off the heist of the century at New York's annual Met Gala.",
+      "release_date": "2018-06-07"
+    }
+  ]
+}]
