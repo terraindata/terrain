@@ -126,7 +126,10 @@ export default abstract class ConstructionUtil
       {
         const kp = yadeep.get(tree, location.set(-1, 'path'));
         const type = value;
-        engine.addField(kp, { etlType: type });
+        if (kp.size !== 0)
+        {
+          engine.addField(kp, { etlType: type });
+        }
       }
     }
 

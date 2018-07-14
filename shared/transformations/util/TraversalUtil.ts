@@ -72,6 +72,9 @@ export default abstract class Traversal
     return engine['dag'];
   }
 
+  /*
+   *  Find the source identity node for the given field
+   */
   public static findIdentityNode(engine: TransformationEngine, field: number)
   {
     const graph = Traversal.getGraph(engine);
@@ -80,7 +83,11 @@ export default abstract class Traversal
       const node = graph.node(nId);
       if (node.typeCode === TransformationNodeType.IdentityNode && node.fields.get(0).id === field)
       {
-        return node.id;
+        const { type } = node.meta as NodeOptionsType<TransformationNodeType.IdentityNode>;
+        if (type !== 'Rename')
+        {
+          return node.id;
+        }
       }
     }
     return -1;

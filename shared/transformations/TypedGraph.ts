@@ -103,41 +103,41 @@ export interface TypedGraph<V = any, E = any> extends GraphLib.Graph
    * coming from node u. Behavior is undefined for undirected graphs - use nodeEdges instead.
    * Returns undefined if node v is not in the graph. Takes O(|E|) time.
    */
-  inEdges(v: string, u?: string): Edge[] | void;
+  inEdges(v: string, u?: string): Edge[] | undefined;
 
   /**
    * Return all edges that are pointed at by node v. Optionally filters those edges down to just
    * those point to w. Behavior is undefined for undirected graphs - use nodeEdges instead.
    * Returns undefined if node v is not in the graph. Takes O(|E|) time.
    */
-  outEdges(v: string, w?: string): Edge[] | void;
+  outEdges(v: string, w?: string): Edge[] | undefined;
 
   /**
    * Returns all edges to or from node v regardless of direction. Optionally filters those edges
    * down to just those between nodes v and w regardless of direction. Returns undefined if node v
    * is not in the graph. Takes O(|E|) time.
    */
-  nodeEdges(v: string, w?: string): Edge[] | void;
+  nodeEdges(v: string, w?: string): Edge[] | undefined;
 
   /**
    * Return all nodes that are predecessors of the specified node or undefined if node v is not in
    * the graph. Behavior is undefined for undirected graphs - use neighbors instead. Takes O(|V|)
    * time.
    */
-  predecessors(node: string): string[] | void;
+  predecessors(node: string): string[] | undefined;
 
   /**
    * Return all nodes that are successors of the specified node or undefined if node v is not in
    * the graph. Behavior is undefined for undirected graphs - use neighbors instead. Takes O(|V|)
    * time.
    */
-  successors(node: string): string[] | void;
+  successors(node: string): string[] | undefined;
 
   /**
    * Return all nodes that are predecessors or successors of the specified node or undefined if
    * node v is not in the graph. Takes O(|V|) time.
    */
-  neighbors(node: string): string[] | void;
+  neighbors(node: string): string[] | undefined;
 
   isDirected(): boolean;
   isMultigraph(): boolean;
@@ -150,7 +150,7 @@ export interface TypedGraph<V = any, E = any> extends GraphLib.Graph
    * Returns the currently assigned label for the graph. If no label has been assigned,
    * returns undefined.
    */
-  graph(): string | void;
+  graph(): string | undefined;
 
   /**
    * Returns the number of nodes in the graph.

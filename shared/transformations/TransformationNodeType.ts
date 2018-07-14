@@ -106,7 +106,7 @@ type HasCommon<T extends object> = {
 interface TransformationOptionTypes extends HasCommon<TransformationOptionTypes>
 {
   IdentityNode: {
-    synthetic: boolean;
+    type: 'Organic' | 'Synthetic' | 'Rename';
   };
   SplitNode: {
     newFieldKeyPaths: List<KeyPath>;
@@ -248,7 +248,7 @@ export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[k
 export enum TransformationEdgeTypes
 {
   Synthetic = 'Synthetic',
-  InPlace = 'InPlace',
+  Same = 'Same',
   Rename = 'Rename',
 }
 

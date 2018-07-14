@@ -86,7 +86,7 @@ export default class CreationVisitor
 
   public visitDefault(type: TransformationNodeType, node: TransformationNode, engine: TransformationEngine)
   {
-    let edgeType: EdgeTypes = EdgeTypes.InPlace;
+    let edgeType: EdgeTypes = EdgeTypes.Same;
     if (node.meta.newFieldKeyPaths !== undefined && node.meta.newFieldKeyPaths.size > 0)
     {
       edgeType = EdgeTypes.Synthetic;
@@ -142,10 +142,11 @@ export default class CreationVisitor
 
   protected visitRenameNode(type, node: TransformationNode, engine: TransformationEngine): void
   {
-    Utils.traversal.appendNodeToField(engine, node.fields.get(0).id, node.id, EdgeTypes.Rename);
+    const sourceId = node.fields.get(0).id;
+    Utils.traversal.appendNodeToField(engine, sourceId, node.id, EdgeTypes.Synthetic);
   }
 
-  protected duplicateChildFields(engine: TransformationEngine, sourceId: number, rootPath: KeyPath, node?: number)
+  protected duplicateChildFields(engine: TransformationEngine, sourceId: number, rootPath: KeyPath, node: number)
   {
     const sourcePath = Utils.path.convertIndices(engine.getFieldPath(sourceId));
     sourceId = engine.getFieldID(sourcePath);
@@ -156,7 +157,9 @@ export default class CreationVisitor
       {
         const pathAfterRoot = engine.getFieldPath(childId).slice(sourcePath.size);
         const newFieldPath = rootPath.concat(pathAfterRoot).toList();
-        Utils.engine.copyField(engine, childId, newFieldPath, node);
+        const newFieldId = Utils.engine.copyField(engine, childId, newFieldPath, node);
+        const childEnd = Utils.traversal.findEndTransformation(engine, childId);
+        Utils.traversal.prependNodeToField(engine, newFieldId, childEnd, EdgeTypes.Synthetic);
       }
     });
   }

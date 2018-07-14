@@ -54,7 +54,7 @@ import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 
 import DataStore from './DataStore';
-import TransformationNodeType, { TransformationEdgeTypes as EdgeTypes } from './TransformationNodeType';
+import TransformationNodeType, { NodeOptionsType, TransformationEdgeTypes as EdgeTypes } from './TransformationNodeType';
 import TransformationRegistry from './TransformationRegistry';
 import CreateTransformationVisitor from './visitors/CreateTransformationVisitor';
 import TransformationEngineNodeVisitor from './visitors/TransformationEngineNodeVisitor';
@@ -98,7 +98,7 @@ export class TransformationEngine
   {
     const parsedJSON: object = typeof json === 'string' ? TransformationEngine.parseSerializedString(json as string) : json as object;
     const e: TransformationEngine = new TransformationEngine();
-    e.dag = GraphLib.json.read(parsedJSON['dag']);
+    e.dag = GraphLib.json.read(parsedJSON['dag']) as TransformationGraph;
     e.doc = parsedJSON['doc'];
     e.uidField = parsedJSON['uidField'];
     e.uidNode = parsedJSON['uidNode'];
@@ -160,6 +160,65 @@ export class TransformationEngine
       // initial field nodes can be implicit, DAG should only represent actual transformations
     }
     // allow construction without example doc (manually add fields)
+  }
+
+  public debug()
+  {
+    function pathStr(path: KeyPath)
+    {
+      if (path === undefined || path.size === 0)
+      {
+        return '';
+      }
+      let str = String(path.get(0));
+      for (let i = 1; i < path.size; i++)
+      {
+        str += `.${path.get(i)}`;
+      }
+      return str;
+    }
+    let res = '';
+    function print(str: string)
+    {
+      res += str + '\n';
+    }
+    print('-------------------------------');
+    this.dag.nodes().forEach((id: any) =>
+    {
+      id = Number(id);
+      const node = this.dag.node(id);
+      print(`NODE ${id}: ${node.typeCode}`);
+      let inputs = '';
+      node.fields.forEach(({ path }) =>
+      {
+        inputs += `${pathStr(path)}, `;
+      });
+      print(`  Inputs: ${inputs}`);
+      if (node.meta.newFieldKeyPaths !== undefined)
+      {
+        let outputs = '';
+        node.meta.newFieldKeyPaths.forEach((path) =>
+        {
+          outputs += `${pathStr(path)}, `;
+        });
+        print(`  Outputs: ${outputs}`);
+      }
+      const successors = this.dag.successors(id);
+      if (successors !== undefined)
+      {
+        let edges = '';
+        successors.forEach((toId) =>
+        {
+          edges += `${toId} (${this.dag.edge(id, toId)}), `;
+        });
+        print(`  Out Edges: ${edges}`);
+      }
+      else
+      {
+        print('  No Edges');
+      }
+    });
+    return res;
   }
 
   public clone(): TransformationEngine
@@ -309,12 +368,13 @@ export class TransformationEngine
     this.fieldEnabled = this.fieldEnabled.set(id, true);
     this.fieldProps = this.fieldProps.set(id, options);
 
+    const synthetic = sourceNode !== undefined;
     const identityId = this.appendTransformation(
       TransformationNodeType.IdentityNode,
       List([id]),
-      { synthetic: sourceNode !== undefined },
+      { type: synthetic ? 'Organic' : 'Synthetic' } as NodeOptionsType<TransformationNodeType.IdentityNode>,
     );
-    if (sourceNode !== undefined)
+    if (synthetic)
     {
       this.dag.setEdge(String(sourceNode), String(identityId), EdgeTypes.Synthetic);
     }
@@ -438,18 +498,26 @@ export class TransformationEngine
     {
       return null; // invalid
     }
+
     const renameId = this.appendTransformation(
       TransformationNodeType.RenameNode,
       List([oldPath]),
       { newFieldKeyPaths: List([newPath]) },
     );
-    // loop over children
+
     const transplantIndex = oldPath.size;
     Utils.traversal.postorderFields(this, fieldID, (id) =>
     {
       const childPath = this.getFieldPath(id);
       this.setFieldPath(id, newPath.concat(childPath.slice(transplantIndex)).toList());
+      const identityNode = this.appendTransformation(TransformationNodeType.IdentityNode, List([id]), { type: 'Rename' });
+      Utils.traversal.appendNodeToField(this, id, identityNode, EdgeTypes.Rename);
+      this.dag.setEdge(String(renameId), String(identityNode), EdgeTypes.Synthetic);
     });
+
+    // there is now a rename edge pointing from the field to the rename field.
+    // need to create an identity node for the original id and all the children. connect those identity nodes to the rename
+
     return renameId;
   }
 
