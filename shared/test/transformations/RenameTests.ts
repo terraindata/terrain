@@ -49,6 +49,8 @@ import { TestDocs } from 'shared/test/transformations/TestDocs';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { KeyPath } from 'shared/util/KeyPath';
 
+import * as Utils from 'shared/transformations/util/EngineUtils';
+
 test('rename a field (no structural changes)', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
@@ -99,7 +101,8 @@ test('rename a field (an object with subkeys)', () =>
 test('rename a field (deeply nested property in array)', () =>
 {
   {
-    const e: TransformationEngine = new TransformationEngine(TestDocs.doc3);
+    const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc3);
+    e.addField(KeyPath(['arr', 1, -1, 'a']));
     e.renameField(e.getFieldID(KeyPath(['arr', 1, -1, 'a'])), KeyPath(['arr', 1, -1, 'cool']));
     expect(e.transform(TestDocs.doc3)['arr'][1][0]['a']).toBe(undefined);
     expect(e.transform(TestDocs.doc3)['arr'][1][0]['cool']).toBe('dog');
@@ -109,14 +112,16 @@ test('rename a field (deeply nested property in array)', () =>
 
   {
     const doc = { d: [[{ b: 2 }, { b: 3 }]] };
-    const e: TransformationEngine = new TransformationEngine(doc);
+    const e: TransformationEngine = Utils.construction.makeEngine(doc);
+    e.addField(KeyPath(['d', 0, -1, 'b']));
     e.renameField(e.getFieldID(KeyPath(['d', 0, -1, 'b'])), KeyPath(['d', 0, -1, 'c']));
     expect(e.transform(doc)).toEqual({ d: [[{ c: 2 }, { c: 3 }]] });
   }
 
   {
     const doc = { a: [[{ b: 2 }, { b: 3 }]] };
-    const e: TransformationEngine = new TransformationEngine(doc);
+    const e: TransformationEngine = Utils.construction.makeEngine(doc);
+    e.addField(KeyPath(['a', 0, -1, 'b']));
     e.renameField(e.getFieldID(KeyPath(['a', 0, -1, 'b'])), KeyPath(['a', 0, -1, 'c']));
     expect(e.transform(doc)).toEqual({ a: [[{ c: 2 }, { c: 3 }]] });
   }
@@ -140,7 +145,7 @@ test('structural rename with array', () =>
 
 test('proper wildcard behavior in rename stage', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc4);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc4);
   e.renameField(e.getFieldID(KeyPath(['arr'])), KeyPath(['car']));
   expect(e.transform(TestDocs.doc5)).toEqual(
     {

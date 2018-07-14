@@ -52,91 +52,11 @@ import TransformationNodeConstructorVisitor from 'shared/transformations/visitor
 import { KeyPath } from 'shared/util/KeyPath';
 import { TestDocs } from './TestDocs';
 
-// const NodeConstructor = new TransformationNodeConstructorVisitor();
-
-// test('serialize to JSON', () =>
-// {
-//   const e: TransformationEngine = new TransformationEngine(TestDocs.doc1);
-//   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['name'])]), { format: 'uppercase' });
-//   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]), { format: 'uppercase' });
-//   expect(e.toJSON()).toEqual({
-//     dag: {
-//       options: {
-//         directed: true,
-//         multigraph: false,
-//         compound: false,
-//       },
-//       nodes: [
-//         {
-//           v: '0',
-//           value: NodeConstructor.visit(TransformationNodeType.CaseNode, undefined, {
-//             id: 0,
-//             fieldIds: List<number>([0]),
-//             fields: List<KeyPath>([KeyPath(['name'])]),
-//             meta: {
-//               format: 'uppercase',
-//             },
-//           }),
-//         },
-//         {
-//           v: '1',
-//           value: NodeConstructor.visit(TransformationNodeType.CaseNode, undefined, {
-//             id: 1,
-//             fieldIds: List<number>([3]),
-//             fields: List<KeyPath>([KeyPath(['meta', 'school'])]),
-//             meta: {
-//               format: 'uppercase',
-//             },
-//           }),
-//         },
-//       ],
-//       edges: [],
-//     },
-//     doc: {
-//       name: 'Bob',
-//       age: 17,
-//       meta: {
-//         school: 'Stanford',
-//       },
-//     },
-//     uidField: 4,
-//     uidNode: 2,
-//     fieldNameToIDMap: [
-//       [KeyPath(['name']), 0],
-//       [KeyPath(['age']), 1],
-//       [KeyPath(['meta']), 2],
-//       [KeyPath(['meta', 'school']), 3],
-//     ],
-//     IDToFieldNameMap: [
-//       [0, KeyPath(['name'])],
-//       [1, KeyPath(['age'])],
-//       [2, KeyPath(['meta'])],
-//       [3, KeyPath(['meta', 'school'])],
-//     ],
-//     fieldTypes: [
-//       [0, 'string'],
-//       [1, 'number'],
-//       [2, 'object'],
-//       [3, 'string'],
-//     ],
-//     fieldEnabled: [
-//       [0, true],
-//       [1, true],
-//       [2, true],
-//       [3, true],
-//     ],
-//     fieldProps: [
-//       [0, {}],
-//       [1, {}],
-//       [2, {}],
-//       [3, {}],
-//     ],
-//   });
-// });
+import * as Utils from 'shared/transformations/util/EngineUtils';
 
 test('JSON serialize/deserialize round trip', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc1);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc1);
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['name'])]), { format: 'uppercase' });
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]), { format: 'uppercase' });
   const j = e.toJSON();
@@ -148,7 +68,7 @@ test('JSON serialize/deserialize round trip', () =>
 
 test('String serialize/deserialize round trip', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc1);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc1);
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['name'])]), { format: 'uppercase' });
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]), { format: 'uppercase' });
   const j: string = JSON.stringify(e.toJSON());
@@ -161,7 +81,7 @@ test('String serialize/deserialize round trip', () =>
 
 test('String serialize/deserialize round trip - substring', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc1);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc1);
   e.appendTransformation(TransformationNodeType.SubstringNode, List<KeyPath>([KeyPath(['meta', 'school'])]), { from: 1, length: 3 });
   const j: string = JSON.stringify(e.toJSON());
   const e2 = TransformationEngine.load(j);
@@ -175,7 +95,7 @@ test('split a field (regex delimiter) after serialize/deserialize trip', () =>
     foo: 'la dee da',
   };
 
-  const e: TransformationEngine = new TransformationEngine(doc);
+  const e: TransformationEngine = Utils.construction.makeEngine(doc);
   const opts = {
     newFieldKeyPaths: List<KeyPath>([KeyPath(['s1']), KeyPath(['s2']), KeyPath(['s3'])]),
     delimiter: '[\\s,]+',

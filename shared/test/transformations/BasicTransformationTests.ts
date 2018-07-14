@@ -77,7 +77,7 @@ test('change text field case', () =>
   doc['t2'] = 'pascal case me bro';
   doc['t3'] = 'title case me bro';
 
-  const e: TransformationEngine = new TransformationEngine(doc);
+  const e: TransformationEngine = Utils.construction.makeEngine(doc);
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['t1'])]), { format: 'camelcase' });
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['t2'])]), { format: 'pascalcase' });
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['t3'])]), { format: 'titlecase' });
@@ -94,7 +94,7 @@ test('change text field case', () =>
 
 test('prepend string to a field', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc1);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc1);
   e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath(['name'])]), { at: 0, value: 'Sponge ' });
   const r = e.transform(TestDocs.doc1);
   expect(r['name']).toBe('Sponge Bob');
@@ -102,7 +102,7 @@ test('prepend string to a field', () =>
 
 test('append string to a field', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc1);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc1);
   e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath(['name'])]), { value: 's Burgers' });
   const r = e.transform(TestDocs.doc1);
   expect(r['name']).toBe('Bobs Burgers');
@@ -110,14 +110,14 @@ test('append string to a field', () =>
 
 test('transform doc with null value(s)', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc6);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc6);
   const r = e.transform(TestDocs.doc6);
   expect(r['value']).toBe(null);
 });
 
 test('linear chain of transformations', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc1);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc1);
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['name'])]), { format: 'uppercase' });
   e.appendTransformation(TransformationNodeType.SubstringNode, List<KeyPath>([KeyPath(['name'])]), { from: 0, length: 2 });
   const t = e.transform(TestDocs.doc1);
@@ -137,13 +137,13 @@ test('get transformations for a field', () =>
 
 test('array in array in object: identity transformation', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc7);
   expect(e.transform(TestDocs.doc7)).toEqual(TestDocs.doc7);
 });
 
 test('transform of deeply nested value', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc3);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc3);
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['hardarr', 1, 1, 0])]), { format: 'uppercase' });
   expect(e.transform(TestDocs.doc3)).toEqual(
     {
@@ -177,7 +177,7 @@ test('transform of deeply nested value', () =>
 
 test('nested transform with wildcard', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc3);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc3);
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['arr', 1, -1, 'a'])]), { format: 'uppercase' });
   expect(e.transform(TestDocs.doc3)).toEqual(
     {
@@ -211,7 +211,7 @@ test('nested transform with wildcard', () =>
 
 test('proper wildcard behavior across multiple docs', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc4);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc4);
   e.renameField(e.getFieldID(KeyPath(['arr'])), KeyPath(['car']));
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['car', -1])]), { format: 'uppercase' });
   expect(e.transform(TestDocs.doc5)).toEqual(
@@ -223,7 +223,7 @@ test('proper wildcard behavior across multiple docs', () =>
 
 // test('(deep) clone a TransformationEngine', () =>
 // {
-//   const e: TransformationEngine = new TransformationEngine(TestDocs.doc4);
+//   const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc4);
 //   e.renameField(e.getFieldID(KeyPath(['arr'])), KeyPath(['car']));
 //   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['arr', -1])]), { format: 'uppercase' });
 //   const clone: TransformationEngine = e.clone();
@@ -234,7 +234,7 @@ test('proper wildcard behavior across multiple docs', () =>
 
 test('join two fields', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc2);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc2);
   e.appendTransformation(
     TransformationNodeType.JoinNode,
     List<KeyPath>([KeyPath(['meta', 'school']), KeyPath(['meta', 'sport'])]),
@@ -267,7 +267,7 @@ test('join multiple fields in a nested array', () =>
     ],
   };
 
-  const e: TransformationEngine = new TransformationEngine(doc);
+  const e: TransformationEngine = Utils.construction.makeEngine(doc);
   e.appendTransformation(
     TransformationNodeType.JoinNode,
     List([KeyPath(['fields', -1, 'foo']), KeyPath(['fields', -1, 'bar']), KeyPath(['fields', -1, 'baz'])]),
@@ -283,7 +283,7 @@ test('join multiple fields in a nested array', () =>
 
 test('duplicate a field', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc2);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc2);
   e.appendTransformation(
     TransformationNodeType.DuplicateNode,
     List<KeyPath>([KeyPath(['meta', 'school'])]),
@@ -297,7 +297,7 @@ test('duplicate a field', () =>
 
 test('split a field (string delimiter)', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc2);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc2);
   e.appendTransformation(
     TransformationNodeType.SplitNode,
     List<KeyPath>([KeyPath(['meta', 'sport'])]),
@@ -314,7 +314,7 @@ test('split a field (string delimiter)', () =>
 
 test('split a field (numeric index)', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc2);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc2);
   e.appendTransformation(
     TransformationNodeType.SplitNode,
     List<KeyPath>([KeyPath(['meta', 'sport'])]),
@@ -334,7 +334,7 @@ test('split a field (regex delimiter)', () =>
     foo: 'la dee da',
   };
 
-  const e: TransformationEngine = new TransformationEngine(doc);
+  const e: TransformationEngine = Utils.construction.makeEngine(doc);
   e.appendTransformation(
     TransformationNodeType.SplitNode,
     List<KeyPath>([KeyPath(['foo'])]),
@@ -365,7 +365,7 @@ test('split multiple fields in a nested array', () =>
     ],
   };
 
-  const e: TransformationEngine = new TransformationEngine(doc);
+  const e: TransformationEngine = Utils.construction.makeEngine(doc);
   e.appendTransformation(
     TransformationNodeType.SplitNode,
     List([KeyPath(['fields', -1, 'foo'])]),
@@ -411,7 +411,7 @@ test('regex split multiple fields in a nested array', () =>
     ],
   };
 
-  const e: TransformationEngine = new TransformationEngine(doc);
+  const e: TransformationEngine = Utils.construction.makeEngine(doc);
   e.appendTransformation(
     TransformationNodeType.SplitNode,
     List([KeyPath(['fields', -1, 'foo'])]),
@@ -449,7 +449,7 @@ test('regex split multiple fields in a nested array', () =>
 
 test('cast node tests', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc2);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc2);
   e.appendTransformation(
     TransformationNodeType.CastNode,
     List<KeyPath>([KeyPath(['age'])]),
@@ -476,7 +476,7 @@ test('cast node tests', () =>
 
 test('boolean cast tests', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc8);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc8);
   e.appendTransformation(
     TransformationNodeType.CastNode,
     List<KeyPath>([KeyPath(['t'])]),
@@ -538,7 +538,7 @@ test('date cast tests', () =>
     foo: '5-18-2018',
     bar: '5-19-2018',
   };
-  const e: TransformationEngine = new TransformationEngine(doc);
+  const e: TransformationEngine = Utils.construction.makeEngine(doc);
   e.appendTransformation(
     TransformationNodeType.CastNode,
     List<KeyPath>([KeyPath(['foo'])]),
@@ -570,7 +570,7 @@ test('super deep transformation preserves arrays', () =>
     ],
   };
 
-  const e = new TransformationEngine(doc);
+  const e = Utils.construction.makeEngine(doc);
 
   expect(e.transform(doc)).toEqual(doc);
 });
@@ -584,7 +584,7 @@ test('split a nested field', () =>
     ],
   };
 
-  const e = new TransformationEngine(doc);
+  const e = Utils.construction.makeEngine(doc);
 
   e.appendTransformation(
     TransformationNodeType.SplitNode,
@@ -614,7 +614,7 @@ test('cast array to array should be no-op', () =>
     ],
   };
 
-  const e = new TransformationEngine(doc);
+  const e = Utils.construction.makeEngine(doc);
 
   e.appendTransformation(
     TransformationNodeType.CastNode,
@@ -673,7 +673,7 @@ test('cast on a field inside a nested object inside an array', () =>
 test('hash transformation', () =>
 {
   const doc = { email1: 'david@terraindata.com', email2: 'alex@terraindata.com' };
-  const e = new TransformationEngine(doc);
+  const e = Utils.construction.makeEngine(doc);
   const salt1 = 'CIerTrDRYQPBAL7FOjxh1pQm';
   const salt2 = 'bQtO7Ne2dfg5qVRNsmCvCzwx';
   e.appendTransformation(TransformationNodeType.HashNode, List([List(['email1'])]), { salt: salt1 });
@@ -690,7 +690,7 @@ test('array sum transformation', () =>
     foo: [1, 2, 3, 4],
   };
 
-  const e: TransformationEngine = new TransformationEngine(doc);
+  const e: TransformationEngine = Utils.construction.makeEngine(doc);
   e.appendTransformation(
     TransformationNodeType.ArraySumNode,
     List<KeyPath>([KeyPath(['foo'])]),
@@ -797,7 +797,8 @@ test('duplicate a field and then rename that field', () =>
       },
     ],
   };
-  const e = new TransformationEngine(doc);
+  const e = Utils.construction.makeEngine(doc);
+  e.addField(KeyPath(['foo', 0, 'bar']));
   e.appendTransformation(
     TransformationNodeType.DuplicateNode,
     List<KeyPath>([KeyPath(['foo', 0, 'bar'])]),
@@ -837,7 +838,7 @@ test('super deep duplication and modify', () =>
       },
     ],
   };
-  const e = new TransformationEngine(doc);
+  const e = Utils.construction.makeEngine(doc);
   e.appendTransformation(
     TransformationNodeType.DuplicateNode,
     wrap(['fields1', -1, 'fields2']),
@@ -889,7 +890,7 @@ test('suite of numeric transformations', () =>
     ],
   };
 
-  const e = new TransformationEngine(doc);
+  const e = Utils.construction.makeEngine(doc);
 
   e.appendTransformation(
     TransformationNodeType.AddNode,
@@ -973,7 +974,7 @@ test('suite of numeric transformations', () =>
 
 test('test set if transformation', () =>
 {
-  const e = new TransformationEngine(TestDocs.doc1);
+  const e = Utils.construction.makeEngine(TestDocs.doc1);
 
   e.addField(List(['bleep']));
 
@@ -1005,7 +1006,7 @@ test('duplicate a disabled array', () =>
   const doc = {
     foo: [1, 2, 3],
   };
-  const e = new TransformationEngine(doc);
+  const e = Utils.construction.makeEngine(doc);
   const kp = List(['foo']);
   e.appendTransformation(TransformationNodeType.DuplicateNode, List([kp]), {
     newFieldKeyPaths: List([List(['copy of foo'])]),
@@ -1018,7 +1019,7 @@ test('duplicate a disabled array', () =>
 
 test('test find replace transformation', () =>
 {
-  const e = new TransformationEngine(TestDocs.doc9);
+  const e = Utils.construction.makeEngine(TestDocs.doc9);
 
   e.appendTransformation(
     TransformationNodeType.FindReplaceNode,
@@ -1050,7 +1051,7 @@ test('array count transformation', () =>
     foo: [{}, { a: 3 }, { b: 'fo' }, 4, []],
   };
 
-  const e: TransformationEngine = new TransformationEngine(doc);
+  const e: TransformationEngine = Utils.construction.makeEngine(doc);
   e.appendTransformation(
     TransformationNodeType.ArrayCountNode,
     List<KeyPath>([KeyPath(['foo'])]),
@@ -1063,7 +1064,7 @@ test('array count transformation', () =>
 
 test('take product of several fields', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc7);
   e.appendTransformation(
     TransformationNodeType.ProductNode,
     List<KeyPath>([KeyPath(['deepArray', 0, 0]), KeyPath(['deepArray', 1, 0])]),
@@ -1076,7 +1077,7 @@ test('take product of several fields', () =>
 
 test('take quotient of several fields', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc7);
   e.appendTransformation(
     TransformationNodeType.QuotientNode,
     List<KeyPath>([KeyPath(['deepArray', 1, 0]), KeyPath(['deepArray', 0, 0])]),
@@ -1089,7 +1090,7 @@ test('take quotient of several fields', () =>
 
 test('take sum of several fields', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc7);
   e.appendTransformation(
     TransformationNodeType.SumNode,
     List<KeyPath>([KeyPath(['deepArray', 0, 0]), KeyPath(['deepArray', 1, 0])]),
@@ -1102,7 +1103,7 @@ test('take sum of several fields', () =>
 
 test('take difference of several fields', () =>
 {
-  const e: TransformationEngine = new TransformationEngine(TestDocs.doc7);
+  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc7);
   e.appendTransformation(
     TransformationNodeType.DifferenceNode,
     List<KeyPath>([KeyPath(['deepArray', 0, 0]), KeyPath(['deepArray', 1, 0])]),
@@ -1116,7 +1117,7 @@ test('take difference of several fields', () =>
 // TODO: Refactor tests since private keys are now registered by midway
 // test('Encrypt a field', () =>
 // {
-//   const e: TransformationEngine = new TransformationEngine(TestDocs.doc2);
+//   const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc2);
 //   e.appendTransformation(
 //     TransformationNodeType.EncryptNode,
 //     List<KeyPath>([KeyPath(['name'])]),
@@ -1127,7 +1128,7 @@ test('take difference of several fields', () =>
 
 // test('Encrypt and decrypt a field', () =>
 // {
-//   const e: TransformationEngine = new TransformationEngine(TestDocs.doc2);
+//   const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc2);
 //   e.appendTransformation(
 //     TransformationNodeType.EncryptNode,
 //     List<KeyPath>([KeyPath(['name'])]),
@@ -1149,7 +1150,7 @@ test('Duplicate a nested field', () =>
       },
     },
   };
-  const e = new TransformationEngine(doc);
+  const e = Utils.construction.makeEngine(doc);
   e.appendTransformation(TransformationNodeType.DuplicateNode, wrap(['field']), {
     newFieldKeyPaths: wrap(['copy1']),
   });
@@ -1173,7 +1174,7 @@ test('split a field that does not always exist', () =>
     id: 'foo',
   };
 
-  const e = new TransformationEngine(doc);
+  const e = Utils.construction.makeEngine(doc);
 
   e.appendTransformation(
     TransformationNodeType.SplitNode,
@@ -1213,7 +1214,7 @@ test('Group By Transformation', () =>
       ],
     };
 
-  const e = new TransformationEngine(doc);
+  const e = Utils.construction.makeEngine(doc);
   e.appendTransformation(TransformationNodeType.GroupByNode, wrap(['items']), {
     newFieldKeyPaths: List([
       List(['activeItems']),
@@ -1245,7 +1246,7 @@ test('numeric keys', () =>
 {
   // {
   //   const doc = { 0: { '5': 3, '-1': ['a', 'b'] } };
-  //   const e = new TransformationEngine(doc);
+  //   const e = Utils.construction.makeEngine(doc);
   //   e.renameField(e.getFieldID(KeyPath(['0', '5'])), KeyPath(['0', '1']));
   //   e.renameField(e.getFieldID(KeyPath(['0', '-1'])), KeyPath(['0', '0']));
   //   e.appendTransformation(TransformationNodeType.CaseNode, List([List(['0', '-1', -1])]), { format: 'uppercase' });
@@ -1253,7 +1254,7 @@ test('numeric keys', () =>
   // }
   {
     const doc = { '-1': [{ z: 1, 1: { 2: 1 } }, { z: 2.5 }] };
-    const e = new TransformationEngine(doc);
+    const e = Utils.construction.makeEngine(doc);
     e.appendTransformation(TransformationNodeType.AddNode, List([List(['-1', 0, '1', '2'])]), { shift: 13 });
     e.appendTransformation(TransformationNodeType.AddNode, List([List(['-1', -1, 'z'])]), { shift: 3 });
     expect(e.transform(doc)).toEqual({ '-1': [{ z: 4, 1: { 2: 14 } }, { z: 5.5 }] });
@@ -1273,7 +1274,7 @@ test('transform a zipcode', () =>
     zip8: '96400',
   };
 
-  const e: TransformationEngine = new TransformationEngine(doc);
+  const e: TransformationEngine = Utils.construction.makeEngine(doc);
   e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip1'])]), { format: 'latlon' });
   e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip2'])]), { format: 'city' });
   e.appendTransformation(TransformationNodeType.ZipcodeNode, List<KeyPath>([KeyPath(['zip3'])]), { format: 'state' });
@@ -1313,7 +1314,7 @@ test('remove duplicates test', () =>
   const doc = {
     fields: [1, 4, 3, 2, 2, 5, 1],
   };
-  const e = new TransformationEngine(doc);
+  const e = Utils.construction.makeEngine(doc);
   e.appendTransformation(
     TransformationNodeType.RemoveDuplicatesNode,
     wrap(['fields']),
@@ -1334,7 +1335,7 @@ test('remove nested duplicates test', () =>
       [5, 6, 7],
     ],
   };
-  const e = new TransformationEngine(doc);
+  const e = Utils.construction.makeEngine(doc);
   e.appendTransformation(
     TransformationNodeType.RemoveDuplicatesNode,
     wrap(['fields', -1]),
@@ -1355,7 +1356,7 @@ test('filter array test null', () =>
   const doc = {
     fields: [3, 2, null, 5, null, undefined],
   };
-  const e = Utils.construction.createEngineFromDocuments(List([doc])).engine;
+  const e = Utils.construction.makeEngine(doc);
 
   e.appendTransformation(
     TransformationNodeType.FilterArrayNode,
@@ -1373,7 +1374,7 @@ test('filter array test undefined', () =>
   const doc = {
     fields: [3, 2, null, 5, null, undefined],
   };
-  const e = new TransformationEngine(doc);
+  const e = Utils.construction.makeEngine(doc);
   e.appendTransformation(
     TransformationNodeType.FilterArrayNode,
     wrap(['fields']),
@@ -1390,7 +1391,7 @@ test('filter array test complex', () =>
   const doc = {
     fields: [3, 2, null, 5, null, undefined],
   };
-  const e = new TransformationEngine(doc);
+  const e = Utils.construction.makeEngine(doc);
   e.appendTransformation(
     TransformationNodeType.FilterArrayNode,
     wrap(['fields']),

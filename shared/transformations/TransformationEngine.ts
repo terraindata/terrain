@@ -99,7 +99,6 @@ export class TransformationEngine
     const parsedJSON: object = typeof json === 'string' ? TransformationEngine.parseSerializedString(json as string) : json as object;
     const e: TransformationEngine = new TransformationEngine();
     e.dag = GraphLib.json.read(parsedJSON['dag']) as TransformationGraph;
-    e.doc = parsedJSON['doc'];
     e.uidField = parsedJSON['uidField'];
     e.uidNode = parsedJSON['uidNode'];
     e.IDToPathMap = Map<number, KeyPath>(parsedJSON['IDToPathMap']);
@@ -137,7 +136,6 @@ export class TransformationEngine
   }
 
   private dag: TransformationGraph = new GraphLib.Graph({ directed: true }) as TransformationGraph;
-  private doc: object = {};
   private uidField: number = 0;
   private uidNode: number = 0;
   private fieldEnabled: Map<number, boolean> = Map<number, boolean>();
@@ -151,15 +149,9 @@ export class TransformationEngine
    *                     passed, is used to generate initial
    *                     field IDs and mappings
    */
-  constructor(doc?: object)
+  constructor()
   {
-    if (doc !== undefined)
-    {
-      this.doc = Object.assign({}, doc);
-      this.generateInitialFieldMaps(this.doc); // TODO can't return ID list here... disable this or what?
-      // initial field nodes can be implicit, DAG should only represent actual transformations
-    }
-    // allow construction without example doc (manually add fields)
+
   }
 
   public debug()
@@ -336,7 +328,6 @@ export class TransformationEngine
     // slightly verbose syntax is required to convert to plain JS arrays
     return {
       dag: GraphLib.json.write(this.dag),
-      doc: this.doc,
       uidField: this.uidField,
       uidNode: this.uidNode,
       IDToPathMap: this.IDToPathMap.map((v: KeyPath, k: number) => [k, v]).toArray(),
@@ -613,103 +604,5 @@ export class TransformationEngine
   protected addIdentity(fieldId: number, options: NodeOptionsType<TransformationNodeType.IdentityNode>): number
   {
     return this.appendTransformation(TransformationNodeType.IdentityNode, List([fieldId]), options);
-  }
-
-  private addPrimitiveField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any): List<number>
-  {
-    return ids.push(this.addField(currentKeyPath.push(key)));
-  }
-
-  private addArrayField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any, depth: number = 1): List<number>
-  {
-    let arrayType;
-    try
-    {
-      arrayType = arrayTypeOfValues(obj[key]);
-    }
-    catch (e)
-    {
-      // todo log?
-    }
-    if (arrayType === undefined)
-    {
-      arrayType = null;
-    }
-    const arrayID: number = this.addField(currentKeyPath.push(key));
-    ids = ids.push(arrayID);
-    let awkp: KeyPath = currentKeyPath.push(key);
-    awkp = awkp.slice(0, awkp.size - depth + 1).toList();
-    for (let i: number = 0; i < depth; i++)
-    {
-      awkp = awkp.push(-1);
-    }
-    const arrayWildcardID: number = this.addField(awkp);
-    ids = ids.push(arrayWildcardID);
-    for (let i: number = 0; i < obj[key].length; i++)
-    {
-      if (isPrimitive(obj[key][i]))
-      {
-        ids = this.addPrimitiveField(ids, obj[key], currentKeyPath.push(key), i);
-      } else if (Array.isArray(obj[key][i]))
-      {
-        ids = this.addArrayField(ids, obj[key], currentKeyPath.push(key), i, depth + 1);
-      } else
-      {
-        ids = ids.push(this.addField(currentKeyPath.push(key).push(i)));
-        ids = this.addObjectField(ids, obj[key][i], awkp, true);
-        ids = this.addObjectField(ids, obj[key][i], currentKeyPath.push(key).push(i), true);
-      }
-    }
-    return ids;
-  }
-
-  private addObjectField(ids: List<number>, obj: object, currentKeyPath: KeyPath, prevArray: boolean = false): List<number>
-  {
-    for (const key of Object.keys(obj))
-    {
-      if (isPrimitive(obj[key]))
-      {
-        if (prevArray && this.getFieldID(currentKeyPath.butLast().toList().push(-1).push(key)) === undefined)
-        {
-          ids = this.addPrimitiveField(ids, obj, currentKeyPath.butLast().toList().push(-1), key);
-        }
-        ids = this.addPrimitiveField(ids, obj, currentKeyPath, key);
-      } else if (obj[key].constructor === Array)
-      {
-        if (prevArray && this.getFieldID(currentKeyPath.butLast().toList().push(-1).push(key)) === undefined)
-        {
-          ids = this.addArrayField(ids, obj, currentKeyPath.butLast().toList().push(-1), key);
-        }
-        ids = this.addArrayField(ids, obj, currentKeyPath, key);
-      } else
-      {
-        if (prevArray && this.getFieldID(currentKeyPath.butLast().toList().push(-1).push(key)) === undefined)
-        {
-          // current children
-          ids = ids.push(this.addField(currentKeyPath.butLast().toList().push(-1).push(key)));
-          // recursive call with wildcard
-          ids = this.addObjectField(ids, obj[key], currentKeyPath.butLast().toList().push(-1).push(key));
-        }
-        ids = ids.push(this.addField(currentKeyPath.push(key)));
-        // recursive call without wildcard
-        ids = this.addObjectField(ids, obj[key], currentKeyPath.push(key));
-      }
-    }
-    return ids;
-  }
-
-  /**
-   * Private helper that parses an example document and registers all its fields,
-   * using the above helper functions.  Recursive.
-   *
-   * @param {object} obj               The document to parse
-   * @param {KeyPath} currentKeyPath   Recursive parameter; what path you've built up so far
-   * @returns {Immutable.List<number>} A list of field IDs added
-   */
-  private generateInitialFieldMaps(obj: object, currentKeyPath: KeyPath = List<string>()): List<number>
-  {
-    let ids: List<number> = List<number>();
-    ids = this.addObjectField(ids, obj, currentKeyPath);
-    return ids;
   }
 }

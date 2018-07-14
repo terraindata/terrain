@@ -139,6 +139,11 @@ export default abstract class ConstructionUtil
     };
   }
 
+  public static makeEngine(doc: object): TransformationEngine
+  {
+    return ConstructionUtil.createEngineFromDocuments(List([doc])).engine;
+  }
+
   private static buildTreeFromPathTypes(pathTypes: { [k: string]: TypeTracker }, onConflict: (msg: string) => void): FieldNode
   {
     const tree: FieldNode = {

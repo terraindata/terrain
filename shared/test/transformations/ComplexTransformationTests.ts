@@ -77,7 +77,7 @@ test('identity transformation for nested arrays', () =>
   };
 
   const copyOfDoc = _.cloneDeep(doc);
-  const e = new TransformationEngine(doc);
+  const e = Utils.construction.makeEngine(doc);
   const r = e.transform(doc);
   expect(r).toEqual(copyOfDoc);
 });
@@ -99,7 +99,7 @@ test('identity transformation for ui-constructed nested arrays', () =>
   };
 
   const copyOfDoc = _.cloneDeep(doc);
-  const e = Utils.construction.createEngineFromDocuments(List([doc])).engine;
+  const e = Utils.construction.makeEngine(doc);
   const r = e.transform(doc);
   expect(r).toEqual(copyOfDoc);
 });
@@ -112,7 +112,7 @@ test('join transformation where the first field does not exist', () =>
     f3: 'world',
   };
 
-  const e: TransformationEngine = new TransformationEngine(doc);
+  const e: TransformationEngine = Utils.construction.makeEngine(doc);
   e.addField(KeyPath(['f1']));
   e.appendTransformation(
     TransformationNodeType.JoinNode,
@@ -142,7 +142,7 @@ test('array sum on a nested array field', () =>
     ],
   };
 
-  const e: TransformationEngine = new TransformationEngine(doc);
+  const e: TransformationEngine = Utils.construction.makeEngine(doc);
   e.appendTransformation(
     TransformationNodeType.ArraySumNode,
     wrap(['foo', -1, 'values']),
@@ -169,7 +169,8 @@ test('extract an array field with duplicate', () =>
   const doc = {
     fields: ['foo', 'bar', 'baz'],
   };
-  const e = new TransformationEngine(doc);
+  const e = Utils.construction.makeEngine(doc);
+  e.addField(KeyPath(['fields', 0]));
   e.appendTransformation(
     TransformationNodeType.DuplicateNode,
     wrap(['fields', 0]),
@@ -193,7 +194,7 @@ describe('suite of complex duplication tests', () =>
 {
   function dupHelper(inKP: WayPoint[], outKP: WayPoint[], inDoc: object): object
   {
-    const e = new TransformationEngine(inDoc);
+    const e = Utils.construction.makeEngine(inDoc);
     e.appendTransformation(
       TransformationNodeType.DuplicateNode,
       wrap(inKP),
