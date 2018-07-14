@@ -55,10 +55,10 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { DateFormats, etlFieldTypesList, etlFieldTypesNames, FieldTypes } from 'shared/etl/types/ETLTypes';
-import * as Utils from 'shared/etl/util/ETLUtils';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
 import { DynamicForm } from 'common/components/DynamicForm';
@@ -106,7 +106,7 @@ export class CastTFF extends TransformationForm<CastOptions, TransformationNodeT
     const { fieldId, isCreate, engine } = this.props;
     if (isCreate)
     {
-      const etlType = Utils.engine.fieldType(fieldId, engine);
+      const etlType = Utils.fields.fieldType(fieldId, engine);
       const state: CastOptions = {
         toTypename: etlType,
       };

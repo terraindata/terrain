@@ -46,7 +46,7 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file
 
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
-import TypeUtil from 'shared/etl/TypeUtil';
+import TypeUtil from 'shared/transformations/util/TypeUtil';
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 
 type SimpleType = ReturnType<typeof TypeUtil['getSimpleType']>;

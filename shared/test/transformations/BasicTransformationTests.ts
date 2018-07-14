@@ -54,7 +54,7 @@ import * as yadeep from '../../util/yadeep';
 import { TestDocs } from './TestDocs';
 
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
-import * as Utils from 'shared/etl/util/ETLUtils';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 
 function wrap(kp: any[])
 {
@@ -240,7 +240,6 @@ test('join two fields', () =>
     List<KeyPath>([KeyPath(['meta', 'school']), KeyPath(['meta', 'sport'])]),
     {
       newFieldKeyPaths: List<KeyPath>([KeyPath(['meta', 'fullTeam'])]),
-      // preserveOldFields: false,
       delimiter: ' ',
     });
   const r = e.transform(TestDocs.doc2);
@@ -592,7 +591,6 @@ test('split a nested field', () =>
     List([List(['foo', -1, 'bar'])]),
     {
       newFieldKeyPaths: List([List(['foo', -1, 'a']), List(['foo', -1, 'b'])]),
-      preserveOldFields: true,
       delimiter: ' and ',
     },
   );
@@ -629,22 +627,22 @@ test('cast array to array should be no-op', () =>
   expect(e.transform(doc)).toEqual(doc);
 });
 
-test('delete a field that has transformations', () =>
-{
-  const e = new TransformationEngine();
-  const id1 = e.addField(List(['foo']));
-  e.addField(List(['bar']));
-  e.appendTransformation(TransformationNodeType.CastNode, List([List(['foo'])]),
-    {
-      toTypename: FieldTypes.String,
-    });
-  e.deleteField(id1);
-  const doc = {
-    foo: 'hi',
-    bar: 'yo',
-  };
-  expect(e.transform(doc)).toEqual({ bar: 'yo' });
-});
+// test('delete a field that has transformations', () =>
+// {
+//   const e = new TransformationEngine();
+//   const id1 = e.addField(List(['foo']));
+//   e.addField(List(['bar']));
+//   e.appendTransformation(TransformationNodeType.CastNode, List([List(['foo'])]),
+//     {
+//       toTypename: FieldTypes.String,
+//     });
+//   e.deleteField(id1);
+//   const doc = {
+//     foo: 'hi',
+//     bar: 'yo',
+//   };
+//   expect(e.transform(doc)).toEqual({ bar: 'yo' });
+// });
 
 test('cast on a field inside a nested object inside an array', () =>
 {
@@ -1182,7 +1180,6 @@ test('split a field that does not always exist', () =>
     List([List(['size'])]),
     {
       newFieldKeyPaths: List([List(['w']), List(['h'])]),
-      preserveOldFields: true,
       delimiter: ' x ',
     },
   );

@@ -52,10 +52,9 @@ const { List, Map } = Immutable;
 import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
-import * as Utils from 'shared/etl/util/ETLUtils';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
 export interface TransformationConfig
@@ -126,7 +125,7 @@ export class EngineProxy
       fields.forEach((kp) =>
       {
         const fieldId = this.engine.getFieldID(kp);
-        Utils.engine.changeType(this.engine, fieldId, config.newSourceType);
+        Utils.fields.changeType(this.engine, fieldId, config.newSourceType);
       });
     }
     if (options.newFieldKeyPaths !== undefined)
@@ -138,12 +137,12 @@ export class EngineProxy
 
         if (config !== undefined && config.type !== undefined)
         {
-          Utils.engine.setType(this.engine, newId, config.type);
+          Utils.fields.setType(this.engine, newId, config.type);
         }
         else
         {
-          const synthType = Utils.engine.fieldType(origFieldId, this.engine);
-          Utils.engine.setType(this.engine, newId, synthType);
+          const synthType = Utils.fields.fieldType(origFieldId, this.engine);
+          Utils.fields.setType(this.engine, newId, synthType);
         }
       });
     }
@@ -186,7 +185,7 @@ export class EngineProxy
       throw new Error('Cannot extract array field, source keypath is empty');
     }
     const specifiedSourceKP = sourceKP.set(sourceKP.size - 1, index);
-    const specifiedSourceType = Utils.engine.fieldType(sourceId, this.engine);
+    const specifiedSourceType = Utils.fields.fieldType(sourceId, this.engine);
 
     let specifiedSourceId: number;
 
@@ -197,7 +196,7 @@ export class EngineProxy
       {
         throw new Error('Field type is array, but could not find any children in the Transformation Engine');
       }
-      const childType = Utils.engine.fieldType(anyChildId, this.engine);
+      const childType = Utils.fields.fieldType(anyChildId, this.engine);
       specifiedSourceId = this.addField(specifiedSourceKP, FieldTypes.Array, childType);
     }
     else
@@ -223,9 +222,9 @@ export class EngineProxy
     );
     const newFieldId = this.engine.getFieldID(destKP);
 
-    const newFieldType = Utils.engine.fieldType(sourceId, this.engine);
+    const newFieldType = Utils.fields.fieldType(sourceId, this.engine);
     this.addFieldToEngine(destKP.push(-1), newFieldType);
-    Utils.engine.setType(this.engine, newFieldId, FieldTypes.Array);
+    Utils.fields.setType(this.engine, newFieldId, FieldTypes.Array);
     this.requestRebuild();
   }
 
@@ -241,7 +240,7 @@ export class EngineProxy
     {
       newId = this.addFieldToEngine(keypath, type);
     }
-    Utils.engine.castField(this.engine, newId, type);
+    Utils.transformations.castField(this.engine, newId, type);
     this.requestRebuild();
     return newId;
   }
@@ -249,7 +248,7 @@ export class EngineProxy
   public addRootField(name: string, type: FieldTypes)
   {
     const pathToAdd = List([name]);
-    if (validateNewFieldName(this.engine, -1, pathToAdd).isValid)
+    if (Utils.validation.canAddField(this.engine, -1, pathToAdd).isValid)
     {
       this.addField(pathToAdd, type);
       this.requestRebuild();
@@ -297,7 +296,7 @@ export class EngineProxy
       optionsNew,
     );
     const newFieldId = this.engine.getFieldID(destKP);
-    Utils.engine.transferFieldData(sourceId, newFieldId, this.engine, this.engine);
+    Utils.fields.transferFieldData(sourceId, newFieldId, this.engine, this.engine);
     this.requestRebuild();
     return newFieldId;
   }
@@ -307,7 +306,7 @@ export class EngineProxy
     etlType: FieldTypes,
   ): number
   {
-    return Utils.engine.addFieldToEngine(this.engine, keypath, etlType);
+    return Utils.fields.addFieldToEngine(this.engine, keypath, etlType);
   }
 }
 
@@ -338,7 +337,7 @@ export class FieldProxy
         return;
       }
 
-      const dependents: List<number> = Utils.engine.getFieldDependents(this.engine, fieldId);
+      const dependents: List<number> = Utils.traversal.getFieldDependents(this.engine, fieldId);
       if (dependents.size > 0)
       {
         const paths = JSON.stringify(
@@ -367,7 +366,7 @@ export class FieldProxy
 
   public structuralChangeName(newPath: EnginePath)
   {
-    if (validateRename(this.engine, this.fieldId, newPath).isValid)
+    if (Utils.validation.canRename(this.engine, this.fieldId, newPath).isValid)
     {
       // Transformation Engine automatically reassigns child output paths
       this.engine.renameField(this.fieldId, newPath);
@@ -389,7 +388,7 @@ export class FieldProxy
   public addNewField(name: string, type: FieldTypes)
   {
     const newPath = this.engine.getFieldPath(this.fieldId).push(name);
-    if (validateNewFieldName(this.engine, this.fieldId, newPath).isValid)
+    if (Utils.validation.canAddField(this.engine, this.fieldId, newPath).isValid)
     {
       this.engineProxy.addField(newPath, type);
       this.syncWithEngine(true);
@@ -402,7 +401,7 @@ export class FieldProxy
 
   public changeType(newType: FieldTypes)
   {
-    const oldType = Utils.engine.fieldType(this.fieldId, this.engine);
+    const oldType = Utils.fields.fieldType(this.fieldId, this.engine);
     if (oldType === newType)
     {
       return;
@@ -421,14 +420,14 @@ export class FieldProxy
       }
     }
 
-    Utils.engine.changeType(this.engine, this.fieldId, newType);
-    Utils.engine.castField(this.engine, this.fieldId, newType);
+    Utils.fields.changeType(this.engine, this.fieldId, newType);
+    Utils.transformations.castField(this.engine, this.fieldId, newType);
 
     if (newType === FieldTypes.Array)
     {
       const childPath = this.engine.getFieldPath(this.fieldId).push(-1);
-      Utils.engine.addFieldToEngine(this.engine, childPath, FieldTypes.String);
-      Utils.engine.setType(this.engine, this.fieldId, FieldTypes.Array);
+      Utils.fields.addFieldToEngine(this.engine, childPath, FieldTypes.String);
+      Utils.fields.setType(this.engine, this.fieldId, FieldTypes.Array);
     }
 
     this.syncWithEngine(true);

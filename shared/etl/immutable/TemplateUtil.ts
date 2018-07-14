@@ -55,9 +55,9 @@ import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
-import * as Utils from 'shared/etl/util/ETLUtils';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
 import
@@ -186,7 +186,7 @@ export default class TemplateUtil
         {
           const parentPath = okp.slice(0, -1).toList();
           const parentID = engine.getFieldID(parentPath);
-          const type = Utils.engine.fieldType(parentID, engine);
+          const type = Utils.fields.fieldType(parentID, engine);
           if (type !== FieldTypes.Array && type !== FieldTypes.Object)
           {
             errors.push(`Field ${okp.toJS()} has a parent that is not an array or object`);

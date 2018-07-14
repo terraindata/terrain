@@ -63,7 +63,7 @@ import TransformationVisitResult from './TransformationVisitResult';
 
 import { Edge, TransformationGraph } from 'shared/transformations/TypedGraph';
 
-import * as Utils from 'shared/etl/util/ETLUtils';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 
 /*
  *  This visitor will be called after the transformation engine creates the node in the dag.
@@ -152,7 +152,7 @@ export default class CreationVisitor
       {
         const pathAfterRoot = engine.getFieldPath(childId).slice(sourcePath.size);
         const newFieldPath = rootPath.concat(pathAfterRoot).toList();
-        const newFieldId = Utils.engine.copyField(engine, childId, newFieldPath, node);
+        const newFieldId = Utils.fields.copyField(engine, childId, newFieldPath, node);
         const childEnd = Utils.traversal.findEndTransformation(engine, childId);
         Utils.traversal.prependNodeToField(engine, newFieldId, childEnd, EdgeTypes.Synthetic);
       }

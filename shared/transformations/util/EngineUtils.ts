@@ -46,16 +46,20 @@ THE SOFTWARE.
 
 // rename this file when other util files get cleaned up
 
-import TypeUtil from 'shared/etl/TypeUtil';
 import ConstructionUtil from 'shared/transformations/util/ConstructionUtil';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+import FieldUtil from 'shared/transformations/util/FieldUtil';
 import TopologyUtil from 'shared/transformations/util/TopologyUtil';
+import TransformationsUtil from 'shared/transformations/util/TransformationsUtil';
 import TraversalUtil from 'shared/transformations/util/TraversalUtil';
+import TypeUtil from 'shared/transformations/util/TypeUtil';
+import ValidationUtil from 'shared/transformations/util/ValidationUtil';
 import { KeyPathUtil } from 'shared/util/KeyPath';
 
 export { TypeUtil as type };
 export { KeyPathUtil as path };
 export { TopologyUtil as topology };
 export { ConstructionUtil as construction };
-export { EngineUtil as engine };
+export { FieldUtil as fields };
+export { TransformationsUtil as transformations };
 export { TraversalUtil as traversal };
+export { ValidationUtil as validation };

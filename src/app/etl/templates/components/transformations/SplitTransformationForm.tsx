@@ -69,7 +69,6 @@ interface SplitOptions
 {
   leftName: string;
   rightName: string;
-  preserveOldFields: boolean;
   delimiter: string | number;
   regex: boolean;
 }
@@ -103,16 +102,10 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
       group: 'row2',
       widthFactor: -1,
     },
-    preserveOldFields: {
-      type: DisplayType.CheckBox,
-      displayName: 'Keep Original Field',
-      widthFactor: 3,
-    },
   };
   protected readonly initialState = {
     leftName: 'Split Field 1',
     rightName: 'Split Field 2',
-    preserveOldFields: false,
     delimiter: '-',
     regex: false,
   };
@@ -131,7 +124,6 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
       return {
         leftName: meta.newFieldKeyPaths.size > 0 ? meta.newFieldKeyPaths.get(0).last().toString() : '',
         rightName: meta.newFieldKeyPaths.size > 1 ? meta.newFieldKeyPaths.get(1).last().toString() : '',
-        preserveOldFields: meta.preserveOldFields,
         delimiter: meta.delimiter,
         regex: meta.regex,
       };
@@ -141,7 +133,7 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
   protected computeArgs()
   {
     const { engine, fieldId } = this.props;
-    const { leftName, rightName, delimiter, preserveOldFields, regex } = this.state;
+    const { leftName, rightName, delimiter, regex } = this.state;
     const args = super.computeArgs();
 
     const currentKeyPath = engine.getFieldPath(fieldId);
@@ -156,7 +148,6 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
       options: {
         newFieldKeyPaths,
         delimiter,
-        preserveOldFields,
         regex,
       },
       fields: args.fields,

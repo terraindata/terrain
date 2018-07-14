@@ -53,7 +53,7 @@ import { KeyPath, WayPoint } from '../../util/KeyPath';
 import * as yadeep from '../../util/yadeep';
 import { TestDocs } from './TestDocs';
 
-import * as Utils from 'shared/etl/util/ETLUtils';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 
 function wrap(kp: any[])
 {

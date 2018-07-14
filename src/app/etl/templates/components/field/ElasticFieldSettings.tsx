@@ -68,7 +68,7 @@ import
 } from 'etl/templates/FieldTypes';
 import { defaultProps, ElasticAnalyzers, ElasticFieldProps, ElasticTypes, ETLToElasticOptions } from 'shared/etl/types/ETLElasticTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
-import * as Utils from 'shared/etl/util/ETLUtils';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './FieldSettings.less';
@@ -128,7 +128,7 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
 
   public showPrimaryKey(s: ElasticFieldProps)
   {
-    const etlType = Utils.engine.fieldType(this.props.fieldId, this._currentEngine());
+    const etlType = Utils.fields.fieldType(this.props.fieldId, this._currentEngine());
     return (etlType === FieldTypes.String || etlType === FieldTypes.Number || etlType === FieldTypes.Integer)
       && this._isRootField() ?
       DisplayState.Active : DisplayState.Inactive;
@@ -136,7 +136,7 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
 
   public showIsAnalyzed(s: ElasticFieldProps)
   {
-    const etlType = Utils.engine.fieldType(this.props.fieldId, this._currentEngine());
+    const etlType = Utils.fields.fieldType(this.props.fieldId, this._currentEngine());
     return (etlType === FieldTypes.String && !s.isPrimaryKey) ?
       DisplayState.Active : DisplayState.Inactive;
   }

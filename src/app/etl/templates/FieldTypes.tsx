@@ -54,7 +54,7 @@ import TransformationNodeType from 'shared/transformations/TransformationNodeTyp
 import { NodeOptionsType, NodeTypes } from 'shared/transformations/TransformationNodeType';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
-import * as Utils from 'shared/etl/util/ETLUtils';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 
 // only put fields in here that are needed to track display-sensitive state
 class TemplateFieldC

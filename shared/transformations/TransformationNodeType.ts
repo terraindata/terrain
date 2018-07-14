@@ -112,13 +112,11 @@ interface TransformationOptionTypes extends HasCommon<TransformationOptionTypes>
   };
   SplitNode: {
     newFieldKeyPaths: List<KeyPath>;
-    preserveOldFields: boolean;
     delimiter: string | number;
     regex: boolean;
   };
   JoinNode: {
     newFieldKeyPaths: List<KeyPath>;
-    preserveOldFields: boolean;
     delimiter: string;
   };
   RenameNode: {

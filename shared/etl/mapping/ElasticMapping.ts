@@ -55,7 +55,7 @@ import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { KeyPath, KeyPath as EnginePath } from 'shared/util/KeyPath';
 
-import * as Utils from 'shared/etl/util/ETLUtils';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 
 interface PathHashMap<T>
 {
@@ -286,7 +286,7 @@ export class ElasticMapping
   {
     const elasticProps = ElasticMapping.getElasticProps(fieldID, engine);
 
-    const etlType = Utils.engine.fieldType(fieldID, engine);
+    const etlType = Utils.fields.fieldType(fieldID, engine);
     const elasticType = elasticProps.elasticType === ElasticTypes.Auto ?
       etlTypeToElastic(etlType)
       :
@@ -347,7 +347,7 @@ export class ElasticMapping
 
   protected getETLType(fieldID: number): FieldTypes
   {
-    return Utils.engine.fieldType(fieldID, this.engine);
+    return Utils.fields.fieldType(fieldID, this.engine);
   }
 
   protected clearGeopointMappings(disabledFields: { [k: number]: boolean })

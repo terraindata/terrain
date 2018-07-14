@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import { List } from 'immutable';
 import * as _ from 'lodash';
-import * as Utils from 'shared/etl/util/ETLUtils';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
@@ -57,30 +57,8 @@ import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 
 const etlTypeKeyPath = List(['etlType']);
-export default class EngineUtil
+export default class FieldUtil
 {
-  // refactor this
-  public static getFieldDependents(engine: TransformationEngine, fieldId: number): List<number>
-  {
-    const transformations = engine.getTransformations(fieldId);
-    const asSet = transformations.flatMap((id) =>
-    {
-      const transformation = engine.getTransformationInfo(id);
-      const nfkp: List<KeyPath> = _.get(transformation, ['meta', 'newFieldKeyPaths']);
-      if (nfkp === undefined)
-      {
-        return undefined;
-      }
-      else
-      {
-        return nfkp;
-      }
-    }).map((kp) => engine.getFieldID(kp))
-      .toList()
-      .toSet();
-    return List(asSet);
-  }
-
   public static addFieldToEngine(
     engine: TransformationEngine,
     keypath: KeyPath,
@@ -104,11 +82,10 @@ export default class EngineUtil
 
   public static changeType(engine: TransformationEngine, fieldId: number, type: FieldTypes)
   {
-    EngineUtil.changeFieldTypeSideEffects(engine, fieldId, type);
-    EngineUtil.setType(engine, fieldId, type);
+    FieldUtil.changeFieldTypeSideEffects(engine, fieldId, type);
+    FieldUtil.setType(engine, fieldId, type);
   }
 
-  // get the ETL type of a field
   public static fieldType(id: number, engine: TransformationEngine): FieldTypes
   {
     const etlType = engine.getFieldProp(id, etlTypeKeyPath) as FieldTypes;
@@ -123,50 +100,10 @@ export default class EngineUtil
       .changeFieldTypeSideEffects(engine, fieldId, newType);
   }
 
-  // cast the field to the specified type (or the field's current type if type is not specified)
-  public static castField(engine: TransformationEngine, fieldId: number, type?: FieldTypes, format?: DateFormats)
-  {
-    const ikp = engine.getFieldPath(fieldId);
-    const etlType: FieldTypes = type === undefined ? EngineUtil.fieldType(fieldId, engine) : type;
-
-    if (etlType === FieldTypes.Date && format === undefined)
-    {
-      format = DateFormats.ISOstring;
-    }
-
-    const transformOptions: NodeOptionsType<TransformationNodeType.CastNode> = {
-      toTypename: etlType,
-      format,
-    };
-
-    engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), transformOptions);
-  }
-
-  // TODO move this to an "analysis" or "Transformations util"
-  public static addInitialTypeCasts(engine: TransformationEngine)
-  {
-    engine.getAllFieldIDs().forEach((id) =>
-    {
-      const firstCastIndex = engine.getTransformations(id).findIndex((transformId) =>
-      {
-        const node = engine.getTransformationInfo(transformId);
-        return node.typeCode === TransformationNodeType.CastNode;
-      });
-
-      // do not perform casts if there is already a cast
-      if (firstCastIndex !== -1)
-      {
-        return;
-      }
-
-      EngineUtil.castField(engine, id);
-    });
-  }
-
   public static copyField(e1: TransformationEngine, id1: number, keypath: KeyPath, node?: number, e2 = e1)
   {
     const id2 = e2.addField(keypath, {}, node);
-    EngineUtil.transferFieldData(id1, id2, e1, e2);
+    FieldUtil.transferFieldData(id1, id2, e1, e2);
     return id2;
   }
 

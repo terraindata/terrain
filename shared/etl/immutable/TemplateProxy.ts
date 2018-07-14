@@ -55,9 +55,9 @@ import { ETLTemplate, SinksMap, SourcesMap } from 'shared/etl/immutable/Template
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages } from 'shared/etl/types/ETLTypes';
-import * as Utils from 'shared/etl/util/ETLUtils';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
 import
@@ -160,7 +160,6 @@ export class TemplateProxy
       options.outputKey,
     );
     this.setEdgeTransformations(newEdgeId, newEngine);
-    // this.performTypeDetection(newEdgeId);
   }
 
   // delete a source and its node
@@ -195,7 +194,6 @@ export class TemplateProxy
 
   public createInitialEdgeEngine(edgeId: number, documents: List<object>): string[]
   {
-    const { engine, errors } = Utils.construction.createEngineFromDocuments(documents);
     let castStringsToPrimitives = false;
     const fromNode = this.template.getNode(this.template.getEdge(edgeId).from);
     if (fromNode.type === NodeTypes.Source)
@@ -210,12 +208,10 @@ export class TemplateProxy
         castStringsToPrimitives = true;
       }
     }
+
+    const { engine, errors } = Utils.construction.createEngineFromDocuments(documents, castStringsToPrimitives);
+    Utils.transformations.addInitialTypeCasts(engine);
     this.setEdgeTransformations(edgeId, engine);
-    this.performTypeDetection(edgeId,
-      {
-        documents,
-        castStringsToPrimitives,
-      });
     this.cleanFieldOrdering(edgeId);
     return errors;
   }
@@ -291,22 +287,6 @@ export class TemplateProxy
       .map((id) => engine.getFieldPath(id).last());
     sink = sink.setIn(['fileConfig', 'fieldOrdering'], rootNames.toArray());
     this.setSink(key, sink);
-  }
-
-  // Add automatic type casts to fields, and apply language specific type checking
-  // if documentConfig is provided, do additional type checking / inference
-  private performTypeDetection(
-    edgeId: number,
-    documentConfig?: {
-      documents: List<object>,
-      castStringsToPrimitives?: boolean,
-    },
-  )
-  {
-    const engine = this.template.getTransformationEngine(edgeId);
-
-    // Utils.engine.interpretETLTypes(engine, documentConfig);
-    Utils.engine.addInitialTypeCasts(engine);
   }
 
   private createNode(node: ETLNode): number

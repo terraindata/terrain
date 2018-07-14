@@ -53,16 +53,15 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 const { List, Map } = Immutable;
 
-import Autocomplete from 'common/components/Autocomplete';
 import Modal from 'common/components/Modal';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './EditorFieldModal.less';
@@ -123,7 +122,7 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
   @instanceFnDecorator(memoizeOne)
   public _validateKeyPath(engine, engineVersion, field, pathKP: KeyPath)
   {
-    return validateRename(engine, field.fieldId, pathKP);
+    return Utils.validation.canRename(engine, field.fieldId, pathKP);
   }
 
   public validateKeyPath(): { isValid: boolean, message: string }

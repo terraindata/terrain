@@ -53,7 +53,7 @@ import * as React from 'react';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
-import * as Utils from 'shared/etl/util/ETLUtils';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
@@ -134,8 +134,8 @@ export class NumericFormBase<NodeType extends TransformationNodeType>
     return engine.getAllFieldIDs().filter((id, i) => fieldId !== id
       && Topology.areFieldsLocal(currentKP, engine.getFieldPath(id))
       && (
-        Utils.engine.fieldType(id, engine) === FieldTypes.Number ||
-        Utils.engine.fieldType(id, engine) === FieldTypes.Integer
+        Utils.fields.fieldType(id, engine) === FieldTypes.Number ||
+        Utils.fields.fieldType(id, engine) === FieldTypes.Integer
       ),
     ).toList();
   }

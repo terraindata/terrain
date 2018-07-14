@@ -49,7 +49,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
-import * as Utils from 'shared/etl/util/ETLUtils';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -82,16 +82,16 @@ export default abstract class ConstructionUtil
     leftEngine.getAllFieldIDs().forEach((id) =>
     {
       const keypath = leftEngine.getFieldPath(id);
-      const newId = Utils.engine.copyField(leftEngine, id, keypath, undefined, newEngine);
+      const newId = Utils.fields.copyField(leftEngine, id, keypath, undefined, newEngine);
     });
     const outputKeyPathBase = List([outputKey, -1]);
-    const outputFieldId = Utils.engine.addFieldToEngine(newEngine, List([outputKey]), FieldTypes.Array);
-    const outputFieldWildcardId = Utils.engine.addFieldToEngine(newEngine, outputKeyPathBase, FieldTypes.Object);
+    const outputFieldId = Utils.fields.addFieldToEngine(newEngine, List([outputKey]), FieldTypes.Array);
+    const outputFieldWildcardId = Utils.fields.addFieldToEngine(newEngine, outputKeyPathBase, FieldTypes.Object);
 
     rightEngine.getAllFieldIDs().forEach((id) =>
     {
       const newKeyPath = outputKeyPathBase.concat(rightEngine.getFieldPath(id)).toList();
-      const newId = Utils.engine.copyField(rightEngine, id, newKeyPath, undefined, newEngine);
+      const newId = Utils.fields.copyField(rightEngine, id, newKeyPath, undefined, newEngine);
     });
     return newEngine;
   }

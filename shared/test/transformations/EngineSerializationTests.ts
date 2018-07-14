@@ -178,7 +178,6 @@ test('split a field (regex delimiter) after serialize/deserialize trip', () =>
   const e: TransformationEngine = new TransformationEngine(doc);
   const opts = {
     newFieldKeyPaths: List<KeyPath>([KeyPath(['s1']), KeyPath(['s2']), KeyPath(['s3'])]),
-    // preserveOldFields: false,
     delimiter: '[\\s,]+',
     regex: true,
   };

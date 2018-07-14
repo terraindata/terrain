@@ -47,135 +47,50 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
-import { FieldTypes } from 'shared/etl/types/ETLTypes';
-import * as Utils from 'shared/etl/util/ETLUtils';
+import { DateFormats, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import Topology from 'shared/transformations/util/TopologyUtil';
-import { KeyPath, KeyPathUtil as PathUtil } from 'shared/util/KeyPath';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 
-// return true if the given keypath would be a valid new child field under provided fieldId
-// if fieldId is not provided or -1, then it does not consider the new field as a child field
-// (e.g. a root level field)
-export function validateNewFieldName(
-  engine: TransformationEngine,
-  fieldId: number,
-  newKeyPath: KeyPath,
-):
-  {
-    isValid: boolean,
-    message: string,
-  }
+export default abstract class TransformationsUtil
 {
-  if (newKeyPath.last() === '')
-  {
-    return {
-      isValid: false,
-      message: 'Invalid Name. Names cannot be empty',
-    };
-  }
-  if (newKeyPath.last() === -1)
-  {
-    return {
-      isValid: false,
-      message: 'Invalid Name. Name cannot be \'*\'',
-    };
-  }
-  const otherId = engine.getFieldID(newKeyPath);
-  if (otherId !== undefined && otherId !== fieldId)
-  {
-    return {
-      isValid: false,
-      message: 'Invalid Name. This field already exists',
-    };
-  }
 
-  if (fieldId !== undefined && fieldId !== -1)
+  // cast the field to the specified type (or the field's current type if type is not specified)
+  public static castField(engine: TransformationEngine, fieldId: number, type?: FieldTypes, format?: DateFormats)
   {
-    const parentType = Utils.engine.fieldType(fieldId, engine);
-    if (parentType !== FieldTypes.Object && parentType !== FieldTypes.Array)
+    const ikp = engine.getFieldPath(fieldId);
+    const etlType: FieldTypes = type === undefined ? Utils.fields.fieldType(fieldId, engine) : type;
+
+    if (etlType === FieldTypes.Date && format === undefined)
     {
-      return {
-        isValid: false,
-        message: 'Invalid Rename. Parent fields is not a nested object',
-      };
+      format = DateFormats.ISOstring;
     }
+
+    const transformOptions: NodeOptionsType<TransformationNodeType.CastNode> = {
+      toTypename: etlType,
+      format,
+    };
+
+    engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), transformOptions);
   }
 
-  return {
-    isValid: true,
-    message: '',
-  };
-}
-
-export function validateRename(
-  engine: TransformationEngine,
-  fieldId: number,
-  newKeyPath: KeyPath,
-):
+  public static addInitialTypeCasts(engine: TransformationEngine)
   {
-    isValid: boolean,
-    message: string,
-  }
-{
-  const existingKp = engine.getFieldPath(fieldId);
-  const failIndex = newKeyPath.findIndex((value) => value === '');
-  if (failIndex !== -1)
-  {
-    return {
-      isValid: false,
-      message: 'Invalid Rename. Names cannot be empty',
-    };
-  }
-  if (typeof newKeyPath.last() === 'number')
-  {
-    return {
-      isValid: false,
-      message: 'Invalid Rename. Name cannot end with a number',
-    };
-  }
-  const otherId = engine.getFieldID(newKeyPath);
-  if (otherId !== undefined && otherId !== fieldId)
-  {
-    return {
-      isValid: false,
-      message: 'Invalid Rename. This field already exists',
-    };
-  }
-  else if (!PathUtil.isNamed(existingKp))
-  {
-    return {
-      isValid: false,
-      message: 'Invalid Rename. Cannot rename a dynamic field',
-    };
-  }
-
-  if (!Topology.areFieldsLocal(existingKp, newKeyPath))
-  {
-    return {
-      isValid: false,
-      message: 'Invalid Rename. Cannot move field between array levels',
-    };
-  }
-
-  for (let i = 1; i < newKeyPath.size; i++)
-  {
-    const kpToTest = newKeyPath.slice(0, i).toList();
-    const parentId = engine.getFieldID(kpToTest);
-    if (parentId !== undefined)
+    engine.getAllFieldIDs().forEach((id) =>
     {
-      const parentType = Utils.engine.fieldType(parentId, engine);
-      if (parentType !== FieldTypes.Object && parentType !== FieldTypes.Array)
+      const firstCastIndex = engine.getTransformations(id).findIndex((transformId) =>
       {
-        return {
-          isValid: false,
-          message: 'Invalid Rename. One of the ancestor fields is not a nested object',
-        };
-      }
-    }
-  }
+        const node = engine.getTransformationInfo(transformId);
+        return node.typeCode === TransformationNodeType.CastNode;
+      });
 
-  return {
-    isValid: true,
-    message: '',
-  };
+      // do not perform casts if there is already a cast
+      if (firstCastIndex !== -1)
+      {
+        return;
+      }
+
+      TransformationsUtil.castField(engine, id);
+    });
+  }
 }

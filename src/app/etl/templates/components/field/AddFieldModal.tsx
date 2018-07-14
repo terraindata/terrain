@@ -52,23 +52,22 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
-const { List, Map } = Immutable;
 
-import Autocomplete from 'common/components/Autocomplete';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import Modal from 'common/components/Modal';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
-import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { etlFieldTypesList, etlFieldTypesNames, FieldTypes } from 'shared/etl/types/ETLTypes';
-import { validateNewFieldName } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+
+const { List, Map } = Immutable;
 
 import './EditorFieldModal.less';
 
@@ -135,7 +134,7 @@ class AddFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
   @instanceFnDecorator(memoizeOne)
   public _validateKeyPath(engine, engineVersion, field, pathKP: KeyPath)
   {
-    return validateNewFieldName(engine, field.fieldId, pathKP);
+    return Utils.validation.canAddField(engine, field.fieldId, pathKP);
   }
 
   public validateKeyPath(): { isValid: boolean, message: string }
@@ -241,7 +240,7 @@ class AddRootFieldModalC extends TerrainComponent<RootFieldProps>
   public _validateKeyPath(engine, engineVersion, name: string)
   {
     const pathKP = List([name]);
-    return validateNewFieldName(engine, -1, pathKP);
+    return Utils.validation.canAddField(engine, -1, pathKP);
   }
 
   public validateKeyPath(): { isValid: boolean, message: string }
