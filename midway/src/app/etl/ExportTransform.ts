@@ -67,20 +67,14 @@ export default class ExportTransform extends ADocumentTransform
 {
   private rank: number = 0;
   private includeRank: boolean = true;
-  private scoreNormalization: number = 1;
   private normalizeScore: boolean = false;
 
   constructor(cfg: ExportTransformOptions = {})
   {
     super();
     const options: ExportTransformOptions = _.extend({}, optionsDefaults, cfg);
-    const { includeRank, scoreNormalization, startingRank } = options;
+    const { includeRank, startingRank } = options;
 
-    if (scoreNormalization !== undefined && !isNaN(scoreNormalization) && scoreNormalization !== 0)
-    {
-      this.normalizeScore = true;
-      this.scoreNormalization = scoreNormalization;
-    }
     this.includeRank = includeRank;
     this.rank = startingRank;
   }
@@ -95,12 +89,6 @@ export default class ExportTransform extends ADocumentTransform
     return input['hits'].hits.map((hit) =>
     {
       const doc = mergeDocument(hit)['_source'];
-      if (this.normalizeScore)
-      {
-        const normalized = doc['TerrainScore'] / this.scoreNormalization;
-        doc['TerrainScore'] = normalized;
-      }
-
       return this.process(doc);
     });
   }

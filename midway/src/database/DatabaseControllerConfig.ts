@@ -128,7 +128,7 @@ export class DatabaseControllerConfig
     {
       const config = Util.dsn.parseDSNConfig(dsnString);
       this.config = {
-        hosts: [config.host + ':' + config.port.toString()],
+        hosts: [config.host + ':' + String(config.port)],
         httpAuth: config.user + ':' + config.password,
         keepAlive: false,
         requestTimeout: 600000,

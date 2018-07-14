@@ -57,26 +57,70 @@ if [ -z "$VERSION" ]
     echo "IMPORTANT: No version supplied, assuming version 5";
 fi
 
+echo "*************************************************"
+echo "Welcome to Deploy-o-matic 30024"
+echo "It is our pleasure to deploy you today"
+echo "When presented with [y/n] options, a single letter answer will suffice"
+echo "When available, the default will be uppercase (e.g., [Y\n] defaults to Yes)"
+echo "Simply press Enter / Return to accept that default."
+echo "*************************************************"
 
+echo ""
 
-echo "Default is to deploy to staging."
-read -n1 -p "Deploy to production instead? [y/N] " PRODUCTION
+echo "Let's make sure you have permissions on this host."
+echo "Look for an error message about public key denied below:"
+echo "-------------------------------------------------"
+echo ""
+
+ssh terrain@${ADDRESS} << EOF
+echo "ssh'd in"
+EOF
+
+echo ""
+echo "-------------------------------------------------"
+echo "*************************************************"
+
+echo "Above, did you see a message saying you were rejected because of your publickey?"
+read -n1 -p "Did you? [y\N] " HAS_PERMS
+echo ""
+if [ "$HAS_PERMS" = "y" ] || [ "$HAS_PERMS" = "Y" ]
+  then 
+    echo "Ah, you need to get a kind wizard like Justin or Luke to give you perms."
+    echo "Ta-ta for now."
+    exit 1;
+  else
+    echo "Excellent, your credentials have served you well."
+fi
+
+echo ""
+echo "*************************************************"
+
+echo "Our default is to deploy to staging."
+read -n1 -p "Would you care to deploy to production instead? [y/N] " PRODUCTION
 echo ""
 
 if [ "$PRODUCTION" = "y" ] || [ "$PRODUCTION" = "Y" ]
   then
-    read -n1 -p "Please confirm you want to eploy to production? [y/N] " PRODUCTION
+    read -n1 -p "Please confirm you desire to deploy to production? [y/N] " PRODUCTION
     echo ""
     if [ "$PRODUCTION" = "y" ] || [ "$PRODUCTION" = "Y" ]
       then
         PRODUCTION=true
       else
-        echo "Mismatched input, aborting!"
+        echo "Mismatched input, aborting! Please re-attempt your deploy, kind engineer!"
         exit 1;
     fi
+    read -n1 -p "Do you also want to kill Staging and switch the staging DB to be the production DB? [y/N] " SWITCH_RESPONSE
+    if [ "$SWITCH_RESPONSE" = "y" ] || [ "$SWITCH_RESPONSE" = "Y" ]
+      then
+        SWITCH_FROM_STAGING="switch"
+    fi
+    echo ""
   else
     PRODUCTION=""
-    read -n1 -p "Stage production DB? [Y/n] " STAGE_DB
+    echo "*************************************************"
+    echo "When deploying to Staging for the first time, it is common to copy the production DB to a staging DB."
+    read -n1 -p "Copy production DB to staging DB? [y\N] " STAGE_DB
     echo ""
     if [ "$STAGE_DB" = "y" ] || [ "$STAGE_DB" = "Y" ]
       then
@@ -92,16 +136,17 @@ if [ "$PRODUCTION" = "y" ] || [ "$PRODUCTION" = "Y" ]
                 SOURCE_DB_NAME="${CUSTNAME}_production"
             fi
             
-            echo "Default source DB for version ${VERSION} to copy is ${SOURCE_DB_NAME}"
-            read -n1 -p "Is this ok? [y\N] " STAGE_DB_CONFIRM
-            echo ""
-            if [ "$STAGE_DB_CONFIRM" = "y" ] || [ "$STAGE_DB_CONFIRM" = "Y" ]
-              then
-                echo "Thanks for confirming."
-              else
-                echo "Aborting!"
-                exit 1;
-            fi
+            # Used to ask to confirm the default option, but this was annoying.
+            # echo "Default source DB for version ${VERSION} to copy is ${SOURCE_DB_NAME}"
+            # read -n1 -p "Is this ok? [y\N] " STAGE_DB_CONFIRM
+            # echo ""
+            # if [ "$STAGE_DB_CONFIRM" = "y" ] || [ "$STAGE_DB_CONFIRM" = "Y" ]
+            #   then
+            #     echo "Thanks for confirming."
+            #   else
+            #     echo "Aborting!"
+            #     exit 1;
+            # fi
         fi
         
       else
@@ -156,7 +201,10 @@ if [ "$STAGE_DB" ]
     MIGRATION_COMMAND=""
     if [ "$VERSION" = "5" ]
       then
-        MIGRATION_COMMAND="psql -U 't3rr41n-demo' -d ${MIDWAY_DB} -h localhost -f scripts/MIDWAY_PG_MIGRATION.sql"
+        read -r -d '' MIGRATION_COMMAND << EOM
+        psql -U 't3rr41n-demo' -d ${MIDWAY_DB} -h localhost -f scripts/MIDWAY_PG_MIGRATION.sql;
+        psql -U 't3rr41n-demo' -d ${MIDWAY_DB} -h localhost -c "UPDATE items SET name = name || ' ' || id WHERE id in (SELECT b.id FROM items as a, items as b WHERE b.id > a.id AND a.name = b.name AND a.parent = b.parent AND a.name <> '')";
+EOM
         echo "Version 5 migrations applied."
       else
         echo "No migrations needed."
@@ -172,15 +220,30 @@ if [ "$STAGE_DB" ]
       psql -U "t3rr41n-demo" -d "${MIDWAY_DB}" -h localhost -p 5432 -c 'update schedules set running = false, "shouldRunNext" = false;'
       psql -U "t3rr41n-demo" -d "${MIDWAY_DB}" -h localhost -p 5432 -c "update jobs set status='ABORTED', running=false where running=true;"
 EOM
+  else
+    if [ "$SWITCH_FROM_STAGING" = "switch" ]
+      then
+        # kill screen(s) and rename DB
+        # note: you can remove the old runmidway screen command once that is outdated
+        read -r -d '' STAGE_DB_COMMAND << EOM
+        screen -S runmidway -X stuff $'\cc';
+        screen -S runmidway-7000 -X stuff $'\cc';
+        export PGPASSWORD="r3curs1v3$";
+        psql -U "t3rr41n-demo" -d postgres -h localhost -p 5432 -c "alter database ${MIDWAY_DB} rename to production_backup;";
+        psql -U "t3rr41n-demo" -d postgres -h localhost -p 5432 -c "alter database ${CUSTNAME}_staging rename to ${MIDWAY_DB};";
+EOM
+    fi
 fi
 
 
 # SECTION: Version 
 
+echo "*************************************************"
 echo "Beginning instance update with customer name \""$CUSTNAME"\" and IP address" $ADDRESS;
 echo "App will use port ${PORT} on version ${VERSION}";
 echo "App will be running on: ${MIDWAYHOSTNAME}";
 echo "App will use database: ${MIDWAY_DB}";
+echo "*************************************************"
 
 read -n1 -p "Skip RSYNC? [y\N] " SKIP_RSYNC
 echo ""
@@ -194,15 +257,24 @@ if [ "$SKIP_RSYNC" = "y" ] || [ "$SKIP_RSYNC" = "Y" ]
     (! test -d Search) && (echo "Error: could not find Search directory"; exit 1);
 
     echo "rsyncing";
-    rsync -vrP --progress  --exclude midway.json --exclude midway.db --exclude node_modules --exclude .cache --delete  $PWD/Search terrain@${ADDRESS}:src-${VERSION}/ > "rsynclog.log";
+    rsync -vrP --progress  --exclude midway.json --exclude midway.db --exclude node_modules --exclude .cache --exclude .git --exclude build --exclude coverage --exclude midway/src/bundles --exclude rr --exclude *.db --exclude bundle.js --delete  $PWD/Search terrain@${ADDRESS}:src-${VERSION}/ > "rsynclog.log";
     echo "rsync complete"
 fi
+
+echo "*************************************************"
+echo "Look for 'no screen session found' message below:"
+echo "-------------------------------------------------"
+echo ""
 
 ssh terrain@${ADDRESS} << EOF
 screen -S runmidway-${SCREEN_ID} -X stuff $'\cc';
 EOF
 
-echo "One last thing: did you just now see a message saying 'No screen found' ?"
+echo ""
+echo "-------------------------------------------------"
+echo "*************************************************"
+
+echo "Above, did you see a message saying 'No screen session found' ?"
 HAS_SCREEN=""
 while [ "$HAS_SCREEN" != "y" ] && [ "$HAS_SCREEN" != "n" ]; do
   read -n1 -p "Did you? [y\n] " HAS_SCREEN
@@ -225,4 +297,8 @@ screen -S runmidway-${SCREEN_ID} -X stuff "yarn; yarn build-prod;\r";
 screen -S runmidway-${SCREEN_ID} -X stuff "NODE_ENV=production yarn start-midway -p ${PORT} -i ${MIDWAY_DB} > >(tee -a /var/log/midway/midway_${VERSION}_${PORT}.log) 2> >(tee -a /var/log/midway/midway_error_${VERSION}_${PORT}.log >&2)\r";
 EOF
 
-echo "End of Update Script";
+echo "*************************************************"
+
+echo "Update Complete";
+echo "It has been our pleasure to be your deploy cyborg this fine morning/day/evening"
+echo ""

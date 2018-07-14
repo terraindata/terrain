@@ -202,9 +202,6 @@ export default class GroupJoinTransform extends SafeReadable
         if (vi !== null)
         {
           // winston.debug('parentObject ' + JSON.stringify(hits[j]._source, null, 2));
-          const header = {};
-          body.push(header);
-
           try
           {
             const queryStr = ESParameterFiller.generate(
@@ -212,7 +209,14 @@ export default class GroupJoinTransform extends SafeReadable
               {
                 [this.parentAlias]: inputs[i]['_source'],
               });
-            body.push(JSON.parse(queryStr));
+            const queryObj = JSON.parse(queryStr);
+            const index = queryObj.query.bool.filter.constructor === Array ? queryObj.query.bool.filter[0].term._index :
+              queryObj.query.bool.filter.term._index;
+
+            const header = { index };
+            body.push(header);
+
+            body.push(queryObj);
           }
           catch (e)
           {
