@@ -110,7 +110,7 @@ class InsertTransformationInfoC extends TransformationNodeInfo
   public editable = true;
   public creatable = true;
 
-  public availInfo = {
+  protected availInfo = {
     allowedTypes: [FieldTypes.String],
   };
 

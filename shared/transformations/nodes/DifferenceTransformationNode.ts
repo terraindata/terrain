@@ -95,9 +95,10 @@ class DifferenceTransformationInfoC extends TransformationNodeInfo
 
   public editable = false;
   public creatable = true;
-  public newFieldType = 'number';
 
-  public availInfo = {
+  protected newType = FieldTypes.Number;
+
+  protected availInfo = {
     allowedTypes: [FieldTypes.Number, FieldTypes.Integer],
     isNamed: true,
   };

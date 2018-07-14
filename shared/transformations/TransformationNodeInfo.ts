@@ -62,15 +62,19 @@ export default abstract class TransformationNodeInfo
   public editable: boolean = false;
   public creatable: boolean = false;
   public visible: boolean = true;
-  public newFieldType: string = 'string';
+
+  protected newType: FieldTypes;
 
   // override this
-  public availInfo: {
+  protected availInfo: {
     allowedTypes?: FieldTypes[];
     arrayOf?: FieldTypes[]; // if the field is an array
     isNamed?: boolean; // if undefined, don't check. if false, ensure not named, if true, ensure named
   };
 
+  /*
+   * Todo, turn these functions into visitors to be more consistent?
+   */
   public isAvailable(engine: TransformationEngine, fieldId: number, tree: Map<number, List<number>>): boolean
   {
     if (this.availInfo !== undefined)
@@ -106,6 +110,28 @@ export default abstract class TransformationNodeInfo
       return true;
     }
     return true;
+  }
+
+  public computeNewFieldType(engine?: TransformationEngine, node?: TransformationNode, index?: number): FieldTypes
+  {
+    if (this.newType === undefined)
+    {
+      if (engine !== undefined && node !== undefined)
+      {
+        const firstField = node.fields.get(0).id;
+        return Utils.fields.fieldType(firstField, engine);
+      }
+      else
+      {
+        return FieldTypes.String;
+      }
+    }
+    return this.newType;
+  }
+
+  public computeNewSourceType(engine?: TransformationEngine, node?: TransformationNode, index?: number): FieldTypes | null
+  {
+    return null;
   }
 
   public shortSummary(meta: object): string

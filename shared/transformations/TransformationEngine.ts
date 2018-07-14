@@ -118,7 +118,7 @@ export class TransformationEngine
    *                   processing in `load` to finish converting
    *                   to a `TransformationEngine`.
    */
-  private static parseSerializedString(s: string): object
+  protected static parseSerializedString(s: string): object
   {
     const parsed: object = JSON.parse(s);
     parsed['IDToPathMap'] = parsed['IDToPathMap'].map((v) => [v[0], KeyPath(v[1])]);
@@ -135,12 +135,12 @@ export class TransformationEngine
     return parsed;
   }
 
-  private dag: TransformationGraph = new GraphLib.Graph({ directed: true }) as TransformationGraph;
-  private uidField: number = 0;
-  private uidNode: number = 0;
-  private fieldEnabled: Map<number, boolean> = Map<number, boolean>();
-  private fieldProps: Map<number, object> = Map<number, object>();
-  private IDToPathMap: Map<number, KeyPath> = Map<number, KeyPath>();
+  protected dag: TransformationGraph = new GraphLib.Graph({ directed: true }) as TransformationGraph;
+  protected uidField: number = 0;
+  protected uidNode: number = 0;
+  protected fieldEnabled: Map<number, boolean> = Map<number, boolean>();
+  protected fieldProps: Map<number, object> = Map<number, object>();
+  protected IDToPathMap: Map<number, KeyPath> = Map<number, KeyPath>();
 
   /**
    * Constructor for `TransformationEngine`.
@@ -250,6 +250,7 @@ export class TransformationEngine
   public appendTransformation(nodeType: TransformationNodeType, inFields: List<KeyPath | number>,
     options?: object): number
   {
+    // should this create new fields?
     const fields = inFields.map((val) =>
     {
       if (typeof val === 'number')
@@ -347,24 +348,19 @@ export class TransformationEngine
    */
   public addField(fullKeyPath: KeyPath, options: object = {}, sourceNode?: number): number
   {
-    const id = this.uidField;
-    this.uidField++;
-
     if (this.getFieldID(fullKeyPath) !== undefined)
     {
       return this.getFieldID(fullKeyPath);
     }
+
+    const id = this.uidField;
+    this.uidField++;
+
     this.IDToPathMap = this.IDToPathMap.set(id, fullKeyPath);
     this.fieldEnabled = this.fieldEnabled.set(id, true);
     this.fieldProps = this.fieldProps.set(id, options);
+    const identityId = this.addIdentity(id, sourceNode);
 
-    const synthetic = sourceNode !== undefined;
-    const identityId = this.addIdentity(id, { type: synthetic ? 'Organic' : 'Synthetic' });
-
-    if (synthetic)
-    {
-      this.dag.setEdge(String(sourceNode), String(identityId), EdgeTypes.Synthetic);
-    }
     return id;
   }
 
@@ -486,23 +482,11 @@ export class TransformationEngine
       return null; // invalid
     }
 
-    const renameId = this.appendTransformation(
+    return this.appendTransformation(
       TransformationNodeType.RenameNode,
-      List([oldPath]),
+      List([fieldID]),
       { newFieldKeyPaths: List([newPath]) },
     );
-
-    const transplantIndex = oldPath.size;
-    Utils.traversal.postorderFields(this, fieldID, (id) =>
-    {
-      const childPath = this.getFieldPath(id);
-      this.setFieldPath(id, newPath.concat(childPath.slice(transplantIndex)).toList());
-      const identityNode = this.addIdentity(id, { type: 'Rename' });
-      Utils.traversal.appendNodeToField(this, id, identityNode, EdgeTypes.Rename);
-      this.dag.setEdge(String(renameId), String(identityNode), EdgeTypes.Synthetic);
-    });
-
-    return renameId;
   }
 
   public getFieldEnabled(fieldID: number): boolean
@@ -601,8 +585,36 @@ export class TransformationEngine
     this.IDToPathMap = this.IDToPathMap.set(fieldID, path);
   }
 
-  protected addIdentity(fieldId: number, options: NodeOptionsType<TransformationNodeType.IdentityNode>): number
+  /*
+   *  Add Identity Node to a newly added field (or a renamed field)
+   */
+  protected addIdentity(fieldId: number, sourceNode?: number): number
   {
-    return this.appendTransformation(TransformationNodeType.IdentityNode, List([fieldId]), options);
+    let type;
+    if (sourceNode !== undefined)
+    {
+      const node = this.dag.node(String(sourceNode));
+      if (node.typeCode === TransformationNodeType.RenameNode)
+      {
+        type = 'Rename';
+      }
+      else
+      {
+        type = 'Synthetic';
+      }
+    }
+    else
+    {
+      type = 'Organic';
+    }
+    const options: NodeOptionsType<TransformationNodeType.IdentityNode> = {
+      type,
+    };
+    const identityId = this.appendTransformation(TransformationNodeType.IdentityNode, List([fieldId]), options);
+    if (sourceNode !== undefined)
+    {
+      this.dag.setEdge(String(sourceNode), String(identityId), EdgeTypes.Synthetic);
+    }
+    return identityId;
   }
 }

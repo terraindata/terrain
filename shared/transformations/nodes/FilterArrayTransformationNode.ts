@@ -100,9 +100,8 @@ class FilterArrayTransformationInfoC extends TransformationNodeInfo
 
   public editable = true;
   public creatable = true;
-  public newFieldType = 'array';
 
-  public availInfo = {
+  protected availInfo = {
     allowedTypes: [FieldTypes.Array],
     isNamed: true,
   };

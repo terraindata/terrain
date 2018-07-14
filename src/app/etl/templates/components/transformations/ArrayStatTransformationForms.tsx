@@ -106,13 +106,6 @@ function SimpleStatFactory<T extends TransformationNodeType>(type: T, startingNa
         fields: inputFields,
       };
     }
-
-    protected overrideTransformationConfig()
-    {
-      return {
-        type: FieldTypes.Number,
-      };
-    }
   };
 }
 

@@ -118,9 +118,9 @@ class GroupByTransformationInfoC extends TransformationNodeInfo
 
   public editable = false;
   public creatable = true;
-  public newFieldType = 'array';
 
-  public availInfo = {
+  protected newType = FieldTypes.Array;
+  protected availInfo = {
     allowedTypes: [FieldTypes.Array],
     arrayOf: [FieldTypes.Object],
     isNamed: true,

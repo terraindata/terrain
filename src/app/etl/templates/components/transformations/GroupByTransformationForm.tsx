@@ -134,8 +134,9 @@ export class GroupByTFF extends TransformationForm<GroupByOptions, Transformatio
       subkey,
     };
     const fields = List([engine.getFieldPath(fieldId)]);
-    proxy.addTransformation(this.type, fields, options, {
-      type: FieldTypes.Array,
-    });
+    // proxy.addTransformation(this.type, fields, options, {
+    //   type: FieldTypes.Array,
+    // });
+    proxy.addTransformation(this.type, fields, options);
   }
 }

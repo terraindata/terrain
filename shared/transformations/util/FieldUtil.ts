@@ -59,11 +59,7 @@ import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 const etlTypeKeyPath = List(['etlType']);
 export default class FieldUtil
 {
-  public static addFieldToEngine(
-    engine: TransformationEngine,
-    keypath: KeyPath,
-    type: FieldTypes,
-  ): number
+  public static addFieldToEngine(engine: TransformationEngine, keypath: KeyPath, type: FieldTypes): number
   {
     const cfg = {
       etlType: type,

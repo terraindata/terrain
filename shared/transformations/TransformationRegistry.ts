@@ -194,9 +194,9 @@ class TransformationRegistryLookup
     return registryVisitor.visit(type).nodeClass;
   }
 
-  public getNewFieldType(type: TransformationNodeType): string
+  public getInfo(type: TransformationNodeType): TransformationNodeInfo
   {
-    return registryVisitor.visit(type).newFieldType;
+    return registryVisitor.visit(type);
   }
 }
 

@@ -103,7 +103,6 @@ class RenameTransformationInfoC extends TransformationNodeInfo
 
   public editable = false;
   public creatable = false;
-  public newFieldType = 'same';
 }
 
 export const RenameTransformationInfo = new RenameTransformationInfoC();

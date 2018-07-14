@@ -43,51 +43,25 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as yadeep from 'shared/util/yadeep';
+import { List, Map } from 'immutable';
 
-const { List, Map } = Immutable;
-
-import Encryption, { Keys } from 'shared/encryption/Encryption';
-import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import { TransformationGraph } from 'shared/transformations/TypedGraph';
+import TransformationNodeType, { NodeOptionsType, TransformationEdgeTypes as EdgeTypes } from './TransformationNodeType';
 
-import TransformationNode from 'shared/transformations/TransformationNode';
-import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import { KeyPath } from 'shared/util/KeyPath';
-
-import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
-
-const TYPECODE = TransformationNodeType.DecryptNode;
-
-export class DecryptTransformationNode extends SimpleTransformationType
+/*
+ *  This "Friend" class allows simulation of the friend modifier for the transformation visitors that need it
+ */
+export default abstract class FriendEngine extends TransformationEngine
 {
-  public readonly typeCode = TYPECODE;
-  public readonly acceptedType = 'string';
+  public abstract dag: TransformationGraph;
+  public abstract uidField: number;
+  public abstract uidNode: number;
+  public abstract fieldEnabled: Map<number, boolean>;
+  public abstract fieldProps: Map<number, object>;
+  public abstract IDToPathMap: Map<number, KeyPath>;
 
-  public transformer(el: string): string
-  {
-    return Encryption.decryptStatic(el, Keys.Transformations);
-  }
+  public abstract setFieldPath(fieldID: number, path: KeyPath): void;
+  public abstract addIdentity(fieldId: number, sourceNode?: number): number;
 }
-
-class DecryptTransformationInfoC extends TransformationNodeInfo
-{
-  public readonly typeCode = TYPECODE;
-  public humanName = 'Decrypt';
-  public description = 'Decrypt a field that was previously encrypted with an Encrypt transformation';
-  public nodeClass = DecryptTransformationNode;
-
-  public editable = true;
-  public creatable = true;
-
-  protected availInfo = {
-    allowedTypes: [FieldTypes.String],
-  };
-}
-
-export const DecryptTransformationInfo = new DecryptTransformationInfoC();

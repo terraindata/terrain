@@ -95,12 +95,12 @@ class SumTransformationInfoC extends TransformationNodeInfo
 
   public editable = false;
   public creatable = true;
-  public newFieldType = 'number';
 
-  public availInfo = {
+  protected availInfo = {
     allowedTypes: [FieldTypes.Number, FieldTypes.Integer],
     isNamed: true,
   };
+  protected newType = FieldTypes.Number;
 }
 
 export const SumTransformationInfo = new SumTransformationInfoC();

@@ -57,11 +57,11 @@ import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/
 import * as Utils from 'shared/transformations/util/EngineUtils';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
-export interface TransformationConfig
-{
-  type?: FieldTypes; // specify new field type
-  newSourceType?: FieldTypes; // if the source field changes types due to transformation
-}
+// export interface TransformationConfig
+// {
+//   type?: FieldTypes; // specify new field type
+//   newSourceType?: FieldTypes; // if the source field changes types due to transformation
+// }
 
 /*
  *  Should this file in be /shared?
@@ -115,35 +115,18 @@ export class EngineProxy
       newFieldKeyPaths?: List<EnginePath>;
       [k: string]: any;
     },
-    config?: TransformationConfig, // if not specified, any new fields will have the same type as source field
+    // config?: TransformationConfig, // if not specified, any new fields will have the same type as source field
   )
   {
     const origFieldId = this.engine.getFieldID(fields.get(0));
     this.engine.appendTransformation(type, fields, options);
-    if (config !== undefined && config.newSourceType !== undefined)
-    {
-      fields.forEach((kp) =>
-      {
-        const fieldId = this.engine.getFieldID(kp);
-        Utils.fields.changeType(this.engine, fieldId, config.newSourceType);
-      });
-    }
+
     if (options.newFieldKeyPaths !== undefined)
     {
       options.newFieldKeyPaths.forEach((kp) =>
       {
         const newId = this.engine.getFieldID(kp);
         this.orderField(newId, origFieldId);
-
-        if (config !== undefined && config.type !== undefined)
-        {
-          Utils.fields.setType(this.engine, newId, config.type);
-        }
-        else
-        {
-          const synthType = Utils.fields.fieldType(origFieldId, this.engine);
-          Utils.fields.setType(this.engine, newId, synthType);
-        }
       });
     }
     this.requestRebuild();

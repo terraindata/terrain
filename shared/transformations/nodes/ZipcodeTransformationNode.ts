@@ -83,9 +83,26 @@ class ZipcodeTransformationInfoC extends TransformationNodeInfo
   public editable = true;
   public creatable = true;
 
-  public availInfo = {
+  protected availInfo = {
     allowedTypes: [FieldTypes.String],
   };
+
+  public computeNewSourceType(engine?, node?, index?): FieldTypes
+  {
+    if (node === undefined)
+    {
+      return null;
+    }
+    const options: NodeOptionsType<TransformationNodeType.ZipcodeNode> = node.meta;
+    if (options.format === 'loc')
+    {
+      return FieldTypes.GeoPoint;
+    }
+    else
+    {
+      return FieldTypes.String;
+    }
+  }
 }
 
 export const ZipcodeTransformationInfo = new ZipcodeTransformationInfoC();

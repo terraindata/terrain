@@ -106,9 +106,8 @@ class JoinTransformationInfoC extends TransformationNodeInfo
 
   public editable = false;
   public creatable = true;
-  public newFieldType = 'string';
 
-  public availInfo = {
+  protected availInfo = {
     allowedTypes: [FieldTypes.String],
     isNamed: true,
   };

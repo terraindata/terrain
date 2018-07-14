@@ -49,6 +49,8 @@ import * as _ from 'lodash';
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
+import { DateFormats, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import FriendEngine from 'shared/transformations/FriendEngine';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, {
@@ -84,32 +86,39 @@ export default class CreationVisitor
     this.bindVisitors();
   }
 
-  public visitDefault(type: TransformationNodeType, node: TransformationNode, engine: TransformationEngine)
+  public visitDefault(type: TransformationNodeType, node: TransformationNode, engine: FriendEngine)
   {
     let edgeType: EdgeTypes = EdgeTypes.Same;
-    if (node.meta.newFieldKeyPaths !== undefined && node.meta.newFieldKeyPaths.size > 0)
+    if (node.meta.newFieldKeyPaths != null && node.meta.newFieldKeyPaths.size > 0)
     {
       edgeType = EdgeTypes.Synthetic;
     }
 
-    node.fields.forEach((field) =>
+    const nodeInfo = TransformationRegistry.getInfo(type);
+    node.fields.forEach((field, index) =>
     {
       Utils.traversal.appendNodeToField(engine, field.id, node.id, edgeType);
+      const newSourceType = nodeInfo.computeNewSourceType(engine, node, index);
+      if (newSourceType != null)
+      {
+        Utils.fields.changeType(engine, field.id, newSourceType);
+      }
     });
 
     if (edgeType === EdgeTypes.Synthetic)
     {
-      node.meta.newFieldKeyPaths.forEach((kp) =>
+      node.meta.newFieldKeyPaths.forEach((kp, index) =>
       {
-        if (engine.getFieldID(kp) === undefined)
+        const newType = nodeInfo.computeNewFieldType(engine, node, index);
+        if (engine.getFieldID(kp) == null)
         {
-          engine.addField(kp, {}, node.id);
+          engine.addField(kp, { etlType: newType }, node.id);
         }
       });
     }
   }
 
-  protected visitGroupByNode(type, node: TransformationNode, engine: TransformationEngine): void
+  protected visitGroupByNode(type, node: TransformationNode, engine: FriendEngine): void
   {
     this.visitDefault(type, node, engine);
 
@@ -120,7 +129,7 @@ export default class CreationVisitor
     });
   }
 
-  protected visitDuplicateNode(type, node: TransformationNode, engine: TransformationEngine): void
+  protected visitDuplicateNode(type, node: TransformationNode, engine: FriendEngine): void
   {
     this.visitDefault(type, node, engine); // do all the normal stuff
     // add all child fields of the original field
@@ -130,18 +139,29 @@ export default class CreationVisitor
     this.duplicateChildFields(engine, sourceId, destPath, node.id);
   }
 
-  protected visitIdentityNode(type, node: TransformationNode, engine: TransformationEngine): void
+  protected visitIdentityNode(type, node: TransformationNode, engine: FriendEngine): void
   {
 
   }
 
-  protected visitRenameNode(type, node: TransformationNode, engine: TransformationEngine): void
+  protected visitRenameNode(type, node: TransformationNode, engine: FriendEngine): void
   {
     const sourceId = node.fields.get(0).id;
     Utils.traversal.appendNodeToField(engine, sourceId, node.id, EdgeTypes.Synthetic);
+    const newPath = node.meta.newFieldKeyPaths.get(0);
+    const oldPath = engine.getFieldPath(sourceId);
+    const transplantIndex = oldPath.size;
+    Utils.traversal.postorderFields(engine, sourceId, (id) =>
+    {
+      const childPath = engine.getFieldPath(id);
+      engine.setFieldPath(id, newPath.concat(childPath.slice(transplantIndex)).toList());
+      const identityNode = engine.addIdentity(id, node.id);
+      Utils.traversal.appendNodeToField(engine, id, identityNode, EdgeTypes.Rename);
+      engine.dag.setEdge(String(node.id), String(identityNode), EdgeTypes.Synthetic);
+    });
   }
 
-  protected duplicateChildFields(engine: TransformationEngine, sourceId: number, rootPath: KeyPath, node: number)
+  protected duplicateChildFields(engine: FriendEngine, sourceId: number, rootPath: KeyPath, node: number)
   {
     const sourcePath = Utils.path.convertIndices(engine.getFieldPath(sourceId));
     sourceId = engine.getFieldID(sourcePath);

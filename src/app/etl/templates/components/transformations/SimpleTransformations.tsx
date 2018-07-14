@@ -334,22 +334,6 @@ export class ZipcodeTFF extends TransformationForm<ZipcodeOptions, Transformatio
   protected readonly initialState = {
     format: 'loc',
   };
-
-  protected overrideTransformationConfig()
-  {
-    if (this.state.format === 'loc')
-    {
-      return {
-        newSourceType: FieldTypes.GeoPoint,
-      };
-    }
-    else
-    {
-      return {
-        newSourceType: FieldTypes.String,
-      };
-    }
-  }
 }
 
 const zipcodeFormats = List(['loc', 'city', 'state', 'citystate', 'type']);

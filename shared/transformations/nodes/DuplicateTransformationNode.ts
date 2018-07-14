@@ -224,9 +224,8 @@ class DuplicateTransformationInfoC extends TransformationNodeInfo
 
   public editable = false;
   public creatable = true;
-  public newFieldType = 'same';
 
-  public availInfo = {
+  protected availInfo = {
     isNamed: true,
   };
 }

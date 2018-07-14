@@ -95,9 +95,9 @@ class ProductTransformationInfoC extends TransformationNodeInfo
 
   public editable = false;
   public creatable = true;
-  public newFieldType = 'number';
+  protected newType = FieldTypes.Number;
 
-  public availInfo = {
+  protected availInfo = {
     allowedTypes: [FieldTypes.Number, FieldTypes.Integer],
     isNamed: true,
   };

@@ -181,12 +181,6 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
     };
   }
 
-  // override this to customize the newFieldInfo object that gets passed to addTransformation
-  protected overrideTransformationConfig(): { type?: FieldTypes, newSourceType?: FieldTypes }
-  {
-    return undefined;
-  }
-
   // override this to customize how initial state gets computed from existing args
   protected computeInitialState(): State
   {
@@ -205,7 +199,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   protected createTransformation(proxy: EngineProxy)
   {
     const args = this.computeArgs();
-    proxy.addTransformation(this.type, args.fields, args.options, this.overrideTransformationConfig());
+    proxy.addTransformation(this.type, args.fields, args.options);
   }
 
   // override this to customize how transformations are edited

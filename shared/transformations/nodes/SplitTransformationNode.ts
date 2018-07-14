@@ -96,9 +96,8 @@ class SplitTransformationInfoC extends TransformationNodeInfo
 
   public editable = true;
   public creatable = true;
-  public newFieldType = 'string';
 
-  public availInfo = {
+  protected availInfo = {
     allowedTypes: [FieldTypes.String],
     isNamed: true,
   };
