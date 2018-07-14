@@ -51,19 +51,17 @@ export default class StreamUtil
 {
   public static completeStream(jsonStringStream)
   {
+    // let results = [];
     let bracketStack = [];
     let stringStream = '';
-    let isInObject = false;
-    let isInArray = false;
     parser.on('openarray', function() {
       bracketStack.push('[');
-      stringStream += '[';
-      isInArray = true;
+      stringStream = stringStream + '[';
     });
 
     parser.on('closearray', function() {
       const recent = bracketStack.pop();
-      stringStream += ']';
+      stringStream = stringStream + ']';
       if (recent !== '[')
       {
         throw new Error('Error parsing');
@@ -72,12 +70,12 @@ export default class StreamUtil
 
     parser.on('openobject', function(key) {
       bracketStack.push('{');
-      stringStream += '{';
+      stringStream = stringStream + '{';
     });
 
     parser.on('closeobject', function() {
       const recent = bracketStack.pop();
-      stringStream += '}';
+      stringStream = stringStream + '}';
       if (recent !== '{')
       {
         throw new Error('Error parsing');
@@ -85,23 +83,48 @@ export default class StreamUtil
     });
 
     parser.on('key', function(name) {
-      let keyHeader = name + ': ';
-      stringStream += keyHeader;
+      stringStream = stringStream + `"${name}":`;
     });
 
     parser.on('value', function(value) {
-
+      let valueString;
+      const valueType = typeof value;
+      switch (valueType) {
+        case 'number':
+          valueString = value.toString();
+          break;
+        case 'string':
+          valueString = value;
+        case 'boolean':
+          valueString = `${value}`;
+        case 'undefined':
+          valueString = `${value}`;
+        case 'object': 
+        // the only value that reaches here is null because typeof null returns 'object'
+        // for expected objects and arrays, 'openobject' and 'openarray' should be called first
+        // so they should never reach here technically
+          valueString = `${value}`;
+        default:
+          throw new Error('Unrecognized type');
+          break;
+      }
+      stringStream = stringStream + valueString + ', '
     });
-    return bracketStack;
+    return [bracketStack, stringStream];
   }
 
-
-  // parse the string with clarinet
+  public fixStringStream(rawStringStream)
+  {
+    
+  }
 
   public static formatJsonString(jsonString)
   {
     // apply clarinet parsing to jsonString
-    const bracketStack = this.completeStream(jsonString);
+    const results = this.completeStream(jsonString);
+    const bracketStack = results[0];
+    const rawStringStream = results[1];
+    const fixedStringStream = this.fixStringStream(rawStringStream);
 
     if (bracketStack === [])
     {
