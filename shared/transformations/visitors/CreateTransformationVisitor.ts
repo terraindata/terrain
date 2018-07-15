@@ -78,6 +78,7 @@ export default class CreationVisitor
     [TransformationNodeType.RenameNode]: this.visitRenameNode,
     [TransformationNodeType.IdentityNode]: this.visitIdentityNode,
     [TransformationNodeType.DuplicateNode]: this.visitDuplicateNode,
+    [TransformationNodeType.GroupByNode]: this.visitGroupByNode,
   };
 
   constructor()
@@ -88,13 +89,20 @@ export default class CreationVisitor
 
   public visitDefault(type: TransformationNodeType, node: TransformationNode, engine: FriendEngine)
   {
-    let edgeType: EdgeTypes = EdgeTypes.Same;
     if (node.meta.newFieldKeyPaths != null && node.meta.newFieldKeyPaths.size > 0)
     {
-      edgeType = EdgeTypes.Synthetic;
+      this.processInputFields(engine, node, EdgeTypes.Synthetic);
+      this.processOutputFields(engine, node);
     }
+    else
+    {
+      this.processInputFields(engine, node, EdgeTypes.Same);
+    }
+  }
 
-    const nodeInfo = TransformationRegistry.getInfo(type);
+  public processInputFields(engine: FriendEngine, node: TransformationNode, edgeType: EdgeTypes)
+  {
+    const nodeInfo = TransformationRegistry.getInfo(node.typeCode);
     node.fields.forEach((field, index) =>
     {
       Utils.traversal.appendNodeToField(engine, field.id, node.id, edgeType);
@@ -104,53 +112,89 @@ export default class CreationVisitor
         Utils.fields.changeType(engine, field.id, newSourceType);
       }
     });
-
-    if (edgeType === EdgeTypes.Synthetic)
-    {
-      node.meta.newFieldKeyPaths.forEach((kp, index) =>
-      {
-        const newType = nodeInfo.computeNewFieldType(engine, node, index);
-        if (engine.getFieldID(kp) == null)
-        {
-          engine.addField(kp, { etlType: newType }, node.id);
-        }
-      });
-    }
   }
 
-  protected visitGroupByNode(type, node: TransformationNode, engine: FriendEngine): void
+  public processOutputFields(engine: FriendEngine, node: TransformationNode)
+  {
+    const nodeInfo = TransformationRegistry.getInfo(node.typeCode);
+    node.meta.newFieldKeyPaths.forEach((kp, index) =>
+    {
+      this.createAncestors(engine, kp, node.id);
+      const newType = nodeInfo.computeNewFieldType(engine, node, index);
+      if (engine.getFieldID(kp) == null)
+      {
+        engine.addField(kp, { etlType: newType }, node.id);
+      }
+    });
+  }
+
+  public visitGroupByNode(type, node: TransformationNode, engine: FriendEngine): void
   {
     this.visitDefault(type, node, engine);
 
     const sourceId = node.fields.get(0).id;
     node.meta.newFieldKeyPaths.forEach((kp) =>
     {
-      this.duplicateChildFields(engine, sourceId, kp, node.id);
+      this.copyNestedStructure(engine, sourceId, kp, node.id);
     });
   }
 
-  protected visitDuplicateNode(type, node: TransformationNode, engine: FriendEngine): void
+  // what about [foo, -1, bar] to [baz] (extract simple)
+  // or [foo, bar, 1] to [baz]
+  // or [foo, -1, 1] to [baz]
+  public visitDuplicateNode(type, node: TransformationNode, engine: FriendEngine): void
   {
-    this.visitDefault(type, node, engine); // do all the normal stuff
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.DuplicateNode>;
+    this.processInputFields(engine, node, EdgeTypes.Synthetic);
     // add all child fields of the original field
-
     const sourceId = node.fields.get(0).id;
-    const destPath = node.meta.newFieldKeyPaths.get(0);
-    this.duplicateChildFields(engine, sourceId, destPath, node.id);
+    let sourcePath = node.fields.get(0).path;
+    if (opts.extractionPath !== undefined)
+    {
+      sourcePath = opts.extractionPath;
+    }
+    const destPath = opts.newFieldKeyPaths.get(0);
+    const [r1, r2] = Utils.topology.getRelation(sourcePath, destPath);
+
+    if (r1 === 'one' && r2 === 'one')
+    {
+      this.processOutputFields(engine, node);
+      this.copyNestedStructure(engine, sourceId, destPath, node.id);
+    }
+    else if (r1 === 'many' && r2 === 'one') // e.g. [foo, -1, bar] to [a, b, baz] (simple extract)
+    {
+      // [a, b, baz] is an array where [a, b, baz, -1] matches the structure of [foo, -1, bar]
+      const nodeInfo = TransformationRegistry.getInfo(node.typeCode);
+      this.createAncestors(engine, destPath, node.id);
+      engine.addField(destPath, { etlType: FieldTypes.Array }, node.id);
+      const newType = nodeInfo.computeNewFieldType(engine, node, 0);
+      const arrayedPath = destPath.push(-1);
+      engine.addField(arrayedPath, { etlType: newType }, node.id);
+      this.copyNestedStructure(engine, sourceId, arrayedPath, node.id);
+    }
+    else if (r1 === 'one' && r2 === 'many') // e.g. [foo, bar] to [baz, -1, dog]
+    {
+      // currently unsupported in the UI
+    }
+    else
+    {
+      throw new Error('Cannot create a many-to-many duplication');
+    }
   }
 
-  protected visitIdentityNode(type, node: TransformationNode, engine: FriendEngine): void
+  public visitIdentityNode(type, node: TransformationNode, engine: FriendEngine): void
   {
 
   }
 
-  protected visitRenameNode(type, node: TransformationNode, engine: FriendEngine): void
+  public visitRenameNode(type, node: TransformationNode, engine: FriendEngine): void
   {
     const sourceId = node.fields.get(0).id;
     Utils.traversal.appendNodeToField(engine, sourceId, node.id, EdgeTypes.Synthetic);
     const newPath = node.meta.newFieldKeyPaths.get(0);
     const oldPath = engine.getFieldPath(sourceId);
     const transplantIndex = oldPath.size;
+    this.createAncestors(engine, newPath, node.id);
     Utils.traversal.postorderFields(engine, sourceId, (id) =>
     {
       const childPath = engine.getFieldPath(id);
@@ -161,7 +205,25 @@ export default class CreationVisitor
     });
   }
 
-  protected duplicateChildFields(engine: FriendEngine, sourceId: number, rootPath: KeyPath, node: number)
+  /*
+   *  if path is [foo, bar, -1, baz] ensure that [foo], [foo, bar], and [foo, bar, -1] exist
+   *  if new fields are to be created, nodeId indicates the transformation
+   */
+  protected createAncestors(engine: TransformationEngine, path: KeyPath, nodeId: number)
+  {
+    for (let i = 1; i < path.size; i++)
+    {
+      const parentPath = path.slice(0, i).toList();
+      if (engine.getFieldID(parentPath) === undefined)
+      {
+        const nextWaypoint = path.get(i);
+        const type = typeof nextWaypoint === 'number' ? FieldTypes.Array : FieldTypes.Object;
+        const newId = engine.addField(parentPath, { etlType: type }, nodeId);
+      }
+    }
+  }
+
+  protected copyNestedStructure(engine: FriendEngine, sourceId: number, rootPath: KeyPath, node: number)
   {
     const sourcePath = Utils.path.convertIndices(engine.getFieldPath(sourceId));
     sourceId = engine.getFieldID(sourcePath);
@@ -175,6 +237,10 @@ export default class CreationVisitor
         const newFieldId = Utils.fields.copyField(engine, childId, newFieldPath, node);
         const childEnd = Utils.traversal.findEndTransformation(engine, childId);
         Utils.traversal.prependNodeToField(engine, newFieldId, childEnd, EdgeTypes.Synthetic);
+      }
+      else
+      {
+        Utils.fields.transferFieldData(sourceId, childId, engine, engine);
       }
     });
   }

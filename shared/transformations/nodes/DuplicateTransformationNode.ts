@@ -171,9 +171,13 @@ export class DuplicateTransformationNode extends TransformationNode
   protected transformDocument(doc: object): TransformationVisitResult
   {
     const errors = [];
-    const opts = this.meta as NodeOptionsType<any>;
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
 
-    const inputField = this.fields.get(0).path;
+    let inputField = this.fields.get(0).path;
+    if (opts.extractionPath !== undefined)
+    {
+      inputField = opts.extractionPath;
+    }
     const outputField = opts.newFieldKeyPaths.get(0);
 
     // when we implement optimizations / caching and overrideable serialization we can memoize this

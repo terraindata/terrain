@@ -116,7 +116,7 @@ export class GroupByTFF extends TransformationForm<GroupByOptions, Transformatio
     this.setState(newState);
   }
 
-  protected createTransformation(proxy: EngineProxy)
+  protected computeArgs()
   {
     const { engine, fieldId } = this.props;
     const { outputMapping, subkey } = this.state;
@@ -134,9 +134,9 @@ export class GroupByTFF extends TransformationForm<GroupByOptions, Transformatio
       subkey,
     };
     const fields = List([engine.getFieldPath(fieldId)]);
-    // proxy.addTransformation(this.type, fields, options, {
-    //   type: FieldTypes.Array,
-    // });
-    proxy.addTransformation(this.type, fields, options);
+    return {
+      fields,
+      options,
+    }
   }
 }

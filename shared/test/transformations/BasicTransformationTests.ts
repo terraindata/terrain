@@ -1155,7 +1155,7 @@ test('Duplicate a nested field', () =>
     newFieldKeyPaths: wrap(['copy1']),
   });
 
-  const sub1 = e.addField(List(['copy1', 'subField']));
+  const sub1 = e.getFieldID(List(['copy1', 'subField']));
   e.disableField(sub1);
 
   const r = e.transform(doc);

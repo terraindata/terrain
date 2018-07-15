@@ -57,12 +57,6 @@ import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/
 import * as Utils from 'shared/transformations/util/EngineUtils';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
-// export interface TransformationConfig
-// {
-//   type?: FieldTypes; // specify new field type
-//   newSourceType?: FieldTypes; // if the source field changes types due to transformation
-// }
-
 /*
  *  Should this file in be /shared?
  *  Proxy objects are generated synchronously and aren't meant to be persisted
@@ -115,11 +109,10 @@ export class EngineProxy
       newFieldKeyPaths?: List<EnginePath>;
       [k: string]: any;
     },
-    // config?: TransformationConfig, // if not specified, any new fields will have the same type as source field
-  )
+  ): number
   {
     const origFieldId = this.engine.getFieldID(fields.get(0));
-    this.engine.appendTransformation(type, fields, options);
+    const nodeId = this.engine.appendTransformation(type, fields, options);
 
     if (options.newFieldKeyPaths !== undefined)
     {
@@ -130,6 +123,7 @@ export class EngineProxy
       });
     }
     this.requestRebuild();
+    return nodeId;
   }
 
   public editTransformation(id: number, options)
@@ -154,11 +148,7 @@ export class EngineProxy
     this.requestRebuild();
   }
 
-  /*
-   *  This is a rather complicated operation
-   *  If the given keypath is [foo, *], then we need to create the specific field [foo, index]
-   *  After creating the extracted field, we need to perform the duplication operation on the extracted field
-   */
+  // extract a specific index of an array field and duplicate it to somewhere else
   public extractIndexedArrayField(sourceId: number, index: number, destKP: KeyPath)
   {
     const sourceKP = this.engine.getFieldPath(sourceId);
@@ -168,46 +158,29 @@ export class EngineProxy
       throw new Error('Cannot extract array field, source keypath is empty');
     }
     const specifiedSourceKP = sourceKP.set(sourceKP.size - 1, index);
-    const specifiedSourceType = Utils.fields.fieldType(sourceId, this.engine);
-
-    let specifiedSourceId: number;
-
-    if (specifiedSourceType === FieldTypes.Array)
-    {
-      const anyChildId = Utils.traversal.findChildField(sourceId, this.engine);
-      if (anyChildId === undefined)
-      {
-        throw new Error('Field type is array, but could not find any children in the Transformation Engine');
-      }
-      const childType = Utils.fields.fieldType(anyChildId, this.engine);
-      specifiedSourceId = this.addField(specifiedSourceKP, FieldTypes.Array, childType);
+    const options: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
+      newFieldKeyPaths: List([destKP]),
+      extractionPath: specifiedSourceKP,
     }
-    else
-    {
-      specifiedSourceId = this.addField(specifiedSourceKP, specifiedSourceType);
-    }
-    this.duplicateField(specifiedSourceId, destKP);
 
+    this.addTransformation(
+      TransformationNodeType.DuplicateNode,
+      List([sourceKP]),
+      options,
+    );
     const parentKP = sourceKP.slice(0, -1).toList();
     this.orderField(this.engine.getFieldID(destKP), this.engine.getFieldID(parentKP));
     this.requestRebuild();
   }
 
+  // extract a specific field of an array and make it an array somewhere ese
   public extractSimpleArrayField(sourceId, destKP: KeyPath)
   {
-    const optionsNew: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
-      newFieldKeyPaths: List([destKP]),
-    };
     this.addTransformation(
       TransformationNodeType.DuplicateNode,
       List([this.engine.getFieldPath(sourceId)]),
-      optionsNew,
+      { newFieldKeyPaths: List([destKP]) },
     );
-    const newFieldId = this.engine.getFieldID(destKP);
-
-    const newFieldType = Utils.fields.fieldType(sourceId, this.engine);
-    this.addFieldToEngine(destKP.push(-1), newFieldType);
-    Utils.fields.setType(this.engine, newFieldId, FieldTypes.Array);
     this.requestRebuild();
   }
 
@@ -267,21 +240,15 @@ export class EngineProxy
     this.orderController.setOrder(order);
   }
 
-  // if despecify is true, then strip away specific indices
   public duplicateField(sourceId: number, destKP: KeyPath): number
   {
-    const optionsNew: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
-      newFieldKeyPaths: List([destKP]),
-    };
-    this.addTransformation(
+    const nodeId = this.addTransformation(
       TransformationNodeType.DuplicateNode,
       List([this.engine.getFieldPath(sourceId)]),
-      optionsNew,
+      { newFieldKeyPaths: List([destKP]) },
     );
-    const newFieldId = this.engine.getFieldID(destKP);
-    Utils.fields.transferFieldData(sourceId, newFieldId, this.engine, this.engine);
     this.requestRebuild();
-    return newFieldId;
+    return nodeId;
   }
 
   private addFieldToEngine(

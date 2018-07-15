@@ -350,7 +350,7 @@ export class TransformationEngine
   {
     if (this.getFieldID(fullKeyPath) !== undefined)
     {
-      return this.getFieldID(fullKeyPath);
+      throw new Error('Field already exists');
     }
 
     const id = this.uidField;
