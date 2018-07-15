@@ -67,16 +67,16 @@ class TemplateFieldC
   public readonly name: string = '';
   public readonly childrenIds: List<number> = List([]);
   public readonly transformations: List<TransformationNode> = List([]);
-  public readonly outputKeyPath: KeyPath = List([]);
+  public readonly fieldPath: KeyPath = List([]);
 
   public isWildcardField(): boolean
   {
-    return Utils.path.isWildcard(this.outputKeyPath);
+    return Utils.path.isWildcard(this.fieldPath);
   }
 
   public isAncestorNamedField(index: number)
   {
-    return Utils.path.isNamed(this.outputKeyPath.slice(0, index + 1).toList());
+    return Utils.path.isNamed(this.fieldPath.slice(0, index + 1).toList());
   }
 
   public canMoveField(): boolean
@@ -109,12 +109,12 @@ class TemplateFieldC
   public isLocalToRoot(): boolean
   {
     // we can use a placeholder name
-    return Utils.topology.areFieldsLocal(this.outputKeyPath, List(['sample_name']));
+    return Utils.topology.areFieldsLocal(this.fieldPath, List(['sample_name']));
   }
 
   public isNamedField()
   {
-    return Utils.path.isNamed(this.outputKeyPath);
+    return Utils.path.isNamed(this.fieldPath);
   }
 }
 export type TemplateField = WithIRecord<TemplateFieldC>;

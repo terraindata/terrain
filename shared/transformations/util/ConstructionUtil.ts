@@ -84,13 +84,13 @@ export default abstract class ConstructionUtil
       const keypath = leftEngine.getFieldPath(id);
       const newId = Utils.fields.copyField(leftEngine, id, keypath, undefined, newEngine);
     });
-    const outputKeyPathBase = List([outputKey, -1]);
+    const fieldPathBase = List([outputKey, -1]);
     const outputFieldId = Utils.fields.addFieldToEngine(newEngine, List([outputKey]), FieldTypes.Array);
-    const outputFieldWildcardId = Utils.fields.addFieldToEngine(newEngine, outputKeyPathBase, FieldTypes.Object);
+    const outputFieldWildcardId = Utils.fields.addFieldToEngine(newEngine, fieldPathBase, FieldTypes.Object);
 
     rightEngine.getAllFieldIDs().forEach((id) =>
     {
-      const newKeyPath = outputKeyPathBase.concat(rightEngine.getFieldPath(id)).toList();
+      const newKeyPath = fieldPathBase.concat(rightEngine.getFieldPath(id)).toList();
       const newId = Utils.fields.copyField(rightEngine, id, newKeyPath, undefined, newEngine);
     });
     return newEngine;

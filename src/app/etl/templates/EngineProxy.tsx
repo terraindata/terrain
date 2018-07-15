@@ -161,7 +161,7 @@ export class EngineProxy
     const options: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
       newFieldKeyPaths: List([destKP]),
       extractionPath: specifiedSourceKP,
-    }
+    };
 
     this.addTransformation(
       TransformationNodeType.DuplicateNode,

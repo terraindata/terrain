@@ -154,7 +154,7 @@ class AddFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
   public computeKeyPath(): EnginePath
   {
     const field = this._field();
-    return this._computeKeyPath(field.outputKeyPath, this.state.name);
+    return this._computeKeyPath(field.fieldPath, this.state.name);
   }
 
   public renderInner()

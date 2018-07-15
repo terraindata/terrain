@@ -84,4 +84,3 @@ export class StringifyTFF extends TransformationForm<Options, typeof TYPECODE>
     pretty: false,
   };
 }
-

@@ -115,7 +115,7 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
   public computeStateFromProps(props)
   {
     return {
-      pathKP: this._field().outputKeyPath,
+      pathKP: this._field().fieldPath,
     };
   }
 
@@ -136,7 +136,7 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
   @instanceFnDecorator(memoizeOne)
   public computeListProps(pathKP: KeyPath, field: TemplateField): { items: any[], computeOptions: (index) => RowOptions }
   {
-    const currentKp = field.outputKeyPath;
+    const currentKp = field.fieldPath;
     const lastNamed = currentKp.findLastIndex((value, index) => !field.isAncestorNamedField(index));
     const computeOptions = (index) =>
     {

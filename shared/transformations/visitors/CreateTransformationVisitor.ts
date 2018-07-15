@@ -275,12 +275,12 @@ export default class CreationVisitor
 
   protected killSubfields(engine: FriendEngine, node: TransformationNode, fieldId: number)
   {
-    Utils.traversal.postorderFields(engine, fieldId, (childId) => {
+    Utils.traversal.postorderFields(engine, fieldId, (childId) =>
+    {
       if (fieldId === childId)
       {
         return;
       }
-      console.log('killing ', engine.getFieldPath(childId).toJS());
       engine.killField(childId, node.id);
     });
   }

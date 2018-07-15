@@ -521,8 +521,8 @@ export class TransformationEngine
     const filtered = includeDead ?
       this.IDToPathMap
       :
-      this.IDToPathMap.filter((kp, id) => this.isDead(kp));
-    return this.IDToPathMap.filter((kp, id) => kp.size > 0).keySeq().toList();
+      this.IDToPathMap.filter((kp, id) => !this.isDead(kp));
+    return filtered.keySeq().toList();
   }
 
   public isDead(kp: KeyPath): boolean

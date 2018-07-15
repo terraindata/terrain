@@ -137,6 +137,6 @@ export class GroupByTFF extends TransformationForm<GroupByOptions, Transformatio
     return {
       fields,
       options,
-    }
+    };
   }
 }

@@ -96,7 +96,7 @@ export function createFieldFromEngine(
     isHidden: engine.getFieldProp(id, hiddenPath) === true,
     fieldId: id,
     fieldProps: engine.getFieldProps(id),
-    outputKeyPath: engine.getFieldPath(id),
+    fieldPath: engine.getFieldPath(id),
     etlType: Utils.fields.fieldType(id, engine),
     transformations,
     name: enginePath.last().toString(),
