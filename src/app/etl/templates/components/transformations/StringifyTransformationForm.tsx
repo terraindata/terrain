@@ -43,68 +43,45 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:no-var-requires no-empty-interface max-classes-per-file
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
+import * as React from 'react';
+
+import * as Utils from 'shared/transformations/util/EngineUtils';
+import { instanceFnDecorator } from 'shared/util/Classes';
+
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { TransformationNode } from 'etl/templates/FieldTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
+
+import { DynamicForm } from 'common/components/DynamicForm';
+import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 import * as Immutable from 'immutable';
-import { List } from 'immutable';
-import * as _ from 'lodash';
-import * as Utils from 'shared/transformations/util/EngineUtils';
+const { List, Map } = Immutable;
 
-import LanguageController from 'shared/etl/languages/LanguageControllers';
-import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
-import { DateFormats, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import { KeyPath, WayPoint } from 'shared/util/KeyPath';
+const TYPECODE = TransformationNodeType.StringifyNode;
 
-const etlTypeKeyPath = List(['etlType']);
-export default class FieldUtil
+type Options = NodeOptionsType<typeof TYPECODE>;
+export class StringifyTFF extends TransformationForm<Options, typeof TYPECODE>
 {
-  public static addFieldToEngine(engine: TransformationEngine, keypath: KeyPath, type: FieldTypes): number
-  {
-    const cfg = {
-      etlType: type,
-    };
-    return engine.addField(keypath, cfg);
-  }
+  protected readonly type = TYPECODE;
+  protected readonly inputMap: InputDeclarationMap<Options> = {
+    pretty: {
+      type: DisplayType.CheckBox,
+      displayName: 'Prettify',
+    },
+  };
 
-  public static setType(engine: TransformationEngine, fieldId: number, type: FieldTypes)
-  {
-    FieldUtil.changeFieldTypeSideEffects(engine, fieldId, type);
-    engine.setFieldProp(fieldId, etlTypeKeyPath, type);
-  }
-
-  public static fieldType(id: number, engine: TransformationEngine): FieldTypes
-  {
-    const etlType = engine.getFieldProp(id, etlTypeKeyPath) as FieldTypes;
-    return etlType == null ? FieldTypes.String : etlType;
-  }
-
-  public static changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType: FieldTypes)
-  {
-    LanguageController.get(Languages.Elastic)
-      .changeFieldTypeSideEffects(engine, fieldId, newType);
-    LanguageController.get(Languages.JavaScript)
-      .changeFieldTypeSideEffects(engine, fieldId, newType);
-  }
-
-  public static copyField(e1: TransformationEngine, id1: number, keypath: KeyPath, node?: number, e2 = e1)
-  {
-    const id2 = e2.addField(keypath, {}, node);
-    FieldUtil.transferFieldData(id1, id2, e1, e2);
-    return id2;
-  }
-
-  // copies a field's configuration from e1 to e2. id1 and id2 should both exist in e1 and e2 respectively
-  public static transferFieldData(id1: number, id2: number, e1: TransformationEngine, e2: TransformationEngine)
-  {
-    e2.setFieldProps(id2, _.cloneDeep(e1.getFieldProps(id1)));
-    if (e1.getFieldEnabled(id1))
-    {
-      e2.enableField(id2);
-    }
-    else
-    {
-      e2.disableField(id2);
-    }
-  }
+  protected readonly initialState: Options = {
+    pretty: false,
+  };
 }
+

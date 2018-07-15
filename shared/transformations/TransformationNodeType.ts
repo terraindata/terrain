@@ -77,6 +77,7 @@ enum TransformationNodeType
   RoundNode = 'RoundNode',
   SetIfNode = 'SetIfNode',
   SplitNode = 'SplitNode',
+  StringifyNode = 'StringifyNode',
   SubstringNode = 'SubstringNode',
   SubtractNode = 'SubtractNode',
   SumNode = 'SumNode',
@@ -98,6 +99,7 @@ type AssertOptionTypesExhaustive = {
 
 export interface CommonTransformationOptions
 {
+  fromType?: FieldTypes;
   newFieldKeyPaths?: List<KeyPath>;
 }
 
@@ -108,7 +110,7 @@ type HasCommon<T extends object> = {
 interface TransformationOptionTypes extends HasCommon<TransformationOptionTypes>
 {
   IdentityNode: {
-    type: 'Organic' | 'Synthetic' | 'Rename';
+    type: 'Organic' | 'Synthetic' | 'Rename' | 'Removal';
   };
   SplitNode: {
     newFieldKeyPaths: List<KeyPath>;
@@ -217,10 +219,13 @@ interface TransformationOptionTypes extends HasCommon<TransformationOptionTypes>
     deprecatedType: 'CastNode';
     [k: string]: any;
   };
+  StringifyNode: {
+    pretty?: boolean;
+  };
 }
 
 export type NodeTypes = keyof TransformationOptionTypes;
-export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key];
+export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key] & CommonTransformationOptions;
 
 /*
  * TODO document
@@ -230,6 +235,7 @@ export enum TransformationEdgeTypes
   Synthetic = 'Synthetic',
   Same = 'Same',
   Rename = 'Rename',
+  Removal = 'Removal',
 }
 
 export default TransformationNodeType;

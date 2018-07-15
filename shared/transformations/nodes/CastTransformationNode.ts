@@ -228,12 +228,18 @@ class CastTransformationInfoC extends TransformationNodeInfo
   public description = 'Convert this field to a different type';
   public nodeClass = CastTransformationNode;
 
-  public editable = true;
+  public editable = false;
   public creatable = true;
 
   public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
   {
     return `Cast to ${meta.toTypename}`;
+  }
+
+  public computeNewSourceType(engine?, node?, index?)
+  {
+    const opts = node.meta as NodeOptionsType<typeof TYPECODE>;
+    return opts.toTypename;
   }
 }
 

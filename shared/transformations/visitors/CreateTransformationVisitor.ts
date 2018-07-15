@@ -106,11 +106,14 @@ export default class CreationVisitor
     node.fields.forEach((field, index) =>
     {
       Utils.traversal.appendNodeToField(engine, field.id, node.id, edgeType);
+
       const newSourceType = nodeInfo.computeNewSourceType(engine, node, index);
-      if (newSourceType != null)
-      {
-        Utils.fields.changeType(engine, field.id, newSourceType);
-      }
+      // if (newSourceType != null && newSourceType !== currentType)
+      // {
+      //   node.meta.fromType = currentType;
+      //   Utils.fields.setType(engine, field.id, newSourceType);
+      // }
+      this.changeTypeEffects(engine, node, field.id, newSourceType);
     });
   }
 
@@ -184,7 +187,13 @@ export default class CreationVisitor
 
   public visitIdentityNode(type, node: TransformationNode, engine: FriendEngine): void
   {
-
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.IdentityNode>;
+    if (opts.type === 'Removal')
+    {
+      const fieldId = node.fields.get(0).id;
+      Utils.traversal.appendNodeToField(engine, fieldId, node.id, EdgeTypes.Removal);
+      engine.setFieldPath(fieldId, List([null]));
+    }
   }
 
   public visitRenameNode(type, node: TransformationNode, engine: FriendEngine): void
@@ -209,7 +218,7 @@ export default class CreationVisitor
    *  if path is [foo, bar, -1, baz] ensure that [foo], [foo, bar], and [foo, bar, -1] exist
    *  if new fields are to be created, nodeId indicates the transformation
    */
-  protected createAncestors(engine: TransformationEngine, path: KeyPath, nodeId: number)
+  protected createAncestors(engine: FriendEngine, path: KeyPath, nodeId: number)
   {
     for (let i = 1; i < path.size; i++)
     {
@@ -242,6 +251,37 @@ export default class CreationVisitor
       {
         Utils.fields.transferFieldData(sourceId, childId, engine, engine);
       }
+    });
+  }
+
+  protected changeTypeEffects(engine: FriendEngine, node: TransformationNode, fieldId: number, newType: FieldTypes)
+  {
+    const currentType = Utils.fields.fieldType(fieldId, engine);
+    if (newType != null && newType !== currentType)
+    {
+      node.meta.fromType = currentType;
+      Utils.fields.setType(engine, fieldId, newType);
+      if (currentType === FieldTypes.Array || currentType === FieldTypes.Object)
+      {
+        this.killSubfields(engine, node, fieldId);
+      }
+      if (newType === FieldTypes.Array)
+      {
+        const kp = engine.getFieldPath(fieldId).push(-1);
+        engine.addField(kp, { etlType: FieldTypes.String }, node.id);
+      }
+    }
+  }
+
+  protected killSubfields(engine: FriendEngine, node: TransformationNode, fieldId: number)
+  {
+    Utils.traversal.postorderFields(engine, fieldId, (childId) => {
+      if (fieldId === childId)
+      {
+        return;
+      }
+      console.log('killing ', engine.getFieldPath(childId).toJS());
+      engine.killField(childId, node.id);
     });
   }
 }

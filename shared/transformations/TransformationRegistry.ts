@@ -72,6 +72,7 @@ import { RenameTransformationInfo, RenameTransformationNode } from './nodes/Rena
 import { RoundTransformationInfo, RoundTransformationNode } from './nodes/RoundTransformationNode';
 import { SetIfTransformationInfo, SetIfTransformationNode } from './nodes/SetIfTransformationNode';
 import { SplitTransformationInfo, SplitTransformationNode } from './nodes/SplitTransformationNode';
+import { StringifyTransformationInfo, StringifyTransformationNode } from './nodes/StringifyTransformationNode';
 import { SubstringTransformationInfo, SubstringTransformationNode } from './nodes/SubstringTransformationNode';
 import { SubtractTransformationInfo, SubtractTransformationNode } from './nodes/SubtractTransformationNode';
 import { SumTransformationInfo, SumTransformationNode } from './nodes/SumTransformationNode';
@@ -113,6 +114,7 @@ const infos: {
     [TransformationNodeType.RoundNode]: RoundTransformationInfo,
     [TransformationNodeType.SetIfNode]: SetIfTransformationInfo,
     [TransformationNodeType.SplitNode]: SplitTransformationInfo,
+    [TransformationNodeType.StringifyNode]: StringifyTransformationInfo,
     [TransformationNodeType.SubstringNode]: SubstringTransformationInfo,
     [TransformationNodeType.SubtractNode]: SubtractTransformationInfo,
     [TransformationNodeType.SumNode]: SumTransformationInfo,

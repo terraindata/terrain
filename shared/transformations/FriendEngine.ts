@@ -64,4 +64,5 @@ export default abstract class FriendEngine extends TransformationEngine
 
   public abstract setFieldPath(fieldID: number, path: KeyPath): void;
   public abstract addIdentity(fieldId: number, sourceNode?: number): number;
+  public abstract killField(fieldID: number, killedByNode: number): number;
 }

@@ -43,68 +43,66 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 
 import * as Immutable from 'immutable';
-import { List } from 'immutable';
 import * as _ from 'lodash';
-import * as Utils from 'shared/transformations/util/EngineUtils';
+import * as yadeep from 'shared/util/yadeep';
 
-import LanguageController from 'shared/etl/languages/LanguageControllers';
-import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
-import { DateFormats, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+const { List, Map } = Immutable;
+
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import { KeyPath, WayPoint } from 'shared/util/KeyPath';
+import { KeyPath } from 'shared/util/KeyPath';
 
-const etlTypeKeyPath = List(['etlType']);
-export default class FieldUtil
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
+
+const TYPECODE = TransformationNodeType.StringifyNode;
+
+export class StringifyTransformationNode extends SimpleTransformationType
 {
-  public static addFieldToEngine(engine: TransformationEngine, keypath: KeyPath, type: FieldTypes): number
-  {
-    const cfg = {
-      etlType: type,
-    };
-    return engine.addField(keypath, cfg);
-  }
+  public readonly typeCode = TYPECODE;
+  public readonly skipNulls = false;
 
-  public static setType(engine: TransformationEngine, fieldId: number, type: FieldTypes)
+  public shouldTransform(el: any)
   {
-    FieldUtil.changeFieldTypeSideEffects(engine, fieldId, type);
-    engine.setFieldProp(fieldId, etlTypeKeyPath, type);
-  }
-
-  public static fieldType(id: number, engine: TransformationEngine): FieldTypes
-  {
-    const etlType = engine.getFieldProp(id, etlTypeKeyPath) as FieldTypes;
-    return etlType == null ? FieldTypes.String : etlType;
-  }
-
-  public static changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType: FieldTypes)
-  {
-    LanguageController.get(Languages.Elastic)
-      .changeFieldTypeSideEffects(engine, fieldId, newType);
-    LanguageController.get(Languages.JavaScript)
-      .changeFieldTypeSideEffects(engine, fieldId, newType);
-  }
-
-  public static copyField(e1: TransformationEngine, id1: number, keypath: KeyPath, node?: number, e2 = e1)
-  {
-    const id2 = e2.addField(keypath, {}, node);
-    FieldUtil.transferFieldData(id1, id2, e1, e2);
-    return id2;
-  }
-
-  // copies a field's configuration from e1 to e2. id1 and id2 should both exist in e1 and e2 respectively
-  public static transferFieldData(id1: number, id2: number, e1: TransformationEngine, e2: TransformationEngine)
-  {
-    e2.setFieldProps(id2, _.cloneDeep(e1.getFieldProps(id1)));
-    if (e1.getFieldEnabled(id1))
+    if (typeof el === 'object')
     {
-      e2.enableField(id2);
+      return true;
     }
-    else
+  }
+
+  public transformer(el: any): any
+  {
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    try
     {
-      e2.disableField(id2);
+      return opts.pretty ? JSON.stringify(el, null, 2) : JSON.stringify(el);
+    }
+    catch (e)
+    {
+      return '';
     }
   }
 }
+
+class StringifyTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Stringify';
+  public description = 'Turn an object or array into a string';
+  public nodeClass = StringifyTransformationNode;
+
+  public editable = false;
+  public creatable = true;
+
+  public computeNewSourceType(engine?, node?, index?): FieldTypes
+  {
+    return FieldTypes.String;
+  }
+}
+
+export const StringifyTransformationInfo = new StringifyTransformationInfoC();

@@ -84,7 +84,7 @@ export default abstract class Traversal
       if (node.typeCode === TransformationNodeType.IdentityNode && node.fields.get(0).id === field)
       {
         const { type } = node.meta as NodeOptionsType<TransformationNodeType.IdentityNode>;
-        if (type !== 'Rename')
+        if (type !== 'Rename' && type !== 'Removal')
         {
           return node.id;
         }
@@ -224,24 +224,24 @@ export default abstract class Traversal
     return key;
   }
 
-  public static getFieldDependents(engine: TransformationEngine, fieldId: number): List<number>
-  {
-    const transformations = engine.getTransformations(fieldId);
-    const asSet = transformations.flatMap((id) =>
-    {
-      const transformation = engine.getTransformationInfo(id);
-      const nfkp: List<KeyPath> = _.get(transformation, ['meta', 'newFieldKeyPaths']);
-      if (nfkp === undefined)
-      {
-        return undefined;
-      }
-      else
-      {
-        return nfkp;
-      }
-    }).map((kp) => engine.getFieldID(kp))
-      .toList()
-      .toSet();
-    return List(asSet);
-  }
+  // public static getFieldDependents(engine: TransformationEngine, fieldId: number): List<number>
+  // {
+  //   const transformations = engine.getTransformations(fieldId);
+  //   const asSet = transformations.flatMap((id) =>
+  //   {
+  //     const transformation = engine.getTransformationInfo(id);
+  //     const nfkp: List<KeyPath> = _.get(transformation, ['meta', 'newFieldKeyPaths']);
+  //     if (nfkp === undefined)
+  //     {
+  //       return undefined;
+  //     }
+  //     else
+  //     {
+  //       return nfkp;
+  //     }
+  //   }).map((kp) => engine.getFieldID(kp))
+  //     .toList()
+  //     .toSet();
+  //   return List(asSet);
+  // }
 }

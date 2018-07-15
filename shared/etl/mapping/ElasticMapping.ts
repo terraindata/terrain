@@ -458,8 +458,7 @@ export class ElasticMapping
       this.errors.push(`Error encountered while clearing Geopoint Mappings. Details: ${String(e)}`);
     }
 
-    TerrainLog.debug('Creat ES mapping: ' + JSON.stringify(this.mapping)
-      + ' from all fields: ' + JSON.stringify(this.engine.getAllFieldNames()));
+    TerrainLog.debug('Create ES mapping: ' + JSON.stringify(this.mapping));
   }
 
   protected verifyAndSetPrimaryKey(id: number)

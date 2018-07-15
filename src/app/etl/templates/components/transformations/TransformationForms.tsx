@@ -71,6 +71,7 @@ import
   HashTFF, MultiplyTFF, RemoveDuplicatesTFF, RoundTFF, SubstringTFF, SubtractTFF, ZipcodeTFF,
 } from './SimpleTransformations';
 import { SplitTFF } from './SplitTransformationForm';
+import { StringifyTFF } from './StringifyTransformationForm';
 
 const forms: Array<{ new(props): TransformationForm<any, any> }> = [
   AddTFF,
@@ -97,6 +98,7 @@ const forms: Array<{ new(props): TransformationForm<any, any> }> = [
   RoundTFF,
   SetIfTFF,
   SplitTFF,
+  StringifyTFF,
   SubstringTFF,
   SubtractTFF,
   SumTFF,

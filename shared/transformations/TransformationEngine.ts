@@ -516,14 +516,18 @@ export class TransformationEngine
     this.fieldProps = this.fieldProps.set(fieldID, newProps);
   }
 
-  public getAllFieldIDs(): List<number>
+  public getAllFieldIDs(includeDead = false): List<number>
   {
-    return this.IDToPathMap.keySeq().toList();
+    const filtered = includeDead ?
+      this.IDToPathMap
+      :
+      this.IDToPathMap.filter((kp, id) => this.isDead(kp));
+    return this.IDToPathMap.filter((kp, id) => kp.size > 0).keySeq().toList();
   }
 
-  public getAllFieldNames(): List<KeyPath>
+  public isDead(kp: KeyPath): boolean
   {
-    return this.IDToPathMap.valueSeq().toList();
+    return kp.size === 1 && kp.get(0) === null;
   }
 
   public enableField(fieldID: number): void
@@ -616,5 +620,13 @@ export class TransformationEngine
       this.dag.setEdge(String(sourceNode), String(identityId), EdgeTypes.Synthetic);
     }
     return identityId;
+  }
+
+  protected killField(fieldID: number, killedByNode: number): number
+  {
+    const options: NodeOptionsType<TransformationNodeType.IdentityNode> = {
+      type: 'Removal',
+    };
+    return this.appendTransformation(TransformationNodeType.IdentityNode, List([fieldID]), options);
   }
 }

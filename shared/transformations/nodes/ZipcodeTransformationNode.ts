@@ -93,7 +93,7 @@ class ZipcodeTransformationInfoC extends TransformationNodeInfo
     {
       return null;
     }
-    const options: NodeOptionsType<TransformationNodeType.ZipcodeNode> = node.meta;
+    const options: NodeOptionsType<typeof TYPECODE> = node.meta;
     if (options.format === 'loc')
     {
       return FieldTypes.GeoPoint;

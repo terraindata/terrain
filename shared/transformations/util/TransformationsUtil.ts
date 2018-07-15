@@ -54,11 +54,9 @@ import * as Utils from 'shared/transformations/util/EngineUtils';
 
 export default abstract class TransformationsUtil
 {
-
-  // cast the field to the specified type (or the field's current type if type is not specified)
+  // shortcut to cast the field to the specified type (or the field's current type if type is not specified)
   public static castField(engine: TransformationEngine, fieldId: number, type?: FieldTypes, format?: DateFormats)
   {
-    const ikp = engine.getFieldPath(fieldId);
     const etlType: FieldTypes = type === undefined ? Utils.fields.fieldType(fieldId, engine) : type;
 
     if (etlType === FieldTypes.Date && format === undefined)
@@ -71,7 +69,33 @@ export default abstract class TransformationsUtil
       format,
     };
 
-    engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), transformOptions);
+    engine.appendTransformation(TransformationNodeType.CastNode, List([fieldId]), transformOptions);
+  }
+
+  public static parseField(engine: TransformationEngine, fieldId: number, to: 'array' | 'object')
+  {
+    const currentType = Utils.fields.fieldType(fieldId, engine);
+    if (currentType !== FieldTypes.String)
+    {
+      throw new Error('Cannot add transformation to parse from a non-string');
+    }
+    const options: NodeOptionsType<TransformationNodeType.ParseNode> = {
+      to,
+    };
+    engine.appendTransformation(TransformationNodeType.ParseNode, List([fieldId]), options);
+  }
+
+  public static stringifyField(engine: TransformationEngine, fieldId: number, pretty = false)
+  {
+    const currentType = Utils.fields.fieldType(fieldId, engine);
+    if (currentType !== FieldTypes.Array && currentType !== FieldTypes.Object)
+    {
+      throw new Error('Cannot add transformation to stringify a non-array or object field');
+    }
+    const options: NodeOptionsType<TransformationNodeType.StringifyNode> = {
+      pretty,
+    };
+    engine.appendTransformation(TransformationNodeType.StringifyNode, List([fieldId]), options);
   }
 
   public static addInitialTypeCasts(engine: TransformationEngine)

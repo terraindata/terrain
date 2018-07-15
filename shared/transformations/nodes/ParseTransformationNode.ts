@@ -60,8 +60,6 @@ import { KeyPath } from 'shared/util/KeyPath';
 
 import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
 
-import dateFormat = require('date-format');
-
 const TYPECODE = TransformationNodeType.ParseNode;
 
 export class ParseTransformationNode extends SimpleTransformationType
@@ -129,6 +127,23 @@ class ParseTransformationInfoC extends TransformationNodeInfo
   public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
   {
     return `Parse to ${meta.to}`;
+  }
+
+  public computeNewSourceType(engine?, node?, index?): FieldTypes
+  {
+    if (node === undefined)
+    {
+      return null;
+    }
+    const options: NodeOptionsType<typeof TYPECODE> = node.meta;
+    if (options.to === 'array')
+    {
+      return FieldTypes.Array;
+    }
+    else
+    {
+      return FieldTypes.Object;
+    }
   }
 }
 

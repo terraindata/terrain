@@ -116,10 +116,10 @@ class EditorFieldPreview extends TemplateEditorField<Props>
         text: 'Move this Field',
         onClick: this.requestMoveField,
       });
-      options.push({
-        text: 'Delete this Field',
-        onClick: this.requestDeleteField,
-      });
+      // options.push({
+      //   text: 'Delete this Field',
+      //   onClick: this.requestDeleteField,
+      // });
     }
     if (!field.isNamedField())
     {
@@ -387,31 +387,31 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     });
   }
 
-  public deleteThisField()
-  {
-    this._try((proxy) =>
-    {
-      proxy.deleteField(this.props.fieldId);
-    });
-  }
+  // public deleteThisField()
+  // {
+  //   this._try((proxy) =>
+  //   {
+  //     proxy.deleteField(this.props.fieldId);
+  //   });
+  // }
 
-  public requestDeleteField()
-  {
-    let message = 'Are you sure you want to delete this field?';
-    if (this._field().childrenIds.size > 0)
-    {
-      message = 'Deleting this field will remove all child fields. ' + message;
-    }
-    this.props.act({
-      actionType: 'addModal',
-      props: {
-        title: 'Confirm Action',
-        message,
-        confirm: true,
-        onConfirm: this.deleteThisField.bind(this),
-      },
-    });
-  }
+  // public requestDeleteField()
+  // {
+  //   let message = 'Are you sure you want to delete this field?';
+  //   if (this._field().childrenIds.size > 0)
+  //   {
+  //     message = 'Deleting this field will remove all child fields. ' + message;
+  //   }
+  //   this.props.act({
+  //     actionType: 'addModal',
+  //     props: {
+  //       title: 'Confirm Action',
+  //       message,
+  //       confirm: true,
+  //       onConfirm: this.deleteThisField.bind(this),
+  //     },
+  //   });
+  // }
 
   public requestAddField()
   {
