@@ -247,11 +247,11 @@ QueryRouter.post('/template', passport.authenticate('access-token-local'), async
   const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
   const elasticClient: ElasticClient = (database as DatabaseController).getClient() as ElasticClient;
   const params: any =
-    {
-      index: [...indexSet],
-      type: [...typeSet],
-      body: bodyArr,
-    };
+  {
+    index: [...indexSet],
+    type: [...typeSet],
+    body: bodyArr,
+  };
   ctx.body = await new Promise<any>(async (resolve, reject) =>
   {
     elasticClient.msearchTemplate(params, SharedUtil.promise.makeCallback(resolve, reject));

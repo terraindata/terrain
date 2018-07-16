@@ -57,39 +57,39 @@ export const enum FieldType
 }
 
 export const FieldTypeMapping =
-  {
-    [FieldType.Numerical]: ['long', 'double', 'short', 'byte', 'integer', 'half_float', 'float', 'boolean'],
-    [FieldType.Text]: ['text'],
-    [FieldType.Date]: ['date'],
-    [FieldType.Geopoint]: ['geo_point'],
-    [FieldType.Ip]: ['ip'],
-    [FieldType.Any]: ['text',
-      'long',
-      'boolean',
-      'date',
-      'array',
-      'double',
-      'short',
-      'byte',
-      'integer',
-      'half_float',
-      'float',
-      'geo_point'],
-    [FieldType.Nested]: ['nested'],
-  };
+{
+  [FieldType.Numerical]: ['long', 'double', 'short', 'byte', 'integer', 'half_float', 'float', 'boolean'],
+  [FieldType.Text]: ['text'],
+  [FieldType.Date]: ['date'],
+  [FieldType.Geopoint]: ['geo_point'],
+  [FieldType.Ip]: ['ip'],
+  [FieldType.Any]: ['text',
+    'long',
+    'boolean',
+    'date',
+    'array',
+    'double',
+    'short',
+    'byte',
+    'integer',
+    'half_float',
+    'float',
+    'geo_point'],
+  [FieldType.Nested]: ['nested'],
+};
 
 export const ReverseFieldTypeMapping =
-  {
-    long: FieldType.Numerical,
-    double: FieldType.Numerical,
-    short: FieldType.Numerical,
-    byte: FieldType.Numerical,
-    integer: FieldType.Numerical,
-    float: FieldType.Numerical,
-    boolean: FieldType.Numerical,
-    text: FieldType.Text,
-    date: FieldType.Date,
-    geo_point: FieldType.Geopoint,
-    ip: FieldType.Geopoint,
-    nested: FieldType.Nested,
-  };
+{
+  long: FieldType.Numerical,
+  double: FieldType.Numerical,
+  short: FieldType.Numerical,
+  byte: FieldType.Numerical,
+  integer: FieldType.Numerical,
+  float: FieldType.Numerical,
+  boolean: FieldType.Numerical,
+  text: FieldType.Text,
+  date: FieldType.Date,
+  geo_point: FieldType.Geopoint,
+  ip: FieldType.Geopoint,
+  nested: FieldType.Nested,
+};

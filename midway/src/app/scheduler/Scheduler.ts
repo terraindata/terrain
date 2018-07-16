@@ -145,10 +145,10 @@ export class Scheduler
     const timezone: string = momentZone.tz.guess();
     const name: string = momentZone.tz(timezone).zoneName();
     const timezoneObj: object =
-      {
-        timezone,
-        name,
-      };
+    {
+      timezone,
+      name,
+    };
     return Promise.resolve(timezoneObj);
   }
 
@@ -189,23 +189,23 @@ export class Scheduler
       const jobFilename: string = 'Job_' + (id.toString() as string) + '_' + new Date().toISOString() + '.bin';
       const jobType: string = runNow === true ? 'Scheduled ad-hoc' : 'Scheduled';
       const jobConfig: JobConfig =
-        {
-          createdAt: null,
-          createdBy: schedule.createdBy,
-          id: null,
-          logId: null,
-          meta: '',
-          name: schedule.name,
-          pausedFilename: jobFilename,
-          priority: 1,
-          running: null,
-          runNowPriority: null,
-          scheduleId: id,
-          status: '',
-          tasks: schedule.tasks,
-          type: jobType,
-          workerId: 1, // TODO change this for clustering support
-        };
+      {
+        createdAt: null,
+        createdBy: schedule.createdBy,
+        id: null,
+        logId: null,
+        meta: '',
+        name: schedule.name,
+        pausedFilename: jobFilename,
+        priority: 1,
+        running: null,
+        runNowPriority: null,
+        scheduleId: id,
+        status: '',
+        tasks: schedule.tasks,
+        type: jobType,
+        workerId: 1, // TODO change this for clustering support
+      };
       await this.setRunning(id, true, handle);
       const runningSched = await this.get(id);
       const jobCreateStatus: JobConfig[] | string = await App.JobQ.create(jobConfig, runNow, userId);

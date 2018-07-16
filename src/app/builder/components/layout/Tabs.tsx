@@ -72,14 +72,14 @@ const Tab = createReactClass({
   wrapperDiv: null,
 
   propTypes:
-    {
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      selected: PropTypes.bool.isRequired,
-      index: PropTypes.number.isRequired,
-      onClick: PropTypes.func.isRequired,
-      onClose: PropTypes.func.isRequired,
-    },
+  {
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    selected: PropTypes.bool.isRequired,
+    index: PropTypes.number.isRequired,
+    onClick: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired,
+  },
 
   getDefaultProps(): any
   {

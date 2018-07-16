@@ -64,24 +64,24 @@ type FormLookupMap<E extends string> =
   };
 
 export const SourceFormMap: FormLookupMap<Sources> =
-  {
-    [Sources.Upload]: UploadEndpoint,
-    [Sources.Algorithm]: AlgorithmEndpoint,
-    [Sources.Sftp]: SftpEndpoint,
-    [Sources.GoogleAnalytics]: GoogleAnalyticsEndpoint,
-    [Sources.Http]: HttpEndpointForm,
-    [Sources.Fs]: FsEndpoint,
-    [Sources.Mysql]: SQLEndpoint,
-    [Sources.Postgresql]: SQLEndpoint,
-  };
+{
+  [Sources.Upload]: UploadEndpoint,
+  [Sources.Algorithm]: AlgorithmEndpoint,
+  [Sources.Sftp]: SftpEndpoint,
+  [Sources.GoogleAnalytics]: GoogleAnalyticsEndpoint,
+  [Sources.Http]: HttpEndpointForm,
+  [Sources.Fs]: FsEndpoint,
+  [Sources.Mysql]: SQLEndpoint,
+  [Sources.Postgresql]: SQLEndpoint,
+};
 
 export const SinkFormMap: FormLookupMap<Sinks> =
-  {
-    [Sinks.Download]: DownloadEndpoint,
-    [Sinks.Database]: DatabaseEndpoint,
-    [Sinks.Sftp]: SftpEndpoint,
-    [Sinks.Http]: HttpEndpointForm,
-    [Sinks.Fs]: FsEndpoint,
-    [Sinks.FollowUpBoss]: FollowUpBossEndpoint,
-    [Sinks.MailChimp]: MailChimpEndpoint,
-  };
+{
+  [Sinks.Download]: DownloadEndpoint,
+  [Sinks.Database]: DatabaseEndpoint,
+  [Sinks.Sftp]: SftpEndpoint,
+  [Sinks.Http]: HttpEndpointForm,
+  [Sinks.Fs]: FsEndpoint,
+  [Sinks.FollowUpBoss]: FollowUpBossEndpoint,
+  [Sinks.MailChimp]: MailChimpEndpoint,
+};

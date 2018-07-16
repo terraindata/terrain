@@ -512,75 +512,75 @@ class App extends TerrainComponent<Props>
     };
 
     const layout =
-      {
-        fullHeight: true,
-        columns:
-          [
-            {
-              width: sidebarWidth,
-              content: <Sidebar
-                links={links}
-                selectedIndex={selectedIndex}
-                expandable={true}
-                expanded={sidebarExpanded}
-                onExpand={this.toggleSidebar}
-              />,
-            },
-            {
-              noProps: true,
-              content:
-                <div
-                  className='app-inner'
-                  style={style}
-                >
-                  <Switch>
-                    <Route exact path='/' component={Redirect} />
+    {
+      fullHeight: true,
+      columns:
+        [
+          {
+            width: sidebarWidth,
+            content: <Sidebar
+              links={links}
+              selectedIndex={selectedIndex}
+              expandable={true}
+              expanded={sidebarExpanded}
+              onExpand={this.toggleSidebar}
+            />,
+          },
+          {
+            noProps: true,
+            content:
+              <div
+                className='app-inner'
+                style={style}
+              >
+                <Switch>
+                  <Route exact path='/' component={Redirect} />
 
-                    <Route exact path='/builder' component={Builder} />
-                    <Route exact path='/builder/:config' component={Builder} />
-                    <Route exact path='/builder/:config/:splitConfig' component={Builder} />
+                  <Route exact path='/builder' component={Builder} />
+                  <Route exact path='/builder/:config' component={Builder} />
+                  <Route exact path='/builder/:config/:splitConfig' component={Builder} />
 
-                    <Route exact path='/library' render={libraryLibrary} />
-                    <Route exact path='/library/:categoryId' render={libraryLibrary} />
-                    <Route exact path='/library/:categoryId/:groupId' render={libraryLibrary} />
-                    <Route exact path='/library/:categoryId/:groupId/:algorithmId' render={libraryLibrary} />
+                  <Route exact path='/library' render={libraryLibrary} />
+                  <Route exact path='/library/:categoryId' render={libraryLibrary} />
+                  <Route exact path='/library/:categoryId/:groupId' render={libraryLibrary} />
+                  <Route exact path='/library/:categoryId/:groupId/:algorithmId' render={libraryLibrary} />
 
-                    <Route path='/account' component={Account} />
+                  <Route path='/account' component={Account} />
 
-                    <Route exact path='/manual' component={ManualWrapper} />
-                    <Route exact path='/manual/:term' component={ManualWrapper} />
+                  <Route exact path='/manual' component={ManualWrapper} />
+                  <Route exact path='/manual/:term' component={ManualWrapper} />
 
-                    <Route exact path='/users/:userId' component={Account} />
+                  <Route exact path='/users/:userId' component={Account} />
 
-                    <Route path='/reporting' component={Placeholder} />
+                  <Route path='/reporting' component={Placeholder} />
 
-                    <Route path='/logout' component={Logout} />
+                  <Route path='/logout' component={Logout} />
 
-                    <Route exact path='/x' component={X} />
-                    <Route exact path='/x/:x' component={X} />
+                  <Route exact path='/x' component={X} />
+                  <Route exact path='/x/:x' component={X} />
 
-                    <Route path='/ui' component={UIComponentsPage} />
+                  <Route path='/ui' component={UIComponentsPage} />
 
-                    <Route exact path='/browser' component={Redirect} />
-                    <Route exact path='/browser/:a' component={Redirect} />
-                    <Route exact path='/browser/:a/:b' component={Redirect} />
-                    <Route exact path='/browser/:a/:b/:c' component={Redirect} />
+                  <Route exact path='/browser' component={Redirect} />
+                  <Route exact path='/browser/:a' component={Redirect} />
+                  <Route exact path='/browser/:a/:b' component={Redirect} />
+                  <Route exact path='/browser/:a/:b/:c' component={Redirect} />
 
-                    <Route path='/schema' component={SchemaPage} />
+                  <Route path='/schema' component={SchemaPage} />
 
-                    <Route exact path='/data' render={(props) => <RRedirect to='/data/templates' />} />
-                    <Route path='/data' component={DataTabs} />
+                  <Route exact path='/data' render={(props) => <RRedirect to='/data/templates' />} />
+                  <Route path='/data' component={DataTabs} />
 
-                    <Route exact path='/analytics' render={analyticsLibrary} />
-                    <Route exact path='/analytics/:categoryId' render={analyticsLibrary} />
-                    <Route exact path='/analytics/:categoryId/:groupId' render={analyticsLibrary} />
-                    <Route exact path='/analytics/:categoryId/:groupId/:algorithmId' render={analyticsLibrary} />
-                  </Switch>
-                </div>
-              ,
-            },
-          ],
-      };
+                  <Route exact path='/analytics' render={analyticsLibrary} />
+                  <Route exact path='/analytics/:categoryId' render={analyticsLibrary} />
+                  <Route exact path='/analytics/:categoryId/:groupId' render={analyticsLibrary} />
+                  <Route exact path='/analytics/:categoryId/:groupId/:algorithmId' render={analyticsLibrary} />
+                </Switch>
+              </div>
+            ,
+          },
+        ],
+    };
 
     return <LayoutManager layout={layout} />;
   }

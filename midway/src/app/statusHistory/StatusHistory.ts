@@ -66,12 +66,12 @@ export class StatusHistory
     }
     // can only insert
     const newVersion: StatusHistoryConfig =
-      {
-        userId: user.id,
-        algorithmId: id,
-        fromStatus: obj['status'],
-        toStatus: newStatus,
-      };
+    {
+      userId: user.id,
+      algorithmId: id,
+      fromStatus: obj['status'],
+      toStatus: newStatus,
+    };
     return App.DB.upsert(this.statusHistoryTable, newVersion) as Promise<StatusHistoryConfig>;
   }
 }

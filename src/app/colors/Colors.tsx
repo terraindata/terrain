@@ -57,95 +57,95 @@ const Color = require('color');
 // 1 is highest contrast (most to edge of spectrum)
 //  as number increases, contrast decreases
 const NTColors =
-  {
-    light1: '#fff',
-    light2: '#f8f8f8',
-    light3: '#f4f5f7',
+{
+  light1: '#fff',
+  light2: '#f8f8f8',
+  light3: '#f4f5f7',
 
-    grey1: '#e3e3e3',
-    grey2: '#d8d8d8',
-    grey3: '#ccc',
-    grey4: '#f4f4f4',
-    grey5: '#adadad',
-    grey6: '#878787',
+  grey1: '#e3e3e3',
+  grey2: '#d8d8d8',
+  grey3: '#ccc',
+  grey4: '#f4f4f4',
+  grey5: '#adadad',
+  grey6: '#878787',
 
-    dark1: '#000',
-    dark2: '#231F20',
-    dark3: '#2f3132',
+  dark1: '#000',
+  dark2: '#231F20',
+  dark3: '#2f3132',
 
-    mainBlue: '#1eb4fa',
-    blue1: '#a5e2ff',
-    blue2: '#55c6fa',
-    blue3: '#1a9cd9',
-    blue4: '#157eb0',
-    blue5: '#c6edff',
-    blue6: '#0087c6',
+  mainBlue: '#1eb4fa',
+  blue1: '#a5e2ff',
+  blue2: '#55c6fa',
+  blue3: '#1a9cd9',
+  blue4: '#157eb0',
+  blue5: '#c6edff',
+  blue6: '#0087c6',
 
-    green: '#72ee7c',
-  };
+  green: '#72ee7c',
+};
 
 const connectionStatuses =
-  {
-    CONNECTED: '#94be6b',
-    CONN_TIMEOUT: '#ffa8b9',
-    ACCESS_DENIED: '#ffa8b9',
-    CONNECTING: '#1eb4fa',
-    DISCONNECTED: '#ea526f',
-    DISCONNECTING: '#ff8a5b',
-    UNKNOWN: '#cccccc',
-  };
+{
+  CONNECTED: '#94be6b',
+  CONN_TIMEOUT: '#ffa8b9',
+  ACCESS_DENIED: '#ffa8b9',
+  CONNECTING: '#1eb4fa',
+  DISCONNECTED: '#ea526f',
+  DISCONNECTING: '#ff8a5b',
+  UNKNOWN: '#cccccc',
+};
 
 const jobStatuses =
-  {
-    SUCCESS: '#94be6b',
-    ABORTED: '#ffa8b9',
-    CANCELED: '#ffa8b9',
-    RUNNING: '#1eb4fa',
-    FAILURE: '#ea526f',
-    PAUSED: '#ff8a5b',
-    PENDING: '#cccccc',
-  };
+{
+  SUCCESS: '#94be6b',
+  ABORTED: '#ffa8b9',
+  CANCELED: '#ffa8b9',
+  RUNNING: '#1eb4fa',
+  FAILURE: '#ea526f',
+  PAUSED: '#ff8a5b',
+  PENDING: '#cccccc',
+};
 
 const logLevels =
-  {
-    info: '#1eb4fa',
-    warn: '#ff8a5b',
-    error: '#ea526f',
-  };
+{
+  info: '#1eb4fa',
+  warn: '#ff8a5b',
+  error: '#ea526f',
+};
 
 const NewTheme =
-  {
-    fontColor: NTColors.dark3,
-    fontColor2: '#606262',
-    fontColorLightest: NTColors.grey3,
-    fontWhite: NTColors.light1,
+{
+  fontColor: NTColors.dark3,
+  fontColor2: '#606262',
+  fontColorLightest: NTColors.grey3,
+  fontWhite: NTColors.light1,
 
-    active: NTColors.mainBlue,
+  active: NTColors.mainBlue,
 
-    bg: NTColors.light1,
-    blockBg: NTColors.light3, // e.g., in Pathfinder, behind block elements
-    blockOutline: NTColors.grey1,
+  bg: NTColors.light1,
+  blockBg: NTColors.light3, // e.g., in Pathfinder, behind block elements
+  blockOutline: NTColors.grey1,
 
-    sidebarBg: NTColors.light1,
+  sidebarBg: NTColors.light1,
 
-    textboxBg: NTColors.light1,
-    lightBlue: NTColors.blue1,
+  textboxBg: NTColors.light1,
+  lightBlue: NTColors.blue1,
 
-    success: NTColors.green,
-    connectionStatuses,
-    jobStatuses,
-    logLevels,
+  success: NTColors.green,
+  connectionStatuses,
+  jobStatuses,
+  logLevels,
 
-    mainBlue: NTColors.mainBlue,
-    todayHighlight: NTColors.blue5,
+  mainBlue: NTColors.mainBlue,
+  todayHighlight: NTColors.blue5,
 
-    dateViewLabel: NTColors.blue4,
+  dateViewLabel: NTColors.blue4,
 
-    sectionBg: NTColors.grey4,
-    sectionEditButton: NTColors.grey2,
-    sectionSubtitle: NTColors.grey5,
-    mainSectionTitle: NTColors.grey6,
-  };
+  sectionBg: NTColors.grey4,
+  sectionEditButton: NTColors.grey2,
+  sectionSubtitle: NTColors.grey5,
+  mainSectionTitle: NTColors.grey6,
+};
 
 // Will be deprecated
 interface OldTheme
@@ -387,763 +387,763 @@ interface OldTheme
 const darkActive = '#1eb4fa';
 
 const code =
-  {
-    numberClause: '#1eb4fa',
-    nullClause: '#d14f42', // code mirror marks nulls as numbers
+{
+  numberClause: '#1eb4fa',
+  nullClause: '#d14f42', // code mirror marks nulls as numbers
 
-    booleanClause: '#b161bc',
-    baseClause: '#f99c49',
+  booleanClause: '#b161bc',
+  baseClause: '#f99c49',
 
-    anyClause: '#559dce',
+  anyClause: '#559dce',
 
-    arrayClause: '#b161bc',
+  arrayClause: '#b161bc',
 
-    enumClause: 'rgb(255, 189, 86)',
-    fieldClause: '#f99c49', // pastel purple: 'rgb(144, 118, 170)',
+  enumClause: 'rgb(255, 189, 86)',
+  fieldClause: '#f99c49', // pastel purple: 'rgb(144, 118, 170)',
 
-    structureClause: '#4fc0ba',
-    mapClause: '#4fc0ba',
-    objectClause: '#4fc0ba',
+  structureClause: '#4fc0ba',
+  mapClause: '#4fc0ba',
+  objectClause: '#4fc0ba',
 
-    stringClause: '#f99c49', // string types
-    indexClause: '#f99c49',
-    typeClause: '#f99c49',
+  stringClause: '#f99c49', // string types
+  indexClause: '#f99c49',
+  typeClause: '#f99c49',
 
-    inputParameter: '#4ef9ab', // '#da62ea',
+  inputParameter: '#4ef9ab', // '#da62ea',
 
-  };
+};
 
 const DARK: OldTheme =
+{
+  // Use these colors
+
+  bg1: 'rgb(39, 39, 39)',
+  bg2: 'rgb(47, 47, 47)',
+  bg3: 'rgb(60, 63, 65)',
+
+  emptyBg: 'rgb(21, 21, 21)',
+
+  border1: 'rgb(72,72,72)',
+  border2: 'rgb(100,105,107)',
+  border3: 'rgb(125,130,139)',
+
+  text1: '#fff',
+  text2: 'rgba(255,255,255,0.85)',
+  text3: 'rgba(255,255,255,0.5)',
+
+  altBg1: '#fff',
+  altBg2: '#EDEFF3',
+
+  altText1: '#000',
+  altText2: '#242424',
+  altText3: '#424242',
+
+  altHighlight: 'rgba(210,215,219,0.75)',
+
+  highlight: 'rgba(255,255,255,0.15)', // for slight emphasis
+  darkerHighlight: 'rgba(255,255,255,0.05)', // to make a depth effect with highlight
+  stroke: 'rgba(255,255,255,0.15)', // stands out against any background
+
+  boxShadow: 'rgba(0, 0, 0, 0.39)',
+
+  fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
+
+  inputBg: 'rgba(0,0,0,0.25)',
+  inputBorder: 'rgba(0,0,0,0.25)',
+  inputFocusBg: 'rgba(0,0,0,0.5)',
+
+  active: darkActive,
+  activeText: '#fff',
+  inactiveHover: Color(darkActive).fade(0.25).string(),
+  inactiveHoverText: '#fff',
+  activeHover: '#2ec4ff',
+
+  scrollbarBG: 'rgba(255,255,255,0.15)',
+  scrollbarPiece: 'rgba(255,255,255,0.25)',
+
+  altScrollbarPiece: 'rgba(0, 0, 0, 0.15)',
+
+  error: '#d14f42',
+
+  import: '#1efab4',
+
+  resultLine: 'rgba(255,255,255,0.25)',
+
+  tqlEditor: 'monokai',
+
+  transformChartBg: 'rgb(43,60,69)',
+
+  iconColor: '#fff',
+
+  // DO NOT USE these below colors anymore -- these need to be cleaned up
+
+  // text
+  text:
   {
-    // Use these colors
+    baseDark: '#000000',
+    secondaryDark: 'rgba(0,0,0,0.50)',
+    baseLight: '#FFFFFF',
+    secondaryLight: 'rgba(255,255,255,0.80)',
+    thirdLight: 'rgba(255,255,255,0.5)',
 
-    bg1: 'rgb(39, 39, 39)',
-    bg2: 'rgb(47, 47, 47)',
-    bg3: 'rgb(60, 63, 65)',
+    link: Color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
+    linkHover: Color('#4C7C9C').lighten(0.5).saturate(0.15).string(),
+  },
 
-    emptyBg: 'rgb(21, 21, 21)',
+  button:
+  {
+    text: '#FFFFFF',
+    background: Color('#4C7C9C').lighten(0.15).saturate(0.15).string(),
+    backgroundHover: Color('#4C7C9C').saturate(0.15).string(),
+  },
 
-    border1: 'rgb(72,72,72)',
-    border2: 'rgb(100,105,107)',
-    border3: 'rgb(125,130,139)',
+  // Library ------
 
-    text1: '#fff',
-    text2: 'rgba(255,255,255,0.85)',
-    text3: 'rgba(255,255,255,0.5)',
-
-    altBg1: '#fff',
-    altBg2: '#EDEFF3',
-
-    altText1: '#000',
-    altText2: '#242424',
-    altText3: '#424242',
-
-    altHighlight: 'rgba(210,215,219,0.75)',
-
-    highlight: 'rgba(255,255,255,0.15)', // for slight emphasis
-    darkerHighlight: 'rgba(255,255,255,0.05)', // to make a depth effect with highlight
-    stroke: 'rgba(255,255,255,0.15)', // stands out against any background
-
-    boxShadow: 'rgba(0, 0, 0, 0.39)',
-
-    fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
-
-    inputBg: 'rgba(0,0,0,0.25)',
-    inputBorder: 'rgba(0,0,0,0.25)',
-    inputFocusBg: 'rgba(0,0,0,0.5)',
-
-    active: darkActive,
-    activeText: '#fff',
-    inactiveHover: Color(darkActive).fade(0.25).string(),
-    inactiveHoverText: '#fff',
-    activeHover: '#2ec4ff',
-
-    scrollbarBG: 'rgba(255,255,255,0.15)',
-    scrollbarPiece: 'rgba(255,255,255,0.25)',
-
-    altScrollbarPiece: 'rgba(0, 0, 0, 0.15)',
-
-    error: '#d14f42',
-
-    import: '#1efab4',
-
-    resultLine: 'rgba(255,255,255,0.25)',
-
-    tqlEditor: 'monokai',
-
-    transformChartBg: 'rgb(43,60,69)',
-
-    iconColor: '#fff',
-
-    // DO NOT USE these below colors anymore -- these need to be cleaned up
-
-    // text
-    text:
-      {
-        baseDark: '#000000',
-        secondaryDark: 'rgba(0,0,0,0.50)',
-        baseLight: '#FFFFFF',
-        secondaryLight: 'rgba(255,255,255,0.80)',
-        thirdLight: 'rgba(255,255,255,0.5)',
-
-        link: Color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
-        linkHover: Color('#4C7C9C').lighten(0.5).saturate(0.15).string(),
-      },
-
-    button:
-      {
-        text: '#FFFFFF',
-        background: Color('#4C7C9C').lighten(0.15).saturate(0.15).string(),
-        backgroundHover: Color('#4C7C9C').saturate(0.15).string(),
-      },
-
-    // Library ------
-
-    library:
-      {
-        // item
-        item: {
-          title: '#424242',
-          body: '#4B4B4B',
-          activeBody: '#4C7C9C',
-        },
-
-        // info graph selection btn
-        infoGraphBtn: {
-          btnBase: '#696666',
-          btnRoll: '#6E6B6B',
-          btnSelected: '#828080',
-          btnRadioBase: 'rgba(0,0,0,0.50)',
-          btnRadioSelected: '#80CCFF',
-        },
-
-        //text box
-        textbox: {
-          base: '#FFFFFF',
-        },
-      },
-
-    // Builder -----------------------------
-
-    builder: {
-      // tab area
-      tabs: {
-        background: '#151515',
-        tabActive: '#272727',
-        tabTopRibbon: '#4C7C9C',
-        tabInactive: 'rgba(39,39,39,50)',
-        tabTopRibbonInactive: 'rgba(76, 124, 156, 0.5)',
-      },
-
-      // deck
-      deck: {
-        background: '#2B2A2A',
-      },
-
-      // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
-      cards: {
-
-        cardBgOpacity: 0.15,
-
-        cardBase: 'rgba(47, 47, 47, 0)', //'rgb(60, 63, 65)', //'#2F2F2F', // '#424242', // TODO
-
-        // card theme colors
-
-        //by category
-        categories: {
-          primary: '#4fc0ba',
-          control: '#fad14b',
-          sort: '#1eb4fa',
-          filter: '#77f067',
-          match: '#b161bc',
-          score: '#1eb4fa',
-          script: '#4fc0ba',
-          compound: '#fad14b',
-          join: '#fad14b',
-          geo: '#0ee06b',
-          suggest: '#bbfa1e',
-          parameter: code.inputParameter,
-        },
-
-        //by clause type
-        anyClause: code.anyClause,
-        arrayClause: code.arrayClause,
-        baseClause: code.baseClause,
-        booleanClause: code.booleanClause,
-        enumClause: code.enumClause,
-        fieldClause: code.fieldClause,
-        indexClause: code.indexClause,
-        mapClause: code.mapClause,
-        nullClause: code.nullClause,
-        numberClause: code.numberClause,
-        objectClause: code.objectClause,
-        stringClause: code.stringClause,
-        structureClause: code.structureClause,
-        typeClause: code.typeClause,
-        inputParameter: code.inputParameter,
-
-        card1: '#559DCE',
-        card2: '#397DD0',
-        card3: '#D14F42',
-        card4: '#D55A44',
-        card5: '#DA6846',
-        card6: '#DD7547',
-        card7: '#DD8846',
-        card8: '#DAA043',
-        card9: '#D9B540',
-        card10: '#86A760',
-        card11: '#659F72',
-        card12: '#4B977F',
-        card13: '#39908B',
-        card14: '#2E8C9A',
-        card15: '#2589AA',
-        card16: '#466AA3',
-        card17: '#824BA0',
-        card18: '#B161BC',
-        card19: '#319AA9',
-        card20: '#4A979A',
-        card21: '#3A91A5',
-
-        card1BG: Color('#559DCE').alpha(.2).string(),
-        card2BG: Color('#397DD0').alpha(0.2).string(),
-        card3BG: Color('#D14F42').alpha(0.2).string(),
-        card4BG: Color('#D55A44').alpha(0.2).string(),
-        card5BG: Color('#DA6846').alpha(0.2).string(),
-        card6BG: Color('#DD7547').alpha(0.2).string(),
-        card7BG: Color('#DD8846').alpha(0.2).string(),
-        card8BG: Color('#DAA043').alpha(0.2).string(),
-        card9BG: Color('#D9B540').alpha(0.2).string(),
-        card10BG: Color('#86A760').alpha(0.2).string(),
-        card11BG: Color('#659F72').alpha(0.2).string(),
-        card12BG: Color('#4B977F').alpha(0.2).string(),
-        card13BG: Color('#39908B').alpha(0.2).string(),
-        card14BG: Color('#2E8C9A').alpha(0.2).string(),
-        card15BG: Color('#2589AA').alpha(0.2).string(),
-        card16BG: Color('#466AA3').alpha(0.2).string(),
-        card17BG: Color('#824BA0').alpha(0.2).string(),
-        card18BG: Color('#B161BC').alpha(0.2).string(),
-        card19BG: Color('#319AA9').alpha(0.2).string(),
-        card20BG: Color('#4A979A').alpha(0.2).string(),
-        card21BG: Color('#3A91A5').alpha(0.2).string(),
-      },
-
-      //builder column
-      builderColumn: {
-        background: 'rgba(0,0,0,0)', // 'rgb(47, 47, 47)', //'rgb(60, 63, 65)',
-      },
-
-      inputs:
-        {
-          background: '#626262',
-        },
+  library:
+  {
+    // item
+    item: {
+      title: '#424242',
+      body: '#4B4B4B',
+      activeBody: '#4C7C9C',
     },
 
-    // File import -----------------------------
-
-    fileimport: {
-      preview: {
-        column: {
-          base: '#00a0f4',
-          typeDropdown: '#005d69',
-          transform: '#a2af93',
-        },
-        cell: '#f1d7d7',
-      },
+    // info graph selection btn
+    infoGraphBtn: {
+      btnBase: '#696666',
+      btnRoll: '#6E6B6B',
+      btnSelected: '#828080',
+      btnRadioBase: 'rgba(0,0,0,0.50)',
+      btnRadioSelected: '#80CCFF',
     },
-  };
+
+    //text box
+    textbox: {
+      base: '#FFFFFF',
+    },
+  },
+
+  // Builder -----------------------------
+
+  builder: {
+    // tab area
+    tabs: {
+      background: '#151515',
+      tabActive: '#272727',
+      tabTopRibbon: '#4C7C9C',
+      tabInactive: 'rgba(39,39,39,50)',
+      tabTopRibbonInactive: 'rgba(76, 124, 156, 0.5)',
+    },
+
+    // deck
+    deck: {
+      background: '#2B2A2A',
+    },
+
+    // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
+    cards: {
+
+      cardBgOpacity: 0.15,
+
+      cardBase: 'rgba(47, 47, 47, 0)', //'rgb(60, 63, 65)', //'#2F2F2F', // '#424242', // TODO
+
+      // card theme colors
+
+      //by category
+      categories: {
+        primary: '#4fc0ba',
+        control: '#fad14b',
+        sort: '#1eb4fa',
+        filter: '#77f067',
+        match: '#b161bc',
+        score: '#1eb4fa',
+        script: '#4fc0ba',
+        compound: '#fad14b',
+        join: '#fad14b',
+        geo: '#0ee06b',
+        suggest: '#bbfa1e',
+        parameter: code.inputParameter,
+      },
+
+      //by clause type
+      anyClause: code.anyClause,
+      arrayClause: code.arrayClause,
+      baseClause: code.baseClause,
+      booleanClause: code.booleanClause,
+      enumClause: code.enumClause,
+      fieldClause: code.fieldClause,
+      indexClause: code.indexClause,
+      mapClause: code.mapClause,
+      nullClause: code.nullClause,
+      numberClause: code.numberClause,
+      objectClause: code.objectClause,
+      stringClause: code.stringClause,
+      structureClause: code.structureClause,
+      typeClause: code.typeClause,
+      inputParameter: code.inputParameter,
+
+      card1: '#559DCE',
+      card2: '#397DD0',
+      card3: '#D14F42',
+      card4: '#D55A44',
+      card5: '#DA6846',
+      card6: '#DD7547',
+      card7: '#DD8846',
+      card8: '#DAA043',
+      card9: '#D9B540',
+      card10: '#86A760',
+      card11: '#659F72',
+      card12: '#4B977F',
+      card13: '#39908B',
+      card14: '#2E8C9A',
+      card15: '#2589AA',
+      card16: '#466AA3',
+      card17: '#824BA0',
+      card18: '#B161BC',
+      card19: '#319AA9',
+      card20: '#4A979A',
+      card21: '#3A91A5',
+
+      card1BG: Color('#559DCE').alpha(.2).string(),
+      card2BG: Color('#397DD0').alpha(0.2).string(),
+      card3BG: Color('#D14F42').alpha(0.2).string(),
+      card4BG: Color('#D55A44').alpha(0.2).string(),
+      card5BG: Color('#DA6846').alpha(0.2).string(),
+      card6BG: Color('#DD7547').alpha(0.2).string(),
+      card7BG: Color('#DD8846').alpha(0.2).string(),
+      card8BG: Color('#DAA043').alpha(0.2).string(),
+      card9BG: Color('#D9B540').alpha(0.2).string(),
+      card10BG: Color('#86A760').alpha(0.2).string(),
+      card11BG: Color('#659F72').alpha(0.2).string(),
+      card12BG: Color('#4B977F').alpha(0.2).string(),
+      card13BG: Color('#39908B').alpha(0.2).string(),
+      card14BG: Color('#2E8C9A').alpha(0.2).string(),
+      card15BG: Color('#2589AA').alpha(0.2).string(),
+      card16BG: Color('#466AA3').alpha(0.2).string(),
+      card17BG: Color('#824BA0').alpha(0.2).string(),
+      card18BG: Color('#B161BC').alpha(0.2).string(),
+      card19BG: Color('#319AA9').alpha(0.2).string(),
+      card20BG: Color('#4A979A').alpha(0.2).string(),
+      card21BG: Color('#3A91A5').alpha(0.2).string(),
+    },
+
+    //builder column
+    builderColumn: {
+      background: 'rgba(0,0,0,0)', // 'rgb(47, 47, 47)', //'rgb(60, 63, 65)',
+    },
+
+    inputs:
+    {
+      background: '#626262',
+    },
+  },
+
+  // File import -----------------------------
+
+  fileimport: {
+    preview: {
+      column: {
+        base: '#00a0f4',
+        typeDropdown: '#005d69',
+        transform: '#a2af93',
+      },
+      cell: '#f1d7d7',
+    },
+  },
+};
 
 const LIGHT: OldTheme =
+{
+  // Use these colors
+
+  bg1: 'rgb(220, 222, 226)',
+  bg2: 'rgb(237, 239, 243)',
+  bg3: '#fff',
+
+  emptyBg: '#c7cacf', // 'rgb(249, 251, 255)',
+
+  border1: 'rgb(200, 202, 206)',
+  border2: 'rgb(100,105,107)',
+  border3: 'rgb(125,130,139)',
+
+  text1: '#161616',
+  text2: '#242424',
+  text3: 'rgba(0,0,0,0.40)',
+
+  altBg1: '#fff',
+  altBg2: '#EDEFF3',
+
+  altText1: '#000',
+  altText2: '#242424',
+  altText3: '#424242',
+
+  altHighlight: 'rgba(255,255,255,0.15)',
+
+  highlight: 'rgba(210,215,219,0.25)', // for slight emphasis
+  darkerHighlight: 'rgba(210,215,219,0.5)', // to make a depth effect with highlight
+  stroke: '#aaa', // stands out against any background
+
+  boxShadow: 'rgba(130,130,130,0.3)',
+
+  fadedOutBg: 'rgba(255, 255, 255, 0.75)', // bg to cover up things when they are faded out
+
+  inputBg: 'rgba(255,255,255,1)', //237, 239, 243)',
+  inputBorder: 'rgb(200, 202, 206)',
+  inputFocusBg: '#fff',
+
+  active: darkActive,
+  activeText: '#fff',
+  inactiveHover: Color(darkActive).fade(0.25).string(),
+  inactiveHoverText: '#fff',
+  activeHover: '#2ec4ff',
+
+  scrollbarBG: 'rgba(0,0,0,0.1)',
+  scrollbarPiece: 'rgb(180, 182, 186)',
+
+  altScrollbarPiece: 'rgba(0, 0, 0, 0.25)',
+
+  error: '#d14f42',
+
+  import: '#1efab4',
+
+  resultLine: 'rgba(0,0,0,0.25)',
+
+  tqlEditor: 'default',
+
+  transformChartBg: '#fff',
+
+  iconColor: 'rgba(0, 0, 0, 0.4)',
+
+  // DO NOT USE these below colors anymore -- these need to be cleaned up
+
+  // text
+  text:
   {
-    // Use these colors
+    baseDark: '#000000',
+    secondaryDark: 'rgba(0,0,0,0.50)',
+    baseLight: 'rgba(0, 0, 0, 0.6)',
+    secondaryLight: 'rgba(0, 0, 0, 0.8)',
+    thirdLight: 'rgba(0, 0, 0, 1)',
 
-    bg1: 'rgb(220, 222, 226)',
-    bg2: 'rgb(237, 239, 243)',
-    bg3: '#fff',
+    link: Color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
+    linkHover: Color('#4C7C9C').lighten(0.5).saturate(0.15).string(),
+  },
 
-    emptyBg: '#c7cacf', // 'rgb(249, 251, 255)',
+  button:
+  {
+    text: '#FFFFFF',
+    background: Color('#4C7C9C').lighten(0.15).saturate(0.15).string(),
+    backgroundHover: Color('#4C7C9C').saturate(0.15).string(),
+  },
 
-    border1: 'rgb(200, 202, 206)',
-    border2: 'rgb(100,105,107)',
-    border3: 'rgb(125,130,139)',
+  // Library ------
 
-    text1: '#161616',
-    text2: '#242424',
-    text3: 'rgba(0,0,0,0.40)',
-
-    altBg1: '#fff',
-    altBg2: '#EDEFF3',
-
-    altText1: '#000',
-    altText2: '#242424',
-    altText3: '#424242',
-
-    altHighlight: 'rgba(255,255,255,0.15)',
-
-    highlight: 'rgba(210,215,219,0.25)', // for slight emphasis
-    darkerHighlight: 'rgba(210,215,219,0.5)', // to make a depth effect with highlight
-    stroke: '#aaa', // stands out against any background
-
-    boxShadow: 'rgba(130,130,130,0.3)',
-
-    fadedOutBg: 'rgba(255, 255, 255, 0.75)', // bg to cover up things when they are faded out
-
-    inputBg: 'rgba(255,255,255,1)', //237, 239, 243)',
-    inputBorder: 'rgb(200, 202, 206)',
-    inputFocusBg: '#fff',
-
-    active: darkActive,
-    activeText: '#fff',
-    inactiveHover: Color(darkActive).fade(0.25).string(),
-    inactiveHoverText: '#fff',
-    activeHover: '#2ec4ff',
-
-    scrollbarBG: 'rgba(0,0,0,0.1)',
-    scrollbarPiece: 'rgb(180, 182, 186)',
-
-    altScrollbarPiece: 'rgba(0, 0, 0, 0.25)',
-
-    error: '#d14f42',
-
-    import: '#1efab4',
-
-    resultLine: 'rgba(0,0,0,0.25)',
-
-    tqlEditor: 'default',
-
-    transformChartBg: '#fff',
-
-    iconColor: 'rgba(0, 0, 0, 0.4)',
-
-    // DO NOT USE these below colors anymore -- these need to be cleaned up
-
-    // text
-    text:
-      {
-        baseDark: '#000000',
-        secondaryDark: 'rgba(0,0,0,0.50)',
-        baseLight: 'rgba(0, 0, 0, 0.6)',
-        secondaryLight: 'rgba(0, 0, 0, 0.8)',
-        thirdLight: 'rgba(0, 0, 0, 1)',
-
-        link: Color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
-        linkHover: Color('#4C7C9C').lighten(0.5).saturate(0.15).string(),
-      },
-
-    button:
-      {
-        text: '#FFFFFF',
-        background: Color('#4C7C9C').lighten(0.15).saturate(0.15).string(),
-        backgroundHover: Color('#4C7C9C').saturate(0.15).string(),
-      },
-
-    // Library ------
-
-    library:
-      {
-        // item
-        item: {
-          title: '#424242',
-          body: '#4B4B4B',
-          activeBody: '#4C7C9C',
-        },
-
-        // info graph selection btn
-        infoGraphBtn: {
-          btnBase: '#696666',
-          btnRoll: '#6E6B6B',
-          btnSelected: '#828080',
-          btnRadioBase: 'rgba(0,0,0,0.50)',
-          btnRadioSelected: '#80CCFF',
-        },
-
-        //text box
-        textbox: {
-          base: '#FFFFFF',
-        },
-      },
-
-    // Builder -----------------------------
-
-    builder: {
-      // tab area
-      tabs: {
-        background: '#151515',
-        tabActive: '#272727',
-        tabTopRibbon: '#4C7C9C',
-        tabInactive: 'rgba(39,39,39,50)',
-        tabTopRibbonInactive: 'rgba(76, 124, 156, 0.5)',
-      },
-
-      // deck
-      deck: {
-        background: 'rgb(256, 256, 260)',
-      },
-
-      // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
-      cards: {
-
-        cardBgOpacity: 0.15,
-
-        cardBase: 'rgba(47, 47, 47, 0)', //'rgb(60, 63, 65)', //'#2F2F2F', // '#424242', // TODO
-
-        // card theme colors
-
-        //by category
-        categories: {
-          primary: '#4fc0ba',
-          control: '#f99c49',
-          sort: '#1eb4fa',
-          filter: '#38fa1e',
-          match: '#b161bc',
-          score: '#1eb4fa',
-          script: '#4fc0ba',
-          compound: '#f99c49',
-          join: '#f99c49',
-          geo: '#0ee06b',
-          suggest: '#bbfa1e',
-          parameter: code.inputParameter,
-        },
-
-        //by clause type
-        anyClause: code.anyClause,
-        arrayClause: code.arrayClause,
-        baseClause: code.baseClause,
-        booleanClause: code.booleanClause,
-        enumClause: code.enumClause,
-        fieldClause: code.fieldClause,
-        indexClause: code.indexClause,
-        mapClause: code.mapClause,
-        nullClause: code.nullClause,
-        numberClause: code.numberClause,
-        objectClause: code.objectClause,
-        stringClause: code.stringClause,
-        structureClause: code.structureClause,
-        typeClause: code.typeClause,
-        inputParameter: code.inputParameter,
-
-        card1: '#559DCE',
-        card2: '#397DD0',
-        card3: '#D14F42',
-        card4: '#D55A44',
-        card5: '#DA6846',
-        card6: '#DD7547',
-        card7: '#DD8846',
-        card8: '#DAA043',
-        card9: '#D9B540',
-        card10: '#86A760',
-        card11: '#659F72',
-        card12: '#4B977F',
-        card13: '#39908B',
-        card14: '#2E8C9A',
-        card15: '#2589AA',
-        card16: '#466AA3',
-        card17: '#824BA0',
-        card18: '#B161BC',
-        card19: '#319AA9',
-        card20: '#4A979A',
-        card21: '#3A91A5',
-
-        card1BG: Color('#559DCE').alpha(.2).string(),
-        card2BG: Color('#397DD0').alpha(0.2).string(),
-        card3BG: Color('#D14F42').alpha(0.2).string(),
-        card4BG: Color('#D55A44').alpha(0.2).string(),
-        card5BG: Color('#DA6846').alpha(0.2).string(),
-        card6BG: Color('#DD7547').alpha(0.2).string(),
-        card7BG: Color('#DD8846').alpha(0.2).string(),
-        card8BG: Color('#DAA043').alpha(0.2).string(),
-        card9BG: Color('#D9B540').alpha(0.2).string(),
-        card10BG: Color('#86A760').alpha(0.2).string(),
-        card11BG: Color('#659F72').alpha(0.2).string(),
-        card12BG: Color('#4B977F').alpha(0.2).string(),
-        card13BG: Color('#39908B').alpha(0.2).string(),
-        card14BG: Color('#2E8C9A').alpha(0.2).string(),
-        card15BG: Color('#2589AA').alpha(0.2).string(),
-        card16BG: Color('#466AA3').alpha(0.2).string(),
-        card17BG: Color('#824BA0').alpha(0.2).string(),
-        card18BG: Color('#B161BC').alpha(0.2).string(),
-        card19BG: Color('#319AA9').alpha(0.2).string(),
-        card20BG: Color('#4A979A').alpha(0.2).string(),
-        card21BG: Color('#3A91A5').alpha(0.2).string(),
-      },
-
-      //builder column
-      builderColumn: {
-        background: 'rgba(0,0,0,0)', // 'rgb(47, 47, 47)', //'rgb(60, 63, 65)',
-      },
-
-      inputs:
-        {
-          background: '#626262',
-        },
+  library:
+  {
+    // item
+    item: {
+      title: '#424242',
+      body: '#4B4B4B',
+      activeBody: '#4C7C9C',
     },
 
-    // File import -----------------------------
-
-    fileimport: {
-      preview: {
-        column: {
-          base: '#00a0f4',
-          typeDropdown: '#005d69',
-          transform: '#a2af93',
-        },
-        cell: '#f1d7d7',
-      },
+    // info graph selection btn
+    infoGraphBtn: {
+      btnBase: '#696666',
+      btnRoll: '#6E6B6B',
+      btnSelected: '#828080',
+      btnRadioBase: 'rgba(0,0,0,0.50)',
+      btnRadioSelected: '#80CCFF',
     },
-  };
+
+    //text box
+    textbox: {
+      base: '#FFFFFF',
+    },
+  },
+
+  // Builder -----------------------------
+
+  builder: {
+    // tab area
+    tabs: {
+      background: '#151515',
+      tabActive: '#272727',
+      tabTopRibbon: '#4C7C9C',
+      tabInactive: 'rgba(39,39,39,50)',
+      tabTopRibbonInactive: 'rgba(76, 124, 156, 0.5)',
+    },
+
+    // deck
+    deck: {
+      background: 'rgb(256, 256, 260)',
+    },
+
+    // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
+    cards: {
+
+      cardBgOpacity: 0.15,
+
+      cardBase: 'rgba(47, 47, 47, 0)', //'rgb(60, 63, 65)', //'#2F2F2F', // '#424242', // TODO
+
+      // card theme colors
+
+      //by category
+      categories: {
+        primary: '#4fc0ba',
+        control: '#f99c49',
+        sort: '#1eb4fa',
+        filter: '#38fa1e',
+        match: '#b161bc',
+        score: '#1eb4fa',
+        script: '#4fc0ba',
+        compound: '#f99c49',
+        join: '#f99c49',
+        geo: '#0ee06b',
+        suggest: '#bbfa1e',
+        parameter: code.inputParameter,
+      },
+
+      //by clause type
+      anyClause: code.anyClause,
+      arrayClause: code.arrayClause,
+      baseClause: code.baseClause,
+      booleanClause: code.booleanClause,
+      enumClause: code.enumClause,
+      fieldClause: code.fieldClause,
+      indexClause: code.indexClause,
+      mapClause: code.mapClause,
+      nullClause: code.nullClause,
+      numberClause: code.numberClause,
+      objectClause: code.objectClause,
+      stringClause: code.stringClause,
+      structureClause: code.structureClause,
+      typeClause: code.typeClause,
+      inputParameter: code.inputParameter,
+
+      card1: '#559DCE',
+      card2: '#397DD0',
+      card3: '#D14F42',
+      card4: '#D55A44',
+      card5: '#DA6846',
+      card6: '#DD7547',
+      card7: '#DD8846',
+      card8: '#DAA043',
+      card9: '#D9B540',
+      card10: '#86A760',
+      card11: '#659F72',
+      card12: '#4B977F',
+      card13: '#39908B',
+      card14: '#2E8C9A',
+      card15: '#2589AA',
+      card16: '#466AA3',
+      card17: '#824BA0',
+      card18: '#B161BC',
+      card19: '#319AA9',
+      card20: '#4A979A',
+      card21: '#3A91A5',
+
+      card1BG: Color('#559DCE').alpha(.2).string(),
+      card2BG: Color('#397DD0').alpha(0.2).string(),
+      card3BG: Color('#D14F42').alpha(0.2).string(),
+      card4BG: Color('#D55A44').alpha(0.2).string(),
+      card5BG: Color('#DA6846').alpha(0.2).string(),
+      card6BG: Color('#DD7547').alpha(0.2).string(),
+      card7BG: Color('#DD8846').alpha(0.2).string(),
+      card8BG: Color('#DAA043').alpha(0.2).string(),
+      card9BG: Color('#D9B540').alpha(0.2).string(),
+      card10BG: Color('#86A760').alpha(0.2).string(),
+      card11BG: Color('#659F72').alpha(0.2).string(),
+      card12BG: Color('#4B977F').alpha(0.2).string(),
+      card13BG: Color('#39908B').alpha(0.2).string(),
+      card14BG: Color('#2E8C9A').alpha(0.2).string(),
+      card15BG: Color('#2589AA').alpha(0.2).string(),
+      card16BG: Color('#466AA3').alpha(0.2).string(),
+      card17BG: Color('#824BA0').alpha(0.2).string(),
+      card18BG: Color('#B161BC').alpha(0.2).string(),
+      card19BG: Color('#319AA9').alpha(0.2).string(),
+      card20BG: Color('#4A979A').alpha(0.2).string(),
+      card21BG: Color('#3A91A5').alpha(0.2).string(),
+    },
+
+    //builder column
+    builderColumn: {
+      background: 'rgba(0,0,0,0)', // 'rgb(47, 47, 47)', //'rgb(60, 63, 65)',
+    },
+
+    inputs:
+    {
+      background: '#626262',
+    },
+  },
+
+  // File import -----------------------------
+
+  fileimport: {
+    preview: {
+      column: {
+        base: '#00a0f4',
+        typeDropdown: '#005d69',
+        transform: '#a2af93',
+      },
+      cell: '#f1d7d7',
+    },
+  },
+};
 
 const halloweenActive = '#ffa125';
 
 const HALLOWEEN: OldTheme =
+{
+  // Use these colors
+
+  bg1: 'rgb(0,0,0)',
+  bg2: 'rgb(12,12,12)',
+  bg3: 'rgb(24,24,24)',
+
+  emptyBg: 'rgb(0,0,0)',
+
+  border1: 'rgb(72,72,72)',
+  border2: 'rgb(100,105,107)',
+  border3: 'rgb(125,130,139)',
+
+  text1: 'rgb(253,234,191)',
+  text2: 'rgb(255,216,130)',
+  text3: 'rgb(247,187,51)',
+
+  altBg1: '#fff',
+  altBg2: '#EDEFF3',
+
+  altText1: '#000',
+  altText2: '#242424',
+  altText3: '#424242',
+
+  iconColor: halloweenActive,
+  inputFocusBg: halloweenActive,
+  inputBorder: halloweenActive,
+
+  stroke: halloweenActive,
+
+  altHighlight: 'rgba(210,215,219,0.75)',
+
+  highlight: 'rgba(255,255,255,0.15)', // for slight emphasis
+  darkerHighlight: 'rgba(255,255,255,0.05)', // to make a depth effect with highlight
+
+  boxShadow: 'rgba(0, 0, 0, 0.39)',
+
+  fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
+
+  inputBg: 'rgba(0,0,0,0.25)',
+
+  active: halloweenActive,
+  activeText: '#fff',
+  inactiveHover: Color(halloweenActive).fade(0.25).string(),
+  inactiveHoverText: '#fff',
+  activeHover: Color(halloweenActive).fade(0.75).string(),
+
+  scrollbarBG: 'rgba(255,255,255,0.15)',
+  scrollbarPiece: halloweenActive,
+
+  altScrollbarPiece: halloweenActive,
+
+  error: '#d14f42',
+
+  import: halloweenActive,
+
+  resultLine: 'rgba(255,255,255,0.25)',
+
+  tqlEditor: 'monokai',
+
+  transformChartBg: '#fff',
+
+  // DO NOT USE these below colors anymore -- these need to be cleaned up
+
+  // text
+  text:
   {
-    // Use these colors
+    baseDark: '#000000',
+    secondaryDark: 'rgba(0,0,0,0.50)',
+    baseLight: '#FFFFFF',
+    secondaryLight: 'rgba(255,255,255,0.80)',
+    thirdLight: 'rgba(255,255,255,0.5)',
 
-    bg1: 'rgb(0,0,0)',
-    bg2: 'rgb(12,12,12)',
-    bg3: 'rgb(24,24,24)',
+    link: Color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
+    linkHover: Color('#4C7C9C').lighten(0.5).saturate(0.15).string(),
+  },
 
-    emptyBg: 'rgb(0,0,0)',
+  button:
+  {
+    text: '#FFFFFF',
+    background: Color('#4C7C9C').lighten(0.15).saturate(0.15).string(),
+    backgroundHover: Color('#4C7C9C').saturate(0.15).string(),
+  },
 
-    border1: 'rgb(72,72,72)',
-    border2: 'rgb(100,105,107)',
-    border3: 'rgb(125,130,139)',
+  // Library ------
 
-    text1: 'rgb(253,234,191)',
-    text2: 'rgb(255,216,130)',
-    text3: 'rgb(247,187,51)',
-
-    altBg1: '#fff',
-    altBg2: '#EDEFF3',
-
-    altText1: '#000',
-    altText2: '#242424',
-    altText3: '#424242',
-
-    iconColor: halloweenActive,
-    inputFocusBg: halloweenActive,
-    inputBorder: halloweenActive,
-
-    stroke: halloweenActive,
-
-    altHighlight: 'rgba(210,215,219,0.75)',
-
-    highlight: 'rgba(255,255,255,0.15)', // for slight emphasis
-    darkerHighlight: 'rgba(255,255,255,0.05)', // to make a depth effect with highlight
-
-    boxShadow: 'rgba(0, 0, 0, 0.39)',
-
-    fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
-
-    inputBg: 'rgba(0,0,0,0.25)',
-
-    active: halloweenActive,
-    activeText: '#fff',
-    inactiveHover: Color(halloweenActive).fade(0.25).string(),
-    inactiveHoverText: '#fff',
-    activeHover: Color(halloweenActive).fade(0.75).string(),
-
-    scrollbarBG: 'rgba(255,255,255,0.15)',
-    scrollbarPiece: halloweenActive,
-
-    altScrollbarPiece: halloweenActive,
-
-    error: '#d14f42',
-
-    import: halloweenActive,
-
-    resultLine: 'rgba(255,255,255,0.25)',
-
-    tqlEditor: 'monokai',
-
-    transformChartBg: '#fff',
-
-    // DO NOT USE these below colors anymore -- these need to be cleaned up
-
-    // text
-    text:
-      {
-        baseDark: '#000000',
-        secondaryDark: 'rgba(0,0,0,0.50)',
-        baseLight: '#FFFFFF',
-        secondaryLight: 'rgba(255,255,255,0.80)',
-        thirdLight: 'rgba(255,255,255,0.5)',
-
-        link: Color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
-        linkHover: Color('#4C7C9C').lighten(0.5).saturate(0.15).string(),
-      },
-
-    button:
-      {
-        text: '#FFFFFF',
-        background: Color('#4C7C9C').lighten(0.15).saturate(0.15).string(),
-        backgroundHover: Color('#4C7C9C').saturate(0.15).string(),
-      },
-
-    // Library ------
-
-    library:
-      {
-        // item
-        item: {
-          title: '#424242',
-          body: '#4B4B4B',
-          activeBody: '#4C7C9C',
-        },
-
-        // info graph selection btn
-        infoGraphBtn: {
-          btnBase: '#696666',
-          btnRoll: '#6E6B6B',
-          btnSelected: '#828080',
-          btnRadioBase: 'rgba(0,0,0,0.50)',
-          btnRadioSelected: '#80CCFF',
-        },
-
-        //text box
-        textbox: {
-          base: '#FFFFFF',
-        },
-      },
-
-    // Builder -----------------------------
-
-    builder: {
-      // tab area
-      tabs: {
-        background: '#151515',
-        tabActive: '#272727',
-        tabTopRibbon: '#4C7C9C',
-        tabInactive: 'rgba(39,39,39,50)',
-        tabTopRibbonInactive: 'rgba(76, 124, 156, 0.5)',
-      },
-
-      // deck
-      deck: {
-        background: '#2B2A2A',
-      },
-
-      // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
-      cards: {
-
-        cardBgOpacity: 0.45,
-
-        cardBase: 'rgba(47, 47, 47, 0)', //'rgb(60, 63, 65)', //'#2F2F2F', // '#424242', // TODO
-
-        // card theme colors
-
-        //by category
-        categories: {
-          primary: halloweenActive,
-          control: halloweenActive,
-          sort: halloweenActive,
-          filter: halloweenActive,
-          match: halloweenActive,
-          score: halloweenActive,
-          script: halloweenActive,
-          compound: halloweenActive,
-          join: halloweenActive,
-          geo: halloweenActive,
-          suggest: halloweenActive,
-          parameter: halloweenActive,
-        },
-
-        //by clause type
-        anyClause: code.anyClause,
-        arrayClause: code.arrayClause,
-        baseClause: code.baseClause,
-        booleanClause: code.booleanClause,
-        enumClause: code.enumClause,
-        fieldClause: code.fieldClause,
-        indexClause: code.indexClause,
-        mapClause: code.mapClause,
-        nullClause: code.nullClause,
-        numberClause: code.numberClause,
-        objectClause: code.objectClause,
-        stringClause: code.stringClause,
-        structureClause: code.structureClause,
-        typeClause: code.typeClause,
-        inputParameter: code.inputParameter,
-
-        card1: '#559DCE',
-        card2: '#397DD0',
-        card3: '#D14F42',
-        card4: '#D55A44',
-        card5: '#DA6846',
-        card6: '#DD7547',
-        card7: '#DD8846',
-        card8: '#DAA043',
-        card9: '#D9B540',
-        card10: '#86A760',
-        card11: '#659F72',
-        card12: '#4B977F',
-        card13: '#39908B',
-        card14: '#2E8C9A',
-        card15: '#2589AA',
-        card16: '#466AA3',
-        card17: '#824BA0',
-        card18: '#B161BC',
-        card19: '#319AA9',
-        card20: '#4A979A',
-        card21: '#3A91A5',
-
-        card1BG: Color('#559DCE').alpha(.2).string(),
-        card2BG: Color('#397DD0').alpha(0.2).string(),
-        card3BG: Color('#D14F42').alpha(0.2).string(),
-        card4BG: Color('#D55A44').alpha(0.2).string(),
-        card5BG: Color('#DA6846').alpha(0.2).string(),
-        card6BG: Color('#DD7547').alpha(0.2).string(),
-        card7BG: Color('#DD8846').alpha(0.2).string(),
-        card8BG: Color('#DAA043').alpha(0.2).string(),
-        card9BG: Color('#D9B540').alpha(0.2).string(),
-        card10BG: Color('#86A760').alpha(0.2).string(),
-        card11BG: Color('#659F72').alpha(0.2).string(),
-        card12BG: Color('#4B977F').alpha(0.2).string(),
-        card13BG: Color('#39908B').alpha(0.2).string(),
-        card14BG: Color('#2E8C9A').alpha(0.2).string(),
-        card15BG: Color('#2589AA').alpha(0.2).string(),
-        card16BG: Color('#466AA3').alpha(0.2).string(),
-        card17BG: Color('#824BA0').alpha(0.2).string(),
-        card18BG: Color('#B161BC').alpha(0.2).string(),
-        card19BG: Color('#319AA9').alpha(0.2).string(),
-        card20BG: Color('#4A979A').alpha(0.2).string(),
-        card21BG: Color('#3A91A5').alpha(0.2).string(),
-      },
-
-      //builder column
-      builderColumn: {
-        background: 'rgba(0,0,0,0)', // 'rgb(47, 47, 47)', //'rgb(60, 63, 65)',
-      },
-
-      inputs:
-        {
-          background: '#626262',
-        },
+  library:
+  {
+    // item
+    item: {
+      title: '#424242',
+      body: '#4B4B4B',
+      activeBody: '#4C7C9C',
     },
 
-    // File import -----------------------------
-
-    fileimport: {
-      preview: {
-        column: {
-          base: '#00a0f4',
-          typeDropdown: '#005d69',
-          transform: '#a2af93',
-        },
-        cell: '#f1d7d7',
-      },
+    // info graph selection btn
+    infoGraphBtn: {
+      btnBase: '#696666',
+      btnRoll: '#6E6B6B',
+      btnSelected: '#828080',
+      btnRadioBase: 'rgba(0,0,0,0.50)',
+      btnRadioSelected: '#80CCFF',
     },
-  };
+
+    //text box
+    textbox: {
+      base: '#FFFFFF',
+    },
+  },
+
+  // Builder -----------------------------
+
+  builder: {
+    // tab area
+    tabs: {
+      background: '#151515',
+      tabActive: '#272727',
+      tabTopRibbon: '#4C7C9C',
+      tabInactive: 'rgba(39,39,39,50)',
+      tabTopRibbonInactive: 'rgba(76, 124, 156, 0.5)',
+    },
+
+    // deck
+    deck: {
+      background: '#2B2A2A',
+    },
+
+    // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
+    cards: {
+
+      cardBgOpacity: 0.45,
+
+      cardBase: 'rgba(47, 47, 47, 0)', //'rgb(60, 63, 65)', //'#2F2F2F', // '#424242', // TODO
+
+      // card theme colors
+
+      //by category
+      categories: {
+        primary: halloweenActive,
+        control: halloweenActive,
+        sort: halloweenActive,
+        filter: halloweenActive,
+        match: halloweenActive,
+        score: halloweenActive,
+        script: halloweenActive,
+        compound: halloweenActive,
+        join: halloweenActive,
+        geo: halloweenActive,
+        suggest: halloweenActive,
+        parameter: halloweenActive,
+      },
+
+      //by clause type
+      anyClause: code.anyClause,
+      arrayClause: code.arrayClause,
+      baseClause: code.baseClause,
+      booleanClause: code.booleanClause,
+      enumClause: code.enumClause,
+      fieldClause: code.fieldClause,
+      indexClause: code.indexClause,
+      mapClause: code.mapClause,
+      nullClause: code.nullClause,
+      numberClause: code.numberClause,
+      objectClause: code.objectClause,
+      stringClause: code.stringClause,
+      structureClause: code.structureClause,
+      typeClause: code.typeClause,
+      inputParameter: code.inputParameter,
+
+      card1: '#559DCE',
+      card2: '#397DD0',
+      card3: '#D14F42',
+      card4: '#D55A44',
+      card5: '#DA6846',
+      card6: '#DD7547',
+      card7: '#DD8846',
+      card8: '#DAA043',
+      card9: '#D9B540',
+      card10: '#86A760',
+      card11: '#659F72',
+      card12: '#4B977F',
+      card13: '#39908B',
+      card14: '#2E8C9A',
+      card15: '#2589AA',
+      card16: '#466AA3',
+      card17: '#824BA0',
+      card18: '#B161BC',
+      card19: '#319AA9',
+      card20: '#4A979A',
+      card21: '#3A91A5',
+
+      card1BG: Color('#559DCE').alpha(.2).string(),
+      card2BG: Color('#397DD0').alpha(0.2).string(),
+      card3BG: Color('#D14F42').alpha(0.2).string(),
+      card4BG: Color('#D55A44').alpha(0.2).string(),
+      card5BG: Color('#DA6846').alpha(0.2).string(),
+      card6BG: Color('#DD7547').alpha(0.2).string(),
+      card7BG: Color('#DD8846').alpha(0.2).string(),
+      card8BG: Color('#DAA043').alpha(0.2).string(),
+      card9BG: Color('#D9B540').alpha(0.2).string(),
+      card10BG: Color('#86A760').alpha(0.2).string(),
+      card11BG: Color('#659F72').alpha(0.2).string(),
+      card12BG: Color('#4B977F').alpha(0.2).string(),
+      card13BG: Color('#39908B').alpha(0.2).string(),
+      card14BG: Color('#2E8C9A').alpha(0.2).string(),
+      card15BG: Color('#2589AA').alpha(0.2).string(),
+      card16BG: Color('#466AA3').alpha(0.2).string(),
+      card17BG: Color('#824BA0').alpha(0.2).string(),
+      card18BG: Color('#B161BC').alpha(0.2).string(),
+      card19BG: Color('#319AA9').alpha(0.2).string(),
+      card20BG: Color('#4A979A').alpha(0.2).string(),
+      card21BG: Color('#3A91A5').alpha(0.2).string(),
+    },
+
+    //builder column
+    builderColumn: {
+      background: 'rgba(0,0,0,0)', // 'rgb(47, 47, 47)', //'rgb(60, 63, 65)',
+    },
+
+    inputs:
+    {
+      background: '#626262',
+    },
+  },
+
+  // File import -----------------------------
+
+  fileimport: {
+    preview: {
+      column: {
+        base: '#00a0f4',
+        typeDropdown: '#005d69',
+        transform: '#a2af93',
+      },
+      cell: '#f1d7d7',
+    },
+  },
+};
 
 export const OldThemes: { [name: string]: OldTheme } =
-  {
-    DARK, LIGHT, HALLOWEEN,
-  };
+{
+  DARK, LIGHT, HALLOWEEN,
+};
 
 export const OldThemesInt =
-  {
-    DARK: 0,
-    LIGHT: 1,
-    HALLOWEEN: 2,
-  };
+{
+  DARK: 0,
+  LIGHT: 1,
+  HALLOWEEN: 2,
+};
 
 export const OldThemesArray = ['DARK', 'LIGHT', 'HALLOWEEN'];
 

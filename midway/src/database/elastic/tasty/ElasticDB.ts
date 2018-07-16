@@ -319,12 +319,12 @@ export class ElasticDB implements TastyDB
     {
       const cmd = upsert ? 'index' : 'update';
       const command =
-        {
-          [cmd]: {
-            _index: table.getDatabaseName(),
-            _type: table.getTableName(),
-          },
-        };
+      {
+        [cmd]: {
+          _index: table.getDatabaseName(),
+          _type: table.getTableName(),
+        },
+      };
 
       const compositePrimaryKey = this.makeID(table, element);
       if (compositePrimaryKey !== '')

@@ -195,12 +195,12 @@ export class ElasticWriter extends SafeWritable
       for (const chunk of chunks)
       {
         const command =
-          {
-            update: {
-              _index: this.index,
-              _type: this.type,
-            },
-          };
+        {
+          update: {
+            _index: this.index,
+            _type: this.type,
+          },
+        };
 
         if (this.primaryKey !== undefined && chunk.chunk[this.primaryKey] !== undefined)
         {
@@ -227,12 +227,12 @@ export class ElasticWriter extends SafeWritable
     for (const chunk of chunks)
     {
       const command =
-        {
-          index: {
-            _index: this.index,
-            _type: this.type,
-          },
-        };
+      {
+        index: {
+          _index: this.index,
+          _type: this.type,
+        },
+      };
 
       if (this.primaryKey !== undefined && chunk.chunk[this.primaryKey] !== undefined)
       {

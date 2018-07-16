@@ -67,13 +67,13 @@ beforeAll(async () =>
 {
   MidwayLogger.level = 'debug';
   const config: PostgresConfig =
-    {
-      database: 'moviesdb',
-      host: 'localhost',
-      port: 65432,
-      password: 'r3curs1v3$',
-      user: 't3rr41n-demo',
-    };
+  {
+    database: 'moviesdb',
+    host: 'localhost',
+    port: 65432,
+    password: 'r3curs1v3$',
+    user: 't3rr41n-demo',
+  };
 
   try
   {

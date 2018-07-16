@@ -85,21 +85,21 @@ export enum Sinks
 }
 
 export const EndpointTypeNames =
-  {
-    Upload: 'Upload',
-    Download: 'Download',
-    Algorithm: 'Terrain Algorithm',
-    Database: 'Database',
-    Sftp: 'SFTP',
-    Http: 'HTTP',
-    Fs: 'Local Filesystem',
-    Mysql: 'MySQL',
-    Postgresql: 'PostgreSQL',
-    Magento: 'Magento',
-    GoogleAnalytics: 'Google Analytics',
-    MailChimp: 'MailChimp',
-    FollowUpBoss: 'Follow Up Boss',
-  };
+{
+  Upload: 'Upload',
+  Download: 'Download',
+  Algorithm: 'Terrain Algorithm',
+  Database: 'Database',
+  Sftp: 'SFTP',
+  Http: 'HTTP',
+  Fs: 'Local Filesystem',
+  Mysql: 'MySQL',
+  Postgresql: 'PostgreSQL',
+  Magento: 'Magento',
+  GoogleAnalytics: 'Google Analytics',
+  MailChimp: 'MailChimp',
+  FollowUpBoss: 'Follow Up Boss',
+};
 
 export const SchedulableSinks: Sinks[] =
   [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs, Sinks.FollowUpBoss, Sinks.MailChimp];
@@ -159,29 +159,29 @@ export interface SourceOptionsTypes // TODO check that these are right
 }
 
 export const SourceOptionsDefaults: SourceOptionsTypes =
-  {
-    Upload: {
-      file: null,
-    },
-    Algorithm: {
-      algorithmId: -1,
-    },
-    Sftp: {
-      filepath: 'filename.json',
-      credentialId: -1,
-    },
-    GoogleAnalytics: {
-      dayInterval: 30,
-    },
-    Http: {
-      method: 'GET',
-    },
-    Fs: {},
-    Mysql: {
-    },
-    Postgresql: {
-    },
-  };
+{
+  Upload: {
+    file: null,
+  },
+  Algorithm: {
+    algorithmId: -1,
+  },
+  Sftp: {
+    filepath: 'filename.json',
+    credentialId: -1,
+  },
+  GoogleAnalytics: {
+    dayInterval: 30,
+  },
+  Http: {
+    method: 'GET',
+  },
+  Fs: {},
+  Mysql: {
+  },
+  Postgresql: {
+  },
+};
 
 export interface SinkOptionsTypes
 {
@@ -202,28 +202,28 @@ export interface SinkOptionsTypes
 }
 
 export const SinkOptionsDefaults: SinkOptionsTypes =
-  {
-    Download: {
-      filename: '',
-    },
-    Database: {
-      language: Languages.Elastic,
-      serverId: '',
-      database: '',
-      table: '',
-    },
-    Sftp: {
-      filepath: 'filename.json',
-      credentialId: -1,
-    },
-    Http: {
-      method: 'POST',
-    },
-    Fs: {},
-    FollowUpBoss: {
-    },
-    MailChimp: {},
-  };
+{
+  Download: {
+    filename: '',
+  },
+  Database: {
+    language: Languages.Elastic,
+    serverId: '',
+    database: '',
+    table: '',
+  },
+  Sftp: {
+    filepath: 'filename.json',
+    credentialId: -1,
+  },
+  Http: {
+    method: 'POST',
+  },
+  Fs: {},
+  FollowUpBoss: {
+  },
+  MailChimp: {},
+};
 
 export interface SftpOptions
 {

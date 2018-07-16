@@ -122,27 +122,27 @@ export class Integrations
     if (userConfigs.length !== 0)
     {
       const integration: object =
+      {
+        authConfig:
         {
-          authConfig:
-            {
-              password: 'S:p3_a:%D~M>mEvRxM$r;y{g"X{5,nA!',
-            },
-          connectionConfig:
-            {
-              customerName: '',
-              email: 'notifications@terraindata.com',
-              port: 465,
-              recipient: 'alerts@terraindata.com',
-              smtp: 'smtp.gmail.com',
-            },
-          createdBy: userConfigs[0].id,
-          meta: '',
-          name: 'Default Failure Email',
-          readPermission: IntegrationPermission.Admin,
-          type: 'Email',
-          lastModified: new Date(),
-          writePermission: IntegrationPermission.Admin,
-        };
+          password: 'S:p3_a:%D~M>mEvRxM$r;y{g"X{5,nA!',
+        },
+        connectionConfig:
+        {
+          customerName: '',
+          email: 'notifications@terraindata.com',
+          port: 465,
+          recipient: 'alerts@terraindata.com',
+          smtp: 'smtp.gmail.com',
+        },
+        createdBy: userConfigs[0].id,
+        meta: '',
+        name: 'Default Failure Email',
+        readPermission: IntegrationPermission.Admin,
+        type: 'Email',
+        lastModified: new Date(),
+        writePermission: IntegrationPermission.Admin,
+      };
       const integrations: IntegrationSimpleConfig[] = await this.getSimple(null, 'Email');
       if (integrations.length !== 0)
       {

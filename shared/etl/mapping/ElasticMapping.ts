@@ -252,19 +252,19 @@ export class ElasticMapping
       type: elasticProps.isAnalyzed ? 'text' : 'keyword',
       index: true,
       fields:
-        {
-          keyword: elasticProps.isAnalyzed ?
-            {
-              type: 'keyword',
-              index: elasticProps.isAnalyzed,
-            }
-            :
-            {
-              type: 'keyword',
-              index: true,
-              ignore_above: 256,
-            },
-        },
+      {
+        keyword: elasticProps.isAnalyzed ?
+          {
+            type: 'keyword',
+            index: elasticProps.isAnalyzed,
+          }
+          :
+          {
+            type: 'keyword',
+            index: true,
+            ignore_above: 256,
+          },
+      },
     };
     if (elasticProps.isAnalyzed)
     {

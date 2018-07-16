@@ -60,11 +60,11 @@ export default class CSVTransform
   ): Transform
   {
     const csvParams =
-      {
-        headers,
-        delimiter,
-        discardUnmappedColumns: true,
-      };
+    {
+      headers,
+      delimiter,
+      discardUnmappedColumns: true,
+    };
     if (ignoreQuotes === true)
     {
       csvParams['quote'] = null;
@@ -80,11 +80,11 @@ export default class CSVTransform
   ): Transform
   {
     const csvParams =
-      {
-        headers,
-        delimiter,
-        rowDelimiter,
-      };
+    {
+      headers,
+      delimiter,
+      rowDelimiter,
+    };
     if (ignoreQuotes === true)
     {
       csvParams['quote'] = null;

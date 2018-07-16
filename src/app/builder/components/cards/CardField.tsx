@@ -120,10 +120,10 @@ interface IMoveState
 }
 
 const DefaultMoveState: IMoveState =
-  {
-    moving: false,
-    movedTo: null,
-  };
+{
+  moving: false,
+  movedTo: null,
+};
 
 // TODO consider adding state to the template
 @Radium

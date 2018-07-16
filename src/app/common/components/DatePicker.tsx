@@ -559,10 +559,10 @@ export class DatePickerUncontained extends TerrainComponent<Props>
   {
     const date = this.getDate();
     const modifiers =
-      {
-        selected: (day) => DateUtils.isSameDay(day, date.toDate()),
-        today: new Date(),
-      };
+    {
+      selected: (day) => DateUtils.isSameDay(day, date.toDate()),
+      today: new Date(),
+    };
 
     return (
       <div
