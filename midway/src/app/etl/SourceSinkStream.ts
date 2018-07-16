@@ -79,11 +79,12 @@ import SFTPEndpoint from './endpoints/SFTPEndpoint';
 
 export const postProcessTransform: PostProcess = new PostProcess();
 
-export async function getSourceStreamPreview(name: string, source: SourceConfig, files?: stream.Readable[], size?: number, rawStream?: boolean): Promise<string>
+export async function getSourceStreamPreview(name: string, source: SourceConfig, files?: stream.Readable[], 
+  size?: number, rawStream?: boolean): Promise<string>
 {
   return new Promise<string>(async (resolve, reject) =>
   {
-    const readableStream: stream.Readable = await this.getSourceStream(name, source, files, size, rawStream);
+    const readableStream: stream.Readable = await getSourceStream(name, source, files, size, rawStream);
     let buffAsStr: string = '';
     let returnedStr: boolean = false;
     if (rawStream === true)
@@ -121,7 +122,8 @@ export async function getSourceStreamPreview(name: string, source: SourceConfig,
   });
 }
 
-export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[], size?: number, rawStream?: boolean): Promise<stream.Readable>
+export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[], 
+  size?: number, rawStream?: boolean): Promise<stream.Readable>
 {
   return new Promise<stream.Readable>(async (resolve, reject) =>
   {
