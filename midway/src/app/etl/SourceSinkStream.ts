@@ -80,15 +80,36 @@ export const postProcessTransform: PostProcess = new PostProcess();
 
 export async function getSourceStreamPreview(name: string, source: SourceConfig, files?: stream.Readable[], size?: number, rawStream?: true): Promise<string>
 {
-  const readableStream: stream.Readable = await this.getSourceStream(name, source, files, rawStream);
-  const buff = readableStream.readableBuffer; 
-  if (rawStream === true)
+  return new Promise<string>(async (resolve, reject) =>
   {
-    readableStream.on('data', (data) =>
+    const readableStream: stream.Readable = await this.getSourceStream(name, source, files, rawStream);
+    const buffAsStr: string = ''; 
+    if (rawStream !== true)
     {
+      readableStream.on('data', (data) =>
+      {
+        if (data.length >= size)
+        {
+          buffAsStr += ((data.toString() as string).substring(0, size) as string);
+        }
+        else if (data.length < size)
+        {
+          buffAsStr += (data.toString() as string);
+        }
 
-    });
-  }
+        if (buffAsStr.length >= size)
+        {
+          return resolve(buffAsStr);
+        }
+      });
+    }
+    else
+    {
+      const results = await BufferTransform.toArray(readableStream, size);
+      return resolve(JSON.stringify(results));
+      return resolve()
+    }
+  });
 }
 
 export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[], rawStream?: true): Promise<stream.Readable>
