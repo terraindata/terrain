@@ -72,6 +72,7 @@ export default abstract class TransformationsUtil
     engine.appendTransformation(TransformationNodeType.CastNode, List([fieldId]), transformOptions);
   }
 
+  // shortcut to parse a string field into an object / array
   public static parseField(engine: TransformationEngine, fieldId: number, to: FieldTypes.Array | FieldTypes.Object)
   {
     const currentType = Utils.fields.fieldType(fieldId, engine);
@@ -85,6 +86,7 @@ export default abstract class TransformationsUtil
     engine.appendTransformation(TransformationNodeType.ParseNode, List([fieldId]), options);
   }
 
+  // shortcut to stringify an object or array into a string
   public static stringifyField(engine: TransformationEngine, fieldId: number, pretty = false)
   {
     const currentType = Utils.fields.fieldType(fieldId, engine);
@@ -98,6 +100,7 @@ export default abstract class TransformationsUtil
     engine.appendTransformation(TransformationNodeType.StringifyNode, List([fieldId]), options);
   }
 
+  // add initial casts to all fields
   public static addInitialTypeCasts(engine: TransformationEngine)
   {
     engine.getAllFieldIDs().forEach((id) =>

@@ -48,9 +48,9 @@ import { List } from 'immutable';
 import * as _ from 'lodash';
 
 import { DateFormats, FieldTypes } from 'shared/etl/types/ETLTypes';
-import TransformationRegistry from 'shared/transformations/TransformationRegistry';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import TransformationRegistry from 'shared/transformations/TransformationRegistry';
 
 import { KeyPath, WayPoint } from '../../util/KeyPath';
 import * as yadeep from '../../util/yadeep';
@@ -346,7 +346,8 @@ describe('suite of complex duplication tests', () =>
   });
 });
 
-describe('Simple multi rename with an operation', () => {
+describe('Simple multi rename with an operation', () =>
+{
   const doc = {
     nested: {
       foo: 'hi',
@@ -407,13 +408,15 @@ describe('Complex Stringify and Parse Gauntlet', () =>
     return engine;
   }
 
-  test('Simple Gauntlet', () => {
+  test('Simple Gauntlet', () =>
+  {
     const { engine } = Utils.construction.createEngineFromDocuments(List([baseDoc]));
     Utils.transformations.addInitialTypeCasts(engine);
     runGauntlet(engine, baseDoc);
   });
 
-  test('Gauntlet with initial rename', () => {
+  test('Gauntlet with initial rename', () =>
+  {
     const doc = {
       foo: 'hello',
       noosted: {
@@ -435,7 +438,8 @@ describe('Complex Stringify and Parse Gauntlet', () =>
     runGauntlet(engine, doc);
   });
 
-  test('Gauntlet with in place transformations', () => {
+  test('Gauntlet with in place transformations', () =>
+  {
     const doc = {
       foo: 'ello',
       nested: {
@@ -464,7 +468,8 @@ describe('Complex Stringify and Parse Gauntlet', () =>
     runGauntlet(engine, doc);
   });
 
-  test('Gauntlet with combination of joins sums and renames', () => {
+  test('Gauntlet with combination of joins sums and renames', () =>
+  {
     const doc = {
       fooPart1: 'he',
       fooPart2: 'llo',

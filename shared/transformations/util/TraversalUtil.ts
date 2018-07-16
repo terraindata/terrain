@@ -50,6 +50,7 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import FriendEngine from 'shared/transformations/FriendEngine';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
@@ -64,12 +65,17 @@ import { Edge, TransformationGraph } from 'shared/transformations/TypedGraph';
 
 import * as TerrainLog from 'loglevel';
 
+/*
+ *  Utility class for performing common operations on
+ *    - The graph structure of the transformation nodes
+ *    - The tree structure of the fields
+ */
 export default abstract class Traversal
 {
   // in the absence of "friend" modifiers, let's do this
   public static getGraph(engine: TransformationEngine): TransformationGraph
   {
-    return engine['dag'];
+    return (engine as FriendEngine).dag;
   }
 
   /*
@@ -93,6 +99,7 @@ export default abstract class Traversal
     return -1;
   }
 
+  // find the last non-synthetic transformation associated with the field
   public static findEndTransformation(engine: TransformationEngine, field: number): number
   {
     const graph = Traversal.getGraph(engine);
@@ -205,7 +212,7 @@ export default abstract class Traversal
     }
   }
 
-  // returns the first child field
+  // returns the first child field underneath this field
   public static findChildField(fieldId: number, engine: TransformationEngine): number | undefined
   {
     const myKP = engine.getFieldPath(fieldId);

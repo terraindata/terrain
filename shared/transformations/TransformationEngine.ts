@@ -75,12 +75,6 @@ const ExecutionVisitor = new TransformationEngineNodeVisitor();
  * This is used by the ETL import/export system in order to pre-/post-process
  * data, but is a fairly general-purpose system for manipulating deep objects.
  *
- * A TransformationEngine can be initialized from an example document, or fields
- * can manually be registered with the engine.  In either case, once fields are
- * registered, transformations can be added (they are represented as a DAG;
- * transformations may have dependencies).  Once an engine is fully configured,
- * documents with the same/similar schemas may be transformed using the
- * engine's `transform` method.
  */
 export class TransformationEngine
 {
@@ -146,16 +140,15 @@ export class TransformationEngine
 
   /**
    * Constructor for `TransformationEngine`.
-   *
-   * @param {object} doc An optional example document that, if
-   *                     passed, is used to generate initial
-   *                     field IDs and mappings
    */
   constructor()
   {
 
   }
 
+  /*
+   *  Keep this around until we're confident in our graph structure
+   */
   public debug()
   {
     function pathStr(path: KeyPath)
@@ -242,7 +235,7 @@ export class TransformationEngine
    * appended to the engine's transformation DAG in the appropriate place.
    *
    * @param {TransformationNodeType} nodeType    The type of transformation to create
-   * @param {Immutable.List<KeyPath>} inFields A list of field names (not IDs)
+   * @param {Immutable.List<KeyPath>} inFields A list of field names or IDs
    *                                             on which to apply the new transformation
    * @param {object} options                     Any options for the transformation;
    *                                             different transformation types have
@@ -303,13 +296,13 @@ export class TransformationEngine
       {
         transformationResult.errors.forEach((error: TransformationVisitError) =>
         {
-          // winston.error(`\t -${error.message}`);
+          // TODO handle error
         });
       }
       const document = transformationResult.document;
       output = document;
     }
-    // Exclude disabled fields (must do this as a postprocess, because e.g. join node)
+
     this.fieldEnabled.map((enabled: boolean, fieldID: number) =>
     {
       if (!enabled)
@@ -342,11 +335,12 @@ export class TransformationEngine
 
   /**
    * Register a field with the current engine.  This enables adding
-   * transformations to the field. If the field already exists, returns
-   * the associated id.
+   * transformations to the field. If the field already exists, throw an error
    *
    * @param {KeyPath} fullKeyPath The path of the field to add
-   * @param {object} options      Any field options (e.g., Elastic analyzers)
+   * @param {object} options      Field Metadata
+   * @param {number} sourceNode   If specified, indicates the field is created by or structurally
+   *                              affected by the transformation node
    * @returns {number}            The ID of the newly-added field
    */
   public addField(fullKeyPath: KeyPath, options: object = {}, sourceNode?: number): number
@@ -367,7 +361,7 @@ export class TransformationEngine
     return id;
   }
 
-  // todo make this respect the dag
+  // TODO Need to make this traverse the dag properly
   public deleteField(id: number): void
   {
     // Order matters!  Must do this first, else getTransformations can't work because
@@ -426,10 +420,9 @@ export class TransformationEngine
   }
 
   /**
-   * This method allows editing of any/all transformation node properties.
+   *  TODO make an 'EditTransformation' visitor to handle side effects
    *
    * @param {number} transformationID Which transformation to update
-   * @param {Immutable.List<KeyPath>} fieldNames New field names
    * @param {object} options New options
    */
   public editTransformation(transformationID: number, options?: object): void
@@ -446,7 +439,7 @@ export class TransformationEngine
   }
 
   /**
-   * Delete a transformation from the engine/DAG.
+   *  TODO Need to make this traverse the dag properly (like with delete field)
    *
    * @param {number} transformationID Which transformation to delete.
    */
@@ -543,6 +536,9 @@ export class TransformationEngine
     this.fieldEnabled = this.fieldEnabled.set(fieldID, false);
   }
 
+  /*
+   *  Create a simple tree representation that maps fieldIds to a list of that field's children
+   */
   public createTree(): Map<number, List<number>>
   {
     const ids = this.getAllFieldIDs();
@@ -593,7 +589,12 @@ export class TransformationEngine
   }
 
   /*
-   *  Add Identity Node to a newly added field (or a renamed field)
+   *  Add Identity Node.
+   *  idType indicates the type of identity node
+   *    Organic   - this field exists in the source document
+   *    Synthetic - this field is created by a transformation
+   *    Removal   - this field gets removed from the document
+   *    Rename    - this field gets moved to a new name
    */
   protected addIdentity(fieldId: number, sourceNode?: number, idType?: 'Removal' | 'Rename' | 'Synthetic'): number
   {
@@ -624,19 +625,14 @@ export class TransformationEngine
 
   /*
    *  Returns nodes in the order they should be executed
-   *
-   *  Custom topological sort that also makes sure that edges are sorted in this order:
-   *  - Synthetic
-   *  - Rename
-   *  - Same
-   *  - Removal
-   *  Note that any node should only have ever 1 inbound and 1 outbound Rename, Same, or Removal edge.
+   *  Makes sure that edges are sorted so that synthetic edges are walked first
    */
   protected computeExecutionOrder(): string[]
   {
     // copy the dag
     const dag = GraphLib.json.read(GraphLib.json.write(this.dag)) as TransformationGraph;
 
+    // for each transformation in the executionOrder, explicitly create an edge between the nodes in chronological order
     for (let i = 1; i < this.executionOrder.length; i++)
     {
       dag.setEdge(String(this.executionOrder[i - 1]), String(this.executionOrder[i]), 'DUMMY' as any);
@@ -671,6 +667,5 @@ export class TransformationEngine
     const order = GraphLib.alg.topsort(dag)
       .filter((id) => dag.node(id).typeCode !== TransformationNodeType.IdentityNode);
     return order;
-
   }
 }

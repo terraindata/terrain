@@ -69,6 +69,9 @@ interface FieldNode
   fields: { [k: string]: FieldNode };
 }
 
+/*
+ *  Utility class to create transformation engines
+ */
 export default abstract class ConstructionUtil
 {
   // take two engines and return an engine whose fields most closely resembles the result of the merge

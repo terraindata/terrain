@@ -57,6 +57,10 @@ import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 
 const etlTypeKeyPath = List(['etlType']);
+
+/*
+ *  Utility class to perform common operations on the fields of transformation engines
+ */
 export default class FieldUtil
 {
   public static addFieldToEngine(engine: TransformationEngine, keypath: KeyPath, type: FieldTypes): number

@@ -170,44 +170,6 @@ export default class TopologyUtil
     }
   }
 
-  public static createSinglePathMatcher(kp1: KeyPath, kp2: KeyPath): (kp: KeyPath) => KeyPath
-  {
-    const indices1 = [];
-    const indices2 = [];
-    for (let i = 0; i < kp1.size; i++)
-    {
-      if (kp1.get(i) === -1)
-      {
-        indices1.push(i);
-      }
-    }
-    for (let i = 0; i < kp2.size; i++)
-    {
-      if (kp2.get(i) === -1)
-      {
-        indices2.push(i);
-      }
-    }
-    if (indices1.length !== indices2.length)
-    {
-      return null;
-    }
-    const mapper = [];
-    for (let i = 0; i < indices1.length; i++)
-    {
-      mapper.push([indices1[i], indices2[i]]);
-    }
-    return (kp: KeyPath) =>
-    {
-      let ret = kp2;
-      for (const [i1, i2] of mapper)
-      {
-        ret = ret.set(i2, kp.get(i1));
-      }
-      return ret;
-    };
-  }
-
   // returns true if two given keypaths represent fields that are "local" to each other.
   // fields are local if they are unambiguously traversable to each other.
   // e.g. [a] is local to [b] and [c, d]

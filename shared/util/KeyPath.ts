@@ -74,8 +74,6 @@ export class KeyPathUtil
     return KeyPath(JSON.parse(keypath));
   }
 
-  // turn all indices into a particular value, based on
-  // an existing engine that has fields with indices in them
   public static convertIndices(keypath: KeyPath, value = -1): KeyPath
   {
     if (keypath.size === 0)

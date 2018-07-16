@@ -46,8 +46,8 @@ THE SOFTWARE.
 // tslint:disable no-unused-expression
 import { List } from 'immutable';
 import { DateFormats, FieldTypes } from 'shared/etl/types/ETLTypes';
-import { KeyPath } from 'shared/util/KeyPath';
 import { CaseFormats } from 'shared/transformations/nodes/CaseTransformationNode';
+import { KeyPath } from 'shared/util/KeyPath';
 
 enum TransformationNodeType
 {

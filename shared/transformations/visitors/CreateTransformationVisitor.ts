@@ -67,10 +67,6 @@ import { Edge, TransformationGraph } from 'shared/transformations/TypedGraph';
 
 import * as Utils from 'shared/transformations/util/EngineUtils';
 
-/*
- *  This visitor will be called after the transformation engine creates the node in the dag.
- */
-
 export default class CreationVisitor
   extends TransformationNodeVisitor<void, TransformationEngine>
 {
@@ -100,6 +96,10 @@ export default class CreationVisitor
     }
   }
 
+  /*
+   *  Process a transformation node's 'fields' property.
+   *  Attach the transformation node to all the node's input fields and calculate if their should must change
+   */
   public processInputFields(engine: FriendEngine, node: TransformationNode, edgeType: EdgeTypes)
   {
     const nodeInfo = TransformationRegistry.getInfo(node.typeCode);
@@ -108,15 +108,13 @@ export default class CreationVisitor
       Utils.traversal.appendNodeToField(engine, field.id, node.id, edgeType);
 
       const newSourceType = nodeInfo.computeNewSourceType(engine, node, index);
-      // if (newSourceType != null && newSourceType !== currentType)
-      // {
-      //   node.meta.fromType = currentType;
-      //   Utils.fields.setType(engine, field.id, newSourceType);
-      // }
       this.changeTypeEffects(engine, node, field.id, newSourceType);
     });
   }
 
+  /*
+   *  Process a transformation node's 'newFieldKeyPaths'.
+   */
   public processOutputFields(engine: FriendEngine, node: TransformationNode)
   {
     const nodeInfo = TransformationRegistry.getInfo(node.typeCode);
@@ -142,9 +140,6 @@ export default class CreationVisitor
     });
   }
 
-  // what about [foo, -1, bar] to [baz] (extract simple)
-  // or [foo, bar, 1] to [baz]
-  // or [foo, -1, 1] to [baz]
   public visitDuplicateNode(type, node: TransformationNode, engine: FriendEngine): void
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.DuplicateNode>;
@@ -177,7 +172,7 @@ export default class CreationVisitor
     }
     else if (r1 === 'one' && r2 === 'many') // e.g. [foo, bar] to [baz, -1, dog]
     {
-      // currently unsupported in the UI
+      // currently cannot be created by the UI
     }
     else
     {
@@ -232,16 +227,13 @@ export default class CreationVisitor
     }
   }
 
-  protected modifyParents(engine: FriendEngine, path: KeyPath, nodeId: number)
-  {
-
-  }
-
-  protected modifyChildren(engine: FriendEngine, path: KeyPath, nodeId: number)
-  {
-
-  }
-
+  /*
+   *  Take sourceId's properties and its children (and their properties too)
+   *  and copy them underneath rootPath. This does not create the field at rootPath, so make sure that exists
+   *  e.g.
+   *  Given a sourceId representing path [a] (where there are also fields [a, b], and [a, c])
+   *  And given rootPath [d], the new copy function will add fields [d, b] and [d, c].
+   */
   protected copyNestedStructure(engine: FriendEngine, sourceId: number, rootPath: KeyPath, node: number)
   {
     const sourcePath = Utils.path.convertIndices(engine.getFieldPath(sourceId));
@@ -264,6 +256,11 @@ export default class CreationVisitor
     });
   }
 
+  /*
+   *  Given that 'node' causes 'fieldId's type to change to 'newType', take care of the side effects
+   *  e.g. If the field had children and was turned into a string, then its children should be removed
+   *  e.g. If the field is now an array, add a wildcard field (defaults to type string)
+   */
   protected changeTypeEffects(engine: FriendEngine, node: TransformationNode, fieldId: number, newType: FieldTypes)
   {
     const currentType = Utils.fields.fieldType(fieldId, engine);

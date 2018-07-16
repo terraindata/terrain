@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-// rename this file when other util files get cleaned up
-
 import ConstructionUtil from 'shared/transformations/util/ConstructionUtil';
 import FieldUtil from 'shared/transformations/util/FieldUtil';
 import TopologyUtil from 'shared/transformations/util/TopologyUtil';

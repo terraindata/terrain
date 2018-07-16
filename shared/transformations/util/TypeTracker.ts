@@ -51,6 +51,10 @@ import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 
 type SimpleType = ReturnType<typeof TypeUtil['getSimpleType']>;
 
+/*
+ *  Instances of this class accumulate values in order to provide a guess
+ *  for what the best type is given the values seen.
+ */
 export class TypeTracker
 {
   public static messageValueLength = 20;
