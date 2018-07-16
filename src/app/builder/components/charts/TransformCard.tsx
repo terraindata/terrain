@@ -146,13 +146,11 @@ class TransformCard extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if ((nextProps.builder.query.tql !== this.props.builder.query.tql ||
-      nextProps.builder.query.inputs !== this.props.builder.query.inputs)
+    if ((nextProps.builder.query.tql !== this.props.builder.query.tql)
       && !this.props.data.closed && nextProps.data.input === '_score')
     {
       this.computeBars(nextProps.data, this.state.maxDomain, true, nextProps.builder.query);
     }
-
     // nextProps.data.domain is list<string>
     const newDomain: List<number> = List([Number(nextProps.data.domain.get(0)), Number(nextProps.data.domain.get(1))]);
     if (!newDomain.equals(this.state.maxDomain))
@@ -168,9 +166,13 @@ class TransformCard extends TerrainComponent<Props>
         return;
       }
     }
-
     if (nextProps.data.input !== this.props.data.input ||
-      nextProps.data.distanceValue !== nextProps.data.distanceValue)
+      nextProps.data.distanceValue !== this.props.data.distanceValue ||
+      (
+        nextProps.builder.query.inputs !== this.props.builder.query.inputs &&
+        nextProps.data.distanceValue && nextProps.data.distanceValue.address &&
+        nextProps.data.distanceValue.address.charAt(0) === '@'
+       ))
     {
       this.computeBars(nextProps.data, this.state.maxDomain, true);
     }
@@ -746,12 +748,31 @@ class TransformCard extends TerrainComponent<Props>
       }
       else if (distanceValue)
       {
+        let lat: string | number = 0;
+        let lon: string | number = 0;
+        let userInterpreter = false;
+        if (distanceValue.location)
+        {
+          lat = distanceValue.location[0];
+          lon = distanceValue.location[1];
+        }
+        if (distanceValue.address && distanceValue.address.charAt(0) === '@')
+        {
+          lat = distanceValue.address + '.lat';
+          lon = distanceValue.address + '.lon';
+          userInterpreter = true;
+        }
         aggQuery = {
+          query: {
+            bool: {
+              filter,
+            },
+          },
           aggs: {
             transformCard: {
               geo_distance: {
                 field: input,
-                origin: { lat: distanceValue.location[0], lon: distanceValue.location[1] },
+                origin: { lat, lon },
                 ranges: this.computeGeoRanges(interval, min, max),
                 unit: 'mi',
                 keyed: true,
@@ -760,6 +781,21 @@ class TransformCard extends TerrainComponent<Props>
           },
           size: 1,
         };
+        if (userInterpreter)
+        {
+          const qt = new ESJSParser(aggQuery);
+          if (qt.getErrors().length)
+          {
+            return;
+          }
+          const params = toInputMap(this.props.builder.query.inputs);
+          const interpreter: ESInterpreter = new ESInterpreter(qt, params);
+          if (interpreter.errors.length)
+          {
+            return;
+          }
+          aggQuery = JSON.parse(interpreter.finalQuery);
+        }
       }
       else
       {

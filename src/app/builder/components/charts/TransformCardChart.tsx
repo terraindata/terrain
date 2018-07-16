@@ -133,6 +133,20 @@ export class TransformCardChart extends TerrainComponent<Props>
     TransformChart.create(el, this.getChartState());
   }
 
+  public parseInputs(toParse)
+  {
+    const inputs = {};
+    if (toParse === undefined || toParse === null)
+    {
+      return {};
+    }
+    toParse.forEach((input) =>
+    {
+      inputs['@' + String(input.key)] = input.value;
+    });
+    return inputs;
+  }
+
   public onSelect(pointId: string, selectRange: boolean): void
   {
     const { points } = this.props;
@@ -606,6 +620,7 @@ export class TransformCardChart extends TerrainComponent<Props>
       schema: this.props.schema,
       builder: this.props.builder,
       distanceValue: overrideState.distanceValue || this.props.distanceValue,
+      inputs: this.parseInputs(this.props.builder.query.inputs),
     };
   }
 

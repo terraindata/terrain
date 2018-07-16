@@ -180,7 +180,8 @@ const TransformChart = {
     this._draw(el, scales, barsData, state.pointsData, state.onMove, state.onRelease,
       state.spotlights, state.inputKey, state.onLineClick, state.onLineMove, state.onSelect,
       state.onCreate, state.onDelete, state.onPointMoveStart, state.width, state.height,
-      state.canEdit, state.domain, state.mode, state.colors, state.schema, state.builder, state.index, state.distanceValue);
+      state.canEdit, state.domain, state.mode, state.colors, state.schema, state.builder,
+      state.index, state.distanceValue, state.inputs);
 
     d3.select(el).select('.inner-svg').on('mousedown', () =>
     {
@@ -608,7 +609,8 @@ const TransformChart = {
     bar.exit().remove();
   },
 
-  _drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData, pointFn, mode, domainMin, domainMax, isDate, isGeo, distanceValue)
+  _drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData,
+    pointFn, mode, domainMin, domainMax, isDate, isGeo, distanceValue, inputs)
   {
     const g = d3.select(el).selectAll('.spotlights');
 
@@ -638,13 +640,26 @@ const TransformChart = {
       }
       else if (isGeo)
       {
-        if (!distanceValue || !distanceValue.location)
+        if (!distanceValue)
         {
           return minX;
         }
         const loc = MapUtil.getCoordinatesFromGeopoint(d['fields'][inputKey]);
-        const distance = MapUtil.distance(loc, distanceValue.location);
-        return Util.valueMinMax(distance, minX, maxX);
+        if (distanceValue.location)
+        {
+          const distance = MapUtil.distance(loc, distanceValue.location);
+          return Util.valueMinMax(distance, minX, maxX);
+        }
+        if (distanceValue.address && distanceValue.address.chartAt(0) === '@')
+        {
+          const input = MapUtil.getCoordinatesFromGeopoint(inputs[distanceValue.address]);
+          if (input)
+          {
+            const distance = MapUtil.distance(loc, input);
+            return Util.valueMinMax(distance, minX, maxX);
+          }
+        }
+        return minX;
       }
       return Util.valueMinMax(d['fields'][inputKey], minX, maxX);
     };
@@ -1805,7 +1820,8 @@ const TransformChart = {
   _draw(el, scales, barsData, pointsData, onMove,
     onRelease, spotlights, inputKey, onLineClick,
     onLineMove, onSelect, onCreate, onDelete, onPointMoveStart,
-    width, height, canEdit, domain, mode, colors, schema, builder, index, distanceValue)
+    width, height, canEdit, domain, mode, colors, schema, builder,
+    index, distanceValue, inputs)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
@@ -1858,7 +1874,8 @@ const TransformChart = {
     {
       this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
     }
-    this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData, pointFn, mode, domain.x[0], domain.x[1], isDate, isGeo, distanceValue);
+    this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData,
+      pointFn, mode, domain.x[0], domain.x[1], isDate, isGeo, distanceValue, inputs);
 
     if (mode === 'linear'
       || (mode === 'exponential' && numPoints === NUM_CURVE_POINTS.exponential)
