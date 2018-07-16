@@ -116,7 +116,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
 
   const isProtected = (await databases.get(db.id))[0].isProtected;
 
-  if (isProtected)
+  if (isProtected && !ctx.state.user.isSuperUser)
   {
     throw new Error('Cannot update a protected database');
   }
