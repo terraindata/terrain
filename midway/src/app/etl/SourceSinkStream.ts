@@ -78,13 +78,14 @@ import SFTPEndpoint from './endpoints/SFTPEndpoint';
 
 export const postProcessTransform: PostProcess = new PostProcess();
 
-export async function getSourceStreamPreview(name: string, source: SourceConfig, files?: stream.Readable[], size?: number, rawStream?: true): Promise<string>
+export async function getSourceStreamPreview(name: string, source: SourceConfig, files?: stream.Readable[], size?: number, rawStream?: boolean): Promise<string>
 {
   return new Promise<string>(async (resolve, reject) =>
   {
-    const readableStream: stream.Readable = await this.getSourceStream(name, source, files, rawStream);
-    const buffAsStr: string = ''; 
-    if (rawStream !== true)
+    const readableStream: stream.Readable = await this.getSourceStream(name, source, files, size, rawStream);
+    let buffAsStr: string = '';
+    let returnedStr: boolean = false;
+    if (rawStream === true)
     {
       readableStream.on('data', (data) =>
       {
@@ -99,6 +100,14 @@ export async function getSourceStreamPreview(name: string, source: SourceConfig,
 
         if (buffAsStr.length >= size)
         {
+          returnedStr = true;
+          return resolve(buffAsStr);
+        }
+      });
+      readableStream.on('end', () =>
+      {
+        if (returnedStr === false)
+        {
           return resolve(buffAsStr);
         }
       });
@@ -107,12 +116,11 @@ export async function getSourceStreamPreview(name: string, source: SourceConfig,
     {
       const results = await BufferTransform.toArray(readableStream, size);
       return resolve(JSON.stringify(results));
-      return resolve()
     }
   });
 }
 
-export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[], rawStream?: true): Promise<stream.Readable>
+export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[], size?: number, rawStream?: boolean): Promise<stream.Readable>
 {
   return new Promise<stream.Readable>(async (resolve, reject) =>
   {
@@ -131,6 +139,8 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
         case 'Algorithm':
           endpoint = new AlgorithmEndpoint();
           const exportTransform = await (endpoint as AlgorithmEndpoint).getExportTransform(source);
+          exportTransform.on('error', (e) => algorithmStream.emit('error', e));
+          source.options['size'] = size;
           const algorithmStream = await endpoint.getSource(source) as stream.Readable;
           sourceStream = algorithmStream.pipe(exportTransform);
           return resolve(sourceStream);
@@ -181,11 +191,10 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
 
       if (rawStream === true)
       {
-        importStreams.push(sourceStreams[0]);
-        return resolve(importStreams[0]);
+        return resolve(sourceStreams[0]);
       }
 
-      sourceStreams.forEach(async (ss: stream.Readable) =>
+      sourceStreams.forEach((ss: stream.Readable) =>
       {
         switch (source.fileConfig.fileType)
         {
@@ -208,7 +217,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
             break;
           case 'xml':
             const xmlPath: string | undefined = source.fileConfig.xmlPath;
-            importStreams.push(sourceStream.pipe(XMLTransform.createImportStream(xmlPath)));
+            importStreams.push(ss.pipe(XMLTransform.createImportStream(xmlPath)));
             break;
           default:
             throw new Error('Download file type must be either CSV, TSV, JSON, XLSX or XML.');

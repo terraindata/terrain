@@ -44,8 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import passportHeaderAPIKey = require('passport-headerapikey');
 import passportLocal = require('passport-local');
 
+import { apikeys } from '../apikeys/APIKeyRouter';
 import Middleware from '../Middleware';
 import { users } from '../users/UserRouter';
 
@@ -78,6 +80,21 @@ Middleware.passport.use('local', new passportLocal.Strategy(
     users.loginWithEmail(email, password).then((user) =>
     {
       done(null, user);
+    }).catch((e) =>
+    {
+      done(e, null);
+    });
+  }));
+
+// authenticate with API key (only for API routes)
+Middleware.passport.use('api-key', new passportHeaderAPIKey.HeaderAPIKeyStrategy(
+  { header: 'Authorization', prefix: 'APIKey ' },
+  true,
+  (key: string, done) =>
+  {
+    apikeys.validate(key).then((apikey) =>
+    {
+      done(null, apikey);
     }).catch((e) =>
     {
       done(e, null);

@@ -184,7 +184,7 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
     }
     else
     {
-      message = `There aren't yet any ${this.props.itemsName || 'item'}s`;
+      message = `There aren't any ${this.props.itemsName || 'item'}s yet`;
     }
 
     return message;
@@ -192,7 +192,8 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
 
   public render()
   {
-    const { columnConfig, items, getMenuOptions } = this.props;
+    const { columnConfig, items, getMenuOptions, loading } = this.props;
+
     return (
       <div
         className='item-list-table'
@@ -227,7 +228,7 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
         </div>
 
         {
-          items.size > 0 ?
+          items.size > 0 && !loading ?
             items.map(this.renderRow).toList()
             :
             <div className='item-list-message'>

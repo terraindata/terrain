@@ -7,8 +7,8 @@
   "scripts": {
     "start": "yarn start-postgres && yarn start-midway",
     "start-minified": "yarn start-postgres && yarn start-midway-minified",
-    "start-midway": "nodemon --exec ./node_modules/.bin/ts-node --transpileOnly -r tsconfig-paths/register -P midway $NODE_DEBUG_OPTION --harmony --max_executable_size=8192 --max_old_space_size=8192 -- ./midway/src/Midway.ts",
-    "start-midway-minified": "node ./midway/src/assets/bundle.server.js",
+    "start-midway": "rm -rf midway/build; mkdir midway/build; touch midway/build/build.log; ( yarn build-server-live & ) && while ! grep -q \"Compilation complete. Watching for file changes.\" midway/build/build.log; do sleep 1; done && NODE_PATH=${NODE_PATH}:./midway/build nodemon -e js --watch midway/build -r source-map-support/register --max_old_space_size=8192 -- ./midway/build/midway/src/Midway.js",
+    "start-midway-minified": "node -- ./midway/src/assets/bundle.server.js",
     "start-postgres": "docker-compose -f midway-postgres-docker.yml up -d",
     "start-front": "yarn commit-log && webpack-dev-server --config webpack.config.js --inline --content-base midway/src/assets --history-api-fallback --compress --progress --info --mode development",
     "stop-postgres": "docker-compose -f midway-postgres-docker.yml down",
@@ -26,7 +26,9 @@
     "copy-assets": "cp src/app/index.html midway/src/assets/index.html",
     "build": "yarn commit-log && webpack --config webpack.config.js --output-path midway/src/bundles/ --mode development",
     "build-prod": "yarn commit-log && webpack -p --config webpack.config.prod.js --output-path midway/src/bundles/ --mode production",
-    "build-server": "webpack -p --config webpack.config.server.js --output-path midway/src/assets/ --mode production",
+    "build-server-minified": "webpack -p --config webpack.config.server.js --output-path midway/src/assets/ --mode production",
+    "build-server": "tsc --noEmitOnError -p midway/tsconfig.json",
+    "build-server-live": "yarn build-server -w | tee midway/build/build.log | sed 's/\\x1b//g'",
     "lint": "yarn lint-front && yarn lint-back && yarn lint-sigint && yarn lint-analytics-js",
     "lint-parallel": "npm-run-all --parallel lint-front lint-back lint-sigint lint-analytics-js",
     "lint-front": "tslint -c tslint.json --fix --project tsconfig.json",
@@ -37,14 +39,14 @@
     "style-branch": "run(){ git diff --name-only HEAD $(git merge-base HEAD $1) | egrep '.ts$|.tsx$' | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\; | grep replaced || exit 0 && exit 1; }; run",
     "fix": "yarn style && yarn lint-parallel;",
     "diff-style": "git ls-files -m | grep \"\\.ts\" | parallel --no-notice ./node_modules/.bin/tsfmt -r {} | grep replaced || exit 0 && exit 1",
-    "rr": "./node_modules/.bin/ts-node ./rr/RecordReplay.ts",
-    "fetch-query": "./node_modules/.bin/ts-node -r tsconfig-paths/register ./rr/FetchQueries.ts",
+    "rr": "tsc --noEmitOnError -p rr/tsconfig.json && NODE_PATH=${NODE_PATH}:./rr/build node ./rr/build/rr/RecordReplay.js",
+    "fetch-query": "tsc --noEmitOnError -p rr/tsconfig.json && NODE_PATH=${NODE_PATH}:./rr/build node ./rr/build/rr/FetchQueries.js",
     "test-fullstack-login": "jest ./rr/test/login --forceExit",
     "test-fullstack-import": "jest ./rr/test/import --forceExit",
     "test-rr-pathfinder": "jest ./rr/test/pathfinder --forceExit",
     "test-rr-etl-http-import": "jest ./rr/test/etl --forceExit",
     "test-fullstack-component": "jest ./rr/test/components --forceExit",
-    "clean": "rm -rf .cache && rm -rf .cache-loader && rm -rf midway/src/assets/.cache"
+    "clean": "rm -rf .cache && rm -rf .cache-loader && rm -rf midway/src/bundles/"
   },
   "repository": {
     "type": "git",
@@ -61,6 +63,11 @@
     "transform": {
       ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
+    "testPathIgnorePatterns": [
+      "node_modules",
+      "midway/build",
+      "rr/build"
+    ],
     "testRegex": "/test/.+Tests\\.(ts|tsx|js)$",
     "moduleFileExtensions": [
       "ts",
@@ -77,6 +84,7 @@
       "^builder/(.*)$": "<rootDir>/src/app/builder/$1",
       "^charts/(.*)$": "<rootDir>/src/app/charts/$1",
       "^common/(.*)$": "<rootDir>/src/app/common/$1",
+      "^connections/(.*)$": "<rootDir>/src/app/connections/$1",
       "^control/(.*)$": "<rootDir>/src/app/control/$1",
       "^database/(.*)$": "<rootDir>/src/database/$1",
       "^deploy/(.*)$": "<rootDir>/src/app/deploy/$1",
@@ -178,6 +186,7 @@
     "nodemailer": "^4.6.6",
     "object-assign": "^4.1.1",
     "papaparse": "4.4.0",
+    "passport-headerapikey": "^1.0.5",
     "passport-local": "^1.0.0",
     "pg": "^7.4.3",
     "pg-error-constants": "^1.0.0",
@@ -239,7 +248,6 @@
     "transit-immutable-js": "^0.7.0",
     "transit-js": "^0.8.861",
     "triple-beam": "^1.3.0",
-    "ts-node": "6.0.0",
     "typescript": "2.8.3",
     "typescript-formatter": "^7.2.2",
     "uglifyjs-webpack-plugin": "^1.2.5",
@@ -307,7 +315,7 @@
     "axios-mock-adapter": "^1.15.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.4",
+    "babel-loader": "^7.1.5",
     "babel-plugin-transform-async-to-generator": "^6.22.0",
     "babel-plugin-transform-decorators": "^6.24.1",
     "babel-plugin-transform-proto-to-assign": "^6.26.0",
@@ -325,7 +333,7 @@
     "expose-loader": "^0.7.5",
     "file-loader": "^1.1.11",
     "fork-ts-checker-webpack-plugin": "^0.4.2",
-    "hard-source-webpack-plugin": "^0.7.5",
+    "hard-source-webpack-plugin": "^0.10.1",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^23.2.0",
     "json-loader": "^0.5.4",
@@ -337,6 +345,7 @@
     "react-test-renderer": "^16.4.1",
     "redux-mock-store": "^1.5.3",
     "sleep": "^5.1.1",
+    "source-map-support": "^0.5.6",
     "string-replace-loader": "^2.1.1",
     "style-loader": "^0.21.0",
     "supertest": "^3.1.0",
@@ -348,7 +357,7 @@
     "tsconfig-paths": "^3.4.1",
     "tslint": "^5.10.0",
     "url-loader": "^1.0.1",
-    "webpack": "^4.13.0",
+    "webpack": "^4.15.1",
     "webpack-bundle-analyzer": "^2.13.1",
     "webpack-cli": "^3.0.8",
     "webpack-dev-server": "^3.1.4",
@@ -356,6 +365,7 @@
     "yarn-run-all": "^3.1.1"
   },
   "resolutions": {
-    "@types/react": "16.0.34"
+    "@types/react": "16.0.34",
+    "ursa": "https://github.com/JoshKaufman/ursa#master"
   }
 }

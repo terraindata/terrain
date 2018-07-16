@@ -1,0 +1,32 @@
+{
+    "compilerOptions": {
+        "newLine": "LF",
+        "jsx": "react",
+        "lib": ["es7", "dom"],
+        "module": "commonjs",
+        "sourceMap": false,
+        "inlineSources": true,
+        "inlineSourceMap": true,
+        "target": "es6",
+        "typeRoots": [
+            "../shared/typings",
+            "../node_modules/@types"
+        ],
+        "baseUrl": ".",
+        "paths": {
+            "shared/*": ["../shared/*"]
+        },
+        "experimentalDecorators": true,
+        "declaration": false,
+        "outDir": "./build/"
+    },
+    "exclude": [
+        "../node_modules",
+        "../src",
+        "../midway",
+        "build",
+        "../coverage",
+        "../analytics.js",
+        "../sigint"
+    ]
+}

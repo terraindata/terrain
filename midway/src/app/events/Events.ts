@@ -148,19 +148,19 @@ export class Events
       .aggregation(
         'date_histogram',
         'timestamp',
-        'histogram',
         {
           interval: request.interval,
         },
+        'histogram',
         (agg) => agg.aggregation(
           'filter',
           undefined,
-          numerator,
           {
             term: {
               eventname: eventnames[0],
             },
           },
+          numerator,
           (agg1) => agg1.aggregation(
             'value_count',
             'eventname.keyword',
@@ -170,12 +170,12 @@ export class Events
           .aggregation(
             'filter',
             undefined,
-            denominator,
             {
               term: {
                 eventname: eventnames[1],
               },
             },
+            denominator,
             (agg1) => agg1.aggregation(
               'value_count',
               'eventname.keyword',
@@ -185,14 +185,14 @@ export class Events
           .aggregation(
             'bucket_script',
             undefined,
-            rate,
             {
               buckets_path: {
                 [numerator]: numerator + '>count',
                 [denominator]: denominator + '>count',
               },
               script: 'params.' + numerator + ' / params.' + denominator,
-            }),
+            },
+            rate),
     );
 
     return this.buildQuery(controller, body.build());

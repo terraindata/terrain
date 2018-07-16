@@ -44,76 +44,74 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { Export, ExportConfig } from '../Export';
-import ADocumentTransform from './ADocumentTransform';
+import * as bcrypt from 'bcrypt';
+import * as winston from 'winston';
 
-/**
- * Applies export transformations to a result stream
- */
-export default class ExportTransform extends ADocumentTransform
+import srs = require('secure-random-string');
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
+import * as Util from '../AppUtil';
+import RecoveryTokenConfig from './RecoveryTokenConfig';
+export class RecoveryTokens
 {
-  private exportt: Export;
-  private config: ExportConfig;
-  private rank: number;
-  private mapping: object;
+  private recoveryTokensTable: Tasty.Table;
 
-  constructor(exportt: Export, config: ExportConfig)
+  public initialize()
   {
-    super();
-    this.rank = 1;
-    this.exportt = exportt;
+    this.recoveryTokensTable = App.TBLS.recoveryTokens;
+  }
 
-    if (config.rank === true)
+  public async create(entry: RecoveryTokenConfig): Promise<RecoveryTokenConfig>
+  {
+    if (entry.id === undefined)
     {
-      config.columnTypes['TERRAINRANK'] = { type: 'long' };
+      throw new Error('Requires ID for recovery token creation');
     }
-
-    config.transformations.forEach((transformation) =>
-    {
-      if (transformation['name'] === 'rename')
+    const existingUsers = await this.select(['id'], { id: entry.id });
+    const newRecoveryToken: RecoveryTokenConfig =
       {
-        config.columnTypes[transformation['colName']] = config.columnTypes[transformation['args']['newName']];
+        id: entry.id,
+        token: entry.token,
+        createdAt: entry.createdAt,
+      };
+    return this.upsert(newRecoveryToken);
+  }
+
+  public async update(entry: RecoveryTokenConfig): Promise<RecoveryTokenConfig>
+  {
+    return new Promise<RecoveryTokenConfig>(async (resolve, reject) =>
+    {
+      const results = await this.get(entry.id);
+      if (results.length === 0)
+      {
+        return reject('User id not found');
       }
+
+      const oldEntry = results[0];
+
+      entry = Util.updateObject(oldEntry, entry);
+      resolve(await this.upsert(entry));
     });
-
-    this.config = config;
   }
 
-  protected transform(input: object, chunkNumber: number): object | object[]
+  public async select(columns: string[], filter: object): Promise<RecoveryTokenConfig[]>
   {
-    if (input['hits'] === undefined)
-    {
-      return input;
-    }
-
-    return input['hits'].hits.map((hit) => this.process(hit['_source']));
+    return App.DB.select(this.recoveryTokensTable, columns, filter) as Promise<RecoveryTokenConfig[]>;
   }
 
-  private process(doc: object): object
+  public async get(id?: number): Promise<RecoveryTokenConfig[]>
   {
-    if (this.config.rank === true && doc['TERRAINRANK'] === undefined)
+    if (id !== undefined)
     {
-      doc['TERRAINRANK'] = this.rank++;
+      return this.select([], { id });
     }
+    return this.select([], {});
+  }
 
-    // fields in document not in mapping
-    for (const field of Object.keys(doc))
-    {
-      if (this.config.columnTypes[field] === undefined)
-      {
-        delete doc[field];
-      }
-    }
-
-    // fields in mapping not in document
-    for (const field of Object.keys(this.config.columnTypes))
-    {
-      if (doc[field] === undefined)
-      {
-        doc[field] = null;
-      }
-    }
-
-    return this.exportt._postProcessDoc(doc, this.config);
+  public async upsert(newEntry: RecoveryTokenConfig): Promise<RecoveryTokenConfig>
+  {
+    return App.DB.upsert(this.recoveryTokensTable, newEntry) as Promise<RecoveryTokenConfig>;
   }
 }
+
+export default RecoveryTokens;

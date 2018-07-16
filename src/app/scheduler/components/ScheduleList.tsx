@@ -44,6 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:strict-boolean-expressions no-var-requires
+
+import * as Immutable from 'immutable';
+import { List } from 'immutable';
+import * as React from 'react';
+
 import EtlRouteUtil from 'app/etl/ETLRouteUtil';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
 import { _SchedulerConfig, scheduleForDatabase, SchedulerConfig } from 'app/scheduler/SchedulerTypes';
@@ -52,9 +57,7 @@ import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
 import cronstrue from 'cronstrue';
 import { HeaderConfig, ItemList } from 'etl/common/components/ItemList';
-import * as Immutable from 'immutable';
-import { List } from 'immutable';
-import * as React from 'react';
+import { ETLActions } from 'etl/ETLRedux';
 import TaskEnum from 'shared/types/jobs/TaskEnum';
 import './Schedule.less';
 const RefreshIcon = require('images/icon_refresh.svg?name=RefreshIcon');
@@ -63,6 +66,7 @@ export interface Props
 {
   schedules?: Immutable.Map<ID, SchedulerConfig>;
   schedulerActions?: typeof SchedulerActions;
+  etlActions?: typeof ETLActions;
   loading?: boolean;
 }
 
@@ -182,6 +186,28 @@ class ScheduleList extends TerrainComponent<Props>
     }
   }
 
+  public deleteSchedule(scheduleId: ID, e?)
+  {
+    const onConfirm = () =>
+    {
+      this.props.schedulerActions({
+        actionType: 'deleteSchedule',
+        scheduleId,
+      });
+    };
+    this.props.etlActions({
+      actionType: 'addModal',
+      props: {
+        title: 'Delete Schedule',
+        message: 'Are you sure you want to delete this schedule?',
+        closeOnConfirm: true,
+        confirm: true,
+        confirmButtonText: 'Delete',
+        onConfirm,
+      },
+    });
+  }
+
   public getMenuActions(schedule: SchedulerConfig)
   {
     let actions = List([{
@@ -195,7 +221,7 @@ class ScheduleList extends TerrainComponent<Props>
         onClick: this._fn(this.performAction, 'runSchedule', schedule.id),
       }).push({
         text: 'Delete',
-        onClick: this._fn(this.performAction, 'deleteSchedule', schedule.id),
+        onClick: this._fn(this.deleteSchedule, schedule.id),
       });
     }
     else
@@ -257,5 +283,6 @@ export default Util.createContainer(
   ],
   {
     schedulerActions: SchedulerActions,
+    etlActions: ETLActions,
   },
 );

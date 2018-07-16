@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import bodybuilder = require('bodybuilder');
+import * as bodybuilder from 'bodybuilder';
 import * as Elastic from 'elasticsearch';
 import TastyNode from '../../../tasty/TastyNode';
 import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
@@ -160,7 +160,7 @@ export class ElasticGenerator
     return [queryParam];
   }
 
-  private accumulateFilters(body: bodybuilder, expression: TastyNode)
+  private accumulateFilters(body: bodybuilder.FilterBuilder<any> & bodybuilder.QueryBuilder<any>, expression: TastyNode)
   {
     // https://www.elastic.co/guide/en/elasticsearch/guide/current/combining-filters.html#bool-filter
     // currently only supports the basic operators, with the column on the lhs, as well as && and ||
@@ -171,8 +171,14 @@ export class ElasticGenerator
     }
 
     // NB: could be made to accept the column on the rhs too, but currently only supports column on lhs
-    const columnName = this.getColumnName(expression.lhs);
-    const value = expression.rhs.value; // could be checked for validity
+    let columnName;
+    let value;
+
+    if (expression.type !== '&&' && expression.type !== '||')
+    {
+      columnName = this.getColumnName(expression.lhs);
+      value = expression.rhs.value; // could be checked for validity
+    }
 
     if (expression.type === '==')
     {
@@ -200,21 +206,25 @@ export class ElasticGenerator
     }
     else if (expression.type === '&&')
     {
-      const leftQuery = bodybuilder();
-      this.accumulateFilters(leftQuery, expression.lhs);
-      const rightQuery = bodybuilder();
-      this.accumulateFilters(rightQuery, expression.rhs);
-      body.andFilter(leftQuery);
-      body.andFilter(rightQuery);
+      body.andFilter('bool', (b) =>
+      {
+        this.accumulateFilters(b, expression.lhs);
+        this.accumulateFilters(b, expression.rhs);
+        return b;
+      });
     }
     else if (expression.type === '||')
     {
-      const leftQuery = bodybuilder();
-      this.accumulateFilters(leftQuery, expression.lhs);
-      const rightQuery = bodybuilder();
-      this.accumulateFilters(rightQuery, expression.rhs);
-      body.orFilter(leftQuery);
-      body.orFilter(rightQuery);
+      body.orFilter('bool', (b) =>
+      {
+        this.accumulateFilters(b, expression.lhs);
+        return b;
+      })
+        .orFilter('bool', (b) =>
+        {
+          this.accumulateFilters(b, expression.rhs);
+          return b;
+        });
     }
     else
     {

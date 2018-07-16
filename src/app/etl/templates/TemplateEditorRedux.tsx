@@ -267,7 +267,7 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
         {
           return newState;
         }
-        const { template, uiState } = currentItem);
+        const { template, uiState } = currentItem;
         return newState.set('template', template).set('uiState', uiState);
       },
       rebuildFieldMap: (state, action) =>

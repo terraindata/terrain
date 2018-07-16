@@ -71,7 +71,7 @@ interface ETLUIPreviewConfig
 
 Router.post('/preview', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const request: ETLUIPreviewConfig = ctx.request.body.body;
+  const request: ETLUIPreviewConfig = ctx.request.body['body'];
   const previewName = 'preview';
 
   Util.verifyParameters(request, ['source']);

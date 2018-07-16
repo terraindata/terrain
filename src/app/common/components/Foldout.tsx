@@ -68,6 +68,7 @@ export interface Props
   direction: 'right'; // in the future: 'left' | 'right';
   width: number;
   children?: any;
+  uniqueId?: string;
 }
 
 @Radium
@@ -77,22 +78,8 @@ export class Foldout extends TerrainComponent<Props>
     expanded: boolean,
   } =
     {
-      expanded: true,
+      expanded: localStorage.getItem('foldout-' + this.props.uniqueId) === 'closed' ? false : true,
     };
-
-  public componentWillMount()
-  {
-    // this.props.colorsActions({
-    //   actionType: 'setStyle',
-    //   selector: '.foldout-expand-icon',
-    //   style: { fill: Colors().text2 },
-    // });
-    // this.props.colorsActions({
-    //   actionType: 'setStyle',
-    //   selector: '.foldout-expand:hover .foldout-expand-icon',
-    //   style: { fill: Colors().text1 },
-    // });
-  }
 
   public componentWillReceiveProps(nextProps)
   {
@@ -110,7 +97,7 @@ export class Foldout extends TerrainComponent<Props>
       <div
         className={classNames({
           'foldout-container': true,
-          // 'foldout-left': props.direction === 'left',
+          // 'foldout-left': props.direction === 'left', // no CSS support yet
           'foldout-right': props.direction === 'right',
           'foldout-container-expanded': state.expanded,
         })}
@@ -121,7 +108,7 @@ export class Foldout extends TerrainComponent<Props>
       >
         <div
           className='foldout-expand'
-          onClick={this._toggle('expanded')}
+          onClick={this.toggle}
           key='foldout-expand'
           style={[
             getStyle('width', expandButtonWidth),
@@ -148,6 +135,19 @@ export class Foldout extends TerrainComponent<Props>
         </div>
       </div>
     );
+  }
+
+  private toggle()
+  {
+    const expanded = !this.state.expanded;
+    this.setState({
+      expanded,
+    });
+
+    if (this.props.uniqueId !== undefined)
+    {
+      localStorage.setItem('foldout-' + this.props.uniqueId, expanded ? 'expanded' : 'closed');
+    }
   }
 }
 
