@@ -8,7 +8,7 @@
     "start": "yarn start-postgres && yarn start-midway-dev",
     "start-minified": "yarn start-postgres && yarn start-midway-minified",
     "run-midway": "NODE_PATH=${NODE_PATH}:./midway/build node -r source-map-support/register --max_old_space_size=8192 -- ./midway/build/midway/src/Midway.js",
-    "start-midway-dev": "rm -rf midway/build; mkdir midway/build; ( NODE_PATH=${NODE_PATH}:./midway/build tsc-watch -p midway/tsconfig.json --onSuccess \"yarn run-midway -- `command -v jq > /dev/null && echo $npm_config_argv | jq '.original[1:] | .[]' | tr '\"\\n' ' '`\" ); ",
+    "start-midway-dev": "rm -rf midway/build; mkdir midway/build; ( NODE_PATH=${NODE_PATH}:./midway/build tsc-watch -p midway/tsconfig.json --onSuccess \"yarn run-midway -- `command -v jq > /dev/null && echo $npm_config_argv | jq '.original[1:] | .[]' | tr '\"\\n' ' '`\" | sed 's/\\x1bc//g' ); ",
     "start-midway-prod": "rm -rf midway/build; mkdir midway/build; yarn build-server && NODE_ENV=production yarn run-midway --",
     "start-midway-minified": "node -r source-map-support/register --max_old_space_size=8192 -- ./midway/src/assets/bundle.server.js",
     "start-postgres": "docker-compose -f midway-postgres-docker.yml up -d",
