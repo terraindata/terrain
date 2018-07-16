@@ -160,10 +160,13 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
             importStreams.push(ss.pipe(JSONTransform.createImportStream(jsonPath)));
             break;
           case 'csv':
-            importStreams.push(ss.pipe(CSVTransform.createImportStream()));
+            importStreams.push(ss.pipe(CSVTransform.createImportStream(true,
+              source.fileConfig.ignoreQuotes !== null ? source.fileConfig.ignoreQuotes : false)));
             break;
           case 'tsv':
-            importStreams.push(ss.pipe(CSVTransform.createImportStream(true, '\t')));
+            importStreams.push(ss.pipe(CSVTransform.createImportStream(true,
+              source.fileConfig.ignoreQuotes !== null ? source.fileConfig.ignoreQuotes : false,
+              '\t')));
             break;
           case 'xlsx':
             importStreams.push(ss.pipe(XLSXTransform.createImportStream()));
@@ -288,11 +291,13 @@ export async function getSinkStream(
           case 'csv':
             transformStream = CSVTransform.createExportStream(
               sink.fileConfig.fieldOrdering !== null ? sink.fileConfig.fieldOrdering : sink.fileConfig.hasCsvHeader,
+              sink.fileConfig.ignoreQuotes !== null ? sink.fileConfig.ignoreQuotes : false,
             );
             break;
           case 'tsv':
             transformStream = CSVTransform.createExportStream(
               sink.fileConfig.fieldOrdering !== null ? sink.fileConfig.fieldOrdering : sink.fileConfig.hasCsvHeader,
+              sink.fileConfig.ignoreQuotes !== null ? sink.fileConfig.ignoreQuotes : false,
               '\t',
             );
             break;
