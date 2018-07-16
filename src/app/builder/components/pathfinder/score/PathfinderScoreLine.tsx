@@ -342,7 +342,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
       fieldName = this.props.dropdownOptions.get(fieldIndex).displayName as string;
       if (fieldType === FieldType.Geopoint && transformData.distanceValue && transformData.distanceValue.address)
       {
-        fieldName += ' ' + transformData.distanceValue.address;
+        fieldName += ' to ' + transformData.distanceValue.address;
       }
     }
     return (

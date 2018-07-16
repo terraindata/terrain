@@ -745,7 +745,7 @@ class ElasticDataSourceC extends DataSource
         {
           const fieldType = ReverseFieldTypeMapping[col.datatype];
           return _ChoiceOption({
-            displayName: fieldType === FieldType.Geopoint ? col.name + ' to' : col.name,
+            displayName: col.name,
             value: col.name,
             meta: {
               fieldType,
