@@ -183,7 +183,7 @@ export type ConnectionConfigType<key extends ConnectionTypes> = ConnectionConfig
 
 // Type wizardry
 type IntegrationNamingAssertion = {
-  [K in keyof typeof Integrations]: K;
+  [K in keyof typeof Integrations]: string;
 };
 Integrations as IntegrationNamingAssertion;
 

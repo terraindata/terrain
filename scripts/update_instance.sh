@@ -294,7 +294,7 @@ ${STAGE_DB_COMMAND}
 ${START_SCREEN_COMMAND}
 screen -S runmidway-${SCREEN_ID} -X stuff "cd /home/terrain/src-${VERSION}/Search;\r";
 screen -S runmidway-${SCREEN_ID} -X stuff "yarn; yarn build-prod;\r";
-screen -S runmidway-${SCREEN_ID} -X stuff "NODE_ENV=production yarn start-midway -p ${PORT} -i ${MIDWAY_DB} > >(tee -a /var/log/midway/midway_${VERSION}_${PORT}.log) 2> >(tee -a /var/log/midway/midway_error_${VERSION}_${PORT}.log >&2)\r";
+screen -S runmidway-${SCREEN_ID} -X stuff "NODE_ENV=production yarn start-midway-prod -p ${PORT} -i ${MIDWAY_DB} > >(tee -a /var/log/midway/midway_${VERSION}_${PORT}.log) 2> >(tee -a /var/log/midway/midway_error_${VERSION}_${PORT}.log >&2)\r";
 EOF
 
 echo "*************************************************"
