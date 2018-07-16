@@ -400,9 +400,13 @@ class MagentoForm extends IntegrationFormBase<MagentoAuthT, MagentoConnectionT>
   };
 
   public connectionMap: InputDeclarationMap<MagentoConnectionT> = {
-    apiUser: {
+    username: {
       type: DisplayType.TextBox,
-      displayName: 'API User',
+      displayName: 'Username',
+    },
+    host: {
+      type: DisplayType.TextBox,
+      displayName: 'Host',
     },
   };
 }

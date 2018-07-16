@@ -77,9 +77,10 @@ import
 import
 {
   FileConfig as FileConfigI, GoogleAnalyticsOptions, HttpOptions,
-  SftpOptions, SinkOptionsType, Sinks, SourceOptionsType,
+  MagentoOptions, SftpOptions, SinkOptionsType, Sinks, SourceOptionsType,
   Sources, SQLOptions,
 } from 'shared/etl/types/EndpointTypes';
+
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 
 import { InputForm, InputsForm } from '../../endpoints/InputForm';
