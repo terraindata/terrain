@@ -80,7 +80,11 @@ import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 import
 {
   InputConfig,
+  InputFileEnum,
+  InputFileOptionsType,
+  InputFileOptionsTypes,
   InputFileTypes as InputFileTypes,
+  InputOptionsEnum,
   InputOptionsType,
   InputTypes,
   RootInputConfig as RootInputConfigI,
@@ -212,8 +216,7 @@ export class InputsForm extends TerrainComponent<Props>
     newItems.push({
       type: 'File',
       options: {
-        dayInterval: null,
-        format: null,
+        options: {},
         name: null,
         type: null,
       },
@@ -284,14 +287,17 @@ export class InputForm extends TerrainComponent<InProps>
   public renderOptions(state, disabled)
   {
     const options = this.getCurrentOptions();
-    if (state.type === 'File')
+    switch (state.type)
     {
-      return (
-        <FileForm
-          options={options as FileState}
-          onChange={this.handleOptionsChange}
-        />
-      );
+      case InputOptionsEnum.File:
+        return (
+          <FileForm
+            options={options as FileState}
+            onChange={this.handleOptionsChange}
+          />
+        );
+      default:
+        return null;
     }
   }
 
@@ -310,7 +316,7 @@ export class InputForm extends TerrainComponent<InProps>
   }
 }
 
-type FileState = InputOptionsType<'File'>;
+type FileState = InputOptionsType<InputOptionsEnum.File>;
 export interface FileProps
 {
   options: FileState;
@@ -319,10 +325,10 @@ export interface FileProps
 
 export class FileForm extends TerrainComponent<FileProps>
 {
-  public fileOptions: List<InputFileTypes> = List([
-    InputFileTypes.Date,
-    InputFileTypes.Number,
-    InputFileTypes.Text,
+  public fileOptions: List<InputFileEnum> = List([
+    InputFileEnum.Date,
+    InputFileEnum.Number,
+    InputFileEnum.Text,
   ]);
 
   public inputMap: InputDeclarationMap<FileState> = {
@@ -334,18 +340,166 @@ export class FileForm extends TerrainComponent<FileProps>
         indexResolver: (value) => this.fileOptions.indexOf(value),
       },
     },
-    format: {
-      type: DisplayType.TextBox,
-      displayName: 'Format',
-    },
     name: {
       type: DisplayType.TextBox,
       displayName: 'Name',
     },
+    options: {
+      type: DisplayType.Custom,
+      options: {
+        render: this.renderOptions,
+      },
+    },
+  };
+
+  public renderOptions(state, disabled)
+  {
+    const options = this.getCurrentType();
+    switch (state.type)
+    {
+      case InputFileEnum.Date:
+        return (
+          <FileDateForm
+            options={options as FileDateState}
+            onChange={this.handleOptionsChange}
+          />
+        );
+      case InputFileEnum.Number:
+        return (
+          <FileNumberForm
+            options={options as FileNumberState}
+            onChange={this.handleOptionsChange}
+          />
+        );
+      case InputFileEnum.Text:
+        return (
+          <FileTextForm
+            options={options as FileTextState}
+            onChange={this.handleOptionsChange}
+          />
+        );
+      default:
+        return null;
+    }
+  }
+
+  public getCurrentType()
+  {
+    const { options } = this.props;
+    return options.options != null ? options.options : {};
+  }
+
+  public handleOptionsChange(options, apply?: boolean)
+  {
+    const newInput = _.extend({}, this.props.options, {
+      options,
+    });
+    this.props.onChange(newInput, apply);
+  }
+
+  public render()
+  {
+    return (
+      <DynamicForm
+        inputMap={this.inputMap}
+        onStateChange={this.props.onChange}
+        inputState={this.props.options}
+      />
+    );
+  }
+}
+
+interface OptionProps<T>
+{
+  onChange: (val, apply?) => void;
+  options: T;
+}
+
+type FileDateState = InputFileOptionsType<InputFileEnum.Date>;
+// export interface FileDateProps
+// {
+//   options: FileDateState;
+//   onChange: (cfg: FileDateState, apply?: boolean) => void;
+// }
+
+export class FileDateForm extends TerrainComponent<OptionProps<FileDateState>>
+{
+  public inputMap: InputDeclarationMap<FileDateState> = {
+    format: {
+      type: DisplayType.TextBox,
+      displayName: 'Format',
+    },
     dayInterval: {
       type: DisplayType.NumberBox,
       displayName: 'Day Interval',
-      getDisplayState: (s: FileState) => s.type === InputFileTypes.Date ? DisplayState.Active : DisplayState.Hidden,
+    },
+  };
+
+  public render()
+  {
+    return (
+      <DynamicForm
+        inputMap={this.inputMap}
+        onStateChange={this.props.onChange}
+        inputState={this.props.options}
+      />
+    );
+  }
+}
+
+type FileNumberState = InputFileOptionsType<InputFileEnum.Number>;
+export interface FileNumberProps
+{
+  options: FileNumberState;
+  onChange: (cfg: FileNumberState, apply?: boolean) => void;
+}
+
+export class FileNumberForm extends TerrainComponent<OptionProps<FileNumberState>>
+{
+  public inputMap: InputDeclarationMap<FileNumberState> = {
+    start: {
+      type: DisplayType.NumberBox,
+      displayName: 'Start',
+    },
+    end: {
+      type: DisplayType.NumberBox,
+      displayName: 'End',
+    },
+    interval: {
+      type: DisplayType.NumberBox,
+      displayName: 'Interval',
+    },
+    padding: {
+      type: DisplayType.TextBox,
+      displayName: 'Padding',
+    },
+  };
+
+  public render()
+  {
+    return (
+      <DynamicForm
+        inputMap={this.inputMap}
+        onStateChange={this.props.onChange}
+        inputState={this.props.options}
+      />
+    );
+  }
+}
+
+type FileTextState = InputFileOptionsType<InputFileEnum.Text>;
+export interface FileTextProps
+{
+  options: FileTextState;
+  onChange: (cfg: FileTextState, apply?: boolean) => void;
+}
+
+export class FileTextForm extends TerrainComponent<OptionProps<FileTextState>>
+{
+  public inputMap: InputDeclarationMap<FileTextState> = {
+    name: {
+      type: DisplayType.TextBox,
+      displayName: 'Name',
     },
   };
 
