@@ -177,7 +177,7 @@
         "type" : "number",
         "order" : "desc",
         "script" : {
-          "stored" : "terrain_PWLScore",
+          "stored" : "Terrain.Score.PWL",
           "params" : {
             "factors" : [
               {
@@ -497,11 +497,11 @@
         "type" : "number",
         "order" : "desc",
         "script" : {
-          "stored" : "terrain_PWLScore",
+          "stored" : "Terrain.Score.PWL",
           "params" : {
             "factors" : [
               {
-                "weight" : 0.1,
+                "weight" : 0,
                 "ranges" : [
                   -100.0,
                   100.0
@@ -512,7 +512,7 @@
                 ]
               },
               {
-                "weight" : 0.2,
+                "weight" : 10,
                 "a" : 0.0,
                 "b" : 1.0,
                 "numerators" : [
@@ -538,7 +538,7 @@
                 ]
               },
               {
-                "weight" : 0.2,
+                "weight" : 10,
                 "a" : 25.0,
                 "b" : 10.0,
                 "numerators" : [
@@ -567,7 +567,7 @@
                 ]
               },
               {
-                "weight" : 0.5,
+                "weight" : 10,
                 "a" : 0.0,
                 "b" : 1.0,
                 "numerators" : [

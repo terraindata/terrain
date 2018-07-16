@@ -74,9 +74,7 @@ export class AlgorithmEndpoint extends AEndpointStream
     if (algorithmId !== undefined)
     {
       query = await Util.getQueryFromAlgorithm(algorithmId);
-      const scoreNormalization = Util.computeMaximumAlgorithmScore(query);
       return new ExportTransform({
-        scoreNormalization,
       });
     }
     return new ExportTransform();

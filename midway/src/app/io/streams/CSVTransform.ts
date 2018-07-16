@@ -55,28 +55,40 @@ export default class CSVTransform
 {
   public static createImportStream(
     headers: boolean = true,
+    ignoreQuotes: boolean = false,
     delimiter: string = ',',
   ): Transform
   {
-    return csv({
-      headers,
-      delimiter,
-      discardUnmappedColumns: true,
-      quote: null,
-    });
+    const csvParams =
+      {
+        headers,
+        delimiter,
+        discardUnmappedColumns: true,
+      };
+    if (ignoreQuotes === true)
+    {
+      csvParams['quote'] = null;
+    }
+    return csv(csvParams);
   }
 
   public static createExportStream(
     headers: boolean | string[] = true,
+    ignoreQuotes: boolean = false,
     delimiter: string = ',',
     rowDelimiter: string = '\r\n',
   ): Transform
   {
-    return csv.createWriteStream({
-      headers,
-      delimiter,
-      rowDelimiter,
-      quote: null,
-    });
+    const csvParams =
+      {
+        headers,
+        delimiter,
+        rowDelimiter,
+      };
+    if (ignoreQuotes === true)
+    {
+      csvParams['quote'] = null;
+    }
+    return csv.createWriteStream(csvParams);
   }
 }
