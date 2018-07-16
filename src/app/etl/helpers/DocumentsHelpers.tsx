@@ -221,6 +221,34 @@ class DocumentsHelpers extends ETLHelpers
     });
   }
 
+  public fetchPreviewString(
+    source: SourceConfig,
+  ): Promise<List<object>>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      switch (source.type)
+      {
+        case Sources.Upload: {
+          const file = source.options['file'];
+          if (file == null)
+          {
+            return reject('File not provided');
+          }
+          const config = source.fileConfig;
+          return this.fetchFromFile(source)
+            .then(resolve)
+            .catch(reject);
+        }
+        default: {
+          return ETLAjax.fetchPreview(source, DefaultDocumentLimit)
+            .then(resolve)
+            .catch(reject);
+        }
+      }
+    });
+  }
+
   protected async sliceFromFile(file: File, size = CHUNK_SIZE): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>

@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:switch-default
 
 import * as clarinet from 'clarinet';
 
@@ -125,9 +126,6 @@ export default class StreamUtil
           // for expected objects and arrays, 'openobject' and 'openarray' should be called first
           // so they should never reach here technically
           valueString = `${value}`;
-          break;
-        default:
-          throw new Error('Unrecognized type');
           break;
       }
       stringStream = stringStream + valueString + ', ';

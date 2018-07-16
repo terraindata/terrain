@@ -78,6 +78,7 @@ SKU: '317-139', Genres: 'Comedy|Romance', Title: 'Pretty Woman (1990)', Tagline:
         { favs: ['apples', 'peaches'], legal: false, friends: [{ name: 'bob', age: 21 }, { name: 'joe' }] },
       '{"favs": ["apples", "peaches"], "legal": false, "friends": [{"name":"bob", "age":21},{"name":"joe","age":29}':
         { favs: ['apples', 'peaches'], legal: false, friends: [{ name: 'bob', age: 21 }, { name: 'joe', age: 29 }] },
+      
     };
 
   describe('#formatJsonString', () =>
