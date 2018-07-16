@@ -71,22 +71,28 @@ export class PostProcess
     return new Promise<object[]>(async (resolve, reject) =>
     {
       const data: object[] = [];
+      const dataStreamPromises: Array<Promise<boolean>> = [];
       dataStreams.forEach(async (dataStream) =>
       {
-        const accumulatedData: object[] = await BufferTransform.toArray(dataStream);
-        accumulatedData.forEach((chunk) =>
+        dataStreamPromises.push(new Promise(async (resolve2, reject2) =>
         {
-          try
+          const accumulatedData: object[] = await BufferTransform.toArray(dataStream);
+          accumulatedData.forEach((chunk) =>
           {
-            data.push(chunk);
-          }
-          catch (e)
-          {
-            MidwayLogger.warn((e as any).toString() as string);
-          }
-        });
+            try
+            {
+              data.push(chunk);
+            }
+            catch (e)
+            {
+              MidwayLogger.warn((e as any).toString() as string);
+            }
+          });
+          resolve2(true);
+        }));
       });
 
+      await Promise.all(dataStreamPromises);
       let processedData: object[] = _.cloneDeep(data);
       if (!Array.isArray(transformConfigs))
       {
@@ -127,53 +133,52 @@ export class PostProcess
   private _aggregate(options: object, data: object[]): object[]
   {
     const patternRegExp = new RegExp(options['pattern']);
-    const patternRegExpFull = new RegExp(options['pattern'] as string + '.*');
+    const patternRegExpFull = new RegExp(options['pattern'] as string);
     const aggParams: string[] = options['fields'];
     const newDataDict: object = {};
+    let parentRows: object[] = [];
+    let childRows: object[] = [];
     // step 1
-    data.forEach((row) =>
-    {
-      if (patternRegExpFull.test(row[options['primaryKey']]))
-      {
-        const extractedPrimaryKey: string = row[options['primaryKey']]
-          .replace(row[options['primaryKey']].replace(patternRegExp, ''), '');
-        if (newDataDict[extractedPrimaryKey] === undefined)
-        {
-          newDataDict[extractedPrimaryKey] = [];
-        }
-        newDataDict[extractedPrimaryKey] = newDataDict[extractedPrimaryKey].concat(row);
-      }
-    });
 
-    Object.keys(newDataDict).forEach((nDDKey) =>
+    if (options['fieldInPattern'] !== true)
     {
-      newDataDict[nDDKey].sort((a, b) =>
+      data.forEach((row) =>
       {
-        return a[options['primaryKey']] > b[options['primaryKey']];
+        if (patternRegExpFull.test(row[options['primaryKey']]))
+        {
+          const extractedPrimaryKey: string = row[options['primaryKey']]
+            .replace(row[options['primaryKey']].replace(patternRegExp, ''), '');
+          if (newDataDict[extractedPrimaryKey] === undefined)
+          {
+            newDataDict[extractedPrimaryKey] = [];
+          }
+          newDataDict[extractedPrimaryKey] = newDataDict[extractedPrimaryKey].concat(row);
+        }
       });
-    });
+
+      Object.keys(newDataDict).forEach((nDDKey) =>
+      {
+        newDataDict[nDDKey].sort((a, b) =>
+        {
+          return a[options['primaryKey']] > b[options['primaryKey']];
+        });
+      });
+    }
+    else
+    {
+      // extract all "parent" objects
+      parentRows = data.filter((row) => row[options['parentKey']] === options['parentKeyValue']);
+      childRows = _.difference(data, parentRows);
+      childRows.forEach((row) =>
+      {
+        const nDDKey = row[options['primaryKey']];
+        newDataDict[nDDKey] = row;
+      });
+    }
 
     const returnData: object[] = [];
     switch (options['operation'])
     {
-      case PostProcessAggregationTypes.Sum:
-        Object.keys(newDataDict).forEach((nDDKey) =>
-        {
-          if (Array.isArray(newDataDict[nDDKey]) && newDataDict[nDDKey].length > 0)
-          {
-            const nDDValue: object = _.cloneDeep(newDataDict[nDDKey][0]);
-            for (let i = 1; i < newDataDict[nDDKey].length; ++i)
-            {
-              options['fields'].forEach((aggField) =>
-              {
-                nDDValue[aggField] = parseFloat(nDDValue[aggField]) + parseFloat(newDataDict[nDDKey][i][aggField]);
-              });
-            }
-            nDDValue[options['primaryKey']] = nDDKey;
-            returnData.push(nDDValue);
-          }
-        });
-        break;
       case PostProcessAggregationTypes.Average:
         Object.keys(newDataDict).forEach((nDDKey) =>
         {
@@ -199,6 +204,90 @@ export class PostProcess
           }
         });
         break;
+      case PostProcessAggregationTypes.Concat:
+        const childKeys = Object.keys(newDataDict);
+        parentRows.forEach((row) =>
+        {
+          const nDDValue: object = _.cloneDeep(row);
+          options['fields'].forEach((aggField) =>
+          {
+            nDDValue[aggField] = [row[aggField]];
+          });
+          childKeys.forEach((ck) =>
+          {
+            if (new RegExp((row[options['primaryKey']] as string) + (options['pattern'] as string)).test(ck))
+            {
+              options['fields'].forEach((aggField) =>
+              {
+                nDDValue[aggField] = nDDValue[aggField].concat(newDataDict[ck][aggField]);
+              });
+            }
+          });
+          returnData.push(nDDValue);
+        });
+        break;
+      case PostProcessAggregationTypes.Sum:
+        if (options['fieldInPattern'] !== true)
+        {
+          Object.keys(newDataDict).forEach((nDDKey) =>
+          {
+            if (Array.isArray(newDataDict[nDDKey]) && newDataDict[nDDKey].length > 0)
+            {
+              const nDDValue: object = _.cloneDeep(newDataDict[nDDKey][0]);
+              for (let i = 1; i < newDataDict[nDDKey].length; ++i)
+              {
+                options['fields'].forEach((aggField) =>
+                {
+                  nDDValue[aggField] = parseFloat(nDDValue[aggField]) + parseFloat(newDataDict[nDDKey][i][aggField]);
+                });
+              }
+              nDDValue[options['primaryKey']] = nDDKey;
+              returnData.push(nDDValue);
+            }
+          });
+        }
+        else
+        {
+          const childKeysSum = Object.keys(newDataDict);
+          parentRows.forEach((row) =>
+          {
+            const nDDValue: object = _.cloneDeep(row);
+            options['fields'].forEach((aggField) =>
+            {
+              nDDValue[aggField] = parseFloat(row[aggField]);
+            });
+            childKeysSum.forEach((ck) =>
+            {
+              if (new RegExp((row[options['primaryKey']] as string) + (options['pattern'] as string)).test(ck))
+              {
+                options['fields'].forEach((aggField) =>
+                {
+                  nDDValue[aggField] = parseFloat(nDDValue[aggField]) + parseFloat(newDataDict[ck][aggField]);
+                });
+              }
+            });
+            returnData.push(nDDValue);
+          });
+        }
+        break;
+      // case PostProcessAggregationTypes.MergeByPattern: // given the pattern, extract {{@<field name>}}
+      //   Object.keys(newDataDict).forEach((nDDKey) =>
+      //   {
+      //     if (Array.isArray(newDataDict[nDDKey]) && newDataDict[nDDKey].length > 0)
+      //     {
+      //       const nDDValue: object = _.cloneDeep(newDataDict[nDDKey][0]);
+      //       for (let i = 1; i < newDataDict[nDDKey].length; ++i)
+      //       {
+      //         options['fields'].forEach((aggField) =>
+      //         {
+      //           nDDValue[aggField] = parseFloat(nDDValue[aggField]) + parseFloat(newDataDict[nDDKey][i][aggField]);
+      //         });
+      //       }
+      //       nDDValue[options['primaryKey']] = nDDKey;
+      //       returnData.push(nDDValue);
+      //     }
+      //   });
+      //   break;
       default:
     }
     return returnData;

@@ -47,6 +47,15 @@ THE SOFTWARE.
 
 import { FileTypes, Languages } from './ETLTypes';
 import { RootInputConfig } from './InputTypes';
+import
+{
+  KV,
+  MagentoParamConfigType,
+  MagentoParamConfigTypes,
+  MagentoParamTypes,
+  MagentoRoutes,
+} from './MagentoTypes';
+
 import { RootPostProcessConfig } from './PostProcessTypes';
 
 export interface FileConfig
@@ -70,6 +79,7 @@ export enum Sources
   Http = 'Http',
   Fs = 'Fs',
   Mysql = 'Mysql',
+  Magento = 'Magento',
   Postgresql = 'Postgresql',
 }
 
@@ -82,6 +92,7 @@ export enum Sinks
   Fs = 'Fs',
   FollowUpBoss = 'FollowUpBoss',
   MailChimp = 'MailChimp',
+  Magento = 'Magento',
 }
 
 export const EndpointTypeNames =
@@ -102,10 +113,19 @@ export const EndpointTypeNames =
 };
 
 export const SchedulableSinks: Sinks[] =
-  [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs, Sinks.FollowUpBoss, Sinks.MailChimp];
+  [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs, Sinks.FollowUpBoss, Sinks.MailChimp, Sinks.Magento];
 
 export const SchedulableSources: Sources[] =
-  [Sources.Algorithm, Sources.Sftp, Sources.GoogleAnalytics, Sources.Http, Sources.Fs, Sources.Mysql, Sources.Postgresql];
+  [
+    Sources.Algorithm,
+    Sources.Sftp,
+    Sources.GoogleAnalytics,
+    Sources.Http,
+    Sources.Fs,
+    Sources.Mysql,
+    Sources.Magento,
+    Sources.Postgresql,
+  ];
 
 export interface SourceConfig
 {
@@ -155,33 +175,43 @@ export interface SourceOptionsTypes // TODO check that these are right
   Http: HttpOptions;
   Fs: {};
   Mysql: SQLOptions;
+  Magento: MagentoOptions;
   Postgresql: SQLOptions;
 }
 
 export const SourceOptionsDefaults: SourceOptionsTypes =
-{
-  Upload: {
-    file: null,
-  },
-  Algorithm: {
-    algorithmId: -1,
-  },
-  Sftp: {
-    filepath: 'filename.json',
-    credentialId: -1,
-  },
-  GoogleAnalytics: {
-    dayInterval: 30,
-  },
-  Http: {
-    method: 'GET',
-  },
-  Fs: {},
-  Mysql: {
-  },
-  Postgresql: {
-  },
-};
+  {
+    Upload: {
+      file: null,
+    },
+    Algorithm: {
+      algorithmId: -1,
+    },
+    Sftp: {
+      filepath: 'filename.json',
+      credentialId: -1,
+    },
+    GoogleAnalytics: {
+      dayInterval: 30,
+    },
+    Http: {
+      method: 'GET',
+    },
+    Fs: {},
+    Mysql: {
+    },
+    Magento: {
+      esdbid: null,
+      esindex: null,
+      includedFields: ['sku'],
+      params: null,
+      onlyFirst: true,
+      route: null,
+      remapping: {},
+    },
+    Postgresql: {
+    },
+  };
 
 export interface SinkOptionsTypes
 {
@@ -199,31 +229,41 @@ export interface SinkOptionsTypes
   Fs: {};
   FollowUpBoss: FollowUpBossOptions;
   MailChimp: {};
+  Magento: MagentoOptions;
 }
 
 export const SinkOptionsDefaults: SinkOptionsTypes =
-{
-  Download: {
-    filename: '',
-  },
-  Database: {
-    language: Languages.Elastic,
-    serverId: '',
-    database: '',
-    table: '',
-  },
-  Sftp: {
-    filepath: 'filename.json',
-    credentialId: -1,
-  },
-  Http: {
-    method: 'POST',
-  },
-  Fs: {},
-  FollowUpBoss: {
-  },
-  MailChimp: {},
-};
+  {
+    Download: {
+      filename: '',
+    },
+    Database: {
+      language: Languages.Elastic,
+      serverId: '',
+      database: '',
+      table: '',
+    },
+    Sftp: {
+      filepath: 'filename.json',
+      credentialId: -1,
+    },
+    Http: {
+      method: 'POST',
+    },
+    Fs: {},
+    FollowUpBoss: {
+    },
+    MailChimp: {},
+    Magento: {
+      esdbid: null,
+      esindex: null,
+      includedFields: [],
+      params: null,
+      onlyFirst: true,
+      route: null,
+      remapping: {},
+    },
+  };
 
 export interface SftpOptions
 {
@@ -243,6 +283,17 @@ export interface FollowUpBossOptions { }
 export interface GoogleAnalyticsOptions
 {
   dayInterval: number;
+}
+
+export interface MagentoOptions
+{
+  esdbid: string;
+  esindex: string;
+  includedFields: string[];
+  params: MagentoParamConfigType<MagentoParamTypes>;
+  onlyFirst: boolean;
+  remapping: object;
+  route: MagentoRoutes;
 }
 
 export interface SQLOptions

@@ -90,8 +90,11 @@ export interface RootPostProcessConfig
 export interface PostProcessOptionsTypes
 {
   Aggregate: {
+    fieldInPattern?: boolean;
     fields: string[];
     operation: PostProcessAggregationTypes;
+    parentKey?: string;
+    parentKeyValue?: string;
     pattern: string;
     primaryKey: string;
   };
