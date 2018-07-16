@@ -52,13 +52,13 @@ import * as promise from './util/Promise';
 import * as xml from './util/XML';
 
 export const Util =
-  {
-    csv,
-    dsn,
-    elastic,
-    json,
-    promise,
-    xml,
-  };
+{
+  csv,
+  dsn,
+  elastic,
+  json,
+  promise,
+  xml,
+};
 
 export default Util;

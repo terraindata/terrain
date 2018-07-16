@@ -97,15 +97,15 @@ export const CRONWeekDayOptionsList: number[] = cronMapToList(CRONWeekDayOptions
 export const defaultCRONWeekDayOptions = { 1: true }; // Monday
 
 export const CRONWeekDayNames =
-  {
-    0: 'Sunday',
-    1: 'Monday',
-    2: 'Tuesday',
-    3: 'Wednesday',
-    4: 'Thursday',
-    5: 'Friday',
-    6: 'Saturday',
-  };
+{
+  0: 'Sunday',
+  1: 'Monday',
+  2: 'Tuesday',
+  3: 'Wednesday',
+  4: 'Thursday',
+  5: 'Friday',
+  6: 'Saturday',
+};
 
 export const CRONMonthDayOptions: CRONMap = fillCRONMap([], 1, 31);
 export const CRONMonthDayOptionsList: number[] = cronMapToList(CRONMonthDayOptions, true);

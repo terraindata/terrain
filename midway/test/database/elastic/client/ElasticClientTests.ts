@@ -199,23 +199,23 @@ test('prefix isolation', async (done) =>
       body: {
         query: {
           bool:
-            {
-              filter:
-                [
+          {
+            filter:
+              [
+                {
+                  term:
                   {
-                    term:
-                      {
-                        _index: 'bcd.secret',
-                      },
+                    _index: 'bcd.secret',
                   },
+                },
+                {
+                  term:
                   {
-                    term:
-                      {
-                        _id: '13333337',
-                      },
+                    _id: '13333337',
                   },
-                ],
-            },
+                },
+              ],
+          },
         },
       },
     },
@@ -274,9 +274,9 @@ test('prefix isolation', async (done) =>
         {
           query: {
             term:
-              {
-                _id: '13333337',
-              },
+            {
+              _id: '13333337',
+            },
           },
         },
       ],
@@ -290,23 +290,23 @@ test('prefix isolation', async (done) =>
         {
           query: {
             bool:
-              {
-                filter:
-                  [
+            {
+              filter:
+                [
+                  {
+                    term:
                     {
-                      term:
-                        {
-                          _index: 'bcd.secret',
-                        },
+                      _index: 'bcd.secret',
                     },
+                  },
+                  {
+                    term:
                     {
-                      term:
-                        {
-                          _id: '13333337',
-                        },
+                      _id: '13333337',
                     },
-                  ],
-              },
+                  },
+                ],
+            },
           },
         },
       ],

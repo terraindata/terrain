@@ -74,11 +74,11 @@ export class JobLog
       }
 
       const newJobLog: JobLogConfig =
-        {
-          contents: '',
-          createdAt: new Date(),
-          id: jobId,
-        };
+      {
+        contents: '',
+        createdAt: new Date(),
+        id: jobId,
+      };
 
       const upsertedJobLogs: JobLogConfig[] = await App.DB.upsert(this.jobLogTable, newJobLog) as JobLogConfig[];
       resolve(upsertedJobLogs);

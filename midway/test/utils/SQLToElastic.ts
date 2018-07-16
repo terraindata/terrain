@@ -55,19 +55,19 @@ import * as Tasty from '../../src/tasty/Tasty';
 
 let mysqlController;
 const mysqlConfig: MySQLConfig =
-  {
-    connectionLimit: 20,
-    database: 'moviesdb',
-    host: 'localhost',
-    password: 'r3curs1v3$',
-    user: 't3rr41n-demo',
-  };
+{
+  connectionLimit: 20,
+  database: 'moviesdb',
+  host: 'localhost',
+  password: 'r3curs1v3$',
+  user: 't3rr41n-demo',
+};
 
 let elasticController;
 const elasticConfig: ElasticConfig =
-  {
-    hosts: ['http://localhost:9200'],
-  };
+{
+  hosts: ['http://localhost:9200'],
+};
 
 async function initializeDBs(): Promise<void>
 {

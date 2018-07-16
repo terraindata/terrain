@@ -60,18 +60,18 @@ export enum Integrations
 }
 
 export const IntegrationNames =
-  {
-    Sftp: 'SFTP',
-    Http: 'HTTP',
-    Fs: 'File System',
-    Mysql: 'MySQL',
-    Postgresql: 'PostgreSQL',
-    Magento: 'Magento',
-    GoogleAnalytics: 'Google Analytics',
-    Email: 'Email',
-    FollowUpBoss: 'Follow Up Boss',
-    MailChimp: 'MailChimp',
-  };
+{
+  Sftp: 'SFTP',
+  Http: 'HTTP',
+  Fs: 'File System',
+  Mysql: 'MySQL',
+  Postgresql: 'PostgreSQL',
+  Magento: 'Magento',
+  GoogleAnalytics: 'Google Analytics',
+  Email: 'Email',
+  FollowUpBoss: 'Follow Up Boss',
+  MailChimp: 'MailChimp',
+};
 
 export interface IntegrationConfigBase
 {
@@ -153,7 +153,8 @@ export interface ConnectionConfigTypes
     database: string;
   };
   Magento: {
-    apiUser: string;
+    username: string;
+    host: string;
   };
   GoogleAnalytics: {
     email: string;

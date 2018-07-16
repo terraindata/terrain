@@ -258,8 +258,8 @@ interface FormLookupMap
 }
 
 export const TaskFormMap: FormLookupMap =
-  {
-    [TaskEnum.taskDefaultExit]: DefaultExitForm,
-    [TaskEnum.taskDefaultFailure]: DefaultFailureForm,
-    [TaskEnum.taskETL]: ETLTaskForm,
-  };
+{
+  [TaskEnum.taskDefaultExit]: DefaultExitForm,
+  [TaskEnum.taskDefaultFailure]: DefaultFailureForm,
+  [TaskEnum.taskETL]: ETLTaskForm,
+};

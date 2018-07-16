@@ -51,24 +51,24 @@ import { createMockStore } from 'test-helpers/helpers';
 const MIDWAY_BASE_URL = `/midway/v1`;
 
 const loginResponse =
-  {
-    accessToken: 'valid_access_token',
-    id: 1,
-  };
+{
+  accessToken: 'valid_access_token',
+  id: 1,
+};
 
 const logoutResponse =
-  {
-    accessToken: '',
-    email: 'luser@terraindata.com',
-    id: 1,
-    isDisabled: 0,
-    isSuperUser: 1,
-    meta: '{}',
-    name: 'Terrain Admin',
-    oldPassword: null,
-    password: '$2a$10$HWMqhIOEnaVwmaT5R3trBuuutBGq0ljGbdCMv6s0sZfyT7vCo.JSO',
-    timezone: '',
-  };
+{
+  accessToken: '',
+  email: 'luser@terraindata.com',
+  id: 1,
+  isDisabled: 0,
+  isSuperUser: 1,
+  meta: '{}',
+  name: 'Terrain Admin',
+  oldPassword: null,
+  password: '$2a$10$HWMqhIOEnaVwmaT5R3trBuuutBGq0ljGbdCMv6s0sZfyT7vCo.JSO',
+  timezone: '',
+};
 
 const mockStore = createMockStore();
 

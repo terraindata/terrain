@@ -57,10 +57,10 @@ export const AllBackendsArray: Backend[] =
   ];
 
 export const AllBackendsMap: { [type: string]: Backend } =
-  {
-    elastic: ElasticBackend,
-    mysql: MySQLBackend,
-  };
+{
+  elastic: ElasticBackend,
+  mysql: MySQLBackend,
+};
 
 AllBackendsArray.map(
   (backend) =>

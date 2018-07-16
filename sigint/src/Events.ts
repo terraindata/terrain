@@ -128,10 +128,10 @@ export class Events
   public async store(event: EventConfig): Promise<void>
   {
     return this.client.index({
-        index: indexName,
-        type: typeName,
-        body: event,
-      });
+      index: indexName,
+      type: typeName,
+      body: event,
+    });
   }
 
   public async storeBulk(events: EventConfig[]): Promise<void>
@@ -151,7 +151,7 @@ export class Events
     }
 
     return this.client.bulk({
-        body,
-      });
+      body,
+    });
   }
 }

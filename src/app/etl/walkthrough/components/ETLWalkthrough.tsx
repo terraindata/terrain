@@ -177,127 +177,127 @@ export default Util.createContainer(
 );
 
 export const walkthroughGraph: WalkthroughGraphType<ViewState> =
-  {
-    [ViewState.Begin]: {
-      prompt: 'What Would You Like to Do?',
-      options: [
-        {
-          link: ViewState.NewImport,
-          buttonText: 'Start a New Import',
-        },
-        {
-          link: ViewState.PickExportAlgorithm,
-          buttonText: 'Start a New Export',
-        },
-      ],
-    },
-    [ViewState.PickExportAlgorithm]: {
-      prompt: 'Select an Algorithm to Export From',
-      crumbText: 'Select Algorithm',
-      options: [
-        {
-          link: ViewState.ExportDestination,
-          component: PickAlgorithmStep,
-          onRevert: PickAlgorithmStep.onRevert,
-          onArrive: PickAlgorithmStep.onArrive,
-        },
-      ],
-    },
-    [ViewState.ExportDestination]: {
-      prompt: 'Where Would You Like the Results?',
-      crumbText: 'Destination Type',
-      options: [
-        {
-          link: ViewState.Review,
-          onArrive: (params: TransitionParams) => params.act({
-            actionType: 'setState',
-            state: {
-              sink: _SinkConfig({ type: Sinks.Download }),
-            },
-          }),
-          buttonText: 'Download The Results',
-          default: true,
-        },
-        {
-          link: ViewState.PickExportDestination,
-          buttonText: 'Send to a Custom Destination',
-        },
-      ],
-    },
-    [ViewState.PickExportDestination]: {
-      prompt: 'Select an Export Destination',
-      crumbText: 'Export Destination',
-      options: [
-        {
-          link: ViewState.Review,
-          component: PickEndpointStep,
-          extraProps: () => ({ isSource: false }),
-          onRevert: PickEndpointStep.onRevert.bind(undefined, false),
-          onArrive: PickEndpointStep.onArrive.bind(undefined, false),
-        },
-      ],
-    },
-    [ViewState.NewImport]: {
-      prompt: 'What Would You Like to Import?',
-      crumbText: 'Source Type',
-      options: [
-        {
-          link: ViewState.PickLocalFile,
-          buttonText: 'Upload a File',
-          default: true,
-        },
-        {
-          link: ViewState.PickImportSource,
-          buttonText: 'Use an External Source',
-        },
-      ],
-    },
-    [ViewState.PickLocalFile]: {
-      prompt: '',
-      crumbText: 'Upload File',
-      options: [
-        {
-          link: ViewState.PickDatabase,
-          component: ETLUploadStep,
-          onRevert: ETLUploadStep.onRevert,
-          onArrive: ETLUploadStep.onArrive,
-        },
-      ],
-    },
-    [ViewState.PickImportSource]: {
-      prompt: 'Select a Source to Import From',
-      crumbText: 'Select Source',
-      options: [
-        {
-          link: ViewState.PickDatabase,
-          component: PickEndpointStep,
-          extraProps: () => ({ isSource: true }),
-          onRevert: PickEndpointStep.onRevert.bind(undefined, true),
-          onArrive: PickEndpointStep.onArrive.bind(undefined, true),
-        },
-      ],
-    },
-    [ViewState.PickDatabase]: {
-      prompt: 'Choose a Database to Import Into',
-      crumbText: 'Select Database',
-      options: [
-        {
-          link: ViewState.Review,
-          component: PickDatabaseStep,
-          onRevert: PickDatabaseStep.onRevert,
-          onArrive: PickDatabaseStep.onArrive,
-        },
-      ],
-    },
-    [ViewState.Review]: {
-      prompt: 'Review Details',
-      crumbText: 'Review',
-      options: [
-        {
-          link: ViewState.Finish,
-          component: ETLReviewStep,
-        },
-      ],
-    },
-  };
+{
+  [ViewState.Begin]: {
+    prompt: 'What Would You Like to Do?',
+    options: [
+      {
+        link: ViewState.NewImport,
+        buttonText: 'Start a New Import',
+      },
+      {
+        link: ViewState.PickExportAlgorithm,
+        buttonText: 'Start a New Export',
+      },
+    ],
+  },
+  [ViewState.PickExportAlgorithm]: {
+    prompt: 'Select an Algorithm to Export From',
+    crumbText: 'Select Algorithm',
+    options: [
+      {
+        link: ViewState.ExportDestination,
+        component: PickAlgorithmStep,
+        onRevert: PickAlgorithmStep.onRevert,
+        onArrive: PickAlgorithmStep.onArrive,
+      },
+    ],
+  },
+  [ViewState.ExportDestination]: {
+    prompt: 'Where Would You Like the Results?',
+    crumbText: 'Destination Type',
+    options: [
+      {
+        link: ViewState.Review,
+        onArrive: (params: TransitionParams) => params.act({
+          actionType: 'setState',
+          state: {
+            sink: _SinkConfig({ type: Sinks.Download }),
+          },
+        }),
+        buttonText: 'Download The Results',
+        default: true,
+      },
+      {
+        link: ViewState.PickExportDestination,
+        buttonText: 'Send to a Custom Destination',
+      },
+    ],
+  },
+  [ViewState.PickExportDestination]: {
+    prompt: 'Select an Export Destination',
+    crumbText: 'Export Destination',
+    options: [
+      {
+        link: ViewState.Review,
+        component: PickEndpointStep,
+        extraProps: () => ({ isSource: false }),
+        onRevert: PickEndpointStep.onRevert.bind(undefined, false),
+        onArrive: PickEndpointStep.onArrive.bind(undefined, false),
+      },
+    ],
+  },
+  [ViewState.NewImport]: {
+    prompt: 'What Would You Like to Import?',
+    crumbText: 'Source Type',
+    options: [
+      {
+        link: ViewState.PickLocalFile,
+        buttonText: 'Upload a File',
+        default: true,
+      },
+      {
+        link: ViewState.PickImportSource,
+        buttonText: 'Use an External Source',
+      },
+    ],
+  },
+  [ViewState.PickLocalFile]: {
+    prompt: '',
+    crumbText: 'Upload File',
+    options: [
+      {
+        link: ViewState.PickDatabase,
+        component: ETLUploadStep,
+        onRevert: ETLUploadStep.onRevert,
+        onArrive: ETLUploadStep.onArrive,
+      },
+    ],
+  },
+  [ViewState.PickImportSource]: {
+    prompt: 'Select a Source to Import From',
+    crumbText: 'Select Source',
+    options: [
+      {
+        link: ViewState.PickDatabase,
+        component: PickEndpointStep,
+        extraProps: () => ({ isSource: true }),
+        onRevert: PickEndpointStep.onRevert.bind(undefined, true),
+        onArrive: PickEndpointStep.onArrive.bind(undefined, true),
+      },
+    ],
+  },
+  [ViewState.PickDatabase]: {
+    prompt: 'Choose a Database to Import Into',
+    crumbText: 'Select Database',
+    options: [
+      {
+        link: ViewState.Review,
+        component: PickDatabaseStep,
+        onRevert: PickDatabaseStep.onRevert,
+        onArrive: PickDatabaseStep.onArrive,
+      },
+    ],
+  },
+  [ViewState.Review]: {
+    prompt: 'Review Details',
+    crumbText: 'Review',
+    options: [
+      {
+        link: ViewState.Finish,
+        component: ETLReviewStep,
+      },
+    ],
+  },
+};
 const WalkthroughComponentClass = walkthroughFactory<ViewState>(walkthroughGraph);

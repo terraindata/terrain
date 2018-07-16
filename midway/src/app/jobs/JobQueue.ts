@@ -278,13 +278,13 @@ export class JobQueue
         newJobTasks[0].params =
           {
             options:
-              {
-                overrideSinks: fields['overrideSinks'],
-                overrideSources: fields['overrideSources'],
-                template: fields['template'],
-                templateId: fields['templateId'],
-                inputStreams: files,
-              },
+            {
+              overrideSinks: fields['overrideSinks'],
+              overrideSources: fields['overrideSources'],
+              template: fields['template'],
+              templateId: fields['templateId'],
+              inputStreams: files,
+            },
           };
       }
       catch (e)

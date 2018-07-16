@@ -90,8 +90,11 @@ export interface RootPostProcessConfig
 export interface PostProcessOptionsTypes
 {
   Aggregate: {
+    fieldInPattern?: boolean;
     fields: string[];
     operation: PostProcessAggregationTypes;
+    parentKey?: string;
+    parentKeyValue?: string;
     pattern: string;
     primaryKey: string;
   };
@@ -111,27 +114,27 @@ export interface PostProcessOptionsTypes
 }
 
 export const PostProcessOptionsDefaults: PostProcessOptionsTypes =
-  {
-    Aggregate: {
-      fields: [],
-      operation: null,
-      pattern: '',
-      primaryKey: '',
-    },
-    Filter: {
-      operation: null,
-      pattern: '',
-      primaryKey: '',
-    },
-    Parse: {
-      field: '',
-      operation: null,
-      url: '',
-    },
-    Sort: {
-      operations: [],
-    },
-  };
+{
+  Aggregate: {
+    fields: [],
+    operation: null,
+    pattern: '',
+    primaryKey: '',
+  },
+  Filter: {
+    operation: null,
+    pattern: '',
+    primaryKey: '',
+  },
+  Parse: {
+    field: '',
+    operation: null,
+    url: '',
+  },
+  Sort: {
+    operations: [],
+  },
+};
 
 export type PostProcessTypes = keyof PostProcessOptionsTypes;
 export type PostProcessOptionsType<key extends PostProcessTypes> = PostProcessOptionsTypes[key];

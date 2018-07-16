@@ -81,16 +81,16 @@ export const elasticScore = _card(
         const factors = block['weights'].map((weightBlock) => tqlTranslationFn(weightBlock, tqlConfig)).toArray();
         const _scriptObj = {
           _script:
-            {
-              type: block['sortType'],
-              order: block['sortOrder'],
-              script: {
-                stored: 'Terrain.Score.PWL',
-                params: {
-                  factors,
-                },
+          {
+            type: block['sortType'],
+            order: block['sortOrder'],
+            script: {
+              stored: 'Terrain.Score.PWL',
+              params: {
+                factors,
               },
             },
+          },
         };
 
         if (block['sortMode'] !== 'auto')
@@ -121,43 +121,43 @@ export const elasticScore = _card(
             factoryType: 'elasticWeight',
             provideParentData: true,
             row:
-              {
-                noDataPadding: true,
-                inner:
-                  [
-                    {
-                      displayType: DisplayType.CARDTEXT,
-                      key: 'key',
-                      // help: ManualConfig.help['key'],
-                      placeholder: 'Field',
-                      accepts: List(['elasticTransform']),
-                      showWhenCards: true,
-                    },
-                    {
-                      displayType: DisplayType.NUM,
-                      // help: ManualConfig.help['weight'],
-                      key: 'weight',
-                      placeholder: 'Weight',
-                      style: {
-                        maxWidth: 120,
-                      },
-                      // autoDisabled: true,
-                    },
-                    {
-                      displayType: DisplayType.COMPONENT,
-                      component: CardsScoreBar,
-                      requiresBuilderState: true,
-                      key: 'elasticScore',
-                      // help: ManualConfig.help['score'],
-                    },
-                  ],
-
-                below:
+            {
+              noDataPadding: true,
+              inner:
+                [
                   {
-                    displayType: DisplayType.CARDSFORTEXT,
+                    displayType: DisplayType.CARDTEXT,
                     key: 'key',
+                    // help: ManualConfig.help['key'],
+                    placeholder: 'Field',
+                    accepts: List(['elasticTransform']),
+                    showWhenCards: true,
                   },
+                  {
+                    displayType: DisplayType.NUM,
+                    // help: ManualConfig.help['weight'],
+                    key: 'weight',
+                    placeholder: 'Weight',
+                    style: {
+                      maxWidth: 120,
+                    },
+                    // autoDisabled: true,
+                  },
+                  {
+                    displayType: DisplayType.COMPONENT,
+                    component: CardsScoreBar,
+                    requiresBuilderState: true,
+                    key: 'elasticScore',
+                    // help: ManualConfig.help['score'],
+                  },
+                ],
+
+              below:
+              {
+                displayType: DisplayType.CARDSFORTEXT,
+                key: 'key',
               },
+            },
           },
           // Advanced controls
           {

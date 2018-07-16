@@ -394,9 +394,13 @@ class MagentoForm extends IntegrationFormBase<MagentoAuthT, MagentoConnectionT>
   };
 
   public connectionMap: InputDeclarationMap<MagentoConnectionT> = {
-    apiUser: {
+    username: {
       type: DisplayType.TextBox,
-      displayName: 'API User',
+      displayName: 'Username',
+    },
+    host: {
+      type: DisplayType.TextBox,
+      displayName: 'Host',
     },
   };
 }
@@ -541,15 +545,15 @@ type FormLookupMap =
   };
 
 export const IntegrationFormMap: FormLookupMap =
-  {
-    [Integrations.Sftp]: SftpForm,
-    [Integrations.Http]: HttpForm,
-    [Integrations.Fs]: FsForm,
-    [Integrations.Email]: EmailForm,
-    [Integrations.Mysql]: MysqlForm,
-    [Integrations.Postgresql]: PostgresqlForm,
-    [Integrations.Magento]: MagentoForm,
-    [Integrations.GoogleAnalytics]: GoogleAnalyticsForm,
-    [Integrations.FollowUpBoss]: FollowUpBossForm,
-    [Integrations.MailChimp]: MailChimpForm,
-  };
+{
+  [Integrations.Sftp]: SftpForm,
+  [Integrations.Http]: HttpForm,
+  [Integrations.Fs]: FsForm,
+  [Integrations.Email]: EmailForm,
+  [Integrations.Mysql]: MysqlForm,
+  [Integrations.Postgresql]: PostgresqlForm,
+  [Integrations.Magento]: MagentoForm,
+  [Integrations.GoogleAnalytics]: GoogleAnalyticsForm,
+  [Integrations.FollowUpBoss]: FollowUpBossForm,
+  [Integrations.MailChimp]: MailChimpForm,
+};

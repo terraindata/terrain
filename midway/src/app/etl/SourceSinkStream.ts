@@ -70,6 +70,7 @@ import FollowUpBossEndpoint from './endpoints/FollowUpBossEndpoint';
 import FSEndpoint from './endpoints/FSEndpoint';
 import GoogleAnalyticsEndpoint from './endpoints/GoogleAnalyticsEndpoint';
 import HTTPEndpoint from './endpoints/HTTPEndpoint';
+import MagentoEndpoint from './endpoints/MagentoEndpoint';
 import MailChimpEndpoint from './endpoints/MailChimpEndpoint';
 import MySQLEndpoint from './endpoints/MySQLEndpoint';
 import PostgreSQLEndpoint from './endpoints/PostgreSQLEndpoint';
@@ -123,6 +124,10 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
           break;
         case 'Fs':
           endpoint = new FSEndpoint();
+          sourceStream = await endpoint.getSource(source) as stream.Readable;
+          break;
+        case 'Magento':
+          endpoint = new MagentoEndpoint();
           sourceStream = await endpoint.getSource(source) as stream.Readable;
           break;
         case 'Mysql':
@@ -187,11 +192,11 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
 
       // ETL transformation engine currently only takes a single source stream, so we have to do postprocessing on
       // multiple streams to reduce them down to a single stream, or throw an error if we would be returning multiple streams
-      if (Array.isArray(source.options['transformations']) && source.options['transformations'].length !== 0)
+      if (Array.isArray(source.rootPostProcessConfig['transformations']) && source.rootPostProcessConfig['transformations'].length !== 0)
       {
         const writeStream = new stream.Readable({ objectMode: true });
         const postProcessedRows: object[]
-          = await postProcessTransform.process(source.options['transformations'] as PostProcessConfig[], importStreams);
+          = await postProcessTransform.process(source.rootPostProcessConfig['transformations'] as PostProcessConfig[], importStreams);
         resolve(writeStream);
         postProcessedRows.forEach((pPR) =>
         {
@@ -246,7 +251,7 @@ export async function getSinkStream(
 
     try
     {
-      if (sink.type !== 'Database' && sink.type !== 'FollowUpBoss' && sink.type !== 'MailChimp')
+      if (sink.type !== 'Database' && sink.type !== 'FollowUpBoss' && sink.type !== 'MailChimp' && sink.type !== 'Magento')
       {
         switch (sink.fileConfig.fileType)
         {
@@ -336,6 +341,9 @@ export async function getSinkStream(
           break;
         case 'MailChimp':
           endpoint = new MailChimpEndpoint();
+          break;
+        case 'Magento':
+          endpoint = new MagentoEndpoint();
           break;
         default:
           throw new Error('Sink type not implemented.');

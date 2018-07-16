@@ -50,17 +50,17 @@ import { MidwayLogger } from '../../log/MidwayLogger';
 import { Task } from '../Task';
 
 const taskOutputConfig: TaskOutputConfig =
+{
+  blocking: true,
+  exit: true,
+  options:
   {
-    blocking: true,
-    exit: true,
-    options:
-      {
-        logStream: null,
-        outputStream: null,
-      },
-    status: false,
-    rootLogStream: null,
-  };
+    logStream: null,
+    outputStream: null,
+  },
+  status: false,
+  rootLogStream: null,
+};
 
 export class TaskDefaultFailure extends Task
 {

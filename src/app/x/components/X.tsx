@@ -51,18 +51,18 @@ import MultiSwitchWrapper from './MultiSwitchWrapper';
 import './X.less';
 
 const xes =
+{
+  // cards:
+  // {
+  //   name: 'Immutable Builder',
+  //   component: XCards,
+  // },
+  multiSwitch:
   {
-    // cards:
-    // {
-    //   name: 'Immutable Builder',
-    //   component: XCards,
-    // },
-    multiSwitch:
-      {
-        name: 'Multi Switch Component',
-        component: MultiSwitchWrapper,
-      },
-  };
+    name: 'Multi Switch Component',
+    component: MultiSwitchWrapper,
+  },
+};
 
 export interface Props
 {

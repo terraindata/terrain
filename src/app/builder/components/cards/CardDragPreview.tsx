@@ -216,17 +216,17 @@ class CardDragPreview extends TerrainComponent<CDPProps>
 }
 
 const cardPreviewTarget =
+{
+  canDrop(targetProps: CDPProps, monitor)
   {
-    canDrop(targetProps: CDPProps, monitor)
-    {
-      return true;
-    },
+    return true;
+  },
 
-    drop: (targetProps: CDPProps, monitor, component) =>
-    {
-      onCardDrop(targetProps, monitor, component);
-    },
-  };
+  drop: (targetProps: CDPProps, monitor, component) =>
+  {
+    onCardDrop(targetProps, monitor, component);
+  },
+};
 
 const cardPreviewCollect = (connect, monitor) =>
   ({

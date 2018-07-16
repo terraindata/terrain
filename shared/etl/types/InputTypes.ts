@@ -45,11 +45,16 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file no-unused-expression
 
-export enum InputFileTypes
+export enum InputFileEnum
 {
   Date = 'Date',
   Number = 'Number',
   Text = 'Text',
+}
+
+export enum InputOptionsEnum
+{
+  File = 'File',
 }
 
 // export interface FileInputTypes
@@ -68,11 +73,27 @@ export interface InputConfig
   options: InputOptionsType<InputTypes>;
 }
 
+export interface InputFileOptionsTypes
+{
+  Date: {
+    dayInterval: number;
+    format: string;
+  };
+  Number: {
+    end: number;
+    interval: number;
+    padding: string;
+    start: number;
+  };
+  Text: {
+
+  };
+}
+
 export interface InputOptionsTypes
 {
   File: {
-    dayInterval: number;
-    format: string;
+    options: InputFileOptionsType<InputFileTypes>;
     name: string;
     type: InputFileTypes;
   };
@@ -85,3 +106,6 @@ export interface RootInputConfig
 
 export type InputTypes = keyof InputOptionsTypes;
 export type InputOptionsType<key extends InputTypes> = InputOptionsTypes[key];
+
+export type InputFileTypes = keyof InputFileOptionsTypes;
+export type InputFileOptionsType<key extends InputFileTypes> = InputFileOptionsTypes[key];

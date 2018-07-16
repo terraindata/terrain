@@ -75,10 +75,10 @@ export interface Props
 }
 
 export type PathfinderPiece = El |
-  {
-    content: El,
-    visible: boolean,
-  };
+{
+  content: El,
+  visible: boolean,
+};
 
 export class PathfinderLine extends TerrainComponent<Props>
 {

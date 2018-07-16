@@ -132,7 +132,7 @@ export async function handleConfig(config: Config): Promise<void>
       delete db['isMultitenant'];
 
       MidwayLogger.info('Registering new database item: ', db);
-      await databases.upsert({} as UserConfig, db);
+      await databases.upsert({ isSuperUser: true } as UserConfig, db);
     }
   }
 }
