@@ -165,10 +165,10 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
   {
     this.log('deleteTemplate', params);
     const scriptParams: Elastic.DeleteScriptParams =
-      {
-        id: params.id,
-        lang: 'mustache',
-      };
+    {
+      id: params.id,
+      lang: 'mustache',
+    };
     return this.deleteScript(scriptParams, callback);
   }
 
@@ -207,10 +207,10 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
     {
       this.log('getTemplate', params);
       const scriptParams: Elastic.GetScriptParams =
-        {
-          id: params.id,
-          lang: 'mustache',
-        };
+      {
+        id: params.id,
+        lang: 'mustache',
+      };
       return this.getScript(scriptParams);
     });
   }
@@ -307,11 +307,11 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
     {
       this.log('putTemplate', params);
       const scriptParams: Elastic.PutScriptParams =
-        {
-          id: params.id,
-          lang: 'mustache',
-          body: params.body,
-        };
+      {
+        id: params.id,
+        lang: 'mustache',
+        body: params.body,
+      };
       return this.putScript(scriptParams);
     });
   }

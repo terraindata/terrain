@@ -72,375 +72,305 @@ export interface AjaxResponse
 }
 
 export const Ajax =
+{
+  reduxStoreDispatch: (action) => console.error('Ajax reduxStoreDispatch property has not been set.'),
+
+  config: (config) =>
   {
-    reduxStoreDispatch: (action) => console.error('Ajax reduxStoreDispatch property has not been set.'),
+    Ajax.reduxStoreDispatch = config.reduxStoreDispatch;
+  },
 
-    config: (config) =>
+  req(method: 'post' | 'get' | 'delete',
+    url: string,
+    body: object,
+    onLoad: (response: object) => void,
+    config: {
+      noCredentials?: boolean,
+      onError?: (response: any) => void,
+      // crossDomain?: boolean;
+      download?: boolean;
+      downloadFilename?: string;
+      urlArgs?: object;
+    } = {})
+  {
+    let data: object;
+    if (config.noCredentials)
     {
-      Ajax.reduxStoreDispatch = config.reduxStoreDispatch;
-    },
-
-    req(method: 'post' | 'get' | 'delete',
-      url: string,
-      body: object,
-      onLoad: (response: object) => void,
-      config: {
-        noCredentials?: boolean,
-        onError?: (response: any) => void,
-        // crossDomain?: boolean;
-        download?: boolean;
-        downloadFilename?: string;
-        urlArgs?: object;
-      } = {})
+      data = body;
+    }
+    else
     {
-      let data: object;
-      if (config.noCredentials)
+      data = {
+        id: localStorage['id'],
+        accessToken: localStorage['accessToken'],
+        body,
+      };
+    }
+    return Ajax._reqGeneric(
+      method,
+      '/midway/v1/' + url,
+      JSON.stringify(data),
+      (response) =>
       {
-        data = body;
-      }
-      else
-      {
-        data = {
-          id: localStorage['id'],
-          accessToken: localStorage['accessToken'],
-          body,
-        };
-      }
-      return Ajax._reqGeneric(
-        method,
-        '/midway/v1/' + url,
-        JSON.stringify(data),
-        (response) =>
-        {
-          onLoad(response);
-        },
-        _.extend({
-          onError: config.onError,
-          noToken: true,
-          json: true,
-          crossDomain: false,
-        }, config),
-      );
-    },
+        onLoad(response);
+      },
+      _.extend({
+        onError: config.onError,
+        noToken: true,
+        json: true,
+        crossDomain: false,
+      }, config),
+    );
+  },
 
-    _reqGeneric(method: string,
-      url: string,
-      data: string,
-      onLoad: (response: any) => void,
-      config: {
-        onError?: (response: any) => void,
-        host?: string,
-        crossDomain?: boolean;
-        noToken?: boolean;
-        download?: boolean;
-        downloadFilename?: string;
-        json?: boolean;
-        urlArgs?: object;
-      } = {})
+  _reqGeneric(method: string,
+    url: string,
+    data: string,
+    onLoad: (response: any) => void,
+    config: {
+      onError?: (response: any) => void,
+      host?: string,
+      crossDomain?: boolean;
+      noToken?: boolean;
+      download?: boolean;
+      downloadFilename?: string;
+      json?: boolean;
+      urlArgs?: object;
+    } = {})
+  {
+    const host = config.host || '';
+    const fullUrl = host + url;
+
+    if (config.download)
     {
-      const host = config.host || '';
-      const fullUrl = host + url;
+      const form = document.createElement('form');
+      form.setAttribute('action', fullUrl);
+      form.setAttribute('method', 'post');
+      form.setAttribute('target', '_blank');
 
-      if (config.download)
+      // TODO move
+      const accessToken = localStorage['accessToken'];
+      const id = localStorage['id'];
+      const dataObj = {
+        id,
+        accessToken,
+        data,
+        filename: config.downloadFilename,
+      };
+      _.map(dataObj as any, (value, key) =>
       {
-        const form = document.createElement('form');
-        form.setAttribute('action', fullUrl);
-        form.setAttribute('method', 'post');
-        form.setAttribute('target', '_blank');
+        const input = document.createElement('input');
+        input.setAttribute('type', 'hidden');
+        input.setAttribute('name', key + '');
+        input.setAttribute('value', value as any);
+        form.appendChild(input);
+      });
 
-        // TODO move
-        const accessToken = localStorage['accessToken'];
-        const id = localStorage['id'];
-        const dataObj = {
-          id,
-          accessToken,
-          data,
-          filename: config.downloadFilename,
-        };
-        _.map(dataObj as any, (value, key) =>
+      document.body.appendChild(form); // Required for FF
+      form.submit();
+      form.remove();
+      return;
+    }
+
+    const axiosInstance = axios.create();
+
+    axiosInstance.interceptors.response.use(
+      (response) => response,
+      (error) =>
+      {
+        // This is an route error, we have to abstract the route error to an MidwayError object
+        if (error && error.response)
         {
-          const input = document.createElement('input');
-          input.setAttribute('type', 'hidden');
-          input.setAttribute('name', key + '');
-          input.setAttribute('value', value as any);
-          form.appendChild(input);
-        });
-
-        document.body.appendChild(form); // Required for FF
-        form.submit();
-        form.remove();
-        return;
-      }
-
-      const axiosInstance = axios.create();
-
-      axiosInstance.interceptors.response.use(
-        (response) => response,
-        (error) =>
-        {
-          // This is an route error, we have to abstract the route error to an MidwayError object
-          if (error && error.response)
+          if (error.response.status === 401)
           {
-            if (error.response.status === 401)
-            {
-              Ajax.reduxStoreDispatch(Actions({ actionType: 'logout' }));
-            }
+            Ajax.reduxStoreDispatch(Actions({ actionType: 'logout' }));
           }
-          const midwayError = MidwayError.fromAxiosErrorResponse(error, 'The Connection Has Been Lost.');
-          return Promise.reject(midwayError);
-        },
-      );
+        }
+        const midwayError = MidwayError.fromAxiosErrorResponse(error, 'The Connection Has Been Lost.');
+        return Promise.reject(midwayError);
+      },
+    );
 
-      const headers = {};
-      if (config.crossDomain)
-      {
-        headers['Access-Control-Allow-Origin'] = '*';
-        headers['Access-Control-Allow-Headers'] = 'Content-Type, \
+    const headers = {};
+    if (config.crossDomain)
+    {
+      headers['Access-Control-Allow-Origin'] = '*';
+      headers['Access-Control-Allow-Headers'] = 'Content-Type, \
           Access-Control-Allow-Headers, \
           Authorization, \
           X-Requested-With, \
           Access-Control-Allow-Origin';
-      }
+    }
 
-      const CancelToken = axios.CancelToken;
-      const source = CancelToken.source();
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
 
-      const xhr = axiosInstance.request({
-        method,
-        url: fullUrl,
-        timeout: 180000,
-        withCredentials: config.crossDomain,
-        headers,
-        params: method === 'get' ? Object.assign({}, JSON.parse(data), config.urlArgs) : {},
-        data: method !== 'get' ? JSON.parse(data) : {},
-        cancelToken: source.token,
+    const xhr = axiosInstance.request({
+      method,
+      url: fullUrl,
+      timeout: 180000,
+      withCredentials: config.crossDomain,
+      headers,
+      params: method === 'get' ? Object.assign({}, JSON.parse(data), config.urlArgs) : {},
+      data: method !== 'get' ? JSON.parse(data) : {},
+      cancelToken: source.token,
+    })
+      .then((response) =>
+      {
+        onLoad(response.data);
       })
-        .then((response) =>
+      .catch((err: MidwayError) =>
+      {
+        if (axios.isCancel(err))
         {
-          onLoad(response.data);
-        })
-        .catch((err: MidwayError) =>
+          // Added for testing, can be removed.
+          TerrainLog.debug('isCanceled', err.getDetail());
+        }
+        // TODO: process this routeError via the Promise catch interface.
+        // pass the error to the error handler if there is one.
+        TerrainLog.debug('Midway Route Error: ' + err.getDetail());
+        config && config.onError && config.onError(err);
+      });
+
+    return {
+      promise: xhr,
+      cancel: source.cancel,
+    };
+  },
+
+  midwayStatus(success: () => void,
+    failure: () => void)
+  {
+    return Ajax.req(
+      'get',
+      'status',
+      {},
+      (resp: { status: string }) =>
+      {
+        if (resp && resp.status === 'ok')
         {
-          if (axios.isCancel(err))
+          success();
+        }
+        else
+        {
+          failure();
+        }
+      },
+      {
+        onError: failure,
+      },
+    );
+  },
+
+  getUsers(onLoad: (users: { [id: string]: any }) => void)
+  {
+    return Ajax.req(
+      'get',
+      'users/',
+      {},
+      (response: object[]) =>
+      {
+        const usersObj = {};
+        response.map(
+          (user) =>
           {
-            // Added for testing, can be removed.
-            TerrainLog.debug('isCanceled', err.getDetail());
-          }
-          // TODO: process this routeError via the Promise catch interface.
-          // pass the error to the error handler if there is one.
-          TerrainLog.debug('Midway Route Error: ' + err.getDetail());
-          config && config.onError && config.onError(err);
-        });
-
-      return {
-        promise: xhr,
-        cancel: source.cancel,
-      };
-    },
-
-    midwayStatus(success: () => void,
-      failure: () => void)
-    {
-      return Ajax.req(
-        'get',
-        'status',
-        {},
-        (resp: { status: string }) =>
-        {
-          if (resp && resp.status === 'ok')
-          {
-            success();
-          }
-          else
-          {
-            failure();
-          }
-        },
-        {
-          onError: failure,
-        },
-      );
-    },
-
-    getUsers(onLoad: (users: { [id: string]: any }) => void)
-    {
-      return Ajax.req(
-        'get',
-        'users/',
-        {},
-        (response: object[]) =>
-        {
-          const usersObj = {};
-          response.map(
-            (user) =>
-            {
-              usersObj[user['id']] = responseToRecordConfig(user);
-            },
-          );
-          onLoad(usersObj);
-        },
-      );
-    },
-
-    saveUser(user: UserTypes.User,
-      onSave: (response: any) => void,
-      onError: (response: any) => void)
-    {
-      const userData = recordForSave(user);
-
-      return Ajax.req(
-        'post',
-        `users/${user.id}`,
-        userData,
-        onSave,
-        {
-          onError,
-        },
-      );
-    },
-
-    changePassword(id: number,
-      oldPassword: string,
-      newPassword: string,
-      onSave: (response: any) => void,
-      onError: (response: any) => void)
-    {
-      return Ajax.req(
-        'post',
-        `users/${id}`,
-        {
-          oldPassword,
-          password: newPassword,
-        },
-        onSave,
-        {
-          onError,
-        });
-    },
-
-    adminSaveUser(user: UserTypes.User)
-    {
-      return Ajax.req(
-        'post',
-        `users/${user.id}`,
-        {
-          isSuperUser: user.isSuperUser,
-          isDisabled: user.isDisabled,
-          email: user.email,
-        },
-        _.noop,
-      );
-    },
-
-    createUser(name: string, email: string, password: string, onSave: (response: any) => void, onError: (response: any) => void)
-    {
-      return Ajax.req(
-        'post',
-        `users`,
-        {
-          name,
-          email,
-          password,
-        },
-        onSave,
-        {
-          onError,
-        },
-      );
-    },
-    getItems(onLoad: (categories: IMMap<number, LibraryTypes.Category>,
-      groups: IMMap<number, LibraryTypes.Group>,
-      algorithms: IMMap<number, LibraryTypes.Algorithm>,
-      categoriesOrder: IMList<number, any>) => void,
-      onError?: (ev: Event) => void)
-    {
-      return Ajax.req(
-        'get',
-        'items/',
-        {},
-        (items: object[]) =>
-        {
-          const mapping =
-            {
-              ALGORITHM: Immutable.Map<number, LibraryTypes.Algorithm>() as any,
-              GROUP: Immutable.Map<number, LibraryTypes.Group>(),
-              CATEGORY: Immutable.Map<number, LibraryTypes.Category>(),
-              QUERY: Immutable.Map<number, Query>(),
-            };
-          const categoriesOrder = [];
-          items.map(
-            (itemObj) =>
-            {
-              const metaObj = JSON.parse(itemObj['meta']);
-              if (itemObj['type'] === 'GROUP' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 3))
-              {
-                itemObj['type'] = 'CATEGORY';
-              }
-              if (itemObj['type'] === 'ALGORITHM' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 3))
-              {
-                itemObj['type'] = 'GROUP';
-              }
-              if (itemObj['type'] === 'VARIANT' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 3))
-              {
-                itemObj['type'] = 'ALGORITHM';
-              }
-              const item = LibraryTypes.typeToConstructor[itemObj['type']](
-                responseToRecordConfig(itemObj),
-              );
-              mapping[item.type] = mapping[item.type].set(item.id, item);
-              // Category or Group TODO TODO
-              if (item.type === ItemType.Category)
-              {
-                categoriesOrder.push(item.id);
-              }
-            },
-          );
-          mapping.GROUP = mapping.GROUP.map(
-            (cat) => cat.set('categoryId', cat.parent),
-          ).toMap();
-          mapping.ALGORITHM = mapping.ALGORITHM.map(
-            (v) =>
-            {
-              v = v.set('groupId', v.parent);
-              const alg = mapping.GROUP.get(v.groupId);
-              if (alg)
-              {
-                v = v.set('categoryId', alg.categoryId);
-              }
-              return v;
-            },
-          ).toMap();
-
-          onLoad(
-            mapping.CATEGORY,
-            mapping.GROUP,
-            mapping.ALGORITHM,
-            Immutable.List(categoriesOrder),
-          );
-        },
-        {
-          onError,
-          urlArgs: {
-            type: 'CATEGORY,ALGORITHM,VARIANT,GROUP', // Still have variant to retrieve old items
+            usersObj[user['id']] = responseToRecordConfig(user);
           },
-        },
-      );
-    },
+        );
+        onLoad(usersObj);
+      },
+    );
+  },
 
-    getItem(type: ItemType,
-      id: ID,
-      onLoad: (item: Item) => void,
-      onError?: (ev: Event) => void)
-    {
-      return Ajax.req(
-        'get',
-        `items/${id}`,
-        {},
-        (response: object[]) =>
+  saveUser(user: UserTypes.User,
+    onSave: (response: any) => void,
+    onError: (response: any) => void)
+  {
+    const userData = recordForSave(user);
+
+    return Ajax.req(
+      'post',
+      `users/${user.id}`,
+      userData,
+      onSave,
+      {
+        onError,
+      },
+    );
+  },
+
+  changePassword(id: number,
+    oldPassword: string,
+    newPassword: string,
+    onSave: (response: any) => void,
+    onError: (response: any) => void)
+  {
+    return Ajax.req(
+      'post',
+      `users/${id}`,
+      {
+        oldPassword,
+        password: newPassword,
+      },
+      onSave,
+      {
+        onError,
+      });
+  },
+
+  adminSaveUser(user: UserTypes.User)
+  {
+    return Ajax.req(
+      'post',
+      `users/${user.id}`,
+      {
+        isSuperUser: user.isSuperUser,
+        isDisabled: user.isDisabled,
+        email: user.email,
+      },
+      _.noop,
+    );
+  },
+
+  createUser(name: string, email: string, password: string, onSave: (response: any) => void, onError: (response: any) => void)
+  {
+    return Ajax.req(
+      'post',
+      `users`,
+      {
+        name,
+        email,
+        password,
+      },
+      onSave,
+      {
+        onError,
+      },
+    );
+  },
+  getItems(onLoad: (categories: IMMap<number, LibraryTypes.Category>,
+    groups: IMMap<number, LibraryTypes.Group>,
+    algorithms: IMMap<number, LibraryTypes.Algorithm>,
+    categoriesOrder: IMList<number, any>) => void,
+    onError?: (ev: Event) => void)
+  {
+    return Ajax.req(
+      'get',
+      'items/',
+      {},
+      (items: object[]) =>
+      {
+        const mapping =
         {
-          if (response && response[0])
+          ALGORITHM: Immutable.Map<number, LibraryTypes.Algorithm>() as any,
+          GROUP: Immutable.Map<number, LibraryTypes.Group>(),
+          CATEGORY: Immutable.Map<number, LibraryTypes.Category>(),
+          QUERY: Immutable.Map<number, Query>(),
+        };
+        const categoriesOrder = [];
+        items.map(
+          (itemObj) =>
           {
-            const itemObj = response[0];
             const metaObj = JSON.parse(itemObj['meta']);
             if (itemObj['type'] === 'GROUP' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 3))
             {
@@ -454,704 +384,774 @@ export const Ajax =
             {
               itemObj['type'] = 'ALGORITHM';
             }
-            const item = LibraryTypes.typeToConstructor[itemObj['type']](responseToRecordConfig(itemObj));
-            onLoad(item);
-          }
-          else
+            const item = LibraryTypes.typeToConstructor[itemObj['type']](
+              responseToRecordConfig(itemObj),
+            );
+            mapping[item.type] = mapping[item.type].set(item.id, item);
+            // Category or Group TODO TODO
+            if (item.type === ItemType.Category)
+            {
+              categoriesOrder.push(item.id);
+            }
+          },
+        );
+        mapping.GROUP = mapping.GROUP.map(
+          (cat) => cat.set('categoryId', cat.parent),
+        ).toMap();
+        mapping.ALGORITHM = mapping.ALGORITHM.map(
+          (v) =>
           {
-            onError && onError('Nothing found' as any);
-          }
-        },
-        {
-          onError,
-        });
-    },
+            v = v.set('groupId', v.parent);
+            const alg = mapping.GROUP.get(v.groupId);
+            if (alg)
+            {
+              v = v.set('categoryId', alg.categoryId);
+            }
+            return v;
+          },
+        ).toMap();
 
-    getAlgorithm(algorithmId: ID,
-      onLoad: (algorithm: LibraryTypes.Algorithm) => void)
-    {
-      return Ajax.getItem(
-        'ALGORITHM',
-        algorithmId,
-        (algorithmItem: Item) =>
-        {
-          onLoad(algorithmItem as LibraryTypes.Algorithm);
-        },
-        (error) =>
-        {
-          if (error as any === 'Nothing found')
-          {
-            onLoad(null);
-          }
-        },
-      );
-      // }
-      // TODO
-      // if (algorithmId.indexOf('@') === -1)
-      // {
-      // else
-      // {
-      //   // TODO
-      //   // return Ajax.getAlgorithmVersion(
-      //   //   algorithmId,
-      //   //   onLoad,
-      //   // );
-      // }
-    },
-
-    getAlgorithmStatus(
-      algorithmId: ID,
-      dbid: number,
-      deployedName: string,
-      onLoad: (resp: object) => void,
-      onError?: (resp: any) => void,
-    )
-    {
-      const onLoadHandler = (resp) =>
+        onLoad(
+          mapping.CATEGORY,
+          mapping.GROUP,
+          mapping.ALGORITHM,
+          Immutable.List(categoriesOrder),
+        );
+      },
       {
-        onLoad(resp);
-      };
-      Ajax.req(
-        'get',
-        'items/live/' + algorithmId,
-        {},
-        (response: object) =>
-        {
-          let responseData: object;
-          try
-          {
-            responseData = response;
-          }
-          catch (e)
-          {
-            onError && onError(e.message);
-          }
-
-          if (responseData !== undefined)
-          {
-            // needs to be outside of the try/catch so that any errors it throws aren't caught
-            onLoad(responseData);
-          }
+        onError,
+        urlArgs: {
+          type: 'CATEGORY,ALGORITHM,VARIANT,GROUP', // Still have variant to retrieve old items
         },
-        {
-          onError, urlArgs: { dbid, deployedName },
-        },
-      );
-      return;
-    },
+      },
+    );
+  },
 
-    getVersions(id: ID, onLoad: (versions: any) => void, onError?: (ev: Event) => void)
-    {
-      return Ajax.req('get', 'versions/items/' + id, {}, (response: any) =>
+  getItem(type: ItemType,
+    id: ID,
+    onLoad: (item: Item) => void,
+    onError?: (ev: Event) => void)
+  {
+    return Ajax.req(
+      'get',
+      `items/${id}`,
+      {},
+      (response: object[]) =>
       {
+        if (response && response[0])
+        {
+          const itemObj = response[0];
+          const metaObj = JSON.parse(itemObj['meta']);
+          if (itemObj['type'] === 'GROUP' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 3))
+          {
+            itemObj['type'] = 'CATEGORY';
+          }
+          if (itemObj['type'] === 'ALGORITHM' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 3))
+          {
+            itemObj['type'] = 'GROUP';
+          }
+          if (itemObj['type'] === 'VARIANT' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 3))
+          {
+            itemObj['type'] = 'ALGORITHM';
+          }
+          const item = LibraryTypes.typeToConstructor[itemObj['type']](responseToRecordConfig(itemObj));
+          onLoad(item);
+        }
+        else
+        {
+          onError && onError('Nothing found' as any);
+        }
+      },
+      {
+        onError,
+      });
+  },
+
+  getAlgorithm(algorithmId: ID,
+    onLoad: (algorithm: LibraryTypes.Algorithm) => void)
+  {
+    return Ajax.getItem(
+      'ALGORITHM',
+      algorithmId,
+      (algorithmItem: Item) =>
+      {
+        onLoad(algorithmItem as LibraryTypes.Algorithm);
+      },
+      (error) =>
+      {
+        if (error as any === 'Nothing found')
+        {
+          onLoad(null);
+        }
+      },
+    );
+    // }
+    // TODO
+    // if (algorithmId.indexOf('@') === -1)
+    // {
+    // else
+    // {
+    //   // TODO
+    //   // return Ajax.getAlgorithmVersion(
+    //   //   algorithmId,
+    //   //   onLoad,
+    //   // );
+    // }
+  },
+
+  getAlgorithmStatus(
+    algorithmId: ID,
+    dbid: number,
+    deployedName: string,
+    onLoad: (resp: object) => void,
+    onError?: (resp: any) => void,
+  )
+  {
+    const onLoadHandler = (resp) =>
+    {
+      onLoad(resp);
+    };
+    Ajax.req(
+      'get',
+      'items/live/' + algorithmId,
+      {},
+      (response: object) =>
+      {
+        let responseData: object;
         try
         {
-          onLoad(response);
+          responseData = response;
         }
         catch (e)
         {
-          onError && onError(response as any);
+          onError && onError(e.message);
         }
-      });
-    },
 
-    getVersion(id: ID, onLoad: (version: any) => void)
+        if (responseData !== undefined)
+        {
+          // needs to be outside of the try/catch so that any errors it throws aren't caught
+          onLoad(responseData);
+        }
+      },
+      {
+        onError, urlArgs: { dbid, deployedName },
+      },
+    );
+    return;
+  },
+
+  getVersions(id: ID, onLoad: (versions: any) => void, onError?: (ev: Event) => void)
+  {
+    return Ajax.req('get', 'versions/items/' + id, {}, (response: any) =>
     {
-      // TODO
-      onLoad(null);
-      return null;
+      try
+      {
+        onLoad(response);
+      }
+      catch (e)
+      {
+        onError && onError(response as any);
+      }
+    });
+  },
 
-      // if (!id || id.indexOf('@') === -1)
-      // {
-      //   onLoad(null);
-      //   return null;
-      // }
+  getVersion(id: ID, onLoad: (version: any) => void)
+  {
+    // TODO
+    onLoad(null);
+    return null;
 
-      // // viewing an old version
-      // const pieces = id.split('@');
-      // const originalId = pieces[0];
-      // const versionId = pieces[1];
+    // if (!id || id.indexOf('@') === -1)
+    // {
+    //   onLoad(null);
+    //   return null;
+    // }
 
-      // const url = '/versions/' + originalId;
-      // return Ajax._get(
-      //   url,
-      //   '',
-      //   (response: any) =>
-      //   {
-      //     const version = JSON.parse(response).find((version) => version.id === versionId);
-      //     if (version)
-      //     {
-      //       const data = JSON.parse(version.data);
-      //       Ajax.getAlgorithm(originalId, (v: LibraryTypes.Algorithm) =>
-      //       {
-      //         if (v)
-      //         {
-      //           data['id'] = v.id;
-      //           data['createdByUserId'] = v.createdByUserId;
-      //           data['object'] = v['object'];
-      //           data['objectId'] = v.objectId;
-      //           data['objectType'] = v.objectType;
+    // // viewing an old version
+    // const pieces = id.split('@');
+    // const originalId = pieces[0];
+    // const versionId = pieces[1];
 
-      //           onLoad(LibraryTypes._Algorithm(data));
-      //         }
-      //         else
-      //         {
-      //           onLoad(null);
-      //         }
-      //       });
-      //     }
-      //     else
-      //     {
-      //       onLoad(null);
-      //     }
-      //   },
-      //   () => onLoad(null),
-      // );
-    },
+    // const url = '/versions/' + originalId;
+    // return Ajax._get(
+    //   url,
+    //   '',
+    //   (response: any) =>
+    //   {
+    //     const version = JSON.parse(response).find((version) => version.id === versionId);
+    //     if (version)
+    //     {
+    //       const data = JSON.parse(version.data);
+    //       Ajax.getAlgorithm(originalId, (v: LibraryTypes.Algorithm) =>
+    //       {
+    //         if (v)
+    //         {
+    //           data['id'] = v.id;
+    //           data['createdByUserId'] = v.createdByUserId;
+    //           data['object'] = v['object'];
+    //           data['objectId'] = v.objectId;
+    //           data['objectType'] = v.objectType;
 
-    getQuery(algorithmId: ID,
-      onLoad: (query: Query, algorithm: LibraryTypes.Algorithm) => void)
+    //           onLoad(LibraryTypes._Algorithm(data));
+    //         }
+    //         else
+    //         {
+    //           onLoad(null);
+    //         }
+    //       });
+    //     }
+    //     else
+    //     {
+    //       onLoad(null);
+    //     }
+    //   },
+    //   () => onLoad(null),
+    // );
+  },
+
+  getQuery(algorithmId: ID,
+    onLoad: (query: Query, algorithm: LibraryTypes.Algorithm) => void)
+  {
+    if (!algorithmId)
     {
-      if (!algorithmId)
+      return;
+    }
+
+    // TODO change if we store queries separate from algorithms
+    return Ajax.getAlgorithm(
+      algorithmId,
+      (v: LibraryTypes.Algorithm) =>
+      {
+        if (!v || !v.query)
+        {
+          onLoad(null, v);
+        }
+        else
+        {
+          onLoad(v.query, v);
+        }
+      },
+    );
+  },
+
+  saveItem(item: Item,
+    onLoad?: (resp: any) => void, onError?: (ev: Event) => void)
+  {
+    if (item.type === ItemType.Algorithm)
+    {
+      item = LibraryTypes.algorithmForSave(item as LibraryTypes.Algorithm);
+    }
+    const itemData = recordForSave(item);
+    const id = itemData['id'];
+    let route = `items/${id}`;
+    if (id === -1)
+    {
+      delete itemData['id'];
+      route = 'items';
+    }
+    onLoad = onLoad || _.noop;
+
+    return Ajax.req(
+      'post',
+      route,
+      itemData,
+      (respArray) =>
+      {
+        onLoad(respArray[0]);
+      },
+      {
+        onError,
+      },
+    );
+  },
+
+  deleteItem(item: Item,
+    onLoad?: (resp: any) => void, onError?: (ev: Event) => void)
+  {
+    const id = item.id;
+    const route = `items/${id}`;
+    onLoad = onLoad || _.noop;
+
+    return Ajax.req(
+      'delete',
+      route,
+      null,
+      (respArray) =>
+      {
+        onLoad(respArray[0]);
+      },
+      {
+        onError,
+      },
+    );
+  },
+
+  /**
+   * Query M2
+   */
+  query(body: string,
+    db: BackendInstance,
+    onLoad: (response: MidwayQueryResponse) => void,
+    onError?: (ev: string | MidwayError) => void,
+    sqlQuery?: boolean, // unused
+    options: {
+      streaming?: boolean,
+      streamingTo?: string,
+    } = {},
+  ): { xhr: AjaxResponse, queryId: string }
+  {
+    const payload: QueryRequest = {
+      type: 'search', // can be other things in the future
+      database: db.id as number, // should be passed by caller
+      streaming: options.streaming,
+      body,
+    };
+
+    const onLoadHandler = (resp) =>
+    {
+      const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
+      onLoad(queryResult);
+    };
+    const queryId = '' + Math.random();
+    const xhr = Ajax.req(
+      'post',
+      'query/',
+      payload,
+      onLoadHandler,
+      {
+        onError,
+        download: options.streaming,
+        downloadFilename: options.streamingTo,
+      },
+    );
+
+    return { queryId, xhr };
+  },
+
+  deployQuery(
+    type: string,
+    body: object,
+    db: BackendInstance,
+    onLoad: (response: MidwayQueryResponse) => void,
+    onError?: (ev: string | MidwayError) => void,
+  )
+  {
+    const payload: QueryRequest = {
+      type,
+      database: db.id as number,
+      body,
+    };
+
+    const onLoadHandler = (resp) =>
+    {
+      const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
+      onLoad(queryResult);
+    };
+
+    Ajax.req(
+      'post',
+      'query/',
+      payload,
+      onLoadHandler,
+      {
+        onError,
+      },
+    );
+  },
+
+  starColumn(
+    columnId: ID,
+    starred: boolean,
+    id?: number,
+    onLoad?: (resp) => void,
+    onError?: (error) => void)
+  {
+    const body = id !== undefined ? { columnId, starred, id } : { columnId, starred, id };
+    return Ajax.req('post', 'schemametadata/star', body, (resp: any) =>
+    {
+      try
+      {
+        onLoad && onLoad(resp);
+      }
+      catch (e)
+      {
+        onError && onError(e);
+      }
+    });
+  },
+
+  schemaMetadata(id?: number, onLoad?: (resp) => void, onError?: (error) => void)
+  {
+    return Ajax.req('get', 'schemametadata/', { id }, (resp: any) =>
+    {
+      try
+      {
+        onLoad && onLoad(resp);
+      }
+      catch (e)
+      {
+        onError && onError(e);
+      }
+    });
+  },
+
+  countColumn(
+    columnId: ID,
+    algorithmId?: string | number,
+    id?: number,
+    onLoad?: (resp) => void,
+    onError?: (error) => void)
+  {
+    const body = id === undefined ? { columnId, algorithmId } : { columnId, algorithmId, id };
+    return Ajax.req('post', 'schemametadata/count', body, (resp: any) =>
+    {
+      try
+      {
+        onLoad && onLoad(resp);
+      }
+      catch (e)
+      {
+        onError && onError(e);
+      }
+    });
+  },
+
+  getResultsConfig(
+    index: string,
+    onLoad?: (resp) => void,
+    onError?: (error) => void,
+  )
+  {
+    return Ajax.req('post', 'resultsconfig/', { index }, (resp: any) =>
+    {
+      try
+      {
+        onLoad && onLoad(JSON.parse(JSON.stringify(resp)));
+      }
+      catch (e)
+      {
+        onError && onError(e);
+      }
+    });
+  },
+
+  updateResultsConfig(
+    index: string,
+    resultsConfig: any,
+    onLoad?: (resp) => void,
+    onError?: (error) => void,
+  )
+  {
+    const body = { resultsConfig, index };
+    return Ajax.req('post', 'resultsconfig/update', body, (resp: any) =>
+    {
+      try
+      {
+        onLoad && onLoad(resp);
+      }
+      catch (e)
+      {
+        onError && onError(e);
+      }
+    });
+  },
+
+  runOnDemandSchedule(
+    id: ID,
+    onLoad: (resp: object[]) => void,
+    onError?: (ev: string) => void,
+  )
+  {
+    const payload = {};
+
+    return Ajax.req(
+      'post',
+      'scheduler/run/' + String(id),
+      payload,
+      (response: object[]) =>
+      {
+        onLoad(response);
+      },
+      {
+        onError,
+      },
+    );
+  },
+
+  schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
+  {
+    // TODO see if needs to query m1
+    return Ajax.req('get', 'database/' + dbId + '/schema', {}, (response: any) =>
+    {
+      try
+      {
+        const cols: object = typeof response === 'string' ? JSON.parse(response) : response;
+        onLoad(cols);
+      }
+      catch (e)
+      {
+        onError && onError(response as any);
+      }
+    });
+  },
+
+  getDbs(onLoad: (dbs: BackendInstance[], loadFinished: boolean) => void, onError?: (ev: Event) => void)
+  {
+    let m2Dbs: BackendInstance[] = null;
+    const checkForLoaded = () =>
+    {
+      if (!m2Dbs)
       {
         return;
       }
 
-      // TODO change if we store queries separate from algorithms
-      return Ajax.getAlgorithm(
-        algorithmId,
-        (v: LibraryTypes.Algorithm) =>
-        {
-          if (!v || !v.query)
-          {
-            onLoad(null, v);
-          }
-          else
-          {
-            onLoad(v.query, v);
-          }
-        },
-      );
-    },
-
-    saveItem(item: Item,
-      onLoad?: (resp: any) => void, onError?: (ev: Event) => void)
-    {
-      if (item.type === ItemType.Algorithm)
+      let dbs: BackendInstance[] = [];
+      if (m2Dbs)
       {
-        item = LibraryTypes.algorithmForSave(item as LibraryTypes.Algorithm);
+        dbs = dbs.concat(m2Dbs);
       }
-      const itemData = recordForSave(item);
-      const id = itemData['id'];
-      let route = `items/${id}`;
-      if (id === -1)
+      onLoad(dbs, !!(m2Dbs));
+    };
+
+    Ajax.req(
+      'get',
+      'database',
+      {},
+      (dbs: [BackendInstance]) =>
       {
-        delete itemData['id'];
-        route = 'items';
-      }
-      onLoad = onLoad || _.noop;
-
-      return Ajax.req(
-        'post',
-        route,
-        itemData,
-        (respArray) =>
+        m2Dbs = dbs.map((db) =>
         {
-          onLoad(respArray[0]);
-        },
-        {
-          onError,
-        },
-      );
-    },
-
-    deleteItem(item: Item,
-      onLoad?: (resp: any) => void, onError?: (ev: Event) => void)
-    {
-      const id = item.id;
-      const route = `items/${id}`;
-      onLoad = onLoad || _.noop;
-
-      return Ajax.req(
-        'delete',
-        route,
-        null,
-        (respArray) =>
-        {
-          onLoad(respArray[0]);
-        },
-        {
-          onError,
-        },
-      );
-    },
-
-    /**
-     * Query M2
-     */
-    query(body: string,
-      db: BackendInstance,
-      onLoad: (response: MidwayQueryResponse) => void,
-      onError?: (ev: string | MidwayError) => void,
-      sqlQuery?: boolean, // unused
-      options: {
-        streaming?: boolean,
-        streamingTo?: string,
-      } = {},
-    ): { xhr: AjaxResponse, queryId: string }
-    {
-      const payload: QueryRequest = {
-        type: 'search', // can be other things in the future
-        database: db.id as number, // should be passed by caller
-        streaming: options.streaming,
-        body,
-      };
-
-      const onLoadHandler = (resp) =>
+          db['source'] = 'm2';
+          return db;
+        });
+        checkForLoaded();
+      },
       {
-        const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
-        onLoad(queryResult);
-      };
-      const queryId = '' + Math.random();
-      const xhr = Ajax.req(
-        'post',
-        'query/',
-        payload,
-        onLoadHandler,
+        onError: (e) =>
         {
-          onError,
-          download: options.streaming,
-          downloadFilename: options.streamingTo,
+          onError && onError(e);
+          m2Dbs = [] as any;
+          checkForLoaded();
         },
-      );
+      },
+    );
+  },
 
-      return { queryId, xhr };
-    },
-
-    deployQuery(
-      type: string,
-      body: object,
-      db: BackendInstance,
-      onLoad: (response: MidwayQueryResponse) => void,
-      onError?: (ev: string | MidwayError) => void,
-    )
-    {
-      const payload: QueryRequest = {
+  createDb(name: string, dsn: string, type: string,
+    isAnalytics: boolean, analyticsIndex: string, analyticsType: string,
+    onSave: (response: any) => void,
+    onError: (response: any) => void)
+  {
+    return Ajax.req(
+      'post',
+      `database`,
+      {
+        name,
+        dsn,
+        host: dsn,
         type,
-        database: db.id as number,
-        body,
-      };
-
-      const onLoadHandler = (resp) =>
+        isAnalytics,
+        analyticsIndex,
+        analyticsType,
+      },
+      onSave,
       {
-        const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
-        onLoad(queryResult);
-      };
+        onError,
+      },
+    );
+  },
 
-      Ajax.req(
-        'post',
-        'query/',
-        payload,
-        onLoadHandler,
-        {
-          onError,
-        },
-      );
-    },
-
-    starColumn(
-      columnId: ID,
-      starred: boolean,
-      id?: number,
-      onLoad?: (resp) => void,
-      onError?: (error) => void)
-    {
-      const body = id !== undefined ? { columnId, starred, id } : { columnId, starred, id };
-      return Ajax.req('post', 'schemametadata/star', body, (resp: any) =>
+  deleteDb(id: number,
+    onSave: (response: any) => void,
+    onError: (response: any) => void)
+  {
+    return Ajax.req(
+      'post',
+      `database/` + id + `/delete`,
+      {},
+      onSave,
       {
-        try
-        {
-          onLoad && onLoad(resp);
-        }
-        catch (e)
-        {
-          onError && onError(e);
-        }
-      });
-    },
+        onError,
+      },
+    );
+  },
 
-    schemaMetadata(id?: number, onLoad?: (resp) => void, onError?: (error) => void)
-    {
-      return Ajax.req('get', 'schemametadata/', { id }, (resp: any) =>
+  login(email: string,
+    password: string,
+    onLoad: (data: {
+      id: number,
+      accessToken: string,
+    }) => void,
+    onError: (error) => void): any
+  {
+    return Ajax.req(
+      'post',
+      'auth/login',
       {
-        try
-        {
-          onLoad && onLoad(resp);
-        }
-        catch (e)
-        {
-          onError && onError(e);
-        }
-      });
-    },
-
-    countColumn(
-      columnId: ID,
-      algorithmId?: string | number,
-      id?: number,
-      onLoad?: (resp) => void,
-      onError?: (error) => void)
-    {
-      const body = id === undefined ? { columnId, algorithmId } : { columnId, algorithmId, id };
-      return Ajax.req('post', 'schemametadata/count', body, (resp: any) =>
+        email,
+        password,
+      },
+      onLoad,
       {
-        try
-        {
-          onLoad && onLoad(resp);
-        }
-        catch (e)
-        {
-          onError && onError(e);
-        }
-      });
-    },
+        onError,
+        noCredentials: true,
+      },
+    );
+  },
 
-    getResultsConfig(
-      index: string,
-      onLoad?: (resp) => void,
-      onError?: (error) => void,
-    )
-    {
-      return Ajax.req('post', 'resultsconfig/', { index }, (resp: any) =>
+  logout(accessToken: string, id: number)
+  {
+    return Ajax.req(
+      'post',
+      'auth/logout',
       {
-        try
-        {
-          onLoad && onLoad(JSON.parse(JSON.stringify(resp)));
-        }
-        catch (e)
-        {
-          onError && onError(e);
-        }
-      });
-    },
+        accessToken,
+        id,
+      },
+      () =>
+      {
+        // successfully logged out, reload the page
+        location.reload();
+      },
+      {
+        noCredentials: true,
+      },
+    );
+  },
 
-    updateResultsConfig(
-      index: string,
-      resultsConfig: any,
-      onLoad?: (resp) => void,
-      onError?: (error) => void,
-    )
-    {
-      const body = { resultsConfig, index };
-      return Ajax.req('post', 'resultsconfig/update', body, (resp: any) =>
+  getAnalytics(
+    connectionId: number,
+    algorithmIds: ID[],
+    start: Date,
+    end: Date,
+    metric: string,
+    intervalId: number,
+    aggregation: string,
+    onLoad: (response: any) => void,
+    onError?: (error: any) => void)
+  {
+    const args = {
+      algorithmid: algorithmIds.join(','),
+      start,
+      end,
+      eventname: metric,
+      interval: intervalId,
+      agg: aggregation,
+      field: 'timestamp',
+      database: connectionId,
+    };
+
+    return Ajax.req(
+      'get',
+      `events/agg`,
+      {},
+      (response: any) =>
       {
         try
-        {
-          onLoad && onLoad(resp);
-        }
-        catch (e)
-        {
-          onError && onError(e);
-        }
-      });
-    },
-
-    runOnDemandSchedule(
-      id: ID,
-      onLoad: (resp: object[]) => void,
-      onError?: (ev: string) => void,
-    )
-    {
-      const payload = {};
-
-      return Ajax.req(
-        'post',
-        'scheduler/run/' + String(id),
-        payload,
-        (response: object[]) =>
         {
           onLoad(response);
-        },
+        }
+        catch (e)
         {
-          onError,
-        },
-      );
-    },
+          onError && onError(JSON.parse(response) as any);
+        }
+      },
+      { onError, urlArgs: args });
+  },
 
-    schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
-    {
-      // TODO see if needs to query m1
-      return Ajax.req('get', 'database/' + dbId + '/schema', {}, (response: any) =>
+  getServerTime(
+    onLoad: (response: any) => void,
+    onError?: (ev: Event) => void,
+  )
+  {
+    return Ajax.req(
+      'get',
+      'time',
+      {},
+      (response: any) =>
       {
         try
         {
-          const cols: object = typeof response === 'string' ? JSON.parse(response) : response;
-          onLoad(cols);
+          onLoad(response);
         }
         catch (e)
         {
           onError && onError(response as any);
         }
-      });
-    },
+      },
+      { onError });
+  },
 
-    getDbs(onLoad: (dbs: BackendInstance[], loadFinished: boolean) => void, onError?: (ev: Event) => void)
-    {
-      let m2Dbs: BackendInstance[] = null;
-      const checkForLoaded = () =>
+  getAvailableMetrics(
+    onLoad: (response: any) => void,
+    onError?: (ev: Event) => void,
+  )
+  {
+    return Ajax.req(
+      'get',
+      'events/metrics',
+      {},
+      (response: any) =>
       {
-        if (!m2Dbs)
+        try
         {
-          return;
+          onLoad(response);
         }
-
-        let dbs: BackendInstance[] = [];
-        if (m2Dbs)
+        catch (e)
         {
-          dbs = dbs.concat(m2Dbs);
+          onError && onError(response as any);
         }
-        onLoad(dbs, !!(m2Dbs));
-      };
+      },
+      { onError });
+  },
 
-      Ajax.req(
-        'get',
-        'database',
-        {},
-        (dbs: [BackendInstance]) =>
-        {
-          m2Dbs = dbs.map((db) =>
-          {
-            db['source'] = 'm2';
-            return db;
-          });
-          checkForLoaded();
-        },
-        {
-          onError: (e) =>
-          {
-            onError && onError(e);
-            m2Dbs = [] as any;
-            checkForLoaded();
-          },
-        },
-      );
-    },
-
-    createDb(name: string, dsn: string, type: string,
-      isAnalytics: boolean, analyticsIndex: string, analyticsType: string,
-      onSave: (response: any) => void,
-      onError: (response: any) => void)
-    {
-      return Ajax.req(
-        'post',
-        `database`,
-        {
-          name,
-          dsn,
-          host: dsn,
-          type,
-          isAnalytics,
-          analyticsIndex,
-          analyticsType,
-        },
-        onSave,
-        {
-          onError,
-        },
-      );
-    },
-
-    deleteDb(id: number,
-      onSave: (response: any) => void,
-      onError: (response: any) => void)
-    {
-      return Ajax.req(
-        'post',
-        `database/` + id + `/delete`,
-        {},
-        onSave,
-        {
-          onError,
-        },
-      );
-    },
-
-    login(email: string,
-      password: string,
-      onLoad: (data: {
-        id: number,
-        accessToken: string,
-      }) => void,
-      onError: (error) => void): any
-    {
-      return Ajax.req(
-        'post',
-        'auth/login',
-        {
-          email,
-          password,
-        },
-        onLoad,
-        {
-          onError,
-          noCredentials: true,
-        },
-      );
-    },
-
-    logout(accessToken: string, id: number)
-    {
-      return Ajax.req(
-        'post',
-        'auth/logout',
-        {
-          accessToken,
-          id,
-        },
-        () =>
-        {
-          // successfully logged out, reload the page
-          location.reload();
-        },
-        {
-          noCredentials: true,
-        },
-      );
-    },
-
-    getAnalytics(
-      connectionId: number,
-      algorithmIds: ID[],
-      start: Date,
-      end: Date,
-      metric: string,
-      intervalId: number,
-      aggregation: string,
-      onLoad: (response: any) => void,
-      onError?: (error: any) => void)
-    {
-      const args = {
-        algorithmid: algorithmIds.join(','),
-        start,
-        end,
-        eventname: metric,
-        interval: intervalId,
-        agg: aggregation,
-        field: 'timestamp',
-        database: connectionId,
-      };
-
-      return Ajax.req(
-        'get',
-        `events/agg`,
-        {},
-        (response: any) =>
-        {
-          try
-          {
-            onLoad(response);
-          }
-          catch (e)
-          {
-            onError && onError(JSON.parse(response) as any);
-          }
-        },
-        { onError, urlArgs: args });
-    },
-
-    getServerTime(
-      onLoad: (response: any) => void,
-      onError?: (ev: Event) => void,
-    )
-    {
-      return Ajax.req(
-        'get',
-        'time',
-        {},
-        (response: any) =>
-        {
-          try
-          {
-            onLoad(response);
-          }
-          catch (e)
-          {
-            onError && onError(response as any);
-          }
-        },
-        { onError });
-    },
-
-    getAvailableMetrics(
-      onLoad: (response: any) => void,
-      onError?: (ev: Event) => void,
-    )
-    {
-      return Ajax.req(
-        'get',
-        'events/metrics',
-        {},
-        (response: any) =>
-        {
-          try
-          {
-            onLoad(response);
-          }
-          catch (e)
-          {
-            onError && onError(response as any);
-          }
-        },
-        { onError });
-    },
-
-    getLogs(
-      onLoad: (response: any) => void,
-      onError?: (ev: Event) => void,
-    )
-    {
-      return Ajax.req(
-        'get',
-        'status/logs',
-        {},
-        (response: any) =>
-        {
-          try
-          {
-            onLoad(response);
-          }
-          catch (e)
-          {
-            onError && onError(response as any);
-          }
-        },
-        { onError });
-    },
-
-    // not to be confused with deleteDb, which actually deletes a server connection
-    deleteDatabase(
-      dbid: number,
-      dbname: string,
-      language: string,
-    ): Promise<any>
-    {
-      return new Promise<any>((resolve, reject) =>
+  getLogs(
+    onLoad: (response: any) => void,
+    onError?: (ev: Event) => void,
+  )
+  {
+    return Ajax.req(
+      'get',
+      'status/logs',
+      {},
+      (response: any) =>
       {
-        return Ajax.req(
-          'post',
-          'schema/database/delete',
-          {
-            dbid,
-            dbname,
-            language,
-          },
-          resolve,
-          {
-            onError: reject,
-          },
-        );
-      });
-    },
-  };
+        try
+        {
+          onLoad(response);
+        }
+        catch (e)
+        {
+          onError && onError(response as any);
+        }
+      },
+      { onError });
+  },
+
+  // not to be confused with deleteDb, which actually deletes a server connection
+  deleteDatabase(
+    dbid: number,
+    dbname: string,
+    language: string,
+  ): Promise<any>
+  {
+    return new Promise<any>((resolve, reject) =>
+    {
+      return Ajax.req(
+        'post',
+        'schema/database/delete',
+        {
+          dbid,
+          dbname,
+          language,
+        },
+        resolve,
+        {
+          onError: reject,
+        },
+      );
+    });
+  },
+};
 
 export default Ajax;

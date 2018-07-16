@@ -110,10 +110,10 @@ export default class SFTPEndpoint extends AEndpointStream
         const pathToFile: string = source.options['filepath'].substring(0, (source.options['filepath'].lastIndexOf('/') as number) + 1);
         const filesAtPath: string[] = await this._getFilesFromPath(pathToFile, sftp);
         const options =
-          {
-            filename: source.options['filepath'],
-            inputs: source.rootInputConfig['inputs'],
-          };
+        {
+          filename: source.options['filepath'],
+          inputs: source.rootInputConfig['inputs'],
+        };
 
         const filenames: string[] = inputs.parseFilename(filesAtPath, options);
         filenames.forEach(async (filename) =>

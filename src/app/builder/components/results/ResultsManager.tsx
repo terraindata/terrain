@@ -635,13 +635,14 @@ export class ResultsManager extends TerrainComponent<Props>
       else
       {
         changes['count'] = Math.min(resultsData.rawResult.hits.total, MAX_HITS);
-        if (querySize !== undefined)
+        if (querySize !== undefined && typeof querySize === 'number') // query size could equal 'all'
         {
           changes['count'] = Math.min(changes['count'], querySize);
         }
       }
     }
-    changes['estimatedTotal'] = querySize === undefined ? resultsData.rawResult.hits.total :
+    changes['estimatedTotal'] = querySize === undefined || typeof querySize !== 'number'
+      ? resultsData.rawResult.hits.total :
       Math.min(querySize, resultsData.rawResult.hits.total);
     // Need to take into account drop if less than group joins
     if (this.props.query.path &&

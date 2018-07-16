@@ -112,153 +112,153 @@ function calculateDateRange(api, dateRangeId: number, callback)
 }
 
 const Actions =
+{
+  fetch: (
+    connectionName: string,
+    algorithmIds: ID[],
+    metric,
+    intervalId,
+    dateRangeId,
+    callback?: (analyticsAlgorithms: any) => void,
+    errorCallback?: (response) => void,
+  ) => (dispatch, getState, api) =>
+    {
+      dispatch({ type: ActionTypes.fetchStart });
+
+      const connection = getState().get('schema').servers.get(connectionName);
+      const connectionId = connection !== undefined ?
+        connection.connectionId : 1; // TODO: choose a suitable default connection
+
+      const numericDateRangeId = parseInt(dateRangeId, 10);
+      calculateDateRange(
+        api,
+        numericDateRangeId,
+        (dateRange) =>
+        {
+          const start = dateRange.start;
+          const end = dateRange.end;
+
+          let aggregation = '';
+
+          if (metric === 'click,impression' || metric === 'conversion,impression')
+          {
+            aggregation = 'rate';
+          } else
+          {
+            aggregation = 'histogram';
+          }
+
+          const algorithms = getState().get('library').algorithms;
+          const deployedAlgorithmNames = algorithmIds.map((id) =>
+          {
+            return algorithms.get(id).deployedName;
+          });
+
+          return api.getAnalytics(
+            connectionId,
+            deployedAlgorithmNames,
+            start,
+            end,
+            metric,
+            intervalId,
+            aggregation,
+            (algorithmAnalytics) =>
+            {
+              dispatch({
+                type: ActionTypes.fetchSuccess,
+                payload: {
+                  analytics: algorithmAnalytics,
+                  dateRangeDomain: {
+                    start: dateRange.startTimestamp,
+                    end: dateRange.endTimestamp,
+                  },
+                },
+              });
+              callback && callback(algorithmAnalytics);
+            },
+            (errorResponse) =>
+            {
+              const error = JSON.parse(errorResponse);
+              dispatch({
+                type: ActionTypes.fetchFailure,
+                payload: {
+                  errors: error.errors.map((e) => e.detail),
+                },
+              });
+              errorCallback && errorCallback(error);
+            },
+          );
+        },
+      );
+    },
+
+  selectMetric: (metric) =>
   {
-    fetch: (
-      connectionName: string,
-      algorithmIds: ID[],
-      metric,
-      intervalId,
-      dateRangeId,
-      callback?: (analyticsAlgorithms: any) => void,
-      errorCallback?: (response) => void,
-    ) => (dispatch, getState, api) =>
-      {
-        dispatch({ type: ActionTypes.fetchStart });
+    return {
+      type: ActionTypes.selectMetric,
+      payload: { metric },
+    };
+  },
 
-        const connection = getState().get('schema').servers.get(connectionName);
-        const connectionId = connection !== undefined ?
-          connection.connectionId : 1; // TODO: choose a suitable default connection
+  selectInterval: (intervalId) =>
+  {
+    return {
+      type: ActionTypes.selectInterval,
+      payload: { intervalId },
+    };
+  },
 
-        const numericDateRangeId = parseInt(dateRangeId, 10);
-        calculateDateRange(
-          api,
-          numericDateRangeId,
-          (dateRange) =>
-          {
-            const start = dateRange.start;
-            const end = dateRange.end;
+  selectDateRange: (dateRangeId) =>
+  {
+    return {
+      type: ActionTypes.selectDateRange,
+      payload: { dateRangeId },
+    };
+  },
 
-            let aggregation = '';
+  selectAnalyticsConnection: (connectionName) =>
+  {
+    return {
+      type: ActionTypes.selectAnalyticsConnection,
+      payload: { connectionName },
+    };
+  },
 
-            if (metric === 'click,impression' || metric === 'conversion,impression')
-            {
-              aggregation = 'rate';
-            } else
-            {
-              aggregation = 'histogram';
-            }
+  pinAlgorithm: (algorithmId) =>
+  {
+    return {
+      type: ActionTypes.pinAlgorithm,
+      payload: { algorithmId },
+    };
+  },
 
-            const algorithms = getState().get('library').algorithms;
-            const deployedAlgorithmNames = algorithmIds.map((id) =>
-            {
-              return algorithms.get(id).deployedName;
-            });
+  clearPinned: () =>
+  {
+    return {
+      type: ActionTypes.clearPinned,
+    };
+  },
 
-            return api.getAnalytics(
-              connectionId,
-              deployedAlgorithmNames,
-              start,
-              end,
-              metric,
-              intervalId,
-              aggregation,
-              (algorithmAnalytics) =>
-              {
-                dispatch({
-                  type: ActionTypes.fetchSuccess,
-                  payload: {
-                    analytics: algorithmAnalytics,
-                    dateRangeDomain: {
-                      start: dateRange.startTimestamp,
-                      end: dateRange.endTimestamp,
-                    },
-                  },
-                });
-                callback && callback(algorithmAnalytics);
-              },
-              (errorResponse) =>
-              {
-                const error = JSON.parse(errorResponse);
-                dispatch({
-                  type: ActionTypes.fetchFailure,
-                  payload: {
-                    errors: error.errors.map((e) => e.detail),
-                  },
-                });
-                errorCallback && errorCallback(error);
-              },
-            );
-          },
-        );
-      },
-
-    selectMetric: (metric) =>
+  fetchAvailableMetrics: (
+    callback?: (analyticsAlgorithms: any) => void,
+  ) => (dispatch, getState, api) =>
     {
-      return {
-        type: ActionTypes.selectMetric,
-        payload: { metric },
-      };
+      dispatch({
+        type: ActionTypes.fetchAvailableMetricsStart,
+      });
+      return api.getAvailableMetrics(
+        (availableMetrics) =>
+        {
+          dispatch({
+            type: ActionTypes.fetchAvailableMetricsSuccess,
+            payload: {
+              availableMetrics,
+            },
+          });
+          callback && callback(availableMetrics);
+        },
+      );
     },
-
-    selectInterval: (intervalId) =>
-    {
-      return {
-        type: ActionTypes.selectInterval,
-        payload: { intervalId },
-      };
-    },
-
-    selectDateRange: (dateRangeId) =>
-    {
-      return {
-        type: ActionTypes.selectDateRange,
-        payload: { dateRangeId },
-      };
-    },
-
-    selectAnalyticsConnection: (connectionName) =>
-    {
-      return {
-        type: ActionTypes.selectAnalyticsConnection,
-        payload: { connectionName },
-      };
-    },
-
-    pinAlgorithm: (algorithmId) =>
-    {
-      return {
-        type: ActionTypes.pinAlgorithm,
-        payload: { algorithmId },
-      };
-    },
-
-    clearPinned: () =>
-    {
-      return {
-        type: ActionTypes.clearPinned,
-      };
-    },
-
-    fetchAvailableMetrics: (
-      callback?: (analyticsAlgorithms: any) => void,
-    ) => (dispatch, getState, api) =>
-      {
-        dispatch({
-          type: ActionTypes.fetchAvailableMetricsStart,
-        });
-        return api.getAvailableMetrics(
-          (availableMetrics) =>
-          {
-            dispatch({
-              type: ActionTypes.fetchAvailableMetricsSuccess,
-              payload: {
-                availableMetrics,
-              },
-            });
-            callback && callback(availableMetrics);
-          },
-        );
-      },
-  };
+};
 
 export default Actions;

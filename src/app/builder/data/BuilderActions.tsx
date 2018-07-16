@@ -55,122 +55,122 @@ const $ = (type: string, payload: any) =>
 };
 
 const BuilderActions =
-  {
-    change: // reserved for cards only
-      (keyPath: KeyPath, value: any, notDirty = false) =>
-        (dispatch) =>
-          dispatch($(ActionTypes.change, { keyPath, value, notDirty })),
+{
+  change: // reserved for cards only
+    (keyPath: KeyPath, value: any, notDirty = false) =>
+      (dispatch) =>
+        dispatch($(ActionTypes.change, { keyPath, value, notDirty })),
 
-    changePath:
-      (keyPath: KeyPath, value: any, notDirty = false, fieldChange: boolean = false) =>
-        $(ActionTypes.changePath, { keyPath, value, notDirty, fieldChange }),
+  changePath:
+    (keyPath: KeyPath, value: any, notDirty = false, fieldChange: boolean = false) =>
+      $(ActionTypes.changePath, { keyPath, value, notDirty, fieldChange }),
 
-    changeQuery:
-      (query: Query) =>
-        $(ActionTypes.changeQuery, { query }),
+  changeQuery:
+    (query: Query) =>
+      $(ActionTypes.changeQuery, { query }),
 
-    create:
-      (keyPath: KeyPath, index: number, factoryType: string, data?: any) =>
-        $(ActionTypes.create, { keyPath, factoryType, index, data }),
+  create:
+    (keyPath: KeyPath, index: number, factoryType: string, data?: any) =>
+      $(ActionTypes.create, { keyPath, factoryType, index, data }),
 
-    createInput:
-      (keyPath: KeyPath, index: number, factoryType: string, data?: any) =>
-        $(ActionTypes.createInput, { keyPath, factoryType, index, data }),
+  createInput:
+    (keyPath: KeyPath, index: number, factoryType: string, data?: any) =>
+      $(ActionTypes.createInput, { keyPath, factoryType, index, data }),
 
-    move:
-      (keyPath: KeyPath, index: number, newIndex: number) =>
-        $(ActionTypes.move, { keyPath, index, newIndex }),
+  move:
+    (keyPath: KeyPath, index: number, newIndex: number) =>
+      $(ActionTypes.move, { keyPath, index, newIndex }),
 
-    nestedMove:
-      (itemKeyPath: KeyPath, itemIndex: number, newKeyPath: KeyPath, newIndex: number) =>
-        $(ActionTypes.nestedMove, { itemKeyPath, itemIndex, newKeyPath, newIndex }),
+  nestedMove:
+    (itemKeyPath: KeyPath, itemIndex: number, newKeyPath: KeyPath, newIndex: number) =>
+      $(ActionTypes.nestedMove, { itemKeyPath, itemIndex, newKeyPath, newIndex }),
 
-    remove:
-      (keyPath: KeyPath, index: number) =>
-        $(ActionTypes.remove, { keyPath, index }),
+  remove:
+    (keyPath: KeyPath, index: number) =>
+      $(ActionTypes.remove, { keyPath, index }),
 
-    dragCard:
-      (cardItem: CardItem | null) =>
-        $(ActionTypes.dragCard, { cardItem }),
+  dragCard:
+    (cardItem: CardItem | null) =>
+      $(ActionTypes.dragCard, { cardItem }),
 
-    dragCardOver:
-      (keyPath: KeyPath, index: number) =>
-        $(ActionTypes.dragCardOver, { keyPath, index }),
+  dragCardOver:
+    (keyPath: KeyPath, index: number) =>
+      $(ActionTypes.dragCardOver, { keyPath, index }),
 
-    dropCard:
-      () =>
-        $(ActionTypes.dropCard, {}),
+  dropCard:
+    () =>
+      $(ActionTypes.dropCard, {}),
 
-    changeTQL:
-      (tql: string, tqlMode: string) =>
-        $(ActionTypes.changeTQL, { tql, tqlMode, changeQuery: BuilderActions.changeQuery }),
+  changeTQL:
+    (tql: string, tqlMode: string) =>
+      $(ActionTypes.changeTQL, { tql, tqlMode, changeQuery: BuilderActions.changeQuery }),
 
-    hoverCard:
-      (cardId: ID) =>
-        $(BuilderCardsActionTypes.hoverCard, { cardId }),
+  hoverCard:
+    (cardId: ID) =>
+      $(BuilderCardsActionTypes.hoverCard, { cardId }),
 
-    selectCard:
-      (cardId: ID, shiftKey: boolean, ctrlKey: boolean) =>
-        $(ActionTypes.selectCard, { cardId, shiftKey, ctrlKey }),
+  selectCard:
+    (cardId: ID, shiftKey: boolean, ctrlKey: boolean) =>
+      $(ActionTypes.selectCard, { cardId, shiftKey, ctrlKey }),
 
-    toggleDeck:
-      (open: boolean) =>
-        $(ActionTypes.toggleDeck, { open }),
+  toggleDeck:
+    (open: boolean) =>
+      $(ActionTypes.toggleDeck, { open }),
 
-    // fetches the query from the server
-    fetchQuery:
-      (algorithmId: ID, handleNoAlgorithm: (algorithmId: ID) => void, db: BackendInstance) =>
-        (dispatch) =>
-          dispatch($(ActionTypes.fetchQuery, {
-            algorithmId,
-            handleNoAlgorithm,
-            db,
-            dispatch,
-            onRequestDone: (query, xhr, database) => dispatch(BuilderActions.queryLoaded(query, algorithmId, xhr, database)),
-            changeQuery: BuilderActions.changeQuery,
-          })),
+  // fetches the query from the server
+  fetchQuery:
+    (algorithmId: ID, handleNoAlgorithm: (algorithmId: ID) => void, db: BackendInstance) =>
+      (dispatch) =>
+        dispatch($(ActionTypes.fetchQuery, {
+          algorithmId,
+          handleNoAlgorithm,
+          db,
+          dispatch,
+          onRequestDone: (query, xhr, database) => dispatch(BuilderActions.queryLoaded(query, algorithmId, xhr, database)),
+          changeQuery: BuilderActions.changeQuery,
+        })),
 
-    // load query from server into state
-    queryLoaded:
-      (query: Query, algorithmId: ID, xhr: XMLHttpRequest, db: BackendInstance) =>
-        (dispatch) =>
-          dispatch($(ActionTypes.queryLoaded, { query, algorithmId, xhr, db, dispatch })),
+  // load query from server into state
+  queryLoaded:
+    (query: Query, algorithmId: ID, xhr: XMLHttpRequest, db: BackendInstance) =>
+      (dispatch) =>
+        dispatch($(ActionTypes.queryLoaded, { query, algorithmId, xhr, db, dispatch })),
 
-    save:
-      (failed?: boolean) =>
-        $(ActionTypes.save, { failed }),
+  save:
+    (failed?: boolean) =>
+      $(ActionTypes.save, { failed }),
 
-    undo:
-      () =>
-        $(ActionTypes.undo, {}),
+  undo:
+    () =>
+      $(ActionTypes.undo, {}),
 
-    redo:
-      () =>
-        $(ActionTypes.redo, {}),
+  redo:
+    () =>
+      $(ActionTypes.redo, {}),
 
-    checkpoint:
-      () =>
-        $(ActionTypes.checkpoint, {}),
+  checkpoint:
+    () =>
+      $(ActionTypes.checkpoint, {}),
 
-    changeResultsConfig:
-      (resultsConfig, field?) =>
-        $(ActionTypes.changeResultsConfig, {
-          resultsConfig,
-          field,
-        }),
+  changeResultsConfig:
+    (resultsConfig, field?) =>
+      $(ActionTypes.changeResultsConfig, {
+        resultsConfig,
+        field,
+      }),
 
-    updateKeyPath:
-      (id, keyPath) =>
-        $(ActionTypes.updateKeyPath, {
-          id,
-          keyPath,
-        }),
+  updateKeyPath:
+    (id, keyPath) =>
+      $(ActionTypes.updateKeyPath, {
+        id,
+        keyPath,
+      }),
 
-    results:
-      (resultsState) =>
-        $(ActionTypes.results, {
-          resultsState,
-        }),
-  };
+  results:
+    (resultsState) =>
+      $(ActionTypes.results, {
+        resultsState,
+      }),
+};
 
 export default BuilderActions;

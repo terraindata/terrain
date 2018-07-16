@@ -52,13 +52,13 @@ import PostgreSQLReader from '../../../../src/database/pg/streams/PostgreSQLRead
 MidwayLogger.level = 'debug';
 
 const pgConfig: PostgreSQLConfig =
-  {
-    database: 'moviesdb',
-    host: 'localhost',
-    port: 65432,
-    password: 'r3curs1v3$',
-    user: 't3rr41n-demo',
-  };
+{
+  database: 'moviesdb',
+  host: 'localhost',
+  port: 65432,
+  password: 'r3curs1v3$',
+  user: 't3rr41n-demo',
+};
 
 const query = 'SELECT movieid, title, budget \n  FROM movies\n  LIMIT 3';
 

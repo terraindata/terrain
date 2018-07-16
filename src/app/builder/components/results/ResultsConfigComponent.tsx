@@ -977,23 +977,23 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
 }
 // Defines a draggable result functionality
 const resultSource =
+{
+  beginDrag(props)
   {
-    beginDrag(props)
-    {
-      return props;
-    },
+    return props;
+  },
 
-    endDrag(props, monitor, component)
+  endDrag(props, monitor, component)
+  {
+    if (!monitor.didDrop())
     {
-      if (!monitor.didDrop())
-      {
-        return;
-      }
+      return;
+    }
 
-      const item = monitor.getItem();
-      const dropResult = monitor.getDropResult();
-    },
-  };
+    const item = monitor.getItem();
+    const dropResult = monitor.getDropResult();
+  },
+};
 
 // Defines props to inject into the component
 const dragCollect = (connect, monitor) =>
@@ -1004,24 +1004,24 @@ const dragCollect = (connect, monitor) =>
   });
 
 const resultTarget =
+{
+  canDrop(props, monitor)
   {
-    canDrop(props, monitor)
-    {
-      return false;
-    },
+    return false;
+  },
 
-    hover(props, monitor, component)
+  hover(props, monitor, component)
+  {
+    if (!props.isAvailableField && props.onHover)
     {
-      if (!props.isAvailableField && props.onHover)
-      {
-        props.onHover(props.index, monitor.getItem().field);
-      }
-    },
+      props.onHover(props.index, monitor.getItem().field);
+    }
+  },
 
-    drop(props, monitor, component)
-    {
-    },
-  };
+  drop(props, monitor, component)
+  {
+  },
+};
 
 const resultDropCollect = (connect, monitor) =>
   ({
@@ -1056,23 +1056,23 @@ class CRTargetC extends TerrainComponent<CRTargetProps>
 }
 
 const crTarget =
+{
+  canDrop(props, monitor)
   {
-    canDrop(props, monitor)
-    {
-      return true;
-    },
+    return true;
+  },
 
-    hover(props, monitor, component)
-    {
-      const canDrop = monitor.canDrop();
-    },
+  hover(props, monitor, component)
+  {
+    const canDrop = monitor.canDrop();
+  },
 
-    drop(props, monitor, component)
-    {
-      const item = monitor.getItem();
-      props.onDrop(props.type, item.field);
-    },
-  };
+  drop(props, monitor, component)
+  {
+    const item = monitor.getItem();
+    props.onDrop(props.type, item.field);
+  },
+};
 
 const crDropCollect = (connect, monitor) =>
   ({

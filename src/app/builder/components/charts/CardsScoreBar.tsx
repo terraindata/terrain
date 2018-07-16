@@ -53,11 +53,11 @@ import './CardsScoreBar.less';
 
 const BORDER_RADIUS = '5px';
 const SCORE_COLORS =
-  {
-    // POSITIVE: ['#DFDE52', '#AFD364', '#9DCF66', '#4ef9ab'],
-    POSITIVE: ['#4ef9ab'],
-    NEGATIVE: ['#d14f42'],
-  };
+{
+  // POSITIVE: ['#DFDE52', '#AFD364', '#9DCF66', '#4ef9ab'],
+  POSITIVE: ['#4ef9ab'],
+  NEGATIVE: ['#d14f42'],
+};
 
 class CardsScoreBar extends TerrainComponent<{
   parentData: {

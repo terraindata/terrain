@@ -90,28 +90,28 @@ Router.get('/stats', passport.authenticate('access-token-local'), async (ctx, ne
     },
 
     os:
-      {
-        arch: os.arch(),
-        // constants:         os.constants,
-        numCPUs: os.cpus().length,
-        // endianness: os.endianness(),
-        freemem: os.freemem(),
-        // homedir: os.homedir(),
-        // hostname: os.hostname(),
-        loadavg: os.loadavg(),
-        // networkInterfaces: os.networkInterfaces(),
-        // platform: os.platform(),
-        // release: os.release(),
-        // tmpdir: os.tmpdir(),
-        totalmem: os.totalmem(),
-        uptime: os.uptime(),
-      },
+    {
+      arch: os.arch(),
+      // constants:         os.constants,
+      numCPUs: os.cpus().length,
+      // endianness: os.endianness(),
+      freemem: os.freemem(),
+      // homedir: os.homedir(),
+      // hostname: os.hostname(),
+      loadavg: os.loadavg(),
+      // networkInterfaces: os.networkInterfaces(),
+      // platform: os.platform(),
+      // release: os.release(),
+      // tmpdir: os.tmpdir(),
+      totalmem: os.totalmem(),
+      uptime: os.uptime(),
+    },
 
     process:
-      {
-        pid: process.pid,
-        // ppid: process.ppid,
-      },
+    {
+      pid: process.pid,
+      // ppid: process.ppid,
+    },
 
     databases: dbs,
   };

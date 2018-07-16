@@ -66,8 +66,8 @@ class ExecutionHelpers extends ETLHelpers
       const options: {
         mappings: { [k: string]: object };
       } = {
-          mappings: {},
-        };
+        mappings: {},
+      };
 
       const promises = [];
       const indexMapping = [];

@@ -150,19 +150,19 @@ export interface Display
 // Section: Re-useable displays
 
 export const valueDisplay: Display =
-  {
-    displayType: NUM,
-    // help: ManualConfig.help['value'],
-    key: 'value',
-    placeholder: 'value',
-  };
+{
+  displayType: NUM,
+  // help: ManualConfig.help['value'],
+  key: 'value',
+  placeholder: 'value',
+};
 
 export const stringValueDisplay: Display =
-  {
-    displayType: TEXT,
-    key: 'value',
-    placeholder: 'value',
-  };
+{
+  displayType: TEXT,
+  key: 'value',
+  placeholder: 'value',
+};
 
 export const getCardStringDisplay =
   (config: { accepts?: List<string>, defaultValue?: string } = {}): Display[] =>
@@ -187,19 +187,19 @@ export const firstSecondDisplay = (middle: Display, accepts: List<string>): Disp
     key: null,
 
     above:
-      {
-        displayType: CARDSFORTEXT,
-        key: 'first',
-        className: 'card-double-first',
-        accepts,
-      },
+    {
+      displayType: CARDSFORTEXT,
+      key: 'first',
+      className: 'card-double-first',
+      accepts,
+    },
 
     below:
-      {
-        displayType: CARDSFORTEXT,
-        key: 'second',
-        accepts,
-      },
+    {
+      displayType: CARDSFORTEXT,
+      key: 'second',
+      accepts,
+    },
 
     flex:
       [
@@ -225,45 +225,45 @@ export const firstSecondDisplay = (middle: Display, accepts: List<string>): Disp
   });
 
 export const wrapperDisplay: Display =
-  {
-    displayType: CARDS,
-    key: 'cards',
-    className: 'nested-cards-content',
-  };
+{
+  displayType: CARDS,
+  key: 'cards',
+  className: 'nested-cards-content',
+};
 
 export const wrapperSingleChildDisplay: Display =
-  {
-    displayType: CARDS,
-    key: 'cards',
-    className: 'nested-cards-content',
-    singleChild: true,
-  };
+{
+  displayType: CARDS,
+  key: 'cards',
+  className: 'nested-cards-content',
+  singleChild: true,
+};
 
 export const letVarDisplay =
-  {
-    displayType: FLEX,
-    key: null,
-    flex:
-      [
-        {
-          displayType: TEXT,
-          // help: ManualConfig.help['let-var-field'],
-          key: 'field',
-        },
-        {
-          displayType: LABEL,
-          label: '=',
-          key: null,
-        },
-        {
-          displayType: CARDTEXT,
-          // help: ManualConfig.help['expression'],
-          key: 'expression',
-        },
-      ],
-    below:
+{
+  displayType: FLEX,
+  key: null,
+  flex:
+    [
       {
-        key: 'expression',
-        displayType: CARDSFORTEXT,
+        displayType: TEXT,
+        // help: ManualConfig.help['let-var-field'],
+        key: 'field',
       },
-  };
+      {
+        displayType: LABEL,
+        label: '=',
+        key: null,
+      },
+      {
+        displayType: CARDTEXT,
+        // help: ManualConfig.help['expression'],
+        key: 'expression',
+      },
+    ],
+  below:
+  {
+    key: 'expression',
+    displayType: CARDSFORTEXT,
+  },
+};

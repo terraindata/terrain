@@ -80,18 +80,18 @@ const iconConfig: {
     after?: boolean,
   },
 } =
-  {
-    next: {
-      element: <ArrowIcon />,
-      after: true,
-    },
-    back: {
-      element: <ArrowIcon className='rotate180' />,
-    },
-    check: {
-      element: <CheckMark />,
-    },
-  };
+{
+  next: {
+    element: <ArrowIcon />,
+    after: true,
+  },
+  back: {
+    element: <ArrowIcon className='rotate180' />,
+  },
+  check: {
+    element: <CheckMark />,
+  },
+};
 
 @Radium
 class Button extends TerrainComponent<Props>

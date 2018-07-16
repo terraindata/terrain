@@ -324,14 +324,14 @@ export const _FieldProperty = (config: {
 export type FieldPropertyMap = IMMap<string, FieldProperty>;
 
 export const typeToStoreKey =
-  {
-    server: 'servers',
-    database: 'databases',
-    table: 'tables',
-    column: 'columns',
-    index: 'indexes',
-    fieldProperty: 'fieldProperties',
-  };
+{
+  server: 'servers',
+  database: 'databases',
+  table: 'tables',
+  column: 'columns',
+  index: 'indexes',
+  fieldProperty: 'fieldProperties',
+};
 
 export function searchIncludes(item: SchemaBaseClass, search: string): boolean
 {

@@ -65,16 +65,16 @@ export class TaskETL extends Task
     return new Promise<TaskOutputConfig>(async (resolve, reject) =>
     {
       const taskOutputConfig: TaskOutputConfig =
-        {
-          blocking: this.taskConfig.blocking,
-          exit: false,
-          options: {
-            logStream: null,
-            outputStream: null,
-          },
-          rootLogStream: this.taskConfig.rootLogStream,
-          status: true,
-        };
+      {
+        blocking: this.taskConfig.blocking,
+        exit: false,
+        options: {
+          logStream: null,
+          outputStream: null,
+        },
+        rootLogStream: this.taskConfig.rootLogStream,
+        status: true,
+      };
 
       try
       {

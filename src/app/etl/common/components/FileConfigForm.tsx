@@ -86,6 +86,7 @@ type FormState = FileConfigI & {
   useJsonPath: boolean;
   isPlaFeed: boolean;
   previewDataSource: any;
+  ignoreQuotes: boolean;
 };
 
 export default class FileConfigForm extends TerrainComponent<Props>
@@ -142,6 +143,13 @@ export default class FileConfigForm extends TerrainComponent<Props>
         group: 'path',
         widthFactor: 3,
         getDisplayState: (s: FormState) => s.fileType === FileTypes.Json ? DisplayState.Active : DisplayState.Hidden,
+      },
+      ignoreQuotes: {
+        type: DisplayType.CheckBox,
+        displayName: 'Ignore Quoting',
+        group: 'path',
+        widthFactor: 3,
+        getDisplayState: (s: FormState) => s.fileType === FileTypes.Csv ? DisplayState.Active : DisplayState.Hidden,
       },
       jsonPath: {
         type: DisplayType.TextBox,

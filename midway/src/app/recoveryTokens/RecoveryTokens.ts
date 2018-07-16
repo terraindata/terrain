@@ -69,11 +69,11 @@ export class RecoveryTokens
     }
     const existingUsers = await this.select(['id'], { id: entry.id });
     const newRecoveryToken: RecoveryTokenConfig =
-      {
-        id: entry.id,
-        token: entry.token,
-        createdAt: entry.createdAt,
-      };
+    {
+      id: entry.id,
+      token: entry.token,
+      createdAt: entry.createdAt,
+    };
     return this.upsert(newRecoveryToken);
   }
 

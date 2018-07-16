@@ -67,10 +67,11 @@ import
 } from 'shared/etl/immutable/EndpointRecords';
 import
 {
-  GoogleAnalyticsOptions, HttpOptions,
-  SftpOptions, SinkOptionsType, Sinks, SourceOptionsType,
+  FileConfig as FileConfigI, GoogleAnalyticsOptions, HttpOptions,
+  MagentoOptions, SftpOptions, SinkOptionsType, Sinks, SourceOptionsType,
   Sources, SQLOptions,
 } from 'shared/etl/types/EndpointTypes';
+
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 
 import { InputsForm } from '../../endpoints/InputForm';
