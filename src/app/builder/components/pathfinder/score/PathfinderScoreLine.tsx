@@ -77,6 +77,7 @@ export interface Props
 {
   line: ScoreLine;
   index: number;
+  valueOptions: List<any>;
   onDelete: (index) => void;
   onValueChange: (key: string, index: number, newValue: any) => void;
   allWeights: Array<{ weight: number }>;
@@ -323,6 +324,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           canEdit={this.props.pathfinderContext.canEdit}
           hideZoomControl={true}
           inputs={this.props.inputs}
+          options={this.props.valueOptions && this.props.valueOptions.map((opt) => opt.value).toList()}
         />
       </div>
     );

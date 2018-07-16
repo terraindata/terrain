@@ -172,7 +172,7 @@ class TransformCard extends TerrainComponent<Props>
         nextProps.builder.query.inputs !== this.props.builder.query.inputs &&
         nextProps.data.distanceValue && nextProps.data.distanceValue.address &&
         nextProps.data.distanceValue.address.charAt(0) === '@'
-       ))
+      ))
     {
       this.computeBars(nextProps.data, this.state.maxDomain, true);
     }

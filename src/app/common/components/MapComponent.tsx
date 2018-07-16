@@ -109,40 +109,40 @@ interface BoundingRectangle
 
 // for map markers, distances must be converted to meters
 const UNIT_CONVERSIONS =
-  {
-    mi: 1609.34,
-    yd: 0.9144,
-    ft: 0.3048,
-    in: 0.0254,
-    km: 1000,
-    m: 1,
-    cm: .01,
-    mm: .001,
-    nmi: 1852,
-    miles: 1609.34,
-    yards: 0.9144,
-    feet: 0.3048,
-    inch: 0.0254,
-    kilometers: 1000,
-    meters: 1,
-    centimeters: .01,
-    millimeters: .001,
-    nauticalmiles: 1852,
-    NM: 1852,
-  };
+{
+  mi: 1609.34,
+  yd: 0.9144,
+  ft: 0.3048,
+  in: 0.0254,
+  km: 1000,
+  m: 1,
+  cm: .01,
+  mm: .001,
+  nmi: 1852,
+  miles: 1609.34,
+  yards: 0.9144,
+  feet: 0.3048,
+  inch: 0.0254,
+  kilometers: 1000,
+  meters: 1,
+  centimeters: .01,
+  millimeters: .001,
+  nauticalmiles: 1852,
+  NM: 1852,
+};
 
 export const units =
-  {
-    mi: 'miles',
-    yd: 'yards',
-    ft: 'feet',
-    in: 'inches',
-    km: 'kilometers',
-    m: 'meters',
-    cm: 'centimeters',
-    mm: 'millimeters',
-    nmi: 'nautical miles',
-  };
+{
+  mi: 'miles',
+  yd: 'yards',
+  ft: 'feet',
+  in: 'inches',
+  km: 'kilometers',
+  m: 'meters',
+  cm: 'centimeters',
+  mm: 'millimeters',
+  nmi: 'nautical miles',
+};
 
 class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
 {
@@ -605,10 +605,10 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
   {
     const oldLocation = MapUtil.getCoordinatesFromGeopoint(this.props.coordinates);
     const newLocation =
-      {
-        lat: key === 'latitude' ? !isNaN(parseFloat(value)) ? parseFloat(value) : value : oldLocation[0],
-        lon: key === 'longitude' ? !isNaN(parseFloat(value)) ? parseFloat(value) : value : oldLocation[1],
-      };
+    {
+      lat: key === 'latitude' ? !isNaN(parseFloat(value)) ? parseFloat(value) : value : oldLocation[0],
+      lon: key === 'longitude' ? !isNaN(parseFloat(value)) ? parseFloat(value) : value : oldLocation[1],
+    };
     this.onChange(newLocation, '');
     this.reverseGeocode(newLocation);
   }

@@ -51,6 +51,7 @@ import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import DragAndDrop from 'app/common/components/DragAndDrop';
 import FadeInOut from 'app/common/components/FadeInOut';
 import { RouteSelector, RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
+import { RouteSelectorOption } from 'app/common/components/RouteSelector';
 import { List } from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
@@ -73,6 +74,7 @@ export interface Props
   pathfinderContext: PathfinderContext;
   score: Score;
   keyPath: KeyPath;
+  valueOptions: List<any>;
   onStepChange: (oldStep: PathfinderSteps) => void;
   builderActions?: typeof BuilderActions;
   colorsActions?: typeof ColorsActions;
@@ -269,7 +271,6 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       });
     }
     const keyPath = this._ikeyPath(this.props.keyPath, 'lines');
-
     return (
       scoreLines.map((line, index) =>
       {
@@ -278,6 +279,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
             content: <PathfinderScoreLine
               key={String(index)}
               line={line}
+              valueOptions={this.props.valueOptions}
               onDelete={this.handleDeleteLine}
               index={index}
               onValueChange={this.handleValueChange}
