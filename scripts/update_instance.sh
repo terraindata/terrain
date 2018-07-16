@@ -229,8 +229,13 @@ EOM
         screen -S runmidway -X stuff $'\cc';
         screen -S runmidway-7000 -X stuff $'\cc';
         export PGPASSWORD="r3curs1v3$";
+        echo "It's ok if you see a 'no database found' error for 'production_backup' or '${MIDWAY_DB}";
+        echo "It's NOT ok if you see a 'no database found' error for '${CUSTNAME}_staging' -- BAD!";
+        echo "--- DB Commands ---";
+        psql -U "t3rr41n-demo" -d postgres -h localhost -p 5432 -c "drop database production_backup;";
         psql -U "t3rr41n-demo" -d postgres -h localhost -p 5432 -c "alter database ${MIDWAY_DB} rename to production_backup;";
         psql -U "t3rr41n-demo" -d postgres -h localhost -p 5432 -c "alter database ${CUSTNAME}_staging rename to ${MIDWAY_DB};";
+        echo "--- End DB Commands ---";
 EOM
     fi
 fi

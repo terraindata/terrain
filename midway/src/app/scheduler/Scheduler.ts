@@ -426,6 +426,11 @@ export class Scheduler
       const schedules: SchedulerConfig[] = await this.get(id);
       if (schedules.length !== 0)
       {
+        if (schedules[0].shouldRunNext === false && status === true)
+        {
+          const currIntervalCronDate = cronParser.parseExpression(schedules[0].cron, { tz: 'America/Los_Angeles' });
+          schedules[0].lastRun = new Date(currIntervalCronDate.prev().toDate().valueOf() + 1000);
+        }
         schedules[0].shouldRunNext = status;
         return resolve(await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[]);
       }
