@@ -57,6 +57,7 @@ import { MidwayLogger } from '../log/MidwayLogger';
 import ExportTransform from './ExportTransform';
 import { PostProcess } from './PostProcess';
 
+import BufferTransform from '../io/streams/BufferTransform';
 import CSVTransform from '../io/streams/CSVTransform';
 import JSONTransform from '../io/streams/JSONTransform';
 import ProgressStream from '../io/streams/ProgressStream';
@@ -77,7 +78,20 @@ import SFTPEndpoint from './endpoints/SFTPEndpoint';
 
 export const postProcessTransform: PostProcess = new PostProcess();
 
-export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[]): Promise<stream.Readable>
+export async function getSourceStreamPreview(name: string, source: SourceConfig, files?: stream.Readable[], size?: number, rawStream?: true): Promise<string>
+{
+  const readableStream: stream.Readable = await this.getSourceStream(name, source, files, rawStream);
+  const buff = readableStream.readableBuffer; 
+  if (rawStream === true)
+  {
+    readableStream.on('data', (data) =>
+    {
+
+    });
+  }
+}
+
+export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[], rawStream?: true): Promise<stream.Readable>
 {
   return new Promise<stream.Readable>(async (resolve, reject) =>
   {
@@ -142,6 +156,12 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
       if (sourceStream !== undefined && sourceStreams === undefined)
       {
         sourceStreams = [sourceStream] as stream.Readable[];
+      }
+
+      if (rawStream === true)
+      {
+        importStreams.push(sourceStreams[0]);
+        return resolve(importStreams[0]);
       }
 
       sourceStreams.forEach(async (ss: stream.Readable) =>
