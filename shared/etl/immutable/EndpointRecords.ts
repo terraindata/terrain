@@ -74,6 +74,7 @@ class FileConfigC implements FileConfigI
   public jsonPath = null;
   public fieldOrdering = null;
   public isPlaFeed = false;
+  public ignoreQuotes = false;
 }
 
 class RootInputConfigC implements RootInputConfigI

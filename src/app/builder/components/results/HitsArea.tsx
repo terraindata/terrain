@@ -556,10 +556,18 @@ class HitsArea extends TerrainComponent<Props>
     }
     else if (resultsState.hasError)
     {
+      let detailMessage = resultsState.errorMessage;
+      if (detailMessage.startsWith('Route'))
+      {
+        if (resultsState.subErrorMessage)
+        {
+          detailMessage += ` (${resultsState.subErrorMessage})`;
+        }
+      }
       hitsAreOutdated = true;
       infoAreaContent = <InfoArea
         large='There was an error with your query.'
-        small={resultsState.errorMessage}
+        small={detailMessage}
       />;
     }
     else if (resultsState.loading && (!hits || !hits.size))
@@ -572,9 +580,12 @@ class HitsArea extends TerrainComponent<Props>
     // If we have hits, we try to show the `infoAreaContent` on top of last `hits`.
     if (!hits)
     {
-      infoAreaContent = <InfoArea
-        large='Compose a query to view results here.'
-      />;
+      if (!infoAreaContent)
+      {
+        infoAreaContent = <InfoArea
+          large='Compose a query to view results here.'
+        />;
+      }
     }
     else if (!hits.size)
     {

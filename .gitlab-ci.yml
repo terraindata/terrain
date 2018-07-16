@@ -91,6 +91,13 @@ test-sigint:
     - schedules
   stage: standard-tests
 
+build-backend:
+  script:
+   - yarn build-server
+  except:
+   - schedules
+  stage: style-and-compilation
+
 build-frontend:
   script:
    - yarn build
@@ -124,9 +131,9 @@ fullstack-meta:
     - pkill node || true;
     - timeout 240 yarn test-fullstack-setup
     - yarn clean
-    - MIDWAY_HOST=`hostname`:3000 yarn build
-    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
-    - sleep 10
+    - yarn build
+    - NODE_ENV=production nohup yarn start-midway-prod > ./midwayConsole.log < /dev/null 2>&1&
+    - sleep 25
 # TODO: enable this after update it to the ETL
 #    - yarn test-fullstack-import
     - yarn test-fullstack-component
@@ -141,9 +148,9 @@ fullstack-screenshot-login-pathfinder:
     - pkill node || true;
     - timeout 240 yarn test-fullstack-setup
     - yarn clean
-    - MIDWAY_HOST=`hostname`:3000 yarn build
-    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
-    - sleep 10
+    - yarn build
+    - NODE_ENV=production nohup yarn start-midway-prod > ./midwayConsole.log < /dev/null 2>&1&
+    - sleep 25
     - yarn test-fullstack-login
     - yarn test-rr-pathfinder
   only:
@@ -166,9 +173,9 @@ fullstack-screenshot-http-import:
     - pkill node || true;
     - timeout 240 yarn test-fullstack-setup
     - yarn clean
-    - MIDWAY_HOST=`hostname`:3000 yarn build
-    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
-    - sleep 10
+    - yarn build
+    - NODE_ENV=production nohup yarn start-midway-prod > ./midwayConsole.log < /dev/null 2>&1&
+    - sleep 25
     - yarn test-rr-etl-http-import
   only:
     - schedules
@@ -186,10 +193,10 @@ fullstack-screenshot-http-import:
 
 deploy:
   script:
-   - MIDWAY_HOST=pa-terraformer01.terrain.int:33000 yarn build-prod
+   - yarn build-prod
    - rsync -a --stats ../Search /opt --exclude '*.db' --exclude '.git'
    - fuser -k -n tcp 33000 || true
-   - cd /opt/Search && NODE_ENV=production yarn start -- --port 33000 &
+   - cd /opt/Search && NODE_ENV=production yarn start-midway-prod -- --port 33000 &
   only:
    - master
   stage: deploy

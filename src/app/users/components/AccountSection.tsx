@@ -54,6 +54,7 @@ import Modal from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as UserTypes from '../UserTypes';
 
+import Menu, { MenuOption } from 'common/components/Menu';
 import * as _ from 'lodash';
 import { Colors } from '../../colors/Colors';
 import FadeInOut from '../../common/components/FadeInOut';
@@ -71,11 +72,11 @@ export interface Props
   hasPhoto: boolean;
   userImage?: any;
   columnNum: number;
-  onChange: (value: any) => void;
+  onChange?: (value: any) => void;
   onCancel?: () => void;
   canEdit: boolean;
-  canDisable: boolean;
   addingUser: boolean;
+  menuOptions?: List<MenuOption>;
 }
 
 export default class Section extends TerrainComponent<Props>
@@ -331,6 +332,10 @@ export default class Section extends TerrainComponent<Props>
 
   public onSaveChange()
   {
+    if (!this.props.onChange)
+    {
+      return;
+    }
     const saveSuccessful = this.props.onChange(this.state.editingSections);
     if (saveSuccessful)
     {
@@ -392,24 +397,6 @@ export default class Section extends TerrainComponent<Props>
     );
   }
 
-  public toggleDisable(isDisabledFlag)
-  {
-    this.props.onChange({ isDisabledFlag: !isDisabledFlag });
-  }
-
-  public renderDisableButton(isDisabledFlag)
-  {
-    return (
-      <div
-        className='section-edit-button'
-        onClick={this._fn(this.toggleDisable, isDisabledFlag)}
-        style={{ color: Colors().bg, background: (isDisabledFlag) ? Colors().mainBlue : Colors().sectionEditButton }}
-      >
-        {(isDisabledFlag) ? 'Enable' : 'Disable'}
-      </div>
-    );
-  }
-
   public render()
   {
     return (
@@ -419,9 +406,19 @@ export default class Section extends TerrainComponent<Props>
       >
         <div className='section-header-bar'>
           <div className='section-header'>{this.props.sectionTitle}</div>
-          {(this.props.canEdit || this.props.addingUser) && (this.state.isEditing ?
-            this.renderCancelAndSaveButtons() : this.renderEditButton())}
-          {this.props.canDisable && this.renderDisableButton(this.props.isDisabled)}
+          {
+            (this.props.canEdit || this.props.addingUser) && (this.state.isEditing ?
+              this.renderCancelAndSaveButtons() :
+              this.renderEditButton())
+          }
+          {
+            this.props.menuOptions && this.props.menuOptions.size ?
+              <Menu
+                options={this.props.menuOptions}
+              />
+              :
+              null
+          }
         </div>
         {
           <FadeInOut

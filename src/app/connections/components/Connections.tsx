@@ -239,6 +239,7 @@ class Connections extends TerrainComponent<Props>
             itemsName='connection'
             canCreate={TerrainTools.isAdmin()}
             onCreate={this.createConnection}
+            loading={connections.loading}
           />
         </div>
         <MultiModal

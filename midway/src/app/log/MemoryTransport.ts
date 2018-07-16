@@ -51,6 +51,7 @@ import tripleBeam = require('triple-beam');
 
 export class MemoryTransport extends Transport
 {
+  private name: string;
   private msgs: any[];
   private index: number;
   private hasWrapped: boolean;
@@ -74,7 +75,7 @@ export class MemoryTransport extends Transport
   public log(info: object, callback)
   {
     const level = info[tripleBeam.LEVEL];
-    const msg = info.message;
+    const msg = info['message'];
     const meta = info;
     if (level === 'info' || level === 'warning' || level === 'error')
     {

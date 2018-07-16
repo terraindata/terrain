@@ -55,12 +55,12 @@ beforeAll(async (done) =>
   try
   {
     const options =
-      {
-        debug: true,
-        demo: true,
-        db: 'http://127.0.0.1:9200',
-        port: 43003,
-      };
+    {
+      debug: true,
+      demo: true,
+      db: 'http://127.0.0.1:9200',
+      port: 43003,
+    };
 
     const app = new App(options);
     server = await app.start();

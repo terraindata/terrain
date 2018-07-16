@@ -66,7 +66,7 @@ module.exports =
     headers: {
       'Access-Control-Allow-Origin': '*'
     },
-    
+
     // proxy midway requests to dev midway
     proxy: {
       '/midway/**': {
@@ -90,6 +90,7 @@ module.exports =
       charts: path.resolve(__dirname, 'src/app/charts'),
       colors: path.resolve(__dirname, 'src/app/colors'),
       common: path.resolve(__dirname, 'src/app/common'),
+      connections: path.resolve(__dirname, 'src/app/connections'),
       control: path.resolve(__dirname, 'src/app/control'),
       database: path.resolve(__dirname, 'src/database'),
       deploy: path.resolve(__dirname, 'src/app/deploy'),
@@ -166,7 +167,7 @@ module.exports =
       { test: /\.txt$/, exclude: /midway/, loader: 'raw-loader' },
     ],
   },
-  
+
   plugins:
   [
     new webpack.DefinePlugin({
@@ -175,7 +176,7 @@ module.exports =
     new HardSourceWebpackPlugin({
       cacheDirectory: './.cache/hard-source/dev/[confighash]',
     }),
-    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true, workers: 2 }),
+    new ForkTsCheckerWebpackPlugin({ tslint: true, checkSyntacticErrors: true, workers: 2 }),
   ],
   optimization: {
     removeAvailableModules: false,

@@ -68,7 +68,7 @@ export default class GroupJoinTransform extends SafeReadable
   private source: ElasticReader;
   private query: object;
 
-  private maxPendingQueries: number = 2;
+  private maxPendingQueries: number = 1;
   private maxBufferedOutputs: number;
   private bufferedOutputs: Deque<Ticket>;
 
@@ -127,7 +127,7 @@ export default class GroupJoinTransform extends SafeReadable
       this.source.on('readable', () =>
       {
         let response = this.source.read();
-        while (response !== null)
+        while (response !== null && !this._isSourceEmpty)
         {
           this.dispatchSubqueryBlock(response);
           response = this.source.read();
@@ -143,6 +143,11 @@ export default class GroupJoinTransform extends SafeReadable
       });
       this.source.on('error', (e) => this.emit('error', e));
 
+      this.on('error', (e) =>
+      {
+        this._isSourceEmpty = true;
+        this.source.destroy(e);
+      });
     }
     catch (e)
     {
@@ -196,9 +201,6 @@ export default class GroupJoinTransform extends SafeReadable
         const vi = this.subqueryValueInfos[subQuery];
         if (vi !== null)
         {
-          const header = {};
-          body.push(header);
-
           try
           {
             const queryStr = ESParameterFiller.generate(
@@ -206,7 +208,12 @@ export default class GroupJoinTransform extends SafeReadable
               {
                 [this.parentAlias]: inputs[i]['_source'],
               });
-            body.push(JSON.parse(queryStr));
+            const queryObj = JSON.parse(queryStr);
+
+            const header = {};
+            body.push(header);
+
+            body.push(queryObj);
           }
           catch (e)
           {
@@ -242,9 +249,24 @@ export default class GroupJoinTransform extends SafeReadable
 
           for (let j = 0; j < numInputs; ++j)
           {
-            if (resp.responses[j] !== undefined && resp.responses[j].hits !== undefined)
+            if (resp.responses[j] !== undefined)
             {
-              ticket.response['hits'].hits[j][subQuery] = resp.responses[j].hits.hits;
+              if (resp.responses[j]._shards !== undefined)
+              {
+                if (resp.responses[j]._shards.failed > 0)
+                {
+                  resp.responses[j]._shards.failures.forEach((f) =>
+                  {
+                    // winston.error(f);
+                    this.emit('error', f);
+                  });
+                  return;
+                }
+              }
+              if (resp.responses[j].hits !== undefined)
+              {
+                ticket.response['hits'].hits[j][subQuery] = resp.responses[j].hits.hits;
+              }
             }
             else
             {

@@ -64,11 +64,18 @@ class PrefixedElasticController extends ElasticController
     return this.indexPrefix;
   }
 
-  public prependIndexParam(obj): void
+  public prependIndexParam(obj, allowNoIndex = true): void
   {
     if (!('index' in obj))
     {
-      obj.index = this.getIndexPrefix() + '*';
+      if (allowNoIndex)
+      {
+        obj.index = this.getIndexPrefix() + '*';
+      }
+      else
+      {
+        throw new Error('No index');
+      }
     }
     else if (typeof obj.index === 'string')
     {

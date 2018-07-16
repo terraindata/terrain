@@ -20,6 +20,7 @@
             "charts/*": ["app/charts/*"],
             "colors/*": ["app/colors/*"],
             "common/*": ["app/common/*"],
+            "connections/*": ["app/connections/*"],
             "deploy/*": ["app/deploy/*"],
             "etl*": ["src/app/etl/*"],
             "jobs/*": ["app/jobs/*"],

@@ -89,6 +89,7 @@ const notificationManager = {
     if (this.system)
     {
       this.system.addNotification({
+        uid: `${title}-${message}`,
         title,
         message,
         level,

@@ -74,6 +74,7 @@ class App
 
   private app: Koa;
   private config: Config.Config;
+  private router: Router;
 
   constructor(config: Config.Config = CmdLineArgs)
   {
@@ -101,8 +102,8 @@ class App
     this.app.use(Middleware.logger(logger));
     this.app.use(Middleware.responseTime());
 
-    const router = new Router(config);
-    this.app.use(router.routes());
+    this.router = new Router(config);
+    this.app.use(this.router.routes());
 
     if (config.demo === true)
     {
@@ -120,6 +121,7 @@ class App
   public async start(): Promise<http.Server>
   {
     await Config.handleConfig(this.config);
+    await this.router.initialize();
 
     logger.info('Listening on port ' + String(this.config.port));
     return this.app.listen(this.config.port);

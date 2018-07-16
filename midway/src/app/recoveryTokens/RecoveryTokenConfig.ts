@@ -42,19 +42,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
+import ConfigType from '../ConfigType';
+
+export class RecoveryTokenConfig extends ConfigType
 {
-  return (error: Error, response: T) =>
+  public id: number = undefined;
+  public token: string = undefined;
+  public createdAt: Date = null;
+
+  constructor(props: object)
   {
-    if (error !== null && error !== undefined)
-    {
-      reject(error);
-    }
-    else
-    {
-      resolve(response);
-    }
-  };
+    super();
+    ConfigType.initialize(this, props);
+  }
 }
+
+export default RecoveryTokenConfig;

@@ -770,7 +770,6 @@ class Settings extends TerrainComponent<Props>
           columnNum={2}
           onChange={this.updateUserInfo}
           canEdit={true}
-          canDisable={false}
           addingUser={false}
         />
         <Section
@@ -789,7 +788,6 @@ class Settings extends TerrainComponent<Props>
           columnNum={0}
           onChange={this.updateUserPassword}
           canEdit={true}
-          canDisable={false}
           addingUser={false}
         />
         <Section
@@ -808,7 +806,6 @@ class Settings extends TerrainComponent<Props>
           columnNum={0}
           onChange={this.updateUserInfo}
           canEdit={true}
-          canDisable={false}
           addingUser={false}
         />
         <Modal

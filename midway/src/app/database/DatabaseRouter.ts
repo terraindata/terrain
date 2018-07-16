@@ -79,7 +79,7 @@ Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   MidwayLogger.info('add new database');
-  const db: DatabaseConfig = ctx.request.body.body;
+  const db: DatabaseConfig = ctx.request.body['body'];
   Util.verifyParameters(db, ['name', 'dsn', 'host', 'isAnalytics']);
   if (db.id !== undefined)
   {
@@ -101,7 +101,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   MidwayLogger.info('update existing database');
-  const db: DatabaseConfig = ctx.request.body.body;
+  const db: DatabaseConfig = ctx.request.body['body'];
   if (db.id === undefined)
   {
     db.id = Number(ctx.params.id);

@@ -65,7 +65,7 @@ export class ElasticWriter extends SafeWritable
   {
     super({
       objectMode: true,
-      highWaterMark: 1024 * 128,
+      highWaterMark: 1024 * 8,
     });
 
     this.client = client;
@@ -161,6 +161,7 @@ export class ElasticWriter extends SafeWritable
           doc_as_upsert: true,
         },
       };
+      delete body['_id'];
 
       this.client.update(query, callback);
     }
@@ -210,6 +211,7 @@ export class ElasticWriter extends SafeWritable
           doc: chunk.chunk,
           doc_as_upsert: true,
         };
+        delete chunk.chunk['_id'];
 
         body.push(command);
         body.push(newBody);

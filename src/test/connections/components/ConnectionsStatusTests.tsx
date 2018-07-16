@@ -43,85 +43,78 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:no-empty
 
-import * as stream from 'stream';
+import * as InAppNotification from 'common/components/InAppNotification';
+import { ConnectionsStatus } from 'connections/components/ConnectionsStatus';
+import { _ConnectionConfig } from 'connections/ConnectionTypes';
+import { shallow } from 'enzyme';
+import * as React from 'react';
+import ConnectionsHelper from 'test-helpers/ConnectionsHelper';
 
-import * as Tasty from '../../../../src/tasty/Tasty';
-import DatabaseController from '../../../database/DatabaseController';
-import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
-import CSVTransform from '../streams/CSVTransform';
+jest.mock('common/components/InAppNotification', () =>
+  Object.assign(require.requireActual('common/components/InAppNotification'), {
+    notificationManager: { addNotification: jest.fn() },
+  }),
+);
 
-let tasty: Tasty.Tasty;
-
-export interface MySQLSourceConfig
+describe('ConnectionsStatus', () =>
 {
-  id: number;
-  tablename: string;
-  query: string;
-}
+  const connectionsStateMock = ConnectionsHelper.mockState();
+  const connections = connectionsStateMock
+    .addConnection(_ConnectionConfig({
+      id: 1,
+      name: 'Connection 1',
+      type: 'ElasticSearch',
+      dsn: '',
+      host: 'localhost:9200',
+      status: 'DISCONNECTED',
+      isAnalytics: false,
+    }))
+    .addConnection(_ConnectionConfig({
+      id: 2,
+      name: 'Connection 2',
+      type: 'ElasticSearch',
+      dsn: '',
+      host: 'localhost:9200',
+      status: 'CONNECTED',
+      isAnalytics: false,
+    }))
+    .addConnection(_ConnectionConfig({
+      id: 3,
+      name: 'Connection 3',
+      type: 'Mysql',
+      dsn: '',
+      host: 'localhost:9200',
+      status: 'CONN_TIMEOUT',
+      isAnalytics: false,
+    }))
+    .getState();
 
-export interface MySQLRowConfig
-{
-  rows: object[];
-}
+  let componentWrapper = null;
 
-export class MySQL
-{
-
-  public async getQueryAsCSVStream(mysqlRowConfig: MySQLRowConfig | string): Promise<stream.Readable | string>
+  beforeEach(() =>
   {
-    return new Promise<stream.Readable | string>(async (resolve, reject) =>
-    {
-      if (typeof mysqlRowConfig === 'string')
-      {
-        return resolve(mysqlRowConfig);
-      }
+    componentWrapper = shallow(
+      <ConnectionsStatus
+        connections={connections}
+      />,
+    );
+  });
 
-      const writer = CSVTransform.createExportStream();
-      if ((mysqlRowConfig as MySQLRowConfig).rows.length > 0)
-      {
-        (mysqlRowConfig as MySQLRowConfig).rows.forEach((row) =>
-        {
-          writer.write(row);
-        });
-      }
-      writer.end();
-      resolve(writer);
-    });
-  }
-
-  public async runQuery(mysqlConfig: MySQLSourceConfig): Promise<MySQLRowConfig | string>
+  it('should render nothing', () =>
   {
-    return new Promise<MySQLRowConfig | string>(async (resolve, reject) =>
-    {
-      try
-      {
-        const mysqlRowConfig: MySQLRowConfig =
-          {
-            rows: [],
-          };
-        const database: DatabaseController | undefined = DatabaseRegistry.get(mysqlConfig.id);
-        if (database !== undefined)
-        {
-          if (database.getType() !== 'MySQLController')
-          {
-            return resolve('MySQL source requires a MySQL database ID.');
-          }
-          tasty = database.getTasty() as Tasty.Tasty;
-          mysqlRowConfig.rows = await tasty.getDB().execute([mysqlConfig.query]) as object[];
-          resolve(mysqlRowConfig);
-        }
-        else
-        {
-          return resolve('Database not found.');
-        }
-      }
-      catch (e)
-      {
-        resolve((e as any).toString());
-      }
-    });
-  }
-}
+    expect(componentWrapper.getElement()).toBe(null);
+  });
 
-export default MySQL;
+  it('should call notificationManager.addNotification twice', (done) =>
+  {
+    setTimeout(() =>
+    {
+      expect(InAppNotification.notificationManager.addNotification).toHaveBeenCalledTimes(2);
+      done();
+    },
+      1500,
+    );
+  });
+});

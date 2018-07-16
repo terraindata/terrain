@@ -235,6 +235,7 @@ class TemplateEditor extends TerrainComponent<Props>
             <Foldout
               direction='right'
               width={480}
+              uniqueId='template-editor'
             >
               {this.renderDocumentsSection()}
             </Foldout>

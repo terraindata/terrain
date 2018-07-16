@@ -61,7 +61,7 @@ export const initialize = () => { };
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   MidwayLogger.info('getting all schema');
-  const request = ctx.request.body.body;
+  const request = ctx.request.body['body'];
   if (request !== undefined && request.database !== undefined)
   {
     ctx.body = await getSchema(request.database);
@@ -91,7 +91,7 @@ Router.get('/:database/:table', passport.authenticate('access-token-local'), asy
 
 Router.post('/database/delete', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const params = ctx.request.body.body;
+  const params = ctx.request.body['body'];
   Util.verifyParameters(params, ['language', 'dbname', 'dbid']);
   await perm.ImportPermissions.verifyDefaultRoute(ctx.state.user, params);
   switch (params.language)

@@ -42,43 +42,75 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import { Import, ImportConfig } from '../Import';
-import ADocumentTransform from './ADocumentTransform';
+// tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
+import { ConnectionState } from 'connections/ConnectionTypes';
+import { List, Map } from 'immutable';
+import * as React from 'react';
 
-/**
- * Applies import transformations to a result stream
- */
-export default class ImportTransform extends ADocumentTransform
+import { ConnectionsActions } from 'connections/data/ConnectionsRedux';
+import Util from 'util/Util';
+import TerrainComponent, { browserHistory } from '../../common/components/TerrainComponent';
+import { notificationManager } from './../../common/components/InAppNotification';
+
+interface ConnectionsStatusProps
 {
-  private importt: Import;
-  private config: ImportConfig;
-  private mapping: object;
+  connections?: ConnectionState;
+  connectionsActions?: typeof ConnectionsActions;
+}
 
-  constructor(importt: Import, config: ImportConfig)
+export class ConnectionsStatus extends TerrainComponent<ConnectionsStatusProps>
+{
+  private interval = null;
+
+  public componentDidMount()
   {
-    super();
-    this.importt = importt;
-    this.config = config;
+    this.interval = setInterval(
+      () =>
+      {
+        this.props.connectionsActions(
+          {
+            actionType: 'getConnections',
+          })
+          .then((response) =>
+          {
+            this.forceUpdate();
+          });
+      },
+      10000,
+    ); // Check every 10 seconds
   }
 
-  protected transform(input: object | object[], chunkNumber: number): object | object[]
+  public componentWillUnmount()
   {
-    if (Array.isArray(input))
-    {
-      return input.map((i) => this.transform(i, chunkNumber++));
-    }
+    clearInterval(this.interval);
+  }
 
-    let transformed;
-    try
-    {
-      transformed = this.importt._transformAndCheck(input, this.config);
-    }
-    catch (e)
-    {
-      this.emit('error', e);
-    }
-    return transformed;
+  public render()
+  {
+    const { connections } = this.props.connections;
+
+    connections.keySeq()
+      .forEach((key) =>
+      {
+        const connection = connections.get(key);
+        if (connection.status === 'DISCONNECTED' || connection.status === 'CONN_TIMEOUT')
+        {
+          notificationManager.addNotification(
+            'Disconnected connections',
+            connection.name,
+            'error',
+          );
+        }
+      });
+
+    return null;
   }
 }
+
+export default Util.createTypedContainer(
+  ConnectionsStatus,
+  ['connections'],
+  { connectionsActions: ConnectionsActions },
+);

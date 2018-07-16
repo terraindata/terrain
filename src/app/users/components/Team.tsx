@@ -50,6 +50,7 @@ import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCr
 import TerrainTools from 'app/util/TerrainTools';
 import { AuthState } from 'auth/AuthTypes';
 import { Colors } from 'colors/Colors';
+import { MenuOption } from 'common/components/Menu';
 import { List } from 'immutable';
 import * as React from 'react';
 import Util from 'util/Util';
@@ -237,7 +238,6 @@ class Team extends TerrainComponent<Props>
             onChange={this.createNewUser}
             onCancel={this._toggle('addingUser')}
             canEdit={true}
-            canDisable={false}
             addingUser={true}
           />
         );
@@ -269,23 +269,64 @@ class Team extends TerrainComponent<Props>
     });
   }
 
-  public disableUser(user, editingSections)
+  public confirmAction(user, sectionsToUpdate, message: string)
   {
-    this.props.userActions({
-      actionType: 'change',
-      user: user.set('isDisabled', editingSections.isDisabledFlag),
-    });
-  }
-
-  public promptDisableUser(user, editingSections)
-  {
-    const message = (user.isDisabled) ? 'Are you sure you want to enable this user?' : 'Are you sure you want to disable this user?';
     this.setState({
       confirmModalMessage: message,
       userToToggle: user,
-      sectionsToUpdate: editingSections,
+      sectionsToUpdate,
     });
     this.toggleConfirmModal();
+  }
+
+  public performAction()
+  {
+    let user = this.state.userToToggle;
+    Object.keys(this.state.sectionsToUpdate).forEach((key) =>
+    {
+      user = user.set(key, this.state.sectionsToUpdate[key]);
+    });
+    this.props.userActions({
+      actionType: 'change',
+      user,
+    });
+    this.setState({
+      confirmModalMessage: '',
+      userToToggle: null,
+      sectionsToUpdate: {},
+    });
+  }
+
+  public getMenuOptions(user: User)
+  {
+    let menuOptions: List<MenuOption> = List();
+    if (!TerrainTools.isAdmin())
+    {
+      menuOptions = List([
+        {
+          text: user.isDisabled ? 'Enable' : 'Disable',
+          onClick: this._fn(
+            this.confirmAction,
+            user,
+            { isDisabled: !user.isDisabled },
+            user.isDisabled ?
+              'Are you sure you want to re-enable this user?' :
+              'Are you sure you want to disable this user?',
+          ),
+        },
+        {
+          text: user.isSuperUser ? 'Revoke Admin Status' : 'Make Admin',
+          onClick: this._fn(
+            this.confirmAction,
+            user,
+            { isSuperUser: !user.isSuperUser },
+            user.isSuperUser ? 'Are you sure you want to revoke this user\'s admin status?' :
+              'Are you sure you want to make this user an admin?',
+          ),
+        },
+      ]);
+    }
+    return menuOptions;
   }
 
   public renderUser(user: User)
@@ -311,10 +352,9 @@ class Team extends TerrainComponent<Props>
         hasPhoto={true}
         userImage={<UserThumbnail large={true} userId={user.id} square={true} />}
         columnNum={0}
-        onChange={this._fn(this.promptDisableUser, user)}
         canEdit={false}
-        canDisable={TerrainTools.isAdmin()}
         addingUser={false}
+        menuOptions={this.getMenuOptions(user)}
       />
     );
   }
@@ -322,7 +362,6 @@ class Team extends TerrainComponent<Props>
   public render()
   {
     const { users, loading } = this.props.users;
-
     return (
       <div className='team-main-container'>
         <div className='team-page-title' style={{ color: Colors().mainSectionTitle }}>
@@ -349,7 +388,7 @@ class Team extends TerrainComponent<Props>
           confirm={true}
           confirmButtonText='Yes'
           cancelButtonText='No'
-          onConfirm={this._fn(this.disableUser, this.state.userToToggle, this.state.sectionsToUpdate)}
+          onConfirm={this.performAction}
         />
       </div>
     );

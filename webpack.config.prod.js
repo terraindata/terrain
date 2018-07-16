@@ -162,7 +162,7 @@ module.exports =
     new HardSourceWebpackPlugin({
       cacheDirectory: './.cache/hard-source/dev/[confighash]',
     }),
-    new ForkTsCheckerWebpackPlugin(),
+    new ForkTsCheckerWebpackPlugin({ tslint: true, checkSyntacticErrors: true, workers: 2 }),
     // new BundleAnalyzerPlugin(),
     new CompressionPlugin({
       asset: "[path].gz[query]",

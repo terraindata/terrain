@@ -73,7 +73,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
 {
   // update user, must be super user or authenticated user updating own info
   MidwayLogger.info('user update');
-  const user: UserConfig = ctx.request.body.body;
+  const user: UserConfig = ctx.request.body['body'];
 
   if (user.id === undefined)
   {
@@ -88,7 +88,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   }
 
   // if superuser or id to be updated is current user
-  if (ctx.state.user.isSuperUser || ctx.request.body.id === user.id)
+  if (ctx.state.user.isSuperUser || ctx.request.body['id'] === user.id)
   {
     ctx.body = await users.update(user);
   }
@@ -98,7 +98,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 {
   // create a user, must be admin
   MidwayLogger.info('create user');
-  const user: UserConfig = ctx.request.body.body;
+  const user: UserConfig = ctx.request.body['body'];
   Util.verifyParameters(user, ['email', 'password']);
   if (user.id !== undefined)
   {
