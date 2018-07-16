@@ -44,14 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import clarinet = require('clarinet');
-const parser = clarinet.createStream();
+import * as clarinet from 'clarinet';
 
 export default class StreamUtil
 {
   public static completeStream(jsonStringStream)
   {
-    // let results = [];
+    const parser = clarinet.createStream();
     const bracketStack = [];
     let stringStream = '';
     parser.on('openarray', () =>
@@ -63,7 +62,11 @@ export default class StreamUtil
     parser.on('closearray', () =>
     {
       const recent = bracketStack.pop();
-      stringStream = stringStream + ']';
+      if (stringStream.slice(-2) === ', ')
+      {
+        stringStream = stringStream.slice(0, -2);
+      }
+      stringStream = stringStream + ']' + ', ';
       if (recent !== '[')
       {
         throw new Error('Error parsing');
@@ -72,14 +75,19 @@ export default class StreamUtil
 
     parser.on('openobject', (key) =>
     {
+      // console.log(key);
       bracketStack.push('{');
-      stringStream = stringStream + '{';
+      stringStream = stringStream + '{' + `"${key}":`;
     });
 
     parser.on('closeobject', () =>
     {
       const recent = bracketStack.pop();
-      stringStream = stringStream + '}';
+      if (stringStream.slice(-2) === ', ')
+      {
+        stringStream = stringStream.slice(0, -2);
+      }
+      stringStream = stringStream + '}' + ', ';
       if (recent !== '{')
       {
         throw new Error('Error parsing');
@@ -88,12 +96,14 @@ export default class StreamUtil
 
     parser.on('key', (name) =>
     {
+      // console.log(name);
       stringStream = stringStream + `"${name}":`;
     });
 
     parser.on('value', (value) =>
     {
       let valueString: string;
+      // console.log(value);
       const valueType = typeof value;
       switch (valueType)
       {
@@ -101,7 +111,8 @@ export default class StreamUtil
           valueString = value.toString();
           break;
         case 'string':
-          valueString = value;
+          valueString = `"${value}"`;
+          // console.log(valueString);
           break;
         case 'boolean':
           valueString = `${value}`;
@@ -121,15 +132,29 @@ export default class StreamUtil
       }
       stringStream = stringStream + valueString + ', ';
     });
+
+    parser.on('end', () =>
+    {
+      return [bracketStack, stringStream];
+    });
+
+    parser.on('error', (e) =>
+    {
+      throw new Error('Error parsing');
+    });
+
+    parser.write(jsonStringStream);
     return [bracketStack, stringStream];
   }
 
   public static fixStringStream(rawStringStream)
   {
     let correctedString;
+    // console.log(rawStringStream);
     const checkBracketOrKey = rawStringStream.slice(-1);
     const checkValue = rawStringStream.slice(-2);
-    console.log(checkBracketOrKey);
+    // console.log(checkBracketOrKey);
+    // console.log(checkValue);
     switch (checkBracketOrKey)
     {
       case '[':
@@ -173,10 +198,12 @@ export default class StreamUtil
   public static formatJsonString(jsonString)
   {
     const results: object = this.completeStream(jsonString);
-    console.log(results);
+    // console.log(results);
     const bracketStack: string[] = results[0];
     const rawStringStream: string = results[1];
+    // console.log(rawStringStream);
     let fixedStringStream: string = this.fixStringStream(rawStringStream);
+    // console.log(fixedStringStream);
 
     if (bracketStack === [])
     {
@@ -195,6 +222,12 @@ export default class StreamUtil
         {
           fixedStringStream = fixedStringStream + '}';
         }
+      }
+      // console.log(fixedStringStream);
+      if (fixedStringStream.slice(0, 1) === '[') // can't parse if wrapped in array
+      {
+        // console.log([fixedStringStream.slice(1, -1)]);
+        return [JSON.parse(fixedStringStream.slice(1, -1))];
       }
       return JSON.parse(fixedStringStream);
     }
