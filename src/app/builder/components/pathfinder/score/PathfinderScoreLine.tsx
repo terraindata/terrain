@@ -147,7 +147,6 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath), newLine, false, true);
     if (fieldType !== FieldType.Geopoint)
     {
-      console.log('set editing field false');
       this.setState((state) => ({ editingField: false }));
     }
   }
@@ -259,7 +258,6 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
   public handleDropdownClose()
   {
-    console.log('handle dropdown close');
     if (this.props.line.fieldType !== FieldType.Geopoint)
     {
       this.setState({
@@ -278,7 +276,6 @@ class PathfinderScoreLine extends TerrainComponent<Props>
       this.props.keyPath,
       newLine,
     );
-    console.log('handle map submit close');
     this.setState((state) => ({ editingField: false }));
   }
 

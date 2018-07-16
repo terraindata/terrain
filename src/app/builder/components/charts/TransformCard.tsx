@@ -683,7 +683,7 @@ class TransformCard extends TerrainComponent<Props>
         if (userInterpreter)
         {
           const qt = new ESJSParser(domainQuery);
-          if (qt.errors.length)
+          if (qt.getErrors().length)
           {
             return;
           }

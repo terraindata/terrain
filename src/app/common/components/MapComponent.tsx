@@ -288,7 +288,6 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
   // Given an address, find the corresponding coorindates
   public geocode(address)
   {
-    console.log('geocode here', address);
     if (!address)
     {
       return;
