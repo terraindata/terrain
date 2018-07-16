@@ -50,15 +50,13 @@ import * as Deque from 'double-ended-queue';
 import * as elasticsearch from 'elasticsearch';
 import { Readable } from 'stream';
 
-import { MidwayLogger } from '../midway/src/app/log/MidwayLogger';
 import DatabaseControllerConfig from '../midway/src/database/DatabaseControllerConfig';
 import ElasticClient from '../midway/src/database/elastic/client/ElasticClient';
 import ElasticConfig from '../midway/src/database/elastic/ElasticConfig';
 import ElasticController from '../midway/src/database/elastic/ElasticController';
 import ElasticReader from '../midway/src/database/elastic/streams/ElasticReader';
 import ElasticWriter from '../midway/src/database/elastic/streams/ElasticWriter';
-
-MidwayLogger.level = 'z';
+import SharedUtil from '../shared/Util';
 
 function uncaughtExceptionHandler(err: Error): void
 {
@@ -113,7 +111,7 @@ const unused = (async () =>
       isProtected: false,
     },
   )).getClient();
-  const result = await srcElasticClient.indices.getMapping({});
+  const result = await new Promise((res, rej) => srcElasticClient.indices.getMapping({}, SharedUtil.promise.makeCallback(res, rej)));
   for (const oldIndex of Object.keys(result))
   {
     if (oldIndex.startsWith('.'))
@@ -124,21 +122,22 @@ const unused = (async () =>
     const index = prefix + oldIndex;
     try
     {
-      await dstElasticClient.indices.delete({ index });
+      await new Promise((res, rej) => dstElasticClient.indices.delete({ index }, SharedUtil.promise.makeCallback(res, rej)));
     }
     catch (e)
     {
     }
-    await dstElasticClient.indices.create({ index });
+    await new Promise((res, rej) => dstElasticClient.indices.create({ index }, SharedUtil.promise.makeCallback(res, rej)));
     for (const type of Object.keys(mappings))
     {
-      await dstElasticClient.indices.putMapping(
+      await new Promise((res, rej) => dstElasticClient.indices.putMapping(
         {
           index,
           type,
           body: mappings[type],
         },
-      );
+        SharedUtil.promise.makeCallback(res, rej),
+      ));
       console.log('Mapping migrated for index: ' + index + ', type: ' + type);
       const reader = new OneToManyReader(
         new ElasticReader(srcElasticClient, { query: { bool: { filter: { term: { _index: oldIndex } } } } }, true),
