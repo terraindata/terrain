@@ -161,6 +161,7 @@ export class ElasticWriter extends SafeWritable
           doc_as_upsert: true,
         },
       };
+      delete body['_id'];
 
       this.client.update(query, callback);
     }
@@ -210,6 +211,7 @@ export class ElasticWriter extends SafeWritable
           doc: chunk.chunk,
           doc_as_upsert: true,
         };
+        delete chunk.chunk['_id'];
 
         body.push(command);
         body.push(newBody);
