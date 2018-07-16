@@ -277,29 +277,6 @@ export class FieldProxy
     this.engineProxy.setFieldEnabled(this.fieldId, enabled);
   }
 
-  // delete this field and all child fields
-  // public deleteField(rootId: number, childrenOnly?: boolean)
-  // {
-  //   Utils.traversal.postorderFields(this.engine, rootId, (fieldId) =>
-  //   {
-  //     if (childrenOnly && fieldId === rootId)
-  //     {
-  //       return;
-  //     }
-
-  //     const dependents: List<number> = Utils.traversal.getFieldDependents(this.engine, fieldId);
-  //     if (dependents.size > 0)
-  //     {
-  //       const paths = JSON.stringify(
-  //         dependents.map((id) => this.engine.getFieldPath(id),
-  //         ).toList().toJS(), null, 2);
-  //       throw new Error(`Cannot delete field. This field has ${dependents.size} dependent fields: ${paths}`);
-  //     }
-  //     this.engine.deleteField(fieldId);
-  //   });
-  //   this.syncWithEngine(true);
-  // }
-
   public changeName(value: string)
   {
     if (value === '' || value === undefined || value === null)
@@ -357,32 +334,17 @@ export class FieldProxy
       return;
     }
 
-    // const tree = this.engine.createTree();
-    // if (tree.get(this.fieldId).size > 0 && oldType === FieldTypes.Array)
-    // {
-    //   try
-    //   {
-    //     this.deleteField(this.fieldId, true);
-    //   }
-    //   catch (e)
-    //   {
-    //     throw new Error(`Could not remove dependent fields: ${String(e)}`);
-    //   }
-    // }
-
-    // Utils.fields.changeType(this.engine, this.fieldId, newType);
-    // Utils.transformations.castField(this.engine, this.fieldId, newType);
     if (newType === FieldTypes.String && (oldType === FieldTypes.Array || oldType === FieldTypes.Object))
     {
       Utils.transformations.stringifyField(this.engine, this.fieldId);
     }
     else if (oldType === FieldTypes.String && newType === FieldTypes.Array)
     {
-      Utils.transformations.parseField(this.engine, this.fieldId, 'array');
+      Utils.transformations.parseField(this.engine, this.fieldId, FieldTypes.Array);
     }
     else if (oldType === FieldTypes.String && newType === FieldTypes.Object)
     {
-      Utils.transformations.parseField(this.engine, this.fieldId, 'object');
+      Utils.transformations.parseField(this.engine, this.fieldId, FieldTypes.Object);
     }
     else
     {

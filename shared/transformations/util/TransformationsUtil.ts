@@ -72,7 +72,7 @@ export default abstract class TransformationsUtil
     engine.appendTransformation(TransformationNodeType.CastNode, List([fieldId]), transformOptions);
   }
 
-  public static parseField(engine: TransformationEngine, fieldId: number, to: 'array' | 'object')
+  public static parseField(engine: TransformationEngine, fieldId: number, to: FieldTypes.Array | FieldTypes.Object)
   {
     const currentType = Utils.fields.fieldType(fieldId, engine);
     if (currentType !== FieldTypes.String)

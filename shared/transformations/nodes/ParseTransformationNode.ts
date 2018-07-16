@@ -95,7 +95,7 @@ export class ParseTransformationNode extends SimpleTransformationType
     {
       return null;
     }
-    else if (opts.to === 'array')
+    else if (opts.to === FieldTypes.Array)
     {
       if (!Array.isArray(parsed))
       {
@@ -136,7 +136,7 @@ class ParseTransformationInfoC extends TransformationNodeInfo
       return null;
     }
     const options: NodeOptionsType<typeof TYPECODE> = node.meta;
-    if (options.to === 'array')
+    if (options.to === FieldTypes.Array)
     {
       return FieldTypes.Array;
     }

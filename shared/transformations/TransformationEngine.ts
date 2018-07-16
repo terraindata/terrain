@@ -99,6 +99,7 @@ export class TransformationEngine
     const parsedJSON: object = typeof json === 'string' ? TransformationEngine.parseSerializedString(json as string) : json as object;
     const e: TransformationEngine = new TransformationEngine();
     e.dag = GraphLib.json.read(parsedJSON['dag']) as TransformationGraph;
+    e.executionOrder = parsedJSON['executionOrder'];
     e.uidField = parsedJSON['uidField'];
     e.uidNode = parsedJSON['uidNode'];
     e.IDToPathMap = Map<number, KeyPath>(parsedJSON['IDToPathMap']);
@@ -136,6 +137,7 @@ export class TransformationEngine
   }
 
   protected dag: TransformationGraph = new GraphLib.Graph({ directed: true }) as TransformationGraph;
+  protected executionOrder: number[] = [];
   protected uidField: number = 0;
   protected uidNode: number = 0;
   protected fieldEnabled: Map<number, boolean> = Map<number, boolean>();
@@ -277,6 +279,7 @@ export class TransformationEngine
       meta: options,
     });
     this.dag.setNode(nodeId.toString(), node);
+    this.executionOrder.push(nodeId);
     node.accept(TransformationCreator, this);
 
     return nodeId;
@@ -291,8 +294,7 @@ export class TransformationEngine
   public transform(doc: object): object
   {
     let output = _.cloneDeep(doc);
-    const ordered = GraphLib.alg.topsort(this.dag);
-
+    const ordered = this.computeExecutionOrder();
     for (const nodeKey of ordered)
     {
       const node: TransformationNode = this.dag.node(nodeKey);
@@ -329,6 +331,7 @@ export class TransformationEngine
     // slightly verbose syntax is required to convert to plain JS arrays
     return {
       dag: GraphLib.json.write(this.dag),
+      executionOrder: this.executionOrder,
       uidField: this.uidField,
       uidNode: this.uidNode,
       IDToPathMap: this.IDToPathMap.map((v: KeyPath, k: number) => [k, v]).toArray(),
@@ -359,7 +362,7 @@ export class TransformationEngine
     this.IDToPathMap = this.IDToPathMap.set(id, fullKeyPath);
     this.fieldEnabled = this.fieldEnabled.set(id, true);
     this.fieldProps = this.fieldProps.set(id, options);
-    const identityId = this.addIdentity(id, sourceNode);
+    const identityId = this.addIdentity(id, sourceNode, sourceNode !== undefined ? 'Synthetic' : undefined);
 
     return id;
   }
@@ -592,20 +595,12 @@ export class TransformationEngine
   /*
    *  Add Identity Node to a newly added field (or a renamed field)
    */
-  protected addIdentity(fieldId: number, sourceNode?: number): number
+  protected addIdentity(fieldId: number, sourceNode?: number, idType?: 'Removal' | 'Rename' | 'Synthetic'): number
   {
     let type;
-    if (sourceNode !== undefined)
+    if (sourceNode !== undefined && idType !== undefined)
     {
-      const node = this.dag.node(String(sourceNode));
-      if (node.typeCode === TransformationNodeType.RenameNode)
-      {
-        type = 'Rename';
-      }
-      else
-      {
-        type = 'Synthetic';
-      }
+      type = idType;
     }
     else
     {
@@ -624,9 +619,58 @@ export class TransformationEngine
 
   protected killField(fieldID: number, killedByNode: number): number
   {
-    const options: NodeOptionsType<TransformationNodeType.IdentityNode> = {
-      type: 'Removal',
-    };
-    return this.appendTransformation(TransformationNodeType.IdentityNode, List([fieldID]), options);
+    return this.addIdentity(fieldID, killedByNode, 'Removal');
+  }
+
+  /*
+   *  Returns nodes in the order they should be executed
+   *
+   *  Custom topological sort that also makes sure that edges are sorted in this order:
+   *  - Synthetic
+   *  - Rename
+   *  - Same
+   *  - Removal
+   *  Note that any node should only have ever 1 inbound and 1 outbound Rename, Same, or Removal edge.
+   */
+  protected computeExecutionOrder(): string[]
+  {
+    // copy the dag
+    const dag = GraphLib.json.read(GraphLib.json.write(this.dag)) as TransformationGraph;
+
+    for (let i = 1; i < this.executionOrder.length; i++)
+    {
+      dag.setEdge(String(this.executionOrder[i - 1]), String(this.executionOrder[i]), 'DUMMY' as any);
+    }
+
+    // iterate through all rename, same, and removal edges (v, w). For each node v whose synthetic edges are
+    // [v, w_synth], create a "helper" edge from w_synth to w. This ensures a topological dependency that enforces that
+    // the synthetic nodes w_synth are visited before w.
+
+    for (const edge of dag.edges())
+    {
+      const label = dag.edge(edge);
+      if (label !== EdgeTypes.Synthetic && label !== 'DUMMY' as any)
+      {
+        const { v, w } = edge;
+        const synthSuccessors = dag.successors(v).filter((wTest) => dag.edge(v, wTest) === EdgeTypes.Synthetic);
+        for (const wSynth of synthSuccessors)
+        {
+          if (dag.edge(wSynth, w) === undefined)
+          {
+            dag.setEdge(wSynth, w, 'DUMMY' as any);
+          }
+        }
+      }
+    }
+
+    if (!GraphLib.alg.isAcyclic(dag))
+    {
+      throw new Error('Could not perform topological sort: Graph is Cyclic');
+    }
+
+    const order = GraphLib.alg.topsort(dag)
+      .filter((id) => dag.node(id).typeCode !== TransformationNodeType.IdentityNode);
+    return order;
+
   }
 }

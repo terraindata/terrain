@@ -85,8 +85,8 @@ export class ParseTFF extends TransformationForm<Options, typeof TYPECODE>
   };
 
   protected readonly initialState: Options = {
-    to: 'array',
+    to: FieldTypes.Array,
   };
 }
 
-const optionsList = List(['array', 'object']);
+const optionsList = List([FieldTypes.Array, FieldTypes.Object]);

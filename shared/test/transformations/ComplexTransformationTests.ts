@@ -46,9 +46,12 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 import * as _ from 'lodash';
+
+import { DateFormats, FieldTypes } from 'shared/etl/types/ETLTypes';
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
-import { TransformationEngine } from '../../transformations/TransformationEngine';
-import TransformationNodeType from '../../transformations/TransformationNodeType';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+
 import { KeyPath, WayPoint } from '../../util/KeyPath';
 import * as yadeep from '../../util/yadeep';
 import { TestDocs } from './TestDocs';
@@ -340,5 +343,156 @@ describe('suite of complex duplication tests', () =>
         ],
       },
     );
+  });
+});
+
+describe('Simple multi rename with an operation', () => {
+  const doc = {
+    nested: {
+      foo: 'hi',
+    },
+  };
+  const { engine } = Utils.construction.createEngineFromDocuments(List([doc]));
+  const nestedId = engine.getFieldID(KeyPath(['nested']));
+  const fooId = engine.getFieldID(KeyPath(['nested', 'foo']));
+
+  engine.renameField(fooId, KeyPath(['nested', 'bar']));
+  engine.renameField(nestedId, KeyPath(['thing']));
+  engine.appendTransformation(TransformationNodeType.StringifyNode, List([nestedId]));
+
+  expect(engine.transform(doc)).toEqual({
+    thing: '{"bar":"hi"}',
+  });
+});
+
+describe('Complex Stringify and Parse Gauntlet', () =>
+{
+  const baseDoc = {
+    foo: 'hello',
+    nested: {
+      name: 'bob',
+      value: 10,
+    },
+  };
+
+  /*
+   *  This test stringifies an object field, surrounds it with '[' and ']' then parses it.
+   */
+  function runGauntlet(engine: TransformationEngine, doc: object)
+  {
+    expect(engine.getFieldID(KeyPath(['nested', 'name']))).toBeDefined();
+    expect(engine.getFieldID(KeyPath(['nested', 'value']))).toBeDefined();
+
+    const nestedID = engine.getFieldID(KeyPath(['nested']));
+    expect(nestedID).toBeDefined();
+    engine.appendTransformation(TransformationNodeType.StringifyNode, List([nestedID]));
+
+    const nestedAsStr = engine.transform(doc)['nested'];
+    expect(typeof nestedAsStr).toBe('string');
+    expect(JSON.parse(nestedAsStr)).toEqual(baseDoc['nested']);
+    expect(Utils.fields.fieldType(nestedID, engine)).toBe(FieldTypes.String);
+
+    expect(engine.getFieldID(KeyPath(['nested', 'name']))).toBeUndefined();
+    expect(engine.getFieldID(KeyPath(['nested', 'value']))).toBeUndefined();
+
+    engine.appendTransformation(TransformationNodeType.InsertNode, List([nestedID]), { at: 0, value: '[' });
+    engine.appendTransformation(TransformationNodeType.InsertNode, List([nestedID]), { at: -1, value: ']' });
+    engine.appendTransformation(TransformationNodeType.ParseNode, List([nestedID]), { to: FieldTypes.Array });
+    const finalTransformed = engine.transform(doc);
+    const nestedAsArr = finalTransformed['nested'];
+    expect(nestedAsArr).toEqual([baseDoc['nested']]);
+    expect(finalTransformed['foo']).toBe(baseDoc['foo']);
+    expect(Utils.fields.fieldType(nestedID, engine)).toBe(FieldTypes.Array);
+
+    return engine;
+  }
+
+  test('Simple Gauntlet', () => {
+    const { engine } = Utils.construction.createEngineFromDocuments(List([baseDoc]));
+    Utils.transformations.addInitialTypeCasts(engine);
+    runGauntlet(engine, baseDoc);
+  });
+
+  test('Gauntlet with initial rename', () => {
+    const doc = {
+      foo: 'hello',
+      noosted: {
+        fame: 'bob',
+        eulav: 10,
+      },
+    };
+    const { engine } = Utils.construction.createEngineFromDocuments(List([doc]));
+    Utils.transformations.addInitialTypeCasts(engine);
+
+    const nameId = engine.getFieldID(KeyPath(['noosted', 'fame']));
+    engine.renameField(nameId, KeyPath(['noosted', 'name']));
+
+    const nestedId = engine.getFieldID(KeyPath(['noosted']));
+    engine.renameField(nestedId, KeyPath(['nested']));
+
+    const valueId = engine.getFieldID(KeyPath(['nested', 'eulav']));
+    engine.renameField(valueId, KeyPath(['nested', 'value']));
+    runGauntlet(engine, doc);
+  });
+
+  test('Gauntlet with in place transformations', () => {
+    const doc = {
+      foo: 'ello',
+      nested: {
+        name: 'BOB',
+        value: 3,
+      },
+    };
+    const { engine } = Utils.construction.createEngineFromDocuments(List([doc]));
+    Utils.transformations.addInitialTypeCasts(engine);
+
+    const nameId = engine.getFieldID(KeyPath(['nested', 'name']));
+    const nestedId = engine.getFieldID(KeyPath(['nested']));
+    const fooId = engine.getFieldID(KeyPath(['foo']));
+    const valueId = engine.getFieldID(KeyPath(['nested', 'value']));
+
+    engine.appendTransformation(TransformationNodeType.CaseNode, List([nameId]), {
+      format: 'lowercase', // can't seem to import CaseFormats
+    });
+    engine.appendTransformation(TransformationNodeType.AddNode, List([valueId]), {
+      shift: 7,
+    });
+    engine.appendTransformation(TransformationNodeType.InsertNode, List([fooId]), {
+      at: 0,
+      value: 'h',
+    });
+    runGauntlet(engine, doc);
+  });
+
+  test('Gauntlet with combination of joins sums and renames', () => {
+    const doc = {
+      fooPart1: 'he',
+      fooPart2: 'llo',
+      nested: {
+        name: 'bob',
+        value: 3,
+        valuePart: 7,
+      },
+    };
+    const { engine } = Utils.construction.createEngineFromDocuments(List([doc]));
+    Utils.transformations.addInitialTypeCasts(engine);
+
+    const fooPartId = engine.getFieldID(KeyPath(['fooPart1']));
+    const fooPart2Id = engine.getFieldID(KeyPath(['fooPart2']));
+    engine.renameField(fooPartId, KeyPath(['fooPartRenamed']));
+    engine.appendTransformation(TransformationNodeType.JoinNode, List([fooPartId, fooPart2Id]), {
+      delimiter: '',
+      newFieldKeyPaths: wrap(['foo']),
+    });
+    const valueId = engine.getFieldID(KeyPath(['nested', 'value']));
+    const valuePartId = engine.getFieldID(KeyPath(['nested', 'valuePart']));
+    engine.appendTransformation(TransformationNodeType.SumNode, List([valueId, valuePartId]), {
+      newFieldKeyPaths: wrap(['sumvalue']),
+    });
+    engine.renameField(valueId, KeyPath(['get me out of here']));
+    engine.renameField(valuePartId, KeyPath(['get me out of here too']));
+    const newFieldId = engine.getFieldID(KeyPath(['sumvalue']));
+    engine.renameField(newFieldId, KeyPath(['nested', 'value']));
+    runGauntlet(engine, doc);
   });
 });

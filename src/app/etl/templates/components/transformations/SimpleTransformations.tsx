@@ -112,7 +112,7 @@ export class CaseTFF extends TransformationForm<CaseOptions, TransformationNodeT
     },
   };
   protected readonly initialState = {
-    format: 'uppercase',
+    format: CaseFormats.uppercase,
   };
 }
 

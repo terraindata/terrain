@@ -56,6 +56,7 @@ import TransformationNodeType, { NodeOptionsType, TransformationEdgeTypes as Edg
 export default abstract class FriendEngine extends TransformationEngine
 {
   public abstract dag: TransformationGraph;
+  public abstract executionOrder: number[];
   public abstract uidField: number;
   public abstract uidNode: number;
   public abstract fieldEnabled: Map<number, boolean>;
@@ -63,6 +64,6 @@ export default abstract class FriendEngine extends TransformationEngine
   public abstract IDToPathMap: Map<number, KeyPath>;
 
   public abstract setFieldPath(fieldID: number, path: KeyPath): void;
-  public abstract addIdentity(fieldId: number, sourceNode?: number): number;
+  public abstract addIdentity(fieldId: number, sourceNode?: number, idType?: 'Rename' | 'Synthetic' | 'Removal'): number;
   public abstract killField(fieldID: number, killedByNode: number): number;
 }

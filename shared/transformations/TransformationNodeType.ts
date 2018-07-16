@@ -47,6 +47,7 @@ THE SOFTWARE.
 import { List } from 'immutable';
 import { DateFormats, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { KeyPath } from 'shared/util/KeyPath';
+import { CaseFormats } from 'shared/transformations/nodes/CaseTransformationNode';
 
 enum TransformationNodeType
 {
@@ -134,7 +135,7 @@ interface TransformationOptionTypes extends HasCommon<TransformationOptionTypes>
     value: string;
   };
   CaseNode: {
-    format: string;
+    format: CaseFormats;
   };
   SubstringNode: {
     from: number;
@@ -183,7 +184,7 @@ interface TransformationOptionTypes extends HasCommon<TransformationOptionTypes>
     newFieldKeyPaths: List<KeyPath>;
   };
   ParseNode: {
-    to: 'array' | 'object';
+    to: FieldTypes.Array | FieldTypes.Object;
   };
   ProductNode: {
     newFieldKeyPaths: List<KeyPath>;

@@ -208,7 +208,7 @@ export default class CreationVisitor
     {
       const childPath = engine.getFieldPath(id);
       engine.setFieldPath(id, newPath.concat(childPath.slice(transplantIndex)).toList());
-      const identityNode = engine.addIdentity(id, node.id);
+      const identityNode = engine.addIdentity(id, node.id, 'Rename');
       Utils.traversal.appendNodeToField(engine, id, identityNode, EdgeTypes.Rename);
       engine.dag.setEdge(String(node.id), String(identityNode), EdgeTypes.Synthetic);
     });
@@ -230,6 +230,16 @@ export default class CreationVisitor
         const newId = engine.addField(parentPath, { etlType: type }, nodeId);
       }
     }
+  }
+
+  protected modifyParents(engine: FriendEngine, path: KeyPath, nodeId: number)
+  {
+
+  }
+
+  protected modifyChildren(engine: FriendEngine, path: KeyPath, nodeId: number)
+  {
+
   }
 
   protected copyNestedStructure(engine: FriendEngine, sourceId: number, rootPath: KeyPath, node: number)
