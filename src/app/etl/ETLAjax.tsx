@@ -375,6 +375,7 @@ class ETLAjax
     {
       const handleResponse = (response: any) =>
       {
+        console.log(response);
         let documents;
         try
         {
