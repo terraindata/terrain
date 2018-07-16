@@ -129,7 +129,7 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
 
   protected handleAuthFormChange(state: AuthState, apply?: boolean)
   {
-    if (apply)
+    if (apply !== false)
     {
       const { onChange, integration } = this.props;
       const newConfig = this.authStateToConfig(state);
@@ -140,7 +140,7 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
 
   protected handleConnectionFormChange(state: ConnectionState, apply?: boolean)
   {
-    if (apply)
+    if (apply !== false)
     {
       const { onChange, integration } = this.props;
       const newConfig = this.connectionStateToConfig(state);
@@ -431,19 +431,6 @@ class GoogleAnalyticsForm extends IntegrationFormBase<GoogleAnalyticsAuthT, Goog
         render: this.renderMetricsForm,
       },
     },
-    // metrics: {
-    //   type: DisplayType.TagsBox,
-    //   displayName: 'Metrics',
-    //   options: {
-    //     transformValue: (value) => value.map((v) => (v.alias as string) + ',' + (v.expression as string)),
-    //     untransformValue: (value) => value.map((v) =>
-    //     {
-    //       const pieces = v != null ? v.split(',') : ['', ''];
-    //       return { alias: pieces[0] || '', expression: pieces[1] || '' };
-    //     },
-    //     ),
-    //   },
-    // },
     dimensions: {
       type: DisplayType.TagsBox,
       displayName: 'Dimensions',
@@ -482,7 +469,7 @@ class GoogleAnalyticsForm extends IntegrationFormBase<GoogleAnalyticsAuthT, Goog
     */
     return (
       <ObjectForm
-        object={state.metrics != null ? state.metrics : {}}
+        object={state.metrics != null ? state.metrics : []}
         keyName='alias'
         valueName='expression'
         onChange={this.handleMetricsChange}
