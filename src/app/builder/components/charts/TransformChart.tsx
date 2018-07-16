@@ -58,9 +58,9 @@ import * as $ from 'jquery';
 import * as _ from 'lodash';
 
 import ElasticBlockHelpers from '../../../../database/elastic/blocks/ElasticBlockHelpers';
+import MapUtil from '../../../util/MapUtil';
 import TransformUtil, { NUM_CURVE_POINTS } from '../../../util/TransformUtil';
 import Util from '../../../util/Util';
-import MapUtil from '../../../util/MapUtil';
 
 const xMargin = 45;
 const yMargin = 10;

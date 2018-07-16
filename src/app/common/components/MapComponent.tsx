@@ -177,7 +177,7 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
     return !(_.isEqual(nextProps, this.props) && this.state === nextState);
   }
 
-  public onChange(coordinates, inputValue, submit=false)
+  public onChange(coordinates, inputValue, submit = false)
   {
     this.setState({
       inputValue,
@@ -288,6 +288,11 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
   // Given an address, find the corresponding coorindates
   public geocode(address)
   {
+    console.log('geocode here', address);
+    if (!address)
+    {
+      return;
+    }
     if (address.charAt(0) === '@')
     {
       // Just an input, dont geocode it
@@ -299,7 +304,7 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
     }
     if (this.geoCache[address] !== undefined)
     {
-      this.onChange(this.geoCache[address], address);
+      this.onChange(this.geoCache[address], address, true);
       return;
     }
     if (this.props.geocoder === 'photon')
@@ -661,7 +666,11 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
               styles={{ input: inputStyle }}
               geocoder={this.props.geocoder}
               classNames={{ root: 'map-component-address-input' }}
-              autocompleteOptions={usingInput ? this.props.options.toArray() : undefined}
+              autocompleteOptions={usingInput && this.props.options ? this.props.options.toArray() : undefined}
+              onEnterKeyDown={this.props.onSubmit ?
+                this.geocode :
+                undefined
+              }
             />
         }
         {

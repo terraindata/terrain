@@ -67,7 +67,10 @@ import PathfinderText from 'builder/components/pathfinder/PathfinderText';
 import FadeInOut from 'common/components/FadeInOut';
 import Switch from 'common/components/Switch';
 import { ElasticQueryResult } from '../../../../../shared/database/elastic/ElasticQueryResponse';
+import ESInterpreter from '../../../../../shared/database/elastic/parser/ESInterpreter';
+import { ESJSParser } from '../../../../../shared/database/elastic/parser/ESJSParser';
 import { MidwayError } from '../../../../../shared/error/MidwayError';
+import { toInputMap } from '../../../../blocks/types/Input';
 import { isInput } from '../../../../blocks/types/Input';
 import { getIndex, getType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
@@ -143,7 +146,6 @@ class TransformCard extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    console.log('will receive props ', nextProps.data.distanceValue);
     if ((nextProps.builder.query.tql !== this.props.builder.query.tql ||
       nextProps.builder.query.inputs !== this.props.builder.query.inputs)
       && !this.props.data.closed && nextProps.data.input === '_score')
@@ -170,7 +172,6 @@ class TransformCard extends TerrainComponent<Props>
     if (nextProps.data.input !== this.props.data.input ||
       nextProps.data.distanceValue !== nextProps.data.distanceValue)
     {
-      console.log('HERE');
       this.computeBars(nextProps.data, this.state.maxDomain, true);
     }
   }
@@ -624,7 +625,6 @@ class TransformCard extends TerrainComponent<Props>
         },
       });
     }
-    console.log('distance value is ', distanceValue);
     if (recomputeDomain)
     {
       let domainQuery;
@@ -632,8 +632,22 @@ class TransformCard extends TerrainComponent<Props>
       {
         domainQuery = this.computeScoreElasticBars(maxDomain, recomputeDomain, overrideQuery);
       }
-      else if (distanceValue && distanceValue.location)
+      else if (distanceValue)
       {
+        let lat: string | number = 0;
+        let lon: string | number = 0;
+        let userInterpreter = false;
+        if (distanceValue.location)
+        {
+          lat = distanceValue.location[0];
+          lon = distanceValue.location[1];
+        }
+        if (distanceValue.address && distanceValue.address.charAt(0) === '@')
+        {
+          lat = distanceValue.address + '.lat';
+          lon = distanceValue.address + '.lon';
+          userInterpreter = true;
+        }
         domainQuery = {
           query: {
             bool: {
@@ -645,8 +659,8 @@ class TransformCard extends TerrainComponent<Props>
               min: {
                 script: {
                   params: {
-                    lat: distanceValue.location[0],
-                    lon: distanceValue.location[1],
+                    lat,
+                    lon,
                   },
                   inline: `doc['${input}'].arcDistance(params.lat, params.lon) * 0.000621371`,
                 },
@@ -656,8 +670,8 @@ class TransformCard extends TerrainComponent<Props>
               max: {
                 script: {
                   params: {
-                    lat: distanceValue.location[0],
-                    lon: distanceValue.location[1],
+                    lat,
+                    lon,
                   },
                   inline: `doc['${input}'].arcDistance(params.lat, params.lon) * 0.000621371`,
                 },
@@ -665,6 +679,22 @@ class TransformCard extends TerrainComponent<Props>
             },
           },
         };
+        // If there were inputs involved, need to use an interpreter
+        if (userInterpreter)
+        {
+          const qt = new ESJSParser(domainQuery);
+          if (qt.errors.length)
+          {
+            return;
+          }
+          const params = toInputMap(this.props.builder.query.inputs);
+          const interpreter: ESInterpreter = new ESInterpreter(qt, params);
+          if (interpreter.errors.length)
+          {
+            return;
+          }
+          domainQuery = JSON.parse(interpreter.finalQuery);
+        }
       }
       else
       {

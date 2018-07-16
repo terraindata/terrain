@@ -50,9 +50,11 @@ import TransformCard from 'app/builder/components/charts/TransformCard';
 import ExpandIcon from 'app/common/components/ExpandIcon';
 import LinearSelector from 'app/common/components/LinearSelector';
 import { BuilderState } from 'builder/data/BuilderState';
+import MapComponent from 'common/components/MapComponent';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
+import MapUtil from 'util/MapUtil';
 import Util from 'util/Util';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { backgroundColor, borderColor, Colors, getStyle } from '../../../../colors/Colors';
@@ -63,8 +65,6 @@ import PathfinderLine from '../PathfinderLine';
 import { ChoiceOption, PathfinderContext, ScoreLine } from '../PathfinderTypes';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 import BuilderActions from './../../../data/BuilderActions';
-import MapComponent from 'common/components/MapComponent';
-import MapUtil from 'util/MapUtil';
 const SigmoidIcon = require('images/icon_sigmoid.svg?name=SigmoidIcon');
 const LinearIcon = require('images/icon_linear.svg?name=LinearIcon');
 const ExponentialIcon = require('images/icon_exponential.svg?name=ExponentialIcon');
@@ -83,7 +83,7 @@ export interface Props
   keyPath: KeyPath;
   dropdownOptions: List<ChoiceOption>;
   pathfinderContext: PathfinderContext;
-
+  inputs?: any;
   builder?: BuilderState;
   builderActions?: typeof BuilderActions;
 }
@@ -264,7 +264,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     {
       this.setState({
         editingField: false,
-      });   
+      });
     }
   }
 
@@ -272,7 +272,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   {
     const newLine = this.props.line.setIn(
       ['transformData', 'distanceValue'],
-      {location: MapUtil.getCoordinatesFromGeopoint(location), address}
+      { location: MapUtil.getCoordinatesFromGeopoint(location), address },
     );
     this.props.builderActions.changePath(
       this.props.keyPath,
@@ -325,6 +325,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           debounce={true}
           canEdit={this.props.pathfinderContext.canEdit}
           hideZoomControl={true}
+          inputs={this.props.inputs}
         />
       </div>
     );

@@ -76,6 +76,7 @@ export interface Props
   onStepChange: (oldStep: PathfinderSteps) => void;
   builderActions?: typeof BuilderActions;
   colorsActions?: typeof ColorsActions;
+  inputs?: any;
 }
 
 @Radium
@@ -284,6 +285,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
               allWeights={this.state.allWeights}
               dropdownOptions={dropdownOptions}
               pathfinderContext={this.props.pathfinderContext}
+              inputs={this.props.inputs}
             />,
             key: String(index),
             draggable: !line.expanded || !line.field,
@@ -396,7 +398,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
 
 export default Util.createTypedContainer(
   PathfinderScoreSection,
-  [],
+  [['builder', 'query', 'inputs']],
   {
     builderActions: BuilderActions,
     colorsActions: ColorsActions,

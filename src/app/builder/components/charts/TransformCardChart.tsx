@@ -92,7 +92,7 @@ export interface Props
   index?: string;
   schema?: SchemaState;
   builder?: BuilderState;
-  distanceValue?: {location: number[], address: ''};
+  distanceValue?: { location: number[], address: '' };
 }
 
 // http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/

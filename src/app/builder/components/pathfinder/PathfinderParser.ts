@@ -312,7 +312,19 @@ function parseTerrainScore(score: Score, simpleParser: boolean = false)
       ranges = data.ranges;
       outputs = data.outputs;
     }
-    const { distanceValue } = line.transformData; 
+    const { distanceValue } = line.transformData;
+    let lat: string | number = 0;
+    let lon: string | number = 0;
+    if (distanceValue && distanceValue.location)
+    {
+      lat = distanceValue.location[0];
+      lon = distanceValue.location[1];
+    }
+    if (distanceValue && distanceValue.address && distanceValue.address.charAt(0) === '@')
+    {
+      lat = distanceValue.address + '.lat';
+      lon = distanceValue.address + '.lon';
+    }
     if (simpleParser)
     {
       return {
@@ -320,8 +332,8 @@ function parseTerrainScore(score: Score, simpleParser: boolean = false)
         b: 1,
         mode: line.transformData.mode,
         isDistance: line.fieldType === FieldType.Geopoint,
-        lat: distanceValue && distanceValue.location ? line.transformData.distanceValue.location[0] : 0,
-        lon: distanceValue && distanceValue.location ? line.transformData.distanceValue.location[1] : 0,
+        lat,
+        lon,
         visiblePoints: {
           ranges: line.transformData.visiblePoints.map((scorePt) => scorePt.value).toArray(),
           outputs: line.transformData.visiblePoints.map((scorePt) => scorePt.score).toArray(),
