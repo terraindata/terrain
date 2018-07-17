@@ -54,7 +54,7 @@ import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 
 import DataStore from './DataStore';
-import TransformationNodeType, { NodeOptionsType, TransformationEdgeTypes as EdgeTypes } from './TransformationNodeType';
+import TransformationNodeType, { IdentityTypes, NodeOptionsType, TransformationEdgeTypes as EdgeTypes } from './TransformationNodeType';
 import TransformationRegistry from './TransformationRegistry';
 import CreateTransformationVisitor from './visitors/CreateTransformationVisitor';
 import TransformationEngineNodeVisitor from './visitors/TransformationEngineNodeVisitor';
@@ -356,7 +356,7 @@ export class TransformationEngine
     this.IDToPathMap = this.IDToPathMap.set(id, fullKeyPath);
     this.fieldEnabled = this.fieldEnabled.set(id, true);
     this.fieldProps = this.fieldProps.set(id, options);
-    const identityId = this.addIdentity(id, sourceNode, sourceNode !== undefined ? 'Synthetic' : undefined);
+    const identityId = this.addIdentity(id, sourceNode, sourceNode !== undefined ? IdentityTypes.Synthetic : undefined);
 
     return id;
   }
@@ -521,8 +521,17 @@ export class TransformationEngine
     return filtered.keySeq().toList();
   }
 
-  public isDead(kp: KeyPath): boolean
+  public isDead(field: KeyPath | number): boolean
   {
+    let kp: KeyPath;
+    if (typeof field === 'number')
+    {
+      kp = this.getFieldPath(field);
+    }
+    else
+    {
+      kp = field;
+    }
     return kp.size === 1 && kp.get(0) === null;
   }
 
@@ -596,7 +605,11 @@ export class TransformationEngine
    *    Removal   - this field gets removed from the document
    *    Rename    - this field gets moved to a new name
    */
-  protected addIdentity(fieldId: number, sourceNode?: number, idType?: 'Removal' | 'Rename' | 'Synthetic'): number
+  protected addIdentity(
+    fieldId: number,
+    sourceNode?: number,
+    idType?: IdentityTypes.Removal | IdentityTypes.Rename | IdentityTypes.Synthetic,
+  ): number
   {
     let type;
     if (sourceNode !== undefined && idType !== undefined)
@@ -605,7 +618,7 @@ export class TransformationEngine
     }
     else
     {
-      type = 'Organic';
+      type = IdentityTypes.Organic;
     }
     const options: NodeOptionsType<TransformationNodeType.IdentityNode> = {
       type,
@@ -620,7 +633,7 @@ export class TransformationEngine
 
   protected killField(fieldID: number, killedByNode: number): number
   {
-    return this.addIdentity(fieldID, killedByNode, 'Removal');
+    return this.addIdentity(fieldID, killedByNode, IdentityTypes.Removal);
   }
 
   /*

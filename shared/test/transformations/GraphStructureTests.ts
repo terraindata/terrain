@@ -48,6 +48,7 @@ import { List } from 'immutable';
 import * as _ from 'lodash';
 
 import { DateFormats, FieldTypes } from 'shared/etl/types/ETLTypes';
+import FriendEngine from 'shared/transformations/FriendEngine';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
@@ -61,6 +62,21 @@ import * as Utils from 'shared/transformations/util/EngineUtils';
 function wrap(kp: any[])
 {
   return List([List<string | number>(kp)]);
+}
+
+function getDependents(eng: TransformationEngine, fieldId: number)
+{
+  const engine = eng as FriendEngine;
+  Utils.traversal.findIdentityNode(engine, fieldId);
+
+}
+
+/*
+ *
+ */
+function ensureGraphValidity(eng: TransformationEngine)
+{
+
 }
 
 test('todo', () =>

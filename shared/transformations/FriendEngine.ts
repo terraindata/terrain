@@ -48,7 +48,7 @@ import { List, Map } from 'immutable';
 
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { TransformationGraph } from 'shared/transformations/TypedGraph';
-import TransformationNodeType, { NodeOptionsType, TransformationEdgeTypes as EdgeTypes } from './TransformationNodeType';
+import TransformationNodeType, { IdentityTypes, NodeOptionsType, TransformationEdgeTypes as EdgeTypes } from './TransformationNodeType';
 
 /*
  *  This "Friend" class allows simulation of the friend modifier for the transformation visitors that need it
@@ -64,6 +64,11 @@ export default abstract class FriendEngine extends TransformationEngine
   public abstract IDToPathMap: Map<number, KeyPath>;
 
   public abstract setFieldPath(fieldID: number, path: KeyPath): void;
-  public abstract addIdentity(fieldId: number, sourceNode?: number, idType?: 'Rename' | 'Synthetic' | 'Removal'): number;
+  public abstract addIdentity(
+    fieldId: number,
+    sourceNode?: number,
+    idType?: IdentityTypes.Removal | IdentityTypes.Rename | IdentityTypes.Synthetic,
+  ): number;
   public abstract killField(fieldID: number, killedByNode: number): number;
+  public abstract computeExecutionOrder(): string[];
 }

@@ -55,6 +55,7 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, {
   CommonTransformationOptions,
+  IdentityTypes,
   NodeOptionsType,
   TransformationEdgeTypes as EdgeTypes,
 } from 'shared/transformations/TransformationNodeType';
@@ -131,8 +132,10 @@ export default class CreationVisitor
 
   public visitGroupByNode(type, node: TransformationNode, engine: FriendEngine): void
   {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.GroupByNode>;
     this.visitDefault(type, node, engine);
-
+    const extraDependency = node.fields.get(0).path.push(-1).push(opts.subkey);
+    this.addDependency(engine, extraDependency, node.id);
     const sourceId = node.fields.get(0).id;
     node.meta.newFieldKeyPaths.forEach((kp) =>
     {
@@ -183,7 +186,7 @@ export default class CreationVisitor
   public visitIdentityNode(type, node: TransformationNode, engine: FriendEngine): void
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.IdentityNode>;
-    if (opts.type === 'Removal')
+    if (opts.type === IdentityTypes.Removal)
     {
       const fieldId = node.fields.get(0).id;
       Utils.traversal.appendNodeToField(engine, fieldId, node.id, EdgeTypes.Same);
@@ -203,7 +206,7 @@ export default class CreationVisitor
     {
       const childPath = engine.getFieldPath(id);
       engine.setFieldPath(id, newPath.concat(childPath.slice(transplantIndex)).toList());
-      const identityNode = engine.addIdentity(id, node.id, 'Rename');
+      const identityNode = engine.addIdentity(id, node.id, IdentityTypes.Rename);
       Utils.traversal.appendNodeToField(engine, id, identityNode, EdgeTypes.Same);
       engine.dag.setEdge(String(node.id), String(identityNode), EdgeTypes.Synthetic);
     });
@@ -290,5 +293,19 @@ export default class CreationVisitor
       }
       engine.killField(childId, node.id);
     });
+  }
+
+  protected addDependency(engine: FriendEngine, field: KeyPath | number, node: number)
+  {
+    let fieldId: number = field as any;
+    if (typeof field !== 'number')
+    {
+      fieldId = engine.getFieldID(field);
+      if (fieldId === undefined)
+      {
+        throw new Error('Field path does not exist');
+      }
+    }
+    Utils.traversal.appendNodeToField(engine, fieldId, node, EdgeTypes.Synthetic);
   }
 }

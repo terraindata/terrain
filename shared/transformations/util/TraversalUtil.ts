@@ -57,6 +57,7 @@ import * as yadeep from 'shared/util/yadeep';
 
 import TransformationNodeType, {
   CommonTransformationOptions,
+  IdentityTypes,
   NodeOptionsType,
   TransformationEdgeTypes as EdgeTypes,
 } from 'shared/transformations/TransformationNodeType';
@@ -90,7 +91,7 @@ export default abstract class Traversal
       if (node.typeCode === TransformationNodeType.IdentityNode && node.fields.get(0).id === field)
       {
         const { type } = node.meta as NodeOptionsType<TransformationNodeType.IdentityNode>;
-        if (type !== 'Rename' && type !== 'Removal')
+        if (type !== IdentityTypes.Rename && type !== IdentityTypes.Removal)
         {
           return node.id;
         }

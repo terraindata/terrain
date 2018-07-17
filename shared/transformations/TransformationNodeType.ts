@@ -111,7 +111,7 @@ type HasCommon<T extends object> = {
 interface TransformationOptionTypes extends HasCommon<TransformationOptionTypes>
 {
   IdentityNode: {
-    type: 'Organic' | 'Synthetic' | 'Rename' | 'Removal';
+    type: IdentityTypes;
   };
   SplitNode: {
     newFieldKeyPaths: List<KeyPath>;
@@ -235,6 +235,14 @@ export enum TransformationEdgeTypes
 {
   Synthetic = 'Synthetic',
   Same = 'Same',
+}
+
+export enum IdentityTypes
+{
+  Organic = 'Organic',
+  Synthetic = 'Synthetic',
+  Rename = 'Rename',
+  Removal = 'Removal',
 }
 
 export default TransformationNodeType;
