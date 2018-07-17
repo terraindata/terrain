@@ -459,15 +459,14 @@ class ETLAjax
     data['id'] = localStorage['id'];
     data['accessToken'] = localStorage['accessToken'];
     data['downloadName'] = cfg.downloadName;
-    _.map(data as any, (value, key) =>
+    Object.keys(data).forEach((key) =>
     {
       const input = document.createElement('input');
       input.setAttribute('type', 'hidden');
-      input.setAttribute('name', key + '');
-      input.setAttribute('value', value as any);
+      input.setAttribute('name', key);
+      input.setAttribute('value', data[key] as any);
       form.appendChild(input);
     });
-
     document.body.appendChild(form); // Required for FF
     form.submit();
     form.remove();
