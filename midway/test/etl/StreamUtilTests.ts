@@ -81,29 +81,45 @@ describe('StreamUtil', () =>
 
   };
 
-  const testString = '{"favs": ["apples", "peaches"], "legal": false, "friends": [{"name":"bob", "age":21},{"name":"joe","age":29}';
+  const formatJsonStringErrorTests =
+    [
+      '{"favs": ["apples", "peaches"], "legal": false, "friends": [{"name":"bob", "age":21},{"name":"joe","age":29}',
+      '{"type": "FeatureCollection", "metadata": { "generated": 124123, ',
+      '{"page": 1, "total_results": 367048, "total_pages": 18353, "results": [{ "vote_count": 1178, ',
+      '{"vote_count": 403,"id": 260513,"video": false,"vote_average": 7.6,"title": "Incredibles 2","popularity": 171.840079,',
+      '[{"PurchaseHistory": [{"SKU": "317-139", "Genres": "Comedy|Romance", "Title": "Pretty Woman (1990)", "Tagline": \
+        "Who knew it was so much fun to be a hooker?", "Version": 1, "Inventory": 42,',
+      '{"type": "Feature", "properties": {"mag": 2.63, "place": "2km SSW of Volcano, Hawaii",',
+      '{"name": "Steven", "age": 21, "favNums": [1,2,',
+      '[{"type": "FeatureCollection", "metadata"',
+      '{"favs": ["apples", "peaches"], "legal": false, "friends": [{"name":"bob", "age":21},{"name":"joe","age"',
+    ];
 
   describe('#formatJsonString', () =>
   {
-    // it('should return a proper json string without loose ends', () =>
-    // {
-    //   for (const rawJsonString of Object.keys(formatJsonStringTests))
-    //   {
-    //     expect(formatJsonStringTests[rawJsonString]).toEqual(StreamUtil.formatJsonString(rawJsonString));
-    //   }
-    // });
+    it('should return a proper json string without loose ends', () =>
+    {
+      for (const rawJsonString of Object.keys(formatJsonStringTests))
+      {
+        expect(formatJsonStringTests[rawJsonString]).toEqual(StreamUtil.formatJsonString(rawJsonString));
+      }
+    });
 
     it('should not error when run on a proper json string fragment', () =>
     {
-      for (let i = 0; i <= testString.length; i++)
+      for (let i = 0; i < formatJsonStringErrorTests.length; i++)
       {
-        let testFragment = testString.slice(0, i);
-        console.log('TEST FRAGMENT', testFragment);
-        const testSubstrings = jest.fn(() => StreamUtil.formatJsonString(testFragment));
-        testSubstrings();
-        expect(testSubstrings).toHaveReturned();
+        const testString = formatJsonStringErrorTests[i];
+        for (let j = 0; j <= testString.length; j++)
+        {
+          const testFragment = testString.slice(0, j);
+          // console.log('TEST FRAGMENT', testFragment);
+          const testSubstrings = jest.fn(() => StreamUtil.formatJsonString(testFragment));
+          testSubstrings();
+          expect(testSubstrings).toHaveReturned();
+        }
       }
-    })
+    });
   });
 
 },

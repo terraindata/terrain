@@ -52,9 +52,9 @@ import { SourceConfig } from 'shared/etl/types/EndpointTypes';
 import * as Util from '../AppUtil';
 import BufferTransform from '../io/streams/BufferTransform';
 import { Permissions } from '../permissions/Permissions';
+import StreamUtil from './pathselector/StreamUtil';
 import { getSourceStream, getSourceStreamPreview } from './SourceSinkStream';
 import * as TemplateRouter from './TemplateRouter';
-import StreamUtil from './pathselector/StreamUtil';
 
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
