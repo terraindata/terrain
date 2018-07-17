@@ -74,9 +74,9 @@ beforeAll(async () =>
 {
   MidwayLogger.level = 'debug';
   const config: SQLiteConfig =
-    {
-      filename: 'moviesdb.db',
-    };
+  {
+    filename: 'moviesdb.db',
+  };
 
   try
   {

@@ -51,12 +51,12 @@ import * as koaPassport from 'koa-passport';
 import koaResponseTime = require('koa-response-time');
 
 const Middleware =
-  {
-    bodyParser: koaBodyParser,
-    favicon: koaFavicon,
-    logger: koaLogger,
-    passport: koaPassport,
-    responseTime: koaResponseTime,
-  };
+{
+  bodyParser: koaBodyParser,
+  favicon: koaFavicon,
+  logger: koaLogger,
+  passport: koaPassport,
+  responseTime: koaResponseTime,
+};
 
 export default Middleware;

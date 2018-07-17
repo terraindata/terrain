@@ -161,6 +161,7 @@ export class ElasticWriter extends SafeWritable
           doc_as_upsert: true,
         },
       };
+      delete body['_id'];
 
       this.client.update(query, callback);
     }
@@ -194,12 +195,12 @@ export class ElasticWriter extends SafeWritable
       for (const chunk of chunks)
       {
         const command =
-          {
-            update: {
-              _index: this.index,
-              _type: this.type,
-            },
-          };
+        {
+          update: {
+            _index: this.index,
+            _type: this.type,
+          },
+        };
 
         if (this.primaryKey !== undefined && chunk.chunk[this.primaryKey] !== undefined)
         {
@@ -210,6 +211,7 @@ export class ElasticWriter extends SafeWritable
           doc: chunk.chunk,
           doc_as_upsert: true,
         };
+        delete chunk.chunk['_id'];
 
         body.push(command);
         body.push(newBody);
@@ -225,12 +227,12 @@ export class ElasticWriter extends SafeWritable
     for (const chunk of chunks)
     {
       const command =
-        {
-          index: {
-            _index: this.index,
-            _type: this.type,
-          },
-        };
+      {
+        index: {
+          _index: this.index,
+          _type: this.type,
+        },
+      };
 
       if (this.primaryKey !== undefined && chunk.chunk[this.primaryKey] !== undefined)
       {

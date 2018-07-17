@@ -381,46 +381,46 @@ const cardCouldWrap = (targetProps: Props, item: CardItem) =>
 };
 
 const cardTarget =
+{
+  canDrop(targetProps: Props, monitor)
   {
-    canDrop(targetProps: Props, monitor)
-    {
-      const item = monitor.getItem() as CardItem;
-      return cardCouldWrap(targetProps, item);
-    },
+    const item = monitor.getItem() as CardItem;
+    return cardCouldWrap(targetProps, item);
+  },
 
-    hover(targetProps: Props, monitor)
+  hover(targetProps: Props, monitor)
+  {
+    if (monitor.isOver({ shallow: true }))
     {
-      if (monitor.isOver({ shallow: true }))
+      const state = targetProps.builder;
+      let keyPath: KeyPath = null;
+      let index: number = null;
+
+      if (monitor.canDrop())
       {
-        const state = targetProps.builder;
-        let keyPath: KeyPath = null;
-        let index: number = null;
+        keyPath = targetProps.keyPath;
+        index = targetProps.index;
+        const { type } = monitor.getItem();
 
-        if (monitor.canDrop())
+        if (targetProps.lower)
         {
-          keyPath = targetProps.keyPath;
-          index = targetProps.index;
-          const { type } = monitor.getItem();
-
-          if (targetProps.lower)
-          {
-            index++;
-          }
-        }
-
-        if (keyPath !== state.draggingOverKeyPath || index !== state.draggingOverIndex)
-        {
-          targetProps.builderActions.dragCardOver(keyPath, index);
+          index++;
         }
       }
 
-    },
+      if (keyPath !== state.draggingOverKeyPath || index !== state.draggingOverIndex)
+      {
+        targetProps.builderActions.dragCardOver(keyPath, index);
+      }
+    }
 
-    drop: (targetProps: Props, monitor, component) =>
-    {
-      onCardDrop(targetProps, monitor, component);
-    },
-  };
+  },
+
+  drop: (targetProps: Props, monitor, component) =>
+  {
+    onCardDrop(targetProps, monitor, component);
+  },
+};
 
 const dropCollect = (connect, monitor) =>
   ({

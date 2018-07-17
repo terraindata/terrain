@@ -83,370 +83,370 @@ const duplicateNameHandler = (ev) =>
 };
 
 const Actions =
+{
+  categories:
   {
-    categories:
-      {
-        create:
-          (
-            category: LibraryTypes.Category = LibraryTypes._Category(),
-            idCallBack?: (id: ID) => void,
-          ) => (dispatch, getState, api) =>
+    create:
+      (
+        category: LibraryTypes.Category = LibraryTypes._Category(),
+        idCallBack?: (id: ID) => void,
+      ) => (dispatch, getState, api) =>
+        {
+          api.saveItem(
+            category,
+            (response) =>
             {
-              api.saveItem(
-                category,
-                (response) =>
-                {
-                  // on load
-                  const id = response.id; // ??
-                  dispatch($(ActionTypes.categories.create, {
-                    category: category.set('id', id),
-                  }));
+              // on load
+              const id = response.id; // ??
+              dispatch($(ActionTypes.categories.create, {
+                category: category.set('id', id),
+              }));
 
-                  idCallBack && idCallBack(id);
-                },
-                duplicateNameHandler,
-              );
+              idCallBack && idCallBack(id);
             },
+            duplicateNameHandler,
+          );
+        },
 
-        remove:
-          (category: Category) =>
-            $(ActionTypes.categories.remove, { category }),
+    remove:
+      (category: Category) =>
+        $(ActionTypes.categories.remove, { category }),
 
-        change:
-          (category: Category) =>
-            (dispatch, getState, api) =>
+    change:
+      (category: Category) =>
+        (dispatch, getState, api) =>
+        {
+          api.saveItem(
+            category,
+            (response) =>
             {
-              api.saveItem(
-                category,
-                (response) =>
-                {
-                  dispatch($(ActionTypes.categories.change, { category }));
-                },
-                duplicateNameHandler,
-              );
+              dispatch($(ActionTypes.categories.change, { category }));
             },
+            duplicateNameHandler,
+          );
+        },
 
-        move:
-          (category, index: number) =>
-            $(ActionTypes.categories.move, { category, index }),
+    move:
+      (category, index: number) =>
+        $(ActionTypes.categories.move, { category, index }),
 
-        // duplicate:
-        //   (category: Category, index: number) =>
-        //     $(ActionTypes.categories.duplicate, { category, index }),
-      },
+    // duplicate:
+    //   (category: Category, index: number) =>
+    //     $(ActionTypes.categories.duplicate, { category, index }),
+  },
 
-    groups:
-      {
-        create:
-          (
-            categoryId: ID,
-            group = LibraryTypes._Group(),
-            idCallback?: (id: ID) => void,
-          ) => (dispatch, getState) =>
+  groups:
+  {
+    create:
+      (
+        categoryId: ID,
+        group = LibraryTypes._Group(),
+        idCallback?: (id: ID) => void,
+      ) => (dispatch, getState) =>
+        {
+          const category = getState().get('library').categories.get(categoryId);
+          group = group
+            .set('parent', categoryId)
+            .set('categoryId', categoryId);
+
+          Ajax.saveItem(
+            group,
+            (response) =>
             {
-              const category = getState().get('library').categories.get(categoryId);
-              group = group
-                .set('parent', categoryId)
-                .set('categoryId', categoryId);
-
-              Ajax.saveItem(
-                group,
-                (response) =>
-                {
-                  // on load
-                  const id = response.id; // ??
-                  dispatch($(ActionTypes.groups.create, {
-                    group: group.set('id', id),
-                  }));
-                  idCallback && idCallback(id);
-                },
-                duplicateNameHandler,
-              );
+              // on load
+              const id = response.id; // ??
+              dispatch($(ActionTypes.groups.create, {
+                group: group.set('id', id),
+              }));
+              idCallback && idCallback(id);
             },
+            duplicateNameHandler,
+          );
+        },
 
-        remove:
-          (group: Group) =>
-            $(ActionTypes.groups.remove, { group }),
+    remove:
+      (group: Group) =>
+        $(ActionTypes.groups.remove, { group }),
 
-        createAs:
-          (
-            categoryId: ID,
-            name: string,
-            db: BackendInstance,
-            onCreate?: (groupId) => void,
-          ) => (dispatch, getState) =>
+    createAs:
+      (
+        categoryId: ID,
+        name: string,
+        db: BackendInstance,
+        onCreate?: (groupId) => void,
+      ) => (dispatch, getState) =>
+        {
+          const category = getState().get('library').categories.get(categoryId);
+          const group = LibraryTypes._Group()
+            .set('name', name)
+            .set('db', db)
+            .set('language', category.defaultLanguage);
+          dispatch(Actions.groups.create(categoryId, group, onCreate));
+        },
+
+    change:
+      (group: Group) =>
+        (dispatch, getState, api) =>
+        {
+          api.saveItem(
+            group,
+            (response) =>
             {
-              const category = getState().get('library').categories.get(categoryId);
-              const group = LibraryTypes._Group()
-                .set('name', name)
-                .set('db', db)
-                .set('language', category.defaultLanguage);
-              dispatch(Actions.groups.create(categoryId, group, onCreate));
+              dispatch($(ActionTypes.groups.change, { group }));
             },
+            duplicateNameHandler,
+          );
+        },
 
-        change:
-          (group: Group) =>
-            (dispatch, getState, api) =>
+    move:
+      (group: Group, index: number, categoryId: ID) =>
+        $(ActionTypes.groups.move, { categoryId, index, group }),
+
+    duplicate:
+      (group: Group, index: number, name: string, db: BackendInstance, categoryId?: ID) =>
+        (dispatch, getState) =>
+        {
+          const { algorithmsOrder } = group;
+
+          categoryId = categoryId || group.categoryId;
+          group = group
+            .set('parent', categoryId)
+            .set('categoryId', categoryId)
+            .set('id', -1)
+            .set('name', name)
+            .set('db', db)
+            .set('algorithmsOrder', Immutable.List([]));
+
+          dispatch(Actions.groups.create(
+            group.categoryId,
+            group,
+            (groupId: ID) =>
             {
-              api.saveItem(
-                group,
-                (response) =>
+              const algorithms = getState().get('library').algorithms;
+              algorithmsOrder.map(
+                (algorithmId, index) =>
                 {
-                  dispatch($(ActionTypes.groups.change, { group }));
-                },
-                duplicateNameHandler,
-              );
-            },
-
-        move:
-          (group: Group, index: number, categoryId: ID) =>
-            $(ActionTypes.groups.move, { categoryId, index, group }),
-
-        duplicate:
-          (group: Group, index: number, name: string, db: BackendInstance, categoryId?: ID) =>
-            (dispatch, getState) =>
-            {
-              const { algorithmsOrder } = group;
-
-              categoryId = categoryId || group.categoryId;
-              group = group
-                .set('parent', categoryId)
-                .set('categoryId', categoryId)
-                .set('id', -1)
-                .set('name', name)
-                .set('db', db)
-                .set('algorithmsOrder', Immutable.List([]));
-
-              dispatch(Actions.groups.create(
-                group.categoryId,
-                group,
-                (groupId: ID) =>
-                {
-                  const algorithms = getState().get('library').algorithms;
-                  algorithmsOrder.map(
-                    (algorithmId, index) =>
-                    {
-                      const algorithm = algorithms.get(algorithmId);
-                      setTimeout(() =>
-                        dispatch(
-                          Actions.algorithms.duplicate(
-                            algorithm,
-                            index,
-                            null,
-                            categoryId,
-                            groupId,
-                            db,
-                          ),
-                        ),
-                        index * 200,
-                      );
-                    },
+                  const algorithm = algorithms.get(algorithmId);
+                  setTimeout(() =>
+                    dispatch(
+                      Actions.algorithms.duplicate(
+                        algorithm,
+                        index,
+                        null,
+                        categoryId,
+                        groupId,
+                        db,
+                      ),
+                    ),
+                    index * 200,
                   );
                 },
-              ));
-            },
-      },
-
-    algorithms:
-      {
-        create:
-          (
-            categoryId: ID,
-            groupId: ID,
-            algorithm = LibraryTypes._Algorithm(),
-            responseHandler?: (response, algorithm) => any,
-          ) => (dispatch, getState) =>
-            {
-              const group = getState().get('library').groups.get(groupId);
-              algorithm = algorithm
-                .set('parent', groupId)
-                .set('groupId', groupId)
-                .set('categoryId', categoryId)
-                .set('db', group && group.db)
-                .set('language', group && group.language);
-
-              Ajax.saveItem(
-                algorithm,
-                (response) =>
-                {
-                  // on load
-                  const id = response.id; // ??
-                  dispatch($(ActionTypes.algorithms.create, {
-                    algorithm: algorithm
-                      .set('id', id)
-                      .set('deployedName', algorithm.deployedName || 'terrain_' + String(id)),
-                  }));
-                  responseHandler && responseHandler(response, algorithm);
-                },
-                duplicateNameHandler,
               );
             },
+          ));
+        },
+  },
 
-        remove:
-          (algorithm: Algorithm) =>
-            $(ActionTypes.algorithms.remove, { algorithm }),
-
-        change:
-          (algorithm: Algorithm) =>
-            (dispatch, getState, api) =>
-            {
-              api.saveItem(
-                algorithm,
-                (response) =>
-                {
-                  const oldName: string = getState().get('library').algorithms.get(algorithm.id).name;
-                  if (oldName !== algorithm.name)
-                  {
-                    let message = '"' + oldName + '" is now "' + algorithm.name + '"';
-                    if (!oldName)
-                    {
-                      message = 'To "' + algorithm.name + '"';
-                    }
-
-                    notificationManager.addNotification(
-                      'Renamed',
-                      message,
-                      'info',
-                      5,
-                    );
-                  }
-                  dispatch($(ActionTypes.algorithms.change, { algorithm }));
-                },
-                duplicateNameHandler,
-              );
-            },
-
-        move:
-          (algorithm: Algorithm, index: number, categoryId: ID, groupId: ID) => (dispatch, getState) =>
-          {
-            const group = getState().get('library').groups.get(groupId);
-            algorithm = algorithm.set('db', group.db).set('language', group.language);
-            return dispatch($(ActionTypes.algorithms.move, { algorithm, index, categoryId, groupId }));
-          },
-
-        duplicate:
-          (algorithm: Algorithm, index: number, name?: string, categoryId?: ID, groupId?: ID, db?: BackendInstance) =>
-            (dispatch, getState) =>
-            {
-              categoryId = categoryId || algorithm.categoryId;
-              groupId = groupId || algorithm.groupId;
-              const group = getState().get('library').groups.get(groupId);
-              db = db || group.db;
-              name = name || Util.duplicateNameFor(algorithm.name);
-              let newAlgorithm = algorithm
-                .set('id', -1)
-                .set('parent', groupId)
-                .set('groupId', groupId)
-                .set('categoryId', categoryId)
-                .set('name', name)
-                .set('status', algorithm.status === ItemStatus.Archive ? ItemStatus.Archive : ItemStatus.Build)
-                .set('db', db)
-                .set('deployedName', '')
-                .set('language', group.language);
-              newAlgorithm = LibraryTypes.touchAlgorithm(newAlgorithm);
-
-              dispatch(Actions.algorithms.create(categoryId, groupId, newAlgorithm));
-            },
-
-        duplicateAs:
-          (algorithm: Algorithm, algorithmName?: string, responseHandler?: (response, algorithm) => any) =>
-            (dispatch) =>
-            {
-              algorithmName = algorithmName || Util.duplicateNameFor(algorithm.name);
-              let newAlgorithm = algorithm
-                .set('id', -1)
-                .set('parent', algorithm.groupId)
-                .set('groupId', algorithm.groupId)
-                .set('categoryId', algorithm.categoryId)
-                .set('name', algorithmName)
-                .set('status', ItemStatus.Build);
-              newAlgorithm = LibraryTypes.touchAlgorithm(newAlgorithm);
-
-              dispatch(Actions.algorithms.create(algorithm.categoryId, algorithm.groupId, newAlgorithm, responseHandler));
-            },
-
-        deploy:
-          (algorithm: Algorithm, op: string, templateBody: object, toStatus: ItemStatus, deployedName: string) => (dispatch) =>
-          {
-            if (algorithm.deployedName !== deployedName)
-            {
-              algorithm = algorithm.set('deployedName', deployedName);
-              dispatch(Actions.algorithms.change(algorithm));
-            }
-
-            Ajax.deployQuery(
-              op,
-              templateBody,
-              algorithm.db,
-              (response) =>
-              {
-                // on load
-                dispatch(Actions.algorithms.status(algorithm, toStatus, true));
-              },
-            );
-          },
-
-        status:
-          (algorithm: Algorithm, status: ItemStatus, confirmed?: boolean) =>
-            $(ActionTypes.algorithms.status, { algorithm, status, confirmed }),
-
-        fetchVersion:
-          (algorithmId: string, onNoVersion: (algorithmId: string) => void) =>
-          {
-            return { type: 'noop' };
-            // TODO
-            // Ajax.getAlgorithmVersion(algorithmId, (algorithmVersion: LibraryTypes.Algorithm) =>
-            // {
-            //   if (!algorithmVersion)
-            //   {
-            //     onNoVersion(algorithmId);
-            //   }
-            //   else
-            //   {
-            //     Actions.algorithms.loadVersion(algorithmId, algorithmVersion);
-            //   }
-            // });
-          },
-
-        loadVersion:
-          (algorithmId: string, algorithmVersion: LibraryTypes.Algorithm) =>
-            $(ActionTypes.algorithms.loadVersion, { algorithmId, algorithmVersion }),
-
-        select:
-          (algorithmId: string) =>
-            $(ActionTypes.algorithms.select, { algorithmId }),
-
-        unselect:
-          (algorithmId: string) =>
-            $(ActionTypes.algorithms.unselect, {}),
-      },
-
-    loadState:
-      (state: LibraryState) =>
-        $(ActionTypes.loadState, { state }),
-
-    setDbs:
-      (dbs: List<BackendInstance>, dbLoadFinished: boolean) =>
-        $(ActionTypes.setDbs, { dbs, dbLoadFinished }),
-
-    // overwrites current state with state from server
-    fetch:
-      () =>
-      {
-        return (dispatch) =>
+  algorithms:
+  {
+    create:
+      (
+        categoryId: ID,
+        groupId: ID,
+        algorithm = LibraryTypes._Algorithm(),
+        responseHandler?: (response, algorithm) => any,
+      ) => (dispatch, getState) =>
         {
-          Ajax.getItems((categories, groups, algorithms, categoriesOrder) =>
-          {
-            dispatch(Actions.loadState(_LibraryState({
-              categories,
-              groups,
-              algorithms,
-              categoriesOrder,
-              loading: false,
-            })));
-          });
-        };
+          const group = getState().get('library').groups.get(groupId);
+          algorithm = algorithm
+            .set('parent', groupId)
+            .set('groupId', groupId)
+            .set('categoryId', categoryId)
+            .set('db', group && group.db)
+            .set('language', group && group.language);
+
+          Ajax.saveItem(
+            algorithm,
+            (response) =>
+            {
+              // on load
+              const id = response.id; // ??
+              dispatch($(ActionTypes.algorithms.create, {
+                algorithm: algorithm
+                  .set('id', id)
+                  .set('deployedName', algorithm.deployedName || 'terrain_' + String(id)),
+              }));
+              responseHandler && responseHandler(response, algorithm);
+            },
+            duplicateNameHandler,
+          );
+        },
+
+    remove:
+      (algorithm: Algorithm) =>
+        $(ActionTypes.algorithms.remove, { algorithm }),
+
+    change:
+      (algorithm: Algorithm) =>
+        (dispatch, getState, api) =>
+        {
+          api.saveItem(
+            algorithm,
+            (response) =>
+            {
+              const oldName: string = getState().get('library').algorithms.get(algorithm.id).name;
+              if (oldName !== algorithm.name)
+              {
+                let message = '"' + oldName + '" is now "' + algorithm.name + '"';
+                if (!oldName)
+                {
+                  message = 'To "' + algorithm.name + '"';
+                }
+
+                notificationManager.addNotification(
+                  'Renamed',
+                  message,
+                  'info',
+                  5,
+                );
+              }
+              dispatch($(ActionTypes.algorithms.change, { algorithm }));
+            },
+            duplicateNameHandler,
+          );
+        },
+
+    move:
+      (algorithm: Algorithm, index: number, categoryId: ID, groupId: ID) => (dispatch, getState) =>
+      {
+        const group = getState().get('library').groups.get(groupId);
+        algorithm = algorithm.set('db', group.db).set('language', group.language);
+        return dispatch($(ActionTypes.algorithms.move, { algorithm, index, categoryId, groupId }));
       },
-  };
+
+    duplicate:
+      (algorithm: Algorithm, index: number, name?: string, categoryId?: ID, groupId?: ID, db?: BackendInstance) =>
+        (dispatch, getState) =>
+        {
+          categoryId = categoryId || algorithm.categoryId;
+          groupId = groupId || algorithm.groupId;
+          const group = getState().get('library').groups.get(groupId);
+          db = db || group.db;
+          name = name || Util.duplicateNameFor(algorithm.name);
+          let newAlgorithm = algorithm
+            .set('id', -1)
+            .set('parent', groupId)
+            .set('groupId', groupId)
+            .set('categoryId', categoryId)
+            .set('name', name)
+            .set('status', algorithm.status === ItemStatus.Archive ? ItemStatus.Archive : ItemStatus.Build)
+            .set('db', db)
+            .set('deployedName', '')
+            .set('language', group.language);
+          newAlgorithm = LibraryTypes.touchAlgorithm(newAlgorithm);
+
+          dispatch(Actions.algorithms.create(categoryId, groupId, newAlgorithm));
+        },
+
+    duplicateAs:
+      (algorithm: Algorithm, algorithmName?: string, responseHandler?: (response, algorithm) => any) =>
+        (dispatch) =>
+        {
+          algorithmName = algorithmName || Util.duplicateNameFor(algorithm.name);
+          let newAlgorithm = algorithm
+            .set('id', -1)
+            .set('parent', algorithm.groupId)
+            .set('groupId', algorithm.groupId)
+            .set('categoryId', algorithm.categoryId)
+            .set('name', algorithmName)
+            .set('status', ItemStatus.Build);
+          newAlgorithm = LibraryTypes.touchAlgorithm(newAlgorithm);
+
+          dispatch(Actions.algorithms.create(algorithm.categoryId, algorithm.groupId, newAlgorithm, responseHandler));
+        },
+
+    deploy:
+      (algorithm: Algorithm, op: string, templateBody: object, toStatus: ItemStatus, deployedName: string) => (dispatch) =>
+      {
+        if (algorithm.deployedName !== deployedName)
+        {
+          algorithm = algorithm.set('deployedName', deployedName);
+          dispatch(Actions.algorithms.change(algorithm));
+        }
+
+        Ajax.deployQuery(
+          op,
+          templateBody,
+          algorithm.db,
+          (response) =>
+          {
+            // on load
+            dispatch(Actions.algorithms.status(algorithm, toStatus, true));
+          },
+        );
+      },
+
+    status:
+      (algorithm: Algorithm, status: ItemStatus, confirmed?: boolean) =>
+        $(ActionTypes.algorithms.status, { algorithm, status, confirmed }),
+
+    fetchVersion:
+      (algorithmId: string, onNoVersion: (algorithmId: string) => void) =>
+      {
+        return { type: 'noop' };
+        // TODO
+        // Ajax.getAlgorithmVersion(algorithmId, (algorithmVersion: LibraryTypes.Algorithm) =>
+        // {
+        //   if (!algorithmVersion)
+        //   {
+        //     onNoVersion(algorithmId);
+        //   }
+        //   else
+        //   {
+        //     Actions.algorithms.loadVersion(algorithmId, algorithmVersion);
+        //   }
+        // });
+      },
+
+    loadVersion:
+      (algorithmId: string, algorithmVersion: LibraryTypes.Algorithm) =>
+        $(ActionTypes.algorithms.loadVersion, { algorithmId, algorithmVersion }),
+
+    select:
+      (algorithmId: string) =>
+        $(ActionTypes.algorithms.select, { algorithmId }),
+
+    unselect:
+      (algorithmId: string) =>
+        $(ActionTypes.algorithms.unselect, {}),
+  },
+
+  loadState:
+    (state: LibraryState) =>
+      $(ActionTypes.loadState, { state }),
+
+  setDbs:
+    (dbs: List<BackendInstance>, dbLoadFinished: boolean) =>
+      $(ActionTypes.setDbs, { dbs, dbLoadFinished }),
+
+  // overwrites current state with state from server
+  fetch:
+    () =>
+    {
+      return (dispatch) =>
+      {
+        Ajax.getItems((categories, groups, algorithms, categoriesOrder) =>
+        {
+          dispatch(Actions.loadState(_LibraryState({
+            categories,
+            groups,
+            algorithms,
+            categoriesOrder,
+            loading: false,
+          })));
+        });
+      };
+    },
+};
 
 export default Actions;

@@ -73,34 +73,34 @@ beforeAll(async (done) =>
   try
   {
     const options =
-      {
-        debug: true,
-        db: 'postgres',
-        dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:65432',
-        instanceId: 'moviesdb',
-        port: 63000,
-        databases: [
-          {
-            name: 'My ElasticSearch Instance',
-            type: 'elastic',
-            dsn: 'user:pass@127.0.0.1:9200',
-            host: 'http://127.0.0.1:9200',
-            isAnalytics: true,
-            analyticsIndex: 'terrain-analytics',
-            analyticsType: 'events',
-            indexPrefix: 'abc.',
-            isProtected: true,
-          },
-          {
-            name: 'MySQL Test Connection',
-            type: 'mysql',
-            dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:63306/moviesdb',
-            host: '127.0.0.1:63306',
-            isAnalytics: false,
-            isProtected: false,
-          },
-        ],
-      };
+    {
+      debug: true,
+      db: 'postgres',
+      dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:65432',
+      instanceId: 'moviesdb',
+      port: 63000,
+      databases: [
+        {
+          name: 'My ElasticSearch Instance',
+          type: 'elastic',
+          dsn: 'user:pass@127.0.0.1:9200',
+          host: 'http://127.0.0.1:9200',
+          isAnalytics: true,
+          analyticsIndex: 'terrain-analytics',
+          analyticsType: 'events',
+          indexPrefix: 'abc.',
+          isProtected: true,
+        },
+        {
+          name: 'MySQL Test Connection',
+          type: 'mysql',
+          dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:63306/moviesdb',
+          host: '127.0.0.1:63306',
+          isAnalytics: false,
+          isProtected: false,
+        },
+      ],
+    };
 
     const app = new App(options);
     server = await app.start();
@@ -651,18 +651,18 @@ describe('Query route tests', () =>
             from: 0,
             size: 0,
             query:
+            {
+              bool:
               {
-                bool:
+                filter:
+                {
+                  term:
                   {
-                    filter:
-                      {
-                        term:
-                          {
-                            _index: 'movies',
-                          },
-                      },
+                    _index: 'movies',
                   },
+                },
               },
+            },
           }),
         },
       })
@@ -1527,9 +1527,9 @@ describe('Scheduler tests', () =>
                 id: 1,
                 taskId: 2,
                 params:
-                  {
-                    templateId, // ETL template ID
-                  },
+                {
+                  templateId, // ETL template ID
+                },
               },
             ],
         },

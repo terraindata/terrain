@@ -7,7 +7,7 @@ reset-midway-db()
   echo "Create the midway database.";
   createdb --host=localhost --port=5432 --username=postgres midway;
   echo "start the midway in production mode."
-  NODE_ENV=production yarn run start-midway
+  NODE_ENV=production yarn start-midway-prod
 }
 
 restart-chrome-docker()

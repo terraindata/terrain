@@ -82,26 +82,26 @@ export class Email
         if (!this.transports.has(integrationId))
         {
           const transportOptions =
+          {
+            host: fullConfig['smtp'],
+            port: fullConfig['port'],
+            auth:
             {
-              host: fullConfig['smtp'],
-              port: fullConfig['port'],
-              auth:
-                {
-                  user: fullConfig['email'],
-                  pass: fullConfig['password'],
-                },
-            };
+              user: fullConfig['email'],
+              pass: fullConfig['password'],
+            },
+          };
           this.transports.set(integrationId, nodemailer.createTransport(transportOptions));
         }
         const currTransport = this.transports.get(integrationId);
         // set email parameters
         const emailContents: object =
-          {
-            from: fullConfig['email'],
-            to: fullConfig['recipient'],
-            subject,
-            text: body,
-          };
+        {
+          from: fullConfig['email'],
+          to: fullConfig['recipient'],
+          subject,
+          text: body,
+        };
         if (attachment !== undefined)
         {
           emailContents['attachments'] = attachment;

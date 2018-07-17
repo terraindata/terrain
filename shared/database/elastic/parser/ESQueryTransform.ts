@@ -133,13 +133,13 @@ export default class ESQueryTransform
     {
       // no body at all
       const bodyValue =
-        {
-          query: {
-            bool: {
-              filter: filterArray,
-            },
+      {
+        query: {
+          bool: {
+            filter: filterArray,
           },
-        };
+        },
+      };
       if (theFrom !== null)
       {
         bodyValue['from'] = theFrom;

@@ -912,44 +912,44 @@ export default class EngineUtil
 export const ETLTypeToCastString: {
   [k in ETLFieldTypes]: string
 } = {
-    [ETLFieldTypes.Array]: 'array',
-    [ETLFieldTypes.Object]: 'object',
-    [ETLFieldTypes.Date]: 'date',
-    [ETLFieldTypes.GeoPoint]: 'object',
-    [ETLFieldTypes.Number]: 'number',
-    [ETLFieldTypes.Integer]: 'number',
-    [ETLFieldTypes.Boolean]: 'boolean',
-    [ETLFieldTypes.String]: 'string',
-  };
+  [ETLFieldTypes.Array]: 'array',
+  [ETLFieldTypes.Object]: 'object',
+  [ETLFieldTypes.Date]: 'date',
+  [ETLFieldTypes.GeoPoint]: 'object',
+  [ETLFieldTypes.Number]: 'number',
+  [ETLFieldTypes.Integer]: 'number',
+  [ETLFieldTypes.Boolean]: 'boolean',
+  [ETLFieldTypes.String]: 'string',
+};
 
 const CompatibilityMatrix: {
   [x in FieldTypes]: {
     [y in FieldTypes]?: FieldTypes | 'warning' | 'softWarning'
   }
 } = {
-    array: {
-      array: 'array',
-      object: 'warning',
-      string: 'warning',
-      number: 'warning',
-      boolean: 'warning',
-    },
-    object: {
-      object: 'object',
-      string: 'warning',
-      number: 'warning',
-      boolean: 'warning',
-    },
-    string: {
-      string: 'string',
-      number: 'softWarning',
-      boolean: 'softWarning',
-    },
-    number: {
-      number: 'number',
-      boolean: 'softWarning',
-    },
-    boolean: {
-      boolean: 'boolean',
-    },
-  };
+  array: {
+    array: 'array',
+    object: 'warning',
+    string: 'warning',
+    number: 'warning',
+    boolean: 'warning',
+  },
+  object: {
+    object: 'object',
+    string: 'warning',
+    number: 'warning',
+    boolean: 'warning',
+  },
+  string: {
+    string: 'string',
+    number: 'softWarning',
+    boolean: 'softWarning',
+  },
+  number: {
+    number: 'number',
+    boolean: 'softWarning',
+  },
+  boolean: {
+    boolean: 'boolean',
+  },
+};

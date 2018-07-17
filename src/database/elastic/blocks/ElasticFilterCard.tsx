@@ -298,24 +298,24 @@ export const elasticFilter = _card({
           english: 'Index',
           factoryType: 'elasticFilterBlock',
           row:
-            {
-              inner:
-                [
+          {
+            inner:
+              [
+                {
+                  displayType: DisplayType.LABEL,
+                  label: 'Index:',
+                  key: null,
+                },
+                {
+                  displayType: DisplayType.TEXT,
+                  key: 'field',
+                  getAutoTerms: (schemaState, builderState) =>
                   {
-                    displayType: DisplayType.LABEL,
-                    label: 'Index:',
-                    key: null,
+                    return ElasticBlockHelpers.autocompleteMatches(schemaState, builderState, AutocompleteMatchType.Index);
                   },
-                  {
-                    displayType: DisplayType.TEXT,
-                    key: 'field',
-                    getAutoTerms: (schemaState, builderState) =>
-                    {
-                      return ElasticBlockHelpers.autocompleteMatches(schemaState, builderState, AutocompleteMatchType.Index);
-                    },
-                  },
-                ],
-            },
+                },
+              ],
+          },
         },
         {
           displayType: DisplayType.ROWS,
@@ -323,16 +323,16 @@ export const elasticFilter = _card({
           english: 'Soft Bool',
           factoryType: 'elasticFilterBlock',
           row:
-            {
-              inner:
-                [
-                  {
-                    displayType: DisplayType.LABEL,
-                    label: 'Soft Filter',
-                    key: null,
-                  },
-                ],
-            },
+          {
+            inner:
+              [
+                {
+                  displayType: DisplayType.LABEL,
+                  label: 'Soft Filter',
+                  key: null,
+                },
+              ],
+          },
         },
         // finally display all other filters.
         {
@@ -341,77 +341,77 @@ export const elasticFilter = _card({
           english: 'Index',
           factoryType: 'elasticFilterBlock',
           row:
-            {
-              inner:
-                [
+          {
+            inner:
+              [
+                {
+                  displayType: DisplayType.TEXT,
+                  key: 'field',
+                  getAutoTerms: (schemaState, builderState) =>
                   {
-                    displayType: DisplayType.TEXT,
-                    key: 'field',
-                    getAutoTerms: (schemaState, builderState) =>
+                    return ElasticBlockHelpers.autocompleteMatches(schemaState, builderState, AutocompleteMatchType.Field);
+                  },
+                },
+                {
+                  displayType: DisplayType.DROPDOWN,
+                  key: 'boolQuery',
+                  options: List(
+                    FilterUtils.terrainFilterClauses,
+                    // Can consider using this, but it includes "minmum_should_match," which
+                    //  doesn't make sense in this context
+                    // Object.keys(ESInterpreterDefaultConfig.getClause('bool_query')['structure'])
+                  ),
+                  optionsDisplayName: Immutable.Map<any, string>(
                     {
-                      return ElasticBlockHelpers.autocompleteMatches(schemaState, builderState, AutocompleteMatchType.Field);
-                    },
+                      must: 'Must',
+                      must_not: 'Must Not',
+                      should: 'Should',
+                      should_not: 'Should Not',
+                      filter: 'Filter',
+                      filter_not: 'Filter Not',
+                    } as any,
+                  ),
+                  dropdownTooltips: List([
+                    'A result must pass the equation you specify to be included in the final results.',
+                    'A result must not pass the equation you specify to be included in the final results.',
+                    'A result must pass at least one of the "should" equations you specify to be included in the final results.',
+                    'A result must not pass at least one of the "should" equations you specify to be included in the final results.',
+                    'A result must pass the equation you specify to be included in the final results, ' +
+                    "but this equation won't be included in calculating the Elastic _score.",
+                    'A result must not pass the equation you specify to be included in the final results, ' +
+                    "but this equation won't be included in calculating the Elastic _score.",
+                  ]),
+                  dropdownUsesRawValues: true,
+                  autoDisabled: true,
+                  centerDropdown: true,
+                  style: {
+                    maxWidth: 150,
+                    minWidth: 115,
+                    marginRight: 3,
                   },
-                  {
-                    displayType: DisplayType.DROPDOWN,
-                    key: 'boolQuery',
-                    options: List(
-                      FilterUtils.terrainFilterClauses,
-                      // Can consider using this, but it includes "minmum_should_match," which
-                      //  doesn't make sense in this context
-                      // Object.keys(ESInterpreterDefaultConfig.getClause('bool_query')['structure'])
-                    ),
-                    optionsDisplayName: Immutable.Map<any, string>(
-                      {
-                        must: 'Must',
-                        must_not: 'Must Not',
-                        should: 'Should',
-                        should_not: 'Should Not',
-                        filter: 'Filter',
-                        filter_not: 'Filter Not',
-                      } as any,
-                    ),
-                    dropdownTooltips: List([
-                      'A result must pass the equation you specify to be included in the final results.',
-                      'A result must not pass the equation you specify to be included in the final results.',
-                      'A result must pass at least one of the "should" equations you specify to be included in the final results.',
-                      'A result must not pass at least one of the "should" equations you specify to be included in the final results.',
-                      'A result must pass the equation you specify to be included in the final results, ' +
-                      "but this equation won't be included in calculating the Elastic _score.",
-                      'A result must not pass the equation you specify to be included in the final results, ' +
-                      "but this equation won't be included in calculating the Elastic _score.",
-                    ]),
-                    dropdownUsesRawValues: true,
-                    autoDisabled: true,
-                    centerDropdown: true,
-                    style: {
-                      maxWidth: 150,
-                      minWidth: 115,
-                      marginRight: 3,
-                    },
+                },
+                {
+                  displayType: DisplayType.DROPDOWN,
+                  key: 'filterOp',
+                  options: List(
+                    _.keys(FilterUtils.esFilterOperatorsMap) as string[],
+                    // can consider using this, but it includes 'boost', and uses raw text values
+                    // Object.keys(ESInterpreterDefaultConfig.getClause('range_value')['structure'])),
+                  ),
+                  dropdownTooltips: List(_.values(FilterUtils.esFilterOperatorsTooltips)),
+                  dropdownUsesRawValues: true,
+                  centerDropdown: true,
+                  autoDisabled: true,
+                  style: {
+                    maxWidth: 75,
                   },
-                  {
-                    displayType: DisplayType.DROPDOWN,
-                    key: 'filterOp',
-                    options: List(
-                      _.keys(FilterUtils.esFilterOperatorsMap) as string[],
-                      // can consider using this, but it includes 'boost', and uses raw text values
-                      // Object.keys(ESInterpreterDefaultConfig.getClause('range_value')['structure'])),
-                    ),
-                    dropdownTooltips: List(_.values(FilterUtils.esFilterOperatorsTooltips)),
-                    dropdownUsesRawValues: true,
-                    centerDropdown: true,
-                    autoDisabled: true,
-                    style: {
-                      maxWidth: 75,
-                    },
-                  },
-                  {
-                    displayType: DisplayType.TEXT,
-                    key: 'value',
-                  },
-                ],
-            },
+                },
+                {
+                  displayType: DisplayType.TEXT,
+                  key: 'value',
+                },
+              ],
+          },
         },
         {
           displayType: DisplayType.CARDS,

@@ -95,47 +95,47 @@ const typeToRendering: {
     canSelect: boolean,
   },
 } = {
-    server:
-      {
-        component: ServerTreeInfo,
-        childConfig: serverChildrenConfig,
-        canSelect: false,
-      },
-    database:
-      {
-        component: DatabaseTreeInfo,
-        childConfig: databaseChildrenConfig,
-        canSelect: false,
-      },
+  server:
+  {
+    component: ServerTreeInfo,
+    childConfig: serverChildrenConfig,
+    canSelect: false,
+  },
+  database:
+  {
+    component: DatabaseTreeInfo,
+    childConfig: databaseChildrenConfig,
+    canSelect: false,
+  },
 
-    table:
-      {
-        component: TableTreeInfo,
-        childConfig: tableChildrenConfig,
-        canSelect: true,
-      },
+  table:
+  {
+    component: TableTreeInfo,
+    childConfig: tableChildrenConfig,
+    canSelect: true,
+  },
 
-    column:
-      {
-        component: ColumnTreeInfo,
-        childConfig: columnChildrenConfig,
-        canSelect: true,
-      },
+  column:
+  {
+    component: ColumnTreeInfo,
+    childConfig: columnChildrenConfig,
+    canSelect: true,
+  },
 
-    fieldProperty:
-      {
-        component: FieldPropertyTreeInfo,
-        childConfig: fieldPropertyChildrenConfig,
-        canSelect: true,
-      },
+  fieldProperty:
+  {
+    component: FieldPropertyTreeInfo,
+    childConfig: fieldPropertyChildrenConfig,
+    canSelect: true,
+  },
 
-    index:
-      {
-        component: IndexTreeInfo,
-        childConfig: indexChildrenConfig,
-        canSelect: true,
-      },
-  };
+  index:
+  {
+    component: IndexTreeInfo,
+    childConfig: indexChildrenConfig,
+    canSelect: true,
+  },
+};
 
 @Radium
 class SchemaTreeItem extends TerrainComponent<Props>

@@ -47,19 +47,19 @@ THE SOFTWARE.
 import Util from 'util/Util';
 
 export const AnalyticsActionTypes =
-  {
-    fetchStart: '',
-    fetchSuccess: '',
-    fetchFailure: '',
-    selectMetric: '',
-    selectInterval: '',
-    selectDateRange: '',
-    selectAnalyticsConnection: '',
-    pinAlgorithm: '',
-    clearPinned: '',
-    fetchAvailableMetricsStart: '',
-    fetchAvailableMetricsSuccess: '',
-  };
+{
+  fetchStart: '',
+  fetchSuccess: '',
+  fetchFailure: '',
+  selectMetric: '',
+  selectInterval: '',
+  selectDateRange: '',
+  selectAnalyticsConnection: '',
+  pinAlgorithm: '',
+  clearPinned: '',
+  fetchAvailableMetricsStart: '',
+  fetchAvailableMetricsSuccess: '',
+};
 
 Util.setValuesToKeys(AnalyticsActionTypes, 'analytics');
 

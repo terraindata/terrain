@@ -65,11 +65,11 @@ describe('AlgorithmSelector', () =>
     .addAlgorithm(4, 6, 'Algorithm 1')
     .getState();
   const selectorState =
-    {
-      ids: List([-1, -1, -1]),
-      onChangeSelection: (ids) => { },
-      library,
-    };
+  {
+    ids: List([-1, -1, -1]),
+    onChangeSelection: (ids) => { },
+    library,
+  };
 
   beforeEach(() =>
   {

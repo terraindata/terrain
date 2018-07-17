@@ -81,6 +81,10 @@ export class AggregateForm extends TerrainComponent<FormProps<AggregateState>>
   ]);
 
   public inputMap: InputDeclarationMap<AggregateState> = {
+    fieldInPattern: {
+      type: DisplayType.CheckBox,
+      displayName: 'Pattern contains field name',
+    },
     fields: {
       type: DisplayType.TagsBox,
       displayName: 'Fields',
@@ -92,6 +96,14 @@ export class AggregateForm extends TerrainComponent<FormProps<AggregateState>>
         pickOptions: (s) => this.aggregationOptions,
         indexResolver: (value) => this.aggregationOptions.indexOf(value),
       },
+    },
+    parentKey: {
+      type: DisplayType.TextBox,
+      displayName: 'Parent Key',
+    },
+    parentKeyValue: {
+      type: DisplayType.TextBox,
+      displayName: 'Parent Key Value',
     },
     pattern: {
       type: DisplayType.TextBox,

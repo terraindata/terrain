@@ -47,6 +47,15 @@ THE SOFTWARE.
 
 import { FileTypes, Languages } from './ETLTypes';
 import { RootInputConfig } from './InputTypes';
+import
+{
+  KV,
+  MagentoParamConfigType,
+  MagentoParamConfigTypes,
+  MagentoParamTypes,
+  MagentoRoutes,
+} from './MagentoTypes';
+
 import { RootPostProcessConfig } from './PostProcessTypes';
 
 export interface FileConfig
@@ -58,6 +67,7 @@ export interface FileConfig
   jsonPath?: string;
   fieldOrdering?: string[];
   isPlaFeed?: boolean;
+  ignoreQuotes?: boolean;
 }
 
 export enum Sources
@@ -69,6 +79,7 @@ export enum Sources
   Http = 'Http',
   Fs = 'Fs',
   Mysql = 'Mysql',
+  Magento = 'Magento',
   Postgresql = 'Postgresql',
 }
 
@@ -81,30 +92,40 @@ export enum Sinks
   Fs = 'Fs',
   FollowUpBoss = 'FollowUpBoss',
   MailChimp = 'MailChimp',
+  Magento = 'Magento',
 }
 
 export const EndpointTypeNames =
-  {
-    Upload: 'Upload',
-    Download: 'Download',
-    Algorithm: 'Terrain Algorithm',
-    Database: 'Database',
-    Sftp: 'SFTP',
-    Http: 'HTTP',
-    Fs: 'Local Filesystem',
-    Mysql: 'MySQL',
-    Postgresql: 'PostgreSQL',
-    Magento: 'Magento',
-    GoogleAnalytics: 'Google Analytics',
-    MailChimp: 'MailChimp',
-    FollowUpBoss: 'Follow Up Boss',
-  };
+{
+  Upload: 'Upload',
+  Download: 'Download',
+  Algorithm: 'Terrain Algorithm',
+  Database: 'Database',
+  Sftp: 'SFTP',
+  Http: 'HTTP',
+  Fs: 'Local Filesystem',
+  Mysql: 'MySQL',
+  Postgresql: 'PostgreSQL',
+  Magento: 'Magento',
+  GoogleAnalytics: 'Google Analytics',
+  MailChimp: 'MailChimp',
+  FollowUpBoss: 'Follow Up Boss',
+};
 
 export const SchedulableSinks: Sinks[] =
-  [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs, Sinks.FollowUpBoss, Sinks.MailChimp];
+  [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs, Sinks.FollowUpBoss, Sinks.MailChimp, Sinks.Magento];
 
 export const SchedulableSources: Sources[] =
-  [Sources.Algorithm, Sources.Sftp, Sources.GoogleAnalytics, Sources.Http, Sources.Fs, Sources.Mysql, Sources.Postgresql];
+  [
+    Sources.Algorithm,
+    Sources.Sftp,
+    Sources.GoogleAnalytics,
+    Sources.Http,
+    Sources.Fs,
+    Sources.Mysql,
+    Sources.Magento,
+    Sources.Postgresql,
+  ];
 
 export interface SourceConfig
 {
@@ -154,6 +175,7 @@ export interface SourceOptionsTypes // TODO check that these are right
   Http: HttpOptions;
   Fs: {};
   Mysql: SQLOptions;
+  Magento: MagentoOptions;
   Postgresql: SQLOptions;
 }
 
@@ -178,6 +200,15 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
     Fs: {},
     Mysql: {
     },
+    Magento: {
+      esdbid: null,
+      esindex: null,
+      includedFields: ['sku'],
+      params: null,
+      onlyFirst: true,
+      route: null,
+      remapping: {},
+    },
     Postgresql: {
     },
   };
@@ -198,6 +229,7 @@ export interface SinkOptionsTypes
   Fs: {};
   FollowUpBoss: FollowUpBossOptions;
   MailChimp: {};
+  Magento: MagentoOptions;
 }
 
 export const SinkOptionsDefaults: SinkOptionsTypes =
@@ -222,6 +254,15 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
     FollowUpBoss: {
     },
     MailChimp: {},
+    Magento: {
+      esdbid: null,
+      esindex: null,
+      includedFields: [],
+      params: null,
+      onlyFirst: true,
+      route: null,
+      remapping: {},
+    },
   };
 
 export interface SftpOptions
@@ -244,6 +285,17 @@ export interface GoogleAnalyticsOptions
   dayInterval: number;
 }
 
+export interface MagentoOptions
+{
+  esdbid: string;
+  esindex: string;
+  includedFields: string[];
+  params: MagentoParamConfigType<MagentoParamTypes>;
+  onlyFirst: boolean;
+  remapping: object;
+  route: MagentoRoutes;
+}
+
 export interface SQLOptions
 {
   meta?: any;
@@ -260,7 +312,7 @@ export type SinkOptionsType<key extends SinkTypes> = SinkOptionsTypes[key];
 // 1: The source and sink enum names are the same as their values
 // 2: Each sink and source has a defined option type
 type SourceNamingAssertion = {
-  [K in keyof typeof Sources]: K
+  [K in keyof typeof Sources]: string
 };
 Sources as SourceNamingAssertion;
 
@@ -269,7 +321,7 @@ type SourceAssertOptionTypesExhaustive = {
 };
 
 type SinkNamingAssertion = {
-  [K in keyof typeof Sinks]: K
+  [K in keyof typeof Sinks]: string
 };
 Sinks as SinkNamingAssertion;
 

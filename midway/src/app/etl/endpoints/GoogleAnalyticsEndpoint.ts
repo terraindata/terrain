@@ -163,16 +163,16 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
       const dateRange: object[] = [{ startDate: startDateStr, endDate: currDateStr }];
 
       const analyticsBody: object =
-        {
-          reportRequests: [
-            {
-              dateRanges: dateRange,
-              dimensions: gaConfig['dimensions'],
-              metrics: gaConfig['metrics'],
-              viewId: gaConfig['viewId'].toString(),
-            },
-          ],
-        };
+      {
+        reportRequests: [
+          {
+            dateRanges: dateRange,
+            dimensions: gaConfig['dimensions'],
+            metrics: gaConfig['metrics'],
+            viewId: gaConfig['viewId'].toString(),
+          },
+        ],
+      };
 
       let colNames: string[] = [];
       let constructedHeader: boolean = false;
@@ -212,11 +212,11 @@ export default class GoogleAnalyticsEndpoint extends AEndpointStream
             method: gaConfig['method'] != null ? gaConfig['method'] : 'POST',
             url,
             jwt:
-              {
-                email: gaConfig['email'],
-                key: gaConfigPrivateKey,
-                scopes,
-              },
+            {
+              email: gaConfig['email'],
+              key: gaConfigPrivateKey,
+              scopes,
+            },
             json: true,
             body: analyticsBody,
           }, (err, res, body) =>

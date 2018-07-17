@@ -196,30 +196,30 @@ export interface CardItem
 }
 
 const cardSource =
+{
+  canDrag: (props) => true,
+
+  beginDrag: (props: CardProps): CardItem =>
   {
-    canDrag: (props) => true,
+    setTimeout(() => $('body').addClass('body-card-is-dragging'), 100);
+    // TODO unselect cards?
 
-    beginDrag: (props: CardProps): CardItem =>
-    {
-      setTimeout(() => $('body').addClass('body-card-is-dragging'), 100);
-      // TODO unselect cards?
+    const item: CardItem = {
+      type: props.card.type,
+      new: true,
+    };
 
-      const item: CardItem = {
-        type: props.card.type,
-        new: true,
-      };
+    props.builderActions.dragCard(item);
 
-      props.builderActions.dragCard(item);
+    return item;
+  },
 
-      return item;
-    },
-
-    endDrag: (props) =>
-    {
-      $('body').removeClass('body-card-is-dragging');
-      props.builderActions.dragCard(null);
-    },
-  };
+  endDrag: (props) =>
+  {
+    $('body').removeClass('body-card-is-dragging');
+    props.builderActions.dragCard(null);
+  },
+};
 
 const dragCollect = (connect, monitor) =>
   ({

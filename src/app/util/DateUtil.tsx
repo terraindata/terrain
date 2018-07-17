@@ -51,134 +51,134 @@ import TerrainDateParameter from 'shared/database/elastic/parser/TerrainDatePara
 const moment = require('moment-timezone');
 
 const DateUtil =
+{
+  formatTime(rawTime)
   {
-    formatTime(rawTime)
+    let unit;
+    const parsedTime = rawTime.split(':');
+    let hour = parsedTime[0];
+    const hourNumber = parseInt(hour, 10);
+    const minutes = parsedTime[1];
+    if (hourNumber < 12)
     {
-      let unit;
-      const parsedTime = rawTime.split(':');
-      let hour = parsedTime[0];
-      const hourNumber = parseInt(hour, 10);
-      const minutes = parsedTime[1];
-      if (hourNumber < 12)
+      unit = 'am';
+      hour = (hourNumber - 0).toString();
+      if (hourNumber === 0)
       {
-        unit = 'am';
-        hour = (hourNumber - 0).toString();
-        if (hourNumber === 0)
-        {
-          hour = '12';
-        }
+        hour = '12';
       }
-      else
+    }
+    else
+    {
+      unit = 'pm';
+      if (hourNumber !== 12)
       {
-        unit = 'pm';
-        if (hourNumber !== 12)
-        {
-          hour = (hourNumber - 12).toString();
-        }
+        hour = (hourNumber - 12).toString();
       }
-      return hour + ':' + minutes + ' ' + unit;
-    },
+    }
+    return hour + ':' + minutes + ' ' + unit;
+  },
 
-    formatCalendarDate(date)
+  formatCalendarDate(date)
+  {
+    let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (timeZone === undefined)
     {
-      let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      if (timeZone === undefined)
-      {
-        timeZone = 'America/Los_Angeles';
-      }
-      return moment(date).tz(timeZone).format('MMMM D YYYY, h:mm a');
-    },
+      timeZone = 'America/Los_Angeles';
+    }
+    return moment(date).tz(timeZone).format('MMMM D YYYY, h:mm a');
+  },
 
-    formatRelativeDate(date)
+  formatRelativeDate(date)
+  {
+    const parsedDate = date.split('.');
+    const oneWeekScope = parsedDate[1];
+    const rawDay = parsedDate[2];
+    const rawTime = parsedDate[3];
+    const time = DateUtil.formatTime(rawTime.slice(1));
+    const dayDict =
     {
-      const parsedDate = date.split('.');
-      const oneWeekScope = parsedDate[1];
-      const rawDay = parsedDate[2];
-      const rawTime = parsedDate[3];
-      const time = DateUtil.formatTime(rawTime.slice(1));
-      const dayDict =
-        {
-          0: 'Monday',
-          1: 'Tuesday',
-          2: 'Wednesday',
-          3: 'Thursday',
-          4: 'Friday',
-          5: 'Saturday',
-          6: 'Sunday',
-        };
-      const day = dayDict[rawDay];
-      return oneWeekScope.slice(0, 4) + ' ' + day + ', ' + time;
-    },
+      0: 'Monday',
+      1: 'Tuesday',
+      2: 'Wednesday',
+      3: 'Thursday',
+      4: 'Friday',
+      5: 'Saturday',
+      6: 'Sunday',
+    };
+    const day = dayDict[rawDay];
+    return oneWeekScope.slice(0, 4) + ' ' + day + ', ' + time;
+  },
 
-    formatSpecificDate(date)
+  formatSpecificDate(date)
+  {
+    if (date.toLowerCase() === 'now')
     {
-      if (date.toLowerCase() === 'now')
-      {
-        return 'now';
-      }
-      let tense;
-      let dateParser;
-      let plural;
-      const elasticUnit = date.slice(-1);
-      if (date.includes('+'))
-      {
-        tense = 'from now';
-        dateParser = '+';
-      }
-      else
-      {
-        tense = 'ago';
-        dateParser = '-';
-      }
-      const parsedDate = date.split(dateParser);
-      const dateDetails = parsedDate[1];
-      const amount = dateDetails.slice(0, -1);
-      const unit = (DateUnitMap[elasticUnit].slice(0, -3)).toLowerCase();
-      if (amount !== '1')
-      {
-        plural = 's';
-      }
-      else
-      {
-        plural = '';
-      }
-      return amount + ' ' + unit + plural + ' ' + tense;
-    },
+      return 'now';
+    }
+    let tense;
+    let dateParser;
+    let plural;
+    const elasticUnit = date.slice(-1);
+    if (date.includes('+'))
+    {
+      tense = 'from now';
+      dateParser = '+';
+    }
+    else
+    {
+      tense = 'ago';
+      dateParser = '-';
+    }
+    const parsedDate = date.split(dateParser);
+    const dateDetails = parsedDate[1];
+    const amount = dateDetails.slice(0, -1);
+    const unit = (DateUnitMap[elasticUnit].slice(0, -3)).toLowerCase();
+    if (amount !== '1')
+    {
+      plural = 's';
+    }
+    else
+    {
+      plural = '';
+    }
+    return amount + ' ' + unit + plural + ' ' + tense;
+  },
 
-    isValidElasticDateParameter(date)
-    {
-      const properNow = date.slice(0, 3).toLowerCase();
-      const properSign = date[3];
-      const properUnit = date.slice(-1);
-      const properAmount = date.slice(4);
-      const properNumber = date.slice(4, -1);
-      return ((date.toLowerCase() === 'now') || ((properNow === 'now') &&
-        (properSign === '+' || properSign === '-') &&
-        (!properAmount.includes('+') && !properAmount.includes('-'))
-        && (!isNaN((Number(properNumber))))
-        && (DateUnitArray.indexOf(properUnit) !== -1)
-      ));
-    },
+  isValidElasticDateParameter(date)
+  {
+    const properNow = date.slice(0, 3).toLowerCase();
+    const properSign = date[3];
+    const properUnit = date.slice(-1);
+    const properAmount = date.slice(4);
+    const properNumber = date.slice(4, -1);
+    return ((date.toLowerCase() === 'now') || ((properNow === 'now') &&
+      (properSign === '+' || properSign === '-') &&
+      (!properAmount.includes('+') && !properAmount.includes('-'))
+      && (!isNaN((Number(properNumber))))
+      && (DateUnitArray.indexOf(properUnit) !== -1)
+    ));
+  },
 
-    formatDateValue(date)
+  formatDateValue(date)
+  {
+    if (date.includes('@TerrainDate') && TerrainDateParameter.isValidTerrainDateParameter(date))
     {
-      if (date.includes('@TerrainDate') && TerrainDateParameter.isValidTerrainDateParameter(date))
-      {
-        return DateUtil.formatRelativeDate(date);
-      }
-      else if (DateUtil.isValidElasticDateParameter(date))
-      {
-        return DateUtil.formatSpecificDate(date);
-      }
-      else if (date.charAt(0) === '@')
-      {
-        return date; // Input
-      }
-      else
-      {
-        return DateUtil.formatCalendarDate(date);
-      }
-    },
-  };
+      return DateUtil.formatRelativeDate(date);
+    }
+    else if (DateUtil.isValidElasticDateParameter(date))
+    {
+      return DateUtil.formatSpecificDate(date);
+    }
+    else if (date.charAt(0) === '@')
+    {
+      return date; // Input
+    }
+    else
+    {
+      return DateUtil.formatCalendarDate(date);
+    }
+  },
+};
 
 export default DateUtil;

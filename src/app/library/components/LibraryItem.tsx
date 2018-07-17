@@ -648,34 +648,34 @@ $(document).on('dragover dragend', (e) => { shifted = e.shiftKey; return true; }
 // http://stackoverflow.com/questions/3781142/jquery-or-javascript-how-determine-if-shift-key-being-pressed-while-clicking-an
 
 const source =
+{
+  canDrag(props, monitor)
   {
-    canDrag(props, monitor)
-    {
-      return props.canDrag;
-    },
+    return props.canDrag;
+  },
 
-    beginDrag(props)
-    {
-      const item = {
-        id: props.id,
-        type: props.type,
-        index: props.index,
-      };
-      return item;
-    },
+  beginDrag(props)
+  {
+    const item = {
+      id: props.id,
+      type: props.type,
+      index: props.index,
+    };
+    return item;
+  },
 
-    endDrag(props, monitor, component)
+  endDrag(props, monitor, component)
+  {
+    props.onDragFinish();
+    if (!monitor.didDrop())
     {
-      props.onDragFinish();
-      if (!monitor.didDrop())
-      {
-        return;
-      }
-      const item = monitor.getItem();
-      const { type, targetItem } = monitor.getDropResult();
-      props.onDropped(item.id, type, targetItem, shifted);
-    },
-  };
+      return;
+    }
+    const item = monitor.getItem();
+    const { type, targetItem } = monitor.getDropResult();
+    props.onDropped(item.id, type, targetItem, shifted);
+  },
+};
 
 const dragCollect = (connect, monitor) =>
   ({
@@ -699,29 +699,29 @@ const canDrop = (props, monitor) =>
   return itemType === targetType;
 };
 const target =
+{
+  canDrop,
+
+  hover(props, monitor, component)
   {
-    canDrop,
-
-    hover(props, monitor, component)
+    if (canDrop(props, monitor))
     {
-      if (canDrop(props, monitor))
-      {
-        const item = monitor.getItem();
-        props.onHover(props.index, item.type, item.id);
-      }
-    },
+      const item = monitor.getItem();
+      props.onHover(props.index, item.type, item.id);
+    }
+  },
 
-    drop(props, monitor, component)
+  drop(props, monitor, component)
+  {
+    if (monitor.isOver({ shallow: true }))
     {
-      if (monitor.isOver({ shallow: true }))
-      {
-        return {
-          targetItem: props.item,
-          type: props.type,
-        };
-      }
-    },
-  };
+      return {
+        targetItem: props.item,
+        type: props.type,
+      };
+    }
+  },
+};
 
 const dropCollect = (connect, monitor) =>
   ({

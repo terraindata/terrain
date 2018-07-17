@@ -498,15 +498,15 @@ const BooleanTypeIcon = require('./../../../../../images/icon_type_boolean.svg?n
 const typeToIcon: {
   [k in ETLFieldTypes]: any;
 } = {
-    [ETLFieldTypes.String]: TextTypeIcon,
-    [ETLFieldTypes.Object]: ObjectTypeIcon,
-    [ETLFieldTypes.Number]: NumberTypeIcon,
-    [ETLFieldTypes.Integer]: NumberTypeIcon,
-    [ETLFieldTypes.Boolean]: BooleanTypeIcon,
-    [ETLFieldTypes.Array]: ArrayTypeIcon,
-    [ETLFieldTypes.Date]: DateTypeIcon,
-    [ETLFieldTypes.GeoPoint]: GeoTypeIcon,
-  };
+  [ETLFieldTypes.String]: TextTypeIcon,
+  [ETLFieldTypes.Object]: ObjectTypeIcon,
+  [ETLFieldTypes.Number]: NumberTypeIcon,
+  [ETLFieldTypes.Integer]: NumberTypeIcon,
+  [ETLFieldTypes.Boolean]: BooleanTypeIcon,
+  [ETLFieldTypes.Array]: ArrayTypeIcon,
+  [ETLFieldTypes.Date]: DateTypeIcon,
+  [ETLFieldTypes.GeoPoint]: GeoTypeIcon,
+};
 
 const emptyOptions = List([]);
 

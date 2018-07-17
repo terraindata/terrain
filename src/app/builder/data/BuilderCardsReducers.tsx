@@ -47,18 +47,18 @@ import ActionTypes from './BuilderCardsActionTypes';
 import { _BuilderCardsState, BuilderCardsState } from './BuilderCardsState';
 
 const BuilderCardsReducers =
+{
+  [ActionTypes.hoverCard]: (state, action) =>
   {
-    [ActionTypes.hoverCard]: (state, action) =>
+    if (state.hoveringCardId !== action.payload.cardId)
     {
-      if (state.hoveringCardId !== action.payload.cardId)
-      {
-        return state.set('hoveringCardId', action.payload.cardId);
-      }
+      return state.set('hoveringCardId', action.payload.cardId);
+    }
 
-      return state;
-    },
-    // if hovered over same card, will return original state object
-  };
+    return state;
+  },
+  // if hovered over same card, will return original state object
+};
 
 const BuilderCardsReducersWrapper = (
   state: BuilderCardsState = _BuilderCardsState(),

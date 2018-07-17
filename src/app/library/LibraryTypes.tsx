@@ -324,9 +324,9 @@ export function colorForStatus(status: ItemStatus): string
 export const typeToConstructor: {
   [key: string]: (...args) => Item,
 } =
-  {
-    [ItemType.Query]: _Query,
-    [ItemType.Algorithm]: _Algorithm,
-    [ItemType.Group]: _Group,
-    [ItemType.Category]: _Category,
-  };
+{
+  [ItemType.Query]: _Query,
+  [ItemType.Algorithm]: _Algorithm,
+  [ItemType.Group]: _Group,
+  [ItemType.Category]: _Category,
+};

@@ -116,27 +116,27 @@ const canDrop = (props, monitor) =>
   return !props.dropDisabled;
 };
 const target =
+{
+  canDrop,
+
+  hover(props, monitor, component)
   {
-    canDrop,
-
-    hover(props, monitor, component)
-    {
-      if (canDrop(props, monitor))
-      {
-        const item = monitor.getItem();
-        props.onHover(props.status, item.id);
-      }
-    },
-
-    drop(props, monitor, component)
+    if (canDrop(props, monitor))
     {
       const item = monitor.getItem();
-      if (props.onDrop)
-      {
-        props.onDrop(props.status, item.id);
-      }
-    },
-  };
+      props.onHover(props.status, item.id);
+    }
+  },
+
+  drop(props, monitor, component)
+  {
+    const item = monitor.getItem();
+    if (props.onDrop)
+    {
+      props.onDrop(props.status, item.id);
+    }
+  },
+};
 
 const dropCollect = (connect, monitor) =>
   ({

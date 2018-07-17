@@ -206,17 +206,17 @@ export class TaskTree
       if (this.tasks.length === 0) // nothing to do
       {
         const taskOutputConfig: TaskOutputConfig =
+        {
+          blocking: null,
+          exit: true,
+          options:
           {
-            blocking: null,
-            exit: true,
-            options:
-              {
-                logStream: null,
-                outputStream: null,
-              },
-            rootLogStream: null,
-            status: true,
-          };
+            logStream: null,
+            outputStream: null,
+          },
+          rootLogStream: null,
+          status: true,
+        };
         return resolve(taskOutputConfig);
       }
 
@@ -292,15 +292,15 @@ export class TaskTree
           onFailure: null,
           onSuccess: null,
           params:
+          {
+            exit: true,
+            options:
             {
-              exit: true,
-              options:
-                {
-                  logStream: new stream.PassThrough(),
-                  inputStreams: [new stream.PassThrough()],
-                },
-              status: true,
+              logStream: new stream.PassThrough(),
+              inputStreams: [new stream.PassThrough()],
             },
+            status: true,
+          },
           paused: null,
           taskId: TaskEnum.taskDefaultExit,
           blocking: null,
@@ -314,15 +314,15 @@ export class TaskTree
           onFailure: null,
           onSuccess: null,
           params:
+          {
+            exit: true,
+            options:
             {
-              exit: true,
-              options:
-                {
-                  logStream: new stream.PassThrough(),
-                  inputStreams: [new stream.PassThrough()],
-                },
-              status: false,
+              logStream: new stream.PassThrough(),
+              inputStreams: [new stream.PassThrough()],
             },
+            status: false,
+          },
           paused: null,
           taskId: TaskEnum.taskDefaultFailure,
           blocking: null,

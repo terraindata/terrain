@@ -54,9 +54,9 @@ THE SOFTWARE.
 // So you end up with ActionTypes.cards.move === 'cards.move'
 
 export let BuilderCardsActionTypes =
-  {
-    hoverCard: '',
-  };
+{
+  hoverCard: '',
+};
 
 // I tried using this type to correclty classify this function,
 //  but because of how object literals work in TypeScript,

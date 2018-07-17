@@ -52,31 +52,31 @@ const move = '';
 const duplicate = '';
 
 export let LibraryActionTypes =
+{
+  categories:
   {
-    categories:
-      {
-        create, remove, change, move,
-        // duplicate,
-      },
+    create, remove, change, move,
+    // duplicate,
+  },
 
-    groups:
-      {
-        create, remove, change, move,
-      },
+  groups:
+  {
+    create, remove, change, move,
+  },
 
-    algorithms:
-      {
-        create, remove, change, move,
-        status: '',
-        fetchVersion: '',
-        loadVersion: '',
-        select: '',
-        unselect: '',
-      },
+  algorithms:
+  {
+    create, remove, change, move,
+    status: '',
+    fetchVersion: '',
+    loadVersion: '',
+    select: '',
+    unselect: '',
+  },
 
-    loadState: '',
-    setDbs: '',
-  };
+  loadState: '',
+  setDbs: '',
+};
 
 Util.setValuesToKeys(LibraryActionTypes, 'library');
 

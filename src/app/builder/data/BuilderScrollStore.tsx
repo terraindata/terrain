@@ -107,12 +107,12 @@ export function scrollAction(columnTop: number, columnHeight: number, columnScro
   BuilderScrollStore.dispatch({
     type: 'scroll',
     payload:
-      {
-        columnTop,
-        columnHeight,
-        columnScroll,
-        totalHeight,
-      },
+    {
+      columnTop,
+      columnHeight,
+      columnScroll,
+      totalHeight,
+    },
   });
 }
 

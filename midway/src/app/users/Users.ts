@@ -102,16 +102,16 @@ export class Users
     }
 
     const newUser: UserConfig =
-      {
-        accessToken: user.accessToken === undefined ? '' : user.accessToken,
-        email: user.email,
-        isDisabled: user.isDisabled === undefined ? false : user.isDisabled,
-        isSuperUser: user.isSuperUser === undefined ? false : user.isSuperUser,
-        name: user.name === undefined ? '' : user.name,
-        password: await this.hashPassword(user.password),
-        timezone: user.timezone === undefined ? '' : user.timezone,
-        meta: user.meta === undefined ? '{}' : user.meta,
-      };
+    {
+      accessToken: user.accessToken === undefined ? '' : user.accessToken,
+      email: user.email,
+      isDisabled: user.isDisabled === undefined ? false : user.isDisabled,
+      isSuperUser: user.isSuperUser === undefined ? false : user.isSuperUser,
+      name: user.name === undefined ? '' : user.name,
+      password: await this.hashPassword(user.password),
+      timezone: user.timezone === undefined ? '' : user.timezone,
+      meta: user.meta === undefined ? '{}' : user.meta,
+    };
     return this.upsert(newUser);
   }
 

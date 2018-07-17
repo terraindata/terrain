@@ -97,9 +97,9 @@ export function ElasticValueInfoToCards(rootValueInfo: ESValueInfo, currentCards
 }
 
 export const ElasticCustomCards: { [type: string]: any } =
-  {
-    eqlbool_query: FilterUtils.makeCustomFilterCard,
-  };
+{
+  eqlbool_query: FilterUtils.makeCustomFilterCard,
+};
 
 export default function ElasticToCards(
   query: Query,

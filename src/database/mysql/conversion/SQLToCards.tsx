@@ -129,21 +129,21 @@ const parseTreeError = (error, context) =>
 };
 
 const TQLToCards =
+{
+  convert(statement: Statement, currentCards?: Cards): Cards
   {
-    convert(statement: Statement, currentCards?: Cards): Cards
+    const statements = statement.statements.map(parseNodeAsCard);
+
+    const cards: Cards = List(statements);
+
+    if (currentCards)
     {
-      const statements = statement.statements.map(parseNodeAsCard);
+      return BlockUtils.reconcileCards(currentCards, cards);
+    }
 
-      const cards: Cards = List(statements);
-
-      if (currentCards)
-      {
-        return BlockUtils.reconcileCards(currentCards, cards);
-      }
-
-      return cards;
-    },
-  };
+    return cards;
+  },
+};
 
 function parseNode(node: Node | string): CardString
 {
@@ -221,283 +221,283 @@ const generalProcessors: {
     node: Node,
   ) => CardString,
 } = {
-    'FROM':
-      (node) =>
-      {
-        const tables = _.compact(
-          flattenCommas(node.child)
-            .map(
-              (tableNode) =>
+  'FROM':
+    (node) =>
+    {
+      const tables = _.compact(
+        flattenCommas(node.child)
+          .map(
+            (tableNode) =>
+            {
+              if (!tableNode)
               {
-                if (!tableNode)
-                {
-                  return null;
-                }
-                if (typeof tableNode !== 'object' || tableNode.op !== 'AS')
-                {
-                  return make(Blocks.table, {
-                    table: tableNode,
-                  });
-                }
-                else
-                {
-                  return make(Blocks.table, {
-                    table: parseNode(tableNode.left_child),
-                    alias: tableNode.right_child,
-                  });
-                }
-              },
-          ));
-
-        let cards = List([]);
-        if (tables.length)
-        {
-          // If there are no tables, this is an empty From statement, and we shouldn't make a card for it
-          cards = List([
-            make(Blocks.from, {
-              tables: List(tables),
-            }),
-          ]);
-        }
-
-        return make(Blocks.sfw, {
-          cards,
-        });
-      },
-
-    'SELECT':
-      (node) =>
-      {
-        const sfw = parseNode(node.left_child) as Card;
-        const fieldNodes = flattenCommas(node.right_child);
-        const fieldBlocks: Block[] = fieldNodes.map(
-          (fieldNode) =>
-            make(
-              Blocks.field,
+                return null;
+              }
+              if (typeof tableNode !== 'object' || tableNode.op !== 'AS')
               {
-                field: parseNode(fieldNode),
-              },
-            ),
-        );
-        return sfw.set('fields', Immutable.List(fieldBlocks));
-      },
+                return make(Blocks.table, {
+                  table: tableNode,
+                });
+              }
+              else
+              {
+                return make(Blocks.table, {
+                  table: parseNode(tableNode.left_child),
+                  alias: tableNode.right_child,
+                });
+              }
+            },
+        ));
 
-    '.':
-      (node) =>
+      let cards = List([]);
+      if (tables.length)
       {
-        return node.left_child + '.' + node.right_child;
-      },
+        // If there are no tables, this is an empty From statement, and we shouldn't make a card for it
+        cards = List([
+          make(Blocks.from, {
+            tables: List(tables),
+          }),
+        ]);
+      }
 
-    'CALL':
-      (node) =>
+      return make(Blocks.sfw, {
+        cards,
+      });
+    },
+
+  'SELECT':
+    (node) =>
+    {
+      const sfw = parseNode(node.left_child) as Card;
+      const fieldNodes = flattenCommas(node.right_child);
+      const fieldBlocks: Block[] = fieldNodes.map(
+        (fieldNode) =>
+          make(
+            Blocks.field,
+            {
+              field: parseNode(fieldNode),
+            },
+          ),
+      );
+      return sfw.set('fields', Immutable.List(fieldBlocks));
+    },
+
+  '.':
+    (node) =>
+    {
+      return node.left_child + '.' + node.right_child;
+    },
+
+  'CALL':
+    (node) =>
+    {
+      let type = node.left_child as string;
+
+      if (typeof type === 'string')
       {
-        let type = node.left_child as string;
+        type = type.trim().toLowerCase();
 
-        if (typeof type === 'string')
+        if (type === 'date')
         {
-          type = type.trim().toLowerCase();
-
-          if (type === 'date')
-          {
-            return '"' + parseNode(node.right_child) + '"';
-          }
-
-          if (type === 'linear_score')
-          {
-            const weightNodes = flattenCommas(node.right_child);
-            let weights = List([]);
-            for (let i = 0; i < weightNodes.length; i += 2)
-            {
-              weights = weights.push(
-                make(Blocks.weight, {
-                  weight: parseNode(weightNodes[i]),
-                  key: parseNode(weightNodes[i + 1]),
-                }),
-              );
-            }
-            return make(Blocks.score, {
-              weights,
-            });
-          }
-
-          if (type === 'linear_transform')
-          {
-            const scorePointNodes = flattenCommas(node.right_child);
-            let scorePoints = List([]);
-
-            for (let i = 1; i < scorePointNodes.length; i += 2)
-            {
-              scorePoints = scorePoints.push(
-                make(Blocks.scorePoint, {
-                  score: parseNode(scorePointNodes[i]),
-                  value: parseNode(scorePointNodes[i + 1]),
-                }),
-              );
-            }
-            return make(Blocks.transform, {
-              input: parseNode(scorePointNodes[0]),
-              scorePoints,
-            });
-          }
-
-          if (Blocks[type])
-          {
-            return make(Blocks[type], {
-              value: parseNode(node.right_child),
-            });
-          }
-        }
-        return make(Blocks.tql, { clause: 'call' });
-      },
-
-    'call':
-      (node) =>
-      {
-        let type = node.left_child as string;
-        if (typeof type === 'string')
-        {
-          type = type.trim();
-
-          if (type === 'linear_score')
-          {
-            const weightNodes = flattenCommas(node.right_child);
-            let weights = List([]);
-            for (let i = 0; i < weightNodes.length; i += 2)
-            {
-              weights = weights.push(
-                make(Blocks.weight, {
-                  weight: parseNode(weightNodes[i]),
-                  key: parseNode(weightNodes[i + 1]),
-                }),
-              );
-            }
-            return make(Blocks.score, {
-              weights,
-            });
-          }
-
-          if (type === 'linear_transform')
-          {
-            const scorePointNodes = flattenCommas(node.right_child);
-            let scorePoints = List([]);
-
-            for (let i = 1; i < scorePointNodes.length; i += 2)
-            {
-              scorePoints = scorePoints.push(
-                make(Blocks.scorePoint, {
-                  score: scorePointNodes[i],
-                  value: scorePointNodes[i + 1],
-                }),
-              );
-            }
-            return make(Blocks.transform, {
-              input: parseNode(scorePointNodes[0]),
-              scorePoints,
-            });
-          }
-
-          if (Blocks[type])
-          {
-            return make(Blocks[type], {
-              value: parseNode(node.right_child),
-            });
-          }
+          return '"' + parseNode(node.right_child) + '"';
         }
 
-        return make(Blocks.tql, { clause: 'call' });
-      },
-
-    'DISTINCT':
-      (node) =>
-        make(Blocks.distinct, {
-          value: parseNode(node.child),
-        }),
-
-    'EXPR':
-      (node) =>
-        parseNode(node.child),
-
-    'AS':
-      (node) =>
-        make(Blocks.as, {
-          value: parseNode(node.left_child),
-          alias: node.right_child,
-        }),
-
-    'AND':
-      andOrProcessor('AND'),
-
-    'OR':
-      andOrProcessor('OR'),
-
-    'EXISTS':
-      (node) =>
-        make(
-          Blocks.exists,
+        if (type === 'linear_score')
+        {
+          const weightNodes = flattenCommas(node.right_child);
+          let weights = List([]);
+          for (let i = 0; i < weightNodes.length; i += 2)
           {
-            cards: List([
-              parseNodeAsCard(node.child),
+            weights = weights.push(
+              make(Blocks.weight, {
+                weight: parseNode(weightNodes[i]),
+                key: parseNode(weightNodes[i + 1]),
+              }),
+            );
+          }
+          return make(Blocks.score, {
+            weights,
+          });
+        }
+
+        if (type === 'linear_transform')
+        {
+          const scorePointNodes = flattenCommas(node.right_child);
+          let scorePoints = List([]);
+
+          for (let i = 1; i < scorePointNodes.length; i += 2)
+          {
+            scorePoints = scorePoints.push(
+              make(Blocks.scorePoint, {
+                score: parseNode(scorePointNodes[i]),
+                value: parseNode(scorePointNodes[i + 1]),
+              }),
+            );
+          }
+          return make(Blocks.transform, {
+            input: parseNode(scorePointNodes[0]),
+            scorePoints,
+          });
+        }
+
+        if (Blocks[type])
+        {
+          return make(Blocks[type], {
+            value: parseNode(node.right_child),
+          });
+        }
+      }
+      return make(Blocks.tql, { clause: 'call' });
+    },
+
+  'call':
+    (node) =>
+    {
+      let type = node.left_child as string;
+      if (typeof type === 'string')
+      {
+        type = type.trim();
+
+        if (type === 'linear_score')
+        {
+          const weightNodes = flattenCommas(node.right_child);
+          let weights = List([]);
+          for (let i = 0; i < weightNodes.length; i += 2)
+          {
+            weights = weights.push(
+              make(Blocks.weight, {
+                weight: parseNode(weightNodes[i]),
+                key: parseNode(weightNodes[i + 1]),
+              }),
+            );
+          }
+          return make(Blocks.score, {
+            weights,
+          });
+        }
+
+        if (type === 'linear_transform')
+        {
+          const scorePointNodes = flattenCommas(node.right_child);
+          let scorePoints = List([]);
+
+          for (let i = 1; i < scorePointNodes.length; i += 2)
+          {
+            scorePoints = scorePoints.push(
+              make(Blocks.scorePoint, {
+                score: scorePointNodes[i],
+                value: scorePointNodes[i + 1],
+              }),
+            );
+          }
+          return make(Blocks.transform, {
+            input: parseNode(scorePointNodes[0]),
+            scorePoints,
+          });
+        }
+
+        if (Blocks[type])
+        {
+          return make(Blocks[type], {
+            value: parseNode(node.right_child),
+          });
+        }
+      }
+
+      return make(Blocks.tql, { clause: 'call' });
+    },
+
+  'DISTINCT':
+    (node) =>
+      make(Blocks.distinct, {
+        value: parseNode(node.child),
+      }),
+
+  'EXPR':
+    (node) =>
+      parseNode(node.child),
+
+  'AS':
+    (node) =>
+      make(Blocks.as, {
+        value: parseNode(node.left_child),
+        alias: node.right_child,
+      }),
+
+  'AND':
+    andOrProcessor('AND'),
+
+  'OR':
+    andOrProcessor('OR'),
+
+  'EXISTS':
+    (node) =>
+      make(
+        Blocks.exists,
+        {
+          cards: List([
+            parseNodeAsCard(node.child),
+          ]),
+        },
+      ),
+
+  'NOT':
+    (node) =>
+      make(
+        Blocks.not,
+        {
+          cards: List([
+            parseNodeAsCard(node.child),
+          ]),
+        },
+      ),
+
+  // TODO migrate to card when available
+  'IS NOT NULL':
+    (node) =>
+      node.child + ' IS NOT NULL',
+
+  '+':
+    (node) =>
+      parseMathNode(node, '+', Blocks.add),
+
+  '-':
+    (node) =>
+    {
+      // could be negative, or could be subract
+      if (node.child)
+      {
+        // negative
+        const contents = parseNode(node.child);
+        if (typeof contents !== 'object')
+        {
+          return '-' + contents;
+        }
+
+        return make(Blocks.subtract,
+          {
+            fields: List([
+              make(Blocks.field, {
+                field: '0',
+              }),
+              make(Blocks.field, {
+                field: contents,
+              }),
             ]),
-          },
-        ),
+          });
+      }
+      return parseMathNode(node, '-', Blocks.subtract);
+    },
 
-    'NOT':
-      (node) =>
-        make(
-          Blocks.not,
-          {
-            cards: List([
-              parseNodeAsCard(node.child),
-            ]),
-          },
-        ),
+  '*':
+    (node) =>
+      parseMathNode(node, '*', Blocks.multiply),
 
-    // TODO migrate to card when available
-    'IS NOT NULL':
-      (node) =>
-        node.child + ' IS NOT NULL',
+  '/':
+    (node) =>
+      parseMathNode(node, '/', Blocks.divide),
 
-    '+':
-      (node) =>
-        parseMathNode(node, '+', Blocks.add),
-
-    '-':
-      (node) =>
-      {
-        // could be negative, or could be subract
-        if (node.child)
-        {
-          // negative
-          const contents = parseNode(node.child);
-          if (typeof contents !== 'object')
-          {
-            return '-' + contents;
-          }
-
-          return make(Blocks.subtract,
-            {
-              fields: List([
-                make(Blocks.field, {
-                  field: '0',
-                }),
-                make(Blocks.field, {
-                  field: contents,
-                }),
-              ]),
-            });
-        }
-        return parseMathNode(node, '-', Blocks.subtract);
-      },
-
-    '*':
-      (node) =>
-        parseMathNode(node, '*', Blocks.multiply),
-
-    '/':
-      (node) =>
-        parseMathNode(node, '/', Blocks.divide),
-
-  };
+};
 
 function parseMathNode(node: Node, op: string, mathCardBlock): Card
 {
@@ -547,77 +547,77 @@ const sfwProcessors: {
   ) => CardString,
 } = {
 
-    TAKE:
-      (rightNodes) =>
-        make(Blocks.take, {
-          value: rightNodes[0],
-        }),
+  TAKE:
+    (rightNodes) =>
+      make(Blocks.take, {
+        value: rightNodes[0],
+      }),
 
-    SKIP:
-      (rightNodes) =>
-        make(Blocks.skip, {
-          value: rightNodes[0],
-        }),
+  SKIP:
+    (rightNodes) =>
+      make(Blocks.skip, {
+        value: rightNodes[0],
+      }),
 
-    SORT:
-      (sortNodes) =>
-        make(Blocks.sort, {
-          sorts: List(
-            sortNodes.map(
-              (node) =>
+  SORT:
+    (sortNodes) =>
+      make(Blocks.sort, {
+        sorts: List(
+          sortNodes.map(
+            (node) =>
+            {
+              let config: any = {
+                property: node,
+              };
+              if (typeof node === 'object')
               {
-                let config: any = {
-                  property: node,
+                config = {
+                  property: parseNode(node.child),
+                  direction: node.op === 'ASC' ? CommonSQL.Direction.ASC : CommonSQL.Direction.DESC,
                 };
-                if (typeof node === 'object')
-                {
-                  config = {
-                    property: parseNode(node.child),
-                    direction: node.op === 'ASC' ? CommonSQL.Direction.ASC : CommonSQL.Direction.DESC,
-                  };
-                }
-                return make(Blocks.sortBlock, config);
-              },
-            ),
+              }
+              return make(Blocks.sortBlock, config);
+            },
           ),
-        }),
+        ),
+      }),
 
-    GROUP:
-      (fieldNodes) =>
-        make(Blocks.groupBy, {
-          fields: List(
-            fieldNodes.map(
-              (node) =>
-                make(Blocks.field, {
-                  field: parseNode(node),
-                }),
-            ),
+  GROUP:
+    (fieldNodes) =>
+      make(Blocks.groupBy, {
+        fields: List(
+          fieldNodes.map(
+            (node) =>
+              make(Blocks.field, {
+                field: parseNode(node),
+              }),
           ),
-        }),
-
-    FILTER:
-      (childNodes) =>
-        make(
-          Blocks.where,
-          {
-            // filter doesn't use commas, will only have one node
-            cards: List([
-              parseNodeAsCard(childNodes[0]),
-            ]),
-          },
         ),
+      }),
 
-    HAVING:
-      (childNodes) =>
-        make(
-          Blocks.having,
-          {
-            cards: List([
-              parseNodeAsCard(childNodes[0]),
-            ]),
-          },
-        ),
-  };
+  FILTER:
+    (childNodes) =>
+      make(
+        Blocks.where,
+        {
+          // filter doesn't use commas, will only have one node
+          cards: List([
+            parseNodeAsCard(childNodes[0]),
+          ]),
+        },
+      ),
+
+  HAVING:
+    (childNodes) =>
+      make(
+        Blocks.having,
+        {
+          cards: List([
+            parseNodeAsCard(childNodes[0]),
+          ]),
+        },
+      ),
+};
 
 // takes a tree of a certain op (e.g. commas, and/or)
 //  and turns it into an array of Node
