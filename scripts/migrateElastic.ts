@@ -81,14 +81,20 @@ process.on('unhandledRejection', unhandledRejectionHandler);
 
 const unused = (async () =>
 {
-  if (process.argv.length !== 5)
+  if (process.argv.length < 5)
   {
-    console.log('Bad args. Requires [srcDsn] [dstDsn] [prefix]');
+    console.log('Bad args. Requires [srcDsn] [dstDsn] [newPrefix] [oldPrefix=\'\']');
     return;
   }
   const srcDsn = process.argv[2];
   const dstDsn = process.argv[3];
   const prefix = process.argv[4];
+  const oldPrefix = process.argv[5] || '';
+  if (oldPrefix === '' && prefix === '')
+  {
+    console.log('Bad args.');
+    return;
+  }
   const srcElasticClient: ElasticClient = (await DatabaseControllerConfig.makeDatabaseController(
     {
       id: 1,
@@ -118,8 +124,12 @@ const unused = (async () =>
     {
       continue;
     }
+    if (!oldIndex.startsWith(oldPrefix))
+    {
+      continue;
+    }
     const mappings = result[oldIndex].mappings;
-    const index = prefix + oldIndex;
+    const index = prefix + oldIndex.substring(oldPrefix.length);
     try
     {
       await new Promise((res, rej) => dstElasticClient.indices.delete({ index }, SharedUtil.promise.makeCallback(res, rej)));
