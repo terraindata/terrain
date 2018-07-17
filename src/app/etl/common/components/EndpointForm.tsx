@@ -45,11 +45,11 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
 import TerrainComponent from 'common/components/TerrainComponent';
+import StreamUtil from 'etl/pathselector/StreamUtil';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
 import Util from 'util/Util';
-import StreamUtil from 'etl/pathselector/StreamUtil';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';

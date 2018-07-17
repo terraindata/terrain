@@ -49,37 +49,37 @@ import StreamUtil from 'app/etl/pathselector/StreamUtil';
 describe('StreamUtil', () =>
 {
   const formatJsonStringTests =
-    {
-      '{"type": "FeatureCollection", "metadata": { "generated": 124123, ': { type: 'FeatureCollection', metadata: { generated: 124123 } },
-      '{"page": 1, "total_results": 367048, "total_pages": 18353, "results": [{ "vote_count": 1178, ': {
-        page: 1, total_results: 367048,
-        total_pages: 18353, results: [{ vote_count: 1178 }],
-      },
-      '{"vote_count": 403,"id": 260513,"video": false,"vote_average": 7.6,"title": "Incredibles 2","popularity": 171.840079,':
-        { vote_count: 403, id: 260513, video: false, vote_average: 7.6, title: 'Incredibles 2', popularity: 171.840079 },
-      '[{"PurchaseHistory": [{"SKU": "317-139", "Genres": "Comedy|Romance", "Title": "Pretty Woman (1990)", "Tagline": \
+  {
+    '{"type": "FeatureCollection", "metadata": { "generated": 124123, ': { type: 'FeatureCollection', metadata: { generated: 124123 } },
+    '{"page": 1, "total_results": 367048, "total_pages": 18353, "results": [{ "vote_count": 1178, ': {
+      page: 1, total_results: 367048,
+      total_pages: 18353, results: [{ vote_count: 1178 }],
+    },
+    '{"vote_count": 403,"id": 260513,"video": false,"vote_average": 7.6,"title": "Incredibles 2","popularity": 171.840079,':
+      { vote_count: 403, id: 260513, video: false, vote_average: 7.6, title: 'Incredibles 2', popularity: 171.840079 },
+    '[{"PurchaseHistory": [{"SKU": "317-139", "Genres": "Comedy|Romance", "Title": "Pretty Woman (1990)", "Tagline": \
         "Who knew it was so much fun to be a hooker?", "Version": 1, "Inventory": 42,':
-        [{
-          PurchaseHistory: [{
-            SKU: '317-139', Genres: 'Comedy|Romance', Title: 'Pretty Woman (1990)', Tagline:
-              'Who knew it was so much fun to be a hooker?', Version: 1, Inventory: 42,
-          }],
+      [{
+        PurchaseHistory: [{
+          SKU: '317-139', Genres: 'Comedy|Romance', Title: 'Pretty Woman (1990)', Tagline:
+            'Who knew it was so much fun to be a hooker?', Version: 1, Inventory: 42,
         }],
-      '{"type": "Feature", "properties": {"mag": 2.63, "place": "2km SSW of Volcano, Hawaii",': {
-        type: 'Feature', properties:
-          { mag: 2.63, place: '2km SSW of Volcano, Hawaii' },
-      },
-      '{"name": "Steven", "age": 21, "favNums": [1,2,': { name: 'Steven', age: 21, favNums: [1, 2] },
-      '[{"type": "FeatureCollection", "metadata"': [{ type: 'FeatureCollection' }],
-      '{"name": "Steven", "age": 21, "favNums"': { name: 'Steven', age: 21 },
-      '{"favs": ["apples", "peaches"], "legal": false, "friends": [{"name":"bob", "age":21},{"name"':
-        { favs: ['apples', 'peaches'], legal: false, friends: [{ name: 'bob', age: 21 }] },
-      '{"favs": ["apples", "peaches"], "legal": false, "friends": [{"name":"bob", "age":21},{"name":"joe","age"':
-        { favs: ['apples', 'peaches'], legal: false, friends: [{ name: 'bob', age: 21 }, { name: 'joe' }] },
-      '{"favs": ["apples", "peaches"], "legal": false, "friends": [{"name":"bob", "age":21},{"name":"joe","age":29}':
-        { favs: ['apples', 'peaches'], legal: false, friends: [{ name: 'bob', age: 21 }, { name: 'joe', age: 29 }] },
+      }],
+    '{"type": "Feature", "properties": {"mag": 2.63, "place": "2km SSW of Volcano, Hawaii",': {
+      type: 'Feature', properties:
+        { mag: 2.63, place: '2km SSW of Volcano, Hawaii' },
+    },
+    '{"name": "Steven", "age": 21, "favNums": [1,2,': { name: 'Steven', age: 21, favNums: [1, 2] },
+    '[{"type": "FeatureCollection", "metadata"': [{ type: 'FeatureCollection' }],
+    '{"name": "Steven", "age": 21, "favNums"': { name: 'Steven', age: 21 },
+    '{"favs": ["apples", "peaches"], "legal": false, "friends": [{"name":"bob", "age":21},{"name"':
+      { favs: ['apples', 'peaches'], legal: false, friends: [{ name: 'bob', age: 21 }] },
+    '{"favs": ["apples", "peaches"], "legal": false, "friends": [{"name":"bob", "age":21},{"name":"joe","age"':
+      { favs: ['apples', 'peaches'], legal: false, friends: [{ name: 'bob', age: 21 }, { name: 'joe' }] },
+    '{"favs": ["apples", "peaches"], "legal": false, "friends": [{"name":"bob", "age":21},{"name":"joe","age":29}':
+      { favs: ['apples', 'peaches'], legal: false, friends: [{ name: 'bob', age: 21 }, { name: 'joe', age: 29 }] },
 
-    };
+  };
 
   describe('#formatJsonString', () =>
   {
