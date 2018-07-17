@@ -96,7 +96,24 @@ Router.post('/run/:id', passport.authenticate('access-token-local'), async (ctx,
 
 Router.post('/runnow/:id', async (ctx, next) =>
 {
-  const { fields, files } = await asyncBusboy(ctx.req);
+  let fields;
+  let files;
+  let isDownloadRequest = false;
+  let downloadName;
+  // TODO: better to check the download request by looking the template.
+  if (ctx.request.type === 'application/x-www-form-urlencoded')
+  {
+    isDownloadRequest = true;
+    fields = ctx.request.body;
+    if (fields.hasOwnProperty('downloadName') === false)
+    {
+      throw (new Error('Download Name is missing'));
+    }
+    downloadName = fields['downloadName'];
+  } else
+  {
+    ({ fields, files } = await asyncBusboy(ctx.req));
+  }
 
   AppUtil.verifyParameters(fields, ['id', 'accessToken']);
   const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
@@ -118,6 +135,11 @@ Router.post('/runnow/:id', async (ctx, next) =>
   }
   else
   {
+    if (isDownloadRequest === true)
+    {
+      ctx.type = 'text/plain';
+      ctx.attachment(downloadName);
+    }
     ctx.body = responseStream.pipe(new stream.PassThrough());
   }
 });

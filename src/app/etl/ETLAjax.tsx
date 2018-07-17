@@ -356,12 +356,23 @@ class ETLAjax
 
       _.extend(payload, { template: templateToRun });
 
-      this.reqFormData(
-        `jobs/runnow/${jobId}`,
-        payload,
-        (resp) => resolve(resp),
-        config,
-      );
+      if (config.downloadName !== undefined)
+      {
+        this.downloadFile(
+          `jobs/runnow/${jobId}`,
+          payload,
+          (resp) => resolve(resp),
+          config,
+        );
+      } else
+      {
+        this.reqFormData(
+          `jobs/runnow/${jobId}`,
+          payload,
+          (resp) => resolve(resp),
+          config,
+        );
+      }
     });
   }
 
@@ -428,6 +439,40 @@ class ETLAjax
         },
       );
     });
+  }
+
+  private downloadFile(
+    route: string,
+    data: {
+      [k: string]: string | File,
+    },
+    handleResponse: (response: any) => void,
+    cfg: ReqConfig,
+  )
+  {
+    const fullUrl = '/midway/v1/' + route;
+    const form = document.createElement('form');
+    form.setAttribute('action', fullUrl);
+    form.setAttribute('method', 'post');
+    form.setAttribute('target', '_self');
+
+    data['id'] = localStorage['id'];
+    data['accessToken'] = localStorage['accessToken'];
+    data['downloadName'] = cfg.downloadName;
+    _.map(data as any, (value, key) =>
+    {
+      const input = document.createElement('input');
+      input.setAttribute('type', 'hidden');
+      input.setAttribute('name', key + '');
+      input.setAttribute('value', value as any);
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form); // Required for FF
+    form.submit();
+    form.remove();
+    handleResponse('');
+    return;
   }
 
   private reqFormData(
