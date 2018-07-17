@@ -196,7 +196,7 @@ class DocumentsHelpers extends ETLHelpers
   public fetchPreview(
     source: SourceConfig,
     rawStringOnly?: boolean,
-  ): Promise<List<object> | string>
+  ): Promise<List<object> | object>
   {
     return new Promise((resolve, reject) =>
     {
@@ -250,7 +250,7 @@ class DocumentsHelpers extends ETLHelpers
     source: SourceConfig,
     size: number,
     rawStringOnly?: boolean,
-  ): Promise<List<object> | string>
+  ): Promise<List<object> | object>
   {
     return new Promise(async (resolve, reject) =>
     {

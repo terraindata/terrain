@@ -44,11 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-// const Earthquakes = require('./earthquakes.json');
-// const Movies = require('./movies.json');
-// // const UsersRomance = require('./Users_Romance.json');
-// const Waduhek = require('./waduhekmovies.json');
-
 interface PathInfo
 {
   name: string;
@@ -66,7 +61,7 @@ export default class PathUtil
   public static renderFields(objectItem: object)
   {
     const keyFields = [];
-    if (objectItem == null)
+    if (objectItem === undefined || objectItem === null)
     {
       return keyFields;
     }
@@ -221,7 +216,3 @@ export default class PathUtil
     return sortedPathInfo;
   }
 }
-
-// console.log(PathUtil.guessFilePaths(Earthquakes));
-// console.log(PathUtil.guessFilePaths(Movies));
-// console.log(PathUtil.guessFilePaths(Waduhek));

@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import StreamUtil from 'app/etl/pathselector/StreamUtil';
+import StreamUtil from '../../src/app/etl/pathselector/StreamUtil';
 
 describe('StreamUtil', () =>
 {
@@ -81,15 +81,29 @@ describe('StreamUtil', () =>
 
   };
 
+  const testString = '{"favs": ["apples", "peaches"], "legal": false, "friends": [{"name":"bob", "age":21},{"name":"joe","age":29}';
+
   describe('#formatJsonString', () =>
   {
-    it('should return a proper json string without loose ends', () =>
+    // it('should return a proper json string without loose ends', () =>
+    // {
+    //   for (const rawJsonString of Object.keys(formatJsonStringTests))
+    //   {
+    //     expect(formatJsonStringTests[rawJsonString]).toEqual(StreamUtil.formatJsonString(rawJsonString));
+    //   }
+    // });
+
+    it('should not error when run on a proper json string fragment', () =>
     {
-      for (const rawJsonString of Object.keys(formatJsonStringTests))
+      for (let i = 0; i <= testString.length; i++)
       {
-        expect(formatJsonStringTests[rawJsonString]).toEqual(StreamUtil.formatJsonString(rawJsonString));
+        let testFragment = testString.slice(0, i);
+        console.log('TEST FRAGMENT', testFragment);
+        const testSubstrings = jest.fn(() => StreamUtil.formatJsonString(testFragment));
+        testSubstrings();
+        expect(testSubstrings).toHaveReturned();
       }
-    });
+    })
   });
 
 },

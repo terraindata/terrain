@@ -54,15 +54,16 @@ export default class StreamUtil
     const parser = clarinet.createStream();
     const bracketStack = [];
     let stringStream = '';
-    console.log(parser);
     parser.on('openarray', () =>
     {
+      //console.log('opening array');
       bracketStack.push('[');
       stringStream = stringStream + '[';
     });
 
     parser.on('closearray', () =>
     {
+      //console.log('clsing array');
       const recent = bracketStack.pop();
       if (stringStream.slice(-2) === ', ')
       {
@@ -71,19 +72,20 @@ export default class StreamUtil
       stringStream = stringStream + ']' + ', ';
       if (recent !== '[')
       {
-        throw new Error('Error parsing');
+        throw new Error('Object bracket mismatch');
       }
     });
 
     parser.on('openobject', (key) =>
     {
-      // console.log(key);
+      //console.log('opening object');
       bracketStack.push('{');
       stringStream = stringStream + '{' + `"${key}":`;
     });
 
     parser.on('closeobject', () =>
     {
+      //console.log('closing object');
       const recent = bracketStack.pop();
       if (stringStream.slice(-2) === ', ')
       {
@@ -92,20 +94,20 @@ export default class StreamUtil
       stringStream = stringStream + '}' + ', ';
       if (recent !== '{')
       {
-        throw new Error('Error parsing');
+        throw new Error('Object bracket mismatch');
       }
     });
 
     parser.on('key', (name) =>
     {
-      // console.log(name);
+      //console.log('got a key');
       stringStream = stringStream + `"${name}":`;
     });
 
     parser.on('value', (value) =>
     {
+      //console.log('got a value');
       let valueString: string;
-      // console.log(value);
       const valueType = typeof value;
       switch (valueType)
       {
@@ -114,7 +116,6 @@ export default class StreamUtil
           break;
         case 'string':
           valueString = `"${value}"`;
-          // console.log(valueString);
           break;
         case 'boolean':
           valueString = `${value}`;
@@ -134,6 +135,15 @@ export default class StreamUtil
 
     parser.on('end', () =>
     {
+      //console.log('ending');
+      if (stringStream.slice(-2) === ', ')
+      {
+        stringStream = stringStream.slice(0, -2);
+      }
+      if (stringStream.slice(-1) === ':')
+      {
+        //console.log('hihihihihhi');
+      }
       return [bracketStack, stringStream];
     });
 
@@ -146,21 +156,45 @@ export default class StreamUtil
     return [bracketStack, stringStream];
   }
 
-  public static fixStringStream(rawStringStream: string): string
+  public static handleDroppedBrackets(substring: string): number
   {
+    let count = 0;
+    for (let i = 0; i < substring.length; i++)
+    {
+      let character = substring[i];
+      if (character === '[' || character === '{')
+      {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  public static fixStringStream(rawStringStream: string, bracketStack)
+  {
+    console.log(rawStringStream);
+    console.log('working with this bracket sstack', bracketStack);
     let correctedString;
-    // console.log(rawStringStream);
     const checkBracketOrKey = rawStringStream.slice(-1);
     const checkValue = rawStringStream.slice(-2);
-    // console.log(checkBracketOrKey);
-    // console.log(checkValue);
+    if (rawStringStream.length === 0)
+    {
+      return [bracketStack, rawStringStream];
+    }
     switch (checkBracketOrKey)
     {
+      case '"':
+        correctedString = rawStringStream;
+        break;
       case '[':
         correctedString = rawStringStream.slice(0, -1);
+        console.log('BEFORE ', bracketStack);
+        bracketStack.pop();
+        console.log('AFTER ', bracketStack);
         break;
       case '{':
         correctedString = rawStringStream.slice(0, -1);
+        bracketStack.pop();
         break;
       case ']':
         correctedString = rawStringStream;
@@ -169,41 +203,82 @@ export default class StreamUtil
         correctedString = rawStringStream;
         break;
       case ':':
+        console.log('got herereRERREREERER ');
         const splitString = rawStringStream.split(',');
-        splitString.pop();
+        let droppedFragment = splitString.pop();
+        let droppedBracketCount = this.handleDroppedBrackets(droppedFragment);
+        for (let count = 0; count < droppedBracketCount; count++)
+        {
+          bracketStack.pop();
+        }
         if (splitString.length < 0)
         {
           throw new Error('Error parsing');
         }
         else
         {
+          console.log('STRING ARRAY ', splitString);
           correctedString = splitString.join(',');
+          console.log('CORRECTWSDKJSDF SRING ',correctedString);
         }
         break;
       default:
+        console.log(checkValue);
         if (checkValue === ', ')
         {
           correctedString = rawStringStream.slice(0, -2);
         }
         else
         {
-          throw new Error('Error parsing');
+          correctedString = rawStringStream;
         }
         break;
     }
-    return correctedString;
+    // recursively fix string if needed
+    //let recursiveFixedString = this.fixStringStream(correctedString);
+    //console.log('this is my atetmpte at recursion   ', recursiveFixedString, 'with', correctedString);
+    // while (correctedString !== recursiveFixedString)
+    // {
+    //   correctedString = recursiveFixedString;
+    //   recursiveFixedString = this.fixStringStream(correctedString);
+    //   console.log('CORRECTED STEING, ', correctedString);
+    //   console.log('RECURIDLKV ', recursiveFixedString);
+    // }
+    if (correctedString.slice(-1) === ':')
+    {
+      const splitKey = correctedString.split(',');
+      splitKey.pop();
+      if (splitKey.length < 0)
+      {
+        throw new Error('Error parsing');
+      }
+      else
+      {
+        correctedString = splitKey.join(',');
+      }
+    }
+    console.log('I SHULDVE CHANGED ', bracketStack);
+    return [bracketStack, correctedString];
   }
 
   public static formatJsonString(jsonString: string): object
   {
+    console.log(jsonString);
     const results: object = this.completeStream(jsonString);
-    // console.log(results);
-    const bracketStack: string[] = results[0];
+    console.log(results);
+    let bracketStack: string[] = results[0];
     const rawStringStream: string = results[1];
-    // console.log(rawStringStream);
-    let fixedStringStream: string = this.fixStringStream(rawStringStream);
-    // console.log(fixedStringStream);
+    let fixedBracketsAndStringStream = this.fixStringStream(rawStringStream, bracketStack);
+    bracketStack = fixedBracketsAndStringStream[0];
+    let fixedStringStream = fixedBracketsAndStringStream[1];
+    console.log(fixedBracketsAndStringStream[0]);
+    console.log(fixedBracketsAndStringStream[1]);
 
+    if (fixedStringStream === '')
+    {
+      console.log('i got hererheehrhreheheherhr');
+      return {};
+    }
     if (bracketStack === [])
     {
       return JSON.parse(fixedStringStream); // no incomplete parens
@@ -222,12 +297,11 @@ export default class StreamUtil
           fixedStringStream = fixedStringStream + '}';
         }
       }
-      // console.log(fixedStringStream);
       if (fixedStringStream.slice(0, 1) === '[') // can't parse if wrapped in array
       {
-        // console.log([fixedStringStream.slice(1, -1)]);
         return [JSON.parse(fixedStringStream.slice(1, -1))];
       }
+      console.log('TRYNA PARSE THIS BAIFKG', fixedStringStream);
       return JSON.parse(fixedStringStream);
     }
   }

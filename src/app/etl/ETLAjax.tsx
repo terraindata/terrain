@@ -370,7 +370,7 @@ class ETLAjax
     size: number,
     rawStringOnly: boolean,
     fileString?: string,
-  ): Promise<List<object> | string>
+  ): Promise<List<object> | object>
   {
     return new Promise((resolve, reject) =>
     {

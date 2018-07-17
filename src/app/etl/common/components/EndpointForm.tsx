@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
 import TerrainComponent from 'common/components/TerrainComponent';
-import StreamUtil from 'etl/pathselector/StreamUtil';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
@@ -282,14 +281,13 @@ class EndpointForm extends TerrainComponent<Props>
     if (newEndpoint.fileConfig.fileType === FileTypes.Json)
     {
       newEndpoint = newEndpoint.setIn(['fileConfig', 'jsonPath'], '');
-      DocumentsHelpers.fetchPreview(newEndpoint, true).then((res: string) =>
+      DocumentsHelpers.fetchPreview(newEndpoint, true).then((res: object) =>
       {
         console.log(typeof res);
-        const fixedRes = StreamUtil.formatJsonString(res);
-        console.log('fixedres is ', fixedRes);
+        console.log('res is ', res);
         this.setState(
           {
-            currentObject: fixedRes,
+            currentObject: res,
           },
         );
       })

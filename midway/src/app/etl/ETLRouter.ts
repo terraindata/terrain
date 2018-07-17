@@ -54,6 +54,7 @@ import BufferTransform from '../io/streams/BufferTransform';
 import { Permissions } from '../permissions/Permissions';
 import { getSourceStream, getSourceStreamPreview } from './SourceSinkStream';
 import * as TemplateRouter from './TemplateRouter';
+import StreamUtil from './pathselector/StreamUtil';
 
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
@@ -101,7 +102,7 @@ Router.post('/preview', passport.authenticate('access-token-local'), async (ctx,
   if (request.rawString === true)
   {
     ctx.body = {
-      result: sourceStreamAsString
+      result: StreamUtil.formatJsonString(sourceStreamAsString),
     };
   }
   else
