@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable-next-line
 /// <reference path="../../../shared/typings/tsd.d.ts" />
 
+import Bottleneck from 'bottleneck';
 import * as http from 'http';
 import * as Koa from 'koa';
 import * as winston from 'winston';
@@ -96,6 +97,7 @@ export let EMAIL: Email;
 export let HA: number;
 export let JobL: JobLog;
 export let JobQ: JobQueue;
+export let Limiter: Bottleneck; // TODO: for clustering, ensure total limit is matched
 export let SKDR: Scheduler;
 export let TBLS: Schema.Tables;
 
@@ -147,6 +149,7 @@ export class App
   private EMAIL: Email;
   private JobL: JobLog;
   private JobQ: JobQueue;
+  private Limiter: Bottleneck;
   private SKDR: Scheduler;
   private Migrations: Migrations; // for now, do not allow external access
   private app: Koa;
@@ -184,6 +187,12 @@ export class App
     this.JobQ = new JobQueue();
     JobQ = this.JobQ;
     JobQ.initialize();
+
+    this.Limiter = new Bottleneck({
+      maxConcurrent: 1,
+      minTime: 2000,
+    });
+    Limiter = this.Limiter;
 
     this.SKDR = new Scheduler();
     SKDR = this.SKDR;

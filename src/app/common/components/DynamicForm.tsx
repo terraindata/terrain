@@ -342,7 +342,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
               const untransformedValue = options.untransformValue !== undefined ?
                 options.untransformValue(val) : val;
 
-              return this.setStateNoApplyHOC(stateName)(untransformedValue);
+              return this.setStateHOC(stateName)(untransformedValue);
             }
           }
           focusedClassName={''}

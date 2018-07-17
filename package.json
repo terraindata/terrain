@@ -44,7 +44,8 @@
     "test-rr-pathfinder": "jest ./rr/test/pathfinder --forceExit",
     "test-rr-etl-http-import": "jest ./rr/test/etl --forceExit",
     "test-fullstack-component": "jest ./rr/test/components --forceExit",
-    "clean": "rm -rf .cache && rm -rf .cache-loader && rm -rf midway/src/assets/.cache"
+    "migrate-elastic": "tsc -p scripts/tsconfig.json && NODE_PATH=scripts/build node scripts/build/scripts/migrateElastic.js",
+    "clean": "rm -rf .cache && rm -rf .cache-loader && rm -rf midway/src/bundles/"
   },
   "repository": {
     "type": "git",

@@ -153,7 +153,8 @@ export interface ConnectionConfigTypes
     database: string;
   };
   Magento: {
-    apiUser: string;
+    username: string;
+    host: string;
   };
   GoogleAnalytics: {
     email: string;

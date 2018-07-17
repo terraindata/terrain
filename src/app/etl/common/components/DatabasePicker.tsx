@@ -73,6 +73,7 @@ interface FormState
 
 interface Props
 {
+  allowEmpty?: boolean;
   language: Languages;
   serverId: ID;
   database: string;
@@ -122,6 +123,11 @@ class DatabasePicker extends TerrainComponent<Props>
 
   public validateForm(state: FormState): string | undefined
   {
+    if (this.props.allowEmpty === true)
+    {
+      return undefined;
+    }
+
     const db = state.database;
     if (db === '')
     {
