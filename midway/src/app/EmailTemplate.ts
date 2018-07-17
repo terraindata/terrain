@@ -48,13 +48,13 @@ class EmailTemplate
 {
   public makeEmailContent(headerText, descriptionText, secondDescriptionText, buttonUrl, buttonText): string
   {
-  	const path: string = process.cwd() + '/midway/src/assets/EmailTemplate.html';
-    let html: string = fs.readFileSync(path, 'utf8');
-    let htmlString: string = html.replace("%BUTTONURL%", buttonUrl);
-    htmlString = htmlString.replace("%HEADERTEXT%", headerText);
-    htmlString = htmlString.replace("%DESCRIPTIONTEXT%", descriptionText);
-    htmlString = htmlString.replace("%DESCRIPTIONTEXT2%", secondDescriptionText);
-    htmlString = htmlString.replace("%BUTTONTEXT%", buttonText);
+    const path: string = process.cwd() + '/midway/src/assets/EmailTemplate.html';
+    const html: string = fs.readFileSync(path, 'utf8');
+    let htmlString: string = html.replace('%BUTTONURL%', buttonUrl);
+    htmlString = htmlString.replace('%HEADERTEXT%', headerText);
+    htmlString = htmlString.replace('%DESCRIPTIONTEXT%', descriptionText);
+    htmlString = htmlString.replace('%DESCRIPTIONTEXT2%', secondDescriptionText);
+    htmlString = htmlString.replace('%BUTTONTEXT%', buttonText);
     return htmlString;
   }
 }

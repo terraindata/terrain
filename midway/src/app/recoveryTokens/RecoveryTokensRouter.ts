@@ -44,12 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import * as fs from 'fs';
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as srs from 'secure-random-string';
 import * as App from '../App';
 import * as Util from '../AppUtil';
-import * as fs from 'fs';
 import { MidwayLogger } from '../log/MidwayLogger';
 import RecoveryTokenConfig from '../recoveryTokens/RecoveryTokenConfig';
 import RecoveryTokens from '../recoveryTokens/RecoveryTokens';
@@ -114,10 +114,10 @@ Router.post('/', async (ctx, next) =>
     const body: string = '';
     // const path: string = process.cwd() + '/midway/src/app/recoveryTokens/EmailTemplate.html';
     // let html: string = fs.readFileSync(path, 'utf8');
-    let emailHtml: string = EmailTemplate.makeEmailContent("Reset your password.", 
-      "You're receiving this email because someone requested a password reset for your user account at Terrain.*", 
-      "*If you didn’t request this email or don't know why you received it, please contact leslie@terraindata.com immediately.", 
-      route, "RESET PASSWORD");
+    const emailHtml: string = EmailTemplate.makeEmailContent('Reset your password.',
+      "You're receiving this email because someone requested a password reset for your user account at Terrain.*",
+      "*If you didn’t request this email or don't know why you received it, please contact leslie@terraindata.com immediately.",
+      route, 'RESET PASSWORD');
     const attachment: object = [
     {
       filename: 'bg-blue-gradient.png',
@@ -132,12 +132,12 @@ Router.post('/', async (ctx, next) =>
     {
       filename: 'twitter@2x.png',
       path: process.cwd() + '/src/images/twitter@2x.png',
-      cid: 'twitterlogo'
+      cid: 'twitterlogo',
     },
     {
       filename: 'linkedin@2x.png',
       path: process.cwd() + '/src/images/linkedin@2x.png',
-      cid: 'linkedinlogo'
+      cid: 'linkedinlogo',
     }];
     const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body, attachment, email, emailHtml);
     MidwayLogger.info(`email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
