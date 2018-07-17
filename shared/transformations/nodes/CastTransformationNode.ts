@@ -169,7 +169,7 @@ export class CastTransformationNode extends SimpleTransformationType
 
   public castToInteger(el: any): number
   {
-    return Number.parseInt(Number(el) as any);
+    return Number.parseInt(Number(el) as any, 10);
   }
 
   public castToBoolean(el: any): boolean

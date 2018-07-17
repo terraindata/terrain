@@ -282,6 +282,9 @@ export class TemplateProxy
     {
       throw new Error(`No sink exists with key ${key}`);
     }
+
+    // Set the sink's field ordering to be the names of the root fields
+    // This is used for CSV and TSV exports
     const rootNames = order.ordering
       .filter((id) => engine.getFieldPath(id).size === 1 && engine.getFieldEnabled(id))
       .map((id) => engine.getFieldPath(id).last());

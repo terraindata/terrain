@@ -186,7 +186,7 @@ export default class CreationVisitor
     if (opts.type === 'Removal')
     {
       const fieldId = node.fields.get(0).id;
-      Utils.traversal.appendNodeToField(engine, fieldId, node.id, EdgeTypes.Removal);
+      Utils.traversal.appendNodeToField(engine, fieldId, node.id, EdgeTypes.Same);
       engine.setFieldPath(fieldId, List([null]));
     }
   }
@@ -204,7 +204,7 @@ export default class CreationVisitor
       const childPath = engine.getFieldPath(id);
       engine.setFieldPath(id, newPath.concat(childPath.slice(transplantIndex)).toList());
       const identityNode = engine.addIdentity(id, node.id, 'Rename');
-      Utils.traversal.appendNodeToField(engine, id, identityNode, EdgeTypes.Rename);
+      Utils.traversal.appendNodeToField(engine, id, identityNode, EdgeTypes.Same);
       engine.dag.setEdge(String(node.id), String(identityNode), EdgeTypes.Synthetic);
     });
   }

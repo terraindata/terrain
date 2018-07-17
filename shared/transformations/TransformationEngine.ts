@@ -632,12 +632,6 @@ export class TransformationEngine
     // copy the dag
     const dag = GraphLib.json.read(GraphLib.json.write(this.dag)) as TransformationGraph;
 
-    // for each transformation in the executionOrder, explicitly create an edge between the nodes in chronological order
-    for (let i = 1; i < this.executionOrder.length; i++)
-    {
-      dag.setEdge(String(this.executionOrder[i - 1]), String(this.executionOrder[i]), 'DUMMY' as any);
-    }
-
     // iterate through all rename, same, and removal edges (v, w). For each node v whose synthetic edges are
     // [v, w_synth], create a "helper" edge from w_synth to w. This ensures a topological dependency that enforces that
     // the synthetic nodes w_synth are visited before w.
@@ -657,6 +651,12 @@ export class TransformationEngine
           }
         }
       }
+    }
+
+    // for each transformation in the executionOrder, explicitly create an edge between the nodes in chronological order
+    for (let i = 1; i < this.executionOrder.length; i++)
+    {
+      dag.setEdge(String(this.executionOrder[i - 1]), String(this.executionOrder[i]), 'DUMMY' as any);
     }
 
     if (!GraphLib.alg.isAcyclic(dag))

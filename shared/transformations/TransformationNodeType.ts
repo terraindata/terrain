@@ -235,8 +235,6 @@ export enum TransformationEdgeTypes
 {
   Synthetic = 'Synthetic',
   Same = 'Same',
-  Rename = 'Rename',
-  Removal = 'Removal',
 }
 
 export default TransformationNodeType;
