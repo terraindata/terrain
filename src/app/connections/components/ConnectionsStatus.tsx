@@ -101,6 +101,7 @@ export class ConnectionsStatus extends TerrainComponent<ConnectionsStatusProps>
             'Disconnected connections',
             connection.name,
             'error',
+            4,
           );
         }
       });

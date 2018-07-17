@@ -98,81 +98,81 @@ export interface MagentoParamConfigTypes
 }
 
 export const MagentoParamPayloadTypes =
-  {
-    CatalogCategoryAssignedProducts: {
-      dbPicker: false,
-    },
-    CatalogCategoryAssignProduct: {
-      dbPicker: false,
-      paramName: 'product',
-      type: 'string',
-      isArray: false,
-    },
-    CatalogCategoryRemoveProduct: {
-      dbPicker: false,
-      paramName: 'product',
-      type: 'string',
-      isArray: false,
-    },
-    CatalogInventoryStockItemList: {
-      dbPicker: true,
-      paramName: 'products',
-      type: 'string',
-      isArray: true,
-    },
-    CatalogProductAttributeMediaList: {
-      dbPicker: true,
-      paramName: 'product',
-      type: 'string',
-      isArray: false,
-    },
-    CatalogProductInfo: {
-      dbPicker: true,
-      paramName: 'productId',
-      type: 'string',
-      isArray: false,
-    },
-    CatalogProductList: {
-      dbPicker: false,
-    },
-  };
+{
+  CatalogCategoryAssignedProducts: {
+    dbPicker: false,
+  },
+  CatalogCategoryAssignProduct: {
+    dbPicker: false,
+    paramName: 'product',
+    type: 'string',
+    isArray: false,
+  },
+  CatalogCategoryRemoveProduct: {
+    dbPicker: false,
+    paramName: 'product',
+    type: 'string',
+    isArray: false,
+  },
+  CatalogInventoryStockItemList: {
+    dbPicker: true,
+    paramName: 'products',
+    type: 'string',
+    isArray: true,
+  },
+  CatalogProductAttributeMediaList: {
+    dbPicker: true,
+    paramName: 'product',
+    type: 'string',
+    isArray: false,
+  },
+  CatalogProductInfo: {
+    dbPicker: true,
+    paramName: 'productId',
+    type: 'string',
+    isArray: false,
+  },
+  CatalogProductList: {
+    dbPicker: false,
+  },
+};
 
 export const MagentoParamConfigDefaults: MagentoParamConfigTypes =
-  {
-    CatalogCategoryAssignedProducts: {
-      categoryId: '',
-      storeView: 1,
-    },
-    CatalogCategoryAssignProduct: {
-      categoryId: '',
-      product: '',
-      position: '',
-    },
-    CatalogCategoryRemoveProduct: {
-      categoryId: '',
-      product: '',
-      storeView: 1,
-    },
-    CatalogInventoryStockItemList: {
-      products: [],
-    },
-    CatalogProductAttributeMediaList: {
-      product: '',
-      storeView: 1,
-    },
-    CatalogProductInfo: {
-      productId: '',
-      storeView: 1,
-    },
-    CatalogProductList: {
-      filters: [],
-      storeView: 1,
-    },
-    Login: {
-      apiKey: '',
-      username: '',
-    },
-  };
+{
+  CatalogCategoryAssignedProducts: {
+    categoryId: '',
+    storeView: 1,
+  },
+  CatalogCategoryAssignProduct: {
+    categoryId: '',
+    product: '',
+    position: '',
+  },
+  CatalogCategoryRemoveProduct: {
+    categoryId: '',
+    product: '',
+    storeView: 1,
+  },
+  CatalogInventoryStockItemList: {
+    products: [],
+  },
+  CatalogProductAttributeMediaList: {
+    product: '',
+    storeView: 1,
+  },
+  CatalogProductInfo: {
+    productId: '',
+    storeView: 1,
+  },
+  CatalogProductList: {
+    filters: [],
+    storeView: 1,
+  },
+  Login: {
+    apiKey: '',
+    username: '',
+  },
+};
 
 export interface KV
 {
@@ -237,16 +237,16 @@ export const MagentoRoutesNames = Immutable.Map<string, string>({
 });
 
 export const MagentoRoutesRaw =
-  {
-    CatalogCategoryAssignedProducts: 'catalogCategoryAssignedProducts',
-    CatalogCategoryAssignProduct: 'catalogCategoryAssignProduct',
-    CatalogCategoryRemoveProduct: 'catalogCategoryRemoveProduct',
-    CatalogProductAttributeMediaList: 'catalogProductAttributeMediaList',
-    CatalogProductInfo: 'catalogProductInfo',
-    CatalogInventoryStockItemList: 'catalogInventoryStockItemList',
-    CatalogProductList: 'catalogProductList',
-    Login: 'login',
-  };
+{
+  CatalogCategoryAssignedProducts: 'catalogCategoryAssignedProducts',
+  CatalogCategoryAssignProduct: 'catalogCategoryAssignProduct',
+  CatalogCategoryRemoveProduct: 'catalogCategoryRemoveProduct',
+  CatalogProductAttributeMediaList: 'catalogProductAttributeMediaList',
+  CatalogProductInfo: 'catalogProductInfo',
+  CatalogInventoryStockItemList: 'catalogInventoryStockItemList',
+  CatalogProductList: 'catalogProductList',
+  Login: 'login',
+};
 
 // export const MagentoRoutesArr: List<MagentoRoutes> = Immutable.List([
 //   MagentoRoutes.CatalogInventoryStockItemList,
