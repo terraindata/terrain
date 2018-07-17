@@ -49,6 +49,7 @@ import * as KoaRouter from 'koa-router';
 import * as srs from 'secure-random-string';
 import * as App from '../App';
 import * as Util from '../AppUtil';
+import * as fs from 'fs';
 import { MidwayLogger } from '../log/MidwayLogger';
 import RecoveryTokenConfig from '../recoveryTokens/RecoveryTokenConfig';
 import RecoveryTokens from '../recoveryTokens/RecoveryTokens';
@@ -61,6 +62,7 @@ const recoveryTokens: RecoveryTokens = new RecoveryTokens();
 import IntegrationConfig from '../integrations/IntegrationConfig';
 import Integrations from '../integrations/Integrations';
 const integrations: Integrations = new Integrations();
+import EmailTemplate from '../EmailTemplate';
 Router.post('/', async (ctx, next) =>
 {
   let hostNameValid: boolean = false;
@@ -110,14 +112,34 @@ Router.post('/', async (ctx, next) =>
     const emailIntegrations: IntegrationConfig[] = await integrations.get(null, undefined, 'Email', true) as IntegrationConfig[];
     const subject: string = 'Password reset link from notifications@terraindata.com';
     const body: string = '';
-    const html: string = '<img style="background-color: #1eb4fa" src="cid:terrainlogo"/>'
-    +  '<br> <br> Please click on the link below to reset your password. <br> <br>' + route;
-    const attachment: object = [{
-      filename: 'icon-terrain.png',
-      path: process.cwd() + '/midway/src/app/recoveryTokens/icon-terrain.png',
+    // const path: string = process.cwd() + '/midway/src/app/recoveryTokens/EmailTemplate.html';
+    // let html: string = fs.readFileSync(path, 'utf8');
+    let emailHtml: string = EmailTemplate.makeEmailContent("Reset your password.", 
+      "You're receiving this email because someone requested a password reset for your user account at Terrain.*", 
+      "*If you didn’t request this email or don't know why you received it, please contact leslie@terraindata.com immediately.", 
+      route, "RESET PASSWORD");
+    const attachment: object = [
+    {
+      filename: 'bg-blue-gradient.png',
+      path: process.cwd() + '/src/images/bg-blue-gradient.png',
+      cid: 'terrainbackground',
+    },
+    {
+      filename: 'logo-terrain-light.png',
+      path: process.cwd() + '/src/images/logo-terrain-light.png',
       cid: 'terrainlogo',
+    },
+    {
+      filename: 'twitter@2x.png',
+      path: process.cwd() + '/src/images/twitter@2x.png',
+      cid: 'twitterlogo'
+    },
+    {
+      filename: 'linkedin@2x.png',
+      path: process.cwd() + '/src/images/linkedin@2x.png',
+      cid: 'linkedinlogo'
     }];
-    const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body, attachment, email, html);
+    const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body, attachment, email, emailHtml);
     MidwayLogger.info(`email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
   }
 
