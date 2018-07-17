@@ -89,7 +89,7 @@ const unused = (async () =>
   const srcDsn = process.argv[2];
   const dstDsn = process.argv[3];
   const prefix = process.argv[4];
-  const oldPrefix = process.argv[5] || '';
+  const oldPrefix = process.argv[5] == null ? process.argv[5] : '';
   if (oldPrefix === prefix)
   {
     console.log('Bad args.');
