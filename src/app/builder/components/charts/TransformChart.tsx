@@ -645,7 +645,7 @@ const TransformChart = {
           return minX;
         }
         const loc = MapUtil.getCoordinatesFromGeopoint(d['fields'][inputKey]);
-                if (distanceValue.address && distanceValue.address.chartAt(0) === '@')
+                if (distanceValue.address && distanceValue.address.charAt(0) === '@')
         {
           const input = MapUtil.getCoordinatesFromGeopoint(inputs[distanceValue.address]);
           if (input)

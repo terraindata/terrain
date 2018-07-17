@@ -687,7 +687,7 @@ class TransformCard extends TerrainComponent<Props>
           },
         };
         // If there were inputs involved, need to use an interpreter
-        if (typeof lat === 'string' && lat.chartAt(0) === '@')
+        if (typeof lat === 'string' && lat.charAt(0) === '@')
         {
           const qt = new ESJSParser(domainQuery);
           if (qt.getErrors().length)
@@ -772,7 +772,7 @@ class TransformCard extends TerrainComponent<Props>
           },
           size: 1,
         };
-        if (typeof lat === 'string' && lat.chartAt(0) === '@')
+        if (typeof lat === 'string' && lat.charAt(0) === '@')
         {
           const qt = new ESJSParser(aggQuery);
           if (qt.getErrors().length)
