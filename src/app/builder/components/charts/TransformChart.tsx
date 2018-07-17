@@ -645,13 +645,40 @@ const TransformChart = {
           return minX;
         }
         const loc = MapUtil.getCoordinatesFromGeopoint(d['fields'][inputKey]);
-                if (distanceValue.address && distanceValue.address.charAt(0) === '@')
+        if (distanceValue.address && distanceValue.address.charAt(0) === '@')
         {
-          const input = MapUtil.getCoordinatesFromGeopoint(inputs[distanceValue.address]);
-          if (input)
+          if (inputs[distanceValue.address])
           {
-            const distance = MapUtil.distance(loc, input);
+            const distance = MapUtil.distance(
+              loc,
+              MapUtil.getCoordinatesFromGeopoint(inputs[distanceValue.address]),
+            );
             return Util.valueMinMax(distance, minX, maxX);
+          }
+          else
+          {
+            // Maybe its a parent field, try getting field from parent obj
+            const keyPath = distanceValue.address.split('.');
+            if (keyPath.length > 1)
+            {
+              let parentLoc = d['parentHit'];
+              for (let i = 1; i < keyPath.length; i++)
+              {
+                if (!parentLoc)
+                {
+                  break;
+                }
+                parentLoc = parentLoc[keyPath[i]];
+              }
+              if (parentLoc)
+              {
+                const distance = MapUtil.distance(
+                  loc,
+                  MapUtil.getCoordinatesFromGeopoint(parentLoc),
+                );
+                return Util.valueMinMax(distance, minX, maxX);
+              }
+            }
           }
         }
         if (distanceValue.location)

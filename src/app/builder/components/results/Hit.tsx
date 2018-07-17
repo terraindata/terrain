@@ -101,6 +101,7 @@ export interface Props
   hideFieldNames?: boolean;
   firstVisibleField?: number;
   isVisible?: boolean;
+  parentHit?: Hit;
 
   isOver?: boolean;
   isDragging?: boolean;
@@ -371,6 +372,7 @@ class HitComponent extends TerrainComponent<Props> {
                 primaryKey={fields['_id']}
                 onExpand={undefined}
                 isNestedHit={true}
+                parentHit={this.props.hit}
               />);
           },
           )
@@ -563,6 +565,7 @@ class HitComponent extends TerrainComponent<Props> {
       actionType: 'spotlightAction',
       id,
       hit: spotlightData,
+      parentHit: this.props.parentHit.toJS()['fields'],
     });
     this.props.onSpotlightAdded(id, spotlightData);
   }

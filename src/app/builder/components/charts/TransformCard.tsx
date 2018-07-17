@@ -147,7 +147,7 @@ class TransformCard extends TerrainComponent<Props>
   public componentWillReceiveProps(nextProps: Props)
   {
     if ((nextProps.builder.query.tql !== this.props.builder.query.tql ||
-        nextProps.builder.query.inputs !== this.props.builder.query.inputs)
+      nextProps.builder.query.inputs !== this.props.builder.query.inputs)
       && !this.props.data.closed && nextProps.data.input === '_score')
     {
       this.computeBars(nextProps.data, this.state.maxDomain, true, nextProps.builder.query);
@@ -588,7 +588,7 @@ class TransformCard extends TerrainComponent<Props>
     return ranges;
   }
 
-  private getLatLon(distanceValue): {lat, lon}
+  private getLatLon(distanceValue): { lat, lon }
   {
     let lat: string | number = 0;
     let lon: string | number = 0;
@@ -602,7 +602,7 @@ class TransformCard extends TerrainComponent<Props>
       lat = distanceValue.address + '.lat';
       lon = distanceValue.address + '.lon';
     }
-    return {lat, lon};
+    return { lat, lon };
   }
 
   private computeElasticBars(data: any, maxDomain: List<number>, recomputeDomain: boolean, overrideQuery?)

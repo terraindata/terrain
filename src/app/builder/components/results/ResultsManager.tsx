@@ -288,6 +288,7 @@ export class ResultsManager extends TerrainComponent<Props>
                 rank: nestedIndex !== -1 ? nestedIndex : hitIndex,
               },
                 fields || nextState.hits.get(hitIndex).toJS(),
+                nextState.hits.get(hitIndex).toJS(), // Useful for spotlighting of nested objects
               ),
             });
             // TODO something more like this
