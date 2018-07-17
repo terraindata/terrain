@@ -51,7 +51,6 @@ import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import DragAndDrop from 'app/common/components/DragAndDrop';
 import FadeInOut from 'app/common/components/FadeInOut';
 import { RouteSelector, RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
-import { RouteSelectorOption } from 'app/common/components/RouteSelector';
 import { List } from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';

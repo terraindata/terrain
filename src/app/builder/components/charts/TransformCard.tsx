@@ -146,7 +146,8 @@ class TransformCard extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if ((nextProps.builder.query.tql !== this.props.builder.query.tql)
+    if ((nextProps.builder.query.tql !== this.props.builder.query.tql ||
+        nextProps.builder.query.inputs !== this.props.builder.query.inputs)
       && !this.props.data.closed && nextProps.data.input === '_score')
     {
       this.computeBars(nextProps.data, this.state.maxDomain, true, nextProps.builder.query);
@@ -587,6 +588,23 @@ class TransformCard extends TerrainComponent<Props>
     return ranges;
   }
 
+  private getLatLon(distanceValue): {lat, lon}
+  {
+    let lat: string | number = 0;
+    let lon: string | number = 0;
+    if (distanceValue.location)
+    {
+      lat = distanceValue.location[0];
+      lon = distanceValue.location[1];
+    }
+    if (distanceValue.address && distanceValue.address.charAt(0) === '@')
+    {
+      lat = distanceValue.address + '.lat';
+      lon = distanceValue.address + '.lon';
+    }
+    return {lat, lon};
+  }
+
   private computeElasticBars(data: any, maxDomain: List<number>, recomputeDomain: boolean, overrideQuery?)
   {
     const { builder } = this.props;
@@ -636,20 +654,7 @@ class TransformCard extends TerrainComponent<Props>
       }
       else if (distanceValue)
       {
-        let lat: string | number = 0;
-        let lon: string | number = 0;
-        let userInterpreter = false;
-        if (distanceValue.location)
-        {
-          lat = distanceValue.location[0];
-          lon = distanceValue.location[1];
-        }
-        if (distanceValue.address && distanceValue.address.charAt(0) === '@')
-        {
-          lat = distanceValue.address + '.lat';
-          lon = distanceValue.address + '.lon';
-          userInterpreter = true;
-        }
+        const { lat, lon } = this.getLatLon(distanceValue);
         domainQuery = {
           query: {
             bool: {
@@ -682,7 +687,7 @@ class TransformCard extends TerrainComponent<Props>
           },
         };
         // If there were inputs involved, need to use an interpreter
-        if (userInterpreter)
+        if (typeof lat === 'string' && lat.chartAt(0) === '@')
         {
           const qt = new ESJSParser(domainQuery);
           if (qt.getErrors().length)
@@ -695,7 +700,6 @@ class TransformCard extends TerrainComponent<Props>
           {
             return;
           }
-          domainQuery = JSON.parse(interpreter.finalQuery);
         }
       }
       else
@@ -721,7 +725,7 @@ class TransformCard extends TerrainComponent<Props>
         };
       }
       const domainAggregationAjax = Ajax.query(
-        JSON.stringify(domainQuery),
+        typeof domainQuery === 'string' ? domainQuery : JSON.stringify(domainQuery),
         db,
         (resp) =>
         {
@@ -748,20 +752,7 @@ class TransformCard extends TerrainComponent<Props>
       }
       else if (distanceValue)
       {
-        let lat: string | number = 0;
-        let lon: string | number = 0;
-        let userInterpreter = false;
-        if (distanceValue.location)
-        {
-          lat = distanceValue.location[0];
-          lon = distanceValue.location[1];
-        }
-        if (distanceValue.address && distanceValue.address.charAt(0) === '@')
-        {
-          lat = distanceValue.address + '.lat';
-          lon = distanceValue.address + '.lon';
-          userInterpreter = true;
-        }
+        const { lat, lon } = this.getLatLon(distanceValue);
         aggQuery = {
           query: {
             bool: {
@@ -781,7 +772,7 @@ class TransformCard extends TerrainComponent<Props>
           },
           size: 1,
         };
-        if (userInterpreter)
+        if (typeof lat === 'string' && lat.chartAt(0) === '@')
         {
           const qt = new ESJSParser(aggQuery);
           if (qt.getErrors().length)

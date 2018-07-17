@@ -645,12 +645,7 @@ const TransformChart = {
           return minX;
         }
         const loc = MapUtil.getCoordinatesFromGeopoint(d['fields'][inputKey]);
-        if (distanceValue.location)
-        {
-          const distance = MapUtil.distance(loc, distanceValue.location);
-          return Util.valueMinMax(distance, minX, maxX);
-        }
-        if (distanceValue.address && distanceValue.address.chartAt(0) === '@')
+                if (distanceValue.address && distanceValue.address.chartAt(0) === '@')
         {
           const input = MapUtil.getCoordinatesFromGeopoint(inputs[distanceValue.address]);
           if (input)
@@ -658,6 +653,11 @@ const TransformChart = {
             const distance = MapUtil.distance(loc, input);
             return Util.valueMinMax(distance, minX, maxX);
           }
+        }
+        if (distanceValue.location)
+        {
+          const distance = MapUtil.distance(loc, distanceValue.location);
+          return Util.valueMinMax(distance, minX, maxX);
         }
         return minX;
       }
