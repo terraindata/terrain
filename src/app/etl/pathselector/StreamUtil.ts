@@ -49,11 +49,12 @@ import * as clarinet from 'clarinet';
 
 export default class StreamUtil
 {
-  public static completeStream(jsonStringStream)
+  public static completeStream(jsonStringStream: string)
   {
     const parser = clarinet.createStream();
     const bracketStack = [];
     let stringStream = '';
+    console.log(parser);
     parser.on('openarray', () =>
     {
       bracketStack.push('[');
@@ -145,7 +146,7 @@ export default class StreamUtil
     return [bracketStack, stringStream];
   }
 
-  public static fixStringStream(rawStringStream)
+  public static fixStringStream(rawStringStream: string): string
   {
     let correctedString;
     // console.log(rawStringStream);
@@ -193,7 +194,7 @@ export default class StreamUtil
     return correctedString;
   }
 
-  public static formatJsonString(jsonString)
+  public static formatJsonString(jsonString: string): object
   {
     const results: object = this.completeStream(jsonString);
     // console.log(results);

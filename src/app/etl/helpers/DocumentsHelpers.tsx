@@ -195,10 +195,12 @@ class DocumentsHelpers extends ETLHelpers
 
   public fetchPreview(
     source: SourceConfig,
-  ): Promise<List<object>>
+    rawStringOnly?: boolean,
+  ): Promise<List<object> | string>
   {
     return new Promise((resolve, reject) =>
     {
+      const sizeLimit = (rawStringOnly) ? 5000 : DefaultDocumentLimit;
       switch (source.type)
       {
         case Sources.Upload: {
@@ -208,40 +210,12 @@ class DocumentsHelpers extends ETLHelpers
             return reject('File not provided');
           }
           const config = source.fileConfig;
-          return this.fetchFromFile(source)
+          return this.fetchFromFile(source, sizeLimit, rawStringOnly)
             .then(resolve)
             .catch(reject);
         }
         default: {
-          return ETLAjax.fetchPreview(source, DefaultDocumentLimit)
-            .then(resolve)
-            .catch(reject);
-        }
-      }
-    });
-  }
-
-  public fetchPreviewString(
-    source: SourceConfig,
-  ): Promise<List<object>>
-  {
-    return new Promise((resolve, reject) =>
-    {
-      switch (source.type)
-      {
-        case Sources.Upload: {
-          const file = source.options['file'];
-          if (file == null)
-          {
-            return reject('File not provided');
-          }
-          const config = source.fileConfig;
-          return this.fetchFromFile(source)
-            .then(resolve)
-            .catch(reject);
-        }
-        default: {
-          return ETLAjax.fetchPreview(source, DefaultDocumentLimit)
+          return ETLAjax.fetchPreview(source, sizeLimit, rawStringOnly)
             .then(resolve)
             .catch(reject);
         }
@@ -274,7 +248,9 @@ class DocumentsHelpers extends ETLHelpers
 
   protected fetchFromFile(
     source: SourceConfig,
-  ): Promise<List<object>>
+    size: number,
+    rawStringOnly?: boolean,
+  ): Promise<List<object> | string>
   {
     return new Promise(async (resolve, reject) =>
     {
@@ -289,17 +265,17 @@ class DocumentsHelpers extends ETLHelpers
         let sliceString = await this.sliceFromFile(file, CHUNK_SIZE);
         if (sliceString.length < CHUNK_SIZE)
         {
-          const results = await ETLAjax.fetchPreview(source, DefaultDocumentLimit, sliceString);
+          const results = await ETLAjax.fetchPreview(source, size, rawStringOnly, sliceString);
           resolve(results);
         }
         else
         {
-          let results = await ETLAjax.fetchPreview(source, DefaultDocumentLimit, sliceString);
+          let results = (await ETLAjax.fetchPreview(source, size, rawStringOnly, sliceString)) as List<object>;
           // currently only try increasing the size once
-          if (results.size < DefaultDocumentLimit)
+          if (results.size < size)
           {
             sliceString = await this.sliceFromFile(file, 5 * CHUNK_SIZE);
-            results = await ETLAjax.fetchPreview(source, DefaultDocumentLimit, sliceString);
+            results = (await ETLAjax.fetchPreview(source, size, rawStringOnly, sliceString)) as List<object>;
           }
           resolve(results);
         }

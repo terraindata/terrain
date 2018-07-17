@@ -49,6 +49,7 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
 import Util from 'util/Util';
+import StreamUtil from 'etl/pathselector/StreamUtil';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
@@ -58,6 +59,7 @@ import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, Source
 import { EndpointTypeNames, SchedulableSinks, SchedulableSources, Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 
 import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormLookups';
+import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import FadeInOut from 'app/common/components/FadeInOut';
 import IntegrationForm from 'etl/common/components/IntegrationForm';
@@ -277,18 +279,22 @@ class EndpointForm extends TerrainComponent<Props>
 
     this.props.onChange(newEndpoint, apply);
 
-    newEndpoint = newEndpoint.setIn(['fileConfig', 'jsonPath'], '');
-
-    DocumentsHelpers.fetchPreview(newEndpoint).then((res) =>
+    if (newEndpoint.fileConfig.fileType === FileTypes.Json)
     {
-      // console.log(res.get(0));
-      this.setState(
-        {
-          currentObject: res.get(0),
-        },
-      );
-    })
-      .catch((e) => e);
+      newEndpoint = newEndpoint.setIn(['fileConfig', 'jsonPath'], '');
+      DocumentsHelpers.fetchPreview(newEndpoint, true).then((res: string) =>
+      {
+        console.log(typeof res);
+        const fixedRes = StreamUtil.formatJsonString(res);
+        console.log('fixedres is ', fixedRes);
+        this.setState(
+          {
+            currentObject: fixedRes,
+          },
+        );
+      })
+        .catch((e) => console.log(e));
+    }
   }
 
   public extractFileConfigDelta(oldConfig: Partial<FileConfig>, newConfig: Partial<FileConfig>): Partial<FileConfig>

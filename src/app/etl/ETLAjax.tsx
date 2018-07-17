@@ -368,31 +368,43 @@ class ETLAjax
   public fetchPreview(
     source: SourceConfig,
     size: number,
+    rawStringOnly: boolean,
     fileString?: string,
-  ): Promise<List<object>>
+  ): Promise<List<object> | string>
   {
     return new Promise((resolve, reject) =>
     {
       const handleResponse = (response: any) =>
       {
-        let documents;
-        try
+        if (rawStringOnly === true)
         {
-          documents = List(response);
+          if (response !== undefined)
+          {
+            resolve(response.result);
+          }
         }
-        catch (e)
+        else
         {
-          return reject(e);
-        }
-        if (documents !== undefined)
-        {
-          resolve(documents);
+          let documents;
+          try
+          {
+            documents = List(response);
+          }
+          catch (e)
+          {
+            return reject(e);
+          }
+          if (documents !== undefined)
+          {
+            resolve(documents);
+          }
         }
       };
       const payload = {
         source: recordForSave(source),
         size,
         fileString,
+        rawString: rawStringOnly,
       };
       return Ajax.req(
         'post',
