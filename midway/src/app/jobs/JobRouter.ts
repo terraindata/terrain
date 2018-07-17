@@ -107,7 +107,7 @@ Router.post('/runnow/:id', async (ctx, next) =>
     fields = ctx.request.body;
     if (fields.hasOwnProperty('downloadName') === false)
     {
-      throw (new Error('Download Name is missing'));
+      throw (new Error('API error: download name field is empty.'));
     }
     downloadName = fields['downloadName'];
   } else
