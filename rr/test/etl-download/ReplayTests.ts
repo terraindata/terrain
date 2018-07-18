@@ -129,7 +129,8 @@ describe('Replay a builder action', () =>
       if (action.eventType === 'mousedown')
       {
         if (action.selector === ':nth-child(5) > .tabs-action-piece'
-          || action.selector === ':nth-child(7) > .editor-top-bar-item')
+          || action.selector === ':nth-child(7) > .editor-top-bar-item'
+          || action.selector === '.tabs-action-text.tabs-action-enabled > .tabs-action-piece')
         {
           sleep.sleep(4);
         }
