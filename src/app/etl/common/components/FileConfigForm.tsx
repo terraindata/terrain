@@ -62,7 +62,7 @@ import { FileTypes } from 'shared/etl/types/ETLTypes';
 import Button from 'app/common/components/Button';
 import FadeInOut from 'app/common/components/FadeInOut';
 import Modal from 'app/common/components/Modal';
-import PathUtil from 'etl/pathselector/PathGuessTest';
+import PathUtil from 'etl/pathselector/PathguesserUtil';
 import { List } from 'immutable';
 import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import { ColorsActions } from '../../../colors/data/ColorsRedux';

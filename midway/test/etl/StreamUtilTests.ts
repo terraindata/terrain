@@ -113,7 +113,6 @@ describe('StreamUtil', () =>
         for (let j = 0; j <= testString.length; j++)
         {
           const testFragment = testString.slice(0, j);
-          // console.log('TEST FRAGMENT', testFragment);
           const testSubstrings = jest.fn(() => StreamUtil.formatJsonString(testFragment));
           testSubstrings();
           expect(testSubstrings).toHaveReturned();

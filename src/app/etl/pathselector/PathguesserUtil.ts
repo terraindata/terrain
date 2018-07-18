@@ -61,7 +61,7 @@ export default class PathUtil
   public static renderFields(objectItem: object)
   {
     const keyFields = [];
-    if (objectItem === undefined || objectItem === null)
+    if (objectItem == null)
     {
       return keyFields;
     }
