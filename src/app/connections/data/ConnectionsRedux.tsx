@@ -281,6 +281,13 @@ class ConnectionsRedux extends TerrainRedux<ConnectionsActionTypes, ConnectionSt
         });
 
         return Promise.resolve(connection);
+      })
+      .catch((error) =>
+      {
+        directDispatch({
+          actionType: 'createConnectionFailed',
+          error: JSON.stringify(error.errors),
+        });
       });
   }
 
