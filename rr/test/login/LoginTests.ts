@@ -136,27 +136,31 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
   let browser;
   let page;
 
-  beforeAll(async () =>
+  beforeAll(async (done) =>
   {
     const wsAddress = await getChromeDebugAddress();
     browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
     TestLogger.info('Connected to the Chrome ' + wsAddress);
+    done();
     // browser = await puppeteer.launch({headless: false});
     // page = await browser.newPage();
   });
 
-  it('login', async () =>
+  it('login', async (done) =>
   {
     page = await browser.newPage();
     TestLogger.info('Created a new page.');
     await page.setViewport({ width: 1600, height: 1200 });
     const url = `http://${ip.address()}:3000`;
     await loginToBuilder(page, url);
+    done();
   }, 200000);
 
-  afterAll(async () =>
+  afterAll(async (done) =>
   {
     await page.close();
     TestLogger.info('The page is closed.');
+    await browser.disconnect();
+    done();
   });
 });
