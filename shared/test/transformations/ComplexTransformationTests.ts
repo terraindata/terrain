@@ -105,6 +105,7 @@ test('identity transformation for ui-constructed nested arrays', () =>
   const e = Utils.construction.makeEngine(doc);
   const r = e.transform(doc);
   expect(r).toEqual(copyOfDoc);
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('join transformation where the first field does not exist', () =>
@@ -130,6 +131,7 @@ test('join transformation where the first field does not exist', () =>
     f3: 'world',
     result: 'hello world',
   });
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('array sum on a nested array field', () =>
@@ -165,6 +167,7 @@ test('array sum on a nested array field', () =>
       },
     ],
   });
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('extract an array field with duplicate', () =>
@@ -191,6 +194,7 @@ test('extract an array field with duplicate', () =>
     fields: ['foo', 'bar', 'baz'],
     zeroth: 'foo',
   });
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 describe('suite of complex duplication tests', () =>
@@ -204,6 +208,7 @@ describe('suite of complex duplication tests', () =>
       { newFieldKeyPaths: wrap(outKP) },
     );
     const r = e.transform(inDoc);
+    expect(Utils.validation.verifyEngine(e)).toEqual([]);
     return r;
   }
 
@@ -364,6 +369,7 @@ describe('Simple multi rename with an operation', () =>
   expect(engine.transform(doc)).toEqual({
     thing: '{"bar":"hi"}',
   });
+  expect(Utils.validation.verifyEngine(engine)).toEqual([]);
 });
 
 describe('Complex Stringify and Parse Gauntlet', () =>
@@ -404,7 +410,7 @@ describe('Complex Stringify and Parse Gauntlet', () =>
     expect(nestedAsArr).toEqual([baseDoc['nested']]);
     expect(finalTransformed['foo']).toBe(baseDoc['foo']);
     expect(Utils.fields.fieldType(nestedID, engine)).toBe(FieldTypes.Array);
-
+    expect(Utils.validation.verifyEngine(engine)).toEqual([]);
     return engine;
   }
 

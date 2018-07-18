@@ -55,7 +55,7 @@ import TransformationNodeType, {
   TransformationEdgeTypes as EdgeTypes,
 } from 'shared/transformations/TransformationNodeType';
 
-import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import { etlFieldTypesList, FieldTypes } from 'shared/etl/types/ETLTypes';
 import FriendEngine from 'shared/transformations/FriendEngine';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNode from 'shared/transformations/TransformationNode';
@@ -73,19 +73,34 @@ type IdentityOptions = NodeOptionsType<TransformationNodeType.IdentityNode>;
 
 export default abstract class ValidationUtil
 {
+
+  public static verifyEngine(eng: TransformationEngine): string[]
+  {
+    try {
+      ValidationUtil.verifyFieldIntegrity(eng);
+      ValidationUtil.verifyGraphIntegrity(eng);
+    }
+    catch (e)
+    {
+      console.error(e);
+      return [`Error in Engine: ${e}`];
+    }
+    return [];
+  }
+
   /*
    *  The graph is valid if
    *  - the transformation graph is acyclic
    *  - all node ids are the same as their ids in the graph
    *  - all fields have exactly 1 organic or synthetic identity nodes
    *  - all synthetic identity nodes have at least 1 inbound synthetic edge
-   *  - all organic identity nodes must be sources, and all sources must be organic identity nodes (todo-ish)
+   *  - all organic identity nodes must be sources, and all sources must be organic identity nodes
    *  - all removal identity nodes have no outbound edges
    *  - all fields with nullish paths end in a removal identity node
    *  - there is a single walkable non-synthetic path for all fields
    *  - all edges have valid label
    *  - all fields' last identity node paths are consistent with their mapping
-   *  - computing the execution order does not throw errors (todo)
+   *  - computing the execution order does not throw errors
    *  It's not possible check every possible thing, but this is a very comprehensive sanity check
    */
   public static verifyGraphIntegrity(eng: TransformationEngine): boolean
@@ -161,16 +176,19 @@ export default abstract class ValidationUtil
         if (opts.type === IdentityTypes.Organic || opts.type === IdentityTypes.Synthetic)
         {
           firstNode = node;
-          const inbounds = dag.predecessors(String(node.id));
-          if (inbounds.length > 0)
+          if (opts.type === IdentityTypes.Organic)
           {
-            throw new Error(`${opts.type} Identity Node for field ${fieldId} should be a source but it has inbound edges`);
+            const inbounds = dag.predecessors(String(node.id));
+            if (inbounds !== undefined && inbounds.length > 0)
+            {
+              throw new Error(`${opts.type} Identity Node for field ${fieldId} should be a source but it has inbound edges`);
+            }
           }
         }
         if (opts.type === IdentityTypes.Removal)
         {
           const outbounds = dag.successors(String(node.id));
-          if (outbounds.length > 0)
+          if (outbounds !== undefined && outbounds.length > 0)
           {
             throw new Error(`${opts.type} Identity Node for field ${fieldId} should be a sink but it has outbound edges`);
           }
@@ -225,12 +243,60 @@ export default abstract class ValidationUtil
    *  An engine is valid if:
    *  - all non-null paths are unique.
    *  - all fields have a type
-   *  - all array or object fields have no children
+   *  - all non primitive fields have no children
    *  - all fields have ancestors
    */
-  public static verifyEngineIntegrity(eng: TransformationEngine)
+  public static verifyFieldIntegrity(eng: TransformationEngine): boolean
   {
+    const engine = eng as FriendEngine;
+    const seenIds: {[k: number]: boolean} = {};
+    const seenKps: {[k: string]: boolean} = {};
+    const checkField = (fieldId: number) => {
+      const kp = engine.getFieldPath(fieldId);
+      if (seenIds[fieldId])
+      {
+        throw new Error(`Field ${fieldId} is not unique`);
+      }
+      seenIds[fieldId] = true;
+      if (seenKps[Utils.path.hash(kp)])
+      {
+        throw new Error(`Path ${kp.toArray} is not unique`);
+      }
+      seenKps[Utils.path.hash(kp)] = true;
+    };
 
+    engine.getAllFieldIDs(true).forEach((id) => {
+      if (etlFieldTypesList.indexOf(Utils.fields.fieldType(id, engine)) === -1)
+      {
+        throw new Error(`Field ${id} has an invalid type: ${Utils.fields.fieldType(id, engine)}`);
+      }
+    });
+
+    const tree = engine.createTree();
+    const rootFields = engine.getAllFieldIDs().filter((id) => engine.getFieldPath(id).size === 1);
+    rootFields.forEach((fieldId) => {
+      for (const childId of Utils.traversal.preorder(tree, fieldId))
+      {
+        checkField(childId);
+        const type = Utils.fields.fieldType(childId, engine);
+        if (type !== FieldTypes.Array && type !== FieldTypes.Object && type !== FieldTypes.GeoPoint)
+        {
+          if (tree.get(childId).size !== 0)
+          {
+            throw new Error(`Field ${childId} is a primitive (${type}) but has children in the tree`);
+          }
+        }
+      }
+    });
+
+    engine.getAllFieldIDs().forEach((id) => {
+      if (!seenIds[id])
+      {
+        throw new Error(`Field ${id} with path ${engine.getFieldPath(id)} is disconnected from the tree`);
+      }
+    });
+
+    return true;
   }
 
   public static canAddField(engine: TransformationEngine, fieldId: number, path: KeyPath): ValidInfo
@@ -343,7 +409,7 @@ export default abstract class ValidationUtil
     for (let i = 0; i < dag.nodeCount(); i++)
     {
       const outNodes = dag.successors(node);
-      if (outNodes.length === 0)
+      if (outNodes === undefined || outNodes.length === 0)
       {
         return Number(node);
       }
@@ -363,6 +429,10 @@ export default abstract class ValidationUtil
             throw new Error(`There were multiple outbound non-synthetic edges for node ${node}`);
           }
         }
+      }
+      if (next === undefined)
+      {
+        return Number(node);
       }
       node = next;
     }

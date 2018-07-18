@@ -63,6 +63,9 @@ import TransformationNodeType, {
 } from 'shared/transformations/TransformationNodeType';
 
 import { Edge, TransformationGraph } from 'shared/transformations/TypedGraph';
+import DependencyTraversalVisitor from 'shared/transformations/visitors/DependencyTraversalVisitor';
+
+const DependencyVisitor = new DependencyTraversalVisitor();
 
 import * as TerrainLog from 'loglevel';
 
@@ -73,10 +76,15 @@ import * as TerrainLog from 'loglevel';
  */
 export default abstract class Traversal
 {
-  // in the absence of "friend" modifiers, let's do this
-  public static getGraph(engine: TransformationEngine): TransformationGraph
+  /**
+   *  TODO
+   *  Find dependencies of this field
+   */
+  public static findDependencies(engine: TransformationEngine, node: number): number[]
   {
-    return (engine as FriendEngine).dag;
+    const graph = (engine as FriendEngine).dag;
+    const startNode = graph.node(String(node));
+    return startNode.accept(DependencyVisitor, engine);
   }
 
   /*
@@ -84,7 +92,7 @@ export default abstract class Traversal
    */
   public static findIdentityNode(engine: TransformationEngine, field: number)
   {
-    const graph = Traversal.getGraph(engine);
+    const graph = (engine as FriendEngine).dag;
     for (const nId of graph.nodes())
     {
       const node = graph.node(nId);
@@ -103,7 +111,7 @@ export default abstract class Traversal
   // find the last non-synthetic transformation associated with the field
   public static findEndTransformation(engine: TransformationEngine, field: number): number
   {
-    const graph = Traversal.getGraph(engine);
+    const graph = (engine as FriendEngine).dag;
     const startId = Traversal.findIdentityNode(engine, field);
     if (startId === -1)
     {
@@ -134,7 +142,7 @@ export default abstract class Traversal
   public static appendNodeToField(engine: TransformationEngine, fieldId: number, nodeId: number, edgeType: EdgeTypes)
   {
     const endNode = Traversal.findEndTransformation(engine, fieldId);
-    const graph = Traversal.getGraph(engine);
+    const graph = (engine as FriendEngine).dag;
     if (endNode === -1)
     {
       return;
@@ -145,7 +153,7 @@ export default abstract class Traversal
   public static prependNodeToField(engine: TransformationEngine, fieldId: number, nodeId: number, edgeType: EdgeTypes)
   {
     const startNode = Traversal.findIdentityNode(engine, fieldId);
-    const graph = Traversal.getGraph(engine);
+    const graph = (engine as FriendEngine).dag;
     if (startNode === -1)
     {
       return;
@@ -183,7 +191,7 @@ export default abstract class Traversal
     tree: Immutable.Map<number, List<number>>,
     id: number,
     shouldExplore: (id) => boolean = () => true,
-  )
+  ): IterableIterator<number>
   {
     const children = tree.get(id);
     if (children !== undefined && shouldExplore(id))
@@ -200,7 +208,7 @@ export default abstract class Traversal
     tree: Immutable.Map<number, List<number>>,
     id: number,
     shouldExplore: (id) => boolean = () => true,
-  )
+  ): IterableIterator<number>
   {
     const children = tree.get(id);
     if (children !== undefined && shouldExplore(id))

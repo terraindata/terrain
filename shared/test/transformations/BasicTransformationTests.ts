@@ -90,6 +90,7 @@ test('change text field case', () =>
   expect(r['t2']).toBe('PascalCaseMeBro');
   expect(r['t3']).toBe('Title Case Me Bro');
   expect(yadeep.get(r, KeyPath(['meta', 'school']))).toBe('STANFORD');
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('prepend string to a field', () =>
@@ -98,6 +99,8 @@ test('prepend string to a field', () =>
   e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath(['name'])]), { at: 0, value: 'Sponge ' });
   const r = e.transform(TestDocs.doc1);
   expect(r['name']).toBe('Sponge Bob');
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('append string to a field', () =>
@@ -106,6 +109,7 @@ test('append string to a field', () =>
   e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath(['name'])]), { value: 's Burgers' });
   const r = e.transform(TestDocs.doc1);
   expect(r['name']).toBe('Bobs Burgers');
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('transform doc with null value(s)', () =>
@@ -113,6 +117,7 @@ test('transform doc with null value(s)', () =>
   const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc6);
   const r = e.transform(TestDocs.doc6);
   expect(r['value']).toBe(null);
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('linear chain of transformations', () =>
@@ -122,6 +127,7 @@ test('linear chain of transformations', () =>
   e.appendTransformation(TransformationNodeType.SubstringNode, List<KeyPath>([KeyPath(['name'])]), { from: 0, length: 2 });
   const t = e.transform(TestDocs.doc1);
   expect(t['name']).toBe('BO');
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('get transformations for a field', () =>
@@ -393,6 +399,7 @@ test('split multiple fields in a nested array', () =>
     f2: 'cat',
     f3: 'dragged in',
   });
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('regex split multiple fields in a nested array', () =>
@@ -445,6 +452,7 @@ test('regex split multiple fields in a nested array', () =>
     f2: 'QWERTY',
     f3: 'HELLO9ABC',
   });
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('cast node tests', () =>
@@ -530,6 +538,7 @@ test('boolean cast tests', () =>
   expect(r['f']).toEqual(false);
   expect(r['tb']).toEqual('1');
   expect(r['fb']).toEqual('0');
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('date cast tests', () =>
@@ -555,6 +564,7 @@ test('date cast tests', () =>
     });
   expect(e.transform(doc)['foo'].substr(0, 11)).toEqual('2018-05-18T');
   expect(e.transform(doc)['bar']).toEqual('05/19/2018');
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('super deep transformation preserves arrays', () =>
@@ -573,6 +583,7 @@ test('super deep transformation preserves arrays', () =>
   const e = Utils.construction.makeEngine(doc);
 
   expect(e.transform(doc)).toEqual(doc);
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('split a nested field', () =>
@@ -603,6 +614,7 @@ test('split a nested field', () =>
       ],
     },
   );
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('cast array to array should be no-op', () =>
@@ -613,7 +625,6 @@ test('cast array to array should be no-op', () =>
       { bar: 'Milk and Cookies' },
     ],
   };
-
   const e = Utils.construction.makeEngine(doc);
 
   e.appendTransformation(
@@ -623,8 +634,8 @@ test('cast array to array should be no-op', () =>
       toTypename: FieldTypes.Array,
     },
   );
-
   expect(e.transform(doc)).toEqual(doc);
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 // test('delete a field that has transformations', () =>
@@ -651,7 +662,7 @@ test('cast on a field inside a nested object inside an array', () =>
   e.addField(List(['foo', -1]));
   const id3 = e.addField(List(['foo', -1, 'bar']));
   e.appendTransformation(
-    TransformationNodeType.CastNode,
+    TransformationNodeType.StringifyNode,
     List([e.getFieldPath(id3)]),
     {
       toTypename: FieldTypes.String,
@@ -699,6 +710,7 @@ test('array sum transformation', () =>
     });
   const r = e.transform(doc);
   expect(r['foosum']).toBe(10);
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('duplicate a wildcard array of fields', () =>
@@ -818,6 +830,7 @@ test('duplicate a field and then rename that field', () =>
       },
     ],
   });
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('super deep duplication and modify', () =>
@@ -866,6 +879,7 @@ test('super deep duplication and modify', () =>
     [10.5],
     [110],
   ]);
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('suite of numeric transformations', () =>
@@ -891,7 +905,11 @@ test('suite of numeric transformations', () =>
   };
 
   const e = Utils.construction.makeEngine(doc);
-
+  Utils.fields.addIndexedField(e, KeyPath(['foo', 0, 'bar', -1]));
+  Utils.fields.addIndexedField(e, KeyPath(['foo', 1, 'bar', -1]));
+  Utils.fields.addIndexedField(e, KeyPath(['foo', 2, 'bar', -1]));
+  Utils.fields.addIndexedField(e, KeyPath(['foo', 3, 'bar', -1]));
+  Utils.fields.addIndexedField(e, KeyPath(['foo', 4, 'bar', -1]));
   e.appendTransformation(
     TransformationNodeType.AddNode,
     List<KeyPath>([KeyPath(['foo', 0, 'bar', -1])]),
@@ -970,6 +988,7 @@ test('suite of numeric transformations', () =>
       ],
     },
   );
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('test set if transformation', () =>
@@ -999,6 +1018,7 @@ test('test set if transformation', () =>
   const r = e.transform(TestDocs.doc1);
   expect(r['name']).toEqual('Tim');
   expect(r['bleep']).not.toEqual('bloop');
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('duplicate a disabled array', () =>
@@ -1015,6 +1035,7 @@ test('duplicate a disabled array', () =>
   expect(e.transform(doc)).toEqual({
     'copy of foo': [1, 2, 3],
   });
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('test find replace transformation', () =>
@@ -1043,6 +1064,7 @@ test('test find replace transformation', () =>
   const r = e.transform(TestDocs.doc9);
   expect(r['meta']['school']).toEqual('Stabford');
   expect(r['age']).toEqual('NN years');
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('array count transformation', () =>
@@ -1060,11 +1082,14 @@ test('array count transformation', () =>
     });
   const r = e.transform(doc);
   expect(r['foocount']).toBe(5);
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('take product of several fields', () =>
 {
   const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc7);
+  Utils.fields.addIndexedField(e, KeyPath(['deepArray', 0, 0]));
+  Utils.fields.addIndexedField(e, KeyPath(['deepArray', 1, 0]));
   e.appendTransformation(
     TransformationNodeType.ProductNode,
     List<KeyPath>([KeyPath(['deepArray', 0, 0]), KeyPath(['deepArray', 1, 0])]),
@@ -1073,6 +1098,7 @@ test('take product of several fields', () =>
     });
   const r = e.transform(TestDocs.doc7);
   expect(r['producto']).toBe(30);
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('take quotient of several fields', () =>
@@ -1161,6 +1187,7 @@ test('Duplicate a nested field', () =>
   const r = e.transform(doc);
   expect(Object.keys(r['copy1']).length).toEqual(0);
   expect(Object.keys(r['field']).length).toEqual(1);
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('split a field that does not always exist', () =>
@@ -1199,6 +1226,7 @@ test('split a field that does not always exist', () =>
       id: 'foo',
     },
   );
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('Group By Transformation', () =>
@@ -1240,6 +1268,7 @@ test('Group By Transformation', () =>
       ],
     },
   );
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('numeric keys', () =>
@@ -1324,6 +1353,7 @@ test('remove duplicates test', () =>
   expect(r).toEqual({
     fields: [1, 4, 3, 2, 5],
   });
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('remove nested duplicates test', () =>
@@ -1349,6 +1379,7 @@ test('remove nested duplicates test', () =>
       [5, 6, 7],
     ],
   });
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('filter array test null', () =>
@@ -1367,6 +1398,7 @@ test('filter array test null', () =>
   expect(r).toEqual({
     fields: [3, 2, 5, undefined],
   });
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('filter array test undefined', () =>
@@ -1384,6 +1416,7 @@ test('filter array test undefined', () =>
   expect(r).toEqual({
     fields: [3, 2, null, 5, null],
   });
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('filter array test complex', () =>
@@ -1406,4 +1439,5 @@ test('filter array test complex', () =>
   })).toEqual({
     fields: [],
   });
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });

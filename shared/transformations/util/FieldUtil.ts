@@ -71,6 +71,21 @@ export default class FieldUtil
     return engine.addField(keypath, cfg);
   }
 
+  // add field, but infer the type
+  public static addIndexedField(engine: TransformationEngine, keypath: KeyPath): number
+  {
+    const pathToCheck = Utils.path.convertIndices(keypath);
+    const id = engine.getFieldID(pathToCheck);
+    if (id === undefined)
+    {
+      throw new Error('Could not find appropriate field to get type information');
+    }
+    else
+    {
+      return FieldUtil.addFieldToEngine(engine, keypath, FieldUtil.fieldType(id, engine));
+    }
+  }
+
   public static setType(engine: TransformationEngine, fieldId: number, type: FieldTypes)
   {
     FieldUtil.changeFieldTypeSideEffects(engine, fieldId, type);

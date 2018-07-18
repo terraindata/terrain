@@ -560,13 +560,17 @@ export class TransformationEngine
 
     sortedIds.forEach((id, index) =>
     {
-      const enginePath = this.getFieldPath(id).toJS();
-      if (enginePath.length === 0)
+      const enginePath = this.getFieldPath(id);
+      if (enginePath.size === 0)
       {
         return;
       }
-      const parentPath = enginePath.slice(0, -1);
-      const parentHash = JSON.stringify(parentPath);
+      const parentPath = enginePath.slice(0, -1).toList();
+      let parentHash = Utils.path.hash(parentPath);
+      if (enginePathToField[parentHash] === undefined) // if no parent found, attempt to despecify
+      {
+        parentHash = Utils.path.hash(Utils.path.convertIndices(parentPath));
+      }
       const parentField: List<number> = enginePathToField[parentHash];
       const newField = List([]);
 
@@ -574,7 +578,7 @@ export class TransformationEngine
       {
         enginePathToField[parentHash] = parentField.push(id);
       }
-      enginePathToField[JSON.stringify(enginePath)] = newField;
+      enginePathToField[Utils.path.hash(enginePath)] = newField;
     });
 
     const fieldMap: { [k: number]: List<number> } = {};
