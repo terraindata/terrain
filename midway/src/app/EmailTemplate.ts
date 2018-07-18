@@ -44,20 +44,23 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 import * as fs from 'fs';
+import * as path from 'path';
+import { MidwayLogger } from './log/MidwayLogger';
 class EmailTemplate
 {
-  public makeEmailContent(headerText, descriptionText, secondDescriptionText, buttonUrl, buttonText): string
+  public static makeEmailContent(params: object): string
   {
-    const path: string = process.cwd() + '/midway/src/assets/EmailTemplate.html';
-    const html: string = fs.readFileSync(path, 'utf8');
-    let htmlString: string = html.replace('%BUTTONURL%', buttonUrl);
-    htmlString = htmlString.replace('%HEADERTEXT%', headerText);
-    htmlString = htmlString.replace('%DESCRIPTIONTEXT%', descriptionText);
-    htmlString = htmlString.replace('%DESCRIPTIONTEXT2%', secondDescriptionText);
-    htmlString = htmlString.replace('%BUTTONTEXT%', buttonText);
+    let htmlString: string = EmailTemplate.html;
+    Object.keys(params).forEach((key) =>
+      {
+        const replacement: string = '%' + key.toUpperCase() + '%';
+        htmlString = htmlString.replace(replacement, params[key]);
+      });
     return htmlString;
   }
-}
-const emailTemplate: EmailTemplate = new EmailTemplate();
+  private static emailPath: string = path.join(__dirname, '../assets/EmailTemplate.html');
+  private static html: string = fs.readFileSync(EmailTemplate.emailPath, 'utf8');
 
-export default emailTemplate;
+}
+
+export default EmailTemplate;

@@ -95,7 +95,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
       }];
     }
     // MidwayLogger.info("id: " + emailIntegrations[0].id);
-    const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body, attachment, undefined, undefined);
+    const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body, attachment);
     MidwayLogger.info(`Feedback email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
   }
 });
