@@ -57,7 +57,6 @@ import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { ETLState } from 'etl/ETLTypes';
 import ExecutionHelpers from 'etl/helpers/ExecutionHelpers';
 import Initializers from 'etl/helpers/TemplateInitializers';
-import PathUtil from 'etl/pathselector/PathGuessTest';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
@@ -67,8 +66,6 @@ import { notificationManager } from './../../common/components/InAppNotification
 
 import { List } from 'immutable';
 import './ETLEditorPage.less';
-
-// console.log(PathUtil);
 
 export interface Props
 {
