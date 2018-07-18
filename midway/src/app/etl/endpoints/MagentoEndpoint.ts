@@ -295,11 +295,11 @@ export default class MagentoEndpoint extends AEndpointStream
 
       let wsdlAsJSON: object = {};
       const wsdlTree: WSDLTree =
-        {
-          message: {},
-          portType: {},
-          types: {},
-        };
+      {
+        message: {},
+        portType: {},
+        types: {},
+      };
       const wsdlMsg: object = {};
       const wsdlPortType: object = {};
 
@@ -340,27 +340,27 @@ export default class MagentoEndpoint extends AEndpointStream
     {
       const magentoIntegrationConfig: object = await this.getIntegrationConfig(endpointConfig.integrationId) as object;
       const magConf: MagentoConfig =
-        {
-          esdbid: null,
-          esindex: null,
-          host: magentoIntegrationConfig['host'],
-          includedFields: [],
-          onlyFirst: false,
-          params: {
-            username: magentoIntegrationConfig['username'],
-            apiKey: magentoIntegrationConfig['apiKey'],
-          },
-          remapping: {},
-          route: MagentoRoutes.Login,
-        };
+      {
+        esdbid: null,
+        esindex: null,
+        host: magentoIntegrationConfig['host'],
+        includedFields: [],
+        onlyFirst: false,
+        params: {
+          username: magentoIntegrationConfig['username'],
+          apiKey: magentoIntegrationConfig['apiKey'],
+        },
+        remapping: {},
+        route: MagentoRoutes.Login,
+      };
 
       try
       {
         const partialMagentoConfig: PartialMagentoConfig =
-          {
-            host: '',
-            sessionId: '',
-          };
+        {
+          host: '',
+          sessionId: '',
+        };
         partialMagentoConfig.host = magentoIntegrationConfig['host'];
         partialMagentoConfig.sessionId = await this.call(magConf) as string;
         resolve(partialMagentoConfig);
@@ -426,17 +426,17 @@ export default class MagentoEndpoint extends AEndpointStream
     {
       const partialMagConf: PartialMagentoConfig = await this.login(sourceConfig);
       const magentoConfig: MagentoConfig =
-        {
-          esdbid: sourceConfig['options']['esdbid'],
-          esindex: sourceConfig['options']['esindex'],
-          host: partialMagConf.host,
-          includedFields: sourceConfig['options']['includedFields'],
-          params: sourceConfig['options']['params'],
-          onlyFirst: sourceConfig['options']['onlyFirst'],
-          remapping: sourceConfig['options']['remapping'],
-          route: sourceConfig['options']['route'],
-          sessionId: partialMagConf.sessionId,
-        };
+      {
+        esdbid: sourceConfig['options']['esdbid'],
+        esindex: sourceConfig['options']['esindex'],
+        host: partialMagConf.host,
+        includedFields: sourceConfig['options']['includedFields'],
+        params: sourceConfig['options']['params'],
+        onlyFirst: sourceConfig['options']['onlyFirst'],
+        remapping: sourceConfig['options']['remapping'],
+        route: sourceConfig['options']['route'],
+        sessionId: partialMagConf.sessionId,
+      };
 
       resolve(magentoConfig);
     });

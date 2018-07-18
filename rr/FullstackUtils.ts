@@ -264,7 +264,7 @@ export async function login(page, url: string)
   TestLogger.info('Login ' + url);
   try
   {
-    await page.waitForSelector(USERNAME_SELECTOR, { timeout: 0 });
+    await page.waitForSelector(USERNAME_SELECTOR, { timeout: 1000, visible: true });
     TestLogger.info('Username selector is ready.');
     await page.click(USERNAME_SELECTOR);
     await page.keyboard.type('admin@terraindata.com');
@@ -277,4 +277,53 @@ export async function login(page, url: string)
     TestLogger.warn('The page might be already loaded, keep going.');
     sleep.sleep(4);
   }
+}
+
+export async function createAndLoadFirstLiveAlgorithm(page)
+{
+  await page.evaluate(() =>
+  {
+    window['TerrainTools'].terrainTests.testCreateCategory();
+  });
+  sleep.sleep(1);
+  const catid = await page.evaluate(() =>
+  {
+    return window['TerrainTools'].terrainTests.lastCategoryId;
+  });
+  TestLogger.info('Create a new category, ID:' + String(catid));
+
+  await page.evaluate(() =>
+  {
+    window['TerrainTools'].terrainTests.testCreateGroup();
+  });
+  sleep.sleep(1);
+  const groupid = await page.evaluate(() =>
+  {
+    return window['TerrainTools'].terrainTests.lastGroupId;
+  });
+  TestLogger.info('Create a new group, ID:' + String(groupid));
+
+  await page.evaluate(() =>
+  {
+    window['TerrainTools'].terrainTests.testCreateAlgorithm();
+  });
+  sleep.sleep(1);
+  const algid = await page.evaluate(() =>
+  {
+    return window['TerrainTools'].terrainTests.lastAlgorithmId;
+  });
+  TestLogger.info('Create a new algorithm, ID:' + String(algid));
+
+  await page.evaluate(() =>
+  {
+    window['TerrainTools'].terrainTests.setAlgorithmStatus();
+  });
+  sleep.sleep(1);
+
+  await page.evaluate(() =>
+  {
+    window['TerrainTools'].terrainTests.gotoAlgorithm();
+  });
+  sleep.sleep(1);
+  return { catid, groupid, algid };
 }

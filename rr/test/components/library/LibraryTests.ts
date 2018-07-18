@@ -42,49 +42,51 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires max-classes-per-file
-import * as React from 'react';
+// Copyright 2018 Terrain Data, Inc.
 
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import * as ip from 'ip';
 
-import
+import * as jsonfile from 'jsonfile';
+
+import * as puppeteer from 'puppeteer';
+import { TestLogger } from '../../../../shared/test/TestLogger';
+import { createAndLoadFirstLiveAlgorithm, getChromeDebugAddress, login } from '../../../FullstackUtils';
+
+describe('Testing the library related actions', () =>
 {
-  AlgorithmEndpoint,
-  DatabaseEndpoint, DownloadEndpoint,
-  FollowUpBossEndpoint, FsEndpoint,
-  GoogleAnalyticsEndpoint,
-  HttpEndpointForm, MailChimpEndpoint, Props, SftpEndpoint,
-  SQLEndpoint, UploadEndpoint,
-} from './EndpointFormClasses';
-import { MagentoEndpoint } from './MagentoEndpointForm';
+  let browser;
+  let page;
 
-type FormLookupMap<E extends string> =
+  beforeAll(async (done) =>
   {
-    [k in E]: React.ComponentClass<Props>
-  };
+    const wsAddress = await getChromeDebugAddress();
+    browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
+    // browser = await puppeteer.launch({ headless: false });
+    TestLogger.info('Connected to the Chrome ' + String(wsAddress));
+    page = await browser.newPage();
+    TestLogger.info('Created a new browser page.');
+    await page.setViewport({ width: 1600, height: 1200 });
+    TestLogger.info('Set the page view to 1600x1200.');
+    done();
+  });
 
-export const SourceFormMap: FormLookupMap<Sources> =
-{
-  [Sources.Algorithm]: AlgorithmEndpoint,
-  [Sources.Upload]: UploadEndpoint,
-  [Sources.Fs]: FsEndpoint,
-  [Sources.GoogleAnalytics]: GoogleAnalyticsEndpoint,
-  [Sources.Http]: HttpEndpointForm,
-  [Sources.Magento]: MagentoEndpoint,
-  [Sources.Mysql]: SQLEndpoint,
-  [Sources.Postgresql]: SQLEndpoint,
-  [Sources.Sftp]: SftpEndpoint,
-};
+  afterAll(async (done) =>
+  {
+    await page.close();
+    TestLogger.info('The page is closed');
+    await browser.disconnect();
+    TestLogger.info('The chrome connection is closed');
+    done();
+  });
 
-export const SinkFormMap: FormLookupMap<Sinks> =
-{
-  [Sinks.Database]: DatabaseEndpoint,
-  [Sinks.Download]: DownloadEndpoint,
-  [Sinks.FollowUpBoss]: FollowUpBossEndpoint,
-  [Sinks.Fs]: FsEndpoint,
-  [Sinks.Http]: HttpEndpointForm,
-  [Sinks.Magento]: MagentoEndpoint,
-  [Sinks.MailChimp]: MailChimpEndpoint,
-  [Sinks.Sftp]: SftpEndpoint,
-};
+  it('Create first live algorithm', async (done) =>
+  {
+    const url = `http://${ip.address()}:3000`;
+    TestLogger.info('Get url:' + url);
+    await login(page, url);
+    const id = await createAndLoadFirstLiveAlgorithm(page);
+    TestLogger.info('Create IDs: ' + JSON.stringify(id));
+    expect(id).toEqual({ catid: 1, groupid: 2, algid: 3 });
+    done();
+  }, 30000);
+});

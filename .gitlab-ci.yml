@@ -191,6 +191,29 @@ fullstack-screenshot-http-import:
     - timeout 240 yarn test-fullstack-teardown
     - pkill node || true;
 
+fullstack-screenshot-download-export:
+  script:
+    - pkill node || true;
+    - timeout 240 yarn test-fullstack-setup
+    - yarn clean
+    - yarn build
+    - NODE_ENV=production nohup yarn start-midway-prod > ./midwayConsole.log < /dev/null 2>&1&
+    - sleep 25
+    - yarn test-rr-etl-download-export
+  only:
+    - schedules
+  stage: screenshot-tests
+  allow_failure: true
+  artifacts:
+    when: on_failure
+    expire_in: 1 week
+    paths:
+    - rr/test/etl-download/__image_snapshots__/__diff_output__
+  after_script:
+    - tail -n20 ./midwayConsole.log || true
+    - timeout 240 yarn test-fullstack-teardown
+    - pkill node || true;
+
 deploy:
   script:
    - yarn build-prod

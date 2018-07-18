@@ -44,78 +44,107 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+// tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands max-line-length
+
 import * as ip from 'ip';
-
 import * as jsonfile from 'jsonfile';
-
 import * as puppeteer from 'puppeteer';
-import { TestLogger } from '../../../../shared/test/TestLogger';
-import { getChromeDebugAddress, login } from '../../../FullstackUtils';
+import * as sleep from 'sleep';
+import * as request from 'then-request';
+
+import { toMatchImageSnapshot } from 'jest-image-snapshot';
+import { TestLogger } from '../../../shared/test/TestLogger';
+import { createAndLoadFirstLiveAlgorithm, login, replayInputEventOnly, replayRREvents } from '../../FullstackUtils';
 
 const USERNAME_SELECTOR = '#login-email';
+const PASSWORD_SELECTOR = '#login-password';
+const BUTTON_SELECTOR = '#login-submit';
+
+expect.extend({ toMatchImageSnapshot } as any);
 
 function getExpectedActionFile(): string
 {
   return __dirname + '/actions.json';
 }
 
-async function loadPage(page, url)
+async function takeAndCompareScreenShot(page, options?)
 {
-  await page.goto(url);
+  const localOption = { failureThreshold: '0.01', failureThresholdType: 'percent' };
+  if (options)
+  {
+    Object.assign(localOption, options);
+  }
+  const image = await page.screenshot();
+  (expect(image) as any).toMatchImageSnapshot(localOption);
 }
 
-describe('Testing the pathfinder parser', () =>
+async function getChromeDebugAddress()
+{
+  try
+  {
+    const res = await (request as any)('GET', 'http://localhost:9222/json');
+    const resBody = JSON.parse(res.getBody());
+    const wsAddress = resBody[resBody.length - 1]['webSocketDebuggerUrl'];
+    return wsAddress;
+  } catch (err)
+  {
+    TestLogger.error(err);
+    return undefined;
+  }
+}
+
+async function takeBuilderActionScreenshot(page)
+{
+  await takeAndCompareScreenShot(page);
+}
+
+describe('Replay a builder action', () =>
 {
   let browser;
   let page;
-  let actions;
-
-  beforeAll(async (done) =>
+  let actionFileData;
+  beforeAll(async () =>
   {
-    const actionFileName = getExpectedActionFile();
-    const actionFileData = jsonfile.readFileSync(actionFileName);
-    actions = actionFileData.actions;
-    TestLogger.info('Testing ' + String(actions.length) + ' queries.');
     const wsAddress = await getChromeDebugAddress();
     browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
-    // browser = await puppeteer.launch({ headless: false });
-    TestLogger.info('Connected to the Chrome ' + String(wsAddress));
-    page = await browser.newPage();
-    TestLogger.info('Created a new browser page.');
-    await page.setViewport({ width: 1600, height: 1200 });
-    TestLogger.info('Set the page view to 1600x1200.');
-    done();
+    TestLogger.info('Connected to the Chrome ' + wsAddress);
+    actionFileData = jsonfile.readFileSync(getExpectedActionFile());
+    // loading from options['directory']/actions.json
   });
 
-  it('pathfinder parser test', async (done) =>
+  it('builder-replay', async () =>
   {
+    page = await browser.newPage();
+    await page.setViewport({ width: 1600, height: 1200 });
     const url = `http://${ip.address()}:3000`;
-    TestLogger.info('Get url:' + url);
     await login(page, url);
-    for (let i = 0; i < actions.length; i++)
+    await createAndLoadFirstLiveAlgorithm(page);
+    await takeAndCompareScreenShot(page);
+    const actions = actionFileData['actions'];
+    const serializeRecords = actionFileData['records'];
+    console.log('Replaying ' + actions.length + ' actions.');
+    await replayRREvents(page, url, actions, serializeRecords, replayInputEventOnly, async (action) =>
     {
-      const thisAction = JSON.parse(actions[i].action);
-      if (thisAction.payload.notDirty === true)
+      if (action.eventType === 'mousedown')
       {
-        continue;
+        if (action.selector === ':nth-child(5) > .tabs-action-piece'
+          || action.selector === ':nth-child(7) > .editor-top-bar-item')
+        {
+          sleep.sleep(4);
+        }
+      } else if (action.eventType === 'keypress')
+      {
+        // no delay for key pressing, and avoid taking the snapshot too
+        return;
       }
-      const query = actions[i].query;
-      const { tql, pathErrorMap } = await page.evaluate((theQuery) =>
-      {
-        return window['TerrainTools'].terrainTests.PathFinderToQuery(theQuery);
-      }, query);
-      TestLogger.info('Parsing item' + String(i) + ':' + JSON.stringify(actions[i]));
-      expect(tql).toBe(query.tql);
-    }
-    done();
-  }, 30000);
+      sleep.sleep(1);
+      await takeBuilderActionScreenshot(page);
+    });
+  }, 600000);
 
-  afterAll(async (done) =>
+  afterAll(async () =>
   {
     await page.close();
-    TestLogger.info('The page is closed');
-    await browser.disconnect();
-    TestLogger.info('The chrome connection is closed');
-    done();
+    TestLogger.info('The page is closed.');
   });
 });

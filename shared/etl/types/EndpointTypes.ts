@@ -180,38 +180,38 @@ export interface SourceOptionsTypes // TODO check that these are right
 }
 
 export const SourceOptionsDefaults: SourceOptionsTypes =
-  {
-    Upload: {
-      file: null,
-    },
-    Algorithm: {
-      algorithmId: -1,
-    },
-    Sftp: {
-      filepath: 'filename.json',
-      credentialId: -1,
-    },
-    GoogleAnalytics: {
-      dayInterval: 30,
-    },
-    Http: {
-      method: 'GET',
-    },
-    Fs: {},
-    Mysql: {
-    },
-    Magento: {
-      esdbid: null,
-      esindex: null,
-      includedFields: ['sku'],
-      params: null,
-      onlyFirst: true,
-      route: null,
-      remapping: {},
-    },
-    Postgresql: {
-    },
-  };
+{
+  Upload: {
+    file: null,
+  },
+  Algorithm: {
+    algorithmId: -1,
+  },
+  Sftp: {
+    filepath: 'filename.json',
+    credentialId: -1,
+  },
+  GoogleAnalytics: {
+    dayInterval: 30,
+  },
+  Http: {
+    method: 'GET',
+  },
+  Fs: {},
+  Mysql: {
+  },
+  Magento: {
+    esdbid: null,
+    esindex: null,
+    includedFields: ['sku'],
+    params: null,
+    onlyFirst: true,
+    route: null,
+    remapping: {},
+  },
+  Postgresql: {
+  },
+};
 
 export interface SinkOptionsTypes
 {
@@ -233,37 +233,37 @@ export interface SinkOptionsTypes
 }
 
 export const SinkOptionsDefaults: SinkOptionsTypes =
-  {
-    Download: {
-      filename: '',
-    },
-    Database: {
-      language: Languages.Elastic,
-      serverId: '',
-      database: '',
-      table: '',
-    },
-    Sftp: {
-      filepath: 'filename.json',
-      credentialId: -1,
-    },
-    Http: {
-      method: 'POST',
-    },
-    Fs: {},
-    FollowUpBoss: {
-    },
-    MailChimp: {},
-    Magento: {
-      esdbid: null,
-      esindex: null,
-      includedFields: [],
-      params: null,
-      onlyFirst: true,
-      route: null,
-      remapping: {},
-    },
-  };
+{
+  Download: {
+    filename: '',
+  },
+  Database: {
+    language: Languages.Elastic,
+    serverId: '',
+    database: '',
+    table: '',
+  },
+  Sftp: {
+    filepath: 'filename.json',
+    credentialId: -1,
+  },
+  Http: {
+    method: 'POST',
+  },
+  Fs: {},
+  FollowUpBoss: {
+  },
+  MailChimp: {},
+  Magento: {
+    esdbid: null,
+    esindex: null,
+    includedFields: [],
+    params: null,
+    onlyFirst: true,
+    route: null,
+    remapping: {},
+  },
+};
 
 export interface SftpOptions
 {
