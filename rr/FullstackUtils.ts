@@ -203,6 +203,7 @@ export async function replayRREvents(page, url, actions, records,
         if (a.eventType === 'click' || a.eventType === 'mousedown')
         {
           await page.click(a.selector);
+          await page.mouse.move(0, 0);
         } else if (a.eventType === 'dblclick')
         {
           await page.click(a.selector, { clickCount: 2 });
