@@ -323,7 +323,7 @@ export class App
     {
       await DB.getDB().execute([
         [
-          'ALTER TABLE databases ADD CONSTRAINT unique_db_names EXCLUDE (name WITH =) WHERE (name != \'\');',
+          'ALTER TABLE databases ADD CONSTRAINT unique_db_names EXCLUDE (name WITH =);',
         ],
         undefined,
       ]);
