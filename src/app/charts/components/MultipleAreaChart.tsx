@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
 import TVictoryLabel from 'charts/components/victory-custom/TVictoryLabel';
 import TVictoryLinePoint from 'charts/components/victory-custom/TVictoryLinePoint';
 import TVictoryPin from 'charts/components/victory-custom/TVictoryPin';
@@ -83,7 +84,7 @@ const styles = {
   topChart: {
     axis: {
       tickLabels: {
-        fill: 'rgba(255,255,255,0.75)',
+        fill: 'rgba(100,100,100,0.75)',
         fontWeight: 'bold',
         padding: 2,
       },
@@ -104,17 +105,17 @@ const styles = {
     }),
     tooltipLegend: {
       border: {
-        stroke: 'rgba(255,255,255,0.25)',
+        stroke: 'rgba(100,100,100,0.25)',
         fill: 'black',
         fillOpacity: 0.4,
       },
       title: {
         fontSize: 15,
-        fill: 'rgba(255,255,255,0.75)',
+        fill: 'rgba(100,100,100,0.75)',
         fontWeight: 'bold',
       },
     },
-    activeDataVerticalLine: { stroke: 'rgba(0, 0, 0, .2)', strokeWidth: 1 },
+    activeDataVerticalLine: { stroke: 'rgba(0,0,0,.2)', strokeWidth: 1 },
   },
   bottomChart: {
     padding: { top: 0, bottom: 0, left: 0, right: 0 },
@@ -135,10 +136,10 @@ const styles = {
   legend: {
     title: {
       fontSize: 15,
-      fill: 'rgba(255,255,255,0.75)',
+      fill: 'rgba(100,100,100,0.75)',
       fontWeight: 'bold',
     },
-    pinStyle: { fill: 'rgba(255, 255, 255, 0.75)' },
+    pinStyle: { fill: 'rgba(100,100,100,0.75)' },
     borderPadding: {
       left: 10,
       right: 10,
@@ -312,7 +313,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     const data = datasets
       .map((ds, key) =>
       {
-        const labelsStyle = { fill: 'rgba(255,255,255,0.75)' };
+        const labelsStyle = { fill: 'rgba(100,100,100,0.75)' };
         const dataStyle = { fill: this.getDatasetColor(ds.id) };
 
         return {
@@ -380,7 +381,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
         mutation: (labelProps) =>
         {
           // Changes the VictoryLegend hover item text font size.
-          const newStyle = Object.assign({}, labelProps.style, { fill: 'rgba(255,255,255,1)' });
+          const newStyle = Object.assign({}, labelProps.style, { fill: 'rgba(100,100,100,1)' });
           return { style: newStyle };
         },
       },
@@ -533,6 +534,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                 />
                 <VictoryGroup offset={15}>
                   {datasets.map((d) => (<VictoryBar
+                    key={d}
                     style={styles.bottomChart
                       .bars(this.getDatasetColor(d.id))
                     }

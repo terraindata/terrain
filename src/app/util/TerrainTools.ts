@@ -73,7 +73,6 @@ const FEATURE_KEY_PREFIX = 'toggle-feature-'; // prefix for the localStorage key
 // tslint:disable:no-console
 class TerrainTools
 {
-  public static ANALYTICS = 'analytics';
   public static ADVANCED_RESULTS = 'advanced_results';
   public static OPERATORS = 'operators';
   public static PATHFINDER_COPY = 'pathfinder_copy';
@@ -96,10 +95,10 @@ TerrainTools.activate(<feature>)
 TerrainTools.deactivate(<feature>)
 
 Example:
-TerrainTools.activate(TerrainTools.ANALYITICS);
+TerrainTools.activate(TerrainTools.ADVANCED_RESULTS);
 
 Toggle-able Features:
-* TerrainTools.ANALYTICS`, LEVEL_INFO);
+* TerrainTools.ADVANCED_RESULTS`, LEVEL_INFO);
   }
 
   public static isAdmin()
