@@ -44,6 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import * as math from 'mathjs';
+
+// The PathguesserUtil provides an array of suggested path keys given a JSON object.
+// Each key is given a score to measure the algorithm's confidence of that key being the desired path
+// based on expected behavior of the values at the corresponding key.
+
 interface PathInfo
 {
   name: string;
@@ -52,6 +58,12 @@ interface PathInfo
 
 export default class PathUtil
 {
+  // The suggested path scoring is calculated upon meeting certain expected behavior given a key, such as:
+  // Corresponding values not being numbers or strings
+  // Being an array of confirmed objects, of which:
+  // Objects contain identical inner keys, or an equal number of inner keys, with a scaling factor
+  // of how much items are in the object.
+  // The scores are then normalized to be from 0-10 for scale, with specificity to two decimal places.
   public static renderFields(objectItem: object)
   {
     const keyFields = [];
@@ -94,8 +106,10 @@ export default class PathUtil
     }
 
     let comparedKeys;
+    let absoluteKeyCount = 0;
     for (const key of Object.keys(object))
     {
+      absoluteKeyCount++;
       const keyFields = PathUtil.renderFields(object[key]);
       if (comparedKeys !== undefined && !(PathUtil.keyFieldsCompare(comparedKeys, keyFields, keyObject)))
       {
@@ -103,15 +117,17 @@ export default class PathUtil
       }
       comparedKeys = keyFields;
     }
-    keyObject.score += 4;
+    keyObject.score += (4 * absoluteKeyCount);
     return true;
   }
 
   public static matchingFieldLength(object, keyObject: PathInfo) // check that objects in the json have the same number of key fields
   {
     let comparedLength;
+    let absoluteKeyCount = 0;
     for (const itemKey of Object.keys(object))
     {
+      absoluteKeyCount++;
       const itemLength = (object[itemKey] !== undefined) ? object[itemKey].length : 0;
       if (comparedLength !== undefined && itemLength !== comparedLength)
       {
@@ -119,7 +135,7 @@ export default class PathUtil
       }
       comparedLength = itemLength;
     }
-    keyObject.score += 3;
+    keyObject.score += (3 * absoluteKeyCount);
     return true;
   }
 
@@ -206,7 +222,7 @@ export default class PathUtil
     const suggestedPathInfo = PathUtil.guessPath(json, [], 0);
     const sortedPathInfo = suggestedPathInfo.sort((keyA, keyB) => keyB.score - keyA.score);
     const maxScore = Math.max(...suggestedPathInfo.map((key, i) => key.score));
-    sortedPathInfo.forEach((key) => key.score = (key.score / maxScore) * 10);
+    sortedPathInfo.forEach((key) => key.score = (math.round((key.score / maxScore) * 10, 2)));
     return sortedPathInfo;
   }
 }
