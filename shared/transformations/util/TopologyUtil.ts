@@ -175,12 +175,23 @@ export default class TopologyUtil
   // e.g. [a] is local to [b] and [c, d]
   // [a, -1, b] would be local to [a, -1, c]
   // [a] would not be local to [c, -1, d]
-  public static areFieldsLocal(kp1, kp2): boolean
+  public static areFieldsLocal(kp1: KeyPath, kp2: KeyPath): boolean
   {
     const [r1, r2] = TopologyUtil.getRelation(kp1, kp2);
     if (r1 === 'one' && r2 === 'one')
     {
       return true;
     }
+  }
+
+  // return true if kp1 is the parent of kp2
+  public static isParent(kp1: KeyPath, kp2: KeyPath)
+  {
+    if (kp2.size <= kp1.size)
+    {
+      return false;
+    }
+    const index = TopologyUtil.getDifferingBaseIndex(kp1, kp2);
+    return index === kp1.size;
   }
 }

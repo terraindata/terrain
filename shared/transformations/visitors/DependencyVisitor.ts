@@ -76,7 +76,7 @@ interface VisitorArgs
 interface ReturnType
 {
   synthetic: number[]; // dependencies as a result of transformations
-  structural: number[]; // dependencies that are a result of parent-child relationships
+  structural: number[]; // dependencies that are a result of parent-child relationships (organic only)
   self: number; // the next node that operates on this node's field
 }
 
@@ -138,6 +138,22 @@ export default class DependencyVisitor
     if (opts.type === IdentityTypes.Organic)
     {
       const kp = node.fields.get(0).path;
+      const organics = engine.dag.nodes().filter((n) => {
+        const nd = engine.dag.node(n);
+        if (nd.typeCode === TransformationNodeType.IdentityNode)
+        {
+          const opt = nd.meta as NodeOptionsType<TransformationNodeType.IdentityNode>;
+          if (opt.type === IdentityTypes.Organic)
+          {
+            if (Utils.topology.isParent(kp, nd.fields.get(0).path))
+            {
+              return true;
+            }
+          }
+        }
+        return false;
+      }).map((val) => Number(val));
+      result.structural = organics;
     }
     return result;
   }

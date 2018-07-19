@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { List } from 'immutable';
+import { List, Set } from 'immutable';
 import * as _ from 'lodash';
 
 import { DateFormats, FieldTypes } from 'shared/etl/types/ETLTypes';
@@ -59,27 +59,89 @@ import { TestDocs } from './TestDocs';
 
 import * as Utils from 'shared/transformations/util/EngineUtils';
 
+// just a convenient shorthand
 function wrap(kp: any[])
 {
   return List([List<string | number>(kp)]);
 }
 
-function getDependents(eng: TransformationEngine, fieldId: number)
+// just a convenient shorthand
+function getId(engine: TransformationEngine, kp: any[])
+{
+  return engine.getFieldID(KeyPath(kp));
+}
+
+function getDependents(eng: TransformationEngine, fieldId: number): number[]
 {
   const engine = eng as FriendEngine;
-  Utils.traversal.findIdentityNode(engine, fieldId);
-
+  const identity = Utils.traversal.findIdentityNode(engine, fieldId);
+  return Utils.traversal.findDependencies(engine, identity);
 }
 
-/*
- *
- */
-function ensureGraphValidity(eng: TransformationEngine)
+function dependencyIntersection(eng: TransformationEngine, field1: number, field2: number): Set<number>
 {
-
+  const nodes1 = Set(getDependents(eng, field1));
+  const nodes2 = Set(getDependents(eng, field2));
+  return nodes1.intersect(nodes2);
 }
 
-test('todo', () =>
+test('test organic fields', () =>
 {
+  const doc = {
+    foo: 'hello',
+    bar: 5,
+    a: [1, 2, 3],
+    b: {
+      c: 'hi',
+      d: 'yo',
+    },
+  };
+  const e = Utils.construction.makeEngine(doc);
 
+  const fooId = getId(e, ['foo']);
+  const barId = getId(e, ['bar']);
+  const aId = getId(e, ['a']);
+  const aSubId = getId(e, ['a', -1]);
+  const bId = getId(e, ['b']);
+  const cId = getId(e, ['b', 'c']);
+  const dId = getId(e, ['b', 'd']);
+
+  expect(dependencyIntersection(e, fooId, barId).size).toBe(0);
+  expect(dependencyIntersection(e, aId, aSubId).size).toBeGreaterThan(0);
+  expect(dependencyIntersection(e, bId, cId).size).toBeGreaterThan(0);
+  expect(dependencyIntersection(e, bId, dId).size).toBeGreaterThan(0);
+  expect(dependencyIntersection(e, aId, dId).size).toBe(0);
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
+});
+
+test('test synthetic dependent fields', () =>
+{
+  const doc = {
+    foo: 'hello',
+    bar: 'hey there',
+  };
+  const e = Utils.construction.makeEngine(doc);
+  const fooId = getId(e, ['foo']);
+  const barId = getId(e, ['bar']);
+  const joinNodeId = e.appendTransformation(TransformationNodeType.JoinNode, List([fooId, barId]), {
+    delimiter: '-',
+    newFieldKeyPaths: wrap(['joined']),
+  });
+  const joinFieldId = getId(e, ['joined']);
+  const hashId = e.appendTransformation(TransformationNodeType.HashNode, List([joinFieldId]), {
+    salt: 'abc',
+  });
+  const joinedFieldNodeId = Utils.traversal.findIdentityNode(e, joinFieldId);
+  const appendToFooId = e.appendTransformation(TransformationNodeType.InsertNode, List([fooId]), {
+    at: -1,
+    value: '...',
+  });
+
+  const intersection = dependencyIntersection(e, fooId, barId);
+
+  expect(intersection.has(joinNodeId)).toBe(true);
+  expect(intersection.has(joinedFieldNodeId)).toBe(true);
+  expect(intersection.has(hashId)).toBe(true);
+  expect(intersection.has(appendToFooId)).toBe(false);
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });

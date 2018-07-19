@@ -77,14 +77,42 @@ import * as TerrainLog from 'loglevel';
 export default abstract class Traversal
 {
   /**
-   *  TODO
    *  Find dependencies of this field
    */
-  public static findDependencies(engine: TransformationEngine, node: number): number[]
+  public static findDependencies(engine: TransformationEngine, nodeId: number): number[]
   {
     const graph = (engine as FriendEngine).dag;
-    const startNode = graph.node(String(node));
-    return startNode.accept(DependencyVisitor, { engine }).synthetic;
+    // const startNode = graph.node(String(nodeId));
+
+    const result = [nodeId];
+    const visited: { [k: number]: boolean } = {};
+    const nodeQueue: number[] = [];
+
+    // add a node to the queue of dependencies, the results, and mark it as visited
+    const addNode = (id: number) => {
+      if (id != null && !visited[id])
+      {
+        visited[id] = true;
+        nodeQueue.push(id);
+        result.push(id);
+      }
+    };
+    addNode(nodeId);
+
+    for (let ncount = 0; ncount < graph.nodeCount(); ncount++)
+    {
+      const toVisit: number = nodeQueue.pop();
+      if (toVisit === undefined)
+      {
+        break;
+      }
+      const toVisitNode = graph.node(String(toVisit));
+      const { synthetic, structural, self } = toVisitNode.accept(DependencyVisitor, { engine });
+      synthetic.forEach((id) => addNode(id));
+      structural.forEach((id) => addNode(id));
+      addNode(self);
+    }
+    return result;
   }
 
   /*
