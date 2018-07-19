@@ -48,7 +48,7 @@ import * as path from 'path';
 import { MidwayLogger } from './log/MidwayLogger';
 class EmailTemplate
 {
-  public async makeEmailContent(params: object): Promise <string>
+  public static async makeEmailContent(params: object): Promise <string>
   {
     return new Promise<string>((resolve, reject) =>
     {

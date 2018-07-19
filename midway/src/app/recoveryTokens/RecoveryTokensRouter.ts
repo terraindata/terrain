@@ -64,7 +64,6 @@ import EmailTemplate from '../EmailTemplate';
 import IntegrationConfig from '../integrations/IntegrationConfig';
 import Integrations from '../integrations/Integrations';
 const integrations: Integrations = new Integrations();
-const emailTemplate: EmailTemplate = new EmailTemplate();
 
 Router.post('/', async (ctx, next) =>
 {
@@ -123,7 +122,7 @@ Router.post('/', async (ctx, next) =>
       buttonUrl: route,
       buttonText: 'RESET PASSWORD',
     };
-    const emailHtml: string = await emailTemplate.makeEmailContent(htmlParams);
+    const emailHtml: string = await EmailTemplate.makeEmailContent(htmlParams);
     const attachment: object = [
     {
       filename: 'bg-blue-gradient.png',
