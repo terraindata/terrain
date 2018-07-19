@@ -87,7 +87,7 @@ enum TransformationNodeType
 
 // if this has errors, double check TransformationNodeType's keys are equal to its values
 type AssertEnumValuesEqualKeys = {
-  [K in keyof typeof TransformationNodeType]: K
+  [K in keyof typeof TransformationNodeType]: string
 };
 // noinspection BadExpressionStatementJS
 TransformationNodeType as AssertEnumValuesEqualKeys;

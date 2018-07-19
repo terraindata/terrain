@@ -312,7 +312,7 @@ export type SinkOptionsType<key extends SinkTypes> = SinkOptionsTypes[key];
 // 1: The source and sink enum names are the same as their values
 // 2: Each sink and source has a defined option type
 type SourceNamingAssertion = {
-  [K in keyof typeof Sources]: K
+  [K in keyof typeof Sources]: string
 };
 Sources as SourceNamingAssertion;
 
@@ -321,7 +321,7 @@ type SourceAssertOptionTypesExhaustive = {
 };
 
 type SinkNamingAssertion = {
-  [K in keyof typeof Sinks]: K
+  [K in keyof typeof Sinks]: string
 };
 Sinks as SinkNamingAssertion;
 
