@@ -235,7 +235,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
 
   public formatSectionData(key, i)
   {
-    const jsonPath = (key.name === '*') ? JSON.stringify(this.props.source.slice(0, 50), null, 2) :
+    const jsonPath = (key.name === '*') ? JSON.stringify(this.props.source.slice(0, 60), null, 2) :
       JSON.stringify(this.props.source[key.name], null, 2);
     return jsonPath;
   }

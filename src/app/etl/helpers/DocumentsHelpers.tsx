@@ -200,7 +200,7 @@ class DocumentsHelpers extends ETLHelpers
   {
     return new Promise((resolve, reject) =>
     {
-      const sizeLimit = (rawStringOnly) ? 5000 : DefaultDocumentLimit;
+      const sizeLimit = (rawStringOnly) ? 10000 : DefaultDocumentLimit;
       switch (source.type)
       {
         case Sources.Upload: {
