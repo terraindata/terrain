@@ -126,21 +126,36 @@ describe('Replay a builder action', () =>
     console.log('Replaying ' + actions.length + ' actions.');
     await replayRREvents(page, url, actions, serializeRecords, replayInputEventOnly, async (action) =>
     {
+      let screenShotOptions;
       if (action.eventType === 'mousedown')
       {
-        if (action.selector === ':nth-child(5) > .tabs-action-piece'
-          || action.selector === ':nth-child(7) > .editor-top-bar-item'
-          || action.selector === '.tabs-action-text.tabs-action-enabled > .tabs-action-piece')
+        // mouse click
+        switch (action.selector)
         {
-          sleep.sleep(9);
+          case ':nth-child(5) > .tabs-action-piece':
+            // `save` button
+            sleep.sleep(4);
+            break;
+          case ':nth-child(7) > .editor-top-bar-item':
+            // `run` button
+            sleep.sleep(4);
+            break;
+          case '.tabs-action-text.tabs-action-enabled > .tabs-action-piece':
+            sleep.sleep(4);
+            screenShotOptions = { failureThreshold: '0.03', failureThresholdType: 'percent' };
+            break;
+          default:
+            // other actions
+            sleep.sleep(1);
+            break;
         }
       } else if (action.eventType === 'keypress')
       {
+        // keyboard typing
         // no delay for key pressing, and avoid taking the snapshot too
         return;
       }
-      sleep.sleep(1);
-      await takeBuilderActionScreenshot(page);
+      await takeAndCompareScreenShot(page, screenShotOptions);
     });
     done();
   }, 600000);
