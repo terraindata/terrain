@@ -465,7 +465,6 @@ class TransformCard extends TerrainComponent<Props>
     if (agg === undefined || agg['minimum'] === undefined || agg['maximum'] === undefined)
     {
       // IT MIGHT ACTUALLY BE THE GEO ONE WITH GROUPJOIN
-      console.log(resp.result);
       return;
     }
     const newDomain = this.trimDomain(this.state.maxDomain, List([agg['minimum'].value, agg['maximum'].value]));
@@ -565,18 +564,15 @@ class TransformCard extends TerrainComponent<Props>
       {
         return;
       }
-      console.log('the domain query is ', domainQuery);
       const domainAggregationAjax = Ajax.query(
         domainQuery,
         db,
         (resp) =>
         {
-          console.log('the response is ', resp);
           this.handleElasticDomainAggregationResponse(resp);
         },
         (err) =>
         {
-          console.log('error is ', err);
           this.handleElasticDomainAggregationError(err);
         },
       );

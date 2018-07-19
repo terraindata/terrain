@@ -84,6 +84,7 @@ export interface Props
   // Show/Hide certain features
   hideZoomControl?: boolean;
   hideSearchBar?: boolean;
+  hideMap?: boolean;
 
   // Styling
   className?: string;
@@ -736,19 +737,22 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
       >
         {!this.props.hideSearchBar && this.renderSearchBar()}
         {
-          this.props.fadeInOut ?
-            <div
-              className={classNames({
-                'map-component-fade-in-out': true,
-                'map-component-fade-in-out-hidden': !this.state.mapExpanded,
-              })}
-            >
-              {
-                this.renderMapWrapper(location)
-              }
-            </div>
+          this.props.hideMap ?
+            null
             :
-            this.renderMapWrapper(location)
+            this.props.fadeInOut ?
+              <div
+                className={classNames({
+                  'map-component-fade-in-out': true,
+                  'map-component-fade-in-out-hidden': !this.state.mapExpanded,
+                })}
+              >
+                {
+                  this.renderMapWrapper(location)
+                }
+              </div>
+              :
+              this.renderMapWrapper(location)
         }
       </div>
     );

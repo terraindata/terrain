@@ -37,6 +37,7 @@
 			.score-bar {
 				position: relative;
 				top: -2px;
+				margin-left: 24px;
 			}
 			&.pf-linear-score-line-wrapper
 			{
@@ -74,9 +75,9 @@
 	}
 	
 	.pf-score-line-transform {
-		margin-top: 32px;
+		margin-top: 12px;
 		position: relative;
-		width: calc(~"100% - 51x");
+		width: calc(~"100% - 51px");
 		border-radius: 4px;
 		padding-left: 24px;
 		left: -10px;
@@ -130,6 +131,9 @@
 	.pf-score-line {
 		margin: 12px;
 	}
+	.pf-score-line-wrapper {
+		width: 100%;
+	}
 	.pf-line {
 		.pf-score-line-arrow {
 			svg
@@ -150,9 +154,15 @@
 		}
 		.pf-score-line-inner {
 			position: relative;
+			margin-bottom: 20px;
+			width: 100%;
 			.builder-tb {
 				flex-basis: 50px;
 				margin: 0px 4px;
+			}
+			.pf-score-line-expand {
+				position: absolute;
+				right: 0px;
 			}
 			.pf-score-line-geo-wrapper {
 				display: flex;
@@ -204,13 +214,21 @@
 				text-align: left;
 				color: #1eb4fa;
 				font-size: 18px;
-				width: 33.33%;
+				width: 50%;
 				padding-left: 15px;
 				min-width: 150px;
 				overflow: hidden;
-			    line-height: 20px;
-			    max-height: 40px;
 				cursor: pointer;
+			}
+			.field-name-editing {
+				width: 50%;
+				margin-left: 27px;
+				margin-top: 10px;
+				.field-name-editing-label {
+					font-size: 12px;
+					text-transform: uppercase;
+					margin-bottom: 3px;
+				}
 			}
 			.field-weight {
 				display: none;

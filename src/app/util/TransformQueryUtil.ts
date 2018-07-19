@@ -45,18 +45,19 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:strict-boolean-expressions
 
+import { parsePath } from 'app/builder/components/pathfinder/PathfinderParser';
+import { List, Map } from 'immutable';
 import { toInputMap } from '../../blocks/types/Input';
 import { isInput } from '../../blocks/types/Input';
 import { stringifyWithParameters } from '../../database/elastic/conversion/ParseElasticQuery';
-import { List, Map } from 'immutable';
-import { parsePath } from 'app/builder/components/pathfinder/PathfinderParser';
 /*
   A set pf functions that creates domain and histogram aggregation queries for the transform charts
   for different forms (geodistance, _score, and regular curves)
 */
 
 export const TransformQueryUtil = {
-  getDomainAggregation(index, type, input): string {
+  getDomainAggregation(index, type, input): string
+  {
     return JSON.stringify({
       query: {
         bool: {
@@ -78,7 +79,8 @@ export const TransformQueryUtil = {
     });
   },
 
-  getHistogramAggregation(index, type, input, min, max, interval) {
+  getHistogramAggregation(index, type, input, min, max, interval)
+  {
     return JSON.stringify({
       query: {
         bool: {
@@ -105,7 +107,8 @@ export const TransformQueryUtil = {
     });
   },
 
-  getGeoDomainAggregation(index, type, input, distanceValue, query) {
+  getGeoDomainAggregation(index, type, input, distanceValue, query)
+  {
     let { lat, lon } = TransformQueryUtil.getLatLon(distanceValue);
     if (distanceValue.address && distanceValue.address.charAt(0) === '@')
     {
@@ -126,14 +129,15 @@ export const TransformQueryUtil = {
           .setIn(['more', 'source'], List([parentField]))
           .setIn(['more', 'customSource'], true)
           .setIn(['score', 'type'], 'random');
-        path.nested.forEach((nested, i) => {
+        path.nested.forEach((nested, i) =>
+        {
           path = path
             .setIn(['nested', i, 'source', 'count'], 10)
             .setIn(['nested', i, 'more', 'source'], List([input]))
             .setIn(['nested', i, 'more', 'customSource'], true)
             .setIn(['nested', i, 'score', 'type'], 'random');
         });
-        const {tql, pathErrorMap} = parsePath(path, query.inputs);
+        const { tql, pathErrorMap } = parsePath(path, query.inputs);
         if (pathErrorMap.size !== 0)
         {
           return null;
@@ -181,7 +185,8 @@ export const TransformQueryUtil = {
     return JSON.stringify(domainQuery);
   },
 
-  getGeoHistogramAggregation(index, type, input, min, max, interval, distanceValue, inputs) {
+  getGeoHistogramAggregation(index, type, input, min, max, interval, distanceValue, inputs)
+  {
     let { lat, lon } = TransformQueryUtil.getLatLon(distanceValue);
     if (distanceValue.address && distanceValue.address.charAt(0) === '@')
     {
@@ -215,25 +220,11 @@ export const TransformQueryUtil = {
       },
       size: 1,
     };
-    if (typeof lat === 'string' && lat.charAt(0) === '@')
-    {
-      const qt = new ESJSParser(aggQuery);
-      if (qt.getErrors().length)
-      {
-        return null;
-      }
-      const params = toInputMap(inputs);
-      const interpreter: ESInterpreter = new ESInterpreter(qt, params);
-      if (interpreter.errors.length)
-      {
-        return null;
-      }
-      return interpreter.finalQuery;
-    }
     return JSON.stringify(aggQuery);
   },
 
-  getScoreDomainAggregation(query) {
+  getScoreDomainAggregation(query)
+  {
     let tqlString = '';
     try
     {
@@ -261,7 +252,8 @@ export const TransformQueryUtil = {
     return JSON.stringify(tql);
   },
 
-  getScoreHistogramAggregation(query, min, max, interval) {
+  getScoreHistogramAggregation(query, min, max, interval)
+  {
     let tqlString = '';
     try
     {
