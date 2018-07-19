@@ -53,7 +53,6 @@ class EmailTemplate
     return new Promise<string>((resolve, reject) =>
     {
       const emailPath: string = path.join(__dirname, '../../../../src/assets/EmailTemplate.html');
-      MidwayLogger.error(emailPath);
       let htmlString: string;
       fs.readFile(emailPath, (err, data) =>
       {
