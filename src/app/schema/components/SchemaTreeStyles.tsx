@@ -71,144 +71,144 @@ const starSvgStyles = {
 };
 
 const SchemaTreeStyles =
-  {
-    schemaView: {
-      height: '100%',
-      overflow: 'auto',
-    },
+{
+  schemaView: {
+    height: '100%',
+    overflow: 'auto',
+  },
 
-    schemaHeading: [
-      Styles.font.big,
-    ],
+  schemaHeading: [
+    Styles.font.big,
+  ],
 
-    label: Styles.font.semiBoldNormal,
+  label: Styles.font.semiBoldNormal,
 
-    none: {
+  none: {
 
-    },
+  },
 
-    treeItem: [
-      Styles.transition,
-    ],
-
-    unselectedStarIcon: _.extend({},
-      starSvgStyles,
-      {
-        fill: 'none',
-      }),
-
-    selectedStarIcon: _.extend({},
-      starSvgStyles,
-      {
-        fill: Colors().active,
-      }),
-
-    arrow: _.extend(
-      {
-        width: '12px',
-        height: '12px',
-      },
-      arrowSvgStyles,
-      Styles.rotate90,
-      Styles.transition,
-    ),
-
-    arrowOpen: _.extend(
-      {},
-      arrowSvgStyles,
-      {
-        width: '12px',
-        height: '12px',
-        fill: Colors().active,
-      },
-      Styles.rotate180,
-      Styles.transition,
-    ),
-
-    treeItemHeader: [{
-      'display': 'flex',
-      'cursor': 'pointer',
-      'borderRadius': 4,
-
-      ':hover': {
-        background: Colors().inactiveHover,
-      },
-    },
+  treeItem: [
     Styles.transition,
+  ],
+
+  unselectedStarIcon: _.extend({},
+    starSvgStyles,
+    {
+      fill: 'none',
+    }),
+
+  selectedStarIcon: _.extend({},
+    starSvgStyles,
+    {
+      fill: Colors().active,
+    }),
+
+  arrow: _.extend(
+    {
+      width: '12px',
+      height: '12px',
+    },
+    arrowSvgStyles,
+    Styles.rotate90,
+    Styles.transition,
+  ),
+
+  arrowOpen: _.extend(
+    {},
+    arrowSvgStyles,
+    {
+      width: '12px',
+      height: '12px',
+      fill: Colors().active,
+    },
+    Styles.rotate180,
+    Styles.transition,
+  ),
+
+  treeItemHeader: [{
+    'display': 'flex',
+    'cursor': 'pointer',
+    'borderRadius': 4,
+
+    ':hover': {
+      background: Colors().inactiveHover,
+    },
+  },
+  Styles.transition,
+  ],
+
+  treeItemHeaderSelected:
+  {
+    'background': Colors().inactiveHover,
+    ':hover': {
+      background: Colors().inactiveHover,
+    },
+  },
+
+  treeItemHeaderHighlighted:
+  {
+    background: Colors().inactiveHover,
+  },
+
+  name: {
+    marginRight: Styles.margin * 3,
+    marginLeft: Styles.margin,
+    fontSize: 16,
+  },
+
+  itemInfoRow: {
+    flexGrow: '1',
+    display: 'flex',
+  },
+
+  childrenWrapper: {
+    normal: [
+      {
+        paddingLeft: 0,
+      },
+      Styles.transition,
     ],
 
-    treeItemHeaderSelected:
-      {
-        'background': Colors().inactiveHover,
-        ':hover': {
-          background: Colors().inactiveHover,
-        },
-      },
+    search: Styles.transition,
+  },
 
-    treeItemHeaderHighlighted:
-      {
-        background: Colors().inactiveHover,
-      },
+  childSection: {
 
-    name: {
-      marginRight: Styles.margin * 3,
-      marginLeft: Styles.margin,
-      fontSize: 16,
+  },
+
+  // SchemaTreeInfo
+  infoPieces: {
+    display: 'flex',
+    paddingTop: '2px',
+  },
+
+  infoPiece: {
+    marginRight: Styles.margin * 2,
+  },
+
+  infoPieceNumber: {
+    fontWeight: 1000,
+  },
+
+  searchTextEmphasis: {
+    fontWeight: 1000,
+    color: Colors().active,
+  },
+
+  link: {
+    'color': Colors().active,
+    'cursor': 'pointer',
+
+    ':hover':
+    {
+      color: Colors().activeText,
     },
 
-    itemInfoRow: {
-      flexGrow: '1',
-      display: 'flex',
-    },
+    'float': 'left',
+    'width': '100px',
+  },
 
-    childrenWrapper: {
-      normal: [
-        {
-          paddingLeft: 0,
-        },
-        Styles.transition,
-      ],
-
-      search: Styles.transition,
-    },
-
-    childSection: {
-
-    },
-
-    // SchemaTreeInfo
-    infoPieces: {
-      display: 'flex',
-      paddingTop: '2px',
-    },
-
-    infoPiece: {
-      marginRight: Styles.margin * 2,
-    },
-
-    infoPieceNumber: {
-      fontWeight: 1000,
-    },
-
-    searchTextEmphasis: {
-      fontWeight: 1000,
-      color: Colors().active,
-    },
-
-    link: {
-      'color': Colors().active,
-      'cursor': 'pointer',
-
-      ':hover':
-        {
-          color: Colors().activeText,
-        },
-
-      'float': 'left',
-      'width': '100px',
-    },
-
-    margin: Styles.margin,
-  };
+  margin: Styles.margin,
+};
 
 export default SchemaTreeStyles;

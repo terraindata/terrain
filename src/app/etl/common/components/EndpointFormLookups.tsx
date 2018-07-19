@@ -57,6 +57,7 @@ import
   HttpEndpointForm, MailChimpEndpoint, Props, SftpEndpoint,
   SQLEndpoint, UploadEndpoint,
 } from './EndpointFormClasses';
+import { MagentoEndpoint } from './MagentoEndpointForm';
 
 type FormLookupMap<E extends string> =
   {
@@ -64,24 +65,26 @@ type FormLookupMap<E extends string> =
   };
 
 export const SourceFormMap: FormLookupMap<Sources> =
-  {
-    [Sources.Upload]: UploadEndpoint,
-    [Sources.Algorithm]: AlgorithmEndpoint,
-    [Sources.Sftp]: SftpEndpoint,
-    [Sources.GoogleAnalytics]: GoogleAnalyticsEndpoint,
-    [Sources.Http]: HttpEndpointForm,
-    [Sources.Fs]: FsEndpoint,
-    [Sources.Mysql]: SQLEndpoint,
-    [Sources.Postgresql]: SQLEndpoint,
-  };
+{
+  [Sources.Algorithm]: AlgorithmEndpoint,
+  [Sources.Upload]: UploadEndpoint,
+  [Sources.Fs]: FsEndpoint,
+  [Sources.GoogleAnalytics]: GoogleAnalyticsEndpoint,
+  [Sources.Http]: HttpEndpointForm,
+  [Sources.Magento]: MagentoEndpoint,
+  [Sources.Mysql]: SQLEndpoint,
+  [Sources.Postgresql]: SQLEndpoint,
+  [Sources.Sftp]: SftpEndpoint,
+};
 
 export const SinkFormMap: FormLookupMap<Sinks> =
-  {
-    [Sinks.Download]: DownloadEndpoint,
-    [Sinks.Database]: DatabaseEndpoint,
-    [Sinks.Sftp]: SftpEndpoint,
-    [Sinks.Http]: HttpEndpointForm,
-    [Sinks.Fs]: FsEndpoint,
-    [Sinks.FollowUpBoss]: FollowUpBossEndpoint,
-    [Sinks.MailChimp]: MailChimpEndpoint,
-  };
+{
+  [Sinks.Database]: DatabaseEndpoint,
+  [Sinks.Download]: DownloadEndpoint,
+  [Sinks.FollowUpBoss]: FollowUpBossEndpoint,
+  [Sinks.Fs]: FsEndpoint,
+  [Sinks.Http]: HttpEndpointForm,
+  [Sinks.Magento]: MagentoEndpoint,
+  [Sinks.MailChimp]: MailChimpEndpoint,
+  [Sinks.Sftp]: SftpEndpoint,
+};

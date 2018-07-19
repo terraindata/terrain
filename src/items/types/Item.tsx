@@ -59,11 +59,11 @@ export const ItemType: {
   Group: ItemType;
   Category: ItemType;
 } = {
-    Query: 'QUERY',
-    Algorithm: 'ALGORITHM',
-    Group: 'GROUP',
-    Category: 'CATEGORY',
-  };
+  Query: 'QUERY',
+  Algorithm: 'ALGORITHM',
+  Group: 'GROUP',
+  Category: 'CATEGORY',
+};
 
 export type ItemStatus = 'ARCHIVE' | 'BUILD' | 'APPROVE' | 'LIVE' | 'DEFAULT' | 'DEPLOYED';
 export const ItemStatus: {
@@ -74,14 +74,14 @@ export const ItemStatus: {
   Default: ItemStatus;
   Deployed: ItemStatus;
 } =
-  {
-    Archive: 'ARCHIVE',
-    Build: 'BUILD',
-    Approve: 'APPROVE',
-    Live: 'LIVE',
-    Default: 'DEFAULT',
-    Deployed: 'DEPLOYED',
-  };
+{
+  Archive: 'ARCHIVE',
+  Build: 'BUILD',
+  Approve: 'APPROVE',
+  Live: 'LIVE',
+  Default: 'DEFAULT',
+  Deployed: 'DEPLOYED',
+};
 
 export class ItemC extends BaseClass
 {

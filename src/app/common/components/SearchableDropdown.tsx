@@ -204,7 +204,7 @@ class SearchableDropdown extends TerrainComponent<Props & InjectedOnClickOutProp
         const { action } = this.props;
         if (typeof action === 'string')
         {
-          this.props.builderActions[action](this.props.keyPath, value);
+          (this.props.builderActions[action] as any)(this.props.keyPath, value);
         }
         else
         {

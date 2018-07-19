@@ -132,7 +132,7 @@ fullstack-meta:
     - timeout 240 yarn test-fullstack-setup
     - yarn clean
     - yarn build
-    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
+    - NODE_ENV=production nohup yarn start-midway-prod > ./midwayConsole.log < /dev/null 2>&1&
     - sleep 25
 # TODO: enable this after update it to the ETL
 #    - yarn test-fullstack-import
@@ -149,7 +149,7 @@ fullstack-screenshot-login-pathfinder:
     - timeout 240 yarn test-fullstack-setup
     - yarn clean
     - yarn build
-    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
+    - NODE_ENV=production nohup yarn start-midway-prod > ./midwayConsole.log < /dev/null 2>&1&
     - sleep 25
     - yarn test-fullstack-login
     - yarn test-rr-pathfinder
@@ -174,7 +174,7 @@ fullstack-screenshot-http-import:
     - timeout 240 yarn test-fullstack-setup
     - yarn clean
     - yarn build
-    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
+    - NODE_ENV=production nohup yarn start-midway-prod > ./midwayConsole.log < /dev/null 2>&1&
     - sleep 25
     - yarn test-rr-etl-http-import
   only:
@@ -191,12 +191,35 @@ fullstack-screenshot-http-import:
     - timeout 240 yarn test-fullstack-teardown
     - pkill node || true;
 
+fullstack-screenshot-download-export:
+  script:
+    - pkill node || true;
+    - timeout 240 yarn test-fullstack-setup
+    - yarn clean
+    - yarn build
+    - NODE_ENV=production nohup yarn start-midway-prod > ./midwayConsole.log < /dev/null 2>&1&
+    - sleep 25
+    - yarn test-rr-etl-download-export
+  only:
+    - schedules
+  stage: screenshot-tests
+  allow_failure: true
+  artifacts:
+    when: on_failure
+    expire_in: 1 week
+    paths:
+    - rr/test/etl-download/__image_snapshots__/__diff_output__
+  after_script:
+    - tail -n20 ./midwayConsole.log || true
+    - timeout 240 yarn test-fullstack-teardown
+    - pkill node || true;
+
 deploy:
   script:
    - yarn build-prod
    - rsync -a --stats ../Search /opt --exclude '*.db' --exclude '.git'
    - fuser -k -n tcp 33000 || true
-   - cd /opt/Search && NODE_ENV=production yarn start -- --port 33000 &
+   - cd /opt/Search && NODE_ENV=production yarn start-midway-prod -- --port 33000 &
   only:
    - master
   stage: deploy

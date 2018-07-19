@@ -64,13 +64,13 @@ export interface Props
 const STYLE: {
   [key: string]: any,
 } = {
-    opacity: 0,
-    height: 0,
-    width: 0,
-    position: 'absolute', // vodka
-    top: 0,
-    left: 0,
-  };
+  opacity: 0,
+  height: 0,
+  width: 0,
+  position: 'absolute', // vodka
+  top: 0,
+  left: 0,
+};
 
 class KeyboardFocus extends TerrainComponent<Props>
 {

@@ -65,15 +65,15 @@ beforeAll(async () =>
 {
   MidwayLogger.level = 'debug';
   const config: MySQLConfig =
-    {
-      connectionLimit: 20,
-      database: 'moviesdb',
-      host: 'localhost',
-      port: 63306,
-      password: 'r3curs1v3$',
-      user: 't3rr41n-demo',
-      dateStrings: true,
-    };
+  {
+    connectionLimit: 20,
+    database: 'moviesdb',
+    host: 'localhost',
+    port: 63306,
+    password: 'r3curs1v3$',
+    user: 't3rr41n-demo',
+    dateStrings: true,
+  };
 
   try
   {

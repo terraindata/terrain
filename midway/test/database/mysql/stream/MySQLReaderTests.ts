@@ -52,15 +52,15 @@ import MySQLReader from '../../../../src/database/mysql/streams/MySQLReader';
 MidwayLogger.level = 'debug';
 
 const mysqlConfig: MySQLConfig =
-  {
-    connectionLimit: 20,
-    database: 'moviesdb',
-    host: 'localhost',
-    port: 63306,
-    password: 'r3curs1v3$',
-    user: 't3rr41n-demo',
-    dateStrings: true,
-  };
+{
+  connectionLimit: 20,
+  database: 'moviesdb',
+  host: 'localhost',
+  port: 63306,
+  password: 'r3curs1v3$',
+  user: 't3rr41n-demo',
+  dateStrings: true,
+};
 
 const query = 'SELECT movieid, title, budget \n  FROM movies\n  LIMIT 3';
 

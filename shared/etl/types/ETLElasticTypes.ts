@@ -105,28 +105,28 @@ export function defaultProps(obj: Partial<ElasticFieldProps> = {}): ElasticField
 export const ETLToElasticOptions: {
   [k in ETLFieldTypes]: ElasticTypes[]
 } = {
-    [ETLFieldTypes.Array]: [ElasticTypes.Auto, ElasticTypes.Array],
-    [ETLFieldTypes.Object]: [ElasticTypes.Auto, ElasticTypes.Nested],
-    [ETLFieldTypes.String]: [ElasticTypes.Auto, ElasticTypes.Text],
-    [ETLFieldTypes.Number]: [ElasticTypes.Auto, ElasticTypes.Double, ElasticTypes.Float, ElasticTypes.HalfFloat],
-    [ETLFieldTypes.Boolean]: [ElasticTypes.Auto, ElasticTypes.Boolean],
-    [ETLFieldTypes.Date]: [ElasticTypes.Auto, ElasticTypes.Date],
-    [ETLFieldTypes.Integer]: [ElasticTypes.Auto, ElasticTypes.Long, ElasticTypes.Integer, ElasticTypes.Short, ElasticTypes.Byte],
-    [ETLFieldTypes.GeoPoint]: [ElasticTypes.Auto, ElasticTypes.GeoPoint],
-  };
+  [ETLFieldTypes.Array]: [ElasticTypes.Auto, ElasticTypes.Array],
+  [ETLFieldTypes.Object]: [ElasticTypes.Auto, ElasticTypes.Nested],
+  [ETLFieldTypes.String]: [ElasticTypes.Auto, ElasticTypes.Text],
+  [ETLFieldTypes.Number]: [ElasticTypes.Auto, ElasticTypes.Double, ElasticTypes.Float, ElasticTypes.HalfFloat],
+  [ETLFieldTypes.Boolean]: [ElasticTypes.Auto, ElasticTypes.Boolean],
+  [ETLFieldTypes.Date]: [ElasticTypes.Auto, ElasticTypes.Date],
+  [ETLFieldTypes.Integer]: [ElasticTypes.Auto, ElasticTypes.Long, ElasticTypes.Integer, ElasticTypes.Short, ElasticTypes.Byte],
+  [ETLFieldTypes.GeoPoint]: [ElasticTypes.Auto, ElasticTypes.GeoPoint],
+};
 
 export const ETLTypeAutoMap: {
   [k in ETLFieldTypes]: ElasticTypes
 } = {
-    [ETLFieldTypes.Array]: ElasticTypes.Array,
-    [ETLFieldTypes.Object]: ElasticTypes.Nested,
-    [ETLFieldTypes.String]: ElasticTypes.Text,
-    [ETLFieldTypes.Number]: ElasticTypes.Double,
-    [ETLFieldTypes.Boolean]: ElasticTypes.Boolean,
-    [ETLFieldTypes.Date]: ElasticTypes.Date,
-    [ETLFieldTypes.Integer]: ElasticTypes.Long,
-    [ETLFieldTypes.GeoPoint]: ElasticTypes.GeoPoint,
-  };
+  [ETLFieldTypes.Array]: ElasticTypes.Array,
+  [ETLFieldTypes.Object]: ElasticTypes.Nested,
+  [ETLFieldTypes.String]: ElasticTypes.Text,
+  [ETLFieldTypes.Number]: ElasticTypes.Double,
+  [ETLFieldTypes.Boolean]: ElasticTypes.Boolean,
+  [ETLFieldTypes.Date]: ElasticTypes.Date,
+  [ETLFieldTypes.Integer]: ElasticTypes.Long,
+  [ETLFieldTypes.GeoPoint]: ElasticTypes.GeoPoint,
+};
 
 export function etlTypeToElastic(type: ETLFieldTypes): ElasticTypes
 {

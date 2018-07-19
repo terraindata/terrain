@@ -237,28 +237,28 @@ class TQLEditor extends TerrainComponent<Props>
   public render()
   {
     const options =
-      {
-        readOnly: !this.props.canEdit,
-        lineNumbers: true,
-        extraKeys: {
-          'Shift-Tab': 'indentLess',
-          'Tab': 'indentMore',
-          'Ctrl-F': 'findPersistent',
-          'Ctrl-Alt-F': this.handleAutoFormatRequest,
-          'Ctrl-Enter': this.issueQuery,
-        },
-        lineWrapping: true,
-        theme: Colors().tqlEditor,
-        matchBrackets: true,
-        autoCloseBrackets: true,
-        foldGutter: true,
-        lint: false,
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
-        revertButtons: false,
-        connect: 'align',
-        tabSize: ESConverter.defaultIndentSize,
-        origLeft: this.props.diffTql,
-      };
+    {
+      readOnly: !this.props.canEdit,
+      lineNumbers: true,
+      extraKeys: {
+        'Shift-Tab': 'indentLess',
+        'Tab': 'indentMore',
+        'Ctrl-F': 'findPersistent',
+        'Ctrl-Alt-F': this.handleAutoFormatRequest,
+        'Ctrl-Enter': this.issueQuery,
+      },
+      lineWrapping: true,
+      theme: Colors().tqlEditor,
+      matchBrackets: true,
+      autoCloseBrackets: true,
+      foldGutter: true,
+      lint: false,
+      gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
+      revertButtons: false,
+      connect: 'align',
+      tabSize: ESConverter.defaultIndentSize,
+      origLeft: this.props.diffTql,
+    };
     if (this.props.language === 'elastic')
     {
       options['mode'] = 'elastic';

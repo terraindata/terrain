@@ -1120,11 +1120,11 @@ export class PathToCards
     if (sourceBool === null)
     {
       const sourceBoolTemplate =
-        {
-          'query:query': {
-            'bool:elasticFilter': { 'filter:query[]': [{ 'term:term_query': { '_index:string': indexValue } }] },
-          },
-        };
+      {
+        'query:query': {
+          'bool:elasticFilter': { 'filter:query[]': [{ 'term:term_query': { '_index:string': indexValue } }] },
+        },
+      };
       TerrainLog.debug('(P->B) Source card is missing, create a new one with index ' + indexValue);
       parser.createCardIfNotExist(sourceBoolTemplate, body);
       return;

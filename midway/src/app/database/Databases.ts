@@ -98,6 +98,10 @@ export class Databases
 
   public async upsert(user: UserConfig, db: DatabaseConfig): Promise<DatabaseConfig>
   {
+    if (!user.isSuperUser)
+    {
+      throw new Error('Only superusers can upsert databases.');
+    }
     if (db.id !== undefined)
     {
       const results: DatabaseConfig[] = await this.get(db.id);

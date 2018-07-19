@@ -1208,14 +1208,14 @@ test('Group By Transformation', () =>
 {
 
   const doc =
-    {
-      items: [
-        { status: 'active', mlsId: 1 },
-        { status: 'sold', mlsId: 2 },
-        { status: 'active', mlsId: 3 },
-        { status: 'some garbage', mlsId: 5 },
-      ],
-    };
+  {
+    items: [
+      { status: 'active', mlsId: 1 },
+      { status: 'sold', mlsId: 2 },
+      { status: 'active', mlsId: 3 },
+      { status: 'some garbage', mlsId: 5 },
+    ],
+  };
 
   const e = new TransformationEngine(doc);
   e.appendTransformation(TransformationNodeType.GroupByNode, wrap(['items']), {

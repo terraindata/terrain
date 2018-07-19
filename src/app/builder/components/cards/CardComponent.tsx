@@ -1067,32 +1067,32 @@ export interface CardItem
 }
 
 const cardSource =
+{
+  canDrag: (props) => props.canEdit,
+
+  beginDrag: (props: Props): CardItem =>
   {
-    canDrag: (props) => props.canEdit,
+    // TODO
+    setTimeout(() => $('body').addClass('body-card-is-dragging'), 100);
+    const item: CardItem = {
+      props,
+      childIds: BlockUtils.getChildIds(props.card)
+        .remove(props.card.id),
+      type: props.card.type,
+    };
 
-    beginDrag: (props: Props): CardItem =>
-    {
-      // TODO
-      setTimeout(() => $('body').addClass('body-card-is-dragging'), 100);
-      const item: CardItem = {
-        props,
-        childIds: BlockUtils.getChildIds(props.card)
-          .remove(props.card.id),
-        type: props.card.type,
-      };
+    props.builderActions.dragCard(item);
 
-      props.builderActions.dragCard(item);
+    return item;
+  },
+  // select card?
 
-      return item;
-    },
-    // select card?
-
-    endDrag: (props) =>
-    {
-      $('body').removeClass('body-card-is-dragging');
-      props.builderActions.dragCard(null);
-    },
-  };
+  endDrag: (props) =>
+  {
+    $('body').removeClass('body-card-is-dragging');
+    props.builderActions.dragCard(null);
+  },
+};
 
 const dragCollect = (connect, monitor) =>
   ({

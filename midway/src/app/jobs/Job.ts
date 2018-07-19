@@ -73,12 +73,12 @@ export class Job
     }
     this.tasks = args;
     const taskTreeConfig: TaskTreeConfig =
-      {
-        cancel: false,
-        filename,
-        jobStatus: 0,
-        paused: -1,
-      };
+    {
+      cancel: false,
+      filename,
+      jobStatus: 0,
+      paused: -1,
+    };
     return this.taskTree.create(args, taskTreeConfig);
   }
 

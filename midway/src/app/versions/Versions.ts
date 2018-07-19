@@ -66,12 +66,12 @@ export class Versions
     }
     // can only insert
     const newVersion: VersionConfig =
-      {
-        createdByUserId: user.id,
-        object: JSON.stringify(obj),
-        objectId: id,
-        objectType: type,
-      };
+    {
+      createdByUserId: user.id,
+      object: JSON.stringify(obj),
+      objectId: id,
+      objectType: type,
+    };
     return App.DB.upsert(this.versionTable, newVersion) as Promise<VersionConfig>;
   }
 

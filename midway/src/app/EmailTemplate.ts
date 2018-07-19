@@ -42,19 +42,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
+// Copyright 2018 Terrain Data, Inc.
+import * as fs from 'fs';
+import * as path from 'path';
+import { MidwayLogger } from './log/MidwayLogger';
+class EmailTemplate
 {
-  return (error: Error, response: T) =>
+  public static async makeEmailContent(params: object): Promise <string>
   {
-    if (error !== null && error !== undefined)
+    return new Promise<string>((resolve, reject) =>
     {
-      reject(error);
-    }
-    else
-    {
-      resolve(response);
-    }
-  };
+      const emailPath: string = path.join(__dirname, '../../../../src/assets/EmailTemplate.html');
+      let htmlString: string;
+      fs.readFile(emailPath, (err, data) =>
+      {
+        if (data !== undefined)
+        {
+          const html = data.toString();
+          htmlString = html;
+          Object.keys(params).forEach((key) =>
+          {
+            const replacement: string = '%' + key.toUpperCase() + '%';
+            htmlString = htmlString.replace(replacement, params[key]);
+          });
+          return resolve(htmlString);
+        }
+        else
+        {
+          return reject(new Error('unable to read email template'));
+        }
+      });
+    });
+  }
 }
+
+export default EmailTemplate;

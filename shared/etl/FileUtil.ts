@@ -101,12 +101,12 @@ export function guessFileOptionsHelper(path: string): Partial<FileConfig>
 const extensionToFileType: {
   [k: string]: FileTypes,
 } = {
-    json: FileTypes.Json,
-    csv: FileTypes.Csv,
-    tsv: FileTypes.Tsv,
-    xlsx: FileTypes.Xlsx,
-    xml: FileTypes.Xml,
-  };
+  json: FileTypes.Json,
+  csv: FileTypes.Csv,
+  tsv: FileTypes.Tsv,
+  xlsx: FileTypes.Xlsx,
+  xml: FileTypes.Xml,
+};
 
 export function getFileType(file: File): FileTypes
 {

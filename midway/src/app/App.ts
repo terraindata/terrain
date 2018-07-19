@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable-next-line
 /// <reference path="../../../shared/typings/tsd.d.ts" />
 
+import Bottleneck from 'bottleneck';
 import * as http from 'http';
 import * as Koa from 'koa';
 
@@ -95,6 +96,7 @@ export let EMAIL: Email;
 export let HA: number;
 export let JobL: JobLog;
 export let JobQ: JobQueue;
+export let Limiter: Bottleneck; // TODO: for clustering, ensure total limit is matched
 export let SKDR: Scheduler;
 export let TBLS: Schema.Tables;
 
@@ -146,6 +148,7 @@ export class App
   private EMAIL: Email;
   private JobL: JobLog;
   private JobQ: JobQueue;
+  private Limiter: Bottleneck;
   private SKDR: Scheduler;
   private Migrations: Migrations; // for now, do not allow external access
   private app: Koa;
@@ -183,6 +186,12 @@ export class App
     this.JobQ = new JobQueue();
     JobQ = this.JobQ;
     JobQ.initialize();
+
+    this.Limiter = new Bottleneck({
+      maxConcurrent: 1,
+      minTime: 2000,
+    });
+    Limiter = this.Limiter;
 
     this.SKDR = new Scheduler();
     SKDR = this.SKDR;
@@ -292,27 +301,42 @@ export class App
     {
       await DB.getDB().putMapping(TBLS[key]);
     }
-    const query = [
-      [
-        'ALTER TABLE items ADD CONSTRAINT unique_item_names EXCLUDE (name WITH =, parent WITH =) WHERE (name != \'\');',
-      ],
-      undefined,
-    ];
+
     try
     {
-      await DB.getDB().execute(query);
-    } catch (e)
+      await DB.getDB().execute([
+        [
+          'ALTER TABLE items ADD CONSTRAINT unique_item_names EXCLUDE (name WITH =, parent WITH =) WHERE (name != \'\');',
+        ],
+        undefined,
+      ]);
+    }
+    catch (e)
     {
       if (e.message !== 'relation "unique_item_names" already exists')
       {
         throw e;
       }
     }
-    MidwayLogger.info('Finished creating application schema...');
 
-    // process configuration options
-    await Config.initialHandleConfig(this.config);
-    MidwayLogger.debug('Finished initial processing configuration options...');
+    try
+    {
+      await DB.getDB().execute([
+        [
+          'ALTER TABLE databases ADD CONSTRAINT unique_db_names EXCLUDE (name WITH =) WHERE (name != \'\');',
+        ],
+        undefined,
+      ]);
+    }
+    catch (e)
+    {
+      if (e.message !== 'relation "unique_db_names" already exists')
+      {
+        throw e;
+      }
+    }
+
+    MidwayLogger.info('Finished creating application schema...');
 
     // perform migrations
     await this.Migrations.runMigrations();
