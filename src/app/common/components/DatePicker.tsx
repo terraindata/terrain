@@ -146,6 +146,15 @@ export const DateUnitArray = [
   'y',
 ];
 const DateUnitOptions = Immutable.List(DateUnitArray);
+const DateSpecificityMap = {
+  m: 'Minute',
+  h: 'Hour',
+  d: 'Day',
+  w: 'Week',
+  M: 'Month',
+  y: 'Year',
+};
+const DateSpecificityMapImmu = Immutable.Map(DateSpecificityMap);
 
 export interface Props
 {
@@ -165,6 +174,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     sign: '-',
     unit: 'M',
     amount: '',
+    specificity: '',
   };
   public componentDidMount()
   {
@@ -431,6 +441,12 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     this.props.onChange(this.formatElasticQuery(this.state.sign, this.state.unit, e.target.value));
   }
 
+  public handleSpecificityChange(specificityIndex)
+  {
+    const specificity = DateUnitArray[specificityIndex];
+    this.props.onChange(this.formatElasticQuery())
+  }
+
   public formatElasticQuery(sign: string, unit: string, amount: string): string
   {
     return 'now' + sign + amount + unit;
@@ -540,6 +556,16 @@ export class DatePickerUncontained extends TerrainComponent<Props>
             type='text'
             value={this.state.amount || ''}
             onChange={this.handleAmountChange}
+          />
+        </div>
+        <div className='labeled-row'>
+          <p className='date-view-label'>Round to nearest</p>
+          <Dropdown
+            canEdit={this.props.canEdit}
+            options={DateUnitOptions}
+            optionsDisplayName={DateSpecificityMapImmu}
+            selectedIndex={0}
+            onChange={this.handleSpecificityChange}
           />
         </div>
       </div>
