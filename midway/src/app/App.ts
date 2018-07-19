@@ -301,22 +301,41 @@ export class App
     {
       await DB.getDB().putMapping(TBLS[key]);
     }
-    const query = [
-      [
-        'ALTER TABLE items ADD CONSTRAINT unique_item_names EXCLUDE (name WITH =, parent WITH =) WHERE (name != \'\');',
-      ],
-      undefined,
-    ];
+
     try
     {
-      await DB.getDB().execute(query);
-    } catch (e)
+      await DB.getDB().execute([
+        [
+          'ALTER TABLE items ADD CONSTRAINT unique_item_names EXCLUDE (name WITH =, parent WITH =) WHERE (name != \'\');',
+        ],
+        undefined,
+      ]);
+    }
+    catch (e)
     {
       if (e.message !== 'relation "unique_item_names" already exists')
       {
         throw e;
       }
     }
+
+    try
+    {
+      await DB.getDB().execute([
+        [
+          'ALTER TABLE databases ADD CONSTRAINT unique_db_names EXCLUDE (name WITH =) WHERE (name != \'\');',
+        ],
+        undefined,
+      ]);
+    }
+    catch (e)
+    {
+      if (e.message !== 'relation "unique_db_names" already exists')
+      {
+        throw e;
+      }
+    }
+
     MidwayLogger.info('Finished creating application schema...');
 
     // perform migrations

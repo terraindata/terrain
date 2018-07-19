@@ -51,6 +51,7 @@ import { browserHistory } from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import LibraryActions from 'library/data/LibraryActions';
 import { replaceRoute } from 'library/helpers/LibraryRoutesHelper';
+import * as LibraryTypes from 'library/LibraryTypes';
 import * as _ from 'lodash';
 import TerrainStore from 'store/TerrainStore';
 import Ajax from 'util/Ajax';
@@ -60,6 +61,7 @@ import ESParserError from '../../../shared/database/elastic/parser/ESParserError
 import CardsToElastic from '../../database/elastic/conversion/CardsToElastic';
 import { ElasticValueInfoToCards } from '../../database/elastic/conversion/ElasticToCards';
 import ESCardParser from '../../database/elastic/conversion/ESCardParser';
+import { ItemStatus } from '../../items/types/Item';
 import { _Query, default as Query } from '../../items/types/Query';
 
 export default class TerrainTests
@@ -67,6 +69,7 @@ export default class TerrainTests
   public static lastCategoryId;
   public static lastGroupId;
   public static lastAlgorithmId;
+  public static lastAlgorithm;
   public static testCreateCategory(baseUrl = 'library')
   {
     const createActionHandler = LibraryActions.categories.create(undefined, (id) =>
@@ -98,11 +101,12 @@ export default class TerrainTests
     createActionHandler(TerrainStore.dispatch, TerrainStore.getState);
   }
 
-  public static testCreateAlgorithm(baseUrl = 'library', categoryId = TerrainTests.lastCategoryId, groupId = TerrainTests.lastGroupId)
+  public static testCreateAlgorithm(baseUrl = 'library', categoryId = TerrainTests.lastCategoryId, groupId = TerrainTests.lastGroupId, live: boolean = false)
   {
     const createActionHandler = LibraryActions.algorithms.create(categoryId, groupId, undefined, (r, a) =>
     {
       TerrainTests.lastAlgorithmId = r.id;
+      this.lastAlgorithm = a.set('id', r.id);
       replaceRoute(
         {
           basePath: baseUrl,
@@ -112,6 +116,11 @@ export default class TerrainTests
         });
     });
     createActionHandler(TerrainStore.dispatch, TerrainStore.getState);
+  }
+
+  public static setAlgorithmStatus(algorithm = TerrainTests.lastAlgorithm, newState = ItemStatus.Live)
+  {
+    TerrainStore.dispatch(LibraryActions.algorithms.status(algorithm, newState, true));
   }
 
   public static gotoAlgorithm(algorithmId = TerrainTests.lastAlgorithmId)

@@ -43,61 +43,37 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-
-import * as App from '../App';
-import IntegrationConfig from '../integrations/IntegrationConfig';
-import Integrations from '../integrations/Integrations';
-import { MidwayLogger } from '../log/MidwayLogger';
-
-const Router = new KoaRouter();
-const integrations: Integrations = new Integrations();
-export const initialize = () => integrations.initialize();
-
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+import * as fs from 'fs';
+import * as path from 'path';
+import { MidwayLogger } from './log/MidwayLogger';
+class EmailTemplate
 {
-  const fullBody = ctx.request.body['body'];
-  const description = JSON.stringify(fullBody.description);
-  const user = JSON.stringify(fullBody.user);
-  const browserInfo = JSON.stringify(fullBody.browserInfo);
-  let subject: string = '';
-  let body: string;
-  ctx.status = 200;
-  const emailIntegrations: IntegrationConfig[] = await integrations.get(null, undefined, 'Email', true) as IntegrationConfig[];
-  MidwayLogger.info('email integrations: ' + JSON.stringify(emailIntegrations));
-  if (emailIntegrations.length !== 1)
+  public static async makeEmailContent(params: object): Promise <string>
   {
-    MidwayLogger.warn(`Invalid number of email integrations, found ${emailIntegrations.length}`);
-  }
-  else if (emailIntegrations.length === 1 && emailIntegrations[0].name !== 'Default Failure Email')
-  {
-    MidwayLogger.warn('Invalid Email found.');
-  }
-  else
-  {
-    let attachment: object;
-    if (fullBody.bug)
+    return new Promise<string>((resolve, reject) =>
     {
-      subject = 'Bug report from ' + user;
-      body = 'A user has submitted a bug report detailed below. \n \n' + description + '\n \n Browser/OS information: ' + browserInfo;
-    }
-    else
-    {
-      subject = 'Feedback report from ' + user;
-      body = 'A user has submitted a feedback report detailed below. \n \n' + description + '\n \n Browser/OS information: ' + browserInfo;
-    }
-    if (fullBody.screenshot)
-    {
-      attachment = [{
-        path: fullBody.screenshot,
-      }];
-    }
-    // MidwayLogger.info("id: " + emailIntegrations[0].id);
-    const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body, attachment);
-    MidwayLogger.info(`Feedback email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
+      const emailPath: string = path.join(__dirname, '../../../../src/assets/EmailTemplate.html');
+      let htmlString: string;
+      fs.readFile(emailPath, (err, data) =>
+      {
+        if (data !== undefined)
+        {
+          const html = data.toString();
+          htmlString = html;
+          Object.keys(params).forEach((key) =>
+          {
+            const replacement: string = '%' + key.toUpperCase() + '%';
+            htmlString = htmlString.replace(replacement, params[key]);
+          });
+          return resolve(htmlString);
+        }
+        else
+        {
+          return reject(new Error('unable to read email template'));
+        }
+      });
+    });
   }
-});
+}
 
-export default Router;
+export default EmailTemplate;

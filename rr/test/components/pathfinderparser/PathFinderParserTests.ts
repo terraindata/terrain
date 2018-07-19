@@ -70,7 +70,7 @@ describe('Testing the pathfinder parser', () =>
   let page;
   let actions;
 
-  beforeAll(async () =>
+  beforeAll(async (done) =>
   {
     const actionFileName = getExpectedActionFile();
     const actionFileData = jsonfile.readFileSync(actionFileName);
@@ -84,13 +84,14 @@ describe('Testing the pathfinder parser', () =>
     TestLogger.info('Created a new browser page.');
     await page.setViewport({ width: 1600, height: 1200 });
     TestLogger.info('Set the page view to 1600x1200.');
+    done();
+  });
+
+  it('pathfinder parser test', async (done) =>
+  {
     const url = `http://${ip.address()}:3000`;
     TestLogger.info('Get url:' + url);
     await login(page, url);
-  });
-
-  it('pathfinder parser test', async () =>
-  {
     for (let i = 0; i < actions.length; i++)
     {
       const thisAction = JSON.parse(actions[i].action);
@@ -106,11 +107,15 @@ describe('Testing the pathfinder parser', () =>
       TestLogger.info('Parsing item' + String(i) + ':' + JSON.stringify(actions[i]));
       expect(tql).toBe(query.tql);
     }
+    done();
   }, 30000);
 
-  afterAll(async () =>
+  afterAll(async (done) =>
   {
     await page.close();
     TestLogger.info('The page is closed');
+    await browser.disconnect();
+    TestLogger.info('The chrome connection is closed');
+    done();
   });
 });
