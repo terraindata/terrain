@@ -132,7 +132,7 @@ describe('Replay a builder action', () =>
           || action.selector === ':nth-child(7) > .editor-top-bar-item'
           || action.selector === '.tabs-action-text.tabs-action-enabled > .tabs-action-piece')
         {
-          sleep.sleep(4);
+          sleep.sleep(9);
         }
       } else if (action.eventType === 'keypress')
       {
