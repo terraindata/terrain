@@ -72,15 +72,15 @@ test-backend:
     paths:
       - coverage
 
-test-sigint:
-  before_script:
-    - . .monorepo.gitlab/last_green_commit.sh
-  script:
-    - .monorepo.gitlab/build_if_changed.sh sigint "( cd sigint && yarn ) && timeout 240 yarn test-sigint-setup"
-    - .monorepo.gitlab/build_if_changed.sh sigint "( cd sigint && yarn test )"
-  after_script:
-    - .monorepo.gitlab/build_if_changed.sh sigint "timeout 240 yarn test-sigint-teardown"
-  stage: standard-tests
+# test-sigint:
+#  before_script:
+#    - . .monorepo.gitlab/last_green_commit.sh
+#  script:
+#    - .monorepo.gitlab/build_if_changed.sh sigint "( cd sigint && yarn ) && timeout 240 yarn test-sigint-setup"
+#    - .monorepo.gitlab/build_if_changed.sh sigint "( cd sigint && yarn test )"
+#  after_script:
+#    - .monorepo.gitlab/build_if_changed.sh sigint "timeout 240 yarn test-sigint-teardown"
+#  stage: standard-tests
 
 build-frontend:
   script:
