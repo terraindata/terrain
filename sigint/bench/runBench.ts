@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { logger } from '../src/Logging';
+import winston from 'winston';
 import * as Benchmark from './Benchmark';
 
 exports.runBench = async (request, response) =>
@@ -72,10 +72,10 @@ exports.runBench = async (request, response) =>
   try
   {
     const s1 = await Benchmark.runBenchmark(host);
-    logger.info(JSON.stringify(s1));
+    winston.info(JSON.stringify(s1));
 
     const s2 = await Benchmark.runBatchBenchmark(host);
-    logger.info(JSON.stringify(s2));
+    winston.info(JSON.stringify(s2));
 
     response.status(200).send([s1, s2]);
   }

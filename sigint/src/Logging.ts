@@ -47,18 +47,25 @@ THE SOFTWARE.
 import dateFormat = require('date-format');
 import * as winston from 'winston';
 
-export const logger = winston.createLogger({
-  level: 'debug',
-  format: winston.format.combine(
-    winston.format.colorize(),
-    winston.format.printf((info) =>
-    {
-      const meta = (info.meta !== undefined) && (Object.keys(info.meta).length > 0) ? '\n\t' + JSON.stringify(info.meta) : '';
-      return `${dateFormat('yyyy-MM-dd hh:mm:ss.SSS')} [${process.pid}] ${info.level}: ${info.message} ${meta}`;
-    }),
-  ),
-  transports:
-    [
-      new winston.transports.Console(),
-    ],
-});
+winston.configure(
+  {
+    transports:
+      [
+        new (winston.transports.Console)(
+          {
+            formatter: (options) =>
+            {
+              const message: string = options.message;
+              const level = winston.config.colorize(options.level);
+              const meta = (options.meta !== undefined) && (Object.keys(options.meta).length > 0) ? '\n\t' + JSON.stringify(options.meta)
+                : '';
+              return `${options.timestamp()} [${process.pid}] ${level}: ${message} ${meta}`;
+            },
+            timestamp: () =>
+            {
+              return dateFormat('yyyy-MM-dd hh:mm:ss.SSS');
+            },
+          },
+        ),
+      ],
+  });

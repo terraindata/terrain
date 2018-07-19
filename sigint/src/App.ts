@@ -47,12 +47,13 @@ THE SOFTWARE.
 import * as http from 'http';
 import * as Koa from 'koa';
 import serve = require('koa-static-server');
+import * as winston from 'winston';
 
 import cors = require('kcors');
 
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
-import { logger } from './Logging';
+import './Logging';
 import Middleware from './Middleware';
 import { Router } from './Router';
 
@@ -62,19 +63,18 @@ class App
 {
   private static uncaughtExceptionHandler(err: Error): void
   {
-    logger.error('Uncaught Exception: ' + err.toString());
+    winston.error('Uncaught Exception: ' + err.toString());
     // this is a good place to clean tangled resources
     process.abort();
   }
 
   private static unhandledRejectionHandler(err: Error): void
   {
-    logger.error('Unhandled Promise Rejection: ' + err.toString());
+    winston.error('Unhandled Promise Rejection: ' + err.toString());
   }
 
   private app: Koa;
   private config: Config.Config;
-  private router: Router;
 
   constructor(config: Config.Config = CmdLineArgs)
   {
@@ -84,7 +84,7 @@ class App
     // first, load config from a config file, if one is specified
     config = Config.loadConfigFromFile(config);
 
-    logger.info('Using configuration: ' + JSON.stringify(config));
+    winston.info('Using configuration: ' + JSON.stringify(config));
     this.config = config;
     CFG = this.config;
 
@@ -99,15 +99,15 @@ class App
     this.app.use(cors());
 
     this.app.use(Middleware.bodyParser({ jsonLimit: '10gb', formLimit: '10gb' }));
-    this.app.use(Middleware.logger(logger));
+    this.app.use(Middleware.logger(winston));
     this.app.use(Middleware.responseTime());
 
-    this.router = new Router(config);
-    this.app.use(this.router.routes());
+    const router = new Router(config);
+    this.app.use(router.routes());
 
     if (config.demo === true)
     {
-      logger.info('Demo mode enabled. Demo website will be served at /demo');
+      winston.info('Demo mode enabled. Demo website will be served at /demo');
 
       /**
        * @api {get} /demo Serve the Terrain Analytics demo website
@@ -121,9 +121,8 @@ class App
   public async start(): Promise<http.Server>
   {
     await Config.handleConfig(this.config);
-    await this.router.initialize();
 
-    logger.info('Listening on port ' + String(this.config.port));
+    winston.info('Listening on port ' + String(this.config.port));
     return this.app.listen(this.config.port);
   }
 

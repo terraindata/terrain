@@ -49,10 +49,10 @@ import * as koaLogger from 'koa-logger-winston';
 import koaResponseTime = require('koa-response-time');
 
 const Middleware =
-{
-  bodyParser: koaBodyParser,
-  logger: koaLogger,
-  responseTime: koaResponseTime,
-};
+  {
+    bodyParser: koaBodyParser,
+    logger: koaLogger,
+    responseTime: koaResponseTime,
+  };
 
 export default Middleware;

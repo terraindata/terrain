@@ -45,9 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as cluster from 'cluster';
+import * as winston from 'winston';
 import App from './App';
 import CmdLineArgs from './CmdLineArgs';
-import { logger } from './Logging';
 
 export let app;
 export let server;
@@ -59,12 +59,12 @@ if (cluster.isMaster)
 
   cluster.on('online', (worker: cluster.Worker) =>
   {
-    logger.info('Spawned a backup worker: ' + String(worker.process.pid));
+    winston.info('Spawned a backup worker: ' + String(worker.process.pid));
   });
 
   cluster.on('exit', (worker: cluster.Worker, code: number, signal: string) =>
   {
-    logger.info('Worker ' + String(worker.process.pid) + ' died with code: ' + String(code) + ' and signal: ' + signal);
+    winston.info('Worker ' + String(worker.process.pid) + ' died with code: ' + String(code) + ' and signal: ' + signal);
     cluster.fork();
   });
 }
