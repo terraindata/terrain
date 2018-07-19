@@ -533,8 +533,8 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                   style={styles.bottomChart.axis}
                 />
                 <VictoryGroup offset={15}>
-                  {datasets.map((d) => (<VictoryBar
-                    key={d}
+                  {datasets.map((d, key) => (<VictoryBar
+                    key={key}
                     style={styles.bottomChart
                       .bars(this.getDatasetColor(d.id))
                     }
