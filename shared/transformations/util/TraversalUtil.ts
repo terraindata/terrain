@@ -63,9 +63,9 @@ import TransformationNodeType, {
 } from 'shared/transformations/TransformationNodeType';
 
 import { Edge, TransformationGraph } from 'shared/transformations/TypedGraph';
-import DependencyTraversalVisitor from 'shared/transformations/visitors/DependencyTraversalVisitor';
+import DependencyVisitorC from 'shared/transformations/visitors/DependencyVisitor';
 
-const DependencyVisitor = new DependencyTraversalVisitor();
+const DependencyVisitor = new DependencyVisitorC();
 
 import * as TerrainLog from 'loglevel';
 
@@ -84,7 +84,7 @@ export default abstract class Traversal
   {
     const graph = (engine as FriendEngine).dag;
     const startNode = graph.node(String(node));
-    return startNode.accept(DependencyVisitor, engine);
+    return startNode.accept(DependencyVisitor, { engine }).synthetic;
   }
 
   /*

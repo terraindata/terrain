@@ -68,11 +68,23 @@ import { Edge, TransformationGraph } from 'shared/transformations/TypedGraph';
 
 import * as Utils from 'shared/transformations/util/EngineUtils';
 
-export default class DependencyTraversalVisitor
-  extends TransformationNodeVisitor<number[], TransformationEngine>
+interface VisitorArgs
 {
-  public visitorLookup: VisitorLookupMap<number[], TransformationEngine> = {
+  engine: TransformationEngine;
+}
 
+interface ReturnType
+{
+  synthetic: number[]; // dependencies as a result of transformations
+  structural: number[]; // dependencies that are a result of parent-child relationships
+  self: number; // the next node that operates on this node's field
+}
+
+export default class DependencyVisitor
+  extends TransformationNodeVisitor<ReturnType, VisitorArgs>
+{
+  public visitorLookup: VisitorLookupMap<ReturnType, VisitorArgs> = {
+    [TransformationNodeType.IdentityNode]: this.visitIdentityNode,
   };
 
   constructor()
@@ -81,8 +93,52 @@ export default class DependencyTraversalVisitor
     this.bindVisitors();
   }
 
-  public visitDefault(type: TransformationNodeType, node: TransformationNode, engine: FriendEngine): number[]
+  public visitDefault(type: TransformationNodeType, node: TransformationNode, args: VisitorArgs): ReturnType
   {
-    return [];
+    const engine = args.engine as FriendEngine;
+    const nexts = engine.dag.successors(String(node.id));
+    if (nexts === undefined || nexts.length === 0)
+    {
+      return {
+        synthetic: [],
+        structural: [],
+        self: null,
+      };
+    }
+
+    const synthetic = [];
+    const structural = [];
+    let self = null;
+
+    for (const nextNode of nexts)
+    {
+      const edge = engine.dag.edge(String(node.id), nextNode);
+      if (edge === EdgeTypes.Synthetic)
+      {
+        synthetic.push(Number(nextNode));
+      }
+      else if (edge === EdgeTypes.Same)
+      {
+        self = Number(nextNode);
+      }
+    }
+
+    return {
+      synthetic,
+      structural,
+      self,
+    };
+  }
+
+  public visitIdentityNode(type: TransformationNodeType, node: TransformationNode, args: VisitorArgs): ReturnType
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.IdentityNode>;
+    const engine = args.engine as FriendEngine;
+    const result = this.visitDefault(type, node, args);
+    if (opts.type === IdentityTypes.Organic)
+    {
+      const kp = node.fields.get(0).path;
+    }
+    return result;
   }
 }
