@@ -617,7 +617,7 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
   let query = {};
   let field = line.field;
   // If the value is an empty string then set field to field.keyword
-  if (line.value === '' || line.value === null)
+  if (line.fieldType === FieldType.Text && (line.value === '' || line.value === null))
   {
     field = field + '.keyword';
   }
