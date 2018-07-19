@@ -52,12 +52,6 @@ interface PathInfo
 
 export default class PathUtil
 {
-  public static isArray(object)
-  {
-    const isArrayType = Array.isArray(object);
-    return isArrayType;
-  }
-
   public static renderFields(objectItem: object)
   {
     const keyFields = [];
@@ -160,7 +154,7 @@ export default class PathUtil
       keyObject.score = 0;
       return false;
     }
-    if (PathUtil.isArray(object))
+    if (Array.isArray(object))
     {
       if (!PathUtil.containsAllObjects(object, keyObject))
       {
@@ -190,7 +184,7 @@ export default class PathUtil
     }
 
     const baseObject: PathInfo = { name: '*', score: 0 };
-    if (PathUtil.isArray(json) && PathUtil.containsAllObjects(json, baseObject))
+    if (Array.isArray(json) && PathUtil.containsAllObjects(json, baseObject))
     {
       baseObject.score = 2;
       return [(baseObject)]; // json itself is a proper path already

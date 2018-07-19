@@ -112,7 +112,7 @@ Router.post('/preview', passport.authenticate('access-token-local'), async (ctx,
       ctx.body = sourceStreamAsString;
     }
   }
-  catch(e)
+  catch (e)
   {
     throw new Error('StreamUtil is unable to complete string');
   }

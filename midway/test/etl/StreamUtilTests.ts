@@ -78,7 +78,10 @@ describe('StreamUtil', () =>
       { favs: ['apples', 'peaches'], legal: false, friends: [{ name: 'bob', age: 21 }, { name: 'joe' }] },
     '{"favs": ["apples", "peaches"], "legal": false, "friends": [{"name":"bob", "age":21},{"name":"joe","age":29}':
       { favs: ['apples', 'peaches'], legal: false, friends: [{ name: 'bob', age: 21 }, { name: 'joe', age: 29 }] },
-
+    '{"value": "[hello]", "test": "[peach, apple]", "same": "[\'omg\', \'lol\', \'testing\']", "meta": "another test, here, there"}':
+      { value: '[hello]', test: '[peach, apple]', same: '[\'omg\', \'lol\', \'testing\']', meta: 'another test, here, there' },
+    '{"stringA": "Hi, I like fruits, vegetables, and friends", "stringB": "my friends are joe, bob, and nancy!"}':
+      { stringA: 'Hi, I like fruits, vegetables, and friends', stringB: 'my friends are joe, bob, and nancy!' },
   };
 
   const formatJsonStringErrorTests =

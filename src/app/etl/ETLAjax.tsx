@@ -387,12 +387,16 @@ class ETLAjax
     {
       const handleResponse = (response: any) =>
       {
-        console.log('response is ', response);
+        // console.log('response is ', response);
         if (rawStringOnly === true)
         {
           if (response !== undefined)
           {
             resolve(response.result);
+          }
+          else
+          {
+            throw new Error('No valid response');
           }
         }
         else
@@ -409,6 +413,10 @@ class ETLAjax
           if (documents !== undefined)
           {
             resolve(documents);
+          }
+          else
+          {
+            throw new Error('No valid response');
           }
         }
       };

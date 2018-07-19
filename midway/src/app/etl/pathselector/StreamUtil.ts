@@ -141,6 +141,8 @@ export default class StreamUtil
     return [bracketStack, stringStream];
   }
 
+  // dropping a hanging substring (i.e. value-less key) may also drop some opening brackets
+  // in which case you want to remove them from the bracket stack
   public static handleDroppedBrackets(substring: string): number
   {
     let count = 0;
@@ -205,7 +207,7 @@ export default class StreamUtil
         }
         break;
       default:
-      // string ended on a value, so drop hanging comma and space
+        // string ended on a value, so drop hanging comma and space
         if (checkValue === ', ')
         {
           correctedString = rawStringStream.slice(0, -2);
