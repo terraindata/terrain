@@ -48,19 +48,32 @@ import * as path from 'path';
 import { MidwayLogger } from './log/MidwayLogger';
 class EmailTemplate
 {
-  public static makeEmailContent(params: object): string
+  public async makeEmailContent(params: object): Promise <string>
   {
-    let htmlString: string = EmailTemplate.html;
-    Object.keys(params).forEach((key) =>
+    return new Promise<string>((resolve, reject) =>
+    {
+      const emailPath: string = path.join(__dirname, '../assets/EmailTemplate.html');
+      let htmlString: string;
+      fs.readFile(emailPath, (err, data) =>
       {
-        const replacement: string = '%' + key.toUpperCase() + '%';
-        htmlString = htmlString.replace(replacement, params[key]);
+        if (data !== undefined)
+        {
+          const html = data.toString();
+          htmlString = html;
+          Object.keys(params).forEach((key) =>
+          {
+            const replacement: string = '%' + key.toUpperCase() + '%';
+            htmlString = htmlString.replace(replacement, params[key]);
+          });
+          return resolve(htmlString);
+        }
+        else
+        {
+          return reject(new Error('unable to read email template'));
+        }
       });
-    return htmlString;
+    });
   }
-  private static emailPath: string = path.join(__dirname, '../assets/EmailTemplate.html');
-  private static html: string = fs.readFileSync(EmailTemplate.emailPath, 'utf8');
-
 }
 
 export default EmailTemplate;

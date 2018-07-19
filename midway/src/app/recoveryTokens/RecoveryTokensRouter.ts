@@ -60,10 +60,12 @@ const users: Users = new Users();
 export const initialize = () => users.initialize();
 const Router = new KoaRouter();
 const recoveryTokens: RecoveryTokens = new RecoveryTokens();
+import EmailTemplate from '../EmailTemplate';
 import IntegrationConfig from '../integrations/IntegrationConfig';
 import Integrations from '../integrations/Integrations';
 const integrations: Integrations = new Integrations();
-import EmailTemplate from '../EmailTemplate';
+const emailTemplate: EmailTemplate = new EmailTemplate();
+
 Router.post('/', async (ctx, next) =>
 {
   let hostNameValid: boolean = false;
@@ -121,7 +123,7 @@ Router.post('/', async (ctx, next) =>
       buttonUrl: route,
       buttonText: 'RESET PASSWORD',
     };
-    const emailHtml: string = EmailTemplate.makeEmailContent(htmlParams);
+    const emailHtml: string = await emailTemplate.makeEmailContent(htmlParams);
     const attachment: object = [
     {
       filename: 'bg-blue-gradient.png',
