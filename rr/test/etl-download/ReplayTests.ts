@@ -47,18 +47,25 @@ THE SOFTWARE.
 // tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands max-line-length
 
 import * as ip from 'ip';
+import * as jsonfile from 'jsonfile';
 import * as puppeteer from 'puppeteer';
 import * as sleep from 'sleep';
+import * as request from 'then-request';
+
+import { toMatchImageSnapshot } from 'jest-image-snapshot';
+import { TestLogger } from '../../../shared/test/TestLogger';
+import { createAndLoadFirstLiveAlgorithm, login, replayInputEventOnly, replayRREvents } from '../../FullstackUtils';
 
 const USERNAME_SELECTOR = '#login-email';
 const PASSWORD_SELECTOR = '#login-password';
 const BUTTON_SELECTOR = '#login-submit';
 
-import { toMatchImageSnapshot } from 'jest-image-snapshot';
-import { TestLogger } from '../../../shared/test/TestLogger';
-import { getChromeDebugAddress } from '../../FullstackUtils';
-
 expect.extend({ toMatchImageSnapshot } as any);
+
+function getExpectedActionFile(): string
+{
+  return __dirname + '/actions.json';
+}
 
 async function takeAndCompareScreenShot(page, options?)
 {
@@ -71,90 +78,86 @@ async function takeAndCompareScreenShot(page, options?)
   (expect(image) as any).toMatchImageSnapshot(localOption);
 }
 
-async function loginToBuilder(page, url)
+async function getChromeDebugAddress()
 {
-  await page.goto(url);
-  sleep.sleep(1);
-  TestLogger.info('Goto the login page ' + url);
-  await page.waitForSelector(USERNAME_SELECTOR);
-  TestLogger.info('Username selector is ready.');
-  await takeAndCompareScreenShot(page);
-  await page.click(USERNAME_SELECTOR);
-  await page.keyboard.type('admin@terraindata.com');
-  await page.click(PASSWORD_SELECTOR);
-  await page.keyboard.type('CnAATPys6tEB*ypTvqRRP5@2fUzTuY!C^LZP#tBQcJiC*5');
-  await page.click(BUTTON_SELECTOR);
-  sleep.sleep(6);
-  await takeAndCompareScreenShot(page);
-  await page.evaluate(() =>
+  try
   {
-    window['TerrainTools'].terrainTests.testCreateCategory();
-  });
-  sleep.sleep(1);
-  const catid = await page.evaluate(() =>
+    const res = await (request as any)('GET', 'http://localhost:9222/json');
+    const resBody = JSON.parse(res.getBody());
+    const wsAddress = resBody[resBody.length - 1]['webSocketDebuggerUrl'];
+    return wsAddress;
+  } catch (err)
   {
-    return window['TerrainTools'].terrainTests.lastCategoryId;
-  });
-  TestLogger.info('Create a new category, ID:' + String(catid));
-  await takeAndCompareScreenShot(page);
+    TestLogger.error(err);
+    return undefined;
+  }
+}
 
-  await page.evaluate(() =>
-  {
-    window['TerrainTools'].terrainTests.testCreateGroup();
-  });
-  sleep.sleep(1);
-  const groupid = await page.evaluate(() =>
-  {
-    return window['TerrainTools'].terrainTests.lastGroupId;
-  });
-  TestLogger.info('Create a new group, ID:' + String(groupid));
-  await takeAndCompareScreenShot(page);
-
-  await page.evaluate(() =>
-  {
-    window['TerrainTools'].terrainTests.testCreateAlgorithm();
-  });
-  sleep.sleep(1);
-  const algid = await page.evaluate(() =>
-  {
-    return window['TerrainTools'].terrainTests.lastAlgorithmId;
-  });
-  TestLogger.info('Create a new algorithm, ID:' + String(algid));
-  await takeAndCompareScreenShot(page);
-
-  await page.evaluate(() =>
-  {
-    window['TerrainTools'].terrainTests.gotoAlgorithm();
-  });
-  sleep.sleep(1);
-  TestLogger.info('Load algorithm ' + String(algid));
+async function takeBuilderActionScreenshot(page)
+{
   await takeAndCompareScreenShot(page);
 }
 
-describe('jest-image-snapshot usage with an image received from puppeteer', () =>
+describe('Replay a builder action', () =>
 {
   let browser;
   let page;
-
+  let actionFileData;
   beforeAll(async (done) =>
   {
     const wsAddress = await getChromeDebugAddress();
     browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
     TestLogger.info('Connected to the Chrome ' + wsAddress);
+    actionFileData = jsonfile.readFileSync(getExpectedActionFile());
+    // loading from options['directory']/actions.json
     done();
-    // browser = await puppeteer.launch({headless: false});
-    // page = await browser.newPage();
   });
 
-  it('login', async (done) =>
+  it('builder-replay', async (done) =>
   {
     page = await browser.newPage();
-    TestLogger.info('Created a new page.');
     await page.setViewport({ width: 1600, height: 1200 });
     const url = `http://${ip.address()}:3000`;
-    await loginToBuilder(page, url);
+    await login(page, url);
+    await createAndLoadFirstLiveAlgorithm(page);
+    await takeAndCompareScreenShot(page);
+    const actions = actionFileData['actions'];
+    const serializeRecords = actionFileData['records'];
+    console.log('Replaying ' + actions.length + ' actions.');
+    await replayRREvents(page, url, actions, serializeRecords, replayInputEventOnly, async (action) =>
+    {
+      const screenShotOptions = { failureThreshold: '0.03', failureThresholdType: 'percent' };
+      if (action.eventType === 'mousedown')
+      {
+        // mouse click
+        switch (action.selector)
+        {
+          case ':nth-child(5) > .tabs-action-piece':
+            // `save` button
+            sleep.sleep(4);
+            break;
+          case ':nth-child(7) > .editor-top-bar-item':
+            // `run` button
+            sleep.sleep(4);
+            break;
+          case '.tabs-action-text.tabs-action-enabled > .tabs-action-piece':
+            sleep.sleep(4);
+            break;
+          default:
+            // other actions
+            sleep.sleep(1);
+            break;
+        }
+      } else if (action.eventType === 'keypress')
+      {
+        // keyboard typing
+        // no delay for key pressing, and avoid taking the snapshot too
+        return;
+      }
+      await takeAndCompareScreenShot(page, screenShotOptions);
+    });
     done();
-  }, 200000);
+  }, 600000);
 
   afterAll(async (done) =>
   {

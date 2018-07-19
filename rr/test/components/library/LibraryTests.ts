@@ -50,32 +50,15 @@ import * as jsonfile from 'jsonfile';
 
 import * as puppeteer from 'puppeteer';
 import { TestLogger } from '../../../../shared/test/TestLogger';
-import { getChromeDebugAddress, login } from '../../../FullstackUtils';
+import { createAndLoadFirstLiveAlgorithm, getChromeDebugAddress, login } from '../../../FullstackUtils';
 
-const USERNAME_SELECTOR = '#login-email';
-
-function getExpectedActionFile(): string
-{
-  return __dirname + '/actions.json';
-}
-
-async function loadPage(page, url)
-{
-  await page.goto(url);
-}
-
-describe('Testing the pathfinder parser', () =>
+describe('Testing the library related actions', () =>
 {
   let browser;
   let page;
-  let actions;
 
   beforeAll(async (done) =>
   {
-    const actionFileName = getExpectedActionFile();
-    const actionFileData = jsonfile.readFileSync(actionFileName);
-    actions = actionFileData.actions;
-    TestLogger.info('Testing ' + String(actions.length) + ' queries.');
     const wsAddress = await getChromeDebugAddress();
     browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
     // browser = await puppeteer.launch({ headless: false });
@@ -87,29 +70,6 @@ describe('Testing the pathfinder parser', () =>
     done();
   });
 
-  it('pathfinder parser test', async (done) =>
-  {
-    const url = `http://${ip.address()}:3000`;
-    TestLogger.info('Get url:' + url);
-    await login(page, url);
-    for (let i = 0; i < actions.length; i++)
-    {
-      const thisAction = JSON.parse(actions[i].action);
-      if (thisAction.payload.notDirty === true)
-      {
-        continue;
-      }
-      const query = actions[i].query;
-      const { tql, pathErrorMap } = await page.evaluate((theQuery) =>
-      {
-        return window['TerrainTools'].terrainTests.PathFinderToQuery(theQuery);
-      }, query);
-      TestLogger.info('Parsing item' + String(i) + ':' + JSON.stringify(actions[i]));
-      expect(tql).toBe(query.tql);
-    }
-    done();
-  }, 30000);
-
   afterAll(async (done) =>
   {
     await page.close();
@@ -118,4 +78,15 @@ describe('Testing the pathfinder parser', () =>
     TestLogger.info('The chrome connection is closed');
     done();
   });
+
+  it('Create first live algorithm', async (done) =>
+  {
+    const url = `http://${ip.address()}:3000`;
+    TestLogger.info('Get url:' + url);
+    await login(page, url);
+    const id = await createAndLoadFirstLiveAlgorithm(page);
+    TestLogger.info('Create IDs: ' + JSON.stringify(id));
+    expect(id).toEqual({ catid: 1, groupid: 2, algid: 3 });
+    done();
+  }, 30000);
 });
