@@ -118,7 +118,7 @@ Router.post('/', async (ctx, next) =>
       headerText: 'Reset your password.',
       descriptionText: 'You\'re receiving this email because someone requested a password reset for your user account at Terrain.*',
       descriptionText2: '*If you didn\’t request this email or don\'t know why you received it,' +
-      'please contact leslie@terraindata.com immediately.',
+      ' please contact leslie@terraindata.com immediately.',
       buttonUrl: route,
       buttonText: 'RESET PASSWORD',
     };
