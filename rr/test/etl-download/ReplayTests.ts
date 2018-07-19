@@ -126,7 +126,7 @@ describe('Replay a builder action', () =>
     console.log('Replaying ' + actions.length + ' actions.');
     await replayRREvents(page, url, actions, serializeRecords, replayInputEventOnly, async (action) =>
     {
-      let screenShotOptions;
+      const screenShotOptions = { failureThreshold: '0.03', failureThresholdType: 'percent' };
       if (action.eventType === 'mousedown')
       {
         // mouse click
@@ -142,7 +142,6 @@ describe('Replay a builder action', () =>
             break;
           case '.tabs-action-text.tabs-action-enabled > .tabs-action-piece':
             sleep.sleep(4);
-            screenShotOptions = { failureThreshold: '0.03', failureThresholdType: 'percent' };
             break;
           default:
             // other actions
