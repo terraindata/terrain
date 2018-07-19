@@ -166,9 +166,11 @@ export default class StreamUtil
     }
     switch (checkBracketOrKey)
     {
+      // string completed on an endquote, so it is properly parsed
       case '"':
         correctedString = rawStringStream;
         break;
+      // string completed on an open bracket, so remove it before fixing
       case '[':
         correctedString = rawStringStream.slice(0, -1);
         bracketStack.pop();
@@ -177,12 +179,14 @@ export default class StreamUtil
         correctedString = rawStringStream.slice(0, -1);
         bracketStack.pop();
         break;
+      // string completed on a closing bracket, so it is properly parsed
       case ']':
         correctedString = rawStringStream;
         break;
       case '}':
         correctedString = rawStringStream;
         break;
+      // string completed on a colon after a key, so remove the value-less key before fixing
       case ':':
         const splitString = rawStringStream.split(',');
         const droppedFragment = splitString.pop();
@@ -201,6 +205,7 @@ export default class StreamUtil
         }
         break;
       default:
+      // string ended on a value, so drop hanging comma and space
         if (checkValue === ', ')
         {
           correctedString = rawStringStream.slice(0, -2);
@@ -211,6 +216,7 @@ export default class StreamUtil
         }
         break;
     }
+    // double check that resulting string did not propogate up to a value-less key
     if (correctedString.slice(-1) === ':')
     {
       const splitKey = correctedString.split(',');

@@ -266,6 +266,7 @@ class DocumentsHelpers extends ETLHelpers
         if (sliceString.length < CHUNK_SIZE)
         {
           const results = await ETLAjax.fetchPreview(source, size, rawStringOnly, sliceString);
+          console.log('1: ',results);
           resolve(results);
         }
         else
@@ -277,6 +278,7 @@ class DocumentsHelpers extends ETLHelpers
             sliceString = await this.sliceFromFile(file, 5 * CHUNK_SIZE);
             results = (await ETLAjax.fetchPreview(source, size, rawStringOnly, sliceString)) as List<object>;
           }
+          console.log('2: ',results);
           resolve(results);
         }
       }
