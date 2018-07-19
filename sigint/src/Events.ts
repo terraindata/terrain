@@ -45,10 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
-import * as winston from 'winston';
 
 import { Config } from './Config';
-import { makePromiseCallback } from './Util';
+import { logger } from './Logging';
 
 export interface EventConfig
 {
@@ -76,59 +75,62 @@ export const typeName = 'events';
 export class Events
 {
   private client: Elastic.Client;
+  private config: Config;
 
   constructor(config: Config)
   {
+    this.config = config;
     this.client = new Elastic.Client({
       host: config.db,
     });
+  }
 
-    this.client.ping({
-      requestTimeout: 500,
-    }, (err) =>
+  public async initialize()
+  {
+    try
+    {
+      await this.client.ping({
+        requestTimeout: 500,
+      });
+    }
+    catch (err)
+    {
+      if (err !== null && err !== undefined)
       {
-        if (err !== null && err !== undefined)
-        {
-          throw new Error('creating ES client for host: ' + String(config.db) + ': ' + String(err));
-        }
+        throw new Error('creating ES client for host: ' + String(this.config.db) + ': ' + String(err));
+      }
+    }
+
+    try
+    {
+      const indexExists = await this.client.indices.exists({
+        index: indexName,
       });
 
-    this.client.indices.exists({
-      index: indexName,
-    }, (err, indexExists) =>
+      if (!indexExists)
       {
-        if (err !== null && err !== undefined)
-        {
-          throw new Error('creating index: ' + indexName + ': ' + String(err));
-        }
-
-        if (!indexExists)
-        {
-          winston.info('Index ' + indexName + ' does not exist. Creating it...');
-          this.client.indices.create({
-            index: indexName,
-            timeout: '5s',
-          }, (err2) =>
-            {
-              if (err2 !== null && err2 !== undefined)
-              {
-                throw new Error('creating index: ' + indexName + ': ' + String(err));
-              }
-            });
-        }
-      });
+        logger.info('Index ' + indexName + ' does not exist. Creating it...');
+        await this.client.indices.create({
+          index: indexName,
+          timeout: '5s',
+        });
+      }
+    }
+    catch (err)
+    {
+      if (err !== null && err !== undefined)
+      {
+        throw new Error('creating index: ' + indexName + ': ' + String(err));
+      }
+    }
   }
 
   public async store(event: EventConfig): Promise<void>
   {
-    return new Promise<void>((resolve, reject) =>
-    {
-      this.client.index({
-        index: indexName,
-        type: typeName,
-        body: event,
-      },
-        makePromiseCallback(resolve, reject));
+    return this.client.index({
+      index: indexName,
+      type: typeName,
+      body: event,
     });
   }
 
@@ -148,12 +150,8 @@ export class Events
       body.push(event);
     }
 
-    return new Promise<void>((resolve, reject) =>
-    {
-      this.client.bulk({
-        body,
-      },
-        makePromiseCallback(resolve, reject));
+    return this.client.bulk({
+      body,
     });
   }
 }

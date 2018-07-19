@@ -45,9 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
-import * as winston from 'winston';
 
-import { makePromiseCallback } from './Util';
+import { logger } from './Logging';
 
 export const index = 'abc.movies';
 export const type = 'data';
@@ -68,59 +67,54 @@ export async function search(req: Request): Promise<object[]>
 
   try
   {
-    await new Promise((resolve, reject) =>
-    {
-      client.ping({
-        requestTimeout: 500,
-      }, makePromiseCallback(resolve, reject));
+    await client.ping({
+      requestTimeout: 500,
     });
   }
   catch (e)
   {
-    winston.error('creating ES client for host: ' + String(req.s) + ': ' + String(e));
+    logger.error('creating ES client for host: ' + String(req.s) + ': ' + String(e));
     return [];
   }
 
   try
   {
-    const resp: any = await new Promise((resolve, reject) =>
-    {
-      const from = Number(req.p) * 30;
-      const size = 30;
+    const from = Number(req.p) * 30;
+    const size = 30;
 
-      if (req.v === undefined || req.v === 'MovieDemoAlgorithm')
-      {
-        winston.info('Calling ES query: (from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
-        client.search({
-          index,
-          type,
-          from,
-          size,
-          body: {
-            query: {
-              prefix: {
-                'title.keyword': req.q,
-              },
+    let resp;
+    if (req.v === undefined || req.v === 'MovieDemoAlgorithm')
+    {
+      logger.info('Calling ES query: (from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
+      resp = await client.search({
+        index,
+        type,
+        from,
+        size,
+        body: {
+          query: {
+            prefix: {
+              'title.keyword': req.q,
             },
           },
-        }, makePromiseCallback(resolve, reject));
-      }
-      else
-      {
-        winston.info('Calling Terrain variant: ' + req.v +
-          '(from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
-        client.searchTemplate({
-          body: {
-            id: req.v,
-            params: {
-              from: (Number(req.p) * 30),
-              size: 30,
-              title: '\"' + req.q + '\"',
-            },
+        },
+      });
+    }
+    else
+    {
+      logger.info('Calling Terrain variant: ' + req.v +
+        '(from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
+      resp = await client.searchTemplate({
+        body: {
+          id: req.v,
+          params: {
+            from: (Number(req.p) * 30),
+            size: 30,
+            title: '\"' + req.q + '\"',
           },
-        } as any, makePromiseCallback(resolve, reject));
-      }
-    });
+        },
+      } as any);
+    }
 
     if (resp.hits.hits === undefined)
     {
@@ -131,7 +125,7 @@ export async function search(req: Request): Promise<object[]>
   }
   catch (e)
   {
-    winston.error('querying ES: ' + String(req.q) + ': ' + String(e));
+    logger.error('querying ES: ' + String(req.q) + ': ' + String(e));
     return [];
   }
 }
