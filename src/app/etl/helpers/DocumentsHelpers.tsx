@@ -66,6 +66,7 @@ import { NodeTypes } from 'shared/etl/types/ETLTypes';
 import ETLHelpers from './ETLHelpers';
 
 const DefaultDocumentLimit = 10;
+const DefaultStreamStringLimit = 5000;
 const CHUNK_SIZE = 1e6;
 
 class DocumentsHelpers extends ETLHelpers
@@ -200,7 +201,7 @@ class DocumentsHelpers extends ETLHelpers
   {
     return new Promise((resolve, reject) =>
     {
-      const sizeLimit = (rawStringOnly) ? 10000 : DefaultDocumentLimit;
+      const sizeLimit = (rawStringOnly) ? DefaultStreamStringLimit : DefaultDocumentLimit;
       switch (source.type)
       {
         case Sources.Upload: {
