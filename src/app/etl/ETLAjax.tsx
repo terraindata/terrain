@@ -387,7 +387,6 @@ class ETLAjax
     {
       const handleResponse = (response: any) =>
       {
-        // console.log('response is ', response);
         if (rawStringOnly === true)
         {
           if (response !== undefined)

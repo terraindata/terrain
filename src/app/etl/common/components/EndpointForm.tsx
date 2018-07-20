@@ -80,12 +80,12 @@ export interface Props
   isSchedule?: boolean;
   integrations?: IMMap<ID, IntegrationConfig>;
   etlActions?: typeof ETLActions;
+  previewObject: object;
 }
 
 interface State
 {
   usingCustomIntegration: boolean;
-  currentObject?: object;
 }
 
 class EndpointForm extends TerrainComponent<Props>
@@ -241,7 +241,7 @@ class EndpointForm extends TerrainComponent<Props>
                 endpoint={endpoint}
                 isSource={this.props.isSource}
                 onChange={this.handleEndpointChange}
-                previewSource={this.state.currentObject}
+                previewSource={this.props.previewObject}
               />
               :
               null
@@ -283,11 +283,13 @@ class EndpointForm extends TerrainComponent<Props>
       newEndpoint = newEndpoint.setIn(['fileConfig', 'jsonPath'], '');
       DocumentsHelpers.fetchPreview(newEndpoint, true).then((res: object) =>
       {
-        this.setState(
-          {
-            currentObject: res,
-          },
-        );
+        console.log('res is ', res);
+        console.log('obj before ', this.props.previewObject);
+        this.props.etlActions({
+          actionType: 'setPreviewObject',
+          previewObject: res,
+        });
+        console.log('updated ',this.props.previewObject);
       })
         .catch((e) => e);
     }
@@ -333,7 +335,7 @@ const endpointTypeNames: IMMap<any, string> = Map<any, string>(EndpointTypeNames
 
 export default Util.createContainer(
   EndpointForm,
-  [['etl', 'integrations']],
+  [['etl', 'integrations'], ['etl', 'previewObject']],
   {
     etlActions: ETLActions,
   },
