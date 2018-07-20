@@ -73,7 +73,10 @@ class PrefixedElasticController extends ElasticController
         obj.index = this.getIndexPrefix() + '*';
         // by default ES only expands the wildcard to the open indices.
         // see the [expandWildcards = open] (https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html)
-        obj.expandWildcards = 'all';
+        if (obj.hasOwnProperty('expandWildcards'))
+        {
+          obj.expandWildcards = 'all';
+        }
       }
       else
       {
