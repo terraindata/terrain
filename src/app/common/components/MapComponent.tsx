@@ -71,6 +71,7 @@ export interface Props
   inputs?: any; // inputs so that it can tell what is an input
   onChange?: (coordinates, inputValue) => void;
   onSubmit?: (coordinates, inputValue) => void;
+  onBlur?: () => void;
   onMapClick?: (e) => void;
   canEdit: boolean;
   markers?: List<LocationMarker> | List<{}>; // A list of additional markers to add to the map
@@ -643,6 +644,7 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
       value: this.state.inputValue,
       onChange: this.handleInputValueChange,
       disabled: this.props.canEdit === false,
+      onBlur: this.props.onBlur,
     };
     const inputStyle = this.props.canEdit === false ? _.extend({}, backgroundColor(Colors().darkerHighlight)) : {};
     const location = MapUtil.getCoordinatesFromGeopoint(this.props.coordinates);

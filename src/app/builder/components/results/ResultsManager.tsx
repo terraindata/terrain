@@ -702,7 +702,6 @@ export class ResultsManager extends TerrainComponent<Props>
 
   private handleM2QueryResponse(response: MidwayQueryResponse, isAllFields: boolean, appendResults?: boolean, querySize?: number)
   {
-    console.log('the response is ', response);
     const queryKey = isAllFields ? 'allQuery' : 'query';
     this.setState({
       [queryKey]: null,
@@ -840,7 +839,6 @@ export class ResultsManager extends TerrainComponent<Props>
   private updateM2ErrorState(errors: MidwayErrorItem[], isAllFields?: boolean)
   {
     // TODO: handle myltiple errors.
-    console.log(errors);
     if (!errors)
     {
       return;
@@ -881,13 +879,11 @@ export class ResultsManager extends TerrainComponent<Props>
 
   private handleM2QueryError(response: MidwayQueryResponse, isAllFields?: boolean)
   {
-    console.log('response was ', response);
     this.updateM2ErrorState(response.errors, isAllFields);
   }
 
   private handleM2RouteError(response: MidwayError | string, isAllFields: boolean)
   {
-    console.log('response ', response);
     let errorItems: MidwayErrorItem[];
     if (typeof response === 'string')
     {

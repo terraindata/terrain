@@ -116,8 +116,6 @@ export function parsePath(path: Path, inputs, nestedPath: boolean = false, index
   // (originalShould) => originalShould.concat(baseQuery.getIn(['query', 'bool', 'should'])));
 
   // Scores
-  console.log('type', path.score.type);
-  console.log('score lines size ', path.score.lines.size);
   if ((path.score.type !== 'terrain' && path.score.type !== 'linear') || path.score.lines.size)
   {
     let sortObj = parseScore(path.score, true);
@@ -133,8 +131,8 @@ export function parsePath(path: Path, inputs, nestedPath: boolean = false, index
           query: queryBody.query,
           random_score: {
             seed: path.score.seed,
-          }
-        }
+          },
+        },
       };
       queryBody.query = sortObj;
     }
@@ -210,7 +208,6 @@ export function parsePath(path: Path, inputs, nestedPath: boolean = false, index
   }
   // TODO: format the query when interpreting.
   const formatedTql = ESConverter.formatES(new ESJSONParser(interpreter.query));
-  console.log('formatted tql ', formatedTql);
   return { tql: formatedTql, pathErrorMap: Immutable.fromJS(errorMap) };
 
   // TODO

@@ -130,7 +130,7 @@ export const TransformQueryUtil = {
           .setIn(['more', 'customSource'], true)
           .setIn(['score', 'type'], 'random')
           .setIn(['score', 'lines'], List())
-        ;
+          ;
         path.nested.forEach((nested, i) =>
         {
           path = path
@@ -140,7 +140,7 @@ export const TransformQueryUtil = {
             .setIn(['nested', i, 'score', 'type'], 'random')
             .setIn(['nested', i, 'name'], 'childQuery')
             .setIn(['score', 'lines'], List())
-          ;
+            ;
         });
         const { tql, pathErrorMap } = parsePath(path, query.inputs);
         if (pathErrorMap.size !== 0)
@@ -186,7 +186,6 @@ export const TransformQueryUtil = {
       },
     };
     // If there were inputs involved, need to use an interpreter
-
     return JSON.stringify(domainQuery);
   },
 

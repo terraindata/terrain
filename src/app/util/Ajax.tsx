@@ -224,7 +224,7 @@ export const Ajax =
         if (axios.isCancel(err))
         {
           // Added for testing, can be removed.
-          TerrainLog.debug('isCanceled',  err.getDetail ? err.getDetail() : err);
+          TerrainLog.debug('isCanceled', err.getDetail ? err.getDetail() : err);
         }
         // TODO: process this routeError via the Promise catch interface.
         // pass the error to the error handler if there is one.

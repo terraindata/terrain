@@ -92,6 +92,7 @@ const TransformChartPreview = {
       .append('path')
       .attr('class', 'lines')
       .attr('style', 'stroke: ' + state.colors[0]);
+
     this.update(el, state);
   },
 
@@ -191,6 +192,8 @@ const TransformChartPreview = {
       .attr('d', lineFunction(pointsData))
       .attr('class', 'lines');
 
+    d3.select(el).select('.lines-bg')
+      .attr('d', lineFunction(pointsData));
   },
 
   _draw(el, scales, pointsData, mode, domain)
