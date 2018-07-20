@@ -42,7 +42,7 @@ diff-style:
     - . .monorepo.gitlab/last_green_commit.sh
     - yarn add npm-run-all tslint typescript-formatter
   script:
-   - yarn diff-style
+   - yarn commit-style
   stage: style-and-compilation
   except:
    - master

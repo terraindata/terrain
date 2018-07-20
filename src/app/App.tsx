@@ -211,7 +211,6 @@ const links =
       icon: <ReportingIcon />,
       text: 'Analytics',
       route: '/analytics',
-      enabled: TerrainTools.isFeatureEnabled(TerrainTools.ANALYTICS),
     },
     // {
     //   icon: <ManualIcon />,
