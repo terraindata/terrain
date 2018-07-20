@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { default as GetCardVisitor } from 'builder/getCard/GetCardVisitor';
-import * as TerrainLog from 'loglevel';
 import * as TerrainLog from 'loglevel';
 import ESParameterFiller from 'shared/database/elastic/parser/EQLParameterFiller';
 import ESJSONType from 'shared/database/elastic/parser/ESJSONType';

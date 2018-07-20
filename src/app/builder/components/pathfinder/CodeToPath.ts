@@ -44,568 +44,579 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import PathfinderLine from 'builder/components/pathfinder/PathfinderLine';
-import {
+// tslint:disable:restrict-plus-operands strict-boolean-expressions
+
+import
+{
   _FilterGroup, _FilterLine, _Path, _Source, FilterLine,
   Path,
 } from 'builder/components/pathfinder/PathfinderTypes';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as TerrainLog from 'loglevel';
-import {Classes} from 'react-modal';
+import { Classes } from 'react-modal';
 import ESInterpreter from '../../../../../shared/database/elastic/parser/ESInterpreter';
 import ESPropertyInfo from '../../../../../shared/database/elastic/parser/ESPropertyInfo';
 import ESUtils from '../../../../../shared/database/elastic/parser/ESUtils';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
-import {AllRecordMap} from '../../../../../shared/util/Classes';
+import { AllRecordMap } from '../../../../../shared/util/Classes';
 import { toInputMap } from '../../../../blocks/types/Input';
 
-export default class CodeToPath
+// NOTE: Please follow the structure in `ClauseToPathTable` when you want to support other queries.
+
+/**
+ * ESCodeToPathfinder generates the path from the TQL query.
+ */
+export function ESCodeToPathfinder(query: string, inputs): Path | null
 {
-  public static ClauseToPathTable = {
-    body: {
-      before: CodeToPath.BodyToPathBefore,
-      after: CodeToPath.BodyToPathAfter,
-    },
-    bool_query: {
-      after: CodeToPath.BoolToPath,
-    },
-    query: {
-      after: CodeToPath.QueryToPath,
-    },
-    term_query: {
-      after: CodeToPath.TermToPathAfter,
-    },
-    terms_query: {
-      after: CodeToPath.TermsToPathAfter,
-    },
-    match: {
-      after: CodeToPath.MatchToPathAfter,
-    },
-    exists_query: {
-      after: CodeToPath.ExistsToPathAfter,
-    },
-    range_query: {
-      after: CodeToPath.RangeToPathAfter,
-    },
-    geo_distance: {
-      after: CodeToPath.GeoDistanceToPath,
-    },
-  };
-
-  public static NegativeableComparionMap = {
-    contain: 'notcontain',
-    equal: 'notequal',
-    isin: 'isnotin',
-    exists: 'notexists',
-  };
-
-  public static TermToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+  try
   {
-    const config = {};
-    const fieldName = Object.keys(node.objectChildren)[0];
-    const fieldValue = node.objectChildren[fieldName].propertyValue;
-    if (fieldValue.clause.type === 'term_settings')
+    const params = toInputMap(inputs);
+    const interpreter: ESInterpreter = new ESInterpreter(query, inputs);
+    return generatePath(interpreter);
+  } catch (e)
+  {
+    TerrainLog.error(e);
+    return null;
+  }
+}
+
+/**
+ * generatePath generates the path from the interpreter via a bottom-up re-writing.
+ * @param {ESInterpreter}: the interpreter
+ * @returns {Path}: the path generated from the interpreter
+ */
+function generatePath(inter: ESInterpreter): Path
+{
+  const currentPath = [];
+  const rootValueInfo = inter.rootValueInfo;
+  rootValueInfo.recursivelyVisit((element, key) =>
+  {
+    return beforeProcessValueInfo(element, inter, key);
+  }, (node, key) =>
     {
-      config['value'] = fieldValue.value['value'];
-      if (fieldValue.value.boost === undefined)
+      afterProcessValueInfo(node, inter, key);
+    });
+  TerrainLog.debug('New Path: ' + JSON.stringify(rootValueInfo.annotation.path));
+  return rootValueInfo.annotation.path;
+}
+
+// we can mark some useful information for the bottom up processing
+function beforeProcessValueInfo(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+{
+  if (node.annotation === undefined)
+  {
+    node.annotation = {};
+  }
+  const handler = ClauseToPathTable[node.clause.type];
+  if (handler && handler.before)
+  {
+    handler.before(node, interpreter, key);
+  }
+  return true;
+}
+
+/**
+ * A collection of rewriting functions. Each member maps to a ES node type.
+ * [member].before is called before processing the subtree (top down),
+ * while [member].after is called after processing the subtree (bottom up).
+ * The before and after functions can use ValueInfo.annotation for storing data, such as generated path component.
+ */
+const ClauseToPathTable = {
+  body: {
+    before: BodyToPathBefore,
+    after: BodyToPathAfter,
+  },
+  bool_query: {
+    after: BoolToPath,
+  },
+  query: {
+    after: ESQueryToPath,
+  },
+  term_query: {
+    after: TermToPath,
+  },
+  terms_query: {
+    after: TermsToPath,
+  },
+  match: {
+    after: MatchToPath,
+  },
+  exists_query: {
+    after: ExistsToPath,
+  },
+  range_query: {
+    after: RangeToPath,
+  },
+  geo_distance: {
+    after: GeoDistanceToPath,
+  },
+};
+
+const NegativeableComparionMap = {
+  contain: 'notcontain',
+  equal: 'notequal',
+  isin: 'isnotin',
+  exists: 'notexists',
+};
+
+// bottom up generating the path components
+function afterProcessValueInfo(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+{
+  const handler = ClauseToPathTable[node.clause.type];
+  if (handler && handler.after)
+  {
+    handler.after(node, interpreter, key);
+  }
+}
+
+function TermToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+{
+  const config = {};
+  const fieldName = Object.keys(node.objectChildren)[0];
+  const fieldValue = node.objectChildren[fieldName].propertyValue;
+  if (fieldValue.clause.type === 'term_settings')
+  {
+    config['value'] = fieldValue.value['value'];
+    if (fieldValue.value.boost === undefined)
+    {
+      config['boost'] = 1;
+    } else
+    {
+      config['boost'] = fieldValue.value['boost'];
+    }
+  } else
+  {
+    config['value'] = fieldValue.value;
+    config['boost'] = 1;
+  }
+  config['field'] = fieldName;
+  config['comparison'] = 'equal';
+  const filterLine = _FilterLine(config);
+  node.annotation.path = filterLine;
+  TerrainLog.debug('term_query to ' + JSON.stringify(filterLine));
+}
+
+// terms
+function TermsToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+{
+  const config = {};
+  const fieldKV = ESUtils.ExtractFirstField(node);
+  if (fieldKV !== null)
+  {
+    const kValueInfo = fieldKV.propertyName;
+    const vValueInfo = fieldKV.propertyValue;
+    if (vValueInfo.clause.type === 'base[]')
+    {
+      const fieldName = kValueInfo.value;
+      const fieldValue = JSON.stringify(vValueInfo.value);
+      config['field'] = fieldName;
+      config['vaue'] = fieldValue;
+    }
+  }
+
+  config['comparison'] = 'isin';
+  config['boost'] = node.value.boost === undefined ? 1 : node.value.boost;
+  const filterLine = _FilterLine(config);
+  node.annotation.path = filterLine;
+  TerrainLog.debug('terms_query to ' + JSON.stringify(filterLine));
+}
+
+// match
+// [field] : { "value" : val, "boost": 1 }
+function MatchToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+{
+  const config = {};
+  const fieldName = Object.keys(node.objectChildren)[0];
+  const fieldValue = node.objectChildren[fieldName].propertyValue;
+  if (fieldValue.clause.type === 'match_settings')
+  {
+    config['value'] = fieldValue.value['query'];
+    if (fieldValue.value.boost === undefined)
+    {
+      config['boost'] = 1;
+    } else
+    {
+      config['boost'] = fieldValue.value['boost'];
+    }
+  } else
+  {
+    config['value'] = fieldValue.value;
+    config['boost'] = 1;
+  }
+  config['field'] = fieldName;
+  config['comparison'] = 'equal';
+  const filterLine = _FilterLine(config);
+  node.annotation.path = filterLine;
+  TerrainLog.debug('match_query to ' + JSON.stringify(filterLine));
+}
+
+// exists
+// [field] : { field: 'field', 'boost': boost }
+function ExistsToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+{
+  const config = {
+    field: node.value.field,
+    boost: node.value.boost === undefined ? 1 : node.value.boost,
+    comparison: 'exists',
+  };
+  const filterLine = _FilterLine(config);
+  node.annotation.path = filterLine;
+  TerrainLog.debug('exists_query to ' + JSON.stringify(filterLine));
+}
+
+// range
+// [field] : { "value" : val, "boost": 1 }
+function RangeToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+{
+  const fieldName = Object.keys(node.objectChildren)[0];
+  const rangeValue = node.objectChildren[fieldName].propertyValue;
+  const rangeComparisonMap = {
+    gt: 'greater',
+    gte: 'greaterequal',
+    lt: 'less',
+    lte: 'lessequal',
+  };
+  let rangeOp;
+  for (const op of Object.keys(rangeComparisonMap))
+  {
+    if (rangeValue.objectChildren[op] !== undefined)
+    {
+      rangeOp = op;
+      break;
+    }
+  }
+  if (rangeOp === undefined)
+  {
+    return;
+  }
+  const config = {
+    field: fieldName,
+    value: rangeValue.value[rangeOp],
+    comparison: rangeComparisonMap[rangeOp],
+    boost: rangeValue.value['boost'] === 'undefined' ? 1 : rangeValue.value['boost'],
+  };
+  const filterLine = _FilterLine(config);
+  node.annotation.path = filterLine;
+  TerrainLog.debug('range_query to ' + JSON.stringify(filterLine));
+}
+
+function GeoDistanceToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+{
+  const vu = ESUtils.ExtractDistanceValueUnit(node.value.distance);
+  if (vu === null)
+  {
+    return;
+  }
+  const fieldKV = ESUtils.ExtractFirstField(node);
+  if (fieldKV === null)
+  {
+    return;
+  }
+  const fieldName = fieldKV.propertyName.value;
+  const fieldValue = fieldKV.propertyValue;
+  const distanceValue = { distance: vu.distance, units: vu.unit };
+  // fieldValue can be latlon_object {lon: number, lat: number}, number[lon, lat] , or a string 'lat, lon'
+  if (fieldValue.clause.type === 'latlon_object')
+  {
+    distanceValue['location'] = [fieldValue.value.lon, fieldValue.value.lat];
+  } else if (fieldValue.clause.type === 'number[]')
+  {
+    distanceValue['location'] = fieldValue.value;
+  } else if (fieldValue.clause.type === 'string')
+  {
+    distanceValue['address'] = fieldValue.value;
+  }
+  const config = {
+    field: fieldName,
+    value: distanceValue,
+    boost: node.value.boost === undefined ? 1 : node.value.boost,
+    comparison: 'located',
+  };
+  const filterLine = _FilterLine(config);
+  node.annotation.path = filterLine;
+  TerrainLog.debug('Geo_distance to ' + JSON.stringify(filterLine));
+}
+
+// query
+function ESQueryToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+{
+  let queryName;
+  for (const n of Object.keys(node.objectChildren))
+  {
+    if (ESUtils.QueryNameMap[n] !== undefined)
+    {
+      queryName = n;
+    }
+  }
+  const queryValue = node.objectChildren[queryName].propertyValue;
+  if (queryValue.annotation.path !== undefined)
+  {
+    node.annotation.path = queryValue.annotation.path;
+  }
+}
+
+// must_not : query
+function NegativeBoolToPath(node: ESValueInfo, query: ESValueInfo): boolean
+{
+  if (query.annotation.path)
+  {
+    // could be multiple lines if followed by a nested clause
+    const lines = [];
+    if (Immutable.List.isList(query.annotation.path))
+    {
+      (query.annotation.path as List<FilterLine>).map((line: FilterLine) =>
       {
-        config['boost'] = 1;
-      } else
+        if (NegativeableComparionMap[line.comparison])
+        {
+          lines.push(line.set('comparison', NegativeableComparionMap[line.comparison]));
+        }
+      });
+      if (lines.length > 0)
       {
-        config['boost'] = fieldValue.value['boost'];
+        node.annotation.path = List(lines);
+        return true;
       }
     } else
     {
-      config['value'] = fieldValue.value;
-      config['boost'] = 1;
-    }
-    config['field'] = fieldName;
-    config['comparison'] = 'equal';
-    const filterLine = _FilterLine(config);
-    node.annotation.path = filterLine;
-    TerrainLog.debug('term_query to ' + JSON.stringify(filterLine));
-  }
-
-  // terms
-  public static TermsToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
-  {
-    const config = {};
-    const fieldKV = ESUtils.ExtractFirstField(node);
-    if (fieldKV !== null)
-    {
-      const kValueInfo = fieldKV.propertyName;
-      const vValueInfo = fieldKV.propertyValue;
-      if (vValueInfo.clause.type === 'base[]')
+      let line = query.annotation.path as FilterLine;
+      if (NegativeableComparionMap[line.comparison])
       {
-        const fieldName = kValueInfo.value;
-        const fieldValue = JSON.stringify(vValueInfo.value);
-        config['field'] = fieldName;
-        config['vaue'] = fieldValue;
+        line = line.set('comparison', NegativeableComparionMap[line.comparison]);
+        node.annotation.path = line;
+        return true;
       }
     }
-
-    config['comparison'] = 'isin';
-    config['boost'] = node.value.boost === undefined ? 1 : node.value.boost;
-    const filterLine = _FilterLine(config);
-    node.annotation.path = filterLine;
-    TerrainLog.debug('terms_query to ' + JSON.stringify(filterLine));
   }
-
-  // match
-  // [field] : { "value" : val, "boost": 1 }
-  public static MatchToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
-  {
-    const config = {};
-    const fieldName = Object.keys(node.objectChildren)[0];
-    const fieldValue = node.objectChildren[fieldName].propertyValue;
-    if (fieldValue.clause.type === 'match_settings')
-    {
-      config['value'] = fieldValue.value['query'];
-      if (fieldValue.value.boost === undefined)
-      {
-        config['boost'] = 1;
-      } else
-      {
-        config['boost'] = fieldValue.value['boost'];
-      }
-    } else
-    {
-      config['value'] = fieldValue.value;
-      config['boost'] = 1;
-    }
-    config['field'] = fieldName;
-    config['comparison'] = 'equal';
-    const filterLine = _FilterLine(config);
-    node.annotation.path = filterLine;
-    TerrainLog.debug('match_query to ' + JSON.stringify(filterLine));
-  }
-
-  // exists
-  // [field] : { field: 'field', 'boost': boost }
-  public static ExistsToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
-  {
-    const config = {
-      field: node.value.field,
-      boost: node.value.boost === undefined ? 1 : node.value.boost,
-      comparison: 'exists',
-    };
-    const filterLine = _FilterLine(config);
-    node.annotation.path = filterLine;
-    TerrainLog.debug('exists_query to ' + JSON.stringify(filterLine));
-  }
-
-  // range
-  // [field] : { "value" : val, "boost": 1 }
-  public static RangeToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
-  {
-    const fieldName = Object.keys(node.objectChildren)[0];
-    const rangeValue = node.objectChildren[fieldName].propertyValue;
-    const rangeComparisonMap = {
-      gt: 'greater',
-      gte: 'greaterequal',
-      lt: 'less',
-      lte: 'lessequal',
-    };
-    let rangeOp;
-    for (const op of Object.keys(rangeComparisonMap))
-    {
-      if (rangeValue.objectChildren[op] !== undefined)
-      {
-        rangeOp = op;
-        break;
-      }
-    }
-    if (rangeOp === undefined)
-    {
-      return;
-    }
-    const config = {
-      field: fieldName,
-      value: rangeValue.value[rangeOp],
-      comparison: rangeComparisonMap[rangeOp],
-      boost: rangeValue.value['boost'] === 'undefined' ? 1 : rangeValue.value['boost'],
-    };
-    const filterLine = _FilterLine(config);
-    node.annotation.path = filterLine;
-    TerrainLog.debug('range_query to ' + JSON.stringify(filterLine));
-  }
-
-  public static GeoDistanceToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
-  {
-    const vu = ESUtils.ExtractDistanceValueUnit(node.value.distance);
-    if (vu === null)
-    {
-      return;
-    }
-    const fieldKV = ESUtils.ExtractFirstField(node);
-    if (fieldKV === null)
-    {
-      return;
-    }
-    const fieldName = fieldKV.propertyName.value;
-    const fieldValue = fieldKV.propertyValue;
-    const distanceValue = { distance: vu.distance, units: vu.unit };
-    // fieldValue can be latlon_object {lon: number, lat: number}, number[lon, lat] , or a string 'lat, lon'
-    if (fieldValue.clause.type === 'latlon_object')
-    {
-      distanceValue['location'] = [fieldValue.value.lon, fieldValue.value.lat];
-    } else if (fieldValue.clause.type === 'number[]')
-    {
-      distanceValue['location'] = fieldValue.value;
-    } else if (fieldValue.clause.type === 'string')
-    {
-      distanceValue['address'] = fieldValue.value;
-    }
-    const config = {
-      field: fieldName,
-      value: distanceValue,
-      boost: node.value.boost === undefined ? 1 : node.value.boost,
-      comparison: 'located',
-    };
-    const filterLine = _FilterLine(config);
-    node.annotation.path = filterLine;
-    TerrainLog.debug('Geo_distance to ' + JSON.stringify(filterLine));
-  }
-
-  // query
-  public static QueryToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
-  {
-    let queryName;
-    for (const n of Object.keys(node.objectChildren))
-    {
-      if (ESUtils.QueryNameMap[n] !== undefined)
-      {
-         queryName = n;
-      }
-    }
-    const queryValue = node.objectChildren[queryName].propertyValue;
-    if (queryValue.annotation.path !== undefined)
-    {
-      node.annotation.path = queryValue.annotation.path;
-    }
-    console.log('Query copies path from ' + queryName);
-  }
-
-  // must_not : query
-  public static NegativeBoolToPath(node: ESValueInfo, query: ESValueInfo): boolean
+  return false;
+}
+function BoolToFilterGroup(node: ESValueInfo, queries: ESValueInfo[], minMatches: 'all' | 'any')
+{
+  const lines = [];
+  queries.map((query) =>
   {
     if (query.annotation.path)
     {
-      // could be multiple lines if followed by a nested clause
-      const lines = [];
-      if (Immutable.List.isList(query.annotation.path))
+      // could be a List for nested query
+      if (List.isList(query.annotation.path))
       {
-        (query.annotation.path as List<FilterLine>).map((line: FilterLine) => {
-          if (CodeToPath.NegativeableComparionMap[line.comparison])
-          {
-            lines.push(line.set('comparison', CodeToPath.NegativeableComparionMap[line.comparison]));
-          }
-        });
-        if (lines.length > 0)
+        if (query.value.nested === undefined)
         {
-          node.annotation.path = List(lines);
-          return true;
+          TerrainLog.error('Query ' + JSON.stringify(query.value) + ' has a list of filter lines');
         }
+        query.annotation.path.map((line) =>
+        {
+          lines.push(line);
+        });
       } else
       {
-        let line = query.annotation.path as FilterLine;
-        if (CodeToPath.NegativeableComparionMap[line.comparison])
-        {
-          line = line.set('comparison', CodeToPath.NegativeableComparionMap[line.comparison]);
-          node.annotation.path = line;
-          return true;
-        }
+        lines.push(query.annotation.path);
       }
     }
-    return false;
-  }
-  public static BoolToFilterGroup(node: ESValueInfo, queries: ESValueInfo[], minMatches: 'all' | 'any')
-  {
-    const lines = [];
-    queries.map((query) =>
+  });
+
+  const filterGroup = _FilterGroup(
     {
-      if (query.annotation.path)
-      {
-        // could be a List for nested query
-        if (List.isList(query.annotation.path))
-        {
-          if (query.value.nested === undefined)
-          {
-            TerrainLog.error('Query ' + JSON.stringify(query.value) + ' has a list of filter lines');
-          }
-          query.annotation.path.map((line) =>
-          {
-            lines.push(line);
-          });
-        } else
-        {
-          lines.push(query.annotation.path);
-        }
-      }
-    });
+      minMatches,
+    }).set('lines', List(lines));
+  node.annotation.path = _FilterLine().set('filterGroup', filterGroup);
+}
 
-    const filterGroup = _FilterGroup(
-      {
-        minMatches,
-      }).set('lines', List(lines));
-    node.annotation.path = _FilterLine().set('filterGroup', filterGroup);
-  }
-
-  //
-  public static BoolToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+//
+function BoolToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+{
+  // source bool
+  if (node.annotation.isSourceBool === true)
   {
-    // source bool
-    if (node.annotation.isSourceBool === true)
+    // setup index, filterGroup, softFilterGroup
+    let softFilterGroup;
+    let filterGroup;
+    let index;
+
+    if (Array.isArray(node.value.filter))
     {
-      // setup index, filterGroup, softFilterGroup
-      let softFilterGroup;
-      let filterGroup;
-      let index;
-
-      if (Array.isArray(node.value.filter))
+      const filterNode = node.objectChildren['filter'].propertyValue;
+      for (const q of filterNode.arrayChildren)
       {
-        const filterNode = node.objectChildren['filter'].propertyValue;
-        for (const q of filterNode.arrayChildren)
+        if (q.annotation.path instanceof AllRecordMap['FilterLineC'])
         {
-          if (q.annotation.path instanceof  AllRecordMap['FilterLineC'])
+          const line = q.annotation.path as FilterLine;
+          if (line.field === '_index' && line.comparison === 'equal')
           {
-            const line = q.annotation.path as FilterLine;
-            if (line.field === '_index' && line.comparison === 'equal')
+            if (index === undefined)
             {
-              if (index === undefined)
-              {
-                index = line.value;
-                TerrainLog.debug('Found index ' + index);
-              }
-            }
-
-            if (q.objectChildren['bool'])
-            {
-              const boolNode = q.objectChildren['bool'].propertyValue;
-              if (boolNode.annotation.path && boolNode.annotation.path.filterGroup)
-              {
-                if (filterGroup === undefined)
-                {
-                  filterGroup = boolNode.annotation.path.filterGroup;
-                  TerrainLog.debug('Found hard bool ' + JSON.stringify(filterGroup));
-                }
-              }
+              index = line.value;
+              TerrainLog.debug('Found index ' + index);
             }
           }
-        }
-      }
 
-      if (Array.isArray(node.value.should))
-      {
-        const shouldNode = (node.objectChildren['should'] as any).propertyValue;
-        for (const q of shouldNode.arrayChildren)
-        {
           if (q.objectChildren['bool'])
           {
             const boolNode = q.objectChildren['bool'].propertyValue;
             if (boolNode.annotation.path && boolNode.annotation.path.filterGroup)
             {
-              if (softFilterGroup === undefined)
+              if (filterGroup === undefined)
               {
-                softFilterGroup = boolNode.annotation.path.filterGroup;
-                TerrainLog.debug('Found soft bool ' + JSON.stringify(softFilterGroup));
+                filterGroup = boolNode.annotation.path.filterGroup;
+                TerrainLog.debug('Found hard bool ' + JSON.stringify(filterGroup));
               }
             }
           }
         }
       }
-      // looking for the first bool in the shouldClause
-      node.annotation.index = index === undefined ? '' : index;
-      node.annotation.softFilterGroup = softFilterGroup === undefined ? _FilterGroup({minMatch: 'any'}) : softFilterGroup;
-      node.annotation.filterGroup = filterGroup === undefined ? _FilterGroup({minMatch: 'all'}) : filterGroup;
-      return;
     }
-    // nested -> query -> bool
-    if (node.annotation.isInNested === true)
+
+    if (Array.isArray(node.value.should))
     {
-      // all filter lines are in the nested -> query -> bool -> filter -> [query]
-      const queries = node.objectChildren['filter'] && node.objectChildren['filter'].propertyValue;
-      if (queries && queries.clause.type === 'query[]')
+      const shouldNode = (node.objectChildren['should'] as any).propertyValue;
+      for (const q of shouldNode.arrayChildren)
       {
-        // aggregate all filter lines here
-        const lines = [];
-        queries.arrayChildren.map((query) =>
+        if (q.objectChildren['bool'])
         {
-          if (query.annotation.path)
+          const boolNode = q.objectChildren['bool'].propertyValue;
+          if (boolNode.annotation.path && boolNode.annotation.path.filterGroup)
           {
-            lines.push(query.annotation.path);
+            if (softFilterGroup === undefined)
+            {
+              softFilterGroup = boolNode.annotation.path.filterGroup;
+              TerrainLog.debug('Found soft bool ' + JSON.stringify(softFilterGroup));
+            }
           }
-        });
-        if (lines.length > 0)
-        {
-          node.annotation.path = List(lines);
-          return;
         }
       }
     }
-
-    // bool -> must_not -> query
-    if (node.objectChildren['must_not'])
+    // looking for the first bool in the shouldClause
+    node.annotation.index = index === undefined ? '' : index;
+    node.annotation.softFilterGroup = softFilterGroup === undefined ? _FilterGroup({ minMatch: 'any' }) : softFilterGroup;
+    node.annotation.filterGroup = filterGroup === undefined ? _FilterGroup({ minMatch: 'all' }) : filterGroup;
+    return;
+  }
+  // nested -> query -> bool
+  if (node.annotation.isInNested === true)
+  {
+    // all filter lines are in the nested -> query -> bool -> filter -> [query]
+    const queries = node.objectChildren['filter'] && node.objectChildren['filter'].propertyValue;
+    if (queries && queries.clause.type === 'query[]')
     {
-      const query = node.objectChildren['must_not'].propertyValue;
-      if (query.clause.type === 'query')
+      // aggregate all filter lines here
+      const lines = [];
+      queries.arrayChildren.map((query) =>
       {
-        if (CodeToPath.NegativeBoolToPath(node, query))
+        if (query.annotation.path)
         {
-          return;
+          lines.push(query.annotation.path);
         }
-      }
-    }
-
-    if (Array.isArray(node.value.filter))
-    {
-      // soft filter group?
-      if (node.value.filter.length === 1 && _.isEqual(node.value.filter[0], {
-          exists: {
-            field: '_id',
-          },
-        }) === true)
+      });
+      if (lines.length > 0)
       {
-        if (Array.isArray(node.value.should) && node.value.should.length > 0)
-        {
-          CodeToPath.BoolToFilterGroup(node, (node.objectChildren.should as any).propertyValue.arrayChildren, 'any');
-          TerrainLog.debug('Soft any filter group line ' + JSON.stringify(node.annotation.path));
-          return;
-        }
-      } else
-      {
-        CodeToPath.BoolToFilterGroup(node, node.objectChildren['filter'].propertyValue.arrayChildren, 'all');
-        TerrainLog.debug('Hard all filter group line ' + JSON.stringify(node.annotation.path));
+        node.annotation.path = List(lines);
         return;
       }
-      // hard all filter group
-    } else if (Array.isArray(node.value.should) && node.value.should.length > 0)
+    }
+  }
+
+  // bool -> must_not -> query
+  if (node.objectChildren['must_not'])
+  {
+    const query = node.objectChildren['must_not'].propertyValue;
+    if (query.clause.type === 'query')
     {
-      CodeToPath.BoolToFilterGroup(node, (node.objectChildren.should as any).propertyValue.arrayChildren, 'any');
-      TerrainLog.debug('Hard any filter group line ' + JSON.stringify(node.annotation.path));
+      if (NegativeBoolToPath(node, query))
+      {
+        return;
+      }
+    }
+  }
+
+  if (Array.isArray(node.value.filter))
+  {
+    // soft filter group?
+    if (node.value.filter.length === 1 && _.isEqual(node.value.filter[0], {
+      exists: {
+        field: '_id',
+      },
+    }) === true)
+    {
+      if (Array.isArray(node.value.should) && node.value.should.length > 0)
+      {
+        BoolToFilterGroup(node, (node.objectChildren.should as any).propertyValue.arrayChildren, 'any');
+        TerrainLog.debug('Soft any filter group line ' + JSON.stringify(node.annotation.path));
+        return;
+      }
+    } else
+    {
+      BoolToFilterGroup(node, node.objectChildren['filter'].propertyValue.arrayChildren, 'all');
+      TerrainLog.debug('Hard all filter group line ' + JSON.stringify(node.annotation.path));
       return;
     }
-
-    // hard filter group
-    // all group
-    // any group
-  }
-
-  // body
-  public static BodyToPathBefore(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+    // hard all filter group
+  } else if (Array.isArray(node.value.should) && node.value.should.length > 0)
   {
-    // annotate source bool
-    const sourceBool = interpreter.searchValueInfo({'query:query': {'bool:bool_query': true}});
-    if (sourceBool)
-    {
-      TerrainLog.debug('Found Source Bool ' + JSON.stringify(sourceBool.value));
-      sourceBool.annotation = {isSourceBool: true};
-      node.annotation.sourceBool = sourceBool;
-    }
+    BoolToFilterGroup(node, (node.objectChildren.should as any).propertyValue.arrayChildren, 'any');
+    TerrainLog.debug('Hard any filter group line ' + JSON.stringify(node.annotation.path));
+    return;
   }
 
-  public static BodyToSource(node: ESValueInfo, index: string)
-  {
-    const start = node.value.hasOwnProperty('from') ? node.value.from : 0;
-    const count = node.value.hasOwnProperty('size') ? node.value.size : 'all';
-    const source = _Source({
-      count,
-      start,
-      dataSource: {
-        index,
-      },
-    });
-    return source;
-  }
+  // hard filter group
+  // all group
+  // any group
+}
 
-  public static BodyToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+// body
+function BodyToPathBefore(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+{
+  // annotate source bool
+  const sourceBool = interpreter.searchValueInfo({ 'query:query': { 'bool:bool_query': true } });
+  if (sourceBool)
   {
-    let index = '';
-    let filterGroup;
-    let softFilterGroup;
-    if (node.annotation.sourceBool)
-    {
-      const sourceBool = node.annotation.sourceBool;
-      index = sourceBool.annotation.index;
-      filterGroup = sourceBool.annotation.filterGroup;
-      softFilterGroup = sourceBool.annotation.softFilterGroup;
-    }
-    const source = CodeToPath.BodyToSource(node, index);
-    let path = _Path({step: 1}).set('source', source);
-    if (filterGroup)
-    {
-      TerrainLog.debug('Path Filter Group' + JSON.stringify(filterGroup));
-      path = path.set('filterGroup', filterGroup);
-    }
-    if (softFilterGroup)
-    {
-      path = path.set('softFilterGroup', softFilterGroup);
-    }
-    node.annotation.path = path;
-    TerrainLog.debug('Body to Path' + JSON.stringify(node.annotation.path));
+    TerrainLog.debug('Found Source Bool ' + JSON.stringify(sourceBool.value));
+    sourceBool.annotation = { isSourceBool: true };
+    node.annotation.sourceBool = sourceBool;
   }
+}
+function BodyToSource(node: ESValueInfo, index: string)
+{
+  const start = node.value.hasOwnProperty('from') ? node.value.from : 0;
+  const count = node.value.hasOwnProperty('size') ? node.value.size : 'all';
+  const source = _Source({
+    count,
+    start,
+    dataSource: {
+      index,
+    },
+  });
+  return source;
+}
+
+function BodyToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+{
+  let index = '';
+  let filterGroup;
+  let softFilterGroup;
+  if (node.annotation.sourceBool)
+  {
+    const sourceBool = node.annotation.sourceBool;
+    index = sourceBool.annotation.index;
+    filterGroup = sourceBool.annotation.filterGroup;
+    softFilterGroup = sourceBool.annotation.softFilterGroup;
+  }
+  const source = BodyToSource(node, index);
+  let path = _Path({ step: 1 }).set('source', source);
+  if (filterGroup)
+  {
+    TerrainLog.debug('Path Filter Group' + JSON.stringify(filterGroup));
+    path = path.set('filterGroup', filterGroup);
+  }
+  if (softFilterGroup)
+  {
+    path = path.set('softFilterGroup', softFilterGroup);
+  }
+  node.annotation.path = path;
+  TerrainLog.debug('Body to Path' + JSON.stringify(node.annotation.path));
+}
 
   // bool
 
   // script
 
   // sort
-
-  // we can mark some useful information for the bottom up processing
-  public static beforeProcessValueInfo(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
-  {
-    if (node.annotation === undefined)
-    {
-      node.annotation = {};
-    }
-    const handler = this.ClauseToPathTable[node.clause.type];
-    if (handler && handler.before)
-    {
-      handler.before(node, interpreter, key);
-    }
-    return true;
-  }
-
-  // bottom up generating the path components
-  public static afterProcessValueInfo(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
-  {
-    const handler = this.ClauseToPathTable[node.clause.type];
-    if (handler && handler.after)
-    {
-      handler.after(node, interpreter, key);
-    }
-  }
-  /**
-   * @param {ESInterpreter} code
-   * @returns {Path}
-   */
-  public static generatePath(inter: ESInterpreter): Path
-  {
-    const currentPath = [];
-    const rootValueInfo = inter.rootValueInfo;
-    rootValueInfo.recursivelyVisit((element, key) =>
-    {
-      return CodeToPath.beforeProcessValueInfo(element, inter, key);
-    }, (node, key) =>
-      {
-        CodeToPath.afterProcessValueInfo(node, inter, key);
-      });
-    console.log('New Path: ' + JSON.stringify(rootValueInfo.annotation.path));
-    return rootValueInfo.annotation.path;
-  }
-
-  public static parseCode(query: string, inputs): Path
-  {
-    try
-    {
-      const params = toInputMap(inputs);
-      const interpreter: ESInterpreter = new ESInterpreter(query, inputs);
-      return this.generatePath(interpreter);
-    } catch (e)
-    {
-      TerrainLog.error(e);
-      return null;
-    }
-  }
-}

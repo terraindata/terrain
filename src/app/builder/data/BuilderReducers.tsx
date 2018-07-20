@@ -45,11 +45,12 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 // tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const no-unused-expression no-shadowed-variable
-import CodeToPath from 'builder/components/pathfinder/CodeToPath';
-import * as Immutable from 'immutable';
+import { ESCodeToPathfinder } from 'builder/components/pathfinder/CodeToPath';
 import { List, Map } from 'immutable';
+import * as Immutable from 'immutable';
 import { invert } from 'lodash';
 import * as TerrainLog from 'loglevel';
+import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import BackendInstance from '../../../database/types/BackendInstance';
@@ -390,13 +391,15 @@ const BuilderReducers =
     const tql: string = action.payload.tql;
     query = query.set('lastMutation', query.lastMutation + 1).set('tql', tql);
     query = query.set('tqlMode', action.payload.tqlMode);
-    query = query.set('parseTree', AllBackendsMap[query.language].parseQuery(query));
     // update cards
     query = AllBackendsMap[query.language].codeToQuery(
       query,
       action.payload.changeQuery,
     );
+    const path = ESCodeToPathfinder(query.tql, query.inputs);
+    // query = query.set('path', path);
     state = state.set('query', query);
+
     if (query.cardsAndCodeInSync === false)
     {
       TerrainLog.debug('Cards and code not synchronized (from TQL mutation).');

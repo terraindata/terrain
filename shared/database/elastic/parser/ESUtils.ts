@@ -153,7 +153,7 @@ export default class ESUtils
       if (matched.length === 0)
       {
         inter.accumulateError(valueInfo,
-          'Only allow ' + size.join(',') + ' of ' + JSON.stringify(fieldList) + ' fields, but found ' + hitList.length
+          'Only allow ' + String(size.join(',')) + ' of ' + JSON.stringify(fieldList) + ' fields, but found ' + String(hitList.length)
           + '(' + JSON.stringify(hitList) + ').');
         return false;
       }

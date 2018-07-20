@@ -67,7 +67,7 @@ export default class ESMapClause extends ESClause
     if (valueInfo.childrenSize() !== 1)
     {
       inter.accumulateError(valueInfo,
-        valueInfo.clause.name + ' should have one field, but found ' + valueInfo.childrenSize());
+        valueInfo.clause.name + ' should have one field, but found ' + String(valueInfo.childrenSize()));
       return false;
     }
     return true;
