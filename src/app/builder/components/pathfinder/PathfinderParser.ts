@@ -780,7 +780,7 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
     case 'isin':
       value = PathFinderStringToJSONArray(String(value));
       field = line.fieldType === FieldType.Text && !line.analyzed && field.indexOf('.keyword') === -1
-            ? field + '.keyword' : field;
+        ? field + '.keyword' : field;
       query = {
         terms: {
           [field]: value,
@@ -791,7 +791,7 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
     case 'isnotin':
       value = PathFinderStringToJSONArray(String(value));
       field = line.fieldType === FieldType.Text && !line.analyzed && field.indexOf('.keyword') === -1
-            ? field + '.keyword' : field;
+        ? field + '.keyword' : field;
       query = {
         bool: {
           must_not: {
