@@ -291,13 +291,10 @@ class EndpointForm extends TerrainComponent<Props>
       newEndpoint = newEndpoint.setIn(['fileConfig', 'jsonPath'], '');
       DocumentsHelpers.fetchPreview(newEndpoint, true).then((res: object) =>
       {
-        console.log('res is ', res);
-        console.log('obj before ', this.props.previewObject);
         this.props.etlActions({
           actionType: 'setPreviewObject',
           previewObject: res,
         });
-        console.log('updated ',this.props.previewObject);
       })
         .catch((e) => e);
     }

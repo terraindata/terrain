@@ -383,12 +383,10 @@ class ETLAjax
     fileString?: string,
   ): Promise<List<object> | object>
   {
-    console.log('source here is ', source);
     return new Promise((resolve, reject) =>
     {
       const handleResponse = (response: any) =>
       {
-        console.log('REPSONSE.  ', response);
         if (rawStringOnly === true)
         {
           if (response !== undefined)
