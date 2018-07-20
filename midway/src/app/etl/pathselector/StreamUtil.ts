@@ -159,7 +159,7 @@ export default class StreamUtil
 
   public static fixStringStream(rawStringStream: string, bracketStack)
   {
-    let correctedString;
+    let correctedString: string;
     const checkBracketOrKey = rawStringStream.slice(-1);
     const checkValue = rawStringStream.slice(-2);
     if (rawStringStream.length === 0)
@@ -190,20 +190,18 @@ export default class StreamUtil
         break;
       // string completed on a colon after a key, so remove the value-less key before fixing
       case ':':
-        const splitString = rawStringStream.split(',');
-        const droppedFragment = splitString.pop();
+        const hangingKeyIndex = rawStringStream.lastIndexOf(',');
+        const droppedFragment = rawStringStream.slice(hangingKeyIndex);
         const droppedBracketCount = this.handleDroppedBrackets(droppedFragment);
         for (let count = 0; count < droppedBracketCount; count++)
         {
           bracketStack.pop();
         }
-        if (splitString.length < 0)
+        correctedString = rawStringStream.slice(0, hangingKeyIndex);
+        // remove leftover single value-less key if still present
+        if (correctedString.slice(-1) === '"')
         {
-          throw new Error('Error parsing');
-        }
-        else
-        {
-          correctedString = splitString.join(',');
+          correctedString = '';
         }
         break;
       default:
@@ -221,15 +219,17 @@ export default class StreamUtil
     // double check that resulting string did not propogate up to a value-less key
     if (correctedString.slice(-1) === ':')
     {
-      const splitKey = correctedString.split(',');
-      splitKey.pop();
-      if (splitKey.length < 0)
+      const newHangingKeyIndex = correctedString.lastIndexOf(',');
+      const newDroppedFragment = correctedString.slice(newHangingKeyIndex);
+      const newDroppedBracketCount = this.handleDroppedBrackets(newDroppedFragment);
+      for (let count = 0; count < newDroppedBracketCount; count++)
       {
-        throw new Error('Error parsing');
+        bracketStack.pop();
       }
-      else
+      correctedString = correctedString.slice(0, newHangingKeyIndex);
+      if (correctedString.slice(-1) === '"')
       {
-        correctedString = splitKey.join(',');
+        correctedString = '';
       }
     }
     return [bracketStack, correctedString];

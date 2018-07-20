@@ -96,6 +96,8 @@ describe('StreamUtil', () =>
       '{"name": "Steven", "age": 21, "favNums": [1,2,',
       '[{"type": "FeatureCollection", "metadata"',
       '{"favs": ["apples", "peaches"], "legal": false, "friends": [{"name":"bob", "age":21},{"name":"joe","age"',
+      '{"value": "[hello]", "test": "[peach, apple]", "same": "[\'omg\', \'lol\', \'testing\']", "meta": "another test, here, there"}',
+      '{"stringA": "Hi, I like fruits, vegetables, and friends", "stringB": "my friends are joe, bob, and nancy!"}',
     ];
 
   describe('#formatJsonString', () =>
