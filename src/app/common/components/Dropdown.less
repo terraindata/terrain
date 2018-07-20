@@ -95,10 +95,9 @@
   }
  }
 
- .dropdown-value,
- .dropdown-option {
-    height: @option-height;
-    padding: 0px 6px;
+  .dropdown-value,
+  .dropdown-option {
+    padding: 6px;
     position: relative;
     margin: 0px 6px;
     transition: all 0.05s;
@@ -106,6 +105,7 @@
   }
 
   .dropdown-value {
+    height: @option-height;
     width: 100%;
     height: 100%;
     margin: 0px;
@@ -136,6 +136,11 @@
         padding-top: 15px;
         opacity: 1;
         white-space: nowrap;
+        
+        width: 100%;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+        height: 100%;
       }
       &.searchable-dropdown-option-hidden {
         height: 0px;
@@ -228,7 +233,6 @@
   }
 
  .dropdown-option-inner {
-    padding-top: 4px;
     svg {
       height: 14px;
       width: 14px;
