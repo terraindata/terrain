@@ -92,7 +92,6 @@ import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
 import { BaseClass, New } from 'shared/util/Classes';
 import { FieldType, FieldTypeMapping, ReverseFieldTypeMapping } from '../../../../../shared/builder/FieldTypes';
-import {AllRecordMap} from '../../../../../shared/util/Classes';
 import PathfinderText from './PathfinderText';
 
 export enum PathfinderSteps

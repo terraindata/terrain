@@ -1,6 +1,4 @@
 {
-  "empty query" : {
-  },
   "simple query" : {
     "from" : 0,
     "size" : 10
