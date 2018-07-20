@@ -43,6 +43,7 @@
     "style-branch": "run(){ git diff --name-only HEAD $(git merge-base HEAD $1) | egrep '.ts$|.tsx$' | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\; | grep replaced || exit 0 && exit 1; }; run",
     "fix": "yarn style && yarn lint-parallel;",
     "diff-style": "git ls-files -m | grep \"\\.ts\" | parallel --no-notice ./node_modules/.bin/tsfmt -r {} | grep replaced || exit 0 && exit 1",
+    "commit-style": "git diff-tree --no-commit-id --name-only -r HEAD | grep \"\\.ts\" | parallel --no-notice ./node_modules/.bin/tsfmt -r {} | grep replaced || exit 0 && exit 1",
     "rr": "tsc --noEmitOnError -p rr/tsconfig.json && NODE_PATH=${NODE_PATH}:./rr/build node ./rr/build/rr/RecordReplay.js",
     "fetch-query": "tsc --noEmitOnError -p rr/tsconfig.json && NODE_PATH=${NODE_PATH}:./rr/build node ./rr/build/rr/FetchQueries.js",
     "test-fullstack-login": "jest ./rr/test/login --forceExit",
