@@ -172,7 +172,7 @@ async function recordBuilderActions(browser, url, column: 'builder' | 'pathfinde
   actions = filteringRecordBuilderActions(actions);
   await page.close();
   const timestamp = Date();
-  return { timestamp, records, actions };
+  return { timestamp, updateTest: false, interactiveUpdating: false, records, actions };
 }
 
 async function rr()
