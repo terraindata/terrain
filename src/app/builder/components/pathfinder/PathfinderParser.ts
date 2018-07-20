@@ -612,6 +612,11 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
   const boost = typeof line.boost === 'string' ? parseFloat(line.boost) : line.boost;
   let query = {};
   let field = line.field;
+  // If the value is an empty string then set field to field.keyword
+  if (line.fieldType === FieldType.Text && (line.value === '' || line.value === null))
+  {
+    field = field + '.keyword';
+  }
   switch (line.comparison)
   {
     case 'notexists':
@@ -631,7 +636,7 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
         bool: {
           must_not: {
             term: {
-              [line.field]: {
+              [field]: {
                 value,
               },
             },
@@ -645,7 +650,7 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
         bool: {
           must_not: {
             match: {
-              [line.field]: {
+              [field]: {
                 query: value,
               },
             },
@@ -665,7 +670,7 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
     case 'equal':
       query = {
         term: {
-          [line.field]: {
+          [field]: {
             value,
             boost,
           },
@@ -675,7 +680,7 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
     case 'contains':
       query = {
         match: {
-          [line.field]: {
+          [field]: {
             query: value,
             boost,
           },
@@ -774,7 +779,8 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
       break;
     case 'isin':
       value = PathFinderStringToJSONArray(String(value));
-      field = line.fieldType === FieldType.Text && !line.analyzed ? field + '.keyword' : field;
+      field = line.fieldType === FieldType.Text && !line.analyzed && field.indexOf('.keyword') === -1
+            ? field + '.keyword' : field;
       query = {
         terms: {
           [field]: value,
@@ -784,12 +790,13 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
       break;
     case 'isnotin':
       value = PathFinderStringToJSONArray(String(value));
-      field = line.fieldType === FieldType.Text && !line.analyzed ? field + '.keyword' : field;
+      field = line.fieldType === FieldType.Text && !line.analyzed && field.indexOf('.keyword') === -1
+            ? field + '.keyword' : field;
       query = {
         bool: {
           must_not: {
             terms: {
-              [line.field]: value,
+              [field]: value,
             },
           },
           boost,
