@@ -8,7 +8,7 @@
     "start": "yarn start-postgres && yarn start-midway-dev",
     "start-minified": "yarn start-postgres && yarn start-midway-minified",
     "run-midway": "yarn copy-midway-assets && NODE_PATH=${NODE_PATH}:./midway/build ./node_modules/.bin/nodemon --delay 500 -r source-map-support/register --max_old_space_size=8192 -- ./midway/build/midway/src/Midway.js",
-    "start-midway-dev": "rm -rf midway/build; mkdir midway/build; yarn copy-midway-assets; ( NODE_PATH=${NODE_PATH}:./midway/build script -qef -c 'tsc-watch -p midway/tsconfig.json --onFailure \"yarn tsc-watch-failure\" --onSuccess \"yarn tsc-watch-success\"' /dev/null | sed 's/\\x1bc//g' ); ",
+    "start-midway-dev": "rm -rf midway/build; mkdir midway/build; yarn copy-midway-assets; NODE_PATH=${NODE_PATH}:./midway/build tsc-watch -p midway/tsconfig.json --preserveWatchOutput --onFailure \"yarn tsc-watch-failure\" --onSuccess \"yarn tsc-watch-success\"",
     "tsc-watch-failure": "rm -f ./midway/build/midway/src/Midway.js",
     "tsc-watch-success": "if [ ! -f ./midway/build/midway/src/Midway.js ]; then touch ./midway/src/Midway.ts; else yarn copy-midway-assets && NODE_PATH=${NODE_PATH}:./midway/build ./node_modules/.bin/nodemon --delay 500 -r source-map-support/register --max_old_space_size=8192 -- ./midway/build/midway/src/Midway.js `command -v jq > /dev/null && echo $npm_config_argv | jq '.original[1:] | .[]' | tr '\"\\n' ' '`; fi",
     "start-midway-prod": "rm -rf midway/build; mkdir midway/build; yarn build-server && NODE_ENV=production yarn run-midway --",
