@@ -77,6 +77,7 @@ import { getIndex, getType } from '../../../../database/elastic/blocks/ElasticBl
 import { stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import { M1QueryResponse } from '../../../util/AjaxM1';
+import MapUtil from 'util/MapUtil';
 
 const NUM_BARS = 1000;
 
@@ -452,6 +453,63 @@ class TransformCard extends TerrainComponent<Props>
     });
   }
 
+  // Given a groupjoined query, generate aggreagtions for min, max, and bars manually
+  private handleParentGeoResponse(resp: MidwayQueryResponse)
+  {
+    if (resp.result && resp.result.hits && resp.result.hits.hits && resp.result.hits.hits.length)
+    {
+      let min;
+      let max;
+      const distances = [];
+      console.log('resp ', resp);
+      // Look at all the parents
+      resp.result.hits.hits.forEach((hit, i) =>
+       {
+         // If they have a child query field, look through all their children
+         if (hit.childQuery && hit.childQuery.length)
+         {
+            const parentField = Object.keys(hit._source)[0];
+            const childField = Object.keys(hit.childQuery[0]._source)[0];
+            hit.childQuery.forEach((child, j) =>
+            {
+             // Find distance between child and parent
+              const distance = MapUtil.distance(
+                [hit._source[parentField].lat, hit._source[parentField].lon],
+                [child._source[childField].lat, child._source[childField].lon]
+               );
+              console.log('distance is ', distance);
+              if (min === undefined || distance < min)
+              {
+                min = distance;
+              }
+              if (max === undefined || distance > max)
+              {
+                max = distance;
+              }
+              distances.push(distance);
+            });
+          }
+        });
+      // let bars = [];
+      // keys.forEach((key, i) =>
+      // {
+      //   const numKey =
+      //     bars.push({
+      //       id: '' + i,
+      //       count: buckets[key].doc_count,
+      //       percentage: totalDoc ? buckets[key].doc_count / totalDoc : 0,
+      //       range: {
+      //         min: parseFloat(key),
+      //         max: keys[i + 1] !== undefined ? parseFloat(keys[i + 1]) :
+      //           parseFloat(keys[i]) + parseFloat(keys[i]) - parseFloat(keys[i - 1]),
+      //       },
+      //     });
+      // });
+      // this.setState({
+      //   bars: List(bars),
+      // });
+    }
+  }
   private handleElasticDomainAggregationResponse(resp: MidwayQueryResponse)
   {
     const { data, keyPath } = this.props;
@@ -464,7 +522,7 @@ class TransformCard extends TerrainComponent<Props>
     const agg = (resp.result as ElasticQueryResult).aggregations;
     if (agg === undefined || agg['minimum'] === undefined || agg['maximum'] === undefined)
     {
-      // IT MIGHT ACTUALLY BE THE GEO ONE WITH GROUPJOIN
+      this.handleParentGeoResponse(resp);
       return;
     }
     const newDomain = this.trimDomain(this.state.maxDomain, List([agg['minimum'].value, agg['maximum'].value]));

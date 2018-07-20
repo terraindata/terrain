@@ -224,11 +224,11 @@ export const Ajax =
         if (axios.isCancel(err))
         {
           // Added for testing, can be removed.
-          TerrainLog.debug('isCanceled', err.getDetail());
+          TerrainLog.debug('isCanceled',  err.getDetail ? err.getDetail() : err);
         }
         // TODO: process this routeError via the Promise catch interface.
         // pass the error to the error handler if there is one.
-        TerrainLog.debug('Midway Route Error: ' + err.getDetail());
+        TerrainLog.debug('Midway Route Error: ' + err);
         config && config.onError && config.onError(err);
       });
 

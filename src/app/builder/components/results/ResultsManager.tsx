@@ -690,6 +690,7 @@ export class ResultsManager extends TerrainComponent<Props>
 
   private handleM2QueryResponse(response: MidwayQueryResponse, isAllFields: boolean, appendResults?: boolean, querySize?: number)
   {
+    console.log('the response is ', response);
     const queryKey = isAllFields ? 'allQuery' : 'query';
     this.setState({
       [queryKey]: null,
@@ -712,47 +713,51 @@ export class ResultsManager extends TerrainComponent<Props>
       });
       return;
     }
-    const hits = resultsData.hits.hits.map((hit) =>
+    let hits = [];
+    if (resultsData.hits)
     {
-      let hitTemp = _.cloneDeep(hit);
-      let rootKeys: string[] = [];
-      rootKeys = _.without(Object.keys(hitTemp), '_index', '_type', '_id', '_score', '_source', 'sort', '', 'fields');
-      if (rootKeys.length > 0) // there were group join objects
+      hits = resultsData.hits.hits.map((hit) =>
       {
-        const duplicateRootKeys: string[] = [];
-        rootKeys.forEach((rootKey) =>
+        let hitTemp = _.cloneDeep(hit);
+        let rootKeys: string[] = [];
+        rootKeys = _.without(Object.keys(hitTemp), '_index', '_type', '_id', '_score', '_source', 'sort', '', 'fields');
+        if (rootKeys.length > 0) // there were group join objects
         {
-          if (Object.keys(hitTemp._source).indexOf(rootKey) > -1)
+          const duplicateRootKeys: string[] = [];
+          rootKeys.forEach((rootKey) =>
           {
-            duplicateRootKeys.push(rootKey);
+            if (Object.keys(hitTemp._source).indexOf(rootKey) > -1)
+            {
+              duplicateRootKeys.push(rootKey);
+            }
+          });
+          if (duplicateRootKeys.length !== 0)
+          {
+            console.log('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
           }
-        });
-        if (duplicateRootKeys.length !== 0)
-        {
-          console.log('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
+          rootKeys.forEach((rootKey) =>
+          {
+            hitTemp['_source'][rootKey] = hitTemp[rootKey];
+            delete hitTemp[rootKey];
+          });
         }
-        rootKeys.forEach((rootKey) =>
+        const sort = hitTemp.sort !== undefined ? { TerrainScore: hitTemp.sort[0] } : {};
+        let fields = {};
+        if (hitTemp.fields !== undefined)
         {
-          hitTemp['_source'][rootKey] = hitTemp[rootKey];
-          delete hitTemp[rootKey];
+          _.keys(hitTemp.fields).forEach((field) =>
+          {
+            fields[field] = hitTemp.fields[field][0];
+          });
+        }
+        return _.extend({}, hitTemp._source, sort, fields, {
+          _index: hitTemp._index,
+          _type: hitTemp._type,
+          _score: hitTemp._score,
+          _id: hitTemp._id,
         });
-      }
-      const sort = hitTemp.sort !== undefined ? { TerrainScore: hitTemp.sort[0] } : {};
-      let fields = {};
-      if (hitTemp.fields !== undefined)
-      {
-        _.keys(hitTemp.fields).forEach((field) =>
-        {
-          fields[field] = hitTemp.fields[field][0];
-        });
-      }
-      return _.extend({}, hitTemp._source, sort, fields, {
-        _index: hitTemp._index,
-        _type: hitTemp._type,
-        _score: hitTemp._score,
-        _id: hitTemp._id,
       });
-    });
+    }
     const aggregations = resultsData.aggregations;
     this.updateResults({ hits, aggregations, rawResult: resultsData }, isAllFields, appendResults, querySize);
   }
@@ -819,6 +824,11 @@ export class ResultsManager extends TerrainComponent<Props>
   private updateM2ErrorState(errors: MidwayErrorItem[], isAllFields?: boolean)
   {
     // TODO: handle myltiple errors.
+    console.log(errors);
+    if (!errors)
+    {
+      return;
+    }
     const err = errors[0];
     let { resultsState } = this.props;
     if (!isAllFields)
@@ -855,11 +865,13 @@ export class ResultsManager extends TerrainComponent<Props>
 
   private handleM2QueryError(response: MidwayQueryResponse, isAllFields?: boolean)
   {
+    console.log('response was ', response);
     this.updateM2ErrorState(response.errors, isAllFields);
   }
 
   private handleM2RouteError(response: MidwayError | string, isAllFields: boolean)
   {
+    console.log('response ', response);
     let errorItems: MidwayErrorItem[];
     if (typeof response === 'string')
     {
