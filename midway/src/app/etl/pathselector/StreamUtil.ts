@@ -190,19 +190,28 @@ export default class StreamUtil
         break;
       // string completed on a colon after a key, so remove the value-less key before fixing
       case ':':
+        console.log(' I SHOULD BE HERE');
         const hangingKeyIndex = rawStringStream.lastIndexOf(',');
-        const droppedFragment = rawStringStream.slice(hangingKeyIndex);
-        const droppedBracketCount = this.handleDroppedBrackets(droppedFragment);
-        for (let count = 0; count < droppedBracketCount; count++)
-        {
-          bracketStack.pop();
-        }
-        correctedString = rawStringStream.slice(0, hangingKeyIndex);
-        // remove leftover single value-less key if still present
-        if (correctedString.slice(-1) === '"')
+        if (hangingKeyIndex === -1)
         {
           correctedString = '';
         }
+        else
+        {
+          const droppedFragment = rawStringStream.slice(hangingKeyIndex);
+          const droppedBracketCount = this.handleDroppedBrackets(droppedFragment);
+          for (let count = 0; count < droppedBracketCount; count++)
+          {
+            bracketStack.pop();
+          }
+          console.log('they index ', hangingKeyIndex);
+          correctedString = rawStringStream.slice(0, hangingKeyIndex);
+        }
+        // remove leftover single value-less key if still present
+        // if (correctedString.slice(-1) === '"')
+        // {
+        //   correctedString = '';
+        // }
         break;
       default:
         // string ended on a value, so drop hanging comma and space
@@ -217,35 +226,38 @@ export default class StreamUtil
         break;
     }
     // double check that resulting string did not propogate up to a value-less key
-    if (correctedString.slice(-1) === ':')
-    {
-      const newHangingKeyIndex = correctedString.lastIndexOf(',');
-      const newDroppedFragment = correctedString.slice(newHangingKeyIndex);
-      const newDroppedBracketCount = this.handleDroppedBrackets(newDroppedFragment);
-      for (let count = 0; count < newDroppedBracketCount; count++)
-      {
-        bracketStack.pop();
-      }
-      correctedString = correctedString.slice(0, newHangingKeyIndex);
-      if (correctedString.slice(-1) === '"')
-      {
-        correctedString = '';
-      }
-    }
+    // if (correctedString.slice(-1) === ':')
+    // {
+    //   const newHangingKeyIndex = correctedString.lastIndexOf(',');
+    //   const newDroppedFragment = correctedString.slice(newHangingKeyIndex);
+    //   const newDroppedBracketCount = this.handleDroppedBrackets(newDroppedFragment);
+    //   for (let count = 0; count < newDroppedBracketCount; count++)
+    //   {
+    //     bracketStack.pop();
+    //   }
+    //   correctedString = correctedString.slice(0, newHangingKeyIndex);
+    //   if (correctedString.slice(-1) === '"')
+    //   {
+    //     correctedString = '';
+    //   }
+    // }
     return [bracketStack, correctedString];
   }
 
   public static formatJsonString(jsonString: string): object
   {
     const results: object = this.completeStream(jsonString);
+    console.log('RESULTS HERE LMAO', results);
     let bracketStack: string[] = results[0];
     const rawStringStream: string = results[1];
     const fixedBracketsAndStringStream = this.fixStringStream(rawStringStream, bracketStack);
     bracketStack = fixedBracketsAndStringStream[0];
     let fixedStringStream: string = fixedBracketsAndStringStream[1];
+    console.log(fixedStringStream);
 
-    if (fixedStringStream === '')
+    if (fixedStringStream === '' || fixedStringStream.slice(-1) === ':')
     {
+      console.log('NO WAY');
       return {};
     }
     if (fixedStringStream.slice(-1) === ',')
@@ -258,6 +270,7 @@ export default class StreamUtil
     }
     else
     {
+      console.log('did i get here');
       while (bracketStack.length > 0)
       {
         const unclosedBracket = bracketStack.pop();

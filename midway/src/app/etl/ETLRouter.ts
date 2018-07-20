@@ -103,6 +103,7 @@ Router.post('/preview', passport.authenticate('access-token-local'), async (ctx,
     const sourceStreamAsString: string = await getSourceStreamPreview(previewName, source, files, request.size, request.rawString);
     if (request.rawString === true)
     {
+      console.log('source stream hi.  ', sourceStreamAsString);
       ctx.body = {
         result: StreamUtil.formatJsonString(sourceStreamAsString),
       };

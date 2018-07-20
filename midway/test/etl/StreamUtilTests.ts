@@ -82,6 +82,9 @@ describe('StreamUtil', () =>
       { value: '[hello]', test: '[peach, apple]', same: '[\'omg\', \'lol\', \'testing\']', meta: 'another test, here, there' },
     '{"stringA": "Hi, I like fruits, vegetables, and friends", "stringB": "my friends are joe, bob, and nancy!"}':
       { stringA: 'Hi, I like fruits, vegetables, and friends', stringB: 'my friends are joe, bob, and nancy!' },
+    '{"hi": "omg", "bye":': {hi: 'omg'},
+    '{"omg": 24, "bye": true, "same": "string", "omg2":': {omg: 24, bye: true, same: 'string'},
+    '{"hi": {"omg":': {},
   };
 
   const formatJsonStringErrorTests =

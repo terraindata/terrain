@@ -267,6 +267,7 @@ class DocumentsHelpers extends ETLHelpers
         if (sliceString.length < CHUNK_SIZE)
         {
           const results = await ETLAjax.fetchPreview(source, size, rawStringOnly, sliceString);
+          console.log('sadfghjkjhgfdghjuk. ', results);
           resolve(results);
         }
         else

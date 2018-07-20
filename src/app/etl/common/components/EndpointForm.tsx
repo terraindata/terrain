@@ -128,6 +128,14 @@ class EndpointForm extends TerrainComponent<Props>
     });
   }
 
+  public componentWillUnmount()
+  {
+    this.props.etlActions({
+      actionType: 'setPreviewObject',
+      previewObject: null,
+    });
+  }
+
   public detectFileConfigFromIntegration(newEndpoint, integration: IntegrationConfig | number): SourceConfig | SinkConfig
   {
     const { integrations, endpoint } = this.props;
