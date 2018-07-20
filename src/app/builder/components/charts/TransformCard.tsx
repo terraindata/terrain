@@ -66,6 +66,7 @@ import Util from 'app/util/Util';
 import PathfinderText from 'builder/components/pathfinder/PathfinderText';
 import FadeInOut from 'common/components/FadeInOut';
 import Switch from 'common/components/Switch';
+import MapUtil from 'util/MapUtil';
 import { TransformQueryUtil } from 'util/TransformQueryUtil';
 import { ElasticQueryResult } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import ESInterpreter from '../../../../../shared/database/elastic/parser/ESInterpreter';
@@ -77,7 +78,6 @@ import { getIndex, getType } from '../../../../database/elastic/blocks/ElasticBl
 import { stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import { M1QueryResponse } from '../../../util/AjaxM1';
-import MapUtil from 'util/MapUtil';
 
 const NUM_BARS = 1000;
 
@@ -461,35 +461,33 @@ class TransformCard extends TerrainComponent<Props>
       let min;
       let max;
       const distances = [];
-      console.log('resp ', resp);
       // Look at all the parents
       resp.result.hits.hits.forEach((hit, i) =>
-       {
-         // If they have a child query field, look through all their children
-         if (hit.childQuery && hit.childQuery.length)
-         {
-            const parentField = Object.keys(hit._source)[0];
-            const childField = Object.keys(hit.childQuery[0]._source)[0];
-            hit.childQuery.forEach((child, j) =>
+      {
+        // If they have a child query field, look through all their children
+        if (hit.childQuery && hit.childQuery.length)
+        {
+          const parentField = Object.keys(hit._source)[0];
+          const childField = Object.keys(hit.childQuery[0]._source)[0];
+          hit.childQuery.forEach((child, j) =>
+          {
+            // Find distance between child and parent
+            const distance = MapUtil.distance(
+              [hit._source[parentField].lat, hit._source[parentField].lon],
+              [child._source[childField].lat, child._source[childField].lon],
+            );
+            if (min === undefined || distance < min)
             {
-             // Find distance between child and parent
-              const distance = MapUtil.distance(
-                [hit._source[parentField].lat, hit._source[parentField].lon],
-                [child._source[childField].lat, child._source[childField].lon]
-               );
-              console.log('distance is ', distance);
-              if (min === undefined || distance < min)
-              {
-                min = distance;
-              }
-              if (max === undefined || distance > max)
-              {
-                max = distance;
-              }
-              distances.push(distance);
-            });
-          }
-        });
+              min = distance;
+            }
+            if (max === undefined || distance > max)
+            {
+              max = distance;
+            }
+            distances.push(distance);
+          });
+        }
+      });
       // let bars = [];
       // keys.forEach((key, i) =>
       // {

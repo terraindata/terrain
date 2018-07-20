@@ -10,6 +10,9 @@
 	}
 	
 	.drag-drop-pf-score {
+		.leaflet-container {
+			margin-top: 12px;
+		}
 		.pf-line-wrapper
 		{	
 			border: 1px solid;
@@ -172,9 +175,6 @@
 				width: 100%;
 				.pf-score-map-component-wrapper {
 					width: 50%;
-					.map-component-search-bar {
-						width: 100%;
-					}
 					#PlacesAutocomplete__root {
 						margin-bottom: 0px;
 					}
@@ -219,15 +219,31 @@
 				min-width: 150px;
 				overflow: hidden;
 				cursor: pointer;
+				width: calc(~"50% - 50px");
 			}
 			.field-name-editing {
 				width: 50%;
 				margin-left: 27px;
+				width: calc(~"50% - 50px");
 				margin-top: 10px;
-				.field-name-editing-label {
-					font-size: 12px;
-					text-transform: uppercase;
-					margin-bottom: 3px;
+				.map-component-search-bar {
+					position: relative;
+				    top: 1px;
+				    left: -10px;
+				    width: 100%;
+				    input {
+				    	background: none;
+				    	border: none;
+				    }
+				}
+			}
+			.field-name-editing-label {
+				font-size: 12px;
+				text-transform: uppercase;
+				margin-bottom: 3px;
+				&.field-name-editing-address {
+					position: relative;
+					top: 11px;
 				}
 			}
 			.field-weight {

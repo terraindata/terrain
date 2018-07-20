@@ -149,7 +149,27 @@ class PathfinderScoreLine extends TerrainComponent<Props>
       newLine = newLine.setIn(['transformData', 'distanceValue'], null);
     }
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath), newLine, false, true);
-    this.setState((state) => ({ editingField: false }));
+    this.setState((state) => ({
+      editingField: false,
+      editingLocation: fieldType === FieldType.Geopoint && !newLine.transformData.distanceValue,
+    }));
+  }
+
+  public renderMapComponent()
+  {
+    const { distanceValue } = this.props.line.transformData;
+    return (
+      <MapComponent
+        geocoder='google'
+        inputValue={distanceValue && distanceValue.address || ''}
+        coordinates={distanceValue && distanceValue.location ? distanceValue.location.reverse() : undefined}
+        debounce={true}
+        canEdit={this.props.pathfinderContext.canEdit}
+        hideZoomControl={false}
+        inputs={this.props.inputs}
+        hideSearchBar={true}
+      />
+    );
   }
 
   public renderTransformChart()
@@ -259,9 +279,10 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
   public handleDropdownClose()
   {
-    this.setState({
+    const newState = {
       editingField: false,
-    });
+    };
+    this.setState(newState);
   }
 
   public handleMapChange(location, address)
@@ -308,12 +329,20 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   {
     const { distanceValue } = this.props.line.transformData;
     return (
-      <div>
+      <div
+        className='field-name-editing'
+      >
+        <div
+          className='field-name-editing-label field-name-editing-address'
+        >
+          Address
+        </div>
         <MapComponent
           geocoder='google'
           inputValue={distanceValue && distanceValue.address || ''}
           coordinates={distanceValue && distanceValue.location ? distanceValue.location : undefined}
           onSubmit={this.handleMapChange}
+          onBlur={this._toggle('editingLocation')}
           debounce={true}
           canEdit={this.props.pathfinderContext.canEdit}
           hideZoomControl={true}
@@ -341,11 +370,17 @@ class PathfinderScoreLine extends TerrainComponent<Props>
       >
         {
           <div className='pf-line pf-score-line-inner'>
+            {
+              this.renderExpandIcon()
+            }
             <EditableField
               editing={editing}
               editComponent={this.renderEditingComponent()}
               readOnlyComponent={
-                <div className='field-name' onClick={this.editingField}>
+                <div
+                  className='field-name'
+                  onClick={this.editingField}
+                >
                   <FloatingInput
                     label={'field'}
                     value={fieldName}
@@ -356,7 +391,6 @@ class PathfinderScoreLine extends TerrainComponent<Props>
                   />
                 </div>
               }
-              style={{ width: '50%' }}
             />
             {
               fieldType === FieldType.Geopoint ?
@@ -403,9 +437,10 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   public render()
   {
     const { field, fieldType, transformData } = this.props.line;
-    const hasExpandable = fieldType !== FieldType.Geopoint ? field != null && field !== '' :
-      field != null && field !== '' && transformData.distanceValue != null;
-    const expandableContent = hasExpandable ? this.renderTransformChart() : null;
+    const expandableChart = field != null && field !== '';
+    const expandableMap = this.state.editingLocation;
+    const expandableContent = expandableMap ? this.renderMapComponent() :
+      expandableChart ? this.renderTransformChart() : null;
     return (
       <PathfinderLine
         canDrag={true}
