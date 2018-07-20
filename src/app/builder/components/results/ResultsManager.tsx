@@ -718,7 +718,7 @@ export class ResultsManager extends TerrainComponent<Props>
     let resultsData = response.getResultsData();
     if (resultsData.hits === undefined)
     {
-      resultsData = { hits: { hits: [] } };
+      resultsData = { hits: { total: 0, max_score: null, hits: [] } };
     }
     if (appendResults && resultsData.hits.hits.length === 0)
     {
