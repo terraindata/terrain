@@ -488,24 +488,33 @@ class TransformCard extends TerrainComponent<Props>
           });
         }
       });
-      // let bars = [];
-      // keys.forEach((key, i) =>
-      // {
-      //   const numKey =
-      //     bars.push({
-      //       id: '' + i,
-      //       count: buckets[key].doc_count,
-      //       percentage: totalDoc ? buckets[key].doc_count / totalDoc : 0,
-      //       range: {
-      //         min: parseFloat(key),
-      //         max: keys[i + 1] !== undefined ? parseFloat(keys[i + 1]) :
-      //           parseFloat(keys[i]) + parseFloat(keys[i]) - parseFloat(keys[i - 1]),
-      //       },
-      //     });
-      // });
-      // this.setState({
-      //   bars: List(bars),
-      // });
+
+      const interval = (max - min) / NUM_BARS;
+      const bars = [];
+      for (let i = 0; i < 1000; i++)
+      {
+        bars.push({
+          id: String(i),
+          count: 0,
+          percentage: 0,
+          range: {
+            min: i * interval + min,
+            madx: (i + 1) * interval + min,
+          },
+        });
+      }
+      distances.forEach((distance, i) =>
+      {
+        const barNum = (distance - min) / interval;
+        const bar = bars[barNum];
+        bar.count += 1;
+        bars[barNum] = bar;
+      });
+      this.setState({
+        bars: List(bars),
+        maxDomain: List([min, max]),
+        chartDomain: List([min, max]),
+      });
     }
   }
   private handleElasticDomainAggregationResponse(resp: MidwayQueryResponse)
