@@ -238,7 +238,7 @@ export default class StreamUtil
     {
       fixedStringStream = fixedStringStream.slice(0, -1);
     }
-    if (bracketStack === [])
+    if (bracketStack.length === 0)
     {
       return JSON.parse(fixedStringStream); // no incomplete parens
     }

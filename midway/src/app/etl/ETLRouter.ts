@@ -100,16 +100,25 @@ Router.post('/preview', passport.authenticate('access-token-local'), async (ctx,
   // get a preview up to "size" rows from the specified source
   try
   {
-    const sourceStreamAsString: string = await getSourceStreamPreview(previewName, source, files, request.size, request.rawString);
+    const sourceStreamPreview: string = await getSourceStreamPreview(previewName, source, files, request.size, request.rawString);
     if (request.rawString === true)
     {
+      let parsedString;
+      try
+      {
+        parsedString = JSON.parse(sourceStreamPreview);
+      }
+      catch (e)
+      {
+        parsedString = StreamUtil.formatJsonString(sourceStreamPreview);
+      }
       ctx.body = {
-        result: StreamUtil.formatJsonString(sourceStreamAsString),
+        result: parsedString,
       };
     }
     else
     {
-      ctx.body = sourceStreamAsString;
+      ctx.body = sourceStreamPreview;
     }
   }
   catch (e)
