@@ -355,7 +355,7 @@
     "thread-loader": "^1.1.2",
     "ts-jest": "^23.0.0",
     "ts-loader": "^4.4.2",
-    "tsc-watch": "^1.0.24",
+    "tsc-watch": "^1.0.26",
     "tsconfig-paths": "^3.4.2",
     "tslint": "^5.10.0",
     "typescript": "^2.9.2",
