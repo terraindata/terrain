@@ -76,13 +76,13 @@ export default abstract class ValidationUtil
 
   public static verifyEngine(eng: TransformationEngine): string[]
   {
-    try {
+    try
+    {
       ValidationUtil.verifyFieldIntegrity(eng);
       ValidationUtil.verifyGraphIntegrity(eng);
     }
     catch (e)
     {
-      console.error(e);
       return [`Error in Engine: ${e}`];
     }
     return [];
@@ -113,8 +113,9 @@ export default abstract class ValidationUtil
       throw new Error(`Graph is not acyclic`);
     }
     // build a cache mapping fields to identity nodes
-    const accumulator: {[k: number]: TransformationNode[]} = {};
-    const addNode = (nodeId: string) => {
+    const accumulator: { [k: number]: TransformationNode[] } = {};
+    const addNode = (nodeId: string) =>
+    {
       const node = dag.node(nodeId);
       if (node.typeCode === TransformationNodeType.IdentityNode)
       {
@@ -129,14 +130,15 @@ export default abstract class ValidationUtil
         throw new Error(`Node id ${node.id} does not match its id in the graph (${nodeId})`);
       }
     };
-    dag.nodes().forEach((nodeId) => {
+    dag.nodes().forEach((nodeId) =>
+    {
       addNode(nodeId);
     });
     // ensure no field has too many organic, synthetic, or removal nodes
     for (const key of Object.keys(accumulator))
     {
       const fieldId = Number(key);
-      const seen: {[k in IdentityTypes]?: boolean} = {};
+      const seen: { [k in IdentityTypes]?: boolean } = {};
       for (const node of accumulator[key])
       {
         const opts = node.meta as IdentityOptions;
@@ -163,7 +165,8 @@ export default abstract class ValidationUtil
       }
     }
     // now check for the graph connectivity for each identity node for each field
-    engine.getAllFieldIDs(true).forEach((fieldId) => {
+    engine.getAllFieldIDs(true).forEach((fieldId) =>
+    {
       if (accumulator[fieldId] === undefined)
       {
         throw new Error(`Field ${fieldId} has no identity nodes`);
@@ -249,9 +252,10 @@ export default abstract class ValidationUtil
   public static verifyFieldIntegrity(eng: TransformationEngine): boolean
   {
     const engine = eng as FriendEngine;
-    const seenIds: {[k: number]: boolean} = {};
-    const seenKps: {[k: string]: boolean} = {};
-    const checkField = (fieldId: number) => {
+    const seenIds: { [k: number]: boolean } = {};
+    const seenKps: { [k: string]: boolean } = {};
+    const checkField = (fieldId: number) =>
+    {
       const kp = engine.getFieldPath(fieldId);
       if (seenIds[fieldId])
       {
@@ -265,7 +269,8 @@ export default abstract class ValidationUtil
       seenKps[Utils.path.hash(kp)] = true;
     };
 
-    engine.getAllFieldIDs(true).forEach((id) => {
+    engine.getAllFieldIDs(true).forEach((id) =>
+    {
       if (etlFieldTypesList.indexOf(Utils.fields.fieldType(id, engine)) === -1)
       {
         throw new Error(`Field ${id} has an invalid type: ${Utils.fields.fieldType(id, engine)}`);
@@ -274,7 +279,8 @@ export default abstract class ValidationUtil
 
     const tree = engine.createTree();
     const rootFields = engine.getAllFieldIDs().filter((id) => engine.getFieldPath(id).size === 1);
-    rootFields.forEach((fieldId) => {
+    rootFields.forEach((fieldId) =>
+    {
       for (const childId of Utils.traversal.preorder(tree, fieldId))
       {
         checkField(childId);
@@ -289,7 +295,8 @@ export default abstract class ValidationUtil
       }
     });
 
-    engine.getAllFieldIDs().forEach((id) => {
+    engine.getAllFieldIDs().forEach((id) =>
+    {
       if (!seenIds[id])
       {
         throw new Error(`Field ${id} with path ${engine.getFieldPath(id)} is disconnected from the tree`);

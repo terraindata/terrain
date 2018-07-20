@@ -138,7 +138,8 @@ export default class DependencyVisitor
     if (opts.type === IdentityTypes.Organic)
     {
       const kp = node.fields.get(0).path;
-      const organics = engine.dag.nodes().filter((n) => {
+      const organics = engine.dag.nodes().filter((n) =>
+      {
         const nd = engine.dag.node(n);
         if (nd.typeCode === TransformationNodeType.IdentityNode)
         {

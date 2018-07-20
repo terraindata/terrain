@@ -84,12 +84,13 @@ export default abstract class Traversal
     const graph = (engine as FriendEngine).dag;
     // const startNode = graph.node(String(nodeId));
 
-    const result = [nodeId];
+    const result = [];
     const visited: { [k: number]: boolean } = {};
     const nodeQueue: number[] = [];
 
     // add a node to the queue of dependencies, the results, and mark it as visited
-    const addNode = (id: number) => {
+    const addNode = (id: number) =>
+    {
       if (id != null && !visited[id])
       {
         visited[id] = true;

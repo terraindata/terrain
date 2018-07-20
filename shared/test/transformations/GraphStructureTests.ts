@@ -71,17 +71,26 @@ function getId(engine: TransformationEngine, kp: any[])
   return engine.getFieldID(KeyPath(kp));
 }
 
-function getDependents(eng: TransformationEngine, fieldId: number): number[]
+function getFieldDependents(eng: TransformationEngine, fieldId: number): number[]
 {
   const engine = eng as FriendEngine;
   const identity = Utils.traversal.findIdentityNode(engine, fieldId);
   return Utils.traversal.findDependencies(engine, identity);
 }
 
+// intersection of field identity node dependencies
 function dependencyIntersection(eng: TransformationEngine, field1: number, field2: number): Set<number>
 {
-  const nodes1 = Set(getDependents(eng, field1));
-  const nodes2 = Set(getDependents(eng, field2));
+  const nodes1 = Set(getFieldDependents(eng, field1));
+  const nodes2 = Set(getFieldDependents(eng, field2));
+  return nodes1.intersect(nodes2);
+}
+
+// intersection of transformation node dependencies
+function nodeIntersection(eng: TransformationEngine, node1: number, node2: number): Set<number>
+{
+  const nodes1 = Set(Utils.traversal.findDependencies(eng, node1));
+  const nodes2 = Set(Utils.traversal.findDependencies(eng, node2));
   return nodes1.intersect(nodes2);
 }
 
@@ -144,4 +153,161 @@ test('test synthetic dependent fields', () =>
   expect(intersection.has(hashId)).toBe(true);
   expect(intersection.has(appendToFooId)).toBe(false);
   expect(Utils.validation.verifyEngine(e)).toEqual([]);
+});
+
+describe('rename structural tests', () =>
+{
+  const doc = {
+    foo: 'hello',
+    b: {
+      c: 'hi',
+      d: 'yo',
+    },
+  };
+
+  const engine = Utils.construction.makeEngine(doc);
+  const fooId = getId(engine, ['foo']);
+  const cId = getId(engine, ['b', 'c']);
+  const dId = getId(engine, ['b', 'd']);
+  const bId = getId(engine, ['b']);
+
+  test('nested renamed fields that should have shared dependencies', () =>
+  {
+    const e = engine.clone();
+    const renameId = e.renameField(bId, KeyPath(['lol']));
+
+    expect(dependencyIntersection(e, bId, cId).size).toBeGreaterThan(0);
+    expect(dependencyIntersection(e, bId, fooId).size).toBe(0);
+
+    expect(nodeIntersection(e, renameId, Utils.traversal.findIdentityNode(e, bId)).size).toBeGreaterThan(0);
+    expect(nodeIntersection(e, renameId, Utils.traversal.findIdentityNode(e, cId)).size).toBeGreaterThan(0);
+    expect(nodeIntersection(e, renameId, Utils.traversal.findIdentityNode(e, dId)).size).toBeGreaterThan(0);
+    expect(Utils.validation.verifyEngine(e)).toEqual([]);
+  });
+
+  test('renamed fields that should not have shared dependencies', () =>
+  {
+    const e = engine.clone();
+
+    const rename1 = e.renameField(fooId, KeyPath(['b', 'foo']));
+    expect(dependencyIntersection(e, fooId, bId).size).toBe(0);
+    const rename2 = e.renameField(fooId, KeyPath(['foo']));
+    expect(dependencyIntersection(e, fooId, bId).size).toBe(0);
+    expect(getFieldDependents(e, fooId)).toContain(rename1);
+    expect(getFieldDependents(e, fooId)).toContain(rename2);
+    expect(Utils.validation.verifyEngine(e)).toEqual([]);
+  });
+
+  test('multi-rename dependency', () =>
+  {
+    const e = engine.clone();
+    const rename1 = e.renameField(fooId, KeyPath(['b', 'foo']));
+    expect(nodeIntersection(e, rename1, Utils.traversal.findIdentityNode(e, bId)).size).toBe(0);
+    const rename2 = e.renameField(bId, KeyPath(['newB']));
+    expect(dependencyIntersection(e, fooId, bId).size).toBeGreaterThan(0);
+    expect(nodeIntersection(e, rename2, Utils.traversal.findIdentityNode(e, bId)).size).toBeGreaterThan(0);
+    expect(Utils.validation.verifyEngine(e)).toEqual([]);
+  });
+});
+
+describe('synthetic graph tests', () =>
+{
+  const doc = {
+    a: 'what',
+    b: 'in',
+    c: 'the',
+    d: 'world',
+  };
+
+  test('tournament style graph', () =>
+  {
+    const e = Utils.construction.makeEngine(doc);
+    const aId = getId(e, ['a']);
+    const bId = getId(e, ['b']);
+    const cId = getId(e, ['c']);
+    const dId = getId(e, ['d']);
+    const a = Utils.traversal.findIdentityNode(e, aId);
+    const b = Utils.traversal.findIdentityNode(e, bId);
+    const c = Utils.traversal.findIdentityNode(e, cId);
+    const d = Utils.traversal.findIdentityNode(e, dId);
+    // semifinals
+    const abJoin = e.appendTransformation(TransformationNodeType.JoinNode, List([aId, bId]), {
+      delimiter: '-',
+      newFieldKeyPaths: wrap(['ab']),
+    });
+    const abId = getId(e, ['ab']);
+    const ab = Utils.traversal.findIdentityNode(e, abId);
+    const cdJoin = e.appendTransformation(TransformationNodeType.JoinNode, List([cId, dId]), {
+      delimiter: '-',
+      newFieldKeyPaths: wrap(['cd']),
+    });
+    const cdId = getId(e, ['cd']);
+    const cd = Utils.traversal.findIdentityNode(e, cdId);
+    const pairIntersection = nodeIntersection(e, a, b);
+    expect(pairIntersection.toArray()).toContain(abJoin);
+    expect(pairIntersection.toArray()).toContain(ab);
+    expect(pairIntersection.size).toBe(2); // join node and the synthId node
+    expect(nodeIntersection(e, c, d).size).toBe(2);
+    expect(nodeIntersection(e, a, d).size).toBe(0);
+    // finals
+    const abcdJoin = e.appendTransformation(TransformationNodeType.JoinNode, List([abId, cdId]), {
+      delimiter: '-',
+      newFieldKeyPaths: wrap(['abcd']),
+    });
+    const abcd = Utils.traversal.findIdentityNode(e, getId(e, ['abcd']));
+    const crossIntersection = nodeIntersection(e, a, d);
+    expect(crossIntersection.toArray()).toContain(abcd);
+    expect(crossIntersection.toArray()).toContain(abcdJoin);
+    expect(crossIntersection.size).toBe(2);
+    expect(Utils.validation.verifyEngine(e)).toEqual([]);
+  });
+
+  test('tournament style with trick renames', () =>
+  {
+    const e = Utils.construction.makeEngine(doc);
+
+    e.renameField(getId(e, ['b']), KeyPath(['temp']));
+    e.renameField(getId(e, ['c']), KeyPath(['b']));
+    e.renameField(getId(e, ['temp']), KeyPath(['c']));
+
+    const aId = getId(e, ['a']);
+    const bId = getId(e, ['b']);
+    const cId = getId(e, ['c']);
+    const dId = getId(e, ['d']);
+    const a = Utils.traversal.findIdentityNode(e, aId);
+    const b = Utils.traversal.findIdentityNode(e, bId);
+    const c = Utils.traversal.findIdentityNode(e, cId);
+    const d = Utils.traversal.findIdentityNode(e, dId);
+
+    // semifinals
+    const abJoin = e.appendTransformation(TransformationNodeType.JoinNode, List([aId, bId]), {
+      delimiter: '-',
+      newFieldKeyPaths: wrap(['ab']),
+    });
+    const abId = getId(e, ['ab']);
+    const ab = Utils.traversal.findIdentityNode(e, abId);
+    const cdJoin = e.appendTransformation(TransformationNodeType.JoinNode, List([cId, dId]), {
+      delimiter: '-',
+      newFieldKeyPaths: wrap(['cd']),
+    });
+    const cdId = getId(e, ['cd']);
+    const cd = Utils.traversal.findIdentityNode(e, cdId);
+    const pairIntersection = nodeIntersection(e, a, b);
+    expect(pairIntersection.toArray()).toContain(abJoin);
+    expect(pairIntersection.toArray()).toContain(ab);
+    expect(pairIntersection.size).toBe(2); // join node and the synthId node
+    expect(nodeIntersection(e, c, d).size).toBe(2);
+    expect(nodeIntersection(e, a, d).size).toBe(0);
+    // finals
+    const abcdJoin = e.appendTransformation(TransformationNodeType.JoinNode, List([abId, cdId]), {
+      delimiter: '-',
+      newFieldKeyPaths: wrap(['abcd']),
+    });
+    const abcd = Utils.traversal.findIdentityNode(e, getId(e, ['abcd']));
+    const crossIntersection = nodeIntersection(e, a, d);
+    expect(crossIntersection.toArray()).toContain(abcd);
+    expect(crossIntersection.toArray()).toContain(abcdJoin);
+    expect(crossIntersection.size).toBe(2);
+    expect(Utils.validation.verifyEngine(e)).toEqual([]);
+  });
 });

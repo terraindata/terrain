@@ -147,74 +147,6 @@ test('array in array in object: identity transformation', () =>
   expect(e.transform(TestDocs.doc7)).toEqual(TestDocs.doc7);
 });
 
-test('transform of deeply nested value', () =>
-{
-  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc3);
-  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['hardarr', 1, 1, 0])]), { format: 'uppercase' });
-  expect(e.transform(TestDocs.doc3)).toEqual(
-    {
-      name: 'Bob',
-      arr: [
-        'sled',
-        [
-          {
-            a: 'dog',
-          },
-          {
-            b: 'doggo',
-            a: 'fren',
-          },
-        ],
-      ],
-      hardarr: [
-        [
-          'a',
-        ],
-        [
-          'b',
-          [
-            'C',
-          ],
-        ],
-      ],
-    },
-  );
-});
-
-test('nested transform with wildcard', () =>
-{
-  const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc3);
-  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['arr', 1, -1, 'a'])]), { format: 'uppercase' });
-  expect(e.transform(TestDocs.doc3)).toEqual(
-    {
-      name: 'Bob',
-      arr: [
-        'sled',
-        [
-          {
-            a: 'DOG',
-          },
-          {
-            a: 'FREN',
-            b: 'doggo',
-          },
-        ],
-      ],
-      hardarr: [
-        [
-          'a',
-        ],
-        [
-          'b',
-          [
-            'c',
-          ],
-        ],
-      ],
-    },
-  );
-});
-
 test('proper wildcard behavior across multiple docs', () =>
 {
   const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc4);
@@ -226,17 +158,6 @@ test('proper wildcard behavior across multiple docs', () =>
     },
   );
 });
-
-// test('(deep) clone a TransformationEngine', () =>
-// {
-//   const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc4);
-//   e.renameField(e.getFieldID(KeyPath(['arr'])), KeyPath(['car']));
-//   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['arr', -1])]), { format: 'uppercase' });
-//   const clone: TransformationEngine = e.clone();
-//   expect(clone.equals(e)).toBe(true);
-//   e.renameField(e.getFieldID(KeyPath(['arr'])), KeyPath(['dog']));
-//   expect(clone.equals(e)).toBe(false);
-// });
 
 test('join two fields', () =>
 {
@@ -1104,6 +1025,8 @@ test('take product of several fields', () =>
 test('take quotient of several fields', () =>
 {
   const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc7);
+  Utils.fields.addIndexedField(e, KeyPath(['deepArray', 0, 0]));
+  Utils.fields.addIndexedField(e, KeyPath(['deepArray', 1, 0]));
   e.appendTransformation(
     TransformationNodeType.QuotientNode,
     List<KeyPath>([KeyPath(['deepArray', 1, 0]), KeyPath(['deepArray', 0, 0])]),
@@ -1117,6 +1040,8 @@ test('take quotient of several fields', () =>
 test('take sum of several fields', () =>
 {
   const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc7);
+  Utils.fields.addIndexedField(e, KeyPath(['deepArray', 0, 0]));
+  Utils.fields.addIndexedField(e, KeyPath(['deepArray', 1, 0]));
   e.appendTransformation(
     TransformationNodeType.SumNode,
     List<KeyPath>([KeyPath(['deepArray', 0, 0]), KeyPath(['deepArray', 1, 0])]),
@@ -1130,6 +1055,8 @@ test('take sum of several fields', () =>
 test('take difference of several fields', () =>
 {
   const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc7);
+  Utils.fields.addIndexedField(e, KeyPath(['deepArray', 0, 0]));
+  Utils.fields.addIndexedField(e, KeyPath(['deepArray', 1, 0]));
   e.appendTransformation(
     TransformationNodeType.DifferenceNode,
     List<KeyPath>([KeyPath(['deepArray', 0, 0]), KeyPath(['deepArray', 1, 0])]),
@@ -1273,17 +1200,10 @@ test('Group By Transformation', () =>
 
 test('numeric keys', () =>
 {
-  // {
-  //   const doc = { 0: { '5': 3, '-1': ['a', 'b'] } };
-  //   const e = Utils.construction.makeEngine(doc);
-  //   e.renameField(e.getFieldID(KeyPath(['0', '5'])), KeyPath(['0', '1']));
-  //   e.renameField(e.getFieldID(KeyPath(['0', '-1'])), KeyPath(['0', '0']));
-  //   e.appendTransformation(TransformationNodeType.CaseNode, List([List(['0', '-1', -1])]), { format: 'uppercase' });
-  //   expect(e.transform(doc)).toEqual({ 0: { 1: 3, 0: ['A', 'B'] } });
-  // }
   {
     const doc = { '-1': [{ z: 1, 1: { 2: 1 } }, { z: 2.5 }] };
     const e = Utils.construction.makeEngine(doc);
+    Utils.fields.addIndexedField(e, KeyPath(['-1', 0, '1', '2']));
     e.appendTransformation(TransformationNodeType.AddNode, List([List(['-1', 0, '1', '2'])]), { shift: 13 });
     e.appendTransformation(TransformationNodeType.AddNode, List([List(['-1', -1, 'z'])]), { shift: 3 });
     expect(e.transform(doc)).toEqual({ '-1': [{ z: 4, 1: { 2: 14 } }, { z: 5.5 }] });

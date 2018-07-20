@@ -210,7 +210,7 @@ export class TransformationEngine
 
   public clone(): TransformationEngine
   {
-    return TransformationEngine.load(this.toJSON());
+    return TransformationEngine.load(_.cloneDeep(this.toJSON()));
   }
 
   /**
@@ -250,15 +250,25 @@ export class TransformationEngine
     {
       if (typeof val === 'number')
       {
+        const path = this.getFieldPath(val);
+        if (path === undefined)
+        {
+          throw new Error('Could not find that ID');
+        }
         return {
           id: val,
-          path: this.getFieldPath(val),
+          path,
         };
       }
       else
       {
+        const id = this.getFieldID(val);
+        if (id === undefined)
+        {
+          throw new Error('Could not find that path');
+        }
         return {
-          id: this.getFieldID(val),
+          id,
           path: val,
         };
       }
