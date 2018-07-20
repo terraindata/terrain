@@ -52,8 +52,9 @@ import * as Utils from 'shared/transformations/util/EngineUtils';
 import LanguageController from 'shared/etl/languages/LanguageControllers';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { DateFormats, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import FriendEngine from 'shared/transformations/FriendEngine';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import TransformationNodeType, { IdentityTypes, NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 
 const etlTypeKeyPath = List(['etlType']);
@@ -63,17 +64,74 @@ const etlTypeKeyPath = List(['etlType']);
  */
 export default class FieldUtil
 {
-  public static addFieldToEngine(engine: TransformationEngine, keypath: KeyPath, type: FieldTypes): number
+  /*
+   *  Use this for organic fields
+   */
+  public static addFieldToEngine(engine: TransformationEngine, keypath: KeyPath, type: FieldTypes, node?: number): number
   {
     const cfg = {
       etlType: type,
     };
-    return engine.addField(keypath, cfg);
+    return engine.addField(keypath, cfg, node);
+  }
+
+  /*
+   *  Add a field but attempt to infer pre-existing transformations and perform a replay on renames
+   */
+  public static addInferredField(engine: TransformationEngine, keypath: KeyPath, type: FieldTypes): number
+  {
+    const inferred = Utils.traversal.findInferredSources(engine as FriendEngine, keypath);
+    if (inferred == null) // then organic and parentless
+    {
+      return FieldUtil.addFieldToEngine(engine, keypath, type);
+    }
+    const { parentId, syntheticSource, renames } = inferred;
+
+    const graph = (engine as FriendEngine).dag;
+    const parentIdentity = Utils.traversal.findIdentityNode(engine, parentId);
+    const parentNode = graph.node(String(parentIdentity));
+    const initialParentPath = parentNode.fields.get(0).path;
+    const finalParentPath = engine.getFieldPath(parentId);
+
+    // we need to "replay" all renames that occured on the parent
+    const childSegment = keypath.slice(finalParentPath.size);
+    const indices = keypath.filter((wp) => typeof wp === 'number');
+    const pathTranslator = (parentPath: KeyPath) =>
+    {
+      let specifiedIndex = 0;
+      for (let i = 0; i < parentPath.size; i++)
+      {
+        if (typeof parentPath.get(i) === 'number')
+        {
+          parentPath = parentPath.set(i, indices.get(specifiedIndex));
+          specifiedIndex++;
+        }
+      }
+      return parentPath.concat(childSegment).toList();
+    };
+
+    const fieldId = FieldUtil.addFieldToEngine(
+      engine, pathTranslator(initialParentPath), type, syntheticSource == null ? undefined : syntheticSource);
+    for (const rename of renames)
+    {
+      const renameSource = Utils.traversal.findIdentitySourceNode(engine, Number(rename));
+      const parentRename = graph.node(String(rename));
+      const fieldPath = pathTranslator(parentRename.fields.get(0).path);
+      (engine as FriendEngine).setFieldPath(fieldId, fieldPath);
+      (engine as FriendEngine).addIdentity(fieldId, renameSource, IdentityTypes.Rename);
+    }
+    return fieldId;
   }
 
   // add field, but infer the type
   public static addIndexedField(engine: TransformationEngine, keypath: KeyPath): number
   {
+    const existingId = engine.getFieldID(keypath);
+    if (existingId !== undefined)
+    {
+      return existingId;
+    }
+
     const pathToCheck = Utils.path.convertIndices(keypath);
     const id = engine.getFieldID(pathToCheck);
     if (id === undefined)
@@ -82,7 +140,8 @@ export default class FieldUtil
     }
     else
     {
-      return FieldUtil.addFieldToEngine(engine, keypath, FieldUtil.fieldType(id, engine));
+      // return FieldUtil.addFieldToEngine(engine, keypath, FieldUtil.fieldType(id, engine));
+      return FieldUtil.addInferredField(engine, keypath, FieldUtil.fieldType(id, engine));
     }
   }
 

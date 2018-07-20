@@ -128,7 +128,6 @@ interface TransformationOptionTypes extends HasCommon<TransformationOptionTypes>
   // FilterNode: any;
   DuplicateNode: {
     newFieldKeyPaths: List<KeyPath>;
-    extractionPath?: KeyPath;
   };
   InsertNode: {
     at?: number;

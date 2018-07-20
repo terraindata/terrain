@@ -149,11 +149,7 @@ export default class CreationVisitor
     this.processInputFields(engine, node, EdgeTypes.Synthetic);
     // add all child fields of the original field
     const sourceId = node.fields.get(0).id;
-    let sourcePath = node.fields.get(0).path;
-    if (opts.extractionPath !== undefined)
-    {
-      sourcePath = opts.extractionPath;
-    }
+    const sourcePath = node.fields.get(0).path;
     const destPath = opts.newFieldKeyPaths.get(0);
     const [r1, r2] = Utils.topology.getRelation(sourcePath, destPath);
 

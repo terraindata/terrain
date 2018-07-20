@@ -104,14 +104,16 @@ export class EngineProxy
 
   public addTransformation(
     type: TransformationNodeType,
-    fields: List<EnginePath>,
+    fields: List<EnginePath | number>,
     options: {
       newFieldKeyPaths?: List<EnginePath>;
       [k: string]: any;
     },
   ): number
   {
-    const origFieldId = this.engine.getFieldID(fields.get(0));
+    const firstField = fields.get(0);
+    const origFieldId = typeof firstField === 'number' ? firstField : this.engine.getFieldID(firstField);
+
     const nodeId = this.engine.appendTransformation(type, fields, options);
 
     if (options.newFieldKeyPaths !== undefined)
@@ -158,14 +160,15 @@ export class EngineProxy
       throw new Error('Cannot extract array field, source keypath is empty');
     }
     const specifiedSourceKP = sourceKP.set(sourceKP.size - 1, index);
+    const specifiedSourceId = Utils.fields.addIndexedField(this.engine, specifiedSourceKP);
+
     const options: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
       newFieldKeyPaths: List([destKP]),
-      extractionPath: specifiedSourceKP,
     };
 
     this.addTransformation(
       TransformationNodeType.DuplicateNode,
-      List([sourceKP]),
+      List([specifiedSourceId]),
       options,
     );
     const parentKP = sourceKP.slice(0, -1).toList();
@@ -189,12 +192,12 @@ export class EngineProxy
     let newId: number;
     if (type === FieldTypes.Array)
     {
-      newId = this.addFieldToEngine(keypath, type);
-      const wildId = this.addFieldToEngine(keypath.push(-1), childType);
+      newId = this.addInferredField(keypath, type);
+      const wildId = this.addInferredField(keypath.push(-1), childType);
     }
     else
     {
-      newId = this.addFieldToEngine(keypath, type);
+      newId = this.addInferredField(keypath, type);
     }
     Utils.transformations.castField(this.engine, newId, type);
     this.requestRebuild();
@@ -206,7 +209,7 @@ export class EngineProxy
     const pathToAdd = List([name]);
     if (Utils.validation.canAddField(this.engine, -1, pathToAdd).isValid)
     {
-      this.addField(pathToAdd, type);
+      this.addInferredField(pathToAdd, type);
       this.requestRebuild();
     }
   }
@@ -251,12 +254,12 @@ export class EngineProxy
     return nodeId;
   }
 
-  private addFieldToEngine(
+  private addInferredField(
     keypath: KeyPath,
     etlType: FieldTypes,
   ): number
   {
-    return Utils.fields.addFieldToEngine(this.engine, keypath, etlType);
+    return Utils.fields.addInferredField(this.engine, keypath, etlType);
   }
 }
 

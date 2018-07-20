@@ -311,3 +311,26 @@ describe('synthetic graph tests', () =>
     expect(Utils.validation.verifyEngine(e)).toEqual([]);
   });
 });
+
+test('test index specified fields', () =>
+{
+  const doc = {
+    item: [0, 1, 2],
+    foo: 5,
+  };
+
+  const e = Utils.construction.makeEngine(doc);
+  const itemId = getId(e, ['item']);
+  const index1Id = Utils.fields.addIndexedField(e, KeyPath(['item', 1]));
+  const fooId = getId(e, ['foo']);
+
+  e.appendTransformation(TransformationNodeType.DuplicateNode, List([index1Id]), {
+    newFieldKeyPaths: wrap(['extracted']),
+  });
+
+  const extractedId = getId(e, ['extracted']);
+  const extractedNodeId = Utils.traversal.findIdentityNode(e, extractedId);
+  const index1NodeId = Utils.traversal.findIdentityNode(e, index1Id);
+  expect(Utils.traversal.findDependencies(e, index1NodeId)).toContain(extractedNodeId);
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
+});

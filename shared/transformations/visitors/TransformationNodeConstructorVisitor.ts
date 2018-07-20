@@ -77,7 +77,6 @@ export default class ConstructorVisitor
   extends TransformationNodeVisitor<TransformationNode, ConstructionArgs>
 {
   public visitorLookup: VisitorLookupMap<TransformationNode, ConstructionArgs> = {
-    [TransformationNodeType.DuplicateNode]: this.visitDuplicateNode,
   };
 
   constructor()
@@ -119,19 +118,5 @@ export default class ConstructorVisitor
       args as NodeArgs;
 
     return new ctor(id, fields, meta);
-  }
-
-  public visitDuplicateNode(type: TransformationNodeType, node: undefined, args: ConstructionArgs)
-  {
-    const newNode = this.visitDefault(type, node, args);
-    if (args.deserialize)
-    {
-      const options = newNode.meta as NodeOptionsType<TransformationNodeType.DuplicateNode>;
-      if (options.extractionPath !== undefined)
-      {
-        options.extractionPath = KeyPath(options.extractionPath as any);
-      }
-    }
-    return newNode;
   }
 }

@@ -52,6 +52,7 @@ const { List, Map } = Immutable;
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import FriendEngine from 'shared/transformations/FriendEngine';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
@@ -69,6 +70,7 @@ const DependencyVisitor = new DependencyVisitorC();
 
 import * as TerrainLog from 'loglevel';
 
+type IdentityOptions = NodeOptionsType<TransformationNodeType.IdentityNode>;
 /*
  *  Utility class for performing common operations on
  *    - The graph structure of the transformation nodes
@@ -137,6 +139,90 @@ export default abstract class Traversal
     return -1;
   }
 
+  /*
+   *  Find the transformation node that is responsible for creating the provided identity node
+   */
+  public static findIdentitySourceNode(engine: TransformationEngine, identity: number): number
+  {
+    const graph = (engine as FriendEngine).dag;
+    const inNodes = graph.predecessors(String(identity));
+    let creator: number;
+    if (inNodes !== undefined)
+    {
+      for (const v of inNodes)
+      {
+        if (graph.edge(v, String(identity)) === EdgeTypes.Synthetic)
+        {
+          creator = Number(v);
+          break;
+        }
+      }
+    }
+    return creator;
+  }
+
+  /*
+   *  Find the source node and rename nodes that should point to the provided keypath
+   *  If returns null, then there is no parent field
+   *  Provides syntheticSource if parent is synthetic
+   */
+  public static findInferredSources(engine: TransformationEngine, path: KeyPath)
+    : { parentId: number, syntheticSource: number, renames: number[] }
+  {
+    const graph = (engine as FriendEngine).dag;
+    let parentId: number;
+    for (let i = path.size - 1; i > 1; i--)
+    {
+      const parentPath = Utils.path.convertIndices(path.slice(0, i).toList());
+      if (Utils.path.isNamed(parentPath))
+      {
+        const potentialId = engine.getFieldID(parentPath);
+        if (potentialId !== undefined)
+        {
+          parentId = potentialId;
+          break;
+        }
+      }
+    }
+    if (parentId === undefined)
+    {
+      return null;
+    }
+    const creator = Traversal.findIdentitySourceNode(engine, Traversal.findIdentityNode(engine, parentId));
+    const identityNodes = Traversal.findAllIdentityNodes(engine, parentId);
+    const renameNodes = identityNodes.filter(
+      (nId) => (graph.node(String(nId)).meta as IdentityOptions).type === IdentityTypes.Rename,
+    );
+    return {
+      syntheticSource: creator,
+      renames: renameNodes,
+      parentId,
+    };
+  }
+
+  public static replayRenames()
+  {
+
+  }
+
+  // finds all identity nodes that belong to the field
+  public static findAllIdentityNodes(engine: TransformationEngine, fieldId: number): number[]
+  {
+    const start = Traversal.findIdentityNode(engine, fieldId);
+    const graph = (engine as FriendEngine).dag;
+    const identityNodes = [start];
+    Traversal.walk(engine, start, (edges) =>
+    {
+      const edge = edges.find((e) => graph.edge(e) !== EdgeTypes.Synthetic);
+      if (edge != null && graph.node(edge.w).typeCode === TransformationNodeType.IdentityNode)
+      {
+        identityNodes.push(Number(edge.w));
+      }
+      return edge;
+    });
+    return identityNodes;
+  }
+
   // find the last non-synthetic transformation associated with the field
   public static findEndTransformation(engine: TransformationEngine, field: number): number
   {
@@ -146,6 +232,22 @@ export default abstract class Traversal
     {
       return -1;
     }
+    let node = startId;
+    Traversal.walk(engine, startId, (edges) =>
+    {
+      const edge = edges.find((e) => graph.edge(e) !== EdgeTypes.Synthetic);
+      if (edge != null)
+      {
+        node = Number(edge.w);
+      }
+      return edge;
+    });
+    return node;
+  }
+
+  public static walk(engine: TransformationEngine, startId: number, choosePath: (edges: Edge[]) => Edge)
+  {
+    const graph = (engine as FriendEngine).dag;
 
     let node = String(startId);
     for (let i = 0; i < graph.nodeCount(); i++)
@@ -153,19 +255,18 @@ export default abstract class Traversal
       const edges = graph.outEdges(node);
       if (!Array.isArray(edges))
       {
-        return Number(node);
+        return;
       }
       else
       {
-        const edge = edges.find((e) => graph.edge(e) !== EdgeTypes.Synthetic);
+        const edge = choosePath(edges);
         if (edge == null)
         {
-          return Number(node);
+          return;
         }
         node = edge.w;
       }
     }
-    return -1;
   }
 
   public static appendNodeToField(engine: TransformationEngine, fieldId: number, nodeId: number, edgeType: EdgeTypes)
