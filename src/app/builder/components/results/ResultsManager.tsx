@@ -499,29 +499,41 @@ export class ResultsManager extends TerrainComponent<Props>
       return;
     }
     const interpreter: ESInterpreter = new ESInterpreter(query.tql, toInputMap(query.inputs));
-    if (interpreter.hasError())
+    if (query.tqlMode !== 'manual')
     {
-      TerrainLog.debug('Query has errors: ' + interpreter.getErrors());
-      const errorMsg = new MidwayError(200, 'Detected ' + interpreter.getErrors().length + ' errors.', '', {});
-      this.handleM2RouteError(errorMsg, false);
-      return;
+      if (interpreter.hasError())
+      {
+        TerrainLog.debug('Query has errors: ' + interpreter.getErrors());
+        const errorMsg = new MidwayError(200, 'Detected ' + interpreter.getErrors().length + ' errors.', '', {});
+        this.handleM2RouteError(errorMsg, false);
+        return;
+      }
+      // we only post-process the query in the `auto` mode
+      this.postprocessEQL(interpreter, hitsPage, appendResults);
+    } else
+    {
+      // manual mode, we only check JSON parsing errors
+      if (interpreter.hasJSONParsingError())
+      {
+        TerrainLog.debug('Query has JSON format errors: ' + JSON.stringify(interpreter.parser.getErrorMessages()));
+        return;
+      }
+      // NOTE: Don't call handleM2RouteError here, it triggers the infinite rendering loop.
     }
+    const eql = interpreter.finalQuery;
     if (interpreter.hasError())
     {
       TerrainLog.debug('Query has errors after updating from and size: ' + interpreter.getErrors());
-      return;
     }
-    let eql = interpreter.finalQuery;
+    TerrainLog.debug('Issue query ' + eql);
     if (this.state.query && this.state.query.xhr)
     {
       this.state.query.xhr.cancel();
     }
-    eql = this.postprocessEQL(interpreter, hitsPage, appendResults);
     if (query.path)
     {
       querySize = query.path.source.count;
     }
-    TerrainLog.debug('Issue query ' + eql);
     this.setState({
       lastQuery: query,
       queriedTql: eql,

@@ -44,60 +44,49 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
+import * as ip from 'ip';
 
-import * as App from '../App';
-import IntegrationConfig from '../integrations/IntegrationConfig';
-import Integrations from '../integrations/Integrations';
-import { MidwayLogger } from '../log/MidwayLogger';
+import * as jsonfile from 'jsonfile';
 
-const Router = new KoaRouter();
-const integrations: Integrations = new Integrations();
-export const initialize = () => integrations.initialize();
+import * as puppeteer from 'puppeteer';
+import { TestLogger } from '../../../../shared/test/TestLogger';
+import { createAndLoadFirstLiveAlgorithm, getChromeDebugAddress, login } from '../../../FullstackUtils';
 
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+describe('Testing the library related actions', () =>
 {
-  const fullBody = ctx.request.body['body'];
-  const description = JSON.stringify(fullBody.description);
-  const user = JSON.stringify(fullBody.user);
-  const browserInfo = JSON.stringify(fullBody.browserInfo);
-  let subject: string = '';
-  let body: string;
-  ctx.status = 200;
-  const emailIntegrations: IntegrationConfig[] = await integrations.get(null, undefined, 'Email', true) as IntegrationConfig[];
-  MidwayLogger.info('email integrations: ' + JSON.stringify(emailIntegrations));
-  if (emailIntegrations.length !== 1)
-  {
-    MidwayLogger.warn(`Invalid number of email integrations, found ${emailIntegrations.length}`);
-  }
-  else if (emailIntegrations.length === 1 && emailIntegrations[0].name !== 'Default Failure Email')
-  {
-    MidwayLogger.warn('Invalid Email found.');
-  }
-  else
-  {
-    let attachment: object;
-    if (fullBody.bug)
-    {
-      subject = 'Bug report from ' + user;
-      body = 'A user has submitted a bug report detailed below. \n \n' + description + '\n \n Browser/OS information: ' + browserInfo;
-    }
-    else
-    {
-      subject = 'Feedback report from ' + user;
-      body = 'A user has submitted a feedback report detailed below. \n \n' + description + '\n \n Browser/OS information: ' + browserInfo;
-    }
-    if (fullBody.screenshot)
-    {
-      attachment = [{
-        path: fullBody.screenshot,
-      }];
-    }
-    // MidwayLogger.info("id: " + emailIntegrations[0].id);
-    const emailSendStatus: boolean = await App.EMAIL.send(emailIntegrations[0].id, subject, body, attachment);
-    MidwayLogger.info(`Feedback email ${emailSendStatus === true ? 'sent successfully' : 'failed'}`);
-  }
-});
+  let browser;
+  let page;
 
-export default Router;
+  beforeAll(async (done) =>
+  {
+    const wsAddress = await getChromeDebugAddress();
+    browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
+    // browser = await puppeteer.launch({ headless: false });
+    TestLogger.info('Connected to the Chrome ' + String(wsAddress));
+    page = await browser.newPage();
+    TestLogger.info('Created a new browser page.');
+    await page.setViewport({ width: 1600, height: 1200 });
+    TestLogger.info('Set the page view to 1600x1200.');
+    done();
+  });
+
+  afterAll(async (done) =>
+  {
+    await page.close();
+    TestLogger.info('The page is closed');
+    await browser.disconnect();
+    TestLogger.info('The chrome connection is closed');
+    done();
+  });
+
+  it('Create first live algorithm', async (done) =>
+  {
+    const url = `http://${ip.address()}:3000`;
+    TestLogger.info('Get url:' + url);
+    await login(page, url);
+    const id = await createAndLoadFirstLiveAlgorithm(page);
+    TestLogger.info('Create IDs: ' + JSON.stringify(id));
+    expect(id).toEqual({ catid: 1, groupid: 2, algid: 3 });
+    done();
+  }, 30000);
+});

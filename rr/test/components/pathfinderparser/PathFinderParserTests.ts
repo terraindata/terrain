@@ -50,7 +50,7 @@ import * as jsonfile from 'jsonfile';
 
 import * as puppeteer from 'puppeteer';
 import { TestLogger } from '../../../../shared/test/TestLogger';
-import { getChromeDebugAddress, login } from '../../../FullstackUtils';
+import { getChromeDebugAddress, login, waitForInput } from '../../../FullstackUtils';
 
 const USERNAME_SELECTOR = '#login-email';
 
@@ -68,14 +68,22 @@ describe('Testing the pathfinder parser', () =>
 {
   let browser;
   let page;
+  let actionFileData;
   let actions;
+  let updateTest = false;
+  let mutated = false;
 
-  beforeAll(async () =>
+  beforeAll(async (done) =>
   {
     const actionFileName = getExpectedActionFile();
-    const actionFileData = jsonfile.readFileSync(actionFileName);
+    actionFileData = jsonfile.readFileSync(actionFileName);
     actions = actionFileData.actions;
     TestLogger.info('Testing ' + String(actions.length) + ' queries.');
+    if (actionFileData.updateTest === true)
+    {
+      TestLogger.warn('The test data will be updated by this run.');
+      updateTest = true;
+    }
     const wsAddress = await getChromeDebugAddress();
     browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
     // browser = await puppeteer.launch({ headless: false });
@@ -84,13 +92,14 @@ describe('Testing the pathfinder parser', () =>
     TestLogger.info('Created a new browser page.');
     await page.setViewport({ width: 1600, height: 1200 });
     TestLogger.info('Set the page view to 1600x1200.');
+    done();
+  });
+
+  it('pathfinder parser test', async (done) =>
+  {
     const url = `http://${ip.address()}:3000`;
     TestLogger.info('Get url:' + url);
     await login(page, url);
-  });
-
-  it('pathfinder parser test', async () =>
-  {
     for (let i = 0; i < actions.length; i++)
     {
       const thisAction = JSON.parse(actions[i].action);
@@ -104,13 +113,60 @@ describe('Testing the pathfinder parser', () =>
         return window['TerrainTools'].terrainTests.PathFinderToQuery(theQuery);
       }, query);
       TestLogger.info('Parsing item' + String(i) + ':' + JSON.stringify(actions[i]));
-      expect(tql).toBe(query.tql);
+      if (updateTest === true)
+      {
+        try
+        {
+          expect(tql).toBe(query.tql);
+        } catch (err)
+        {
+          if (actionFileData.interactiveUpdating === true)
+          {
+            TestLogger.info(String(err.message) + '\n Do you want to update this one?');
+            const answer = await waitForInput('Type y for YES, n for NO, then press Enter:');
+            if (answer === 'y')
+            {
+              query.tql = tql;
+              mutated = true;
+              TestLogger.info('Updated the test data to:\n' + String(tql));
+            } else
+            {
+              TestLogger.info('Avoid updating this test, keep going.');
+            }
+          } else
+          {
+            query.tql = tql;
+            mutated = true;
+            TestLogger.info('There are errors when checking the data, updating now');
+          }
+        }
+      } else
+      {
+        expect(tql).toBe(query.tql);
+      }
     }
+    done();
   }, 30000);
 
-  afterAll(async () =>
+  afterAll(async (done) =>
   {
+    if (actionFileData.updateTest === true)
+    {
+      if (mutated === true)
+      {
+        const actionFileName = getExpectedActionFile();
+        const timestamp = Date();
+        actionFileData.timestamp = timestamp;
+        jsonfile.writeFileSync(actionFileName, actionFileData);
+      } else
+      {
+        TestLogger.info('The data is clean. Do not need to update the data.');
+      }
+    }
     await page.close();
     TestLogger.info('The page is closed');
+    await browser.disconnect();
+    TestLogger.info('The chrome connection is closed');
+    done();
   });
 });

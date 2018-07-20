@@ -172,7 +172,7 @@ async function recordBuilderActions(browser, url, column: 'builder' | 'pathfinde
   actions = filteringRecordBuilderActions(actions);
   await page.close();
   const timestamp = Date();
-  return { timestamp, records, actions };
+  return { timestamp, updateTest: false, interactiveUpdating: false, records, actions };
 }
 
 async function rr()
@@ -250,6 +250,7 @@ async function rr()
       {
         await startBuilder(page);
       }
+      const replayPostProcess = (action) => true;
       await replayRREvents(page, url, actions, serializeRecords, async (action) =>
       {
         if (action.eventType)
@@ -265,11 +266,16 @@ async function rr()
             return false;
           }
         }
-        return true;
+        return replayPostProcess(action);
       }, async (action) =>
         {
           if (action.eventType === 'mousedown')
           {
+            if (action.selector === ':nth-child(5) > .tabs-action-piece'
+              || action.selector === ':nth-child(7) > .editor-top-bar-item')
+            {
+              sleep.sleep(4);
+            }
             if (action.selector === 'etl-step-big-button')
             {
               sleep.sleep(10);

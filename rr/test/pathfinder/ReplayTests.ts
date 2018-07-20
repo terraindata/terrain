@@ -110,16 +110,17 @@ describe('Replay a builder action', () =>
   let browser;
   let page;
   let actionFileData;
-  beforeAll(async () =>
+  beforeAll(async (done) =>
   {
     const wsAddress = await getChromeDebugAddress();
     browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
     TestLogger.info('Connected to the Chrome ' + wsAddress);
     actionFileData = jsonfile.readFileSync(getExpectedActionFile());
+    done();
     // loading from options['directory']/actions.json
   });
 
-  it('builder-replay', async () =>
+  it('builder-replay', async (done) =>
   {
     page = await browser.newPage();
     await page.setViewport({ width: 1600, height: 1200 });
@@ -135,11 +136,14 @@ describe('Replay a builder action', () =>
       await takeBuilderActionScreenshot(page);
       return true;
     });
+    done();
   }, 600000);
 
-  afterAll(async () =>
+  afterAll(async (done) =>
   {
     await page.close();
     TestLogger.info('The page is closed.');
+    await browser.disconnect();
+    done();
   });
 });
