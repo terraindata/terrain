@@ -47,7 +47,9 @@ THE SOFTWARE.
 import arrayTypeOfValues = require('array-typeof-values');
 import * as GraphLib from 'graphlib';
 import { List, Map } from 'immutable';
+import memoizeOne from 'memoize-one';
 import isPrimitive = require('is-primitive');
+import { instanceFnDecorator } from 'shared/util/Classes';
 import * as _ from 'lodash';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import { KeyPath } from '../util/KeyPath';
@@ -144,68 +146,6 @@ export class TransformationEngine
   constructor()
   {
 
-  }
-
-  /*
-   *  Keep this around until we're confident in our graph structure
-   */
-  public debug()
-  {
-    function pathStr(path: KeyPath)
-    {
-      if (path === undefined || path.size === 0)
-      {
-        return '';
-      }
-      let str = String(path.get(0));
-      for (let i = 1; i < path.size; i++)
-      {
-        str += `.${path.get(i)}`;
-      }
-      return str;
-    }
-    let res = '';
-    function print(str: string)
-    {
-      res += str + '\n';
-    }
-    print('-------------------------------');
-    this.dag.nodes().forEach((id: any) =>
-    {
-      id = Number(id);
-      const node = this.dag.node(id);
-      print(`NODE ${id}: ${node.typeCode}`);
-      let inputs = '';
-      node.fields.forEach(({ path }) =>
-      {
-        inputs += `${pathStr(path)}, `;
-      });
-      print(`  Inputs: ${inputs}`);
-      if (node.meta.newFieldKeyPaths !== undefined)
-      {
-        let outputs = '';
-        node.meta.newFieldKeyPaths.forEach((path) =>
-        {
-          outputs += `${pathStr(path)}, `;
-        });
-        print(`  Outputs: ${outputs}`);
-      }
-      const successors = this.dag.successors(id);
-      if (successors !== undefined)
-      {
-        let edges = '';
-        successors.forEach((toId) =>
-        {
-          edges += `${toId} (${this.dag.edge(id, toId)}), `;
-        });
-        print(`  Out Edges: ${edges}`);
-      }
-      else
-      {
-        print('  No Edges');
-      }
-    });
-    return res;
   }
 
   public clone(): TransformationEngine
@@ -362,8 +302,7 @@ export class TransformationEngine
 
     const id = this.uidField;
     this.uidField++;
-
-    this.IDToPathMap = this.IDToPathMap.set(id, fullKeyPath);
+    this.setFieldPath(id, fullKeyPath);
     this.fieldEnabled = this.fieldEnabled.set(id, true);
     this.fieldProps = this.fieldProps.set(id, options);
     const identityId = this.addIdentity(id, sourceNode, sourceNode !== undefined ? IdentityTypes.Synthetic : undefined);
@@ -477,7 +416,17 @@ export class TransformationEngine
 
   public getFieldID(path: KeyPath): number
   {
-    return this.IDToPathMap.keyOf(path);
+    return this._getFieldIDCache(this.IDToPathMap).get(Utils.path.hash(path));
+  }
+
+  @instanceFnDecorator(memoizeOne)
+  public _getFieldIDCache(pathMap: Map<number, KeyPath>): Map<string, number>
+  {
+    const reverseMap: { [k: string]: number } = {};
+    pathMap.forEach((path, id) => {
+      reverseMap[Utils.path.hash(path)] = id;
+    });
+   return Map<string, number>(reverseMap);
   }
 
   public renameField(fieldID: number, newPath: KeyPath): number
