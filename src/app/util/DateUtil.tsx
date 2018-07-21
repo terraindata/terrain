@@ -112,15 +112,19 @@ const DateUtil =
 
   formatSpecificDate(date)
   {
-    if (date.toLowerCase() === 'now')
+    const isNowSpecified = (date[date.length - 2] === '/');
+    const isPastDate = date.includes('-');
+    const isFutureDate = date.includes('+');
+    const isCurrentSpecified = (isNowSpecified && !isPastDate && !isFutureDate);
+    if (date.toLowerCase() === 'now' || isCurrentSpecified)
     {
       return 'now';
     }
     let tense;
     let dateParser;
     let plural;
-    const elasticUnit = date.slice(-1);
-    if (date.includes('+'))
+    const elasticUnit = (isNowSpecified) ? date[date.length - 3] : date.slice(-1);
+    if (isFutureDate)
     {
       tense = 'from now';
       dateParser = '+';
@@ -132,7 +136,7 @@ const DateUtil =
     }
     const parsedDate = date.split(dateParser);
     const dateDetails = parsedDate[1];
-    const amount = dateDetails.slice(0, -1);
+    const amount = (isNowSpecified) ? dateDetails.slice(0, -3) : dateDetails.slice(0, -1);
     const unit = (DateUnitMap[elasticUnit].slice(0, -3)).toLowerCase();
     if (amount !== '1')
     {
@@ -145,11 +149,30 @@ const DateUtil =
     return amount + ' ' + unit + plural + ' ' + tense;
   },
 
+  hasProperElasticSegments(splitDate)
+  {
+    for (let i = 0; i < splitDate.length; i++)
+    {
+      let dateSegment = splitDate[i];
+      let segmentLength = dateSegment.length;
+      let segmentStart = dateSegment[0];
+      let segmentEnd = dateSegment[segmentLength - 1];
+      if (segmentStart === '-' || segmentEnd === '-' || segmentStart === '+' || segmentEnd === '-')
+      {
+        return false
+      }
+    }
+  },
+
   isValidElasticDateParameter(date)
   {
     const properNow = date.slice(0, 3).toLowerCase();
     const properSign = date[3];
-    const properUnit = date.slice(-1);
+    const isSpecified = (date[date.length - 2] === '/');
+    const properSpecification = (isSpecified) ? date.slice(-1) : '';
+    const properUnit = (isSpecified) ? date[date.length - 3] : date.slice(-1);
+    const splitDate = date.split(properSign);
+    const hasAdjacentSigns = DateUtil.hasProperElasticSegments(splitDate);
     const properAmount = date.slice(4);
     const properNumber = date.slice(4, -1);
     return ((date.toLowerCase() === 'now') || ((properNow === 'now') &&

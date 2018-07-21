@@ -146,13 +146,24 @@ export const DateUnitArray = [
   'y',
 ];
 const DateUnitOptions = Immutable.List(DateUnitArray);
+const DateSpecificityArray = [
+  '',
+  'm',
+  'h',
+  'd',
+  'w',
+  'M',
+  'y',
+];
+const DateSpecificityOptions = Immutable.List(DateSpecificityArray);
 const DateSpecificityMap = {
-  m: 'Minute',
-  h: 'Hour',
-  d: 'Day',
-  w: 'Week',
-  M: 'Month',
-  y: 'Year',
+  '': 'Unspecified',
+  'm': 'Minute',
+  'h': 'Hour',
+  'd': 'Day',
+  'w': 'Week',
+  'M': 'Month',
+  'y': 'Year',
 };
 const DateSpecificityMapImmu = Immutable.Map(DateSpecificityMap);
 
@@ -192,6 +203,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
           sign: updatedState[0],
           unit: updatedState[1],
           amount: updatedState[2],
+          specificity: updatedState[3],
         },
       );
     }
@@ -295,7 +307,9 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     {
       newSign = '-';
     }
-    const nextUnit = newDate.slice(-1);
+    const specificityIndex = newDate.length - 2;
+    const isSpecified = (newDate[specificityIndex] === '/');
+    const nextUnit = (isSpecified) ? newDate[newDate.length -3] : newDate.slice(-1);
     if (DateUnitArray.includes(nextUnit) && newDate.toLowerCase() !== 'now')
     {
       newUnit = nextUnit;
@@ -304,8 +318,9 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     {
       newUnit = 'M';
     }
-    const newAmount = newDate.slice(4, -1);
-    return [newSign, newUnit, newAmount];
+    const newAmount = (isSpecified) ? newDate.slice(4, -3) : newDate.slice(4, -1);
+    const newSpecificity = (isSpecified) ? newDate.slice(-1) : '';
+    return [newSign, newUnit, newAmount, newSpecificity];
   }
 
   public componentWillReceiveProps(nextProps)
@@ -331,6 +346,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
           sign: updatedState[0],
           unit: updatedState[1],
           amount: updatedState[2],
+          specificity: updatedState[3],
         },
       );
     }
@@ -427,29 +443,30 @@ export class DatePickerUncontained extends TerrainComponent<Props>
   public handleTenseChange(tenseIndex)
   {
     const sign = DateTenseArray[tenseIndex];
-    this.props.onChange(this.formatElasticQuery(sign, this.state.unit, this.state.amount));
+    this.props.onChange(this.formatElasticQuery(sign, this.state.unit, this.state.amount, this.state.specificity));
   }
 
   public handleUnitChange(unitIndex)
   {
     const unit = DateUnitArray[unitIndex];
-    this.props.onChange(this.formatElasticQuery(this.state.sign, unit, this.state.amount));
+    this.props.onChange(this.formatElasticQuery(this.state.sign, unit, this.state.amount, this.state.specificity));
   }
 
   public handleAmountChange(e)
   {
-    this.props.onChange(this.formatElasticQuery(this.state.sign, this.state.unit, e.target.value));
+    this.props.onChange(this.formatElasticQuery(this.state.sign, this.state.unit, e.target.value, this.state.specificity));
   }
 
   public handleSpecificityChange(specificityIndex)
   {
-    const specificity = DateUnitArray[specificityIndex];
-    this.props.onChange(this.formatElasticQuery())
+    const specificity = DateSpecificityArray[specificityIndex];
+    this.props.onChange(this.formatElasticQuery(this.state.sign, this.state.unit, this.state.amount, specificity));
   }
 
-  public formatElasticQuery(sign: string, unit: string, amount: string): string
+  public formatElasticQuery(sign: string, unit: string, amount: string, specificity: string): string
   {
-    return 'now' + sign + amount + unit;
+    const specificitySegment = (specificity === '') ? '' : ('/' + specificity);
+    return 'now' + sign + amount + unit + specificitySegment;
   }
 
   public dateToHourIndex(date: Moment)
@@ -562,9 +579,9 @@ export class DatePickerUncontained extends TerrainComponent<Props>
           <p className='date-view-label'>Round to nearest</p>
           <Dropdown
             canEdit={this.props.canEdit}
-            options={DateUnitOptions}
+            options={DateSpecificityOptions}
             optionsDisplayName={DateSpecificityMapImmu}
-            selectedIndex={0}
+            selectedIndex={DateSpecificityOptions.indexOf(this.state.specificity)}
             onChange={this.handleSpecificityChange}
           />
         </div>
