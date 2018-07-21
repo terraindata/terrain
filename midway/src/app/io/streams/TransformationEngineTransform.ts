@@ -72,6 +72,6 @@ export default class TransformationEngineTransform extends ADocumentTransform
       return input.map((i) => this.transform(i, chunkNumber++));
     }
 
-    return this.engine.transform(input);
+    return this.engine.transform(input, { cache: true });
   }
 }

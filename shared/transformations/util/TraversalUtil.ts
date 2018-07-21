@@ -71,6 +71,7 @@ const DependencyVisitor = new DependencyVisitorC();
 import * as TerrainLog from 'loglevel';
 
 type IdentityOptions = NodeOptionsType<TransformationNodeType.IdentityNode>;
+
 /*
  *  Utility class for performing common operations on
  *    - The graph structure of the transformation nodes
@@ -84,7 +85,6 @@ export default abstract class Traversal
   public static findDependencies(engine: TransformationEngine, nodeId: number): number[]
   {
     const graph = (engine as FriendEngine).dag;
-    // const startNode = graph.node(String(nodeId));
 
     const result = [];
     const visited: { [k: number]: boolean } = {};

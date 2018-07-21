@@ -448,3 +448,28 @@ describe('inferred field tests', () =>
     });
   });
 });
+
+test('test duplication dependencies', () =>
+{
+  const doc = {
+    foo: {
+      a: 'hi',
+      b: 'yo',
+    },
+  };
+
+  const e = Utils.construction.makeEngine(doc);
+  const aId = getId(e, ['foo', 'a']);
+  const bId = getId(e, ['foo', 'b']);
+  const fooId = getId(e, ['foo']);
+  const dupId = e.appendTransformation(TransformationNodeType.DuplicateNode, List([fooId]), {
+    newFieldKeyPaths: wrap(['fooCopied']),
+  });
+  const fooCopiedId = getId(e, ['fooCopied']);
+  const bIdentity = Utils.traversal.findIdentityNode(e, bId);
+  const intersection = nodeIntersection(e, dupId, bIdentity);
+  expect(intersection.toArray()).not.toContain(dupId);
+  expect(intersection.toArray()).not.toContain(bIdentity);
+  expect(intersection.toArray()).toContain(Utils.traversal.findIdentityNode(e, getId(e, ['fooCopied', 'b'])));
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
+});

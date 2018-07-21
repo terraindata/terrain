@@ -361,6 +361,10 @@ export class TransformationEngine
   {
     // Order matters!  Must do this first, else getTransformations can't work because
     // it relies on the entry in fieldNameToIDMap.
+    if (!Utils.fields.isOrganic(this, id))
+    {
+      throw new Error('Cannot delete synthetic field');
+    }
     this.getTransformations(id).forEach((t: number) => this.deleteTransformation(t));
     this.IDToPathMap = this.IDToPathMap.delete(id);
     this.fieldProps = this.fieldProps.delete(id);
