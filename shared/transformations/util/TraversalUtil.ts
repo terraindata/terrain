@@ -171,7 +171,7 @@ export default abstract class Traversal
   {
     const graph = (engine as FriendEngine).dag;
     let parentId: number;
-    for (let i = path.size - 1; i > 1; i--)
+    for (let i = path.size - 1; i >= 1; i--)
     {
       const parentPath = Utils.path.convertIndices(path.slice(0, i).toList());
       if (Utils.path.isNamed(parentPath))

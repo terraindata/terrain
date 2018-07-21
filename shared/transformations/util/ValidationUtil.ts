@@ -95,6 +95,7 @@ export default abstract class ValidationUtil
    *  - all fields have exactly 1 organic or synthetic identity nodes
    *  - all synthetic identity nodes have at least 1 inbound synthetic edge
    *  - all organic identity nodes must be sources, and all sources must be organic identity nodes
+   *  - all rename identity nodes must have at least 1 inbound same edge
    *  - all removal identity nodes have no outbound edges
    *  - all fields with nullish paths end in a removal identity node
    *  - there is a single walkable non-synthetic path for all fields
@@ -184,16 +185,40 @@ export default abstract class ValidationUtil
             const inbounds = dag.predecessors(String(node.id));
             if (inbounds !== undefined && inbounds.length > 0)
             {
-              throw new Error(`${opts.type} Identity Node for field ${fieldId} should be a source but it has inbound edges`);
+              throw new Error(`Organic Identity Node for field ${fieldId} should be a source but it has inbound edges`);
+            }
+          }
+          else
+          {
+            const inbounds = dag.predecessors(String(node.id));
+            if (inbounds === undefined || inbounds.length === 0)
+            {
+              throw new Error(`Synthetic Identity Node for field ${fieldId} should not be a source but it has no edges`);
+            }
+            if (inbounds.find((v) => dag.edge(v, String(node.id)) === EdgeTypes.Same) !== undefined)
+            {
+              throw new Error(`Synthetic Identity Node for field ${fieldId} has inbound same edges`);
             }
           }
         }
-        if (opts.type === IdentityTypes.Removal)
+        else if (opts.type === IdentityTypes.Removal)
         {
           const outbounds = dag.successors(String(node.id));
           if (outbounds !== undefined && outbounds.length > 0)
           {
             throw new Error(`${opts.type} Identity Node for field ${fieldId} should be a sink but it has outbound edges`);
+          }
+        }
+        else if (opts.type === IdentityTypes.Rename)
+        {
+          const inbounds = dag.predecessors(String(node.id));
+          if (inbounds === undefined || inbounds.length === 0)
+          {
+            throw new Error(`Rename Identity Node for field ${fieldId} should not be a source but it has no edges`);
+          }
+          if (inbounds.find((v) => dag.edge(v, String(node.id)) === EdgeTypes.Same) === undefined)
+          {
+            throw new Error(`Rename Identity Node for field ${fieldId} should have an inbound same edge but it has none`);
           }
         }
       }

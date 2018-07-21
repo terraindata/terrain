@@ -334,3 +334,117 @@ test('test index specified fields', () =>
   expect(Utils.traversal.findDependencies(e, index1NodeId)).toContain(extractedNodeId);
   expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
+
+describe('inferred field tests', () =>
+{
+  const doc = {
+    foo: 'hello',
+    b: {
+      c: 'hi',
+    },
+  };
+
+  test('add inferred new organic field', () =>
+  {
+    const e = Utils.construction.makeEngine(doc);
+    const bId = getId(e, ['b']);
+    const cId = getId(e, ['b', 'c']);
+    const fooId = getId(e, ['foo']);
+    const dId = Utils.fields.addInferredField(e, KeyPath(['b', 'd']), FieldTypes.String);
+    expect(dependencyIntersection(e, bId, dId).toArray()).toContain(Utils.traversal.findIdentityNode(e, dId));
+    expect(dependencyIntersection(e, bId, dId).size).toBe(1);
+    expect(Utils.fields.isOrganic(e, dId)).toBe(true);
+    expect(dependencyIntersection(e, cId, dId).size).toBe(0);
+    expect(Utils.validation.verifyEngine(e)).toEqual([]);
+  });
+
+  test('add inferred new organic field no parent', () =>
+  {
+    const e = Utils.construction.makeEngine(doc);
+    const bId = getId(e, ['b']);
+    const cId = getId(e, ['b', 'c']);
+    const fooId = getId(e, ['foo']);
+    const barId = Utils.fields.addInferredField(e, KeyPath(['bar']), FieldTypes.String);
+    expect(dependencyIntersection(e, barId, cId).size).toBe(0);
+    expect(dependencyIntersection(e, barId, bId).size).toBe(0);
+    expect(dependencyIntersection(e, barId, fooId).size).toBe(0);
+    expect(Utils.fields.isOrganic(e, barId)).toBe(true);
+    expect(Utils.validation.verifyEngine(e)).toEqual([]);
+  });
+
+  test('add inferred new organic field with rename', () =>
+  {
+    const e = Utils.construction.makeEngine(doc);
+
+    const bId = getId(e, ['b']);
+    const cId = getId(e, ['b', 'c']);
+    const fooId = getId(e, ['foo']);
+    const renameId = e.renameField(bId, KeyPath(['newB']));
+    const dId = Utils.fields.addInferredField(e, KeyPath(['newB', 'd']), FieldTypes.String);
+
+    expect(dependencyIntersection(e, bId, dId).toArray()).toContain(Utils.traversal.findIdentityNode(e, dId));
+    expect(dependencyIntersection(e, bId, dId).size).toBeGreaterThan(1);
+    expect(Utils.fields.isOrganic(e, dId)).toBe(true);
+    expect(dependencyIntersection(e, cId, dId).size).toBe(0);
+    e.appendTransformation(TransformationNodeType.InsertNode, List([dId]), {
+      at: -1,
+      value: '...',
+    });
+    expect(Utils.validation.verifyEngine(e)).toEqual([]);
+    expect(e.transform({
+      foo: 'hello',
+      b: {
+        c: 'hi',
+        d: 'surprise',
+      },
+    })).toEqual({
+      foo: 'hello',
+      newB: {
+        c: 'hi',
+        d: 'surprise...',
+      },
+    });
+  });
+
+  test('add inferred new synthetic field with rename', () =>
+  {
+    const e = Utils.construction.makeEngine(doc);
+    const bId = getId(e, ['b']);
+    const cId = getId(e, ['b', 'c']);
+    const fooId = getId(e, ['foo']);
+    const renameBId = e.renameField(bId, KeyPath(['newB']));
+    const renameCId = e.renameField(cId, KeyPath(['newB', 'newC']));
+    const dupId = e.appendTransformation(TransformationNodeType.DuplicateNode, List([bId]), { newFieldKeyPaths: wrap(['copiedB']) });
+    const dId = Utils.fields.addInferredField(e, KeyPath(['copiedB', 'd']), FieldTypes.String);
+    const copiedBId = getId(e, ['copiedB']);
+    const dupCid = getId(e, ['copiedB', 'newC']);
+    e.appendTransformation(TransformationNodeType.InsertNode, List([dupCid]), {
+      at: -1,
+      value: '!',
+    });
+    const join = e.appendTransformation(TransformationNodeType.JoinNode, List([dId, dupCid]),
+      { newFieldKeyPaths: wrap(['joined']), delimiter: '-' });
+
+    expect(nodeIntersection(e, dupId, Utils.traversal.findIdentityNode(e, dId)).size).toBeGreaterThan(0);
+    expect(Utils.fields.isOrganic(e, dId)).toBe(false);
+    expect(dependencyIntersection(e, dId, dupCid).toArray()).toContain(join);
+    expect(dependencyIntersection(e, dId, dupCid).toArray()).toContain(Utils.traversal.findIdentityNode(e, getId(e, ['joined'])));
+    expect(Utils.validation.verifyEngine(e)).toEqual([]);
+    expect(e.transform({
+      b: {
+        c: 'hi',
+        d: 'yo',
+      },
+    })).toEqual({
+      newB: {
+        newC: 'hi',
+        d: 'yo',
+      },
+      copiedB: {
+        newC: 'hi!',
+        d: 'yo',
+      },
+      joined: 'yo-hi!',
+    });
+  });
+});

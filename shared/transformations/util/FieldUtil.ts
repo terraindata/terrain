@@ -54,11 +54,15 @@ import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { DateFormats, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import FriendEngine from 'shared/transformations/FriendEngine';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType, { IdentityTypes, NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import TransformationNodeType, {
+  IdentityTypes,
+  NodeOptionsType,
+  TransformationEdgeTypes as EdgeTypes,
+} from 'shared/transformations/TransformationNodeType';
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 
 const etlTypeKeyPath = List(['etlType']);
-
+type IdentityOptions = NodeOptionsType<TransformationNodeType.IdentityNode>;
 /*
  *  Utility class to perform common operations on the fields of transformation engines
  */
@@ -77,6 +81,8 @@ export default class FieldUtil
 
   /*
    *  Add a field but attempt to infer pre-existing transformations and perform a replay on renames
+   *  Should refactor this to use a visitor that traverses all the nodes associated with the parent to
+   *  determine necessary side effects
    */
   public static addInferredField(engine: TransformationEngine, keypath: KeyPath, type: FieldTypes): number
   {
@@ -112,13 +118,16 @@ export default class FieldUtil
 
     const fieldId = FieldUtil.addFieldToEngine(
       engine, pathTranslator(initialParentPath), type, syntheticSource == null ? undefined : syntheticSource);
+
     for (const rename of renames)
     {
       const renameSource = Utils.traversal.findIdentitySourceNode(engine, Number(rename));
       const parentRename = graph.node(String(rename));
       const fieldPath = pathTranslator(parentRename.fields.get(0).path);
+
       (engine as FriendEngine).setFieldPath(fieldId, fieldPath);
-      (engine as FriendEngine).addIdentity(fieldId, renameSource, IdentityTypes.Rename);
+      const renameIdentity = (engine as FriendEngine).addIdentity(fieldId, renameSource, IdentityTypes.Rename);
+      Utils.traversal.appendNodeToField(engine, fieldId, renameIdentity, EdgeTypes.Same);
     }
     return fieldId;
   }
@@ -140,7 +149,6 @@ export default class FieldUtil
     }
     else
     {
-      // return FieldUtil.addFieldToEngine(engine, keypath, FieldUtil.fieldType(id, engine));
       return FieldUtil.addInferredField(engine, keypath, FieldUtil.fieldType(id, engine));
     }
   }
@@ -155,6 +163,13 @@ export default class FieldUtil
   {
     const etlType = engine.getFieldProp(id, etlTypeKeyPath) as FieldTypes;
     return etlType == null ? FieldTypes.String : etlType;
+  }
+
+  public static isOrganic(engine: TransformationEngine, id: number)
+  {
+    const identity = Utils.traversal.findIdentityNode(engine, id);
+    const node = engine.getTransformationInfo(identity);
+    return (node.meta as IdentityOptions).type === IdentityTypes.Organic;
   }
 
   public static changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType: FieldTypes)
