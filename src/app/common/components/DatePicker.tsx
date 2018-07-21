@@ -146,7 +146,7 @@ export const DateUnitArray = [
   'y',
 ];
 const DateUnitOptions = Immutable.List(DateUnitArray);
-const DateSpecificityArray = [
+export const DateSpecificityArray = [
   '',
   'm',
   'h',
@@ -309,7 +309,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     }
     const specificityIndex = newDate.length - 2;
     const isSpecified = (newDate[specificityIndex] === '/');
-    const nextUnit = (isSpecified) ? newDate[newDate.length -3] : newDate.slice(-1);
+    const nextUnit = (isSpecified) ? newDate[newDate.length - 3] : newDate.slice(-1);
     if (DateUnitArray.includes(nextUnit) && newDate.toLowerCase() !== 'now')
     {
       newUnit = nextUnit;

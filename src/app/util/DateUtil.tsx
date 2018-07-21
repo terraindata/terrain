@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import { DateUnitArray, DateUnitMap } from 'app/common/components/DatePicker';
+import { DateSpecificityArray, DateUnitArray, DateUnitMap } from 'app/common/components/DatePicker';
 import TerrainDateParameter from 'shared/database/elastic/parser/TerrainDateParameter';
 const moment = require('moment-timezone');
 
@@ -153,33 +153,51 @@ const DateUtil =
   {
     for (let i = 0; i < splitDate.length; i++)
     {
-      let dateSegment = splitDate[i];
-      let segmentLength = dateSegment.length;
-      let segmentStart = dateSegment[0];
-      let segmentEnd = dateSegment[segmentLength - 1];
-      if (segmentStart === '-' || segmentEnd === '-' || segmentStart === '+' || segmentEnd === '-')
+      const dateSegment = splitDate[i];
+      const segmentLength = dateSegment.length;
+      // first segment should be 'now'
+      if (dateSegment === 'now')
       {
-        return false
+        continue;
+      }
+      // if contains an empty segment then that means there were two adjacent signs + -
+      if (segmentLength === 0)
+      {
+        return false;
+      }
+      const properSegmentUnit = dateSegment.slice(-1);
+      const properSegmentAmount = dateSegment.slice(0, -1);
+      // segment is not a proper number amount followed by a proper elastic unit
+      if (DateUnitArray.indexOf(properSegmentUnit) === -1 || isNaN(Number(properSegmentAmount)))
+      {
+        return false;
       }
     }
+    return true;
   },
 
   isValidElasticDateParameter(date)
   {
+    date = date.toLowerCase();
     const properNow = date.slice(0, 3).toLowerCase();
-    const properSign = date[3];
+    const properSign = date[3]; // this can be + - /
+    // check if string is 'now/<unit>' which is still valid
+    if (properSign === '/')
+    {
+      return ((properNow === 'now') && (date.length === 5) && (DateUnitArray.indexOf(date.slice(-1)) !== -1));
+    }
     const isSpecified = (date[date.length - 2] === '/');
-    const properSpecification = (isSpecified) ? date.slice(-1) : '';
-    const properUnit = (isSpecified) ? date[date.length - 3] : date.slice(-1);
-    const splitDate = date.split(properSign);
-    const hasAdjacentSigns = DateUtil.hasProperElasticSegments(splitDate);
-    const properAmount = date.slice(4);
-    const properNumber = date.slice(4, -1);
+    const properSpecification = (isSpecified) ? date.slice(-1) : ''; // check this
+    const properUnit = (isSpecified) ? date[date.length - 3] : date.slice(-1); // check this ??
+    const unspecifiedDate = (isSpecified) ? date.slice(0, -2) : date; // shouldnt contain / anymore?
+    const splitDate = unspecifiedDate.split(/[+-]/);
+    const hasProperElasticSegments = DateUtil.hasProperElasticSegments(splitDate);
+    // const properAmount = date.slice(4);
+    // const properNumber = date.slice(4, -1);
     return ((date.toLowerCase() === 'now') || ((properNow === 'now') &&
       (properSign === '+' || properSign === '-') &&
-      (!properAmount.includes('+') && !properAmount.includes('-'))
-      && (!isNaN((Number(properNumber))))
-      && (DateUnitArray.indexOf(properUnit) !== -1)
+      (hasProperElasticSegments) && (DateUnitArray.indexOf(properUnit) !== -1) &&
+      (DateSpecificityArray.indexOf(properSpecification) !== -1)
     ));
   },
 
