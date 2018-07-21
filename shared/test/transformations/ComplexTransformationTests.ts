@@ -83,26 +83,55 @@ test('identity transformation for nested arrays', () =>
   const e = Utils.construction.makeEngine(doc);
   const r = e.transform(doc);
   expect(r).toEqual(copyOfDoc);
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
-test('identity transformation for ui-constructed nested arrays', () =>
+test('identity transformation for deeply nested arrays', () =>
 {
   const doc = {
     fields: [
       {
-        foo: 'look what',
+        blah: [[[{}]]],
       },
       {
-        blah: [],
-      },
-      {
-        foo: 'the cat dragged in',
+        foo: [
+          [{}],
+          [{ hi: 'lol' }],
+        ],
       },
     ],
+    suh: {},
   };
 
   const copyOfDoc = _.cloneDeep(doc);
   const e = Utils.construction.makeEngine(doc);
+  const r = e.transform(doc);
+  expect(r).toEqual(copyOfDoc);
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
+});
+
+test('identity transformation for conflicting nested arrays with empty arrays', () =>
+{
+  const doc = {
+    fields: [
+      {
+        set1: ['hi'],
+        set2: [],
+        set3: [],
+        set4: 'hi',
+      },
+      {
+        set1: [],
+        set2: ['hi'],
+        set3: 'hi',
+        set4: [],
+      },
+    ],
+    suh: {},
+  };
+  const copyOfDoc = _.cloneDeep(doc);
+  const e = Utils.construction.makeEngine(doc);
+
   const r = e.transform(doc);
   expect(r).toEqual(copyOfDoc);
   expect(Utils.validation.verifyEngine(e)).toEqual([]);

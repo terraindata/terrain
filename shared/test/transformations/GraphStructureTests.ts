@@ -435,7 +435,7 @@ describe('inferred field tests', () =>
         c: 'hi',
         d: 'yo',
       },
-    })).toEqual({
+    }, { includeUnknown: true })).toEqual({
       newB: {
         newC: 'hi',
         d: 'yo',

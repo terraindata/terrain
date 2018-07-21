@@ -47,11 +47,11 @@ THE SOFTWARE.
 import arrayTypeOfValues = require('array-typeof-values');
 import * as GraphLib from 'graphlib';
 import { List, Map } from 'immutable';
-import memoizeOne from 'memoize-one';
 import isPrimitive = require('is-primitive');
-import { instanceFnDecorator } from 'shared/util/Classes';
 import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import TransformationNode from 'shared/transformations/TransformationNode';
+import { instanceFnDecorator } from 'shared/util/Classes';
 import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 
@@ -70,6 +70,12 @@ import * as Utils from 'shared/transformations/util/EngineUtils';
 const NodeConstructor = new TransformationNodeConstructorVisitor();
 const TransformationCreator = new CreateTransformationVisitor();
 const ExecutionVisitor = new TransformationEngineNodeVisitor();
+
+interface TransformOptions
+{
+  cache?: boolean;
+  includeUnknown?: boolean;
+}
 
 /**
  * A TransformationEngine performs transformations on complex JSON documents.
@@ -139,6 +145,7 @@ export class TransformationEngine
   protected fieldEnabled: Map<number, boolean> = Map<number, boolean>();
   protected fieldProps: Map<number, object> = Map<number, object>();
   protected IDToPathMap: Map<number, KeyPath> = Map<number, KeyPath>();
+  protected cachedOrder: number[];
 
   /**
    * Constructor for `TransformationEngine`.
@@ -228,16 +235,55 @@ export class TransformationEngine
     return nodeId;
   }
 
+  public getInitialDocument(doc: object): object
+  {
+    const output = {};
+    const fields = this.dag.sources()
+      .map((id) => this.dag.node(id).fields.get(0).path)
+      .sort((f1, f2) => f1.size - f2.size);
+
+    for (const path of fields)
+    {
+      for (const { location, value } of yadeep.search(doc, path))
+      {
+        if (isPrimitive(value))
+        {
+          yadeep.setIn(output, location, value);
+        }
+        else if (Array.isArray(value))
+        {
+          yadeep.setIn(output, location, []);
+        }
+        else
+        {
+          yadeep.setIn(output, location, {});
+        }
+      }
+    }
+    return output;
+  }
+
   /**
    * Transform a document according to the current engine configuration.
    *
    * @param {object} doc The document to transform.
    * @returns {object}   The transformed document, or possibly errors.
    */
-  public transform(doc: object): object
+  public transform(doc: object, options: TransformOptions = {}): object
   {
-    let output = _.cloneDeep(doc);
-    const ordered = this.computeExecutionOrder();
+    let ordered;
+    if (this.cachedOrder != null && options.cache)
+    {
+      ordered = this.cachedOrder;
+    }
+    else
+    {
+      ordered = this.computeExecutionOrder();
+      this.cachedOrder = ordered;
+    }
+
+    let output = options.includeUnknown ? _.cloneDeep(doc) : this.getInitialDocument(doc);
+
     for (const nodeKey of ordered)
     {
       const node: TransformationNode = this.dag.node(nodeKey);
@@ -423,10 +469,11 @@ export class TransformationEngine
   public _getFieldIDCache(pathMap: Map<number, KeyPath>): Map<string, number>
   {
     const reverseMap: { [k: string]: number } = {};
-    pathMap.forEach((path, id) => {
+    pathMap.forEach((path, id) =>
+    {
       reverseMap[Utils.path.hash(path)] = id;
     });
-   return Map<string, number>(reverseMap);
+    return Map<string, number>(reverseMap);
   }
 
   public renameField(fieldID: number, newPath: KeyPath): number

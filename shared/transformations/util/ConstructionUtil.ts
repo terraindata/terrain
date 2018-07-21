@@ -48,6 +48,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
+import isPrimitive = require('is-primitive');
 
 import * as Utils from 'shared/transformations/util/EngineUtils';
 
@@ -103,19 +104,42 @@ export default abstract class ConstructionUtil
     { engine: TransformationEngine, errors: string[] }
   {
     const pathTypes: { [k: string]: TypeTracker } = {};
+    const potentialArrays: { [k: string]: boolean } = {};
+    const potentialObjects: { [k: string]: boolean } = {};
     const errAccumulator = ConstructionUtil.errorAccumulator();
     documents.forEach((doc, docIndex) =>
     {
-      for (const leaf of yadeep.traverse(doc, { primitivesOnly: true, arrayLimit: 20 }))
+      for (const leaf of yadeep.traverse(doc, { primitivesOnly: false, arrayLimit: 20 }))
       {
-        const { location, value } = leaf;
+        const { value, location } = leaf;
         const path = Utils.path.convertIndices(location);
         const hash = Utils.path.hash(path);
+
+        if (!isPrimitive(value))
+        {
+          if (Array.isArray(value))
+          {
+            if (value.length === 0)
+            {
+              potentialArrays[hash] = true;
+            }
+          }
+          else
+          {
+            if (Object.keys(value).length === 0)
+            {
+              potentialObjects[hash] = true;
+            }
+          }
+          continue;
+        }
+
         if (pathTypes[hash] === undefined)
         {
           pathTypes[hash] = new TypeTracker(path, errAccumulator.fn, interpretText);
         }
         pathTypes[hash].push(value);
+
       }
     });
 
@@ -136,6 +160,30 @@ export default abstract class ConstructionUtil
       }
     }
 
+    for (const key of Object.keys(potentialObjects))
+    {
+      const path = Utils.path.unhash(key);
+      if (engine.getFieldID(path) === undefined)
+      {
+        if (ConstructionUtil.conditionalCreateAncestors(engine, path))
+        {
+          engine.addField(path, { etlType: FieldTypes.Object });
+        }
+      }
+    }
+    for (const key of Object.keys(potentialArrays))
+    {
+      const path = Utils.path.unhash(key);
+      if (engine.getFieldID(path) === undefined)
+      {
+        if (ConstructionUtil.conditionalCreateAncestors(engine, path))
+        {
+          engine.addField(path, { etlType: FieldTypes.Array });
+          engine.addField(path.push(-1), { etlType: FieldTypes.String });
+        }
+      }
+    }
+
     return {
       engine,
       errors: errAccumulator.errors,
@@ -145,6 +193,31 @@ export default abstract class ConstructionUtil
   public static makeEngine(doc: object): TransformationEngine
   {
     return ConstructionUtil.createEngineFromDocuments(List([doc])).engine;
+  }
+
+  private static conditionalCreateAncestors(engine: TransformationEngine, path: KeyPath): boolean
+  {
+    const toAdd: Array<[KeyPath, FieldTypes]> = [];
+    for (let i = 1; i < path.size; i++)
+    {
+      const parentPath = path.slice(0, i).toList();
+      const existingId = engine.getFieldID(parentPath);
+      const nextWaypoint = path.get(i);
+      const type = typeof nextWaypoint === 'number' ? FieldTypes.Array : FieldTypes.Object;
+      if (existingId === undefined)
+      {
+        toAdd.push([parentPath, type]);
+      }
+      else if (Utils.fields.fieldType(existingId, engine) !== type)
+      {
+        return false;
+      }
+    }
+    for (const [parentPath, etlType] of toAdd)
+    {
+      engine.addField(parentPath, { etlType });
+    }
+    return true;
   }
 
   private static buildTreeFromPathTypes(pathTypes: { [k: string]: TypeTracker }, onConflict: (msg: string) => void): FieldNode
