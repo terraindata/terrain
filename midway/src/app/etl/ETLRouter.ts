@@ -100,7 +100,7 @@ Router.post('/preview', passport.authenticate('access-token-local'), async (ctx,
   // get a preview up to "size" rows from the specified source
   try
   {
-    const sourceStreamPreview: string = await getSourceStreamPreview(previewName, source, files, request.size, request.rawString);
+    const sourceStreamPreview: any = await getSourceStreamPreview(previewName, source, files, request.size, request.rawString);
     if (request.rawString === true)
     {
       let parsedString;
@@ -123,7 +123,7 @@ Router.post('/preview', passport.authenticate('access-token-local'), async (ctx,
   }
   catch (e)
   {
-    throw new Error('StreamUtil is unable to complete string');
+    throw new Error('Source stream preview was not received');
   }
 });
 
