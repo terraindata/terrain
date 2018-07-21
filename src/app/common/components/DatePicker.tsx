@@ -576,7 +576,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
           />
         </div>
         <div className='labeled-row'>
-          <p className='date-view-label'>Round to nearest</p>
+          <p className='date-view-label'>Specificity</p>
           <Dropdown
             canEdit={this.props.canEdit}
             options={DateSpecificityOptions}
