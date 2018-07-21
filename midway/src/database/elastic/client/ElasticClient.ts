@@ -48,7 +48,6 @@ import * as Elastic from 'elasticsearch';
 import * as _ from 'lodash';
 import * as request from 'request';
 
-import { hasOwnProperty } from 'tslint/lib/utils';
 import { MidwayLogger } from '../../../app/log/MidwayLogger';
 import { DatabaseControllerStatus } from '../../DatabaseControllerStatus';
 import ElasticConfig from '../ElasticConfig';
@@ -419,7 +418,7 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
     if (params.index == null)
     {
       const index = this.getIndex(params.body);
-      if (index === undefined)
+      if (index == null)
       {
         MidwayLogger.warn('search query does not specify an index');
       } else
@@ -436,7 +435,7 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
       if (params.body[i].index == null)
       {
         const index = this.getIndex(params.body[i + 1]);
-        if (index === undefined)
+        if (index == null)
         {
           MidwayLogger.warn(`msearch query #${i / 2} does not specify an index`);
         } else
