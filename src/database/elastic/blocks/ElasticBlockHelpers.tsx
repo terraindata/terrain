@@ -79,7 +79,47 @@ const metaFields = ['_index', '_type', '_uid', '_id',
   '_parent', '_routing',
   '_meta'];
 
+function findSubfields(path: string, subFields: object): List<string>
+{
+  let result: List<string> = List();
+  Object.keys(subFields).forEach((key) =>
+  {
+    result = result.push(path + '.' + key);
+    if (subFields[key].properties)
+    {
+      result = result.concat(findSubfields(path + '.' + key, subFields[key].properties)).toList();
+    }
+  });
+  return result;
+}
+
 export const ElasticBlockHelpers = {
+  getSubfields(field: string, schemaState: SchemaState, builderState: BuilderState): List<string>
+  {
+    let subFields: List<string> = List();
+    if (!schemaState || !builderState)
+    {
+      return subFields;
+    }
+    const serverName = builderState.db.name;
+    const index = getIndex('', builderState);
+    const key = serverName + '/' + String(index) + '.' + 'data' + '.c.' + field;
+    let col;
+    if (schemaState.columns instanceof Map)
+    {
+      col = schemaState.columns.get(key);
+    }
+    else
+    {
+      col = schemaState.columns[key];
+    }
+    if (col)
+    {
+      subFields = findSubfields(field, col.properties);
+    }
+    return subFields;
+  },
+
   getColumnType(schemaState: SchemaState, builderState: BuilderState, column: string): string
   {
     if (!schemaState || !builderState)

@@ -104,7 +104,7 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
   }
 }
 
-const transitionRowHeight = '58px';
+const transitionRowHeight = '108px';
 
 export default Util.createTypedContainer(
   SourceFileTypeOptions,
