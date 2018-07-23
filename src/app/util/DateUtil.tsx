@@ -135,10 +135,6 @@ const DateUtil =
     }
     const dateDetails = date.slice(4);
     const amount = (isNowSpecified) ? dateDetails.slice(0, -3) : dateDetails.slice(0, -1);
-    if (DateUnitArray.indexOf(elasticUnit) === -1)
-    {
-      return 'Invalid date';
-    }
     const unit = (DateUnitMap[elasticUnit].slice(0, -3)).toLowerCase();
     const plural = (amount !== '1') ? 's' : '';
     return amount + ' ' + unit + plural + ' ' + tense;
@@ -173,7 +169,6 @@ const DateUtil =
 
   isValidElasticDateParameter(date)
   {
-    date = date.toLowerCase();
     const properNow = date.slice(0, 3).toLowerCase();
     const properSign = date[3];
     // check if string is 'now/<unit>' which is still valid
