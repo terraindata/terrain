@@ -459,7 +459,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                       downsample={5}
                       zoomDimension='x'
                       voronoiDimension='x'
-                      labels={(d) => d.l ? `${d.id}|${d.y}|${d.name}|${this.getDatasetColor(d.id)}` : null}
+                      labels={(d) => d.l ? `${d.id}|${d._y}|${d.name}|${this.getDatasetColor(d.id)}` : null}
                       labelComponent={<TVictoryTooltip
                         xDataKey={xDataKey}
                         dateFormat={dateFormat}
