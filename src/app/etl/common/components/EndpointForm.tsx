@@ -58,11 +58,13 @@ import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, Source
 import { EndpointTypeNames, SchedulableSinks, SchedulableSources, Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 
 import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormLookups';
+import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import FadeInOut from 'app/common/components/FadeInOut';
 import IntegrationForm from 'etl/common/components/IntegrationForm';
 import IntegrationPicker from 'etl/common/components/IntegrationPicker';
 import { ETLActions } from 'etl/ETLRedux';
+import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 import { Integrations } from 'shared/etl/types/IntegrationTypes';
 
@@ -78,6 +80,7 @@ export interface Props
   isSchedule?: boolean;
   integrations?: IMMap<ID, IntegrationConfig>;
   etlActions?: typeof ETLActions;
+  previewObject: object;
 }
 
 interface State
@@ -122,6 +125,14 @@ class EndpointForm extends TerrainComponent<Props>
   {
     this.props.etlActions({
       actionType: 'getIntegrations',
+    });
+  }
+
+  public componentWillUnmount()
+  {
+    this.props.etlActions({
+      actionType: 'setPreviewObject',
+      previewObject: null,
     });
   }
 
@@ -238,6 +249,7 @@ class EndpointForm extends TerrainComponent<Props>
                 endpoint={endpoint}
                 isSource={this.props.isSource}
                 onChange={this.handleEndpointChange}
+                previewSource={this.props.previewObject}
               />
               :
               null
@@ -273,6 +285,19 @@ class EndpointForm extends TerrainComponent<Props>
     newEndpoint = newEndpoint.set('fileConfig', newFileConfig);
 
     this.props.onChange(newEndpoint, apply);
+
+    if (newEndpoint.fileConfig.fileType === FileTypes.Json)
+    {
+      newEndpoint = newEndpoint.setIn(['fileConfig', 'jsonPath'], '');
+      DocumentsHelpers.fetchPreview(newEndpoint, true).then((res: object) =>
+      {
+        this.props.etlActions({
+          actionType: 'setPreviewObject',
+          previewObject: res,
+        });
+      })
+        .catch((e) => e);
+    }
   }
 
   public extractFileConfigDelta(oldConfig: Partial<FileConfig>, newConfig: Partial<FileConfig>): Partial<FileConfig>
@@ -315,7 +340,7 @@ const endpointTypeNames: IMMap<any, string> = Map<any, string>(EndpointTypeNames
 
 export default Util.createContainer(
   EndpointForm,
-  [['etl', 'integrations']],
+  [['etl', 'integrations'], ['etl', 'previewObject']],
   {
     etlActions: ETLActions,
   },

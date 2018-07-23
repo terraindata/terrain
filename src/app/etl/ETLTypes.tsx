@@ -65,6 +65,7 @@ class ETLStateC
   public ETLProgress: string = '';
   public blockState: NotificationState = _NotificationState();
   public mappingCache: Immutable.Map<string, object> = Map();
+  public previewObject: object = null;
 }
 export type ETLState = WithIRecord<ETLStateC>;
 export const _ETLState = makeConstructor(ETLStateC);
