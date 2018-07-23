@@ -175,20 +175,18 @@ const DateUtil =
   {
     date = date.toLowerCase();
     const properNow = date.slice(0, 3).toLowerCase();
-    const properSign = date[3]; // this can be + - /
+    const properSign = date[3];
     // check if string is 'now/<unit>' which is still valid
     if (properSign === '/')
     {
       return ((properNow === 'now') && (date.length === 5) && (DateUnitArray.indexOf(date.slice(-1)) !== -1));
     }
     const isSpecified = (date[date.length - 2] === '/');
-    const properSpecification = (isSpecified) ? date.slice(-1) : ''; // check this
-    const properUnit = (isSpecified) ? date[date.length - 3] : date.slice(-1); // check this ??
-    const unspecifiedDate = (isSpecified) ? date.slice(0, -2) : date; // shouldnt contain / anymore?
+    const properSpecification = (isSpecified) ? date.slice(-1) : '';
+    const properUnit = (isSpecified) ? date[date.length - 3] : date.slice(-1);
+    const unspecifiedDate = (isSpecified) ? date.slice(0, -2) : date;
     const splitDate = unspecifiedDate.split(/[+-]/);
     const hasProperElasticSegments = DateUtil.hasProperElasticSegments(splitDate);
-    // const properAmount = date.slice(4);
-    // const properNumber = date.slice(4, -1);
     return ((date.toLowerCase() === 'now') || ((properNow === 'now') &&
       (properSign === '+' || properSign === '-') &&
       (hasProperElasticSegments) && (DateUnitArray.indexOf(properUnit) !== -1) &&
@@ -204,12 +202,11 @@ const DateUtil =
     }
     else if (DateUtil.isValidElasticDateParameter(date))
     {
-      console.log('hi');
       return DateUtil.formatSpecificDate(date);
     }
     else if (date.charAt(0) === '@')
     {
-      return date; // Input
+      return date;
     }
     else
     {
