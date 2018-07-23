@@ -52,7 +52,8 @@ import { SourceConfig } from 'shared/etl/types/EndpointTypes';
 import * as Util from '../AppUtil';
 import BufferTransform from '../io/streams/BufferTransform';
 import { Permissions } from '../permissions/Permissions';
-import { getSourceStream } from './SourceSinkStream';
+import StreamUtil from './pathselector/StreamUtil';
+import { getSourceStream, getSourceStreamPreview } from './SourceSinkStream';
 import * as TemplateRouter from './TemplateRouter';
 
 const Router = new KoaRouter();
@@ -66,6 +67,7 @@ interface ETLUIPreviewConfig
   source: SourceConfig;
   size?: number;
   fileString?: string;
+  rawString?: boolean;
 }
 
 Router.post('/preview', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -96,9 +98,33 @@ Router.post('/preview', passport.authenticate('access-token-local'), async (ctx,
   }
 
   // get a preview up to "size" rows from the specified source
-  const sourceStream: stream.Readable = await getSourceStream('preview', source, files, request.size);
-  const results = await BufferTransform.toArray(sourceStream, request.size);
-  ctx.body = JSON.stringify(results);
+  try
+  {
+    const sourceStreamPreview: any = await getSourceStreamPreview(previewName, source, files, request.size, request.rawString);
+    if (request.rawString === true)
+    {
+      let parsedString;
+      try
+      {
+        parsedString = JSON.parse(sourceStreamPreview);
+      }
+      catch (e)
+      {
+        parsedString = StreamUtil.formatJsonString(sourceStreamPreview);
+      }
+      ctx.body = {
+        result: parsedString,
+      };
+    }
+    else
+    {
+      ctx.body = sourceStreamPreview;
+    }
+  }
+  catch (e)
+  {
+    throw new Error('Source stream preview was not received');
+  }
 });
 
 export default Router;

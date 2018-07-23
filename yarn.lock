@@ -2467,6 +2467,10 @@ clap@^1.0.9:
   dependencies:
     chalk "^1.1.3"
 
+clarinet@^0.12.0:
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/clarinet/-/clarinet-0.12.0.tgz#001d17e22124a62db1b174d9383420ffc933aeaf"
+
 class-utils@^0.3.5:
   version "0.3.6"
   resolved "https://registry.yarnpkg.com/class-utils/-/class-utils-0.3.6.tgz#f93369ae8b9a7ce02fd41faad0ca83033190c463"

@@ -851,9 +851,15 @@ export function getResultValue(hit: Hit, field: string, config: ResultsConfig, i
   overrideFormat?: any, locations?: { [field: string]: any }, color?: string, bgUrlOnly = false)
 {
   let value: any;
-  if (hit)
+  if (hit && field)
   {
+    const pieces = field.split('.');
+    field = pieces[0];
     value = hit.fields.get(field);
+    if (pieces.length > 1)
+    {
+      value = value.getIn(pieces.slice(1));
+    }
   }
   return ResultFormatValue(field, value, config, isTitle, expanded, overrideFormat, locations, color, bgUrlOnly);
 }

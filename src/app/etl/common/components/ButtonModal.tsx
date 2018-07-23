@@ -43,71 +43,110 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
+// tslint:disable:no-var-requires strict-boolean-expressions
 
 import TerrainComponent from 'common/components/TerrainComponent';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import * as React from 'react';
 
-import Util from 'util/Util';
+import Button from 'app/common/components/Button';
+import Modal from 'app/common/components/Modal';
+import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
+import { ColorsActions } from '../../../colors/data/ColorsRedux';
+import './ButtonModal.less';
 
-import FileConfigForm from 'etl/common/components/FileConfigForm';
-import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
-import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { FileConfig } from 'shared/etl/immutable/EndpointRecords';
-import './ETLStepComponent.less';
-
-interface Props
+export interface Props
 {
-  hide?: boolean;
-
-  // injected props
-  act?: typeof WalkthroughActions;
-  walkthrough?: WalkthroughState;
+  button?: string;
+  buttonIcon?: any;
+  iconColor?: any;
+  modal: string;
+  wide: boolean;
+  noFooterPadding: boolean;
+  normalTextButton?: boolean;
+  smallTextButton?: boolean;
+  smallIconButton?: boolean;
+  modalContent?: any;
+  helpCursor?: boolean;
 }
 
-class SourceFileTypeOptions extends TerrainComponent<Props>
+export default class ButtonModal extends TerrainComponent<Props>
 {
-  public render()
+  constructor(props)
   {
-    const { walkthrough } = this.props;
+    super(props);
+    this.state = {
+      modalOpen: false,
+    };
+  }
+
+  public handleModalOpen()
+  {
+    this.setState({
+      modalOpen: true,
+    });
+  }
+
+  public handleModalClose()
+  {
+    this.setState({
+      modalOpen: false,
+    });
+  }
+
+  public renderButton()
+  {
     return (
-      <span
-        style={{ maxHeight: transitionRowHeight }}
-        className='source-filetype-options'
-      >
-        <div
-          className='etl-transition-element field-type-q'
-          style={{ maxHeight: !this.props.hide ? transitionRowHeight : '0px' }}
-        >
-          <FileConfigForm
-            fileConfig={walkthrough.source.fileConfig}
-            onChange={this.handleFileConfigChange}
-            hideTypePicker={true}
-            style={{ padding: '3px' }}
-            isSource={true}
-          />
-        </div>
-      </span>
+      <Button
+        text={this.props.button}
+        onClick={this.handleModalOpen}
+      />
     );
   }
 
-  public handleFileConfigChange(newConfig: FileConfig)
+  public renderSmallTextButton()
   {
-    const { walkthrough } = this.props;
-    const newSource = walkthrough.source.set('fileConfig', newConfig);
-    this.props.act({
-      actionType: 'setState',
-      state: {
-        source: newSource,
-      },
-    });
+    return (
+      <div
+        className={(this.props.helpCursor) ? 'small-text-button' : 'small-help-button'}
+        onClick={this.handleModalOpen}
+        style={{ color: Colors().mainBlue, fontWeight: 200 }}
+      >
+        {this.props.button}
+      </div>
+    );
+  }
+
+  public renderSmallIconButton()
+  {
+    return (
+      <div
+        className='button-icon-div'
+        style={{ fill: this.props.iconColor }}
+        onClick={this.handleModalOpen}
+      >
+        {this.props.buttonIcon}
+      </div>
+    );
+  }
+
+  public render()
+  {
+    return (
+      <div>
+        {this.props.smallIconButton && this.renderSmallIconButton()}
+        {this.props.smallTextButton && this.renderSmallTextButton()}
+        {this.props.normalTextButton && this.renderButton()}
+        <Modal
+          open={this.state.modalOpen}
+          title={this.props.modal}
+          wide={this.props.wide}
+          onClose={this.handleModalClose}
+          noFooterPadding={this.props.noFooterPadding}
+          children={this.props.modalContent}
+        />
+      </div>
+    );
   }
 }
-
-const transitionRowHeight = '108px';
-
-export default Util.createTypedContainer(
-  SourceFileTypeOptions,
-  ['walkthrough'],
-  { act: WalkthroughActions },
-);
