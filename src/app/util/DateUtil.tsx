@@ -147,7 +147,7 @@ const DateUtil =
       const dateSegment = splitDate[i];
       const segmentLength = dateSegment.length;
       // first segment should be 'now'
-      if (dateSegment === 'now')
+      if (dateSegment.toLowerCase() === 'now')
       {
         continue;
       }
