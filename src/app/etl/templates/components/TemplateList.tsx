@@ -215,7 +215,7 @@ class TemplateList extends TerrainComponent<Props>
         className='template-table-wrapper'
       >
         <ItemList
-          items={this.props.templates.sortBy((a) => a.id)}
+          items={this.props.templates.sortBy((a) => a.id).toList()}
           columnConfig={this.displayConfig}
           onRowClicked={this.handleOnClick}
           getMenuOptions={computeOptions}
