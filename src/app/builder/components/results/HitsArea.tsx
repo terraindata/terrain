@@ -210,13 +210,14 @@ class HitsArea extends TerrainComponent<Props>
     let objectFields = List();
     if (resultsState.hits && resultsState.hits.size)
     {
+      // Fields that are simple objects {a: 1, b: 'hello'}
       objectFields = nestedFields.filter((field) =>
         !List.isList(resultsState.hits.get(0).fields.get(field)) &&
         resultsState.hits.get(0).fields.get(field) != null,
       ).toList();
+      // Fields that are lists of objects [{obj1}, {obj1}]
       nestedFields = nestedFields.filter((field) =>
-        List.isList(resultsState.hits.get(0).fields.get(field)) ||
-        !resultsState.hits.get(0).fields.get(field),
+        objectFields.indexOf(field) === -1,
       ).toList();
     }
     // If there is a results config in use, only use nested fields in that config
