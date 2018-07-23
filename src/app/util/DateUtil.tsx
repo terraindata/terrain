@@ -113,8 +113,8 @@ const DateUtil =
   formatSpecificDate(date)
   {
     const isNowSpecified = (date[date.length - 2] === '/');
-    const isPastDate = date.includes('-');
-    const isFutureDate = date.includes('+');
+    const isPastDate = (date.length > 3) && (date[3] === '-');
+    const isFutureDate = (date.length > 3) && (date[3] === '+');
     const isCurrentSpecified = (isNowSpecified && !isPastDate && !isFutureDate);
     if (date.toLowerCase() === 'now' || isCurrentSpecified)
     {
@@ -122,7 +122,6 @@ const DateUtil =
     }
     let tense;
     let dateParser;
-    let plural;
     const elasticUnit = (isNowSpecified) ? date[date.length - 3] : date.slice(-1);
     if (isFutureDate)
     {
@@ -134,22 +133,14 @@ const DateUtil =
       tense = 'ago';
       dateParser = '-';
     }
-    const parsedDate = date.split(dateParser);
-    const dateDetails = parsedDate[1];
+    const dateDetails = date.slice(4);
     const amount = (isNowSpecified) ? dateDetails.slice(0, -3) : dateDetails.slice(0, -1);
     if (DateUnitArray.indexOf(elasticUnit) === -1)
     {
       return 'Invalid date';
     }
     const unit = (DateUnitMap[elasticUnit].slice(0, -3)).toLowerCase();
-    if (amount !== '1')
-    {
-      plural = 's';
-    }
-    else
-    {
-      plural = '';
-    }
+    const plural = (amount !== '1') ? 's' : '';
     return amount + ' ' + unit + plural + ' ' + tense;
   },
 
