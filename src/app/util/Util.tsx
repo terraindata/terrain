@@ -838,7 +838,7 @@ const Util = {
       return aCount === bCount ?
         (a.charAt(0) === '_' ? 1 : b.charAt(0) === '_' ? -1 : a < b ? -1 : 1)
         : 2 * (bCount - aCount)
-      ;
+        ;
     }).toList();
     // Put the sorted non starred fields after the starred fields (Starred are sorted in alpha order)
     let combined = starredFields.sort().concat(nonStarredFields);

@@ -229,7 +229,8 @@ class HitsArea extends TerrainComponent<Props>
     }
     // Take object fields and break them out into their subfields
     let fields = resultsState.fields;
-    objectFields.forEach((field: string) => {
+    objectFields.forEach((field: string) =>
+    {
       const subFields = ElasticBlockHelpers.getSubfields(
         field,
         schema,
