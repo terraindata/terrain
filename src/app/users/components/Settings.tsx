@@ -113,7 +113,6 @@ class Settings extends TerrainComponent<Props>
       modalMessage: '',
       errorModal: false,
       advancedResultsEnabled: Number(TerrainTools.isFeatureEnabled(TerrainTools.ADVANCED_RESULTS)),
-      analyticsEnabled: Number(TerrainTools.isFeatureEnabled(TerrainTools.ANALYTICS)),
     };
   }
 
@@ -539,23 +538,6 @@ class Settings extends TerrainComponent<Props>
     }
   }
 
-  public handleAnalyticsSwitch(selected)
-  {
-    this.setState((state) =>
-    {
-      return { analyticsEnabled: selected };
-    });
-
-    if (TerrainTools.isFeatureEnabled(TerrainTools.ANALYTICS))
-    {
-      TerrainTools.deactivate(TerrainTools.ANALYTICS);
-    }
-    else
-    {
-      TerrainTools.activate(TerrainTools.ANALYTICS);
-    }
-  }
-
   public handleAdvancedResultsSwitch(selected)
   {
     this.setState((state) =>
@@ -575,23 +557,6 @@ class Settings extends TerrainComponent<Props>
 
   public renderTerrainSettingsContent()
   {
-    const terrainSettingsAnalyticsContent = TerrainTools.isAdmin() ? (
-      <div>
-        <div className='settings-field-title'>
-          Analytics Support (EXPERIMENTAL)
-        </div>
-        <div className='settings-row'>
-          <Switch
-            medium={true}
-            first='Off'
-            second='On'
-            selected={this.state.analyticsEnabled}
-            onChange={this.handleAnalyticsSwitch}
-          />
-        </div>
-      </div>
-    ) : undefined;
-
     const terrainSettingsAdvancedResultsContent = TerrainTools.isAdmin() ? (
       <div>
         <div className='settings-field-title'>
@@ -625,7 +590,6 @@ class Settings extends TerrainComponent<Props>
           />
         </div>
         <br />
-        {terrainSettingsAnalyticsContent}
         {terrainSettingsAdvancedResultsContent}
       </div>
     );

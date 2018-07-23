@@ -489,6 +489,12 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
         }
       }
     }
+
+    if (body.query && body.query.function_score)
+    {
+      return this.getIndex(body.query.function_score);
+    }
+
     return undefined;
   }
 }

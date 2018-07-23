@@ -240,6 +240,11 @@ class PrefixedElasticClient extends ElasticClient<PrefixedElasticController>
         }
       }
     }
+
+    if (body.query && body.query.function_score)
+    {
+      this.modifySearchQuery(body.query.function_score);
+    }
   }
 }
 
