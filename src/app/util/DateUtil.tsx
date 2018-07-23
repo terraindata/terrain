@@ -137,6 +137,10 @@ const DateUtil =
     const parsedDate = date.split(dateParser);
     const dateDetails = parsedDate[1];
     const amount = (isNowSpecified) ? dateDetails.slice(0, -3) : dateDetails.slice(0, -1);
+    if (DateUnitArray.indexOf(elasticUnit) === -1)
+    {
+      return 'Invalid date';
+    }
     const unit = (DateUnitMap[elasticUnit].slice(0, -3)).toLowerCase();
     if (amount !== '1')
     {
@@ -209,6 +213,7 @@ const DateUtil =
     }
     else if (DateUtil.isValidElasticDateParameter(date))
     {
+      console.log('hi');
       return DateUtil.formatSpecificDate(date);
     }
     else if (date.charAt(0) === '@')

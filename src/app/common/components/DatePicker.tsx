@@ -310,7 +310,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     const specificityIndex = newDate.length - 2;
     const isSpecified = (newDate[specificityIndex] === '/');
     const nextUnit = (isSpecified) ? newDate[newDate.length - 3] : newDate.slice(-1);
-    if (DateUnitArray.includes(nextUnit) && newDate.toLowerCase() !== 'now')
+    if ((DateUnitArray.indexOf(nextUnit) !== -1) && newDate.toLowerCase() !== 'now')
     {
       newUnit = nextUnit;
     }
