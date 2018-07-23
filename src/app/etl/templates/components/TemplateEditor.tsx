@@ -55,9 +55,11 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 const HTML5Backend = require('react-dnd-html5-backend');
 
+import TerrainTools from 'app/util/TerrainTools';
 import Foldout from 'common/components/Foldout';
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import { ETLActions } from 'etl/ETLRedux';
+import TestGenerator from 'etl/helpers/TemplateTestGenerator';
 import DocumentsPreviewColumn from 'etl/templates/components/columns/DocumentsPreviewColumn';
 import EditorColumnBar from 'etl/templates/components/columns/EditorColumnBar';
 import { EndpointsColumn, OptionsColumn, StepsColumn } from 'etl/templates/components/columns/OptionsColumn';
@@ -98,6 +100,15 @@ class TemplateEditor extends TerrainComponent<Props>
   {
     super(props);
     this.transformDocument = memoizeOne(this.transformDocument);
+  }
+
+  public componentDidMount()
+  {
+    if (TerrainTools.isFeatureEnabled(TerrainTools.TEMPLATE_TEST_GENERATOR))
+    {
+      // tslint:disable-next-line
+      console.log('Terrain Tools: Template Test Generator', TestGenerator);
+    }
   }
 
   public setModalRequests(requests)

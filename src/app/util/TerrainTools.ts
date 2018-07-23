@@ -78,6 +78,7 @@ class TerrainTools
   public static OPERATORS = 'operators';
   public static PATHFINDER_COPY = 'pathfinder_copy';
   public static TEMPLATE_COPY = 'template_copy';
+  public static TEMPLATE_TEST_GENERATOR = 'template_test_generator';
 
   public static terrainStoreLogger = TerrainStoreLogger;
   public static terrainStore = TerrainStore;
