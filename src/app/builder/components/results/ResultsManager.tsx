@@ -715,7 +715,11 @@ export class ResultsManager extends TerrainComponent<Props>
       this.handleM2QueryError(response, isAllFields);
       return;
     }
-    const resultsData = response.getResultsData();
+    let resultsData = response.getResultsData();
+    if (resultsData.hits === undefined)
+    {
+      resultsData = { hits: { total: 0, max_score: null, hits: [] } };
+    }
     if (appendResults && resultsData.hits.hits.length === 0)
     {
       this.changeResults({
