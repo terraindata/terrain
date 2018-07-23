@@ -125,7 +125,7 @@ export const TransformQueryUtil = {
         let path = query.path;
         // Set outer size to 1000 and inner size to 1000
         path = path
-          .setIn(['source', 'count'], 10)
+          .setIn(['source', 'count'], 100)
           .setIn(['more', 'source'], List([parentField]))
           .setIn(['more', 'customSource'], true)
           .setIn(['score', 'type'], 'random')
@@ -134,12 +134,13 @@ export const TransformQueryUtil = {
         path.nested.forEach((nested, i) =>
         {
           path = path
-            .setIn(['nested', i, 'source', 'count'], 10)
+            .setIn(['nested', i, 'source', 'count'], 100)
             .setIn(['nested', i, 'more', 'source'], List([input]))
             .setIn(['nested', i, 'more', 'customSource'], true)
             .setIn(['nested', i, 'score', 'type'], 'random')
             .setIn(['nested', i, 'name'], 'childQuery')
-            .setIn(['score', 'lines'], List())
+            .setIn(['nested', i, 'score', 'lines'], List())
+            .setIn(['nested', i, 'score', 'seed'], 1)
             ;
         });
         const { tql, pathErrorMap } = parsePath(path, query.inputs);

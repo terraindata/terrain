@@ -491,7 +491,7 @@ class TransformCard extends TerrainComponent<Props>
 
       const interval = (max - min) / NUM_BARS;
       const bars = [];
-      for (let i = 0; i < 1000; i++)
+      for (let i = 0; i < NUM_BARS; i++)
       {
         bars.push({
           id: String(i),
@@ -499,15 +499,16 @@ class TransformCard extends TerrainComponent<Props>
           percentage: 0,
           range: {
             min: i * interval + min,
-            madx: (i + 1) * interval + min,
+            max: (i + 1) * interval + min,
           },
         });
       }
       distances.forEach((distance, i) =>
       {
-        const barNum = (distance - min) / interval;
+        const barNum = Math.floor((distance - min) / interval);
         const bar = bars[barNum];
         bar.count += 1;
+        bar.percentage = bar.count / distances.length;
         bars[barNum] = bar;
       });
       this.setState({
