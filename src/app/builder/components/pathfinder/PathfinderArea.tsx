@@ -125,18 +125,17 @@ class PathfinderArea extends TerrainComponent<Props>
       });
     }
     // If inputs changes, or parent query data source changes, update value possibilities
-    if (nextProps.builder.query &&
-      this.state.pathfinderContext.builderState.query &&
+    if ((nextProps.builder.query &&
+      pathfinderContext.builderState.query &&
       (
         nextProps.builder.query.inputs !==
-        this.state.pathfinderContext.builderState.query.inputs ||
+        pathfinderContext.builderState.query.inputs ||
         !_.isEqual(nextProps.parentSource,
           this.state.pathfinderContext.parentSource) ||
         nextProps.parentName !==
-        this.state.pathfinderContext.parentName ||
-        this.state.pathfinderContext.schemaState.columns !==
-        nextProps.schema.columns
-      )
+        this.state.pathfinderContext.parentName
+      )) ||
+      pathfinderContext.schemaState !== nextProps.schema
     )
     {
       this.setState({
@@ -153,8 +152,8 @@ class PathfinderArea extends TerrainComponent<Props>
     const valueOptions = source.dataSource.getChoiceOptions({
       type: 'input',
       source: pathfinderContext.parentSource,
-      builderState: pathfinderContext.builderState,
-      schemaState: pathfinderContext.schemaState,
+      builderState: props.builder,
+      schemaState: props.schema,
       isNested: keyPath.includes('nested'),
       parentName: pathfinderContext.parentName,
     });
