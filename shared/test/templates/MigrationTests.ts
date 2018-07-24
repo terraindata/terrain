@@ -46,11 +46,12 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 import * as _ from 'lodash';
-import TransformationRegistry from 'shared/transformations/TransformationRegistry';
-import { TransformationEngine } from '../../transformations/TransformationEngine';
-import TransformationNodeType from '../../transformations/TransformationNodeType';
-import { KeyPath, WayPoint } from '../../util/KeyPath';
-import * as yadeep from '../../util/yadeep';
-import { TestDocs } from './TestDocs';
 
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationRegistry from 'shared/transformations/TransformationRegistry';
+import { KeyPath, WayPoint } from 'shared/util/KeyPath';
+import * as yadeep from 'shared/util/yadeep';
+
+test('placeholder', () => {
+  // do nothing for now
+});
