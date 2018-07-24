@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file import-spacing
-import * as jszip from 'jszip';
-
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import * as Radium from 'radium';
@@ -65,14 +63,15 @@ import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import
 {
   _ETLEdge, _ETLNode, _ETLProcess,
   _MergeJoinOptions, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions,
 } from 'shared/etl/immutable/ETLProcessRecords';
+import { ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
 import { SinksMap, SourcesMap } from 'shared/etl/immutable/TemplateRecords';
+import { MigrationTestFile } from 'shared/etl/migrations/TemplateVersions';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -87,43 +86,46 @@ class TestGenerator extends ETLHelpers
   {
     const engine = this._templateEditor.getCurrentEngine();
     const documents = this._templateEditor.uiState.documents;
+    const inputs = [];
     const results = [];
-
-    let sourceDocFile = '';
-    const templateFile = JSON.stringify(templateForBackend(this._template));
-    let resultsFile = '';
-
+    const templateString = templateForBackend(this._template);
     let pass = 0;
     let fail = 0;
-    documents.forEach((doc) => {
-      try {
+    documents.forEach((doc) =>
+    {
+      try
+      {
         const result = engine.transform(doc);
-        resultsFile += JSON.stringify(result) + '\n';
+        results.push(result);
         pass++;
       }
       catch (e)
       {
         fail++;
-        resultsFile += 'FAIL' + '\n';
+        results.push('FAIL');
       }
-      sourceDocFile += JSON.stringify(doc) + '\n';
+      inputs.push(doc);
     });
+    if (pass + fail === 0)
+    {
+      return 'No Documents To Test';
+    }
+    else
+    {
+      const overallFile: MigrationTestFile = {
+        testName: name,
+        numDocs: pass + fail,
+        numFailed: fail,
+        whichEdge: this._templateEditor.uiState.currentEdge,
+        inputDocs: inputs,
+        outputDocs: results,
+        template: templateString,
+      };
 
-    const metaFile = JSON.stringify({
-      numDocs: pass + fail,
-      failed: fail,
-      testName: name,
-      whichEdge: this._templateEditor.uiState.currentEdge,
-    }, null, 2);
+      download(JSON.stringify(overallFile, null, 2), name + '.json', 'application/json');
 
-    const zip = new jszip();
-    zip.file('about.json', metaFile + '\n');
-    zip.file('input_docs.json', sourceDocFile);
-    zip.file('expected_docs.json', resultsFile);
-
-    zip.generateAsync({type:'blob'}).then((content) => {
-      download(content, name + '.zip', 'application/zip');
-    });
+      return `Created Test File with ${pass + fail} documents`;
+    }
   }
 }
 

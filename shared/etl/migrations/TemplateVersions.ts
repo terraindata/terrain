@@ -185,3 +185,14 @@ export function updateTemplateIfNeeded(templateObj: TemplateBase): { template: T
   };
 
 }
+
+export interface MigrationTestFile
+{
+  testName: string;
+  numDocs: number;
+  numFailed: number;
+  whichEdge: number;
+  inputDocs: any[];
+  outputDocs: Array<(object | 'FAIL')>;
+  template: object;
+}

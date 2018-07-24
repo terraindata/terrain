@@ -62,7 +62,6 @@ function wrap(kp: any[])
 
 test('join transformation where the first field does not exist', () =>
 {
-
   const doc = {
     f2: 'hello',
     f3: 'world',
