@@ -52,6 +52,67 @@ import TransformationRegistry from 'shared/transformations/TransformationRegistr
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
-test('placeholder', () => {
-  // do nothing for now
+import { NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
+import { _ETLTemplate, ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
+
+import {
+  CURRENT_TEMPLATE_VERSION, getTemplateVersion, MigrationTestFile, TemplateVersion, updateTemplateIfNeeded,
+} from 'shared/etl/migrations/TemplateVersions';
+
+import * as V5InterpretedTypecasts from './cases/V5InterpretedTypecasts';
+import * as V5NumericKeypathsAndMovies from './cases/V5NumericKeypathsAndMovies';
+import * as V5NumericKeypathsRemoveCasts from './cases/V5NumericKeypathsRemoveCasts';
+import * as V5ParseStringifiedArray from './cases/V5ParseStringifiedArray';
+import * as V5ParseStringifiedArrayMoreComplex from './cases/V5ParseStringifiedArrayMoreComplex';
+import * as V5SimpleCase from './cases/V5SimpleCase';
+import * as V5SomeComplexRenames from './cases/V5SomeComplexRenames';
+import * as V5SomeTransformations from './cases/V5SomeTransformations';
+import * as V5TestDeleteFields1 from './cases/V5TestDeleteFields1';
+import * as V5TestDisableFields from './cases/V5TestDisableFields';
+import * as V5TrickyNumberCasts from './cases/V5TrickyNumberCasts';
+
+/*
+ *  Migrate the template in the test file and transform the test file's input documents to ensure
+ *  that they match the output documents
+ */
+function runMigrationFile(test: MigrationTestFile)
+{
+  const { testName, numDocs, numFailed, whichEdge, inputDocs, outputDocs, template } = test;
+
+  const migratedTemplateObj = updateTemplateIfNeeded(template as TemplateBase).template;
+  expect(getTemplateVersion(migratedTemplateObj)).toBe(CURRENT_TEMPLATE_VERSION);
+
+  const templateRecord = _ETLTemplate(template, true);
+  const engine: any = templateRecord.getEdge(whichEdge).transformations;
+
+  let failed = 0;
+  let passed = 0;
+  inputDocs.forEach((doc, i) => {
+    const expected = outputDocs[i];
+    let output: 'FAIL' | object = 'FAIL';
+    try
+    {
+      output = engine.transform(doc);
+      passed++;
+    }
+    catch (e)
+    {
+      failed++;
+    }
+
+    expect(output).toEqual(expected);
+  });
+  expect(failed).toBe(numFailed);
+}
+
+describe('Run V5 Migration Tests', () => {
+  test('V5InterpretedTypecasts', () => {
+    runMigrationFile(V5InterpretedTypecasts);
+  });
+  test('V5NumericKeypathsAndMovies', () => {
+    runMigrationFile(V5NumericKeypathsAndMovies);
+  });
+  test('V5NumericKeypathsRemoveCasts', () => {
+    runMigrationFile(V5NumericKeypathsAndMovies);
+  });
 });

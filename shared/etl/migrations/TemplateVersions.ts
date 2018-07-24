@@ -76,13 +76,13 @@ export const FIRST_TEMPLATE_VERSION: TemplateVersion = 'tv4';
 export type TemplateVersion = 'tv4' | 'tv5' | 'tv5.1';
 export const TemplateVersions = ['tv4', 'tv5', 'tv5.1'];
 
-function isBefore(v1, v2)
-{
-  if (TemplateVersions.indexOf(v1) < TemplateVersions.indexOf(v2))
-  {
-    return true;
-  }
-}
+// function isBefore(v1, v2)
+// {
+//   if (TemplateVersions.indexOf(v1) < TemplateVersions.indexOf(v2))
+//   {
+//     return true;
+//   }
+// }
 
 export function getTemplateVersion(templateObj: object): TemplateVersion
 {
@@ -190,17 +190,7 @@ function upgrade5To51(templateObj: TemplateBase): { changes: number, template: T
   for (const match of yadeep.search(template, List(['process', 'edges', -1, 'transformations'])))
   {
     const { value, location } = match;
-    const oldEngine = V5TransformationEngine.load(value) as any as {
-      dag: GraphLib.Graph;
-      uidField: number;
-      uidNode: number;
-      fieldNameToIDMap: Map<KeyPath, number>;
-      IDToFieldNameMap: Map<number, KeyPath>;
-      fieldTypes: Map<number, string>;
-      fieldEnabled: Map<number, boolean>;
-      fieldProps: Map<number, object>;
-      toJSON: () => object;
-    };
+    const oldEngine = V5TransformationEngine.load(value);
   }
   return {
     template,
@@ -248,7 +238,6 @@ export function updateTemplateIfNeeded(templateObj: TemplateBase): { template: T
     updated,
     message,
   };
-
 }
 
 export interface MigrationTestFile

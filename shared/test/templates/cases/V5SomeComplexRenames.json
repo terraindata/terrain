@@ -1,0 +1,1368 @@
+{
+  "testName": "v5 Some Complex Renames",
+  "numDocs": 2,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "name": "bob",
+      "value": 1.2,
+      "dateField": "2011-05-11T00:00:00.000Z",
+      "nested": {
+        "foo": "bar"
+      },
+      "nestedArray": [
+        {
+          "id": 1,
+          "description": "wowzers"
+        },
+        {
+          "id": 2,
+          "description": "lol"
+        }
+      ],
+      "array2": [
+        [
+          1,
+          2
+        ],
+        [
+          3,
+          4
+        ]
+      ],
+      "array": [
+        "hi",
+        "bye"
+      ]
+    },
+    {
+      "name": "doggo",
+      "value": 1.5,
+      "dateField": "2011-05-11T00:00:00.000Z",
+      "nested": {
+        "foo": "car"
+      },
+      "nestedArray": [
+        {
+          "id": 5,
+          "description": "hey there",
+          "furtherNested": {
+            "foo": "bar"
+          }
+        },
+        {
+          "id": 6,
+          "description": "hello"
+        }
+      ],
+      "array2": [
+        [
+          3,
+          2,
+          1
+        ],
+        [
+          3
+        ],
+        [
+          5,
+          6
+        ]
+      ],
+      "array": [
+        "yo",
+        "bro"
+      ]
+    }
+  ],
+  "outputDocs": [
+    {
+      "name": "bob",
+      "value": 1.2,
+      "dateField": "2011-05-11T00:00:00.000Z",
+      "nested": {
+        "foo": "bar"
+      },
+      "nestedArray": [
+        {
+          "id": 1,
+          "description": "wowzers"
+        },
+        {
+          "id": 2,
+          "description": "lol"
+        }
+      ],
+      "array2": [
+        [
+          1,
+          2
+        ],
+        [
+          3,
+          4
+        ]
+      ],
+      "array": [
+        "hi",
+        "bye"
+      ],
+      "item0": {
+        "id": 1,
+        "description": "WOWZERS"
+      },
+      "descriptionsOfItems": [
+        "wowzers",
+        "lol"
+      ]
+    },
+    {
+      "name": "doggo",
+      "value": 1.5,
+      "dateField": "2011-05-11T00:00:00.000Z",
+      "nested": {
+        "foo": "car"
+      },
+      "nestedArray": [
+        {
+          "id": 5,
+          "description": "hey there",
+          "furtherNested": {
+            "foo": "bar"
+          }
+        },
+        {
+          "id": 6,
+          "description": "hello"
+        }
+      ],
+      "array2": [
+        [
+          3,
+          2,
+          1
+        ],
+        [
+          3
+        ],
+        [
+          5,
+          6
+        ]
+      ],
+      "array": [
+        "yo",
+        "bro"
+      ],
+      "item0": {
+        "id": 5,
+        "description": "HEY THERE",
+        "furtherNested": {
+          "foo": "bar"
+        }
+      },
+      "descriptionsOfItems": [
+        "hey there",
+        "hello"
+      ]
+    }
+  ],
+  "template": {
+    "id": 4,
+    "lastModified": "2018-07-24T00:55:20.050Z",
+    "createdAt": "2018-07-24T00:54:12.762Z",
+    "archived": false,
+    "templateName": "test2",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "dateField"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "date",
+                      "format": "ISOstring"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "name"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "value"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "nested"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "object"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "nested",
+                        "foo"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "nestedArray"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "array"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "nestedArray",
+                        -1
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "object"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "nestedArray",
+                        -1,
+                        "id"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "nestedArray",
+                        -1,
+                        "description"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "array2"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "array"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "array2",
+                        -1
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "array"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "array2",
+                        -1,
+                        -1
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "12",
+                  "value": {
+                    "id": 12,
+                    "fields": [
+                      [
+                        "array"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "array"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "13",
+                  "value": {
+                    "id": 13,
+                    "fields": [
+                      [
+                        "array",
+                        -1
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "14",
+                  "value": {
+                    "id": 14,
+                    "fields": [
+                      [
+                        "nestedArray",
+                        -1,
+                        "furtherNested"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "object"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "15",
+                  "value": {
+                    "id": 15,
+                    "fields": [
+                      [
+                        "nestedArray",
+                        -1,
+                        "furtherNested",
+                        "foo"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "16",
+                  "value": {
+                    "id": 16,
+                    "fields": [
+                      [
+                        "nestedArray",
+                        0
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "object"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "17",
+                  "value": {
+                    "id": 17,
+                    "fields": [
+                      [
+                        "nestedArray",
+                        0
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "item0"
+                        ]
+                      ]
+                    },
+                    "typeCode": "DuplicateNode"
+                  }
+                },
+                {
+                  "v": "18",
+                  "value": {
+                    "id": 18,
+                    "fields": [
+                      [
+                        "_synthetic_nw45fr0lop",
+                        "item0",
+                        "description"
+                      ]
+                    ],
+                    "meta": {
+                      "format": "uppercase"
+                    },
+                    "skipNulls": true,
+                    "typeCode": "CaseNode",
+                    "acceptedType": "string"
+                  }
+                },
+                {
+                  "v": "19",
+                  "value": {
+                    "id": 19,
+                    "fields": [
+                      [
+                        "nestedArray",
+                        -1,
+                        "description"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "descriptionsOfItems"
+                        ]
+                      ]
+                    },
+                    "typeCode": "DuplicateNode"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 24,
+            "uidNode": 20,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "nestedArray"
+                ],
+                5
+              ],
+              [
+                [
+                  "descriptions",
+                  -1
+                ],
+                23
+              ],
+              [
+                [
+                  "_synthetic_gxhx0cdz8gt",
+                  "item0",
+                  "id"
+                ],
+                18
+              ],
+              [
+                [
+                  "nested",
+                  "foo"
+                ],
+                4
+              ],
+              [
+                [
+                  "nestedArray",
+                  -1,
+                  "id"
+                ],
+                7
+              ],
+              [
+                [
+                  "nestedArray",
+                  -1,
+                  "furtherNested",
+                  "foo"
+                ],
+                15
+              ],
+              [
+                [
+                  "array2",
+                  -1
+                ],
+                10
+              ],
+              [
+                [
+                  "array2"
+                ],
+                9
+              ],
+              [
+                [
+                  "_synthetic_b48msc852dq",
+                  "descriptions"
+                ],
+                22
+              ],
+              [
+                [
+                  "_synthetic_fdifj1x778",
+                  "item0",
+                  "furtherNested"
+                ],
+                20
+              ],
+              [
+                [
+                  "array",
+                  -1
+                ],
+                13
+              ],
+              [
+                [
+                  "_synthetic_nw45fr0lop",
+                  "item0",
+                  "description"
+                ],
+                19
+              ],
+              [
+                [
+                  "dateField"
+                ],
+                2
+              ],
+              [
+                [
+                  "value"
+                ],
+                1
+              ],
+              [
+                [
+                  "_synthetic_tztneh9qmi",
+                  "item0"
+                ],
+                17
+              ],
+              [
+                [
+                  "nested"
+                ],
+                3
+              ],
+              [
+                [
+                  "nestedArray",
+                  -1
+                ],
+                6
+              ],
+              [
+                [
+                  "nestedArray",
+                  -1,
+                  "description"
+                ],
+                8
+              ],
+              [
+                [
+                  "name"
+                ],
+                0
+              ],
+              [
+                [
+                  "array2",
+                  -1,
+                  -1
+                ],
+                11
+              ],
+              [
+                [
+                  "nestedArray",
+                  0
+                ],
+                16
+              ],
+              [
+                [
+                  "array"
+                ],
+                12
+              ],
+              [
+                [
+                  "nestedArray",
+                  -1,
+                  "furtherNested"
+                ],
+                14
+              ],
+              [
+                [
+                  "_synthetic_2h2w4hjp8kd",
+                  "item0",
+                  "furtherNested",
+                  "foo"
+                ],
+                21
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "name"
+                ]
+              ],
+              [
+                1,
+                [
+                  "value"
+                ]
+              ],
+              [
+                2,
+                [
+                  "dateField"
+                ]
+              ],
+              [
+                3,
+                [
+                  "nested"
+                ]
+              ],
+              [
+                4,
+                [
+                  "nested",
+                  "foo"
+                ]
+              ],
+              [
+                5,
+                [
+                  "nestedArray"
+                ]
+              ],
+              [
+                6,
+                [
+                  "nestedArray",
+                  -1
+                ]
+              ],
+              [
+                7,
+                [
+                  "nestedArray",
+                  -1,
+                  "id"
+                ]
+              ],
+              [
+                8,
+                [
+                  "nestedArray",
+                  -1,
+                  "description"
+                ]
+              ],
+              [
+                9,
+                [
+                  "array2"
+                ]
+              ],
+              [
+                10,
+                [
+                  "array2",
+                  -1
+                ]
+              ],
+              [
+                11,
+                [
+                  "array2",
+                  -1,
+                  -1
+                ]
+              ],
+              [
+                12,
+                [
+                  "array"
+                ]
+              ],
+              [
+                13,
+                [
+                  "array",
+                  -1
+                ]
+              ],
+              [
+                14,
+                [
+                  "nestedArray",
+                  -1,
+                  "furtherNested"
+                ]
+              ],
+              [
+                15,
+                [
+                  "nestedArray",
+                  -1,
+                  "furtherNested",
+                  "foo"
+                ]
+              ],
+              [
+                16,
+                [
+                  "nestedArray",
+                  0
+                ]
+              ],
+              [
+                17,
+                [
+                  "item0"
+                ]
+              ],
+              [
+                18,
+                [
+                  "item0",
+                  "id"
+                ]
+              ],
+              [
+                19,
+                [
+                  "item0",
+                  "description"
+                ]
+              ],
+              [
+                20,
+                [
+                  "item0",
+                  "furtherNested"
+                ]
+              ],
+              [
+                21,
+                [
+                  "item0",
+                  "furtherNested",
+                  "foo"
+                ]
+              ],
+              [
+                22,
+                [
+                  "descriptionsOfItems"
+                ]
+              ],
+              [
+                23,
+                [
+                  "descriptionsOfItems",
+                  -1
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "number"
+              ],
+              [
+                2,
+                "string"
+              ],
+              [
+                3,
+                "object"
+              ],
+              [
+                4,
+                "string"
+              ],
+              [
+                5,
+                "array"
+              ],
+              [
+                6,
+                "array"
+              ],
+              [
+                7,
+                "number"
+              ],
+              [
+                8,
+                "string"
+              ],
+              [
+                9,
+                "array"
+              ],
+              [
+                10,
+                "array"
+              ],
+              [
+                11,
+                "array"
+              ],
+              [
+                12,
+                "array"
+              ],
+              [
+                13,
+                "array"
+              ],
+              [
+                14,
+                "object"
+              ],
+              [
+                15,
+                "string"
+              ],
+              [
+                16,
+                "object"
+              ],
+              [
+                17,
+                "object"
+              ],
+              [
+                18,
+                "number"
+              ],
+              [
+                19,
+                "string"
+              ],
+              [
+                20,
+                "object"
+              ],
+              [
+                21,
+                "string"
+              ],
+              [
+                22,
+                "array"
+              ],
+              [
+                23,
+                "array"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                true
+              ],
+              [
+                3,
+                true
+              ],
+              [
+                4,
+                true
+              ],
+              [
+                5,
+                true
+              ],
+              [
+                6,
+                true
+              ],
+              [
+                7,
+                true
+              ],
+              [
+                8,
+                true
+              ],
+              [
+                9,
+                true
+              ],
+              [
+                10,
+                true
+              ],
+              [
+                11,
+                true
+              ],
+              [
+                12,
+                true
+              ],
+              [
+                13,
+                true
+              ],
+              [
+                14,
+                true
+              ],
+              [
+                15,
+                true
+              ],
+              [
+                16,
+                true
+              ],
+              [
+                17,
+                true
+              ],
+              [
+                18,
+                true
+              ],
+              [
+                19,
+                true
+              ],
+              [
+                20,
+                true
+              ],
+              [
+                21,
+                true
+              ],
+              [
+                22,
+                true
+              ],
+              [
+                23,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "Date"
+                }
+              ],
+              [
+                3,
+                {}
+              ],
+              [
+                4,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                5,
+                {
+                  "valueType": "object",
+                  "etlType": "Array"
+                }
+              ],
+              [
+                6,
+                {
+                  "valueType": "object"
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                8,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                9,
+                {
+                  "valueType": "array",
+                  "etlType": "Array"
+                }
+              ],
+              [
+                10,
+                {
+                  "valueType": "array",
+                  "etlType": "Array"
+                }
+              ],
+              [
+                11,
+                {
+                  "valueType": "number",
+                  "etlType": "Number"
+                }
+              ],
+              [
+                12,
+                {
+                  "valueType": "string",
+                  "etlType": "Array"
+                }
+              ],
+              [
+                13,
+                {
+                  "valueType": "string",
+                  "etlType": "String"
+                }
+              ],
+              [
+                14,
+                {}
+              ],
+              [
+                15,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                16,
+                {
+                  "etlType": "Object"
+                }
+              ],
+              [
+                17,
+                {
+                  "etlType": "Object"
+                }
+              ],
+              [
+                18,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                19,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                20,
+                {}
+              ],
+              [
+                21,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                22,
+                {
+                  "etlType": "Array",
+                  "valueType": "string"
+                }
+              ],
+              [
+                23,
+                {
+                  "etlType": "String",
+                  "valueType": "string"
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Upload",
+        "name": "Source",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": "",
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "file": null
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Database",
+        "name": "Destination",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": [
+            "name",
+            "value",
+            "dateField",
+            "nested",
+            "nestedArray",
+            "item0",
+            "descriptionsOfItems",
+            "array2",
+            "array"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "language": "elastic",
+          "table": "data",
+          "serverId": "My ElasticSearch Instance",
+          "database": "test1"
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            17,
+            6,
+            7,
+            8,
+            22,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            18,
+            19,
+            20,
+            21,
+            23
+          ]
+        }
+      }
+    }
+  }
+}
