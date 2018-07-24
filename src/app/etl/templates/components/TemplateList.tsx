@@ -88,8 +88,10 @@ class TemplateList extends TerrainComponent<Props>
 {
   public state: {
     rawTemplate: string,
+    templates: List<ETLTemplate>;
   } = {
       rawTemplate: '',
+      templates: this.props.templates.sortBy((t) => t.id).toList(),
     };
 
   public displayConfig: HeaderConfig<ETLTemplate> = [
@@ -125,13 +127,15 @@ class TemplateList extends TerrainComponent<Props>
 
   public getTemplates()
   {
-    const { templates, filter } = this.props;
+    const { filter } = this.props;
+    const { templates } = this.state;
     return this._getTemplates(templates, filter);
   }
 
   public getRowStyle(index)
   {
-    const { templates, getRowStyle } = this.props;
+    const { getRowStyle } = this.props;
+    const { templates } = this.state;
     if (getRowStyle !== undefined)
     {
       return getRowStyle(templates.get(index));
@@ -215,7 +219,7 @@ class TemplateList extends TerrainComponent<Props>
         className='template-table-wrapper'
       >
         <ItemList
-          items={this.props.templates.sortBy((a) => a.id).toList()}
+          items={this.state.templates}
           columnConfig={this.displayConfig}
           onRowClicked={this.handleOnClick}
           getMenuOptions={computeOptions}
@@ -250,7 +254,7 @@ class TemplateList extends TerrainComponent<Props>
 
   public handleOnClick(index)
   {
-    const { templates } = this.props;
+    const { templates } = this.state;
     const template = templates.get(index);
     if (this.props.onClick != null)
     {
