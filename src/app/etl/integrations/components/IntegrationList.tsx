@@ -208,6 +208,7 @@ export class IntegrationListUncontained extends TerrainComponent<Props>
             itemsName='integration'
             canCreate={TerrainTools.isAdmin()}
             onCreate={this.createIntegration}
+            canSearch={true}
           />
         </div>
       </div>

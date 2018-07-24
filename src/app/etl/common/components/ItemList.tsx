@@ -79,6 +79,7 @@ export interface Props<T>
   onCreate?: () => void;
   loading?: boolean;
   loadingMessage?: string;
+  canSearch?: boolean;
 }
 
 const memoize = _.memoize;
@@ -88,6 +89,10 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
   public static defaultProps = {
     loading: false,
     loadingMessage: null,
+  };
+
+  public state = {
+    searchQuery: '',
   };
 
   constructor(props)
@@ -190,61 +195,84 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
     return message;
   }
 
+  public handleSearchQuery()
+  {
+    return;
+  }
+
+  public renderSearchBar()
+  {
+    return (
+      <div className='item-list-search-bar'>
+        <input
+          type='text'
+          className='search-bar-input'
+          placeholder='Search...'
+          value={this.state.searchQuery}
+          onChange={this.handleSearchQuery}
+        />
+      </div>
+    );
+  }
+
   public render()
   {
     const { columnConfig, items, getMenuOptions, loading } = this.props;
 
     return (
-      <div
-        className='item-list-table'
-        style={backgroundColor(Colors().blockBg)}
-      >
+      <div className='search-bar-and-table'>
+        {this.props.canSearch && this.renderSearchBar()}
         <div
-          className='row-info-header'
-          key='header'
+          className='item-list-table'
+          style={backgroundColor(Colors().blockBg)}
         >
-          {
-            columnConfig.map((headerItem: HeaderConfigItem<T>, i: number) =>
+          <div
+            className='row-info-header'
+            key='header'
+          >
             {
-              return (
-                <div
-                  className='row-info-data'
-                  key={i}
-                  style={_.extend(
-                    {},
-                    headerItem.style || { width: `${100 / columnConfig.length}%` },
-                  )}
-                >
-                  {headerItem.name}
-                </div>
-              );
-            })
-          }
+              columnConfig.map((headerItem: HeaderConfigItem<T>, i: number) =>
+              {
+                return (
+                  <div
+                    className='row-info-data'
+                    key={i}
+                    style={_.extend(
+                      {},
+                      headerItem.style || { width: `${100 / columnConfig.length}%` },
+                    )}
+                  >
+                    {headerItem.name}
+                  </div>
+                );
+              })
+            }
+            {
+              getMenuOptions !== undefined ?
+                <div className='row-info-data' key='context-menu' />
+                : undefined
+            }
+          </div>
+
           {
-            getMenuOptions !== undefined ?
-              <div className='row-info-data' key='context-menu' />
-              : undefined
+            items.size > 0 && !loading ?
+              items.map(this.renderRow).toList()
+              :
+              <div className='item-list-message'>
+                {this.getEmptyItemsListMessage()}
+              </div>
+          }
+
+          {
+            this.props.canCreate &&
+            <PathfinderCreateLine
+              text={'Create ' + this.props.itemsName}
+              canEdit={true}
+              onCreate={this.props.onCreate}
+              showText={true}
+            />
           }
         </div>
-
-        {
-          items.size > 0 && !loading ?
-            items.map(this.renderRow).toList()
-            :
-            <div className='item-list-message'>
-              {this.getEmptyItemsListMessage()}
-            </div>
-        }
-
-        {
-          this.props.canCreate &&
-          <PathfinderCreateLine
-            text={'Create ' + this.props.itemsName}
-            canEdit={true}
-            onCreate={this.props.onCreate}
-            showText={true}
-          />
-        }
       </div>
     );
   }

@@ -227,6 +227,7 @@ class TemplateList extends TerrainComponent<Props>
           getActions={!computeOptions ? this.getActions : undefined}
           canCreate={TerrainTools.isAdmin()}
           onCreate={() => ETLRouteUtil.gotoWalkthroughStep(0)}
+          canSearch={true}
         />
         {
           TerrainTools.isFeatureEnabled(TerrainTools.TEMPLATE_COPY) ?

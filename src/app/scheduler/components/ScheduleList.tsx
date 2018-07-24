@@ -269,6 +269,7 @@ class ScheduleList extends TerrainComponent<Props>
           onCreate={this.createSchedule}
           loading={loading}
           loadingMessage={'Loading Schedules...'}
+          canSearch={true}
         />
       </div>
     );
