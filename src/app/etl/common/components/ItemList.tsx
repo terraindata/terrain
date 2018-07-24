@@ -92,7 +92,10 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
     loadingMessage: null,
   };
 
-  public state = {
+  public state: {
+    searchQuery: string,
+    searchedItems: List<T>,
+  } = {
     searchQuery: '',
     searchedItems: [],
   };
@@ -199,11 +202,10 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
 
   public handleSearchQuery(e)
   {
-    console.log(e);
     this.setState(
       {
-        searchQuery: e,
-        searchedItems: this.props.items.filter((item) => this.props.searchFunction(e, item)),
+        searchQuery: e.target.value,
+        searchedItems: this.props.items.filter((item) => this.props.searchFunction(e.target.value, item)),
       },
     );
   }
@@ -225,7 +227,8 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
 
   public render()
   {
-    const { columnConfig, items, getMenuOptions, loading } = this.props;
+    let { columnConfig, items, getMenuOptions, loading } = this.props;
+    items = (this.state.searchedItems.size === 0) ? items : this.state.searchedItems;
 
     return (
       <div className='search-bar-and-table'>
