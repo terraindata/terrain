@@ -114,7 +114,7 @@ export class TransformationEngine
    * @param {object} meta The deserialized meta object
    * @returns {object} The converted meta object
    */
-  private static makeMetaImmutable(meta: object): object
+  public static makeMetaImmutable(meta: object): object
   {
     if (meta['newFieldKeyPaths'] !== undefined)
     {
@@ -141,7 +141,7 @@ export class TransformationEngine
    *                   processing in `load` to finish converting
    *                   to a `TransformationEngine`.
    */
-  private static parseSerializedString(s: string): object
+  public static parseSerializedString(s: string): object
   {
     const parsed: object = JSON.parse(s);
     parsed['fieldNameToIDMap'] = parsed['fieldNameToIDMap'].map((v) => [KeyPath(v[0]), v[1]]);
@@ -160,15 +160,15 @@ export class TransformationEngine
     return parsed;
   }
 
-  private dag: GraphLib.Graph = new GraphLib.Graph({ directed: true });
-  private doc: object = {};
-  private uidField: number = 0;
-  private uidNode: number = 0;
-  private fieldNameToIDMap: Map<KeyPath, number> = Map<KeyPath, number>();
-  private IDToFieldNameMap: Map<number, KeyPath> = Map<number, KeyPath>();
-  private fieldTypes: Map<number, string> = Map<number, string>();
-  private fieldEnabled: Map<number, boolean> = Map<number, boolean>();
-  private fieldProps: Map<number, object> = Map<number, object>();
+  public dag: GraphLib.Graph = new GraphLib.Graph({ directed: true });
+  public doc: object = {};
+  public uidField: number = 0;
+  public uidNode: number = 0;
+  public fieldNameToIDMap: Map<KeyPath, number> = Map<KeyPath, number>();
+  public IDToFieldNameMap: Map<number, KeyPath> = Map<number, KeyPath>();
+  public fieldTypes: Map<number, string> = Map<number, string>();
+  public fieldEnabled: Map<number, boolean> = Map<number, boolean>();
+  public fieldProps: Map<number, object> = Map<number, object>();
 
   /**
    * Constructor for `TransformationEngine`.

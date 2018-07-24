@@ -314,7 +314,8 @@ export default abstract class ValidationUtil
         {
           if (tree.get(childId).size !== 0)
           {
-            throw new Error(`Field ${childId} is a primitive (${type}) but has children in the tree`);
+            const msg = `Field ${childId} is a primitive (${type}) but has children. (${engine.getFieldPath(childId).toJS()})`;
+            throw new Error(msg);
           }
         }
       }

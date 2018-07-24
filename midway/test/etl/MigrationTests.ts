@@ -55,26 +55,30 @@ import * as yadeep from 'shared/util/yadeep';
 
 import { _ETLTemplate, ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
 import { NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
+import { destringifySavedTemplate, templateForSave } from '../../src/app/etl/TemplateConfig';
 
 import
 {
   CURRENT_TEMPLATE_VERSION, getTemplateVersion, MigrationTestFile, TemplateVersion, updateTemplateIfNeeded,
 } from 'shared/etl/migrations/TemplateVersions';
 
+import * as Utils from 'shared/transformations/util/EngineUtils';
+
 const V5InterpretedTypecasts = require('./cases/V5InterpretedTypecasts');
-const V5NumericKeypathsAndMovies = require('V5NumericKeypathsAndMovies');
-const V5NumericKeypathsRemoveCasts = require('V5NumericKeypathsRemoveCasts');
-const V5ParseStringifiedArray = require('V5ParseStringifiedArray');
-const V5ParseStringifiedArrayMoreComplex = require('V5ParseStringifiedArrayMoreComplex');
-const V5SimpleCase = require('V5SimpleCase');
-const V5SomeComplexRenames = require('V5SomeComplexRenames');
-const V5SomeTransformations = require('V5SomeTransformations');
-const V5TestDeleteFields1 = require('V5TestDeleteFields1');
-const V5TestDisableFields = require('V5TestDisableFields');
-const V5TrickyNumberCasts = require('V5TrickyNumberCasts');
+const V5NumericKeypathsAndMoves = require('./cases/V5NumericKeypathsAndMoves');
+const V5NumericKeypathsRemoveCasts = require('./cases/V5NumericKeypathsRemoveCasts');
+const V5ParseStringifiedArray = require('./cases/V5ParseStringifiedArray');
+const V5ParseStringifiedArrayMoreComplex = require('./cases/V5ParseStringifiedArrayMoreComplex');
+const V5SimpleCase = require('./cases/V5SimpleCase');
+const V5SomeComplexRenames = require('./cases/V5SomeComplexRenames');
+const V5SomeTransformations = require('./cases/V5SomeTransformations');
+const V5TestDeleteFields1 = require('./cases/V5TestDeleteFields1');
+const V5TestDisableFields = require('./cases/V5TestDisableFields');
+const V5TrickyNumberCasts = require('./cases/V5TrickyNumberCasts');
 
 function runTransforms(engine: TransformationEngine, inputDocs: object[], outputDocs: Array<object | 'FAIL'>, numFailed: number)
 {
+  expect(Utils.validation.verifyEngine(engine)).toEqual([]);
   let failed = 0;
   let passed = 0;
   inputDocs.forEach((doc, i) =>
@@ -107,27 +111,37 @@ function runMigrationFile(test: MigrationTestFile)
   const migratedTemplateObj = updateTemplateIfNeeded(template as TemplateBase).template;
   expect(getTemplateVersion(migratedTemplateObj)).toBe(CURRENT_TEMPLATE_VERSION);
 
-  const templateRecord = _ETLTemplate(template, true);
+  const templateRecord = _ETLTemplate(migratedTemplateObj, true);
   const engine: TransformationEngine = templateRecord.getEdge(whichEdge).transformations;
   runTransforms(engine, inputDocs, outputDocs, numFailed);
 
-  const roundTripTemplate = _ETLTemplate(templateForBackend(templateRecord), true);
-  const roundTripEngine = roundTripTemplate.getEdge(whichEdge).transformations;
+  let roundTripTemplate: any = templateForBackend(templateRecord);
+  roundTripTemplate = templateForSave(roundTripTemplate);
+  roundTripTemplate = destringifySavedTemplate(roundTripTemplate);
+  roundTripTemplate = _ETLTemplate(roundTripTemplate, true);
+
+  const roundTripEngine = _ETLTemplate(roundTripTemplate, true).getEdge(whichEdge).transformations;
   runTransforms(roundTripEngine, inputDocs, outputDocs, numFailed);
+}
+
+function testShortCut(file: MigrationTestFile)
+{
+  test(`Migration Test: ${file.testName}`, () => {
+    runMigrationFile(file);
+  });
 }
 
 describe('Run V5 Migration Tests', () =>
 {
-  test('V5InterpretedTypecasts', () =>
-  {
-    runMigrationFile(V5InterpretedTypecasts);
-  });
-  test('V5NumericKeypathsAndMovies', () =>
-  {
-    runMigrationFile(V5NumericKeypathsAndMovies);
-  });
-  test('V5NumericKeypathsRemoveCasts', () =>
-  {
-    runMigrationFile(V5NumericKeypathsAndMovies);
-  });
+  // testShortCut(V5InterpretedTypecasts);
+  // testShortCut(V5NumericKeypathsAndMoves);
+  // testShortCut(V5NumericKeypathsRemoveCasts);
+  // testShortCut(V5ParseStringifiedArray);
+  // testShortCut(V5ParseStringifiedArrayMoreComplex);
+  testShortCut(V5SimpleCase);
+  // testShortCut(V5SomeComplexRenames);
+  // testShortCut(V5SomeTransformations);
+  // testShortCut(V5TestDeleteFields1);
+  // testShortCut(V5TestDisableFields);
+  // testShortCut(V5TrickyNumberCasts);
 });

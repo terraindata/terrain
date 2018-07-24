@@ -209,7 +209,7 @@ export function remove(obj: object, path: KeyPath): void
  *  yayadeep!
  */
 
-interface ContextResult
+export interface ContextResult
 {
   value: any;
   location: KeyPath;

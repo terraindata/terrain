@@ -52,15 +52,8 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as yadeep from 'shared/util/yadeep';
 
-import { _SinkConfig, _SourceConfig, ItemWithName, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'shared/etl/immutable/ETLProcessRecords';
-import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import { _ETLTemplate, ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
-import { _TemplateSettings, TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
-import { _TemplateUIData, TemplateUIData } from 'shared/etl/immutable/TemplateUIDataRecords';
-import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
-import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
-import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
+import { NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import
@@ -69,6 +62,7 @@ import
   TransformationNode as V5Node,
 } from 'shared/transformations/V5TransformationEngine';
 import { KeyPath } from 'shared/util/KeyPath';
+import { convertV5Engine } from './ConvertV5Engine';
 
 export const CURRENT_TEMPLATE_VERSION: TemplateVersion = 'tv5.1';
 export const FIRST_TEMPLATE_VERSION: TemplateVersion = 'tv4';
@@ -95,6 +89,25 @@ export function getTemplateVersion(templateObj: object): TemplateVersion
   {
     return FIRST_TEMPLATE_VERSION;
   }
+}
+
+function searchForEngines(template: TemplateBase): yadeep.ContextResult[]
+{
+  const locBase = List(['process', 'edges']);
+  const match: object = yadeep.get(template, locBase);
+  if (match === undefined)
+  {
+    return [];
+  }
+  const ret: yadeep.ContextResult[] = [];
+  for (const key of Object.keys(match))
+  {
+    ret.push({
+      value: match[key]['transformations'],
+      location: locBase.push(key).push('transformations'),
+    });
+  }
+  return ret;
 }
 
 /*
@@ -132,20 +145,10 @@ function upgrade4To5(templateObj: TemplateBase): { changes: number, template: Te
   const convertAll = (kps: List<KeyPath>) => kps.map((kp) => convertKeyPath(kp)).toList();
 
   let template = _.cloneDeep(templateObj);
-  for (const match of yadeep.search(template, List(['process', 'edges', -1, 'transformations'])))
+  for (const match of searchForEngines(template))
   {
     const { value, location } = match;
-    const engine = V5TransformationEngine.load(value) as any as {
-      dag: GraphLib.Graph;
-      uidField: number;
-      uidNode: number;
-      fieldNameToIDMap: Map<KeyPath, number>;
-      IDToFieldNameMap: Map<number, KeyPath>;
-      fieldTypes: Map<number, string>;
-      fieldEnabled: Map<number, boolean>;
-      fieldProps: Map<number, object>;
-      toJSON: () => object;
-    };
+    const engine = V5TransformationEngine.load(value);
     const dag = engine.dag;
     const nodes = dag.nodes();
     if (nodes !== undefined && nodes.length > 0)
@@ -180,17 +183,14 @@ function upgrade4To5(templateObj: TemplateBase): { changes: number, template: Te
 function upgrade5To51(templateObj: TemplateBase): { changes: number, template: TemplateBase }
 {
   const changes = 0;
-  const convertEngine = (oldEngine: V5TransformationEngine): TransformationEngine =>
-  {
-    const newEngine = new TransformationEngine();
-    return newEngine;
-  };
 
   const template = _.cloneDeep(templateObj);
-  for (const match of yadeep.search(template, List(['process', 'edges', -1, 'transformations'])))
+  for (const match of searchForEngines(template))
   {
     const { value, location } = match;
-    const oldEngine = V5TransformationEngine.load(value);
+    const oldEngine = V5TransformationEngine.load(typeof value === 'string' ? value : JSON.stringify(value));
+    const newEngine = convertV5Engine(oldEngine);
+    yadeep.setIn(template, location, newEngine.toJSON());
   }
   return {
     template,
