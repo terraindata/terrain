@@ -163,6 +163,14 @@ export class IntegrationListUncontained extends TerrainComponent<Props>
     );
   }
 
+  public searchIntegration(searchString, integration)
+  {
+    const matchingIntegrationId;
+    const matchingIntegrationName;
+    const matchingIntegrationType;
+    const matchingIntegrationCreator;
+  }
+
   public render()
   {
     const { integrations } = this.props;
@@ -209,6 +217,7 @@ export class IntegrationListUncontained extends TerrainComponent<Props>
             canCreate={TerrainTools.isAdmin()}
             onCreate={this.createIntegration}
             canSearch={true}
+            searchFunction={this.searchIntegration}
           />
         </div>
       </div>

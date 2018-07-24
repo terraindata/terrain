@@ -97,7 +97,7 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
     searchedItems: List<T>,
   } = {
     searchQuery: '',
-    searchedItems: [],
+    searchedItems: List(),
   };
 
   constructor(props)
@@ -227,8 +227,8 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
 
   public render()
   {
-    let { columnConfig, items, getMenuOptions, loading } = this.props;
-    items = (this.state.searchedItems.size === 0) ? items : this.state.searchedItems;
+    const { columnConfig, getMenuOptions, loading } = this.props;
+    const items = (this.state.searchQuery.length === 0) ? this.props.items : this.state.searchedItems;
 
     return (
       <div className='search-bar-and-table'>

@@ -221,7 +221,7 @@ class TemplateList extends TerrainComponent<Props>
     }
   }
 
-  public searchTemplate(searchString, template)
+  public searchTemplate(searchString: string, template: ETLTemplate)
   {
     const matchingTemplateId = String(template.id).includes(searchString);
     const matchingTemplateName = template.templateName.includes(searchString);
