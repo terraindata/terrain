@@ -89,7 +89,10 @@ export class TransformationEngine
    */
   public static load(json: object | string): TransformationEngine
   {
-    const parsedJSON: object = typeof json === 'string' ? TransformationEngine.parseSerializedString(json as string) : json as object;
+    const parsedJSON: object = typeof json === 'string' ?
+      TransformationEngine.parseSerializedString(json as string)
+      :
+      json as object;
     const e: TransformationEngine = new TransformationEngine();
     e.dag = GraphLib.json.read(parsedJSON['dag']);
     e.doc = parsedJSON['doc'];

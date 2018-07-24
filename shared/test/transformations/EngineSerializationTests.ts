@@ -59,7 +59,7 @@ test('JSON serialize/deserialize round trip', () =>
   const e: TransformationEngine = Utils.construction.makeEngine(TestDocs.doc1);
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['name'])]), { format: 'uppercase' });
   e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]), { format: 'uppercase' });
-  const j = e.toJSON();
+  const j = JSON.stringify(e.toJSON());
   const e2 = TransformationEngine.load(j);
   expect(e.equals(e2)).toBe(true);
   e2.addField(KeyPath(['i']));

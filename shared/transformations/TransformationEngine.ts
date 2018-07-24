@@ -96,9 +96,12 @@ export class TransformationEngine
    *                                 deserialize into a working engine.
    * @returns {TransformationEngine} A deserialized, ready-to-go engine.
    */
-  public static load(json: object | string): TransformationEngine
+  public static load(json: string): TransformationEngine
   {
-    const parsedJSON: object = typeof json === 'string' ? TransformationEngine.parseSerializedString(json as string) : json as object;
+    const parsedJSON: object = typeof json === 'string' ?
+      TransformationEngine.parseSerializedString(json as string)
+      :
+      json as object;
     const e: TransformationEngine = new TransformationEngine();
     e.dag = GraphLib.json.read(parsedJSON['dag']) as TransformationGraph;
     e.executionOrder = parsedJSON['executionOrder'];
@@ -157,7 +160,7 @@ export class TransformationEngine
 
   public clone(): TransformationEngine
   {
-    return TransformationEngine.load(_.cloneDeep(this.toJSON()));
+    return TransformationEngine.load(JSON.stringify(this.toJSON()));
   }
 
   /**
