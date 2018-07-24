@@ -55,12 +55,16 @@ import
 } from 'store/TerrainRedux';
 import { _User, _UserState, User, UserMap, UserState } from 'users/UserTypes';
 import Ajax from 'util/Ajax';
+import { MidwayError } from '../../../../shared/error/MidwayError';
 
 export interface UserActionTypes
 {
   change: {
     actionType: 'change';
     user: User;
+    meta?: object;
+    onSave?: () => any;
+    onError?: (error: string) => any;
   };
   fetch: {
     actionType: 'fetch';
@@ -89,13 +93,20 @@ class UserRedux extends TerrainRedux<UserActionTypes, UserState>
     {
       change: (state, action) =>
       {
-        const { user } = action.payload;
+        const { user, meta, onSave, onError } = action.payload;
         let newState = state.setIn(['users', user.id], user);
         if (user.id === state.currentUser.id)
         {
           newState = newState.set('currentUser', user);
         }
-        Ajax.saveUser(user, () => { }, () => { });
+        if (meta !== {})
+        {
+          Ajax.saveUser({user, meta}, onSave, onError);
+        }
+        else
+        {
+          Ajax.saveUser(user, onSave, onError);
+        }
         return newState;
       },
 

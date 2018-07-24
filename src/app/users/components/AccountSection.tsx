@@ -52,6 +52,7 @@ import * as React from 'react';
 import Dropdown from 'common/components/Dropdown';
 import Modal from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
+import { MidwayError } from '../../../../shared/error/MidwayError';
 import * as UserTypes from '../UserTypes';
 
 import Menu, { MenuOption } from 'common/components/Menu';
@@ -72,7 +73,7 @@ export interface Props
   hasPhoto: boolean;
   userImage?: any;
   columnNum: number;
-  onChange?: (value: any) => void;
+  onChange?: (value: any, onSuccess?: () => any, onError?: (error) => any) => void;
   onCancel?: () => void;
   canEdit: boolean;
   addingUser: boolean;
@@ -91,6 +92,8 @@ export default class Section extends TerrainComponent<Props>
       editingSections: {},
       errorModalOpen: false,
       errorModalMessage: '',
+      confirmPasswordModalOpen: false,
+      confirmPasswordModalMessage: 'Please confirm your password to edit email.',
     };
   }
 
@@ -111,6 +114,44 @@ export default class Section extends TerrainComponent<Props>
     this.setState({
       errorModalOpen: !this.state.errorModalOpen,
     });
+  }
+
+  public toggleConfirmPasswordModal()
+  {
+    this.setState({
+      confirmPasswordModalOpen: !this.state.confirmPasswordModalOpen,
+    });
+  }
+
+  public handlePasswordInput(e)
+  {
+    const currentEditingState = this.state.editingSections;
+    currentEditingState['password'] = e;
+    this.setState({
+      editingSections: currentEditingState,
+    });
+  }
+
+  public onConfirmPassword()
+  {
+    const saveSuccessful = this.props.onChange(this.state.editingSections,
+      () =>
+      {
+        this.setState(
+        {
+          isEditing: false,
+          editingSections: {},
+        });
+      },
+      (error) =>
+      {
+        this.setState({
+          errorModalOpen: true,
+          confirmPasswordModalOpen: false,
+          errorModalMessage: MidwayError.fromJSON(JSON.stringify(error)).getDetail(),
+          isEditing: true,
+        });
+      });
   }
 
   public handleUploadImage()
@@ -336,15 +377,22 @@ export default class Section extends TerrainComponent<Props>
     {
       return;
     }
-    const saveSuccessful = this.props.onChange(this.state.editingSections);
-    if (saveSuccessful)
+    if (this.state.editingSections['email'] !== undefined)
     {
-      this.setState(
+      this.toggleConfirmPasswordModal();
+    }
+    else
+    {
+      const saveSuccessful = this.props.onChange(this.state.editingSections);
+      if (saveSuccessful)
+      {
+        this.setState(
         {
           isEditing: false,
           editingSections: {},
         },
-      );
+        );
+      }
     }
   }
 
@@ -431,6 +479,19 @@ export default class Section extends TerrainComponent<Props>
           onClose={this.toggleErrorModal}
           open={this.state.errorModalOpen}
           error={true}
+        />
+        <Modal
+          title='Confirm Password'
+          className='modal-confirm-password'
+          message={this.state.confirmPasswordModalMessage}
+          confirm={true}
+          confirmButtonText='Submit'
+          showTextbox={true}
+          onTextboxValueChange={this.handlePasswordInput}
+          onConfirm={this.onConfirmPassword}
+          onClose={this.toggleConfirmPasswordModal}
+          open={this.state.confirmPasswordModalOpen}
+          inputType='password'
         />
       </div>
     );
