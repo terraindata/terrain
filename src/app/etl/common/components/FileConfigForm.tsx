@@ -194,7 +194,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
   public updateJsonPath(possiblePath)
   {
     const pathName: string = possiblePath.split(':')[0];
-    const formattedPath = (pathName === '*') ? '*' : '*.' + pathName;
+    const formattedPath = (pathName === '*') ? '*' : pathName + '.*';
     const updatedFileConfig = this.props.fileConfig.set('jsonPath', formattedPath);
     this.props.onChange(updatedFileConfig);
   }
@@ -242,7 +242,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
 
   public formatSectionTitles(key, i)
   {
-    const selectedText = (key.name === '*') ? 'CURRENTLY SELECTED: *' : `CURRENTLY SELECTED: *.${key.name}`;
+    const selectedText = (key.name === '*') ? 'CURRENTLY SELECTED: *' : `CURRENTLY SELECTED: ${key.name}.*`;
     const scoreButton = `(${key.score})`;
     const pathScoreMessage = (
       <div className='path-score-message' style={{ color: Colors().mainSectionTitle }}>
@@ -359,7 +359,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
       const suggestedPath = PathUtil.guessFilePaths(this.props.source)[0];
       if (suggestedPath != null)
       {
-        const currentPath = (suggestedPath.name === '*') ? '*' : '*. ' + suggestedPath.name;
+        const currentPath = (suggestedPath.name === '*') ? '*' : suggestedPath.name + '.*';
         state.jsonPath = currentPath;
       }
       else
