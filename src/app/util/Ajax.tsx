@@ -282,19 +282,19 @@ export const Ajax =
     );
   },
 
-  saveUser(user: object,
+  saveUser(payload: object,
     onSave: (response: any) => void,
     onError: (response: any) => void)
   {
     let userData: object;
-    userData = recordForSave(user['user']);
-    if (user.hasOwnProperty('meta'))
+    userData = recordForSave(payload['user']);
+    if (payload.hasOwnProperty('meta'))
     {
-      Object.assign(userData, user['meta']);
+      Object.assign(userData, payload['meta']);
     }
     return Ajax.req(
       'post',
-      `users/${user['user']['id']}`,
+      `users/${payload['user']['id']}`,
       userData,
       onSave,
       {
