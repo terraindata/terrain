@@ -211,6 +211,10 @@ export interface ETLActionTypes
   clearMappingCache: {
     actionType: 'clearMappingCache';
   };
+  setPreviewObject: {
+    actionType: 'setPreviewObject';
+    previewObject: object;
+  };
 }
 
 class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
@@ -334,6 +338,10 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       clearMappingCache: (state, action) =>
       {
         return state.set('mappingCache', Map());
+      },
+      setPreviewObject: (state, action) =>
+      {
+        return state.set('previewObject', action.payload.previewObject);
       },
     };
 

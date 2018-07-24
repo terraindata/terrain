@@ -612,15 +612,7 @@ export class RouteSelector extends TerrainComponent<Props>
 
   private handleOptionSearchFocusLost(optionSetIndex: number)
   {
-    setTimeout(() =>
-    {
-      if (this.state.focusedSetIndex === optionSetIndex)
-      {
-        this.setState({
-          focusedSetIndex: -1,
-        });
-      }
-    }, 200);
+    // Removing focus happened randomly, creating a noop function for now
   }
 
   private handleInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>)

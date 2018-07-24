@@ -48,6 +48,7 @@ import * as Elastic from 'elasticsearch';
 import * as _ from 'lodash';
 import * as request from 'request';
 
+import { MidwayLogger } from '../../../app/log/MidwayLogger';
 import { DatabaseControllerStatus } from '../../DatabaseControllerStatus';
 import ElasticConfig from '../ElasticConfig';
 import ElasticController from '../ElasticController';
@@ -419,9 +420,11 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
       const index = this.getIndex(params.body);
       if (index == null)
       {
-        throw new Error('search query does not specify an index');
+        MidwayLogger.warn('search query does not specify an index');
+      } else
+      {
+        params.index = index;
       }
-      params.index = index;
     }
   }
 
@@ -434,9 +437,11 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
         const index = this.getIndex(params.body[i + 1]);
         if (index == null)
         {
-          throw new Error(`msearch query #${i / 2} does not specify an index`);
+          MidwayLogger.warn(`msearch query #${i / 2} does not specify an index`);
+        } else
+        {
+          params.body[i].index = index;
         }
-        params.body[i].index = index;
       }
     }
   }
@@ -465,7 +470,7 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
     return host;
   }
 
-  private getIndex(body): string
+  private getIndex(body): string | undefined
   {
     if (body.query && body.query.bool && body.query.bool.filter)
     {
@@ -475,8 +480,7 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
         {
           return body.query.bool.filter[0].term._index;
         }
-      }
-      else
+      } else
       {
         if (body.query.bool.filter.term)
         {

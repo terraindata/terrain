@@ -53,7 +53,7 @@ interface Props
 
 const TVictoryLabel = (props: Props) => (
   props.datum.isPinned ?
-    <VictoryLabel dx='10' {...props} /> : <VictoryLabel {...props} />
+    <VictoryLabel dx={10} {...props} /> : <VictoryLabel {...props} />
 );
 
 export default TVictoryLabel;

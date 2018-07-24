@@ -59,7 +59,17 @@ import { _FileConfig, FileConfig } from 'shared/etl/immutable/EndpointRecords';
 import { FileConfig as FileConfigI } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
+import Button from 'app/common/components/Button';
+import FadeInOut from 'app/common/components/FadeInOut';
+import Modal from 'app/common/components/Modal';
+import PathUtil from 'etl/pathselector/PathguesserUtil';
 import { List } from 'immutable';
+import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
+import { ColorsActions } from '../../../colors/data/ColorsRedux';
+import ButtonModal from './ButtonModal';
+import './ButtonModal.less';
+import DataModal from './DataModal';
+const InfoIcon = require('../../../../images/icon_info.svg?name=InfoIcon');
 
 export interface Props
 {
@@ -68,17 +78,23 @@ export interface Props
   hideTypePicker?: boolean;
   style?: any;
   isSource?: boolean;
+  source?: any;
 }
 
 type FormState = FileConfigI & {
   useXmlPath: boolean;
   useJsonPath: boolean;
   isPlaFeed: boolean;
+  previewDataSource: any;
   ignoreQuotes: boolean;
 };
 
 export default class FileConfigForm extends TerrainComponent<Props>
 {
+  public state = {
+    suggestedPathsOpen: false,
+  };
+
   public inputMap: InputDeclarationMap<FormState> =
     {
       fileType: {
@@ -138,8 +154,20 @@ export default class FileConfigForm extends TerrainComponent<Props>
       jsonPath: {
         type: DisplayType.TextBox,
         displayName: 'JSON Path',
-        group: 'path',
+        group: 'suggested path',
         widthFactor: 3,
+        style: { marginTop: '10px' },
+        getDisplayState: this.jsonPathDisplay,
+      },
+      previewDataSource: {
+        type: DisplayType.Custom,
+        displayName: '',
+        group: 'suggested path',
+        widthFactor: 1,
+        style: { marginTop: '10px' },
+        options: {
+          render: this.renderSuggestedJsonPaths,
+        },
         getDisplayState: this.jsonPathDisplay,
       },
       isPlaFeed: {
@@ -156,9 +184,123 @@ export default class FileConfigForm extends TerrainComponent<Props>
     return (
       <DynamicForm
         inputMap={this.inputMap}
-        inputState={this.configToState(this.props.fileConfig)}
+        inputState={this.configToState(this.props.fileConfig, this.props.source)}
         onStateChange={this.handleFormChange}
         style={this.props.style}
+      />
+    );
+  }
+
+  public updateJsonPath(possiblePath)
+  {
+    const pathName: string = possiblePath.split(':')[0];
+    const formattedPath = (pathName === '*') ? '*' : pathName + '.*';
+    const updatedFileConfig = this.props.fileConfig.set('jsonPath', formattedPath);
+    this.props.onChange(updatedFileConfig);
+  }
+
+  public renderSuggestedJsonPaths(state, disabled)
+  {
+    if (this.props.source == null)
+    {
+      return undefined;
+    }
+    else
+    {
+      const suggestedFilePaths = PathUtil.guessFilePaths(this.props.source);
+      if (suggestedFilePaths.length === 0)
+      {
+        return undefined;
+      }
+      return (
+        <ButtonModal
+          buttonIcon={
+            <InfoIcon />
+          }
+          iconColor={Colors().mainBlue}
+          modal='Suggested JSON Paths (Select One)'
+          wide={true}
+          noFooterPadding={true}
+          smallIconButton={true}
+          modalContent={this.renderSuggestedPathsData(suggestedFilePaths)}
+        />
+      );
+    }
+  }
+
+  public formatSectionTabs(key, i)
+  {
+    return `${key.name}: ${key.score}`;
+  }
+
+  public formatSectionData(key, i)
+  {
+    const jsonPath = (key.name === '*') ? JSON.stringify(this.props.source.slice(0, 60), null, 2) :
+      JSON.stringify(this.props.source[key.name], null, 2);
+    return jsonPath;
+  }
+
+  public formatSectionTitles(key, i)
+  {
+    const selectedText = (key.name === '*') ? 'CURRENTLY SELECTED: *' : `CURRENTLY SELECTED: ${key.name}.*`;
+    const scoreButton = `(${key.score})`;
+    const pathScoreMessage = (
+      <div className='path-score-message' style={{ color: Colors().mainSectionTitle }}>
+        <p>
+          The suggested path scoring is calculated upon the JSON object's key meeting
+          certain requirements of expected behavior, such as:
+        </p>
+        <ul>
+          <li>corresponding values not being numbers or strings</li>
+          <li>values being a list of objects</li>
+          <li>objects contain identical inner keys</li>
+          <li>objects contain equal amounts of inner keys</li>
+        </ul>
+        <p>
+          A higher score indicates a stronger confidence of that key being the correct path, on
+          a 0-10 point scale.
+        </p>
+        <p>
+          If there is only one suggested key, then its score is automatically 10 as there is no comparison.
+        </p>
+      </div>
+    );
+    return (
+      <div className='path-with-score'>
+        <div className='path-title-buffer'>{selectedText}</div>
+        <ButtonModal
+          button={scoreButton}
+          modal='Path Scoring'
+          wide={false}
+          noFooterPadding={true}
+          smallTextButton={true}
+          modalContent={pathScoreMessage}
+          helpCursor={true}
+        />
+      </div>
+    );
+  }
+
+  public renderSuggestedPathsData(suggestedFilePaths)
+  {
+    return (
+      <DataModal
+        sectionType='path'
+        sectionOptions={
+          List(suggestedFilePaths.map((key, i) => this.formatSectionTabs(key, i)))
+        }
+        sectionBoxes={
+          List(suggestedFilePaths.map((key, i) => this.formatSectionData(key, i)))
+        }
+        sectionTitles={
+          List(suggestedFilePaths.map((key, i) => this.formatSectionTitles(key, i)))
+        }
+        width='100%'
+        height='80%'
+        strictFormatting={true}
+        dynamicTitle={true}
+        preselected={true}
+        onChange={this.updateJsonPath}
       />
     );
   }
@@ -175,7 +317,8 @@ export default class FileConfigForm extends TerrainComponent<Props>
 
   public jsonPathDisplay(s: FormState)
   {
-    return (s.fileType === FileTypes.Json && s.useJsonPath === true) ? DisplayState.Active : DisplayState.Hidden;
+    return (s.fileType === FileTypes.Json && s.useJsonPath === true && this.props.source !== null) ?
+      DisplayState.Active : DisplayState.Hidden;
   }
 
   public fileTypeDisplayState(s: FormState)
@@ -184,7 +327,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
   }
 
   @instanceFnDecorator(memoizeOne)
-  public configToState(config: FileConfig): FormState
+  public configToState(config: FileConfig, previewDataSource?: any): FormState
   {
     const state = Util.asJS(config) as FormState;
     if (state.xmlPath !== null)
@@ -195,6 +338,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
     {
       state.useJsonPath = true;
     }
+    state.previewDataSource = previewDataSource;
     return state;
   }
 
@@ -212,7 +356,16 @@ export default class FileConfigForm extends TerrainComponent<Props>
 
     if (state.useJsonPath && state.jsonPath === null)
     {
-      state.jsonPath = '';
+      const suggestedPath = PathUtil.guessFilePaths(this.props.source)[0];
+      if (suggestedPath != null)
+      {
+        const currentPath = (suggestedPath.name === '*') ? '*' : suggestedPath.name + '.*';
+        state.jsonPath = currentPath;
+      }
+      else
+      {
+        state.jsonPath = '';
+      }
     }
     else if (!state.useJsonPath && state.jsonPath !== null)
     {

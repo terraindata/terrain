@@ -57,6 +57,7 @@ import { MidwayLogger } from '../log/MidwayLogger';
 import ExportTransform from './ExportTransform';
 import { PostProcess } from './PostProcess';
 
+import BufferTransform from '../io/streams/BufferTransform';
 import CSVTransform from '../io/streams/CSVTransform';
 import JSONTransform from '../io/streams/JSONTransform';
 import ProgressStream from '../io/streams/ProgressStream';
@@ -78,8 +79,51 @@ import SFTPEndpoint from './endpoints/SFTPEndpoint';
 
 export const postProcessTransform: PostProcess = new PostProcess();
 
+export async function getSourceStreamPreview(name: string, source: SourceConfig, files?: stream.Readable[],
+  size?: number, rawStream?: boolean): Promise<string>
+{
+  return new Promise<string>(async (resolve, reject) =>
+  {
+    const readableStream: stream.Readable = await getSourceStream(name, source, files, size, rawStream);
+    let buffAsStr: string = '';
+    let returnedStr: boolean = false;
+    if (rawStream === true)
+    {
+      readableStream.on('data', (data) =>
+      {
+        if (data.length >= size)
+        {
+          buffAsStr += ((data.toString() as string).substring(0, size) as string);
+        }
+        else if (data.length < size)
+        {
+          buffAsStr += (data.toString() as string);
+        }
+
+        if (buffAsStr.length >= size)
+        {
+          returnedStr = true;
+          return resolve(buffAsStr);
+        }
+      });
+      readableStream.on('end', () =>
+      {
+        if (returnedStr === false)
+        {
+          return resolve(buffAsStr);
+        }
+      });
+    }
+    else
+    {
+      const results = await BufferTransform.toArray(readableStream, size);
+      return resolve(JSON.stringify(results));
+    }
+  });
+}
+
 export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[],
-  size?: number): Promise<stream.Readable>
+  size?: number, rawStream?: boolean): Promise<stream.Readable>
 {
   return new Promise<stream.Readable>(async (resolve, reject) =>
   {
@@ -150,6 +194,11 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
       if (sourceStream !== undefined && sourceStreams === undefined)
       {
         sourceStreams = [sourceStream] as stream.Readable[];
+      }
+
+      if (rawStream === true)
+      {
+        return resolve(sourceStreams[0]);
       }
 
       sourceStreams.forEach((ss: stream.Readable) =>

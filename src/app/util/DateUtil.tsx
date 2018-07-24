@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import { DateUnitArray, DateUnitMap } from 'app/common/components/DatePicker';
+import { DateSpecificityArray, DateUnitArray, DateUnitMap } from 'app/common/components/DatePicker';
 import TerrainDateParameter from 'shared/database/elastic/parser/TerrainDateParameter';
 const moment = require('moment-timezone');
 
@@ -112,15 +112,18 @@ const DateUtil =
 
   formatSpecificDate(date)
   {
-    if (date.toLowerCase() === 'now')
+    const isNowSpecified = (date[date.length - 2] === '/');
+    const isPastDate = (date.length > 3) && (date[3] === '-');
+    const isFutureDate = (date.length > 3) && (date[3] === '+');
+    const isCurrentSpecified = (isNowSpecified && !isPastDate && !isFutureDate);
+    if (date.toLowerCase() === 'now' || isCurrentSpecified)
     {
       return 'now';
     }
     let tense;
     let dateParser;
-    let plural;
-    const elasticUnit = date.slice(-1);
-    if (date.includes('+'))
+    const elasticUnit = (isNowSpecified) ? date[date.length - 3] : date.slice(-1);
+    if (isFutureDate)
     {
       tense = 'from now';
       dateParser = '+';
@@ -130,33 +133,59 @@ const DateUtil =
       tense = 'ago';
       dateParser = '-';
     }
-    const parsedDate = date.split(dateParser);
-    const dateDetails = parsedDate[1];
-    const amount = dateDetails.slice(0, -1);
+    const dateDetails = date.slice(4);
+    const amount = (isNowSpecified) ? dateDetails.slice(0, -3) : dateDetails.slice(0, -1);
     const unit = (DateUnitMap[elasticUnit].slice(0, -3)).toLowerCase();
-    if (amount !== '1')
-    {
-      plural = 's';
-    }
-    else
-    {
-      plural = '';
-    }
+    const plural = (amount !== '1') ? 's' : '';
     return amount + ' ' + unit + plural + ' ' + tense;
+  },
+
+  hasProperElasticSegments(splitDate)
+  {
+    for (let i = 0; i < splitDate.length; i++)
+    {
+      const dateSegment = splitDate[i];
+      const segmentLength = dateSegment.length;
+      // first segment should be 'now'
+      if (dateSegment.toLowerCase() === 'now')
+      {
+        continue;
+      }
+      // if contains an empty segment then that means there were two adjacent signs + -
+      if (segmentLength === 0)
+      {
+        return false;
+      }
+      const properSegmentUnit = dateSegment.slice(-1);
+      const properSegmentAmount = dateSegment.slice(0, -1);
+      // segment is not a proper number amount followed by a proper elastic unit
+      if (DateUnitArray.indexOf(properSegmentUnit) === -1 || isNaN(Number(properSegmentAmount)))
+      {
+        return false;
+      }
+    }
+    return true;
   },
 
   isValidElasticDateParameter(date)
   {
     const properNow = date.slice(0, 3).toLowerCase();
     const properSign = date[3];
-    const properUnit = date.slice(-1);
-    const properAmount = date.slice(4);
-    const properNumber = date.slice(4, -1);
+    // check if string is 'now/<unit>' which is still valid
+    if (properSign === '/')
+    {
+      return ((properNow === 'now') && (date.length === 5) && (DateUnitArray.indexOf(date.slice(-1)) !== -1));
+    }
+    const isSpecified = (date[date.length - 2] === '/');
+    const properSpecification = (isSpecified) ? date.slice(-1) : '';
+    const properUnit = (isSpecified) ? date[date.length - 3] : date.slice(-1);
+    const unspecifiedDate = (isSpecified) ? date.slice(0, -2) : date;
+    const splitDate = unspecifiedDate.split(/[+-]/);
+    const hasProperElasticSegments = DateUtil.hasProperElasticSegments(splitDate);
     return ((date.toLowerCase() === 'now') || ((properNow === 'now') &&
       (properSign === '+' || properSign === '-') &&
-      (!properAmount.includes('+') && !properAmount.includes('-'))
-      && (!isNaN((Number(properNumber))))
-      && (DateUnitArray.indexOf(properUnit) !== -1)
+      (hasProperElasticSegments) && (DateUnitArray.indexOf(properUnit) !== -1) &&
+      (DateSpecificityArray.indexOf(properSpecification) !== -1)
     ));
   },
 
@@ -172,7 +201,7 @@ const DateUtil =
     }
     else if (date.charAt(0) === '@')
     {
-      return date; // Input
+      return date;
     }
     else
     {

@@ -117,47 +117,51 @@ describe('DatePicker', () =>
     {
       datePickerComponent.setProps({ date: 'now+24w' });
       expect(datePickerComponent.find('.date-view-title')).toHaveLength(1);
-      expect(datePickerComponent.find('.date-view-label')).toHaveLength(3);
+      expect(datePickerComponent.find('.date-view-label')).toHaveLength(4);
       expect(datePickerComponent.find('.unselected-date-type')).toHaveLength(2);
       expect(datePickerComponent.find('.selected-date-type')).toHaveLength(1);
       expect(datePickerComponent.state()['dateViewType']).toEqual('specific');
       expect(datePickerComponent.state()['sign']).toEqual('+');
       expect(datePickerComponent.state()['unit']).toEqual('w');
       expect(datePickerComponent.state()['amount']).toEqual('24');
-      expect(datePickerComponent.find(Dropdown)).toHaveLength(2);
+      expect(datePickerComponent.state()['specificity']).toEqual('');
+      expect(datePickerComponent.find(Dropdown)).toHaveLength(3);
 
-      datePickerComponent.setProps({ date: 'Now - 1M' });
+      datePickerComponent.setProps({ date: 'Now - 1M/d' });
       expect(datePickerComponent.find('.date-view-title')).toHaveLength(1);
-      expect(datePickerComponent.find('.date-view-label')).toHaveLength(3);
+      expect(datePickerComponent.find('.date-view-label')).toHaveLength(4);
       expect(datePickerComponent.find('.unselected-date-type')).toHaveLength(2);
       expect(datePickerComponent.find('.selected-date-type')).toHaveLength(1);
       expect(datePickerComponent.state()['dateViewType']).toEqual('specific');
       expect(datePickerComponent.state()['sign']).toEqual('-');
       expect(datePickerComponent.state()['unit']).toEqual('M');
       expect(datePickerComponent.state()['amount']).toEqual('1');
-      expect(datePickerComponent.find(Dropdown)).toHaveLength(2);
+      expect(datePickerComponent.state()['specificity']).toEqual('d');
+      expect(datePickerComponent.find(Dropdown)).toHaveLength(3);
 
       datePickerComponent.setProps({ date: 'now +21342y' });
       expect(datePickerComponent.find('.date-view-title')).toHaveLength(1);
-      expect(datePickerComponent.find('.date-view-label')).toHaveLength(3);
+      expect(datePickerComponent.find('.date-view-label')).toHaveLength(4);
       expect(datePickerComponent.find('.unselected-date-type')).toHaveLength(2);
       expect(datePickerComponent.find('.selected-date-type')).toHaveLength(1);
       expect(datePickerComponent.state()['dateViewType']).toEqual('specific');
       expect(datePickerComponent.state()['sign']).toEqual('+');
       expect(datePickerComponent.state()['unit']).toEqual('y');
       expect(datePickerComponent.state()['amount']).toEqual('21342');
-      expect(datePickerComponent.find(Dropdown)).toHaveLength(2);
+      expect(datePickerComponent.state()['specificity']).toEqual('');
+      expect(datePickerComponent.find(Dropdown)).toHaveLength(3);
 
-      datePickerComponent.setProps({ date: 'Now- 0m' });
+      datePickerComponent.setProps({ date: 'Now- 0m /y' });
       expect(datePickerComponent.find('.date-view-title')).toHaveLength(1);
-      expect(datePickerComponent.find('.date-view-label')).toHaveLength(3);
+      expect(datePickerComponent.find('.date-view-label')).toHaveLength(4);
       expect(datePickerComponent.find('.unselected-date-type')).toHaveLength(2);
       expect(datePickerComponent.find('.selected-date-type')).toHaveLength(1);
       expect(datePickerComponent.state()['dateViewType']).toEqual('specific');
       expect(datePickerComponent.state()['sign']).toEqual('-');
       expect(datePickerComponent.state()['unit']).toEqual('m');
       expect(datePickerComponent.state()['amount']).toEqual('0');
-      expect(datePickerComponent.find(Dropdown)).toHaveLength(2);
+      expect(datePickerComponent.state()['specificity']).toEqual('y');
+      expect(datePickerComponent.find(Dropdown)).toHaveLength(3);
     });
 
   });
