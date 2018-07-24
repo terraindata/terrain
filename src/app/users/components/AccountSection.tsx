@@ -126,7 +126,7 @@ export default class Section extends TerrainComponent<Props>
   public handlePasswordInput(e)
   {
     this.setState({
-      editingSections: Object.assign(this.state.editingSections, {password: e}),
+      editingSections: Object.assign(this.state.editingSections, { password: e }),
     });
   }
 
