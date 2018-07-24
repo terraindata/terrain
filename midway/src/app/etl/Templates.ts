@@ -357,6 +357,17 @@ export default class Templates
       },
     );
 
+    const processTransforms = (engine: string | object) => {
+      if (typeof engine === 'object')
+      {
+        return JSON.stringify(engine);
+      }
+      else
+      {
+        return engine;
+      }
+    };
+
     Object.keys(template.process.edges).map(
       (e) =>
       {
@@ -365,7 +376,7 @@ export default class Templates
           dag.setEdge(
             template.process.edges[e].from,
             template.process.edges[e].to,
-            template.process.edges[e].transformations,
+            processTransforms(template.process.edges[e].transformations),
           );
         }
       },

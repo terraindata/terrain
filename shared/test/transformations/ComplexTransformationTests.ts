@@ -139,7 +139,6 @@ test('identity transformation for conflicting nested arrays with empty arrays', 
 
 test('join transformation where the first field does not exist', () =>
 {
-
   const doc = {
     f2: 'hello',
     f3: 'world',
