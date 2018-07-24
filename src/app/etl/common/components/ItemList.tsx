@@ -80,6 +80,7 @@ export interface Props<T>
   loading?: boolean;
   loadingMessage?: string;
   canSearch?: boolean;
+  searchFunction?: (searchText: string, item: T) => boolean;
 }
 
 const memoize = _.memoize;
@@ -93,6 +94,7 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
 
   public state = {
     searchQuery: '',
+    searchedItems: [],
   };
 
   constructor(props)
@@ -195,9 +197,15 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
     return message;
   }
 
-  public handleSearchQuery()
+  public handleSearchQuery(e)
   {
-    return;
+    console.log(e);
+    this.setState(
+      {
+        searchQuery: e,
+        searchedItems: this.props.items.filter((item) => this.props.searchFunction(e, item)),
+      },
+    );
   }
 
   public renderSearchBar()

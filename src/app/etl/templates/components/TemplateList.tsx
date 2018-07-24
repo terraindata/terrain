@@ -221,6 +221,15 @@ class TemplateList extends TerrainComponent<Props>
     }
   }
 
+  public searchTemplate(searchString, template)
+  {
+    console.log(template.id);
+    const matchingTemplateId = String(template.id).includes(searchString);
+    const matchingTemplateName = template.name.includes(searchString);
+    const matchingTemplateDesc = template.description.includes(searchString);
+    return (matchingTemplateId || matchingTemplateName || matchingTemplateDesc);
+  }
+
   public render()
   {
     const computeOptions = this.computeMenuOptionsFactory(this.props.allowedActions);
@@ -238,6 +247,7 @@ class TemplateList extends TerrainComponent<Props>
           canCreate={TerrainTools.isAdmin()}
           onCreate={() => ETLRouteUtil.gotoWalkthroughStep(0)}
           canSearch={true}
+          searchFunction={this.searchTemplate}
         />
         {
           TerrainTools.isFeatureEnabled(TerrainTools.TEMPLATE_COPY) ?
