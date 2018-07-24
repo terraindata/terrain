@@ -223,10 +223,9 @@ class TemplateList extends TerrainComponent<Props>
 
   public searchTemplate(searchString, template)
   {
-    console.log(template.id);
     const matchingTemplateId = String(template.id).includes(searchString);
-    const matchingTemplateName = template.name.includes(searchString);
-    const matchingTemplateDesc = template.description.includes(searchString);
+    const matchingTemplateName = template.templateName.includes(searchString);
+    const matchingTemplateDesc = template.getDescription(this.props.algorithms).includes(searchString);
     return (matchingTemplateId || matchingTemplateName || matchingTemplateDesc);
   }
 
