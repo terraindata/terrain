@@ -227,10 +227,10 @@ export enum MagentoRoutes
 }
 
 export const MagentoRoutesNames = Immutable.Map<string, string>({
-  [MagentoRoutes.CatalogCategoryAssignedProducts]: 'CatalogCategoryAssignedProducts',
-  [MagentoRoutes.CatalogCategoryAssignProduct]: 'CatalogCategoryAssignProduct',
-  [MagentoRoutes.CatalogCategoryRemoveProduct]: 'CatalogCategoryRemoveProduct',
-  [MagentoRoutes.CatalogProductAttributeMediaList]: 'Catalog Product Attr Media List',
+  [MagentoRoutes.CatalogCategoryAssignedProducts]: 'Catalog Category Assigned Products',
+  [MagentoRoutes.CatalogCategoryAssignProduct]: 'Catalog Category Assign Product',
+  [MagentoRoutes.CatalogCategoryRemoveProduct]: 'Catalog Category Remove Product',
+  [MagentoRoutes.CatalogProductAttributeMediaList]: 'Catalog Product Attribute Media List',
   [MagentoRoutes.CatalogProductInfo]: 'Catalog Product Info',
   [MagentoRoutes.CatalogInventoryStockItemList]: 'Catalog Inventory Stock Item List',
   [MagentoRoutes.CatalogProductList]: 'Catalog Product List',
