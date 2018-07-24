@@ -112,6 +112,16 @@ class TemplateList extends TerrainComponent<Props>
     },
   ];
 
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (this.props.templates !== nextProps.templates)
+    {
+      this.setState({
+        templates: nextProps.templates.sortBy((t) => t.id).toList(),
+      });
+    }
+  }
+
   @instanceFnDecorator(memoizeOne)
   public _getTemplates(templates, filter)
   {
