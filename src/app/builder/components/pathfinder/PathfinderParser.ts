@@ -48,9 +48,7 @@ THE SOFTWARE.
 
 import TransformUtil, { NUM_CURVE_POINTS } from 'app/util/TransformUtil';
 import Util from 'app/util/Util';
-import PathfinderLine from 'builder/components/pathfinder/PathfinderLine';
-import { PathToCards } from 'builder/components/pathfinder/PathToCards';
-import { List, Map } from 'immutable';
+import { List } from 'immutable';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as TerrainLog from 'loglevel';
@@ -61,9 +59,7 @@ import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONPa
 import ESJSONType from '../../../../../shared/database/elastic/parser/ESJSONType';
 import { ESJSParser } from '../../../../../shared/database/elastic/parser/ESJSParser';
 import ESParserError from '../../../../../shared/database/elastic/parser/ESParserError';
-import { index } from '../../../../../sigint/src/Demo';
-import { isInput, toInputMap } from '../../../../blocks/types/Input';
-import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
+import { toInputMap } from '../../../../blocks/types/Input';
 import { _FilterGroup, DistanceValue, FilterGroup, FilterLine, More, Path, Score, Script, Source } from './PathfinderTypes';
 
 export const PathFinderDefaultSize = 101;
@@ -616,6 +612,11 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
   const boost = typeof line.boost === 'string' ? parseFloat(line.boost) : line.boost;
   let query = {};
   let field = line.field;
+  // If the value is an empty string then set field to field.keyword
+  if (line.fieldType === FieldType.Text && (line.value === '' || line.value === null))
+  {
+    field = field + '.keyword';
+  }
   switch (line.comparison)
   {
     case 'notexists':
@@ -635,7 +636,7 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
         bool: {
           must_not: {
             term: {
-              [line.field]: {
+              [field]: {
                 value,
               },
             },
@@ -649,7 +650,7 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
         bool: {
           must_not: {
             match: {
-              [line.field]: {
+              [field]: {
                 query: value,
               },
             },
@@ -669,7 +670,7 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
     case 'equal':
       query = {
         term: {
-          [line.field]: {
+          [field]: {
             value,
             boost,
           },
@@ -679,7 +680,7 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
     case 'contains':
       query = {
         match: {
-          [line.field]: {
+          [field]: {
             query: value,
             boost,
           },
@@ -690,10 +691,10 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
       query = {
         range: {
           [line.field]:
-            {
-              gt: value,
-              boost,
-            },
+          {
+            gt: value,
+            boost,
+          },
         },
       };
       break;
@@ -702,10 +703,10 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
       query = {
         range: {
           [line.field]:
-            {
-              gte: value,
-              boost,
-            },
+          {
+            gte: value,
+            boost,
+          },
         },
       };
       break;
@@ -713,10 +714,10 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
       query = {
         range: {
           [line.field]:
-            {
-              lt: value,
-              boost,
-            },
+          {
+            lt: value,
+            boost,
+          },
         },
       };
       break;
@@ -725,10 +726,10 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
       query = {
         range: {
           [line.field]:
-            {
-              lte: value,
-              boost,
-            },
+          {
+            lte: value,
+            boost,
+          },
         },
       };
       break;
@@ -736,10 +737,10 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
       query = {
         range: {
           [line.field]:
-            {
-              gte: value,
-              boost,
-            },
+          {
+            gte: value,
+            boost,
+          },
         },
       };
       break;
@@ -747,10 +748,10 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
       query = {
         range: {
           [line.field]:
-            {
-              lte: value,
-              boost,
-            },
+          {
+            lte: value,
+            boost,
+          },
         },
       };
       break;
@@ -778,7 +779,8 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
       break;
     case 'isin':
       value = PathFinderStringToJSONArray(String(value));
-      field = line.fieldType === FieldType.Text && !line.analyzed ? field + '.keyword' : field;
+      field = line.fieldType === FieldType.Text && !line.analyzed && field.indexOf('.keyword') === -1
+        ? field + '.keyword' : field;
       query = {
         terms: {
           [field]: value,
@@ -788,12 +790,13 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
       break;
     case 'isnotin':
       value = PathFinderStringToJSONArray(String(value));
-      field = line.fieldType === FieldType.Text && !line.analyzed ? field + '.keyword' : field;
+      field = line.fieldType === FieldType.Text && !line.analyzed && field.indexOf('.keyword') === -1
+        ? field + '.keyword' : field;
       query = {
         bool: {
           must_not: {
             terms: {
-              [line.field]: value,
+              [field]: value,
             },
           },
           boost,
