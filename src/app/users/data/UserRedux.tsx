@@ -101,7 +101,7 @@ class UserRedux extends TerrainRedux<UserActionTypes, UserState>
         }
         if (meta !== {})
         {
-          Ajax.saveUser({user, meta}, onSave, onError);
+          Ajax.saveUser({ user, meta }, onSave, onError);
         }
         else
         {

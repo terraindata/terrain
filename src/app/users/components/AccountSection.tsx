@@ -138,10 +138,10 @@ export default class Section extends TerrainComponent<Props>
       () =>
       {
         this.setState(
-        {
-          isEditing: false,
-          editingSections: {},
-        });
+          {
+            isEditing: false,
+            editingSections: {},
+          });
       },
       (error) =>
       {
@@ -387,10 +387,10 @@ export default class Section extends TerrainComponent<Props>
       if (saveSuccessful)
       {
         this.setState(
-        {
-          isEditing: false,
-          editingSections: {},
-        },
+          {
+            isEditing: false,
+            editingSections: {},
+          },
         );
       }
     }

@@ -290,7 +290,7 @@ export const Ajax =
     userData = recordForSave(user['user']);
     if (user.hasOwnProperty('meta'))
     {
-       Object.assign(userData, user['meta']);
+      Object.assign(userData, user['meta']);
     }
     return Ajax.req(
       'post',

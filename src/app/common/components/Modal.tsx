@@ -277,8 +277,8 @@ class Modal extends TerrainComponent<Props>
                   this.props.showTextbox &&
                   <input
                     type={
-                    this.props.inputType ? this.props.inputType : 'text'
-                  }
+                      this.props.inputType ? this.props.inputType : 'text'
+                    }
                     className={classNames({
                       'standard-input': true,
                       [this.props.inputClassName]: this.props.inputClassName !== undefined && this.props.inputClassName !== '',
