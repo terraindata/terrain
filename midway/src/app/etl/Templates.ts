@@ -357,7 +357,8 @@ export default class Templates
       },
     );
 
-    const processTransforms = (engine: string | object) => {
+    const processTransforms = (engine: string | object) =>
+    {
       if (typeof engine === 'object')
       {
         return JSON.stringify(engine);

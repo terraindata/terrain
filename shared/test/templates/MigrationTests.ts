@@ -52,6 +52,7 @@ import TransformationRegistry from 'shared/transformations/TransformationRegistr
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
-test('placeholder', () => {
+test('placeholder', () =>
+{
   // do nothing for now
 });
