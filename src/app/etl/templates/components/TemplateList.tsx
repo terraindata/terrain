@@ -53,6 +53,7 @@ import Util from 'util/Util';
 
 import Button from 'app/common/components/Button';
 import FloatingInput from 'app/common/components/FloatingInput';
+import ItemListUtil from 'app/util/ItemListUtil';
 import TerrainTools from 'app/util/TerrainTools';
 import { MenuOption } from 'common/components/Menu';
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -223,10 +224,13 @@ class TemplateList extends TerrainComponent<Props>
 
   public searchTemplate(searchString: string, template: ETLTemplate)
   {
-    const matchingTemplateId = String(template.id).includes(searchString);
-    const matchingTemplateName = template.templateName.includes(searchString);
-    const matchingTemplateDesc = template.getDescription(this.props.algorithms).includes(searchString);
-    return (matchingTemplateId || matchingTemplateName || matchingTemplateDesc);
+    const itemProps =
+      List([
+        String(template.id),
+        template.templateName,
+        template.getDescription(this.props.algorithms),
+      ]);
+    return ItemListUtil.searchList(searchString, itemProps);
   }
 
   public render()

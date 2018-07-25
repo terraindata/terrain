@@ -45,10 +45,28 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
+import { List } from 'immutable';
 
 const ItemListUtil =
 {
-
+  searchList(searchString: string, itemProps: List<string>)
+  {
+    for (let i = 0; i < itemProps.size; i++)
+    {
+      const matchingPropGeneral = itemProps.get(i).toLowerCase().includes(searchString.toLowerCase());
+      const matchingPropTrimmed = itemProps.get(i).toLowerCase().includes(searchString.toLowerCase().replace(/ /g, ''));
+      const matchingProp = matchingPropGeneral || matchingPropTrimmed;
+      if (matchingProp === true)
+      {
+        return true;
+      }
+      else
+      {
+        continue;
+      }
+    }
+    return false;
+  },
 };
 
 export default ItemListUtil;

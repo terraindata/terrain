@@ -52,6 +52,7 @@ import * as React from 'react';
 import EtlRouteUtil from 'app/etl/ETLRouteUtil';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
 import { _SchedulerConfig, scheduleForDatabase, SchedulerConfig } from 'app/scheduler/SchedulerTypes';
+import ItemListUtil from 'app/util/ItemListUtil';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -250,13 +251,14 @@ class ScheduleList extends TerrainComponent<Props>
 
   public searchSchedule(searchString: string, schedule: SchedulerConfig)
   {
-    const matchingScheduleId = String(schedule.id).includes(searchString);
-    const matchingScheduleName = schedule.name.includes(searchString);
-    const scheduleInterval = this.getIntervalDisplayName(schedule.cron);
-    const scheduleStatus = this.getScheduleStatus(schedule);
-    const matchingScheduleInterval = scheduleInterval.includes(searchString);
-    const matchingScheduleStatus = scheduleStatus.includes(searchString);
-    return (matchingScheduleId || matchingScheduleName || matchingScheduleInterval || matchingScheduleStatus);
+    const itemProps =
+      List([
+        String(schedule.id),
+        schedule.name,
+        this.getIntervalDisplayName(schedule.cron),
+        this.getScheduleStatus(schedule),
+      ]);
+    return ItemListUtil.searchList(searchString, itemProps);
   }
 
   public render()
