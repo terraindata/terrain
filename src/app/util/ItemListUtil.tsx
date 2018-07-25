@@ -60,10 +60,6 @@ const ItemListUtil =
       {
         return true;
       }
-      else
-      {
-        continue;
-      }
     }
     return false;
   },
