@@ -74,6 +74,7 @@ export class TransformationNode
     this.id = id;
     this.fields = fields;
     this.meta = options;
+    this.typeCode = typeCode;
   }
 }
 

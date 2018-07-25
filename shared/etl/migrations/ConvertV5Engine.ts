@@ -55,7 +55,7 @@ import FriendEngine from 'shared/transformations/FriendEngine';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType,
-  { IdentityTypes, NodeOptionsType, TransformationEdgeTypes as EdgeTypes } from 'shared/transformations/TransformationNodeType';
+{ IdentityTypes, NodeOptionsType, TransformationEdgeTypes as EdgeTypes } from 'shared/transformations/TransformationNodeType';
 import { TransformationEngine as V5Engine, TransformationNode as V5Node } from 'shared/transformations/V5TransformationEngine';
 
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
@@ -118,7 +118,11 @@ class EngineConverter
     this.initializeBuildProcess();
     this.addOrganicFields();
     this.renameOrganicFields();
-    // add field props
+    this.addTransformations();
+
+    this.transferProperties();
+    // make sure fields are the right type
+    // check for errors!
     return this.newEngine;
   }
 
@@ -141,7 +145,8 @@ class EngineConverter
     const fieldProps = this.oldEngine.fieldProps;
     const enabledMap = this.oldEngine.fieldEnabled;
 
-    idToPath.forEach((kp, id) => {
+    idToPath.forEach((kp, id) =>
+    {
       const props = fieldProps.get(id);
       let etlType = props['etlType'];
       if (etlType == null)
@@ -177,7 +182,8 @@ class EngineConverter
       const nfkp: List<KeyPath> = node.meta['newFieldKeyPaths'];
       if (nfkp !== undefined && nfkp.size > 0)
       {
-        nfkp.forEach((kp) => {
+        nfkp.forEach((kp) =>
+        {
           const rawId: number = this.getOutputFieldID(kp);
           this.rawFields[rawId].synthetic = true;
         });
@@ -228,7 +234,8 @@ class EngineConverter
 
   private renameOrganicFields()
   {
-    this.newEngine.getAllFieldIDs().forEach((newId) => {
+    this.newEngine.getAllFieldIDs().forEach((newId) =>
+    {
       const rawId = this.oldEngine.fieldNameToIDMap.get(this.newEngine.getFieldPath(newId));
       const rawField = this.getRawField(rawId);
 
@@ -236,6 +243,87 @@ class EngineConverter
       {
         this.newEngine.renameField(newId, rawField.okp);
       }
+    });
+  }
+
+  // add transformations from the old engine to the new one
+  private addTransformations()
+  {
+    const oldGraph = this.oldEngine.dag as TypedGraph<V5Node, any>;
+    const idsToAdd = this.oldEngine.dag.nodes().sort((a, b) => Number(a) - Number(b));
+    for (const oldNodeId of idsToAdd)
+    {
+      const oldNode = oldGraph.node(oldNodeId);
+      this.addTransformation(oldNode);
+    }
+  }
+
+  private addTransformation(oldNode: V5Node)
+  {
+    let typeCode = oldNode.typeCode;
+    let fields = oldNode.fields;
+    const meta = oldNode.meta;
+
+    if (typeCode === 'CastNode')
+    {
+      typeCode = TransformationNodeType.DeprecatedNode;
+      (meta as NodeOptionsType<TransformationNodeType.DeprecatedNode>).deprecatedType = 'CastNode';
+    }
+
+    fields = fields.map((kp) =>
+    {
+      const rawId = this.oldEngine.fieldNameToIDMap.get(kp);
+      const rawField = this.getRawField(rawId);
+      if (this.newEngine.getFieldID(rawField.okp) === undefined)
+      {
+        if (Utils.path.isSpecified(rawField.okp))
+        {
+          Utils.fields.addIndexedField(this.newEngine, rawField.okp);
+        }
+        else
+        {
+          Utils.fields.addInferredField(this.newEngine, rawField.okp, FieldTypes.String);
+        }
+      }
+      return rawField.okp;
+    }).toList();
+
+    if (typeCode === TransformationNodeType.DeprecatedNode)
+    {
+      if (meta['toTypename'] === 'array')
+      {
+        const wildPath = fields.get(0).push(-1);
+        if (this.newEngine.getFieldID(wildPath) === undefined)
+        {
+          this.newEngine.addField(wildPath, {
+            etlType: FieldTypes.String,
+          });
+        }
+      }
+    }
+
+    this.newEngine.appendTransformation(typeCode, fields, meta);
+  }
+
+  private transferProperties()
+  {
+    this.newEngine.getAllFieldIDs().forEach((newId) =>
+    {
+      const rawId = this.getOutputFieldID(this.newEngine.getFieldPath(newId));
+      const rawField = this.getRawField(rawId);
+      if (rawField.enabled)
+      {
+        this.newEngine.enableField(newId);
+      }
+      else
+      {
+        this.newEngine.disableField(newId);
+      }
+      const oldProps = rawField.fieldProps;
+      const currentProps = this.newEngine.getFieldProps(newId);
+      const newProps = _.omit(oldProps, ['etlType', 'valueType']);
+      newProps['etlType'] = rawField.type == null ? currentProps['etlType'] : rawField.type;
+      this.newEngine.setFieldProps(newId, newProps);
     });
   }
 
@@ -258,7 +346,7 @@ class EngineConverter
   {
     for (const id of Object.keys(this.rawFields))
     {
-      yield(Number(id));
+      yield (Number(id));
     }
   }
 

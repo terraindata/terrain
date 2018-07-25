@@ -182,7 +182,7 @@ function upgrade4To5(templateObj: TemplateBase): { changes: number, template: Te
  */
 function upgrade5To51(templateObj: TemplateBase): { changes: number, template: TemplateBase }
 {
-  const changes = 0;
+  const changes = 1;
 
   const template = _.cloneDeep(templateObj);
   for (const match of searchForEngines(template))

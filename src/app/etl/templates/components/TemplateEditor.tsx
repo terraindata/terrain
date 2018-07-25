@@ -107,7 +107,7 @@ class TemplateEditor extends TerrainComponent<Props>
     if (TerrainTools.isFeatureEnabled(TerrainTools.TEMPLATE_TEST_GENERATOR))
     {
       // tslint:disable-next-line
-      console.log('Terrain Tools: Template Test Generator', TestGenerator);
+      console.log('Terrain Tools: Template Test Generator', TestGenerator.saveTestCase);
     }
   }
 

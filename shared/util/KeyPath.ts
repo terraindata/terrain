@@ -64,6 +64,12 @@ export class KeyPathUtil
     return last as number === -1;
   }
 
+  public static isSpecified(keypath: KeyPath, index?: number): boolean
+  {
+    const last = index === undefined ? keypath.last() : keypath.get(index);
+    return last as number !== -1 && typeof last === 'number';
+  }
+
   public static hash(keypath: KeyPath): string
   {
     return JSON.stringify(keypath.toJS());

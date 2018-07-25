@@ -126,22 +126,23 @@ function runMigrationFile(test: MigrationTestFile)
 
 function testShortCut(file: MigrationTestFile)
 {
-  test(`Migration Test: ${file.testName}`, () => {
+  test(`Migration Test: ${file.testName}`, () =>
+  {
     runMigrationFile(file);
   });
 }
 
 describe('Run V5 Migration Tests', () =>
 {
-  // testShortCut(V5InterpretedTypecasts);
-  // testShortCut(V5NumericKeypathsAndMoves);
-  // testShortCut(V5NumericKeypathsRemoveCasts);
-  // testShortCut(V5ParseStringifiedArray);
-  // testShortCut(V5ParseStringifiedArrayMoreComplex);
+  testShortCut(V5InterpretedTypecasts);
+  testShortCut(V5NumericKeypathsAndMoves);
+  testShortCut(V5NumericKeypathsRemoveCasts);
+  testShortCut(V5ParseStringifiedArray);
+  testShortCut(V5ParseStringifiedArrayMoreComplex);
   testShortCut(V5SimpleCase);
-  // testShortCut(V5SomeComplexRenames);
-  // testShortCut(V5SomeTransformations);
-  // testShortCut(V5TestDeleteFields1);
-  // testShortCut(V5TestDisableFields);
-  // testShortCut(V5TrickyNumberCasts);
+  testShortCut(V5SomeComplexRenames);
+  testShortCut(V5SomeTransformations);
+  testShortCut(V5TestDeleteFields1);
+  testShortCut(V5TestDisableFields);
+  testShortCut(V5TrickyNumberCasts);
 });
