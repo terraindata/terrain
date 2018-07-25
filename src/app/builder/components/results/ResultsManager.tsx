@@ -164,7 +164,7 @@ export class ResultsManager extends TerrainComponent<Props>
       this.queryM2Results(query, db, hitsPage, appendResults);
     } else
     {
-      console.log('Unknown Database ' + query);
+      TerrainLog.debug('Unknown Database ' + query);
     }
     // temporarily disable count
     // this.setState({
@@ -745,7 +745,7 @@ export class ResultsManager extends TerrainComponent<Props>
         });
         if (duplicateRootKeys.length !== 0)
         {
-          console.log('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
+          TerrainLog.debug('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
         }
         rootKeys.forEach((rootKey) =>
         {
@@ -886,7 +886,7 @@ export class ResultsManager extends TerrainComponent<Props>
       }
       catch (err)
       {
-        console.log('The error message does not match MidwayError.' + response);
+        TerrainLog.error('The error message does not match MidwayError.' + response);
         error = new MidwayError(-1, 'Unknow Route Error', response, {});
       }
       errorItems = error.getMidwayErrors();
