@@ -197,7 +197,7 @@ class InputComponent extends TerrainComponent<Props>
         <MapComponent
           onChange={this.changeValue}
           canEdit={this.props.canEdit}
-          geocoder='photon'
+          geocoder='google'
           inputValue={this.props.input.meta}
           coordinates={value}
           allowSearchByCoordinate={true}

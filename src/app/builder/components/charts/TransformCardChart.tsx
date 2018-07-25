@@ -92,6 +92,7 @@ export interface Props
   index?: string;
   schema?: SchemaState;
   builder?: BuilderState;
+  distanceValue?: { location: number[], address: '' };
 }
 
 // http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
@@ -130,6 +131,20 @@ export class TransformCardChart extends TerrainComponent<Props>
   {
     const el = ReactDOM.findDOMNode(this);
     TransformChart.create(el, this.getChartState());
+  }
+
+  public parseInputs(toParse)
+  {
+    const inputs = {};
+    if (toParse === undefined || toParse === null)
+    {
+      return {};
+    }
+    toParse.forEach((input) =>
+    {
+      inputs['@' + input.key] = input.value;
+    });
+    return inputs;
   }
 
   public onSelect(pointId: string, selectRange: boolean): void
@@ -604,6 +619,8 @@ export class TransformCardChart extends TerrainComponent<Props>
       index: this.props.index,
       schema: this.props.schema,
       builder: this.props.builder,
+      distanceValue: overrideState.distanceValue || this.props.distanceValue,
+      inputs: this.parseInputs(this.props.builder.query.inputs),
     };
   }
 

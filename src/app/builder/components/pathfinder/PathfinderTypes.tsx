@@ -232,7 +232,7 @@ class ScoreLineC extends LineC
   public field: string = ''; // autocomplete
   public transformData: TransformData = _TransformData();
   public expanded: boolean = true;
-
+  public fieldType: FieldType = undefined;
   public sortOrder: 'desc' | 'asc' = 'desc'; // only used for certain types
 }
 export type ScoreLine = ScoreLineC & IRecord<ScoreLineC>;
@@ -257,6 +257,8 @@ class TransformDataC extends BaseClass
   public hasCustomDomain: boolean = false;
   public mode: string = 'linear';
   public autoBound: boolean = false;
+  // Extra data for distance score lines
+  public distanceValue: { location: [number, number], address: string } = null;
 }
 
 export type TransformData = TransformDataC & IRecord<TransformDataC>;
@@ -716,6 +718,7 @@ class ElasticDataSourceC extends DataSource
               'half_float',
               'float',
               'date',
+              'geo_point',
             ];
         }
         else if (context.subtype === 'match')
@@ -740,9 +743,13 @@ class ElasticDataSourceC extends DataSource
 
         let acceptableOptions: List<ChoiceOption> = acceptableCols.map((col) =>
         {
+          const fieldType = ReverseFieldTypeMapping[col.datatype];
           return _ChoiceOption({
             displayName: col.name,
             value: col.name,
+            meta: {
+              fieldType,
+            },
           });
         }).toSet().toList();
         let fieldNames = acceptableOptions.map((f) => f.value).toList();
@@ -849,7 +856,7 @@ class ElasticDataSourceC extends DataSource
     if (context.type === 'input')
     {
       // Get all of the inputs
-      let inputs = context.builderState.query.inputs;
+      let inputs: any = context.builderState.query.inputs;
       inputs = inputs.map((input) =>
         _ChoiceOption({
           displayName: '@' + String(input.key),

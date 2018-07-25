@@ -241,16 +241,27 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     return true;
   }
 
+  private isFieldTypeNotSet(fieldType)
+  {
+    if (fieldType === undefined ||
+      fieldType === null ||
+      fieldType === FieldType.Any ||
+      isNaN(fieldType)
+    )
+    {
+      return true;
+    } else
+    {
+      return false;
+    }
+  }
+
   // Check if the field is defined and field type isnt (may occur when filter was created by cards)
   // Update the fieldType if necessary
   private updateFieldType(props: Props)
   {
     let fieldType = props.filterLine.fieldType;
-    if (props.filterLine.field &&
-      (fieldType === undefined ||
-        fieldType === null ||
-        fieldType === FieldType.Any ||
-        isNaN(fieldType)))
+    if (props.filterLine.field && this.isFieldTypeNotSet(fieldType))
     {
       const { schemaState, builderState, source } = props.pathfinderContext;
       const data = ElasticBlockHelpers.getTypeOfField(
@@ -292,9 +303,13 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       {
         comparison = comparison === 'contains' ? 'equal' : 'notequal';
       }
-      props.onChange(props.keyPath, props.filterLine
-        .set('fieldType', parseFloat(String(fieldType)))
-        .set('comparison', comparison), true);
+      if (this.isFieldTypeNotSet(fieldType) === false)
+      {
+        // Tell the caller to re-render the line only when we successfully set the type, otherwise this generates the infinite event loop
+        props.onChange(props.keyPath, props.filterLine
+          .set('fieldType', parseFloat(String(fieldType)))
+          .set('comparison', comparison), true);
+      }
     }
   }
 
@@ -546,7 +561,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                   onChange={this.handleMapChange}
                   keyPath={this.props.keyPath}
                   canEdit={pathfinderContext.canEdit}
-                  options={this.props.valueOptions.map((opt) => opt.value).toList()}
+                  options={this.props.valueOptions && this.props.valueOptions.map((opt) => opt.value).toList()}
                 />
               </div>
             );

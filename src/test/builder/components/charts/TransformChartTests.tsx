@@ -106,6 +106,7 @@ describe('TransformCardChart', () =>
     colors: ['blue', 'green'] as [string, string],
     spotlights: [],
     mode: 'linear',
+    builder: { query: { inputs: undefined } } as any,
   };
 
   beforeEach(() =>

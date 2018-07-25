@@ -171,7 +171,6 @@ const TransformUtil = {
     let y1: number = pointsData[0].y !== undefined ? pointsData[0].y : pointsData[0].score;
     const x2: number = pointsData[1].x !== undefined ? pointsData[1].x : pointsData[1].value;
     let y2: number = pointsData[1].y !== undefined ? pointsData[1].y : pointsData[1].score;
-
     const shift = y2 < y1 ? y2 - 0.001 : y1 - 0.001;
     y1 -= shift;
     y2 -= shift;
@@ -180,7 +179,11 @@ const TransformUtil = {
     let x = x1;
     const stepSize = (x2 - x1) / numPoints;
     const lambda = (Math.log(y2) / x1 - Math.log(y1) / x1) / (1 - x2 / x1);
-    const a = y2 / Math.exp(-1 * lambda * x2);
+    let a = y2 / Math.exp(-1 * lambda * x2);
+    if (a === Infinity)
+    {
+      a = 0;
+    }
     for (let i = 0; i <= numPoints; i++)
     {
       const y = TransformUtil._exponential(x, lambda, a);

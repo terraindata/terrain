@@ -66,8 +66,13 @@ import Util from 'app/util/Util';
 import PathfinderText from 'builder/components/pathfinder/PathfinderText';
 import FadeInOut from 'common/components/FadeInOut';
 import Switch from 'common/components/Switch';
+import MapUtil from 'util/MapUtil';
+import { TransformQueryUtil } from 'util/TransformQueryUtil';
 import { ElasticQueryResult } from '../../../../../shared/database/elastic/ElasticQueryResponse';
+import ESInterpreter from '../../../../../shared/database/elastic/parser/ESInterpreter';
+import { ESJSParser } from '../../../../../shared/database/elastic/parser/ESJSParser';
 import { MidwayError } from '../../../../../shared/error/MidwayError';
+import { toInputMap } from '../../../../blocks/types/Input';
 import { isInput } from '../../../../blocks/types/Input';
 import { getIndex, getType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
@@ -137,7 +142,7 @@ class TransformCard extends TerrainComponent<Props>
     // Only want to calculate this the first time that we open the chart
     if (this.state.bars.size === 0)
     {
-      this.computeBars(this.props.data.input, this.state.maxDomain, !this.props.data.hasCustomDomain);
+      this.computeBars(this.props.data, this.state.maxDomain, !this.props.data.hasCustomDomain);
     }
   }
 
@@ -147,9 +152,8 @@ class TransformCard extends TerrainComponent<Props>
       nextProps.builder.query.inputs !== this.props.builder.query.inputs)
       && !this.props.data.closed && nextProps.data.input === '_score')
     {
-      this.computeBars(nextProps.data.input, this.state.maxDomain, true, nextProps.builder.query);
+      this.computeBars(nextProps.data, this.state.maxDomain, true, nextProps.builder.query);
     }
-
     // nextProps.data.domain is list<string>
     const newDomain: List<number> = List([Number(nextProps.data.domain.get(0)), Number(nextProps.data.domain.get(1))]);
     if (!newDomain.equals(this.state.maxDomain))
@@ -161,14 +165,19 @@ class TransformCard extends TerrainComponent<Props>
           maxDomain: trimmedDomain,
           chartDomain: trimmedDomain,
         });
-        this.computeBars(nextProps.data.input, trimmedDomain);
+        this.computeBars(nextProps.data, trimmedDomain);
         return;
       }
     }
-
-    if (nextProps.data.input !== this.props.data.input)
+    if (nextProps.data.input !== this.props.data.input ||
+      nextProps.data.distanceValue !== this.props.data.distanceValue ||
+      (
+        nextProps.builder.query.inputs !== this.props.builder.query.inputs &&
+        nextProps.data.distanceValue && nextProps.data.distanceValue.address &&
+        nextProps.data.distanceValue.address.charAt(0) === '@'
+      ))
     {
-      this.computeBars(nextProps.data.input, this.state.maxDomain, true);
+      this.computeBars(nextProps.data, this.state.maxDomain, true);
     }
   }
 
@@ -246,7 +255,7 @@ class TransformCard extends TerrainComponent<Props>
   // called by TransformCardChart to request that the view be zoomed to fit the data
   public handleZoomToData()
   {
-    this.computeBars(this.props.data.input, this.state.maxDomain, true);
+    this.computeBars(this.props.data, this.state.maxDomain, true);
   }
 
   public handleUpdatePoints(points, isConcrete?: boolean)
@@ -286,6 +295,7 @@ class TransformCard extends TerrainComponent<Props>
           mode={this.props.data.mode}
           builder={this.props.builder}
           index={this.props.index || getIndex('', this.props.builder)}
+          distanceValue={data.distanceValue}
         />
         <TransformCardPeriscope
           onChange={this.props.onChange}
@@ -374,30 +384,62 @@ class TransformCard extends TerrainComponent<Props>
       totalDoc = hits.total;
     }
     let theHist;
-    if (elasticHistogram.transformCard.buckets.length >= NUM_BARS)
+    // Check if buckets is array (normal histogram agg) or object (from geo_distance agg)
+    if (typeof elasticHistogram.transformCard.buckets === 'object' &&
+      !Array.isArray(elasticHistogram.transformCard.buckets)
+    )
     {
-      theHist = elasticHistogram.transformCard.buckets;
-    } else
-    {
-      return this.handleElasticAggregationError('No Result');
-    }
-    const bars: Bar[] = [];
-    for (let j = 0; j < NUM_BARS; j++)
-    {
-      bars.push({
-        id: '' + j,
-        count: theHist[j].doc_count,
-        percentage: totalDoc ? (theHist[j].doc_count / totalDoc) : 0,
-        range: {
-          min: theHist[j].key,
-          max: theHist[j + 1].key,
-        },
+      const keys = Object.keys(elasticHistogram.transformCard.buckets);
+      if (!keys.length)
+      {
+        return this.handleElasticAggregationError('No Result');
+      }
+      const bars: Bar[] = [];
+      const { buckets } = elasticHistogram.transformCard;
+      keys.forEach((key, i) =>
+      {
+        const numKey =
+          bars.push({
+            id: '' + i,
+            count: buckets[key].doc_count,
+            percentage: totalDoc ? buckets[key].doc_count / totalDoc : 0,
+            range: {
+              min: parseFloat(key),
+              max: keys[i + 1] !== undefined ? parseFloat(keys[i + 1]) :
+                parseFloat(keys[i]) + parseFloat(keys[i]) - parseFloat(keys[i - 1]),
+            },
+          });
+      });
+      this.setState({
+        bars: List(bars),
       });
     }
-
-    this.setState({
-      bars: List(bars),
-    });
+    else
+    {
+      if (elasticHistogram.transformCard.buckets.length >= NUM_BARS)
+      {
+        theHist = elasticHistogram.transformCard.buckets;
+      } else
+      {
+        return this.handleElasticAggregationError('No Result');
+      }
+      const bars: Bar[] = [];
+      for (let j = 0; j < NUM_BARS; j++)
+      {
+        bars.push({
+          id: '' + j,
+          count: theHist[j].doc_count,
+          percentage: totalDoc ? (theHist[j].doc_count / totalDoc) : 0,
+          range: {
+            min: theHist[j].key,
+            max: theHist[j + 1] !== undefined ? theHist[j + 1].key : theHist[j] + (theHist[j] - theHist[j - 1]),
+          },
+        });
+      }
+      this.setState({
+        bars: List(bars),
+      });
+    }
   }
 
   private handleElasticDomainAggregationError(err: MidwayError | string)
@@ -411,6 +453,71 @@ class TransformCard extends TerrainComponent<Props>
     });
   }
 
+  // Given a groupjoined query, generate aggreagtions for min, max, and bars manually
+  private handleParentGeoResponse(resp: MidwayQueryResponse)
+  {
+    if (resp.result && resp.result.hits && resp.result.hits.hits && resp.result.hits.hits.length)
+    {
+      let min;
+      let max;
+      const distances = [];
+      // Look at all the parents
+      resp.result.hits.hits.forEach((hit, i) =>
+      {
+        // If they have a child query field, look through all their children
+        if (hit.childQuery && hit.childQuery.length)
+        {
+          const parentField = Object.keys(hit._source)[0];
+          const childField = Object.keys(hit.childQuery[0]._source)[0];
+          hit.childQuery.forEach((child, j) =>
+          {
+            // Find distance between child and parent
+            const distance = MapUtil.distance(
+              [hit._source[parentField].lat, hit._source[parentField].lon],
+              [child._source[childField].lat, child._source[childField].lon],
+            );
+            if (min === undefined || distance < min)
+            {
+              min = distance;
+            }
+            if (max === undefined || distance > max)
+            {
+              max = distance;
+            }
+            distances.push(distance);
+          });
+        }
+      });
+
+      const interval = (max - min) / NUM_BARS;
+      const bars = [];
+      for (let i = 0; i < NUM_BARS; i++)
+      {
+        bars.push({
+          id: String(i),
+          count: 0,
+          percentage: 0,
+          range: {
+            min: i * interval + min,
+            max: (i + 1) * interval + min,
+          },
+        });
+      }
+      distances.forEach((distance, i) =>
+      {
+        const barNum = Math.floor((distance - min) / interval);
+        const bar = bars[barNum];
+        bar.count += 1;
+        bar.percentage = bar.count / distances.length;
+        bars[barNum] = bar;
+      });
+      this.setState({
+        bars: List(bars),
+        maxDomain: List([min, max]),
+        chartDomain: List([min, max]),
+      });
+    }
+  }
   private handleElasticDomainAggregationResponse(resp: MidwayQueryResponse)
   {
     const { data, keyPath } = this.props;
@@ -423,6 +530,7 @@ class TransformCard extends TerrainComponent<Props>
     const agg = (resp.result as ElasticQueryResult).aggregations;
     if (agg === undefined || agg['minimum'] === undefined || agg['maximum'] === undefined)
     {
+      this.handleParentGeoResponse(resp);
       return;
     }
     const newDomain = this.trimDomain(this.state.maxDomain, List([agg['minimum'].value, agg['maximum'].value]));
@@ -460,85 +568,30 @@ class TransformCard extends TerrainComponent<Props>
 
     this.props.onChange(this._ikeyPath(keyPath, 'domain'), newDomain, true);
     this.props.onChange(this._ikeyPath(keyPath, 'dataDomain'), newDomain, true);
-    this.computeBars(data.input, this.state.maxDomain);
+    this.computeBars(data, this.state.maxDomain);
   }
 
   // TODO move the bars computation to a higher level
-  private computeBars(input: CardString, maxDomain: List<number>, recomputeDomain = false, overrideQuery?)
+  private computeBars(data: any, maxDomain: List<number>, recomputeDomain = false, overrideQuery?)
   {
     switch (this.props.language)
     {
       case 'mysql':
-        this.computeTQLBars(input);
+        this.computeTQLBars(data.input);
         break;
       case 'elastic':
-        this.computeElasticBars(input, maxDomain, recomputeDomain, overrideQuery);
+        this.computeElasticBars(data, maxDomain, recomputeDomain, overrideQuery);
         break;
       default:
         break;
     }
   }
 
-  // To calculate a histogram for _score, the query that is actually being run has to
-  // be run because _score is only set when there are text filters, so an empty query isn't sufficient
-  private computeScoreElasticBars(maxDomain: List<number>, recomputeDomain: boolean, overrideQuery?)
-  {
-    const query = overrideQuery || this.props.builder.query;
-    let tqlString = '';
-
-    try
-    {
-      tqlString = stringifyWithParameters(JSON.parse(query.tql), (name) => isInput(name, query.inputs));
-    } catch (e)
-    {
-      // couldn't parse the JSON
-      // TODO clear bars
-      return;
-    }
-
-    const tql = JSON.parse(tqlString);
-    tql['size'] = 0;
-    tql['sort'] = {};
-    if (recomputeDomain)
-    {
-      tql['aggs'] = {
-        maximum: {
-          max: {
-            script: { inline: '_score' },
-          },
-        },
-        minimum: {
-          min: {
-            script: { inline: '_score' },
-          },
-        },
-      };
-    }
-    else
-    {
-      const min = maxDomain.get(0);
-      const max = maxDomain.get(1);
-      const interval = (max - min) / NUM_BARS;
-      tql['aggs'] = {
-        transformCard: {
-          histogram: {
-            script: { inline: '_score' },
-            interval,
-            extended_bounds: {
-              min, max,
-            },
-          },
-        },
-      };
-    }
-    return tql;
-  }
-
-  private computeElasticBars(input: CardString, maxDomain: List<number>, recomputeDomain: boolean, overrideQuery?)
+  private computeElasticBars(data: any, maxDomain: List<number>, recomputeDomain: boolean, overrideQuery?)
   {
     const { builder } = this.props;
     const { db } = builder;
-
+    const { input, distanceValue } = data;
     if (!input)
     {
       return;
@@ -556,57 +609,29 @@ class TransformCard extends TerrainComponent<Props>
       type = getType('', builder);
     }
 
-    const filter = [];
-    // If index and type are strings (there aren't multiple indexes/types) then add filters for them
-    if (typeof index === 'string')
-    {
-      filter.push({
-        term: {
-          _index: index,
-        },
-      });
-    }
-    if (typeof type === 'string' && type !== '')
-    {
-      filter.push({
-        term: {
-          _type: type,
-        },
-      });
-    }
-
     if (recomputeDomain)
     {
-      let domainQuery;
+      let domainQuery = null;
       if (input === '_score')
       {
-        domainQuery = this.computeScoreElasticBars(maxDomain, recomputeDomain, overrideQuery);
+        domainQuery = TransformQueryUtil.getScoreDomainAggregation(overrideQuery || this.props.builder.query);
+      }
+      else if (distanceValue)
+      {
+        domainQuery = TransformQueryUtil.getGeoDomainAggregation(
+          index, type, input, distanceValue, overrideQuery || builder.query,
+        );
       }
       else
       {
-        domainQuery = {
-          query: {
-            bool: {
-              filter,
-            },
-          },
-          aggs: {
-            maximum: {
-              max: {
-                field: input,
-              },
-            },
-            minimum: {
-              min: {
-                field: input,
-              },
-            },
-          },
-        };
+        domainQuery = TransformQueryUtil.getDomainAggregation(index, type, input);
       }
-
+      if (domainQuery === null)
+      {
+        return;
+      }
       const domainAggregationAjax = Ajax.query(
-        JSON.stringify(domainQuery),
+        domainQuery,
         db,
         (resp) =>
         {
@@ -623,43 +648,30 @@ class TransformCard extends TerrainComponent<Props>
     }
     else
     {
+      let aggQuery = null;
       const min = maxDomain.get(0);
       const max = maxDomain.get(1);
       const interval = (max - min) / NUM_BARS;
-      let aggQuery;
       if (input === '_score')
       {
-        aggQuery = this.computeScoreElasticBars(maxDomain, recomputeDomain, overrideQuery);
+        aggQuery = TransformQueryUtil.getScoreHistogramAggregation(overrideQuery || this.props.builder.query, min, max, interval);
+      }
+      else if (distanceValue)
+      {
+        aggQuery = TransformQueryUtil.getGeoHistogramAggregation(
+          index, type, input, min, max, interval, distanceValue, overrideQuery ? overrideQuery.inputs : this.props.builder.query.inputs,
+        );
       }
       else
       {
-        aggQuery = {
-          query: {
-            bool: {
-              filter,
-              must: {
-                range: {
-                  [input as string]: { gte: min, lt: max },
-                },
-              },
-            },
-          },
-          aggs: {
-            transformCard: {
-              histogram: {
-                field: input,
-                interval,
-                extended_bounds: {
-                  min, max,
-                },
-              },
-            },
-          },
-          size: 1,
-        };
+        aggQuery = TransformQueryUtil.getHistogramAggregation(index, type, input, min, max, interval);
+      }
+      if (aggQuery === null)
+      {
+        return;
       }
       const aggregationAjax = Ajax.query(
-        JSON.stringify(aggQuery),
+        aggQuery,
         db,
         (resp) =>
         {
