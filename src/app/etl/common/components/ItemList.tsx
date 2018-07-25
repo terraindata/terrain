@@ -96,9 +96,9 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
     searchQuery: string,
     searchedItems: List<T>,
   } = {
-    searchQuery: '',
-    searchedItems: List(),
-  };
+      searchQuery: '',
+      searchedItems: List(),
+    };
 
   constructor(props)
   {

@@ -163,7 +163,7 @@ export class IntegrationListUncontained extends TerrainComponent<Props>
     );
   }
 
-  public searchIntegration(searchString, integration)
+  public searchIntegration(searchString: string, integration: IntegrationConfig)
   {
     const matchingIntegrationId = String(integration.id).includes(searchString);
     const matchingIntegrationName = integration.name.includes(searchString);

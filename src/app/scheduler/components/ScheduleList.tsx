@@ -248,6 +248,17 @@ class ScheduleList extends TerrainComponent<Props>
     return actions;
   }
 
+  public searchSchedule(searchString: string, schedule: SchedulerConfig)
+  {
+    const matchingScheduleId = String(schedule.id).includes(searchString);
+    const matchingScheduleName = schedule.name.includes(searchString);
+    const scheduleInterval = this.getIntervalDisplayName(schedule.cron);
+    const scheduleStatus = this.getScheduleStatus(schedule);
+    const matchingScheduleInterval = scheduleInterval.includes(searchString);
+    const matchingScheduleStatus = scheduleStatus.includes(searchString);
+    return (matchingScheduleId || matchingScheduleName || matchingScheduleInterval || matchingScheduleStatus);
+  }
+
   public render()
   {
     const { schedules, loading } = this.props;
@@ -270,6 +281,7 @@ class ScheduleList extends TerrainComponent<Props>
           loading={loading}
           loadingMessage={'Loading Schedules...'}
           canSearch={true}
+          searchFunction={this.searchSchedule}
         />
       </div>
     );
