@@ -165,10 +165,12 @@ export class IntegrationListUncontained extends TerrainComponent<Props>
 
   public searchIntegration(searchString, integration)
   {
-    const matchingIntegrationId;
-    const matchingIntegrationName;
-    const matchingIntegrationType;
-    const matchingIntegrationCreator;
+    const matchingIntegrationId = String(integration.id).includes(searchString);
+    const matchingIntegrationName = integration.name.includes(searchString);
+    const matchingIntegrationType = integration.type.includes(searchString);
+    const integrationCreator = this.formatValue('createdBy', integration.createdBy);
+    const matchingIntegrationCreator = integrationCreator.includes(searchString);
+    return (matchingIntegrationId || matchingIntegrationName || matchingIntegrationType || matchingIntegrationCreator);
   }
 
   public render()
