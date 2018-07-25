@@ -886,12 +886,8 @@ const Util = {
     return immutableMap;
   },
 
-  arrayToImmutableList(arrayToConvert: any[], itemConstructor = null)
+  arrayToImmutableList(arrayToConvert: any[] = [], itemConstructor = null)
   {
-    if (!arrayToConvert)
-    {
-      return List();
-    }
     const immutableList = arrayToConvert.map((item) =>
     {
       if (itemConstructor !== null)

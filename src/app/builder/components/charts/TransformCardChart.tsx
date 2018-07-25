@@ -142,7 +142,7 @@ export class TransformCardChart extends TerrainComponent<Props>
     }
     toParse.forEach((input) =>
     {
-      inputs['@' + String(input.key)] = input.value;
+      inputs['@' + input.key] = input.value;
     });
     return inputs;
   }
