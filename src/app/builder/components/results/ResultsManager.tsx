@@ -835,10 +835,6 @@ export class ResultsManager extends TerrainComponent<Props>
   private updateM2ErrorState(errors: MidwayErrorItem[], isAllFields?: boolean)
   {
     // TODO: handle myltiple errors.
-    if (!errors)
-    {
-      return;
-    }
     const err = errors[0];
     let { resultsState } = this.props;
     if (!isAllFields)
