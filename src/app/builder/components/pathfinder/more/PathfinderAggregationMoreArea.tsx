@@ -167,6 +167,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
         pathfinderContext={this.props.pathfinderContext}
         filterGroup={this.props.aggregation.filters}
         keyPath={this._ikeyPath(this.props.keyPath, 'filters')}
+        valueOptions={List()}
       />
     );
   }

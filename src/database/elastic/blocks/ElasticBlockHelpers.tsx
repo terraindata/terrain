@@ -269,6 +269,10 @@ export const ElasticBlockHelpers = {
       }
       return FieldType.Text;
     }
+    else if (field === 'TerrainScore')
+    {
+      return returnDatatype ? 'float' : FieldType.Numerical;
+    }
     if (!builderState.query && !overrideIndex)
     {
       return '';
