@@ -317,7 +317,7 @@ export default class FileConfigForm extends TerrainComponent<Props>
 
   public jsonPathDisplay(s: FormState)
   {
-    return (s.fileType === FileTypes.Json && s.useJsonPath === true && this.props.source !== null) ?
+    return (s.fileType === FileTypes.Json && s.useJsonPath === true) ?
       DisplayState.Active : DisplayState.Hidden;
   }
 
