@@ -241,7 +241,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     return true;
   }
 
-  private isFiledTypeNotSet(fieldType)
+  private isFieldTypeNotSet(fieldType)
   {
     if (fieldType === undefined ||
       fieldType === null ||
@@ -261,7 +261,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   private updateFieldType(props: Props)
   {
     let fieldType = props.filterLine.fieldType;
-    if (props.filterLine.field && this.isFiledTypeNotSet(fieldType))
+    if (props.filterLine.field && this.isFieldTypeNotSet(fieldType))
     {
       const { schemaState, builderState, source } = props.pathfinderContext;
       const data = ElasticBlockHelpers.getTypeOfField(
@@ -303,7 +303,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       {
         comparison = comparison === 'contains' ? 'equal' : 'notequal';
       }
-      if (this.isFiledTypeNotSet(fieldType) === false)
+      if (this.isFieldTypeNotSet(fieldType) === false)
       {
         // Tell the caller to re-render the line only when we successfully set the type, otherwise this generates the infinite event loop
         props.onChange(props.keyPath, props.filterLine
