@@ -5,6 +5,17 @@
 @icon-ratio: 1.25;
 @icon-size: calc(1em*@icon-ratio);
 
+.item-list-search-bar {
+  display: flex;
+  flex-direction: row-reverse;
+  .search-bar-input {
+    width: 25%;
+    border-radius: 20px;
+    padding: 5px 10px;
+    margin: 0px 4px;
+  }
+}
+
 .item-list-table {
   margin-top: @spacing;
   border-collapse: collapse;

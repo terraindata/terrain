@@ -53,6 +53,7 @@ import Util from 'util/Util';
 
 import Button from 'app/common/components/Button';
 import FloatingInput from 'app/common/components/FloatingInput';
+import ItemListUtil from 'app/util/ItemListUtil';
 import TerrainTools from 'app/util/TerrainTools';
 import { MenuOption } from 'common/components/Menu';
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -221,6 +222,17 @@ class TemplateList extends TerrainComponent<Props>
     }
   }
 
+  public searchTemplate(searchString: string, template: ETLTemplate)
+  {
+    const itemProps =
+      List([
+        String(template.id),
+        template.templateName,
+        template.getDescription(this.props.algorithms),
+      ]);
+    return ItemListUtil.searchList(searchString, itemProps);
+  }
+
   public render()
   {
     const computeOptions = this.computeMenuOptionsFactory(this.props.allowedActions);
@@ -237,6 +249,8 @@ class TemplateList extends TerrainComponent<Props>
           getActions={!computeOptions ? this.getActions : undefined}
           canCreate={TerrainTools.isAdmin()}
           onCreate={() => ETLRouteUtil.gotoWalkthroughStep(0)}
+          canSearch={true}
+          searchFunction={this.searchTemplate}
         />
         {
           TerrainTools.isFeatureEnabled(TerrainTools.TEMPLATE_COPY) ?

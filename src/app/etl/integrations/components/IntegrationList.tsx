@@ -46,12 +46,14 @@ THE SOFTWARE.
 // tslint:disable:no-console strict-boolean-expressions no-var-requires
 import { ETLActions } from 'app/etl/ETLRedux';
 import EtlRouteUtil from 'app/etl/ETLRouteUtil';
+import ItemListUtil from 'app/util/ItemListUtil';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { ItemList } from 'etl/common/components/ItemList';
-import * as Immutable from 'immutable';
 import { Map } from 'immutable';
+import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as React from 'react';
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 import { User } from 'users/UserTypes';
@@ -163,6 +165,18 @@ export class IntegrationListUncontained extends TerrainComponent<Props>
     );
   }
 
+  public searchIntegration(searchString: string, integration: IntegrationConfig)
+  {
+    const itemProps =
+      List([
+        String(integration.id),
+        integration.name,
+        integration.type,
+        this.formatValue('createdBy', integration.createdBy),
+      ]);
+    return ItemListUtil.searchList(searchString, itemProps);
+  }
+
   public render()
   {
     const { integrations } = this.props;
@@ -208,6 +222,8 @@ export class IntegrationListUncontained extends TerrainComponent<Props>
             itemsName='integration'
             canCreate={TerrainTools.isAdmin()}
             onCreate={this.createIntegration}
+            canSearch={true}
+            searchFunction={this.searchIntegration}
           />
         </div>
       </div>
