@@ -670,7 +670,7 @@ const TransformChart = {
                 }
                 parentLoc = parentLoc[keyPath[i]];
               }
-              if (parentLoc)
+              if (parentLoc !== null && parentLoc !== undefined)
               {
                 const distance = MapUtil.distance(
                   loc,

@@ -728,51 +728,47 @@ export class ResultsManager extends TerrainComponent<Props>
       });
       return;
     }
-    let hits = [];
-    if (resultsData.hits)
+    const hits = resultsData.hits.hits.map((hit) =>
     {
-      hits = resultsData.hits.hits.map((hit) =>
+      let hitTemp = _.cloneDeep(hit);
+      let rootKeys: string[] = [];
+      rootKeys = _.without(Object.keys(hitTemp), '_index', '_type', '_id', '_score', '_source', 'sort', '', 'fields');
+      if (rootKeys.length > 0) // there were group join objects
       {
-        let hitTemp = _.cloneDeep(hit);
-        let rootKeys: string[] = [];
-        rootKeys = _.without(Object.keys(hitTemp), '_index', '_type', '_id', '_score', '_source', 'sort', '', 'fields');
-        if (rootKeys.length > 0) // there were group join objects
+        const duplicateRootKeys: string[] = [];
+        rootKeys.forEach((rootKey) =>
         {
-          const duplicateRootKeys: string[] = [];
-          rootKeys.forEach((rootKey) =>
+          if (Object.keys(hitTemp._source).indexOf(rootKey) > -1)
           {
-            if (Object.keys(hitTemp._source).indexOf(rootKey) > -1)
-            {
-              duplicateRootKeys.push(rootKey);
-            }
-          });
-          if (duplicateRootKeys.length !== 0)
-          {
-            console.log('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
+            duplicateRootKeys.push(rootKey);
           }
-          rootKeys.forEach((rootKey) =>
-          {
-            hitTemp['_source'][rootKey] = hitTemp[rootKey];
-            delete hitTemp[rootKey];
-          });
-        }
-        const sort = hitTemp.sort !== undefined ? { TerrainScore: hitTemp.sort[0] } : {};
-        let fields = {};
-        if (hitTemp.fields !== undefined)
-        {
-          _.keys(hitTemp.fields).forEach((field) =>
-          {
-            fields[field] = hitTemp.fields[field][0];
-          });
-        }
-        return _.extend({}, hitTemp._source, sort, fields, {
-          _index: hitTemp._index,
-          _type: hitTemp._type,
-          _score: hitTemp._score,
-          _id: hitTemp._id,
         });
+        if (duplicateRootKeys.length !== 0)
+        {
+          console.log('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
+        }
+        rootKeys.forEach((rootKey) =>
+        {
+          hitTemp['_source'][rootKey] = hitTemp[rootKey];
+          delete hitTemp[rootKey];
+        });
+      }
+      const sort = hitTemp.sort !== undefined ? { TerrainScore: hitTemp.sort[0] } : {};
+      let fields = {};
+      if (hitTemp.fields !== undefined)
+      {
+        _.keys(hitTemp.fields).forEach((field) =>
+        {
+          fields[field] = hitTemp.fields[field][0];
+        });
+      }
+      return _.extend({}, hitTemp._source, sort, fields, {
+        _index: hitTemp._index,
+        _type: hitTemp._type,
+        _score: hitTemp._score,
+        _id: hitTemp._id,
       });
-    }
+    });
     const aggregations = resultsData.aggregations;
     this.updateResults({ hits, aggregations, rawResult: resultsData }, isAllFields, appendResults, querySize);
   }

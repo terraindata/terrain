@@ -125,7 +125,18 @@ class PathfinderArea extends TerrainComponent<Props>
       });
     }
     // If inputs changes, or parent query data source changes, update value possibilities
-    if ((nextProps.builder.query &&
+    if (this.shouldUpdateValueOptions(nextProps))
+    {
+      this.setState({
+        valueOptions: this.getValueOptions(nextProps),
+      });
+    }
+  }
+
+  public shouldUpdateValueOptions(nextProps): boolean
+  {
+    const { pathfinderContext } = this.state;
+    const queryChange = nextProps.builder.query &&
       pathfinderContext.builderState.query &&
       (
         nextProps.builder.query.inputs !==
@@ -134,14 +145,9 @@ class PathfinderArea extends TerrainComponent<Props>
           this.state.pathfinderContext.parentSource) ||
         nextProps.parentName !==
         this.state.pathfinderContext.parentName
-      )) ||
-      pathfinderContext.schemaState !== nextProps.schema
-    )
-    {
-      this.setState({
-        valueOptions: this.getValueOptions(nextProps),
-      });
-    }
+      );
+    const schemaChange = pathfinderContext.schemaState !== nextProps.schema;
+    return queryChange || schemaChange;
   }
 
   public getValueOptions(props: Props)
