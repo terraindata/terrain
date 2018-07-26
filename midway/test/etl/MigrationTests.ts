@@ -67,6 +67,7 @@ import * as Utils from 'shared/transformations/util/EngineUtils';
 const V5InterpretedTypecasts = require('./cases/V5InterpretedTypecasts');
 const V5NumericKeypathsAndMoves = require('./cases/V5NumericKeypathsAndMoves');
 const V5NumericKeypathsRemoveCasts = require('./cases/V5NumericKeypathsRemoveCasts');
+const V5TestMergeEngine = require('./cases/V5TestMergeEngine');
 const V5ParseStringifiedArray = require('./cases/V5ParseStringifiedArray');
 const V5ParseStringifiedArrayMoreComplex = require('./cases/V5ParseStringifiedArrayMoreComplex');
 const V5SimpleCase = require('./cases/V5SimpleCase');
@@ -145,4 +146,5 @@ describe('Run V5 Migration Tests', () =>
   testShortCut(V5TestDeleteFields1);
   testShortCut(V5TestDisableFields);
   testShortCut(V5TrickyNumberCasts);
+  testShortCut(V5TestMergeEngine);
 });
