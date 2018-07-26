@@ -1,0 +1,1488 @@
+{
+  "testName": "MC_013",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "SKU": "KTCR-0037-WHA",
+      "VariantName": "Whiskey Appreciation Crate",
+      "Price": 159.99,
+      "Inventory": 1021,
+      "VariantStatus": "sellable",
+      "ProductId": 137,
+      "VariantId": 263,
+      "Path": "whiskey-appreciation-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/whiskey-appreciation-crate",
+      "ContentsHTML": "<h4>Distinguished Gear</h4> <ul>\r\n  <li>Personalized Whiskey Decanter <br>(hand-made, may contain minor imperfections)</li>\r\n  <li>2 Personalized Heavy Bottom Rocks Glasses, 9 oz</li>\r\n  <li>2 Ice Sphere Molds</li>\r\n  <li>2 Slate Coasters</li>\r\n  <li>Whiskey Drinking Journal</li>\r\n</ul> <h4>Luxury Grub</h4> <ul>\r\n  <li>Spiced Peppercorn Peanuts</li>\r\n  <li>Salted Pistachios</li>\r\n  <li>Cranberry Pecans</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours to process.</i></p>",
+      "LongDescription": "An Executive Appreciation In 1797, George Washington, the Michael Jordan of being American, declined the free\r\n   world's greatest honor, a Presidential term three-peat, in order to build a whiskey\r\n   distillery in his basement. The Revolutionary War MVP and celebrity endorser of\r\n   the one dollar bill knew that no amount of prestige or accomplishments could rival\r\n   the warm satisfaction of a good glass of whiskey.\r\n In days past, a man's fondness for whiskey was admirably brandished in full home bars, but in modern times,\r\n   whiskey is hidden out of sight in cabinets and desk drawers like shameful secrets. The Whiskey Appreciation\r\n   Crate is here to restore honor to the once great bond between a man and his drink.\r\n Oh, yes we de-can! Etching your initials into a glass decanter is a public declaration of your affinity for whiskey.\r\n   It's like donning a trenchcoat and holding a boombox overhead blasting Peter Gabriel's\r\n   \"In Your Eyes\" outside of whiskey's house or barging past the TSA checkpoint to frantically\r\n   sprint through the airport terminal for a last second  whiskey\r\n   before boarding your plane.\r\n While the monogrammed decanter looks super classy when flanked by its matching pair of personalized\r\n   rocks tumblers, whiskey should be appraised by taste as well as  presentation. The decanter properly\r\n   aerates and settles your whiskey so you can settle down with a glass of good company anytime.\r\n Good Company Rounding out the Whiskey Appreciation Crate is the ultimate whiskey connoisseur collection: A pair of\r\n   Tovolo Ice Molds and slate coasters, a pocket-sized whiskey tasting journal, and the most important whiskey\r\n   accessory, premium savory snacks.\r\n Box up those dusty sports trophies and find a stud to hang your awkward family portraits, because the\r\n   Personalized Whiskey Decanter is reclaiming whiskey's proper place atop your mantel.\r\n",
+      "Contents": "Distinguished Gear \r\n  Personalized Whiskey Decanter (hand-made, may contain minor imperfections)\r\n  2 Personalized Heavy Bottom Rocks Glasses, 9 oz\r\n  2 Ice Sphere Molds\r\n  2 Slate Coasters\r\n  Whiskey Drinking Journal\r\n Luxury Grub \r\n  Spiced Peppercorn Peanuts\r\n  Salted Pistachios\r\n  Cranberry Pecans\r\n\r\nNOTE: Personalized items require 48 hours to process.",
+      "LongDescriptionHTML": "<h4>An Executive Appreciation</h4> <p>In 1797, George Washington, the Michael Jordan of being American, declined the free\r\n   world's greatest honor, a Presidential term three-peat, in order to build a whiskey\r\n   distillery in his basement. The Revolutionary War MVP and celebrity endorser of\r\n   the one dollar bill knew that no amount of prestige or accomplishments could rival\r\n   the warm satisfaction of a good glass of whiskey.\r\n</p> <p>In days past, a man's fondness for whiskey was admirably brandished in full home bars, but in modern times,\r\n   whiskey is hidden out of sight in cabinets and desk drawers like shameful secrets. The Whiskey Appreciation\r\n   Crate is here to restore honor to the once great bond between a man and his drink.\r\n</p> <h4>Oh, yes we de-can!</h4> <p>Etching your initials into a glass decanter is a public declaration of your affinity for whiskey.\r\n   It's like donning a trenchcoat and holding a boombox overhead blasting Peter Gabriel's\r\n   \"In Your Eyes\" outside of whiskey's house or barging past the TSA checkpoint to frantically\r\n   sprint through the airport terminal for a last second  whiskey\r\n   before boarding your plane.\r\n</p> <p>While the monogrammed decanter looks super classy when flanked by its matching pair of personalized\r\n   rocks tumblers, whiskey should be appraised by taste as well as  presentation. The decanter properly\r\n   aerates and settles your whiskey so you can settle down with a glass of good company anytime.\r\n</p> <h4>Good Company</h4> <p>Rounding out the Whiskey Appreciation Crate is the ultimate whiskey connoisseur collection: A pair of\r\n   Tovolo Ice Molds and slate coasters, a pocket-sized whiskey tasting journal, and the most important whiskey\r\n   accessory, premium savory snacks.\r\n</p> <p>Box up those dusty sports trophies and find a stud to hang your awkward family portraits, because the\r\n   Personalized Whiskey Decanter is reclaiming whiskey's proper place atop your mantel.\r\n</p>",
+      "Name": "Personalized Whiskey Appreciation Crate",
+      "ConversionRate": 2.988691437802908,
+      "UniquePurchases": 222,
+      "ProductRevenue": 35517.78,
+      "Quantity": 222,
+      "AveragePrice": 159.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/001/898/large/wa_engraved_whiskey_gift_collection_for_bold_men__89003.1479337561.1280.1280_copy.jpg?1505426047",
+      "Margin": 70.18,
+      "TerrainScore": 0.3888378448768492,
+      "TERRAINRANK": 1
+    },
+    {
+      "SKU": "KTCR-0039-PIG",
+      "VariantName": "Pit Master Crate",
+      "Price": 119.99,
+      "Inventory": 503,
+      "VariantStatus": "sellable",
+      "ProductId": 119,
+      "VariantId": 243,
+      "Path": "pit-master-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/pit-master-crate",
+      "ContentsHTML": "<h4>Pit Players</h4> <ul>\r\n  <li>Stainless Steel Meat Claws</li>\r\n  <li>Premium Leather Gloves</li>\r\n  <li>Collapsible Grill Fork</li>\r\n  <li>Silicone Basting Brush</li>\r\n  <li>Cast Iron Sauce Pot, 1.5 cup</li>\r\n</ul> <h4>Flavor Infusers</h4> <ul>\r\n  <li>Honey Sweet Sauce, 16 oz</li>\r\n  <li>Touch of Heat Sauce, 16 oz</li>\r\n  <li>Barbecue Meat Rub</li>\r\n  <li>Hickory Grill Wood Chips</li>\r\n  <li>Mesquite Grill Wood Chips</li>\r\n  \r\n</ul>",
+      "LongDescription": "Set Smoker To Beast Mode When the divine spirits of the Ancient World demanded animal sacrifices to satiate their\r\n   celestial hunger, it was never a quick, \"kill it and grill it\" job.\r\n Nay, they ordered full mammoth carcasses be slow-cooked for days over\r\n   glowing coals in a smoky trap of rubs and sauces. This great wisdom was called \"barbecue\", and it\r\n   pleased the gods so greatly that they indulged...perhaps a bit too much.\r\n The Woolies are long gone, but the archaic secrets of True Barbecue live on in the Pit Master Man Crate.  Heat, Eat, Repeat The Pit Master Crate is the Mr.  Miyagi of barbecue gear, your guiding\r\n   sensei on the road to fall-off-the-bone, \"low &amp; slow\" True Barbecue mastery.\r\n Meat Claws are the supreme tools for lifting and lugging huge roasts, whether you've dug a backyard pit to\r\n   \"go whole hog\" or drained and lined your swimming pool to \"go whole herd\". Knuckle up with these stainless\r\n   steel shredders, and you're just a few impassioned Wolverine impressions\r\n   away from pristine pulled pork.\r\n Keep your eyebrows intact with the collapsible barbecue fork, or go face to the fire with premium leather\r\n   gloves intended to handle the densest meat and most intense heat.\r\n Sauce Like A Boss A poorly executed saucing strategy can make or break your barbecue, and we're\r\n   firmly in the \"sauce while hot\" camp. Glaze right over the blaze with the silicone\r\n   basting brush, heat-safe to 550 degrees, and top off the cast-iron sauce pan with\r\n   fine selections from the  Sauce Boss himself, Mr. Rufus Teague.\r\n Teague's Honey Sweet and Touch of Heat flavors bring the bottled best of Kansas City to your cookout,\r\n   the perfect complement to a base-taste layer of his famed meat rub. Seal the deal\r\n   with a pro-style smokestack of hickory wood chips.\r\n Open up the pit with the Pit Master Crate, and unlock the secrets of True Barbecue.",
+      "Contents": "Pit Players \r\n  Stainless Steel Meat Claws\r\n  Premium Leather Gloves\r\n  Collapsible Grill Fork\r\n  Silicone Basting Brush\r\n  Cast Iron Sauce Pot, 1.5 cup\r\n Flavor Infusers \r\n  Honey Sweet Sauce, 16 oz\r\n  Touch of Heat Sauce, 16 oz\r\n  Barbecue Meat Rub\r\n  Hickory Grill Wood Chips\r\n  Mesquite Grill Wood Chips\r\n  \r\n",
+      "LongDescriptionHTML": "<h4>Set Smoker To Beast Mode</h4> <p>When the divine spirits of the Ancient World demanded animal sacrifices to satiate their\r\n   celestial hunger, it was never a quick, \"kill it and grill it\" job.\r\n</p> <p>Nay, they ordered full mammoth carcasses be slow-cooked for days over\r\n   glowing coals in a smoky trap of rubs and sauces. This great wisdom was called \"barbecue\", and it\r\n   pleased the gods so greatly that they indulged...perhaps a bit too much.\r\n</p> <p>The Woolies are long gone, but the archaic secrets of True Barbecue live on in the Pit Master Man Crate. </p> <h4>Heat, Eat, Repeat</h4> <p>The Pit Master Crate is the Mr.  Miyagi of barbecue gear, your guiding\r\n   sensei on the road to fall-off-the-bone, \"low &amp; slow\" True Barbecue mastery.\r\n</p> <p>Meat Claws are the supreme tools for lifting and lugging huge roasts, whether you've dug a backyard pit to\r\n   \"go whole hog\" or drained and lined your swimming pool to \"go whole herd\". Knuckle up with these stainless\r\n   steel shredders, and you're just a few impassioned Wolverine impressions\r\n   away from pristine pulled pork.\r\n</p> <p>Keep your eyebrows intact with the collapsible barbecue fork, or go face to the fire with premium leather\r\n   gloves intended to handle the densest meat and most intense heat.\r\n</p> <h4>Sauce Like A Boss</h4> <p>A poorly executed saucing strategy can make or break your barbecue, and we're\r\n   firmly in the \"sauce while hot\" camp. Glaze right over the blaze with the silicone\r\n   basting brush, heat-safe to 550 degrees, and top off the cast-iron sauce pan with\r\n   fine selections from the  Sauce Boss himself, Mr. Rufus Teague.\r\n</p> <p>Teague's Honey Sweet and Touch of Heat flavors bring the bottled best of Kansas City to your cookout,\r\n   the perfect complement to a base-taste layer of his famed meat rub. Seal the deal\r\n   with a pro-style smokestack of hickory wood chips.\r\n</p> <p>Open up the pit with the Pit Master Crate, and unlock the secrets of True Barbecue.</p>",
+      "Name": "Pit Master Crate",
+      "ConversionRate": 4.6162893266686265,
+      "UniquePurchases": 157,
+      "ProductRevenue": 18838.43,
+      "Quantity": 157,
+      "AveragePrice": 119.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/843/large/pm-awesome-barbecue-gifts-for-the-grilling-guy__39614.jpg?1502411217",
+      "Margin": 60.1,
+      "TerrainScore": 0.3578955354502763,
+      "TERRAINRANK": 2
+    },
+    {
+      "SKU": "KTZC-0007-STG",
+      "VariantName": "Backyard Steakhouse Crate",
+      "Price": 119.99,
+      "Inventory": 554,
+      "VariantStatus": "sellable",
+      "ProductId": 224,
+      "VariantId": 422,
+      "Path": "backyard-steakhouse-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/backyard-steakhouse-crate",
+      "ContentsHTML": "<ul>\r\n    <li>Crate</li>\r\n  \t<li>Crowbar</li>\r\n    <li>Grilling Tool Set Includes:</li>\r\n    <ul>\r\n        <li>Spatula</li>\r\n        <li>Tongs</li>\r\n      \t<li>Basting Brush</li>\r\n        <li>Tool Tote Bag</li>\r\n    </ul>\r\n    <li>Rufus Teague Steak Sauce and Rub Set Includes:</li>\r\n  <ul>\r\n        <li>1 Original Steak Sauce, 7 oz</li>\r\n      \t<li>1 Spicy Steak Sauce, 7 oz</li>\r\n        <li>1 Original Steak Rub, 6.2 oz</li>\r\n  </ul>\r\n  <li>Black Denim Grilling Apron, 35\" Length</li>\r\n  <li>Wooden Safe Scrape Tool</li>\r\n</ul>",
+      "LongDescription": "America's Next Top Chef Idol\r\n\r\nThe backyard grill is far more than a means of searing meats. It's center stage to serve up a platter full of critical acclaim. When flame meets steak, so ignites the fantasy of being head chef at a high-end steakhouse. Cue the dream sequence. Diddle-diddle-duh, diddle-diddle-duh...\r\n\r\nAmid plumes of pillowy smoke, he's harshly judging the imperfect grill marks of an innocent filet mignon like a certain acerbic, British celebrity chef. He then reaches for the Backyard Steakhouse Crate's essential grilling tools and exclusive steak sauces. A surgical steak flip here, a brilliant brush stroke there...and succulent steak worthy of a Michelin rating.\r\n\r\nFame and nationwide franchises are sure to follow when he's cooking with the Backyard Steakhouse Crate.\r\n\r\nEverything but the Poofy, White Hat \r\nWhen he unrolls his tote holding his Oval Pro Chef" 3-Piece Tool Set that's your cue to start your standing ovation.\r\nDonning the black denim grilling apron will instantly command respect from hungry family members, nosy neighbors, and scurrying squirrels.\r\nWe've got an in with legendary flavor maven Rufus Teague. You won't find this set of Steak Lovers sauces and rubs anywhere else. Not even in Rufus's kitchen.\r\nThe Safe Scrape wooden scraping paddle gradually conforms to the shape of the grill's grates to banish charred debris from the cooking surface. Talk about a grate escrape.\r\n",
+      "Contents": "\r\n    Crate\r\n  \tCrowbar\r\n    Grilling Tool Set Includes:\r\n    \r\n        Spatula\r\n        Tongs\r\n      \tBasting Brush\r\n        Tool Tote Bag\r\n    \r\n    Rufus Teague Steak Sauce and Rub Set Includes:\r\n  \r\n        1 Original Steak Sauce, 7 oz\r\n      \t1 Spicy Steak Sauce, 7 oz\r\n        1 Original Steak Rub, 6.2 oz\r\n  \r\n  Black Denim Grilling Apron, 35\" Length\r\n  Wooden Safe Scrape Tool\r\n",
+      "LongDescriptionHTML": "<h4>America's Next Top Chef Idol</h4>\r\n\r\n<p>The backyard grill is far more than a means of searing meats. It's center stage to serve up a platter full of critical acclaim. When flame meets steak, so ignites the fantasy of being head chef at a high-end steakhouse. Cue the dream sequence. Diddle-diddle-duh, diddle-diddle-duh...</p>\r\n\r\n<p>Amid plumes of pillowy smoke, he's harshly judging the imperfect grill marks of an innocent filet mignon like a certain acerbic, British celebrity chef. He then reaches for the Backyard Steakhouse Crate's essential grilling tools and exclusive steak sauces. A surgical steak flip here, a brilliant brush stroke there...and succulent steak worthy of a Michelin rating.</p>\r\n\r\n<p>Fame and nationwide franchises are sure to follow when he's cooking with the Backyard Steakhouse Crate.</p>\r\n\r\n<h4>Everything but the Poofy, White Hat</h4> \r\n<li>When he unrolls his tote holding his Oval Pro Chef" 3-Piece Tool Set that's your cue to start your standing ovation.</li>\r\n<li>Donning the black denim grilling apron will instantly command respect from hungry family members, nosy neighbors, and scurrying squirrels.</li>\r\n<li>We've got an in with legendary flavor maven Rufus Teague. You won't find this set of Steak Lovers sauces and rubs anywhere else. Not even in Rufus's kitchen.</li>\r\n<li>The Safe Scrape wooden scraping paddle gradually conforms to the shape of the grill's grates to banish charred debris from the cooking surface. Talk about a grate escrape.</li>\r\n</ul>",
+      "Name": "Backyard Steakhouse Crate",
+      "ConversionRate": 4.345464421510049,
+      "UniquePurchases": 80,
+      "ProductRevenue": 9599.2,
+      "Quantity": 80,
+      "AveragePrice": 119.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/972/large/MBC_MC_2018-4_Steak-2_WEB-.jpg?1527009751",
+      "Margin": 0,
+      "TerrainScore": 0.3519931644059998,
+      "TERRAINRANK": 3
+    },
+    {
+      "SKU": "KTCR-0009-PWH",
+      "VariantName": "Personalized Whiskey Crate",
+      "Price": 119.99,
+      "Inventory": 532,
+      "VariantStatus": "sellable",
+      "ProductId": 84,
+      "VariantId": 176,
+      "Path": "personalized-whiskey-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/personalized-whiskey-crate",
+      "ContentsHTML": "<h4>Distinguished Gear</h4> <ul>\r\n  <li>2 Personalized, Heavy-Bottom Rocks Glasses, 9 oz.</li>\r\n  <li>2 Tovolo Ice Sphere Molds</li>\r\n  <li>2 Slate Coasters</li>\r\n  <li>33 Drams Whiskey Drinking Journal</li>\r\n</ul> <h4>Luxury Grub</h4> <ul>\r\n  <li>Squirrel Brand Spiced Peppercorn Peanuts</li>\r\n  <li>Wonderful Salted Pistachios</li>\r\n  <li>Sahale Snacks Cranberry Pecans</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "The Sophisticated Man Men aren't born dressed in a sharp tailored suit with a Cuban in hand. Even Frank Sinatra,\r\n   before he was the suave sultan Frank Sinatra, was once young Francis Albert, captain\r\n   of the chess club with enough barbed wire lining his teeth to fence off a Toluca\r\n   cattle ranch.\r\n The transformation into manhood, like most worthwhile ventures in life, begins with a strong drink.\r\n Bold Bravado Handing a guest a drink is like demonstrating a firm handshake in a job interview\r\n   or warming up with one-fingered push-ups before an underground kung-fu death showdown.\r\n   It's a functional maneuver to establish a relaxed, confident presence.\r\n This set of square whiskey glasses are intentionally bottom-loaded to flaunt your gravitas.\r\n   And we'll laser etch your name into the thick glass so no one will forget whose sophisticated\r\n   jazz flute skills they were admiring all night.\r\n Science bests nature once again with the Tovolo ice molds. These pristine ice crystal spheres\r\n   have a slower melting rate, keeping your whiskey chilled longer and tasting stronger.\r\n   And aesthetically they pair perfectly with the solid slate coasters, the marble\r\n   floors of the coaster world, to give your whiskey experience a more rugged, natural\r\n   ambiance.\r\n Cultured Accompaniments Whiskey is a flavor bully, and your childish gas station junk foods will get\r\n   knocked over in its bold wake. These salted pistachios, spiced peppercorn peanuts, and sweet and spicy\r\n   pecans are snacks for the mature, the perfect compliment to any whiskey.\r\n And use the drinking journal to scribble notes for the whiskey blog you're thinking\r\n   about starting, or just let it peek out of your pocket so people think you have\r\n   a whiskey blog. Just as rewarding with much less work.\r\n The road to classy refinement is not for the weak of taste, and it begins with the Personalized\r\n   Whiskey Man Crate.\r\n",
+      "Contents": "Distinguished Gear \r\n  2 Personalized, Heavy-Bottom Rocks Glasses, 9 oz.\r\n  2 Tovolo Ice Sphere Molds\r\n  2 Slate Coasters\r\n  33 Drams Whiskey Drinking Journal\r\n Luxury Grub \r\n  Squirrel Brand Spiced Peppercorn Peanuts\r\n  Wonderful Salted Pistachios\r\n  Sahale Snacks Cranberry Pecans\r\n\r\nNOTE: Personalized items require 48 hours of processing time.",
+      "LongDescriptionHTML": "<h4>The Sophisticated Man</h4> <p>Men aren't born dressed in a sharp tailored suit with a Cuban in hand. Even Frank Sinatra,\r\n   before he was the suave sultan Frank Sinatra, was once young Francis Albert, captain\r\n   of the chess club with enough barbed wire lining his teeth to fence off a Toluca\r\n   cattle ranch.\r\n</p> <p>The transformation into manhood, like most worthwhile ventures in life, begins with a strong drink.\r\n</p> <h4>Bold Bravado</h4> <p>Handing a guest a drink is like demonstrating a firm handshake in a job interview\r\n   or warming up with one-fingered push-ups before an underground kung-fu death showdown.\r\n   It's a functional maneuver to establish a relaxed, confident presence.\r\n</p> <p>This set of square whiskey glasses are intentionally bottom-loaded to flaunt your gravitas.\r\n   And we'll laser etch your name into the thick glass so no one will forget whose sophisticated\r\n   jazz flute skills they were admiring all night.\r\n</p> <p>Science bests nature once again with the Tovolo ice molds. These pristine ice crystal spheres\r\n   have a slower melting rate, keeping your whiskey chilled longer and tasting stronger.\r\n   And aesthetically they pair perfectly with the solid slate coasters, the marble\r\n   floors of the coaster world, to give your whiskey experience a more rugged, natural\r\n   ambiance.\r\n</p> <h4>Cultured Accompaniments</h4> <p>Whiskey is a flavor bully, and your childish gas station junk foods will get\r\n   knocked over in its bold wake. These salted pistachios, spiced peppercorn peanuts, and sweet and spicy\r\n   pecans are snacks for the mature, the perfect compliment to any whiskey.\r\n</p> <p>And use the drinking journal to scribble notes for the whiskey blog you're thinking\r\n   about starting, or just let it peek out of your pocket so people think you have\r\n   a whiskey blog. Just as rewarding with much less work.\r\n</p> <p>The road to classy refinement is not for the weak of taste, and it begins with the Personalized\r\n   Whiskey Man Crate.\r\n</p>",
+      "Name": "Personalized Whiskey Crate",
+      "ConversionRate": 2.8254847645429364,
+      "UniquePurchases": 51,
+      "ProductRevenue": 6119.49,
+      "Quantity": 51,
+      "AveragePrice": 119.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/689/large/pw_sophisticated_whiskey_gifts_for_claseey_guys__10836.jpg?1502411151",
+      "Margin": 68.7,
+      "TerrainScore": 0.35110938545573955,
+      "TERRAINRANK": 4
+    },
+    {
+      "SKU": "KTCR-0004-SUR",
+      "VariantName": "Outdoor Survival Crate",
+      "Price": 119.99,
+      "Inventory": 457,
+      "VariantStatus": "sellable",
+      "ProductId": 32,
+      "VariantId": 61,
+      "Path": "outdoor-survival-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/outdoor-survival-crate",
+      "ContentsHTML": "<h4>Survival Contraptions</h4> <ul>\r\n  <li>GSI Halulite Minimalist 1-person cookset</li>\r\n  <li>Multi-tool with carrying bag</li>\r\n  <li>Shovel, saw, pickaxe, hammer, hatchet heads</li>\r\n  <li>Built-in compass</li>\r\n</ul> <h4>Wilderness Trappings</h4> <ul>\r\n  <li>FM21-76 Army Survival Field Manual</li>\r\n  <li>Paracord knife with firestarter</li>\r\n  <li>50 ft of paracord</li>\r\n  <li>Emergency blanket &amp; glow sticks</li>\r\n  <li>Pemmican Meal Bar</li>\r\n  <li>Of course, Beef Jerky</li>\r\n</ul>",
+      "LongDescription": "The Call of the Wild You heard it, and your instincts told you it must be answered. The last bar on your\r\n   cell phone disappears as you drive into the foothills, all of your worries far behind\r\n   in the rearview mirror. Miles from civilization, not even your cornflower-blue-shirt-wearing\r\n   boss Tad can encroach on your weekend. You're off the grid.\r\nThe untamed wilderness is your proving ground. After all, there's no greater challenge\r\n   than that of Man against the Elements.\r\n The Great Outdoors It's just you and an overgrown hinterland seething with insects and wild animals -\r\n  just the way you like it. With only a few hours\r\n   of daylight left, you set out in search of a suitable campsite.\r\n Paul Bunyan had an axe and an ox, but you have a 5-in-1 multi-tool. You\r\n   wield it with the strength and precision of a grizzled mountaineer. At this rate, it's only a matter of\r\n   time before you trade in your sleeping bag for a log cabin, but you need to set up camp before something\r\n   mistakes you for dinner.\r\n You're a descendant of Man, and Man discovered fire. Yours is crackling merrily in no time with a few\r\n   strikes of your firestarter. The camp is your domain - would-be predators\r\n   keep their distance, and the chill leaves your bones.\r\n Survival of the Fittest In the morning, you boil water and whip up some hard-earned hot grub while consulting your dog-eared copy\r\n   of the Army Field Manual. With luck, the only hairy situation you'll have is the\r\n  prodigious beard that will inevitably sprout during your walkabout, but it\r\n   helps to have the backup. Channeling John Wayne with a little cowboy coffee, you toast your first night of\r\n   survival. Nature,  0. You, 1.\r\n You feel invigorated. You make short work of striking camp, and take your bearings. If you end up in a\r\n   staring contest with a mountain lion, you'll be ready. It's going to be a good weekend.\r\n",
+      "Contents": "Survival Contraptions \r\n  GSI Halulite Minimalist 1-person cookset\r\n  Multi-tool with carrying bag\r\n  Shovel, saw, pickaxe, hammer, hatchet heads\r\n  Built-in compass\r\n Wilderness Trappings \r\n  FM21-76 Army Survival Field Manual\r\n  Paracord knife with firestarter\r\n  50 ft of paracord\r\n  Emergency blanket &amp; glow sticks\r\n  Pemmican Meal Bar\r\n  Of course, Beef Jerky\r\n",
+      "LongDescriptionHTML": "<h4>The Call of the Wild</h4> <p>You heard it, and your instincts told you it must be answered. The last bar on your\r\n   cell phone disappears as you drive into the foothills, all of your worries far behind\r\n   in the rearview mirror. Miles from civilization, not even your cornflower-blue-shirt-wearing\r\n   boss Tad can encroach on your weekend. <span class='highlight'>You're off the grid.</span></p>\r\n<p>The untamed wilderness is your proving ground. After all, there's no greater challenge\r\n   than that of Man against the Elements.\r\n</p> <h4>The Great Outdoors</h4> <p>It's just you and an overgrown hinterland seething with insects and wild animals -\r\n  <span class=\"highlight\">just the way you like it.</span> With only a few hours\r\n   of daylight left, you set out in search of a suitable campsite.\r\n</p> <p>Paul Bunyan had an axe and an ox, but you have a <span class=\"highlight\">5-in-1 multi-tool</span>. You\r\n   wield it with the strength and precision of a grizzled mountaineer. At this rate, it's only a matter of\r\n   time before you trade in your sleeping bag for a log cabin, but you need to set up camp before something\r\n   mistakes you for dinner.\r\n</p> <p>You're a descendant of Man, and Man discovered fire. Yours is crackling merrily in no time with a few\r\n   strikes of your <span class=\"highlight\">firestarter</span>. The camp is your domain - would-be predators\r\n   keep their distance, and the chill leaves your bones.\r\n</p> <h4>Survival of the Fittest</h4> <p>In the morning, you boil water and whip up some hard-earned hot grub while consulting your dog-eared copy\r\n   of the Army Field Manual. With luck, the only hairy situation you'll have is the\r\n  <span class=\"highlight\">prodigious beard</span> that will inevitably sprout during your walkabout, but it\r\n   helps to have the backup. Channeling John Wayne with a little cowboy coffee, you toast your first night of\r\n   survival. <span class=\"highlight\">Nature,  0. You, 1</span>.\r\n</p> <p>You feel invigorated. You make short work of striking camp, and take your bearings. If you end up in a\r\n   staring contest with a mountain lion, you'll be ready. It's going to be a good weekend.\r\n</p>",
+      "Name": "Outdoor Survival Crate",
+      "ConversionRate": 1.507289350135903,
+      "UniquePurchases": 61,
+      "ProductRevenue": 7319.39,
+      "Quantity": 61,
+      "AveragePrice": 119.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/462/large/oscr-cool-survival-gifts-men-will-love__00495.jpg?1502411065",
+      "Margin": 56.05,
+      "TerrainScore": 0.351002019134279,
+      "TERRAINRANK": 5
+    },
+    {
+      "SKU": "KTBX-0026-TOB",
+      "VariantName": "Wine Country Picnic Pack",
+      "Price": 129.99,
+      "Inventory": 415,
+      "VariantStatus": "sellable",
+      "ProductId": 228,
+      "VariantId": 425,
+      "Path": "wine-country-picnic-pack",
+      "CanonicalUrl": "www.mancrates.com/store/products/wine-country-picnic-pack",
+      "ContentsHTML": "<ul>\r\n  <li>Cardboard Box</li>\r\n  <li>Waxed Canvas Adventure Wine Tote Includes:</li>\r\n      <ul>\r\n          <li>2 Stemless Acrylic Wine Glasses</li>\r\n          <li>1 Wine Bottle Stopper</li>\r\n          <li>1 Folding Corkscrew</li>\r\n          <li>1 Cutting Board with Extendable Legs</li>\r\n  \t </ul>\r\n  <li>Wine Pocket Wine Journal, Recycled Paper</li>\r\n  <li>5 Towelettes, Road Spill on the Go Stain Removal</li>\r\n</ul>",
+      "LongDescription": "All Picnic, No Panic\r\n\r\n  Along a rustic vineyard road lies the idyllic picnic spot. The sun is dipping behind the ridge. A warm breeze brushes through the leaves. The blanket is laid out with a spread of local wines and artisan cheeses. The stage is set for a romantWLAHHH...ANTS!\r\n\r\n  If there's one thing wine-country ants love more than a picnic, it's a loosely organized picnic. Flimsy paper plates. Spillable Solo cups. Leftovers hanging out of grocery bags. \"Hey, colony& the line forms here!\"\r\n\r\n  That's precisely why we created the Wine Country Picnic Pack. It has what picnickers need to sip in serenity, while avoiding uninvited centimeter-sized guests.\r\n\r\nPack It Up, Pack It In\r\n  \r\n\tThe insulated double wine tote converts to a backpack to free his hands for plucking grapes right off the vine.\r\n\tLike a fine wine, the portable acacia table has legs, literally elevating the cheese-nibbling experience. \r\n\tWith the two stemless acrylic wine glasses, it's safety first and refinement a close second.\r\n\tThe Wine Pocket wine journal lets him jot down tasting notes at wineries, that elusive ending to his screenplay, and the coordinates of hidden treasure.\r\n\r\n  ",
+      "Contents": "\r\n  Cardboard Box\r\n  Waxed Canvas Adventure Wine Tote Includes:\r\n      \r\n          2 Stemless Acrylic Wine Glasses\r\n          1 Wine Bottle Stopper\r\n          1 Folding Corkscrew\r\n          1 Cutting Board with Extendable Legs\r\n  \t \r\n  Wine Pocket Wine Journal, Recycled Paper\r\n  5 Towelettes, Road Spill on the Go Stain Removal\r\n",
+      "LongDescriptionHTML": "<h4>All Picnic, No Panic</h4>\r\n\r\n  <p>Along a rustic vineyard road lies the idyllic picnic spot. The sun is dipping behind the ridge. A warm breeze brushes through the leaves. The blanket is laid out with a spread of local wines and artisan cheeses. The stage is set for a romantWLAHHH...ANTS!</p>\r\n\r\n  <p>If there's one thing wine-country ants love more than a picnic, it's a loosely organized picnic. Flimsy paper plates. Spillable Solo cups. Leftovers hanging out of grocery bags. \"Hey, colony& the line forms here!\"</p>\r\n\r\n  <p>That's precisely why we created the Wine Country Picnic Pack. It has what picnickers need to sip in serenity, while avoiding uninvited centimeter-sized guests.</p>\r\n\r\n<h4>Pack It Up, Pack It In</h4>\r\n  <ul>\r\n\t<li>The insulated double wine tote converts to a backpack to free his hands for plucking grapes right off the vine.</li>\r\n\t<li>Like a fine wine, the portable acacia table has legs, literally elevating the cheese-nibbling experience. </li>\r\n\t<li>With the two stemless acrylic wine glasses, it's safety first and refinement a close second.</li>\r\n\t<li>The Wine Pocket wine journal lets him jot down tasting notes at wineries, that elusive ending to his screenplay, and the coordinates of hidden treasure.</li>\r\n\r\n  </ul>",
+      "Name": "Wine Country Picnic Pack",
+      "ConversionRate": 1.7687074829931975,
+      "UniquePurchases": 26,
+      "ProductRevenue": 3379.74,
+      "Quantity": 26,
+      "AveragePrice": 129.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/822/large/MBC_MC_2018-4_Wine-3_WEB-2582.jpg?1526330408",
+      "Margin": 0,
+      "TerrainScore": 0.32715502418948345,
+      "TERRAINRANK": 6
+    },
+    {
+      "SKU": "KTPR-0010-FKN",
+      "VariantName": "Folding Knife Making Kit",
+      "Price": 134.99,
+      "Inventory": 716,
+      "VariantStatus": "sellable",
+      "ProductId": 8,
+      "VariantId": 8,
+      "Path": "folding-knife-making-kit",
+      "CanonicalUrl": "www.mancrates.com/store/products/folding-knife-making-kit",
+      "ContentsHTML": "<h4>Blade Buddies</h4> <ul>\r\n  <li>Folding Knife Assembly</li>\r\n  <li>Linen Micarta Handle Scales</li>\r\n</ul> <h4>Shape, Sand, and Polish</h4> <ul>\r\n  <li>Man Crates Folding Knife Making Guide</li>\r\n  <li>File &amp; Rasp Set</li>\r\n  <li>Variable Grit Sandpaper Set</li>\r\n  <li>3\" Bench Vise</li>\r\n  <li>T6 &amp; T8 Torx Wrench Set</li>\r\n</ul>",
+      "LongDescription": "The Sharp Side Of Subtlety Most men aren't going full Crocodile Dundee, strutting around town brandishing a 16\"\r\n   bowie knife and screaming \"That's not a knife! This is a knife!\" at anything remotely\r\n   pointy-looking. That social production of masculinity is a bit much even by our\r\n   standards--unless you're Australian, in which case... good onya, mate!\r\n There's a case to be made for subtlety, and routinely carrying a folding knife is the perfect\r\n   balance of convenience, preparation, and discretion. And the only thing more reassuring\r\n   than having a trusty folding knife clipped to the hip is knowing exactly how that\r\n   knife came to be.\r\n Cold As Steel Assembling the skeleton of a folding knife is just like putting together IKEA furniture, except it's\r\n   extremely tiny, won't break after two months, and will draw blood if done recklessly. This knife\r\n   is constructed from many tiny parts, the majority of which are too small to be choking\r\n   hazards, so swallow away.\r\n This AUS 8 Drop Point Blade is made of heat-treated and sub-zero quenched stainless steel and boasts an\r\n   incredible temper and hardness of 57-58 HRC. The knife's thumb studs and liner lock make it easy to open\r\n   and difficult to accidentally cut fingers off.\r\n Tough As Linen For exceptional presentation and durability, we've selected Linen Micarta handle scales made from\r\n   layers of hardened resin linen. Think fashion-forward, fossilized mummy wrap meets\r\n   intricate wood grain pattern, then pick your jaw up from off the ground.\r\n We've also included a portable bench vise, file, and rasp set, sandpaper, and Torx wrenches\r\n   for assembling and shaping the knife handles to its perfect, palm-fitting specifications,\r\n   as well as an instruction booklet to make sure the knife gets assembled pointy end\r\n   out.\r\n The Folding Knife Project Kit gives the equipment, expertise, and unforgettable\r\n   experience of assembling and shaping a trusty and true folding knife.\r\n",
+      "Contents": "Blade Buddies \r\n  Folding Knife Assembly\r\n  Linen Micarta Handle Scales\r\n Shape, Sand, and Polish \r\n  Man Crates Folding Knife Making Guide\r\n  File &amp; Rasp Set\r\n  Variable Grit Sandpaper Set\r\n  3\" Bench Vise\r\n  T6 &amp; T8 Torx Wrench Set\r\n",
+      "LongDescriptionHTML": "<h4>The Sharp Side Of Subtlety</h4> <p>Most men aren't going full Crocodile Dundee, strutting around town brandishing a 16\"\r\n   bowie knife and screaming \"That's not a knife! This is a knife!\" at anything remotely\r\n   pointy-looking. That social production of masculinity is a bit much even by our\r\n   standards--unless you're Australian, in which case... good onya, mate!\r\n</p> <p>There's a case to be made for subtlety, and routinely carrying a folding knife is the perfect\r\n   balance of convenience, preparation, and discretion. And the only thing more reassuring\r\n   than having a trusty folding knife clipped to the hip is knowing exactly how that\r\n   knife came to be.\r\n</p> <h4>Cold As Steel</h4> <p>Assembling the skeleton of a folding knife is just like putting together IKEA furniture, except it's\r\n   extremely tiny, won't break after two months, and will draw blood if done recklessly. This knife\r\n   is constructed from many tiny parts, the majority of which are too small to be choking\r\n   hazards, so swallow away.\r\n</p> <p>This AUS 8 Drop Point Blade is made of heat-treated and sub-zero quenched stainless steel and boasts an\r\n   incredible temper and hardness of 57-58 HRC. The knife's thumb studs and liner lock make it easy to open\r\n   and difficult to accidentally cut fingers off.\r\n</p> <h4>Tough As Linen</h4> <p>For exceptional presentation and durability, we've selected Linen Micarta handle scales made from\r\n   layers of hardened resin linen. Think fashion-forward, fossilized mummy wrap meets\r\n   intricate wood grain pattern, then pick your jaw up from off the ground.\r\n</p> <p>We've also included a portable bench vise, file, and rasp set, sandpaper, and Torx wrenches\r\n   for assembling and shaping the knife handles to its perfect, palm-fitting specifications,\r\n   as well as an instruction booklet to make sure the knife gets assembled pointy end\r\n   out.\r\n</p> <p>The Folding Knife Project Kit gives the equipment, expertise, and unforgettable\r\n   experience of assembling and shaping a trusty and true folding knife.\r\n</p>",
+      "Name": "Folding Knife Project",
+      "ConversionRate": 3.9312754804892256,
+      "UniquePurchases": 135,
+      "ProductRevenue": 18223.65,
+      "Quantity": 135,
+      "AveragePrice": 134.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/373/large/fkmk-folding-knife-making-kit-gift__05783.jpg?1502411030",
+      "Margin": 54.03,
+      "TerrainScore": 0.320311225973994,
+      "TERRAINRANK": 7
+    },
+    {
+      "SKU": "KTZC-0008-SSS",
+      "VariantName": "Storied Sunrise Cocktail Crate",
+      "Price": 119.99,
+      "Inventory": 257,
+      "VariantStatus": "sellable",
+      "ProductId": 227,
+      "VariantId": 424,
+      "Path": "storied-sunrise-cocktail-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/storied-sunrise-cocktail-crate",
+      "ContentsHTML": "<h4>Our Lasers Take Time</h4>\r\n<p>This personalized item requires 1 day of processing time.</p>\r\n<p>\r\n</p>\r\n<li>Crate</li>\r\n<li>Crowbar</li>\r\n<li>Smokin' Mary Bloody Mary Mix, 750 ml, 25.4 oz</li>\r\n<li>Bloody Mary Cocktail Nuts, Extra Large Virginia Peanuts, 6 oz</li>\r\n<li>Pickled Geen BeansRed Pepper, 16 oz</li>\r\n<li>2 Mason Jar Glasses, Laser-Engraved Personalization with Name, 16 oz</li>\r\n<li><i>The Sun Also Rises</i> by Ernest Hemingway, Hardcover</li>\r\n\r\n</ul>",
+      "LongDescription": "Sunrising to the Occasion\r\n\r\nKaraoke Night. Ladies' Night. All-You-Can-Guzzle Flaming Volcano Bowl Night. There are more evening cocktail occasions than you can shake a swizzle stick at. But one rather mundane morning we got to thinking, why should nighttime have all the fun?\r\n\r\nWhen the plan is to wake and slake with an a.m.-friendly libation, it's best to follow in the staggery footsteps of writer/drinker Ernest Hemingway. The literary legend actually helped popularize the Bloody Mary in the 1920s, giving the world a buzzy brunch beverage that is unequivocally more refreshing when the sun is shining. \r\n\r\nThe Storied Sunrise Cocktail Crate is the ultimate homage to \"Papa,\" pairing a smoke-infused Bloody Mary mix with a copy of his debut novel, The Sun Also Rises. Mornings for the thinking and drinking man are about to get a lot brighter. Take that, moon.\r\n\r\nProper Reading and Drinking Materials \r\nConsidered one of Hemingway's best novels, The Sun Also Rises is a poignant tale about the meaning of life. Except for the knock-knock joke on page 47.\r\nMake it personal with a set of 2 laser-engraved mason jars that are almost as thick as the book.\r\nSmokin' Mary Bloody Mary Mix is made for foodies by foodies. Because a well-made Bloody is practically a meal in itself.\r\nCelery sticks are for, well, we're really not sure. But the Foster's Pickled Green Beans we've included will garnish the heck of his cocktail.",
+      "Contents": "Our Lasers Take Time\r\nThis personalized item requires 1 day of processing time.\r\n\r\n\r\nCrate\r\nCrowbar\r\nSmokin' Mary Bloody Mary Mix, 750 ml, 25.4 oz\r\nBloody Mary Cocktail Nuts, Extra Large Virginia Peanuts, 6 oz\r\nPickled Geen BeansRed Pepper, 16 oz\r\n2 Mason Jar Glasses, Laser-Engraved Personalization with Name, 16 oz\r\nThe Sun Also Rises by Ernest Hemingway, Hardcover\r\n\r\n",
+      "LongDescriptionHTML": "<h4>Sunrising to the Occasion</h4>\r\n\r\n<p>Karaoke Night. Ladies' Night. All-You-Can-Guzzle Flaming Volcano Bowl Night. There are more evening cocktail occasions than you can shake a swizzle stick at. But one rather mundane morning we got to thinking, why should nighttime have all the fun?</p>\r\n\r\n<p>When the plan is to wake and slake with an a.m.-friendly libation, it's best to follow in the staggery footsteps of writer/drinker Ernest Hemingway. The literary legend actually helped popularize the Bloody Mary in the 1920s, giving the world a buzzy brunch beverage that is unequivocally more refreshing when the sun is shining. </p>\r\n\r\n<p>The Storied Sunrise Cocktail Crate is the ultimate homage to \"Papa,\" pairing a smoke-infused Bloody Mary mix with a copy of his debut novel, <i>The Sun Also Rises</i>. Mornings for the thinking and drinking man are about to get a lot brighter. Take that, moon.</p>\r\n\r\n<h4>Proper Reading and Drinking Materials </h4>\r\n<li>Considered one of Hemingway's best novels, <i>The Sun Also Rises</i> is a poignant tale about the meaning of life. Except for the knock-knock joke on page 47.</li>\r\n<li>Make it personal with a set of 2 laser-engraved mason jars that are almost as thick as the book.</li>\r\n<li>Smokin' Mary Bloody Mary Mix is made for foodies by foodies. Because a well-made Bloody is practically a meal in itself.</li>\r\n<li>Celery sticks are for, well, we're really not sure. But the Foster's Pickled Green Beans we've included will garnish the heck of his cocktail.</li>",
+      "Name": "Sunrise Storied Cocktail Crate",
+      "ConversionRate": 2.7164685908319184,
+      "UniquePurchases": 16,
+      "ProductRevenue": 1919.84,
+      "Quantity": 16,
+      "AveragePrice": 119.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/783/large/MBC_MC_2018-4_Bloody_Mary_WEB-2016.jpg?1526326781",
+      "Margin": 0,
+      "TerrainScore": 0.29824773940749894,
+      "TERRAINRANK": 8
+    },
+    {
+      "SKU": "KTAM-0006-CHU",
+      "VariantName": "Premium Cigar Humidor",
+      "Price": 119.99,
+      "Inventory": 255,
+      "VariantStatus": "sellable",
+      "ProductId": 125,
+      "VariantId": 249,
+      "Path": "premium-cigar-humidor",
+      "CanonicalUrl": "www.mancrates.com/store/products/premium-cigar-humidor",
+      "ContentsHTML": "<h4>Moisture Manager</h4> <ul>\n  <li>American Cedar Humidor</li>\n  <li>Humidifier</li>\n  <li>Hygrometer</li>\n</ul> <h4>Expert Smokeware</h4> <ul>\n  <li>Double Guillotine Cigar Cutter</li>\n  <li>Thunderbird Butane Lighter</li>\n  <li>Cigar Tasting Journal</li>\n</ul>",
+      "LongDescription": "Smoke 'em if you got 'em Any Joe Schmoe can huff and puff his way through a cigar, but it takes a true Renaissance\n   man to smoke one correctly.\n A scrupulous surgeon to slice the cap for optimal air flow, a skilled firebreather to summon and harness\n   the erratic flame, and an uninhibited poet to fully appreciate the sharp aesthetic of drawing euphoria from\n   between the fingertips.\n But mastery of skill is not enough. Even Da Vinci, the quintessential Renaissance man, would've just been\n   another creepy Mona Lisa hanger-on if not for the proper equipment. The Premium Cigar Humidor supplies the\n   finest gear for the true cigar aficionado.\n A Cut Above When it comes to getting results, execution is key(unknown character)it was true during the French Revolution, and\n   it's true when cutting cigars. The Premium Cigar Humidor innovates on their enlightened methods by\n   featuring a double-guillotine cutter. It will give your cigars a cleaner straight cut than a 1950's Wall\n   Street barber shop and deliver a smoking experience that will make your head roll.\n We don't take cigar lighting lightly either. Cheap old lighter? Might as well wash your stogie down with a\n   shot of lighter fluid. Ignite the good life by flipping open a Thunderbird Butane torch just like your\n   father and his father once did.\n Gear on the Go With a custom-designed hygrometer and humidifier fitted into the lid, the air-tight, indestructible Ammo\n   Can Humidor is the perfect tobacco tackle box. It's the only traveling humidor that\n   guarantees both regulation of ideal moisture levels and preservation in the event\n   of a nuclear holocaust.\n Don't just blow hot air around, grab the Premium Cigar Humidor and become a cigar connoisseur.",
+      "Contents": "Moisture Manager \n  American Cedar Humidor\n  Humidifier\n  Hygrometer\n Expert Smokeware \n  Double Guillotine Cigar Cutter\n  Thunderbird Butane Lighter\n  Cigar Tasting Journal\n",
+      "LongDescriptionHTML": "<h4>Smoke 'em if you got 'em</h4> <p>Any Joe Schmoe can huff and puff his way through a cigar, but it takes a true Renaissance\n   man to smoke one correctly.\n</p> <p>A scrupulous surgeon to slice the cap for optimal air flow, a skilled firebreather to summon and harness\n   the erratic flame, and an uninhibited poet to fully appreciate the sharp aesthetic of drawing euphoria from\n   between the fingertips.\n</p> <p>But mastery of skill is not enough. Even Da Vinci, the quintessential Renaissance man, would've just been\n   another creepy Mona Lisa hanger-on if not for the proper equipment. The Premium Cigar Humidor supplies the\n   finest gear for the true cigar aficionado.\n</p> <h4>A Cut Above</h4> <p>When it comes to getting results, execution is key(unknown character)it was true during the French Revolution, and\n   it's true when cutting cigars. The Premium Cigar Humidor innovates on their enlightened methods by\n   featuring a double-guillotine cutter. It will give your cigars a cleaner straight cut than a 1950's Wall\n   Street barber shop and deliver a smoking experience that will make your head roll.\n</p> <p>We don't take cigar lighting lightly either. Cheap old lighter? Might as well wash your stogie down with a\n   shot of lighter fluid. Ignite the good life by flipping open a Thunderbird Butane torch just like your\n   father and his father once did.\n</p> <h4>Gear on the Go</h4> <p>With a custom-designed hygrometer and humidifier fitted into the lid, the air-tight, indestructible Ammo\n   Can Humidor is the perfect tobacco tackle box. It's the only traveling humidor that\n   guarantees both regulation of ideal moisture levels and preservation in the event\n   of a nuclear holocaust.\n</p> <p>Don't just blow hot air around, grab the Premium Cigar Humidor and become a cigar connoisseur.</p>",
+      "Name": "Premium Cigar Humidor Ammo Can",
+      "ConversionRate": 2.1142857142857143,
+      "UniquePurchases": 37,
+      "ProductRevenue": 4439.63,
+      "Quantity": 37,
+      "AveragePrice": 119.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/870/large/ch_american_cedar_cigar_humidor.jpg?1504138407",
+      "Margin": 59.3,
+      "TerrainScore": 0.297424735920239,
+      "TERRAINRANK": 9
+    },
+    {
+      "SKU": "KTPR-0009-SHA",
+      "VariantName": "Straight Edge Shaving Kit",
+      "Price": 174.99,
+      "Inventory": 728,
+      "VariantStatus": "sellable",
+      "ProductId": 72,
+      "VariantId": 148,
+      "Path": "straight-edge-shaving-kit",
+      "CanonicalUrl": "www.mancrates.com/store/products/straight-edge-shaving-kit",
+      "ContentsHTML": "<h4>Blade Buddies</h4> <ul>\n  <li>Böker 4/8\" Classic Anthracite Razor</li>\n  <li>Böker Leather Span Strop</li>\n</ul> <h4>Face Buffers</h4> <ul>\n  <li>Renegade Shave Cream, 4 oz</li>\n  <li>Renegade After Shave, 4 oz</li>\n  <li>Alum Bar, 45g</li>\n  <li>Man Crates Shaving Booklet</li>\n</ul>",
+      "LongDescription": "Life on the Edge Men are like diamonds; they have certain attributes that can only be revealed through intense\n   pressure, and a rough careless cut can rob them of all charm and attractiveness.\n And while any quality razor can make a man feel smooth like a baby's bottom,\n   only a straight razor will make him feel \"smooth\" like a 50s greaser. There's just\n   something exhilarating about expertly dragging an extremely sharp blade across the\n   face, staring danger straight in the face with a smooth, straight-shaved face to\n   show for it.\n For generations, a trusty straight razor has brought out the best in men, both inside and out. Solingen for the Win The Straight Shave Project Kit features a handmade 4/8\" Böker straight razor forged in Solingen,\n   Germany, the revered City of Blades. The esteemed \"made in Solingen\" title is strictly\n   reserved for blades made in and subjected to that region's rigorous quality standards,\n   just like Scotch Whiskey, Champagne Sparkling Wine, or Hidden Valley Ranch.\n This top-notch face scraper boasts Anthracite handles and a carbon steel blade\n   with extra hollow ground for extreme sharpness and edge retention. It can be aligned\n   and sharpened against either side of the Böker leather span strop, the paste composite\n   for rough stropping or natural leather for fine stropping.\n Refined Renegade While we're not always the most selective about what we put on our face, we exercise major discretion\n   regarding what gets on our razor. Renegade Shave products make the cut.\n Renegade shave creams primes the face for a close, comfortable shave, and the Alum Bar and After Shave\n   soothes any wounds and face nicks made from the shaky hands of straight razor excitement. The result, a\n   clean shave and an amazing smelling 6-8 inches between the nose and shoulders.\n The Straight Shave Project Kit is giving men a sleek new handle on the sensation of old-fashioned\n   shaving.\n",
+      "Contents": "Blade Buddies \n  Böker 4/8\" Classic Anthracite Razor\n  Böker Leather Span Strop\n Face Buffers \n  Renegade Shave Cream, 4 oz\n  Renegade After Shave, 4 oz\n  Alum Bar, 45g\n  Man Crates Shaving Booklet\n",
+      "LongDescriptionHTML": "<h4>Life on the Edge</h4> <p>Men are like diamonds; they have certain attributes that can only be revealed through intense\n   pressure, and a rough careless cut can rob them of all charm and attractiveness.\n</p> <p>And while any quality razor can make a man feel smooth like a baby's bottom,\n   only a straight razor will make him feel \"smooth\" like a 50s greaser. There's just\n   something exhilarating about expertly dragging an extremely sharp blade across the\n   face, staring danger straight in the face with a smooth, straight-shaved face to\n   show for it.\n</p> <p>For generations, a trusty straight razor has brought out the best in men, both inside and out.</p> <h4>Solingen for the Win</h4> <p>The Straight Shave Project Kit features a handmade 4/8\" Böker straight razor forged in Solingen,\n   Germany, the revered City of Blades. The esteemed \"made in Solingen\" title is strictly\n   reserved for blades made in and subjected to that region's rigorous quality standards,\n   just like Scotch Whiskey, Champagne Sparkling Wine, or Hidden Valley Ranch.\n</p> <p>This top-notch face scraper boasts Anthracite handles and a carbon steel blade\n   with extra hollow ground for extreme sharpness and edge retention. It can be aligned\n   and sharpened against either side of the Böker leather span strop, the paste composite\n   for rough stropping or natural leather for fine stropping.\n</p> <h4>Refined Renegade</h4> <p>While we're not always the most selective about what we put on our face, we exercise major discretion\n   regarding what gets on our razor. Renegade Shave products make the cut.\n</p> <p>Renegade shave creams primes the face for a close, comfortable shave, and the Alum Bar and After Shave\n   soothes any wounds and face nicks made from the shaky hands of straight razor excitement. The result, a\n   clean shave and an amazing smelling 6-8 inches between the nose and shoulders.\n</p> <p>The Straight Shave Project Kit is giving men a sleek new handle on the sensation of old-fashioned\n   shaving.\n</p>",
+      "Name": "Straight Edge Shaving",
+      "ConversionRate": 0.2952755905511811,
+      "UniquePurchases": 3,
+      "ProductRevenue": 524.97,
+      "Quantity": 3,
+      "AveragePrice": 174.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/633/large/sesk-straight-edge-shave-kit-components__46116.jpg?1502411131",
+      "Margin": 49.97,
+      "TerrainScore": 0.2574669890286883,
+      "TERRAINRANK": 10
+    }
+  ],
+  "outputDocs": [
+    {
+      "SKU": "KTCR-0037-WHA",
+      "VariantName": "Whiskey Appreciation Crate",
+      "Price": 159.99,
+      "ProductId": 137,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/whiskey-appreciation-crate",
+      "Contents": "<h4>Distinguished Gear</h4> <ul>\r\n  <li>Personalized Whiskey Decanter <br>(hand-made, may contain minor imperfections)</li>\r\n  <li>2 Personalized Heavy Bottom Rocks Glasses, 9 oz</li>\r\n  <li>2 Ice Sphere Molds</li>\r\n  <li>2 Slate Coasters</li>\r\n  <li>Whiskey Drinking Journal</li>\r\n</ul> <h4>Luxury Grub</h4> <ul>\r\n  <li>Spiced Peppercorn Peanuts</li>\r\n  <li>Salted Pistachios</li>\r\n  <li>Cranberry Pecans</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours to process.</i></p>",
+      "LongDescription": "<h4>An Executive Appreciation</h4> <p>In 1797, George Washington, the Michael Jordan of being American, declined the free\r\n   world's greatest honor, a Presidential term three-peat, in order to build a whiskey\r\n   distillery in his basement. The Revolutionary War MVP and celebrity endorser of\r\n   the one dollar bill knew that no amount of prestige or accomplishments could rival\r\n   the warm satisfaction of a good glass of whiskey.\r\n</p> <p>In days past, a man's fondness for whiskey was admirably brandished in full home bars, but in modern times,\r\n   whiskey is hidden out of sight in cabinets and desk drawers like shameful secrets. The Whiskey Appreciation\r\n   Crate is here to restore honor to the once great bond between a man and his drink.\r\n</p> <h4>Oh, yes we de-can!</h4> <p>Etching your initials into a glass decanter is a public declaration of your affinity for whiskey.\r\n   It's like donning a trenchcoat and holding a boombox overhead blasting Peter Gabriel's\r\n   \"In Your Eyes\" outside of whiskey's house or barging past the TSA checkpoint to frantically\r\n   sprint through the airport terminal for a last second  whiskey\r\n   before boarding your plane.\r\n</p> <p>While the monogrammed decanter looks super classy when flanked by its matching pair of personalized\r\n   rocks tumblers, whiskey should be appraised by taste as well as  presentation. The decanter properly\r\n   aerates and settles your whiskey so you can settle down with a glass of good company anytime.\r\n</p> <h4>Good Company</h4> <p>Rounding out the Whiskey Appreciation Crate is the ultimate whiskey connoisseur collection: A pair of\r\n   Tovolo Ice Molds and slate coasters, a pocket-sized whiskey tasting journal, and the most important whiskey\r\n   accessory, premium savory snacks.\r\n</p> <p>Box up those dusty sports trophies and find a stud to hang your awkward family portraits, because the\r\n   Personalized Whiskey Decanter is reclaiming whiskey's proper place atop your mantel.\r\n</p>",
+      "Name": "Personalized Whiskey Appreciation Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/001/898/large/wa_engraved_whiskey_gift_collection_for_bold_men__89003.1479337561.1280.1280_copy.jpg?1505426047",
+      "TERRAINRANK": 1
+    },
+    {
+      "SKU": "KTCR-0039-PIG",
+      "VariantName": "Pit Master Crate",
+      "Price": 119.99,
+      "ProductId": 119,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/pit-master-crate",
+      "Contents": "<h4>Pit Players</h4> <ul>\r\n  <li>Stainless Steel Meat Claws</li>\r\n  <li>Premium Leather Gloves</li>\r\n  <li>Collapsible Grill Fork</li>\r\n  <li>Silicone Basting Brush</li>\r\n  <li>Cast Iron Sauce Pot, 1.5 cup</li>\r\n</ul> <h4>Flavor Infusers</h4> <ul>\r\n  <li>Honey Sweet Sauce, 16 oz</li>\r\n  <li>Touch of Heat Sauce, 16 oz</li>\r\n  <li>Barbecue Meat Rub</li>\r\n  <li>Hickory Grill Wood Chips</li>\r\n  <li>Mesquite Grill Wood Chips</li>\r\n  \r\n</ul>",
+      "LongDescription": "<h4>Set Smoker To Beast Mode</h4> <p>When the divine spirits of the Ancient World demanded animal sacrifices to satiate their\r\n   celestial hunger, it was never a quick, \"kill it and grill it\" job.\r\n</p> <p>Nay, they ordered full mammoth carcasses be slow-cooked for days over\r\n   glowing coals in a smoky trap of rubs and sauces. This great wisdom was called \"barbecue\", and it\r\n   pleased the gods so greatly that they indulged...perhaps a bit too much.\r\n</p> <p>The Woolies are long gone, but the archaic secrets of True Barbecue live on in the Pit Master Man Crate. </p> <h4>Heat, Eat, Repeat</h4> <p>The Pit Master Crate is the Mr.  Miyagi of barbecue gear, your guiding\r\n   sensei on the road to fall-off-the-bone, \"low &amp; slow\" True Barbecue mastery.\r\n</p> <p>Meat Claws are the supreme tools for lifting and lugging huge roasts, whether you've dug a backyard pit to\r\n   \"go whole hog\" or drained and lined your swimming pool to \"go whole herd\". Knuckle up with these stainless\r\n   steel shredders, and you're just a few impassioned Wolverine impressions\r\n   away from pristine pulled pork.\r\n</p> <p>Keep your eyebrows intact with the collapsible barbecue fork, or go face to the fire with premium leather\r\n   gloves intended to handle the densest meat and most intense heat.\r\n</p> <h4>Sauce Like A Boss</h4> <p>A poorly executed saucing strategy can make or break your barbecue, and we're\r\n   firmly in the \"sauce while hot\" camp. Glaze right over the blaze with the silicone\r\n   basting brush, heat-safe to 550 degrees, and top off the cast-iron sauce pan with\r\n   fine selections from the  Sauce Boss himself, Mr. Rufus Teague.\r\n</p> <p>Teague's Honey Sweet and Touch of Heat flavors bring the bottled best of Kansas City to your cookout,\r\n   the perfect complement to a base-taste layer of his famed meat rub. Seal the deal\r\n   with a pro-style smokestack of hickory wood chips.\r\n</p> <p>Open up the pit with the Pit Master Crate, and unlock the secrets of True Barbecue.</p>",
+      "Name": "Pit Master Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/843/large/pm-awesome-barbecue-gifts-for-the-grilling-guy__39614.jpg?1502411217",
+      "TERRAINRANK": 2
+    },
+    {
+      "SKU": "KTZC-0007-STG",
+      "VariantName": "Backyard Steakhouse Crate",
+      "Price": 119.99,
+      "ProductId": 224,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/backyard-steakhouse-crate",
+      "Contents": "<ul>\r\n    <li>Crate</li>\r\n  \t<li>Crowbar</li>\r\n    <li>Grilling Tool Set Includes:</li>\r\n    <ul>\r\n        <li>Spatula</li>\r\n        <li>Tongs</li>\r\n      \t<li>Basting Brush</li>\r\n        <li>Tool Tote Bag</li>\r\n    </ul>\r\n    <li>Rufus Teague Steak Sauce and Rub Set Includes:</li>\r\n  <ul>\r\n        <li>1 Original Steak Sauce, 7 oz</li>\r\n      \t<li>1 Spicy Steak Sauce, 7 oz</li>\r\n        <li>1 Original Steak Rub, 6.2 oz</li>\r\n  </ul>\r\n  <li>Black Denim Grilling Apron, 35\" Length</li>\r\n  <li>Wooden Safe Scrape Tool</li>\r\n</ul>",
+      "LongDescription": "<h4>America's Next Top Chef Idol</h4>\r\n\r\n<p>The backyard grill is far more than a means of searing meats. It's center stage to serve up a platter full of critical acclaim. When flame meets steak, so ignites the fantasy of being head chef at a high-end steakhouse. Cue the dream sequence. Diddle-diddle-duh, diddle-diddle-duh...</p>\r\n\r\n<p>Amid plumes of pillowy smoke, he's harshly judging the imperfect grill marks of an innocent filet mignon like a certain acerbic, British celebrity chef. He then reaches for the Backyard Steakhouse Crate's essential grilling tools and exclusive steak sauces. A surgical steak flip here, a brilliant brush stroke there...and succulent steak worthy of a Michelin rating.</p>\r\n\r\n<p>Fame and nationwide franchises are sure to follow when he's cooking with the Backyard Steakhouse Crate.</p>\r\n\r\n<h4>Everything but the Poofy, White Hat</h4> \r\n<li>When he unrolls his tote holding his Oval Pro Chef" 3-Piece Tool Set that's your cue to start your standing ovation.</li>\r\n<li>Donning the black denim grilling apron will instantly command respect from hungry family members, nosy neighbors, and scurrying squirrels.</li>\r\n<li>We've got an in with legendary flavor maven Rufus Teague. You won't find this set of Steak Lovers sauces and rubs anywhere else. Not even in Rufus's kitchen.</li>\r\n<li>The Safe Scrape wooden scraping paddle gradually conforms to the shape of the grill's grates to banish charred debris from the cooking surface. Talk about a grate escrape.</li>\r\n</ul>",
+      "Name": "Backyard Steakhouse Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/972/large/MBC_MC_2018-4_Steak-2_WEB-.jpg?1527009751",
+      "TERRAINRANK": 3
+    },
+    {
+      "SKU": "KTCR-0009-PWH",
+      "VariantName": "Personalized Whiskey Crate",
+      "Price": 119.99,
+      "ProductId": 84,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/personalized-whiskey-crate",
+      "Contents": "<h4>Distinguished Gear</h4> <ul>\r\n  <li>2 Personalized, Heavy-Bottom Rocks Glasses, 9 oz.</li>\r\n  <li>2 Tovolo Ice Sphere Molds</li>\r\n  <li>2 Slate Coasters</li>\r\n  <li>33 Drams Whiskey Drinking Journal</li>\r\n</ul> <h4>Luxury Grub</h4> <ul>\r\n  <li>Squirrel Brand Spiced Peppercorn Peanuts</li>\r\n  <li>Wonderful Salted Pistachios</li>\r\n  <li>Sahale Snacks Cranberry Pecans</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "<h4>The Sophisticated Man</h4> <p>Men aren't born dressed in a sharp tailored suit with a Cuban in hand. Even Frank Sinatra,\r\n   before he was the suave sultan Frank Sinatra, was once young Francis Albert, captain\r\n   of the chess club with enough barbed wire lining his teeth to fence off a Toluca\r\n   cattle ranch.\r\n</p> <p>The transformation into manhood, like most worthwhile ventures in life, begins with a strong drink.\r\n</p> <h4>Bold Bravado</h4> <p>Handing a guest a drink is like demonstrating a firm handshake in a job interview\r\n   or warming up with one-fingered push-ups before an underground kung-fu death showdown.\r\n   It's a functional maneuver to establish a relaxed, confident presence.\r\n</p> <p>This set of square whiskey glasses are intentionally bottom-loaded to flaunt your gravitas.\r\n   And we'll laser etch your name into the thick glass so no one will forget whose sophisticated\r\n   jazz flute skills they were admiring all night.\r\n</p> <p>Science bests nature once again with the Tovolo ice molds. These pristine ice crystal spheres\r\n   have a slower melting rate, keeping your whiskey chilled longer and tasting stronger.\r\n   And aesthetically they pair perfectly with the solid slate coasters, the marble\r\n   floors of the coaster world, to give your whiskey experience a more rugged, natural\r\n   ambiance.\r\n</p> <h4>Cultured Accompaniments</h4> <p>Whiskey is a flavor bully, and your childish gas station junk foods will get\r\n   knocked over in its bold wake. These salted pistachios, spiced peppercorn peanuts, and sweet and spicy\r\n   pecans are snacks for the mature, the perfect compliment to any whiskey.\r\n</p> <p>And use the drinking journal to scribble notes for the whiskey blog you're thinking\r\n   about starting, or just let it peek out of your pocket so people think you have\r\n   a whiskey blog. Just as rewarding with much less work.\r\n</p> <p>The road to classy refinement is not for the weak of taste, and it begins with the Personalized\r\n   Whiskey Man Crate.\r\n</p>",
+      "Name": "Personalized Whiskey Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/689/large/pw_sophisticated_whiskey_gifts_for_claseey_guys__10836.jpg?1502411151",
+      "TERRAINRANK": 4
+    },
+    {
+      "SKU": "KTCR-0004-SUR",
+      "VariantName": "Outdoor Survival Crate",
+      "Price": 119.99,
+      "ProductId": 32,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/outdoor-survival-crate",
+      "Contents": "<h4>Survival Contraptions</h4> <ul>\r\n  <li>GSI Halulite Minimalist 1-person cookset</li>\r\n  <li>Multi-tool with carrying bag</li>\r\n  <li>Shovel, saw, pickaxe, hammer, hatchet heads</li>\r\n  <li>Built-in compass</li>\r\n</ul> <h4>Wilderness Trappings</h4> <ul>\r\n  <li>FM21-76 Army Survival Field Manual</li>\r\n  <li>Paracord knife with firestarter</li>\r\n  <li>50 ft of paracord</li>\r\n  <li>Emergency blanket &amp; glow sticks</li>\r\n  <li>Pemmican Meal Bar</li>\r\n  <li>Of course, Beef Jerky</li>\r\n</ul>",
+      "LongDescription": "<h4>The Call of the Wild</h4> <p>You heard it, and your instincts told you it must be answered. The last bar on your\r\n   cell phone disappears as you drive into the foothills, all of your worries far behind\r\n   in the rearview mirror. Miles from civilization, not even your cornflower-blue-shirt-wearing\r\n   boss Tad can encroach on your weekend. <span class='highlight'>You're off the grid.</span></p>\r\n<p>The untamed wilderness is your proving ground. After all, there's no greater challenge\r\n   than that of Man against the Elements.\r\n</p> <h4>The Great Outdoors</h4> <p>It's just you and an overgrown hinterland seething with insects and wild animals -\r\n  <span class=\"highlight\">just the way you like it.</span> With only a few hours\r\n   of daylight left, you set out in search of a suitable campsite.\r\n</p> <p>Paul Bunyan had an axe and an ox, but you have a <span class=\"highlight\">5-in-1 multi-tool</span>. You\r\n   wield it with the strength and precision of a grizzled mountaineer. At this rate, it's only a matter of\r\n   time before you trade in your sleeping bag for a log cabin, but you need to set up camp before something\r\n   mistakes you for dinner.\r\n</p> <p>You're a descendant of Man, and Man discovered fire. Yours is crackling merrily in no time with a few\r\n   strikes of your <span class=\"highlight\">firestarter</span>. The camp is your domain - would-be predators\r\n   keep their distance, and the chill leaves your bones.\r\n</p> <h4>Survival of the Fittest</h4> <p>In the morning, you boil water and whip up some hard-earned hot grub while consulting your dog-eared copy\r\n   of the Army Field Manual. With luck, the only hairy situation you'll have is the\r\n  <span class=\"highlight\">prodigious beard</span> that will inevitably sprout during your walkabout, but it\r\n   helps to have the backup. Channeling John Wayne with a little cowboy coffee, you toast your first night of\r\n   survival. <span class=\"highlight\">Nature,  0. You, 1</span>.\r\n</p> <p>You feel invigorated. You make short work of striking camp, and take your bearings. If you end up in a\r\n   staring contest with a mountain lion, you'll be ready. It's going to be a good weekend.\r\n</p>",
+      "Name": "Outdoor Survival Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/462/large/oscr-cool-survival-gifts-men-will-love__00495.jpg?1502411065",
+      "TERRAINRANK": 5
+    },
+    {
+      "SKU": "KTBX-0026-TOB",
+      "VariantName": "Wine Country Picnic Pack",
+      "Price": 129.99,
+      "ProductId": 228,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/wine-country-picnic-pack",
+      "Contents": "<ul>\r\n  <li>Cardboard Box</li>\r\n  <li>Waxed Canvas Adventure Wine Tote Includes:</li>\r\n      <ul>\r\n          <li>2 Stemless Acrylic Wine Glasses</li>\r\n          <li>1 Wine Bottle Stopper</li>\r\n          <li>1 Folding Corkscrew</li>\r\n          <li>1 Cutting Board with Extendable Legs</li>\r\n  \t </ul>\r\n  <li>Wine Pocket Wine Journal, Recycled Paper</li>\r\n  <li>5 Towelettes, Road Spill on the Go Stain Removal</li>\r\n</ul>",
+      "LongDescription": "<h4>All Picnic, No Panic</h4>\r\n\r\n  <p>Along a rustic vineyard road lies the idyllic picnic spot. The sun is dipping behind the ridge. A warm breeze brushes through the leaves. The blanket is laid out with a spread of local wines and artisan cheeses. The stage is set for a romantWLAHHH...ANTS!</p>\r\n\r\n  <p>If there's one thing wine-country ants love more than a picnic, it's a loosely organized picnic. Flimsy paper plates. Spillable Solo cups. Leftovers hanging out of grocery bags. \"Hey, colony& the line forms here!\"</p>\r\n\r\n  <p>That's precisely why we created the Wine Country Picnic Pack. It has what picnickers need to sip in serenity, while avoiding uninvited centimeter-sized guests.</p>\r\n\r\n<h4>Pack It Up, Pack It In</h4>\r\n  <ul>\r\n\t<li>The insulated double wine tote converts to a backpack to free his hands for plucking grapes right off the vine.</li>\r\n\t<li>Like a fine wine, the portable acacia table has legs, literally elevating the cheese-nibbling experience. </li>\r\n\t<li>With the two stemless acrylic wine glasses, it's safety first and refinement a close second.</li>\r\n\t<li>The Wine Pocket wine journal lets him jot down tasting notes at wineries, that elusive ending to his screenplay, and the coordinates of hidden treasure.</li>\r\n\r\n  </ul>",
+      "Name": "Wine Country Picnic Pack",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/822/large/MBC_MC_2018-4_Wine-3_WEB-2582.jpg?1526330408",
+      "TERRAINRANK": 6
+    },
+    {
+      "SKU": "KTPR-0010-FKN",
+      "VariantName": "Folding Knife Making Kit",
+      "Price": 134.99,
+      "ProductId": 8,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/folding-knife-making-kit",
+      "Contents": "<h4>Blade Buddies</h4> <ul>\r\n  <li>Folding Knife Assembly</li>\r\n  <li>Linen Micarta Handle Scales</li>\r\n</ul> <h4>Shape, Sand, and Polish</h4> <ul>\r\n  <li>Man Crates Folding Knife Making Guide</li>\r\n  <li>File &amp; Rasp Set</li>\r\n  <li>Variable Grit Sandpaper Set</li>\r\n  <li>3\" Bench Vise</li>\r\n  <li>T6 &amp; T8 Torx Wrench Set</li>\r\n</ul>",
+      "LongDescription": "<h4>The Sharp Side Of Subtlety</h4> <p>Most men aren't going full Crocodile Dundee, strutting around town brandishing a 16\"\r\n   bowie knife and screaming \"That's not a knife! This is a knife!\" at anything remotely\r\n   pointy-looking. That social production of masculinity is a bit much even by our\r\n   standards--unless you're Australian, in which case... good onya, mate!\r\n</p> <p>There's a case to be made for subtlety, and routinely carrying a folding knife is the perfect\r\n   balance of convenience, preparation, and discretion. And the only thing more reassuring\r\n   than having a trusty folding knife clipped to the hip is knowing exactly how that\r\n   knife came to be.\r\n</p> <h4>Cold As Steel</h4> <p>Assembling the skeleton of a folding knife is just like putting together IKEA furniture, except it's\r\n   extremely tiny, won't break after two months, and will draw blood if done recklessly. This knife\r\n   is constructed from many tiny parts, the majority of which are too small to be choking\r\n   hazards, so swallow away.\r\n</p> <p>This AUS 8 Drop Point Blade is made of heat-treated and sub-zero quenched stainless steel and boasts an\r\n   incredible temper and hardness of 57-58 HRC. The knife's thumb studs and liner lock make it easy to open\r\n   and difficult to accidentally cut fingers off.\r\n</p> <h4>Tough As Linen</h4> <p>For exceptional presentation and durability, we've selected Linen Micarta handle scales made from\r\n   layers of hardened resin linen. Think fashion-forward, fossilized mummy wrap meets\r\n   intricate wood grain pattern, then pick your jaw up from off the ground.\r\n</p> <p>We've also included a portable bench vise, file, and rasp set, sandpaper, and Torx wrenches\r\n   for assembling and shaping the knife handles to its perfect, palm-fitting specifications,\r\n   as well as an instruction booklet to make sure the knife gets assembled pointy end\r\n   out.\r\n</p> <p>The Folding Knife Project Kit gives the equipment, expertise, and unforgettable\r\n   experience of assembling and shaping a trusty and true folding knife.\r\n</p>",
+      "Name": "Folding Knife Project",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/373/large/fkmk-folding-knife-making-kit-gift__05783.jpg?1502411030",
+      "TERRAINRANK": 7
+    },
+    {
+      "SKU": "KTZC-0008-SSS",
+      "VariantName": "Storied Sunrise Cocktail Crate",
+      "Price": 119.99,
+      "ProductId": 227,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/storied-sunrise-cocktail-crate",
+      "Contents": "<h4>Our Lasers Take Time</h4>\r\n<p>This personalized item requires 1 day of processing time.</p>\r\n<p>\r\n</p>\r\n<li>Crate</li>\r\n<li>Crowbar</li>\r\n<li>Smokin' Mary Bloody Mary Mix, 750 ml, 25.4 oz</li>\r\n<li>Bloody Mary Cocktail Nuts, Extra Large Virginia Peanuts, 6 oz</li>\r\n<li>Pickled Geen BeansRed Pepper, 16 oz</li>\r\n<li>2 Mason Jar Glasses, Laser-Engraved Personalization with Name, 16 oz</li>\r\n<li><i>The Sun Also Rises</i> by Ernest Hemingway, Hardcover</li>\r\n\r\n</ul>",
+      "LongDescription": "<h4>Sunrising to the Occasion</h4>\r\n\r\n<p>Karaoke Night. Ladies' Night. All-You-Can-Guzzle Flaming Volcano Bowl Night. There are more evening cocktail occasions than you can shake a swizzle stick at. But one rather mundane morning we got to thinking, why should nighttime have all the fun?</p>\r\n\r\n<p>When the plan is to wake and slake with an a.m.-friendly libation, it's best to follow in the staggery footsteps of writer/drinker Ernest Hemingway. The literary legend actually helped popularize the Bloody Mary in the 1920s, giving the world a buzzy brunch beverage that is unequivocally more refreshing when the sun is shining. </p>\r\n\r\n<p>The Storied Sunrise Cocktail Crate is the ultimate homage to \"Papa,\" pairing a smoke-infused Bloody Mary mix with a copy of his debut novel, <i>The Sun Also Rises</i>. Mornings for the thinking and drinking man are about to get a lot brighter. Take that, moon.</p>\r\n\r\n<h4>Proper Reading and Drinking Materials </h4>\r\n<li>Considered one of Hemingway's best novels, <i>The Sun Also Rises</i> is a poignant tale about the meaning of life. Except for the knock-knock joke on page 47.</li>\r\n<li>Make it personal with a set of 2 laser-engraved mason jars that are almost as thick as the book.</li>\r\n<li>Smokin' Mary Bloody Mary Mix is made for foodies by foodies. Because a well-made Bloody is practically a meal in itself.</li>\r\n<li>Celery sticks are for, well, we're really not sure. But the Foster's Pickled Green Beans we've included will garnish the heck of his cocktail.</li>",
+      "Name": "Sunrise Storied Cocktail Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/783/large/MBC_MC_2018-4_Bloody_Mary_WEB-2016.jpg?1526326781",
+      "TERRAINRANK": 8
+    },
+    {
+      "SKU": "KTAM-0006-CHU",
+      "VariantName": "Premium Cigar Humidor",
+      "Price": 119.99,
+      "ProductId": 125,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/premium-cigar-humidor",
+      "Contents": "<h4>Moisture Manager</h4> <ul>\n  <li>American Cedar Humidor</li>\n  <li>Humidifier</li>\n  <li>Hygrometer</li>\n</ul> <h4>Expert Smokeware</h4> <ul>\n  <li>Double Guillotine Cigar Cutter</li>\n  <li>Thunderbird Butane Lighter</li>\n  <li>Cigar Tasting Journal</li>\n</ul>",
+      "LongDescription": "<h4>Smoke 'em if you got 'em</h4> <p>Any Joe Schmoe can huff and puff his way through a cigar, but it takes a true Renaissance\n   man to smoke one correctly.\n</p> <p>A scrupulous surgeon to slice the cap for optimal air flow, a skilled firebreather to summon and harness\n   the erratic flame, and an uninhibited poet to fully appreciate the sharp aesthetic of drawing euphoria from\n   between the fingertips.\n</p> <p>But mastery of skill is not enough. Even Da Vinci, the quintessential Renaissance man, would've just been\n   another creepy Mona Lisa hanger-on if not for the proper equipment. The Premium Cigar Humidor supplies the\n   finest gear for the true cigar aficionado.\n</p> <h4>A Cut Above</h4> <p>When it comes to getting results, execution is key(unknown character)it was true during the French Revolution, and\n   it's true when cutting cigars. The Premium Cigar Humidor innovates on their enlightened methods by\n   featuring a double-guillotine cutter. It will give your cigars a cleaner straight cut than a 1950's Wall\n   Street barber shop and deliver a smoking experience that will make your head roll.\n</p> <p>We don't take cigar lighting lightly either. Cheap old lighter? Might as well wash your stogie down with a\n   shot of lighter fluid. Ignite the good life by flipping open a Thunderbird Butane torch just like your\n   father and his father once did.\n</p> <h4>Gear on the Go</h4> <p>With a custom-designed hygrometer and humidifier fitted into the lid, the air-tight, indestructible Ammo\n   Can Humidor is the perfect tobacco tackle box. It's the only traveling humidor that\n   guarantees both regulation of ideal moisture levels and preservation in the event\n   of a nuclear holocaust.\n</p> <p>Don't just blow hot air around, grab the Premium Cigar Humidor and become a cigar connoisseur.</p>",
+      "Name": "Premium Cigar Humidor Ammo Can",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/870/large/ch_american_cedar_cigar_humidor.jpg?1504138407",
+      "TERRAINRANK": 9
+    },
+    {
+      "SKU": "KTPR-0009-SHA",
+      "VariantName": "Straight Edge Shaving Kit",
+      "Price": 174.99,
+      "ProductId": 72,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/straight-edge-shaving-kit",
+      "Contents": "<h4>Blade Buddies</h4> <ul>\n  <li>Böker 4/8\" Classic Anthracite Razor</li>\n  <li>Böker Leather Span Strop</li>\n</ul> <h4>Face Buffers</h4> <ul>\n  <li>Renegade Shave Cream, 4 oz</li>\n  <li>Renegade After Shave, 4 oz</li>\n  <li>Alum Bar, 45g</li>\n  <li>Man Crates Shaving Booklet</li>\n</ul>",
+      "LongDescription": "<h4>Life on the Edge</h4> <p>Men are like diamonds; they have certain attributes that can only be revealed through intense\n   pressure, and a rough careless cut can rob them of all charm and attractiveness.\n</p> <p>And while any quality razor can make a man feel smooth like a baby's bottom,\n   only a straight razor will make him feel \"smooth\" like a 50s greaser. There's just\n   something exhilarating about expertly dragging an extremely sharp blade across the\n   face, staring danger straight in the face with a smooth, straight-shaved face to\n   show for it.\n</p> <p>For generations, a trusty straight razor has brought out the best in men, both inside and out.</p> <h4>Solingen for the Win</h4> <p>The Straight Shave Project Kit features a handmade 4/8\" Böker straight razor forged in Solingen,\n   Germany, the revered City of Blades. The esteemed \"made in Solingen\" title is strictly\n   reserved for blades made in and subjected to that region's rigorous quality standards,\n   just like Scotch Whiskey, Champagne Sparkling Wine, or Hidden Valley Ranch.\n</p> <p>This top-notch face scraper boasts Anthracite handles and a carbon steel blade\n   with extra hollow ground for extreme sharpness and edge retention. It can be aligned\n   and sharpened against either side of the Böker leather span strop, the paste composite\n   for rough stropping or natural leather for fine stropping.\n</p> <h4>Refined Renegade</h4> <p>While we're not always the most selective about what we put on our face, we exercise major discretion\n   regarding what gets on our razor. Renegade Shave products make the cut.\n</p> <p>Renegade shave creams primes the face for a close, comfortable shave, and the Alum Bar and After Shave\n   soothes any wounds and face nicks made from the shaky hands of straight razor excitement. The result, a\n   clean shave and an amazing smelling 6-8 inches between the nose and shoulders.\n</p> <p>The Straight Shave Project Kit is giving men a sleek new handle on the sensation of old-fashioned\n   shaving.\n</p>",
+      "Name": "Straight Edge Shaving",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/633/large/sesk-straight-edge-shave-kit-components__46116.jpg?1502411131",
+      "TERRAINRANK": 10
+    }
+  ],
+  "template": {
+    "id": 33,
+    "lastModified": "2018-07-24T20:08:43.395Z",
+    "createdAt": "2018-07-10T20:19:10.888Z",
+    "archived": false,
+    "templateName": "High Priced - Iterable Export",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "SKU"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "VariantName"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "Price"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "Inventory"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "VariantStatus"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "ProductId"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "VariantId"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "Path"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "CanonicalUrl"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "ContentsHTML"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "LongDescription"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "Contents"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "12",
+                  "value": {
+                    "id": 12,
+                    "fields": [
+                      [
+                        "LongDescriptionHTML"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "13",
+                  "value": {
+                    "id": 13,
+                    "fields": [
+                      [
+                        "Name"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "14",
+                  "value": {
+                    "id": 14,
+                    "fields": [
+                      [
+                        "ConversionRate"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "15",
+                  "value": {
+                    "id": 15,
+                    "fields": [
+                      [
+                        "UniquePurchases"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "16",
+                  "value": {
+                    "id": 16,
+                    "fields": [
+                      [
+                        "ProductRevenue"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "17",
+                  "value": {
+                    "id": 17,
+                    "fields": [
+                      [
+                        "Quantity"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "18",
+                  "value": {
+                    "id": 18,
+                    "fields": [
+                      [
+                        "AveragePrice"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "19",
+                  "value": {
+                    "id": 19,
+                    "fields": [
+                      [
+                        "ImageLink"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "20",
+                  "value": {
+                    "id": 20,
+                    "fields": [
+                      [
+                        "Margin"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "21",
+                  "value": {
+                    "id": 21,
+                    "fields": [
+                      [
+                        "TERRAINRANK"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "22",
+                  "value": {
+                    "id": 22,
+                    "fields": [
+                      [
+                        "CanonicalUrl"
+                      ]
+                    ],
+                    "meta": {
+                      "value": "https://",
+                      "at": 0
+                    },
+                    "skipNulls": true,
+                    "typeCode": "InsertNode",
+                    "acceptedType": "string"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 22,
+            "uidNode": 23,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "Path"
+                ],
+                7
+              ],
+              [
+                [
+                  "Price"
+                ],
+                2
+              ],
+              [
+                [
+                  "Name"
+                ],
+                13
+              ],
+              [
+                [
+                  "LongDescriptionHTML"
+                ],
+                12
+              ],
+              [
+                [
+                  "VariantId"
+                ],
+                6
+              ],
+              [
+                [
+                  "LongDescription"
+                ],
+                10
+              ],
+              [
+                [
+                  "ProductRevenue"
+                ],
+                16
+              ],
+              [
+                [
+                  "ConversionRate"
+                ],
+                14
+              ],
+              [
+                [
+                  "Margin"
+                ],
+                20
+              ],
+              [
+                [
+                  "TERRAINRANK"
+                ],
+                21
+              ],
+              [
+                [
+                  "UniquePurchases"
+                ],
+                15
+              ],
+              [
+                [
+                  "ProductId"
+                ],
+                5
+              ],
+              [
+                [
+                  "SKU"
+                ],
+                0
+              ],
+              [
+                [
+                  "VariantStatus"
+                ],
+                4
+              ],
+              [
+                [
+                  "ContentsHTML"
+                ],
+                9
+              ],
+              [
+                [
+                  "CanonicalUrl"
+                ],
+                8
+              ],
+              [
+                [
+                  "ImageLink"
+                ],
+                19
+              ],
+              [
+                [
+                  "VariantName"
+                ],
+                1
+              ],
+              [
+                [
+                  "Quantity"
+                ],
+                17
+              ],
+              [
+                [
+                  "Contents"
+                ],
+                11
+              ],
+              [
+                [
+                  "AveragePrice"
+                ],
+                18
+              ],
+              [
+                [
+                  "Inventory"
+                ],
+                3
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "SKU"
+                ]
+              ],
+              [
+                1,
+                [
+                  "VariantName"
+                ]
+              ],
+              [
+                2,
+                [
+                  "Price"
+                ]
+              ],
+              [
+                3,
+                [
+                  "Inventory"
+                ]
+              ],
+              [
+                4,
+                [
+                  "VariantStatus"
+                ]
+              ],
+              [
+                5,
+                [
+                  "ProductId"
+                ]
+              ],
+              [
+                6,
+                [
+                  "VariantId"
+                ]
+              ],
+              [
+                7,
+                [
+                  "Path"
+                ]
+              ],
+              [
+                8,
+                [
+                  "CanonicalUrl"
+                ]
+              ],
+              [
+                9,
+                [
+                  "Contents"
+                ]
+              ],
+              [
+                10,
+                [
+                  "LongDescription2"
+                ]
+              ],
+              [
+                11,
+                [
+                  "Contents2"
+                ]
+              ],
+              [
+                12,
+                [
+                  "LongDescription"
+                ]
+              ],
+              [
+                13,
+                [
+                  "Name"
+                ]
+              ],
+              [
+                14,
+                [
+                  "ConversionRate"
+                ]
+              ],
+              [
+                15,
+                [
+                  "UniquePurchases"
+                ]
+              ],
+              [
+                16,
+                [
+                  "ProductRevenue"
+                ]
+              ],
+              [
+                17,
+                [
+                  "Quantity"
+                ]
+              ],
+              [
+                18,
+                [
+                  "AveragePrice"
+                ]
+              ],
+              [
+                19,
+                [
+                  "ImageLink"
+                ]
+              ],
+              [
+                20,
+                [
+                  "Margin"
+                ]
+              ],
+              [
+                21,
+                [
+                  "TERRAINRANK"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "string"
+              ],
+              [
+                2,
+                "number"
+              ],
+              [
+                3,
+                "number"
+              ],
+              [
+                4,
+                "string"
+              ],
+              [
+                5,
+                "number"
+              ],
+              [
+                6,
+                "number"
+              ],
+              [
+                7,
+                "string"
+              ],
+              [
+                8,
+                "string"
+              ],
+              [
+                9,
+                "string"
+              ],
+              [
+                10,
+                "string"
+              ],
+              [
+                11,
+                "string"
+              ],
+              [
+                12,
+                "string"
+              ],
+              [
+                13,
+                "string"
+              ],
+              [
+                14,
+                "number"
+              ],
+              [
+                15,
+                "number"
+              ],
+              [
+                16,
+                "number"
+              ],
+              [
+                17,
+                "number"
+              ],
+              [
+                18,
+                "number"
+              ],
+              [
+                19,
+                "string"
+              ],
+              [
+                20,
+                "number"
+              ],
+              [
+                21,
+                "number"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                true
+              ],
+              [
+                3,
+                false
+              ],
+              [
+                4,
+                false
+              ],
+              [
+                5,
+                true
+              ],
+              [
+                6,
+                false
+              ],
+              [
+                7,
+                false
+              ],
+              [
+                8,
+                true
+              ],
+              [
+                9,
+                true
+              ],
+              [
+                10,
+                false
+              ],
+              [
+                11,
+                false
+              ],
+              [
+                12,
+                true
+              ],
+              [
+                13,
+                true
+              ],
+              [
+                14,
+                false
+              ],
+              [
+                15,
+                false
+              ],
+              [
+                16,
+                false
+              ],
+              [
+                17,
+                false
+              ],
+              [
+                18,
+                false
+              ],
+              [
+                19,
+                true
+              ],
+              [
+                20,
+                false
+              ],
+              [
+                21,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                8,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                9,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                10,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                11,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                12,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                13,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                14,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                15,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                16,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                17,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                18,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                19,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                20,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                21,
+                {
+                  "etlType": "Integer"
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Algorithm",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "algorithmId": 30
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Fs",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": "Products.*",
+          "fieldOrdering": [
+            "SKU",
+            "VariantName",
+            "Price",
+            "ProductId",
+            "CanonicalUrl",
+            "Contents",
+            "LongDescription",
+            "Name",
+            "ImageLink",
+            "TERRAINRANK"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {},
+        "integrationId": 22,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ]
+        }
+      }
+    }
+  }
+}

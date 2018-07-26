@@ -77,18 +77,54 @@ const V5TestDeleteFields1 = require('./cases/V5TestDeleteFields1');
 const V5TestDisableFields = require('./cases/V5TestDisableFields');
 const V5TrickyNumberCasts = require('./cases/V5TrickyNumberCasts');
 
-function runTransforms(engine: TransformationEngine, inputDocs: object[], outputDocs: Array<object | 'FAIL'>, numFailed: number)
+const MCTests = [
+  require('./cases/MC_01'),
+  require('./cases/MC_02'),
+  require('./cases/MC_03'),
+  require('./cases/MC_04'),
+  require('./cases/MC_05'),
+  require('./cases/MC_06'),
+  // require('./cases/MC_07'), file is broken
+  require('./cases/MC_08'),
+  require('./cases/MC_09'),
+  require('./cases/MC_10'),
+  // require('./cases/MC_11'), file is broken
+  require('./cases/MC_12'),
+  // require('./cases/MC_13'), file is broken
+  require('./cases/MC_14'),
+  require('./cases/MC_15'),
+];
+
+interface RunOptions
+{
+  ignoreFields?: string[];
+}
+function runTransforms(
+  engine: TransformationEngine,
+  inputDocs: object[],
+  outputDocs: Array<object | 'FAIL'>,
+  numFailed: number,
+  options?: RunOptions,
+)
 {
   expect(Utils.validation.verifyEngine(engine)).toEqual([]);
   let failed = 0;
   let passed = 0;
   inputDocs.forEach((doc, i) =>
   {
-    const expected = outputDocs[i];
+    let expected = outputDocs[i];
     let output: 'FAIL' | object = 'FAIL';
     try
     {
       output = engine.transform(doc);
+      if (options !== undefined && options.ignoreFields !== undefined)
+      {
+        if (typeof expected === 'object')
+        {
+          expected = _.omit(expected, options.ignoreFields);
+        }
+        output = _.omit(output, options.ignoreFields);
+      }
       passed++;
     }
     catch (e)
@@ -105,7 +141,7 @@ function runTransforms(engine: TransformationEngine, inputDocs: object[], output
  *  Migrate the template in the test file and transform the test file's input documents to ensure
  *  that they match the output docu
  */
-function runMigrationFile(test: MigrationTestFile)
+function runMigrationFile(test: MigrationTestFile, options?: RunOptions)
 {
   const { testName, numDocs, numFailed, whichEdge, inputDocs, outputDocs, template } = test;
 
@@ -114,7 +150,7 @@ function runMigrationFile(test: MigrationTestFile)
 
   const templateRecord = _ETLTemplate(migratedTemplateObj, true);
   const engine: TransformationEngine = templateRecord.getEdge(whichEdge).transformations;
-  runTransforms(engine, inputDocs, outputDocs, numFailed);
+  runTransforms(engine, inputDocs, outputDocs, numFailed, options);
 
   let roundTripTemplate: any = templateForBackend(templateRecord);
   roundTripTemplate = templateForSave(roundTripTemplate);
@@ -122,14 +158,14 @@ function runMigrationFile(test: MigrationTestFile)
   roundTripTemplate = _ETLTemplate(roundTripTemplate, true);
 
   const roundTripEngine = _ETLTemplate(roundTripTemplate, true).getEdge(whichEdge).transformations;
-  runTransforms(roundTripEngine, inputDocs, outputDocs, numFailed);
+  runTransforms(roundTripEngine, inputDocs, outputDocs, numFailed, options);
 }
 
-function testShortCut(file: MigrationTestFile)
+function testShortCut(file: MigrationTestFile, options?: RunOptions)
 {
   test(`Migration Test: ${file.testName}`, () =>
   {
-    runMigrationFile(file);
+    runMigrationFile(file, options);
   });
 }
 
@@ -146,5 +182,12 @@ describe('Run V5 Migration Tests', () =>
   testShortCut(V5TestDeleteFields1);
   testShortCut(V5TestDisableFields);
   testShortCut(V5TrickyNumberCasts);
-  testShortCut(V5TestMergeEngine);
+  testShortCut(V5TestMergeEngine, { ignoreFields: ['geoField']});
+});
+
+describe ('Run V5 Mancrates Tests', () => {
+  for (const test of MCTests)
+  {
+    testShortCut(test);
+  }
 });
