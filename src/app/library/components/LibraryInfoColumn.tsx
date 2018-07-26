@@ -146,7 +146,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
 
   public renderGroup(isSuperUser, isBuilder)
   {
-    if (!this.props.group || this.props.algorithm)
+    if (!this.props.group || this.props.algorithm || this.props.group.db)
     {
       return null;
     }

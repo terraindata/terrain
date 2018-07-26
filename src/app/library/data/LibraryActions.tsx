@@ -203,10 +203,10 @@ const Actions =
         $(ActionTypes.groups.move, { categoryId, index, group }),
 
     duplicate:
-      (group: Group, index: number, name: string, db: BackendInstance, categoryId?: ID) =>
+      (group: Group, index: number, name: string, db: BackendInstance, categoryId?: ID, duplicateArchive?: boolean) =>
         (dispatch, getState) =>
         {
-          const { algorithmsOrder } = group;
+          let { algorithmsOrder } = group;
 
           categoryId = categoryId || group.categoryId;
           group = group
@@ -223,6 +223,12 @@ const Actions =
             (groupId: ID) =>
             {
               const algorithms = getState().get('library').algorithms;
+              if (duplicateArchive === false)
+              {
+                algorithmsOrder = algorithmsOrder.filter((algorithmId) =>
+                  LibraryTypes.nameForStatus(algorithms.get(algorithmId).status) !== 'Archive',
+                ).toList();
+              }
               algorithmsOrder.map(
                 (algorithmId, index) =>
                 {

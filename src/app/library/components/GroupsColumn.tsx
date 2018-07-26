@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands no-var-requires no-shadowed-variable strict-boolean-expressions switch-default
 
+import CheckBox from 'common/components/CheckBox';
 import * as Immutable from 'immutable';
 import { replaceRoute } from 'library/helpers/LibraryRoutesHelper';
 import * as _ from 'lodash';
@@ -111,6 +112,7 @@ export interface State
   duplicateGroupTextboxValue: string;
   duplicateGroupId: ID;
   duplicateGroupCategoryIndex: number;
+  duplicateArchive: boolean;
 }
 
 class GroupsColumn extends TerrainComponent<Props>
@@ -128,6 +130,7 @@ class GroupsColumn extends TerrainComponent<Props>
     duplicateGroupTextboxValue: '',
     duplicateGroupId: '',
     duplicateGroupCategoryIndex: 0,
+    duplicateArchive: false,
   };
 
   constructor(props)
@@ -189,6 +192,7 @@ class GroupsColumn extends TerrainComponent<Props>
     this.setState({
       duplicatingGroup: false,
       duplicateGroupTextboxValue: '',
+      duplicateArchive: false,
     });
   }
 
@@ -208,10 +212,12 @@ class GroupsColumn extends TerrainComponent<Props>
       this.state.duplicateGroupTextboxValue,
       dbs.get(dbIndex),
       this.props.categories.get(categoryId).id,
+      this.state.duplicateArchive,
     );
     this.setState({
       duplicatingGroup: false,
       duplicateGroupTextboxValue: '',
+      duplicateArchive: false,
     });
   }
 
@@ -235,7 +241,7 @@ class GroupsColumn extends TerrainComponent<Props>
     const options = dbs ? dbs.filter((db) => db.type === 'elastic').map((db) => db.name + ` (${db.type})`).toList() : [];
     let selected;
     const group = this.props.groups.get(id);
-    if (group !== undefined)
+    if (group !== undefined && group.db !== undefined)
     {
       selected = group.db.name + ` (${group.db.type})`;
     }
@@ -685,12 +691,33 @@ class GroupsColumn extends TerrainComponent<Props>
     );
   }
 
-  public renderDuplicateDropdowns()
+  public handleDuplicateArchive()
+  {
+    this.setState({
+      duplicateArchive: !this.state.duplicateArchive,
+    });
+  }
+
+  public renderDuplicateArchive()
+  {
+    return (
+      <CheckBox
+        checked={this.state.duplicateArchive}
+        onChange={this.handleDuplicateArchive}
+        className='duplicate-archive-checkbox'
+        label='Duplicate archived algorithms'
+        color={Colors().mainSectionTitle}
+      />
+    );
+  }
+
+  public renderDuplicateComponents()
   {
     return (
       <div>
         {this.renderDatabaseDropdown()}
         {this.renderCategoryDropdown()}
+        {this.renderDuplicateArchive()}
       </div>
     );
   }
@@ -711,7 +738,7 @@ class GroupsColumn extends TerrainComponent<Props>
       confirmButtonText='Duplicate'
       message='What would you like to name the duplicate group?'
       textboxPlaceholderValue='Group Name'
-      children={this.renderDuplicateDropdowns()}
+      children={this.renderDuplicateComponents()}
       childrenMessage='Please select a database for the duplicate group.'
       allowOverflow={true}
       inputClassName='duplicate-group-modal-input'
