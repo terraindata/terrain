@@ -73,6 +73,7 @@ export class PostProcess
   {
     return new Promise<object[]>(async (resolve, reject) =>
     {
+      console.log('processing...');
       const data: object[] = [];
       const dataStreamPromises: Array<Promise<boolean>> = [];
       dataStreams.forEach(async (dataStream) =>
@@ -96,6 +97,7 @@ export class PostProcess
       });
 
       await Promise.all(dataStreamPromises);
+      console.log('PROCESSED DATA: ', JSON.stringify(data, null, 2));
       let processedData: object[] = _.cloneDeep(data);
       if (!Array.isArray(transformConfigs))
       {
@@ -146,7 +148,7 @@ export class PostProcess
     if (options['fieldInPattern'] !== true)
     {
       data.forEach((row) =>
-      {
+      { 
         if (patternRegExpFull.test(row[options['primaryKey']]))
         {
           const extractedPrimaryKey: string = row[options['primaryKey']]

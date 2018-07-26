@@ -159,7 +159,7 @@ export default class MagentoEndpoint extends AEndpointStream
                                   field: '_id',
                                 },
                               },
-                            ],
+                            ], 
                           should: [],
                         },
                       },
@@ -170,7 +170,7 @@ export default class MagentoEndpoint extends AEndpointStream
               track_scores: true,
               _source: true,
               script_fields: {},
-              size: 9999,
+              size: sourceConfig.options['size'] !== undefined ? sourceConfig.options['size'] : 1000,
             }),
         };
         const readStream: Readable = await qh.handleQuery(payload) as Readable;
@@ -178,6 +178,7 @@ export default class MagentoEndpoint extends AEndpointStream
 
         readStream.on('data', async (data) =>
         {
+          console.log('GOT DATA');
           if (data['hits'] !== undefined && data['hits']['hits'] !== undefined && Array.isArray(data['hits']['hits']))
           {
             const rows: object[] = data['hits']['hits'].map((hit) => hit['_source']);
@@ -185,6 +186,7 @@ export default class MagentoEndpoint extends AEndpointStream
           }
           if (doneReading)
           {
+            console.log('ENDING STREAM');
             writeStream.end();
             resolve(writeStream);
           }
@@ -222,6 +224,7 @@ export default class MagentoEndpoint extends AEndpointStream
       {
         try
         {
+          console.log('processing row ', i);
           const row = rows[i];
           const payloadType: object = MagentoParamPayloadTypes[magentoConfig.route];
           const newRow: object = {};
@@ -265,6 +268,7 @@ export default class MagentoEndpoint extends AEndpointStream
                 {
                   elem['original_' + field] = row[field];
                 });
+                console.log('writing elem ', JSON.stringify(elem));
                 writeStream.write(elem);
               });
             }
@@ -476,7 +480,14 @@ export default class MagentoEndpoint extends AEndpointStream
               }
               else
               {
-                rawJSON = [rawJSON['item']['$value']];
+                if (rawJSON['item']['$value'] === undefined)
+                {
+                  rawJSON = [this._parseJSONWithWSDL(rawJSON['item'], innerType['complexContent']['restriction']['attribute']['wsdl:arrayType'])];
+                }
+                else
+                {
+                  rawJSON = [rawJSON['item']['$value']];
+                }
               }
             }
             else if (rawJSON['item'] === undefined)

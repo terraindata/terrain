@@ -350,6 +350,7 @@ class ETLAjax
         downloadName,
         mimeType,
         onProgress,
+        connection: 'Keep-Alive',
       };
 
       const templateToRun = JSON.stringify(templateForBackend(template));
@@ -460,6 +461,7 @@ class ETLAjax
       xhr.responseType = 'blob';
     }
 
+    xhr.timeout = 3600000;
     xhr.onerror = (err: any) =>
     {
       const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
@@ -520,6 +522,7 @@ class ETLAjax
     }
 
     xhr.open('post', '/midway/v1/' + route);
+    xhr.setRequestHeader('Connection', 'Keep-Alive');
     xhr.send(formData);
   }
 }
@@ -530,6 +533,7 @@ interface ReqConfig
   downloadName?: string;
   mimeType?: string;
   onProgress?: (progress: string) => void;
+  connection?: string;
 }
 
 export interface ExecuteConfig

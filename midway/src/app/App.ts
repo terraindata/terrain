@@ -205,7 +205,7 @@ export class App
     this.app.use(async (ctx, next) =>
     {
       // tslint:disable-next-line:no-empty
-      ctx.req.setTimeout(0, () => { });
+      ctx.req.setTimeout(60 * 60 * 1000, () => { });
       try
       {
         await next();
@@ -378,7 +378,9 @@ export class App
     HA = this.heapAvail;
 
     winston.info('Listening on port ' + String(this.config.port));
-    return this.app.listen(this.config.port);
+    const serverInstance = await this.app.listen(this.config.port);
+    serverInstance.setTimeout(60*60*1000);
+    return Promise.resolve(serverInstance);
   }
 
   public getConfig(): Config.Config
