@@ -180,7 +180,7 @@ const Actions =
           const group = LibraryTypes._Group()
             .set('name', name)
             .set('db', db)
-            .set('language', category.defaultLanguage);
+            .set('language', (category !== undefined) ? category.defaultLanguage : '');
           dispatch(Actions.groups.create(categoryId, group, onCreate));
         },
 
