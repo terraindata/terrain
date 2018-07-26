@@ -86,7 +86,9 @@
   text-align: center;
 
   font-weight: 500;
-  
+  .dropdown-option-value-selected {
+    overflow: hidden;
+  }
   div {
     outline: none;
   }
@@ -104,12 +106,14 @@
     .labeled-row {
       display: flex;
       flex-wrap: wrap;
+      align-items: center;
     }
 
     .dropdown-wrapper {
       flex-grow: 1;
       min-width: 100px;
       width: auto;
+
     }
 
     .dropdown-options-wrapper {
@@ -125,6 +129,7 @@
     .labeled-row {
       display: flex;
       flex-wrap: wrap;
+      align-items: center;
     }
 
     .specific-time-amount {
@@ -153,8 +158,10 @@
 
 .date-view-label {
   font-size: 11px;
-  padding-top: 6px;
-  margin-right: 20px;
+  padding: 3px;
+  // padding-top: 6px;
+  // margin-right: 20px;
+  margin-right: 15px;
   text-transform: uppercase;
   text-align: right;
   width: 100px;

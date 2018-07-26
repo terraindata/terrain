@@ -147,6 +147,7 @@ class ETLEditorPage extends TerrainComponent<Props>
           'Template saved',
           savedTemplate.templateName,
           'info',
+          4,
         );
       }
       else

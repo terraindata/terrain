@@ -55,12 +55,14 @@ const theme = {
     style: {
       grid: {
         strokeDasharray,
-        strokeOpacity: 0.2,
+        strokeOpacity: 1,
+        fill: '#000',
       },
       axis: {
+        fill: '#000',
         stroke: blueGrey300,
         strokeWidth: 1,
-        strokeOpacity: 0.2,
+        strokeOpacity: 0.5,
       },
     },
   },

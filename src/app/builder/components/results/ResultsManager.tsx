@@ -164,7 +164,7 @@ export class ResultsManager extends TerrainComponent<Props>
       this.queryM2Results(query, db, hitsPage, appendResults);
     } else
     {
-      console.log('Unknown Database ' + query);
+      TerrainLog.debug('Unknown Database ' + query);
     }
     // temporarily disable count
     // this.setState({
@@ -288,6 +288,7 @@ export class ResultsManager extends TerrainComponent<Props>
                 rank: nestedIndex !== -1 ? nestedIndex : hitIndex,
               },
                 fields || nextState.hits.get(hitIndex).toJS(),
+                nextState.hits.get(hitIndex).toJS(), // Useful for spotlighting of nested objects
               ),
             });
             // TODO something more like this
@@ -498,29 +499,41 @@ export class ResultsManager extends TerrainComponent<Props>
       return;
     }
     const interpreter: ESInterpreter = new ESInterpreter(query.tql, toInputMap(query.inputs));
-    if (interpreter.hasError())
+    if (query.tqlMode !== 'manual')
     {
-      TerrainLog.debug('Query has errors: ' + interpreter.getErrors());
-      const errorMsg = new MidwayError(200, 'Detected ' + interpreter.getErrors().length + ' errors.', '', {});
-      this.handleM2RouteError(errorMsg, false);
-      return;
+      if (interpreter.hasError())
+      {
+        TerrainLog.debug('Query has errors: ' + interpreter.getErrors());
+        const errorMsg = new MidwayError(200, 'Detected ' + interpreter.getErrors().length + ' errors.', '', {});
+        this.handleM2RouteError(errorMsg, false);
+        return;
+      }
+      // we only post-process the query in the `auto` mode
+      this.postprocessEQL(interpreter, hitsPage, appendResults);
+    } else
+    {
+      // manual mode, we only check JSON parsing errors
+      if (interpreter.hasJSONParsingError())
+      {
+        TerrainLog.debug('Query has JSON format errors: ' + JSON.stringify(interpreter.parser.getErrorMessages()));
+        return;
+      }
+      // NOTE: Don't call handleM2RouteError here, it triggers the infinite rendering loop.
     }
+    const eql = interpreter.finalQuery;
     if (interpreter.hasError())
     {
       TerrainLog.debug('Query has errors after updating from and size: ' + interpreter.getErrors());
-      return;
     }
-    let eql = interpreter.finalQuery;
+    TerrainLog.debug('Issue query ' + eql);
     if (this.state.query && this.state.query.xhr)
     {
       this.state.query.xhr.cancel();
     }
-    eql = this.postprocessEQL(interpreter, hitsPage, appendResults);
     if (query.path)
     {
       querySize = query.path.source.count;
     }
-    TerrainLog.debug('Issue query ' + eql);
     this.setState({
       lastQuery: query,
       queriedTql: eql,
@@ -675,7 +688,7 @@ export class ResultsManager extends TerrainComponent<Props>
     // how is the data formatted?
     const hits = resultsData.hits.hits.map((hit) =>
     {
-      const sort = hit.sort !== undefined ? { TerrainScore: hit.sort[0] } : {};
+      const sort = (hit.sort !== undefined && hit.sort.length) ? { TerrainScore: hit.sort[0] } : {};
       return _.extend({}, hit._source, sort, {
         _index: hit._index,
         _type: hit._type,
@@ -703,7 +716,11 @@ export class ResultsManager extends TerrainComponent<Props>
       this.handleM2QueryError(response, isAllFields);
       return;
     }
-    const resultsData = response.getResultsData();
+    let resultsData = response.getResultsData();
+    if (resultsData.hits === undefined)
+    {
+      resultsData = { hits: { total: 0, max_score: null, hits: [] } };
+    }
     if (appendResults && resultsData.hits.hits.length === 0)
     {
       this.changeResults({
@@ -728,7 +745,7 @@ export class ResultsManager extends TerrainComponent<Props>
         });
         if (duplicateRootKeys.length !== 0)
         {
-          console.log('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
+          TerrainLog.debug('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
         }
         rootKeys.forEach((rootKey) =>
         {
@@ -736,7 +753,7 @@ export class ResultsManager extends TerrainComponent<Props>
           delete hitTemp[rootKey];
         });
       }
-      const sort = hitTemp.sort !== undefined ? { _sort: hitTemp.sort[0] } : {};
+      const sort = hitTemp.sort !== undefined ? { TerrainScore: hitTemp.sort[0] } : {};
       let fields = {};
       if (hitTemp.fields !== undefined)
       {
@@ -869,7 +886,7 @@ export class ResultsManager extends TerrainComponent<Props>
       }
       catch (err)
       {
-        console.log('The error message does not match MidwayError.' + response);
+        TerrainLog.error('The error message does not match MidwayError.' + response);
         error = new MidwayError(-1, 'Unknow Route Error', response, {});
       }
       errorItems = error.getMidwayErrors();

@@ -84,6 +84,7 @@ export interface Props
   isSource?: boolean;
   endpoint: SinkConfig | SourceConfig;
   onChange: (newConfig: SinkConfig | SourceConfig, apply?: boolean) => void;
+  previewSource?: object;
 }
 
 const fileTypeList = List([FileTypes.Json, FileTypes.Csv, FileTypes.Xml]);
@@ -140,6 +141,7 @@ export abstract class EndpointFormBase<State, P extends Props = Props> extends T
               fileConfig={fileConfig}
               onChange={this.handleFileConfigChange}
               isSource={this.props.isSource}
+              source={this.props.previewSource}
             /> : null
         }
         {

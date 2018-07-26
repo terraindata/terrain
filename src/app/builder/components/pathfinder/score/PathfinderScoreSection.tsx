@@ -73,9 +73,11 @@ export interface Props
   pathfinderContext: PathfinderContext;
   score: Score;
   keyPath: KeyPath;
+  valueOptions: List<any>;
   onStepChange: (oldStep: PathfinderSteps) => void;
   builderActions?: typeof BuilderActions;
   colorsActions?: typeof ColorsActions;
+  inputs?: any;
 }
 
 @Radium
@@ -268,7 +270,6 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       });
     }
     const keyPath = this._ikeyPath(this.props.keyPath, 'lines');
-
     return (
       scoreLines.map((line, index) =>
       {
@@ -277,6 +278,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
             content: <PathfinderScoreLine
               key={String(index)}
               line={line}
+              valueOptions={this.props.valueOptions}
               onDelete={this.handleDeleteLine}
               index={index}
               onValueChange={this.handleValueChange}
@@ -284,6 +286,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
               allWeights={this.state.allWeights}
               dropdownOptions={dropdownOptions}
               pathfinderContext={this.props.pathfinderContext}
+              inputs={this.props.inputs}
             />,
             key: String(index),
             draggable: !line.expanded || !line.field,
@@ -396,7 +399,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
 
 export default Util.createTypedContainer(
   PathfinderScoreSection,
-  [],
+  [['builder', 'query', 'inputs']],
   {
     builderActions: BuilderActions,
     colorsActions: ColorsActions,

@@ -1637,6 +1637,7 @@ const EQLSpec: ESClause[] =
         lang: 'script_language',
         params: 'script_params',
         inline: 'script_inline',
+        source: 'script_inline',
         stored: 'script_name',
       },
       {
@@ -1719,7 +1720,7 @@ const EQLSpec: ESClause[] =
         constant_score: 'constant_score',
         dis_max: 'dis_max',
         function_score: 'function_score',
-        script_score: 'script_score',
+        script: 'script_score',
         boosting: 'boosting_query',
         nested: 'nested_query',
         has_child: 'has_child_query',

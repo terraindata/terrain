@@ -79,6 +79,7 @@ export interface Props
 {
   pathfinderContext: PathfinderContext;
   filterGroup: FilterGroup;
+  valueOptions: List<RouteSelectorOption>;
   keyPath: KeyPath;
   onStepChange?: (oldStep: PathfinderSteps) => void;
   toSkip?: number;
@@ -98,13 +99,11 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       dragging: boolean,
       canDrag: boolean,
       fieldOptionSet: RouteSelectorOptionSet,
-      valueOptions: List<RouteSelectorOption>,
       addingFilterLine: boolean,
     } = {
       dragging: false,
       canDrag: true,
       fieldOptionSet: undefined,
-      valueOptions: undefined,
       addingFilterLine: false,
     };
 
@@ -127,7 +126,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     });
     this.setState({
       fieldOptionSet: this.getFieldOptionSet(this.props),
-      valueOptions: this.getValueOptions(this.props),
     });
   }
 
@@ -139,24 +137,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       TerrainLog.debug('Update options, new size ' + String(newOptions.options.size));
       this.setState({
         fieldOptionSet: newOptions,
-      });
-    }
-
-    // If inputs changes, or parent query data source changes, update value possibilities
-    if (nextProps.pathfinderContext.builderState.query &&
-      this.props.pathfinderContext.builderState.query &&
-      (
-        nextProps.pathfinderContext.builderState.query.inputs !==
-        this.props.pathfinderContext.builderState.query.inputs ||
-        !_.isEqual(nextProps.pathfinderContext.parentSource,
-          this.props.pathfinderContext.parentSource) ||
-        nextProps.pathfinderContext.parentName !==
-        this.props.pathfinderContext.parentName
-      )
-    )
-    {
-      this.setState({
-        valueOptions: this.getValueOptions(nextProps),
       });
     }
   }
@@ -185,21 +165,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       // hasOther: false,
     };
     return fieldSet;
-  }
-
-  public getValueOptions(props: Props)
-  {
-    const { pathfinderContext, keyPath } = props;
-    const { source } = pathfinderContext;
-    const valueOptions = source.dataSource.getChoiceOptions({
-      type: 'input',
-      source: pathfinderContext.parentSource,
-      builderState: pathfinderContext.builderState,
-      schemaState: pathfinderContext.schemaState,
-      isNested: keyPath.includes('nested'),
-      parentName: pathfinderContext.parentName,
-    });
-    return valueOptions;
   }
 
   public handleAddFilter()
@@ -367,7 +332,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         comesBeforeAGroup={successor && this.isGroup(successor)}
         isSoftFilter={isSoftFilter}
         fieldOptionSet={this.state.fieldOptionSet}
-        valueOptions={this.state.valueOptions}
+        valueOptions={this.props.valueOptions}
         onToggleOpen={this.handleFilterOpen}
         onAddScript={this.props.onAddScript}
         onDeleteScript={this.props.onDeleteScript}

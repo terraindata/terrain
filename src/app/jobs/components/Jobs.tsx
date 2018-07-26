@@ -43,14 +43,15 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-console
+// tslint:disable:no-console no-var-requires
 import 'builder/components/pathfinder/filter/PathfinderFilter.less';
 import 'builder/components/pathfinder/Pathfinder.less';
-import { Colors } from 'colors/Colors';
+import { Colors, getStyle } from 'colors/Colors';
 import Modal from 'common/components/Modal';
 import Section from 'common/components/Section';
 import SimpleTable, { BadgeColumn, ButtonColumn } from 'common/components/SimpleTable';
 import TerrainComponent from 'common/components/TerrainComponent';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as Immutable from 'immutable';
 import { JobsActions } from 'jobs/data/JobsRedux';
 import
@@ -64,6 +65,7 @@ import * as React from 'react';
 import Util from 'util/Util';
 import MidwayError from '../../../../shared/error/MidwayError';
 import './Jobs.less';
+const InfoIcon = require('images/icon_info.svg');
 
 const INTERVAL = 60000;
 
@@ -191,6 +193,26 @@ class Jobs extends TerrainComponent<any> {
     });
   }
 
+  public messageWithDetail(message: string, detail: string): El
+  {
+    return (
+      <div>
+        {
+          message
+        }
+        {
+          tooltip(
+            <InfoIcon
+              className='job-log-info-icon'
+              style={getStyle('fill', Colors().active)}
+            />,
+            detail,
+          )
+        }
+      </div>
+    );
+  }
+
   public parseJobLogContents(jobLogs)
   {
     let contents = [];
@@ -198,7 +220,36 @@ class Jobs extends TerrainComponent<any> {
     {
       try
       {
-        contents = jobLogs.contents.split('\n').map(((logLine) => JSON.parse(logLine)));
+        contents = jobLogs.contents.split('\n').map(((logLine) =>
+        {
+          const parsed = JSON.parse(logLine);
+          // Try to format messages better
+          if (parsed.message)
+          {
+            if (parsed.message.indexOf('Processing source') === 0)
+            {
+              parsed.message = this.messageWithDetail('Processing source', parsed.message);
+            }
+            else if (parsed.message.indexOf('Processing sink') === 0)
+            {
+              parsed.message = this.messageWithDetail('Processing sink', parsed.message);
+            }
+            else if (parsed.message.indexOf('successful') !== -1 &&
+              parsed.message.indexOf('failed') !== -1)
+            {
+              try
+              {
+                const obj = JSON.parse(parsed.message);
+                parsed.message = 'Successful: ' + String(obj.successful) + ', Failed: ' + String(obj.failed);
+              }
+              catch (e) { }
+            }
+            // Format the timestamp to be human readable
+            parsed.timestamp = Util.formatDate(parsed.timestamp, true);
+          }
+          return parsed;
+        }
+        ));
       }
       catch (e)
       {
@@ -217,7 +268,6 @@ class Jobs extends TerrainComponent<any> {
       loading,
     } = this.props;
     const { id, logsModalOpen, jobLogs } = this.state;
-
     const jobsHeader = [
       {
         columnKey: 'name',

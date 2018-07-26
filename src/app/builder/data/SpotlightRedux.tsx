@@ -60,6 +60,7 @@ export interface SpotlightActionTypes
     actionType: 'spotlightAction',
     id: string,
     hit: any,
+    parentHit?: any,
   };
   clearSpotlightAction: {
     actionType: 'clearSpotlightAction',
@@ -75,8 +76,8 @@ class SpotlightRedux extends TerrainRedux<SpotlightActionTypes, SpotlightState>
     {
       spotlightAction: (state, action) =>
       {
-        const { id, hit } = action.payload;
-        return state.setIn(['spotlights', id], _.extend({}, hit, { id }));
+        const { id, hit, parentHit } = action.payload;
+        return state.setIn(['spotlights', id], _.extend({}, hit, { id }, { parentHit }));
       },
       clearSpotlightAction: (state, action) =>
       {

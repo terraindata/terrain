@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import { List, Map } from 'immutable';
 
+import Util from 'app/util/Util';
 import * as Immutable from 'immutable';
 import { createRecordType } from 'shared/util/Classes';
 import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
@@ -56,6 +57,7 @@ import { _Path, Path } from '../../app/builder/components/pathfinder/PathfinderT
 import { Aggregation } from '../../app/builder/components/results/ResultTypes';
 import * as BlockUtils from '../../blocks/BlockUtils';
 import { Cards } from '../../blocks/types/Card';
+import { _Input, Input } from '../../blocks/types/Input';
 import { AllBackendsMap } from '../../database/AllBackends';
 
 // A query can be viewed and edited in the Builder
@@ -81,7 +83,7 @@ class QueryC
   } = {} as any;
 
   cards: Cards = List([]);
-  inputs: List<any> = List([]);
+  inputs: List<Input> = List([]);
   resultsConfig = null; //: ResultsConfig = null;
   tql: string = '';
   tqlMode: 'auto' | 'manual' = 'auto';
@@ -116,7 +118,7 @@ export const _Query = (config?: object) =>
   config = config || {};
   const Blocks = AllBackendsMap[config['language'] || 'elastic'].blocks;
   config['cards'] = BlockUtils.recordFromJS(config['cards'] || [], Blocks);
-  config['inputs'] = BlockUtils.recordFromJS(config['inputs'] || [], Blocks);
+  config['inputs'] = Util.arrayToImmutableList(config['inputs'], _Input);
   config['resultsConfig'] = _ResultsConfig(config['resultsConfig']);
   config['meta'] = Map<string, any>(config['meta']);
   config['cardKeyPaths'] = Map<ID, KeyPath>(config['cardKeyPaths']);

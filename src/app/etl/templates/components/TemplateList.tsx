@@ -53,6 +53,7 @@ import Util from 'util/Util';
 
 import Button from 'app/common/components/Button';
 import FloatingInput from 'app/common/components/FloatingInput';
+import ItemListUtil from 'app/util/ItemListUtil';
 import TerrainTools from 'app/util/TerrainTools';
 import { MenuOption } from 'common/components/Menu';
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -88,8 +89,10 @@ class TemplateList extends TerrainComponent<Props>
 {
   public state: {
     rawTemplate: string,
+    templates: List<ETLTemplate>;
   } = {
       rawTemplate: '',
+      templates: this.props.templates.sortBy((t) => t.id).toList(),
     };
 
   public displayConfig: HeaderConfig<ETLTemplate> = [
@@ -110,6 +113,16 @@ class TemplateList extends TerrainComponent<Props>
     },
   ];
 
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (this.props.templates !== nextProps.templates)
+    {
+      this.setState({
+        templates: nextProps.templates.sortBy((t) => t.id).toList(),
+      });
+    }
+  }
+
   @instanceFnDecorator(memoizeOne)
   public _getTemplates(templates, filter)
   {
@@ -125,13 +138,15 @@ class TemplateList extends TerrainComponent<Props>
 
   public getTemplates()
   {
-    const { templates, filter } = this.props;
+    const { filter } = this.props;
+    const { templates } = this.state;
     return this._getTemplates(templates, filter);
   }
 
   public getRowStyle(index)
   {
-    const { templates, getRowStyle } = this.props;
+    const { getRowStyle } = this.props;
+    const { templates } = this.state;
     if (getRowStyle !== undefined)
     {
       return getRowStyle(templates.get(index));
@@ -207,6 +222,17 @@ class TemplateList extends TerrainComponent<Props>
     }
   }
 
+  public searchTemplate(searchString: string, template: ETLTemplate)
+  {
+    const itemProps =
+      List([
+        String(template.id),
+        template.templateName,
+        template.getDescription(this.props.algorithms),
+      ]);
+    return ItemListUtil.searchList(searchString, itemProps);
+  }
+
   public render()
   {
     const computeOptions = this.computeMenuOptionsFactory(this.props.allowedActions);
@@ -215,7 +241,7 @@ class TemplateList extends TerrainComponent<Props>
         className='template-table-wrapper'
       >
         <ItemList
-          items={this.props.templates}
+          items={this.state.templates}
           columnConfig={this.displayConfig}
           onRowClicked={this.handleOnClick}
           getMenuOptions={computeOptions}
@@ -223,6 +249,8 @@ class TemplateList extends TerrainComponent<Props>
           getActions={!computeOptions ? this.getActions : undefined}
           canCreate={TerrainTools.isAdmin()}
           onCreate={() => ETLRouteUtil.gotoWalkthroughStep(0)}
+          canSearch={true}
+          searchFunction={this.searchTemplate}
         />
         {
           TerrainTools.isFeatureEnabled(TerrainTools.TEMPLATE_COPY) ?
@@ -250,7 +278,7 @@ class TemplateList extends TerrainComponent<Props>
 
   public handleOnClick(index)
   {
-    const { templates } = this.props;
+    const { templates } = this.state;
     const template = templates.get(index);
     if (this.props.onClick != null)
     {

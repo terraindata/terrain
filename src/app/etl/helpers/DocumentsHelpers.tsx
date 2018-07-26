@@ -66,6 +66,7 @@ import { NodeTypes } from 'shared/etl/types/ETLTypes';
 import ETLHelpers from './ETLHelpers';
 
 const DefaultDocumentLimit = 10;
+const DefaultStreamStringLimit = 5000;
 const CHUNK_SIZE = 1e6;
 
 class DocumentsHelpers extends ETLHelpers
@@ -193,12 +194,14 @@ class DocumentsHelpers extends ETLHelpers
     });
   }
 
-  protected fetchPreview(
+  public fetchPreview(
     source: SourceConfig,
-  ): Promise<List<object>>
+    rawStringOnly?: boolean,
+  ): Promise<List<object> | object>
   {
     return new Promise((resolve, reject) =>
     {
+      const sizeLimit = (rawStringOnly) ? DefaultStreamStringLimit : DefaultDocumentLimit;
       switch (source.type)
       {
         case Sources.Upload: {
@@ -208,12 +211,12 @@ class DocumentsHelpers extends ETLHelpers
             return reject('File not provided');
           }
           const config = source.fileConfig;
-          return this.fetchFromFile(source)
+          return this.fetchFromFile(source, sizeLimit, rawStringOnly)
             .then(resolve)
             .catch(reject);
         }
         default: {
-          return ETLAjax.fetchPreview(source, DefaultDocumentLimit)
+          return ETLAjax.fetchPreview(source, sizeLimit, rawStringOnly)
             .then(resolve)
             .catch(reject);
         }
@@ -246,7 +249,9 @@ class DocumentsHelpers extends ETLHelpers
 
   protected fetchFromFile(
     source: SourceConfig,
-  ): Promise<List<object>>
+    size: number,
+    rawStringOnly?: boolean,
+  ): Promise<List<object> | object>
   {
     return new Promise(async (resolve, reject) =>
     {
@@ -261,17 +266,17 @@ class DocumentsHelpers extends ETLHelpers
         let sliceString = await this.sliceFromFile(file, CHUNK_SIZE);
         if (sliceString.length < CHUNK_SIZE)
         {
-          const results = await ETLAjax.fetchPreview(source, DefaultDocumentLimit, sliceString);
+          const results = await ETLAjax.fetchPreview(source, size, rawStringOnly, sliceString);
           resolve(results);
         }
         else
         {
-          let results = await ETLAjax.fetchPreview(source, DefaultDocumentLimit, sliceString);
+          let results = (await ETLAjax.fetchPreview(source, size, rawStringOnly, sliceString)) as List<object>;
           // currently only try increasing the size once
-          if (results.size < DefaultDocumentLimit)
+          if (results.size < size)
           {
             sliceString = await this.sliceFromFile(file, 5 * CHUNK_SIZE);
-            results = await ETLAjax.fetchPreview(source, DefaultDocumentLimit, sliceString);
+            results = (await ETLAjax.fetchPreview(source, size, rawStringOnly, sliceString)) as List<object>;
           }
           resolve(results);
         }

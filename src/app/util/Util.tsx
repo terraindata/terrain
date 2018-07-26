@@ -835,7 +835,10 @@ const Util = {
         bCount = bData.get(0).count;
       }
       // If it's a tie, use alpha sorting, otherwise use count
-      return aCount === bCount ? (a < b ? -1 : 1) : 2 * (bCount - aCount);
+      return aCount === bCount ?
+        (a.charAt(0) === '_' ? 1 : b.charAt(0) === '_' ? -1 : a < b ? -1 : 1)
+        : 2 * (bCount - aCount)
+        ;
     }).toList();
     // Put the sorted non starred fields after the starred fields (Starred are sorted in alpha order)
     let combined = starredFields.sort().concat(nonStarredFields);
@@ -883,7 +886,7 @@ const Util = {
     return immutableMap;
   },
 
-  arrayToImmutableList(arrayToConvert: any[], itemConstructor = null)
+  arrayToImmutableList(arrayToConvert: any[] = [], itemConstructor = null)
   {
     const immutableList = arrayToConvert.map((item) =>
     {

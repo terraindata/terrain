@@ -10,6 +10,9 @@
 	}
 	
 	.drag-drop-pf-score {
+		.leaflet-container {
+			margin-top: 12px;
+		}
 		.pf-line-wrapper
 		{	
 			border: 1px solid;
@@ -37,6 +40,7 @@
 			.score-bar {
 				position: relative;
 				top: -2px;
+				margin-left: 24px;
 			}
 			&.pf-linear-score-line-wrapper
 			{
@@ -74,9 +78,9 @@
 	}
 	
 	.pf-score-line-transform {
-		margin-top: 32px;
+		margin-top: 12px;
 		position: relative;
-		width: calc(~"100% - 51x");
+		width: calc(~"100% - 51px");
 		border-radius: 4px;
 		padding-left: 24px;
 		left: -10px;
@@ -130,6 +134,9 @@
 	.pf-score-line {
 		margin: 12px;
 	}
+	.pf-score-line-wrapper {
+		width: 100%;
+	}
 	.pf-line {
 		.pf-score-line-arrow {
 			svg
@@ -150,9 +157,34 @@
 		}
 		.pf-score-line-inner {
 			position: relative;
+			margin-bottom: 20px;
+			width: 100%;
 			.builder-tb {
 				flex-basis: 50px;
 				margin: 0px 4px;
+			}
+			.pf-score-line-expand {
+				position: absolute;
+				right: 0px;
+			}
+			.pf-score-line-geo-wrapper {
+				display: flex;
+				position: absolute;
+				top: 0px;
+				left: 30px;
+				width: 100%;
+				.pf-score-map-component-wrapper {
+					width: 50%;
+					#PlacesAutocomplete__root {
+						margin-bottom: 0px;
+					}
+					.leaflet-container  {
+						min-height: 250px;
+					}
+					#PlacesAutocomplete__autocomplete-container {
+				    	font-size: 16px;
+					}
+				}
 			}
 			@t: 6px;
 		}
@@ -182,12 +214,37 @@
 				text-align: left;
 				color: #1eb4fa;
 				font-size: 18px;
-				width: 33.33%;
+				width: 50%;
 				padding-left: 15px;
 				min-width: 150px;
 				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
+				cursor: pointer;
+				width: calc(~"50% - 50px");
+			}
+			.field-name-editing {
+				width: 50%;
+				margin-left: 27px;
+				width: calc(~"50% - 50px");
+				margin-top: 10px;
+				.map-component-search-bar {
+					position: relative;
+				    top: 1px;
+				    left: -10px;
+				    width: 100%;
+				    input {
+				    	background: none;
+				    	border: none;
+				    }
+				}
+			}
+			.field-name-editing-label {
+				font-size: 12px;
+				text-transform: uppercase;
+				margin-bottom: 3px;
+				&.field-name-editing-address {
+					position: relative;
+					top: 11px;
+				}
 			}
 			.field-weight {
 				display: none;

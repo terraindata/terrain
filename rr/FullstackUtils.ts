@@ -132,8 +132,9 @@ export async function waitForInput(msg: string)
       output: process.stdout,
       terminal: true,
     });
-  await rl.questionAsync(msg);
+  const answer = await rl.questionAsync(msg);
   rl.close();
+  return answer;
 }
 
 export async function replayInputEventOnly(action)
