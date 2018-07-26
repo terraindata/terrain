@@ -392,7 +392,11 @@ const BuilderReducers =
     const tql: string = action.payload.tql;
     query = query.set('lastMutation', query.lastMutation + 1).set('tql', tql);
     query = query.set('tqlMode', action.payload.tqlMode);
-    const path = ESCodeToPathfinder(query.tql, query.inputs);
+    const path = ESCodeToPathfinder(query.tql, query.inputs, { mergeRefQuery: true, refQuery: query.path });
+    if (path)
+    {
+      query = query.set('path', path);
+    }
     state = state.set('query', query);
     return state;
   },

@@ -64,16 +64,38 @@ import { toInputMap } from '../../../../blocks/types/Input';
 
 // NOTE: Please follow the structure in `ClauseToPathTable` when you want to support other queries.
 
+interface CodeToPathOptions
+{
+  refQuery?: Path;
+  mergeRefQuery?: boolean;
+}
+
 /**
  * ESCodeToPathfinder generates the path from the TQL query.
  */
-export function ESCodeToPathfinder(query: string, inputs): Path | null
+export function ESCodeToPathfinder(query: string, inputs, options: CodeToPathOptions = {}): Path | null
 {
+  let path;
   try
   {
     const params = toInputMap(inputs);
     const interpreter: ESInterpreter = new ESInterpreter(query, inputs);
-    return generatePath(interpreter);
+    if (interpreter.hasError())
+    {
+      TerrainLog.debug(query + ' \n has errors:' + JSON.stringify(interpreter.getErrors(), null, 2));
+      return null;
+    }
+    path = generatePath(interpreter);
+    if (options.mergeRefQuery && options.refQuery)
+    {
+      // TODO: support more sections, now we only support the source and filter groups
+      path = options.refQuery
+        .set('step', path.step)
+        .set('source', path.source)
+        .set('filterGroup', path.filterGroup)
+        .set('softFilterGroup', path.softFilterGroup);
+    }
+    return path;
   } catch (e)
   {
     TerrainLog.error(e);
@@ -81,13 +103,8 @@ export function ESCodeToPathfinder(query: string, inputs): Path | null
   }
 }
 
-export function MergeWithQueryPath(queryPath, codePath)
-{
-
-}
-
 /**
- * generatePath generates the path from the interpreter via a bottom-up re-writing.
+ * generatePath generates the path from the interpreter via a bottom-up re-writing approach
  * @param {ESInterpreter}: the interpreter
  * @returns {Path}: the path generated from the interpreter
  */
@@ -104,21 +121,6 @@ function generatePath(inter: ESInterpreter): Path
     });
   TerrainLog.debug('New Path: ' + JSON.stringify(rootValueInfo.annotation.path));
   return rootValueInfo.annotation.path;
-}
-
-// we can mark some useful information for the bottom up processing
-function beforeProcessValueInfo(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
-{
-  if (node.annotation === undefined)
-  {
-    node.annotation = {};
-  }
-  const handler = ClauseToPathTable[node.clause.type];
-  if (handler && handler.before)
-  {
-    handler.before(node, interpreter, key);
-  }
-  return true;
 }
 
 /**
@@ -156,6 +158,9 @@ const ClauseToPathTable = {
   geo_distance: {
     after: GeoDistanceToPath,
   },
+  nested_query: {
+    after: ESNestedQuerytoPath,
+  },
 };
 
 const NegativeableComparionMap = {
@@ -165,7 +170,47 @@ const NegativeableComparionMap = {
   exists: 'notexists',
 };
 
-// bottom up generating the path components
+function beforeProcessValueInfo(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+{
+  if (node.annotation === undefined)
+  {
+    node.annotation = {};
+  }
+  const handler = ClauseToPathTable[node.clause.type];
+  if (handler && handler.before)
+  {
+    handler.before(node, interpreter, key);
+  }
+  return true;
+}
+
+/*
+ * bottom-up re-writing
+ * For example, for a query like this:
+  {
+   "query": {
+     "bool": {
+       "filter": [
+         {
+           "bool": {
+             "filter": [
+              {
+                "bool": {
+                  "must_not": {
+                    "match": {
+                      "PreferredGenre": {
+                        "query": 300
+                      }
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+   We evaluate the tree in order of:
+   `match` -> `query`-> `bool_query' -> `query` -> `bool_query` -> `query` -> `bool_query` -> `body`,
+   At each stage, the [member].before generates the pathfinder component based on the shape of the subtree.
+ */
+
 function afterProcessValueInfo(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
 {
   const handler = ClauseToPathTable[node.clause.type];
@@ -191,7 +236,7 @@ function BodyToSource(node: ESValueInfo, index: string)
 
 function BodyToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
 {
-  let index = '';
+  let index;
   let filterGroup;
   let softFilterGroup;
   let path;
@@ -202,17 +247,10 @@ function BodyToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any
     filterGroup = sourceBool.annotation.filterGroup;
     softFilterGroup = sourceBool.annotation.softFilterGroup;
     const source = BodyToSource(node, index);
-    path = _Path({ step: 1 }).set('source', source);
-    if (filterGroup)
-    {
-      // TerrainLog.debug('Path Filter Group' + JSON.stringify(filterGroup));
-      path = path.set('filterGroup', filterGroup);
-    }
-    if (softFilterGroup)
-    {
-      // TerrainLog.debug('Soft Path Filter Group' + JSON.stringify(softFilterGroup));
-      path = path.set('softFilterGroup', softFilterGroup);
-    }
+    path = _Path({ step: 1 })
+      .set('source', source)
+      .set('filterGroup', filterGroup)
+      .set('softFilterGroup', softFilterGroup);
   } else
   {
     // no source bool, thus no filters
@@ -421,6 +459,29 @@ function ESQueryToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[]
   }
 }
 
+function ESNestedQuerytoPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+{
+  if (node.objectChildren['query'])
+  {
+    // nested -> query -> bool
+    const path = node.objectChildren['query'].propertyValue.annotation.path;
+    if (path)
+    {
+      if (path.filterGroup)
+      {
+        // nested -> query -> bool
+        TerrainLog.debug('Pick up nested lines' + JSON.stringify(path.filterGroup.lines));
+        node.annotation.path = path.filterGroup.lines;
+      } else
+      {
+        // nested -> query
+        TerrainLog.debug('Pick up single query line' + JSON.stringify(path));
+        node.annotation.path = path;
+      }
+    }
+  }
+}
+
 // must_not : query
 function NegativeBoolToPath(node: ESValueInfo, query: ESValueInfo): boolean
 {
@@ -428,7 +489,7 @@ function NegativeBoolToPath(node: ESValueInfo, query: ESValueInfo): boolean
   {
     // could be multiple lines if followed by a nested clause
     const lines = [];
-    if (Immutable.List.isList(query.annotation.path))
+    if (List.isList(query.annotation.path))
     {
       (query.annotation.path as List<FilterLine>).map((line: FilterLine) =>
       {
@@ -455,6 +516,21 @@ function NegativeBoolToPath(node: ESValueInfo, query: ESValueInfo): boolean
   }
   return false;
 }
+
+function processFilterLine(line: FilterLine): FilterLine
+{
+  if (line.filterGroup)
+  {
+    return line;
+  }
+  if (line.field.endsWith('.keyword'))
+  {
+    return line.set('field', line.field.substr(0, line.field.length - '.keyword'.length));
+  }
+
+  return line;
+}
+
 function BoolToFilterGroup(node: ESValueInfo, queries: ESValueInfo[], minMatches: 'all' | 'any')
 {
   const lines = [];
@@ -471,11 +547,11 @@ function BoolToFilterGroup(node: ESValueInfo, queries: ESValueInfo[], minMatches
         }
         query.annotation.path.map((line) =>
         {
-          lines.push(line);
+          lines.push(processFilterLine(line));
         });
       } else
       {
-        lines.push(query.annotation.path);
+        lines.push(processFilterLine(query.annotation.path));
       }
     }
   });
@@ -487,7 +563,14 @@ function BoolToFilterGroup(node: ESValueInfo, queries: ESValueInfo[], minMatches
   node.annotation.path = _FilterLine().set('filterGroup', filterGroup);
 }
 
-//
+/**
+ * Generate the path component based on the shape of the sub-tree
+ * 1) (highest priority): source bool
+ * 2) negative bool (bool -> must_not -> query)
+ * 3) soft any filter group
+ * 4) hard all filter group
+ * 5) hard any filter group
+ */
 function BoolToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
 {
   // source bool
@@ -550,39 +633,17 @@ function BoolToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
         }
       }
     }
-    // looking for the first bool in the shouldClause
+    // make sure the source bool always has the index, softFilterGroup and filterGroup
     node.annotation.index = index === undefined ? '' : index;
     node.annotation.softFilterGroup = softFilterGroup === undefined ? _FilterGroup({ minMatch: 'any' }) : softFilterGroup;
     node.annotation.filterGroup = filterGroup === undefined ? _FilterGroup({ minMatch: 'all' }) : filterGroup;
     return;
   }
-  // nested -> query -> bool
-  if (node.annotation.isInNested === true)
-  {
-    // all filter lines are in the nested -> query -> bool -> filter -> [query]
-    const queries = node.objectChildren['filter'] && node.objectChildren['filter'].propertyValue;
-    if (queries && queries.clause.type === 'query[]')
-    {
-      // aggregate all filter lines here
-      const lines = [];
-      queries.arrayChildren.map((query) =>
-      {
-        if (query.annotation.path)
-        {
-          lines.push(query.annotation.path);
-        }
-      });
-      if (lines.length > 0)
-      {
-        node.annotation.path = List(lines);
-        return;
-      }
-    }
-  }
 
   // bool -> must_not -> query
   if (node.objectChildren['must_not'])
   {
+    // nested query?
     const query = node.objectChildren['must_not'].propertyValue;
     if (query.clause.type === 'query')
     {
@@ -595,6 +656,7 @@ function BoolToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
 
   if (Array.isArray(node.value.filter))
   {
+    // nested filter group?
     // soft filter group?
     if (node.value.filter.length === 1 && _.isEqual(node.value.filter[0], {
       exists: {
@@ -621,14 +683,4 @@ function BoolToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
     TerrainLog.debug('Hard any filter group line ' + JSON.stringify(node.annotation.path));
     return;
   }
-
-  // hard filter group
-  // all group
-  // any group
 }
-
-  // bool
-
-  // script
-
-  // sort
