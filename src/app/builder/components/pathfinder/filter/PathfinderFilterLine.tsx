@@ -241,16 +241,27 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     return true;
   }
 
+  private isFiledTypeNotSet(fieldType)
+  {
+    if (fieldType === undefined ||
+      fieldType === null ||
+      fieldType === FieldType.Any ||
+      isNaN(fieldType)
+    )
+    {
+      return true;
+    } else
+    {
+      return false;
+    }
+  }
+
   // Check if the field is defined and field type isnt (may occur when filter was created by cards)
   // Update the fieldType if necessary
   private updateFieldType(props: Props)
   {
     let fieldType = props.filterLine.fieldType;
-    if (props.filterLine.field &&
-      (fieldType === undefined ||
-        fieldType === null ||
-        fieldType === FieldType.Any ||
-        isNaN(fieldType)))
+    if (props.filterLine.field && this.isFiledTypeNotSet(fieldType))
     {
       const { schemaState, builderState, source } = props.pathfinderContext;
       const data = ElasticBlockHelpers.getTypeOfField(
@@ -292,9 +303,18 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       {
         comparison = comparison === 'contains' ? 'equal' : 'notequal';
       }
-      props.onChange(props.keyPath, props.filterLine
-        .set('fieldType', parseFloat(String(fieldType)))
-        .set('comparison', comparison), true);
+      if (this.isFiledTypeNotSet(fieldType) === false)
+      {
+        // if we set the field type succesffuly, tell the caller to re-render the line
+        props.onChange(props.keyPath, props.filterLine
+          .set('fieldType', parseFloat(String(fieldType)))
+          .set('comparison', comparison), true);
+      } else
+      {
+        // if we failed to figure out a better type for this field
+        // do not tell the caller to re-render the line because we will trap in
+        // infinite rendering
+      }
     }
   }
 

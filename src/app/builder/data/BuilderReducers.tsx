@@ -46,8 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const no-unused-expression no-shadowed-variable
 import { ESCodeToPathfinder } from 'builder/components/pathfinder/CodeToPath';
-import { List, Map } from 'immutable';
+import { Path } from 'builder/components/pathfinder/PathfinderTypes';
 import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import { invert } from 'lodash';
 import * as TerrainLog from 'loglevel';
 import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
@@ -391,38 +392,8 @@ const BuilderReducers =
     const tql: string = action.payload.tql;
     query = query.set('lastMutation', query.lastMutation + 1).set('tql', tql);
     query = query.set('tqlMode', action.payload.tqlMode);
-    // update cards
-    query = AllBackendsMap[query.language].codeToQuery(
-      query,
-      action.payload.changeQuery,
-    );
     const path = ESCodeToPathfinder(query.tql, query.inputs);
-    // query = query.set('path', path);
     state = state.set('query', query);
-
-    if (query.cardsAndCodeInSync === false)
-    {
-      TerrainLog.debug('Cards and code not synchronized (from TQL mutation).');
-      return state;
-    }
-    // Let's turn on tql -> path after we fix the problem
-    // we might have to update the path and the card
-    // const { parser, path } = CardsToPath.updatePath(query, state.db.name);
-    // state = state.setIn(['query', 'path'], path);
-    // Because updatePath might update cards, we have to propagate the builder changes back to the editor
-    // if the cards are mutated.
-    //      if (parser && parser.isMutated)
-    // {
-    //         const newCards = ESCardParser.parseAndUpdateCards(List([parser.getValueInfo().card]), state.query);
-    //         state = state.setIn(['query', 'cards'], newCards);
-    //         const tql = AllBackendsMap[state.query.language].queryToCode(state.query, {});
-    //         state = state
-    //           .setIn(['query', 'tql'], tql);
-    //         state = state
-    //           .setIn(['query', 'parseTree'], AllBackendsMap[state.query.language].parseQuery(state.query))
-    //           .setIn(['query', 'lastMutation'], state.query.lastMutation + 1)
-    //           .setIn(['query', 'cardsAndCodeInSync'], true);
-    //       }
     return state;
   },
 

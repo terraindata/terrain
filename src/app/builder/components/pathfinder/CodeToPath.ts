@@ -81,6 +81,11 @@ export function ESCodeToPathfinder(query: string, inputs): Path | null
   }
 }
 
+export function MergeWithQueryPath(queryPath, codePath)
+{
+
+}
+
 /**
  * generatePath generates the path from the interpreter via a bottom-up re-writing.
  * @param {ESInterpreter}: the interpreter
@@ -167,6 +172,66 @@ function afterProcessValueInfo(node: ESValueInfo, interpreter: ESInterpreter, ke
   if (handler && handler.after)
   {
     handler.after(node, interpreter, key);
+  }
+}
+
+function BodyToSource(node: ESValueInfo, index: string)
+{
+  const start = node.value.hasOwnProperty('from') ? node.value.from : 0;
+  const count = node.value.hasOwnProperty('size') ? node.value.size : 'all';
+  const source = _Source({
+    count,
+    start,
+    dataSource: {
+      index,
+    },
+  });
+  return source;
+}
+
+function BodyToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+{
+  let index = '';
+  let filterGroup;
+  let softFilterGroup;
+  let path;
+  if (node.annotation.sourceBool)
+  {
+    const sourceBool = node.annotation.sourceBool;
+    index = sourceBool.annotation.index;
+    filterGroup = sourceBool.annotation.filterGroup;
+    softFilterGroup = sourceBool.annotation.softFilterGroup;
+    const source = BodyToSource(node, index);
+    path = _Path({ step: 1 }).set('source', source);
+    if (filterGroup)
+    {
+      // TerrainLog.debug('Path Filter Group' + JSON.stringify(filterGroup));
+      path = path.set('filterGroup', filterGroup);
+    }
+    if (softFilterGroup)
+    {
+      // TerrainLog.debug('Soft Path Filter Group' + JSON.stringify(softFilterGroup));
+      path = path.set('softFilterGroup', softFilterGroup);
+    }
+  } else
+  {
+    // no source bool, thus no filters
+    path = _Path();
+  }
+  node.annotation.path = path;
+  TerrainLog.debug('Body to Path' + JSON.stringify(node.annotation.path));
+}
+
+// body
+function BodyToPathBefore(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+{
+  // annotate source bool
+  const sourceBool = interpreter.searchValueInfo({ 'query:query': { 'bool:bool_query': true } });
+  if (sourceBool)
+  {
+    TerrainLog.debug('Found Source Bool ' + JSON.stringify(sourceBool.value));
+    sourceBool.annotation = { isSourceBool: true };
+    node.annotation.sourceBool = sourceBool;
   }
 }
 
@@ -560,59 +625,6 @@ function BoolToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
   // hard filter group
   // all group
   // any group
-}
-
-// body
-function BodyToPathBefore(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
-{
-  // annotate source bool
-  const sourceBool = interpreter.searchValueInfo({ 'query:query': { 'bool:bool_query': true } });
-  if (sourceBool)
-  {
-    TerrainLog.debug('Found Source Bool ' + JSON.stringify(sourceBool.value));
-    sourceBool.annotation = { isSourceBool: true };
-    node.annotation.sourceBool = sourceBool;
-  }
-}
-function BodyToSource(node: ESValueInfo, index: string)
-{
-  const start = node.value.hasOwnProperty('from') ? node.value.from : 0;
-  const count = node.value.hasOwnProperty('size') ? node.value.size : 'all';
-  const source = _Source({
-    count,
-    start,
-    dataSource: {
-      index,
-    },
-  });
-  return source;
-}
-
-function BodyToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
-{
-  let index = '';
-  let filterGroup;
-  let softFilterGroup;
-  if (node.annotation.sourceBool)
-  {
-    const sourceBool = node.annotation.sourceBool;
-    index = sourceBool.annotation.index;
-    filterGroup = sourceBool.annotation.filterGroup;
-    softFilterGroup = sourceBool.annotation.softFilterGroup;
-  }
-  const source = BodyToSource(node, index);
-  let path = _Path({ step: 1 }).set('source', source);
-  if (filterGroup)
-  {
-    TerrainLog.debug('Path Filter Group' + JSON.stringify(filterGroup));
-    path = path.set('filterGroup', filterGroup);
-  }
-  if (softFilterGroup)
-  {
-    path = path.set('softFilterGroup', softFilterGroup);
-  }
-  node.annotation.path = path;
-  TerrainLog.debug('Body to Path' + JSON.stringify(node.annotation.path));
 }
 
   // bool
