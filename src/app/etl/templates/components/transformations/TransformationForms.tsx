@@ -52,7 +52,7 @@ import { TransformationForm, TransformationFormProps } from './TransformationFor
 
 import { List } from 'immutable';
 
-import { ArrayCountTFF, ArraySumTFF, ArrayMinTFF, ArrayMaxTFF } from './ArrayStatTransformationForms';
+import { ArrayCountTFF, ArrayMaxTFF, ArrayMinTFF, ArraySumTFF } from './ArrayStatTransformationForms';
 import { CastTFF } from './CastTransformationForm';
 import { DuplicateTFF } from './DuplicateTransformationForm';
 import { FilterArrayTFF } from './FilterArrayTransformationForm';
