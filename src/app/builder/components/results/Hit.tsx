@@ -52,8 +52,9 @@ import FadeInOut from 'app/common/components/FadeInOut';
 import { SchemaState } from 'app/schema/SchemaTypes';
 import * as classNames from 'classnames';
 import { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
-import { List, Map } from 'immutable';
+import ElasticBlockHelpers from 'database/elastic/blocks/ElasticBlockHelpers';
 import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
@@ -102,6 +103,7 @@ export interface Props
   firstVisibleField?: number;
   isVisible?: boolean;
   parentHit?: Hit;
+  fieldTypes?: Map<string, string>;
 
   isOver?: boolean;
   isDragging?: boolean;
@@ -133,12 +135,14 @@ class HitComponent extends TerrainComponent<Props> {
     nestedStates: Immutable.Map<string, NestedState>,
     nestedFields: string[],
     scrollState: Immutable.Map<string, number>,
+    fieldTypes: Immutable.Map<string, string>,
   } =
     {
       hovered: false,
       nestedStates: Map<string, NestedState>({}),
       nestedFields: [],
       scrollState: Map<string, number>({}),
+      fieldTypes: Map(),
     };
 
   public constructor(props: Props)
@@ -153,6 +157,10 @@ class HitComponent extends TerrainComponent<Props> {
       this.setState({
         nestedFields: getResultNestedFields(this.props.hit, this.props.resultsConfig),
       });
+    }
+    if (this.props.fieldTypes === undefined)
+    {
+      this.setFieldTypes();
     }
   }
 
@@ -209,6 +217,36 @@ class HitComponent extends TerrainComponent<Props> {
       }
     }
     return false;
+  }
+
+  public setFieldTypes()
+  {
+    const { hit, schema, builder } = this.props;
+    let fieldTypes: Map<string, string> = Map();
+    _.keys(hit.fields.toJS()).forEach((field) =>
+    {
+      const type = ElasticBlockHelpers.getTypeOfField(
+        schema,
+        builder,
+        field,
+        true,
+      );
+      fieldTypes = fieldTypes.set(field, type);
+      const subFields = ElasticBlockHelpers.getSubfields(field, schema, builder);
+      subFields.forEach((subField) =>
+      {
+        const subType = ElasticBlockHelpers.getTypeOfField(
+          schema,
+          builder,
+          subField,
+          true,
+        );
+        fieldTypes = fieldTypes.set(subField, subType);
+      });
+    });
+    this.setState({
+      fieldTypes,
+    });
   }
 
   public renderExpandedField(value, field)
@@ -373,6 +411,7 @@ class HitComponent extends TerrainComponent<Props> {
                 onExpand={undefined}
                 isNestedHit={true}
                 parentHit={this.props.hit}
+                fieldTypes={undefined}
               />);
           },
           )
@@ -481,7 +520,7 @@ class HitComponent extends TerrainComponent<Props> {
     const isSpotlit = spotlights.get(this.props.primaryKey);
     const color = isSpotlit ? spotlights.get(this.props.primaryKey).color : 'black';
     const value = getResultValue(this.props.hit, field, this.props.resultsConfig,
-      false, this.props.expanded, overrideFormat, this.props.locations, color);
+      false, this.props.expanded, this.props.fieldTypes || this.state.fieldTypes, overrideFormat, this.props.locations, color);
     const format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
     const showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     let style = {};
@@ -556,8 +595,8 @@ class HitComponent extends TerrainComponent<Props> {
     const id = overrideId || this.props.primaryKey;
     const spotlightColor = overrideColor || ColorManager.altColorForKey(id);
     const spotlightData = this.props.hit.toJS();
-    spotlightData['name'] = getResultName(this.props.hit, this.props.resultsConfig,
-      this.props.expanded, this.props.schema, this.props.builder, this.props.locations, spotlightColor, true);
+    spotlightData['name'] = getResultName(this.props.hit, this.props.resultsConfig, this.props.expanded,
+      this.props.fieldTypes || this.state.fieldTypes, this.props.schema, this.props.builder, this.props.locations, spotlightColor, true);
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightData['rank'] = this.props.index;
@@ -652,10 +691,15 @@ class HitComponent extends TerrainComponent<Props> {
     const color = spotlight ? spotlight.color : 'black';
 
     const thumbnail = resultsConfig && resultsConfig.thumbnail ?
-      getResultThumbnail(hit, resultsConfig, this.props.expanded, this.props.schema, this.props.builder) :
-      null;
-    const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.schema, this.props.builder,
-      this.props.locations, color);
+      getResultThumbnail(
+        hit, resultsConfig,
+        this.props.expanded,
+        this.props.fieldTypes || this.state.fieldTypes,
+        this.props.schema,
+        this.props.builder,
+      ) : null;
+    const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.fieldTypes || this.state.fieldTypes,
+      this.props.schema, this.props.builder, this.props.locations, color);
     const nestedFields = this.props.nestedFields !== undefined
       ? this.props.nestedFields.toJS()
       : this.state.nestedFields !== undefined ?
@@ -848,20 +892,26 @@ class HitComponent extends TerrainComponent<Props> {
 }
 
 export function getResultValue(hit: Hit, field: string, config: ResultsConfig, isTitle: boolean, expanded: boolean,
-  overrideFormat?: any, locations?: { [field: string]: any }, color?: string, bgUrlOnly = false)
+  fieldTypes: Map<string, string>, overrideFormat?: any, locations?: { [field: string]: any }, color?: string, bgUrlOnly = false)
 {
   let value: any;
   if (hit && field)
   {
     const pieces = field.split('.');
-    field = pieces[0];
-    value = hit.fields.get(field);
-    if (pieces.length > 1)
+    value = Util.asJS(hit.fields.get(pieces[0]));
+    for (let i = 1; i < pieces.length; i++)
     {
-      value = value.getIn(pieces.slice(1));
+      if (value != null)
+      {
+        value = value[pieces[i]];
+      }
+      else
+      {
+        return null;
+      }
     }
   }
-  return ResultFormatValue(field, value, config, isTitle, expanded, overrideFormat, locations, color, bgUrlOnly);
+  return ResultFormatValue(field, value, config, isTitle, expanded, fieldTypes, overrideFormat, locations, color, bgUrlOnly);
 }
 
 export function resultsConfigHasFields(config: ResultsConfig): boolean
@@ -929,8 +979,8 @@ export function getResultNestedFields(hit: Hit, config: ResultsConfig): string[]
   });
 }
 
-export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: boolean, schema?: SchemaState, builder?: BuilderState,
-  locations?: { [field: string]: any }, color?: string)
+export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: boolean, fieldTypes: Map<string, string>,
+  schema?: SchemaState, builder?: BuilderState, locations?: { [field: string]: any }, color?: string)
 {
   let thumbnailField: string;
 
@@ -943,11 +993,11 @@ export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: bo
     thumbnailField = _.first(getResultFields(hit, config, [], schema, builder));
   }
 
-  return getResultValue(hit, thumbnailField, config, false, expanded, null, locations, color, true);
+  return getResultValue(hit, thumbnailField, config, false, expanded, fieldTypes, null, locations, color, true);
 }
 
-export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean, schema?: SchemaState, builder?: BuilderState,
-  locations?: { [field: string]: any }, color?: string, valueOnly = false)
+export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean, fieldTypes: Map<string, string>,
+  schema?: SchemaState, builder?: BuilderState, locations?: { [field: string]: any }, color?: string, valueOnly = false)
 {
   let nameField: string;
 
@@ -960,11 +1010,11 @@ export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean
     nameField = _.first(getResultFields(hit, config, [], schema, builder));
   }
 
-  return getResultValue(hit, nameField, config, true, expanded, null, locations, color, valueOnly);
+  return getResultValue(hit, nameField, config, true, expanded, fieldTypes, null, locations, color, valueOnly);
 }
 
 export function ResultFormatValue(field: string, value: any, config: ResultsConfig, isTitle: boolean, expanded: boolean,
-  overrideFormat?: any, locations?: { [field: string]: any }, color?: string, bgUrlOnly = false): any
+  fieldTypes: Map<string, string>, overrideFormat?: any, locations?: { [field: string]: any }, color?: string, bgUrlOnly = false): any
 {
   let format = config && config.enabled && config.formats && config.formats.get(field);
   format = _Format(Util.asJS(format));
@@ -1112,18 +1162,18 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
             </div>
           </div>
         );
-      case 'date':
-        value = Util.formatDate(value, true);
-        if (!expanded && !bgUrlOnly)
-        {
-          return tooltip(
-            value,
-            {
-              title: value,
-              position: 'left-start',
-              arrow: false,
-            });
-        }
+        // case 'date':
+        //   value = Util.formatDate(value, true);
+        //   if (!expanded && !bgUrlOnly)
+        //   {
+        //     return tooltip(
+        //       value,
+        //       {
+        //         title: value,
+        //         position: 'left-start',
+        //         arrow: false,
+        //       });
+        //   }
         break;
       // case 'map':
       //   const resultLocation = MapUtil.getCoordinatesFromGeopoint(value);
@@ -1155,6 +1205,21 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
       case 'text':
         break;
     }
+  }
+  if (fieldTypes !== undefined && fieldTypes.get(field) === 'date')
+  {
+    value = Util.formatDate(value, true);
+    if (!expanded)
+    {
+      return tooltip(
+        value,
+        {
+          title: value,
+          position: 'left-start',
+          arrow: false,
+        });
+    }
+    return value;
   }
 
   if (typeof value === 'object')

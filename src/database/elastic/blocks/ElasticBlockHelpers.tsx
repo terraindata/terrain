@@ -113,7 +113,7 @@ export const ElasticBlockHelpers = {
     {
       col = schemaState.columns[key];
     }
-    if (col)
+    if (col && col.properties)
     {
       subFields = findSubfields(field, col.properties);
     }
