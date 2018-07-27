@@ -379,7 +379,7 @@ export class App
 
     winston.info('Listening on port ' + String(this.config.port));
     const serverInstance = await this.app.listen(this.config.port);
-    serverInstance.setTimeout(60*60*1000);
+    serverInstance.setTimeout(60 * 60 * 1000);
     return Promise.resolve(serverInstance);
   }
 

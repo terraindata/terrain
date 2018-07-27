@@ -148,7 +148,7 @@ export class PostProcess
     if (options['fieldInPattern'] !== true)
     {
       data.forEach((row) =>
-      { 
+      {
         if (patternRegExpFull.test(row[options['primaryKey']]))
         {
           const extractedPrimaryKey: string = row[options['primaryKey']]

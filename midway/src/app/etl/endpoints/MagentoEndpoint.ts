@@ -159,7 +159,7 @@ export default class MagentoEndpoint extends AEndpointStream
                                   field: '_id',
                                 },
                               },
-                            ], 
+                            ],
                           should: [],
                         },
                       },

@@ -75,6 +75,8 @@ module.exports =
         target: 'http://localhost:3000/midway',
         pathRewrite: { '^/midway': '' },
         secure: false,
+        proxyTimeout: 60*60*1000,
+        timeout: 60*60*1000
         // logLevel: 'debug', // useful when debugging
       },
     },
