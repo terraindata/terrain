@@ -227,6 +227,11 @@ export class DatePickerUncontained extends TerrainComponent<Props>
       });
       this.props.colorsActions({
         actionType: 'setStyle',
+        selector: '.DayPicker',
+        style: { 'border-color': Colors().sectionEditButton },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
         selector: '.DayPicker-Month',
         style: { background: Colors().altBg1 },
       });
@@ -238,7 +243,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
       this.props.colorsActions({
         actionType: 'setStyle',
         selector: '.DayPicker-Day',
-        style: { 'border-color': Colors().altHighlight, 'background': Colors().altBg1, 'color': Colors().altText3 },
+        style: { 'border-color': Colors().altHighlight, 'background': Colors().altBg1, 'color': Colors().mainSectionTitle },
       });
       this.props.colorsActions({
         actionType: 'setStyle',
@@ -258,7 +263,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
       this.props.colorsActions({
         actionType: 'setStyle',
         selector: '.DayPicker-Day--outside',
-        style: { color: Colors().text2, background: Colors().altBg2 },
+        style: { color: Colors().text2, background: Colors().bg },
       });
       this.props.colorsActions({
         actionType: 'setStyle',
@@ -273,7 +278,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
       this.props.colorsActions({
         actionType: 'setStyle',
         selector: '.DayPicker-Day--today',
-        style: { 'color': Colors().active, 'background-color': Colors().todayHighlight },
+        style: { 'color': Colors().active, 'background-color': Colors().bg },
       });
       this.props.colorsActions({
         actionType: 'setStyle',
