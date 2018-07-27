@@ -65,6 +65,8 @@ enum TransformationNodeType
   DivideNode = 'DivideNode',
   SetIfNode = 'SetIfNode',
   FindReplaceNode = 'FindReplaceNode',
+  ArrayMaxNode = 'ArrayMaxNode',
+  ArrayMinNode = 'ArrayMinNode',
   ArraySumNode = 'ArraySumNode',
   ArrayCountNode = 'ArrayCountNode',
   ProductNode = 'ProductNode',
@@ -155,6 +157,12 @@ interface TransformationOptionTypes
     find: string;
     replace: string;
     regex: boolean;
+  };
+  ArrayMaxNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  ArrayMinNode: {
+    newFieldKeyPaths: List<KeyPath>;
   };
   ArraySumNode: {
     newFieldKeyPaths: List<KeyPath>;
