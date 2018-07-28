@@ -489,12 +489,13 @@ export class DatePickerUncontained extends TerrainComponent<Props>
   {
     return (
       <div className='labeled-row'>
-        <p className='date-view-label'>Time</p>
         <Dropdown
           canEdit={this.props.canEdit}
           options={HOUR_OPTIONS}
           selectedIndex={this.dateToHourIndex(this.getDate())}
           onChange={this.handleHourChange}
+          textLabel='Time'
+          labelClass='date-view-label'
         />
       </div>
     );
