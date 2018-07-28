@@ -93,7 +93,8 @@ export function ESCodeToPathfinder(query: string, inputs, options: CodeToPathOpt
         .set('step', path.step)
         .set('source', path.source)
         .set('filterGroup', path.filterGroup)
-        .set('softFilterGroup', path.softFilterGroup);
+        .set('softFilterGroup', path.softFilterGroup)
+        .set('nested', path.nested);
     }
     return path;
   } catch (e)
@@ -133,6 +134,9 @@ const ClauseToPathTable = {
   body: {
     before: BodyToPathBefore,
     after: BodyToPathAfter,
+  },
+  groupjoin_clause: {
+    after: GroupJoinToPath,
   },
   bool_query: {
     after: BoolToPath,
@@ -242,6 +246,7 @@ function BodyToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any
   let path;
   if (node.annotation.sourceBool)
   {
+    // source bool should init `source`, `filterGroup`, `softFilterGroup`
     const sourceBool = node.annotation.sourceBool;
     index = sourceBool.annotation.index;
     filterGroup = sourceBool.annotation.filterGroup;
@@ -256,6 +261,15 @@ function BodyToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any
     // no source bool, thus no filters
     path = _Path();
   }
+
+  if (node.objectChildren['groupJoin'])
+  {
+    const groupJoinInfo = node.objectChildren['groupJoin'].propertyValue;
+    if (groupJoinInfo.annotation.path)
+    {
+      path = path.set('nested', groupJoinInfo.annotation.path);
+    }
+  }
   node.annotation.path = path;
   TerrainLog.debug('Body to Path' + JSON.stringify(node.annotation.path));
 }
@@ -264,13 +278,44 @@ function BodyToPathAfter(node: ESValueInfo, interpreter: ESInterpreter, key: any
 function BodyToPathBefore(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
 {
   // annotate source bool
-  const sourceBool = interpreter.searchValueInfo({ 'query:query': { 'bool:bool_query': true } });
+  const sourceBool = interpreter.searchValueInfo({ 'query:query': { 'bool:bool_query': true } }, node);
   if (sourceBool)
   {
-    TerrainLog.debug('Found Source Bool ' + JSON.stringify(sourceBool.value));
+    TerrainLog.debug('Found Source Bool ' + JSON.stringify(sourceBool.value) + ' at ' + JSON.stringify(key));
     sourceBool.annotation = { isSourceBool: true };
     node.annotation.sourceBool = sourceBool;
   }
+}
+
+// generate `nested`: List<Path>
+function GroupJoinToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+{
+  const paths = [];
+  let parentAlias = 'parent';
+  let minMatch = 0;
+  if (node.value.parentAlias !== undefined)
+  {
+    parentAlias = node.value.parentAlias;
+  }
+  if (node.value.dropIfLessThan !== undefined)
+  {
+    minMatch = node.value.dropIfLessThan;
+  }
+  node.forEachProperty((kv, k) =>
+  {
+    if (kv.propertyValue.clause.type === 'body')
+    {
+      const bodyValueInfo = kv.propertyValue;
+      if (bodyValueInfo.annotation.path)
+      {
+        const childPath = bodyValueInfo.annotation.path.set('name', k)
+          .set('minMatches', minMatch);
+        TerrainLog.debug('Pickup Child Path ' + k);
+        paths.push(childPath);
+      }
+    }
+  });
+  node.annotation.path = List(paths);
 }
 
 function TermToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
@@ -348,7 +393,7 @@ function MatchToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
     config['boost'] = 1;
   }
   config['field'] = fieldName;
-  config['comparison'] = 'equal';
+  config['comparison'] = 'contains';
   const filterLine = _FilterLine(config);
   node.annotation.path = filterLine;
   TerrainLog.debug('match_query to ' + JSON.stringify(filterLine));
@@ -455,7 +500,7 @@ function ESQueryToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[]
   const queryValue = node.objectChildren[queryName].propertyValue;
   if (queryValue.annotation.path !== undefined)
   {
-    node.annotation.path = queryValue.annotation.path;
+    node.annotation = queryValue.annotation;
   }
 }
 
@@ -480,41 +525,6 @@ function ESNestedQuerytoPath(node: ESValueInfo, interpreter: ESInterpreter, key:
       }
     }
   }
-}
-
-// must_not : query
-function NegativeBoolToPath(node: ESValueInfo, query: ESValueInfo): boolean
-{
-  if (query.annotation.path)
-  {
-    // could be multiple lines if followed by a nested clause
-    const lines = [];
-    if (List.isList(query.annotation.path))
-    {
-      (query.annotation.path as List<FilterLine>).map((line: FilterLine) =>
-      {
-        if (NegativeableComparionMap[line.comparison])
-        {
-          lines.push(line.set('comparison', NegativeableComparionMap[line.comparison]));
-        }
-      });
-      if (lines.length > 0)
-      {
-        node.annotation.path = List(lines);
-        return true;
-      }
-    } else
-    {
-      let line = query.annotation.path as FilterLine;
-      if (NegativeableComparionMap[line.comparison])
-      {
-        line = line.set('comparison', NegativeableComparionMap[line.comparison]);
-        node.annotation.path = line;
-        return true;
-      }
-    }
-  }
-  return false;
 }
 
 function processFilterLine(line: FilterLine): FilterLine
@@ -563,6 +573,179 @@ function BoolToFilterGroup(node: ESValueInfo, queries: ESValueInfo[], minMatches
   node.annotation.path = _FilterLine().set('filterGroup', filterGroup);
 }
 
+// soft filter group pattern: filter: [ {"exists": { "field": "_id"} } ] && should: []
+function matchSoftFilterGroup(boolValueInfo: ESValueInfo): boolean
+{
+  const boolValue = boolValueInfo.value;
+  if (Array.isArray(boolValue.filter) && Array.isArray(boolValue.should))
+  {
+    for (const q of boolValue.filter)
+    {
+      if (_.isEqual(q, {
+        exists: {
+          field: '_id',
+        },
+      }) === true)
+      {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+// hard all filter group pattern: filter: [ non-empty ]
+function matchHardAllFilterGroup(boolValueInfo: ESValueInfo): boolean
+{
+  const boolValue = boolValueInfo.value;
+  if (Array.isArray(boolValue.filter))
+  {
+    if (boolValue.filter.length > 0)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+// hard all filter group pattern: should: [ non-empty ]
+function matchHardAnyFilterGroup(boolValueInfo: ESValueInfo): boolean
+{
+  const boolValue = boolValueInfo.value;
+  if (Array.isArray(boolValue.should))
+  {
+    if (boolValue.should.length > 0)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+function matchSourceBool(boolNode: ESValueInfo, key: any[])
+{
+  if (boolNode.annotation.isSourceBool === true)
+  {
+    return true;
+  }
+}
+function sourceBoolToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
+{
+  // setup index, filterGroup, softFilterGroup
+  let softFilterGroup;
+  let filterGroup;
+  let index;
+
+  if (Array.isArray(node.value.filter))
+  {
+    const filterNode = node.objectChildren['filter'].propertyValue;
+    for (const q of filterNode.arrayChildren)
+    {
+      if (q.annotation.path instanceof AllRecordMap['FilterLineC'])
+      {
+        const line = q.annotation.path as FilterLine;
+        if (line.field === '_index' && line.comparison === 'equal')
+        {
+          if (index === undefined)
+          {
+            index = line.value;
+            TerrainLog.debug('Found index ' + index);
+          }
+        }
+
+        if (q.objectChildren['bool'])
+        {
+          const boolNode = q.objectChildren['bool'].propertyValue;
+          if (boolNode.annotation.path && boolNode.annotation.path.filterGroup)
+          {
+            if (filterGroup === undefined)
+            {
+              filterGroup = boolNode.annotation.path.filterGroup;
+              TerrainLog.debug('Found hard bool ' + JSON.stringify(filterGroup));
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (Array.isArray(node.value.should))
+  {
+    const shouldNode = (node.objectChildren['should'] as any).propertyValue;
+    for (const q of shouldNode.arrayChildren)
+    {
+      if (q.objectChildren['bool'])
+      {
+        const boolNode = q.objectChildren['bool'].propertyValue;
+        if (boolNode.annotation.path && boolNode.annotation.path.filterGroup)
+        {
+          if (softFilterGroup === undefined)
+          {
+            softFilterGroup = boolNode.annotation.path.filterGroup;
+            TerrainLog.debug('Found soft bool ' + JSON.stringify(softFilterGroup));
+          }
+        }
+      }
+    }
+  }
+  // make sure the source bool always has the index, softFilterGroup and filterGroup
+  node.annotation.index = index === undefined ? '' : index;
+  node.annotation.softFilterGroup = softFilterGroup === undefined ? _FilterGroup({ minMatch: 'any' }) : softFilterGroup;
+  node.annotation.filterGroup = filterGroup === undefined ? _FilterGroup({ minMatch: 'all' }) : filterGroup;
+  return true;
+}
+
+// pattern: bool -> must_not -> query
+function matchNegativeBool(boolNode: ESValueInfo)
+{
+  // bool -> must_not -> query
+  if (boolNode.objectChildren['must_not'])
+  {
+    // nested query?
+    const query = boolNode.objectChildren['must_not'].propertyValue;
+    if (query.clause.type === 'query' && query.annotation.path)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+// must_not : query
+function NegativeBoolToPath(node: ESValueInfo, query: ESValueInfo): boolean
+{
+  if (query.annotation.path)
+  {
+    // could be multiple lines if followed by a nested clause
+    const lines = [];
+    if (List.isList(query.annotation.path))
+    {
+      (query.annotation.path as List<FilterLine>).map((line: FilterLine) =>
+      {
+        if (NegativeableComparionMap[line.comparison])
+        {
+          lines.push(line.set('comparison', NegativeableComparionMap[line.comparison]));
+        }
+      });
+      if (lines.length > 0)
+      {
+        node.annotation.path = List(lines);
+        return true;
+      }
+    } else
+    {
+      let line = query.annotation.path as FilterLine;
+      if (NegativeableComparionMap[line.comparison])
+      {
+        line = line.set('comparison', NegativeableComparionMap[line.comparison]);
+        node.annotation.path = line;
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 /**
  * Generate the path component based on the shape of the sub-tree
  * 1) (highest priority): source bool
@@ -574,113 +757,40 @@ function BoolToFilterGroup(node: ESValueInfo, queries: ESValueInfo[], minMatches
 function BoolToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
 {
   // source bool
-  if (node.annotation.isSourceBool === true)
+  if (matchSourceBool(node, key))
   {
-    // setup index, filterGroup, softFilterGroup
-    let softFilterGroup;
-    let filterGroup;
-    let index;
-
-    if (Array.isArray(node.value.filter))
-    {
-      const filterNode = node.objectChildren['filter'].propertyValue;
-      for (const q of filterNode.arrayChildren)
-      {
-        if (q.annotation.path instanceof AllRecordMap['FilterLineC'])
-        {
-          const line = q.annotation.path as FilterLine;
-          if (line.field === '_index' && line.comparison === 'equal')
-          {
-            if (index === undefined)
-            {
-              index = line.value;
-              TerrainLog.debug('Found index ' + index);
-            }
-          }
-
-          if (q.objectChildren['bool'])
-          {
-            const boolNode = q.objectChildren['bool'].propertyValue;
-            if (boolNode.annotation.path && boolNode.annotation.path.filterGroup)
-            {
-              if (filterGroup === undefined)
-              {
-                filterGroup = boolNode.annotation.path.filterGroup;
-                TerrainLog.debug('Found hard bool ' + JSON.stringify(filterGroup));
-              }
-            }
-          }
-        }
-      }
-    }
-
-    if (Array.isArray(node.value.should))
-    {
-      const shouldNode = (node.objectChildren['should'] as any).propertyValue;
-      for (const q of shouldNode.arrayChildren)
-      {
-        if (q.objectChildren['bool'])
-        {
-          const boolNode = q.objectChildren['bool'].propertyValue;
-          if (boolNode.annotation.path && boolNode.annotation.path.filterGroup)
-          {
-            if (softFilterGroup === undefined)
-            {
-              softFilterGroup = boolNode.annotation.path.filterGroup;
-              TerrainLog.debug('Found soft bool ' + JSON.stringify(softFilterGroup));
-            }
-          }
-        }
-      }
-    }
-    // make sure the source bool always has the index, softFilterGroup and filterGroup
-    node.annotation.index = index === undefined ? '' : index;
-    node.annotation.softFilterGroup = softFilterGroup === undefined ? _FilterGroup({ minMatch: 'any' }) : softFilterGroup;
-    node.annotation.filterGroup = filterGroup === undefined ? _FilterGroup({ minMatch: 'all' }) : filterGroup;
+    sourceBoolToPath(node, interpreter, key);
+    TerrainLog.debug('Source Bool: ' + JSON.stringify(node.annotation));
     return;
   }
 
-  // bool -> must_not -> query
-  if (node.objectChildren['must_not'])
+  if (matchNegativeBool(node))
   {
-    // nested query?
-    const query = node.objectChildren['must_not'].propertyValue;
-    if (query.clause.type === 'query')
+    if (NegativeBoolToPath(node, node.objectChildren['must_not'].propertyValue))
     {
-      if (NegativeBoolToPath(node, query))
-      {
-        return;
-      }
+      TerrainLog.debug('Negative Bool: ' + JSON.stringify(node.annotation.path));
+      return;
     }
   }
 
-  if (Array.isArray(node.value.filter))
-  {
-    // nested filter group?
-    // soft filter group?
-    if (node.value.filter.length === 1 && _.isEqual(node.value.filter[0], {
-      exists: {
-        field: '_id',
-      },
-    }) === true)
-    {
-      if (Array.isArray(node.value.should) && node.value.should.length > 0)
-      {
-        BoolToFilterGroup(node, (node.objectChildren.should as any).propertyValue.arrayChildren, 'any');
-        TerrainLog.debug('Soft any filter group line ' + JSON.stringify(node.annotation.path));
-        return;
-      }
-    } else
-    {
-      BoolToFilterGroup(node, node.objectChildren['filter'].propertyValue.arrayChildren, 'all');
-      TerrainLog.debug('Hard all filter group line ' + JSON.stringify(node.annotation.path));
-      return;
-    }
-    // hard all filter group
-  } else if (Array.isArray(node.value.should) && node.value.should.length > 0)
+  if (matchSoftFilterGroup(node))
   {
     BoolToFilterGroup(node, (node.objectChildren.should as any).propertyValue.arrayChildren, 'any');
-    TerrainLog.debug('Hard any filter group line ' + JSON.stringify(node.annotation.path));
+    TerrainLog.debug('Soft Group: ' + JSON.stringify(node.annotation.path));
+    return;
+  }
+
+  if (matchHardAllFilterGroup(node))
+  {
+    BoolToFilterGroup(node, node.objectChildren['filter'].propertyValue.arrayChildren, 'all');
+    TerrainLog.debug('Hard All Group: ' + JSON.stringify(node.annotation.path));
+    return;
+  }
+
+  if (matchHardAnyFilterGroup(node))
+  {
+    BoolToFilterGroup(node, (node.objectChildren.should as any).propertyValue.arrayChildren, 'any');
+    TerrainLog.debug('Hard Any Group: ' + JSON.stringify(node.annotation.path));
     return;
   }
 }
