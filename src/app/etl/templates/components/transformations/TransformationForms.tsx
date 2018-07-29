@@ -55,7 +55,7 @@ import { TransformationForm, TransformationFormProps } from './TransformationFor
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { ArrayCountTFF, ArraySumTFF } from './ArrayStatTransformationForms';
+import { ArrayCountTFF, ArraySumTFF, ArrayMinTFF, ArrayMaxTFF } from './ArrayStatTransformationForms';
 import { CastTFF } from './CastTransformationForm';
 import { DuplicateTFF } from './DuplicateTransformationForm';
 import { FilterArrayTFF } from './FilterArrayTransformationForm';
@@ -75,19 +75,22 @@ import { StringifyTFF } from './StringifyTransformationForm';
 
 const forms: Array<{ new(props): TransformationForm<any, any> }> = [
   AddTFF,
-  ArrayCountTFF,
-  ArraySumTFF,
   CaseTFF,
   CastTFF,
   DecryptTFF,
   DifferenceTFF,
+  HashTFF,
+  ArraySumTFF,
+  ArrayMinTFF,
+  ArrayMaxTFF,
+  ArrayCountTFF,
+  RoundTFF,
   DivideTFF,
   DuplicateTFF,
   EncryptTFF,
   FilterArrayTFF,
   FindReplaceTFF,
   GroupByTFF,
-  HashTFF,
   InsertTFF,
   JoinTFF,
   MultiplyTFF,
@@ -95,7 +98,6 @@ const forms: Array<{ new(props): TransformationForm<any, any> }> = [
   ProductTFF,
   QuotientTFF,
   RemoveDuplicatesTFF,
-  RoundTFF,
   SetIfTFF,
   SplitTFF,
   StringifyTFF,

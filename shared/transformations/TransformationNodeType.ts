@@ -53,6 +53,8 @@ enum TransformationNodeType
 {
   AddNode = 'AddNode',
   ArrayCountNode = 'ArrayCountNode',
+  ArrayMaxNode = 'ArrayMaxNode',
+  ArrayMinNode = 'ArrayMinNode',
   ArraySumNode = 'ArraySumNode',
   CaseNode = 'CaseNode',
   CastNode = 'CastNode',
@@ -175,6 +177,12 @@ interface TransformationOptionTypes extends HasCommon<TransformationOptionTypes>
     find: string;
     replace: string;
     regex: boolean;
+  };
+  ArrayMaxNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  ArrayMinNode: {
+    newFieldKeyPaths: List<KeyPath>;
   };
   ArraySumNode: {
     newFieldKeyPaths: List<KeyPath>;

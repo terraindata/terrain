@@ -110,4 +110,6 @@ function SimpleStatFactory<T extends TransformationNodeType>(type: T, startingNa
 }
 
 export const ArraySumTFF = SimpleStatFactory(TransformationNodeType.ArraySumNode, 'Sum of Array');
+export const ArrayMinTFF = SimpleStatFactory(TransformationNodeType.ArrayMinNode, 'Min of Array');
+export const ArrayMaxTFF = SimpleStatFactory(TransformationNodeType.ArrayMaxNode, 'Max of Array');
 export const ArrayCountTFF = SimpleStatFactory(TransformationNodeType.ArrayCountNode, 'Count of Array');
