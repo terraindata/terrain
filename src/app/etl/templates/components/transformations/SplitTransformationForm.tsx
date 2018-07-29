@@ -118,7 +118,7 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
     if (isCreate)
     {
       const fieldId = this.props.fieldId;
-      const fieldName = this.props.engine.getOutputKeyPath(fieldId).get(0);
+      const fieldName = this.props.engine.getFieldPath(fieldId).get(0);
 
       const initialState = Object.assign(
         {},
