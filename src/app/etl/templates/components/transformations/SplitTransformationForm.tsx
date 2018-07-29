@@ -110,8 +110,8 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
     },
   };
   protected readonly initialState = {
-    leftName: 'Split Field 1',
-    rightName: 'Split Field 2',
+    leftName: 'SplitField1',
+    rightName: 'SplitField2',
     preserveOldFields: false,
     delimiter: '-',
     regex: false,
@@ -123,7 +123,18 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
     const { isCreate, transformation } = this.props;
     if (isCreate)
     {
-      return this.initialState;
+      const fieldId = this.props.fieldId;
+      const fieldName = this.props.engine.getOutputKeyPath(fieldId).get(0);
+
+      const initialState = Object.assign(
+        {},
+        this.initialState,
+        {
+          leftName: `${fieldName}_${this.initialState.leftName}`,
+          rightName: `${fieldName}_${this.initialState.rightName}`,
+        },
+      );
+      return initialState;
     }
     else
     {

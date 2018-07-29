@@ -55,7 +55,7 @@ import { TransformationForm, TransformationFormProps } from './TransformationFor
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { ArrayCountTFF, ArraySumTFF } from './ArrayStatTransformationForms';
+import { ArrayCountTFF, ArraySumTFF, ArrayMinTFF, ArrayMaxTFF } from './ArrayStatTransformationForms';
 import { CastTFF } from './CastTransformationForm';
 import { DuplicateTFF } from './DuplicateTransformationForm';
 import { FilterArrayTFF } from './FilterArrayTransformationForm';
@@ -80,6 +80,8 @@ const forms: Array<{ new(props): TransformationForm<any, any> }> = [
   CastTFF,
   HashTFF,
   ArraySumTFF,
+  ArrayMinTFF,
+  ArrayMaxTFF,
   ArrayCountTFF,
   RoundTFF,
   AddTFF,
