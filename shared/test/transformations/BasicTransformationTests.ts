@@ -61,15 +61,6 @@ function wrap(kp: any[])
   return List([List(kp)]);
 }
 
-test('add fields manually', () =>
-{
-  const e: TransformationEngine = new TransformationEngine();
-  e.addField(KeyPath(['meta', 'school']));
-  e.appendTransformation(TransformationNodeType.CaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]), { format: 'uppercase' });
-  const r = e.transform(TestDocs.doc1);
-  expect(yadeep.get(r, KeyPath(['meta', 'school']))).toBe('STANFORD');
-});
-
 test('change text field case', () =>
 {
   const doc = Object.assign({}, TestDocs.doc1);
@@ -397,7 +388,7 @@ test('cast node tests', () =>
     {
       toTypename: FieldTypes.Array,
     });
-  const r = e.transform(TestDocs.doc2);
+  const r = e.transform(TestDocs.doc2, { removeEmptyObjects: false });
   expect(r['age']).toBe('17');
   expect(r['meta']['school']).toEqual({});
   expect(r['meta']['sport']).toEqual([]);
@@ -709,7 +700,7 @@ test('test casting strings to objects', () =>
     bar: 'this should fail',
   };
 
-  expect(e.transform(doc)).toEqual({
+  expect(e.transform(doc, { removeEmptyObjects: false })).toEqual({
     foo: {
       bar: [1, 2, 3],
       baz: { hey: 'doggo' },

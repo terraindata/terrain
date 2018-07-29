@@ -105,7 +105,7 @@ test('identity transformation for deeply nested arrays', () =>
 
   const copyOfDoc = _.cloneDeep(doc);
   const e = Utils.construction.makeEngine(doc);
-  const r = e.transform(doc);
+  const r = e.transform(doc, { removeEmptyObjects: false });
   expect(r).toEqual(copyOfDoc);
   expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
@@ -132,7 +132,7 @@ test('identity transformation for conflicting nested arrays with empty arrays', 
   const copyOfDoc = _.cloneDeep(doc);
   const e = Utils.construction.makeEngine(doc);
 
-  const r = e.transform(doc);
+  const r = e.transform(doc, { removeEmptyObjects: false });
   expect(r).toEqual(copyOfDoc);
   expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });

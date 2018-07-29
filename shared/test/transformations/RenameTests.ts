@@ -81,8 +81,8 @@ test('rename a field (promotion)', () =>
   e.addField(KeyPath(['name']));
   const id2: number = e.addField(KeyPath(['meta', 'school']));
   e.renameField(id2, KeyPath(['skool']));
-  expect(e.transform(TestDocs.doc1)['skool']).toBe('Stanford');
-  expect(e.transform(TestDocs.doc1)['meta']).toEqual({});
+  expect(e.transform(TestDocs.doc1, { removeEmptyObjects: false })['skool']).toBe('Stanford');
+  expect(e.transform(TestDocs.doc1, { removeEmptyObjects: false })['meta']).toEqual({});
 });
 
 test('rename a field (an object with subkeys)', () =>

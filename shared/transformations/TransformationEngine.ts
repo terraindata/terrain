@@ -75,6 +75,7 @@ interface TransformOptions
 {
   cache?: boolean;
   includeUnknown?: boolean;
+  removeEmptyObjects?: boolean;
 }
 
 /**
@@ -274,7 +275,7 @@ export class TransformationEngine
       output = document;
     }
 
-    return this.getCleanedDocument(output);
+    return this.getCleanedDocument(output, options.removeEmptyObjects);
   }
 
   /**
@@ -650,42 +651,28 @@ export class TransformationEngine
   }
 
   /*
-   *  Returns the document that only has enabled fields
+   *  Returns the document that only has enabled fields and if specified, removes empty objects
    */
-  protected getCleanedDocument(doc: object): object
+  protected getCleanedDocument(doc: object, removeEmpty = true): object
   {
     const output = _.cloneDeep(doc);
 
     const tree = this.createTree();
-    this.getAllFieldIDs().forEach((fieldId) => {
-      if (this.getFieldPath(fieldId).size === 1) // is root
+    if (removeEmpty)
+    {
+      for (const { value, location } of yadeep.traverse(output))
       {
-        const shouldExplore = (id) => {
-          return this.getFieldEnabled(id);
-        };
-        for (const id of Utils.traversal.preorder(tree, fieldId, shouldExplore))
+        if (isPrimitive(value))
         {
-          const path = this.getFieldPath(id);
-          for (const { location, value } of yadeep.search(doc, path))
-          {
-            if (isPrimitive(value))
-            {
-              yadeep.setIn(output, location, value);
-            }
-            else if (Array.isArray(value))
-            {
-              yadeep.setIn(output, location, []);
-            }
-            else
-            {
-              yadeep.setIn(output, location, {});
-            }
-          }
+          continue;
+        }
+        else if (!Array.isArray(value) && Object.keys(value).length === 0)
+        {
+          yadeep.deleteIn(output, location);
         }
       }
-    });
+    }
 
-    // const tree = this.createTree();
     const enabledMap = {};
     this.getAllFieldIDs().forEach((fieldId) => {
       if (this.getFieldPath(fieldId).size === 1) // is root
