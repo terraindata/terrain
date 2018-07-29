@@ -1,0 +1,1946 @@
+{
+  "testName": "MB_02",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "id": "gmc01-13503",
+      "ConversionRate": 23.608017817371937,
+      "UniquePurchases": 636,
+      "ProductRevenue": 46202.179023,
+      "Quantity": 957,
+      "AvgPrice": 48.278139,
+      "UniquePageviews": 0,
+      "Condition": "new",
+      "Availability": "in stock",
+      "ImageLink": "https://assets3.mixbook.com/pages/289597319_783584_l.jpg?1524664983",
+      "Description": "        Minimal White is part of our Everyday Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "IdentifierExists": "FALSE",
+      "AdwordsRedirect": "https://www.mixbook.com/everyday-photo-books/minimal-white-5998?ptid=13503&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "ProductType": "Photo Books > Everyday Photo Books",
+      "Title": "Minimal White Photo Book",
+      "Service": "Standard",
+      "Brand": "Mixbook",
+      "Price": 15.99,
+      "ShippingPrice": 8.99,
+      "TotalPrice": 24.98,
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Everyday Photo Books"
+      ],
+      "Country": "US",
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "Link": "https://www.mixbook.com/everyday-photo-books/minimal-white-5998?ptid=13503",
+      "fields": {
+        "ProductType.keyword": [
+          "Photo Books > Everyday Photo Books"
+        ]
+      },
+      "TerrainScore": 0.6449073305793983,
+      "TERRAINRANK": 1
+    },
+    {
+      "id": "gmc01-16551",
+      "ConversionRate": 14.297156587905487,
+      "UniquePurchases": 357,
+      "ProductRevenue": 23351.10855,
+      "Quantity": 461,
+      "AvgPrice": 50.653163882863346,
+      "UniquePageviews": 0,
+      "Condition": "new",
+      "Availability": "in stock",
+      "ImageLink": "https://assets2.mixbook.com/pages/336314846_642596_l.jpg?1521848330",
+      "Description": "        Modern Travels is part of our Travel Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "IdentifierExists": "FALSE",
+      "AdwordsRedirect": "https://www.mixbook.com/travel-photo-books/modern-travels-6611?ptid=16551&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "ProductType": "Photo Books > Travel Photo Books",
+      "Title": "Modern Travels Photo Book",
+      "Service": "Standard",
+      "Brand": "Mixbook",
+      "Price": 15.99,
+      "ShippingPrice": 8.99,
+      "TotalPrice": 24.98,
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Travel Photo Books"
+      ],
+      "Country": "US",
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "Link": "https://www.mixbook.com/travel-photo-books/modern-travels-6611?ptid=16551",
+      "fields": {
+        "ProductType.keyword": [
+          "Photo Books > Travel Photo Books"
+        ]
+      },
+      "TerrainScore": 0.22105011000277652,
+      "TERRAINRANK": 2
+    },
+    {
+      "id": "gmc01-15416",
+      "ConversionRate": 27.89968652037618,
+      "UniquePurchases": 178,
+      "ProductRevenue": 9850.975442,
+      "Quantity": 226,
+      "AvgPrice": 43.58838691150442,
+      "UniquePageviews": 0,
+      "Condition": "new",
+      "Availability": "in stock",
+      "ImageLink": "https://assets1.mixbook.com/pages/321964761_783584_l.jpg?1510081144",
+      "Description": "        A Magical Adventure is part of our Family Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "IdentifierExists": "FALSE",
+      "AdwordsRedirect": "https://www.mixbook.com/family-photo-books/a-magical-adventure-6404?ptid=15416&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "ProductType": "Photo Books > Occasion Photo Books",
+      "Title": "A Magical Adventure Photo Book",
+      "Service": "Standard",
+      "Brand": "Mixbook",
+      "Price": 15.99,
+      "ShippingPrice": 8.99,
+      "TotalPrice": 24.98,
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Occasion Photo Books"
+      ],
+      "Country": "US",
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "Link": "https://www.mixbook.com/family-photo-books/a-magical-adventure-6404?ptid=15416",
+      "fields": {
+        "ProductType.keyword": [
+          "Photo Books > Occasion Photo Books"
+        ]
+      },
+      "TerrainScore": 0.11511627049564378,
+      "TERRAINRANK": 3
+    },
+    {
+      "id": "gmc01-16627",
+      "ConversionRate": 21.182266009852217,
+      "UniquePurchases": 129,
+      "ProductRevenue": 7378.884759,
+      "Quantity": 166,
+      "AvgPrice": 44.4511130060241,
+      "UniquePageviews": 0,
+      "Condition": "new",
+      "Availability": "in stock",
+      "ImageLink": "https://assets0.mixbook.com/pages/337504440_783584_l.jpg?1508280238",
+      "Description": "        Sweet Memories is part of our Family Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "IdentifierExists": "FALSE",
+      "AdwordsRedirect": "https://www.mixbook.com/family-photo-books/sweet-memories-6621?ptid=16627&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "ProductType": "Photo Books > Family Photo Books",
+      "Title": "Sweet Memories Photo Book",
+      "Service": "Standard",
+      "Brand": "Mixbook",
+      "Price": 15.99,
+      "ShippingPrice": 8.99,
+      "TotalPrice": 24.98,
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Family Photo Books"
+      ],
+      "Country": "US",
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "Link": "https://www.mixbook.com/family-photo-books/sweet-memories-6621?ptid=16627",
+      "fields": {
+        "ProductType.keyword": [
+          "Photo Books > Family Photo Books"
+        ]
+      },
+      "TerrainScore": 0.1119031964092124,
+      "TERRAINRANK": 4
+    },
+    {
+      "id": "gmc01-12787",
+      "ConversionRate": 100,
+      "UniquePurchases": 10,
+      "ProductRevenue": 431.42511,
+      "Quantity": 10,
+      "AvgPrice": 43.142511,
+      "UniquePageviews": 0,
+      "Condition": "new",
+      "Availability": "in stock",
+      "ImageLink": "https://assets0.mixbook.com/pages/270730376_783584_l.jpg?1520524124",
+      "Description": "        Anniversary Celebration is part of our Wedding Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "IdentifierExists": "FALSE",
+      "AdwordsRedirect": "https://www.mixbook.com/wedding-photo-books/anniversary-celebration-5800?ptid=12787&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "ProductType": "Photo Books > Romance Photo Books",
+      "Title": "Anniversary Celebration Photo Book",
+      "Service": "Standard",
+      "Brand": "Mixbook",
+      "Price": 15.99,
+      "ShippingPrice": 8.99,
+      "TotalPrice": 24.98,
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Romance Photo Books"
+      ],
+      "Country": "US",
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "Link": "https://www.mixbook.com/wedding-photo-books/anniversary-celebration-5800?ptid=12787",
+      "fields": {
+        "ProductType.keyword": [
+          "Photo Books > Romance Photo Books"
+        ]
+      },
+      "TerrainScore": 0.11111790933357428,
+      "TERRAINRANK": 5
+    },
+    {
+      "id": "gmc01-12785",
+      "ConversionRate": 15.66265060240964,
+      "UniquePurchases": 78,
+      "ProductRevenue": 4199.640172,
+      "Quantity": 98,
+      "AvgPrice": 42.85347114285714,
+      "UniquePageviews": 0,
+      "Condition": "new",
+      "Availability": "in stock",
+      "ImageLink": "https://assets2.mixbook.com/pages/270476478_783584_l.jpg?1494884442",
+      "Description": "        Welcome Baby Girl is part of our Baby Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "IdentifierExists": "FALSE",
+      "AdwordsRedirect": "https://www.mixbook.com/baby-photo-books/welcome-baby-girl-5799?ptid=12785&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "ProductType": "Photo Books > Baby Photo Books",
+      "Title": "Welcome Baby Girl Photo Book",
+      "Service": "Standard",
+      "Brand": "Mixbook",
+      "Price": 15.99,
+      "ShippingPrice": 8.99,
+      "TotalPrice": 24.98,
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Baby Photo Books"
+      ],
+      "Country": "US",
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "Link": "https://www.mixbook.com/baby-photo-books/welcome-baby-girl-5799?ptid=12785",
+      "fields": {
+        "ProductType.keyword": [
+          "Photo Books > Baby Photo Books"
+        ]
+      },
+      "TerrainScore": 0.1110314875539958,
+      "TERRAINRANK": 6
+    },
+    {
+      "id": "gmc01-7966",
+      "ConversionRate": 25,
+      "UniquePurchases": 2,
+      "ProductRevenue": 175.664249,
+      "Quantity": 4,
+      "AvgPrice": 43.91606225,
+      "UniquePageviews": 0,
+      "Condition": "new",
+      "Availability": "in stock",
+      "ImageLink": "https://assets2.mixbook.com/pages/162590006_783584_l.jpg?1499825821",
+      "Description": "Bold and bright, the Summertime photo book displays evidence of a summer well spent for friends and family to savor. Ants marching by, ‘Summer Fun’ and rainbow chevron stripes are just a few of the stunning backgrounds at your disposal. Layouts allow you to span the gutter, build collages or group portraits with room for personal quotes and cheerful artwork.\n        Summertime is part of our Seasonal Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "IdentifierExists": "FALSE",
+      "AdwordsRedirect": "https://www.mixbook.com/seasonal-photo-books/summertime-4155?ptid=7966&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "ProductType": "Photo Books > Seasons Photo Books",
+      "Title": "Summertime Photo Book",
+      "Service": "Standard",
+      "Brand": "Mixbook",
+      "Price": 15.99,
+      "ShippingPrice": 10.99,
+      "TotalPrice": 26.98,
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Seasons Photo Books"
+      ],
+      "Country": "US",
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "Link": "https://www.mixbook.com/seasonal-photo-books/summertime-4155?ptid=7966",
+      "fields": {
+        "ProductType.keyword": [
+          "Photo Books > Seasons Photo Books"
+        ]
+      },
+      "TerrainScore": 0.11046437779679046,
+      "TERRAINRANK": 7
+    },
+    {
+      "id": "gmc01-13451",
+      "ConversionRate": 100,
+      "UniquePurchases": 2,
+      "ProductRevenue": 87.832124,
+      "Quantity": 2,
+      "AvgPrice": 43.916062,
+      "UniquePageviews": 0,
+      "Condition": "new",
+      "Availability": "in stock",
+      "ImageLink": "https://assets2.mixbook.com/pages/287778022_946258_l.jpg?1483581115",
+      "Description": "        Welcome Home is part of our Family Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "IdentifierExists": "FALSE",
+      "AdwordsRedirect": "https://www.mixbook.com/family-photo-books/welcome-home-5988?ptid=13451&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "ProductType": "Photo Books > Events Photo Books",
+      "Title": "Welcome Home Photo Book",
+      "Service": "Standard",
+      "Brand": "Mixbook",
+      "Price": 15.99,
+      "ShippingPrice": 8.99,
+      "TotalPrice": 24.98,
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Events Photo Books"
+      ],
+      "Country": "US",
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "Link": "https://www.mixbook.com/family-photo-books/welcome-home-5988?ptid=13451",
+      "fields": {
+        "ProductType.keyword": [
+          "Photo Books > Events Photo Books"
+        ]
+      },
+      "TerrainScore": 0.11045239553431171,
+      "TERRAINRANK": 8
+    },
+    {
+      "id": "gmc01-200",
+      "ConversionRate": 33.33333333333333,
+      "UniquePurchases": 2,
+      "ProductRevenue": 87.832124,
+      "Quantity": 2,
+      "AvgPrice": 43.916062,
+      "UniquePageviews": 0,
+      "Condition": "new",
+      "Availability": "in stock",
+      "ImageLink": "https://assets2.mixbook.com/pages/62905894_783584_l.jpg?1499920547",
+      "Description": "Celebrate the most wonderful time of the year with the festive and sentimental Merry Christmas photo book. Snowflakes, candy canes and colorful ornaments are featured on joyful holiday backgrounds to showcase your photographs. Layouts allow you to build collages, feature a portrait across the gutter or frame snapshots inside holiday artwork. Your personal quotes and tags are highlighted in eye-catching typography.\n        Merry Christmas is part of our Holiday Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "IdentifierExists": "FALSE",
+      "AdwordsRedirect": "https://www.mixbook.com/holiday-photo-books/merry-christmas-145?ptid=200&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "ProductType": "Photo Books > Holiday Photo Books",
+      "Title": "Merry Christmas Photo Book",
+      "Service": "Standard",
+      "Brand": "Mixbook",
+      "Price": 15.99,
+      "ShippingPrice": 10.99,
+      "TotalPrice": 26.98,
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Holiday Photo Books"
+      ],
+      "Country": "US",
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "Link": "https://www.mixbook.com/holiday-photo-books/merry-christmas-145?ptid=200",
+      "fields": {
+        "ProductType.keyword": [
+          "Photo Books > Holiday Photo Books"
+        ]
+      },
+      "TerrainScore": 0.11045239553431171,
+      "TERRAINRANK": 9
+    },
+    {
+      "id": "gmc01-15859",
+      "ConversionRate": 14.184397163120568,
+      "UniquePurchases": 20,
+      "ProductRevenue": 2559.006566,
+      "Quantity": 82,
+      "AvgPrice": 31.20739714634146,
+      "UniquePageviews": 0,
+      "Condition": "new",
+      "Availability": "in stock",
+      "ImageLink": "https://assets1.mixbook.com/pages/327960485_783584_l.jpg?1524611434",
+      "Description": "        Favorite Recipes Cook Book by Molly Hatch  is part of our Family Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "IdentifierExists": "FALSE",
+      "AdwordsRedirect": "https://www.mixbook.com/family-photo-books/favorite-recipes-cook-book-by-molly-hatch-6504?ptid=15859&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "ProductType": "Photo Books > Cooking Photo Books",
+      "Title": "Favorite Recipes Cook Book by Molly Hatch  Photo Book",
+      "Service": "Standard",
+      "Brand": "Mixbook",
+      "Price": 15.99,
+      "ShippingPrice": 8.99,
+      "TotalPrice": 24.98,
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Cooking Photo Books"
+      ],
+      "Country": "US",
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "Link": "https://www.mixbook.com/family-photo-books/favorite-recipes-cook-book-by-molly-hatch-6504?ptid=15859",
+      "fields": {
+        "ProductType.keyword": [
+          "Photo Books > Cooking Photo Books"
+        ]
+      },
+      "TerrainScore": 0.07448440563534628,
+      "TERRAINRANK": 10
+    }
+  ],
+  "outputDocs": [
+    {
+      "Title": "Minimal White ",
+      "ImageLink": "https://assets3.mixbook.com/pages/289597319_783584_l.jpg?1524664983",
+      "CanonicalLink": "https://www.mixbook.com/everyday-photo-books/minimal-white-5998?ptid=13503",
+      "Price": 15.99,
+      "ProductId": "gmc01-13503",
+      "TerrainRank": 1,
+      "ProductOccasion": " Everyday Photo Books"
+    },
+    {
+      "Title": "Modern Travels ",
+      "ImageLink": "https://assets2.mixbook.com/pages/336314846_642596_l.jpg?1521848330",
+      "CanonicalLink": "https://www.mixbook.com/travel-photo-books/modern-travels-6611?ptid=16551",
+      "Price": 15.99,
+      "ProductId": "gmc01-16551",
+      "TerrainRank": 2,
+      "ProductOccasion": " Travel Photo Books"
+    },
+    {
+      "Title": "A Magical Adventure ",
+      "ImageLink": "https://assets1.mixbook.com/pages/321964761_783584_l.jpg?1510081144",
+      "CanonicalLink": "https://www.mixbook.com/family-photo-books/a-magical-adventure-6404?ptid=15416",
+      "Price": 15.99,
+      "ProductId": "gmc01-15416",
+      "TerrainRank": 3,
+      "ProductOccasion": " Occasion Photo Books"
+    },
+    {
+      "Title": "Sweet Memories ",
+      "ImageLink": "https://assets0.mixbook.com/pages/337504440_783584_l.jpg?1508280238",
+      "CanonicalLink": "https://www.mixbook.com/family-photo-books/sweet-memories-6621?ptid=16627",
+      "Price": 15.99,
+      "ProductId": "gmc01-16627",
+      "TerrainRank": 4,
+      "ProductOccasion": " Family Photo Books"
+    },
+    {
+      "Title": "Anniversary Celebration ",
+      "ImageLink": "https://assets0.mixbook.com/pages/270730376_783584_l.jpg?1520524124",
+      "CanonicalLink": "https://www.mixbook.com/wedding-photo-books/anniversary-celebration-5800?ptid=12787",
+      "Price": 15.99,
+      "ProductId": "gmc01-12787",
+      "TerrainRank": 5,
+      "ProductOccasion": " Romance Photo Books"
+    },
+    {
+      "Title": "Welcome Baby Girl ",
+      "ImageLink": "https://assets2.mixbook.com/pages/270476478_783584_l.jpg?1494884442",
+      "CanonicalLink": "https://www.mixbook.com/baby-photo-books/welcome-baby-girl-5799?ptid=12785",
+      "Price": 15.99,
+      "ProductId": "gmc01-12785",
+      "TerrainRank": 6,
+      "ProductOccasion": " Baby Photo Books"
+    },
+    {
+      "Title": "Summertime ",
+      "ImageLink": "https://assets2.mixbook.com/pages/162590006_783584_l.jpg?1499825821",
+      "CanonicalLink": "https://www.mixbook.com/seasonal-photo-books/summertime-4155?ptid=7966",
+      "Price": 15.99,
+      "ProductId": "gmc01-7966",
+      "TerrainRank": 7,
+      "ProductOccasion": " Seasons Photo Books"
+    },
+    {
+      "Title": "Welcome Home ",
+      "ImageLink": "https://assets2.mixbook.com/pages/287778022_946258_l.jpg?1483581115",
+      "CanonicalLink": "https://www.mixbook.com/family-photo-books/welcome-home-5988?ptid=13451",
+      "Price": 15.99,
+      "ProductId": "gmc01-13451",
+      "TerrainRank": 8,
+      "ProductOccasion": " Events Photo Books"
+    },
+    {
+      "Title": "Merry Christmas ",
+      "ImageLink": "https://assets2.mixbook.com/pages/62905894_783584_l.jpg?1499920547",
+      "CanonicalLink": "https://www.mixbook.com/holiday-photo-books/merry-christmas-145?ptid=200",
+      "Price": 15.99,
+      "ProductId": "gmc01-200",
+      "TerrainRank": 9,
+      "ProductOccasion": " Holiday Photo Books"
+    },
+    {
+      "Title": "Favorite Recipes Cook Book by Molly Hatch  ",
+      "ImageLink": "https://assets1.mixbook.com/pages/327960485_783584_l.jpg?1524611434",
+      "CanonicalLink": "https://www.mixbook.com/family-photo-books/favorite-recipes-cook-book-by-molly-hatch-6504?ptid=15859",
+      "Price": 15.99,
+      "ProductId": "gmc01-15859",
+      "TerrainRank": 10,
+      "ProductOccasion": " Cooking Photo Books"
+    }
+  ],
+  "template": {
+    "id": 13,
+    "lastModified": "2018-07-18T23:25:23.215Z",
+    "createdAt": "2018-06-19T22:37:11.725Z",
+    "archived": false,
+    "templateName": "Responsys - Photo Books Template",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "Availability"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "Title"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "IdentifierExists"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "Description"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "ImageLink"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "AdwordsRedirect"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "Link"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "Brand"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "ProductType"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "Service"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "ProductCategory"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "Price"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "12",
+                  "value": {
+                    "id": 12,
+                    "fields": [
+                      [
+                        "ShippingPrice"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "13",
+                  "value": {
+                    "id": 13,
+                    "fields": [
+                      [
+                        "id"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "14",
+                  "value": {
+                    "id": 14,
+                    "fields": [
+                      [
+                        "Country"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "15",
+                  "value": {
+                    "id": 15,
+                    "fields": [
+                      [
+                        "Condition"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "16",
+                  "value": {
+                    "id": 16,
+                    "fields": [
+                      [
+                        "TotalPrice"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "17",
+                  "value": {
+                    "id": 17,
+                    "fields": [
+                      [
+                        "UniquePageviews"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "18",
+                  "value": {
+                    "id": 18,
+                    "fields": [
+                      [
+                        "ConversionRate"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "19",
+                  "value": {
+                    "id": 19,
+                    "fields": [
+                      [
+                        "UniquePurchases"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "20",
+                  "value": {
+                    "id": 20,
+                    "fields": [
+                      [
+                        "ProductRevenue"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "21",
+                  "value": {
+                    "id": 21,
+                    "fields": [
+                      [
+                        "Quantity"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "22",
+                  "value": {
+                    "id": 22,
+                    "fields": [
+                      [
+                        "AvgPrice"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "23",
+                  "value": {
+                    "id": 23,
+                    "fields": [
+                      [
+                        "fields"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "object"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "24",
+                  "value": {
+                    "id": 24,
+                    "fields": [
+                      [
+                        "fields",
+                        "ProductType.keyword"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "array"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "25",
+                  "value": {
+                    "id": 25,
+                    "fields": [
+                      [
+                        "fields",
+                        "ProductType.keyword",
+                        -1
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "26",
+                  "value": {
+                    "id": 26,
+                    "fields": [
+                      [
+                        "TERRAINRANK"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "27",
+                  "value": {
+                    "id": 27,
+                    "fields": [
+                      [
+                        "ProductType"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "ProductCat"
+                        ],
+                        [
+                          "ProductOccasion"
+                        ]
+                      ],
+                      "delimiter": ">",
+                      "preserveOldFields": false,
+                      "regex": false
+                    },
+                    "skipNulls": true,
+                    "typeCode": "SplitNode",
+                    "acceptedType": "string"
+                  }
+                },
+                {
+                  "v": "28",
+                  "value": {
+                    "id": 28,
+                    "fields": [
+                      [
+                        "Title"
+                      ]
+                    ],
+                    "meta": {
+                      "find": "Photo Book",
+                      "replace": "",
+                      "regex": false
+                    },
+                    "skipNulls": true,
+                    "typeCode": "FindReplaceNode",
+                    "acceptedType": "string"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 29,
+            "uidNode": 29,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "Price"
+                ],
+                11
+              ],
+              [
+                [
+                  "AdwordsRedirect"
+                ],
+                5
+              ],
+              [
+                [
+                  "Condition"
+                ],
+                15
+              ],
+              [
+                [
+                  "Title"
+                ],
+                1
+              ],
+              [
+                [
+                  "ProductType"
+                ],
+                8
+              ],
+              [
+                [
+                  "_synthetic_t814w4l11lc",
+                  "Split Field 1"
+                ],
+                27
+              ],
+              [
+                [
+                  "ProductCategory"
+                ],
+                10
+              ],
+              [
+                [
+                  "ProductRevenue"
+                ],
+                20
+              ],
+              [
+                [
+                  "_synthetic_blt76n186cq",
+                  "Split Field 2"
+                ],
+                28
+              ],
+              [
+                [
+                  "IdentifierExists"
+                ],
+                2
+              ],
+              [
+                [
+                  "Brand"
+                ],
+                7
+              ],
+              [
+                [
+                  "Service"
+                ],
+                9
+              ],
+              [
+                [
+                  "fields"
+                ],
+                23
+              ],
+              [
+                [
+                  "UniquePageviews"
+                ],
+                17
+              ],
+              [
+                [
+                  "ConversionRate"
+                ],
+                18
+              ],
+              [
+                [
+                  "Country"
+                ],
+                14
+              ],
+              [
+                [
+                  "AvgPrice"
+                ],
+                22
+              ],
+              [
+                [
+                  "TERRAINRANK"
+                ],
+                26
+              ],
+              [
+                [
+                  "UniquePurchases"
+                ],
+                19
+              ],
+              [
+                [
+                  "Link"
+                ],
+                6
+              ],
+              [
+                [
+                  "Description"
+                ],
+                3
+              ],
+              [
+                [
+                  "id"
+                ],
+                13
+              ],
+              [
+                [
+                  "ImageLink"
+                ],
+                4
+              ],
+              [
+                [
+                  "fields",
+                  "ProductType.keyword"
+                ],
+                24
+              ],
+              [
+                [
+                  "Quantity"
+                ],
+                21
+              ],
+              [
+                [
+                  "ShippingPrice"
+                ],
+                12
+              ],
+              [
+                [
+                  "TotalPrice"
+                ],
+                16
+              ],
+              [
+                [
+                  "Availability"
+                ],
+                0
+              ],
+              [
+                [
+                  "fields",
+                  "ProductType.keyword",
+                  -1
+                ],
+                25
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "Availability"
+                ]
+              ],
+              [
+                1,
+                [
+                  "Title"
+                ]
+              ],
+              [
+                2,
+                [
+                  "IdentifierExists"
+                ]
+              ],
+              [
+                3,
+                [
+                  "Description"
+                ]
+              ],
+              [
+                4,
+                [
+                  "ImageLink"
+                ]
+              ],
+              [
+                5,
+                [
+                  "AdwordsRedirect"
+                ]
+              ],
+              [
+                6,
+                [
+                  "CanonicalLink"
+                ]
+              ],
+              [
+                7,
+                [
+                  "Brand"
+                ]
+              ],
+              [
+                8,
+                [
+                  "ProductType"
+                ]
+              ],
+              [
+                9,
+                [
+                  "Service"
+                ]
+              ],
+              [
+                10,
+                [
+                  "ProductCategory"
+                ]
+              ],
+              [
+                11,
+                [
+                  "Price"
+                ]
+              ],
+              [
+                12,
+                [
+                  "ShippingPrice"
+                ]
+              ],
+              [
+                13,
+                [
+                  "ProductId"
+                ]
+              ],
+              [
+                14,
+                [
+                  "Country"
+                ]
+              ],
+              [
+                15,
+                [
+                  "Condition"
+                ]
+              ],
+              [
+                16,
+                [
+                  "TotalPrice"
+                ]
+              ],
+              [
+                17,
+                [
+                  "UniquePageviews"
+                ]
+              ],
+              [
+                18,
+                [
+                  "ConversionRate"
+                ]
+              ],
+              [
+                19,
+                [
+                  "UniquePurchases"
+                ]
+              ],
+              [
+                20,
+                [
+                  "ProductRevenue"
+                ]
+              ],
+              [
+                21,
+                [
+                  "Quantity"
+                ]
+              ],
+              [
+                22,
+                [
+                  "AvgPrice"
+                ]
+              ],
+              [
+                23,
+                [
+                  "fields"
+                ]
+              ],
+              [
+                24,
+                [
+                  "fields",
+                  "ProductType.keyword"
+                ]
+              ],
+              [
+                25,
+                [
+                  "fields",
+                  "ProductType.keyword",
+                  -1
+                ]
+              ],
+              [
+                26,
+                [
+                  "TerrainRank"
+                ]
+              ],
+              [
+                27,
+                [
+                  "ProductCat"
+                ]
+              ],
+              [
+                28,
+                [
+                  "ProductOccasion"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "string"
+              ],
+              [
+                2,
+                "string"
+              ],
+              [
+                3,
+                "string"
+              ],
+              [
+                4,
+                "string"
+              ],
+              [
+                5,
+                "string"
+              ],
+              [
+                6,
+                "string"
+              ],
+              [
+                7,
+                "string"
+              ],
+              [
+                8,
+                "string"
+              ],
+              [
+                9,
+                "string"
+              ],
+              [
+                10,
+                "string"
+              ],
+              [
+                11,
+                "number"
+              ],
+              [
+                12,
+                "number"
+              ],
+              [
+                13,
+                "string"
+              ],
+              [
+                14,
+                "string"
+              ],
+              [
+                15,
+                "string"
+              ],
+              [
+                16,
+                "number"
+              ],
+              [
+                17,
+                "number"
+              ],
+              [
+                18,
+                "number"
+              ],
+              [
+                19,
+                "number"
+              ],
+              [
+                20,
+                "number"
+              ],
+              [
+                21,
+                "number"
+              ],
+              [
+                22,
+                "number"
+              ],
+              [
+                23,
+                "object"
+              ],
+              [
+                24,
+                "array"
+              ],
+              [
+                25,
+                "array"
+              ],
+              [
+                26,
+                "number"
+              ],
+              [
+                27,
+                "string"
+              ],
+              [
+                28,
+                "string"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                false
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                false
+              ],
+              [
+                3,
+                false
+              ],
+              [
+                4,
+                true
+              ],
+              [
+                5,
+                false
+              ],
+              [
+                6,
+                true
+              ],
+              [
+                7,
+                false
+              ],
+              [
+                8,
+                false
+              ],
+              [
+                9,
+                false
+              ],
+              [
+                10,
+                false
+              ],
+              [
+                11,
+                true
+              ],
+              [
+                12,
+                false
+              ],
+              [
+                13,
+                true
+              ],
+              [
+                14,
+                false
+              ],
+              [
+                15,
+                false
+              ],
+              [
+                16,
+                false
+              ],
+              [
+                17,
+                false
+              ],
+              [
+                18,
+                false
+              ],
+              [
+                19,
+                false
+              ],
+              [
+                20,
+                false
+              ],
+              [
+                21,
+                false
+              ],
+              [
+                22,
+                false
+              ],
+              [
+                23,
+                false
+              ],
+              [
+                24,
+                false
+              ],
+              [
+                25,
+                false
+              ],
+              [
+                26,
+                true
+              ],
+              [
+                27,
+                false
+              ],
+              [
+                28,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                8,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                9,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                10,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                11,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                12,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                13,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                14,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                15,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                16,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                17,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                18,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                19,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                20,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                21,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                22,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                23,
+                {}
+              ],
+              [
+                24,
+                {
+                  "valueType": "string",
+                  "etlType": "Array"
+                }
+              ],
+              [
+                25,
+                {
+                  "valueType": "string",
+                  "etlType": "String"
+                }
+              ],
+              [
+                26,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                27,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                28,
+                {
+                  "etlType": "String"
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Algorithm",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "algorithmId": 71
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Sftp",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "csv",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": [
+            "Title",
+            "ImageLink",
+            "CanonicalLink",
+            "ProductOccasion",
+            "Price",
+            "ProductId",
+            "TerrainRank"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "filepath": "/home/cli/mxbk_scp/upload/PhotoBooks.csv",
+          "credentialId": -1
+        },
+        "integrationId": 13,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            28,
+            27,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26
+          ]
+        }
+      }
+    }
+  }
+}

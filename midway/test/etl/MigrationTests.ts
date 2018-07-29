@@ -95,6 +95,29 @@ const MCTests = [
   require('./cases/MC_15'),
 ];
 
+const MBTests = [
+  require('./cases/MB_01'),
+  require('./cases/MB_02'),
+  require('./cases/MB_03'),
+  require('./cases/MB_04'),
+  require('./cases/MB_05'),
+];
+
+const FTTests = [
+  require('./cases/FT_01'),
+  require('./cases/FT_02'),
+  require('./cases/FT_03'),
+  require('./cases/FT_04'),
+  require('./cases/FT_07'),
+  require('./cases/FT_08'),
+  require('./cases/FT_09'),
+  require('./cases/FT_10'),
+  require('./cases/FT_11'),
+  require('./cases/FT_12'),
+  require('./cases/FT_13'),
+  require('./cases/FT_14'),
+];
+
 interface RunOptions
 {
   ignoreFields?: string[];
@@ -187,6 +210,20 @@ describe('Run V5 Migration Tests', () =>
 
 describe ('Run V5 Mancrates Tests', () => {
   for (const test of MCTests)
+  {
+    testShortCut(test);
+  }
+});
+
+describe ('Run V5 Mixbook Tests', () => {
+  for (const test of MBTests)
+  {
+    testShortCut(test);
+  }
+});
+
+describe ('Run V5 First Team Tests', () => {
+  for (const test of FTTests)
   {
     testShortCut(test);
   }

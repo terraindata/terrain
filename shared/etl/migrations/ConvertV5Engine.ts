@@ -234,16 +234,18 @@ class EngineConverter
 
   private renameOrganicFields()
   {
-    this.newEngine.getAllFieldIDs().forEach((newId) =>
-    {
-      const rawId = this.oldEngine.fieldNameToIDMap.get(this.newEngine.getFieldPath(newId));
-      const rawField = this.getRawField(rawId);
-
-      if (!rawField.okp.equals(rawField.ikp))
+    this.newEngine.getAllFieldIDs()
+    .sort((a, b) => this.newEngine.getFieldPath(b).size - this.newEngine.getFieldPath(a).size)
+    .forEach((newId) =>
       {
-        this.newEngine.renameField(newId, rawField.okp);
-      }
-    });
+        const rawId = this.oldEngine.fieldNameToIDMap.get(this.newEngine.getFieldPath(newId));
+        const rawField = this.getRawField(rawId);
+
+        if (!rawField.okp.equals(rawField.ikp))
+        {
+          this.newEngine.renameField(newId, rawField.okp);
+        }
+      });
   }
 
   // add transformations from the old engine to the new one

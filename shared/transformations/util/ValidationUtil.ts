@@ -289,7 +289,7 @@ export default abstract class ValidationUtil
       seenIds[fieldId] = true;
       if (seenKps[Utils.path.hash(kp)])
       {
-        throw new Error(`Path ${kp.toArray} is not unique`);
+        throw new Error(`Path ${kp.toArray()} is not unique`);
       }
       seenKps[Utils.path.hash(kp)] = true;
     };

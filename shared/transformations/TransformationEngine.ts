@@ -238,34 +238,6 @@ export class TransformationEngine
     return nodeId;
   }
 
-  public getInitialDocument(doc: object): object
-  {
-    const output = {};
-    const fields = this.dag.sources()
-      .map((id) => this.dag.node(id).fields.get(0).path)
-      .sort((f1, f2) => f1.size - f2.size);
-
-    for (const path of fields)
-    {
-      for (const { location, value } of yadeep.search(doc, path))
-      {
-        if (isPrimitive(value))
-        {
-          yadeep.setIn(output, location, value);
-        }
-        else if (Array.isArray(value))
-        {
-          yadeep.setIn(output, location, []);
-        }
-        else
-        {
-          yadeep.setIn(output, location, {});
-        }
-      }
-    }
-    return output;
-  }
-
   /**
    * Transform a document according to the current engine configuration.
    *
@@ -302,14 +274,7 @@ export class TransformationEngine
       output = document;
     }
 
-    this.fieldEnabled.map((enabled: boolean, fieldID: number) =>
-    {
-      if (!enabled)
-      {
-        yadeep.remove(output, this.getFieldPath(fieldID));
-      }
-    });
-    return output;
+    return this.getCleanedDocument(output);
   }
 
   /**
@@ -651,6 +616,102 @@ export class TransformationEngine
   protected killField(fieldID: number, killedByNode: number): number
   {
     return this.addIdentity(fieldID, killedByNode, IdentityTypes.Removal);
+  }
+
+  /*
+   *  Returns the document that only includes recognized fields
+   */
+  protected getInitialDocument(doc: object): object
+  {
+    const output = {};
+    const fields = this.dag.sources()
+      .map((id) => this.dag.node(id).fields.get(0).path)
+      .sort((f1, f2) => f1.size - f2.size);
+
+    for (const path of fields)
+    {
+      for (const { location, value } of yadeep.search(doc, path))
+      {
+        if (isPrimitive(value))
+        {
+          yadeep.setIn(output, location, value);
+        }
+        else if (Array.isArray(value))
+        {
+          yadeep.setIn(output, location, []);
+        }
+        else
+        {
+          yadeep.setIn(output, location, {});
+        }
+      }
+    }
+    return output;
+  }
+
+  /*
+   *  Returns the document that only has enabled fields
+   */
+  protected getCleanedDocument(doc: object): object
+  {
+    const output = _.cloneDeep(doc);
+
+    const tree = this.createTree();
+    this.getAllFieldIDs().forEach((fieldId) => {
+      if (this.getFieldPath(fieldId).size === 1) // is root
+      {
+        const shouldExplore = (id) => {
+          return this.getFieldEnabled(id);
+        };
+        for (const id of Utils.traversal.preorder(tree, fieldId, shouldExplore))
+        {
+          const path = this.getFieldPath(id);
+          for (const { location, value } of yadeep.search(doc, path))
+          {
+            if (isPrimitive(value))
+            {
+              yadeep.setIn(output, location, value);
+            }
+            else if (Array.isArray(value))
+            {
+              yadeep.setIn(output, location, []);
+            }
+            else
+            {
+              yadeep.setIn(output, location, {});
+            }
+          }
+        }
+      }
+    });
+
+    // const tree = this.createTree();
+    const enabledMap = {};
+    this.getAllFieldIDs().forEach((fieldId) => {
+      if (this.getFieldPath(fieldId).size === 1) // is root
+      {
+        const shouldExplore = (id) => {
+          return this.getFieldEnabled(id);
+        };
+        for (const id of Utils.traversal.preorder(tree, fieldId, shouldExplore))
+        {
+          enabledMap[id] = true;
+        }
+      }
+    });
+
+    this.getAllFieldIDs().forEach((fieldId) => {
+      if (!enabledMap[fieldId])
+      {
+        const path = this.getFieldPath(fieldId);
+        for (const { location, value } of yadeep.search(output, path))
+        {
+          yadeep.deleteIn(output, location);
+        }
+      }
+    });
+
+    return output;
   }
 
   /*
