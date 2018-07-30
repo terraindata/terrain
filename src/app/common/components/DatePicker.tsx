@@ -308,12 +308,12 @@ export class DatePickerUncontained extends TerrainComponent<Props>
       this.props.colorsActions({
         actionType: 'setStyle',
         selector: '.prev-month-button',
-        style: { 'fill': Colors().active },
+        style: { 'fill': Colors().active, 'background-color': Colors().bg },
       });
       this.props.colorsActions({
         actionType: 'setStyle',
         selector: '.next-month-button',
-        style: { 'fill': Colors().active },
+        style: { 'fill': Colors().active, 'background-color': Colors().bg },
       });
     }
   }
@@ -546,7 +546,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     onPreviousClick,
     onNextClick,
     className,
-    localeUtils
+    localeUtils,
   })
   {
     const months = localeUtils.getMonths();

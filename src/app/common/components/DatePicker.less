@@ -235,29 +235,14 @@
     .transition;
   }
 
-    // .DayPicker-NavButton--prev {
-    //   left: 0.5rem;
-    //   top: 2px;
-    //   height: 1em;
-    //   background-image: url("./../../../images/arrow-circle-left.svg");
-    //   &:hover {
-    //     left: (0.5rem * 0.8);
-    //   }
-    // }
-
-    // .DayPicker-NavButton--next {
-    //   right: 0.5rem;
-    //   top: 2px;
-    //   height: 1em;
-    //   &:hover {
-    //     right: (0.5rem * 0.8);
-    //   }
-    // }
-
   .prev-month-button {
     left: 0.7rem;
-    width: 1.5em;
+    top: 0.6em;
+    width: 1.3em;
     position: absolute;
+    transition: all 0.2s ease 0s;
+    cursor: pointer;
+    z-index: 2;
     &:hover {
       opacity: 0.5;
     }
@@ -265,8 +250,12 @@
 
   .next-month-button {
     right: 0.7rem;
-    width: 1.5em;
+    top: 0.6em;
+    width: 1.3em;
     position: absolute;
+    transition: all 0.2s ease 0s;
+    cursor: pointer;
+    z-index: 2;
     &:hover {
       opacity: 0.5;
     }
@@ -276,9 +265,8 @@
     display: table-caption;
     height: 2.6rem;
     text-align: center;
-    font-size: 15px;
+    font-size: 14px;
     letter-spacing: 0.8px;
-    padding-top: 4px;
     margin-bottom: 10px;
     text-transform: uppercase;
     border-bottom: 1px solid;
@@ -286,7 +274,7 @@
     position: relative;
     left: -5px;
     padding-left: 5px;
-    padding-top: 6px;
+    padding-top: 8px;
     pointer-events: none;
   }
 
