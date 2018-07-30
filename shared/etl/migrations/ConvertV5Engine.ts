@@ -103,6 +103,8 @@ class EngineConverter
   private newEngine: TransformationEngine;
 
   private reverseMaps: { output: Map<KeyPath, number>, input: Map<number, KeyPath> };
+  private idsNewToOld: { [id: number]: number } = {};
+  private idsOldToNew: { [id: number]: number } = {};
 
   constructor(oldEngine: V5Engine)
   {
@@ -117,15 +119,25 @@ class EngineConverter
 
     this.initializeBuildProcess();
     this.addOrganicFields();
+    this.buildCrossFieldMap();
     this.renameOrganicFields();
     this.addTransformations();
 
     this.transferProperties();
     // make sure fields are the right type
     // check for errors!
+
+    const errors = Utils.validation.verifyEngine(this.newEngine);
+    if (errors.length > 0)
+    {
+      throw new Error(`Resulting Engine is Malformed: ${errors}`);
+    }
     return this.newEngine;
   }
 
+  /*
+   *  Create cache maps for old engine
+   */
   private generateRawReverseMaps()
   {
     const reverseOutputMap: Map<KeyPath, number> = this.oldEngine.IDToFieldNameMap
@@ -232,16 +244,30 @@ class EngineConverter
     }
   }
 
+  /*
+   *  Generate a map that maps new ids to old ids and vice versa
+   */
+  private buildCrossFieldMap()
+  {
+    this.newEngine.getAllFieldIDs().forEach((newId) =>
+    {
+      const path = this.newEngine.getFieldPath(newId);
+      const oldId = this.oldEngine.fieldNameToIDMap.get(path);
+      this.idsOldToNew[oldId] = newId;
+      this.idsNewToOld[newId] = oldId;
+    });
+  }
+
   private renameOrganicFields()
   {
     this.newEngine.getAllFieldIDs()
-    .sort((a, b) => this.newEngine.getFieldPath(b).size - this.newEngine.getFieldPath(a).size)
-    .forEach((newId) =>
+      .sort((a, b) => this.newEngine.getFieldPath(a).size - this.newEngine.getFieldPath(b).size)
+      .forEach((newId) =>
       {
-        const rawId = this.oldEngine.fieldNameToIDMap.get(this.newEngine.getFieldPath(newId));
+        const rawId = this.idsNewToOld[newId];
         const rawField = this.getRawField(rawId);
-
-        if (!rawField.okp.equals(rawField.ikp))
+        const currentPath = this.newEngine.getFieldPath(newId);
+        if (!currentPath.equals(rawField.okp))
         {
           this.newEngine.renameField(newId, rawField.okp);
         }

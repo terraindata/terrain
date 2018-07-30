@@ -577,6 +577,19 @@ export class TransformationEngine
 
   protected setFieldPath(fieldID: number, path: KeyPath)
   {
+    const existingId = this.getFieldID(path);
+    if (existingId !== undefined && !this.isDead(path) && fieldID !== existingId)
+    {
+      const existingPath = this.getFieldPath(fieldID);
+      if (existingPath === undefined)
+      {
+        throw new Error(`Cannot set new field to ${path}. This field already exists`);
+      }
+      else
+      {
+        throw new Error(`Cannot change field ${existingPath} to ${path}. This field already exists`);
+      }
+    }
     this.IDToPathMap = this.IDToPathMap.set(fieldID, path);
   }
 
@@ -674,10 +687,12 @@ export class TransformationEngine
     }
 
     const enabledMap = {};
-    this.getAllFieldIDs().forEach((fieldId) => {
+    this.getAllFieldIDs().forEach((fieldId) =>
+    {
       if (this.getFieldPath(fieldId).size === 1) // is root
       {
-        const shouldExplore = (id) => {
+        const shouldExplore = (id) =>
+        {
           return this.getFieldEnabled(id);
         };
         for (const id of Utils.traversal.preorder(tree, fieldId, shouldExplore))
@@ -687,7 +702,8 @@ export class TransformationEngine
       }
     });
 
-    this.getAllFieldIDs().forEach((fieldId) => {
+    this.getAllFieldIDs().forEach((fieldId) =>
+    {
       if (!enabledMap[fieldId])
       {
         const path = this.getFieldPath(fieldId);

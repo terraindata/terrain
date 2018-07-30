@@ -205,24 +205,27 @@ describe('Run V5 Migration Tests', () =>
   testShortCut(V5TestDeleteFields1);
   testShortCut(V5TestDisableFields);
   testShortCut(V5TrickyNumberCasts);
-  testShortCut(V5TestMergeEngine, { ignoreFields: ['geoField']});
+  testShortCut(V5TestMergeEngine, { ignoreFields: ['geoField'] });
 });
 
-describe ('Run V5 Mancrates Tests', () => {
+describe('Run V5 Mancrates Tests', () =>
+{
   for (const test of MCTests)
   {
     testShortCut(test);
   }
 });
 
-describe ('Run V5 Mixbook Tests', () => {
+describe('Run V5 Mixbook Tests', () =>
+{
   for (const test of MBTests)
   {
     testShortCut(test);
   }
 });
 
-describe ('Run V5 First Team Tests', () => {
+describe('Run V5 First Team Tests', () =>
+{
   for (const test of FTTests)
   {
     testShortCut(test);
