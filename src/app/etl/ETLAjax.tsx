@@ -350,7 +350,6 @@ class ETLAjax
         downloadName,
         mimeType,
         onProgress,
-        connection: 'Keep-Alive',
       };
 
       const templateToRun = JSON.stringify(templateForBackend(template));
@@ -522,7 +521,6 @@ class ETLAjax
     }
 
     xhr.open('post', '/midway/v1/' + route);
-    xhr.setRequestHeader('Connection', 'Keep-Alive');
     xhr.send(formData);
   }
 }
@@ -533,7 +531,6 @@ interface ReqConfig
   downloadName?: string;
   mimeType?: string;
   onProgress?: (progress: string) => void;
-  connection?: string;
 }
 
 export interface ExecuteConfig

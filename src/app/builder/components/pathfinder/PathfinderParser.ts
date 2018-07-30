@@ -691,10 +691,10 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
       query = {
         range: {
           [line.field]:
-          {
-            gt: value,
-            boost,
-          },
+            {
+              gt: value,
+              boost,
+            },
         },
       };
       break;
@@ -703,10 +703,10 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
       query = {
         range: {
           [line.field]:
-          {
-            gte: value,
-            boost,
-          },
+            {
+              gte: value,
+              boost,
+            },
         },
       };
       break;
@@ -714,10 +714,10 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
       query = {
         range: {
           [line.field]:
-          {
-            lt: value,
-            boost,
-          },
+            {
+              lt: value,
+              boost,
+            },
         },
       };
       break;
@@ -726,10 +726,10 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
       query = {
         range: {
           [line.field]:
-          {
-            lte: value,
-            boost,
-          },
+            {
+              lte: value,
+              boost,
+            },
         },
       };
       break;
@@ -737,10 +737,10 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
       query = {
         range: {
           [line.field]:
-          {
-            gte: value,
-            boost,
-          },
+            {
+              gte: value,
+              boost,
+            },
         },
       };
       break;
@@ -748,10 +748,10 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
       query = {
         range: {
           [line.field]:
-          {
-            lte: value,
-            boost,
-          },
+            {
+              lte: value,
+              boost,
+            },
         },
       };
       break;
