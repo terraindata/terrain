@@ -167,6 +167,8 @@ const DateSpecificityMap = {
 };
 const DateSpecificityMapImmu = Immutable.Map(DateSpecificityMap);
 
+const weekdaysShort: string[] = ['S', 'M', 'T', 'W', 'T', 'F', 'S'] as string[];
+
 export interface Props
 {
   date: string;
@@ -528,6 +530,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
           modifiers={modifiersArg}
           onDayClick={this.handleDayClick}
           initialMonth={dateArg.toDate()}
+          weekdaysShort={weekdaysShort}
         />
         {this.renderTimePicker(dateArg)}
       </div>
