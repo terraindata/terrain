@@ -64,6 +64,9 @@ import { Colors, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import FadeInOut from '../../common/components/FadeInOut';
 
+const PrevMonthIcon = require('../../../images/arrow-circle-left.svg?name=PrevMonthIcon');
+const NextMonthIcon = require('../../../images/arrow-circle-right.svg?name=NextMonthIcon');
+
 const MINUTE_INTERVAL = 30;
 const MINUTE_RATIO = (60 / MINUTE_INTERVAL);
 
@@ -167,7 +170,7 @@ const DateSpecificityMap = {
 };
 const DateSpecificityMapImmu = Immutable.Map(DateSpecificityMap);
 
-const weekdaysShort: string[] = ['S', 'M', 'T', 'W', 'T', 'F', 'S'] as string[];
+const weekdaysShort = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
 export interface Props
 {
@@ -301,6 +304,16 @@ export class DatePickerUncontained extends TerrainComponent<Props>
         actionType: 'setStyle',
         selector: '.unselected-date-type',
         style: { 'color': Colors().text3, 'background-color': Colors().bg },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.prev-month-button',
+        style: { 'fill': Colors().active },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.next-month-button',
+        style: { 'fill': Colors().active },
       });
     }
   }
@@ -527,6 +540,30 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     );
   }
 
+  public Navbar({
+    nextMonth,
+    previousMonth,
+    onPreviousClick,
+    onNextClick,
+    className,
+    localeUtils
+  })
+  {
+    const months = localeUtils.getMonths();
+    const prev = months[previousMonth.getMonth()];
+    const next = months[nextMonth.getMonth()];
+    return (
+      <div className='calendar-nav-bar'>
+        <div className='prev-month-button' onClick={() => onPreviousClick()}>
+          <PrevMonthIcon />
+        </div>
+        <div className='next-month-button' onClick={() => onNextClick()}>
+          <NextMonthIcon />
+        </div>
+      </div>
+    );
+  }
+
   public renderCalendar(dateArg, modifiersArg)
   {
     return (
@@ -535,7 +572,8 @@ export class DatePickerUncontained extends TerrainComponent<Props>
           modifiers={modifiersArg}
           onDayClick={this.handleDayClick}
           initialMonth={dateArg.toDate()}
-          weekdaysShort={weekdaysShort}
+          weekdaysShort={weekdaysShort as any}
+          navbarElement={<this.Navbar />}
         />
         {this.renderTimePicker(dateArg)}
       </div>
