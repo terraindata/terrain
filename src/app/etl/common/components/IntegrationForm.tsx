@@ -72,6 +72,7 @@ export interface Props
   onSubmit?: () => void;
   hideType?: boolean;
   hideName?: boolean;
+  style?: any;
 }
 
 export default class IntegrationForm extends TerrainComponent<Props>
@@ -102,14 +103,17 @@ export default class IntegrationForm extends TerrainComponent<Props>
     if (!integration)
     {
       return (
-        <div>
+        <div style={this.props.style}>
           No Integration Selected
         </div>
       );
     }
     const FormClass = IntegrationFormMap[integration.type];
     return (
-      <div className='integration-form-block'>
+      <div
+        style={this.props.style}
+        className='integration-form-block'
+      >
         {
           !hideName &&
           <DynamicForm
