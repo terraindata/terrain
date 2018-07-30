@@ -64,8 +64,8 @@ import { Colors, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import FadeInOut from '../../common/components/FadeInOut';
 
-const PrevMonthIcon = require('../../../images/arrow-circle-left.svg?name=PrevMonthIcon');
-const NextMonthIcon = require('../../../images/arrow-circle-right.svg?name=NextMonthIcon');
+const PrevMonthIcon = require('../../../images/icon_arrowCircleLeft.svg?name=PrevMonthIcon');
+const NextMonthIcon = require('../../../images/icon_arrowCircleRight.svg?name=NextMonthIcon');
 
 const MINUTE_INTERVAL = 30;
 const MINUTE_RATIO = (60 / MINUTE_INTERVAL);
