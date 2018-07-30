@@ -50,12 +50,24 @@ import * as winston from 'winston';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import { users } from '../users/UserRouter';
+import { versions } from '../versions/VersionRouter';
 
 import { CURRENT_VERSION, FIRST_VERSION, Migrator, Version } from '../AppVersion';
 import { MigrationRecordConfig as MigrationRecord } from '../migrations/MigrationRecordConfig';
+import { TemplateConfig } from './TemplateConfig';
 import { templates as templatesDb } from './TemplateRouter';
 
 import { TemplateVersion, updateTemplateIfNeeded } from 'shared/etl/migrations/TemplateVersions';
+
+function addArchivedVersion(template: TemplateConfig)
+{
+  return new Promise<number>(async (resolve, reject) => {
+    const adminUser = await users.get()[0];
+    const versionConfig = await versions.create(adminUser, 'templates', template.id, template);
+    resolve(versionConfig.id);
+  });
+}
 
 function genericMigrate(from: Version, to: Version)
 {
@@ -66,14 +78,15 @@ function genericMigrate(from: Version, to: Version)
     for (const t of templates)
     {
       try {
-        const oldTemplateStr = JSON.stringify(t);
+        const oldTemplate = _.cloneDeep(t);
         const { template, updated, message } = updateTemplateIfNeeded(t);
         if (updated)
         {
           await templatesDb.update(template);
           anyUpdated = true;
-          winston.debug(`Updated Template ${template.id}: ${message}.`);
-          winston.info(`Updated template from: `)
+          winston.info(`Updated Template ${template.id}: ${message}.`);
+          const versionId = await addArchivedVersion(oldTemplate);
+          winston.info(`Previous Template Version archived with id ${versionId}`);
         }
       }
       catch (e)
