@@ -170,7 +170,7 @@ export default class MagentoEndpoint extends AEndpointStream
               track_scores: true,
               _source: true,
               script_fields: {},
-              size: 9999,
+              size: sourceConfig.options['size'] !== undefined ? sourceConfig.options['size'] : 1000,
             }),
         };
         const readStream: Readable = await qh.handleQuery(payload) as Readable;
@@ -476,7 +476,15 @@ export default class MagentoEndpoint extends AEndpointStream
               }
               else
               {
-                rawJSON = [rawJSON['item']['$value']];
+                if (rawJSON['item']['$value'] === undefined)
+                {
+                  rawJSON = [this._parseJSONWithWSDL(rawJSON['item'],
+                    innerType['complexContent']['restriction']['attribute']['wsdl:arrayType'])];
+                }
+                else
+                {
+                  rawJSON = [rawJSON['item']['$value']];
+                }
               }
             }
             else if (rawJSON['item'] === undefined)
