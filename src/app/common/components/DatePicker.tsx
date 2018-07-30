@@ -496,8 +496,8 @@ export class DatePickerUncontained extends TerrainComponent<Props>
           options={HOUR_OPTIONS}
           selectedIndex={this.dateToHourIndex(this.getDate())}
           onChange={this.handleHourChange}
-          iconLabel={<TimeIcon />}
-          labelClass='time-dropdown-icon'
+          iconLabel={<TimeIcon className='time-icon'/>}
+          labelClass='time-icon-wrapper'
         />
       </div>
     );
