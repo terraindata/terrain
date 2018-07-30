@@ -247,7 +247,7 @@ class App extends TerrainComponent<Props>
   public state = {
     selectedPage: 3,
     loggedIn: false,
-    sidebarExpanded: true,
+    sidebarExpanded: localStorage['sidebarExpanded'] === 'closed' ? false : true,
     loggedInAndLoaded: false,
 
     schemaLoaded: false,
@@ -464,6 +464,7 @@ class App extends TerrainComponent<Props>
 
   public toggleSidebar()
   {
+    localStorage['sidebarExpanded'] = this.state.sidebarExpanded ? 'closed' : 'open';
     this.setState({
       sidebarExpanded: !this.state.sidebarExpanded,
     });
