@@ -57,26 +57,44 @@ import { templates as templatesDb } from './TemplateRouter';
 
 import { TemplateVersion, updateTemplateIfNeeded } from 'shared/etl/migrations/TemplateVersions';
 
-export const templateMigration: Migrator = {
-  fromVersion: 'v4',
-  toVersion: 'v5',
-  migrate: (from, to) =>
+function genericMigrate(from: Version, to: Version)
+{
+  return new Promise<boolean>(async (resolve, reject) =>
   {
-    return new Promise<boolean>(async (resolve, reject) =>
+    let anyUpdated = false;
+    const templates = await templatesDb.get();
+    for (const t of templates)
     {
-      let anyUpdated = false;
-      const templates = await templatesDb.get();
-      for (const t of templates)
-      {
+      try {
+        const oldTemplateStr = JSON.stringify(t);
         const { template, updated, message } = updateTemplateIfNeeded(t);
-        await templatesDb.update(template);
         if (updated)
         {
+          await templatesDb.update(template);
           anyUpdated = true;
-          winston.debug(`Updated Template ${template.id}: ${message}`);
+          winston.debug(`Updated Template ${template.id}: ${message}.`);
+          winston.info(`Updated template from: `)
         }
       }
-      resolve(anyUpdated);
-    });
-  },
+      catch (e)
+      {
+        winston.error(`Error while Migrating Template ${t.id}: ${e}`);
+      }
+    }
+    resolve(anyUpdated);
+  });
+}
+
+const migrate4To5: Migrator = {
+  fromVersion: 'v4',
+  toVersion: 'v5',
+  migrate: genericMigrate,
 };
+
+const migrate5To5: Migrator = {
+  fromVersion: 'v5',
+  toVersion: 'v5',
+  migrate: genericMigrate,
+};
+
+export const templateMigrations = [ migrate4To5, migrate5To5 ];

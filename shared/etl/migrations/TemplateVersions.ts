@@ -70,14 +70,6 @@ export const FIRST_TEMPLATE_VERSION: TemplateVersion = 'tv4';
 export type TemplateVersion = 'tv4' | 'tv5' | 'tv5.1';
 export const TemplateVersions = ['tv4', 'tv5', 'tv5.1'];
 
-// function isBefore(v1, v2)
-// {
-//   if (TemplateVersions.indexOf(v1) < TemplateVersions.indexOf(v2))
-//   {
-//     return true;
-//   }
-// }
-
 export function getTemplateVersion(templateObj: object): TemplateVersion
 {
   const version = _.get(templateObj, ['meta', 'version']);

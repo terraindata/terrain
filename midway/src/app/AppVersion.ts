@@ -51,7 +51,6 @@ export const FIRST_VERSION: Version = 'v4'; // default version if it doesn't exi
 
 export interface Migrator
 {
-  fromPattern?: string; // not yet supported
   fromVersion?: Version;
   toVersion: Version;
   migrate: (from: Version, to: Version) => Promise<boolean>;
