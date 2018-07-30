@@ -423,7 +423,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     const option = this.state.fieldOptions && this.state.fieldOptions.filter((opt) =>
       opt.value === value,
     ).toList().get(0);
-    if (option && option.meta && option.meta.fieldType === FieldType.Text)
+    if (option && option.meta && option.meta.get('fieldType') === FieldType.Text)
     {
       value += '.keyword';
     }
