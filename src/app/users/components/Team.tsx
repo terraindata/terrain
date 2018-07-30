@@ -300,7 +300,7 @@ class Team extends TerrainComponent<Props>
   public getMenuOptions(user: User)
   {
     let menuOptions: List<MenuOption> = List();
-    if (!TerrainTools.isAdmin())
+    if (TerrainTools.isAdmin())
     {
       menuOptions = List([
         {
