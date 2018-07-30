@@ -172,6 +172,27 @@ const DateSpecificityMapImmu = Immutable.Map(DateSpecificityMap);
 
 const weekdaysShort = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
+function Navbar({
+  nextMonth,
+  previousMonth,
+  onPreviousClick,
+  onNextClick,
+  className,
+  localeUtils,
+}: any)
+{
+  return (
+    <div className='calendar-nav-bar'>
+      <div className='prev-month-button' onClick={() => onPreviousClick()}>
+        <PrevMonthIcon />
+      </div>
+      <div className='next-month-button' onClick={() => onNextClick()}>
+        <NextMonthIcon />
+      </div>
+    </div>
+  );
+}
+
 export interface Props
 {
   date: string;
@@ -540,30 +561,6 @@ export class DatePickerUncontained extends TerrainComponent<Props>
     );
   }
 
-  public Navbar({
-    nextMonth,
-    previousMonth,
-    onPreviousClick,
-    onNextClick,
-    className,
-    localeUtils,
-  })
-  {
-    const months = localeUtils.getMonths();
-    const prev = months[previousMonth.getMonth()];
-    const next = months[nextMonth.getMonth()];
-    return (
-      <div className='calendar-nav-bar'>
-        <div className='prev-month-button' onClick={() => onPreviousClick()}>
-          <PrevMonthIcon />
-        </div>
-        <div className='next-month-button' onClick={() => onNextClick()}>
-          <NextMonthIcon />
-        </div>
-      </div>
-    );
-  }
-
   public renderCalendar(dateArg, modifiersArg)
   {
     return (
@@ -573,7 +570,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
           onDayClick={this.handleDayClick}
           initialMonth={dateArg.toDate()}
           weekdaysShort={weekdaysShort as any}
-          navbarElement={<this.Navbar />}
+          navbarElement={<Navbar />}
         />
         {this.renderTimePicker(dateArg)}
       </div>
