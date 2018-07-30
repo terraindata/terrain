@@ -64,6 +64,8 @@ import { Colors, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import FadeInOut from '../../common/components/FadeInOut';
 
+const TimeIcon = require('../../../images/icon_clock.svg?name=TimeIcon');
+
 const MINUTE_INTERVAL = 30;
 const MINUTE_RATIO = (60 / MINUTE_INTERVAL);
 
@@ -494,8 +496,8 @@ export class DatePickerUncontained extends TerrainComponent<Props>
           options={HOUR_OPTIONS}
           selectedIndex={this.dateToHourIndex(this.getDate())}
           onChange={this.handleHourChange}
-          textLabel='Time'
-          labelClass='date-view-label'
+          iconLabel={<TimeIcon />}
+          labelClass='time-dropdown-icon'
         />
       </div>
     );
