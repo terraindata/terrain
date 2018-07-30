@@ -43,65 +43,55 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires no-empty-interface max-classes-per-file
+// tslint:disable:max-classes-per-file
 
-import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { TransformationForm } from './TransformationFormBase';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import { List } from 'immutable';
 
-interface SimpleOptions
-{
-  outputName: string;
-}
+import TransformationNode from 'shared/transformations/TransformationNode';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import { KeyPath } from 'shared/util/KeyPath';
+import * as yadeep from 'shared/util/yadeep';
 
-function SimpleStatFactory<T extends TransformationNodeType>(type: T, startingName: string)
+import AggregateTransformationType from 'shared/transformations/types/AggregateTransformationType';
+
+const TYPECODE = TransformationNodeType.ArrayMaxNode;
+
+export class ArrayMaxTransformationNode extends AggregateTransformationType
 {
-  return class StatForm extends TransformationForm<SimpleOptions, T>
+  public readonly typeCode = TYPECODE;
+
+  public aggregator(vals: any[]): any
   {
-    protected readonly inputMap: InputDeclarationMap<SimpleOptions> = {
-      outputName: {
-        type: DisplayType.TextBox,
-        displayName: 'Output Field Name',
-      },
-    };
-    protected readonly initialState = {
-      outputName: startingName,
-    };
-    protected readonly type = type;
-
-    protected computeArgs()
-    {
-      const { engine, fieldId } = this.props;
-      const { outputName } = this.state;
-
-      const currentKeyPath = engine.getOutputKeyPath(fieldId);
-      const newFieldKeyPaths = List([
-        currentKeyPath.set(currentKeyPath.size - 1, outputName),
-      ]);
-
-      const inputFields = List([engine.getInputKeyPath(fieldId)]);
-
-      return {
-        options: {
-          newFieldKeyPaths,
-        },
-        fields: inputFields,
-      };
-    }
-
-    protected overrideTransformationConfig()
-    {
-      return {
-        type: ETLFieldTypes.Number,
-      };
-    }
-  };
+    return Math.max(...vals);
+  }
 }
 
-export const ArraySumTFF = SimpleStatFactory(TransformationNodeType.ArraySumNode, 'Sum of Array');
-export const ArrayMinTFF = SimpleStatFactory(TransformationNodeType.ArrayMinNode, 'Min of Array');
-export const ArrayMaxTFF = SimpleStatFactory(TransformationNodeType.ArrayMaxNode, 'Max of Array');
-export const ArrayCountTFF = SimpleStatFactory(TransformationNodeType.ArrayCountNode, 'Count of Array');
+class ArrayMaxTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Array Max';
+  public description = 'Maximum of the entries of an array';
+  public nodeClass = ArrayMaxTransformationNode;
+
+  public editable = false;
+  public creatable = true;
+  public newFieldType = 'number';
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return (
+      EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+      EngineUtil.getValueType(fieldId, engine) === 'number' &&
+      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+    );
+  }
+}
+
+export const ArrayMaxTransformationInfo = new ArrayMaxTransformationInfoC();
