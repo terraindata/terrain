@@ -460,7 +460,6 @@ class ETLAjax
       xhr.responseType = 'blob';
     }
 
-    xhr.timeout = 3600000;
     xhr.onerror = (err: any) =>
     {
       const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
