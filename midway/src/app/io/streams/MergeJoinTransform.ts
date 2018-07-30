@@ -137,7 +137,12 @@ export default class MergeJoinTransform extends Readable
     this.mergeJoinName = innerQueries[0];
     // set up the left source
     const leftQuery = this.setSortClause(query, this.leftJoinKey);
+
+    // the left join key could be a string, in which case it is either of type keyword and we can sort
+    // on it directly, or it has a nested subfield of type keyword. in the latter case, the actual field
+    // in the document does not have a ".keyword" suffix and hence we strip out the suffix.
     this.leftJoinKey = this.leftJoinKey.replace('.keyword', '');
+
     this.leftSource = new ElasticReader(client, leftQuery, true);
     this.leftSource.on('data', (buffer) =>
     {
@@ -152,7 +157,12 @@ export default class MergeJoinTransform extends Readable
       mergeJoinQuery[this.mergeJoinName]['size'] = 2147483647;
     }
     const rightQuery = this.setSortClause(mergeJoinQuery[this.mergeJoinName], this.rightJoinKey);
+
+    // the right join key could be a string, in which case it is either of type keyword and we can sort
+    // on it directly, or it has a nested subfield of type keyword. in the latter case, the actual field
+    // in the document does not have a ".keyword" suffix and hence we strip out the suffix.
     this.rightJoinKey = this.rightJoinKey.replace('.keyword', '');
+
     this.rightSource = new ElasticReader(client, rightQuery, true);
     this.rightSource.on('data', (buffer) =>
     {
