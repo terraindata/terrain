@@ -229,6 +229,11 @@ export class DatePickerUncontained extends TerrainComponent<Props>
       });
       this.props.colorsActions({
         actionType: 'setStyle',
+        selector: '.DayPicker-Caption',
+        style: { 'border-color': Colors().sectionEditButton },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
         selector: '.DayPicker',
         style: { 'border-color': Colors().sectionEditButton },
       });
