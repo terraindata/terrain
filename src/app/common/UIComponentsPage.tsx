@@ -48,14 +48,30 @@ THE SOFTWARE.
 
 // A page to show all of the different UI elements and their states
 
+import * as Immutable from 'immutable';
 import { noop } from 'lodash';
 import * as React from 'react';
+import { Colors, getStyle } from '../colors/Colors';
+import { ColorsActions } from '../colors/data/ColorsRedux';
 import TerrainComponent from './../common/components/TerrainComponent';
 import './UIComponentsPageStyle.less';
 
 import Button from './components/Button';
 import CRONEditor from './components/CRONEditor';
+import Dropdown from './components/Dropdown';
 import Foldout from './components/Foldout';
+
+const TrashIcon = require('../../images/icon_trash.svg?name=TrashIcon');
+
+const dropdownOptions = Immutable.List([
+  'Apples',
+  'Oranges',
+  'Peaches',
+  'Grapes',
+  'Strawberries',
+  'Blueberries',
+  'Pears',
+]);
 
 export interface Props
 {
@@ -66,7 +82,23 @@ class UIComponentsPage extends TerrainComponent<Props>
 {
   public state = {
     cron: '* * * * *',
+    itemA: 'Apples',
+    itemB: 'Apples',
   };
+
+  public handleItemAChange(index)
+  {
+    this.setState({
+      itemA: dropdownOptions.get(index),
+    });
+  }
+
+  public handleItemBChange(index)
+  {
+    this.setState({
+      itemB: dropdownOptions.get(index),
+    });
+  }
 
   public render()
   {
@@ -145,7 +177,25 @@ class UIComponentsPage extends TerrainComponent<Props>
           iconComesAfter={true}
         />
         {space}
-
+        <Dropdown
+          options={dropdownOptions}
+          selectedIndex={dropdownOptions.indexOf(this.state.itemA)}
+          onChange={this.handleItemAChange}
+          canEdit={true}
+          iconLabel={<TrashIcon className='icon' style={{ fill: Colors().mainSectionTitle }} />}
+          iconTooltip='Trash'
+          labelClass='icon-label-class'
+        />
+        {space}
+        <Dropdown
+          options={dropdownOptions}
+          selectedIndex={dropdownOptions.indexOf(this.state.itemB)}
+          onChange={this.handleItemBChange}
+          canEdit={true}
+          textLabel='Trash'
+          labelClass='icon-label-class'
+        />
+        {space}
         <CRONEditor
           cron={this.state.cron}
           onChange={this._setStateWrapper('cron')}
