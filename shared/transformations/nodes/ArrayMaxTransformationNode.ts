@@ -43,76 +43,55 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 
-import EQLConfig from '../EQLConfig';
-import ESClauseSettings from '../ESClauseSettings';
-import ESClauseType from '../ESClauseType';
-import ESInterpreter from '../ESInterpreter';
-import ESJSONType from '../ESJSONType';
-import ESPropertyInfo from '../ESPropertyInfo';
-import ESValueInfo from '../ESValueInfo';
-import ESClause from './ESClause';
+import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-/**
- * A clause that corresponds to an object of uniform type values.
- */
-export default class ESMapClause extends ESClause
+import { List } from 'immutable';
+
+import TransformationNode from 'shared/transformations/TransformationNode';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import TransformationVisitError from 'shared/transformations/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import { KeyPath } from 'shared/util/KeyPath';
+import * as yadeep from 'shared/util/yadeep';
+
+import AggregateTransformationType from 'shared/transformations/types/AggregateTransformationType';
+
+const TYPECODE = TransformationNodeType.ArrayMaxNode;
+
+export class ArrayMaxTransformationNode extends AggregateTransformationType
 {
-  public static CheckSingleField(inter: ESInterpreter, valueInfo: ESValueInfo, expected: ESJSONType): boolean
+  public readonly typeCode = TYPECODE;
+
+  public aggregator(vals: any[]): any
   {
-    if (expected !== ESJSONType.object)
-    {
-      return true;
-    }
-    if (valueInfo.childrenSize() !== 1)
-    {
-      inter.accumulateError(valueInfo,
-        valueInfo.clause.name + ' should have one field, but found ' + String(valueInfo.childrenSize()));
-      return false;
-    }
-    return true;
-  }
-
-  public nameType: string;
-  public valueType: string;
-
-  public constructor(type: string, nameType: string, valueType: string, settings?: ESClauseSettings)
-  {
-    super(type, ESClauseType.ESMapClause, settings);
-    this.nameType = nameType;
-    this.valueType = valueType;
-  }
-
-  public init(config: EQLConfig): void
-  {
-    config.declareType(this.nameType);
-    config.declareType(this.valueType);
-  }
-
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    this.typeCheck(interpreter, valueInfo, ESJSONType.object);
-
-    // mark properties
-    const nameClause: ESClause = interpreter.config.getClause(this.nameType);
-    const valueClause: ESClause = interpreter.config.getClause(this.valueType);
-
-    let nrField = 0;
-
-    valueInfo.forEachProperty((viTuple: ESPropertyInfo): void =>
-    {
-      viTuple.propertyName.clause = nameClause;
-      if (viTuple.propertyValue !== null)
-      {
-        viTuple.propertyValue.clause = valueClause;
-      }
-      // multifield checking
-      nrField += 1;
-      if (this.multifield === false && nrField > 1)
-      {
-        interpreter.accumulateError(viTuple.propertyName,
-          'The ' + this.name + ' does not support multiple fields.');
-      }
-    });
+    return Math.max(...vals);
   }
 }
+
+class ArrayMaxTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Array Max';
+  public description = 'Maximum of the entries of an array';
+  public nodeClass = ArrayMaxTransformationNode;
+
+  public editable = false;
+  public creatable = true;
+  public newFieldType = 'number';
+
+  public isAvailable(engine: TransformationEngine, fieldId: number)
+  {
+    return (
+      EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+      EngineUtil.getValueType(fieldId, engine) === 'number' &&
+      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+    );
+  }
+}
+
+export const ArrayMaxTransformationInfo = new ArrayMaxTransformationInfoC();

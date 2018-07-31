@@ -899,17 +899,11 @@ export function getResultValue(hit: Hit, field: string, config: ResultsConfig, i
   {
     const pieces = field.split('.');
     value = Util.asJS(hit.fields.get(pieces[0]));
-    for (let i = 1; i < pieces.length; i++)
+    if (!Map.isMap(value))
     {
-      if (value != null)
-      {
-        value = value[pieces[i]];
-      }
-      else
-      {
-        return null;
-      }
+      value = Immutable.fromJS(value);
     }
+    value = value.getIn(pieces.slice(1));
   }
   return ResultFormatValue(field, value, config, isTitle, expanded, fieldTypes, overrideFormat, locations, color, bgUrlOnly);
 }

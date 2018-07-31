@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands max-line-length
 
+import { ESCodeToPathfinder } from 'builder/components/pathfinder/CodeToPath';
 import { parsePath } from 'builder/components/pathfinder/PathfinderParser';
 import { browserHistory } from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
@@ -128,38 +129,15 @@ export default class TerrainTests
     browserHistory.push(`/builder/?o=${algorithmId}`);
   }
 
-  public static testCardParser(
-    testString: string,
-    expectedValue: any,
-    expectedErrors: ESParserError[] = [])
+  public static QueryToPathFinder(queryConfig)
   {
-    const ret = { passed: true, message: 'The test is passed' };
-    const emptyCards = Immutable.List([]);
-    const interpreter: ESInterpreter = new ESInterpreter(testString);
-    const parser: ESJSONParser = interpreter.parser as ESJSONParser;
-    const rootValueInfo = parser.getValueInfo();
-    const rootCards = ElasticValueInfoToCards(rootValueInfo, Immutable.List([]), _Query());
-    // parse the card
-    const rootCard = rootCards.get(0);
-    if (rootCard['type'] !== 'eqlbody')
+    const query: Query = _Query(queryConfig);
+    const path = ESCodeToPathfinder(query.tql, query.inputs, { mergeRefQuery: true, refQuery: query.path });
+    if (path)
     {
-      ret.passed = false;
-      ret.message = `The parsed root card is not eqlbody, but ${rootCard['type']}.`;
-      return ret;
+      return path.toJS();
     }
-    const cardParser = new ESCardParser(rootCard);
-    // interpreting the parsed card
-    const cardInterpreter = new ESInterpreter(cardParser);
-    const newValue = CardsToElastic.blockToElastic(rootCard, {}, _Query());
-    if (_.isEqual(newValue, expectedValue) === true)
-    {
-      return ret;
-    } else
-    {
-      ret.passed = false;
-      ret.message = 'Parsed value is ' + JSON.stringify(newValue);
-      return ret;
-    }
+    return path;
   }
 
   public static PathFinderToQuery(queryConfig)

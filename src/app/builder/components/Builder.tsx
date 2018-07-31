@@ -363,7 +363,7 @@ class Builder extends TerrainComponent<Props>
       && (props.match.params.config !== undefined || newConfig.length)
     )
     {
-      this.browserHistory.replace(`/builder/${newConfig}`);
+      setTimeout(() => this.browserHistory.replace(`/builder/${newConfig}`), 10);
     }
     localStorage.setItem('config', newConfig || '');
 

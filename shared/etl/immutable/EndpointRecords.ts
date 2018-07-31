@@ -126,6 +126,10 @@ class SourceConfigC implements SourceConfigI
       case Sources.Upload:
         if (options.file != null)
         {
+          if (options.file.type == null || options.file.type.length === 0)
+          {
+            return guessFileOptionsHelper(options.file.name);
+          }
           return {
             fileType: getFileType(options.file),
           };
