@@ -65,7 +65,7 @@ import { ColorsActions } from '../../colors/data/ColorsRedux';
 import FadeInOut from '../../common/components/FadeInOut';
 
 const TimeIcon = require('../../../images/icon_clock.svg?name=TimeIcon');
-const ScopeIcon = require('../../../images/icon_relativeCalendar.svg?name=ScopeIcon');
+const ScopeIcon = require('../../../images/icon_calendar.svg?name=ScopeIcon');
 
 const PrevMonthIcon = require('../../../images/icon_arrowCircleLeft.svg?name=PrevMonthIcon');
 const NextMonthIcon = require('../../../images/icon_arrowCircleRight.svg?name=NextMonthIcon');
@@ -317,7 +317,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
       this.props.colorsActions({
         actionType: 'setStyle',
         selector: '.date-view-label',
-        style: { 'color': Colors().dateViewLabel, 'background-color': Colors().bg },
+        style: { 'color': Colors().mainSectionTitle, 'background-color': Colors().bg },
       });
       this.props.colorsActions({
         actionType: 'setStyle',
@@ -338,6 +338,16 @@ export class DatePickerUncontained extends TerrainComponent<Props>
         actionType: 'setStyle',
         selector: '.next-month-button',
         style: { 'fill': Colors().active, 'background-color': Colors().bg },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.time-icon',
+        style: { fill: Colors().mainSectionTitle },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.scope-icon',
+        style: { fill: Colors().mainSectionTitle },
       });
     }
   }
@@ -560,7 +570,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
           options={DateParameterOptions}
           selectedIndex={this.dateToDateParameterMapIndex()}
           onChange={this.handleDateParameterChange}
-          iconLabel={<ScopeIcon className='time-icon' />}
+          iconLabel={<ScopeIcon className='scope-icon' />}
           iconTooltip='One Week Scope'
           labelClass='time-icon-wrapper'
         />
