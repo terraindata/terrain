@@ -349,7 +349,7 @@ class HitsTable extends TerrainComponent<Props>
     const spotlightColor = ColorManager.altColorForKey(id);
 
     const spotlightData = hit.toJS();
-    spotlightData['name'] = getResultName(hit, this.props.resultsConfig, false);
+    spotlightData['name'] = getResultName(hit, this.props.resultsConfig, false, Map());
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightData['rank'] = row;
