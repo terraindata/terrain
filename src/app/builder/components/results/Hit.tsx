@@ -101,6 +101,7 @@ export interface Props
   hideFieldNames?: boolean;
   firstVisibleField?: number;
   isVisible?: boolean;
+  parentHit?: Hit;
 
   isOver?: boolean;
   isDragging?: boolean;
@@ -371,6 +372,7 @@ class HitComponent extends TerrainComponent<Props> {
                 primaryKey={fields['_id']}
                 onExpand={undefined}
                 isNestedHit={true}
+                parentHit={this.props.hit}
               />);
           },
           )
@@ -563,6 +565,7 @@ class HitComponent extends TerrainComponent<Props> {
       actionType: 'spotlightAction',
       id,
       hit: spotlightData,
+      parentHit: this.props.parentHit.toJS()['fields'],
     });
     this.props.onSpotlightAdded(id, spotlightData);
   }
@@ -648,7 +651,7 @@ class HitComponent extends TerrainComponent<Props> {
     const spotlight = spotlights.get(this.props.primaryKey);
     const color = spotlight ? spotlight.color : 'black';
 
-    const thumbnail = resultsConfig && resultsConfig.thumbnail ?
+    let thumbnail = resultsConfig && resultsConfig.thumbnail ?
       getResultThumbnail(hit, resultsConfig, this.props.expanded, this.props.schema, this.props.builder) :
       null;
     const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.schema, this.props.builder,
@@ -723,20 +726,43 @@ class HitComponent extends TerrainComponent<Props> {
           onDoubleClick={this.expand}
         >
           {
-            thumbnail &&
+            thumbnail && 
             [
-              <div
-                className={classNames({
+            <div className={classNames({
                   'result-thumbnail-wrapper': true,
                   'results-are-small': hitSize === 'small' || hitSize === 'smaller',
                 })}
                 style={{
-                  backgroundImage: `url(${thumbnail})`,
                   width: thumbnailWidth,
                   minWidth: thumbnailWidth,
+                  backgroundImage: `url(${thumbnail})`,
                 }}
                 key={1}
               >
+              {
+                (thumbnail.includes('gifv')) 
+                ? 
+                <video controls src={thumbnail.replace('gifv', 'webm')} style={{
+                  width: thumbnailWidth,
+                  minWidth: thumbnailWidth,
+                }}> </video>
+                :
+                (thumbnail.includes('youtube'))
+                ?
+                <iframe src={thumbnail.replace('watch?v=', 'embed/')} style={{
+                  width: thumbnailWidth,
+                  minWidth: thumbnailWidth}} allowfullscreen>
+                </iframe>
+                :
+                (thumbnail.includes('mp4') || thumbnail.includes('webm'))
+                ?
+                <video controls src={thumbnail} style={{
+                  width: thumbnailWidth,
+                  minWidth: thumbnailWidth,
+                }} > </video>
+                :
+                null
+              }
               </div>
               ,
               this.state.hovered &&
