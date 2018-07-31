@@ -106,7 +106,7 @@ export default class ESUtils
     return null;
   }
 
-  public static ExtractDistanceValueUnit(distanceString: string): {distance: number, unit: string}
+  public static ExtractDistanceValueUnit(distanceString: string): { distance: number, unit: string }
   {
     let valueString = distanceString;
     let valueUnit = 'm';
@@ -123,7 +123,7 @@ export default class ESUtils
     {
       return null;
     }
-    return {distance: Number.parseFloat(valueString), unit: valueUnit};
+    return { distance: Number.parseFloat(valueString), unit: valueUnit };
   }
 
   public static DistanceUnitTypeChecker(inter: ESInterpreter, valueInfo: ESValueInfo, expected: ESJSONType)
@@ -143,7 +143,8 @@ export default class ESUtils
 
   public static GenerateFieldSizeChecker(fieldList, size: number[])
   {
-    return (inter: ESInterpreter, valueInfo: ESValueInfo, expected: ESJSONType) => {
+    return (inter: ESInterpreter, valueInfo: ESValueInfo, expected: ESJSONType) =>
+    {
       if (expected !== ESJSONType.object)
       {
         return true;

@@ -46,14 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const no-unused-expression no-shadowed-variable
 import { ESCodeToPathfinder } from 'builder/components/pathfinder/CodeToPath';
-import { Path } from 'builder/components/pathfinder/PathfinderTypes';
 import * as Immutable from 'immutable';
 import { List } from 'immutable';
 import { invert } from 'lodash';
-import * as TerrainLog from 'loglevel';
-import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 import * as BlockUtils from '../../../blocks/BlockUtils';
-import { toInputMap } from '../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import BackendInstance from '../../../database/types/BackendInstance';
 import Query from '../../../items/types/Query';

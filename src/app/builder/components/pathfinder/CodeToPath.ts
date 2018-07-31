@@ -51,10 +51,9 @@ import
   _FilterGroup, _FilterLine, _Path, _Source, FilterLine,
   Path,
 } from 'builder/components/pathfinder/PathfinderTypes';
-import { List, Map } from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as TerrainLog from 'loglevel';
-import { Classes } from 'react-modal';
 import ESInterpreter from '../../../../../shared/database/elastic/parser/ESInterpreter';
 import ESPropertyInfo from '../../../../../shared/database/elastic/parser/ESPropertyInfo';
 import ESUtils from '../../../../../shared/database/elastic/parser/ESUtils';

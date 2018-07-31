@@ -56,8 +56,6 @@ import { getChromeDebugAddress, login, waitForInput } from '../../../FullstackUt
 
 import { PathFinderStringToJSONArray } from '../../../../src/app/builder/components/pathfinder/PathfinderParser';
 
-const USERNAME_SELECTOR = '#login-email';
-
 function getExpectedActionFile(): string
 {
   return __dirname + '/actions.json';
