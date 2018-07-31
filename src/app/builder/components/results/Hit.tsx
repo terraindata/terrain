@@ -858,6 +858,10 @@ export function getResultValue(hit: Hit, field: string, config: ResultsConfig, i
     value = hit.fields.get(field);
     if (pieces.length > 1)
     {
+      if (!Map.isMap(value))
+      {
+        value = Immutable.fromJS(value);
+      }
       value = value.getIn(pieces.slice(1));
     }
   }
