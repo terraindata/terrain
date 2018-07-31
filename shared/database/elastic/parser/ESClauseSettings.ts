@@ -44,6 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
+import ESJSONType from 'shared/database/elastic/parser/ESJSONType';
+import ESValueInfo from 'shared/database/elastic/parser/ESValueInfo';
+
 /**
  * Settings passed to and stored in an ESClause
  */
@@ -59,6 +63,7 @@ interface ESClauseSettings
   required?: string[];
   suggestions?: any[];
   rewrite?: (ESInterpreter, ESValueInfo) => void;
+  checkers?: Array<(interpreter: ESInterpreter, valueInfo: ESValueInfo, expected: ESJSONType) => boolean>;
 }
 
 export default ESClauseSettings;

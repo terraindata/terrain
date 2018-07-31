@@ -271,6 +271,11 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         false,
         (source.dataSource as any).index,
         true);
+      if (data == null)
+      {
+        // this could be happened when the index is ''
+        return;
+      }
       fieldType = data.fieldType;
       const analyzed = data.analyzed;
       let comparison = props.filterLine.comparison;
