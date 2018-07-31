@@ -67,6 +67,9 @@ import FadeInOut from '../../common/components/FadeInOut';
 const TimeIcon = require('../../../images/icon_clock.svg?name=TimeIcon');
 const ScopeIcon = require('../../../images/icon_relativeCalendar.svg?name=ScopeIcon');
 
+const PrevMonthIcon = require('../../../images/icon_arrowCircleLeft.svg?name=PrevMonthIcon');
+const NextMonthIcon = require('../../../images/icon_arrowCircleRight.svg?name=NextMonthIcon');
+
 const MINUTE_INTERVAL = 30;
 const MINUTE_RATIO = (60 / MINUTE_INTERVAL);
 
@@ -170,6 +173,29 @@ const DateSpecificityMap = {
 };
 const DateSpecificityMapImmu = Immutable.Map(DateSpecificityMap);
 
+const weekdaysShort = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+function Navbar({
+  nextMonth,
+  previousMonth,
+  onPreviousClick,
+  onNextClick,
+  className,
+  localeUtils,
+}: any)
+{
+  return (
+    <div className='calendar-nav-bar'>
+      <div className='prev-month-button' onClick={() => onPreviousClick()}>
+        <PrevMonthIcon />
+      </div>
+      <div className='next-month-button' onClick={() => onNextClick()}>
+        <NextMonthIcon />
+      </div>
+    </div>
+  );
+}
+
 export interface Props
 {
   date: string;
@@ -230,6 +256,16 @@ export class DatePickerUncontained extends TerrainComponent<Props>
       });
       this.props.colorsActions({
         actionType: 'setStyle',
+        selector: '.DayPicker-Caption',
+        style: { 'border-color': Colors().sectionEditButton },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.DayPicker',
+        style: { 'border-color': Colors().sectionEditButton },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
         selector: '.DayPicker-Month',
         style: { background: Colors().altBg1 },
       });
@@ -241,7 +277,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
       this.props.colorsActions({
         actionType: 'setStyle',
         selector: '.DayPicker-Day',
-        style: { 'border-color': Colors().altHighlight, 'background': Colors().altBg1, 'color': Colors().altText3 },
+        style: { 'border-color': Colors().altHighlight, 'background': Colors().altBg1, 'color': Colors().mainSectionTitle },
       });
       this.props.colorsActions({
         actionType: 'setStyle',
@@ -261,7 +297,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
       this.props.colorsActions({
         actionType: 'setStyle',
         selector: '.DayPicker-Day--outside',
-        style: { color: Colors().text2, background: Colors().altBg2 },
+        style: { color: Colors().text2, background: Colors().bg },
       });
       this.props.colorsActions({
         actionType: 'setStyle',
@@ -276,7 +312,7 @@ export class DatePickerUncontained extends TerrainComponent<Props>
       this.props.colorsActions({
         actionType: 'setStyle',
         selector: '.DayPicker-Day--today',
-        style: { 'color': Colors().active, 'background-color': Colors().todayHighlight },
+        style: { 'color': Colors().active, 'background-color': Colors().bg },
       });
       this.props.colorsActions({
         actionType: 'setStyle',
@@ -292,6 +328,16 @@ export class DatePickerUncontained extends TerrainComponent<Props>
         actionType: 'setStyle',
         selector: '.unselected-date-type',
         style: { 'color': Colors().text3, 'background-color': Colors().bg },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.prev-month-button',
+        style: { 'fill': Colors().active, 'background-color': Colors().bg },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.next-month-button',
+        style: { 'fill': Colors().active, 'background-color': Colors().bg },
       });
     }
   }
@@ -530,6 +576,8 @@ export class DatePickerUncontained extends TerrainComponent<Props>
           modifiers={modifiersArg}
           onDayClick={this.handleDayClick}
           initialMonth={dateArg.toDate()}
+          weekdaysShort={weekdaysShort as any}
+          navbarElement={<Navbar />}
         />
         {this.renderTimePicker(dateArg)}
       </div>

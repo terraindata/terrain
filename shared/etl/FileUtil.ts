@@ -117,7 +117,8 @@ export function getFileType(file: File): FileTypes
   }
   else
   {
-    return FileTypes.Json;
+    const guessedFiletype = guessFileOptionsHelper(file.name);
+    return guessedFiletype != null ? guessedFiletype.fileType : FileTypes.Json;
   }
 }
 
