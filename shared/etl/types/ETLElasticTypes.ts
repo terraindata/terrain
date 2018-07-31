@@ -115,6 +115,30 @@ export const ETLToElasticOptions: {
     [FieldTypes.GeoPoint]: [ElasticTypes.Auto, ElasticTypes.GeoPoint],
   };
 
+function computeReverseElasticTypeMap()
+{
+  const mapping: {
+    [k in ElasticTypes]: FieldTypes;
+  } = {
+    [ElasticTypes.Auto]: null,
+  } as any;
+
+  for (const key of Object.keys(ETLToElasticOptions))
+  {
+    const options = ETLToElasticOptions[key as FieldTypes];
+    for (const option of options)
+    {
+      if (option !== ElasticTypes.Auto)
+      {
+        mapping[option] = key as FieldTypes;
+      }
+    }
+  }
+  return mapping;
+}
+
+export const ElasticToETL = computeReverseElasticTypeMap();
+
 export const ETLTypeAutoMap: {
   [k in FieldTypes]: ElasticTypes
 } = {
