@@ -56,6 +56,7 @@ export default class TerrainStoreLogger
   public static recordingActionPercentileLatency = false;
   public static printStateChange = false;
   public static printActions = false;
+  public static printActionStack = false;
 
   public static actionSerializationLog = [];
   public static serializeAction = false;
@@ -86,6 +87,10 @@ export default class TerrainStoreLogger
           if (TerrainStoreLogger.shouldPrintBuilderAction(action))
           {
             TerrainLog.debug(String(action.type) + ' takes ' + String(actionLatency) + ' ms');
+            if (TerrainStoreLogger.printActionStack)
+            {
+              TerrainLog.debug('Action stack: ' + new Error().stack);
+            }
           }
         }
         if (actionLatency > 100)
