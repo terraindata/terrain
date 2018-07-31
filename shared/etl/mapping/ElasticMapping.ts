@@ -50,8 +50,8 @@ import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as TerrainLog from 'loglevel';
 
-import { defaultProps, ElasticFieldProps, ElasticTypes, etlTypeToElastic } from 'shared/etl/types/ETLElasticTypes';
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { defaultProps, ElasticFieldProps, ElasticToETL, ElasticTypes, etlTypeToElastic } from 'shared/etl/types/ETLElasticTypes';
+import { etlFieldTypesNames, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { KeyPath, KeyPath as EnginePath } from 'shared/util/KeyPath';
 
@@ -195,8 +195,22 @@ export class ElasticMapping
   {
     if (toCompareConfig['type'] !== existingConfig['type'])
     {
-      const message = `Type conflict for field ${humanReadablePathName(kp, true)}. ` +
-        `Type '${toCompareConfig['type']}'' does not match type '${existingConfig['type']}'.`;
+      const toCompareType = toCompareConfig['type'];
+      const existingType = existingConfig['type'];
+      let message;
+      if (ElasticToETL[toCompareType] === ElasticToETL[existingType])
+      {
+        message = `Type conflict for field ${humanReadablePathName(kp, true)}. ` +
+          `Base types match, but advanced type '${toCompareType}' does not match type '${existingType}'.`;
+      }
+      else
+      {
+        const toCompareName = etlFieldTypesNames.get(ElasticToETL[toCompareType]);
+        const existingName = etlFieldTypesNames.get(ElasticToETL[existingType]);
+        message = `Type conflict for field ${humanReadablePathName(kp, true)}. ` +
+          `Type '${toCompareName}' does not match type '${existingName}'.`;
+      }
+
       return {
         valid: false,
         message,

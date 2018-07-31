@@ -214,17 +214,33 @@ export class EngineProxy
     }
   }
 
-  public setFieldEnabled(fieldId: number, enabled: boolean)
+  /*
+   *  If applyToChildren is true, set all children of the field
+   *  to have the same enabled/disabled state.
+   */
+  public setFieldEnabled(fieldId: number, enabled: boolean, applyToChildren?: boolean)
   {
-    if (enabled)
+    const setEnabled = (id) =>
     {
-      this.engine.enableField(fieldId);
+      if (enabled)
+      {
+        this.engine.enableField(id);
+      }
+      else
+      {
+        this.engine.disableField(id);
+      }
+    };
+
+    if (applyToChildren)
+    {
+      Utils.traversal.postorderFields(this.engine, fieldId, setEnabled);
     }
     else
     {
-      this.engine.disableField(fieldId);
+      setEnabled(fieldId);
     }
-    this.requestRebuild(fieldId);
+    this.requestRebuild(applyToChildren ? undefined : fieldId);
   }
 
   // Reorder fieldId so that it appears after afterId
