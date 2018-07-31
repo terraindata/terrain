@@ -54,11 +54,11 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
-import { DateFormats, ETLFieldTypes, etlFieldTypesNames } from 'shared/etl/types/ETLTypes';
+import { DateFormats, etlFieldTypesList, etlFieldTypesNames, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import EngineUtil, { ETLTypeToCastString } from 'shared/transformations/util/EngineUtil';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
 import { DynamicForm } from 'common/components/DynamicForm';
@@ -76,9 +76,9 @@ export class CastTFF extends TransformationForm<CastOptions, TransformationNodeT
       type: DisplayType.Pick,
       displayName: 'Cast to Type',
       options: {
-        pickOptions: (s) => typeOptions,
-        indexResolver: (value) => typeOptions.indexOf(value),
-        displayNames: (s) => displayText,
+        pickOptions: (s) => etlFieldTypesList,
+        indexResolver: (value) => etlFieldTypesList.indexOf(value),
+        displayNames: (s) => etlFieldTypesNames,
       },
     },
     format: {
@@ -93,12 +93,12 @@ export class CastTFF extends TransformationForm<CastOptions, TransformationNodeT
   };
 
   protected readonly initialState = {
-    toTypename: 'string',
+    toTypename: FieldTypes.String,
   }; // this should be overriden by computeInitialState
 
   public formatDisplayState(state: CastOptions)
   {
-    return state.toTypename === 'date' ? DisplayState.Active : DisplayState.Hidden;
+    return state.toTypename === FieldTypes.Date ? DisplayState.Active : DisplayState.Hidden;
   }
 
   protected computeInitialState()
@@ -106,11 +106,11 @@ export class CastTFF extends TransformationForm<CastOptions, TransformationNodeT
     const { fieldId, isCreate, engine } = this.props;
     if (isCreate)
     {
-      const etlType = EngineUtil.getETLFieldType(fieldId, engine);
+      const etlType = Utils.fields.fieldType(fieldId, engine);
       const state: CastOptions = {
-        toTypename: ETLTypeToCastString[etlType],
+        toTypename: etlType,
       };
-      if (etlType === ETLFieldTypes.Date)
+      if (etlType === FieldTypes.Date)
       {
         state.format = DateFormats.ISOstring;
       }
@@ -124,7 +124,7 @@ export class CastTFF extends TransformationForm<CastOptions, TransformationNodeT
 
   protected transformFormOnChange(state: CastOptions)
   {
-    if (state.toTypename === 'date' && state.format === undefined)
+    if (state.toTypename === FieldTypes.Date && state.format === undefined)
     {
       return _.extend({}, state, {
         format: DateFormats.ISOstring,
@@ -136,15 +136,5 @@ export class CastTFF extends TransformationForm<CastOptions, TransformationNodeT
     }
   }
 }
-
-const typeOptions = List(['string', 'number', 'boolean', 'array', 'object', 'date']);
-const displayText = Immutable.Map<string, string>({
-  string: 'Text',
-  number: 'Number',
-  array: 'Array',
-  object: 'Object',
-  date: 'Date',
-  boolean: 'Boolean',
-});
 
 const dateOptions: List<DateFormats> = List([DateFormats.ISOstring, DateFormats.MMDDYYYY]);

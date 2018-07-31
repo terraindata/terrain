@@ -56,7 +56,7 @@ import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle
 import Util from 'util/Util';
 
 import * as Immutable from 'immutable';
-import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import Quarantine from 'util/RadiumQuarantine';
 const { List, Map } = Immutable;
 import FadeInOut from 'common/components/FadeInOut';
@@ -143,7 +143,6 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
         return -1;
       }
     });
-
   }
 
   // TODO, if there are special index children that match get those
@@ -308,12 +307,12 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     const content = this.renderRow();
     const showSettings = this._settingsAreOpen();
 
-    if (field.etlType === ETLFieldTypes.Array || field.etlType === ETLFieldTypes.Object)
+    if (field.etlType === FieldTypes.Array || field.etlType === FieldTypes.Object)
     {
       const childrenComponent = (
         <div className='template-editor-children-container'>
           {
-            field.etlType === ETLFieldTypes.Array ?
+            field.etlType === FieldTypes.Array ?
               this.renderArrayChildren() :
               this.renderChildFields()
           }

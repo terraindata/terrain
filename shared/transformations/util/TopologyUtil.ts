@@ -46,7 +46,8 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { TransformationGraph } from 'shared/transformations/TypedGraph';
+
 import { KeyPath, WayPoint } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
@@ -174,26 +175,23 @@ export default class TopologyUtil
   // e.g. [a] is local to [b] and [c, d]
   // [a, -1, b] would be local to [a, -1, c]
   // [a] would not be local to [c, -1, d]
-  public static areFieldsLocal(kp1, kp2): boolean
+  public static areFieldsLocal(kp1: KeyPath, kp2: KeyPath): boolean
   {
-    // const lastIndex1: number = kp1.findLastIndex((value, index) => EngineUtil.isWildcardField(kp1, index));
-    // const concretePath1 = kp1.slice(0, lastIndex1 + 1);
-    // const lastIndex2: number = kp2.findLastIndex((value, index) => EngineUtil.isWildcardField(kp2, index));
-    // const concretePath2 = kp2.slice(0, lastIndex2 + 1);
-
-    // if (lastIndex2 !== lastIndex1 || !concretePath1.equals(concretePath2))
-    // {
-    //   return false;
-    // }
-    // else
-    // {
-    //   // check if fields are wildcards themselves?
-    //   return true;
-    // }
     const [r1, r2] = TopologyUtil.getRelation(kp1, kp2);
     if (r1 === 'one' && r2 === 'one')
     {
       return true;
     }
+  }
+
+  // return true if kp1 is the parent of kp2
+  public static isParent(kp1: KeyPath, kp2: KeyPath)
+  {
+    if (kp2.size <= kp1.size)
+    {
+      return false;
+    }
+    const index = TopologyUtil.getDifferingBaseIndex(kp1, kp2);
+    return index === kp1.size;
   }
 }

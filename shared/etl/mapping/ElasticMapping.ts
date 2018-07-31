@@ -48,14 +48,19 @@ THE SOFTWARE.
 
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
+import * as TerrainLog from 'loglevel';
 
 import { defaultProps, ElasticFieldProps, ElasticTypes, etlTypeToElastic } from 'shared/etl/types/ETLElasticTypes';
-import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import EngineUtil, { PathHashMap } from 'shared/transformations/util/EngineUtil';
 import { KeyPath, KeyPath as EnginePath } from 'shared/util/KeyPath';
 
-import * as TerrainLog from 'loglevel';
+import * as Utils from 'shared/transformations/util/EngineUtils';
+
+interface PathHashMap<T>
+{
+  [k: string]: T;
+}
 
 export interface TypeConfig
 {
@@ -166,7 +171,7 @@ export class ElasticMapping
     : { valid: boolean, message?: string }
   {
     const toCompareConfig = ElasticMapping.getTypeConfig(fieldID, engine);
-    const okp = engine.getOutputKeyPath(fieldID);
+    const okp = engine.getFieldPath(fieldID);
     const mappingPath = ElasticMapping.enginePathToMappingPath(okp);
     const existingConfig = _.get(existingMapping, mappingPath.toArray());
 
@@ -227,7 +232,7 @@ export class ElasticMapping
   protected static enginePathToMappingPath(path: EnginePath): EnginePath
   {
     return path.flatMap(
-      (value, i) => EngineUtil.isNamedField(path, i) ? ['properties', value] : [],
+      (value, i) => Utils.path.isNamed(path, i) ? ['properties', value] : [],
     ).toList() as EnginePath;
   }
 
@@ -281,7 +286,7 @@ export class ElasticMapping
   {
     const elasticProps = ElasticMapping.getElasticProps(fieldID, engine);
 
-    const etlType = EngineUtil.getETLFieldType(fieldID, engine);
+    const etlType = Utils.fields.fieldType(fieldID, engine);
     const elasticType = elasticProps.elasticType === ElasticTypes.Auto ?
       etlTypeToElastic(etlType)
       :
@@ -340,9 +345,9 @@ export class ElasticMapping
     return this.primaryKey;
   }
 
-  protected getETLType(fieldID: number): ETLFieldTypes
+  protected getETLType(fieldID: number): FieldTypes
   {
-    return EngineUtil.getETLFieldType(fieldID, this.engine);
+    return Utils.fields.fieldType(fieldID, this.engine);
   }
 
   protected clearGeopointMappings(disabledFields: { [k: number]: boolean })
@@ -355,13 +360,13 @@ export class ElasticMapping
         return;
       }
       const etlType = this.getETLType(id);
-      if (etlType !== ETLFieldTypes.GeoPoint)
+      if (etlType !== FieldTypes.GeoPoint)
       {
         return;
       }
       else
       {
-        const okp = this.engine.getOutputKeyPath(id);
+        const okp = this.engine.getFieldPath(id);
         const cleanedPath = ElasticMapping.enginePathToMappingPath(okp).toJS();
         const fieldMapping = _.get(this.mapping, cleanedPath);
         const newFieldMapping = _.omit(fieldMapping, ['properties']);
@@ -373,9 +378,9 @@ export class ElasticMapping
   protected addFieldToMapping(id: number)
   {
     const config = ElasticMapping.getTypeConfig(id, this.engine, this.isMerge);
-    const enginePath = this.engine.getOutputKeyPath(id);
+    const enginePath = this.engine.getFieldPath(id);
     const cleanedPath = ElasticMapping.enginePathToMappingPath(enginePath);
-    const hashed = EngineUtil.hashPath(cleanedPath);
+    const hashed = Utils.path.hash(cleanedPath);
 
     if (config !== null)
     {
@@ -411,12 +416,12 @@ export class ElasticMapping
   {
     const ids = this.engine.getAllFieldIDs();
     const disabledMap: { [k: number]: boolean } = {};
-    const tree = EngineUtil.createTreeFromEngine(this.engine);
+    const tree = this.engine.createTree();
     const disabledFields = ids.filter((id) => !this.engine.getFieldEnabled(id)).toSet();
     const shouldExplore = (id) => disabledMap[id] === undefined;
     disabledFields.forEach((id) =>
     {
-      for (const childId of EngineUtil.preorder(tree, id, shouldExplore))
+      for (const childId of Utils.traversal.preorder(tree, id, shouldExplore))
       {
         disabledMap[childId] = true;
       }
@@ -453,8 +458,7 @@ export class ElasticMapping
       this.errors.push(`Error encountered while clearing Geopoint Mappings. Details: ${String(e)}`);
     }
 
-    TerrainLog.debug('Creat ES mapping: ' + JSON.stringify(this.mapping)
-      + ' from all fields: ' + JSON.stringify(this.engine.getAllFieldNames()));
+    TerrainLog.debug('Create ES mapping: ' + JSON.stringify(this.mapping));
   }
 
   protected verifyAndSetPrimaryKey(id: number)
@@ -465,7 +469,7 @@ export class ElasticMapping
       etlTypeToElastic(etlType)
       :
       elasticProps.elasticType;
-    const enginePath = this.engine.getOutputKeyPath(id);
+    const enginePath = this.engine.getFieldPath(id);
     if (enginePath.size > 1)
     {
       this.errors.push(

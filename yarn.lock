@@ -10236,7 +10236,6 @@ url@^0.11.0:
 
 ursa@^0.9.4, "ursa@https://github.com/JoshKaufman/ursa#master":
   version "0.9.4"
-  uid "7083023efe0dd3802573c4cdbe8b4916708a5a51"
   resolved "https://github.com/JoshKaufman/ursa#7083023efe0dd3802573c4cdbe8b4916708a5a51"
   dependencies:
     bindings "^1.2.1"

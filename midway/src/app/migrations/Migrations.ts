@@ -54,10 +54,10 @@ import * as App from '../App';
 import { CURRENT_VERSION, FIRST_VERSION, Migrator, Version } from '../AppVersion';
 import { MigrationRecordConfig as MigrationRecord } from './MigrationRecordConfig';
 
-import { defaultETLMigration } from '../etl/ETLMigrations';
+import { templateMigrations } from '../etl/ETLMigrations';
 
 const registeredMigrations: Migrator[] = [
-  defaultETLMigration,
+  ...templateMigrations,
 ];
 
 export class Migrations

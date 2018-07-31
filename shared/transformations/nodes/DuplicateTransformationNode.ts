@@ -51,16 +51,15 @@ import * as yadeep from 'shared/util/yadeep';
 
 const { List, Map } = Immutable;
 
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitError from 'shared/transformations/TransformationVisitError';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
 import Topology from 'shared/transformations/util/TopologyUtil';
+import TransformationVisitError from 'shared/transformations/visitors/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/visitors/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
 
 import isPrimitive = require('is-primitive');
@@ -85,7 +84,7 @@ export class DuplicateTransformationNode extends TransformationNode
       {
         value = _.cloneDeep(value);
       }
-      yadeep.set(doc, matcherFn(match.location), value, { create: true });
+      yadeep.setIn(doc, matcherFn(match.location), value);
     }
     return undefined;
   }
@@ -122,7 +121,7 @@ export class DuplicateTransformationNode extends TransformationNode
       {
         const { location: leftKP } = innerMatch; // leftKP [A, i, B, j]
         const concreteDestKP = leftKP.concat(destRightKP).toList(); // [A, i, B, j, C];
-        yadeep.set(doc, concreteDestKP, valueToCopy, { create: true });
+        yadeep.setIn(doc, concreteDestKP, valueToCopy);
       }
     }
     return undefined;
@@ -164,7 +163,7 @@ export class DuplicateTransformationNode extends TransformationNode
           return m.value;
         }
       });
-      yadeep.set(doc, destKP, values, { create: true });
+      yadeep.setIn(doc, destKP, values);
     }
     return undefined;
   }
@@ -172,9 +171,9 @@ export class DuplicateTransformationNode extends TransformationNode
   protected transformDocument(doc: object): TransformationVisitResult
   {
     const errors = [];
-    const opts = this.meta as NodeOptionsType<any>;
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
 
-    const inputField = this.fields.get(0);
+    const inputField = this.fields.get(0).path;
     const outputField = opts.newFieldKeyPaths.get(0);
 
     // when we implement optimizations / caching and overrideable serialization we can memoize this
@@ -225,16 +224,10 @@ class DuplicateTransformationInfoC extends TransformationNodeInfo
 
   public editable = false;
   public creatable = true;
-  public newFieldType = 'same';
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    const etlType = EngineUtil.getETLFieldType(fieldId, engine);
-    return (
-      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId)) &&
-      etlType !== ETLFieldTypes.Object && etlType !== ETLFieldTypes.Array
-    );
-  }
+  protected availInfo = {
+    isNamed: true,
+  };
 }
 
 export const DuplicateTransformationInfo = new DuplicateTransformationInfoC();

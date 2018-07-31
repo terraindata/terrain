@@ -90,7 +90,7 @@ export class FieldPicker extends TerrainComponent<Props>
   public translateFieldsToStrings(availableFields: List<number>, engine: TransformationEngine)
   {
     return availableFields.map((id, i) =>
-      this.stringifyKeyPath(engine.getOutputKeyPath(id)),
+      this.stringifyKeyPath(engine.getFieldPath(id)),
     ).toList();
   }
 

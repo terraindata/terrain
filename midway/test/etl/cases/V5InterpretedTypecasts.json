@@ -1,0 +1,1440 @@
+{
+  "testName": "v5 Interpreted Typecasts",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "votecount": 3086,
+      "budget": 380000000,
+      "movieid": 86880,
+      "tagline": "Live Forever Or Die Trying.",
+      "homepage": "http://disney.go.com/pirates/index-on-stranger-tides.html#/video/",
+      "genres": "Action|Adventure|Fantasy|IMAX",
+      "posterpath": "/jUkGuSC9Kt29rW3x6UiB9zyZr1M.jpg",
+      "status": "Released",
+      "voteaverage": 6.300000190734863,
+      "releasedate": "2011-05-11T00:00:00.000Z",
+      "popularity": 4.007579803466797,
+      "@version": 1,
+      "title": "Pirates of the Caribbean: On Stranger Tides (2011)",
+      "language": "en",
+      "runtime": 136,
+      "overview": "Captain Jack Sparrow crosses paths with a woman from his past, and he's not sure if it's love -- or if she's a ruthless con artist who's using him to find the fabled Fountain of Youth. When she forces him aboard the Queen Anne's Revenge, the ship of the formidable pirate Blackbeard, Jack finds himself on an unexpected adventure in which he doesn't know who to fear more: Blackbeard or the woman from his past.",
+      "backdroppath": "/l7zANdjgTvYqwZUx76Vk0EKpCH5.jpg",
+      "revenue": 1021683000,
+      "TERRAINRANK": 1
+    },
+    {
+      "votecount": 2530,
+      "budget": 300000000,
+      "movieid": 53125,
+      "tagline": "At the end of the world, the adventure begins.",
+      "homepage": "http://disney.go.com/disneypictures/pirates/",
+      "genres": "Action|Adventure|Comedy|Fantasy",
+      "posterpath": "/bXb00CkHqx7TPchTGG131sWV59y.jpg",
+      "status": "Released",
+      "voteaverage": 6.699999809265137,
+      "releasedate": "2007-05-19T00:00:00.000Z",
+      "popularity": 4.371650218963623,
+      "@version": 1,
+      "title": "Pirates of the Caribbean: At World's End (2007)",
+      "language": "en",
+      "runtime": 169,
+      "overview": "Captain Barbossa, long believed to be dead, has come back to life and is headed to the edge of the Earth with brave Will Turner and feisty Elizabeth Swann. And what of Jack Sparrow? Nothing is as it seems.",
+      "backdroppath": "/8ZgpAftUiYTU76IhUADITa3Ur9n.jpg",
+      "revenue": 961000000,
+      "TERRAINRANK": 2
+    },
+    {
+      "votecount": 71,
+      "budget": 425000000,
+      "movieid": 83374,
+      "tagline": "Assassin. Hero. Legend.",
+      "homepage": "http://www.iamrogue.com/thewarriorsway",
+      "genres": "Action|Fantasy|Western",
+      "posterpath": "/ev5Einzgi2OFxPllt81DxBnfBSu.jpg",
+      "status": "Released",
+      "voteaverage": 6.400000095367432,
+      "releasedate": "2010-12-02T00:00:00.000Z",
+      "popularity": 0.9823459982872009,
+      "@version": 1,
+      "title": "Warrior's Way, The (2010)",
+      "language": "en",
+      "runtime": 100,
+      "overview": "An Asian assassin (Dong-gun Jang) is forced to hide in a small town in the American Badlands. Also starring Kate Bosworth, Danny Huston, Tony Cox and Academy Award winner Geoffrey Rush.",
+      "backdroppath": "/t2ApQLAdUuaOKxOmSb72mnIyHo4.jpg",
+      "revenue": 11087569,
+      "TERRAINRANK": 3
+    },
+    {
+      "votecount": 798,
+      "budget": 270000000,
+      "movieid": 46530,
+      "tagline": null,
+      "homepage": "http://www.superman.com",
+      "genres": "Action|Adventure|Sci-Fi|IMAX",
+      "posterpath": "/fTWi7V04VrtDj0hm1YDJYK4VpJW.jpg",
+      "status": "Released",
+      "voteaverage": 5.300000190734863,
+      "releasedate": "2006-06-28T00:00:00.000Z",
+      "popularity": 1.9565600156784058,
+      "@version": 1,
+      "title": "Superman Returns (2006)",
+      "language": "en",
+      "runtime": 154,
+      "overview": "Set 5 years after the end of Superman II, the film begins when Superman returns to discover his absence allowed Lex Luthor to walk free, and that those he was closest too felt abandoned and have moved on. Luthor plots his ultimate revenge that could see millions killed and change the face of the planet forever, as well as ridding himself of the Man Of Steel.",
+      "backdroppath": "/pkX4ytzAXswpMhea0JKxgA5Vmqo.jpg",
+      "revenue": 391081192,
+      "TERRAINRANK": 4
+    },
+    {
+      "votecount": 1941,
+      "budget": 260000000,
+      "movieid": 81847,
+      "tagline": "They're taking adventure to new lengths.",
+      "homepage": "http://disney.go.com/disneypictures/tangled/",
+      "genres": "Animation|Children|Comedy|Fantasy|Musical|Romance|IMAX",
+      "posterpath": "/re6AOJbhBk9FIK3knwU6rYlbPDx.jpg",
+      "status": "Released",
+      "voteaverage": 7.300000190734863,
+      "releasedate": "2010-11-24T00:00:00.000Z",
+      "popularity": 2.955810070037842,
+      "@version": 1,
+      "title": "Tangled (2010)",
+      "language": "en",
+      "runtime": 100,
+      "overview": "When the kingdom's most wanted-and most charming-bandit Flynn Rider hides out in a mysterious tower, he's taken hostage by Rapunzel, a beautiful and feisty tower-bound teen with 70 feet of magical, golden hair. Flynn's curious captor, who's looking for her ticket out of the tower where she's been locked away for years, strikes a deal with the handsome thief and the unlikely duo sets off on an action-packed escapade, complete with a super-cop horse, an over-protective chameleon and a gruff gang of pub thugs.",
+      "backdroppath": "/uFg02Gt69UM6Ouam4slMdD0s029.jpg",
+      "revenue": 591794936,
+      "TERRAINRANK": 5
+    },
+    {
+      "votecount": 1438,
+      "budget": 260000000,
+      "movieid": 93363,
+      "tagline": "Lost in Our World. Found in Another.",
+      "homepage": "http://disney.go.com/johncarter/",
+      "genres": "Action|Adventure|Sci-Fi|IMAX",
+      "posterpath": "/4QDBNt9PmxqUH4Ab2R5xKWqzXiQ.jpg",
+      "status": "Released",
+      "voteaverage": 6,
+      "releasedate": "2012-03-07T00:00:00.000Z",
+      "popularity": 1.676069974899292,
+      "@version": 1,
+      "title": "John Carter (2012)",
+      "language": "en",
+      "runtime": 132,
+      "overview": "Civil War vet John Carter is transplanted to Mars, where he discovers a lush, wildly diverse planet whose main inhabitants are 12-foot tall green barbarians. Finding himself a prisoner of these creatures, he escapes, only to encounter Dejah Thoris, Princess of Helium, who is in desperate need of a savior.",
+      "backdroppath": "/qFrJlsJaKr0nIbyRQbb6bdTnkHZ.jpg",
+      "revenue": 284139100,
+      "TERRAINRANK": 6
+    },
+    {
+      "votecount": 2007,
+      "budget": 258000000,
+      "movieid": 52722,
+      "tagline": "The battle within.",
+      "homepage": "http://www.sonypictures.com/movies/spider-man3/",
+      "genres": "Action|Adventure|Sci-Fi|Thriller|IMAX",
+      "posterpath": "/uC2pAMjb32NIgQ1GdC1Bl6LZJc2.jpg",
+      "status": "Released",
+      "voteaverage": 5.800000190734863,
+      "releasedate": "2007-05-01T00:00:00.000Z",
+      "popularity": 2.1854100227355957,
+      "@version": 1,
+      "title": "Spider-Man 3 (2007)",
+      "language": "en",
+      "runtime": 139,
+      "overview": "The seemingly invincible Spider-Man goes up against an all-new crop of villains -- including the shape-shifting Sandman -- in the third installment of this blockbusting comic book adventure series. While Spidey's superpowers are altered by an alien organism, his alter ego, Peter Parker, deals with nemesis Eddie Brock and gets caught up in a love triangle.",
+      "backdroppath": "/4dLA0LgN7tOMSsGwSUSZM7VG7AP.jpg",
+      "revenue": 890871626,
+      "TERRAINRANK": 7
+    },
+    {
+      "votecount": 1558,
+      "budget": 255000000,
+      "movieid": 103384,
+      "tagline": "Never Take Off the Mask",
+      "homepage": "http://disney.go.com/the-lone-ranger/",
+      "genres": "Action|Adventure|Western|IMAX",
+      "posterpath": "/b4vil5ueYJNBNypHmo1tpuevh4z.jpg",
+      "status": "Released",
+      "voteaverage": 5.900000095367432,
+      "releasedate": "2013-07-03T00:00:00.000Z",
+      "popularity": 1.5342999696731567,
+      "@version": 1,
+      "title": "Lone Ranger, The (2013)",
+      "language": "en",
+      "runtime": 149,
+      "overview": "The Texas Rangers chase down a gang of outlaws led by Butch Cavendish, but the gang ambushes the Rangers, seemingly killing them all. One survivor is found, however, by an American Indian named Tonto, who nurses him back to health. The Ranger, donning a mask and riding a white stallion named Silver, teams up with Tonto to bring the unscrupulous gang and others of that ilk to justice.",
+      "backdroppath": "/sgcgfrlOOB6lVXbfl75YTszF4jI.jpg",
+      "revenue": 89289910,
+      "TERRAINRANK": 8
+    },
+    {
+      "votecount": 6582,
+      "budget": 250000000,
+      "movieid": 91529,
+      "tagline": "The Legend Ends",
+      "homepage": "http://www.thedarkknightrises.com/",
+      "genres": "Action|Adventure|Crime|IMAX",
+      "posterpath": "/dEYnvnUfXrqvqeRSqvIEtmzhoA8.jpg",
+      "status": "Released",
+      "voteaverage": 7.5,
+      "releasedate": "2012-07-16T00:00:00.000Z",
+      "popularity": 4.359920024871826,
+      "@version": 1,
+      "title": "Dark Knight Rises, The (2012)",
+      "language": "en",
+      "runtime": 165,
+      "overview": "Following the death of District Attorney Harvey Dent, Batman assumes responsibility for Dent's crimes to protect the late attorney's reputation and is subsequently hunted by the Gotham City Police Department. Eight years later, Batman encounters the mysterious Selina Kyle and the villainous Bane, a new terrorist leader who overwhelms Gotham's finest. The Dark Knight resurfaces to protect a city that has branded him an enemy.",
+      "backdroppath": "/3bgtUfKQKNi3nJsAB5URpP2wdRt.jpg",
+      "revenue": 1081041287,
+      "TERRAINRANK": 9
+    },
+    {
+      "votecount": 2990,
+      "budget": 250000000,
+      "movieid": 118696,
+      "tagline": "Witness the defining chapter of the Middle-Earth saga",
+      "homepage": "http://www.thehobbit.com/",
+      "genres": "Adventure|Fantasy",
+      "posterpath": "/vgAHvS0bT3fpcpnJqT6uDTUsHTo.jpg",
+      "status": "Released",
+      "voteaverage": 7.099999904632568,
+      "releasedate": "2014-12-10T00:00:00.000Z",
+      "popularity": 9.3477201461792,
+      "@version": 1,
+      "title": "The Hobbit: The Battle of the Five Armies (2014)",
+      "language": "en",
+      "runtime": 144,
+      "overview": "Immediately after the events of The Desolation of Smaug, Bilbo and the dwarves try to defend Erebor's mountain of treasure from others who claim it: the men of the ruined Laketown and the elves of Mirkwood. Meanwhile an army of Orcs led by Azog the Defiler is marching on Erebor, fueled by the rise of the dark lord Sauron. Dwarves, elves and men must unite, and the hope for Middle-Earth falls into Bilbo's hands.",
+      "backdroppath": "/qhH3GyIfAnGv1pjdV3mw03qAilg.jpg",
+      "revenue": 955119788,
+      "TERRAINRANK": 10
+    }
+  ],
+  "outputDocs": [
+    {
+      "votecount": 3086,
+      "budget": 380000000.5,
+      "movieid": 173760,
+      "tagline": "Live Forever Or Die Trying.",
+      "homepage": "http://disney.go.com/pirates/index-on-stranger-tides.html#/video/",
+      "genres": "Action|Adventure|Fantasy|IMAX",
+      "posterpath": "/jUkGuSC9Kt29rW3x6UiB9zyZr1M.jpg",
+      "status": "Released",
+      "voteaverage": 6.300000190734863,
+      "releasedate": "2011-05-11T00:00:00.000Z",
+      "popularity": 4.007579803466797,
+      "@version": 1,
+      "title": "Pirates of the Caribbean: On Stranger Tides (2011)",
+      "language": "en",
+      "runtime": 136,
+      "overview": "Captain Jack Sparrow crosses paths with a woman from his past, and he's not sure if it's love -- or if she's a ruthless con artist who's using him to find the fabled Fountain of Youth. When she forces him aboard the Queen Anne's Revenge, the ship of the formidable pirate Blackbeard, Jack finds himself on an unexpected adventure in which he doesn't know who to fear more: Blackbeard or the woman from his past.",
+      "backdroppath": "/l7zANdjgTvYqwZUx76Vk0EKpCH5.jpg",
+      "revenue": 1021683000,
+      "TERRAINRANK": 1
+    },
+    {
+      "votecount": 2530,
+      "budget": 300000000.5,
+      "movieid": 106250,
+      "tagline": "At the end of the world, the adventure begins.",
+      "homepage": "http://disney.go.com/disneypictures/pirates/",
+      "genres": "Action|Adventure|Comedy|Fantasy",
+      "posterpath": "/bXb00CkHqx7TPchTGG131sWV59y.jpg",
+      "status": "Released",
+      "voteaverage": 6.699999809265137,
+      "releasedate": "2007-05-19T00:00:00.000Z",
+      "popularity": 4.371650218963623,
+      "@version": 1,
+      "title": "Pirates of the Caribbean: At World's End (2007)",
+      "language": "en",
+      "runtime": 169,
+      "overview": "Captain Barbossa, long believed to be dead, has come back to life and is headed to the edge of the Earth with brave Will Turner and feisty Elizabeth Swann. And what of Jack Sparrow? Nothing is as it seems.",
+      "backdroppath": "/8ZgpAftUiYTU76IhUADITa3Ur9n.jpg",
+      "revenue": 961000000,
+      "TERRAINRANK": 2
+    },
+    {
+      "votecount": 71,
+      "budget": 425000000.5,
+      "movieid": 166748,
+      "tagline": "Assassin. Hero. Legend.",
+      "homepage": "http://www.iamrogue.com/thewarriorsway",
+      "genres": "Action|Fantasy|Western",
+      "posterpath": "/ev5Einzgi2OFxPllt81DxBnfBSu.jpg",
+      "status": "Released",
+      "voteaverage": 6.400000095367432,
+      "releasedate": "2010-12-02T00:00:00.000Z",
+      "popularity": 0.9823459982872009,
+      "@version": 1,
+      "title": "Warrior's Way, The (2010)",
+      "language": "en",
+      "runtime": 100,
+      "overview": "An Asian assassin (Dong-gun Jang) is forced to hide in a small town in the American Badlands. Also starring Kate Bosworth, Danny Huston, Tony Cox and Academy Award winner Geoffrey Rush.",
+      "backdroppath": "/t2ApQLAdUuaOKxOmSb72mnIyHo4.jpg",
+      "revenue": 11087569,
+      "TERRAINRANK": 3
+    },
+    {
+      "votecount": 798,
+      "budget": 270000000.5,
+      "movieid": 93060,
+      "tagline": null,
+      "homepage": "http://www.superman.com",
+      "genres": "Action|Adventure|Sci-Fi|IMAX",
+      "posterpath": "/fTWi7V04VrtDj0hm1YDJYK4VpJW.jpg",
+      "status": "Released",
+      "voteaverage": 5.300000190734863,
+      "releasedate": "2006-06-28T00:00:00.000Z",
+      "popularity": 1.9565600156784058,
+      "@version": 1,
+      "title": "Superman Returns (2006)",
+      "language": "en",
+      "runtime": 154,
+      "overview": "Set 5 years after the end of Superman II, the film begins when Superman returns to discover his absence allowed Lex Luthor to walk free, and that those he was closest too felt abandoned and have moved on. Luthor plots his ultimate revenge that could see millions killed and change the face of the planet forever, as well as ridding himself of the Man Of Steel.",
+      "backdroppath": "/pkX4ytzAXswpMhea0JKxgA5Vmqo.jpg",
+      "revenue": 391081192,
+      "TERRAINRANK": 4
+    },
+    {
+      "votecount": 1941,
+      "budget": 260000000.5,
+      "movieid": 163694,
+      "tagline": "They're taking adventure to new lengths.",
+      "homepage": "http://disney.go.com/disneypictures/tangled/",
+      "genres": "Animation|Children|Comedy|Fantasy|Musical|Romance|IMAX",
+      "posterpath": "/re6AOJbhBk9FIK3knwU6rYlbPDx.jpg",
+      "status": "Released",
+      "voteaverage": 7.300000190734863,
+      "releasedate": "2010-11-24T00:00:00.000Z",
+      "popularity": 2.955810070037842,
+      "@version": 1,
+      "title": "Tangled (2010)",
+      "language": "en",
+      "runtime": 100,
+      "overview": "When the kingdom's most wanted-and most charming-bandit Flynn Rider hides out in a mysterious tower, he's taken hostage by Rapunzel, a beautiful and feisty tower-bound teen with 70 feet of magical, golden hair. Flynn's curious captor, who's looking for her ticket out of the tower where she's been locked away for years, strikes a deal with the handsome thief and the unlikely duo sets off on an action-packed escapade, complete with a super-cop horse, an over-protective chameleon and a gruff gang of pub thugs.",
+      "backdroppath": "/uFg02Gt69UM6Ouam4slMdD0s029.jpg",
+      "revenue": 591794936,
+      "TERRAINRANK": 5
+    },
+    {
+      "votecount": 1438,
+      "budget": 260000000.5,
+      "movieid": 186726,
+      "tagline": "Lost in Our World. Found in Another.",
+      "homepage": "http://disney.go.com/johncarter/",
+      "genres": "Action|Adventure|Sci-Fi|IMAX",
+      "posterpath": "/4QDBNt9PmxqUH4Ab2R5xKWqzXiQ.jpg",
+      "status": "Released",
+      "voteaverage": 6,
+      "releasedate": "2012-03-07T00:00:00.000Z",
+      "popularity": 1.676069974899292,
+      "@version": 1,
+      "title": "John Carter (2012)",
+      "language": "en",
+      "runtime": 132,
+      "overview": "Civil War vet John Carter is transplanted to Mars, where he discovers a lush, wildly diverse planet whose main inhabitants are 12-foot tall green barbarians. Finding himself a prisoner of these creatures, he escapes, only to encounter Dejah Thoris, Princess of Helium, who is in desperate need of a savior.",
+      "backdroppath": "/qFrJlsJaKr0nIbyRQbb6bdTnkHZ.jpg",
+      "revenue": 284139100,
+      "TERRAINRANK": 6
+    },
+    {
+      "votecount": 2007,
+      "budget": 258000000.5,
+      "movieid": 105444,
+      "tagline": "The battle within.",
+      "homepage": "http://www.sonypictures.com/movies/spider-man3/",
+      "genres": "Action|Adventure|Sci-Fi|Thriller|IMAX",
+      "posterpath": "/uC2pAMjb32NIgQ1GdC1Bl6LZJc2.jpg",
+      "status": "Released",
+      "voteaverage": 5.800000190734863,
+      "releasedate": "2007-05-01T00:00:00.000Z",
+      "popularity": 2.1854100227355957,
+      "@version": 1,
+      "title": "Spider-Man 3 (2007)",
+      "language": "en",
+      "runtime": 139,
+      "overview": "The seemingly invincible Spider-Man goes up against an all-new crop of villains -- including the shape-shifting Sandman -- in the third installment of this blockbusting comic book adventure series. While Spidey's superpowers are altered by an alien organism, his alter ego, Peter Parker, deals with nemesis Eddie Brock and gets caught up in a love triangle.",
+      "backdroppath": "/4dLA0LgN7tOMSsGwSUSZM7VG7AP.jpg",
+      "revenue": 890871626,
+      "TERRAINRANK": 7
+    },
+    {
+      "votecount": 1558,
+      "budget": 255000000.5,
+      "movieid": 206768,
+      "tagline": "Never Take Off the Mask",
+      "homepage": "http://disney.go.com/the-lone-ranger/",
+      "genres": "Action|Adventure|Western|IMAX",
+      "posterpath": "/b4vil5ueYJNBNypHmo1tpuevh4z.jpg",
+      "status": "Released",
+      "voteaverage": 5.900000095367432,
+      "releasedate": "2013-07-03T00:00:00.000Z",
+      "popularity": 1.5342999696731567,
+      "@version": 1,
+      "title": "Lone Ranger, The (2013)",
+      "language": "en",
+      "runtime": 149,
+      "overview": "The Texas Rangers chase down a gang of outlaws led by Butch Cavendish, but the gang ambushes the Rangers, seemingly killing them all. One survivor is found, however, by an American Indian named Tonto, who nurses him back to health. The Ranger, donning a mask and riding a white stallion named Silver, teams up with Tonto to bring the unscrupulous gang and others of that ilk to justice.",
+      "backdroppath": "/sgcgfrlOOB6lVXbfl75YTszF4jI.jpg",
+      "revenue": 89289910,
+      "TERRAINRANK": 8
+    },
+    {
+      "votecount": 6582,
+      "budget": 250000000.5,
+      "movieid": 183058,
+      "tagline": "The Legend Ends",
+      "homepage": "http://www.thedarkknightrises.com/",
+      "genres": "Action|Adventure|Crime|IMAX",
+      "posterpath": "/dEYnvnUfXrqvqeRSqvIEtmzhoA8.jpg",
+      "status": "Released",
+      "voteaverage": 7.5,
+      "releasedate": "2012-07-16T00:00:00.000Z",
+      "popularity": 4.359920024871826,
+      "@version": 1,
+      "title": "Dark Knight Rises, The (2012)",
+      "language": "en",
+      "runtime": 165,
+      "overview": "Following the death of District Attorney Harvey Dent, Batman assumes responsibility for Dent's crimes to protect the late attorney's reputation and is subsequently hunted by the Gotham City Police Department. Eight years later, Batman encounters the mysterious Selina Kyle and the villainous Bane, a new terrorist leader who overwhelms Gotham's finest. The Dark Knight resurfaces to protect a city that has branded him an enemy.",
+      "backdroppath": "/3bgtUfKQKNi3nJsAB5URpP2wdRt.jpg",
+      "revenue": 1081041287,
+      "TERRAINRANK": 9
+    },
+    {
+      "votecount": 2990,
+      "budget": 250000000.5,
+      "movieid": 237392,
+      "tagline": "Witness the defining chapter of the Middle-Earth saga",
+      "homepage": "http://www.thehobbit.com/",
+      "genres": "Adventure|Fantasy",
+      "posterpath": "/vgAHvS0bT3fpcpnJqT6uDTUsHTo.jpg",
+      "status": "Released",
+      "voteaverage": 7.099999904632568,
+      "releasedate": "2014-12-10T00:00:00.000Z",
+      "popularity": 9.3477201461792,
+      "@version": 1,
+      "title": "The Hobbit: The Battle of the Five Armies (2014)",
+      "language": "en",
+      "runtime": 144,
+      "overview": "Immediately after the events of The Desolation of Smaug, Bilbo and the dwarves try to defend Erebor's mountain of treasure from others who claim it: the men of the ruined Laketown and the elves of Mirkwood. Meanwhile an army of Orcs led by Azog the Defiler is marching on Erebor, fueled by the rise of the dark lord Sauron. Dwarves, elves and men must unite, and the hope for Middle-Earth falls into Bilbo's hands.",
+      "backdroppath": "/qhH3GyIfAnGv1pjdV3mw03qAilg.jpg",
+      "revenue": 955119788,
+      "TERRAINRANK": 10
+    }
+  ],
+  "template": {
+    "id": 8,
+    "lastModified": "2018-07-24T01:04:53.805Z",
+    "createdAt": "2018-07-24T01:04:11.917Z",
+    "archived": false,
+    "templateName": "testcsv",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "releasedate"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "date",
+                      "format": "ISOstring"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "votecount"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "budget"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "movieid"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "tagline"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "homepage"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "genres"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "posterpath"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "status"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "voteaverage"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "popularity"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "@version"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "12",
+                  "value": {
+                    "id": 12,
+                    "fields": [
+                      [
+                        "title"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "13",
+                  "value": {
+                    "id": 13,
+                    "fields": [
+                      [
+                        "language"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "14",
+                  "value": {
+                    "id": 14,
+                    "fields": [
+                      [
+                        "runtime"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "15",
+                  "value": {
+                    "id": 15,
+                    "fields": [
+                      [
+                        "overview"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "16",
+                  "value": {
+                    "id": 16,
+                    "fields": [
+                      [
+                        "backdroppath"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "17",
+                  "value": {
+                    "id": 17,
+                    "fields": [
+                      [
+                        "revenue"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "18",
+                  "value": {
+                    "id": 18,
+                    "fields": [
+                      [
+                        "TERRAINRANK"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "19",
+                  "value": {
+                    "id": 19,
+                    "fields": [
+                      [
+                        "movieid"
+                      ]
+                    ],
+                    "meta": {
+                      "factor": 2
+                    },
+                    "skipNulls": true,
+                    "typeCode": "MultiplyNode",
+                    "acceptedType": "number"
+                  }
+                },
+                {
+                  "v": "20",
+                  "value": {
+                    "id": 20,
+                    "fields": [
+                      [
+                        "budget"
+                      ]
+                    ],
+                    "meta": {
+                      "shift": 0.5
+                    },
+                    "skipNulls": true,
+                    "typeCode": "AddNode",
+                    "acceptedType": "number"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 19,
+            "uidNode": 21,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "genres"
+                ],
+                5
+              ],
+              [
+                [
+                  "votecount"
+                ],
+                0
+              ],
+              [
+                [
+                  "homepage"
+                ],
+                4
+              ],
+              [
+                [
+                  "title"
+                ],
+                12
+              ],
+              [
+                [
+                  "backdroppath"
+                ],
+                16
+              ],
+              [
+                [
+                  "movieid"
+                ],
+                2
+              ],
+              [
+                [
+                  "runtime"
+                ],
+                14
+              ],
+              [
+                [
+                  "budget"
+                ],
+                1
+              ],
+              [
+                [
+                  "voteaverage"
+                ],
+                8
+              ],
+              [
+                [
+                  "language"
+                ],
+                13
+              ],
+              [
+                [
+                  "TERRAINRANK"
+                ],
+                18
+              ],
+              [
+                [
+                  "revenue"
+                ],
+                17
+              ],
+              [
+                [
+                  "releasedate"
+                ],
+                9
+              ],
+              [
+                [
+                  "posterpath"
+                ],
+                6
+              ],
+              [
+                [
+                  "@version"
+                ],
+                11
+              ],
+              [
+                [
+                  "overview"
+                ],
+                15
+              ],
+              [
+                [
+                  "tagline"
+                ],
+                3
+              ],
+              [
+                [
+                  "popularity"
+                ],
+                10
+              ],
+              [
+                [
+                  "status"
+                ],
+                7
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "votecount"
+                ]
+              ],
+              [
+                1,
+                [
+                  "budget"
+                ]
+              ],
+              [
+                2,
+                [
+                  "movieid"
+                ]
+              ],
+              [
+                3,
+                [
+                  "tagline"
+                ]
+              ],
+              [
+                4,
+                [
+                  "homepage"
+                ]
+              ],
+              [
+                5,
+                [
+                  "genres"
+                ]
+              ],
+              [
+                6,
+                [
+                  "posterpath"
+                ]
+              ],
+              [
+                7,
+                [
+                  "status"
+                ]
+              ],
+              [
+                8,
+                [
+                  "voteaverage"
+                ]
+              ],
+              [
+                9,
+                [
+                  "releasedate"
+                ]
+              ],
+              [
+                10,
+                [
+                  "popularity"
+                ]
+              ],
+              [
+                11,
+                [
+                  "@version"
+                ]
+              ],
+              [
+                12,
+                [
+                  "title"
+                ]
+              ],
+              [
+                13,
+                [
+                  "language"
+                ]
+              ],
+              [
+                14,
+                [
+                  "runtime"
+                ]
+              ],
+              [
+                15,
+                [
+                  "overview"
+                ]
+              ],
+              [
+                16,
+                [
+                  "backdroppath"
+                ]
+              ],
+              [
+                17,
+                [
+                  "revenue"
+                ]
+              ],
+              [
+                18,
+                [
+                  "TERRAINRANK"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "number"
+              ],
+              [
+                1,
+                "number"
+              ],
+              [
+                2,
+                "number"
+              ],
+              [
+                3,
+                "string"
+              ],
+              [
+                4,
+                "string"
+              ],
+              [
+                5,
+                "string"
+              ],
+              [
+                6,
+                "string"
+              ],
+              [
+                7,
+                "string"
+              ],
+              [
+                8,
+                "number"
+              ],
+              [
+                9,
+                "string"
+              ],
+              [
+                10,
+                "number"
+              ],
+              [
+                11,
+                "number"
+              ],
+              [
+                12,
+                "string"
+              ],
+              [
+                13,
+                "string"
+              ],
+              [
+                14,
+                "number"
+              ],
+              [
+                15,
+                "string"
+              ],
+              [
+                16,
+                "string"
+              ],
+              [
+                17,
+                "number"
+              ],
+              [
+                18,
+                "number"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                true
+              ],
+              [
+                3,
+                true
+              ],
+              [
+                4,
+                true
+              ],
+              [
+                5,
+                true
+              ],
+              [
+                6,
+                true
+              ],
+              [
+                7,
+                true
+              ],
+              [
+                8,
+                true
+              ],
+              [
+                9,
+                true
+              ],
+              [
+                10,
+                true
+              ],
+              [
+                11,
+                true
+              ],
+              [
+                12,
+                true
+              ],
+              [
+                13,
+                true
+              ],
+              [
+                14,
+                true
+              ],
+              [
+                15,
+                true
+              ],
+              [
+                16,
+                true
+              ],
+              [
+                17,
+                true
+              ],
+              [
+                18,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                8,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                9,
+                {
+                  "etlType": "Date"
+                }
+              ],
+              [
+                10,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                11,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                12,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                13,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                14,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                15,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                16,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                17,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                18,
+                {
+                  "etlType": "Integer"
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Upload",
+        "name": "Source",
+        "fileConfig": {
+          "fileType": "csv",
+          "hasCsvHeader": true,
+          "jsonNewlines": true,
+          "xmlPath": "",
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "file": null
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Database",
+        "name": "Destination",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": [
+            "votecount",
+            "budget",
+            "movieid",
+            "tagline",
+            "homepage",
+            "genres",
+            "posterpath",
+            "status",
+            "voteaverage",
+            "releasedate",
+            "popularity",
+            "@version",
+            "title",
+            "language",
+            "runtime",
+            "overview",
+            "backdroppath",
+            "revenue",
+            "TERRAINRANK"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "language": "elastic",
+          "table": "data",
+          "serverId": "My ElasticSearch Instance",
+          "database": "testcsv"
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ]
+        }
+      }
+    }
+  }
+}

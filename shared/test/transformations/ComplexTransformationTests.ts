@@ -46,30 +46,106 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 import * as _ from 'lodash';
+
+import { DateFormats, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
-import { TransformationEngine } from '../../transformations/TransformationEngine';
-import TransformationNodeType from '../../transformations/TransformationNodeType';
+
 import { KeyPath, WayPoint } from '../../util/KeyPath';
 import * as yadeep from '../../util/yadeep';
 import { TestDocs } from './TestDocs';
 
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 
 function wrap(kp: any[])
 {
   return List([List<string | number>(kp)]);
 }
 
+test('identity transformation for nested arrays', () =>
+{
+  const doc = {
+    fields: [
+      {
+        foo: 'look what',
+      },
+      {
+        blah: [],
+      },
+      {
+        foo: 'the cat dragged in',
+      },
+    ],
+  };
+
+  const copyOfDoc = _.cloneDeep(doc);
+  const e = Utils.construction.makeEngine(doc);
+  const r = e.transform(doc);
+  expect(r).toEqual(copyOfDoc);
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
+});
+
+test('identity transformation for deeply nested arrays', () =>
+{
+  const doc = {
+    fields: [
+      {
+        blah: [[[{}]]],
+      },
+      {
+        foo: [
+          [{}],
+          [{ hi: 'lol' }],
+        ],
+      },
+    ],
+    suh: {},
+  };
+
+  const copyOfDoc = _.cloneDeep(doc);
+  const e = Utils.construction.makeEngine(doc);
+  const r = e.transform(doc, { removeEmptyObjects: false });
+  expect(r).toEqual(copyOfDoc);
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
+});
+
+test('identity transformation for conflicting nested arrays with empty arrays', () =>
+{
+  const doc = {
+    fields: [
+      {
+        set1: ['hi'],
+        set2: [],
+        set3: [],
+        set4: 'hi',
+      },
+      {
+        set1: [],
+        set2: ['hi'],
+        set3: 'hi',
+        set4: [],
+      },
+    ],
+    suh: {},
+  };
+  const copyOfDoc = _.cloneDeep(doc);
+  const e = Utils.construction.makeEngine(doc);
+
+  const r = e.transform(doc, { removeEmptyObjects: false });
+  expect(r).toEqual(copyOfDoc);
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
+});
+
 test('join transformation where the first field does not exist', () =>
 {
-
   const doc = {
     f2: 'hello',
     f3: 'world',
   };
 
-  const e: TransformationEngine = new TransformationEngine(doc);
-  e.addField(KeyPath(['f1']), 'string');
+  const e: TransformationEngine = Utils.construction.makeEngine(doc);
+  e.addField(KeyPath(['f1']));
   e.appendTransformation(
     TransformationNodeType.JoinNode,
     List([KeyPath(['f1']), KeyPath(['f2']), KeyPath(['f3'])]),
@@ -83,6 +159,7 @@ test('join transformation where the first field does not exist', () =>
     f3: 'world',
     result: 'hello world',
   });
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('array sum on a nested array field', () =>
@@ -98,7 +175,7 @@ test('array sum on a nested array field', () =>
     ],
   };
 
-  const e: TransformationEngine = new TransformationEngine(doc);
+  const e: TransformationEngine = Utils.construction.makeEngine(doc);
   e.appendTransformation(
     TransformationNodeType.ArraySumNode,
     wrap(['foo', -1, 'values']),
@@ -118,6 +195,7 @@ test('array sum on a nested array field', () =>
       },
     ],
   });
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 test('extract an array field with duplicate', () =>
@@ -125,13 +203,14 @@ test('extract an array field with duplicate', () =>
   const doc = {
     fields: ['foo', 'bar', 'baz'],
   };
-  const e = new TransformationEngine(doc);
+  const e = Utils.construction.makeEngine(doc);
+  e.addField(KeyPath(['fields', 0]));
   e.appendTransformation(
     TransformationNodeType.DuplicateNode,
     wrap(['fields', 0]),
     { newFieldKeyPaths: wrap(['zeroth']) },
   );
-  e.addField(List(['fields', 5]), 'string');
+  e.addField(List(['fields', 5]));
   e.appendTransformation(
     TransformationNodeType.DuplicateNode,
     wrap(['fields', 5]),
@@ -143,19 +222,21 @@ test('extract an array field with duplicate', () =>
     fields: ['foo', 'bar', 'baz'],
     zeroth: 'foo',
   });
+  expect(Utils.validation.verifyEngine(e)).toEqual([]);
 });
 
 describe('suite of complex duplication tests', () =>
 {
   function dupHelper(inKP: WayPoint[], outKP: WayPoint[], inDoc: object): object
   {
-    const e = new TransformationEngine(inDoc);
+    const e = Utils.construction.makeEngine(inDoc);
     e.appendTransformation(
       TransformationNodeType.DuplicateNode,
       wrap(inKP),
       { newFieldKeyPaths: wrap(outKP) },
     );
     const r = e.transform(inDoc);
+    expect(Utils.validation.verifyEngine(e)).toEqual([]);
     return r;
   }
 
@@ -200,27 +281,28 @@ describe('suite of complex duplication tests', () =>
     );
   });
 
-  // test('nested array one to one', () => {
-  //   expect(dupHelper(
-  //     ['items', -1, 'foo'],
-  //     ['items', -1, 'bar'],
-  //     {
-  //       items: [
-  //         { foo: [ 1, 2, 3 ] },
-  //         { foo: [ ] },
-  //         { notFoo: 3 },
-  //       ],
-  //     },
-  //   )).toEqual(
-  //     {
-  //       items: [
-  //         { foo: [ 1, 2, 3 ], bar: [ 1, 2, 3 ] },
-  //         { foo: [ ], bar: [ ] },
-  //         { notFoo: 3 },
-  //       ],
-  //     },
-  //   );
-  // });
+  test('nested array one to one', () =>
+  {
+    expect(dupHelper(
+      ['items', -1, 'foo'],
+      ['items', -1, 'bar'],
+      {
+        items: [
+          { foo: [1, 2, 3] },
+          { foo: [] },
+          { notFoo: 3 },
+        ],
+      },
+    )).toEqual(
+      {
+        items: [
+          { foo: [1, 2, 3], bar: [1, 2, 3] },
+          { foo: [], bar: [] },
+          { notFoo: 3 },
+        ],
+      },
+    );
+  });
 
   test('super nested one to one', () =>
   {
@@ -294,5 +376,162 @@ describe('suite of complex duplication tests', () =>
         ],
       },
     );
+  });
+});
+
+describe('Simple multi rename with an operation', () =>
+{
+  const doc = {
+    nested: {
+      foo: 'hi',
+    },
+  };
+  const { engine } = Utils.construction.createEngineFromDocuments(List([doc]));
+  const nestedId = engine.getFieldID(KeyPath(['nested']));
+  const fooId = engine.getFieldID(KeyPath(['nested', 'foo']));
+
+  engine.renameField(fooId, KeyPath(['nested', 'bar']));
+  engine.renameField(nestedId, KeyPath(['thing']));
+  engine.appendTransformation(TransformationNodeType.StringifyNode, List([nestedId]));
+
+  expect(engine.transform(doc)).toEqual({
+    thing: '{"bar":"hi"}',
+  });
+  expect(Utils.validation.verifyEngine(engine)).toEqual([]);
+});
+
+describe('Complex Stringify and Parse Gauntlet', () =>
+{
+  const baseDoc = {
+    foo: 'hello',
+    nested: {
+      name: 'bob',
+      value: 10,
+    },
+  };
+
+  /*
+   *  This test stringifies an object field, surrounds it with '[' and ']' then parses it.
+   */
+  function runGauntlet(engine: TransformationEngine, doc: object)
+  {
+    expect(engine.getFieldID(KeyPath(['nested', 'name']))).toBeDefined();
+    expect(engine.getFieldID(KeyPath(['nested', 'value']))).toBeDefined();
+
+    const nestedID = engine.getFieldID(KeyPath(['nested']));
+    expect(nestedID).toBeDefined();
+    engine.appendTransformation(TransformationNodeType.StringifyNode, List([nestedID]));
+
+    const nestedAsStr = engine.transform(doc)['nested'];
+    expect(typeof nestedAsStr).toBe('string');
+    expect(JSON.parse(nestedAsStr)).toEqual(baseDoc['nested']);
+    expect(Utils.fields.fieldType(nestedID, engine)).toBe(FieldTypes.String);
+
+    expect(engine.getFieldID(KeyPath(['nested', 'name']))).toBeUndefined();
+    expect(engine.getFieldID(KeyPath(['nested', 'value']))).toBeUndefined();
+
+    engine.appendTransformation(TransformationNodeType.InsertNode, List([nestedID]), { at: 0, value: '[' });
+    engine.appendTransformation(TransformationNodeType.InsertNode, List([nestedID]), { at: -1, value: ']' });
+    engine.appendTransformation(TransformationNodeType.ParseNode, List([nestedID]), { to: FieldTypes.Array });
+    const finalTransformed = engine.transform(doc);
+    const nestedAsArr = finalTransformed['nested'];
+    expect(nestedAsArr).toEqual([baseDoc['nested']]);
+    expect(finalTransformed['foo']).toBe(baseDoc['foo']);
+    expect(Utils.fields.fieldType(nestedID, engine)).toBe(FieldTypes.Array);
+    expect(Utils.validation.verifyEngine(engine)).toEqual([]);
+    return engine;
+  }
+
+  test('Simple Gauntlet', () =>
+  {
+    const { engine } = Utils.construction.createEngineFromDocuments(List([baseDoc]));
+    Utils.transformations.addInitialTypeCasts(engine);
+    runGauntlet(engine, baseDoc);
+  });
+
+  test('Gauntlet with initial rename', () =>
+  {
+    const doc = {
+      foo: 'hello',
+      noosted: {
+        fame: 'bob',
+        eulav: 10,
+      },
+    };
+    const { engine } = Utils.construction.createEngineFromDocuments(List([doc]));
+    Utils.transformations.addInitialTypeCasts(engine);
+
+    const nameId = engine.getFieldID(KeyPath(['noosted', 'fame']));
+    engine.renameField(nameId, KeyPath(['noosted', 'name']));
+
+    const nestedId = engine.getFieldID(KeyPath(['noosted']));
+    engine.renameField(nestedId, KeyPath(['nested']));
+
+    const valueId = engine.getFieldID(KeyPath(['nested', 'eulav']));
+    engine.renameField(valueId, KeyPath(['nested', 'value']));
+    runGauntlet(engine, doc);
+  });
+
+  test('Gauntlet with in place transformations', () =>
+  {
+    const doc = {
+      foo: 'ello',
+      nested: {
+        name: 'BOB',
+        value: 3,
+      },
+    };
+    const { engine } = Utils.construction.createEngineFromDocuments(List([doc]));
+    Utils.transformations.addInitialTypeCasts(engine);
+
+    const nameId = engine.getFieldID(KeyPath(['nested', 'name']));
+    const nestedId = engine.getFieldID(KeyPath(['nested']));
+    const fooId = engine.getFieldID(KeyPath(['foo']));
+    const valueId = engine.getFieldID(KeyPath(['nested', 'value']));
+
+    engine.appendTransformation(TransformationNodeType.CaseNode, List([nameId]), {
+      format: 'lowercase', // can't seem to import CaseFormats
+    });
+    engine.appendTransformation(TransformationNodeType.AddNode, List([valueId]), {
+      shift: 7,
+    });
+    engine.appendTransformation(TransformationNodeType.InsertNode, List([fooId]), {
+      at: 0,
+      value: 'h',
+    });
+    runGauntlet(engine, doc);
+  });
+
+  test('Gauntlet with combination of joins sums and renames', () =>
+  {
+    const doc = {
+      fooPart1: 'he',
+      fooPart2: 'llo',
+      nested: {
+        name: 'bob',
+        value: 3,
+        valuePart: 7,
+      },
+    };
+    const { engine } = Utils.construction.createEngineFromDocuments(List([doc]));
+    Utils.transformations.addInitialTypeCasts(engine);
+
+    const fooPartId = engine.getFieldID(KeyPath(['fooPart1']));
+    const fooPart2Id = engine.getFieldID(KeyPath(['fooPart2']));
+    engine.renameField(fooPartId, KeyPath(['fooPartRenamed']));
+    engine.appendTransformation(TransformationNodeType.JoinNode, List([fooPartId, fooPart2Id]), {
+      delimiter: '',
+      newFieldKeyPaths: wrap(['foo']),
+    });
+    const valueId = engine.getFieldID(KeyPath(['nested', 'value']));
+    const valuePartId = engine.getFieldID(KeyPath(['nested', 'valuePart']));
+    engine.appendTransformation(TransformationNodeType.SumNode, List([valueId, valuePartId]), {
+      newFieldKeyPaths: wrap(['sumvalue']),
+    });
+    engine.renameField(valueId, KeyPath(['get me out of here']));
+    engine.renameField(valuePartId, KeyPath(['get me out of here too']));
+    const newFieldId = engine.getFieldID(KeyPath(['sumvalue']));
+    engine.renameField(newFieldId, KeyPath(['nested', 'value']));
+    runGauntlet(engine, doc);
   });
 });

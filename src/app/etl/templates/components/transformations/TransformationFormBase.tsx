@@ -55,7 +55,7 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
 import { TransformationNode } from 'etl/templates/FieldTypes';
-import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -172,19 +172,13 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   {
     const { transformation, isCreate, engine, fieldId } = this.props;
     const fields = isCreate ?
-      List([engine.getInputKeyPath(fieldId)]) :
-      transformation.fields;
+      List([engine.getFieldPath(fieldId)]) :
+      transformation.fields.map((field) => field.path).toList();
 
     return {
       options: this.state,
       fields,
     };
-  }
-
-  // override this to customize the newFieldInfo object that gets passed to addTransformation
-  protected overrideTransformationConfig(): { type?: ETLFieldTypes, valueType?: ETLFieldTypes, newSourceType?: ETLFieldTypes }
-  {
-    return undefined;
   }
 
   // override this to customize how initial state gets computed from existing args
@@ -205,7 +199,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   protected createTransformation(proxy: EngineProxy)
   {
     const args = this.computeArgs();
-    proxy.addTransformation(this.type, args.fields, args.options, this.overrideTransformationConfig());
+    proxy.addTransformation(this.type, args.fields, args.options);
   }
 
   // override this to customize how transformations are edited
@@ -213,7 +207,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   {
     const { transformation } = this.props;
     const args = this.computeArgs();
-    proxy.editTransformation(transformation.id, args.fields, args.options, this.overrideTransformationConfig());
+    proxy.editTransformation(transformation.id, args.options);
   }
 
   // override this to customize how the state object changes when a form element changes

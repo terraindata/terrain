@@ -51,10 +51,9 @@ import * as yadeep from 'shared/util/yadeep';
 
 const { List, Map } = Immutable;
 
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -96,15 +95,12 @@ class QuotientTransformationInfoC extends TransformationNodeInfo
 
   public editable = false;
   public creatable = true;
-  public newFieldType = 'number';
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    return (
-      EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
-      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
-    );
-  }
+  protected newType = FieldTypes.Number;
+  protected availInfo = {
+    allowedTypes: [FieldTypes.Number, FieldTypes.Integer],
+    isNamed: true,
+  };
 }
 
 export const QuotientTransformationInfo = new QuotientTransformationInfoC();

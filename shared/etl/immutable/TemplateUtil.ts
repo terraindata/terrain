@@ -57,7 +57,7 @@ import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, Sources }
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
 import
@@ -91,7 +91,7 @@ export default class TemplateUtil
     {
       template.getEdges().forEach((edge: ETLEdge, key) =>
       {
-        const engineErrors = EngineUtil.verifyIntegrity(edge.transformations);
+        const engineErrors = TemplateUtil.verifyEngineIntegrity(edge.transformations);
         if (engineErrors.length > 0)
         {
           errors = errors.concat(engineErrors);
@@ -173,6 +173,34 @@ export default class TemplateUtil
     return errors;
   }
 
+  public static verifyEngineIntegrity(engine: TransformationEngine)
+  {
+    const errors = [];
+    try
+    {
+      const fields = engine.getAllFieldIDs();
+      fields.forEach((id) =>
+      {
+        const okp = engine.getFieldPath(id);
+        if (okp.size > 1)
+        {
+          const parentPath = okp.slice(0, -1).toList();
+          const parentID = engine.getFieldID(parentPath);
+          const type = Utils.fields.fieldType(parentID, engine);
+          if (type !== FieldTypes.Array && type !== FieldTypes.Object)
+          {
+            errors.push(`Field ${okp.toJS()} has a parent that is not an array or object`);
+          }
+        }
+      });
+    }
+    catch (e)
+    {
+      errors.push(`Error while trying to verify transformation engine integrity: ${String(e)}`);
+    }
+    return errors;
+  }
+
   /*
    *  Ensure
    *  1: If the template has upload sources, the files exist
@@ -216,7 +244,7 @@ export default class TemplateUtil
             if (fieldVer !== null && fieldVer.type === 'error')
             {
               hasFieldErrors = true;
-              errors.push(`Issue with field "${edge.transformations.getOutputKeyPath(fieldVer.fieldId).toJS()}": ${fieldVer.message}`);
+              errors.push(`Issue with field "${edge.transformations.getFieldPath(fieldVer.fieldId).toJS()}": ${fieldVer.message}`);
             }
           }
           return mappingErrors.length > 0 || hasFieldErrors;

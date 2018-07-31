@@ -61,7 +61,7 @@ import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
 import { DynamicForm } from 'common/components/DynamicForm';
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 import * as Immutable from 'immutable';
@@ -112,7 +112,7 @@ export class CaseTFF extends TransformationForm<CaseOptions, TransformationNodeT
     },
   };
   protected readonly initialState = {
-    format: 'uppercase',
+    format: CaseFormats.uppercase,
   };
 }
 
@@ -334,22 +334,6 @@ export class ZipcodeTFF extends TransformationForm<ZipcodeOptions, Transformatio
   protected readonly initialState = {
     format: 'loc',
   };
-
-  protected overrideTransformationConfig()
-  {
-    if (this.state.format === 'loc')
-    {
-      return {
-        newSourceType: ETLFieldTypes.GeoPoint,
-      };
-    }
-    else
-    {
-      return {
-        newSourceType: ETLFieldTypes.String,
-      };
-    }
-  }
 }
 
 const zipcodeFormats = List(['loc', 'city', 'state', 'citystate', 'type']);

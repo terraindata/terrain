@@ -1,0 +1,911 @@
+{
+  "testName": "FT_07",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "firstname": "J.D.",
+      "lastname": "Aasland",
+      "email": "jdaasland@hotmail.com",
+      "ImagePath": "https://agentphoto.firstteam.com/jdaasland.jpg",
+      "MobileNo": "(949) 637-1616",
+      "OfficePhone": "949-240-7979",
+      "WebSite": "http://jd.firstteam.com",
+      "OfficeName": "Dana Point",
+      "OfficeID": "9",
+      "agentID": "2796"
+    },
+    {
+      "firstname": "Terry",
+      "lastname": "Abbott",
+      "email": "terryabbott@firstteam.com",
+      "ImagePath": "https://agentphoto.firstteam.com/terryabbott.jpg",
+      "MobileNo": "(949) 280-2846",
+      "OfficePhone": "949-389-0004",
+      "WebSite": "http://terryabbott.firstteam.com",
+      "OfficeName": "Aliso Viejo",
+      "OfficeID": "97",
+      "agentID": "34181"
+    },
+    {
+      "firstname": "Mel D",
+      "lastname": "Abordo",
+      "email": "meldabordo@firstteam.com",
+      "ImagePath": "https://agentphoto.firstteam.com/meldabordo2.jpg",
+      "MobileNo": "(951) 526-8561",
+      "OfficePhone": "951-699-9080",
+      "WebSite": "http://meldabordo.firstteam.com",
+      "OfficeName": "Temecula",
+      "OfficeID": "11",
+      "agentID": "34327"
+    },
+    {
+      "firstname": "Steven",
+      "lastname": "Abraham",
+      "email": "lagunacastles@cox.net",
+      "ImagePath": "https://agentphoto.firstteam.com/stevenabraham3.jpg",
+      "MobileNo": "(949) 378-4005",
+      "OfficePhone": "949-497-5454",
+      "WebSite": "http://stevenabraham.firstteam.com",
+      "OfficeName": "Laguna Beach",
+      "OfficeID": "14",
+      "agentID": "31718"
+    },
+    {
+      "firstname": "Stephanie",
+      "lastname": "Abrego",
+      "email": "stephanie4homes@gmail.com",
+      "ImagePath": "https://agentphoto.firstteam.com/stephanieabrego4.jpg",
+      "MobileNo": "(714) 270-4588",
+      "OfficePhone": "714-270-4588",
+      "WebSite": "http://theabregoteam.firstteam.com",
+      "OfficeName": "Yorba Linda",
+      "OfficeID": "15",
+      "agentID": "8734"
+    },
+    {
+      "firstname": "Mary",
+      "lastname": "Abuelafiya",
+      "email": "MaryAbuelafiya@FirstTeam.com",
+      "ImagePath": "https://agentphoto.firstteam.com/maryabuelafiya.jpg",
+      "MobileNo": "(949) 466-9223",
+      "OfficePhone": "949-458-1033",
+      "WebSite": "http://maryabuelafiya.firstteam.com",
+      "OfficeName": "Mission Viejo",
+      "OfficeID": "44",
+      "agentID": "33737"
+    },
+    {
+      "firstname": "Jennifer",
+      "lastname": "Ackerman",
+      "email": "jenniferkackerman@firstteam.com",
+      "ImagePath": "https://agentphoto.firstteam.com/jenniferkackerman.jpg",
+      "MobileNo": "(949) 287-2225",
+      "OfficePhone": "949-240-7979",
+      "WebSite": "http://jenniferkackerman.firstteam.com",
+      "OfficeName": "Dana Point",
+      "OfficeID": "9",
+      "agentID": "33958"
+    },
+    {
+      "firstname": "Vivian",
+      "lastname": "Acosta",
+      "email": "vivianacosta@firstteam.com",
+      "ImagePath": "https://agentphoto.firstteam.com/vivianacosta2.jpg",
+      "MobileNo": "(951) 205-3313",
+      "OfficePhone": "951-205-3313",
+      "WebSite": "http://vivianacosta.firstteam.com",
+      "OfficeName": "Diamond Bar",
+      "OfficeID": "17",
+      "agentID": "5710"
+    },
+    {
+      "firstname": "Chandra",
+      "lastname": "Adam",
+      "email": "chandraadam@firstteam.com",
+      "ImagePath": "https://agentphoto.firstteam.com/chandraadam.jpg",
+      "MobileNo": "(714) 823-8558",
+      "OfficePhone": "714-823-8558",
+      "WebSite": "http://chandraadam.firstteam.com",
+      "OfficeName": "Brea",
+      "OfficeID": "102",
+      "agentID": "4804"
+    },
+    {
+      "firstname": "Barbara",
+      "lastname": "Adams",
+      "email": "barbaraadams@firstteam.com",
+      "ImagePath": "https://agentphoto.firstteam.com/barbaraadams.jpg",
+      "MobileNo": "(714) 878-3022",
+      "OfficePhone": "714-964-1211",
+      "WebSite": "http://barbaraadams.firstteam.com",
+      "OfficeName": "Huntington Beach - South",
+      "OfficeID": "4",
+      "agentID": "9261"
+    }
+  ],
+  "outputDocs": [
+    {
+      "FirstName": "J.D.",
+      "LastName": "Aasland",
+      "Image": "https://agentphoto.firstteam.com/jdaasland.jpg",
+      "WebSite": "http://jd.firstteam.com",
+      "OfficeName": "Dana Point",
+      "OfficeID": 9,
+      "AgentID": "2796",
+      "FullName": "J.D.-Aasland"
+    },
+    {
+      "FirstName": "Terry",
+      "LastName": "Abbott",
+      "Image": "https://agentphoto.firstteam.com/terryabbott.jpg",
+      "WebSite": "http://terryabbott.firstteam.com",
+      "OfficeName": "Aliso Viejo",
+      "OfficeID": 97,
+      "AgentID": "34181",
+      "FullName": "Terry-Abbott"
+    },
+    {
+      "FirstName": "Mel D",
+      "LastName": "Abordo",
+      "Image": "https://agentphoto.firstteam.com/meldabordo2.jpg",
+      "WebSite": "http://meldabordo.firstteam.com",
+      "OfficeName": "Temecula",
+      "OfficeID": 11,
+      "AgentID": "34327",
+      "FullName": "Mel D-Abordo"
+    },
+    {
+      "FirstName": "Steven",
+      "LastName": "Abraham",
+      "Image": "https://agentphoto.firstteam.com/stevenabraham3.jpg",
+      "WebSite": "http://stevenabraham.firstteam.com",
+      "OfficeName": "Laguna Beach",
+      "OfficeID": 14,
+      "AgentID": "31718",
+      "FullName": "Steven-Abraham"
+    },
+    {
+      "FirstName": "Stephanie",
+      "LastName": "Abrego",
+      "Image": "https://agentphoto.firstteam.com/stephanieabrego4.jpg",
+      "WebSite": "http://theabregoteam.firstteam.com",
+      "OfficeName": "Yorba Linda",
+      "OfficeID": 15,
+      "AgentID": "8734",
+      "FullName": "Stephanie-Abrego"
+    },
+    {
+      "FirstName": "Mary",
+      "LastName": "Abuelafiya",
+      "Image": "https://agentphoto.firstteam.com/maryabuelafiya.jpg",
+      "WebSite": "http://maryabuelafiya.firstteam.com",
+      "OfficeName": "Mission Viejo",
+      "OfficeID": 44,
+      "AgentID": "33737",
+      "FullName": "Mary-Abuelafiya"
+    },
+    {
+      "FirstName": "Jennifer",
+      "LastName": "Ackerman",
+      "Image": "https://agentphoto.firstteam.com/jenniferkackerman.jpg",
+      "WebSite": "http://jenniferkackerman.firstteam.com",
+      "OfficeName": "Dana Point",
+      "OfficeID": 9,
+      "AgentID": "33958",
+      "FullName": "Jennifer-Ackerman"
+    },
+    {
+      "FirstName": "Vivian",
+      "LastName": "Acosta",
+      "Image": "https://agentphoto.firstteam.com/vivianacosta2.jpg",
+      "WebSite": "http://vivianacosta.firstteam.com",
+      "OfficeName": "Diamond Bar",
+      "OfficeID": 17,
+      "AgentID": "5710",
+      "FullName": "Vivian-Acosta"
+    },
+    {
+      "FirstName": "Chandra",
+      "LastName": "Adam",
+      "Image": "https://agentphoto.firstteam.com/chandraadam.jpg",
+      "WebSite": "http://chandraadam.firstteam.com",
+      "OfficeName": "Brea",
+      "OfficeID": 102,
+      "AgentID": "4804",
+      "FullName": "Chandra-Adam"
+    },
+    {
+      "FirstName": "Barbara",
+      "LastName": "Adams",
+      "Image": "https://agentphoto.firstteam.com/barbaraadams.jpg",
+      "WebSite": "http://barbaraadams.firstteam.com",
+      "OfficeName": "Huntington Beach - South",
+      "OfficeID": 4,
+      "AgentID": "9261",
+      "FullName": "Barbara-Adams"
+    }
+  ],
+  "template": {
+    "id": 7,
+    "lastModified": "2018-07-10T00:29:19.456Z",
+    "createdAt": "2018-05-30T01:10:29.829Z",
+    "archived": false,
+    "templateName": "Spacio Agents Import Template",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "firstname"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "lastname"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "email"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "ImagePath"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "MobileNo"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "OfficePhone"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "WebSite"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "OfficeName"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "OfficeID"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "agentID"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "firstname"
+                      ],
+                      [
+                        "lastname"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "FullName"
+                        ]
+                      ],
+                      "delimiter": "-",
+                      "preserveOldFields": false
+                    },
+                    "skipNulls": true,
+                    "typeCode": "JoinNode",
+                    "acceptedType": "string"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "agentID"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 11,
+            "uidNode": 12,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "OfficeID"
+                ],
+                8
+              ],
+              [
+                [
+                  "agentID"
+                ],
+                9
+              ],
+              [
+                [
+                  "WebSite"
+                ],
+                6
+              ],
+              [
+                [
+                  "lastname"
+                ],
+                1
+              ],
+              [
+                [
+                  "firstname"
+                ],
+                0
+              ],
+              [
+                [
+                  "_synthetic_h0kitwafzk7",
+                  "FullName"
+                ],
+                10
+              ],
+              [
+                [
+                  "OfficeName"
+                ],
+                7
+              ],
+              [
+                [
+                  "OfficePhone"
+                ],
+                5
+              ],
+              [
+                [
+                  "ImagePath"
+                ],
+                3
+              ],
+              [
+                [
+                  "MobileNo"
+                ],
+                4
+              ],
+              [
+                [
+                  "email"
+                ],
+                2
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "FirstName"
+                ]
+              ],
+              [
+                1,
+                [
+                  "LastName"
+                ]
+              ],
+              [
+                2,
+                [
+                  "Email"
+                ]
+              ],
+              [
+                3,
+                [
+                  "Image"
+                ]
+              ],
+              [
+                4,
+                [
+                  "MobileNo"
+                ]
+              ],
+              [
+                5,
+                [
+                  "OfficePhone"
+                ]
+              ],
+              [
+                6,
+                [
+                  "WebSite"
+                ]
+              ],
+              [
+                7,
+                [
+                  "OfficeName"
+                ]
+              ],
+              [
+                8,
+                [
+                  "OfficeID"
+                ]
+              ],
+              [
+                9,
+                [
+                  "AgentID"
+                ]
+              ],
+              [
+                10,
+                [
+                  "FullName"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "string"
+              ],
+              [
+                2,
+                "string"
+              ],
+              [
+                3,
+                "string"
+              ],
+              [
+                4,
+                "string"
+              ],
+              [
+                5,
+                "string"
+              ],
+              [
+                6,
+                "string"
+              ],
+              [
+                7,
+                "string"
+              ],
+              [
+                8,
+                "number"
+              ],
+              [
+                9,
+                "string"
+              ],
+              [
+                10,
+                "string"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                false
+              ],
+              [
+                3,
+                true
+              ],
+              [
+                4,
+                false
+              ],
+              [
+                5,
+                false
+              ],
+              [
+                6,
+                true
+              ],
+              [
+                7,
+                true
+              ],
+              [
+                8,
+                true
+              ],
+              [
+                9,
+                true
+              ],
+              [
+                10,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                8,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                9,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": true,
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                10,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Http",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "csv",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "method": "GET"
+        },
+        "integrationId": 14,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Database",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": [
+            "FirstName",
+            "FullName",
+            "LastName",
+            "Image",
+            "WebSite",
+            "OfficeName",
+            "OfficeID",
+            "AgentID"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "language": "elastic",
+          "table": "data",
+          "serverId": "FirstTeam ES",
+          "database": "agents"
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            10,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ]
+        }
+      }
+    }
+  }
+}

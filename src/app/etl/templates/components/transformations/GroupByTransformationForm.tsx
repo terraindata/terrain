@@ -58,11 +58,11 @@ import ObjectForm from 'common/components/ObjectForm';
 import { FieldPicker } from 'etl/common/components/FieldPicker.tsx';
 import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
 import { TransformationNode } from 'etl/templates/FieldTypes';
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
@@ -116,7 +116,7 @@ export class GroupByTFF extends TransformationForm<GroupByOptions, Transformatio
     this.setState(newState);
   }
 
-  protected createTransformation(proxy: EngineProxy)
+  protected computeArgs()
   {
     const { engine, fieldId } = this.props;
     const { outputMapping, subkey } = this.state;
@@ -133,15 +133,10 @@ export class GroupByTFF extends TransformationForm<GroupByOptions, Transformatio
       groupValues,
       subkey,
     };
-    const fields = List([engine.getInputKeyPath(fieldId)]);
-    proxy.addTransformation(this.type, fields, options, {
-      type: ETLFieldTypes.Array,
-      valueType: ETLFieldTypes.Object,
-    });
-    for (const key of Object.keys(outputMapping))
-    {
-      const newFieldKP = List([outputMapping[key]]);
-      proxy.copyNestedTypes(fieldId, newFieldKP);
-    }
+    const fields = List([engine.getFieldPath(fieldId)]);
+    return {
+      fields,
+      options,
+    };
   }
 }

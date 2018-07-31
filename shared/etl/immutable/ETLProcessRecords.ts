@@ -98,7 +98,11 @@ class ETLEdgeC implements ETLEdgeI
 }
 export type ETLEdge = WithIRecord<ETLEdgeC>;
 export const _ETLEdge = makeExtendedConstructor(ETLEdgeC, true, {
-  transformations: TransformationEngine.load,
+  transformations: (val) =>
+  {
+    const toLoad = typeof val === 'string' ? val : JSON.stringify(val);
+    return TransformationEngine.load(toLoad);
+  },
 });
 
 class MergeJoinOptionsC implements MergeJoinOptionsI

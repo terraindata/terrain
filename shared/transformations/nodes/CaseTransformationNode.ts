@@ -51,10 +51,9 @@ import * as yadeep from 'shared/util/yadeep';
 
 const { List, Map } = Immutable;
 
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -130,10 +129,9 @@ class CaseTransformationInfoC extends TransformationNodeInfo
   public editable = true;
   public creatable = true;
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
-  }
+  protected availInfo = {
+    allowedTypes: [FieldTypes.String],
+  };
 }
 
 export const CaseTransformationInfo = new CaseTransformationInfoC();

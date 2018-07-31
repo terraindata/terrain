@@ -1,0 +1,2078 @@
+{
+  "testName": "MB_03",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "g:id": "LP001",
+      "g:image_link": "https://assets0.mixbook.com/feeds/images/beautiful-photo-books.jpg",
+      "g:condition": "new",
+      "g:availability": "in stock",
+      "g:brand": "Mixbook",
+      "g:identifier_exists": "FALSE",
+      "title": "Custom Photo Books",
+      "description": "Turn your photos into a customized photo book from Mixbook. Choose from a variety of professionally-designed themes to showcase your photos in an elegantly bound photo book. Mixbook's powerful design software gives you the freedom to lay out and design your book to your heart's content - ideal for capturing those special wedding, baby, family, vacation, school, and team photos. And Mixbook's photo books are made to last - with archival-quality FSC-certified papers, hand-stitched hardcovers, and incredibly detailed print production. Create your own 8.5\" x 8.5\" photo book today.",
+      "g:product_category": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "g:product_type": "Photo Books > Everyday Photo Books",
+      "g:price": "19.99 USD",
+      "g:shipping": {
+        "g:country": "US",
+        "g:service": "Standard",
+        "g:price": "8.99 USD"
+      },
+      "size": "8.5\" x 8.5\"",
+      "link": "https://www.mixbook.com/l/beautiful-photo-books?",
+      "g:adwords_redirect": "https://www.mixbook.com/l/beautiful-photo-books?utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}"
+    },
+    {
+      "g:id": "LP002",
+      "g:image_link": "https://assets1.mixbook.com/feeds/images/books-made-by-you.jpg",
+      "g:condition": "new",
+      "g:availability": "in stock",
+      "g:brand": "Mixbook",
+      "g:identifier_exists": "FALSE",
+      "title": "Custom Photo Books",
+      "description": "With Mixbook, you can design a personalized photo book that's customized to your liking. Mixbook lets you design a photo book to your heart's content with a powerful and flexible design editor that is perfect for any occasion or collection of photos. Not only can you lay out your photos exactly as you want them to appear in a theme of your choosing, but you can also add your own design touch with text and graphics. Mixbook's photobooks take photo albums to a whole new level - ideal for showcasing all those special wedding, baby, family, vacation, travel, school, and team photos - and a great gift too. And Mixbook's photo books are high quality - made with archival-quality FSC-certified paper, hand-stitched hardcovers, and meticulous print production. Create your own 8.5 x 11 photo book today",
+      "g:product_category": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "g:product_type": "Photo Books > Everyday Photo Books",
+      "g:price": "24.99 USD",
+      "g:shipping": {
+        "g:country": "US",
+        "g:service": "Standard",
+        "g:price": "10.99 USD"
+      },
+      "size": "8.5\" x 11\"",
+      "link": "https://www.mixbook.com/l/books-made-by-you?",
+      "g:adwords_redirect": "https://www.mixbook.com/l/books-made-by-you?utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}"
+    },
+    {
+      "g:id": "LP003",
+      "g:image_link": "https://assets2.mixbook.com/feeds/images/our-photo-book-brands.jpg",
+      "g:condition": "new",
+      "g:availability": "in stock",
+      "g:brand": "Mixbook",
+      "g:identifier_exists": "FALSE",
+      "title": "Custom Photo Books",
+      "description": "Mixbook gives you the power to make a photo book you can call your very own. Customized photo books are Mixbook's specialty. The editor on the Mixbook.com web site enables you to create and design a photo book exactly as you want it. You will want to turn all your photos into photo books once you see how easy it is to make a photo book using Mixbook. We offer a wide variety of professionally-designed themes as well as text and graphic design elements to make your book truly personalized. You will be amazed at how the the final elegantly-bound book will look - so much richer than a standard photo album. Mixbook photobooks make great gifts and are ideal for capturing those special wedding, baby, family, vacation, travel, school, and team photos. Mixbooks are also made with lasting, high quality materials, including archival-quality FSC-certified paper, hand-stitched hardcovers, and incredibly detailed print production. Create your own 11 x 8.5 photo book today.",
+      "g:product_category": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "g:product_type": "Photo Books > Everyday Photo Books",
+      "g:price": "24.99 USD",
+      "g:shipping": {
+        "g:country": "US",
+        "g:service": "Standard",
+        "g:price": "8.99 USD"
+      },
+      "size": "11\" x 8.5\"",
+      "link": "https://www.mixbook.com/l/our-photo-book-brands?",
+      "g:adwords_redirect": "https://www.mixbook.com/l/our-photo-book-brands?utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}"
+    },
+    {
+      "g:id": "gmc01-12",
+      "g:image_link": "https://assets2.mixbook.com/pages/61019634_827410_l.jpg?1518721854",
+      "g:condition": "new",
+      "g:availability": "in stock",
+      "g:brand": "Mixbook",
+      "g:identifier_exists": "FALSE",
+      "title": "Simple Wedding Photo Book",
+      "description": "Showcase your wedding photos in the clean, timeless design of the Simple Wedding photo book. This classic theme features a black and white palette with pops of green, understated scrollwork details and a wide variety of layouts. Several beautiful wedding-related quotes appear throughout the template, which you can include as part of your custom album or replace with quotes or passages meaningful to you and your spouse. Add your couple initials along with fun close-up photographs to but your own spin on wedding photographs.\n        Simple Wedding is part of our Wedding Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "g:product_category": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "g:product_type": "Photo Books > Wedding Photo Books",
+      "g:price": "15.99 USD",
+      "g:shipping": {
+        "g:country": "US",
+        "g:service": "Standard",
+        "g:price": "8.99 USD"
+      },
+      "link": "https://www.mixbook.com/wedding-photo-books/simple-wedding-15?ptid=12",
+      "g:adwords_redirect": "https://www.mixbook.com/wedding-photo-books/simple-wedding-15?ptid=12&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}"
+    },
+    {
+      "g:id": "gmc01-14",
+      "g:image_link": "https://assets2.mixbook.com/pages/60318866_827410_l.jpg?1518721851",
+      "g:condition": "new",
+      "g:availability": "in stock",
+      "g:brand": "Mixbook",
+      "g:identifier_exists": "FALSE",
+      "title": "Simple Wedding Photo Book",
+      "description": "Showcase your wedding photos in the clean, timeless design of the Simple Wedding photo book. This classic theme features a black and white palette with pops of green, understated scrollwork details and a wide variety of layouts. Several beautiful wedding-related quotes appear throughout the template, which you can include as part of your custom album or replace with quotes or passages meaningful to you and your spouse. Add your couple initials along with fun close-up photographs to but your own spin on wedding photographs.\n        Simple Wedding is part of our Wedding Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "g:product_category": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "g:product_type": "Photo Books > Wedding Photo Books",
+      "g:price": "15.99 USD",
+      "g:shipping": {
+        "g:country": "US",
+        "g:service": "Standard",
+        "g:price": "10.99 USD"
+      },
+      "link": "https://www.mixbook.com/wedding-photo-books/simple-wedding-15?ptid=14",
+      "g:adwords_redirect": "https://www.mixbook.com/wedding-photo-books/simple-wedding-15?ptid=14&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}"
+    },
+    {
+      "g:id": "gmc01-15",
+      "g:image_link": "https://assets2.mixbook.com/pages/60318306_827410_l.jpg?1518721846",
+      "g:condition": "new",
+      "g:availability": "in stock",
+      "g:brand": "Mixbook",
+      "g:identifier_exists": "FALSE",
+      "title": "Simple Wedding Photo Book",
+      "description": "Showcase your wedding photos in the clean, timeless design of the Simple Wedding photo book. This classic theme features a black and white palette with pops of green, understated scrollwork details and a wide variety of layouts. Several beautiful wedding-related quotes appear throughout the template, which you can include as part of your custom album or replace with quotes or passages meaningful to you and your spouse. Add your couple initials along with fun close-up photographs to but your own spin on wedding photographs.\n        Simple Wedding is part of our Wedding Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "g:product_category": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "g:product_type": "Photo Books > Wedding Photo Books",
+      "g:price": "15.99 USD",
+      "g:shipping": {
+        "g:country": "US",
+        "g:service": "Standard",
+        "g:price": "8.99 USD"
+      },
+      "link": "https://www.mixbook.com/wedding-photo-books/simple-wedding-15?ptid=15",
+      "g:adwords_redirect": "https://www.mixbook.com/wedding-photo-books/simple-wedding-15?ptid=15&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}"
+    },
+    {
+      "g:id": "gmc01-57",
+      "g:image_link": "https://assets2.mixbook.com/pages/61019522_783584_l.jpg?1483533413",
+      "g:condition": "new",
+      "g:availability": "in stock",
+      "g:brand": "Mixbook",
+      "g:identifier_exists": "FALSE",
+      "title": "Father's Day Photo Book",
+      "description": "Celebrate this Father’s Day with a gift that dad will enjoy all year long. Rich, brown backgrounds showcase your special memories in a multitude of layouts. Choose from special portraits or thoughtful collages to create a look that reflects your unique style. Personal quotes and tags can be added with block lettering, post-its or inside eye-catching artwork like a full cup of joe.\n        Father's Day is part of our Family Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "g:product_category": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "g:product_type": "Photo Books > Family Photo Books",
+      "g:price": "15.99 USD",
+      "g:shipping": {
+        "g:country": "US",
+        "g:service": "Standard",
+        "g:price": "8.99 USD"
+      },
+      "link": "https://www.mixbook.com/family-photo-books/father-s-day-19?ptid=57",
+      "g:adwords_redirect": "https://www.mixbook.com/family-photo-books/father-s-day-19?ptid=57&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}"
+    },
+    {
+      "g:id": "gmc01-59",
+      "g:image_link": "https://assets0.mixbook.com/pages/60319000_783584_l.jpg?1483553488",
+      "g:condition": "new",
+      "g:availability": "in stock",
+      "g:brand": "Mixbook",
+      "g:identifier_exists": "FALSE",
+      "title": "Father's Day Photo Book",
+      "description": "Celebrate this Father’s Day with a gift that dad will enjoy all year long. Rich, brown backgrounds showcase your special memories in a multitude of layouts. Choose from special portraits or thoughtful collages to create a look that reflects your unique style. Personal quotes and tags can be added with block lettering, post-its or inside eye-catching artwork like a full cup of joe.\n        Father's Day is part of our Family Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "g:product_category": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "g:product_type": "Photo Books > Family Photo Books",
+      "g:price": "15.99 USD",
+      "g:shipping": {
+        "g:country": "US",
+        "g:service": "Standard",
+        "g:price": "10.99 USD"
+      },
+      "link": "https://www.mixbook.com/family-photo-books/father-s-day-19?ptid=59",
+      "g:adwords_redirect": "https://www.mixbook.com/family-photo-books/father-s-day-19?ptid=59&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}"
+    },
+    {
+      "g:id": "gmc01-60",
+      "g:image_link": "https://assets0.mixbook.com/pages/60318440_783584_l.jpg?1483513396",
+      "g:condition": "new",
+      "g:availability": "in stock",
+      "g:brand": "Mixbook",
+      "g:identifier_exists": "FALSE",
+      "title": "Father's Day Photo Book",
+      "description": "Celebrate this Father’s Day with a gift that dad will enjoy all year long. Rich, brown backgrounds showcase your special memories in a multitude of layouts. Choose from special portraits or thoughtful collages to create a look that reflects your unique style. Personal quotes and tags can be added with block lettering, post-its or inside eye-catching artwork like a full cup of joe.\n        Father's Day is part of our Family Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "g:product_category": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "g:product_type": "Photo Books > Family Photo Books",
+      "g:price": "15.99 USD",
+      "g:shipping": {
+        "g:country": "US",
+        "g:service": "Standard",
+        "g:price": "8.99 USD"
+      },
+      "link": "https://www.mixbook.com/family-photo-books/father-s-day-19?ptid=60",
+      "g:adwords_redirect": "https://www.mixbook.com/family-photo-books/father-s-day-19?ptid=60&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}"
+    },
+    {
+      "g:id": "gmc01-97",
+      "g:image_link": "https://assets3.mixbook.com/pages/61357643_783584_l.jpg?1521644892",
+      "g:condition": "new",
+      "g:availability": "in stock",
+      "g:brand": "Mixbook",
+      "g:identifier_exists": "FALSE",
+      "title": "Blank Canvas Photo Book",
+      "description": "There’s nothing like a Blank Canvas to spark your creativity. This unique photo book puts your imagination in the driver’s seat with unlimited backgrounds and layout choices for your design. Feature your photographs with an assortment of graphics and typographies to make any statement you want. Whatever you can dream, the sky’s the limit with the matchless Blank Canvas photo book.\n        Blank Canvas is part of our Everyday Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "g:product_category": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "g:product_type": "Photo Books > Everyday Photo Books",
+      "g:price": "15.99 USD",
+      "g:shipping": {
+        "g:country": "US",
+        "g:service": "Standard",
+        "g:price": "8.99 USD"
+      },
+      "link": "https://www.mixbook.com/everyday-photo-books/blank-canvas-10?ptid=97",
+      "g:adwords_redirect": "https://www.mixbook.com/everyday-photo-books/blank-canvas-10?ptid=97&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}"
+    }
+  ],
+  "outputDocs": [
+    {
+      "id": "LP001",
+      "ImageLink": "https://assets0.mixbook.com/feeds/images/beautiful-photo-books.jpg",
+      "Condition": "new",
+      "Availability": "in stock",
+      "Brand": "Mixbook",
+      "IdentifierExists": "FALSE",
+      "Title": "Custom Photo Books",
+      "Description": "Turn your photos into a customized photo book from Mixbook. Choose from a variety of professionally-designed themes to showcase your photos in an elegantly bound photo book. Mixbook's powerful design software gives you the freedom to lay out and design your book to your heart's content - ideal for capturing those special wedding, baby, family, vacation, school, and team photos. And Mixbook's photo books are made to last - with archival-quality FSC-certified papers, hand-stitched hardcovers, and incredibly detailed print production. Create your own 8.5\" x 8.5\" photo book today.",
+      "Price": 19.99,
+      "Country": "US",
+      "Service": "Standard",
+      "ShippingPrice": 8.99,
+      "Size": "8.5\" x 8.5\"",
+      "Link": "https://www.mixbook.com/l/beautiful-photo-books?",
+      "AdwordsRedirect": "https://www.mixbook.com/l/beautiful-photo-books?utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "TotalPrice": 28.979999999999997,
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Everyday Photo Books"
+      ],
+      "ProductType": "Photo Books > Everyday Photo Books"
+    },
+    {
+      "id": "LP002",
+      "ImageLink": "https://assets1.mixbook.com/feeds/images/books-made-by-you.jpg",
+      "Condition": "new",
+      "Availability": "in stock",
+      "Brand": "Mixbook",
+      "IdentifierExists": "FALSE",
+      "Title": "Custom Photo Books",
+      "Description": "With Mixbook, you can design a personalized photo book that's customized to your liking. Mixbook lets you design a photo book to your heart's content with a powerful and flexible design editor that is perfect for any occasion or collection of photos. Not only can you lay out your photos exactly as you want them to appear in a theme of your choosing, but you can also add your own design touch with text and graphics. Mixbook's photobooks take photo albums to a whole new level - ideal for showcasing all those special wedding, baby, family, vacation, travel, school, and team photos - and a great gift too. And Mixbook's photo books are high quality - made with archival-quality FSC-certified paper, hand-stitched hardcovers, and meticulous print production. Create your own 8.5 x 11 photo book today",
+      "Price": 24.99,
+      "Country": "US",
+      "Service": "Standard",
+      "ShippingPrice": 10.99,
+      "Size": "8.5\" x 11\"",
+      "Link": "https://www.mixbook.com/l/books-made-by-you?",
+      "AdwordsRedirect": "https://www.mixbook.com/l/books-made-by-you?utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "TotalPrice": 35.98,
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Everyday Photo Books"
+      ],
+      "ProductType": "Photo Books > Everyday Photo Books"
+    },
+    {
+      "id": "LP003",
+      "ImageLink": "https://assets2.mixbook.com/feeds/images/our-photo-book-brands.jpg",
+      "Condition": "new",
+      "Availability": "in stock",
+      "Brand": "Mixbook",
+      "IdentifierExists": "FALSE",
+      "Title": "Custom Photo Books",
+      "Description": "Mixbook gives you the power to make a photo book you can call your very own. Customized photo books are Mixbook's specialty. The editor on the Mixbook.com web site enables you to create and design a photo book exactly as you want it. You will want to turn all your photos into photo books once you see how easy it is to make a photo book using Mixbook. We offer a wide variety of professionally-designed themes as well as text and graphic design elements to make your book truly personalized. You will be amazed at how the the final elegantly-bound book will look - so much richer than a standard photo album. Mixbook photobooks make great gifts and are ideal for capturing those special wedding, baby, family, vacation, travel, school, and team photos. Mixbooks are also made with lasting, high quality materials, including archival-quality FSC-certified paper, hand-stitched hardcovers, and incredibly detailed print production. Create your own 11 x 8.5 photo book today.",
+      "Price": 24.99,
+      "Country": "US",
+      "Service": "Standard",
+      "ShippingPrice": 8.99,
+      "Size": "11\" x 8.5\"",
+      "Link": "https://www.mixbook.com/l/our-photo-book-brands?",
+      "AdwordsRedirect": "https://www.mixbook.com/l/our-photo-book-brands?utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "TotalPrice": 33.98,
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Everyday Photo Books"
+      ],
+      "ProductType": "Photo Books > Everyday Photo Books"
+    },
+    {
+      "id": "gmc01-12",
+      "ImageLink": "https://assets2.mixbook.com/pages/61019634_827410_l.jpg?1518721854",
+      "Condition": "new",
+      "Availability": "in stock",
+      "Brand": "Mixbook",
+      "IdentifierExists": "FALSE",
+      "Title": "Simple Wedding Photo Book",
+      "Description": "Showcase your wedding photos in the clean, timeless design of the Simple Wedding photo book. This classic theme features a black and white palette with pops of green, understated scrollwork details and a wide variety of layouts. Several beautiful wedding-related quotes appear throughout the template, which you can include as part of your custom album or replace with quotes or passages meaningful to you and your spouse. Add your couple initials along with fun close-up photographs to but your own spin on wedding photographs.\n        Simple Wedding is part of our Wedding Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "Price": 15.99,
+      "Country": "US",
+      "Service": "Standard",
+      "ShippingPrice": 8.99,
+      "Link": "https://www.mixbook.com/wedding-photo-books/simple-wedding-15?ptid=12",
+      "AdwordsRedirect": "https://www.mixbook.com/wedding-photo-books/simple-wedding-15?ptid=12&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "TotalPrice": 24.98,
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Wedding Photo Books"
+      ],
+      "ProductType": "Photo Books > Wedding Photo Books"
+    },
+    {
+      "id": "gmc01-14",
+      "ImageLink": "https://assets2.mixbook.com/pages/60318866_827410_l.jpg?1518721851",
+      "Condition": "new",
+      "Availability": "in stock",
+      "Brand": "Mixbook",
+      "IdentifierExists": "FALSE",
+      "Title": "Simple Wedding Photo Book",
+      "Description": "Showcase your wedding photos in the clean, timeless design of the Simple Wedding photo book. This classic theme features a black and white palette with pops of green, understated scrollwork details and a wide variety of layouts. Several beautiful wedding-related quotes appear throughout the template, which you can include as part of your custom album or replace with quotes or passages meaningful to you and your spouse. Add your couple initials along with fun close-up photographs to but your own spin on wedding photographs.\n        Simple Wedding is part of our Wedding Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "Price": 15.99,
+      "Country": "US",
+      "Service": "Standard",
+      "ShippingPrice": 10.99,
+      "Link": "https://www.mixbook.com/wedding-photo-books/simple-wedding-15?ptid=14",
+      "AdwordsRedirect": "https://www.mixbook.com/wedding-photo-books/simple-wedding-15?ptid=14&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "TotalPrice": 26.98,
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Wedding Photo Books"
+      ],
+      "ProductType": "Photo Books > Wedding Photo Books"
+    },
+    {
+      "id": "gmc01-15",
+      "ImageLink": "https://assets2.mixbook.com/pages/60318306_827410_l.jpg?1518721846",
+      "Condition": "new",
+      "Availability": "in stock",
+      "Brand": "Mixbook",
+      "IdentifierExists": "FALSE",
+      "Title": "Simple Wedding Photo Book",
+      "Description": "Showcase your wedding photos in the clean, timeless design of the Simple Wedding photo book. This classic theme features a black and white palette with pops of green, understated scrollwork details and a wide variety of layouts. Several beautiful wedding-related quotes appear throughout the template, which you can include as part of your custom album or replace with quotes or passages meaningful to you and your spouse. Add your couple initials along with fun close-up photographs to but your own spin on wedding photographs.\n        Simple Wedding is part of our Wedding Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "Price": 15.99,
+      "Country": "US",
+      "Service": "Standard",
+      "ShippingPrice": 8.99,
+      "Link": "https://www.mixbook.com/wedding-photo-books/simple-wedding-15?ptid=15",
+      "AdwordsRedirect": "https://www.mixbook.com/wedding-photo-books/simple-wedding-15?ptid=15&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "TotalPrice": 24.98,
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Wedding Photo Books"
+      ],
+      "ProductType": "Photo Books > Wedding Photo Books"
+    },
+    {
+      "id": "gmc01-57",
+      "ImageLink": "https://assets2.mixbook.com/pages/61019522_783584_l.jpg?1483533413",
+      "Condition": "new",
+      "Availability": "in stock",
+      "Brand": "Mixbook",
+      "IdentifierExists": "FALSE",
+      "Title": "Father's Day Photo Book",
+      "Description": "Celebrate this Father’s Day with a gift that dad will enjoy all year long. Rich, brown backgrounds showcase your special memories in a multitude of layouts. Choose from special portraits or thoughtful collages to create a look that reflects your unique style. Personal quotes and tags can be added with block lettering, post-its or inside eye-catching artwork like a full cup of joe.\n        Father's Day is part of our Family Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "Price": 15.99,
+      "Country": "US",
+      "Service": "Standard",
+      "ShippingPrice": 8.99,
+      "Link": "https://www.mixbook.com/family-photo-books/father-s-day-19?ptid=57",
+      "AdwordsRedirect": "https://www.mixbook.com/family-photo-books/father-s-day-19?ptid=57&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "TotalPrice": 24.98,
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Family Photo Books"
+      ],
+      "ProductType": "Photo Books > Family Photo Books"
+    },
+    {
+      "id": "gmc01-59",
+      "ImageLink": "https://assets0.mixbook.com/pages/60319000_783584_l.jpg?1483553488",
+      "Condition": "new",
+      "Availability": "in stock",
+      "Brand": "Mixbook",
+      "IdentifierExists": "FALSE",
+      "Title": "Father's Day Photo Book",
+      "Description": "Celebrate this Father’s Day with a gift that dad will enjoy all year long. Rich, brown backgrounds showcase your special memories in a multitude of layouts. Choose from special portraits or thoughtful collages to create a look that reflects your unique style. Personal quotes and tags can be added with block lettering, post-its or inside eye-catching artwork like a full cup of joe.\n        Father's Day is part of our Family Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "Price": 15.99,
+      "Country": "US",
+      "Service": "Standard",
+      "ShippingPrice": 10.99,
+      "Link": "https://www.mixbook.com/family-photo-books/father-s-day-19?ptid=59",
+      "AdwordsRedirect": "https://www.mixbook.com/family-photo-books/father-s-day-19?ptid=59&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "TotalPrice": 26.98,
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Family Photo Books"
+      ],
+      "ProductType": "Photo Books > Family Photo Books"
+    },
+    {
+      "id": "gmc01-60",
+      "ImageLink": "https://assets0.mixbook.com/pages/60318440_783584_l.jpg?1483513396",
+      "Condition": "new",
+      "Availability": "in stock",
+      "Brand": "Mixbook",
+      "IdentifierExists": "FALSE",
+      "Title": "Father's Day Photo Book",
+      "Description": "Celebrate this Father’s Day with a gift that dad will enjoy all year long. Rich, brown backgrounds showcase your special memories in a multitude of layouts. Choose from special portraits or thoughtful collages to create a look that reflects your unique style. Personal quotes and tags can be added with block lettering, post-its or inside eye-catching artwork like a full cup of joe.\n        Father's Day is part of our Family Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "Price": 15.99,
+      "Country": "US",
+      "Service": "Standard",
+      "ShippingPrice": 8.99,
+      "Link": "https://www.mixbook.com/family-photo-books/father-s-day-19?ptid=60",
+      "AdwordsRedirect": "https://www.mixbook.com/family-photo-books/father-s-day-19?ptid=60&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "TotalPrice": 24.98,
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Family Photo Books"
+      ],
+      "ProductType": "Photo Books > Family Photo Books"
+    },
+    {
+      "id": "gmc01-97",
+      "ImageLink": "https://assets3.mixbook.com/pages/61357643_783584_l.jpg?1521644892",
+      "Condition": "new",
+      "Availability": "in stock",
+      "Brand": "Mixbook",
+      "IdentifierExists": "FALSE",
+      "Title": "Blank Canvas Photo Book",
+      "Description": "There’s nothing like a Blank Canvas to spark your creativity. This unique photo book puts your imagination in the driver’s seat with unlimited backgrounds and layout choices for your design. Feature your photographs with an assortment of graphics and typographies to make any statement you want. Whatever you can dream, the sky’s the limit with the matchless Blank Canvas photo book.\n        Blank Canvas is part of our Everyday Photo Books\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "Price": 15.99,
+      "Country": "US",
+      "Service": "Standard",
+      "ShippingPrice": 8.99,
+      "Link": "https://www.mixbook.com/everyday-photo-books/blank-canvas-10?ptid=97",
+      "AdwordsRedirect": "https://www.mixbook.com/everyday-photo-books/blank-canvas-10?ptid=97&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "TotalPrice": 24.98,
+      "ProductCategoryList": [
+        "Home & Garden",
+        "Household Supplies",
+        "Storage & Organization",
+        "Photo Storage",
+        "Photo Albums"
+      ],
+      "ProductCategory": "Home & Garden > Household Supplies > Storage & Organization > Photo Storage > Photo Albums",
+      "ProductTypeList": [
+        "Photo Books",
+        "Everyday Photo Books"
+      ],
+      "ProductType": "Photo Books > Everyday Photo Books"
+    }
+  ],
+  "template": {
+    "id": 16,
+    "lastModified": "2018-07-12T15:56:38.411Z",
+    "createdAt": "2018-06-30T21:13:03.647Z",
+    "archived": false,
+    "templateName": "Mixbook Products Import - PLA HTTP Feed",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "g:id"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "g:image_link"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "g:condition"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "g:availability"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "g:brand"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "g:identifier_exists"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "title"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "description"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "g:product_category"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "g:product_type"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "g:price"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "12",
+                  "value": {
+                    "id": 12,
+                    "fields": [
+                      [
+                        "g:shipping",
+                        "g:country"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "13",
+                  "value": {
+                    "id": 13,
+                    "fields": [
+                      [
+                        "g:shipping",
+                        "g:service"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "14",
+                  "value": {
+                    "id": 14,
+                    "fields": [
+                      [
+                        "g:shipping",
+                        "g:price"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "15",
+                  "value": {
+                    "id": 15,
+                    "fields": [
+                      [
+                        "size"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "16",
+                  "value": {
+                    "id": 16,
+                    "fields": [
+                      [
+                        "link"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "17",
+                  "value": {
+                    "id": 17,
+                    "fields": [
+                      [
+                        "g:adwords_redirect"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "23",
+                  "value": {
+                    "id": 23,
+                    "fields": [
+                      [
+                        "g:price"
+                      ]
+                    ],
+                    "meta": {
+                      "find": " USD",
+                      "replace": "",
+                      "regex": false
+                    },
+                    "skipNulls": true,
+                    "typeCode": "FindReplaceNode",
+                    "acceptedType": "string"
+                  }
+                },
+                {
+                  "v": "24",
+                  "value": {
+                    "id": 24,
+                    "fields": [
+                      [
+                        "g:price"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "25",
+                  "value": {
+                    "id": 25,
+                    "fields": [
+                      [
+                        "g:shipping",
+                        "g:price"
+                      ]
+                    ],
+                    "meta": {
+                      "find": " USD",
+                      "replace": "",
+                      "regex": false
+                    },
+                    "skipNulls": true,
+                    "typeCode": "FindReplaceNode",
+                    "acceptedType": "string"
+                  }
+                },
+                {
+                  "v": "26",
+                  "value": {
+                    "id": 26,
+                    "fields": [
+                      [
+                        "g:shipping",
+                        "g:price"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "27",
+                  "value": {
+                    "id": 27,
+                    "fields": [
+                      [
+                        "g:shipping",
+                        "g:price"
+                      ],
+                      [
+                        "g:price"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "TotalPrice"
+                        ]
+                      ]
+                    },
+                    "skipNulls": true,
+                    "typeCode": "SumNode",
+                    "acceptedType": "number"
+                  }
+                },
+                {
+                  "v": "28",
+                  "value": {
+                    "id": 28,
+                    "fields": [
+                      [
+                        "g:identifier_exists"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "29",
+                  "value": {
+                    "id": 29,
+                    "fields": [
+                      [
+                        "g:product_category"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "ProductCategoryList"
+                        ]
+                      ]
+                    },
+                    "typeCode": "DuplicateNode"
+                  }
+                },
+                {
+                  "v": "30",
+                  "value": {
+                    "id": 30,
+                    "fields": [
+                      [
+                        "g:product_category"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "ProductCategory"
+                        ]
+                      ]
+                    },
+                    "typeCode": "DuplicateNode"
+                  }
+                },
+                {
+                  "v": "31",
+                  "value": {
+                    "id": 31,
+                    "fields": [
+                      [
+                        "_synthetic_v8mt5gd9p5",
+                        "ProductCategoryList"
+                      ]
+                    ],
+                    "meta": {
+                      "find": " > ",
+                      "replace": "\",\"",
+                      "regex": false
+                    },
+                    "skipNulls": true,
+                    "typeCode": "FindReplaceNode",
+                    "acceptedType": "string"
+                  }
+                },
+                {
+                  "v": "32",
+                  "value": {
+                    "id": 32,
+                    "fields": [
+                      [
+                        "_synthetic_v8mt5gd9p5",
+                        "ProductCategoryList"
+                      ]
+                    ],
+                    "meta": {
+                      "value": "[\"",
+                      "at": 0
+                    },
+                    "skipNulls": true,
+                    "typeCode": "InsertNode",
+                    "acceptedType": "string"
+                  }
+                },
+                {
+                  "v": "33",
+                  "value": {
+                    "id": 33,
+                    "fields": [
+                      [
+                        "_synthetic_v8mt5gd9p5",
+                        "ProductCategoryList"
+                      ]
+                    ],
+                    "meta": {
+                      "value": "\"]",
+                      "at": -1
+                    },
+                    "skipNulls": true,
+                    "typeCode": "InsertNode",
+                    "acceptedType": "string"
+                  }
+                },
+                {
+                  "v": "34",
+                  "value": {
+                    "id": 34,
+                    "fields": [
+                      [
+                        "_synthetic_v8mt5gd9p5",
+                        "ProductCategoryList"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "array"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "35",
+                  "value": {
+                    "id": 35,
+                    "fields": [
+                      [
+                        "g:product_type"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "ProductTypeList"
+                        ]
+                      ]
+                    },
+                    "typeCode": "DuplicateNode"
+                  }
+                },
+                {
+                  "v": "36",
+                  "value": {
+                    "id": 36,
+                    "fields": [
+                      [
+                        "g:product_type"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "ProductType"
+                        ]
+                      ]
+                    },
+                    "typeCode": "DuplicateNode"
+                  }
+                },
+                {
+                  "v": "37",
+                  "value": {
+                    "id": 37,
+                    "fields": [
+                      [
+                        "_synthetic_ribmy4al4wf",
+                        "ProductTypeList"
+                      ]
+                    ],
+                    "meta": {
+                      "find": " > ",
+                      "replace": "\",\"",
+                      "regex": false
+                    },
+                    "skipNulls": true,
+                    "typeCode": "FindReplaceNode",
+                    "acceptedType": "string"
+                  }
+                },
+                {
+                  "v": "38",
+                  "value": {
+                    "id": 38,
+                    "fields": [
+                      [
+                        "_synthetic_ribmy4al4wf",
+                        "ProductTypeList"
+                      ]
+                    ],
+                    "meta": {
+                      "value": "[\"",
+                      "at": 0
+                    },
+                    "skipNulls": true,
+                    "typeCode": "InsertNode",
+                    "acceptedType": "string"
+                  }
+                },
+                {
+                  "v": "39",
+                  "value": {
+                    "id": 39,
+                    "fields": [
+                      [
+                        "_synthetic_ribmy4al4wf",
+                        "ProductTypeList"
+                      ]
+                    ],
+                    "meta": {
+                      "value": "\"]",
+                      "at": -1
+                    },
+                    "skipNulls": true,
+                    "typeCode": "InsertNode",
+                    "acceptedType": "string"
+                  }
+                },
+                {
+                  "v": "40",
+                  "value": {
+                    "id": 40,
+                    "fields": [
+                      [
+                        "_synthetic_ribmy4al4wf",
+                        "ProductTypeList"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "array"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 25,
+            "uidNode": 41,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "_synthetic_ribmy4al4wf",
+                  "ProductTypeList"
+                ],
+                22
+              ],
+              [
+                [
+                  "g:availability"
+                ],
+                3
+              ],
+              [
+                [
+                  "title"
+                ],
+                6
+              ],
+              [
+                [
+                  "_synthetic_v8mt5gd9p5",
+                  "ProductCategoryList"
+                ],
+                19
+              ],
+              [
+                [
+                  "g:identifier_exists"
+                ],
+                5
+              ],
+              [
+                [
+                  "description"
+                ],
+                7
+              ],
+              [
+                [
+                  "g:image_link"
+                ],
+                1
+              ],
+              [
+                [
+                  "g:adwords_redirect"
+                ],
+                17
+              ],
+              [
+                [
+                  "link"
+                ],
+                16
+              ],
+              [
+                [
+                  "g:brand"
+                ],
+                4
+              ],
+              [
+                [
+                  "g:product_type"
+                ],
+                9
+              ],
+              [
+                [
+                  "_synthetic_h17ruhyjx9l",
+                  "TotalPrice"
+                ],
+                18
+              ],
+              [
+                [
+                  "g:shipping",
+                  "g:service"
+                ],
+                13
+              ],
+              [
+                [
+                  "ProductTypeList",
+                  -1
+                ],
+                24
+              ],
+              [
+                [
+                  "g:product_category"
+                ],
+                8
+              ],
+              [
+                [
+                  "g:price"
+                ],
+                10
+              ],
+              [
+                [
+                  "g:shipping",
+                  "g:price"
+                ],
+                14
+              ],
+              [
+                [
+                  "ProductCategoryList",
+                  -1
+                ],
+                21
+              ],
+              [
+                [
+                  "g:id"
+                ],
+                0
+              ],
+              [
+                [
+                  "size"
+                ],
+                15
+              ],
+              [
+                [
+                  "_synthetic_jky9bbbpzwg",
+                  "ProductCategory"
+                ],
+                20
+              ],
+              [
+                [
+                  "g:shipping",
+                  "g:country"
+                ],
+                12
+              ],
+              [
+                [
+                  "g:condition"
+                ],
+                2
+              ],
+              [
+                [
+                  "_synthetic_1daw3aotish",
+                  "ProductType"
+                ],
+                23
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "id"
+                ]
+              ],
+              [
+                1,
+                [
+                  "ImageLink"
+                ]
+              ],
+              [
+                2,
+                [
+                  "Condition"
+                ]
+              ],
+              [
+                3,
+                [
+                  "Availability"
+                ]
+              ],
+              [
+                4,
+                [
+                  "Brand"
+                ]
+              ],
+              [
+                5,
+                [
+                  "IdentifierExists"
+                ]
+              ],
+              [
+                6,
+                [
+                  "Title"
+                ]
+              ],
+              [
+                7,
+                [
+                  "Description"
+                ]
+              ],
+              [
+                8,
+                [
+                  "_ofwx6sjzcrProductCategory"
+                ]
+              ],
+              [
+                9,
+                [
+                  "_3lxuinntqProductType"
+                ]
+              ],
+              [
+                10,
+                [
+                  "Price"
+                ]
+              ],
+              [
+                12,
+                [
+                  "Country"
+                ]
+              ],
+              [
+                13,
+                [
+                  "Service"
+                ]
+              ],
+              [
+                14,
+                [
+                  "ShippingPrice"
+                ]
+              ],
+              [
+                15,
+                [
+                  "Size"
+                ]
+              ],
+              [
+                16,
+                [
+                  "Link"
+                ]
+              ],
+              [
+                17,
+                [
+                  "AdwordsRedirect"
+                ]
+              ],
+              [
+                18,
+                [
+                  "TotalPrice"
+                ]
+              ],
+              [
+                19,
+                [
+                  "ProductCategoryList"
+                ]
+              ],
+              [
+                20,
+                [
+                  "ProductCategory"
+                ]
+              ],
+              [
+                21,
+                [
+                  "ProductCategoryList",
+                  -1
+                ]
+              ],
+              [
+                22,
+                [
+                  "ProductTypeList"
+                ]
+              ],
+              [
+                23,
+                [
+                  "ProductType"
+                ]
+              ],
+              [
+                24,
+                [
+                  "ProductTypeList",
+                  -1
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "string"
+              ],
+              [
+                2,
+                "string"
+              ],
+              [
+                3,
+                "string"
+              ],
+              [
+                4,
+                "string"
+              ],
+              [
+                5,
+                "string"
+              ],
+              [
+                6,
+                "string"
+              ],
+              [
+                7,
+                "string"
+              ],
+              [
+                8,
+                "string"
+              ],
+              [
+                9,
+                "string"
+              ],
+              [
+                10,
+                "number"
+              ],
+              [
+                12,
+                "string"
+              ],
+              [
+                13,
+                "string"
+              ],
+              [
+                14,
+                "number"
+              ],
+              [
+                15,
+                "string"
+              ],
+              [
+                16,
+                "string"
+              ],
+              [
+                17,
+                "string"
+              ],
+              [
+                18,
+                "number"
+              ],
+              [
+                19,
+                "array"
+              ],
+              [
+                20,
+                "string"
+              ],
+              [
+                21,
+                "array"
+              ],
+              [
+                22,
+                "array"
+              ],
+              [
+                23,
+                "string"
+              ],
+              [
+                24,
+                "array"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                true
+              ],
+              [
+                3,
+                true
+              ],
+              [
+                4,
+                true
+              ],
+              [
+                5,
+                true
+              ],
+              [
+                6,
+                true
+              ],
+              [
+                7,
+                true
+              ],
+              [
+                8,
+                false
+              ],
+              [
+                9,
+                false
+              ],
+              [
+                10,
+                true
+              ],
+              [
+                12,
+                true
+              ],
+              [
+                13,
+                true
+              ],
+              [
+                14,
+                true
+              ],
+              [
+                15,
+                true
+              ],
+              [
+                16,
+                true
+              ],
+              [
+                17,
+                true
+              ],
+              [
+                18,
+                true
+              ],
+              [
+                19,
+                true
+              ],
+              [
+                20,
+                true
+              ],
+              [
+                21,
+                true
+              ],
+              [
+                22,
+                true
+              ],
+              [
+                23,
+                true
+              ],
+              [
+                24,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": true
+                  }
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isAnalyzed": true,
+                    "isPrimaryKey": false,
+                    "analyzer": "standard",
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isAnalyzed": true,
+                    "isPrimaryKey": false,
+                    "analyzer": "standard",
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isAnalyzed": true,
+                    "isPrimaryKey": false,
+                    "analyzer": "standard",
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                8,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  },
+                  "uiState": {
+                    "hidden": true
+                  }
+                }
+              ],
+              [
+                9,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isAnalyzed": true,
+                    "isPrimaryKey": false,
+                    "analyzer": "standard",
+                    "elasticType": "auto",
+                    "formState": {
+                      "isAnalyzed": true,
+                      "isPrimaryKey": false,
+                      "analyzer": "standard",
+                      "elasticType": "auto"
+                    }
+                  },
+                  "uiState": {
+                    "hidden": true
+                  }
+                }
+              ],
+              [
+                10,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                12,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                13,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                14,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                15,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                16,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                17,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                18,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                19,
+                {
+                  "etlType": "Array",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  },
+                  "valueType": "string"
+                }
+              ],
+              [
+                20,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                21,
+                {
+                  "etlType": "String",
+                  "valueType": "string",
+                  "elastic": {
+                    "isAnalyzed": false,
+                    "isPrimaryKey": false,
+                    "analyzer": "standard",
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                22,
+                {
+                  "etlType": "Array",
+                  "elastic": {
+                    "isAnalyzed": true,
+                    "isPrimaryKey": false,
+                    "analyzer": "standard",
+                    "elasticType": "auto",
+                    "formState": {
+                      "isAnalyzed": true,
+                      "isPrimaryKey": false,
+                      "analyzer": "standard",
+                      "elasticType": "auto"
+                    }
+                  },
+                  "valueType": "string"
+                }
+              ],
+              [
+                23,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isAnalyzed": true,
+                    "isPrimaryKey": false,
+                    "analyzer": "standard",
+                    "elasticType": "auto",
+                    "formState": {
+                      "isAnalyzed": true,
+                      "isPrimaryKey": false,
+                      "analyzer": "standard",
+                      "elasticType": "auto"
+                    }
+                  }
+                }
+              ],
+              [
+                24,
+                {
+                  "etlType": "String",
+                  "valueType": "string",
+                  "elastic": {
+                    "isAnalyzed": false,
+                    "isPrimaryKey": false,
+                    "analyzer": "standard",
+                    "elasticType": "auto"
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Http",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "xml",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": "item",
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "method": "GET",
+          "headers": {
+            "contentType": "application/json"
+          },
+          "params": {}
+        },
+        "integrationId": 2,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Database",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": [
+            "id",
+            "ImageLink",
+            "Condition",
+            "Availability",
+            "Brand",
+            "IdentifierExists",
+            "Title",
+            "Description",
+            "ProductCategory",
+            "ProductCategoryList",
+            "ProductType",
+            "ProductTypeList",
+            "Price",
+            "Country",
+            "Service",
+            "ShippingPrice",
+            "TotalPrice",
+            "Size",
+            "Link",
+            "AdwordsRedirect"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "serverId": "Mixbook ES ",
+          "database": "mixbook_products",
+          "table": "data",
+          "language": "elastic"
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            20,
+            19,
+            9,
+            23,
+            22,
+            10,
+            12,
+            13,
+            14,
+            18,
+            15,
+            16,
+            17,
+            21,
+            24
+          ]
+        }
+      }
+    }
+  }
+}

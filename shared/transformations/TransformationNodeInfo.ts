@@ -44,10 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { List } from 'immutable';
+import { List, Map } from 'immutable';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 
 export default abstract class TransformationNodeInfo
 {
@@ -59,11 +61,77 @@ export default abstract class TransformationNodeInfo
 
   public editable: boolean = false;
   public creatable: boolean = false;
-  public newFieldType: string = 'string';
+  public visible: boolean = true;
 
-  public isAvailable(engine: TransformationEngine, fieldId: number): boolean
+  protected newType: FieldTypes;
+
+  // override this
+  protected availInfo: {
+    allowedTypes?: FieldTypes[];
+    arrayOf?: FieldTypes[]; // if the field is an array
+    isNamed?: boolean; // if undefined, don't check. if false, ensure not named, if true, ensure named
+  };
+
+  /*
+   * Todo, turn these functions into visitors to be more consistent?
+   */
+  public isAvailable(engine: TransformationEngine, fieldId: number, tree: Map<number, List<number>>): boolean
   {
-    return false;
+    if (this.availInfo !== undefined)
+    {
+      const { allowedTypes, arrayOf, isNamed } = this.availInfo;
+      const etlType = Utils.fields.fieldType(fieldId, engine);
+      if (allowedTypes !== undefined)
+      {
+        if (allowedTypes.indexOf(etlType) === -1)
+        {
+          return false;
+        }
+      }
+      if (arrayOf !== undefined)
+      {
+        if (etlType !== FieldTypes.Array || tree.get(fieldId) == null || tree.get(fieldId).size === 0)
+        {
+          return false;
+        }
+        const childType = Utils.fields.fieldType(tree.get(fieldId).get(0), engine);
+        if (arrayOf.indexOf(childType) === -1)
+        {
+          return false;
+        }
+      }
+      if (isNamed !== undefined)
+      {
+        if (Utils.path.isNamed(engine.getFieldPath(fieldId)) !== isNamed)
+        {
+          return false;
+        }
+      }
+      return true;
+    }
+    return true;
+  }
+
+  public computeNewFieldType(engine?: TransformationEngine, node?: TransformationNode, index?: number): FieldTypes
+  {
+    if (this.newType === undefined)
+    {
+      if (engine !== undefined && node !== undefined)
+      {
+        const firstField = node.fields.get(0).id;
+        return Utils.fields.fieldType(firstField, engine);
+      }
+      else
+      {
+        return FieldTypes.String;
+      }
+    }
+    return this.newType;
+  }
+
+  public computeNewSourceType(engine?: TransformationEngine, node?: TransformationNode, index?: number): FieldTypes | null
+  {
+    return null;
   }
 
   public shortSummary(meta: object): string

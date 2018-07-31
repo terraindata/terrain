@@ -88,16 +88,8 @@ export class DuplicateTFF extends TransformationForm<DuplicateOptions, Transform
     const { fieldId, isCreate, engine } = this.props;
     if (isCreate)
     {
-      const myKP = engine.getOutputKeyPath(fieldId);
-      const baseName = `Copy of ${myKP.last()}`;
-      let outputName = baseName;
-      let i = 2;
-      const fieldNames = engine.getAllFieldNames().map((name) => name.last()).toList();
-      while (fieldNames.indexOf(outputName) !== -1)
-      {
-        outputName = baseName + ' ' + String(i);
-        i++;
-      }
+      const myKP = engine.getFieldPath(fieldId);
+      const outputName = `CopyOf${myKP.last()}`;
       return {
         outputName,
       };
@@ -115,7 +107,7 @@ export class DuplicateTFF extends TransformationForm<DuplicateOptions, Transform
     const { outputName } = this.state;
     const args = super.computeArgs();
 
-    const currentKeyPath = engine.getOutputKeyPath(fieldId);
+    const currentKeyPath = engine.getFieldPath(fieldId);
     const newKeyPath = currentKeyPath.set(currentKeyPath.size - 1, outputName);
     return {
       options: {
@@ -123,14 +115,5 @@ export class DuplicateTFF extends TransformationForm<DuplicateOptions, Transform
       },
       fields: args.fields,
     };
-  }
-
-  protected createTransformation(proxy: EngineProxy)
-  {
-    const { engine, fieldId } = this.props;
-    const { outputName } = this.state;
-    const currentKeyPath = engine.getOutputKeyPath(fieldId);
-    const newKeyPath = currentKeyPath.set(currentKeyPath.size - 1, outputName);
-    proxy.duplicateField(fieldId, newKeyPath);
   }
 }

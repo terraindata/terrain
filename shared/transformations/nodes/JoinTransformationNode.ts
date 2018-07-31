@@ -51,10 +51,9 @@ import * as yadeep from 'shared/util/yadeep';
 
 const { List, Map } = Immutable;
 
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { KeyPath } from 'shared/util/KeyPath';
@@ -107,15 +106,11 @@ class JoinTransformationInfoC extends TransformationNodeInfo
 
   public editable = false;
   public creatable = true;
-  public newFieldType = 'string';
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    return (
-      EngineUtil.getRepresentedType(fieldId, engine) === 'string' &&
-      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
-    );
-  }
+  protected availInfo = {
+    allowedTypes: [FieldTypes.String],
+    isNamed: true,
+  };
 
   public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
   {

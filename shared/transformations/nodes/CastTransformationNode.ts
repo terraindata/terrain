@@ -51,10 +51,9 @@ import * as yadeep from 'shared/util/yadeep';
 
 const { List, Map } = Immutable;
 
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { KeyPath } from 'shared/util/KeyPath';
@@ -72,8 +71,7 @@ export class CastTransformationNode extends SimpleTransformationType
 
   public shouldTransform(el: any)
   {
-    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
-    if (typeof el === opts.toTypename || el == null || (el.constructor === Array && opts.toTypename === 'array'))
+    if (el == null)
     {
       return false;
     }
@@ -89,93 +87,136 @@ export class CastTransformationNode extends SimpleTransformationType
 
     switch (opts.toTypename)
     {
-      case 'string': {
-        if (typeof el === 'object')
+      case FieldTypes.String:
+        return this.castToString(el);
+      case FieldTypes.Object:
+        return this.castToObject(el);
+      case FieldTypes.Array:
+        return this.castToArray(el);
+      case FieldTypes.Number:
+        return this.castToNumber(el);
+      case FieldTypes.Integer:
+        return this.castToInteger(el);
+      case FieldTypes.Boolean:
+        return this.castToBoolean(el);
+      case FieldTypes.Date:
+        return this.castToDate(el);
+      case FieldTypes.GeoPoint:
+        return this.castToGeopoint(el);
+      default:
+        const assertUnreachable = (p: never) =>
         {
-          return JSON.stringify(el);
-        }
-        else
-        {
-          return el.toString();
-        }
+          throw new Error(`${p} is not a valid type cast`);
+        };
+        return assertUnreachable(opts.toTypename);
+    }
+  }
+
+  public castToGeopoint(el: any): object
+  {
+    try
+    {
+      let geoPointObj = el;
+      if (typeof el === 'string')
+      {
+        geoPointObj = JSON.parse(el);
       }
-      case 'number': {
-        return Number(el);
-      }
-      case 'boolean': {
-        if (typeof el === 'string')
-        {
-          return el.toLowerCase() === 'true';
-        }
-        else
-        {
-          return Boolean(el);
-        }
-      }
-      case 'object': {
-        if (typeof el === 'string')
-        {
-          try
-          {
-            const parsed = JSON.parse(el);
-            return parsed;
-          }
-          catch (e)
-          {
-            return {};
-          }
-        }
-        else
-        {
-          return {};
-        }
-      }
-      case 'array': {
-        if (typeof el === 'string')
-        {
-          try
-          {
-            const parsed = JSON.parse(el);
-            if (!Array.isArray(parsed))
-            {
-              return [];
-            }
-            return parsed;
-          }
-          catch (e)
-          {
-            return [];
-          }
-        }
-        else
-        {
-          return [el];
-        }
-      }
-      case 'date': {
-        try
-        {
-          if (opts.format === 'ISOstring')
-          {
-            return new Date(el).toISOString();
-          }
-          else if (opts.format === 'MMDDYYYY')
-          {
-            return dateFormat('MM/dd/yyyy', new Date(el));
-          }
-          else
-          {
-            return el;
-          }
-        }
-        catch (ex)
-        {
-          return null;
-        }
-      }
-      default: {
+      const lat = Number(geoPointObj.lat);
+      const lon = Number(geoPointObj.lon);
+      if (isNaN(lat) || isNaN(lon))
+      {
         return null;
       }
+      return {
+        lat,
+        lon,
+      };
+    }
+    catch (e)
+    {
+      return null;
+    }
+  }
+
+  public castToDate(el: any): string
+  {
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    try
+    {
+      if (opts.format === 'ISOstring')
+      {
+        return new Date(el).toISOString();
+      }
+      else if (opts.format === 'MMDDYYYY')
+      {
+        return dateFormat('MM/dd/yyyy', new Date(el));
+      }
+      else
+      {
+        return el;
+      }
+    }
+    catch (ex)
+    {
+      return null;
+    }
+  }
+
+  public castToNumber(el: any): number
+  {
+    return Number(el);
+  }
+
+  public castToInteger(el: any): number
+  {
+    return Number.parseInt(Number(el) as any, 10);
+  }
+
+  public castToBoolean(el: any): boolean
+  {
+    if (typeof el === 'string')
+    {
+      return el.toLowerCase() === 'true';
+    }
+    else
+    {
+      return Boolean(el);
+    }
+  }
+
+  public castToString(el: any): string
+  {
+    if (typeof el === 'object')
+    {
+      return JSON.stringify(el);
+    }
+    else
+    {
+      return String(el);
+    }
+  }
+
+  public castToArray(el: any): any[]
+  {
+    if (Array.isArray(el))
+    {
+      return el;
+    }
+    else
+    {
+      return [];
+    }
+  }
+
+  public castToObject(el: any): object
+  {
+    if (typeof el !== 'object' || Array.isArray(el))
+    {
+      return {};
+    }
+    else
+    {
+      return el;
     }
   }
 }
@@ -187,12 +228,18 @@ class CastTransformationInfoC extends TransformationNodeInfo
   public description = 'Convert this field to a different type';
   public nodeClass = CastTransformationNode;
 
-  public editable = true;
+  public editable = false;
   public creatable = true;
 
   public shortSummary(meta: NodeOptionsType<typeof TYPECODE>)
   {
     return `Cast to ${meta.toTypename}`;
+  }
+
+  public computeNewSourceType(engine?, node?, index?)
+  {
+    const opts = node.meta as NodeOptionsType<typeof TYPECODE>;
+    return opts.toTypename;
   }
 }
 

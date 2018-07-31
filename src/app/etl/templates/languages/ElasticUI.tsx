@@ -52,14 +52,7 @@ import * as _ from 'lodash';
 import ElasticFieldSettings from 'etl/templates/components/field/ElasticFieldSettings';
 import { DefaultUI } from 'etl/templates/languages/DefaultLanguageUI';
 import { LanguageInterface } from 'etl/templates/languages/LanguageUI';
-import { defaultProps, ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
-import TypeUtil from 'shared/etl/TypeUtil';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
-import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
+import { Languages } from 'shared/etl/types/ETLTypes';
 
 class ElasticUI extends DefaultUI implements LanguageInterface
 {

@@ -211,28 +211,33 @@ class EndpointForm extends TerrainComponent<Props>
               onTextInputEnter={this.props.onSubmit}
             />
         }
-        { // integration form
-          isIntegrationType ?
-            <IntegrationPicker
-              integrationType={endpoint.type}
-              integrations={integrations}
-              selectedIntegration={usingCustomIntegration ? 'custom' : endpoint.integrationId}
-              onChange={this.handleIntegrationPickerChange}
-              createIntegration={this.createIntegration}
-            />
-            :
-            null
-        }
-        <FadeInOut
-          open={showIntegrationForm}
+        <div
+          className='endpoint-integration-block'
+          style={showIntegrationForm ? backgroundColor(Colors().bg2) : undefined}
         >
-          <IntegrationForm
-            integration={integrations.get(endpoint.integrationId)}
-            onChange={this.handleIntegrationChange}
-            hideType={true}
-            hideName={!usingCustomIntegration}
-          />
-        </FadeInOut>
+          { // integration form
+            isIntegrationType ?
+              <IntegrationPicker
+                integrationType={endpoint.type}
+                integrations={integrations}
+                selectedIntegration={usingCustomIntegration ? 'custom' : endpoint.integrationId}
+                onChange={this.handleIntegrationPickerChange}
+                createIntegration={this.createIntegration}
+              />
+              :
+              null
+          }
+          <FadeInOut
+            open={showIntegrationForm}
+          >
+            <IntegrationForm
+              integration={integrations.get(endpoint.integrationId)}
+              onChange={this.handleIntegrationChange}
+              hideType={true}
+              hideName={!usingCustomIntegration}
+            />
+          </FadeInOut>
+        </div>
         <FadeInOut
           open={showForm}
         >

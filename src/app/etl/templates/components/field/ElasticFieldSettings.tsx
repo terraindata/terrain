@@ -60,15 +60,15 @@ const { List, Map } = Immutable;
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import { compareObjects } from 'etl/ETLUtil';
+import { compareObjects } from 'etl/ComponentUtil';
 import
 {
   _TemplateField,
   TemplateField,
 } from 'etl/templates/FieldTypes';
 import { defaultProps, ElasticAnalyzers, ElasticFieldProps, ElasticTypes, ETLToElasticOptions } from 'shared/etl/types/ETLElasticTypes';
-import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './FieldSettings.less';
@@ -128,15 +128,16 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
 
   public showPrimaryKey(s: ElasticFieldProps)
   {
-    const jsType = EngineUtil.getRepresentedType(this.props.fieldId, this._currentEngine());
-    return ((jsType === 'string' || jsType === 'number') && this._isRootField()) ?
+    const etlType = Utils.fields.fieldType(this.props.fieldId, this._currentEngine());
+    return (etlType === FieldTypes.String || etlType === FieldTypes.Number || etlType === FieldTypes.Integer)
+      && this._isRootField() ?
       DisplayState.Active : DisplayState.Inactive;
   }
 
   public showIsAnalyzed(s: ElasticFieldProps)
   {
-    const jsType = EngineUtil.getRepresentedType(this.props.fieldId, this._currentEngine());
-    return (jsType === 'string' && !s.isPrimaryKey) ?
+    const etlType = Utils.fields.fieldType(this.props.fieldId, this._currentEngine());
+    return (etlType === FieldTypes.String && !s.isPrimaryKey) ?
       DisplayState.Active : DisplayState.Inactive;
   }
 
@@ -147,7 +148,7 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
   }
 
   @instanceFnDecorator(memoizeOne)
-  public _getTypeOptions(etlType: ETLFieldTypes): List<string>
+  public _getTypeOptions(etlType: FieldTypes): List<string>
   {
     return List(ETLToElasticOptions[etlType]);
   }

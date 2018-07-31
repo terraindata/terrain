@@ -1,0 +1,2219 @@
+{
+  "testName": "FT_08",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "location": {
+        "street-address": "23000 Newport Coast Drive",
+        "city-name": "Newport Coast",
+        "county": "Orange",
+        "state-code": "CA",
+        "zipcode": "92657",
+        "display-address": "yes"
+      },
+      "details": {
+        "price": "13000",
+        "year-built": "1999",
+        "num-bedrooms": "2",
+        "num-bathrooms": "2",
+        "square-feet": "1400",
+        "date-listed": "2015-05-01",
+        "description": "Ready to show this exclusive Marriott Newport Coast Villa Timeshare, nested in prestigeous Orange County California on a Ocean Bluff, boasting 2 Bedrooms 2 Baths, overlooking Laguana Beach and the Pacific Ocean. Be an Exquisite owner of this Villa and enjoy all the Unique Amenities that include golf, five outdoor Pools, tennis and fitness center with a sauna and steam room, five outdoor whirlpoolhot tubs, walking and bike trails, barbecue areas, restaurant andtoo many incentives to mention. Each Villa has a fully equipped kitchen, spacious marble bathrooms, master bedroom suite and a thrilling ocean view.",
+        "mlsId": "CV15092628"
+      },
+      "agent": {
+        "broker-name": "First Team Real Estate",
+        "agent-name": "Rupert Goffe",
+        "agent-id": "2998",
+        "phone-number": "888-464-5031",
+        "email": "rupertgoffe@firstteam.com"
+      },
+      "status": "active",
+      "property-type": "Timeshare",
+      "site": {
+        "site-url": "www.firsteam.com",
+        "site-name": "firsteam.com"
+      },
+      "pictures": {
+        "picture": {
+          "picture-url": "https://www.firstteam.com/img/no-image.gif"
+        }
+      },
+      "landing-page": {
+        "lp-url": "https://www.firstteam.com/listing/CV15092628"
+      }
+    },
+    {
+      "location": {
+        "street-address": "7873 Rio Vista Drive",
+        "city-name": "Big River",
+        "county": "San Bernardino",
+        "state-code": "CA",
+        "zipcode": "92242",
+        "display-address": "yes"
+      },
+      "details": {
+        "price": "2625",
+        "num-bedrooms": "3",
+        "num-bathrooms": "3",
+        "lot-size": "30100 square ft.",
+        "square-feet": "3000",
+        "date-listed": "2015-05-06",
+        "description": "$2625 for 5 days or   $525 a day 5 day minimun,  Custom Riverfront Estate WITH PRIVATE BEACH!!!on Colorado River, single level   3000 sqft nt, all flat inside , ok for handicap, covered patio is 1800 sqft!!!!, 2  Palapas on your private beach, 2 private decks and boat dock , launch ramp down at the park, loads of room in front yard to park, room for rvs, and a hook up,  also included 2 car covered parking structure, and 2 car garage   w compressor  2 refrigerators , custom lighting inside,   Custom built granite bar w waterfront views forever,   totally private and awesome Estate,   Ac,   swamp cooled, Fresh water up to 80 degrees in the summer,catch catfish, bass, and carp, +++     Plenty of wild birds  and animals in the desert   close to the open desert for riding or flying, biking, or jogging !! Home is loaded w travertine floors, &  showers.  The breeses usually come across the river so its cooler than anywhere else, automatic a/c!!!. Large grand room w banquet table and large granite table for the whole gang   Inside photos will com after the 1st  Submit   5 day minimum submit , pool table , exercise bike, weight set on back deck  BBQ on patio,  Internet (wi fi)   and 2 tv's   one 60inch  ,   direct tv and net flicks included,  Fully Furnished.",
+        "mlsId": "LG15096382"
+      },
+      "agent": {
+        "broker-name": "First Team Real Estate",
+        "agent-name": "Robert Ryan",
+        "agent-id": "855",
+        "phone-number": "888-464-5031",
+        "email": "turbobobryan52@gmail.com"
+      },
+      "status": "for rent",
+      "property-type": "Single-Family Res.",
+      "site": {
+        "site-url": "www.firsteam.com",
+        "site-name": "firsteam.com"
+      },
+      "pictures": {
+        "picture": {
+          "picture-url": "https://www.firstteam.com/img/no-image.gif"
+        }
+      },
+      "landing-page": {
+        "lp-url": "https://www.firstteam.com/listing/LG15096382"
+      }
+    },
+    {
+      "location": {
+        "street-address": "Honey Wagon Rd",
+        "city-name": "Niland",
+        "county": "San Diego",
+        "state-code": "CA",
+        "zipcode": "92257",
+        "display-address": "yes"
+      },
+      "details": {
+        "price": "772800",
+        "lot-size": "2.80526e+007 square ft.",
+        "date-listed": "2015-05-29",
+        "description": "644 Acres of land consisting of 4 contiguous land parcels. Desert land good view, elevation, located by the Rail road tracks and HWY 111, The land comes with a new 99 year lease in place from an energy contractor who will pay quarterly potential income to the owner. located in the Niland area, HWY 111and RR track passes through the South East corner. Also located within The West Chocolate Mountains REEA area which creates a new Solar Energy Zone (SEZ),  APN#002-490-001-000; 002-490-002-000; 002-490-007-000; 002-490-008-000;",
+        "mlsId": "PW15115591"
+      },
+      "agent": {
+        "broker-name": "First Team Real Estate",
+        "agent-name": "Amir Maloumi",
+        "agent-id": "31405",
+        "phone-number": "888-464-5031",
+        "email": "amirmaloumi@firstteam.com"
+      },
+      "status": "active",
+      "property-type": "Land",
+      "site": {
+        "site-url": "www.firsteam.com",
+        "site-name": "firsteam.com"
+      },
+      "pictures": {
+        "picture": {
+          "picture-url": "https://www.firstteam.com/img/no-image.gif"
+        }
+      },
+      "landing-page": {
+        "lp-url": "https://www.firstteam.com/listing/PW15115591"
+      }
+    },
+    {
+      "location": {
+        "street-address": "W. Avenue B12/23 Stw",
+        "city-name": "Lancaster",
+        "county": "Los Angeles",
+        "state-code": "CA",
+        "zipcode": "93536",
+        "display-address": "yes"
+      },
+      "details": {
+        "price": "350000",
+        "lot-size": "1.3068e+006 square ft.",
+        "date-listed": "2015-07-03",
+        "description": "The Subject property is located on the northwest corner of Highway 14 and West Ave C, North of Fox Airfield and Apollo Park. Located within the path of growth, 30 AC consists of 8 contiguous parcels also available for sale separately. The property is unimproved and will be delivered as is.APN # 3115-006-007, 009, 014, 015, 016, 024, 025, 026,",
+        "mlsId": "PW15145211"
+      },
+      "agent": {
+        "broker-name": "First Team Real Estate",
+        "agent-name": "Amir Maloumi",
+        "agent-id": "31405",
+        "phone-number": "888-464-5031",
+        "email": "amirmaloumi@firstteam.com"
+      },
+      "status": "active",
+      "property-type": "Land",
+      "site": {
+        "site-url": "www.firsteam.com",
+        "site-name": "firsteam.com"
+      },
+      "pictures": {
+        "picture": {
+          "picture-url": "https://www.firstteam.com/img/no-image.gif"
+        }
+      },
+      "landing-page": {
+        "lp-url": "https://www.firstteam.com/listing/PW15145211"
+      }
+    },
+    {
+      "location": {
+        "street-address": "11 Quail Bush",
+        "city-name": "Irvine",
+        "county": "Orange",
+        "state-code": "CA",
+        "zipcode": "92618",
+        "display-address": "yes"
+      },
+      "details": {
+        "price": "3000",
+        "num-bedrooms": "3",
+        "num-bathrooms": "2.5",
+        "lot-size": "3500 square ft.",
+        "square-feet": "1600",
+        "date-listed": "2017-08-02",
+        "description": "On a private cul-de sac, this charming detached home, in the gated community of Oak Creek has the perfect interior location. Home was just painted and freshened up throughout. Enter the home & into the main living area, with fireplace & rich dark wood-style flooring. This great room style floor plan features the living area opening to the dining area & kitchen, making it ideal for entertaining family & friends. The living room overlooks the private outdoor entertainment area, with brick trimmed planters & dining area under the covered patio. The spacious, eat-in kitchen is filled with sunshine from a wall of windows & features white country-style cabinetry. A powder room with pedestal sink completes the main level. Upstairs, the large master suite features a roomy walk-in closet with tons of shelves! The master bath offers a walk-in shower with seat, dual sinks & a separate toilet area. The two secondary bedrooms, one with mirrored wardrobes, are separate from the master suite, providing the utmost in privacy. As a bonus, you will find lots of additional storage in the built-in cabinetry in the hallway. The upstairs is complete with the highly sought after second floor laundry room. Parking is convenient with direct access, two car garage & extra long driveway. Just a short walk to the resort-style community amenities, as well as nearby shopping & dining. Located in top rated Irvine School District. Don't miss out on this great opportunity to live the Oak Creek",
+        "mlsId": "OC17178019"
+      },
+      "agent": {
+        "broker-name": "First Team Real Estate",
+        "agent-name": "Lisa Anderson",
+        "agent-id": "3290",
+        "phone-number": "888-464-5031",
+        "email": "lisaandjeffanderson@gmail.com"
+      },
+      "status": "leased",
+      "property-type": "Condominium",
+      "site": {
+        "site-url": "www.firsteam.com",
+        "site-name": "firsteam.com"
+      },
+      "pictures": {
+        "picture": {
+          "picture-url": "https://www.firstteam.com/img/no-image.gif"
+        }
+      },
+      "landing-page": {
+        "lp-url": "https://www.firstteam.com/listing/OC17178019"
+      }
+    },
+    {
+      "location": {
+        "street-address": "10092 Cabo Drive",
+        "city-name": "Westminster",
+        "county": "Orange",
+        "state-code": "CA",
+        "zipcode": "92683",
+        "display-address": "yes"
+      },
+      "details": {
+        "price": "440000",
+        "year-built": "1974",
+        "num-bedrooms": "2",
+        "num-bathrooms": "2.5",
+        "lot-size": "1516 square ft.",
+        "square-feet": "1404",
+        "date-listed": "2017-08-01",
+        "description": "Spacious 2 bedroom 2 1/2 bath patio home in the desirable private gated community of Westminster Monterey. Recently remodeled home including kitchen with granite countertops, solid wood cabinetry and stainless steel appliances. Beautiful custom Spanish-style porcelain flooring throughout the main level. All windows and sliding door have been upgraded with Milgard dual pane windows. City and mountain views from the master bedroom window. Other improvements include new Goodman central heating furnace, crown molding, 2- year old high quality carpeting on the second level, custom window trim, upgraded baseboard moldings and Bali solar shades on all the windows. Freshly painted with Benjamin Moore Regal paint creating a Mediterranean feel. Features include a remodeled patio with split-face concrete walls, multi-color slate patio flooring, fruiting Navel orange tree and an attached 2-car garage complete with storage cabinetry and LED shop lights. This gated community has 2 lighted tennis courts and 4 swimming pools/spas with one heated year round. This wonderful home is situated on one of the best lots in the middle of the complex. It is along a green belt and close to one of the larger pools. The rear is adjacent to a wide portion of the driveway across from visitor parking and tennis courts. Friendly quiet neighbors complete this peaceful living experience. The community of Westminster Monterey is walking distance to shopping, restaurants, schools and Mile Square Pa",
+        "mlsId": "OC17178042"
+      },
+      "agent": {
+        "broker-name": "First Team Real Estate",
+        "agent-name": "Denise Mellor",
+        "agent-id": "680",
+        "phone-number": "888-464-5031",
+        "email": "denisemellor1@cox.net"
+      },
+      "status": "sold",
+      "property-type": "Single-Family Res.",
+      "site": {
+        "site-url": "www.firsteam.com",
+        "site-name": "firsteam.com"
+      },
+      "pictures": {
+        "picture": {
+          "picture-url": "https://www.firstteam.com/img/no-image.gif"
+        }
+      },
+      "landing-page": {
+        "lp-url": "https://www.firstteam.com/listing/OC17178042"
+      }
+    },
+    {
+      "location": {
+        "street-address": "6422 E. Hollyoak",
+        "city-name": "Orange",
+        "county": "Orange",
+        "state-code": "CA",
+        "zipcode": "92867",
+        "display-address": "yes"
+      },
+      "details": {
+        "price": "1470000",
+        "year-built": "1997",
+        "num-bedrooms": "5",
+        "num-bathrooms": "4",
+        "lot-size": "8148 square ft.",
+        "square-feet": "3600",
+        "date-listed": "2017-08-02",
+        "description": "Youve never seen Parkridge Estates look like this!  Impeccably remodeled and tailored to perfection, the flawless design, high-end amenities, open floor plan and stunning outdoor living spaces invite the luxe lifestyle youve been dreaming of.  With dramatic high ceilings, lustrous flooring, unique architectural elements and modern features such as a temperature controlled wine feature wall and programmable window coverings, HVAC and lighting/sound systems controlled by your tablet or cell phone, this home is beyond any entertainer's dreams. An expanded living room flows seamlessly into the chic dining room. Open to a fabulous designer kitchen, the spacious great room boasts accordion doors that expand your entertaining space, opening to a fully covered patio with retractable screens, built-in ceiling fans and heaters along with a fireplace, television, modern outdoor kitchen, BBQ, pool and spa, capturing breathtaking panoramic views which are also enjoyed from the upstairs bonus room with balcony. Two bedrooms with shared bath and a guest bedroom with en-suite bath along with an elegant, private master retreat allow for ample living space. With a fully paid for solar energy system, the electricity bill is virtually non-existent.  Offering privacy on a single loaded street in this highly sought after, gated community, the location of this home is bar none. Community amenities include a pool, spa, sports court and picnic area.  Attendance to distinguished Villa",
+        "mlsId": "PW17168965"
+      },
+      "agent": {
+        "broker-name": "First Team Real Estate",
+        "agent-name": "Kathy Leimkuhler",
+        "agent-id": "9138",
+        "phone-number": "888-464-5031",
+        "email": "kathyleimkuhler@firstteam.com"
+      },
+      "status": "sold",
+      "property-type": "Single-Family Res.",
+      "site": {
+        "site-url": "www.firsteam.com",
+        "site-name": "firsteam.com"
+      },
+      "pictures": {
+        "picture": {
+          "picture-url": "https://www.firstteam.com/img/no-image.gif"
+        }
+      },
+      "landing-page": {
+        "lp-url": "https://www.firstteam.com/listing/PW17168965"
+      }
+    },
+    {
+      "location": {
+        "street-address": "13391 Taft Street # Unit 6",
+        "city-name": "Garden Grove",
+        "county": "Orange",
+        "state-code": "CA",
+        "zipcode": "92843",
+        "display-address": "yes"
+      },
+      "details": {
+        "price": "445000",
+        "year-built": "1980",
+        "num-bedrooms": "3",
+        "num-bathrooms": "2.5",
+        "square-feet": "1473",
+        "date-listed": "2017-09-04",
+        "description": "Absolutely stunning TWO STORY home in the city of Garden Grove! This property is centrally located to schools, shopping, restaurants. Close to 22 freeway for easy commuting. This home has been remodeled from top to bottom featuring a lovely kitchen with granite counters, stainless steel appliances and a farmhouse sink. All three bathrooms have been completely remodeled with travertine tile and granite counters. Egyptian limestone flooring on the main floor with recessed lighting and a beautiful stacked stone fireplace. There is a finished 2 car garage, newer forced air and heat and much much more! Bring your buyers! They will love this home!",
+        "mlsId": "PW17204513"
+      },
+      "agent": {
+        "broker-name": "First Team Real Estate",
+        "agent-name": "Yvonne Parsons",
+        "agent-id": "2535",
+        "phone-number": "888-464-5031",
+        "email": "yvonnelparsons@yahoo.com"
+      },
+      "status": "sold",
+      "property-type": "Townhouse",
+      "site": {
+        "site-url": "www.firsteam.com",
+        "site-name": "firsteam.com"
+      },
+      "pictures": {
+        "picture": {
+          "picture-url": "https://www.firstteam.com/img/no-image.gif"
+        }
+      },
+      "landing-page": {
+        "lp-url": "https://www.firstteam.com/listing/PW17204513"
+      }
+    },
+    {
+      "location": {
+        "street-address": "7723 E. Portofino Avenue",
+        "city-name": "Anaheim Hills",
+        "county": "Orange",
+        "state-code": "CA",
+        "zipcode": "92808",
+        "display-address": "yes"
+      },
+      "details": {
+        "price": "2600",
+        "num-bedrooms": "3",
+        "num-bathrooms": "3",
+        "lot-size": "1000 square ft.",
+        "square-feet": "1363",
+        "date-listed": "2017-09-04",
+        "description": "Beautifully upgraded \"3 bedroom with 3 bathroom\" home in the popular Monaco complex.  Enjoy the resort style living with pool, spas, BBQs, gym, tennis and clubhouse. Ground floor entry leads up to Main floor living space includes Kitchen with granite counters, stainless appliances, breakfast counter, cathedral ceilings.  Along with views, and balcony access.  The open floor plan has Living room with fireplace, niches, and adjacent Dining room.  Master suite includes walk in closet, dual sink vanity with granite, and ceiling fan.  2nd bedroom and bathroom are also on the same level.  Upstairs is the private 3rd bedroom with attached bathroom for guests, teens, or office.  Bright, light, open plan has fresh paint, Brand new wood floors installed, plantation shutters through out, ceiling fans, 2 car attached garage with epoxy floors and built in garage storage.  Direct access to first level.  Private end unit, no one above or below.  Views of greenbelts, trees, and distant lights.",
+        "mlsId": "PW17204599"
+      },
+      "agent": {
+        "broker-name": "First Team Real Estate",
+        "agent-name": "Diane June",
+        "agent-id": "522",
+        "phone-number": "888-464-5031",
+        "email": "djune4@live.com"
+      },
+      "status": "leased",
+      "property-type": "Condominium",
+      "site": {
+        "site-url": "www.firsteam.com",
+        "site-name": "firsteam.com"
+      },
+      "pictures": {
+        "picture": {
+          "picture-url": "https://www.firstteam.com/img/no-image.gif"
+        }
+      },
+      "landing-page": {
+        "lp-url": "https://www.firstteam.com/listing/PW17204599"
+      }
+    },
+    {
+      "location": {
+        "street-address": "13421 Epping Way",
+        "city-name": "Tustin",
+        "county": "Orange",
+        "state-code": "CA",
+        "zipcode": "92780",
+        "display-address": "yes"
+      },
+      "details": {
+        "price": "665000",
+        "year-built": "1964",
+        "num-bedrooms": "5",
+        "num-bathrooms": "2.75",
+        "lot-size": "7380 square ft.",
+        "square-feet": "2236",
+        "date-listed": "2017-09-04",
+        "description": "Diamond in the rough !! A perfect location 5 bedrooms 3 bathrooms single family house in a quiet neighborhood on a cul-de-sac. This unique floor plans first floor offers 3 bedrooms, 2 baths, where the master bedroom has its own walking closet, living room with a fireplace, and kitchen has a large island with breakfast nook. The second level offers 2 bedrooms and a bathroom, which is perfect for extended families or guests. The large backyard has numerous fruit trees, patio, and lots of room for more gardening or perhaps a future pool. Located in a central Tustin location with close proximity to major shopping areas, dining, entertainment, schools, Tustin Market Place, and nearby freeways.",
+        "mlsId": "CV17202185"
+      },
+      "agent": {
+        "broker-name": "First Team Real Estate",
+        "agent-name": "Steve Yang",
+        "agent-id": "30035",
+        "phone-number": "888-464-5031",
+        "email": "steveyang@firstteam.com"
+      },
+      "status": "sold",
+      "property-type": "Single-Family Res.",
+      "site": {
+        "site-url": "www.firsteam.com",
+        "site-name": "firsteam.com"
+      },
+      "pictures": {
+        "picture": {
+          "picture-url": "https://www.firstteam.com/img/no-image.gif"
+        }
+      },
+      "landing-page": {
+        "lp-url": "https://www.firstteam.com/listing/CV17202185"
+      }
+    }
+  ],
+  "outputDocs": [
+    {
+      "StreetAddress": "23000 Newport Coast Drive",
+      "CityName": "Newport Coast",
+      "County": "Orange",
+      "StateCode": "CA",
+      "ZipCode": "92657",
+      "DisplayAddress": "yes",
+      "Price": 13000,
+      "YearBuilt": "1999",
+      "NumberBedrooms": 2,
+      "NumberBathrooms": "2",
+      "SquareFeet": 1400,
+      "DateListed": "2015-05-01T00:00:00.000Z",
+      "Description": "Ready to show this exclusive Marriott Newport Coast Villa Timeshare, nested in prestigeous Orange County California on a Ocean Bluff, boasting 2 Bedrooms 2 Baths, overlooking Laguana Beach and the Pacific Ocean. Be an Exquisite owner of this Villa and enjoy all the Unique Amenities that include golf, five outdoor Pools, tennis and fitness center with a sauna and steam room, five outdoor whirlpoolhot tubs, walking and bike trails, barbecue areas, restaurant andtoo many incentives to mention. Each Villa has a fully equipped kitchen, spacious marble bathrooms, master bedroom suite and a thrilling ocean view.",
+      "MlsId": "CV15092628",
+      "AgentName": "Rupert Goffe",
+      "AgentId": 2998,
+      "Status": "active",
+      "PropertyType": "Timeshare",
+      "SiteUrl": "www.firsteam.com",
+      "SiteName": "firsteam.com",
+      "ImageUrl": "https://www.firstteam.com/img/no-image.gif",
+      "LpUrl": "https://www.firstteam.com/listing/CV15092628",
+      "BrokerNameText": "First Team Real Estate",
+      "BrokerName": "First Team Real Estate"
+    },
+    {
+      "StreetAddress": "7873 Rio Vista Drive",
+      "CityName": "Big River",
+      "County": "San Bernardino",
+      "StateCode": "CA",
+      "ZipCode": "92242",
+      "DisplayAddress": "yes",
+      "Price": 2625,
+      "NumberBedrooms": 3,
+      "NumberBathrooms": "3",
+      "SquareFeet": 3000,
+      "DateListed": "2015-05-06T00:00:00.000Z",
+      "Description": "$2625 for 5 days or   $525 a day 5 day minimun,  Custom Riverfront Estate WITH PRIVATE BEACH!!!on Colorado River, single level   3000 sqft nt, all flat inside , ok for handicap, covered patio is 1800 sqft!!!!, 2  Palapas on your private beach, 2 private decks and boat dock , launch ramp down at the park, loads of room in front yard to park, room for rvs, and a hook up,  also included 2 car covered parking structure, and 2 car garage   w compressor  2 refrigerators , custom lighting inside,   Custom built granite bar w waterfront views forever,   totally private and awesome Estate,   Ac,   swamp cooled, Fresh water up to 80 degrees in the summer,catch catfish, bass, and carp, +++     Plenty of wild birds  and animals in the desert   close to the open desert for riding or flying, biking, or jogging !! Home is loaded w travertine floors, &  showers.  The breeses usually come across the river so its cooler than anywhere else, automatic a/c!!!. Large grand room w banquet table and large granite table for the whole gang   Inside photos will com after the 1st  Submit   5 day minimum submit , pool table , exercise bike, weight set on back deck  BBQ on patio,  Internet (wi fi)   and 2 tv's   one 60inch  ,   direct tv and net flicks included,  Fully Furnished.",
+      "MlsId": "LG15096382",
+      "AgentName": "Robert Ryan",
+      "AgentId": 855,
+      "Status": "for rent",
+      "PropertyType": "Single-Family Res.",
+      "SiteUrl": "www.firsteam.com",
+      "SiteName": "firsteam.com",
+      "ImageUrl": "https://www.firstteam.com/img/no-image.gif",
+      "LpUrl": "https://www.firstteam.com/listing/LG15096382",
+      "LotSize": "30100 square ft.",
+      "BrokerNameText": "First Team Real Estate",
+      "BrokerName": "First Team Real Estate"
+    },
+    {
+      "StreetAddress": "Honey Wagon Rd",
+      "CityName": "Niland",
+      "County": "San Diego",
+      "StateCode": "CA",
+      "ZipCode": "92257",
+      "DisplayAddress": "yes",
+      "Price": 772800,
+      "DateListed": "2015-05-29T00:00:00.000Z",
+      "Description": "644 Acres of land consisting of 4 contiguous land parcels. Desert land good view, elevation, located by the Rail road tracks and HWY 111, The land comes with a new 99 year lease in place from an energy contractor who will pay quarterly potential income to the owner. located in the Niland area, HWY 111and RR track passes through the South East corner. Also located within The West Chocolate Mountains REEA area which creates a new Solar Energy Zone (SEZ),  APN#002-490-001-000; 002-490-002-000; 002-490-007-000; 002-490-008-000;",
+      "MlsId": "PW15115591",
+      "AgentName": "Amir Maloumi",
+      "AgentId": 31405,
+      "Status": "active",
+      "PropertyType": "Land",
+      "SiteUrl": "www.firsteam.com",
+      "SiteName": "firsteam.com",
+      "ImageUrl": "https://www.firstteam.com/img/no-image.gif",
+      "LpUrl": "https://www.firstteam.com/listing/PW15115591",
+      "LotSize": "2.80526e+007 square ft.",
+      "BrokerNameText": "First Team Real Estate",
+      "BrokerName": "First Team Real Estate"
+    },
+    {
+      "StreetAddress": "W. Avenue B12/23 Stw",
+      "CityName": "Lancaster",
+      "County": "Los Angeles",
+      "StateCode": "CA",
+      "ZipCode": "93536",
+      "DisplayAddress": "yes",
+      "Price": 350000,
+      "DateListed": "2015-07-03T00:00:00.000Z",
+      "Description": "The Subject property is located on the northwest corner of Highway 14 and West Ave C, North of Fox Airfield and Apollo Park. Located within the path of growth, 30 AC consists of 8 contiguous parcels also available for sale separately. The property is unimproved and will be delivered as is.APN # 3115-006-007, 009, 014, 015, 016, 024, 025, 026,",
+      "MlsId": "PW15145211",
+      "AgentName": "Amir Maloumi",
+      "AgentId": 31405,
+      "Status": "active",
+      "PropertyType": "Land",
+      "SiteUrl": "www.firsteam.com",
+      "SiteName": "firsteam.com",
+      "ImageUrl": "https://www.firstteam.com/img/no-image.gif",
+      "LpUrl": "https://www.firstteam.com/listing/PW15145211",
+      "LotSize": "1.3068e+006 square ft.",
+      "BrokerNameText": "First Team Real Estate",
+      "BrokerName": "First Team Real Estate"
+    },
+    {
+      "StreetAddress": "11 Quail Bush",
+      "CityName": "Irvine",
+      "County": "Orange",
+      "StateCode": "CA",
+      "ZipCode": "92618",
+      "DisplayAddress": "yes",
+      "Price": 3000,
+      "NumberBedrooms": 3,
+      "NumberBathrooms": "2.5",
+      "SquareFeet": 1600,
+      "DateListed": "2017-08-02T00:00:00.000Z",
+      "Description": "On a private cul-de sac, this charming detached home, in the gated community of Oak Creek has the perfect interior location. Home was just painted and freshened up throughout. Enter the home & into the main living area, with fireplace & rich dark wood-style flooring. This great room style floor plan features the living area opening to the dining area & kitchen, making it ideal for entertaining family & friends. The living room overlooks the private outdoor entertainment area, with brick trimmed planters & dining area under the covered patio. The spacious, eat-in kitchen is filled with sunshine from a wall of windows & features white country-style cabinetry. A powder room with pedestal sink completes the main level. Upstairs, the large master suite features a roomy walk-in closet with tons of shelves! The master bath offers a walk-in shower with seat, dual sinks & a separate toilet area. The two secondary bedrooms, one with mirrored wardrobes, are separate from the master suite, providing the utmost in privacy. As a bonus, you will find lots of additional storage in the built-in cabinetry in the hallway. The upstairs is complete with the highly sought after second floor laundry room. Parking is convenient with direct access, two car garage & extra long driveway. Just a short walk to the resort-style community amenities, as well as nearby shopping & dining. Located in top rated Irvine School District. Don't miss out on this great opportunity to live the Oak Creek",
+      "MlsId": "OC17178019",
+      "AgentName": "Lisa Anderson",
+      "AgentId": 3290,
+      "Status": "leased",
+      "PropertyType": "Condominium",
+      "SiteUrl": "www.firsteam.com",
+      "SiteName": "firsteam.com",
+      "ImageUrl": "https://www.firstteam.com/img/no-image.gif",
+      "LpUrl": "https://www.firstteam.com/listing/OC17178019",
+      "LotSize": "3500 square ft.",
+      "BrokerNameText": "First Team Real Estate",
+      "BrokerName": "First Team Real Estate"
+    },
+    {
+      "StreetAddress": "10092 Cabo Drive",
+      "CityName": "Westminster",
+      "County": "Orange",
+      "StateCode": "CA",
+      "ZipCode": "92683",
+      "DisplayAddress": "yes",
+      "Price": 440000,
+      "YearBuilt": "1974",
+      "NumberBedrooms": 2,
+      "NumberBathrooms": "2.5",
+      "SquareFeet": 1404,
+      "DateListed": "2017-08-01T00:00:00.000Z",
+      "Description": "Spacious 2 bedroom 2 1/2 bath patio home in the desirable private gated community of Westminster Monterey. Recently remodeled home including kitchen with granite countertops, solid wood cabinetry and stainless steel appliances. Beautiful custom Spanish-style porcelain flooring throughout the main level. All windows and sliding door have been upgraded with Milgard dual pane windows. City and mountain views from the master bedroom window. Other improvements include new Goodman central heating furnace, crown molding, 2- year old high quality carpeting on the second level, custom window trim, upgraded baseboard moldings and Bali solar shades on all the windows. Freshly painted with Benjamin Moore Regal paint creating a Mediterranean feel. Features include a remodeled patio with split-face concrete walls, multi-color slate patio flooring, fruiting Navel orange tree and an attached 2-car garage complete with storage cabinetry and LED shop lights. This gated community has 2 lighted tennis courts and 4 swimming pools/spas with one heated year round. This wonderful home is situated on one of the best lots in the middle of the complex. It is along a green belt and close to one of the larger pools. The rear is adjacent to a wide portion of the driveway across from visitor parking and tennis courts. Friendly quiet neighbors complete this peaceful living experience. The community of Westminster Monterey is walking distance to shopping, restaurants, schools and Mile Square Pa",
+      "MlsId": "OC17178042",
+      "AgentName": "Denise Mellor",
+      "AgentId": 680,
+      "Status": "sold",
+      "PropertyType": "Single-Family Res.",
+      "SiteUrl": "www.firsteam.com",
+      "SiteName": "firsteam.com",
+      "ImageUrl": "https://www.firstteam.com/img/no-image.gif",
+      "LpUrl": "https://www.firstteam.com/listing/OC17178042",
+      "LotSize": "1516 square ft.",
+      "BrokerNameText": "First Team Real Estate",
+      "BrokerName": "First Team Real Estate"
+    },
+    {
+      "StreetAddress": "6422 E. Hollyoak",
+      "CityName": "Orange",
+      "County": "Orange",
+      "StateCode": "CA",
+      "ZipCode": "92867",
+      "DisplayAddress": "yes",
+      "Price": 1470000,
+      "YearBuilt": "1997",
+      "NumberBedrooms": 5,
+      "NumberBathrooms": "4",
+      "SquareFeet": 3600,
+      "DateListed": "2017-08-02T00:00:00.000Z",
+      "Description": "Youve never seen Parkridge Estates look like this!  Impeccably remodeled and tailored to perfection, the flawless design, high-end amenities, open floor plan and stunning outdoor living spaces invite the luxe lifestyle youve been dreaming of.  With dramatic high ceilings, lustrous flooring, unique architectural elements and modern features such as a temperature controlled wine feature wall and programmable window coverings, HVAC and lighting/sound systems controlled by your tablet or cell phone, this home is beyond any entertainer's dreams. An expanded living room flows seamlessly into the chic dining room. Open to a fabulous designer kitchen, the spacious great room boasts accordion doors that expand your entertaining space, opening to a fully covered patio with retractable screens, built-in ceiling fans and heaters along with a fireplace, television, modern outdoor kitchen, BBQ, pool and spa, capturing breathtaking panoramic views which are also enjoyed from the upstairs bonus room with balcony. Two bedrooms with shared bath and a guest bedroom with en-suite bath along with an elegant, private master retreat allow for ample living space. With a fully paid for solar energy system, the electricity bill is virtually non-existent.  Offering privacy on a single loaded street in this highly sought after, gated community, the location of this home is bar none. Community amenities include a pool, spa, sports court and picnic area.  Attendance to distinguished Villa",
+      "MlsId": "PW17168965",
+      "AgentName": "Kathy Leimkuhler",
+      "AgentId": 9138,
+      "Status": "sold",
+      "PropertyType": "Single-Family Res.",
+      "SiteUrl": "www.firsteam.com",
+      "SiteName": "firsteam.com",
+      "ImageUrl": "https://www.firstteam.com/img/no-image.gif",
+      "LpUrl": "https://www.firstteam.com/listing/PW17168965",
+      "LotSize": "8148 square ft.",
+      "BrokerNameText": "First Team Real Estate",
+      "BrokerName": "First Team Real Estate"
+    },
+    {
+      "StreetAddress": "13391 Taft Street # Unit 6",
+      "CityName": "Garden Grove",
+      "County": "Orange",
+      "StateCode": "CA",
+      "ZipCode": "92843",
+      "DisplayAddress": "yes",
+      "Price": 445000,
+      "YearBuilt": "1980",
+      "NumberBedrooms": 3,
+      "NumberBathrooms": "2.5",
+      "SquareFeet": 1473,
+      "DateListed": "2017-09-04T00:00:00.000Z",
+      "Description": "Absolutely stunning TWO STORY home in the city of Garden Grove! This property is centrally located to schools, shopping, restaurants. Close to 22 freeway for easy commuting. This home has been remodeled from top to bottom featuring a lovely kitchen with granite counters, stainless steel appliances and a farmhouse sink. All three bathrooms have been completely remodeled with travertine tile and granite counters. Egyptian limestone flooring on the main floor with recessed lighting and a beautiful stacked stone fireplace. There is a finished 2 car garage, newer forced air and heat and much much more! Bring your buyers! They will love this home!",
+      "MlsId": "PW17204513",
+      "AgentName": "Yvonne Parsons",
+      "AgentId": 2535,
+      "Status": "sold",
+      "PropertyType": "Townhouse",
+      "SiteUrl": "www.firsteam.com",
+      "SiteName": "firsteam.com",
+      "ImageUrl": "https://www.firstteam.com/img/no-image.gif",
+      "LpUrl": "https://www.firstteam.com/listing/PW17204513",
+      "BrokerNameText": "First Team Real Estate",
+      "BrokerName": "First Team Real Estate"
+    },
+    {
+      "StreetAddress": "7723 E. Portofino Avenue",
+      "CityName": "Anaheim Hills",
+      "County": "Orange",
+      "StateCode": "CA",
+      "ZipCode": "92808",
+      "DisplayAddress": "yes",
+      "Price": 2600,
+      "NumberBedrooms": 3,
+      "NumberBathrooms": "3",
+      "SquareFeet": 1363,
+      "DateListed": "2017-09-04T00:00:00.000Z",
+      "Description": "Beautifully upgraded \"3 bedroom with 3 bathroom\" home in the popular Monaco complex.  Enjoy the resort style living with pool, spas, BBQs, gym, tennis and clubhouse. Ground floor entry leads up to Main floor living space includes Kitchen with granite counters, stainless appliances, breakfast counter, cathedral ceilings.  Along with views, and balcony access.  The open floor plan has Living room with fireplace, niches, and adjacent Dining room.  Master suite includes walk in closet, dual sink vanity with granite, and ceiling fan.  2nd bedroom and bathroom are also on the same level.  Upstairs is the private 3rd bedroom with attached bathroom for guests, teens, or office.  Bright, light, open plan has fresh paint, Brand new wood floors installed, plantation shutters through out, ceiling fans, 2 car attached garage with epoxy floors and built in garage storage.  Direct access to first level.  Private end unit, no one above or below.  Views of greenbelts, trees, and distant lights.",
+      "MlsId": "PW17204599",
+      "AgentName": "Diane June",
+      "AgentId": 522,
+      "Status": "leased",
+      "PropertyType": "Condominium",
+      "SiteUrl": "www.firsteam.com",
+      "SiteName": "firsteam.com",
+      "ImageUrl": "https://www.firstteam.com/img/no-image.gif",
+      "LpUrl": "https://www.firstteam.com/listing/PW17204599",
+      "LotSize": "1000 square ft.",
+      "BrokerNameText": "First Team Real Estate",
+      "BrokerName": "First Team Real Estate"
+    },
+    {
+      "StreetAddress": "13421 Epping Way",
+      "CityName": "Tustin",
+      "County": "Orange",
+      "StateCode": "CA",
+      "ZipCode": "92780",
+      "DisplayAddress": "yes",
+      "Price": 665000,
+      "YearBuilt": "1964",
+      "NumberBedrooms": 5,
+      "NumberBathrooms": "2.75",
+      "SquareFeet": 2236,
+      "DateListed": "2017-09-04T00:00:00.000Z",
+      "Description": "Diamond in the rough !! A perfect location 5 bedrooms 3 bathrooms single family house in a quiet neighborhood on a cul-de-sac. This unique floor plans first floor offers 3 bedrooms, 2 baths, where the master bedroom has its own walking closet, living room with a fireplace, and kitchen has a large island with breakfast nook. The second level offers 2 bedrooms and a bathroom, which is perfect for extended families or guests. The large backyard has numerous fruit trees, patio, and lots of room for more gardening or perhaps a future pool. Located in a central Tustin location with close proximity to major shopping areas, dining, entertainment, schools, Tustin Market Place, and nearby freeways.",
+      "MlsId": "CV17202185",
+      "AgentName": "Steve Yang",
+      "AgentId": 30035,
+      "Status": "sold",
+      "PropertyType": "Single-Family Res.",
+      "SiteUrl": "www.firsteam.com",
+      "SiteName": "firsteam.com",
+      "ImageUrl": "https://www.firstteam.com/img/no-image.gif",
+      "LpUrl": "https://www.firstteam.com/listing/CV17202185",
+      "LotSize": "7380 square ft.",
+      "BrokerNameText": "First Team Real Estate",
+      "BrokerName": "First Team Real Estate"
+    }
+  ],
+  "template": {
+    "id": 14,
+    "lastModified": "2018-07-19T22:16:08.765Z",
+    "createdAt": "2018-05-30T23:57:37.570Z",
+    "archived": false,
+    "templateName": "Listings ACG Import Template",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "location",
+                        "zipcode"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "details",
+                        "price"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "details",
+                        "year-built"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "details",
+                        "num-bedrooms"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "details",
+                        "num-bathrooms"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "details",
+                        "square-feet"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "agent",
+                        "agent-id"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "details",
+                        "date-listed"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "date",
+                      "format": "ISOstring"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "details",
+                        "lot-size"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "location",
+                        "street-address"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "location",
+                        "city-name"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "12",
+                  "value": {
+                    "id": 12,
+                    "fields": [
+                      [
+                        "location",
+                        "county"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "13",
+                  "value": {
+                    "id": 13,
+                    "fields": [
+                      [
+                        "location",
+                        "state-code"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "14",
+                  "value": {
+                    "id": 14,
+                    "fields": [
+                      [
+                        "location",
+                        "display-address"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "16",
+                  "value": {
+                    "id": 16,
+                    "fields": [
+                      [
+                        "details",
+                        "description"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "17",
+                  "value": {
+                    "id": 17,
+                    "fields": [
+                      [
+                        "details",
+                        "mlsId"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "19",
+                  "value": {
+                    "id": 19,
+                    "fields": [
+                      [
+                        "agent",
+                        "broker-name"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "20",
+                  "value": {
+                    "id": 20,
+                    "fields": [
+                      [
+                        "agent",
+                        "agent-name"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "23",
+                  "value": {
+                    "id": 23,
+                    "fields": [
+                      [
+                        "status"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "24",
+                  "value": {
+                    "id": 24,
+                    "fields": [
+                      [
+                        "property-type"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "26",
+                  "value": {
+                    "id": 26,
+                    "fields": [
+                      [
+                        "site",
+                        "site-url"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "27",
+                  "value": {
+                    "id": 27,
+                    "fields": [
+                      [
+                        "site",
+                        "site-name"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "30",
+                  "value": {
+                    "id": 30,
+                    "fields": [
+                      [
+                        "pictures",
+                        "picture",
+                        "picture-url"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "32",
+                  "value": {
+                    "id": 32,
+                    "fields": [
+                      [
+                        "landing-page",
+                        "lp-url"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "33",
+                  "value": {
+                    "id": 33,
+                    "fields": [
+                      [
+                        "location",
+                        "zipcode"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "34",
+                  "value": {
+                    "id": 34,
+                    "fields": [
+                      [
+                        "details",
+                        "price"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "35",
+                  "value": {
+                    "id": 35,
+                    "fields": [
+                      [
+                        "details",
+                        "year-built"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "36",
+                  "value": {
+                    "id": 36,
+                    "fields": [
+                      [
+                        "details",
+                        "num-bedrooms"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "37",
+                  "value": {
+                    "id": 37,
+                    "fields": [
+                      [
+                        "details",
+                        "num-bathrooms"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "38",
+                  "value": {
+                    "id": 38,
+                    "fields": [
+                      [
+                        "details",
+                        "square-feet"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "39",
+                  "value": {
+                    "id": 39,
+                    "fields": [
+                      [
+                        "agent",
+                        "broker-name"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "BrokerNameText"
+                        ]
+                      ]
+                    },
+                    "typeCode": "DuplicateNode"
+                  }
+                },
+                {
+                  "v": "40",
+                  "value": {
+                    "id": 40,
+                    "fields": [
+                      [
+                        "agent",
+                        "broker-name"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "BrokerName"
+                        ]
+                      ]
+                    },
+                    "typeCode": "DuplicateNode"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 35,
+            "uidNode": 41,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "site",
+                  "site-url"
+                ],
+                25
+              ],
+              [
+                [
+                  "details",
+                  "date-listed"
+                ],
+                13
+              ],
+              [
+                [
+                  "details",
+                  "price"
+                ],
+                8
+              ],
+              [
+                [
+                  "property-type"
+                ],
+                23
+              ],
+              [
+                [
+                  "pictures",
+                  "picture",
+                  "picture-url"
+                ],
+                29
+              ],
+              [
+                [
+                  "details",
+                  "num-bedrooms"
+                ],
+                10
+              ],
+              [
+                [
+                  "details",
+                  "mlsId"
+                ],
+                15
+              ],
+              [
+                [
+                  "details",
+                  "square-feet"
+                ],
+                12
+              ],
+              [
+                [
+                  "details",
+                  "lot-size"
+                ],
+                32
+              ],
+              [
+                [
+                  "agent",
+                  "agent-id"
+                ],
+                19
+              ],
+              [
+                [
+                  "location",
+                  "street-address"
+                ],
+                1
+              ],
+              [
+                [
+                  "location",
+                  "county"
+                ],
+                3
+              ],
+              [
+                [
+                  "_synthetic_fyh3axmijy6",
+                  "Copy of BrokerName"
+                ],
+                33
+              ],
+              [
+                [
+                  "details",
+                  "year-built"
+                ],
+                9
+              ],
+              [
+                [
+                  "details",
+                  "num-bathrooms"
+                ],
+                11
+              ],
+              [
+                [
+                  "landing-page",
+                  "lp-url"
+                ],
+                31
+              ],
+              [
+                [
+                  "location",
+                  "zipcode"
+                ],
+                5
+              ],
+              [
+                [
+                  "location",
+                  "city-name"
+                ],
+                2
+              ],
+              [
+                [
+                  "location",
+                  "display-address"
+                ],
+                6
+              ],
+              [
+                [
+                  "agent",
+                  "agent-name"
+                ],
+                18
+              ],
+              [
+                [
+                  "status"
+                ],
+                22
+              ],
+              [
+                [
+                  "_synthetic_7k2uf1lwfhc",
+                  "BrokerName"
+                ],
+                34
+              ],
+              [
+                [
+                  "location",
+                  "state-code"
+                ],
+                4
+              ],
+              [
+                [
+                  "details",
+                  "description"
+                ],
+                14
+              ],
+              [
+                [
+                  "agent",
+                  "broker-name"
+                ],
+                17
+              ],
+              [
+                [
+                  "site",
+                  "site-name"
+                ],
+                26
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                32,
+                [
+                  "LotSize"
+                ]
+              ],
+              [
+                1,
+                [
+                  "StreetAddress"
+                ]
+              ],
+              [
+                33,
+                [
+                  "BrokerNameText"
+                ]
+              ],
+              [
+                2,
+                [
+                  "CityName"
+                ]
+              ],
+              [
+                34,
+                [
+                  "BrokerName"
+                ]
+              ],
+              [
+                3,
+                [
+                  "County"
+                ]
+              ],
+              [
+                4,
+                [
+                  "StateCode"
+                ]
+              ],
+              [
+                5,
+                [
+                  "ZipCode"
+                ]
+              ],
+              [
+                6,
+                [
+                  "DisplayAddress"
+                ]
+              ],
+              [
+                8,
+                [
+                  "Price"
+                ]
+              ],
+              [
+                9,
+                [
+                  "YearBuilt"
+                ]
+              ],
+              [
+                10,
+                [
+                  "NumberBedrooms"
+                ]
+              ],
+              [
+                11,
+                [
+                  "NumberBathrooms"
+                ]
+              ],
+              [
+                12,
+                [
+                  "SquareFeet"
+                ]
+              ],
+              [
+                13,
+                [
+                  "DateListed"
+                ]
+              ],
+              [
+                14,
+                [
+                  "Description"
+                ]
+              ],
+              [
+                15,
+                [
+                  "MlsId"
+                ]
+              ],
+              [
+                17,
+                [
+                  "_szrdw5zxqpgBrokerName"
+                ]
+              ],
+              [
+                18,
+                [
+                  "AgentName"
+                ]
+              ],
+              [
+                19,
+                [
+                  "AgentId"
+                ]
+              ],
+              [
+                22,
+                [
+                  "Status"
+                ]
+              ],
+              [
+                23,
+                [
+                  "PropertyType"
+                ]
+              ],
+              [
+                25,
+                [
+                  "SiteUrl"
+                ]
+              ],
+              [
+                26,
+                [
+                  "SiteName"
+                ]
+              ],
+              [
+                29,
+                [
+                  "ImageUrl"
+                ]
+              ],
+              [
+                31,
+                [
+                  "LpUrl"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                32,
+                "string"
+              ],
+              [
+                1,
+                "string"
+              ],
+              [
+                33,
+                "string"
+              ],
+              [
+                2,
+                "string"
+              ],
+              [
+                34,
+                "string"
+              ],
+              [
+                3,
+                "string"
+              ],
+              [
+                4,
+                "string"
+              ],
+              [
+                5,
+                "string"
+              ],
+              [
+                6,
+                "string"
+              ],
+              [
+                8,
+                "number"
+              ],
+              [
+                9,
+                "string"
+              ],
+              [
+                10,
+                "number"
+              ],
+              [
+                11,
+                "string"
+              ],
+              [
+                12,
+                "number"
+              ],
+              [
+                13,
+                "string"
+              ],
+              [
+                14,
+                "string"
+              ],
+              [
+                15,
+                "string"
+              ],
+              [
+                17,
+                "string"
+              ],
+              [
+                18,
+                "string"
+              ],
+              [
+                19,
+                "number"
+              ],
+              [
+                22,
+                "string"
+              ],
+              [
+                23,
+                "string"
+              ],
+              [
+                25,
+                "string"
+              ],
+              [
+                26,
+                "string"
+              ],
+              [
+                29,
+                "string"
+              ],
+              [
+                31,
+                "string"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                32,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                33,
+                true
+              ],
+              [
+                2,
+                true
+              ],
+              [
+                34,
+                true
+              ],
+              [
+                3,
+                true
+              ],
+              [
+                4,
+                true
+              ],
+              [
+                5,
+                true
+              ],
+              [
+                6,
+                true
+              ],
+              [
+                8,
+                true
+              ],
+              [
+                9,
+                true
+              ],
+              [
+                10,
+                true
+              ],
+              [
+                11,
+                true
+              ],
+              [
+                12,
+                true
+              ],
+              [
+                13,
+                true
+              ],
+              [
+                14,
+                true
+              ],
+              [
+                15,
+                true
+              ],
+              [
+                17,
+                false
+              ],
+              [
+                18,
+                true
+              ],
+              [
+                19,
+                true
+              ],
+              [
+                22,
+                true
+              ],
+              [
+                23,
+                true
+              ],
+              [
+                25,
+                true
+              ],
+              [
+                26,
+                true
+              ],
+              [
+                29,
+                true
+              ],
+              [
+                31,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                32,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                33,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isAnalyzed": false,
+                    "isPrimaryKey": false,
+                    "analyzer": "standard",
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                34,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                8,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isAnalyzed": true,
+                    "isPrimaryKey": false,
+                    "analyzer": "standard",
+                    "elasticType": "double",
+                    "formState": {
+                      "isAnalyzed": true,
+                      "isPrimaryKey": false,
+                      "analyzer": "standard",
+                      "elasticType": "auto",
+                      "formState": {
+                        "isAnalyzed": true,
+                        "isPrimaryKey": false,
+                        "analyzer": "standard",
+                        "elasticType": "auto"
+                      }
+                    }
+                  }
+                }
+              ],
+              [
+                9,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                10,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                11,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                12,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                13,
+                {
+                  "etlType": "Date",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                14,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                15,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": true
+                  }
+                }
+              ],
+              [
+                17,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  },
+                  "uiState": {
+                    "hidden": true
+                  }
+                }
+              ],
+              [
+                18,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                19,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                22,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                23,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                25,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                26,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                29,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                31,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Http",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "xml",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": "property",
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "method": "GET"
+        },
+        "integrationId": 7,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Database",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": [
+            "LotSize",
+            "StreetAddress",
+            "CityName",
+            "County",
+            "StateCode",
+            "ZipCode",
+            "DisplayAddress",
+            "Price",
+            "YearBuilt",
+            "NumberBedrooms",
+            "NumberBathrooms",
+            "SquareFeet",
+            "DateListed",
+            "Description",
+            "MlsId",
+            "BrokerName",
+            "BrokerNameText",
+            "AgentName",
+            "AgentId",
+            "Status",
+            "PropertyType",
+            "SiteUrl",
+            "SiteName",
+            "ImageUrl",
+            "LpUrl"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "language": "elastic",
+          "table": "data",
+          "serverId": "FirstTeam ES",
+          "database": "listings"
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            32,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            17,
+            34,
+            33,
+            18,
+            19,
+            22,
+            23,
+            25,
+            26,
+            29,
+            31
+          ]
+        }
+      }
+    }
+  }
+}

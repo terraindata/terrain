@@ -47,14 +47,14 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
-import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeBase from 'shared/transformations/TransformationNode';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType, NodeTypes } from 'shared/transformations/TransformationNodeType';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
-import Topology from 'shared/transformations/util/TopologyUtil';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
+
+import * as Utils from 'shared/transformations/util/EngineUtils';
 
 // only put fields in here that are needed to track display-sensitive state
 class TemplateFieldC
@@ -62,22 +62,21 @@ class TemplateFieldC
   public readonly isIncluded: boolean = true;
   public readonly isHidden: boolean = false;
   public readonly fieldProps: object = {};
-  public readonly etlType: ETLFieldTypes = ETLFieldTypes.Object;
+  public readonly etlType: FieldTypes = FieldTypes.Object;
   public readonly fieldId: number = -1;
   public readonly name: string = '';
-  public readonly inputKeyPath: KeyPath = List([]);
   public readonly childrenIds: List<number> = List([]);
   public readonly transformations: List<TransformationNode> = List([]);
-  public readonly outputKeyPath: KeyPath = List([]);
+  public readonly fieldPath: KeyPath = List([]);
 
   public isWildcardField(): boolean
   {
-    return EngineUtil.isWildcardField(this.outputKeyPath);
+    return Utils.path.isWildcard(this.fieldPath);
   }
 
   public isAncestorNamedField(index: number)
   {
-    return EngineUtil.isNamedField(this.outputKeyPath.slice(0, index + 1).toList());
+    return Utils.path.isNamed(this.fieldPath.slice(0, index + 1).toList());
   }
 
   public canMoveField(): boolean
@@ -102,20 +101,20 @@ class TemplateFieldC
 
   public isPrimitive(): boolean
   {
-    return this.etlType !== ETLFieldTypes.Array &&
-      this.etlType !== ETLFieldTypes.Object &&
-      this.etlType !== ETLFieldTypes.GeoPoint;
+    return this.etlType !== FieldTypes.Array &&
+      this.etlType !== FieldTypes.Object &&
+      this.etlType !== FieldTypes.GeoPoint;
   }
 
   public isLocalToRoot(): boolean
   {
     // we can use a placeholder name
-    return Topology.areFieldsLocal(this.outputKeyPath, List(['sample_name']));
+    return Utils.topology.areFieldsLocal(this.fieldPath, List(['sample_name']));
   }
 
   public isNamedField()
   {
-    return EngineUtil.isNamedField(this.outputKeyPath);
+    return Utils.path.isNamed(this.fieldPath);
   }
 }
 export type TemplateField = WithIRecord<TemplateFieldC>;
@@ -127,7 +126,7 @@ class TransformationNodeC
 {
   public id: number = 0;
   public typeCode: TransformationNodeType = TransformationNodeType.SplitNode;
-  public fields: List<KeyPath> = List([]);
+  public fields: List<{ id: number, path: KeyPath }> = List([]);
   public meta: object = {};
 }
 export type TransformationNode = WithIRecord<TransformationNodeC>;

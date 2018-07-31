@@ -424,7 +424,7 @@ export function templateForBackend(template: ETLTemplate): TemplateBase
   obj.uiData = recordForSave(obj.uiData);
   obj.process = obj.process.update('edges', (edges) => edges.map((edge, key) =>
   {
-    return edge.set('transformations', JSON.stringify(edge.transformations.toJSON()));
+    return edge.set('transformations', edge.transformations.toJSON());
   }).toMap());
 
   obj.process = recordForSave(obj.process);

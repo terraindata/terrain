@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { ETLFieldTypes, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
@@ -71,7 +71,7 @@ export interface LanguageInterface
   // set the field to be a primary key or not. Return true if this operation affected any other fields
   setFieldPrimaryKey: (engine: TransformationEngine, fieldId: number, value: boolean) => boolean;
   // if the field changes ETL types, take care of side effects
-  changeFieldTypeSideEffects: (engine: TransformationEngine, fieldId: number, newType: ETLFieldTypes) => boolean;
+  changeFieldTypeSideEffects: (engine: TransformationEngine, fieldId: number, newType: FieldTypes) => boolean;
   // verify if the sink mapping is compatible. Returns an empty array if there are no issues
   verifyMapping: (engine: TransformationEngine, sink: SinkConfig, existingMapping?: object) => string[];
   // get potential issues for fields

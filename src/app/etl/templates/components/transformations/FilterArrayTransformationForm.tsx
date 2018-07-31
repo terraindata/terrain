@@ -50,7 +50,6 @@ import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
 
-import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';

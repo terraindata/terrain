@@ -65,13 +65,12 @@ import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
-import { validateNewFieldName } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+
+import * as Utils from 'shared/transformations/util/EngineUtils';
 
 import './EditorFieldModal.less';
 
@@ -215,7 +214,7 @@ class ExtractFieldModal extends TerrainComponent<Props>
     {
       const { templateEditor } = this.props;
       const engine = templateEditor.getCurrentEngine();
-      const okp = engine.getOutputKeyPath(fieldId);
+      const okp = engine.getFieldPath(fieldId);
 
       if (okp === undefined)
       {
@@ -223,7 +222,7 @@ class ExtractFieldModal extends TerrainComponent<Props>
       }
       else
       {
-        const lastIndex = okp.findLastIndex((val, i) => EngineUtil.isNamedField(okp, i));
+        const lastIndex = okp.findLastIndex((val, i) => Utils.path.isNamed(okp, i));
         if (lastIndex === -1)
         {
           return List([name]);
@@ -267,7 +266,7 @@ class ExtractFieldModal extends TerrainComponent<Props>
         };
       }
     }
-    return validateNewFieldName(engine, -1, keypath);
+    return Utils.validation.canAddField(engine, -1, keypath);
   }
 
   public validateState(): { isValid: boolean, message: string }

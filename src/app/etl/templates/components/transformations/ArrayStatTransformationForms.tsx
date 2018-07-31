@@ -56,11 +56,11 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
 import { TransformationNode } from 'etl/templates/FieldTypes';
-import { ETLFieldTypes, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
@@ -92,25 +92,18 @@ function SimpleStatFactory<T extends TransformationNodeType>(type: T, startingNa
       const { engine, fieldId } = this.props;
       const { outputName } = this.state;
 
-      const currentKeyPath = engine.getOutputKeyPath(fieldId);
+      const currentKeyPath = engine.getFieldPath(fieldId);
       const newFieldKeyPaths = List([
         currentKeyPath.set(currentKeyPath.size - 1, outputName),
       ]);
 
-      const inputFields = List([engine.getInputKeyPath(fieldId)]);
+      const inputFields = List([engine.getFieldPath(fieldId)]);
 
       return {
         options: {
           newFieldKeyPaths,
         },
         fields: inputFields,
-      };
-    }
-
-    protected overrideTransformationConfig()
-    {
-      return {
-        type: ETLFieldTypes.Number,
       };
     }
   };

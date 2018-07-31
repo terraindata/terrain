@@ -1,0 +1,1488 @@
+{
+  "testName": "MC_014",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "SKU": "KTCR-0003-GRI",
+      "VariantName": "Grill Master Crate",
+      "Price": 99.99,
+      "Inventory": 1014,
+      "VariantStatus": "sellable",
+      "ProductId": 14,
+      "VariantId": 14,
+      "Path": "grill-master-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/grill-master-crate",
+      "ContentsHTML": "<h4>Grilling Gadgetry</h4> <ul>\r\n  <li>Brass-knuckle Meat Tenderizer</li>\r\n  <li>Cast Iron Smoker Box</li>\r\n  <li>Set of 4 Steak Thermometers</li>\r\n  <li>Dried Hickory Wood Chips</li>\r\n</ul> <h4>Zesty Downpour</h4> <ul>\r\n  <li>Original BBQ Sauce</li>\r\n  <li>Carolina Bold BBQ Sauce</li>\r\n  <li>Premium Spice Blend</li>\r\n</ul>",
+      "LongDescription": "The Right Tools for the Job There's a line that separates the amateurs from the professionals. It's certainly\r\n   in the training and the experience, but folks often forget about the importance\r\n   of your equipment. Just like you can't win a NASCAR Cup in your grocery-getter,\r\n   can't crush a golf ball into orbit without a high-end driver, and aren't going\r\n   to take a trophy buck without a zeroed-in tack-driver, your grilling game will never\r\n   go next level without the right gear. You gotta have the right tools for the job.\r\n Like a Grill-ionaire Fortunately, you don't need to shell out a mountain of cash to get the equipment you need to get you to\r\n   grilling nirvana. We've included some of the best accessories that every man needs to get that Grillionaire\r\n   status.\r\n Our Grill Master Man Crate includes a cast-iron smoker\r\n  box and some hickory wood chips to get you started. Set the smoker box on\r\n   the grill as it warms up, soak the hickory in some water, and drop 'em into the\r\n   box as your meat grills. Take note, men: real flavor shouldn't come from a bottled\r\n   labeled \"liquid smoke.\"\r\n We threw in a set of four  steak thermometers, too. You may say, \"hey, Team\r\n   Man Crates, isn't that cheating?\" And we say, \"nay.\" There's no dishonor in knowing how done your steak\r\n   is. And when you cut into a perfectly-cooked slab of beef, you too shall understand that G.I. Joe wasn't\r\n   kidding when he said that Knowing Is Half the Battle.\r\n And because \"the right tool for every job\" means that sometimes you'll require some brute force, we've\r\n   included a brass-knuckle meat tenderizer. Nothing blows off the steam from a\r\n   long, hard day at work like beating your meat into submission.\r\n Bone Doctors We search tirelessly, every day, to find the best-in-class goods to put in our crates. Hundreds of sauces\r\n   came and went, the grills burned for weeks, until finally a victor emerged. An unexpected dark\r\n   horse, a little-known operation out of Virginia became the Cinderella story of the\r\n   Man Crates grilling taste-off. We proudly present Bone Doctors'\r\n  BBQ sauces, pair of masterpiece sauces and a brilliant spice blend.\r\n So fire up the grill, and call your agent: after all, you're about to go pro.",
+      "Contents": "Grilling Gadgetry \r\n  Brass-knuckle Meat Tenderizer\r\n  Cast Iron Smoker Box\r\n  Set of 4 Steak Thermometers\r\n  Dried Hickory Wood Chips\r\n Zesty Downpour \r\n  Original BBQ Sauce\r\n  Carolina Bold BBQ Sauce\r\n  Premium Spice Blend\r\n",
+      "LongDescriptionHTML": "<h4>The Right Tools for the Job</h4> <p>There's a line that separates the amateurs from the professionals. It's certainly\r\n   in the training and the experience, but folks often forget about the importance\r\n   of your equipment. Just like you can't win a NASCAR Cup in your grocery-getter,\r\n   can't crush a golf ball into orbit without a high-end driver, and aren't going\r\n   to take a trophy buck without a zeroed-in tack-driver, your grilling game will never\r\n   go next level without the right gear. You gotta have the right tools for the job.\r\n</p> <h4>Like a Grill-ionaire</h4> <p>Fortunately, you don't need to shell out a mountain of cash to get the equipment you need to get you to\r\n   grilling nirvana. We've included some of the best accessories that every man needs to get that Grillionaire\r\n   status.\r\n</p> <p>Our Grill Master Man Crate includes a cast-iron smoker\r\n  box and some hickory wood chips to get you started. Set the smoker box on\r\n   the grill as it warms up, soak the hickory in some water, and drop 'em into the\r\n   box as your meat grills. Take note, men: real flavor shouldn't come from a bottled\r\n   labeled \"liquid smoke.\"\r\n</p> <p>We threw in a set of four  steak thermometers, too. You may say, \"hey, Team\r\n   Man Crates, isn't that cheating?\" And we say, \"nay.\" There's no dishonor in knowing how done your steak\r\n   is. And when you cut into a perfectly-cooked slab of beef, you too shall understand that G.I. Joe wasn't\r\n   kidding when he said that Knowing Is Half the Battle.\r\n</p> <p>And because \"the right tool for every job\" means that sometimes you'll require some brute force, we've\r\n   included a brass-knuckle meat tenderizer. Nothing blows off the steam from a\r\n   long, hard day at work like beating your meat into submission.\r\n</p> <h4>Bone Doctors</h4> <p>We search tirelessly, every day, to find the best-in-class goods to put in our crates. Hundreds of sauces\r\n   came and went, the grills burned for weeks, until finally a victor emerged. An unexpected dark\r\n   horse, a little-known operation out of Virginia became the Cinderella story of the\r\n   Man Crates grilling taste-off. We proudly present Bone Doctors'\r\n  BBQ sauces, pair of masterpiece sauces and a brilliant spice blend.\r\n</p> <p>So fire up the grill, and call your agent: after all, you're about to go pro.</p>",
+      "Name": "Grill Master Crate",
+      "ConversionRate": 2.568634381995994,
+      "UniquePurchases": 218,
+      "ProductRevenue": 21797.82,
+      "Quantity": 218,
+      "AveragePrice": 99.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/399/large/gmc-grill-master-crate-awesome-gift-for-men__77984.jpg?1502411041",
+      "Margin": 64.07,
+      "TerrainScore": 0.6239323187359826,
+      "TERRAINRANK": 1
+    },
+    {
+      "SKU": "KTZC-0007-STG",
+      "VariantName": "Backyard Steakhouse Crate",
+      "Price": 119.99,
+      "Inventory": 554,
+      "VariantStatus": "sellable",
+      "ProductId": 224,
+      "VariantId": 422,
+      "Path": "backyard-steakhouse-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/backyard-steakhouse-crate",
+      "ContentsHTML": "<ul>\r\n    <li>Crate</li>\r\n  \t<li>Crowbar</li>\r\n    <li>Grilling Tool Set Includes:</li>\r\n    <ul>\r\n        <li>Spatula</li>\r\n        <li>Tongs</li>\r\n      \t<li>Basting Brush</li>\r\n        <li>Tool Tote Bag</li>\r\n    </ul>\r\n    <li>Rufus Teague Steak Sauce and Rub Set Includes:</li>\r\n  <ul>\r\n        <li>1 Original Steak Sauce, 7 oz</li>\r\n      \t<li>1 Spicy Steak Sauce, 7 oz</li>\r\n        <li>1 Original Steak Rub, 6.2 oz</li>\r\n  </ul>\r\n  <li>Black Denim Grilling Apron, 35\" Length</li>\r\n  <li>Wooden Safe Scrape Tool</li>\r\n</ul>",
+      "LongDescription": "America's Next Top Chef Idol\r\n\r\nThe backyard grill is far more than a means of searing meats. It's center stage to serve up a platter full of critical acclaim. When flame meets steak, so ignites the fantasy of being head chef at a high-end steakhouse. Cue the dream sequence. Diddle-diddle-duh, diddle-diddle-duh...\r\n\r\nAmid plumes of pillowy smoke, he's harshly judging the imperfect grill marks of an innocent filet mignon like a certain acerbic, British celebrity chef. He then reaches for the Backyard Steakhouse Crate's essential grilling tools and exclusive steak sauces. A surgical steak flip here, a brilliant brush stroke there...and succulent steak worthy of a Michelin rating.\r\n\r\nFame and nationwide franchises are sure to follow when he's cooking with the Backyard Steakhouse Crate.\r\n\r\nEverything but the Poofy, White Hat \r\nWhen he unrolls his tote holding his Oval Pro Chef™ 3-Piece Tool Set that's your cue to start your standing ovation.\r\nDonning the black denim grilling apron will instantly command respect from hungry family members, nosy neighbors, and scurrying squirrels.\r\nWe've got an in with legendary flavor maven Rufus Teague. You won't find this set of Steak Lovers sauces and rubs anywhere else. Not even in Rufus's kitchen.\r\nThe Safe Scrape wooden scraping paddle gradually conforms to the shape of the grill's grates to banish charred debris from the cooking surface. Talk about a grate escrape.\r\n",
+      "Contents": "\r\n    Crate\r\n  \tCrowbar\r\n    Grilling Tool Set Includes:\r\n    \r\n        Spatula\r\n        Tongs\r\n      \tBasting Brush\r\n        Tool Tote Bag\r\n    \r\n    Rufus Teague Steak Sauce and Rub Set Includes:\r\n  \r\n        1 Original Steak Sauce, 7 oz\r\n      \t1 Spicy Steak Sauce, 7 oz\r\n        1 Original Steak Rub, 6.2 oz\r\n  \r\n  Black Denim Grilling Apron, 35\" Length\r\n  Wooden Safe Scrape Tool\r\n",
+      "LongDescriptionHTML": "<h4>America's Next Top Chef Idol</h4>\r\n\r\n<p>The backyard grill is far more than a means of searing meats. It's center stage to serve up a platter full of critical acclaim. When flame meets steak, so ignites the fantasy of being head chef at a high-end steakhouse. Cue the dream sequence. Diddle-diddle-duh, diddle-diddle-duh...</p>\r\n\r\n<p>Amid plumes of pillowy smoke, he's harshly judging the imperfect grill marks of an innocent filet mignon like a certain acerbic, British celebrity chef. He then reaches for the Backyard Steakhouse Crate's essential grilling tools and exclusive steak sauces. A surgical steak flip here, a brilliant brush stroke there...and succulent steak worthy of a Michelin rating.</p>\r\n\r\n<p>Fame and nationwide franchises are sure to follow when he's cooking with the Backyard Steakhouse Crate.</p>\r\n\r\n<h4>Everything but the Poofy, White Hat</h4> \r\n<li>When he unrolls his tote holding his Oval Pro Chef™ 3-Piece Tool Set that's your cue to start your standing ovation.</li>\r\n<li>Donning the black denim grilling apron will instantly command respect from hungry family members, nosy neighbors, and scurrying squirrels.</li>\r\n<li>We've got an in with legendary flavor maven Rufus Teague. You won't find this set of Steak Lovers sauces and rubs anywhere else. Not even in Rufus's kitchen.</li>\r\n<li>The Safe Scrape wooden scraping paddle gradually conforms to the shape of the grill's grates to banish charred debris from the cooking surface. Talk about a grate escrape.</li>\r\n</ul>",
+      "Name": "Backyard Steakhouse Crate",
+      "ConversionRate": 4.345464421510049,
+      "UniquePurchases": 80,
+      "ProductRevenue": 9599.2,
+      "Quantity": 80,
+      "AveragePrice": 119.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/972/large/MBC_MC_2018-4_Steak-2_WEB-.jpg?1527009751",
+      "Margin": 0,
+      "TerrainScore": 0.5988303975974573,
+      "TERRAINRANK": 2
+    },
+    {
+      "SKU": "KTCR-0061-PIZ",
+      "VariantName": "Pizza Grilling Crate",
+      "Price": 99.99,
+      "Inventory": 938,
+      "VariantStatus": "sellable",
+      "ProductId": 81,
+      "VariantId": 157,
+      "Path": "pizza-grilling-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/pizza-grilling-crate",
+      "ContentsHTML": "<h4>It's Pizza Time!</h4> <ul>\r\n  <li>(4) 7.5\" Pizza Stones</li>\r\n  <li>Passione Pizza Flour</li>\r\n  <li>Pizzacraft's Neopolitan Herb Blend</li>\r\n</ul> <h4>Backyard Pizzeria</h4> <ul>\r\n  <li>Foldable Pizza Peel</li>\r\n  <li>2-Sided Dough Roller</li>\r\n  <li>Pizzacraft Pizza Recipe Book</li>\r\n</ul>",
+      "LongDescription": "The History of Pizza (as told through catatstrophic events)* There's nothing original or appetizing about soggy, cardboard delivery pizza, and \"defrost\" is in no way an\r\n   authentic Italian culinary technique. History itself attests to the fact that the most delicious pizzas are\r\n   born of fire.\r\n The Great Fire of Rome in 64 A.D. led to the creation of pozzolanic\r\n   concrete, and thus, crispy flatbread crust. New York's 1835 brick building bonfire\r\n   inspired brick oven pizza, and deep dish style emerged after the widespread fear\r\n   of wood from the Great Chicago Fire of 1871.\r\n The Pizza Grilling Crate transforms the destructive flames of a backyard grill into the source of life for\r\n   delicious, stone-grilled pizza.\r\n From The Fire, We Feast! The Pizza Grilling Crate turns any ordinary grill into a flame-fueled furnace for crisp, smoky pizza.\r\n   The four cordierite baking stones bring the heat to any personal pizza party, but\r\n   can also be fitted together to grill pizza pies of all sizes and shapes, including\r\n   all seven Tetris shapes.\r\n For simple homemade, hand-tossed pizza crust, Passione is the dough you knead. This organic artisanal flour\r\n   ground from premium hard red wheat makes amazing pizza that will have every man kissing his fingers in a\r\n   grandiose manner, proclaiming \"Delizioso!\" in an exaggerated, possibly-offensive Italian accent.\r\n Hot Off The Blocks The double-down dough roller swiftly lays a level base for the whopping of toppings that can and should\r\n   cover the pizza. We're also including Pizzacraft's authentic Neapolitan herb blend and cookbook, the primer\r\n   on all things pizza with over 100 pages of recipes and resources.\r\n Finally, we've custom-designed a collapsible pizza peel that transfers piping hot pies from\r\n   the grill to the table with all toppings in tact.\r\n Like gold, steel, and the rest of civilization's most indispensable elements, pizza is best forged in fire.  *All historical accuracy subject to interpretation.",
+      "Contents": "It's Pizza Time! \r\n  (4) 7.5\" Pizza Stones\r\n  Passione Pizza Flour\r\n  Pizzacraft's Neopolitan Herb Blend\r\n Backyard Pizzeria \r\n  Foldable Pizza Peel\r\n  2-Sided Dough Roller\r\n  Pizzacraft Pizza Recipe Book\r\n",
+      "LongDescriptionHTML": "<h4>The History of Pizza (as told through catatstrophic events)<sup>*</sup></h4> <p>There's nothing original or appetizing about soggy, cardboard delivery pizza, and \"defrost\" is in no way an\r\n   authentic Italian culinary technique. History itself attests to the fact that the most delicious pizzas are\r\n   born of fire.\r\n</p> <p>The Great Fire of Rome in 64 A.D. led to the creation of pozzolanic\r\n   concrete, and thus, crispy flatbread crust. New York's 1835 brick building bonfire\r\n   inspired brick oven pizza, and deep dish style emerged after the widespread fear\r\n   of wood from the Great Chicago Fire of 1871.\r\n</p> <p>The Pizza Grilling Crate transforms the destructive flames of a backyard grill into the source of life for\r\n   delicious, stone-grilled pizza.\r\n</p> <h4>From The Fire, We Feast!</h4> <p>The Pizza Grilling Crate turns any ordinary grill into a flame-fueled furnace for crisp, smoky pizza.\r\n   The four cordierite baking stones bring the heat to any personal pizza party, but\r\n   can also be fitted together to grill pizza pies of all sizes and shapes, including\r\n   all seven Tetris shapes.\r\n</p> <p>For simple homemade, hand-tossed pizza crust, Passione is the dough you knead. This organic artisanal flour\r\n   ground from premium hard red wheat makes amazing pizza that will have every man kissing his fingers in a\r\n   grandiose manner, proclaiming \"Delizioso!\" in an exaggerated, possibly-offensive Italian accent.\r\n</p> <h4>Hot Off The Blocks</h4> <p>The double-down dough roller swiftly lays a level base for the whopping of toppings that can and should\r\n   cover the pizza. We're also including Pizzacraft's authentic Neapolitan herb blend and cookbook, the primer\r\n   on all things pizza with over 100 pages of recipes and resources.\r\n</p> <p>Finally, we've custom-designed a collapsible pizza peel that transfers piping hot pies from\r\n   the grill to the table with all toppings in tact.\r\n</p> <p>Like gold, steel, and the rest of civilization's most indispensable elements, pizza is best forged in fire. </p> <p><sup>*</sup>All historical accuracy subject to interpretation.</p>",
+      "Name": "Pizza Grilling Crate",
+      "ConversionRate": 4.303617876566564,
+      "UniquePurchases": 182,
+      "ProductRevenue": 18198.18,
+      "Quantity": 182,
+      "AveragePrice": 99.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/675/large/pg-cool-gift-for-guys-who-love-pizza-and-grilling__22425.jpg?1502411145",
+      "Margin": 63.59,
+      "TerrainScore": 0.5430274549259807,
+      "TERRAINRANK": 3
+    },
+    {
+      "SKU": "KTCR-0041-STU",
+      "VariantName": "Grilled and Stuffed Crate",
+      "Price": 64.99,
+      "Inventory": 549,
+      "VariantStatus": "sellable",
+      "ProductId": 78,
+      "VariantId": 154,
+      "Path": "grilled-and-stuffed-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/grilled-and-stuffed-crate",
+      "ContentsHTML": "<h4>Grade-A Grilling</h4> <ul>\n  <li>Stuff-A-Burger Press</li>\n  <li>Chili Pepper Rack</li>\n  <li>Pepper Coring Knife</li>\n  <li>Stuffed Burger Recipe Book</li>\n</ul> <h4>Patriotic Picnic</h4> <ul>\n  <li>A-burger-ham Lincoln Seasoning</li>\n  <li>Dwight D. Fries-enhower Seasoning</li>\n  <li>2 Freedom Baskets</li>\n  <li>24 USA Basket Liners</li>\n</ul>",
+      "LongDescription": "The Stuffing of Legend Our forefathers united the nation by railroad, jet-packed a man to the moon, and commissioned\n   peak-80's Hulk Hogan to clobber the Iron Sheik, all in fierce pursuit of the American\n   Dream. But the greatest feat of ingenuity was far and away the invention of the\n   stuffed burger.\n Stuffed burgers would have leapfrogged Democracy as America's chief export if not for every burger being\n   inherently stuffed with Freedom. Domestically, any man with a grill could now participate in the esteemed\n   lineage of Great American Innovation alongside the likes of Edison, Ford, and\n  the Merage Brothers.\n The American Dream is alive and well today, sizzling on the grill, oozing opportunity for all. A Fuller America For All Despite the Kardashians' best efforts, America still believes it's what's on the inside that counts, so\n   we're packing peppers and patties with the precision and vigor of a train-hopping vagabond\n   loading up his knapsack bindle at a Sizzler buffet.\n The Stuff-A-Burger Press and Pepper Rack/Corer Set are the dynamite duo for cramming meat baskets and\n   pepper casings with more cheese than a Keanu Reeves movie marathon. Let\n   ingredients abound as you dream up signature concoctions of meats, veggies, spices, and whatever else\n   your stomach desires. We recommend stuffing a few cheeseburger sliders inside for instant Burgerception!\n Executive Order Up! We recruited the world's leading/only histori-culinary expert to help create delicious seasonings inspired\n   by the greatest proponents of the American Dream. A-burger-ham Lincoln and\n  Dwight D. Fries-enhower are Man Crates spice exclusives, and these POTUS will\n   put your tastebuds on notice.\n The classy American flag liners and freedom baskets transform every day into the 4th of July, or at least\n   that can be your excuse when neighbors complain about all the backyard fireworks.\n Upgrade any cookout to All-American status with the Grilled and Stuffed Crate.",
+      "Contents": "Grade-A Grilling \n  Stuff-A-Burger Press\n  Chili Pepper Rack\n  Pepper Coring Knife\n  Stuffed Burger Recipe Book\n Patriotic Picnic \n  A-burger-ham Lincoln Seasoning\n  Dwight D. Fries-enhower Seasoning\n  2 Freedom Baskets\n  24 USA Basket Liners\n",
+      "LongDescriptionHTML": "<h4>The Stuffing of Legend</h4> <p>Our forefathers united the nation by railroad, jet-packed a man to the moon, and commissioned\n   peak-80's Hulk Hogan to clobber the Iron Sheik, all in fierce pursuit of the American\n   Dream. But the greatest feat of ingenuity was far and away the invention of the\n   stuffed burger.\n</p> <p>Stuffed burgers would have leapfrogged Democracy as America's chief export if not for every burger being\n   inherently stuffed with Freedom. Domestically, any man with a grill could now participate in the esteemed\n   lineage of Great American Innovation alongside the likes of Edison, Ford, and\n  <span class=\"highlight\">the Merage Brothers</span>.\n</p> <p>The American Dream is alive and well today, sizzling on the grill, oozing opportunity for all.</p> <h4>A Fuller America For All</h4> <p>Despite the Kardashians' best efforts, America still believes it's what's on the inside that counts, so\n   we're packing peppers and patties with the precision and vigor of a train-hopping vagabond\n   loading up his knapsack bindle at a Sizzler buffet.\n</p> <p>The Stuff-A-Burger Press and Pepper Rack/Corer Set are the dynamite duo for cramming meat baskets and\n   pepper casings with more cheese than a <span class=\"highlight\">Keanu Reeves movie marathon</span>. Let\n   ingredients abound as you dream up signature concoctions of meats, veggies, spices, and whatever else\n   your stomach desires. We recommend stuffing a few cheeseburger sliders inside for instant Burgerception!\n</p> <h4>Executive Order Up!</h4> <p>We recruited the world's leading/only histori-culinary expert to help create delicious seasonings inspired\n   by the greatest proponents of the American Dream. <span class=\"highlight\">A-burger-ham Lincoln</span> and\n  <span class=\"highlight\">Dwight D. Fries-enhower</span> are Man Crates spice exclusives, and these POTUS will\n   put your tastebuds on notice.\n</p> <p>The classy American flag liners and freedom baskets transform every day into the 4th of July, or at least\n   that can be your excuse when neighbors complain about all the backyard fireworks.\n</p> <p>Upgrade any cookout to All-American status with the Grilled and Stuffed Crate.</p>",
+      "Name": "Grilled & Stuffed Crate",
+      "ConversionRate": 3.7037037037037033,
+      "UniquePurchases": 80,
+      "ProductRevenue": 5199.2,
+      "Quantity": 80,
+      "AveragePrice": 64.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/660/large/gs-american-grilled-and-stuffed-burger-gift-kit-for-guys__47581.jpg?1502411140",
+      "Margin": 57.86,
+      "TerrainScore": 0.5088157413987714,
+      "TERRAINRANK": 4
+    },
+    {
+      "SKU": "KTCR-0077-STK",
+      "VariantName": "Steaks on a Plate Crate",
+      "Price": 99.99,
+      "Inventory": 320,
+      "VariantStatus": "sellable",
+      "ProductId": 231,
+      "VariantId": 428,
+      "Path": "steaks-on-a-plate-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/steaks-on-a-plate-crate",
+      "ContentsHTML": "<ul>\r\n  <li>Crate</li>\r\n  <li>Crowbar</li>\r\n  <li>Jacobsen Salt Co., Tellecherry Peppercorn in Grinder, 2.1 oz</li>\r\n  <li>Jacobsen Salt Co., Steak Seasoning Salt, 5.6 oz</li>\r\n  <li>6 Steak Knives with Rosewood Handles</li>\r\n  <li>Steak Station Digital Thermometer</li>\r\n  <li>4 Stainless Steel Potato People</li>\r\n \r\n</ul>",
+      "LongDescription": "Shhh...Do You Hear That?\r\n\r\n  It’s the sound of several sizzling sssteaksss on the grill. For the avid barbecuer, guiding each perfectly charred Grade-A cut from grate to plate isn't just your typical meal preparation. It's a nonstop thrill ride from the moment the burners flare.\r\n  The Steaks on a Plate Crate will enhance his culinary craftsmanship, whether he's harnessing the heat at the grill or in the dining room on the edge of his seat. From digital meat thermometers to a steak knife set that's literally cutting edge, he'll be well-equipped to expertly gauge doneness and precisely slice his seasoned sirloin.\r\n  Once aboard this flight of flavor, he’ll never get tired of these supperloving steaks on these supperloving plates.\r\n\r\nElevating the Steaks\r\n  \r\n\tWhen we handpicked cutlery, only the set of six forged stainless steel Curtis Lloyd steak knives made the cut. They give diners a nice, clean slice with no tearing.\r\n\tHe’ll corral up to four pesky strips at once with the Charcoal Companion Steak Station, which has a digital display to ensure perfect meat preparation.\r\n\tThe Classic Steak Seasoning and Tellicherry Peppercorn from Portland's Jacobsen Salt will give his filets and T-bones a quick strike of savoriness.\r\n\tThe set of four tater-tilting Potato People will have his back to help save potatoes from scorchy peril. Stainless steel and dishwasher safe, these stands help cook his spuds without searing the skin.\r\n  ",
+      "Contents": "\r\n  Crate\r\n  Crowbar\r\n  Jacobsen Salt Co., Tellecherry Peppercorn in Grinder, 2.1 oz\r\n  Jacobsen Salt Co., Steak Seasoning Salt, 5.6 oz\r\n  6 Steak Knives with Rosewood Handles\r\n  Steak Station Digital Thermometer\r\n  4 Stainless Steel Potato People\r\n \r\n",
+      "LongDescriptionHTML": "<h4>Shhh...Do You Hear That?</h4>\r\n\r\n  <p>It’s the sound of several sizzling sssteaksss on the grill. For the avid barbecuer, guiding each perfectly charred Grade-A cut from grate to plate isn't just your typical meal preparation. It's a nonstop thrill ride from the moment the burners flare.</p>\r\n  <p>The Steaks on a Plate Crate will enhance his culinary craftsmanship, whether he's harnessing the heat at the grill or in the dining room on the edge of his seat. From digital meat thermometers to a steak knife set that's literally cutting edge, he'll be well-equipped to expertly gauge doneness and precisely slice his seasoned sirloin.</p>\r\n  <p>Once aboard this flight of flavor, he’ll never get tired of these supperloving steaks on these supperloving plates.</p>\r\n\r\n<h4>Elevating the Steaks</h4>\r\n  <ul>\r\n\t<li>When we handpicked cutlery, only the set of six forged stainless steel Curtis Lloyd steak knives made the cut. They give diners a nice, clean slice with no tearing.</li>\r\n\t<li>He’ll corral up to four pesky strips at once with the Charcoal Companion Steak Station, which has a digital display to ensure perfect meat preparation.</li>\r\n\t<li>The Classic Steak Seasoning and Tellicherry Peppercorn from Portland's Jacobsen Salt will give his filets and T-bones a quick strike of savoriness.</li>\r\n\t<li>The set of four tater-tilting Potato People will have his back to help save potatoes from scorchy peril. Stainless steel and dishwasher safe, these stands help cook his spuds without searing the skin.</li>\r\n  </ul>",
+      "Name": "Steaks on a Plate Crate",
+      "ConversionRate": 1.1907983761840324,
+      "UniquePurchases": 44,
+      "ProductRevenue": 4399.56,
+      "Quantity": 44,
+      "AveragePrice": 99.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/842/large/MBC_MC_2018-4_Steak-1_WEB-EDIT_V1ja.jpg?1528236041",
+      "Margin": 0,
+      "TerrainScore": 0.4988534777377279,
+      "TERRAINRANK": 5
+    },
+    {
+      "SKU": "KTCR-0035-EVE",
+      "VariantName": "Everest Grill Crate",
+      "Price": 149.99,
+      "Inventory": 98,
+      "VariantStatus": "sellable",
+      "ProductId": 59,
+      "VariantId": 131,
+      "Path": "everest-grill-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/everest-grill-crate",
+      "ContentsHTML": "<h4>Majesty Makers</h4> <ul>\r\n  <li>Himalayan Salt Block, 8\"x8\"x1.5\"</li>\r\n  <li>Salt Block Recipe Cookbook</li>\r\n  <li>Circle Kabobs</li>\r\n  <li>(4) Mini-Thermometers</li>\r\n</ul> <h4>Salty Sidekicks</h4> <ul>\r\n  <li>Salt Block Scrubber Brush</li>\r\n  <li>Black Grilling Glove</li>\r\n  <li>Foldable Spatula</li>\r\n  <li>Salt Block Holder</li>\r\n</ul>",
+      "LongDescription": "Welcome to the Rock If it's completely insane for a group of men to fly halfway around the world, risk their\r\n   lives trekking through the Himalayas, and tunnel beneath the highest mountain on\r\n   planet Earth all for a well-seared and seasoned steak, then we're punching first-class,\r\n   express tickets aboard the Crazy Train.\r\n Our quest for the most majestic grilling experience led us to a prehistoric Fort Knox of crystallized\r\n   flavor buried deep within the mountain range where Ra's Al Ghul trained Batman. Employing the same\r\n   classified techniques BIG TOURISM used to build the Stonehenge, we've extracted blocks of cooking salt so\r\n   enticing that even ever-critical chef Gordon Ramsey let out a small tinkle of excitement.\r\n In the stratosphere of pristine cooking flavors, the Everest Grill Crate stands alone. Bedrock of Flavor The Himalayan Salt Plate (8\" x 8\" x 1.5\") is the pinnacle of grilling versatility and flavor. You're\r\n   basically brining your meat in an ocean for 600 million years, and if that doesn't sound incredible to you,\r\n   then we're probably not explaining it right because it's the most delicious thing we've ever grilled.\r\n The salt plate perfectly flash-flavors any food and even makes fruits and those non-meat green\r\n   things appetizing. Experiment with 70 recipes from the Sultan of Salt Block himself,\r\n   Mark Bitterman, or blaze your own trail through this uncharted flavor frontier.\r\n Shish Ka-Booyah! Continuing its legacy of grilling innovation and mastery, the Everest Grill Crate includes four non-stick\r\n   circular kabobs to keep the good stuff secure on the salt and dinner plates, not the ground. There's also\r\n   four mini meat thermometers so your brain won't have to process anything other than pure anticipation\r\n   for the flavor deluge of salty goodness.\r\n The crate also includes a portable folding spatula, grill mitt, salt block holder, and salt block scrubber\r\n   brush tool.\r\n The Everest Grill Crate is proof to all grillers that once you go block, you never go back.",
+      "Contents": "Majesty Makers \r\n  Himalayan Salt Block, 8\"x8\"x1.5\"\r\n  Salt Block Recipe Cookbook\r\n  Circle Kabobs\r\n  (4) Mini-Thermometers\r\n Salty Sidekicks \r\n  Salt Block Scrubber Brush\r\n  Black Grilling Glove\r\n  Foldable Spatula\r\n  Salt Block Holder\r\n",
+      "LongDescriptionHTML": "<h4>Welcome to the Rock</h4> <p>If it's completely insane for a group of men to fly halfway around the world, risk their\r\n   lives trekking through the Himalayas, and tunnel beneath the highest mountain on\r\n   planet Earth all for a well-seared and seasoned steak, then we're punching first-class,\r\n   express tickets aboard the Crazy Train.\r\n</p> <p>Our quest for the most majestic grilling experience led us to a prehistoric Fort Knox of crystallized\r\n   flavor buried deep within the mountain range where Ra's Al Ghul trained Batman. Employing the same\r\n   classified techniques BIG TOURISM used to build the Stonehenge, we've extracted blocks of cooking salt so\r\n   enticing that even ever-critical chef Gordon Ramsey let out a small tinkle of excitement.\r\n</p> <p>In the stratosphere of pristine cooking flavors, the Everest Grill Crate stands alone.</p> <h4>Bedrock of Flavor</h4> <p>The Himalayan Salt Plate (8\" x 8\" x 1.5\") is the pinnacle of grilling versatility and flavor. You're\r\n   basically brining your meat in an ocean for 600 million years, and if that doesn't sound incredible to you,\r\n   then we're probably not explaining it right because it's the most delicious thing we've ever grilled.\r\n</p> <p>The salt plate perfectly flash-flavors any food and even makes fruits and those non-meat green\r\n   things appetizing. Experiment with 70 recipes from the Sultan of Salt Block himself,\r\n   Mark Bitterman, or blaze your own trail through this uncharted flavor frontier.\r\n</p> <h4>Shish Ka-Booyah!</h4> <p>Continuing its legacy of grilling innovation and mastery, the Everest Grill Crate includes four non-stick\r\n   circular kabobs to keep the good stuff secure on the salt and dinner plates, not the ground. There's also\r\n   four mini meat thermometers so your brain won't have to process anything other than pure anticipation\r\n   for the flavor deluge of salty goodness.\r\n</p> <p>The crate also includes a portable folding spatula, grill mitt, salt block holder, and salt block scrubber\r\n   brush tool.\r\n</p> <p>The Everest Grill Crate is proof to all grillers that once you go block, you never go back.</p>",
+      "Name": "Everest Grill Crate",
+      "ConversionRate": 3.551912568306011,
+      "UniquePurchases": 78,
+      "ProductRevenue": 11699.22,
+      "Quantity": 78,
+      "AveragePrice": 149.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/577/large/egc-everest-grill-crate-the-everest-grill-crate__11638.jpg?1502411107",
+      "Margin": 71.42,
+      "TerrainScore": 0.40614338164368785,
+      "TERRAINRANK": 6
+    },
+    {
+      "SKU": "KTCR-0011-HGR",
+      "VariantName": "Hickory Grilling Crate",
+      "Price": 64.99,
+      "Inventory": 72,
+      "VariantStatus": "sellable",
+      "ProductId": 136,
+      "VariantId": 262,
+      "Path": "hickory-grilling-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/hickory-grilling-crate",
+      "ContentsHTML": "<h4>Grilling Gadgetry</h4> <ul>\r\n  <li>Cast Iron Smoker Box</li>\r\n  <li>Dried Hickory Wood Chips</li>\r\n</ul> <h4>Griller's Grub</h4> <ul>\r\n  <li>Corn Nuggets, 4 oz</li>\r\n  <li>Beer Nuts, 3 oz</li>\r\n</ul> <h4>Zesty Downpour</h4> <ul>\r\n  <li>Miner's Mix Steak Rub</li>\r\n  <li>Miner's Mix Poultry Rub</li>\r\n  <li>Miner's Mix Salmon Marinade</li>\r\n  <li>Bone Doctor's Original Barbeque Sauce</li>\r\n</ul>",
+      "LongDescription": "Time To Fire Up The Grill At some point in time during the dark and dirty and, let's be honest, hairy history\r\n   of our species, an innovator was born. Tired of eating cold, raw mammoth meat, that enterprising caveman invented fire, and before you\r\n   can grunt \"ugg,\" he had thrown a piece of meat on it and invented grilling.\r\n Smoking We love ourselves a good grilled steak. But sometimes, it's nice to mix it up.\r\n   And if you're like us, you've wanted to try smoking your choice of dead animal\r\n   for some time but are leery of making the investment in a dedicated smoker.\r\n Well, we found ourselves a solution, and we loved it so much that we built a\r\n   crate around it so that you, too, could enjoy the pleasures of smoking without having\r\n   to drop a few Benjamins on a new toy. The cast-iron smoker\r\n  box in this crate will quickly become your weapon-of-choice. Just set the\r\n   smoker box onto the grill as it heats up, soak some of the hickory wood chips we've\r\n   helpfully provided, and throw them into the box. Your steaks will come out tasting\r\n   like victory. It's not just for steak, either. For maximum win, try finding some\r\n   cedar chips and throwing them in next time you grill some seafood, or some mesquite\r\n   when you grill pork chops. Your palate will thank you.\r\n Extra Flavors &amp; Snacks We included some of our favorite rubs, steak and barbecue sauces\r\n   to take your smoking habit to the next level. And since being grill-master is an\r\n   arduous, thankless job that involves staring at food for ages before being able\r\n   to eat it, we included some snacks to keep your stomach happy and quiet and your\r\n   mind focused on the task at hand.\r\n So throw a steak on the fire, and crack a beer in honor of your caveman forefathers. After all, you may not\r\n   have invented grilling, but you're damn sure on your way to perfecting\r\n  it.\r\n",
+      "Contents": "Grilling Gadgetry \r\n  Cast Iron Smoker Box\r\n  Dried Hickory Wood Chips\r\n Griller's Grub \r\n  Corn Nuggets, 4 oz\r\n  Beer Nuts, 3 oz\r\n Zesty Downpour \r\n  Miner's Mix Steak Rub\r\n  Miner's Mix Poultry Rub\r\n  Miner's Mix Salmon Marinade\r\n  Bone Doctor's Original Barbeque Sauce\r\n",
+      "LongDescriptionHTML": "<h4>Time To Fire Up The Grill</h4> <p>At some point in time during the dark and dirty and, let's be honest, hairy history\r\n   of our species, an innovator was born. Tired of eating cold, raw mammoth meat, that enterprising caveman invented fire, and before you\r\n   can grunt \"ugg,\" he had thrown a piece of meat on it and invented grilling.\r\n</p> <h4>Smoking</h4> <p>We love ourselves a good grilled steak. But sometimes, it's nice to mix it up.\r\n   And if you're like us, you've wanted to try smoking your choice of dead animal\r\n   for some time but are leery of making the investment in a dedicated smoker.\r\n</p> <p>Well, we found ourselves a solution, and we loved it so much that we built a\r\n   crate around it so that you, too, could enjoy the pleasures of smoking without having\r\n   to drop a few Benjamins on a new toy. The cast-iron smoker\r\n  box in this crate will quickly become your weapon-of-choice. Just set the\r\n   smoker box onto the grill as it heats up, soak some of the hickory wood chips we've\r\n   helpfully provided, and throw them into the box. Your steaks will come out tasting\r\n   like victory. It's not just for steak, either. For maximum win, try finding some\r\n   cedar chips and throwing them in next time you grill some seafood, or some mesquite\r\n   when you grill pork chops. Your palate will thank you.\r\n</p> <h4>Extra Flavors &amp; Snacks</h4> <p>We included some of our favorite rubs, steak and barbecue sauces\r\n   to take your smoking habit to the next level. And since being grill-master is an\r\n   arduous, thankless job that involves staring at food for ages before being able\r\n   to eat it, we included some snacks to keep your stomach happy and quiet and your\r\n   mind focused on the task at hand.\r\n</p> <p>So throw a steak on the fire, and crack a beer in honor of your caveman forefathers. After all, you may not\r\n   have invented grilling, but you're damn sure on your way to perfecting\r\n  it.\r\n</p>",
+      "Name": "Hickory Grilling Crate",
+      "ConversionRate": 4.069767441860465,
+      "UniquePurchases": 7,
+      "ProductRevenue": 454.93,
+      "Quantity": 7,
+      "AveragePrice": 64.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/918/large/hgc-hickory-grilling-crate-awesome-gift-for-men__20406.jpg?1502411245",
+      "Margin": 57.5,
+      "TerrainScore": 0.40300458420156365,
+      "TERRAINRANK": 7
+    },
+    {
+      "SKU": "KTCR-0039-PIG",
+      "VariantName": "Pit Master Crate",
+      "Price": 119.99,
+      "Inventory": 503,
+      "VariantStatus": "sellable",
+      "ProductId": 119,
+      "VariantId": 243,
+      "Path": "pit-master-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/pit-master-crate",
+      "ContentsHTML": "<h4>Pit Players</h4> <ul>\r\n  <li>Stainless Steel Meat Claws</li>\r\n  <li>Premium Leather Gloves</li>\r\n  <li>Collapsible Grill Fork</li>\r\n  <li>Silicone Basting Brush</li>\r\n  <li>Cast Iron Sauce Pot, 1.5 cup</li>\r\n</ul> <h4>Flavor Infusers</h4> <ul>\r\n  <li>Honey Sweet Sauce, 16 oz</li>\r\n  <li>Touch of Heat Sauce, 16 oz</li>\r\n  <li>Barbecue Meat Rub</li>\r\n  <li>Hickory Grill Wood Chips</li>\r\n  <li>Mesquite Grill Wood Chips</li>\r\n  \r\n</ul>",
+      "LongDescription": "Set Smoker To Beast Mode When the divine spirits of the Ancient World demanded animal sacrifices to satiate their\r\n   celestial hunger, it was never a quick, \"kill it and grill it\" job.\r\n Nay, they ordered full mammoth carcasses be slow-cooked for days over\r\n   glowing coals in a smoky trap of rubs and sauces. This great wisdom was called \"barbecue\", and it\r\n   pleased the gods so greatly that they indulged...perhaps a bit too much.\r\n The Woolies are long gone, but the archaic secrets of True Barbecue live on in the Pit Master Man Crate.  Heat, Eat, Repeat The Pit Master Crate is the Mr.  Miyagi of barbecue gear, your guiding\r\n   sensei on the road to fall-off-the-bone, \"low &amp; slow\" True Barbecue mastery.\r\n Meat Claws are the supreme tools for lifting and lugging huge roasts, whether you've dug a backyard pit to\r\n   \"go whole hog\" or drained and lined your swimming pool to \"go whole herd\". Knuckle up with these stainless\r\n   steel shredders, and you're just a few impassioned Wolverine impressions\r\n   away from pristine pulled pork.\r\n Keep your eyebrows intact with the collapsible barbecue fork, or go face to the fire with premium leather\r\n   gloves intended to handle the densest meat and most intense heat.\r\n Sauce Like A Boss A poorly executed saucing strategy can make or break your barbecue, and we're\r\n   firmly in the \"sauce while hot\" camp. Glaze right over the blaze with the silicone\r\n   basting brush, heat-safe to 550 degrees, and top off the cast-iron sauce pan with\r\n   fine selections from the  Sauce Boss himself, Mr. Rufus Teague.\r\n Teague's Honey Sweet and Touch of Heat flavors bring the bottled best of Kansas City to your cookout,\r\n   the perfect complement to a base-taste layer of his famed meat rub. Seal the deal\r\n   with a pro-style smokestack of hickory wood chips.\r\n Open up the pit with the Pit Master Crate, and unlock the secrets of True Barbecue.",
+      "Contents": "Pit Players \r\n  Stainless Steel Meat Claws\r\n  Premium Leather Gloves\r\n  Collapsible Grill Fork\r\n  Silicone Basting Brush\r\n  Cast Iron Sauce Pot, 1.5 cup\r\n Flavor Infusers \r\n  Honey Sweet Sauce, 16 oz\r\n  Touch of Heat Sauce, 16 oz\r\n  Barbecue Meat Rub\r\n  Hickory Grill Wood Chips\r\n  Mesquite Grill Wood Chips\r\n  \r\n",
+      "LongDescriptionHTML": "<h4>Set Smoker To Beast Mode</h4> <p>When the divine spirits of the Ancient World demanded animal sacrifices to satiate their\r\n   celestial hunger, it was never a quick, \"kill it and grill it\" job.\r\n</p> <p>Nay, they ordered full mammoth carcasses be slow-cooked for days over\r\n   glowing coals in a smoky trap of rubs and sauces. This great wisdom was called \"barbecue\", and it\r\n   pleased the gods so greatly that they indulged...perhaps a bit too much.\r\n</p> <p>The Woolies are long gone, but the archaic secrets of True Barbecue live on in the Pit Master Man Crate. </p> <h4>Heat, Eat, Repeat</h4> <p>The Pit Master Crate is the Mr.  Miyagi of barbecue gear, your guiding\r\n   sensei on the road to fall-off-the-bone, \"low &amp; slow\" True Barbecue mastery.\r\n</p> <p>Meat Claws are the supreme tools for lifting and lugging huge roasts, whether you've dug a backyard pit to\r\n   \"go whole hog\" or drained and lined your swimming pool to \"go whole herd\". Knuckle up with these stainless\r\n   steel shredders, and you're just a few impassioned Wolverine impressions\r\n   away from pristine pulled pork.\r\n</p> <p>Keep your eyebrows intact with the collapsible barbecue fork, or go face to the fire with premium leather\r\n   gloves intended to handle the densest meat and most intense heat.\r\n</p> <h4>Sauce Like A Boss</h4> <p>A poorly executed saucing strategy can make or break your barbecue, and we're\r\n   firmly in the \"sauce while hot\" camp. Glaze right over the blaze with the silicone\r\n   basting brush, heat-safe to 550 degrees, and top off the cast-iron sauce pan with\r\n   fine selections from the  Sauce Boss himself, Mr. Rufus Teague.\r\n</p> <p>Teague's Honey Sweet and Touch of Heat flavors bring the bottled best of Kansas City to your cookout,\r\n   the perfect complement to a base-taste layer of his famed meat rub. Seal the deal\r\n   with a pro-style smokestack of hickory wood chips.\r\n</p> <p>Open up the pit with the Pit Master Crate, and unlock the secrets of True Barbecue.</p>",
+      "Name": "Pit Master Crate",
+      "ConversionRate": 4.6162893266686265,
+      "UniquePurchases": 157,
+      "ProductRevenue": 18838.43,
+      "Quantity": 157,
+      "AveragePrice": 119.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/843/large/pm-awesome-barbecue-gifts-for-the-grilling-guy__39614.jpg?1502411217",
+      "Margin": 60.1,
+      "TerrainScore": 0.35481479576809327,
+      "TERRAINRANK": 8
+    },
+    {
+      "SKU": "KTCR-0052-TRO",
+      "VariantName": "Troutdoorsman Crate",
+      "Price": 99.99,
+      "Inventory": 177,
+      "VariantStatus": "sellable",
+      "ProductId": 58,
+      "VariantId": 130,
+      "Path": "troutdoorsman-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/troutdoorsman-crate",
+      "ContentsHTML": "<h4>Man Crates Exclusives</h4> <ul>\r\n  <li>TROUT: Avant-Garde Recipes for the Trout Enthusiast</li>\r\n  <li>O'fish'ial Blend Trout Seasoning</li>\r\n</ul> <h4>Trout Trappers</h4> <ul>\r\n  <li>Canvas Creel</li>\r\n  <li>Kershaw Fixed Blade Filet Knife</li>\r\n  <li>Grandpa's Grill Holder</li>\r\n</ul>",
+      "LongDescription": "Catch And Release The Flavor Unlike their\r\n  conniving, malicious aqua-brethren: bass,\r\n   trout have earned our utmost respect. We think the world of their graceful agility, grandiose color\r\n   patterns, and overall trustworthy character.\r\n They are beautiful, emotionally-complex creatures, and if there was a way we could enjoy their delicious\r\n   meaty insides without angling and gutting them, we would. Alas, the universe is cruel, and the best we can\r\n   do is give them a most honorable end.\r\n A Fresh, Flavorful Farewell To make their journey into eternal slumber as comfortable as possible for the fisher and the fished,\r\n   we've selected a Canvas Creel with a waterproof lining and breathable mesh sides. This bag can hold a\r\n   handful of trout and insulating greenery, creating a fresh, preserving eco-purgatory for our cherished\r\n   chums as they await their Glorious Zesting.\r\n The Kershaw Fish Fillet Knife is the only trout trimming tool that does right by our fallen fish friends.\r\n   The stainless steel blade makes for intricate cutting and compact storage, and its texture grip handle is\r\n   water and fish-slime proof.\r\n And for the camping troutdoorsmen in pursuit of the freshest feast, the Fire\r\n   Grill gets trout over an open cooking fire in no time. This portable stainless steel\r\n   wire cage attaches to any stick for a quick, crispy dinner, and honors the slain\r\n   with a traditional viking burial.\r\n Delicious Fish Dishes The most worthy tribute to a caught and cooked trout is to ensure its death was deliciously\r\n   not in vain. For the trout traditionalists, the zesty citrus O'Fish'ial Blend Trout\r\n   Seasoning ensures every trout reaches its finest flavor potential in life and beyond.\r\n We've unlocked the mysteries of supreme trout flavor in our tell-all book of ingenious meal\r\n   creations--TROUT: Avant-Garde Recipes for the Trout Enthusiast. From tasty fish tacos where the fish is the\r\n   taco, to perfectly cooking a fish inside a fish, this Man Crates exclusive cookbook will make that trout\r\n   wish it was alive to taste itself.\r\n The Troutdoorsman Crate equips every guy to properly commemorate his catch with the freshest, most\r\n   flavorful fillets imaginable.\r\n",
+      "Contents": "Man Crates Exclusives \r\n  TROUT: Avant-Garde Recipes for the Trout Enthusiast\r\n  O'fish'ial Blend Trout Seasoning\r\n Trout Trappers \r\n  Canvas Creel\r\n  Kershaw Fixed Blade Filet Knife\r\n  Grandpa's Grill Holder\r\n",
+      "LongDescriptionHTML": "<h4>Catch And Release The Flavor</h4> <p>Unlike their\r\n  <a href=\"https://www.mancrates.com/crates/bass-fishing\">conniving, malicious aqua-brethren: bass</a>,\r\n   trout have earned our utmost respect. We think the world of their graceful agility, grandiose color\r\n   patterns, and overall trustworthy character.\r\n</p> <p>They are beautiful, emotionally-complex creatures, and if there was a way we could enjoy their delicious\r\n   meaty insides without angling and gutting them, we would. Alas, the universe is cruel, and the best we can\r\n   do is give them a most honorable end.\r\n</p> <h4>A Fresh, Flavorful Farewell</h4> <p>To make their journey into eternal slumber as comfortable as possible for the fisher and the fished,\r\n   we've selected a Canvas Creel with a waterproof lining and breathable mesh sides. This bag can hold a\r\n   handful of trout and insulating greenery, creating a fresh, preserving eco-purgatory for our cherished\r\n   chums as they await their Glorious Zesting.\r\n</p> <p>The Kershaw Fish Fillet Knife is the only trout trimming tool that does right by our fallen fish friends.\r\n   The stainless steel blade makes for intricate cutting and compact storage, and its texture grip handle is\r\n   water and fish-slime proof.\r\n</p> <p>And for the camping troutdoorsmen in pursuit of the freshest feast, the Fire\r\n   Grill gets trout over an open cooking fire in no time. This portable stainless steel\r\n   wire cage attaches to any stick for a quick, crispy dinner, and honors the slain\r\n   with a traditional viking burial.\r\n</p> <h4>Delicious Fish Dishes</h4> <p>The most worthy tribute to a caught and cooked trout is to ensure its death was deliciously\r\n   not in vain. For the trout traditionalists, the zesty citrus O'Fish'ial Blend Trout\r\n   Seasoning ensures every trout reaches its finest flavor potential in life and beyond.\r\n</p> <p>We've unlocked the mysteries of supreme trout flavor in our tell-all book of ingenious meal\r\n   creations--TROUT: Avant-Garde Recipes for the Trout Enthusiast. From tasty fish tacos where the fish is the\r\n   taco, to perfectly cooking a fish inside a fish, this Man Crates exclusive cookbook will make that trout\r\n   wish it was alive to taste itself.\r\n</p> <p>The Troutdoorsman Crate equips every guy to properly commemorate his catch with the freshest, most\r\n   flavorful fillets imaginable.\r\n</p>",
+      "Name": "Trout Fishing Crate",
+      "ConversionRate": 1.1980830670926517,
+      "UniquePurchases": 15,
+      "ProductRevenue": 1499.85,
+      "Quantity": 15,
+      "AveragePrice": 99.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/572/large/tdc-troutdoorsman-crate-kershaw-filet-knife-recipe-book-bag-grandpa-firegrill__22355.jpg?1502411104",
+      "Margin": 59.93,
+      "TerrainScore": 0.2280822482732009,
+      "TERRAINRANK": 9
+    },
+    {
+      "SKU": "KTZC-0004-HUN",
+      "VariantName": "Hunting Crate",
+      "Price": 119.99,
+      "Inventory": 205,
+      "VariantStatus": "sellable",
+      "ProductId": 88,
+      "VariantId": 180,
+      "Path": "hunting-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/hunting-crate",
+      "ContentsHTML": "<h4>Hunting Heroes</h4> <ul>\r\n  <li>Stanley Insulated Vacuum Bottle</li>\r\n  <li>Tac-Force TF-469 Folding Knife</li>\r\n  <li>Stormproof Matches</li>\r\n</ul> <h4>Disappear Completely</h4> <ul>\r\n  <li>Duke Cannon's Hunting Soap</li>\r\n  <li>Camo Face Paint</li>\r\n  <li>Camo Form Wrap</li>\r\n</ul>",
+      "LongDescription": "The Most Dangerous Game Of All If the Schwarzenegger hunting documentary \"Predator\" taught us anything, it's\r\n   that the fate of every hunter is determined by his preparedness for the unpredictable;\r\n   those rare occasions when the hunter becomes the hunted.\r\n It won't always be a blood-thirsty alien; it could be the vengeful brother of the cabin-mounted\r\n   trophy moose, or possibly a trigger-happy former Vice President. Whatever the predator\r\n   and whatever the prey, the Hunting Crate ensures you'll be the most dangerous creature\r\n   of all.\r\n Keep Comfort In The Crosshairs The Stanley extra large insulated bottle is the same classic style, stainless steel flask our grandpas\r\n   handed down to us, except without the bullet nicks from storming Normandy. Its vacuum insulation\r\n   keeps hot things hot and cold things cold for 28 hours, perfect for keeping coffee\r\n   piping hot from one morning to the next or for use as decoy bait for heat-seeking\r\n   predators.\r\n The Tac-Force TF-469 Folding Knife has everything needed for unzipping and grilling the freshest steak\r\n   dinner imaginable: a stainless gut hook blade, silicone grip ring, hard nylon sheath, fire starter, diamond\r\n   honing file, and bottle opener. And if Mother Nature is being a real downer, the capsule of stormproof\r\n   matches will light in even the worst of circumstances.\r\n Unseen and Unscented For starters, the camo form wrap and facepaint disguises anyone and anything as slightly\r\n   off-grey splotches by which animals see the world. But invisible isn't enough to\r\n   be utterly undetectable to the heightened senses of predator and prey.\r\n Duke Cannon's Big Ol' Brick of Hunting Soap will wash any whiff of human clean off your\r\n   body. It's like those Axe body spray commercials when, once applied, beautiful women\r\n   ambush the man out of sheer desire, except instead of ambushing him, they'll completely\r\n   ignore him. And instead of beautiful women, it's a moose.\r\n It's a hunt or be hunted world, and the Hunting Crate equips you to always be atop the food chain.",
+      "Contents": "Hunting Heroes \r\n  Stanley Insulated Vacuum Bottle\r\n  Tac-Force TF-469 Folding Knife\r\n  Stormproof Matches\r\n Disappear Completely \r\n  Duke Cannon's Hunting Soap\r\n  Camo Face Paint\r\n  Camo Form Wrap\r\n",
+      "LongDescriptionHTML": "<h4>The Most Dangerous Game Of All</h4> <p>If the Schwarzenegger hunting documentary \"Predator\" taught us anything, it's\r\n   that the fate of every hunter is determined by his preparedness for the unpredictable;\r\n   those rare occasions when the hunter becomes the hunted.\r\n</p> <p>It won't always be a blood-thirsty alien; it could be the vengeful brother of the cabin-mounted\r\n   trophy moose, or possibly a trigger-happy former Vice President. Whatever the predator\r\n   and whatever the prey, the Hunting Crate ensures you'll be the most dangerous creature\r\n   of all.\r\n</p> <h4>Keep Comfort In The Crosshairs</h4> <p>The Stanley extra large insulated bottle is the same classic style, stainless steel flask our grandpas\r\n   handed down to us, except without the bullet nicks from storming Normandy. Its vacuum insulation\r\n   keeps hot things hot and cold things cold for 28 hours, perfect for keeping coffee\r\n   piping hot from one morning to the next or for use as decoy bait for heat-seeking\r\n   predators.\r\n</p> <p>The Tac-Force TF-469 Folding Knife has everything needed for unzipping and grilling the freshest steak\r\n   dinner imaginable: a stainless gut hook blade, silicone grip ring, hard nylon sheath, fire starter, diamond\r\n   honing file, and bottle opener. And if Mother Nature is being a real downer, the capsule of stormproof\r\n   matches will light in even the worst of circumstances.\r\n</p> <h4>Unseen and Unscented</h4> <p>For starters, the camo form wrap and facepaint disguises anyone and anything as slightly\r\n   off-grey splotches by which animals see the world. But invisible isn't enough to\r\n   be utterly undetectable to the heightened senses of predator and prey.\r\n</p> <p>Duke Cannon's Big Ol' Brick of Hunting Soap will wash any whiff of human clean off your\r\n   body. It's like those Axe body spray commercials when, once applied, beautiful women\r\n   ambush the man out of sheer desire, except instead of ambushing him, they'll completely\r\n   ignore him. And instead of beautiful women, it's a moose.\r\n</p> <p>It's a hunt or be hunted world, and the Hunting Crate equips you to always be atop the food chain.</p>",
+      "Name": "The Hunting Crate",
+      "ConversionRate": 1.3245033112582782,
+      "UniquePurchases": 30,
+      "ProductRevenue": 3599.7,
+      "Quantity": 30,
+      "AveragePrice": 119.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/707/large/hc-awesome-all-purpose-hunting-gifts__43606.jpg?1502411158",
+      "Margin": 55.19,
+      "TerrainScore": 0.1841924473899741,
+      "TERRAINRANK": 10
+    }
+  ],
+  "outputDocs": [
+    {
+      "SKU": "KTCR-0003-GRI",
+      "VariantName": "Grill Master Crate",
+      "Price": 99.99,
+      "ProductId": 14,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/grill-master-crate",
+      "Contents": "<h4>Grilling Gadgetry</h4> <ul>\r\n  <li>Brass-knuckle Meat Tenderizer</li>\r\n  <li>Cast Iron Smoker Box</li>\r\n  <li>Set of 4 Steak Thermometers</li>\r\n  <li>Dried Hickory Wood Chips</li>\r\n</ul> <h4>Zesty Downpour</h4> <ul>\r\n  <li>Original BBQ Sauce</li>\r\n  <li>Carolina Bold BBQ Sauce</li>\r\n  <li>Premium Spice Blend</li>\r\n</ul>",
+      "LongDescription": "<h4>The Right Tools for the Job</h4> <p>There's a line that separates the amateurs from the professionals. It's certainly\r\n   in the training and the experience, but folks often forget about the importance\r\n   of your equipment. Just like you can't win a NASCAR Cup in your grocery-getter,\r\n   can't crush a golf ball into orbit without a high-end driver, and aren't going\r\n   to take a trophy buck without a zeroed-in tack-driver, your grilling game will never\r\n   go next level without the right gear. You gotta have the right tools for the job.\r\n</p> <h4>Like a Grill-ionaire</h4> <p>Fortunately, you don't need to shell out a mountain of cash to get the equipment you need to get you to\r\n   grilling nirvana. We've included some of the best accessories that every man needs to get that Grillionaire\r\n   status.\r\n</p> <p>Our Grill Master Man Crate includes a cast-iron smoker\r\n  box and some hickory wood chips to get you started. Set the smoker box on\r\n   the grill as it warms up, soak the hickory in some water, and drop 'em into the\r\n   box as your meat grills. Take note, men: real flavor shouldn't come from a bottled\r\n   labeled \"liquid smoke.\"\r\n</p> <p>We threw in a set of four  steak thermometers, too. You may say, \"hey, Team\r\n   Man Crates, isn't that cheating?\" And we say, \"nay.\" There's no dishonor in knowing how done your steak\r\n   is. And when you cut into a perfectly-cooked slab of beef, you too shall understand that G.I. Joe wasn't\r\n   kidding when he said that Knowing Is Half the Battle.\r\n</p> <p>And because \"the right tool for every job\" means that sometimes you'll require some brute force, we've\r\n   included a brass-knuckle meat tenderizer. Nothing blows off the steam from a\r\n   long, hard day at work like beating your meat into submission.\r\n</p> <h4>Bone Doctors</h4> <p>We search tirelessly, every day, to find the best-in-class goods to put in our crates. Hundreds of sauces\r\n   came and went, the grills burned for weeks, until finally a victor emerged. An unexpected dark\r\n   horse, a little-known operation out of Virginia became the Cinderella story of the\r\n   Man Crates grilling taste-off. We proudly present Bone Doctors'\r\n  BBQ sauces, pair of masterpiece sauces and a brilliant spice blend.\r\n</p> <p>So fire up the grill, and call your agent: after all, you're about to go pro.</p>",
+      "Name": "Grill Master Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/399/large/gmc-grill-master-crate-awesome-gift-for-men__77984.jpg?1502411041",
+      "TERRAINRANK": 1
+    },
+    {
+      "SKU": "KTZC-0007-STG",
+      "VariantName": "Backyard Steakhouse Crate",
+      "Price": 119.99,
+      "ProductId": 224,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/backyard-steakhouse-crate",
+      "Contents": "<ul>\r\n    <li>Crate</li>\r\n  \t<li>Crowbar</li>\r\n    <li>Grilling Tool Set Includes:</li>\r\n    <ul>\r\n        <li>Spatula</li>\r\n        <li>Tongs</li>\r\n      \t<li>Basting Brush</li>\r\n        <li>Tool Tote Bag</li>\r\n    </ul>\r\n    <li>Rufus Teague Steak Sauce and Rub Set Includes:</li>\r\n  <ul>\r\n        <li>1 Original Steak Sauce, 7 oz</li>\r\n      \t<li>1 Spicy Steak Sauce, 7 oz</li>\r\n        <li>1 Original Steak Rub, 6.2 oz</li>\r\n  </ul>\r\n  <li>Black Denim Grilling Apron, 35\" Length</li>\r\n  <li>Wooden Safe Scrape Tool</li>\r\n</ul>",
+      "LongDescription": "<h4>America's Next Top Chef Idol</h4>\r\n\r\n<p>The backyard grill is far more than a means of searing meats. It's center stage to serve up a platter full of critical acclaim. When flame meets steak, so ignites the fantasy of being head chef at a high-end steakhouse. Cue the dream sequence. Diddle-diddle-duh, diddle-diddle-duh...</p>\r\n\r\n<p>Amid plumes of pillowy smoke, he's harshly judging the imperfect grill marks of an innocent filet mignon like a certain acerbic, British celebrity chef. He then reaches for the Backyard Steakhouse Crate's essential grilling tools and exclusive steak sauces. A surgical steak flip here, a brilliant brush stroke there...and succulent steak worthy of a Michelin rating.</p>\r\n\r\n<p>Fame and nationwide franchises are sure to follow when he's cooking with the Backyard Steakhouse Crate.</p>\r\n\r\n<h4>Everything but the Poofy, White Hat</h4> \r\n<li>When he unrolls his tote holding his Oval Pro Chef™ 3-Piece Tool Set that's your cue to start your standing ovation.</li>\r\n<li>Donning the black denim grilling apron will instantly command respect from hungry family members, nosy neighbors, and scurrying squirrels.</li>\r\n<li>We've got an in with legendary flavor maven Rufus Teague. You won't find this set of Steak Lovers sauces and rubs anywhere else. Not even in Rufus's kitchen.</li>\r\n<li>The Safe Scrape wooden scraping paddle gradually conforms to the shape of the grill's grates to banish charred debris from the cooking surface. Talk about a grate escrape.</li>\r\n</ul>",
+      "Name": "Backyard Steakhouse Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/972/large/MBC_MC_2018-4_Steak-2_WEB-.jpg?1527009751",
+      "TERRAINRANK": 2
+    },
+    {
+      "SKU": "KTCR-0061-PIZ",
+      "VariantName": "Pizza Grilling Crate",
+      "Price": 99.99,
+      "ProductId": 81,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/pizza-grilling-crate",
+      "Contents": "<h4>It's Pizza Time!</h4> <ul>\r\n  <li>(4) 7.5\" Pizza Stones</li>\r\n  <li>Passione Pizza Flour</li>\r\n  <li>Pizzacraft's Neopolitan Herb Blend</li>\r\n</ul> <h4>Backyard Pizzeria</h4> <ul>\r\n  <li>Foldable Pizza Peel</li>\r\n  <li>2-Sided Dough Roller</li>\r\n  <li>Pizzacraft Pizza Recipe Book</li>\r\n</ul>",
+      "LongDescription": "<h4>The History of Pizza (as told through catatstrophic events)<sup>*</sup></h4> <p>There's nothing original or appetizing about soggy, cardboard delivery pizza, and \"defrost\" is in no way an\r\n   authentic Italian culinary technique. History itself attests to the fact that the most delicious pizzas are\r\n   born of fire.\r\n</p> <p>The Great Fire of Rome in 64 A.D. led to the creation of pozzolanic\r\n   concrete, and thus, crispy flatbread crust. New York's 1835 brick building bonfire\r\n   inspired brick oven pizza, and deep dish style emerged after the widespread fear\r\n   of wood from the Great Chicago Fire of 1871.\r\n</p> <p>The Pizza Grilling Crate transforms the destructive flames of a backyard grill into the source of life for\r\n   delicious, stone-grilled pizza.\r\n</p> <h4>From The Fire, We Feast!</h4> <p>The Pizza Grilling Crate turns any ordinary grill into a flame-fueled furnace for crisp, smoky pizza.\r\n   The four cordierite baking stones bring the heat to any personal pizza party, but\r\n   can also be fitted together to grill pizza pies of all sizes and shapes, including\r\n   all seven Tetris shapes.\r\n</p> <p>For simple homemade, hand-tossed pizza crust, Passione is the dough you knead. This organic artisanal flour\r\n   ground from premium hard red wheat makes amazing pizza that will have every man kissing his fingers in a\r\n   grandiose manner, proclaiming \"Delizioso!\" in an exaggerated, possibly-offensive Italian accent.\r\n</p> <h4>Hot Off The Blocks</h4> <p>The double-down dough roller swiftly lays a level base for the whopping of toppings that can and should\r\n   cover the pizza. We're also including Pizzacraft's authentic Neapolitan herb blend and cookbook, the primer\r\n   on all things pizza with over 100 pages of recipes and resources.\r\n</p> <p>Finally, we've custom-designed a collapsible pizza peel that transfers piping hot pies from\r\n   the grill to the table with all toppings in tact.\r\n</p> <p>Like gold, steel, and the rest of civilization's most indispensable elements, pizza is best forged in fire. </p> <p><sup>*</sup>All historical accuracy subject to interpretation.</p>",
+      "Name": "Pizza Grilling Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/675/large/pg-cool-gift-for-guys-who-love-pizza-and-grilling__22425.jpg?1502411145",
+      "TERRAINRANK": 3
+    },
+    {
+      "SKU": "KTCR-0041-STU",
+      "VariantName": "Grilled and Stuffed Crate",
+      "Price": 64.99,
+      "ProductId": 78,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/grilled-and-stuffed-crate",
+      "Contents": "<h4>Grade-A Grilling</h4> <ul>\n  <li>Stuff-A-Burger Press</li>\n  <li>Chili Pepper Rack</li>\n  <li>Pepper Coring Knife</li>\n  <li>Stuffed Burger Recipe Book</li>\n</ul> <h4>Patriotic Picnic</h4> <ul>\n  <li>A-burger-ham Lincoln Seasoning</li>\n  <li>Dwight D. Fries-enhower Seasoning</li>\n  <li>2 Freedom Baskets</li>\n  <li>24 USA Basket Liners</li>\n</ul>",
+      "LongDescription": "<h4>The Stuffing of Legend</h4> <p>Our forefathers united the nation by railroad, jet-packed a man to the moon, and commissioned\n   peak-80's Hulk Hogan to clobber the Iron Sheik, all in fierce pursuit of the American\n   Dream. But the greatest feat of ingenuity was far and away the invention of the\n   stuffed burger.\n</p> <p>Stuffed burgers would have leapfrogged Democracy as America's chief export if not for every burger being\n   inherently stuffed with Freedom. Domestically, any man with a grill could now participate in the esteemed\n   lineage of Great American Innovation alongside the likes of Edison, Ford, and\n  <span class=\"highlight\">the Merage Brothers</span>.\n</p> <p>The American Dream is alive and well today, sizzling on the grill, oozing opportunity for all.</p> <h4>A Fuller America For All</h4> <p>Despite the Kardashians' best efforts, America still believes it's what's on the inside that counts, so\n   we're packing peppers and patties with the precision and vigor of a train-hopping vagabond\n   loading up his knapsack bindle at a Sizzler buffet.\n</p> <p>The Stuff-A-Burger Press and Pepper Rack/Corer Set are the dynamite duo for cramming meat baskets and\n   pepper casings with more cheese than a <span class=\"highlight\">Keanu Reeves movie marathon</span>. Let\n   ingredients abound as you dream up signature concoctions of meats, veggies, spices, and whatever else\n   your stomach desires. We recommend stuffing a few cheeseburger sliders inside for instant Burgerception!\n</p> <h4>Executive Order Up!</h4> <p>We recruited the world's leading/only histori-culinary expert to help create delicious seasonings inspired\n   by the greatest proponents of the American Dream. <span class=\"highlight\">A-burger-ham Lincoln</span> and\n  <span class=\"highlight\">Dwight D. Fries-enhower</span> are Man Crates spice exclusives, and these POTUS will\n   put your tastebuds on notice.\n</p> <p>The classy American flag liners and freedom baskets transform every day into the 4th of July, or at least\n   that can be your excuse when neighbors complain about all the backyard fireworks.\n</p> <p>Upgrade any cookout to All-American status with the Grilled and Stuffed Crate.</p>",
+      "Name": "Grilled & Stuffed Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/660/large/gs-american-grilled-and-stuffed-burger-gift-kit-for-guys__47581.jpg?1502411140",
+      "TERRAINRANK": 4
+    },
+    {
+      "SKU": "KTCR-0077-STK",
+      "VariantName": "Steaks on a Plate Crate",
+      "Price": 99.99,
+      "ProductId": 231,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/steaks-on-a-plate-crate",
+      "Contents": "<ul>\r\n  <li>Crate</li>\r\n  <li>Crowbar</li>\r\n  <li>Jacobsen Salt Co., Tellecherry Peppercorn in Grinder, 2.1 oz</li>\r\n  <li>Jacobsen Salt Co., Steak Seasoning Salt, 5.6 oz</li>\r\n  <li>6 Steak Knives with Rosewood Handles</li>\r\n  <li>Steak Station Digital Thermometer</li>\r\n  <li>4 Stainless Steel Potato People</li>\r\n \r\n</ul>",
+      "LongDescription": "<h4>Shhh...Do You Hear That?</h4>\r\n\r\n  <p>It’s the sound of several sizzling sssteaksss on the grill. For the avid barbecuer, guiding each perfectly charred Grade-A cut from grate to plate isn't just your typical meal preparation. It's a nonstop thrill ride from the moment the burners flare.</p>\r\n  <p>The Steaks on a Plate Crate will enhance his culinary craftsmanship, whether he's harnessing the heat at the grill or in the dining room on the edge of his seat. From digital meat thermometers to a steak knife set that's literally cutting edge, he'll be well-equipped to expertly gauge doneness and precisely slice his seasoned sirloin.</p>\r\n  <p>Once aboard this flight of flavor, he’ll never get tired of these supperloving steaks on these supperloving plates.</p>\r\n\r\n<h4>Elevating the Steaks</h4>\r\n  <ul>\r\n\t<li>When we handpicked cutlery, only the set of six forged stainless steel Curtis Lloyd steak knives made the cut. They give diners a nice, clean slice with no tearing.</li>\r\n\t<li>He’ll corral up to four pesky strips at once with the Charcoal Companion Steak Station, which has a digital display to ensure perfect meat preparation.</li>\r\n\t<li>The Classic Steak Seasoning and Tellicherry Peppercorn from Portland's Jacobsen Salt will give his filets and T-bones a quick strike of savoriness.</li>\r\n\t<li>The set of four tater-tilting Potato People will have his back to help save potatoes from scorchy peril. Stainless steel and dishwasher safe, these stands help cook his spuds without searing the skin.</li>\r\n  </ul>",
+      "Name": "Steaks on a Plate Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/842/large/MBC_MC_2018-4_Steak-1_WEB-EDIT_V1ja.jpg?1528236041",
+      "TERRAINRANK": 5
+    },
+    {
+      "SKU": "KTCR-0035-EVE",
+      "VariantName": "Everest Grill Crate",
+      "Price": 149.99,
+      "ProductId": 59,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/everest-grill-crate",
+      "Contents": "<h4>Majesty Makers</h4> <ul>\r\n  <li>Himalayan Salt Block, 8\"x8\"x1.5\"</li>\r\n  <li>Salt Block Recipe Cookbook</li>\r\n  <li>Circle Kabobs</li>\r\n  <li>(4) Mini-Thermometers</li>\r\n</ul> <h4>Salty Sidekicks</h4> <ul>\r\n  <li>Salt Block Scrubber Brush</li>\r\n  <li>Black Grilling Glove</li>\r\n  <li>Foldable Spatula</li>\r\n  <li>Salt Block Holder</li>\r\n</ul>",
+      "LongDescription": "<h4>Welcome to the Rock</h4> <p>If it's completely insane for a group of men to fly halfway around the world, risk their\r\n   lives trekking through the Himalayas, and tunnel beneath the highest mountain on\r\n   planet Earth all for a well-seared and seasoned steak, then we're punching first-class,\r\n   express tickets aboard the Crazy Train.\r\n</p> <p>Our quest for the most majestic grilling experience led us to a prehistoric Fort Knox of crystallized\r\n   flavor buried deep within the mountain range where Ra's Al Ghul trained Batman. Employing the same\r\n   classified techniques BIG TOURISM used to build the Stonehenge, we've extracted blocks of cooking salt so\r\n   enticing that even ever-critical chef Gordon Ramsey let out a small tinkle of excitement.\r\n</p> <p>In the stratosphere of pristine cooking flavors, the Everest Grill Crate stands alone.</p> <h4>Bedrock of Flavor</h4> <p>The Himalayan Salt Plate (8\" x 8\" x 1.5\") is the pinnacle of grilling versatility and flavor. You're\r\n   basically brining your meat in an ocean for 600 million years, and if that doesn't sound incredible to you,\r\n   then we're probably not explaining it right because it's the most delicious thing we've ever grilled.\r\n</p> <p>The salt plate perfectly flash-flavors any food and even makes fruits and those non-meat green\r\n   things appetizing. Experiment with 70 recipes from the Sultan of Salt Block himself,\r\n   Mark Bitterman, or blaze your own trail through this uncharted flavor frontier.\r\n</p> <h4>Shish Ka-Booyah!</h4> <p>Continuing its legacy of grilling innovation and mastery, the Everest Grill Crate includes four non-stick\r\n   circular kabobs to keep the good stuff secure on the salt and dinner plates, not the ground. There's also\r\n   four mini meat thermometers so your brain won't have to process anything other than pure anticipation\r\n   for the flavor deluge of salty goodness.\r\n</p> <p>The crate also includes a portable folding spatula, grill mitt, salt block holder, and salt block scrubber\r\n   brush tool.\r\n</p> <p>The Everest Grill Crate is proof to all grillers that once you go block, you never go back.</p>",
+      "Name": "Everest Grill Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/577/large/egc-everest-grill-crate-the-everest-grill-crate__11638.jpg?1502411107",
+      "TERRAINRANK": 6
+    },
+    {
+      "SKU": "KTCR-0011-HGR",
+      "VariantName": "Hickory Grilling Crate",
+      "Price": 64.99,
+      "ProductId": 136,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/hickory-grilling-crate",
+      "Contents": "<h4>Grilling Gadgetry</h4> <ul>\r\n  <li>Cast Iron Smoker Box</li>\r\n  <li>Dried Hickory Wood Chips</li>\r\n</ul> <h4>Griller's Grub</h4> <ul>\r\n  <li>Corn Nuggets, 4 oz</li>\r\n  <li>Beer Nuts, 3 oz</li>\r\n</ul> <h4>Zesty Downpour</h4> <ul>\r\n  <li>Miner's Mix Steak Rub</li>\r\n  <li>Miner's Mix Poultry Rub</li>\r\n  <li>Miner's Mix Salmon Marinade</li>\r\n  <li>Bone Doctor's Original Barbeque Sauce</li>\r\n</ul>",
+      "LongDescription": "<h4>Time To Fire Up The Grill</h4> <p>At some point in time during the dark and dirty and, let's be honest, hairy history\r\n   of our species, an innovator was born. Tired of eating cold, raw mammoth meat, that enterprising caveman invented fire, and before you\r\n   can grunt \"ugg,\" he had thrown a piece of meat on it and invented grilling.\r\n</p> <h4>Smoking</h4> <p>We love ourselves a good grilled steak. But sometimes, it's nice to mix it up.\r\n   And if you're like us, you've wanted to try smoking your choice of dead animal\r\n   for some time but are leery of making the investment in a dedicated smoker.\r\n</p> <p>Well, we found ourselves a solution, and we loved it so much that we built a\r\n   crate around it so that you, too, could enjoy the pleasures of smoking without having\r\n   to drop a few Benjamins on a new toy. The cast-iron smoker\r\n  box in this crate will quickly become your weapon-of-choice. Just set the\r\n   smoker box onto the grill as it heats up, soak some of the hickory wood chips we've\r\n   helpfully provided, and throw them into the box. Your steaks will come out tasting\r\n   like victory. It's not just for steak, either. For maximum win, try finding some\r\n   cedar chips and throwing them in next time you grill some seafood, or some mesquite\r\n   when you grill pork chops. Your palate will thank you.\r\n</p> <h4>Extra Flavors &amp; Snacks</h4> <p>We included some of our favorite rubs, steak and barbecue sauces\r\n   to take your smoking habit to the next level. And since being grill-master is an\r\n   arduous, thankless job that involves staring at food for ages before being able\r\n   to eat it, we included some snacks to keep your stomach happy and quiet and your\r\n   mind focused on the task at hand.\r\n</p> <p>So throw a steak on the fire, and crack a beer in honor of your caveman forefathers. After all, you may not\r\n   have invented grilling, but you're damn sure on your way to perfecting\r\n  it.\r\n</p>",
+      "Name": "Hickory Grilling Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/918/large/hgc-hickory-grilling-crate-awesome-gift-for-men__20406.jpg?1502411245",
+      "TERRAINRANK": 7
+    },
+    {
+      "SKU": "KTCR-0039-PIG",
+      "VariantName": "Pit Master Crate",
+      "Price": 119.99,
+      "ProductId": 119,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/pit-master-crate",
+      "Contents": "<h4>Pit Players</h4> <ul>\r\n  <li>Stainless Steel Meat Claws</li>\r\n  <li>Premium Leather Gloves</li>\r\n  <li>Collapsible Grill Fork</li>\r\n  <li>Silicone Basting Brush</li>\r\n  <li>Cast Iron Sauce Pot, 1.5 cup</li>\r\n</ul> <h4>Flavor Infusers</h4> <ul>\r\n  <li>Honey Sweet Sauce, 16 oz</li>\r\n  <li>Touch of Heat Sauce, 16 oz</li>\r\n  <li>Barbecue Meat Rub</li>\r\n  <li>Hickory Grill Wood Chips</li>\r\n  <li>Mesquite Grill Wood Chips</li>\r\n  \r\n</ul>",
+      "LongDescription": "<h4>Set Smoker To Beast Mode</h4> <p>When the divine spirits of the Ancient World demanded animal sacrifices to satiate their\r\n   celestial hunger, it was never a quick, \"kill it and grill it\" job.\r\n</p> <p>Nay, they ordered full mammoth carcasses be slow-cooked for days over\r\n   glowing coals in a smoky trap of rubs and sauces. This great wisdom was called \"barbecue\", and it\r\n   pleased the gods so greatly that they indulged...perhaps a bit too much.\r\n</p> <p>The Woolies are long gone, but the archaic secrets of True Barbecue live on in the Pit Master Man Crate. </p> <h4>Heat, Eat, Repeat</h4> <p>The Pit Master Crate is the Mr.  Miyagi of barbecue gear, your guiding\r\n   sensei on the road to fall-off-the-bone, \"low &amp; slow\" True Barbecue mastery.\r\n</p> <p>Meat Claws are the supreme tools for lifting and lugging huge roasts, whether you've dug a backyard pit to\r\n   \"go whole hog\" or drained and lined your swimming pool to \"go whole herd\". Knuckle up with these stainless\r\n   steel shredders, and you're just a few impassioned Wolverine impressions\r\n   away from pristine pulled pork.\r\n</p> <p>Keep your eyebrows intact with the collapsible barbecue fork, or go face to the fire with premium leather\r\n   gloves intended to handle the densest meat and most intense heat.\r\n</p> <h4>Sauce Like A Boss</h4> <p>A poorly executed saucing strategy can make or break your barbecue, and we're\r\n   firmly in the \"sauce while hot\" camp. Glaze right over the blaze with the silicone\r\n   basting brush, heat-safe to 550 degrees, and top off the cast-iron sauce pan with\r\n   fine selections from the  Sauce Boss himself, Mr. Rufus Teague.\r\n</p> <p>Teague's Honey Sweet and Touch of Heat flavors bring the bottled best of Kansas City to your cookout,\r\n   the perfect complement to a base-taste layer of his famed meat rub. Seal the deal\r\n   with a pro-style smokestack of hickory wood chips.\r\n</p> <p>Open up the pit with the Pit Master Crate, and unlock the secrets of True Barbecue.</p>",
+      "Name": "Pit Master Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/843/large/pm-awesome-barbecue-gifts-for-the-grilling-guy__39614.jpg?1502411217",
+      "TERRAINRANK": 8
+    },
+    {
+      "SKU": "KTCR-0052-TRO",
+      "VariantName": "Troutdoorsman Crate",
+      "Price": 99.99,
+      "ProductId": 58,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/troutdoorsman-crate",
+      "Contents": "<h4>Man Crates Exclusives</h4> <ul>\r\n  <li>TROUT: Avant-Garde Recipes for the Trout Enthusiast</li>\r\n  <li>O'fish'ial Blend Trout Seasoning</li>\r\n</ul> <h4>Trout Trappers</h4> <ul>\r\n  <li>Canvas Creel</li>\r\n  <li>Kershaw Fixed Blade Filet Knife</li>\r\n  <li>Grandpa's Grill Holder</li>\r\n</ul>",
+      "LongDescription": "<h4>Catch And Release The Flavor</h4> <p>Unlike their\r\n  <a href=\"https://www.mancrates.com/crates/bass-fishing\">conniving, malicious aqua-brethren: bass</a>,\r\n   trout have earned our utmost respect. We think the world of their graceful agility, grandiose color\r\n   patterns, and overall trustworthy character.\r\n</p> <p>They are beautiful, emotionally-complex creatures, and if there was a way we could enjoy their delicious\r\n   meaty insides without angling and gutting them, we would. Alas, the universe is cruel, and the best we can\r\n   do is give them a most honorable end.\r\n</p> <h4>A Fresh, Flavorful Farewell</h4> <p>To make their journey into eternal slumber as comfortable as possible for the fisher and the fished,\r\n   we've selected a Canvas Creel with a waterproof lining and breathable mesh sides. This bag can hold a\r\n   handful of trout and insulating greenery, creating a fresh, preserving eco-purgatory for our cherished\r\n   chums as they await their Glorious Zesting.\r\n</p> <p>The Kershaw Fish Fillet Knife is the only trout trimming tool that does right by our fallen fish friends.\r\n   The stainless steel blade makes for intricate cutting and compact storage, and its texture grip handle is\r\n   water and fish-slime proof.\r\n</p> <p>And for the camping troutdoorsmen in pursuit of the freshest feast, the Fire\r\n   Grill gets trout over an open cooking fire in no time. This portable stainless steel\r\n   wire cage attaches to any stick for a quick, crispy dinner, and honors the slain\r\n   with a traditional viking burial.\r\n</p> <h4>Delicious Fish Dishes</h4> <p>The most worthy tribute to a caught and cooked trout is to ensure its death was deliciously\r\n   not in vain. For the trout traditionalists, the zesty citrus O'Fish'ial Blend Trout\r\n   Seasoning ensures every trout reaches its finest flavor potential in life and beyond.\r\n</p> <p>We've unlocked the mysteries of supreme trout flavor in our tell-all book of ingenious meal\r\n   creations--TROUT: Avant-Garde Recipes for the Trout Enthusiast. From tasty fish tacos where the fish is the\r\n   taco, to perfectly cooking a fish inside a fish, this Man Crates exclusive cookbook will make that trout\r\n   wish it was alive to taste itself.\r\n</p> <p>The Troutdoorsman Crate equips every guy to properly commemorate his catch with the freshest, most\r\n   flavorful fillets imaginable.\r\n</p>",
+      "Name": "Trout Fishing Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/572/large/tdc-troutdoorsman-crate-kershaw-filet-knife-recipe-book-bag-grandpa-firegrill__22355.jpg?1502411104",
+      "TERRAINRANK": 9
+    },
+    {
+      "SKU": "KTZC-0004-HUN",
+      "VariantName": "Hunting Crate",
+      "Price": 119.99,
+      "ProductId": 88,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/hunting-crate",
+      "Contents": "<h4>Hunting Heroes</h4> <ul>\r\n  <li>Stanley Insulated Vacuum Bottle</li>\r\n  <li>Tac-Force TF-469 Folding Knife</li>\r\n  <li>Stormproof Matches</li>\r\n</ul> <h4>Disappear Completely</h4> <ul>\r\n  <li>Duke Cannon's Hunting Soap</li>\r\n  <li>Camo Face Paint</li>\r\n  <li>Camo Form Wrap</li>\r\n</ul>",
+      "LongDescription": "<h4>The Most Dangerous Game Of All</h4> <p>If the Schwarzenegger hunting documentary \"Predator\" taught us anything, it's\r\n   that the fate of every hunter is determined by his preparedness for the unpredictable;\r\n   those rare occasions when the hunter becomes the hunted.\r\n</p> <p>It won't always be a blood-thirsty alien; it could be the vengeful brother of the cabin-mounted\r\n   trophy moose, or possibly a trigger-happy former Vice President. Whatever the predator\r\n   and whatever the prey, the Hunting Crate ensures you'll be the most dangerous creature\r\n   of all.\r\n</p> <h4>Keep Comfort In The Crosshairs</h4> <p>The Stanley extra large insulated bottle is the same classic style, stainless steel flask our grandpas\r\n   handed down to us, except without the bullet nicks from storming Normandy. Its vacuum insulation\r\n   keeps hot things hot and cold things cold for 28 hours, perfect for keeping coffee\r\n   piping hot from one morning to the next or for use as decoy bait for heat-seeking\r\n   predators.\r\n</p> <p>The Tac-Force TF-469 Folding Knife has everything needed for unzipping and grilling the freshest steak\r\n   dinner imaginable: a stainless gut hook blade, silicone grip ring, hard nylon sheath, fire starter, diamond\r\n   honing file, and bottle opener. And if Mother Nature is being a real downer, the capsule of stormproof\r\n   matches will light in even the worst of circumstances.\r\n</p> <h4>Unseen and Unscented</h4> <p>For starters, the camo form wrap and facepaint disguises anyone and anything as slightly\r\n   off-grey splotches by which animals see the world. But invisible isn't enough to\r\n   be utterly undetectable to the heightened senses of predator and prey.\r\n</p> <p>Duke Cannon's Big Ol' Brick of Hunting Soap will wash any whiff of human clean off your\r\n   body. It's like those Axe body spray commercials when, once applied, beautiful women\r\n   ambush the man out of sheer desire, except instead of ambushing him, they'll completely\r\n   ignore him. And instead of beautiful women, it's a moose.\r\n</p> <p>It's a hunt or be hunted world, and the Hunting Crate equips you to always be atop the food chain.</p>",
+      "Name": "The Hunting Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/707/large/hc-awesome-all-purpose-hunting-gifts__43606.jpg?1502411158",
+      "TERRAINRANK": 10
+    }
+  ],
+  "template": {
+    "id": 24,
+    "lastModified": "2018-07-24T19:55:28.153Z",
+    "createdAt": "2018-07-10T19:21:08.834Z",
+    "archived": false,
+    "templateName": "Grilling - Iterable Export",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "SKU"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "VariantName"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "Price"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "Inventory"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "VariantStatus"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "ProductId"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "VariantId"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "Path"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "CanonicalUrl"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "ContentsHTML"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "LongDescription"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "Contents"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "12",
+                  "value": {
+                    "id": 12,
+                    "fields": [
+                      [
+                        "LongDescriptionHTML"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "13",
+                  "value": {
+                    "id": 13,
+                    "fields": [
+                      [
+                        "Name"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "14",
+                  "value": {
+                    "id": 14,
+                    "fields": [
+                      [
+                        "ConversionRate"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "15",
+                  "value": {
+                    "id": 15,
+                    "fields": [
+                      [
+                        "UniquePurchases"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "16",
+                  "value": {
+                    "id": 16,
+                    "fields": [
+                      [
+                        "ProductRevenue"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "17",
+                  "value": {
+                    "id": 17,
+                    "fields": [
+                      [
+                        "Quantity"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "18",
+                  "value": {
+                    "id": 18,
+                    "fields": [
+                      [
+                        "AveragePrice"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "19",
+                  "value": {
+                    "id": 19,
+                    "fields": [
+                      [
+                        "ImageLink"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "20",
+                  "value": {
+                    "id": 20,
+                    "fields": [
+                      [
+                        "Margin"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "21",
+                  "value": {
+                    "id": 21,
+                    "fields": [
+                      [
+                        "TERRAINRANK"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "22",
+                  "value": {
+                    "id": 22,
+                    "fields": [
+                      [
+                        "CanonicalUrl"
+                      ]
+                    ],
+                    "meta": {
+                      "value": "https://",
+                      "at": 0
+                    },
+                    "skipNulls": true,
+                    "typeCode": "InsertNode",
+                    "acceptedType": "string"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 22,
+            "uidNode": 23,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "Path"
+                ],
+                7
+              ],
+              [
+                [
+                  "Price"
+                ],
+                2
+              ],
+              [
+                [
+                  "Name"
+                ],
+                13
+              ],
+              [
+                [
+                  "LongDescriptionHTML"
+                ],
+                12
+              ],
+              [
+                [
+                  "VariantId"
+                ],
+                6
+              ],
+              [
+                [
+                  "LongDescription"
+                ],
+                10
+              ],
+              [
+                [
+                  "ProductRevenue"
+                ],
+                16
+              ],
+              [
+                [
+                  "ConversionRate"
+                ],
+                14
+              ],
+              [
+                [
+                  "Margin"
+                ],
+                20
+              ],
+              [
+                [
+                  "TERRAINRANK"
+                ],
+                21
+              ],
+              [
+                [
+                  "UniquePurchases"
+                ],
+                15
+              ],
+              [
+                [
+                  "ProductId"
+                ],
+                5
+              ],
+              [
+                [
+                  "SKU"
+                ],
+                0
+              ],
+              [
+                [
+                  "VariantStatus"
+                ],
+                4
+              ],
+              [
+                [
+                  "ContentsHTML"
+                ],
+                9
+              ],
+              [
+                [
+                  "CanonicalUrl"
+                ],
+                8
+              ],
+              [
+                [
+                  "ImageLink"
+                ],
+                19
+              ],
+              [
+                [
+                  "VariantName"
+                ],
+                1
+              ],
+              [
+                [
+                  "Quantity"
+                ],
+                17
+              ],
+              [
+                [
+                  "Contents"
+                ],
+                11
+              ],
+              [
+                [
+                  "AveragePrice"
+                ],
+                18
+              ],
+              [
+                [
+                  "Inventory"
+                ],
+                3
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "SKU"
+                ]
+              ],
+              [
+                1,
+                [
+                  "VariantName"
+                ]
+              ],
+              [
+                2,
+                [
+                  "Price"
+                ]
+              ],
+              [
+                3,
+                [
+                  "Inventory"
+                ]
+              ],
+              [
+                4,
+                [
+                  "VariantStatus"
+                ]
+              ],
+              [
+                5,
+                [
+                  "ProductId"
+                ]
+              ],
+              [
+                6,
+                [
+                  "VariantId"
+                ]
+              ],
+              [
+                7,
+                [
+                  "Path"
+                ]
+              ],
+              [
+                8,
+                [
+                  "CanonicalUrl"
+                ]
+              ],
+              [
+                9,
+                [
+                  "Contents"
+                ]
+              ],
+              [
+                10,
+                [
+                  "LongDescription2"
+                ]
+              ],
+              [
+                11,
+                [
+                  "Contents2"
+                ]
+              ],
+              [
+                12,
+                [
+                  "LongDescription"
+                ]
+              ],
+              [
+                13,
+                [
+                  "Name"
+                ]
+              ],
+              [
+                14,
+                [
+                  "ConversionRate"
+                ]
+              ],
+              [
+                15,
+                [
+                  "UniquePurchases"
+                ]
+              ],
+              [
+                16,
+                [
+                  "ProductRevenue"
+                ]
+              ],
+              [
+                17,
+                [
+                  "Quantity"
+                ]
+              ],
+              [
+                18,
+                [
+                  "AveragePrice"
+                ]
+              ],
+              [
+                19,
+                [
+                  "ImageLink"
+                ]
+              ],
+              [
+                20,
+                [
+                  "Margin"
+                ]
+              ],
+              [
+                21,
+                [
+                  "TERRAINRANK"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "string"
+              ],
+              [
+                2,
+                "number"
+              ],
+              [
+                3,
+                "number"
+              ],
+              [
+                4,
+                "string"
+              ],
+              [
+                5,
+                "number"
+              ],
+              [
+                6,
+                "number"
+              ],
+              [
+                7,
+                "string"
+              ],
+              [
+                8,
+                "string"
+              ],
+              [
+                9,
+                "string"
+              ],
+              [
+                10,
+                "string"
+              ],
+              [
+                11,
+                "string"
+              ],
+              [
+                12,
+                "string"
+              ],
+              [
+                13,
+                "string"
+              ],
+              [
+                14,
+                "number"
+              ],
+              [
+                15,
+                "number"
+              ],
+              [
+                16,
+                "number"
+              ],
+              [
+                17,
+                "number"
+              ],
+              [
+                18,
+                "number"
+              ],
+              [
+                19,
+                "string"
+              ],
+              [
+                20,
+                "number"
+              ],
+              [
+                21,
+                "number"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                true
+              ],
+              [
+                3,
+                false
+              ],
+              [
+                4,
+                false
+              ],
+              [
+                5,
+                true
+              ],
+              [
+                6,
+                false
+              ],
+              [
+                7,
+                false
+              ],
+              [
+                8,
+                true
+              ],
+              [
+                9,
+                true
+              ],
+              [
+                10,
+                false
+              ],
+              [
+                11,
+                false
+              ],
+              [
+                12,
+                true
+              ],
+              [
+                13,
+                true
+              ],
+              [
+                14,
+                false
+              ],
+              [
+                15,
+                false
+              ],
+              [
+                16,
+                false
+              ],
+              [
+                17,
+                false
+              ],
+              [
+                18,
+                false
+              ],
+              [
+                19,
+                true
+              ],
+              [
+                20,
+                false
+              ],
+              [
+                21,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                8,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                9,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                10,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                11,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                12,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                13,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                14,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                15,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                16,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                17,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                18,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                19,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                20,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                21,
+                {
+                  "etlType": "Integer"
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Algorithm",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "algorithmId": 22
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Fs",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": "Products.*",
+          "fieldOrdering": [
+            "SKU",
+            "VariantName",
+            "Price",
+            "ProductId",
+            "CanonicalUrl",
+            "Contents",
+            "LongDescription",
+            "Name",
+            "ImageLink",
+            "TERRAINRANK"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {},
+        "integrationId": 17,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ]
+        }
+      }
+    }
+  }
+}

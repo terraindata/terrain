@@ -164,6 +164,10 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
 
   public renderTransformationListItem(value: TransformationNode, index: number)
   {
+    if (!TransformationRegistry.isVisible(value.typeCode))
+    {
+      return null;
+    }
     const style = this.transformationListItemStyle(index === this.state.currentIndex && this.state.viewState === ViewState.EDIT);
     const canEdit = TransformationRegistry.canEdit(value.typeCode);
     return (
