@@ -98,8 +98,6 @@ describe('DatePicker', () =>
     expect(datePickerComponent.state()['unit']).toEqual('M');
     expect(datePickerComponent.state()['amount']).toEqual('');
     expect(datePickerComponent.find('.labeled-row')).toHaveLength(1);
-    expect(datePickerComponent.find('.time-icon-wrapper')).toHaveLength(1);
-    expect(datePickerComponent.find('.time-icon')).toHaveLength(1);
     expect(datePickerComponent.find(Dropdown)).toHaveLength(1);
   });
 
