@@ -220,7 +220,7 @@ describe('Testing the pathfinder parser', () =>
   let actionFileData;
   let actions;
   let updateTest = false;
-  const mutated = false;
+  // let mutated = false;
 
   beforeAll(async (done) =>
   {
@@ -312,19 +312,19 @@ describe('Testing the pathfinder parser', () =>
 
   afterAll(async (done) =>
   {
-    if (actionFileData.updateTest === true)
-    {
-      if (mutated === true)
-      {
-        const actionFileName = getExpectedActionFile();
-        const timestamp = Date();
-        actionFileData.timestamp = timestamp;
-        jsonfile.writeFileSync(actionFileName, actionFileData);
-      } else
-      {
-        TestLogger.info('The data is clean. Do not need to update the data.');
-      }
-    }
+    /*    if (actionFileData.updateTest === true)
+        {
+          if (mutated === true)
+          {
+            const actionFileName = getExpectedActionFile();
+            const timestamp = Date();
+            actionFileData.timestamp = timestamp;
+            jsonfile.writeFileSync(actionFileName, actionFileData);
+          } else
+          {
+            TestLogger.info('The data is clean. Do not need to update the data.');
+          }
+        }*/
     await page.close();
     TestLogger.info('The page is closed');
     await browser.disconnect();
