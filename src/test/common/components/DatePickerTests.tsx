@@ -97,7 +97,7 @@ describe('DatePicker', () =>
     expect(datePickerComponent.state()['sign']).toEqual('-');
     expect(datePickerComponent.state()['unit']).toEqual('M');
     expect(datePickerComponent.state()['amount']).toEqual('');
-    expect(datePickerComponent.find('.time-icon-wrapper')).toHaveLength(1);
+    expect(datePickerComponent.find('.labeled-row')).toHaveLength(1);
     expect(datePickerComponent.find(Dropdown)).toHaveLength(1);
   });
 
@@ -108,7 +108,7 @@ describe('DatePicker', () =>
       datePickerComponent.setProps({ date: '@TerrainDate.ThisWeek.1.T12:00:43-07:00' });
       expect(datePickerComponent.find('.date-view-title')).toHaveLength(1);
       expect(datePickerComponent.find('.date-view-label')).toHaveLength(0);
-      expect(datePickerComponent.find('.time-icon-wrapper')).toHaveLength(2);
+      expect(datePickerComponent.find('.labeled-row')).toHaveLength(1);
       expect(datePickerComponent.find('.unselected-date-type')).toHaveLength(2);
       expect(datePickerComponent.find('.selected-date-type')).toHaveLength(1);
       expect(datePickerComponent.state()['dateViewType']).toEqual('relative');
