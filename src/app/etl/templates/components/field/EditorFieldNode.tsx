@@ -358,7 +358,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
   {
     GraphHelpers.mutateEngine((proxy) =>
     {
-      proxy.setFieldEnabled(this.props.fieldId, !this._field().isIncluded);
+      proxy.setFieldEnabled(this.props.fieldId, !this._field().isIncluded, true);
     }).then((structural) =>
     {
       this.props.act({

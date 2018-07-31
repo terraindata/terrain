@@ -214,17 +214,32 @@ export class EngineProxy
     }
   }
 
-  public setFieldEnabled(fieldId: number, enabled: boolean)
+  public setFieldEnabled(fieldId: number, enabled: boolean, applyToChildren?: boolean)
   {
-    if (enabled)
+    const setEnabled = (id) =>
     {
-      this.engine.enableField(fieldId);
+      if (enabled)
+      {
+        this.engine.enableField(id);
+      }
+      else
+      {
+        this.engine.disableField(id);
+      }
+    };
+
+    if (applyToChildren)
+    {
+      Utils.traversal.postorderFields(this.engine, fieldId, (id) =>
+      {
+        setEnabled(id);
+      });
     }
     else
     {
-      this.engine.disableField(fieldId);
+      setEnabled(fieldId);
     }
-    this.requestRebuild(fieldId);
+    this.requestRebuild(applyToChildren ? undefined : fieldId);
   }
 
   // Reorder fieldId so that it appears after afterId
