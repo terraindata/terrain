@@ -214,6 +214,10 @@ export class EngineProxy
     }
   }
 
+  /*
+   *  If applyToChildren is true, set all children of the field
+   *  to have the same enabled/disabled state.
+   */
   public setFieldEnabled(fieldId: number, enabled: boolean, applyToChildren?: boolean)
   {
     const setEnabled = (id) =>
@@ -230,10 +234,7 @@ export class EngineProxy
 
     if (applyToChildren)
     {
-      Utils.traversal.postorderFields(this.engine, fieldId, (id) =>
-      {
-        setEnabled(id);
-      });
+      Utils.traversal.postorderFields(this.engine, fieldId, setEnabled);
     }
     else
     {
