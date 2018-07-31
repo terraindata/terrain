@@ -79,7 +79,7 @@ export function ESCodeToPathfinder(query: string, inputs, options: CodeToPathOpt
   try
   {
     const params = toInputMap(inputs);
-    const interpreter: ESInterpreter = new ESInterpreter(query, inputs);
+    const interpreter: ESInterpreter = new ESInterpreter(query, params);
     if (interpreter.hasError())
     {
       TerrainLog.debug(query + ' \n has errors:' + JSON.stringify(interpreter.getErrors(), null, 2));
@@ -170,6 +170,7 @@ const ClauseToPathTable = {
 const NegativeableComparionMap = {
   contain: 'notcontain',
   equal: 'notequal',
+  contains: 'notcontain',
   isin: 'isnotin',
   exists: 'notexists',
 };
@@ -359,8 +360,24 @@ function TermsToPath(node: ESValueInfo, interpreter: ESInterpreter, key: any[])
       const fieldName = kValueInfo.value;
       const fieldValue = JSON.stringify(vValueInfo.value);
       config['field'] = fieldName;
-      config['vaue'] = fieldValue;
+      config['value'] = fieldValue;
+    } else
+    {
+      TerrainLog.error('Terms value type is not base[]: ' + JSON.stringify(node.value));
+      node.forEachProperty((kv: ESPropertyInfo) =>
+      {
+        TerrainLog.info('K: ' + JSON.stringify(kv.propertyName.value) + '(' + kv.propertyName.clause.type + ')');
+        TerrainLog.info('V: ' + JSON.stringify(kv.propertyValue.value) + '(' + kv.propertyValue.clause.type + ')');
+      });
     }
+  } else
+  {
+    TerrainLog.error('Missing field type in the terms value: ' + JSON.stringify(node.value));
+    node.forEachProperty((kv: ESPropertyInfo) =>
+    {
+      TerrainLog.info('K: ' + JSON.stringify(kv.propertyName.value) + '(' + kv.propertyName.clause.type + ')');
+      TerrainLog.info('V: ' + JSON.stringify(kv.propertyValue.value) + '(' + kv.propertyValue.clause.type + ')');
+    });
   }
 
   config['comparison'] = 'isin';
@@ -706,6 +723,9 @@ function matchNegativeBool(boolNode: ESValueInfo)
     if (query.clause.type === 'query' && query.annotation.path)
     {
       return true;
+    } else
+    {
+      TerrainLog.debug('Must_not does not have query' + query.clause.type + JSON.stringify(query.value));
     }
   }
   return false;
