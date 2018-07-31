@@ -56,6 +56,7 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { EndpointTypeNames, SchedulableSinks, SchedulableSources, Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { backgroundColor, Colors } from 'src/app/colors/Colors';
 
 import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormLookups';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
