@@ -1,0 +1,1488 @@
+{
+  "testName": "MC_05",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "SKU": "KTCR-0037-WHA",
+      "VariantName": "Whiskey Appreciation Crate",
+      "Price": 159.99,
+      "Inventory": 1021,
+      "VariantStatus": "sellable",
+      "ProductId": 137,
+      "VariantId": 263,
+      "Path": "whiskey-appreciation-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/whiskey-appreciation-crate",
+      "ContentsHTML": "<h4>Distinguished Gear</h4> <ul>\r\n  <li>Personalized Whiskey Decanter <br>(hand-made, may contain minor imperfections)</li>\r\n  <li>2 Personalized Heavy Bottom Rocks Glasses, 9 oz</li>\r\n  <li>2 Ice Sphere Molds</li>\r\n  <li>2 Slate Coasters</li>\r\n  <li>Whiskey Drinking Journal</li>\r\n</ul> <h4>Luxury Grub</h4> <ul>\r\n  <li>Spiced Peppercorn Peanuts</li>\r\n  <li>Salted Pistachios</li>\r\n  <li>Cranberry Pecans</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours to process.</i></p>",
+      "LongDescription": "An Executive Appreciation In 1797, George Washington, the Michael Jordan of being American, declined the free\r\n   world's greatest honor, a Presidential term three-peat, in order to build a whiskey\r\n   distillery in his basement. The Revolutionary War MVP and celebrity endorser of\r\n   the one dollar bill knew that no amount of prestige or accomplishments could rival\r\n   the warm satisfaction of a good glass of whiskey.\r\n In days past, a man's fondness for whiskey was admirably brandished in full home bars, but in modern times,\r\n   whiskey is hidden out of sight in cabinets and desk drawers like shameful secrets. The Whiskey Appreciation\r\n   Crate is here to restore honor to the once great bond between a man and his drink.\r\n Oh, yes we de-can! Etching your initials into a glass decanter is a public declaration of your affinity for whiskey.\r\n   It's like donning a trenchcoat and holding a boombox overhead blasting Peter Gabriel's\r\n   \"In Your Eyes\" outside of whiskey's house or barging past the TSA checkpoint to frantically\r\n   sprint through the airport terminal for a last second  whiskey\r\n   before boarding your plane.\r\n While the monogrammed decanter looks super classy when flanked by its matching pair of personalized\r\n   rocks tumblers, whiskey should be appraised by taste as well as  presentation. The decanter properly\r\n   aerates and settles your whiskey so you can settle down with a glass of good company anytime.\r\n Good Company Rounding out the Whiskey Appreciation Crate is the ultimate whiskey connoisseur collection: A pair of\r\n   Tovolo Ice Molds and slate coasters, a pocket-sized whiskey tasting journal, and the most important whiskey\r\n   accessory, premium savory snacks.\r\n Box up those dusty sports trophies and find a stud to hang your awkward family portraits, because the\r\n   Personalized Whiskey Decanter is reclaiming whiskey's proper place atop your mantel.\r\n",
+      "Contents": "Distinguished Gear \r\n  Personalized Whiskey Decanter (hand-made, may contain minor imperfections)\r\n  2 Personalized Heavy Bottom Rocks Glasses, 9 oz\r\n  2 Ice Sphere Molds\r\n  2 Slate Coasters\r\n  Whiskey Drinking Journal\r\n Luxury Grub \r\n  Spiced Peppercorn Peanuts\r\n  Salted Pistachios\r\n  Cranberry Pecans\r\n\r\nNOTE: Personalized items require 48 hours to process.",
+      "LongDescriptionHTML": "<h4>An Executive Appreciation</h4> <p>In 1797, George Washington, the Michael Jordan of being American, declined the free\r\n   world's greatest honor, a Presidential term three-peat, in order to build a whiskey\r\n   distillery in his basement. The Revolutionary War MVP and celebrity endorser of\r\n   the one dollar bill knew that no amount of prestige or accomplishments could rival\r\n   the warm satisfaction of a good glass of whiskey.\r\n</p> <p>In days past, a man's fondness for whiskey was admirably brandished in full home bars, but in modern times,\r\n   whiskey is hidden out of sight in cabinets and desk drawers like shameful secrets. The Whiskey Appreciation\r\n   Crate is here to restore honor to the once great bond between a man and his drink.\r\n</p> <h4>Oh, yes we de-can!</h4> <p>Etching your initials into a glass decanter is a public declaration of your affinity for whiskey.\r\n   It's like donning a trenchcoat and holding a boombox overhead blasting Peter Gabriel's\r\n   \"In Your Eyes\" outside of whiskey's house or barging past the TSA checkpoint to frantically\r\n   sprint through the airport terminal for a last second  whiskey\r\n   before boarding your plane.\r\n</p> <p>While the monogrammed decanter looks super classy when flanked by its matching pair of personalized\r\n   rocks tumblers, whiskey should be appraised by taste as well as  presentation. The decanter properly\r\n   aerates and settles your whiskey so you can settle down with a glass of good company anytime.\r\n</p> <h4>Good Company</h4> <p>Rounding out the Whiskey Appreciation Crate is the ultimate whiskey connoisseur collection: A pair of\r\n   Tovolo Ice Molds and slate coasters, a pocket-sized whiskey tasting journal, and the most important whiskey\r\n   accessory, premium savory snacks.\r\n</p> <p>Box up those dusty sports trophies and find a stud to hang your awkward family portraits, because the\r\n   Personalized Whiskey Decanter is reclaiming whiskey's proper place atop your mantel.\r\n</p>",
+      "Name": "Personalized Whiskey Appreciation Crate",
+      "ConversionRate": 2.988691437802908,
+      "UniquePurchases": 222,
+      "ProductRevenue": 35517.78,
+      "Quantity": 222,
+      "AveragePrice": 159.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/001/898/large/wa_engraved_whiskey_gift_collection_for_bold_men__89003.1479337561.1280.1280_copy.jpg?1505426047",
+      "Margin": 70.18,
+      "TerrainScore": 0.395415412553274,
+      "TERRAINRANK": 1
+    },
+    {
+      "SKU": "KTCR-0055-BLO",
+      "VariantName": "Bloody Mary Crate",
+      "Price": 89.99,
+      "Inventory": 876,
+      "VariantStatus": "sellable",
+      "ProductId": 53,
+      "VariantId": 125,
+      "Path": "bloody-mary-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/bloody-mary-crate",
+      "ContentsHTML": "<h4>Gourmet Garnishes</h4> <ul>\r\n  <li>Pepperoni Straws</li>\r\n  <li>Bacon Rimshot</li>\r\n  <li>(2) Infinium Plastic Pilsner Glasses</li>\r\n</ul> <h4>Flavor Foundation</h4> <ul>\r\n  <li>Demitri's Classic Seasoning</li>\r\n  <li>Demitri's Horseradish Seasoning</li>\r\n  <li>Demitri's Chilis and Peppers Seasoning</li>\r\n  <li>(6) Clamato Tomato Juice Cans</li>\r\n</ul>",
+      "LongDescription": "The Drink You Can Eat Some\r\n   drinks pair well with meat: a single malt scotch with slow-cooked ribs, Imperial\r\n   IPA with hand-cranked sausage, or pinot grigio (if you consider that a drink) with\r\n   tilapia (if you consider that meat).\r\n But the Bloody Mary does more than pair\r\n   well. It fully embraces the mighty flavors of meat, resulting in a delicious cocktail\r\n   that doubles as a balanced brunch. Introducing, the gourmet, meat-infused Bloody\r\n   Mary Crate.\r\n The Spice Specialist The Bloody Mary is the pizza of cocktails; it's best served cold on a Saturday morning while slouched over\r\n   the couch watching cartoons, and it can support a mountain of meaty toppings.\r\n Upgrade your Bloody Mary from its lesser vegetarian form with Demitri's Pepperoni Straws\r\n   and Bacon Rimshot. Slurp your cocktail through a literal sausage vortex, accent\r\n   the flavor with fanciful bacon crumbles, and start stacking other gourmet garnishes\r\n   with your own creative flair.\r\n But even the most delicious topping towers still requires a solid flavor foundation, and no one does spices\r\n   better than Demitri. Demitri, the Marco Polo of Bloody Marys, has been boldly exploring the exotic world\r\n   of spices, and we're sending three of his perfectly mixed flavors: Classic, Horseradish,\r\n   and Chilies and Peppers.\r\n Leaning Tower of Toppings Balancing skewered, top-heavy garnishes like fried chicken or a full stack of pancakes is an art, and\r\n   your first few endeavors will no doubt be accompanied by slips and spills. Hone your stacking skills with\r\n   this pair of infinium plastic Pilsner glasses that won't break when they topple over or are shot with a\r\n   firearm at close range (not legally-binding).\r\n Build a beast of a brunch beverage with the Bloody Mary Man Crate.",
+      "Contents": "Gourmet Garnishes \r\n  Pepperoni Straws\r\n  Bacon Rimshot\r\n  (2) Infinium Plastic Pilsner Glasses\r\n Flavor Foundation \r\n  Demitri's Classic Seasoning\r\n  Demitri's Horseradish Seasoning\r\n  Demitri's Chilis and Peppers Seasoning\r\n  (6) Clamato Tomato Juice Cans\r\n",
+      "LongDescriptionHTML": "<h4>The Drink You Can Eat</h4> <p>Some\r\n   drinks pair well with meat: a single malt scotch with slow-cooked ribs, Imperial\r\n   IPA with hand-cranked sausage, or pinot grigio (if you consider that a drink) with\r\n   tilapia (if you consider that meat).\r\n</p> <p>But the Bloody Mary does more than pair\r\n   well. It fully embraces the mighty flavors of meat, resulting in a delicious cocktail\r\n   that doubles as a balanced brunch. Introducing, the gourmet, meat-infused Bloody\r\n   Mary Crate.\r\n</p> <h4>The Spice Specialist</h4> <p>The Bloody Mary is the pizza of cocktails; it's best served cold on a Saturday morning while slouched over\r\n   the couch watching cartoons, and it can support a mountain of meaty toppings.\r\n</p> <p>Upgrade your Bloody Mary from its lesser vegetarian form with Demitri's Pepperoni Straws\r\n   and Bacon Rimshot. Slurp your cocktail through a literal sausage vortex, accent\r\n   the flavor with fanciful bacon crumbles, and start stacking other gourmet garnishes\r\n   with your own creative flair.\r\n</p> <p>But even the most delicious topping towers still requires a solid flavor foundation, and no one does spices\r\n   better than Demitri. Demitri, the Marco Polo of Bloody Marys, has been boldly exploring the exotic world\r\n   of spices, and we're sending three of his perfectly mixed flavors: Classic, Horseradish,\r\n   and Chilies and Peppers.\r\n</p> <h4>Leaning Tower of Toppings</h4> <p>Balancing skewered, top-heavy garnishes like fried chicken or a full stack of pancakes is an art, and\r\n   your first few endeavors will no doubt be accompanied by slips and spills. Hone your stacking skills with\r\n   this pair of infinium plastic Pilsner glasses that won't break when they topple over or are shot with a\r\n   firearm at close range (not legally-binding).\r\n</p> <p>Build a beast of a brunch beverage with the Bloody Mary Man Crate.</p>",
+      "Name": "Bloody Mary Crate",
+      "ConversionRate": 5.9625212947189095,
+      "UniquePurchases": 140,
+      "ProductRevenue": 12598.6,
+      "Quantity": 140,
+      "AveragePrice": 89.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/551/large/bm_demetris_bloody_mary_mix_gifts_for_men__95099.jpg?1502411096",
+      "Margin": 56.11,
+      "TerrainScore": 0.34747764276406057,
+      "TERRAINRANK": 2
+    },
+    {
+      "SKU": "KTCR-0009-PWH",
+      "VariantName": "Personalized Whiskey Crate",
+      "Price": 119.99,
+      "Inventory": 532,
+      "VariantStatus": "sellable",
+      "ProductId": 84,
+      "VariantId": 176,
+      "Path": "personalized-whiskey-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/personalized-whiskey-crate",
+      "ContentsHTML": "<h4>Distinguished Gear</h4> <ul>\r\n  <li>2 Personalized, Heavy-Bottom Rocks Glasses, 9 oz.</li>\r\n  <li>2 Tovolo Ice Sphere Molds</li>\r\n  <li>2 Slate Coasters</li>\r\n  <li>33 Drams Whiskey Drinking Journal</li>\r\n</ul> <h4>Luxury Grub</h4> <ul>\r\n  <li>Squirrel Brand Spiced Peppercorn Peanuts</li>\r\n  <li>Wonderful Salted Pistachios</li>\r\n  <li>Sahale Snacks Cranberry Pecans</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "The Sophisticated Man Men aren't born dressed in a sharp tailored suit with a Cuban in hand. Even Frank Sinatra,\r\n   before he was the suave sultan Frank Sinatra, was once young Francis Albert, captain\r\n   of the chess club with enough barbed wire lining his teeth to fence off a Toluca\r\n   cattle ranch.\r\n The transformation into manhood, like most worthwhile ventures in life, begins with a strong drink.\r\n Bold Bravado Handing a guest a drink is like demonstrating a firm handshake in a job interview\r\n   or warming up with one-fingered push-ups before an underground kung-fu death showdown.\r\n   It's a functional maneuver to establish a relaxed, confident presence.\r\n This set of square whiskey glasses are intentionally bottom-loaded to flaunt your gravitas.\r\n   And we'll laser etch your name into the thick glass so no one will forget whose sophisticated\r\n   jazz flute skills they were admiring all night.\r\n Science bests nature once again with the Tovolo ice molds. These pristine ice crystal spheres\r\n   have a slower melting rate, keeping your whiskey chilled longer and tasting stronger.\r\n   And aesthetically they pair perfectly with the solid slate coasters, the marble\r\n   floors of the coaster world, to give your whiskey experience a more rugged, natural\r\n   ambiance.\r\n Cultured Accompaniments Whiskey is a flavor bully, and your childish gas station junk foods will get\r\n   knocked over in its bold wake. These salted pistachios, spiced peppercorn peanuts, and sweet and spicy\r\n   pecans are snacks for the mature, the perfect compliment to any whiskey.\r\n And use the drinking journal to scribble notes for the whiskey blog you're thinking\r\n   about starting, or just let it peek out of your pocket so people think you have\r\n   a whiskey blog. Just as rewarding with much less work.\r\n The road to classy refinement is not for the weak of taste, and it begins with the Personalized\r\n   Whiskey Man Crate.\r\n",
+      "Contents": "Distinguished Gear \r\n  2 Personalized, Heavy-Bottom Rocks Glasses, 9 oz.\r\n  2 Tovolo Ice Sphere Molds\r\n  2 Slate Coasters\r\n  33 Drams Whiskey Drinking Journal\r\n Luxury Grub \r\n  Squirrel Brand Spiced Peppercorn Peanuts\r\n  Wonderful Salted Pistachios\r\n  Sahale Snacks Cranberry Pecans\r\n\r\nNOTE: Personalized items require 48 hours of processing time.",
+      "LongDescriptionHTML": "<h4>The Sophisticated Man</h4> <p>Men aren't born dressed in a sharp tailored suit with a Cuban in hand. Even Frank Sinatra,\r\n   before he was the suave sultan Frank Sinatra, was once young Francis Albert, captain\r\n   of the chess club with enough barbed wire lining his teeth to fence off a Toluca\r\n   cattle ranch.\r\n</p> <p>The transformation into manhood, like most worthwhile ventures in life, begins with a strong drink.\r\n</p> <h4>Bold Bravado</h4> <p>Handing a guest a drink is like demonstrating a firm handshake in a job interview\r\n   or warming up with one-fingered push-ups before an underground kung-fu death showdown.\r\n   It's a functional maneuver to establish a relaxed, confident presence.\r\n</p> <p>This set of square whiskey glasses are intentionally bottom-loaded to flaunt your gravitas.\r\n   And we'll laser etch your name into the thick glass so no one will forget whose sophisticated\r\n   jazz flute skills they were admiring all night.\r\n</p> <p>Science bests nature once again with the Tovolo ice molds. These pristine ice crystal spheres\r\n   have a slower melting rate, keeping your whiskey chilled longer and tasting stronger.\r\n   And aesthetically they pair perfectly with the solid slate coasters, the marble\r\n   floors of the coaster world, to give your whiskey experience a more rugged, natural\r\n   ambiance.\r\n</p> <h4>Cultured Accompaniments</h4> <p>Whiskey is a flavor bully, and your childish gas station junk foods will get\r\n   knocked over in its bold wake. These salted pistachios, spiced peppercorn peanuts, and sweet and spicy\r\n   pecans are snacks for the mature, the perfect compliment to any whiskey.\r\n</p> <p>And use the drinking journal to scribble notes for the whiskey blog you're thinking\r\n   about starting, or just let it peek out of your pocket so people think you have\r\n   a whiskey blog. Just as rewarding with much less work.\r\n</p> <p>The road to classy refinement is not for the weak of taste, and it begins with the Personalized\r\n   Whiskey Man Crate.\r\n</p>",
+      "Name": "Personalized Whiskey Crate",
+      "ConversionRate": 2.8254847645429364,
+      "UniquePurchases": 51,
+      "ProductRevenue": 6119.49,
+      "Quantity": 51,
+      "AveragePrice": 119.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/689/large/pw_sophisticated_whiskey_gifts_for_claseey_guys__10836.jpg?1502411151",
+      "Margin": 68.7,
+      "TerrainScore": 0.3128852685120762,
+      "TERRAINRANK": 3
+    },
+    {
+      "SKU": "KTCR-0007-BAR",
+      "VariantName": "Personalized Barware",
+      "Price": 99.99,
+      "Inventory": 510,
+      "VariantStatus": "sellable",
+      "ProductId": 129,
+      "VariantId": 255,
+      "Path": "personalized-barware-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/personalized-barware-crate",
+      "ContentsHTML": "<h4>Home Bar Gear</h4> <ul>\r\n  <li>4 Personalized Pint Glasses</li>\r\n  <li>4 Personalized Wooden Coasters/Bottle Openers</li>\r\n</ul> <h4>Counter Chow</h4> <ul>\r\n  <li>Pistachios, 5 oz</li>\r\n  <li>BBQ Corn Nuggets, 4 oz</li>\r\n  <li>Beer Nuts Bar Mix, 3.25 oz</li>\r\n  <li>CB's Lightly Salted Ballpark Peanuts, 12 oz</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "Greatness Has A Name When the first humans to scale Mount Everest reached the summit, they didn't\r\n   immediately update their wikipedia pages or take selfies with self-aggrandizing\r\n   hashtags. They celebrated their dominance over nature like true men--by cracking\r\n   open a beer and chiseling their names into the icy death they'd conquered.\r\n A man's name isn't just a label. It's a shorthand celebration of his greatest accomplishments. This Time It's Personal Sure, Barry from high school, voted \"Most Likely to Succeed,\" might drive a fancy European sports car to\r\n   his fat cat Wall Street job, but does Barry from high school have his own set of personalized pint glasses?\r\n Probably not. He probably drinks from non-personalized glasses like an uncultured chump.  We've acquired that monstrous laser from \"Goldfinger\" and repurposed its settings from burning James Bond's\r\n   giblets to etching names into pint glasses with perfect precision.\r\n So while Barry's crying alone in his mansion over a frozen microwave dinner, you can be toasting real\r\n   success with three close buddies and four awesome personalized pint glasses.\r\n The Man, The Myth, The Legendary Coasters The matching set of personalized wooden coasters are classy and clean--like drying your tabletops with bear\r\n   skin napkins. Plus, they double as bottle-openers, which means less time scavenging in drawers and more\r\n   time swapping epic drinking stories. Like when you once wrestled a croc while wearing Crocs purely out of\r\n   hubris.\r\n And we've got snacks with your name on them. Figuratively. We used to personalize every individual nut and\r\n   pretzel, but they got inhaled too quickly for anyone to notice.\r\n Grab the Personalized Barware Crate today and ensure the world never forgets your name.",
+      "Contents": "Home Bar Gear \r\n  4 Personalized Pint Glasses\r\n  4 Personalized Wooden Coasters/Bottle Openers\r\n Counter Chow \r\n  Pistachios, 5 oz\r\n  BBQ Corn Nuggets, 4 oz\r\n  Beer Nuts Bar Mix, 3.25 oz\r\n  CB's Lightly Salted Ballpark Peanuts, 12 oz\r\n\r\nNOTE: Personalized items require 48 hours of processing time.",
+      "LongDescriptionHTML": "<h4>Greatness Has A Name</h4> <p>When the first humans to scale Mount Everest reached the summit, they didn't\r\n   immediately update their wikipedia pages or take selfies with self-aggrandizing\r\n   hashtags. They celebrated their dominance over nature like true men--by cracking\r\n   open a beer and chiseling their names into the icy death they'd conquered.\r\n</p> <p>A man's name isn't just a label. It's a shorthand celebration of his greatest accomplishments.</p> <h4>This Time It's Personal</h4> <p>Sure, Barry from high school, voted \"Most Likely to Succeed,\" might drive a fancy European sports car to\r\n   his fat cat Wall Street job, but does Barry from high school have his own set of personalized pint glasses?\r\n</p> <p>Probably not. He probably drinks from non-personalized glasses like an uncultured chump. </p> <p>We've acquired that monstrous laser from \"Goldfinger\" and repurposed its settings from burning James Bond's\r\n   giblets to etching names into pint glasses with perfect precision.\r\n</p> <p>So while Barry's crying alone in his mansion over a frozen microwave dinner, you can be toasting real\r\n   success with three close buddies and four awesome personalized pint glasses.\r\n</p> <h4>The Man, The Myth, The Legendary Coasters</h4> <p>The matching set of personalized wooden coasters are classy and clean--like drying your tabletops with bear\r\n   skin napkins. Plus, they double as bottle-openers, which means less time scavenging in drawers and more\r\n   time swapping epic drinking stories. Like when you once wrestled a croc while wearing Crocs purely out of\r\n   hubris.\r\n</p> <p>And we've got snacks with your name on them. Figuratively. We used to personalize every individual nut and\r\n   pretzel, but they got inhaled too quickly for anyone to notice.\r\n</p> <p>Grab the Personalized Barware Crate today and ensure the world never forgets your name.</p>",
+      "Name": "Personalized Barware Crate",
+      "ConversionRate": 5.160026126714565,
+      "UniquePurchases": 158,
+      "ProductRevenue": 15798.42,
+      "Quantity": 158,
+      "AveragePrice": 99.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/884/large/pb_personalized_pint_giftset_for_beer_loving_guys__44982.jpg?1502411232",
+      "Margin": 77.25,
+      "TerrainScore": 0.2783698377724768,
+      "TERRAINRANK": 4
+    },
+    {
+      "SKU": "KTAM-0007-BAR",
+      "VariantName": "Personalized Pint Set Ammo Can",
+      "Price": 64.99,
+      "Inventory": 1779,
+      "VariantStatus": "sellable",
+      "ProductId": 20,
+      "VariantId": 20,
+      "Path": "personalized-pint-set-ammo-can",
+      "CanonicalUrl": "www.mancrates.com/store/products/personalized-pint-set-ammo-can",
+      "ContentsHTML": "<h4>Beer Buddies</h4> <ul>\r\n  <li>2 Laser-Etched Pint Glasses</li>\r\n  <li>Personalized .50 Cal Bottle Opener</li>\r\n</ul> <h4>Beef Sticks</h4> <ul>\r\n  <li>Peppered Jerky Stick</li>\r\n  <li>Original Jerky Stick</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "The World Is His Man Cave A man's insatiable appetite for adventure will lead him to Earth's highest peaks,\r\n   deepest caverns, and soon, neighboring planets--but none of these places adequately\r\n   cater to his second-most pressing appetite: beer.\r\n But we've built a gift\r\n   that lets him have it all. Whether he's crag climbing, spelunking, or riding a rocket\r\n   to the grand opening of Raging Waters: Mars, the Personalized Pint Set Ammo Can\r\n   will always ensure an awesome pint by his side.\r\n Go Forth And Drink With the Personalized Pint Set Ammo Can, he'll never have to endure the harsh\r\n   humiliation of asking, \"where can a man get a decent drink around here?\" because\r\n   he'll always have a pair of personalized, laser-etched pint glasses tucked safely\r\n   in the indestructible ammo can handcuffed to his wrist.\r\n There's only one\r\n   bottle opener that can withstand the intrepid demand of the adventurous man, and\r\n   that's the personalized bullet bottle opener. This .50 caliber bullet with his name\r\n   engraved on the side is the second coolest way to open a beer with a bullet. And\r\n   man cannot live on beer alone, which is where the two delicious beef sticks come\r\n   into play.\r\n The Personalized Pint Set Ammo Can has all the essentials he'll\r\n   need to get his beers and best buds out of the house and into the world.\r\n",
+      "Contents": "Beer Buddies \r\n  2 Laser-Etched Pint Glasses\r\n  Personalized .50 Cal Bottle Opener\r\n Beef Sticks \r\n  Peppered Jerky Stick\r\n  Original Jerky Stick\r\n\r\nNOTE: Personalized items require 48 hours of processing time.",
+      "LongDescriptionHTML": "<h4>The World Is His Man Cave</h4> <p>A man's insatiable appetite for adventure will lead him to Earth's highest peaks,\r\n   deepest caverns, and soon, neighboring planets--but none of these places adequately\r\n   cater to his second-most pressing appetite: beer.\r\n</p> <p>But we've built a gift\r\n   that lets him have it all. Whether he's crag climbing, spelunking, or riding a rocket\r\n   to the grand opening of Raging Waters: Mars, the Personalized Pint Set Ammo Can\r\n   will always ensure an awesome pint by his side.\r\n</p> <h4>Go Forth And Drink</h4> <p>With the Personalized Pint Set Ammo Can, he'll never have to endure the harsh\r\n   humiliation of asking, \"where can a man get a decent drink around here?\" because\r\n   he'll always have a pair of personalized, laser-etched pint glasses tucked safely\r\n   in the indestructible ammo can handcuffed to his wrist.\r\n</p> <p>There's only one\r\n   bottle opener that can withstand the intrepid demand of the adventurous man, and\r\n   that's the personalized bullet bottle opener. This .50 caliber bullet with his name\r\n   engraved on the side is the second coolest way to open a beer with a bullet. And\r\n   man cannot live on beer alone, which is where the two delicious beef sticks come\r\n   into play.\r\n</p> <p>The Personalized Pint Set Ammo Can has all the essentials he'll\r\n   need to get his beers and best buds out of the house and into the world.\r\n</p>",
+      "Name": "Personalized Barware Ammo Can",
+      "ConversionRate": 5.595116988809766,
+      "UniquePurchases": 275,
+      "ProductRevenue": 17872.25,
+      "Quantity": 275,
+      "AveragePrice": 64.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/420/large/ppsac_awesome-personalized-pint-pair-gift-for-men__88533.jpg?1502411051",
+      "Margin": 75.5,
+      "TerrainScore": 0.23808224566785624,
+      "TERRAINRANK": 5
+    },
+    {
+      "SKU": "KTCR-0079-SOF",
+      "VariantName": "Smokin’ Old Fashioned Crate",
+      "Price": 99.99,
+      "Inventory": 769,
+      "VariantStatus": "sellable",
+      "ProductId": 230,
+      "VariantId": 427,
+      "Path": "smokin-old-fashioned-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/smokin-old-fashioned-crate",
+      "ContentsHTML": "<li>Crate</li>\r\n<li>Crowbar</li>\r\n<li>Pecan Wood Smoked Maple Syrup, 250 ml</li>\r\n<li>2 Spiegelau Perfect Serve Double Old Fashioned Glasses, 12.5 oz</li>\r\n<li>Geometric Ice Rocks Mold</li>\r\n<li>Aromatic Bitters, 2 oz</li>\r\n</ul>",
+      "LongDescription": "Party Like it’s 1879\r\n\r\nThe Old Fashioned Cocktail is a classic drink. It was already old when Thomas Edison ordered it in 1879, almost a decade before the 19th state joined the union. Shortly afterward, he invented the light bulb. Coincidence? You decide.\r\n\r\nOf course, there’s always room to innovate. So because our taste buds have evolved to enjoy more than just sugar and water, we ditched the simple syrup in favor of some delicious pecan smoked maple.\r\n\r\nThe Smokin’ Old Fashioned Crate is a tasteful tribute to the very first bartenders who were knocking it out of the park before there were actual parks to knock it out of.\r\n\r\nCocktail Contents\r\nRunamok’s Pecan Smoked Maple Syrup is tapped from pure, authentic Vermont maple trees that are probably as old as the Old Fashioned itself.\r\nJack Rudy Cocktail Bitters are made from burnt cane sugar syrup. He’ll detect nuanced notes of citrus, winter spices, and the distinguished air of a saloon older than his grandfather.\r\nSilicon Geometric Ice Rocks Molds ensure the ice cubes melt slower, so his drink stays stronger, longer.\r\n",
+      "Contents": "Crate\r\nCrowbar\r\nPecan Wood Smoked Maple Syrup, 250 ml\r\n2 Spiegelau Perfect Serve Double Old Fashioned Glasses, 12.5 oz\r\nGeometric Ice Rocks Mold\r\nAromatic Bitters, 2 oz\r\n",
+      "LongDescriptionHTML": "<h4>Party Like it’s 1879</h4>\r\n\r\n<p>The Old Fashioned Cocktail is a classic drink. It was already old when Thomas Edison ordered it in 1879, almost a decade before the 19th state joined the union. Shortly afterward, he invented the light bulb. Coincidence? You decide.</p>\r\n\r\n<p>Of course, there’s always room to innovate. So because our taste buds have evolved to enjoy more than just sugar and water, we ditched the simple syrup in favor of some delicious pecan smoked maple.</p>\r\n\r\n<p>The Smokin’ Old Fashioned Crate is a tasteful tribute to the very first bartenders who were knocking it out of the park before there were actual parks to knock it out of.</p>\r\n\r\n<h4>Cocktail Contents</h4>\r\n<li>Runamok’s Pecan Smoked Maple Syrup is tapped from pure, authentic Vermont maple trees that are probably as old as the Old Fashioned itself.</li>\r\n<li>Jack Rudy Cocktail Bitters are made from burnt cane sugar syrup. He’ll detect nuanced notes of citrus, winter spices, and the distinguished air of a saloon older than his grandfather.</li>\r\n<li>Silicon Geometric Ice Rocks Molds ensure the ice cubes melt slower, so his drink stays stronger, longer.</li>\r\n</ul>",
+      "Name": "Smokin' Old Fashioned Crate",
+      "ConversionRate": 4,
+      "UniquePurchases": 129,
+      "ProductRevenue": 12898.71,
+      "Quantity": 129,
+      "AveragePrice": 99.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/835/large/MBC_MC_2018-4_Old-Fashion_WEB-2041.jpg?1526333149",
+      "Margin": 0,
+      "TerrainScore": 0.21493354539460452,
+      "TERRAINRANK": 6
+    },
+    {
+      "SKU": "KTCR-0050-MOS",
+      "VariantName": "Moscow Mule Crate",
+      "Price": 79.99,
+      "Inventory": 421,
+      "VariantStatus": "sellable",
+      "ProductId": 146,
+      "VariantId": 272,
+      "Path": "moscow-mule-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/moscow-mule-crate",
+      "ContentsHTML": "<h4>The Classic Mule</h4> <ul>\n  <li>2 Copper Mugs (With Stainless Steel Lining)</li>\n  <li>Cock N' Bull Ginger Beer 4 pack</li>\n</ul> <h4>Bartending Tools</h4> <ul>\n  <li>Tovolo Perfect Cube Ice Tray</li>\n  <li>16 oz. Cocktail Shaker</li>\n  <li>Jigger</li>\n</ul>",
+      "LongDescription": "Kicks Like A Mule We love mixed drinks almost as much as we love America, so we were extra relieved to learn\n   the Moscow Mule was very American and not, as we initially suspected, a delicious\n   brainwashing potion created by a certain shirtless, horse-riding Russian overlord.\n Our research shows the Moscow Mule went from cellar dweller to celebrity socialite\n   overnight by combining ginger beer, vodka, lime, and good ol' American moxie.\n The Rise and Fall of the Moscow Mule In 1941, Vodka was unknown and unwanted in America. Smirnoff owner John Martin had to store his unsellable\n   alcohol in the Cock N' Bull, a bar owned by Martin's equally bland-named friend Jack Morgan.\n   In an effort to clear out the basement, the bartender began mixing Smirnoff with\n   Morgan's unpopular ginger beer in mugs from his girlfriend's failed copper factory.\n It was a risky move to toss a bunch of undesirable things together and re-sell\n   it (scientists call this The Hot Dog Phenomena), but the strategy was an overwhelming\n   success. Soon, every trendsetter in Tinseltown was posing for the Polaroid paparazzi\n   with a copper mug in hand.\n Sadly, nothing copper can stay, and when the Cold War hit in the 1950's, true blue Americans began\n   boycotting vodka, aka \"Communist Tap Water\". The Moscow Mule faded into obscurity.\n Three Cheers for Diplomacy! But today, over half a century later, the United States and Russia share a giant\n   orbiting timeshare in outer space, and the only thing remotely Communist about vodka\n   is how freely Smirnoff Ice bottles get shared on college campuses. The world is\n   ready for the return of the Moscow Mule.\n In addition to the original Cock N' Bull ginger beer, the Moscow Mule Crate includes a pair of authentic\n   copper drinking mugs, Tovolo ice cube mold, 16 oz. mixed drink shaker, and measuring jigger, so\n   you can enjoy one of America's finest, definitely-not-Russian mixed drinks.\n Mix it up the classy way, and taste the kick of the Moscow Mule.",
+      "Contents": "The Classic Mule \n  2 Copper Mugs (With Stainless Steel Lining)\n  Cock N' Bull Ginger Beer 4 pack\n Bartending Tools \n  Tovolo Perfect Cube Ice Tray\n  16 oz. Cocktail Shaker\n  Jigger\n",
+      "LongDescriptionHTML": "<h4>Kicks Like A Mule</h4> <p>We love mixed drinks almost as much as we love America, so we were extra relieved to learn\n   the Moscow Mule was very American and not, as we initially suspected, a delicious\n   brainwashing potion created by a certain shirtless, horse-riding Russian overlord.\n</p> <p>Our research shows the Moscow Mule went from cellar dweller to celebrity socialite\n   overnight by combining ginger beer, vodka, lime, and good ol' American moxie.\n</p> <h4>The Rise and Fall of the Moscow Mule</h4> <p>In 1941, Vodka was unknown and unwanted in America. Smirnoff owner John Martin had to store his unsellable\n   alcohol in the Cock N' Bull, a bar owned by Martin's equally bland-named friend Jack Morgan.\n   In an effort to clear out the basement, the bartender began mixing Smirnoff with\n   Morgan's unpopular ginger beer in mugs from his girlfriend's failed copper factory.\n</p> <p>It was a risky move to toss a bunch of undesirable things together and re-sell\n   it (scientists call this The Hot Dog Phenomena), but the strategy was an overwhelming\n   success. Soon, every trendsetter in Tinseltown was posing for the Polaroid paparazzi\n   with a copper mug in hand.\n</p> <p>Sadly, nothing copper can stay, and when the Cold War hit in the 1950's, true blue Americans began\n   boycotting vodka, aka \"Communist Tap Water\". The Moscow Mule faded into obscurity.\n</p> <h4>Three Cheers for Diplomacy!</h4> <p>But today, over half a century later, the United States and Russia share a giant\n   orbiting timeshare in outer space, and the only thing remotely Communist about vodka\n   is how freely Smirnoff Ice bottles get shared on college campuses. The world is\n   ready for the return of the Moscow Mule.\n</p> <p>In addition to the original Cock N' Bull ginger beer, the Moscow Mule Crate includes a pair of authentic\n   copper drinking mugs, Tovolo ice cube mold, 16 oz. mixed drink shaker, and measuring jigger, so\n   you can enjoy one of America's finest, definitely-not-Russian mixed drinks.\n</p> <p>Mix it up the classy way, and taste the kick of the Moscow Mule.</p>",
+      "Name": "The Moscow Mule Crate",
+      "ConversionRate": 3.6748329621380846,
+      "UniquePurchases": 66,
+      "ProductRevenue": 5279.34,
+      "Quantity": 66,
+      "AveragePrice": 79.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/964/large/mm_awesome_vodka_mixed_drink_gifts_for_guys__47185.jpg?1502411261",
+      "Margin": 55.91,
+      "TerrainScore": 0.17849205050507394,
+      "TERRAINRANK": 7
+    },
+    {
+      "SKU": "KTZC-0008-SSS",
+      "VariantName": "Storied Sunrise Cocktail Crate",
+      "Price": 119.99,
+      "Inventory": 257,
+      "VariantStatus": "sellable",
+      "ProductId": 227,
+      "VariantId": 424,
+      "Path": "storied-sunrise-cocktail-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/storied-sunrise-cocktail-crate",
+      "ContentsHTML": "<h4>Our Lasers Take Time</h4>\r\n<p>This personalized item requires 1 day of processing time.</p>\r\n<p>\r\n</p>\r\n<li>Crate</li>\r\n<li>Crowbar</li>\r\n<li>Smokin' Mary Bloody Mary Mix, 750 ml, 25.4 oz</li>\r\n<li>Bloody Mary Cocktail Nuts, Extra Large Virginia Peanuts, 6 oz</li>\r\n<li>Pickled Geen Beans–Red Pepper, 16 oz</li>\r\n<li>2 Mason Jar Glasses, Laser-Engraved Personalization with Name, 16 oz</li>\r\n<li><i>The Sun Also Rises</i> by Ernest Hemingway, Hardcover</li>\r\n\r\n</ul>",
+      "LongDescription": "Sunrising to the Occasion\r\n\r\nKaraoke Night. Ladies' Night. All-You-Can-Guzzle Flaming Volcano Bowl Night. There are more evening cocktail occasions than you can shake a swizzle stick at. But one rather mundane morning we got to thinking, why should nighttime have all the fun?\r\n\r\nWhen the plan is to wake and slake with an a.m.-friendly libation, it's best to follow in the staggery footsteps of writer/drinker Ernest Hemingway. The literary legend actually helped popularize the Bloody Mary in the 1920s, giving the world a buzzy brunch beverage that is unequivocally more refreshing when the sun is shining. \r\n\r\nThe Storied Sunrise Cocktail Crate is the ultimate homage to \"Papa,\" pairing a smoke-infused Bloody Mary mix with a copy of his debut novel, The Sun Also Rises. Mornings for the thinking and drinking man are about to get a lot brighter. Take that, moon.\r\n\r\nProper Reading and Drinking Materials \r\nConsidered one of Hemingway's best novels, The Sun Also Rises is a poignant tale about the meaning of life. Except for the knock-knock joke on page 47.\r\nMake it personal with a set of 2 laser-engraved mason jars that are almost as thick as the book.\r\nSmokin' Mary Bloody Mary Mix is made for foodies by foodies. Because a well-made Bloody is practically a meal in itself.\r\nCelery sticks are for, well, we're really not sure. But the Foster's Pickled Green Beans we've included will garnish the heck of his cocktail.",
+      "Contents": "Our Lasers Take Time\r\nThis personalized item requires 1 day of processing time.\r\n\r\n\r\nCrate\r\nCrowbar\r\nSmokin' Mary Bloody Mary Mix, 750 ml, 25.4 oz\r\nBloody Mary Cocktail Nuts, Extra Large Virginia Peanuts, 6 oz\r\nPickled Geen Beans–Red Pepper, 16 oz\r\n2 Mason Jar Glasses, Laser-Engraved Personalization with Name, 16 oz\r\nThe Sun Also Rises by Ernest Hemingway, Hardcover\r\n\r\n",
+      "LongDescriptionHTML": "<h4>Sunrising to the Occasion</h4>\r\n\r\n<p>Karaoke Night. Ladies' Night. All-You-Can-Guzzle Flaming Volcano Bowl Night. There are more evening cocktail occasions than you can shake a swizzle stick at. But one rather mundane morning we got to thinking, why should nighttime have all the fun?</p>\r\n\r\n<p>When the plan is to wake and slake with an a.m.-friendly libation, it's best to follow in the staggery footsteps of writer/drinker Ernest Hemingway. The literary legend actually helped popularize the Bloody Mary in the 1920s, giving the world a buzzy brunch beverage that is unequivocally more refreshing when the sun is shining. </p>\r\n\r\n<p>The Storied Sunrise Cocktail Crate is the ultimate homage to \"Papa,\" pairing a smoke-infused Bloody Mary mix with a copy of his debut novel, <i>The Sun Also Rises</i>. Mornings for the thinking and drinking man are about to get a lot brighter. Take that, moon.</p>\r\n\r\n<h4>Proper Reading and Drinking Materials </h4>\r\n<li>Considered one of Hemingway's best novels, <i>The Sun Also Rises</i> is a poignant tale about the meaning of life. Except for the knock-knock joke on page 47.</li>\r\n<li>Make it personal with a set of 2 laser-engraved mason jars that are almost as thick as the book.</li>\r\n<li>Smokin' Mary Bloody Mary Mix is made for foodies by foodies. Because a well-made Bloody is practically a meal in itself.</li>\r\n<li>Celery sticks are for, well, we're really not sure. But the Foster's Pickled Green Beans we've included will garnish the heck of his cocktail.</li>",
+      "Name": "Sunrise Storied Cocktail Crate",
+      "ConversionRate": 2.7164685908319184,
+      "UniquePurchases": 16,
+      "ProductRevenue": 1919.84,
+      "Quantity": 16,
+      "AveragePrice": 119.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/783/large/MBC_MC_2018-4_Bloody_Mary_WEB-2016.jpg?1526326781",
+      "Margin": 0,
+      "TerrainScore": 0.16816843962237035,
+      "TERRAINRANK": 8
+    },
+    {
+      "SKU": "KTMZ-0006-SNS",
+      "VariantName": "Storied Spy Cocktail Crate",
+      "Price": 99.99,
+      "Inventory": 223,
+      "VariantStatus": "sellable",
+      "ProductId": 240,
+      "VariantId": 436,
+      "ContentsHTML": "<ul>\r\n  <li>Jack Rudy Cocktail Co. Vermouth Brined Olives, 16 oz</li>\r\n  <li><i>Casino Royale</i>, Paperback Book</li>\r\n  <li>2 Raye Stemless Martini Glasses, 7.5 oz Each</li>\r\n  <li>Stainless Cocktail Barware Set Includes:</li>\r\n      <ul>\r\n          <li>Shaker</li>\r\n          <li>Spoon</li>\r\n          <li>Jigger</li>\r\n          <li>Strainer</li>\r\n  \t </ul>\r\n  <li>Gentlemen's Hardware Credit Card Tool</li>\r\n  \r\n</ul>",
+      "LongDescription": "Shaken, Not Stirred\r\n\r\n  Despite his childhood dreams, the truth is he’ll probably never be James Bond. And maybe that’s for the best. A guy who loses his keys as often as he does can’t be trusted with bomb-detonating cufflinks. And who wants to ruin their nicest and only suit crawling through those dusty casino air ducts?\r\n  The Storied Spy Cocktail Crate lets him kick his up feet, crack open a book, and cut straight to the action. With a martini in hand, of course. Shaken, not stirred. \r\n\r\n\r\nDoohickey Dossier\r\n  \r\n\tThe cocktail shaker set comes complete with a double jigger and two liquor pourers, perfect for sneaking an odorless poison into the glass of a double-crossing, foreign diplomat.\r\n\tThese vermouth-brined olives have been raised since birth by the Jack Rudy Cocktail Company to provide the finishing touch on a dirty martini.\r\n     Ian Fleming’s Casino Royale is frequently touted as the first truly great spy novel. By us.\r\n\tThe credit card-sized multi-tool is perfect for disarming bombs, disassembling Ikea furniture, or measuring items up to 3” in length. Just like one Q would make.\r\n  ",
+      "Contents": "\r\n  Jack Rudy Cocktail Co. Vermouth Brined Olives, 16 oz\r\n  Casino Royale, Paperback Book\r\n  2 Raye Stemless Martini Glasses, 7.5 oz Each\r\n  Stainless Cocktail Barware Set Includes:\r\n      \r\n          Shaker\r\n          Spoon\r\n          Jigger\r\n          Strainer\r\n  \t \r\n  Gentlemen's Hardware Credit Card Tool\r\n  \r\n",
+      "LongDescriptionHTML": "<h4>Shaken, Not Stirred</h4>\r\n\r\n  <p>Despite his childhood dreams, the truth is he’ll probably never be James Bond. And maybe that’s for the best. A guy who loses his keys as often as he does can’t be trusted with bomb-detonating cufflinks. And who wants to ruin their nicest and only suit crawling through those dusty casino air ducts?</p>\r\n  <p>The Storied Spy Cocktail Crate lets him kick his up feet, crack open a book, and cut straight to the action. With a martini in hand, of course. Shaken, not stirred. </p>\r\n\r\n\r\n<h4>Doohickey Dossier</h4>\r\n  <ul>\r\n\t<li>The cocktail shaker set comes complete with a double jigger and two liquor pourers, perfect for sneaking an odorless poison into the glass of a double-crossing, foreign diplomat.</li>\r\n\t<li>These vermouth-brined olives have been raised since birth by the Jack Rudy Cocktail Company to provide the finishing touch on a dirty martini.</li>\r\n    <li> Ian Fleming’s <i>Casino Royale</i> is frequently touted as the first truly great spy novel. By us.</li>\r\n\t<li>The credit card-sized multi-tool is perfect for disarming bombs, disassembling Ikea furniture, or measuring items up to 3” in length. Just like one Q would make.</li>\r\n  </ul>",
+      "Name": "Spy Storied Cocktail Crate",
+      "Path": "storied-spy-cocktail-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/storied-spy-cocktail-crate",
+      "ConversionRate": 2.295918367346939,
+      "UniquePurchases": 27,
+      "ProductRevenue": 2699.73,
+      "Quantity": 27,
+      "AveragePrice": 99.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/979/large/MBC_MC_2018-4_Martini_WEB-.jpg?1527018629",
+      "Margin": 0,
+      "TerrainScore": 0.16299723205963407,
+      "TERRAINRANK": 9
+    },
+    {
+      "SKU": "KTPR-0011-GIN",
+      "VariantName": "Gin-Fusion Kit",
+      "Price": 59.99,
+      "Inventory": 276,
+      "VariantStatus": "sellable",
+      "ProductId": 151,
+      "VariantId": 277,
+      "Path": "gin-fusion-kit",
+      "CanonicalUrl": "www.mancrates.com/store/products/gin-fusion-kit",
+      "ContentsHTML": "<h4>Spice World</h4> <ul>\r\n  <li>Juniper Berries, 1.4 oz</li>\r\n  <li>Coriander Seeds, 0.6 oz</li>\r\n  <li>Angelica Root, 0.6 oz</li>\r\n  <li>Lavender, 0.2 oz</li>\r\n  <li>Citrus Peel, 0.6 oz</li>\r\n  <li>Grains of Paradise, 1.4 oz</li>\r\n  <li>Star Anise, 0.4 oz</li>\r\n  <li>Chamomile, 0.2 oz</li>\r\n  <li>Cardamom Pods, 0.8 oz</li>\r\n  <li>Allspice Berries, 1 oz</li>\r\n</ul> <h4>Ginstruments</h4> <ul>\r\n  <li>2 Glass Bottles, 375mL</li>\r\n  <li>2 Bartop Corks</li>\r\n  <li>Gin-Fusion Instruction/Recipe Booklet</li>\r\n</ul>",
+      "LongDescription": "Gin For the Win! As much as we enjoy the idea of distilling our own gin, we moreso enjoy keeping our eyesight,\r\n   bathtubs, and status as mostly law-abiding citizens intact. And while DIY spirit\r\n   distillation isn't as mischievous as Prohibition-era propaganda paints it, it'll\r\n   still earn a modern-day moonshiner a few free nights in the county lock-up.\r\n Thankfully, we've found a way to get in on gin without also getting a visit from\r\n   Johnny Law or his lesser known siblings Jimmy Firefighter and Jenny Emergency Ocular\r\n   Surgeon.\r\n Compound gin is our legal loophole. It infuses the spirit after\r\n   distillation and is an easy entry into the world of producing excellent, custom\r\n   cocktail spirits. The Gin-Fusion Kit is the perfect DIY process for the true gintleman.\r\n The Heart of Gin Juniper berries make up the base foundation for any gin, so we've included a healthy amount in the\r\n   Gin-Fusion Kit.\r\n We've also assembled a botanical dream team, nine flavor muses to infuse the gin with a unique\r\n   personality. These botanicals are the active ingredients responsible for every gin's\r\n   unique aroma and flavor.\r\n The Man Crates-exclusive gin-making instruction book comes with three recipes for a surefire success. It\r\n   also strongly encourages experimentation.\r\n Bottles on Bottles Good news! Making compound gin doesn't require slowly stealing lab equipment from a community college\r\n   chemistry class the way distilling gin does. These fancy glass bottles should do the trick.\r\n We're including two 375mL bottles for flavor infusion, which we hear can split\r\n   a 750mL bottle of vodka evenly. We can't know for sure since we were forcibly removed\r\n   from that community college chemistry class before fractions were covered.\r\n The Gin-Fusion Kit puts the fun and freedom of gin infusion into the hands of the everyman.",
+      "Contents": "Spice World \r\n  Juniper Berries, 1.4 oz\r\n  Coriander Seeds, 0.6 oz\r\n  Angelica Root, 0.6 oz\r\n  Lavender, 0.2 oz\r\n  Citrus Peel, 0.6 oz\r\n  Grains of Paradise, 1.4 oz\r\n  Star Anise, 0.4 oz\r\n  Chamomile, 0.2 oz\r\n  Cardamom Pods, 0.8 oz\r\n  Allspice Berries, 1 oz\r\n Ginstruments \r\n  2 Glass Bottles, 375mL\r\n  2 Bartop Corks\r\n  Gin-Fusion Instruction/Recipe Booklet\r\n",
+      "LongDescriptionHTML": "<h4>Gin For the Win!</h4> <p>As much as we enjoy the idea of distilling our own gin, we moreso enjoy keeping our eyesight,\r\n   bathtubs, and status as mostly law-abiding citizens intact. And while DIY spirit\r\n   distillation isn't as mischievous as Prohibition-era propaganda paints it, it'll\r\n   still earn a modern-day moonshiner a few free nights in the county lock-up.\r\n</p> <p>Thankfully, we've found a way to get in on gin without also getting a visit from\r\n   Johnny Law or his lesser known siblings Jimmy Firefighter and Jenny Emergency Ocular\r\n   Surgeon.\r\n</p> <p>Compound gin is our legal loophole. It infuses the spirit after\r\n   distillation and is an easy entry into the world of producing excellent, custom\r\n   cocktail spirits. The Gin-Fusion Kit is the perfect DIY process for the true gintleman.\r\n</p> <h4>The Heart of Gin</h4> <p>Juniper berries make up the base foundation for any gin, so we've included a healthy amount in the\r\n   Gin-Fusion Kit.\r\n</p> <p>We've also assembled a botanical dream team, nine flavor muses to infuse the gin with a unique\r\n   personality. These botanicals are the active ingredients responsible for every gin's\r\n   unique aroma and flavor.\r\n</p> <p>The Man Crates-exclusive gin-making instruction book comes with three recipes for a surefire success. It\r\n   also strongly encourages experimentation.\r\n</p> <h4>Bottles on Bottles</h4> <p>Good news! Making compound gin doesn't require slowly stealing lab equipment from a community college\r\n   chemistry class the way distilling gin does. These fancy glass bottles should do the trick.\r\n</p> <p>We're including two 375mL bottles for flavor infusion, which we hear can split\r\n   a 750mL bottle of vodka evenly. We can't know for sure since we were forcibly removed\r\n   from that community college chemistry class before fractions were covered.\r\n</p> <p>The Gin-Fusion Kit puts the fun and freedom of gin infusion into the hands of the everyman.</p>",
+      "Name": "Gin Making Project Kit",
+      "ConversionRate": 5.460750853242321,
+      "UniquePurchases": 80,
+      "ProductRevenue": 4799.2,
+      "Quantity": 80,
+      "AveragePrice": 59.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/985/large/gmk-gin-making-kit-awesome-craft-drinks-for-men-gift__98172.jpg?1502411268",
+      "Margin": 56.21,
+      "TerrainScore": 0.11751771672577638,
+      "TERRAINRANK": 10
+    }
+  ],
+  "outputDocs": [
+    {
+      "SKU": "KTCR-0037-WHA",
+      "VariantName": "Whiskey Appreciation Crate",
+      "Price": 159.99,
+      "ProductId": 137,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/whiskey-appreciation-crate",
+      "Contents": "<h4>Distinguished Gear</h4> <ul>\r\n  <li>Personalized Whiskey Decanter <br>(hand-made, may contain minor imperfections)</li>\r\n  <li>2 Personalized Heavy Bottom Rocks Glasses, 9 oz</li>\r\n  <li>2 Ice Sphere Molds</li>\r\n  <li>2 Slate Coasters</li>\r\n  <li>Whiskey Drinking Journal</li>\r\n</ul> <h4>Luxury Grub</h4> <ul>\r\n  <li>Spiced Peppercorn Peanuts</li>\r\n  <li>Salted Pistachios</li>\r\n  <li>Cranberry Pecans</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours to process.</i></p>",
+      "LongDescription": "<h4>An Executive Appreciation</h4> <p>In 1797, George Washington, the Michael Jordan of being American, declined the free\r\n   world's greatest honor, a Presidential term three-peat, in order to build a whiskey\r\n   distillery in his basement. The Revolutionary War MVP and celebrity endorser of\r\n   the one dollar bill knew that no amount of prestige or accomplishments could rival\r\n   the warm satisfaction of a good glass of whiskey.\r\n</p> <p>In days past, a man's fondness for whiskey was admirably brandished in full home bars, but in modern times,\r\n   whiskey is hidden out of sight in cabinets and desk drawers like shameful secrets. The Whiskey Appreciation\r\n   Crate is here to restore honor to the once great bond between a man and his drink.\r\n</p> <h4>Oh, yes we de-can!</h4> <p>Etching your initials into a glass decanter is a public declaration of your affinity for whiskey.\r\n   It's like donning a trenchcoat and holding a boombox overhead blasting Peter Gabriel's\r\n   \"In Your Eyes\" outside of whiskey's house or barging past the TSA checkpoint to frantically\r\n   sprint through the airport terminal for a last second  whiskey\r\n   before boarding your plane.\r\n</p> <p>While the monogrammed decanter looks super classy when flanked by its matching pair of personalized\r\n   rocks tumblers, whiskey should be appraised by taste as well as  presentation. The decanter properly\r\n   aerates and settles your whiskey so you can settle down with a glass of good company anytime.\r\n</p> <h4>Good Company</h4> <p>Rounding out the Whiskey Appreciation Crate is the ultimate whiskey connoisseur collection: A pair of\r\n   Tovolo Ice Molds and slate coasters, a pocket-sized whiskey tasting journal, and the most important whiskey\r\n   accessory, premium savory snacks.\r\n</p> <p>Box up those dusty sports trophies and find a stud to hang your awkward family portraits, because the\r\n   Personalized Whiskey Decanter is reclaiming whiskey's proper place atop your mantel.\r\n</p>",
+      "Name": "Personalized Whiskey Appreciation Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/001/898/large/wa_engraved_whiskey_gift_collection_for_bold_men__89003.1479337561.1280.1280_copy.jpg?1505426047",
+      "TERRAINRANK": 1
+    },
+    {
+      "SKU": "KTCR-0055-BLO",
+      "VariantName": "Bloody Mary Crate",
+      "Price": 89.99,
+      "ProductId": 53,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/bloody-mary-crate",
+      "Contents": "<h4>Gourmet Garnishes</h4> <ul>\r\n  <li>Pepperoni Straws</li>\r\n  <li>Bacon Rimshot</li>\r\n  <li>(2) Infinium Plastic Pilsner Glasses</li>\r\n</ul> <h4>Flavor Foundation</h4> <ul>\r\n  <li>Demitri's Classic Seasoning</li>\r\n  <li>Demitri's Horseradish Seasoning</li>\r\n  <li>Demitri's Chilis and Peppers Seasoning</li>\r\n  <li>(6) Clamato Tomato Juice Cans</li>\r\n</ul>",
+      "LongDescription": "<h4>The Drink You Can Eat</h4> <p>Some\r\n   drinks pair well with meat: a single malt scotch with slow-cooked ribs, Imperial\r\n   IPA with hand-cranked sausage, or pinot grigio (if you consider that a drink) with\r\n   tilapia (if you consider that meat).\r\n</p> <p>But the Bloody Mary does more than pair\r\n   well. It fully embraces the mighty flavors of meat, resulting in a delicious cocktail\r\n   that doubles as a balanced brunch. Introducing, the gourmet, meat-infused Bloody\r\n   Mary Crate.\r\n</p> <h4>The Spice Specialist</h4> <p>The Bloody Mary is the pizza of cocktails; it's best served cold on a Saturday morning while slouched over\r\n   the couch watching cartoons, and it can support a mountain of meaty toppings.\r\n</p> <p>Upgrade your Bloody Mary from its lesser vegetarian form with Demitri's Pepperoni Straws\r\n   and Bacon Rimshot. Slurp your cocktail through a literal sausage vortex, accent\r\n   the flavor with fanciful bacon crumbles, and start stacking other gourmet garnishes\r\n   with your own creative flair.\r\n</p> <p>But even the most delicious topping towers still requires a solid flavor foundation, and no one does spices\r\n   better than Demitri. Demitri, the Marco Polo of Bloody Marys, has been boldly exploring the exotic world\r\n   of spices, and we're sending three of his perfectly mixed flavors: Classic, Horseradish,\r\n   and Chilies and Peppers.\r\n</p> <h4>Leaning Tower of Toppings</h4> <p>Balancing skewered, top-heavy garnishes like fried chicken or a full stack of pancakes is an art, and\r\n   your first few endeavors will no doubt be accompanied by slips and spills. Hone your stacking skills with\r\n   this pair of infinium plastic Pilsner glasses that won't break when they topple over or are shot with a\r\n   firearm at close range (not legally-binding).\r\n</p> <p>Build a beast of a brunch beverage with the Bloody Mary Man Crate.</p>",
+      "Name": "Bloody Mary Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/551/large/bm_demetris_bloody_mary_mix_gifts_for_men__95099.jpg?1502411096",
+      "TERRAINRANK": 2
+    },
+    {
+      "SKU": "KTCR-0009-PWH",
+      "VariantName": "Personalized Whiskey Crate",
+      "Price": 119.99,
+      "ProductId": 84,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/personalized-whiskey-crate",
+      "Contents": "<h4>Distinguished Gear</h4> <ul>\r\n  <li>2 Personalized, Heavy-Bottom Rocks Glasses, 9 oz.</li>\r\n  <li>2 Tovolo Ice Sphere Molds</li>\r\n  <li>2 Slate Coasters</li>\r\n  <li>33 Drams Whiskey Drinking Journal</li>\r\n</ul> <h4>Luxury Grub</h4> <ul>\r\n  <li>Squirrel Brand Spiced Peppercorn Peanuts</li>\r\n  <li>Wonderful Salted Pistachios</li>\r\n  <li>Sahale Snacks Cranberry Pecans</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "<h4>The Sophisticated Man</h4> <p>Men aren't born dressed in a sharp tailored suit with a Cuban in hand. Even Frank Sinatra,\r\n   before he was the suave sultan Frank Sinatra, was once young Francis Albert, captain\r\n   of the chess club with enough barbed wire lining his teeth to fence off a Toluca\r\n   cattle ranch.\r\n</p> <p>The transformation into manhood, like most worthwhile ventures in life, begins with a strong drink.\r\n</p> <h4>Bold Bravado</h4> <p>Handing a guest a drink is like demonstrating a firm handshake in a job interview\r\n   or warming up with one-fingered push-ups before an underground kung-fu death showdown.\r\n   It's a functional maneuver to establish a relaxed, confident presence.\r\n</p> <p>This set of square whiskey glasses are intentionally bottom-loaded to flaunt your gravitas.\r\n   And we'll laser etch your name into the thick glass so no one will forget whose sophisticated\r\n   jazz flute skills they were admiring all night.\r\n</p> <p>Science bests nature once again with the Tovolo ice molds. These pristine ice crystal spheres\r\n   have a slower melting rate, keeping your whiskey chilled longer and tasting stronger.\r\n   And aesthetically they pair perfectly with the solid slate coasters, the marble\r\n   floors of the coaster world, to give your whiskey experience a more rugged, natural\r\n   ambiance.\r\n</p> <h4>Cultured Accompaniments</h4> <p>Whiskey is a flavor bully, and your childish gas station junk foods will get\r\n   knocked over in its bold wake. These salted pistachios, spiced peppercorn peanuts, and sweet and spicy\r\n   pecans are snacks for the mature, the perfect compliment to any whiskey.\r\n</p> <p>And use the drinking journal to scribble notes for the whiskey blog you're thinking\r\n   about starting, or just let it peek out of your pocket so people think you have\r\n   a whiskey blog. Just as rewarding with much less work.\r\n</p> <p>The road to classy refinement is not for the weak of taste, and it begins with the Personalized\r\n   Whiskey Man Crate.\r\n</p>",
+      "Name": "Personalized Whiskey Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/689/large/pw_sophisticated_whiskey_gifts_for_claseey_guys__10836.jpg?1502411151",
+      "TERRAINRANK": 3
+    },
+    {
+      "SKU": "KTCR-0007-BAR",
+      "VariantName": "Personalized Barware",
+      "Price": 99.99,
+      "ProductId": 129,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/personalized-barware-crate",
+      "Contents": "<h4>Home Bar Gear</h4> <ul>\r\n  <li>4 Personalized Pint Glasses</li>\r\n  <li>4 Personalized Wooden Coasters/Bottle Openers</li>\r\n</ul> <h4>Counter Chow</h4> <ul>\r\n  <li>Pistachios, 5 oz</li>\r\n  <li>BBQ Corn Nuggets, 4 oz</li>\r\n  <li>Beer Nuts Bar Mix, 3.25 oz</li>\r\n  <li>CB's Lightly Salted Ballpark Peanuts, 12 oz</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "<h4>Greatness Has A Name</h4> <p>When the first humans to scale Mount Everest reached the summit, they didn't\r\n   immediately update their wikipedia pages or take selfies with self-aggrandizing\r\n   hashtags. They celebrated their dominance over nature like true men--by cracking\r\n   open a beer and chiseling their names into the icy death they'd conquered.\r\n</p> <p>A man's name isn't just a label. It's a shorthand celebration of his greatest accomplishments.</p> <h4>This Time It's Personal</h4> <p>Sure, Barry from high school, voted \"Most Likely to Succeed,\" might drive a fancy European sports car to\r\n   his fat cat Wall Street job, but does Barry from high school have his own set of personalized pint glasses?\r\n</p> <p>Probably not. He probably drinks from non-personalized glasses like an uncultured chump. </p> <p>We've acquired that monstrous laser from \"Goldfinger\" and repurposed its settings from burning James Bond's\r\n   giblets to etching names into pint glasses with perfect precision.\r\n</p> <p>So while Barry's crying alone in his mansion over a frozen microwave dinner, you can be toasting real\r\n   success with three close buddies and four awesome personalized pint glasses.\r\n</p> <h4>The Man, The Myth, The Legendary Coasters</h4> <p>The matching set of personalized wooden coasters are classy and clean--like drying your tabletops with bear\r\n   skin napkins. Plus, they double as bottle-openers, which means less time scavenging in drawers and more\r\n   time swapping epic drinking stories. Like when you once wrestled a croc while wearing Crocs purely out of\r\n   hubris.\r\n</p> <p>And we've got snacks with your name on them. Figuratively. We used to personalize every individual nut and\r\n   pretzel, but they got inhaled too quickly for anyone to notice.\r\n</p> <p>Grab the Personalized Barware Crate today and ensure the world never forgets your name.</p>",
+      "Name": "Personalized Barware Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/884/large/pb_personalized_pint_giftset_for_beer_loving_guys__44982.jpg?1502411232",
+      "TERRAINRANK": 4
+    },
+    {
+      "SKU": "KTAM-0007-BAR",
+      "VariantName": "Personalized Pint Set Ammo Can",
+      "Price": 64.99,
+      "ProductId": 20,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/personalized-pint-set-ammo-can",
+      "Contents": "<h4>Beer Buddies</h4> <ul>\r\n  <li>2 Laser-Etched Pint Glasses</li>\r\n  <li>Personalized .50 Cal Bottle Opener</li>\r\n</ul> <h4>Beef Sticks</h4> <ul>\r\n  <li>Peppered Jerky Stick</li>\r\n  <li>Original Jerky Stick</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "<h4>The World Is His Man Cave</h4> <p>A man's insatiable appetite for adventure will lead him to Earth's highest peaks,\r\n   deepest caverns, and soon, neighboring planets--but none of these places adequately\r\n   cater to his second-most pressing appetite: beer.\r\n</p> <p>But we've built a gift\r\n   that lets him have it all. Whether he's crag climbing, spelunking, or riding a rocket\r\n   to the grand opening of Raging Waters: Mars, the Personalized Pint Set Ammo Can\r\n   will always ensure an awesome pint by his side.\r\n</p> <h4>Go Forth And Drink</h4> <p>With the Personalized Pint Set Ammo Can, he'll never have to endure the harsh\r\n   humiliation of asking, \"where can a man get a decent drink around here?\" because\r\n   he'll always have a pair of personalized, laser-etched pint glasses tucked safely\r\n   in the indestructible ammo can handcuffed to his wrist.\r\n</p> <p>There's only one\r\n   bottle opener that can withstand the intrepid demand of the adventurous man, and\r\n   that's the personalized bullet bottle opener. This .50 caliber bullet with his name\r\n   engraved on the side is the second coolest way to open a beer with a bullet. And\r\n   man cannot live on beer alone, which is where the two delicious beef sticks come\r\n   into play.\r\n</p> <p>The Personalized Pint Set Ammo Can has all the essentials he'll\r\n   need to get his beers and best buds out of the house and into the world.\r\n</p>",
+      "Name": "Personalized Barware Ammo Can",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/420/large/ppsac_awesome-personalized-pint-pair-gift-for-men__88533.jpg?1502411051",
+      "TERRAINRANK": 5
+    },
+    {
+      "SKU": "KTCR-0079-SOF",
+      "VariantName": "Smokin’ Old Fashioned Crate",
+      "Price": 99.99,
+      "ProductId": 230,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/smokin-old-fashioned-crate",
+      "Contents": "<li>Crate</li>\r\n<li>Crowbar</li>\r\n<li>Pecan Wood Smoked Maple Syrup, 250 ml</li>\r\n<li>2 Spiegelau Perfect Serve Double Old Fashioned Glasses, 12.5 oz</li>\r\n<li>Geometric Ice Rocks Mold</li>\r\n<li>Aromatic Bitters, 2 oz</li>\r\n</ul>",
+      "LongDescription": "<h4>Party Like it’s 1879</h4>\r\n\r\n<p>The Old Fashioned Cocktail is a classic drink. It was already old when Thomas Edison ordered it in 1879, almost a decade before the 19th state joined the union. Shortly afterward, he invented the light bulb. Coincidence? You decide.</p>\r\n\r\n<p>Of course, there’s always room to innovate. So because our taste buds have evolved to enjoy more than just sugar and water, we ditched the simple syrup in favor of some delicious pecan smoked maple.</p>\r\n\r\n<p>The Smokin’ Old Fashioned Crate is a tasteful tribute to the very first bartenders who were knocking it out of the park before there were actual parks to knock it out of.</p>\r\n\r\n<h4>Cocktail Contents</h4>\r\n<li>Runamok’s Pecan Smoked Maple Syrup is tapped from pure, authentic Vermont maple trees that are probably as old as the Old Fashioned itself.</li>\r\n<li>Jack Rudy Cocktail Bitters are made from burnt cane sugar syrup. He’ll detect nuanced notes of citrus, winter spices, and the distinguished air of a saloon older than his grandfather.</li>\r\n<li>Silicon Geometric Ice Rocks Molds ensure the ice cubes melt slower, so his drink stays stronger, longer.</li>\r\n</ul>",
+      "Name": "Smokin' Old Fashioned Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/835/large/MBC_MC_2018-4_Old-Fashion_WEB-2041.jpg?1526333149",
+      "TERRAINRANK": 6
+    },
+    {
+      "SKU": "KTCR-0050-MOS",
+      "VariantName": "Moscow Mule Crate",
+      "Price": 79.99,
+      "ProductId": 146,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/moscow-mule-crate",
+      "Contents": "<h4>The Classic Mule</h4> <ul>\n  <li>2 Copper Mugs (With Stainless Steel Lining)</li>\n  <li>Cock N' Bull Ginger Beer 4 pack</li>\n</ul> <h4>Bartending Tools</h4> <ul>\n  <li>Tovolo Perfect Cube Ice Tray</li>\n  <li>16 oz. Cocktail Shaker</li>\n  <li>Jigger</li>\n</ul>",
+      "LongDescription": "<h4>Kicks Like A Mule</h4> <p>We love mixed drinks almost as much as we love America, so we were extra relieved to learn\n   the Moscow Mule was very American and not, as we initially suspected, a delicious\n   brainwashing potion created by a certain shirtless, horse-riding Russian overlord.\n</p> <p>Our research shows the Moscow Mule went from cellar dweller to celebrity socialite\n   overnight by combining ginger beer, vodka, lime, and good ol' American moxie.\n</p> <h4>The Rise and Fall of the Moscow Mule</h4> <p>In 1941, Vodka was unknown and unwanted in America. Smirnoff owner John Martin had to store his unsellable\n   alcohol in the Cock N' Bull, a bar owned by Martin's equally bland-named friend Jack Morgan.\n   In an effort to clear out the basement, the bartender began mixing Smirnoff with\n   Morgan's unpopular ginger beer in mugs from his girlfriend's failed copper factory.\n</p> <p>It was a risky move to toss a bunch of undesirable things together and re-sell\n   it (scientists call this The Hot Dog Phenomena), but the strategy was an overwhelming\n   success. Soon, every trendsetter in Tinseltown was posing for the Polaroid paparazzi\n   with a copper mug in hand.\n</p> <p>Sadly, nothing copper can stay, and when the Cold War hit in the 1950's, true blue Americans began\n   boycotting vodka, aka \"Communist Tap Water\". The Moscow Mule faded into obscurity.\n</p> <h4>Three Cheers for Diplomacy!</h4> <p>But today, over half a century later, the United States and Russia share a giant\n   orbiting timeshare in outer space, and the only thing remotely Communist about vodka\n   is how freely Smirnoff Ice bottles get shared on college campuses. The world is\n   ready for the return of the Moscow Mule.\n</p> <p>In addition to the original Cock N' Bull ginger beer, the Moscow Mule Crate includes a pair of authentic\n   copper drinking mugs, Tovolo ice cube mold, 16 oz. mixed drink shaker, and measuring jigger, so\n   you can enjoy one of America's finest, definitely-not-Russian mixed drinks.\n</p> <p>Mix it up the classy way, and taste the kick of the Moscow Mule.</p>",
+      "Name": "The Moscow Mule Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/964/large/mm_awesome_vodka_mixed_drink_gifts_for_guys__47185.jpg?1502411261",
+      "TERRAINRANK": 7
+    },
+    {
+      "SKU": "KTZC-0008-SSS",
+      "VariantName": "Storied Sunrise Cocktail Crate",
+      "Price": 119.99,
+      "ProductId": 227,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/storied-sunrise-cocktail-crate",
+      "Contents": "<h4>Our Lasers Take Time</h4>\r\n<p>This personalized item requires 1 day of processing time.</p>\r\n<p>\r\n</p>\r\n<li>Crate</li>\r\n<li>Crowbar</li>\r\n<li>Smokin' Mary Bloody Mary Mix, 750 ml, 25.4 oz</li>\r\n<li>Bloody Mary Cocktail Nuts, Extra Large Virginia Peanuts, 6 oz</li>\r\n<li>Pickled Geen Beans–Red Pepper, 16 oz</li>\r\n<li>2 Mason Jar Glasses, Laser-Engraved Personalization with Name, 16 oz</li>\r\n<li><i>The Sun Also Rises</i> by Ernest Hemingway, Hardcover</li>\r\n\r\n</ul>",
+      "LongDescription": "<h4>Sunrising to the Occasion</h4>\r\n\r\n<p>Karaoke Night. Ladies' Night. All-You-Can-Guzzle Flaming Volcano Bowl Night. There are more evening cocktail occasions than you can shake a swizzle stick at. But one rather mundane morning we got to thinking, why should nighttime have all the fun?</p>\r\n\r\n<p>When the plan is to wake and slake with an a.m.-friendly libation, it's best to follow in the staggery footsteps of writer/drinker Ernest Hemingway. The literary legend actually helped popularize the Bloody Mary in the 1920s, giving the world a buzzy brunch beverage that is unequivocally more refreshing when the sun is shining. </p>\r\n\r\n<p>The Storied Sunrise Cocktail Crate is the ultimate homage to \"Papa,\" pairing a smoke-infused Bloody Mary mix with a copy of his debut novel, <i>The Sun Also Rises</i>. Mornings for the thinking and drinking man are about to get a lot brighter. Take that, moon.</p>\r\n\r\n<h4>Proper Reading and Drinking Materials </h4>\r\n<li>Considered one of Hemingway's best novels, <i>The Sun Also Rises</i> is a poignant tale about the meaning of life. Except for the knock-knock joke on page 47.</li>\r\n<li>Make it personal with a set of 2 laser-engraved mason jars that are almost as thick as the book.</li>\r\n<li>Smokin' Mary Bloody Mary Mix is made for foodies by foodies. Because a well-made Bloody is practically a meal in itself.</li>\r\n<li>Celery sticks are for, well, we're really not sure. But the Foster's Pickled Green Beans we've included will garnish the heck of his cocktail.</li>",
+      "Name": "Sunrise Storied Cocktail Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/783/large/MBC_MC_2018-4_Bloody_Mary_WEB-2016.jpg?1526326781",
+      "TERRAINRANK": 8
+    },
+    {
+      "SKU": "KTMZ-0006-SNS",
+      "VariantName": "Storied Spy Cocktail Crate",
+      "Price": 99.99,
+      "ProductId": 240,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/storied-spy-cocktail-crate",
+      "Contents": "<ul>\r\n  <li>Jack Rudy Cocktail Co. Vermouth Brined Olives, 16 oz</li>\r\n  <li><i>Casino Royale</i>, Paperback Book</li>\r\n  <li>2 Raye Stemless Martini Glasses, 7.5 oz Each</li>\r\n  <li>Stainless Cocktail Barware Set Includes:</li>\r\n      <ul>\r\n          <li>Shaker</li>\r\n          <li>Spoon</li>\r\n          <li>Jigger</li>\r\n          <li>Strainer</li>\r\n  \t </ul>\r\n  <li>Gentlemen's Hardware Credit Card Tool</li>\r\n  \r\n</ul>",
+      "LongDescription": "<h4>Shaken, Not Stirred</h4>\r\n\r\n  <p>Despite his childhood dreams, the truth is he’ll probably never be James Bond. And maybe that’s for the best. A guy who loses his keys as often as he does can’t be trusted with bomb-detonating cufflinks. And who wants to ruin their nicest and only suit crawling through those dusty casino air ducts?</p>\r\n  <p>The Storied Spy Cocktail Crate lets him kick his up feet, crack open a book, and cut straight to the action. With a martini in hand, of course. Shaken, not stirred. </p>\r\n\r\n\r\n<h4>Doohickey Dossier</h4>\r\n  <ul>\r\n\t<li>The cocktail shaker set comes complete with a double jigger and two liquor pourers, perfect for sneaking an odorless poison into the glass of a double-crossing, foreign diplomat.</li>\r\n\t<li>These vermouth-brined olives have been raised since birth by the Jack Rudy Cocktail Company to provide the finishing touch on a dirty martini.</li>\r\n    <li> Ian Fleming’s <i>Casino Royale</i> is frequently touted as the first truly great spy novel. By us.</li>\r\n\t<li>The credit card-sized multi-tool is perfect for disarming bombs, disassembling Ikea furniture, or measuring items up to 3” in length. Just like one Q would make.</li>\r\n  </ul>",
+      "Name": "Spy Storied Cocktail Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/979/large/MBC_MC_2018-4_Martini_WEB-.jpg?1527018629",
+      "TERRAINRANK": 9
+    },
+    {
+      "SKU": "KTPR-0011-GIN",
+      "VariantName": "Gin-Fusion Kit",
+      "Price": 59.99,
+      "ProductId": 151,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/gin-fusion-kit",
+      "Contents": "<h4>Spice World</h4> <ul>\r\n  <li>Juniper Berries, 1.4 oz</li>\r\n  <li>Coriander Seeds, 0.6 oz</li>\r\n  <li>Angelica Root, 0.6 oz</li>\r\n  <li>Lavender, 0.2 oz</li>\r\n  <li>Citrus Peel, 0.6 oz</li>\r\n  <li>Grains of Paradise, 1.4 oz</li>\r\n  <li>Star Anise, 0.4 oz</li>\r\n  <li>Chamomile, 0.2 oz</li>\r\n  <li>Cardamom Pods, 0.8 oz</li>\r\n  <li>Allspice Berries, 1 oz</li>\r\n</ul> <h4>Ginstruments</h4> <ul>\r\n  <li>2 Glass Bottles, 375mL</li>\r\n  <li>2 Bartop Corks</li>\r\n  <li>Gin-Fusion Instruction/Recipe Booklet</li>\r\n</ul>",
+      "LongDescription": "<h4>Gin For the Win!</h4> <p>As much as we enjoy the idea of distilling our own gin, we moreso enjoy keeping our eyesight,\r\n   bathtubs, and status as mostly law-abiding citizens intact. And while DIY spirit\r\n   distillation isn't as mischievous as Prohibition-era propaganda paints it, it'll\r\n   still earn a modern-day moonshiner a few free nights in the county lock-up.\r\n</p> <p>Thankfully, we've found a way to get in on gin without also getting a visit from\r\n   Johnny Law or his lesser known siblings Jimmy Firefighter and Jenny Emergency Ocular\r\n   Surgeon.\r\n</p> <p>Compound gin is our legal loophole. It infuses the spirit after\r\n   distillation and is an easy entry into the world of producing excellent, custom\r\n   cocktail spirits. The Gin-Fusion Kit is the perfect DIY process for the true gintleman.\r\n</p> <h4>The Heart of Gin</h4> <p>Juniper berries make up the base foundation for any gin, so we've included a healthy amount in the\r\n   Gin-Fusion Kit.\r\n</p> <p>We've also assembled a botanical dream team, nine flavor muses to infuse the gin with a unique\r\n   personality. These botanicals are the active ingredients responsible for every gin's\r\n   unique aroma and flavor.\r\n</p> <p>The Man Crates-exclusive gin-making instruction book comes with three recipes for a surefire success. It\r\n   also strongly encourages experimentation.\r\n</p> <h4>Bottles on Bottles</h4> <p>Good news! Making compound gin doesn't require slowly stealing lab equipment from a community college\r\n   chemistry class the way distilling gin does. These fancy glass bottles should do the trick.\r\n</p> <p>We're including two 375mL bottles for flavor infusion, which we hear can split\r\n   a 750mL bottle of vodka evenly. We can't know for sure since we were forcibly removed\r\n   from that community college chemistry class before fractions were covered.\r\n</p> <p>The Gin-Fusion Kit puts the fun and freedom of gin infusion into the hands of the everyman.</p>",
+      "Name": "Gin Making Project Kit",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/985/large/gmk-gin-making-kit-awesome-craft-drinks-for-men-gift__98172.jpg?1502411268",
+      "TERRAINRANK": 10
+    }
+  ],
+  "template": {
+    "id": 25,
+    "lastModified": "2018-07-24T19:57:37.288Z",
+    "createdAt": "2018-07-10T19:23:29.418Z",
+    "archived": false,
+    "templateName": "Cocktails - Iterable Export",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "SKU"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "VariantName"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "Price"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "Inventory"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "VariantStatus"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "ProductId"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "VariantId"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "Path"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "CanonicalUrl"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "ContentsHTML"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "LongDescription"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "Contents"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "12",
+                  "value": {
+                    "id": 12,
+                    "fields": [
+                      [
+                        "LongDescriptionHTML"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "13",
+                  "value": {
+                    "id": 13,
+                    "fields": [
+                      [
+                        "Name"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "14",
+                  "value": {
+                    "id": 14,
+                    "fields": [
+                      [
+                        "ConversionRate"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "15",
+                  "value": {
+                    "id": 15,
+                    "fields": [
+                      [
+                        "UniquePurchases"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "16",
+                  "value": {
+                    "id": 16,
+                    "fields": [
+                      [
+                        "ProductRevenue"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "17",
+                  "value": {
+                    "id": 17,
+                    "fields": [
+                      [
+                        "Quantity"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "18",
+                  "value": {
+                    "id": 18,
+                    "fields": [
+                      [
+                        "AveragePrice"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "19",
+                  "value": {
+                    "id": 19,
+                    "fields": [
+                      [
+                        "ImageLink"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "20",
+                  "value": {
+                    "id": 20,
+                    "fields": [
+                      [
+                        "Margin"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "21",
+                  "value": {
+                    "id": 21,
+                    "fields": [
+                      [
+                        "TERRAINRANK"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "22",
+                  "value": {
+                    "id": 22,
+                    "fields": [
+                      [
+                        "CanonicalUrl"
+                      ]
+                    ],
+                    "meta": {
+                      "value": "https://",
+                      "at": 0
+                    },
+                    "skipNulls": true,
+                    "typeCode": "InsertNode",
+                    "acceptedType": "string"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 22,
+            "uidNode": 23,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "Path"
+                ],
+                7
+              ],
+              [
+                [
+                  "Price"
+                ],
+                2
+              ],
+              [
+                [
+                  "Name"
+                ],
+                13
+              ],
+              [
+                [
+                  "LongDescriptionHTML"
+                ],
+                12
+              ],
+              [
+                [
+                  "VariantId"
+                ],
+                6
+              ],
+              [
+                [
+                  "LongDescription"
+                ],
+                10
+              ],
+              [
+                [
+                  "ProductRevenue"
+                ],
+                16
+              ],
+              [
+                [
+                  "ConversionRate"
+                ],
+                14
+              ],
+              [
+                [
+                  "Margin"
+                ],
+                20
+              ],
+              [
+                [
+                  "TERRAINRANK"
+                ],
+                21
+              ],
+              [
+                [
+                  "UniquePurchases"
+                ],
+                15
+              ],
+              [
+                [
+                  "ProductId"
+                ],
+                5
+              ],
+              [
+                [
+                  "SKU"
+                ],
+                0
+              ],
+              [
+                [
+                  "VariantStatus"
+                ],
+                4
+              ],
+              [
+                [
+                  "ContentsHTML"
+                ],
+                9
+              ],
+              [
+                [
+                  "CanonicalUrl"
+                ],
+                8
+              ],
+              [
+                [
+                  "ImageLink"
+                ],
+                19
+              ],
+              [
+                [
+                  "VariantName"
+                ],
+                1
+              ],
+              [
+                [
+                  "Quantity"
+                ],
+                17
+              ],
+              [
+                [
+                  "Contents"
+                ],
+                11
+              ],
+              [
+                [
+                  "AveragePrice"
+                ],
+                18
+              ],
+              [
+                [
+                  "Inventory"
+                ],
+                3
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "SKU"
+                ]
+              ],
+              [
+                1,
+                [
+                  "VariantName"
+                ]
+              ],
+              [
+                2,
+                [
+                  "Price"
+                ]
+              ],
+              [
+                3,
+                [
+                  "Inventory"
+                ]
+              ],
+              [
+                4,
+                [
+                  "VariantStatus"
+                ]
+              ],
+              [
+                5,
+                [
+                  "ProductId"
+                ]
+              ],
+              [
+                6,
+                [
+                  "VariantId"
+                ]
+              ],
+              [
+                7,
+                [
+                  "Path"
+                ]
+              ],
+              [
+                8,
+                [
+                  "CanonicalUrl"
+                ]
+              ],
+              [
+                9,
+                [
+                  "Contents"
+                ]
+              ],
+              [
+                10,
+                [
+                  "LongDescription2"
+                ]
+              ],
+              [
+                11,
+                [
+                  "Contents2"
+                ]
+              ],
+              [
+                12,
+                [
+                  "LongDescription"
+                ]
+              ],
+              [
+                13,
+                [
+                  "Name"
+                ]
+              ],
+              [
+                14,
+                [
+                  "ConversionRate"
+                ]
+              ],
+              [
+                15,
+                [
+                  "UniquePurchases"
+                ]
+              ],
+              [
+                16,
+                [
+                  "ProductRevenue"
+                ]
+              ],
+              [
+                17,
+                [
+                  "Quantity"
+                ]
+              ],
+              [
+                18,
+                [
+                  "AveragePrice"
+                ]
+              ],
+              [
+                19,
+                [
+                  "ImageLink"
+                ]
+              ],
+              [
+                20,
+                [
+                  "Margin"
+                ]
+              ],
+              [
+                21,
+                [
+                  "TERRAINRANK"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "string"
+              ],
+              [
+                2,
+                "number"
+              ],
+              [
+                3,
+                "number"
+              ],
+              [
+                4,
+                "string"
+              ],
+              [
+                5,
+                "number"
+              ],
+              [
+                6,
+                "number"
+              ],
+              [
+                7,
+                "string"
+              ],
+              [
+                8,
+                "string"
+              ],
+              [
+                9,
+                "string"
+              ],
+              [
+                10,
+                "string"
+              ],
+              [
+                11,
+                "string"
+              ],
+              [
+                12,
+                "string"
+              ],
+              [
+                13,
+                "string"
+              ],
+              [
+                14,
+                "number"
+              ],
+              [
+                15,
+                "number"
+              ],
+              [
+                16,
+                "number"
+              ],
+              [
+                17,
+                "number"
+              ],
+              [
+                18,
+                "number"
+              ],
+              [
+                19,
+                "string"
+              ],
+              [
+                20,
+                "number"
+              ],
+              [
+                21,
+                "number"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                true
+              ],
+              [
+                3,
+                false
+              ],
+              [
+                4,
+                false
+              ],
+              [
+                5,
+                true
+              ],
+              [
+                6,
+                false
+              ],
+              [
+                7,
+                false
+              ],
+              [
+                8,
+                true
+              ],
+              [
+                9,
+                true
+              ],
+              [
+                10,
+                false
+              ],
+              [
+                11,
+                false
+              ],
+              [
+                12,
+                true
+              ],
+              [
+                13,
+                true
+              ],
+              [
+                14,
+                false
+              ],
+              [
+                15,
+                false
+              ],
+              [
+                16,
+                false
+              ],
+              [
+                17,
+                false
+              ],
+              [
+                18,
+                false
+              ],
+              [
+                19,
+                true
+              ],
+              [
+                20,
+                false
+              ],
+              [
+                21,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                8,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                9,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                10,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                11,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                12,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                13,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                14,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                15,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                16,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                17,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                18,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                19,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                20,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                21,
+                {
+                  "etlType": "Integer"
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Algorithm",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "algorithmId": 23
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Fs",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": "Products.*",
+          "fieldOrdering": [
+            "SKU",
+            "VariantName",
+            "Price",
+            "ProductId",
+            "CanonicalUrl",
+            "Contents",
+            "LongDescription",
+            "Name",
+            "ImageLink",
+            "TERRAINRANK"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {},
+        "integrationId": 18,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ]
+        }
+      }
+    }
+  }
+}

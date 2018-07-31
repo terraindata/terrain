@@ -44,24 +44,35 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires no-empty-interface max-classes-per-file
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
 import * as React from 'react';
 
 import { instanceFnDecorator } from 'shared/util/Classes';
 
-import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import { FieldPicker } from 'etl/common/components/FieldPicker.tsx';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import Topology from 'shared/transformations/util/TopologyUtil';
-import { TransformationForm } from './TransformationFormBase';
+import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 
-import { List } from 'immutable';
+import { DynamicForm } from 'common/components/DynamicForm';
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { FieldPicker } from 'etl/common/components/FieldPicker.tsx';
+import { TransformationNode } from 'etl/templates/FieldTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import Topology from 'shared/transformations/util/TopologyUtil';
+import { KeyPath as EnginePath } from 'shared/util/KeyPath';
+import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
+
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
 
 interface JoinOptions
 {
   otherFieldIds: List<number>;
   outputName: string;
-  preserveOldFields: boolean;
   delimiter: any;
 }
 
@@ -86,17 +97,10 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
       group: 'row2',
       widthFactor: 2,
     },
-    preserveOldFields: {
-      type: DisplayType.CheckBox,
-      displayName: 'Keep Original Field',
-      group: 'row2',
-      widthFactor: 3,
-    },
   };
   protected readonly initialState = {
     otherFieldIds: List([-1]),
     outputName: 'Joined Field',
-    preserveOldFields: false,
     delimiter: '-',
   };
   protected readonly type = TransformationNodeType.JoinNode;
@@ -121,19 +125,19 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
   public computeAvailableFields(fieldId: number): List<number>
   {
     const { engine } = this.props;
-    const currentKP = engine.getOutputKeyPath(fieldId);
+    const currentKP = engine.getFieldPath(fieldId);
     return engine.getAllFieldIDs().filter((id, i) => fieldId !== id
-      && Topology.areFieldsLocal(currentKP, engine.getOutputKeyPath(id))
-      && engine.getFieldType(id) === 'string',
+      && Topology.areFieldsLocal(currentKP, engine.getFieldPath(id))
+      && Utils.fields.fieldType(id, engine) === FieldTypes.String,
     ).toList();
   }
 
   protected computeArgs()
   {
     const { engine, fieldId } = this.props;
-    const { otherFieldIds, outputName, delimiter, preserveOldFields } = this.state;
+    const { otherFieldIds, outputName, delimiter } = this.state;
 
-    const currentKeyPath = engine.getOutputKeyPath(fieldId);
+    const currentKeyPath = engine.getFieldPath(fieldId);
     const changeIndex = currentKeyPath.size - 1;
     const newFieldKeyPaths = List([
       currentKeyPath.set(changeIndex, outputName),
@@ -141,14 +145,13 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
 
     const inputFields = List([fieldId])
       .concat(otherFieldIds)
-      .map((id) => engine.getInputKeyPath(id))
+      .map((id) => engine.getFieldPath(id))
       .toList();
 
     return {
       options: {
         newFieldKeyPaths,
         delimiter,
-        preserveOldFields,
       },
       fields: inputFields,
     };

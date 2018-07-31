@@ -1,0 +1,1934 @@
+{
+  "testName": "MB_05",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "id": "gmc01-5855",
+      "ConversionRate": 25,
+      "UniquePurchases": 2,
+      "ProductRevenue": 673.315369,
+      "Quantity": 19,
+      "AvgPrice": 35.437651,
+      "UniquePageviews": 0,
+      "Condition": "new",
+      "Availability": "in stock",
+      "ImageLink": "https://assets1.mixbook.com/pages/128026005_783584_l.jpg?1510150983",
+      "Description": "        White Portfolio is part of our Custom Calendars\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "IdentifierExists": "FALSE",
+      "AdwordsRedirect": "https://www.mixbook.com/photo-calendars/custom-calendars/white-portfolio-2999?ptid=5855&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "ProductType": "Photo Calendars",
+      "Title": "White Portfolio Photo Calendar",
+      "Service": "Standard",
+      "Brand": "Mixbook",
+      "Price": 24.99,
+      "ShippingPrice": 8.99,
+      "TotalPrice": 33.98,
+      "ProductCategory": "Office Supplies > Filing & Organization > Calendars, Organizers & Planners",
+      "ProductTypeList": [
+        "Photo Calendars"
+      ],
+      "Country": "US",
+      "ProductCategoryList": [
+        "Office Supplies",
+        "Filing & Organization",
+        "Calendars, Organizers & Planners"
+      ],
+      "Link": "https://www.mixbook.com/photo-calendars/custom-calendars/white-portfolio-2999?ptid=5855",
+      "fields": {
+        "ProductType.keyword": [
+          "Photo Calendars"
+        ]
+      },
+      "TerrainScore": 0.06948522416843207,
+      "TERRAINRANK": 1
+    },
+    {
+      "id": "gmc01-12071",
+      "ConversionRate": 100,
+      "UniquePurchases": 4,
+      "ProductRevenue": 3473.458894,
+      "Quantity": 2499,
+      "AvgPrice": 1.3899395334133653,
+      "UniquePageviews": 0,
+      "Condition": "new",
+      "Availability": "in stock",
+      "ImageLink": "https://assets0.mixbook.com/pages/261433920_961906_l.jpg?1507194968",
+      "Description": "        Suited Soiree is part of our Birthday Party Invitations\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "IdentifierExists": "FALSE",
+      "AdwordsRedirect": "https://www.mixbook.com/cards/birthday-party-invitations/suited-soiree-4838?ptid=12071&quantities%5B460%5D=1&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "ProductType": "Cards and Stationery > Birthday Party Invitations",
+      "Title": "Suited Soiree",
+      "Service": "Standard",
+      "Brand": "Mixbook",
+      "Price": 2.59,
+      "ShippingPrice": 8.99,
+      "TotalPrice": 11.58,
+      "ProductCategory": "Arts & Entertainment > Party & Celebration > Party Supplies > Invitations",
+      "ProductTypeList": [
+        "Cards and Stationery",
+        "Birthday Party Invitations"
+      ],
+      "Country": "US",
+      "ProductCategoryList": [
+        "Arts & Entertainment",
+        "Party & Celebration",
+        "Party Supplies",
+        "Invitations"
+      ],
+      "Link": "https://www.mixbook.com/cards/birthday-party-invitations/suited-soiree-4838?ptid=12071&quantities%5B460%5D=1",
+      "fields": {
+        "ProductType.keyword": [
+          "Cards and Stationery > Birthday Party Invitations"
+        ]
+      },
+      "TerrainScore": 0.019724337260154764,
+      "TERRAINRANK": 2
+    },
+    {
+      "id": "gmc01-14851",
+      "ConversionRate": 100,
+      "UniquePurchases": 4,
+      "ProductRevenue": 768.799524,
+      "Quantity": 429,
+      "AvgPrice": 1.7920734825174824,
+      "UniquePageviews": 0,
+      "Condition": "new",
+      "Availability": "in stock",
+      "ImageLink": "https://assets0.mixbook.com/pages/311738356_886795_l.jpg?1507195903",
+      "Description": "        Gold Frame Invitation is part of our Birthday Party Thank You\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "IdentifierExists": "FALSE",
+      "AdwordsRedirect": "https://www.mixbook.com/cards/birthday-party-thank-you/gold-frame-invitation-6256?ptid=14851&quantities%5B210%5D=1&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "ProductType": "Cards and Stationery > Birthday Party Thank You",
+      "Title": "Gold Frame Invitation",
+      "Service": "Standard",
+      "Brand": "Mixbook",
+      "Price": 2.59,
+      "ShippingPrice": 8.99,
+      "TotalPrice": 11.58,
+      "ProductCategory": "Arts & Entertainment > Party & Celebration > Party Supplies > Invitations",
+      "ProductTypeList": [
+        "Cards and Stationery",
+        "Birthday Party Thank You"
+      ],
+      "Country": "US",
+      "ProductCategoryList": [
+        "Arts & Entertainment",
+        "Party & Celebration",
+        "Party Supplies",
+        "Invitations"
+      ],
+      "Link": "https://www.mixbook.com/cards/birthday-party-thank-you/gold-frame-invitation-6256?ptid=14851&quantities%5B210%5D=1",
+      "fields": {
+        "ProductType.keyword": [
+          "Cards and Stationery > Birthday Party Thank You"
+        ]
+      },
+      "TerrainScore": 0.0189040906513679,
+      "TERRAINRANK": 3
+    },
+    {
+      "id": "gmc01-6088",
+      "ImageLink": "https://assets2.mixbook.com/pages/132512702_180106_l.jpg?1507194699",
+      "Condition": "new",
+      "Availability": "in stock",
+      "Brand": "Mixbook",
+      "IdentifierExists": "FALSE",
+      "Title": "Modern Type",
+      "Description": "        Modern Type is part of our Note Cards\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "Price": 2.59,
+      "Country": "US",
+      "Service": "Standard",
+      "ShippingPrice": 8.99,
+      "Link": "https://www.mixbook.com/cards/note-cards/modern-type-3185?ptid=6088&quantities%5B110%5D=1",
+      "AdwordsRedirect": "https://www.mixbook.com/cards/note-cards/modern-type-3185?ptid=6088&quantities%5B110%5D=1&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "TotalPrice": 11.58,
+      "ProductCategoryList": [
+        "Arts & Entertainment",
+        "Party & Celebration",
+        "Party Supplies",
+        "Invitations"
+      ],
+      "ProductCategory": "Arts & Entertainment > Party & Celebration > Party Supplies > Invitations",
+      "ProductTypeList": [
+        "Cards and Stationery",
+        "Note Cards"
+      ],
+      "ProductType": "Cards and Stationery > Note Cards",
+      "UniquePageviews": 0,
+      "ConversionRate": 100,
+      "UniquePurchases": 2,
+      "ProductRevenue": 678.40994,
+      "Quantity": 488,
+      "AvgPrice": 1.3901843032786885,
+      "fields": {
+        "ProductType.keyword": [
+          "Cards and Stationery > Note Cards"
+        ]
+      },
+      "TerrainScore": 0.018863927635904786,
+      "TERRAINRANK": 4
+    },
+    {
+      "id": "gmc01-9253",
+      "ImageLink": "https://assets0.mixbook.com/pages/173675004_961906_l.jpg?1507194879",
+      "Condition": "new",
+      "Availability": "in stock",
+      "Brand": "Mixbook",
+      "IdentifierExists": "FALSE",
+      "Title": "Gold Glitter",
+      "Description": "        Gold Glitter is part of our Thank You Cards\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "Price": 2.59,
+      "Country": "US",
+      "Service": "Standard",
+      "ShippingPrice": 8.99,
+      "Link": "https://www.mixbook.com/cards/thank-you-cards/gold-glitter-4663?ptid=9253&quantities%5B110%5D=1",
+      "AdwordsRedirect": "https://www.mixbook.com/cards/thank-you-cards/gold-glitter-4663?ptid=9253&quantities%5B110%5D=1&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "TotalPrice": 11.58,
+      "ProductCategoryList": [
+        "Arts & Entertainment",
+        "Party & Celebration",
+        "Party Supplies",
+        "Invitations"
+      ],
+      "ProductCategory": "Arts & Entertainment > Party & Celebration > Party Supplies > Invitations",
+      "ProductTypeList": [
+        "Cards and Stationery",
+        "Thank You Cards"
+      ],
+      "ProductType": "Cards and Stationery > Thank You Cards",
+      "UniquePageviews": 0,
+      "ConversionRate": 50,
+      "UniquePurchases": 2,
+      "ProductRevenue": 651.273543,
+      "Quantity": 469,
+      "AvgPrice": 1.388642948827292,
+      "fields": {
+        "ProductType.keyword": [
+          "Cards and Stationery > Thank You Cards"
+        ]
+      },
+      "TerrainScore": 0.0188556816583486,
+      "TERRAINRANK": 5
+    },
+    {
+      "id": "gmc01-11802",
+      "ImageLink": "https://assets2.mixbook.com/pages/259318966_886795_l.jpg?1507195300",
+      "Condition": "new",
+      "Availability": "in stock",
+      "Brand": "Mixbook",
+      "IdentifierExists": "FALSE",
+      "Title": "Ornate Vintage Frame",
+      "Description": "        Ornate Vintage Frame is part of our Directions Cards\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "Price": 2.39,
+      "Country": "US",
+      "Service": "Standard",
+      "ShippingPrice": 8.99,
+      "Link": "https://www.mixbook.com/cards/directions-cards/ornate-vintage-frame-5638?ptid=11802&quantities%5B310%5D=1",
+      "AdwordsRedirect": "https://www.mixbook.com/cards/directions-cards/ornate-vintage-frame-5638?ptid=11802&quantities%5B310%5D=1&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "TotalPrice": 11.38,
+      "ProductCategoryList": [
+        "Arts & Entertainment",
+        "Party & Celebration",
+        "Party Supplies",
+        "Invitations"
+      ],
+      "ProductCategory": "Arts & Entertainment > Party & Celebration > Party Supplies > Invitations",
+      "ProductTypeList": [
+        "Cards and Stationery",
+        "Directions Cards"
+      ],
+      "ProductType": "Cards and Stationery > Directions Cards",
+      "UniquePageviews": 0,
+      "ConversionRate": 50,
+      "UniquePurchases": 4,
+      "ProductRevenue": 598.738258,
+      "Quantity": 431,
+      "AvgPrice": 1.3891838932714617,
+      "fields": {
+        "ProductType.keyword": [
+          "Cards and Stationery > Directions Cards"
+        ]
+      },
+      "TerrainScore": 0.018851266027962915,
+      "TERRAINRANK": 6
+    },
+    {
+      "id": "gmc01-6975",
+      "ConversionRate": 100,
+      "UniquePurchases": 2,
+      "ProductRevenue": 629.60347,
+      "Quantity": 488,
+      "AvgPrice": 1.2901710450819672,
+      "UniquePageviews": 0,
+      "Condition": "new",
+      "Availability": "in stock",
+      "ImageLink": "https://assets0.mixbook.com/pages/149569368_623130_l.jpg?1507194399",
+      "Description": "        Letterpress Circles is part of our Birthday Greeting Cards\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "IdentifierExists": "FALSE",
+      "AdwordsRedirect": "https://www.mixbook.com/cards/birthday-greeting-cards/letterpress-circles-3757?ptid=6975&quantities%5B200%5D=1&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "ProductType": "Cards and Stationery > Birthday Greeting Cards",
+      "Title": "Letterpress Circles",
+      "Service": "Standard",
+      "Brand": "Mixbook",
+      "Price": 2.99,
+      "ShippingPrice": 8.99,
+      "TotalPrice": 11.98,
+      "ProductCategory": "Arts & Entertainment > Party & Celebration > Party Supplies > Invitations",
+      "ProductTypeList": [
+        "Cards and Stationery",
+        "Birthday Greeting Cards"
+      ],
+      "Country": "US",
+      "ProductCategoryList": [
+        "Arts & Entertainment",
+        "Party & Celebration",
+        "Party Supplies",
+        "Invitations"
+      ],
+      "Link": "https://www.mixbook.com/cards/birthday-greeting-cards/letterpress-circles-3757?ptid=6975&quantities%5B200%5D=1",
+      "fields": {
+        "ProductType.keyword": [
+          "Cards and Stationery > Birthday Greeting Cards"
+        ]
+      },
+      "TerrainScore": 0.018848812890913804,
+      "TERRAINRANK": 7
+    },
+    {
+      "id": "gmc01-6949",
+      "ConversionRate": 100,
+      "UniquePurchases": 2,
+      "ProductRevenue": 465.613729,
+      "Quantity": 293,
+      "AvgPrice": 1.5891253549488054,
+      "UniquePageviews": 0,
+      "Condition": "new",
+      "Availability": "in stock",
+      "ImageLink": "https://assets0.mixbook.com/pages/149369648_623130_l.jpg?1507194407",
+      "Description": "        Modern Thank You Photo Collage is part of our Thank You Greeting Cards\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "IdentifierExists": "FALSE",
+      "AdwordsRedirect": "https://www.mixbook.com/cards/thank-you-greeting-cards/modern-thank-you-photo-collage-3737?ptid=6949&quantities%5B200%5D=1&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "ProductType": "Cards and Stationery > Thank You Greeting Cards",
+      "Title": "Modern Thank You Photo Collage",
+      "Service": "Standard",
+      "Brand": "Mixbook",
+      "Price": 2.99,
+      "ShippingPrice": 8.99,
+      "TotalPrice": 11.98,
+      "ProductCategory": "Arts & Entertainment > Party & Celebration > Party Supplies > Invitations",
+      "ProductTypeList": [
+        "Cards and Stationery",
+        "Thank You Greeting Cards"
+      ],
+      "Country": "US",
+      "ProductCategoryList": [
+        "Arts & Entertainment",
+        "Party & Celebration",
+        "Party Supplies",
+        "Invitations"
+      ],
+      "Link": "https://www.mixbook.com/cards/thank-you-greeting-cards/modern-thank-you-photo-collage-3737?ptid=6949&quantities%5B200%5D=1",
+      "fields": {
+        "ProductType.keyword": [
+          "Cards and Stationery > Thank You Greeting Cards"
+        ]
+      },
+      "TerrainScore": 0.01879988093068044,
+      "TERRAINRANK": 8
+    },
+    {
+      "id": "gmc01-15587",
+      "ConversionRate": 300,
+      "UniquePurchases": 6,
+      "ProductRevenue": 314.394318,
+      "Quantity": 197,
+      "AvgPrice": 1.5959102436548223,
+      "UniquePageviews": 0,
+      "Condition": "new",
+      "Availability": "in stock",
+      "ImageLink": "https://assets3.mixbook.com/pages/327424087_959514_l.jpg?1520321105",
+      "Description": "        The Adventure Begins is part of our Girls Baby Shower Invitations\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "IdentifierExists": "FALSE",
+      "AdwordsRedirect": "https://www.mixbook.com/cards/girls-baby-shower-invitations/the-adventure-begins-6359?ptid=15587&quantities%5B420%5D=1&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "ProductType": "Cards and Stationery > Girls Baby Shower Invitations",
+      "Title": "The Adventure Begins",
+      "Service": "Standard",
+      "Brand": "Mixbook",
+      "Price": 2.59,
+      "ShippingPrice": 8.99,
+      "TotalPrice": 11.58,
+      "ProductCategory": "Arts & Entertainment > Party & Celebration > Party Supplies > Invitations",
+      "ProductTypeList": [
+        "Cards and Stationery",
+        "Girls Baby Shower Invitations"
+      ],
+      "Country": "US",
+      "ProductCategoryList": [
+        "Arts & Entertainment",
+        "Party & Celebration",
+        "Party Supplies",
+        "Invitations"
+      ],
+      "Link": "https://www.mixbook.com/cards/girls-baby-shower-invitations/the-adventure-begins-6359?ptid=15587&quantities%5B420%5D=1",
+      "fields": {
+        "ProductType.keyword": [
+          "Cards and Stationery > Girls Baby Shower Invitations"
+        ]
+      },
+      "TerrainScore": 0.01877705065136802,
+      "TERRAINRANK": 9
+    },
+    {
+      "id": "gmc01-5019",
+      "ConversionRate": 43.47826086956522,
+      "UniquePurchases": 10,
+      "ProductRevenue": 228.902347,
+      "Quantity": 146,
+      "AvgPrice": 1.5678242945205478,
+      "UniquePageviews": 0,
+      "Condition": "new",
+      "Availability": "in stock",
+      "ImageLink": "https://assets2.mixbook.com/pages/100352462_196076_l.jpg?1522846369",
+      "Description": "        Engagement Postcard is part of our Engagement Announcements\n        Collection and is backed by our 100% satisfaction guarantee, just like\n        all of our other photo books, cards, and calendars. Mixbook uses only the\n        highest-quality, heavy-weight papers that are ethically sourced from\n        sustainable forests and certified by the Forest Stewardship Council and\n        the Rainforest Alliance.\n",
+      "IdentifierExists": "FALSE",
+      "AdwordsRedirect": "https://www.mixbook.com/cards/engagement-announcements/engagement-postcard-2463?ptid=5019&quantities%5B300%5D=1&utm_source=google&utm_medium=cpc&utm_campaign={ifpe:pe}{ifpla:pla}&utm_keyword={keyword}&utm_adgroup={adwords_producttargetid}&utm_content={creative}",
+      "ProductType": "Cards and Stationery > Engagement Announcements",
+      "Title": "Engagement Postcard",
+      "Service": "Standard",
+      "Brand": "Mixbook",
+      "Price": 2.39,
+      "ShippingPrice": 8.99,
+      "TotalPrice": 11.38,
+      "ProductCategory": "Arts & Entertainment > Party & Celebration > Party Supplies > Invitations",
+      "ProductTypeList": [
+        "Cards and Stationery",
+        "Engagement Announcements"
+      ],
+      "Country": "US",
+      "ProductCategoryList": [
+        "Arts & Entertainment",
+        "Party & Celebration",
+        "Party Supplies",
+        "Invitations"
+      ],
+      "Link": "https://www.mixbook.com/cards/engagement-announcements/engagement-postcard-2463?ptid=5019&quantities%5B300%5D=1",
+      "fields": {
+        "ProductType.keyword": [
+          "Cards and Stationery > Engagement Announcements"
+        ]
+      },
+      "TerrainScore": 0.018774080380676468,
+      "TERRAINRANK": 10
+    }
+  ],
+  "outputDocs": [
+    {
+      "Title": "White Portfolio Photo Calendar",
+      "ImageLink": "https://assets1.mixbook.com/pages/128026005_783584_l.jpg?1510150983",
+      "CanonicalLink": "https://www.mixbook.com/photo-calendars/custom-calendars/white-portfolio-2999?ptid=5855",
+      "Price": 24.99,
+      "ProductId": "gmc01-5855",
+      "TerrainRank": 1,
+      "ProductOccasion": ""
+    },
+    {
+      "Title": "Suited Soiree",
+      "ImageLink": "https://assets0.mixbook.com/pages/261433920_961906_l.jpg?1507194968",
+      "CanonicalLink": "https://www.mixbook.com/cards/birthday-party-invitations/suited-soiree-4838?ptid=12071&quantities%5B460%5D=1",
+      "Price": 2.59,
+      "ProductId": "gmc01-12071",
+      "TerrainRank": 2,
+      "ProductOccasion": " Birthday Party Invitations"
+    },
+    {
+      "Title": "Gold Frame Invitation",
+      "ImageLink": "https://assets0.mixbook.com/pages/311738356_886795_l.jpg?1507195903",
+      "CanonicalLink": "https://www.mixbook.com/cards/birthday-party-thank-you/gold-frame-invitation-6256?ptid=14851&quantities%5B210%5D=1",
+      "Price": 2.59,
+      "ProductId": "gmc01-14851",
+      "TerrainRank": 3,
+      "ProductOccasion": " Birthday Party Thank You"
+    },
+    {
+      "Title": "Modern Type",
+      "ImageLink": "https://assets2.mixbook.com/pages/132512702_180106_l.jpg?1507194699",
+      "CanonicalLink": "https://www.mixbook.com/cards/note-cards/modern-type-3185?ptid=6088&quantities%5B110%5D=1",
+      "Price": 2.59,
+      "ProductId": "gmc01-6088",
+      "TerrainRank": 4,
+      "ProductOccasion": " Note Cards"
+    },
+    {
+      "Title": "Gold Glitter",
+      "ImageLink": "https://assets0.mixbook.com/pages/173675004_961906_l.jpg?1507194879",
+      "CanonicalLink": "https://www.mixbook.com/cards/thank-you-cards/gold-glitter-4663?ptid=9253&quantities%5B110%5D=1",
+      "Price": 2.59,
+      "ProductId": "gmc01-9253",
+      "TerrainRank": 5,
+      "ProductOccasion": " Thank You Cards"
+    },
+    {
+      "Title": "Ornate Vintage Frame",
+      "ImageLink": "https://assets2.mixbook.com/pages/259318966_886795_l.jpg?1507195300",
+      "CanonicalLink": "https://www.mixbook.com/cards/directions-cards/ornate-vintage-frame-5638?ptid=11802&quantities%5B310%5D=1",
+      "Price": 2.39,
+      "ProductId": "gmc01-11802",
+      "TerrainRank": 6,
+      "ProductOccasion": " Directions Cards"
+    },
+    {
+      "Title": "Letterpress Circles",
+      "ImageLink": "https://assets0.mixbook.com/pages/149569368_623130_l.jpg?1507194399",
+      "CanonicalLink": "https://www.mixbook.com/cards/birthday-greeting-cards/letterpress-circles-3757?ptid=6975&quantities%5B200%5D=1",
+      "Price": 2.99,
+      "ProductId": "gmc01-6975",
+      "TerrainRank": 7,
+      "ProductOccasion": " Birthday Greeting Cards"
+    },
+    {
+      "Title": "Modern Thank You Photo Collage",
+      "ImageLink": "https://assets0.mixbook.com/pages/149369648_623130_l.jpg?1507194407",
+      "CanonicalLink": "https://www.mixbook.com/cards/thank-you-greeting-cards/modern-thank-you-photo-collage-3737?ptid=6949&quantities%5B200%5D=1",
+      "Price": 2.99,
+      "ProductId": "gmc01-6949",
+      "TerrainRank": 8,
+      "ProductOccasion": " Thank You Greeting Cards"
+    },
+    {
+      "Title": "The Adventure Begins",
+      "ImageLink": "https://assets3.mixbook.com/pages/327424087_959514_l.jpg?1520321105",
+      "CanonicalLink": "https://www.mixbook.com/cards/girls-baby-shower-invitations/the-adventure-begins-6359?ptid=15587&quantities%5B420%5D=1",
+      "Price": 2.59,
+      "ProductId": "gmc01-15587",
+      "TerrainRank": 9,
+      "ProductOccasion": " Girls Baby Shower Invitations"
+    },
+    {
+      "Title": "Engagement Postcard",
+      "ImageLink": "https://assets2.mixbook.com/pages/100352462_196076_l.jpg?1522846369",
+      "CanonicalLink": "https://www.mixbook.com/cards/engagement-announcements/engagement-postcard-2463?ptid=5019&quantities%5B300%5D=1",
+      "Price": 2.39,
+      "ProductId": "gmc01-5019",
+      "TerrainRank": 10,
+      "ProductOccasion": " Engagement Announcements"
+    }
+  ],
+  "template": {
+    "id": 19,
+    "lastModified": "2018-07-23T23:02:32.930Z",
+    "createdAt": "2018-07-23T23:02:23.926Z",
+    "archived": false,
+    "templateName": "Responsys - Non-PhotoBooks Template",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "Availability"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "Title"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "IdentifierExists"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "Description"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "ImageLink"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "AdwordsRedirect"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "Link"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "Brand"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "ProductType"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "Service"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "ProductCategory"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "Price"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "12",
+                  "value": {
+                    "id": 12,
+                    "fields": [
+                      [
+                        "ShippingPrice"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "13",
+                  "value": {
+                    "id": 13,
+                    "fields": [
+                      [
+                        "id"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "14",
+                  "value": {
+                    "id": 14,
+                    "fields": [
+                      [
+                        "Country"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "15",
+                  "value": {
+                    "id": 15,
+                    "fields": [
+                      [
+                        "Condition"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "16",
+                  "value": {
+                    "id": 16,
+                    "fields": [
+                      [
+                        "TotalPrice"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "17",
+                  "value": {
+                    "id": 17,
+                    "fields": [
+                      [
+                        "UniquePageviews"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "18",
+                  "value": {
+                    "id": 18,
+                    "fields": [
+                      [
+                        "ConversionRate"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "19",
+                  "value": {
+                    "id": 19,
+                    "fields": [
+                      [
+                        "UniquePurchases"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "20",
+                  "value": {
+                    "id": 20,
+                    "fields": [
+                      [
+                        "ProductRevenue"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "21",
+                  "value": {
+                    "id": 21,
+                    "fields": [
+                      [
+                        "Quantity"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "22",
+                  "value": {
+                    "id": 22,
+                    "fields": [
+                      [
+                        "AvgPrice"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "23",
+                  "value": {
+                    "id": 23,
+                    "fields": [
+                      [
+                        "fields"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "object"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "24",
+                  "value": {
+                    "id": 24,
+                    "fields": [
+                      [
+                        "fields",
+                        "ProductType.keyword"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "array"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "25",
+                  "value": {
+                    "id": 25,
+                    "fields": [
+                      [
+                        "fields",
+                        "ProductType.keyword",
+                        -1
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "26",
+                  "value": {
+                    "id": 26,
+                    "fields": [
+                      [
+                        "TERRAINRANK"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "27",
+                  "value": {
+                    "id": 27,
+                    "fields": [
+                      [
+                        "ProductType"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "ProductCat"
+                        ],
+                        [
+                          "ProductOccasion"
+                        ]
+                      ],
+                      "delimiter": ">",
+                      "preserveOldFields": false,
+                      "regex": false
+                    },
+                    "skipNulls": true,
+                    "typeCode": "SplitNode",
+                    "acceptedType": "string"
+                  }
+                },
+                {
+                  "v": "28",
+                  "value": {
+                    "id": 28,
+                    "fields": [
+                      [
+                        "Title"
+                      ]
+                    ],
+                    "meta": {
+                      "find": "Photo Book",
+                      "replace": "",
+                      "regex": false
+                    },
+                    "skipNulls": true,
+                    "typeCode": "FindReplaceNode",
+                    "acceptedType": "string"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 29,
+            "uidNode": 29,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "Price"
+                ],
+                11
+              ],
+              [
+                [
+                  "AdwordsRedirect"
+                ],
+                5
+              ],
+              [
+                [
+                  "Condition"
+                ],
+                15
+              ],
+              [
+                [
+                  "Title"
+                ],
+                1
+              ],
+              [
+                [
+                  "ProductType"
+                ],
+                8
+              ],
+              [
+                [
+                  "_synthetic_t814w4l11lc",
+                  "Split Field 1"
+                ],
+                27
+              ],
+              [
+                [
+                  "ProductCategory"
+                ],
+                10
+              ],
+              [
+                [
+                  "ProductRevenue"
+                ],
+                20
+              ],
+              [
+                [
+                  "_synthetic_blt76n186cq",
+                  "Split Field 2"
+                ],
+                28
+              ],
+              [
+                [
+                  "IdentifierExists"
+                ],
+                2
+              ],
+              [
+                [
+                  "Brand"
+                ],
+                7
+              ],
+              [
+                [
+                  "Service"
+                ],
+                9
+              ],
+              [
+                [
+                  "fields"
+                ],
+                23
+              ],
+              [
+                [
+                  "UniquePageviews"
+                ],
+                17
+              ],
+              [
+                [
+                  "ConversionRate"
+                ],
+                18
+              ],
+              [
+                [
+                  "Country"
+                ],
+                14
+              ],
+              [
+                [
+                  "AvgPrice"
+                ],
+                22
+              ],
+              [
+                [
+                  "TERRAINRANK"
+                ],
+                26
+              ],
+              [
+                [
+                  "UniquePurchases"
+                ],
+                19
+              ],
+              [
+                [
+                  "Link"
+                ],
+                6
+              ],
+              [
+                [
+                  "Description"
+                ],
+                3
+              ],
+              [
+                [
+                  "id"
+                ],
+                13
+              ],
+              [
+                [
+                  "ImageLink"
+                ],
+                4
+              ],
+              [
+                [
+                  "fields",
+                  "ProductType.keyword"
+                ],
+                24
+              ],
+              [
+                [
+                  "Quantity"
+                ],
+                21
+              ],
+              [
+                [
+                  "ShippingPrice"
+                ],
+                12
+              ],
+              [
+                [
+                  "TotalPrice"
+                ],
+                16
+              ],
+              [
+                [
+                  "Availability"
+                ],
+                0
+              ],
+              [
+                [
+                  "fields",
+                  "ProductType.keyword",
+                  -1
+                ],
+                25
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "Availability"
+                ]
+              ],
+              [
+                1,
+                [
+                  "Title"
+                ]
+              ],
+              [
+                2,
+                [
+                  "IdentifierExists"
+                ]
+              ],
+              [
+                3,
+                [
+                  "Description"
+                ]
+              ],
+              [
+                4,
+                [
+                  "ImageLink"
+                ]
+              ],
+              [
+                5,
+                [
+                  "AdwordsRedirect"
+                ]
+              ],
+              [
+                6,
+                [
+                  "CanonicalLink"
+                ]
+              ],
+              [
+                7,
+                [
+                  "Brand"
+                ]
+              ],
+              [
+                8,
+                [
+                  "ProductType"
+                ]
+              ],
+              [
+                9,
+                [
+                  "Service"
+                ]
+              ],
+              [
+                10,
+                [
+                  "ProductCategory"
+                ]
+              ],
+              [
+                11,
+                [
+                  "Price"
+                ]
+              ],
+              [
+                12,
+                [
+                  "ShippingPrice"
+                ]
+              ],
+              [
+                13,
+                [
+                  "ProductId"
+                ]
+              ],
+              [
+                14,
+                [
+                  "Country"
+                ]
+              ],
+              [
+                15,
+                [
+                  "Condition"
+                ]
+              ],
+              [
+                16,
+                [
+                  "TotalPrice"
+                ]
+              ],
+              [
+                17,
+                [
+                  "UniquePageviews"
+                ]
+              ],
+              [
+                18,
+                [
+                  "ConversionRate"
+                ]
+              ],
+              [
+                19,
+                [
+                  "UniquePurchases"
+                ]
+              ],
+              [
+                20,
+                [
+                  "ProductRevenue"
+                ]
+              ],
+              [
+                21,
+                [
+                  "Quantity"
+                ]
+              ],
+              [
+                22,
+                [
+                  "AvgPrice"
+                ]
+              ],
+              [
+                23,
+                [
+                  "fields"
+                ]
+              ],
+              [
+                24,
+                [
+                  "fields",
+                  "ProductType.keyword"
+                ]
+              ],
+              [
+                25,
+                [
+                  "fields",
+                  "ProductType.keyword",
+                  -1
+                ]
+              ],
+              [
+                26,
+                [
+                  "TerrainRank"
+                ]
+              ],
+              [
+                27,
+                [
+                  "ProductCat"
+                ]
+              ],
+              [
+                28,
+                [
+                  "ProductOccasion"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "string"
+              ],
+              [
+                2,
+                "string"
+              ],
+              [
+                3,
+                "string"
+              ],
+              [
+                4,
+                "string"
+              ],
+              [
+                5,
+                "string"
+              ],
+              [
+                6,
+                "string"
+              ],
+              [
+                7,
+                "string"
+              ],
+              [
+                8,
+                "string"
+              ],
+              [
+                9,
+                "string"
+              ],
+              [
+                10,
+                "string"
+              ],
+              [
+                11,
+                "number"
+              ],
+              [
+                12,
+                "number"
+              ],
+              [
+                13,
+                "string"
+              ],
+              [
+                14,
+                "string"
+              ],
+              [
+                15,
+                "string"
+              ],
+              [
+                16,
+                "number"
+              ],
+              [
+                17,
+                "number"
+              ],
+              [
+                18,
+                "number"
+              ],
+              [
+                19,
+                "number"
+              ],
+              [
+                20,
+                "number"
+              ],
+              [
+                21,
+                "number"
+              ],
+              [
+                22,
+                "number"
+              ],
+              [
+                23,
+                "object"
+              ],
+              [
+                24,
+                "array"
+              ],
+              [
+                25,
+                "array"
+              ],
+              [
+                26,
+                "number"
+              ],
+              [
+                27,
+                "string"
+              ],
+              [
+                28,
+                "string"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                false
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                false
+              ],
+              [
+                3,
+                false
+              ],
+              [
+                4,
+                true
+              ],
+              [
+                5,
+                false
+              ],
+              [
+                6,
+                true
+              ],
+              [
+                7,
+                false
+              ],
+              [
+                8,
+                false
+              ],
+              [
+                9,
+                false
+              ],
+              [
+                10,
+                false
+              ],
+              [
+                11,
+                true
+              ],
+              [
+                12,
+                false
+              ],
+              [
+                13,
+                true
+              ],
+              [
+                14,
+                false
+              ],
+              [
+                15,
+                false
+              ],
+              [
+                16,
+                false
+              ],
+              [
+                17,
+                false
+              ],
+              [
+                18,
+                false
+              ],
+              [
+                19,
+                false
+              ],
+              [
+                20,
+                false
+              ],
+              [
+                21,
+                false
+              ],
+              [
+                22,
+                false
+              ],
+              [
+                23,
+                false
+              ],
+              [
+                24,
+                false
+              ],
+              [
+                25,
+                false
+              ],
+              [
+                26,
+                true
+              ],
+              [
+                27,
+                false
+              ],
+              [
+                28,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                8,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                9,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                10,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                11,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                12,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                13,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                14,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                15,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                16,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                17,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                18,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                19,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                20,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                21,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                22,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                23,
+                {}
+              ],
+              [
+                24,
+                {
+                  "valueType": "string",
+                  "etlType": "Array"
+                }
+              ],
+              [
+                25,
+                {
+                  "valueType": "string",
+                  "etlType": "String"
+                }
+              ],
+              [
+                26,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                27,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                28,
+                {
+                  "etlType": "String"
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Algorithm",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "algorithmId": 72
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Sftp",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "csv",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": [
+            "Title",
+            "ImageLink",
+            "CanonicalLink",
+            "ProductOccasion",
+            "Price",
+            "ProductId",
+            "TerrainRank"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "filepath": "/home/cli/mxbk_scp/upload/NonPhotoBooks.csv",
+          "credentialId": -1
+        },
+        "integrationId": 13,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            28,
+            27,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26
+          ]
+        }
+      }
+    }
+  }
+}

@@ -43,19 +43,66 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 
-import TransformationNode from 'shared/transformations/TransformationNode';
-import TransformationNodeType from './TransformationNodeType';
-import TransformationNodeVisitor, { VisitorLookupMap } from './TransformationNodeVisitor';
-import TransformationVisitResult from './TransformationVisitResult';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
 
-export default class TransformationEngineNodeVisitor
-  extends TransformationNodeVisitor<TransformationVisitResult, object>
+const { List, Map } = Immutable;
+
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath } from 'shared/util/KeyPath';
+
+import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
+
+const TYPECODE = TransformationNodeType.StringifyNode;
+
+export class StringifyTransformationNode extends SimpleTransformationType
 {
-  public visitorLookup: VisitorLookupMap<TransformationVisitResult, object> = {};
+  public readonly typeCode = TYPECODE;
+  public readonly skipNulls = false;
 
-  public visitDefault(type: TransformationNodeType, node: TransformationNode, doc: object)
+  public shouldTransform(el: any)
   {
-    return node.transform(doc);
+    if (typeof el === 'object')
+    {
+      return true;
+    }
+  }
+
+  public transformer(el: any): any
+  {
+    const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
+    try
+    {
+      return opts.pretty ? JSON.stringify(el, null, 2) : JSON.stringify(el);
+    }
+    catch (e)
+    {
+      return '';
+    }
   }
 }
+
+class StringifyTransformationInfoC extends TransformationNodeInfo
+{
+  public readonly typeCode = TYPECODE;
+  public humanName = 'Stringify';
+  public description = 'Turn an object or array into a string';
+  public nodeClass = StringifyTransformationNode;
+
+  public editable = false;
+  public creatable = true;
+
+  public computeNewSourceType(engine?, node?, index?): FieldTypes
+  {
+    return FieldTypes.String;
+  }
+}
+
+export const StringifyTransformationInfo = new StringifyTransformationInfoC();

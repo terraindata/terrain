@@ -1,0 +1,715 @@
+{
+  "testName": "MC_03",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "SKU": "KTCR-0038-WHC",
+      "Variant Name": "Whiskey Connoisseur Crate",
+      "Price": "169.9900000000000000",
+      "Total Stock": "-2",
+      "Variant Status": "discontinued",
+      "Product": "111",
+      "Variant": "233",
+      "Date": "2018-07-26 00:00:00"
+    },
+    {
+      "SKU": "KTAL-0002-IP2",
+      "Variant Name": "IPA Explorers Crate",
+      "Price": "84.9900000000000000",
+      "Total Stock": "0",
+      "Variant Status": "unlisted",
+      "Product": "89",
+      "Variant": "181",
+      "Date": "2018-07-26 00:00:00"
+    },
+    {
+      "SKU": "KTAL-0003-GIN",
+      "Variant Name": "Navy Strength Gin Crate",
+      "Price": "119.9900000000000000",
+      "Total Stock": "0",
+      "Variant Status": "discontinued",
+      "Product": "126",
+      "Variant": "250",
+      "Date": "2018-07-26 00:00:00"
+    },
+    {
+      "SKU": "KTAL-0004-SCO",
+      "Variant Name": "Scotch Whisky Crate",
+      "Price": "169.9900000000000000",
+      "Total Stock": "0",
+      "Variant Status": "discontinued",
+      "Product": "144",
+      "Variant": "270",
+      "Date": "2018-07-26 00:00:00"
+    },
+    {
+      "SKU": "KTAL-0005-MEZ",
+      "Variant Name": "Mezcal Crate",
+      "Price": "134.9900000000000000",
+      "Total Stock": "0",
+      "Variant Status": "discontinued",
+      "Product": "2",
+      "Variant": "2",
+      "Date": "2018-07-26 00:00:00"
+    },
+    {
+      "SKU": "KTJK-0001-TER",
+      "Variant Name": "Teriyaki Jerkygram",
+      "Price": "24.9900000000000000",
+      "Total Stock": "0",
+      "Variant Status": "unlisted",
+      "Product": "23",
+      "Variant": "23",
+      "Date": "2018-07-26 00:00:00"
+    },
+    {
+      "SKU": "KTAM-0002-POK",
+      "Variant Name": "Ammo Can Poker Set",
+      "Price": "99.9900000000000000",
+      "Total Stock": "0",
+      "Variant Status": "discontinued",
+      "Product": "141",
+      "Variant": "267",
+      "Date": "2018-07-26 00:00:00"
+    },
+    {
+      "SKU": "KTJK-0006-INS",
+      "Variant Name": "Insanely Spicy Jerkygram",
+      "Price": "24.9900000000000000",
+      "Total Stock": "0",
+      "Variant Status": "unlisted",
+      "Product": "33",
+      "Variant": "62",
+      "Date": "2018-07-26 00:00:00"
+    },
+    {
+      "SKU": "KTJK-0008-WIN",
+      "Variant Name": "West Coast Wine Jerkygram",
+      "Price": "34.9900000000000000",
+      "Total Stock": "0",
+      "Variant Status": "unlisted",
+      "Product": "38",
+      "Variant": "67",
+      "Date": "2018-07-26 00:00:00"
+    },
+    {
+      "SKU": "KTAM-0005-HUM",
+      "Variant Name": "Cigar Humidor Ammo Can",
+      "Price": "59.9900000000000000",
+      "Total Stock": "0",
+      "Variant Status": "unlisted",
+      "Product": "25",
+      "Variant": "25",
+      "Date": "2018-07-26 00:00:00"
+    }
+  ],
+  "outputDocs": [
+    {
+      "SKU": "KTCR-0038-WHC",
+      "VariantName": "Whiskey Connoisseur Crate",
+      "Price": 169.99,
+      "Inventory": -2,
+      "VariantStatus": "discontinued",
+      "ProductId": 111,
+      "VariantId": 233
+    },
+    {
+      "SKU": "KTAL-0002-IP2",
+      "VariantName": "IPA Explorers Crate",
+      "Price": 84.99,
+      "Inventory": 0,
+      "VariantStatus": "unlisted",
+      "ProductId": 89,
+      "VariantId": 181
+    },
+    {
+      "SKU": "KTAL-0003-GIN",
+      "VariantName": "Navy Strength Gin Crate",
+      "Price": 119.99,
+      "Inventory": 0,
+      "VariantStatus": "discontinued",
+      "ProductId": 126,
+      "VariantId": 250
+    },
+    {
+      "SKU": "KTAL-0004-SCO",
+      "VariantName": "Scotch Whisky Crate",
+      "Price": 169.99,
+      "Inventory": 0,
+      "VariantStatus": "discontinued",
+      "ProductId": 144,
+      "VariantId": 270
+    },
+    {
+      "SKU": "KTAL-0005-MEZ",
+      "VariantName": "Mezcal Crate",
+      "Price": 134.99,
+      "Inventory": 0,
+      "VariantStatus": "discontinued",
+      "ProductId": 2,
+      "VariantId": 2
+    },
+    {
+      "SKU": "KTJK-0001-TER",
+      "VariantName": "Teriyaki Jerkygram",
+      "Price": 24.99,
+      "Inventory": 0,
+      "VariantStatus": "unlisted",
+      "ProductId": 23,
+      "VariantId": 23
+    },
+    {
+      "SKU": "KTAM-0002-POK",
+      "VariantName": "Ammo Can Poker Set",
+      "Price": 99.99,
+      "Inventory": 0,
+      "VariantStatus": "discontinued",
+      "ProductId": 141,
+      "VariantId": 267
+    },
+    {
+      "SKU": "KTJK-0006-INS",
+      "VariantName": "Insanely Spicy Jerkygram",
+      "Price": 24.99,
+      "Inventory": 0,
+      "VariantStatus": "unlisted",
+      "ProductId": 33,
+      "VariantId": 62
+    },
+    {
+      "SKU": "KTJK-0008-WIN",
+      "VariantName": "West Coast Wine Jerkygram",
+      "Price": 34.99,
+      "Inventory": 0,
+      "VariantStatus": "unlisted",
+      "ProductId": 38,
+      "VariantId": 67
+    },
+    {
+      "SKU": "KTAM-0005-HUM",
+      "VariantName": "Cigar Humidor Ammo Can",
+      "Price": 59.99,
+      "Inventory": 0,
+      "VariantStatus": "unlisted",
+      "ProductId": 25,
+      "VariantId": 25
+    }
+  ],
+  "template": {
+    "id": 3,
+    "lastModified": "2018-07-11T23:09:51.167Z",
+    "createdAt": "2018-05-25T22:21:41.702Z",
+    "archived": false,
+    "templateName": "Mode Analytics - Stock Levels Import Template",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "Price"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "Total Stock"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "Product"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "Variant"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "Date"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "date",
+                      "format": "ISOstring"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "SKU"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "Variant Name"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "Variant Status"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 8,
+            "uidNode": 8,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "SKU"
+                ],
+                0
+              ],
+              [
+                [
+                  "Variant Name"
+                ],
+                1
+              ],
+              [
+                [
+                  "Price"
+                ],
+                2
+              ],
+              [
+                [
+                  "Total Stock"
+                ],
+                3
+              ],
+              [
+                [
+                  "Variant Status"
+                ],
+                4
+              ],
+              [
+                [
+                  "Product"
+                ],
+                5
+              ],
+              [
+                [
+                  "Variant"
+                ],
+                6
+              ],
+              [
+                [
+                  "Date"
+                ],
+                7
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "SKU"
+                ]
+              ],
+              [
+                1,
+                [
+                  "VariantName"
+                ]
+              ],
+              [
+                2,
+                [
+                  "Price"
+                ]
+              ],
+              [
+                3,
+                [
+                  "Inventory"
+                ]
+              ],
+              [
+                4,
+                [
+                  "VariantStatus"
+                ]
+              ],
+              [
+                5,
+                [
+                  "ProductId"
+                ]
+              ],
+              [
+                6,
+                [
+                  "VariantId"
+                ]
+              ],
+              [
+                7,
+                [
+                  "Date"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "string"
+              ],
+              [
+                2,
+                "number"
+              ],
+              [
+                3,
+                "number"
+              ],
+              [
+                4,
+                "string"
+              ],
+              [
+                5,
+                "number"
+              ],
+              [
+                6,
+                "number"
+              ],
+              [
+                7,
+                "string"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                true
+              ],
+              [
+                3,
+                true
+              ],
+              [
+                4,
+                true
+              ],
+              [
+                5,
+                true
+              ],
+              [
+                6,
+                true
+              ],
+              [
+                7,
+                false
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": true
+                  }
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "Date",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Http",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "csv",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "method": "GET"
+        },
+        "integrationId": 5,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Database",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": [
+            "SKU",
+            "VariantName",
+            "Price",
+            "Inventory",
+            "VariantStatus",
+            "ProductId",
+            "VariantId"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "language": "elastic",
+          "table": "data",
+          "serverId": "Mancrates ES",
+          "database": "mancrates_products"
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ]
+        }
+      }
+    }
+  }
+}

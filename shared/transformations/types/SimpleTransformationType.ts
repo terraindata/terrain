@@ -45,8 +45,17 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+
+import { List } from 'immutable';
+
 import TransformationNode from 'shared/transformations/TransformationNode';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import TransformationVisitError from 'shared/transformations/visitors/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/visitors/TransformationVisitResult';
+import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
 /*
@@ -71,7 +80,7 @@ export default abstract class SimpleTransformationType extends TransformationNod
 
     this.fields.forEach((field) =>
     {
-      for (const match of yadeep.search(doc, field))
+      for (const match of yadeep.search(doc, field.path))
       {
         const { value, location } = match;
         if (value === null && this.skipNulls)
@@ -88,7 +97,7 @@ export default abstract class SimpleTransformationType extends TransformationNod
           continue;
         }
         const newValue = this.transformer(value);
-        yadeep.set(doc, location, newValue, { create: true });
+        yadeep.setIn(doc, location, newValue);
       }
     });
 

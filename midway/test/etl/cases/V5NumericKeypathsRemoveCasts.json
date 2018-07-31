@@ -1,0 +1,519 @@
+{
+  "testName": "v5 Numeric Keypaths Remove Casts",
+  "numDocs": 2,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "2": {
+        "3": "hello",
+        "4": "lol"
+      },
+      "7": [
+        {
+          "8": "COOL STUFF"
+        }
+      ],
+      "name": "bob"
+    },
+    {
+      "2": {
+        "3": "hey there",
+        "4": "well then"
+      },
+      "7": [
+        {
+          "8": "WOW"
+        }
+      ],
+      "name": "doggo"
+    }
+  ],
+  "outputDocs": [
+    {
+      "2": {
+        "4": "lol"
+      },
+      "7": [
+        {
+          "8": "COOL STUFF"
+        }
+      ],
+      "name": "bob!",
+      "Root": {
+        "Blah": "hello"
+      }
+    },
+    {
+      "2": {
+        "4": "well then"
+      },
+      "7": [
+        {
+          "8": "WOW"
+        }
+      ],
+      "name": "doggo!",
+      "Root": {
+        "Blah": "hey there"
+      }
+    }
+  ],
+  "template": {
+    "id": 7,
+    "lastModified": "2018-07-24T01:03:22.306Z",
+    "createdAt": "2018-07-24T01:01:37.336Z",
+    "archived": false,
+    "templateName": "NumericTest",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "2",
+                        "3"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "2",
+                        "4"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "7",
+                        -1,
+                        "8"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "name"
+                      ]
+                    ],
+                    "meta": {
+                      "value": "!",
+                      "at": -1
+                    },
+                    "skipNulls": true,
+                    "typeCode": "InsertNode",
+                    "acceptedType": "string"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "7",
+                        -1,
+                        "8"
+                      ]
+                    ],
+                    "meta": {
+                      "format": "uppercase"
+                    },
+                    "skipNulls": true,
+                    "typeCode": "CaseNode",
+                    "acceptedType": "string"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 8,
+            "uidNode": 10,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "2"
+                ],
+                0
+              ],
+              [
+                [
+                  "2",
+                  "3"
+                ],
+                1
+              ],
+              [
+                [
+                  "2",
+                  "4"
+                ],
+                2
+              ],
+              [
+                [
+                  "7"
+                ],
+                3
+              ],
+              [
+                [
+                  "7",
+                  -1
+                ],
+                4
+              ],
+              [
+                [
+                  "7",
+                  -1,
+                  "8"
+                ],
+                5
+              ],
+              [
+                [
+                  "name"
+                ],
+                6
+              ],
+              [
+                [
+                  "Root"
+                ],
+                7
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "2"
+                ]
+              ],
+              [
+                1,
+                [
+                  "Root",
+                  "Blah"
+                ]
+              ],
+              [
+                2,
+                [
+                  "2",
+                  "4"
+                ]
+              ],
+              [
+                3,
+                [
+                  "7"
+                ]
+              ],
+              [
+                4,
+                [
+                  "7",
+                  -1
+                ]
+              ],
+              [
+                5,
+                [
+                  "7",
+                  -1,
+                  "8"
+                ]
+              ],
+              [
+                6,
+                [
+                  "name"
+                ]
+              ],
+              [
+                7,
+                [
+                  "Root"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "object"
+              ],
+              [
+                1,
+                "string"
+              ],
+              [
+                2,
+                "string"
+              ],
+              [
+                3,
+                "array"
+              ],
+              [
+                4,
+                "array"
+              ],
+              [
+                5,
+                "string"
+              ],
+              [
+                6,
+                "string"
+              ],
+              [
+                7,
+                "object"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                true
+              ],
+              [
+                3,
+                true
+              ],
+              [
+                4,
+                true
+              ],
+              [
+                5,
+                true
+              ],
+              [
+                6,
+                true
+              ],
+              [
+                7,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {}
+              ],
+              [
+                1,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                3,
+                {
+                  "valueType": "object",
+                  "etlType": "Array"
+                }
+              ],
+              [
+                4,
+                {
+                  "valueType": "object"
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "Object"
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Upload",
+        "name": "Source",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": "",
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "file": null
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Database",
+        "name": "Destination",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": [
+            "2",
+            "7",
+            "name",
+            "Root"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "language": "elastic",
+          "table": "data",
+          "serverId": "My ElasticSearch Instance",
+          "database": "test1"
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ]
+        }
+      }
+    }
+  }
+}

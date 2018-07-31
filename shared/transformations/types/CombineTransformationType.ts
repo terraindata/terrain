@@ -45,12 +45,18 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+
+import { List } from 'immutable';
 import * as _ from 'lodash';
 
 import TransformationNode from 'shared/transformations/TransformationNode';
-import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import Topology from 'shared/transformations/util/TopologyUtil';
+import TransformationVisitError from 'shared/transformations/visitors/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/visitors/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
@@ -87,8 +93,9 @@ export default abstract class CombineTransformationType extends TransformationNo
       [k: string]: InputField[],
     } = {};
 
-    this.fields.forEach((field) =>
+    this.fields.forEach((fieldObj) =>
     {
+      const field = fieldObj.path;
       for (const match of yadeep.search(doc, field))
       {
         const { value, location } = match;
@@ -117,7 +124,7 @@ export default abstract class CombineTransformationType extends TransformationNo
     const opts = this.meta as NodeOptionsType<any>;
     const newFieldKeyPath = opts.newFieldKeyPaths.get(0);
 
-    const matchFn = Topology.createBasePathMatcher(this.fields.get(0), newFieldKeyPath);
+    const matchFn = Topology.createBasePathMatcher(this.fields.get(0).path, newFieldKeyPath);
 
     for (const locale of Object.keys(matchSets))
     {
@@ -125,7 +132,7 @@ export default abstract class CombineTransformationType extends TransformationNo
       const newValue = this.combine(this.processMatchSet(matchSet));
 
       const destKP = matchFn(matchSet[0].matchField);
-      yadeep.set(doc, destKP, newValue, { create: true });
+      yadeep.setIn(doc, destKP, newValue);
     }
 
     return {

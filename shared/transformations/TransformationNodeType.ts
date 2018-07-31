@@ -45,39 +45,45 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable no-unused-expression
 import { List } from 'immutable';
-import { DateFormats } from 'shared/etl/types/ETLTypes';
+import { DateFormats, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { CaseFormats } from 'shared/transformations/nodes/CaseTransformationNode';
 import { KeyPath } from 'shared/util/KeyPath';
 
 enum TransformationNodeType
 {
-  SplitNode = 'SplitNode',
-  JoinNode = 'JoinNode',
-  DuplicateNode = 'DuplicateNode',
-  InsertNode = 'InsertNode',
-  CaseNode = 'CaseNode',
-  SubstringNode = 'SubstringNode',
-  CastNode = 'CastNode',
-  HashNode = 'HashNode',
-  RoundNode = 'RoundNode',
   AddNode = 'AddNode',
-  SubtractNode = 'SubtractNode',
-  MultiplyNode = 'MultiplyNode',
-  DivideNode = 'DivideNode',
-  SetIfNode = 'SetIfNode',
-  FindReplaceNode = 'FindReplaceNode',
+  ArrayCountNode = 'ArrayCountNode',
   ArrayMaxNode = 'ArrayMaxNode',
   ArrayMinNode = 'ArrayMinNode',
   ArraySumNode = 'ArraySumNode',
-  ArrayCountNode = 'ArrayCountNode',
+  CaseNode = 'CaseNode',
+  CastNode = 'CastNode',
+  DecryptNode = 'DecryptNode',
+  DeprecatedNode = 'DeprecatedNode',
+  DifferenceNode = 'DifferenceNode',
+  DivideNode = 'DivideNode',
+  DuplicateNode = 'DuplicateNode',
+  EncryptNode = 'EncryptNode',
+  FilterArrayNode = 'FilterArrayNode',
+  FindReplaceNode = 'FindReplaceNode',
+  GroupByNode = 'GroupByNode',
+  HashNode = 'HashNode',
+  IdentityNode = 'IdentityNode',
+  InsertNode = 'InsertNode',
+  JoinNode = 'JoinNode',
+  MultiplyNode = 'MultiplyNode',
+  ParseNode = 'ParseNode',
   ProductNode = 'ProductNode',
   QuotientNode = 'QuotientNode',
-  SumNode = 'SumNode',
-  DifferenceNode = 'DifferenceNode',
-  EncryptNode = 'EncryptNode',
-  DecryptNode = 'DecryptNode',
-  GroupByNode = 'GroupByNode',
-  FilterArrayNode = 'FilterArrayNode',
   RemoveDuplicatesNode = 'RemoveDuplicatesNode',
+  RenameNode = 'RenameNode',
+  RoundNode = 'RoundNode',
+  SetIfNode = 'SetIfNode',
+  SplitNode = 'SplitNode',
+  StringifyNode = 'StringifyNode',
+  SubstringNode = 'SubstringNode',
+  SubtractNode = 'SubtractNode',
+  SumNode = 'SumNode',
   ZipcodeNode = 'ZipcodeNode',
 }
 
@@ -91,21 +97,35 @@ TransformationNodeType as AssertEnumValuesEqualKeys;
 // if this has errors, double check TransformationOptionTypes has a key for every TransformationNodeType
 // noinspection JSUnusedLocalSymbols
 type AssertOptionTypesExhaustive = {
-  [K in TransformationNodeType]: TransformationOptionTypes[K]
+  [K in TransformationNodeType]: TransformationOptionTypes[K];
 };
 
-interface TransformationOptionTypes
+export interface CommonTransformationOptions
 {
+  fromType?: FieldTypes;
+  newFieldKeyPaths?: List<KeyPath>;
+}
+
+type HasCommon<T extends object> = {
+  [k in keyof T]: T[k] & CommonTransformationOptions;
+};
+
+interface TransformationOptionTypes extends HasCommon<TransformationOptionTypes>
+{
+  IdentityNode: {
+    type: IdentityTypes;
+  };
   SplitNode: {
     newFieldKeyPaths: List<KeyPath>;
-    preserveOldFields: boolean;
     delimiter: string | number;
     regex: boolean;
   };
   JoinNode: {
     newFieldKeyPaths: List<KeyPath>;
-    preserveOldFields: boolean;
     delimiter: string;
+  };
+  RenameNode: {
+    newFieldKeyPaths: List<KeyPath>;
   };
   // FilterNode: any;
   DuplicateNode: {
@@ -116,14 +136,14 @@ interface TransformationOptionTypes
     value: string;
   };
   CaseNode: {
-    format: string;
+    format: CaseFormats;
   };
   SubstringNode: {
     from: number;
     length: number;
   };
   CastNode: {
-    toTypename: string;
+    toTypename: FieldTypes;
     format?: DateFormats;
   };
   HashNode: {
@@ -170,6 +190,9 @@ interface TransformationOptionTypes
   ArrayCountNode: {
     newFieldKeyPaths: List<KeyPath>;
   };
+  ParseNode: {
+    to: FieldTypes.Array | FieldTypes.Object;
+  };
   ProductNode: {
     newFieldKeyPaths: List<KeyPath>;
   };
@@ -200,9 +223,33 @@ interface TransformationOptionTypes
   ZipcodeNode: {
     format: string;
   };
+  DeprecatedNode: {
+    deprecatedType: 'CastNode';
+    [k: string]: any;
+  };
+  StringifyNode: {
+    pretty?: boolean;
+  };
 }
 
 export type NodeTypes = keyof TransformationOptionTypes;
-export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key];
+export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key] & CommonTransformationOptions;
+
+/*
+ * TODO document
+ */
+export enum TransformationEdgeTypes
+{
+  Synthetic = 'Synthetic',
+  Same = 'Same',
+}
+
+export enum IdentityTypes
+{
+  Organic = 'Organic',
+  Synthetic = 'Synthetic',
+  Rename = 'Rename',
+  Removal = 'Removal',
+}
 
 export default TransformationNodeType;

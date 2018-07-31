@@ -45,19 +45,24 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing strict-boolean-expressions
 
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
 import * as _ from 'lodash';
 
 import { FieldVerification, LanguageInterface } from 'shared/etl/languages/LanguageControllers';
 import { ElasticMapping, MappingType } from 'shared/etl/mapping/ElasticMapping';
 import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
-import { Languages } from 'shared/etl/types/ETLTypes';
+import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+import * as Utils from 'shared/transformations/util/EngineUtils';
+import { KeyPath } from 'shared/util/KeyPath';
+import * as yadeep from 'shared/util/yadeep';
 import { DefaultController } from './DefaultTemplateController';
 
-import { SinkConfig } from 'shared/etl/immutable/EndpointRecords';
+import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 
 class ElasticController extends DefaultController implements LanguageInterface
 {
@@ -71,9 +76,11 @@ class ElasticController extends DefaultController implements LanguageInterface
 
   public canSetPrimaryKey(engine: TransformationEngine, fieldId: number)
   {
-    const jsType = EngineUtil.getRepresentedType(fieldId, engine);
-    const isRootField = engine.getOutputKeyPath(fieldId).size === 1;
-    return (jsType === 'string' || jsType === 'number') && isRootField;
+    const etlType = Utils.fields.fieldType(fieldId, engine);
+    const isRootField = engine.getFieldPath(fieldId).size === 1;
+    return (
+      etlType === FieldTypes.String || etlType === FieldTypes.Number || etlType === FieldTypes.Integer
+    ) && isRootField;
   }
 
   public setFieldPrimaryKey(engine: TransformationEngine, fieldId: number, value: boolean)
@@ -145,7 +152,7 @@ class ElasticController extends DefaultController implements LanguageInterface
     for (const id of ids.values() as IterableIterator<number>) // cannot use forEach inside iterator
     {
       let yielded = false; // make sure we yield at least once per field to allow async
-      const okp = engine.getOutputKeyPath(id);
+      const okp = engine.getFieldPath(id);
       const name = okp.last();
       if (typeof name === 'string')
       {

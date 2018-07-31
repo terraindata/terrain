@@ -204,7 +204,11 @@ export function remove(obj: object, path: KeyPath): void
   set(obj, path, undefined, { delete: true });
 }
 
-interface ContextResult
+/*
+ *  yayadeep!
+ */
+
+export interface ContextResult
 {
   value: any;
   location: KeyPath;
@@ -287,4 +291,139 @@ export function search(obj: object, path: KeyPath): ContextResult[]
   const results = [];
   searchRecurse(obj, path, (result) => results.push(result));
   return results;
+}
+
+/*
+ *  A specialized set function that performs a set on non-wildcard keypaths
+ */
+export function setIn(obj: object, path: KeyPath, value): object
+{
+  if (path.size === 0)
+  {
+    return value;
+  }
+  if (typeof obj !== 'object' || obj == null)
+  {
+    return obj;
+  }
+  let curr = obj;
+  for (let i = 0; i < path.size - 1; i++)
+  {
+    const waypoint = path.get(i);
+    const nextWaypoint = path.get(i + 1);
+    if (typeof nextWaypoint === 'number')
+    {
+      if (curr[waypoint] == null)
+      {
+        curr[waypoint] = [];
+      }
+      else if (!Array.isArray(curr[waypoint]))
+      {
+        return obj;
+      }
+    }
+    else
+    {
+      if (curr[waypoint] == null)
+      {
+        curr[waypoint] = {};
+      }
+      else if (Array.isArray(curr[waypoint]))
+      {
+        return obj;
+      }
+    }
+    curr = curr[waypoint];
+  }
+  curr[path.last()] = value;
+  return obj;
+}
+
+/*
+ *  A specialized delete function that performs a delete on non-wildcard keypaths
+ */
+export function deleteIn(obj: object, path: KeyPath)
+{
+  if (typeof obj !== 'object' || obj == null || path.size === 0)
+  {
+    return false;
+  }
+  let curr = obj;
+  for (let i = 0; i < path.size - 1; i++)
+  {
+    const waypoint = path.get(i);
+    if (curr[waypoint] == null)
+    {
+      return false;
+    }
+    curr = curr[waypoint];
+  }
+  if (curr.hasOwnProperty(path.last()))
+  {
+    delete curr[path.last()];
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+function* explore(obj: any, path: KeyPath, options: TraverseOptions): IterableIterator<ContextResult>
+{
+  if (isPrimitive(obj))
+  {
+    yield {
+      location: path,
+      value: obj,
+    };
+  }
+  else if (Array.isArray(obj))
+  {
+    const limit = options.arrayLimit !== -1 ? Math.min(options.arrayLimit, obj.length) : obj.length;
+    for (let i = 0; i < limit; i++)
+    {
+      yield* explore(obj[i], path.push(i), options);
+    }
+    if (!options.primitivesOnly)
+    {
+      yield {
+        location: path,
+        value: obj,
+      };
+    }
+  }
+  else
+  {
+    for (const key of Object.keys(obj))
+    {
+      yield* explore(obj[key], path.push(key), options);
+    }
+    if (!options.primitivesOnly)
+    {
+      yield {
+        location: path,
+        value: obj,
+      };
+    }
+  }
+}
+
+export interface TraverseOptions
+{
+  primitivesOnly: boolean; // whether to yield only primitives
+  arrayLimit: number; // limit exploration of arrays
+}
+
+/*
+ *  Perform a postorder traversal of the fields of an object with some special abilities
+ */
+export function traverse(obj: any, opts: Partial<TraverseOptions> = {}): IterableIterator<ContextResult>
+{
+  const defaults: TraverseOptions = {
+    primitivesOnly: false,
+    arrayLimit: -1,
+  };
+  const options: TraverseOptions = _.extend({}, defaults, opts);
+  return explore(obj, KeyPath([]), options);
 }

@@ -45,13 +45,18 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
 
+const { List, Map } = Immutable;
+
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath } from 'shared/util/KeyPath';
 
 import ForkTransformationType, { OutputField } from 'shared/transformations/types/ForkTransformationType';
 
@@ -65,10 +70,6 @@ export class GroupByTransformationNode extends ForkTransformationType
   public split(el: any[]): OutputField[]
   {
     const opts = this.meta as NodeOptionsType<typeof TYPECODE>;
-
-    // const mapper: {
-    //   [k: string]: KeyPath,
-    // } = {};
 
     const mapper: {
       [k: string]: number,
@@ -117,16 +118,13 @@ class GroupByTransformationInfoC extends TransformationNodeInfo
 
   public editable = false;
   public creatable = true;
-  public newFieldType = 'array';
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    return (
-      EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
-      EngineUtil.getValueType(fieldId, engine) === 'object' &&
-      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
-    );
-  }
+  protected newType = FieldTypes.Array;
+  protected availInfo = {
+    allowedTypes: [FieldTypes.Array],
+    arrayOf: [FieldTypes.Object],
+    isNamed: true,
+  };
 }
 
 export const GroupByTransformationInfo = new GroupByTransformationInfoC();

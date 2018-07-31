@@ -45,11 +45,18 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
+
+const { List, Map } = Immutable;
+
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath } from 'shared/util/KeyPath';
 
 import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
 
@@ -76,9 +83,25 @@ class ZipcodeTransformationInfoC extends TransformationNodeInfo
   public editable = true;
   public creatable = true;
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
+  protected availInfo = {
+    allowedTypes: [FieldTypes.String],
+  };
+
+  public computeNewSourceType(engine?, node?, index?): FieldTypes
   {
-    return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+    if (node === undefined)
+    {
+      return null;
+    }
+    const options: NodeOptionsType<typeof TYPECODE> = node.meta;
+    if (options.format === 'loc')
+    {
+      return FieldTypes.GeoPoint;
+    }
+    else
+    {
+      return FieldTypes.String;
+    }
   }
 }
 

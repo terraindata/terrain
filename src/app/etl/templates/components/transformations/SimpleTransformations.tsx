@@ -44,17 +44,28 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires no-empty-interface max-classes-per-file
+import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
+import * as React from 'react';
 
-import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import { availableCases, caseFormatToReadable } from 'shared/transformations/nodes/CaseTransformationNode';
+import { instanceFnDecorator } from 'shared/util/Classes';
+
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { TransformationNode } from 'etl/templates/FieldTypes';
+import { availableCases, CaseFormats, caseFormatToReadable } from 'shared/transformations/nodes/CaseTransformationNode';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import { TransformationForm } from './TransformationFormBase';
+import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
-import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
+import { DynamicForm } from 'common/components/DynamicForm';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
-import { List, Map } from 'immutable';
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
 
 type SubstringOptions = NodeOptionsType<TransformationNodeType.SubstringNode>;
 export class SubstringTFF extends TransformationForm<SubstringOptions, TransformationNodeType.SubstringNode>
@@ -101,7 +112,7 @@ export class CaseTFF extends TransformationForm<CaseOptions, TransformationNodeT
     },
   };
   protected readonly initialState = {
-    format: 'uppercase',
+    format: CaseFormats.uppercase,
   };
 }
 
@@ -323,22 +334,6 @@ export class ZipcodeTFF extends TransformationForm<ZipcodeOptions, Transformatio
   protected readonly initialState = {
     format: 'loc',
   };
-
-  protected overrideTransformationConfig()
-  {
-    if (this.state.format === 'loc')
-    {
-      return {
-        newSourceType: ETLFieldTypes.GeoPoint,
-      };
-    }
-    else
-    {
-      return {
-        newSourceType: ETLFieldTypes.String,
-      };
-    }
-  }
 }
 
 const zipcodeFormats = List(['loc', 'city', 'state', 'citystate', 'type']);

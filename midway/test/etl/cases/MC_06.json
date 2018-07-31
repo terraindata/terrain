@@ -1,0 +1,1488 @@
+{
+  "testName": "MC_06",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "SKU": "KTCR-0007-BAR",
+      "VariantName": "Personalized Barware",
+      "Price": 99.99,
+      "Inventory": 510,
+      "VariantStatus": "sellable",
+      "ProductId": 129,
+      "VariantId": 255,
+      "Path": "personalized-barware-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/personalized-barware-crate",
+      "ContentsHTML": "<h4>Home Bar Gear</h4> <ul>\r\n  <li>4 Personalized Pint Glasses</li>\r\n  <li>4 Personalized Wooden Coasters/Bottle Openers</li>\r\n</ul> <h4>Counter Chow</h4> <ul>\r\n  <li>Pistachios, 5 oz</li>\r\n  <li>BBQ Corn Nuggets, 4 oz</li>\r\n  <li>Beer Nuts Bar Mix, 3.25 oz</li>\r\n  <li>CB's Lightly Salted Ballpark Peanuts, 12 oz</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "Greatness Has A Name When the first humans to scale Mount Everest reached the summit, they didn't\r\n   immediately update their wikipedia pages or take selfies with self-aggrandizing\r\n   hashtags. They celebrated their dominance over nature like true men--by cracking\r\n   open a beer and chiseling their names into the icy death they'd conquered.\r\n A man's name isn't just a label. It's a shorthand celebration of his greatest accomplishments. This Time It's Personal Sure, Barry from high school, voted \"Most Likely to Succeed,\" might drive a fancy European sports car to\r\n   his fat cat Wall Street job, but does Barry from high school have his own set of personalized pint glasses?\r\n Probably not. He probably drinks from non-personalized glasses like an uncultured chump.  We've acquired that monstrous laser from \"Goldfinger\" and repurposed its settings from burning James Bond's\r\n   giblets to etching names into pint glasses with perfect precision.\r\n So while Barry's crying alone in his mansion over a frozen microwave dinner, you can be toasting real\r\n   success with three close buddies and four awesome personalized pint glasses.\r\n The Man, The Myth, The Legendary Coasters The matching set of personalized wooden coasters are classy and clean--like drying your tabletops with bear\r\n   skin napkins. Plus, they double as bottle-openers, which means less time scavenging in drawers and more\r\n   time swapping epic drinking stories. Like when you once wrestled a croc while wearing Crocs purely out of\r\n   hubris.\r\n And we've got snacks with your name on them. Figuratively. We used to personalize every individual nut and\r\n   pretzel, but they got inhaled too quickly for anyone to notice.\r\n Grab the Personalized Barware Crate today and ensure the world never forgets your name.",
+      "Contents": "Home Bar Gear \r\n  4 Personalized Pint Glasses\r\n  4 Personalized Wooden Coasters/Bottle Openers\r\n Counter Chow \r\n  Pistachios, 5 oz\r\n  BBQ Corn Nuggets, 4 oz\r\n  Beer Nuts Bar Mix, 3.25 oz\r\n  CB's Lightly Salted Ballpark Peanuts, 12 oz\r\n\r\nNOTE: Personalized items require 48 hours of processing time.",
+      "LongDescriptionHTML": "<h4>Greatness Has A Name</h4> <p>When the first humans to scale Mount Everest reached the summit, they didn't\r\n   immediately update their wikipedia pages or take selfies with self-aggrandizing\r\n   hashtags. They celebrated their dominance over nature like true men--by cracking\r\n   open a beer and chiseling their names into the icy death they'd conquered.\r\n</p> <p>A man's name isn't just a label. It's a shorthand celebration of his greatest accomplishments.</p> <h4>This Time It's Personal</h4> <p>Sure, Barry from high school, voted \"Most Likely to Succeed,\" might drive a fancy European sports car to\r\n   his fat cat Wall Street job, but does Barry from high school have his own set of personalized pint glasses?\r\n</p> <p>Probably not. He probably drinks from non-personalized glasses like an uncultured chump. </p> <p>We've acquired that monstrous laser from \"Goldfinger\" and repurposed its settings from burning James Bond's\r\n   giblets to etching names into pint glasses with perfect precision.\r\n</p> <p>So while Barry's crying alone in his mansion over a frozen microwave dinner, you can be toasting real\r\n   success with three close buddies and four awesome personalized pint glasses.\r\n</p> <h4>The Man, The Myth, The Legendary Coasters</h4> <p>The matching set of personalized wooden coasters are classy and clean--like drying your tabletops with bear\r\n   skin napkins. Plus, they double as bottle-openers, which means less time scavenging in drawers and more\r\n   time swapping epic drinking stories. Like when you once wrestled a croc while wearing Crocs purely out of\r\n   hubris.\r\n</p> <p>And we've got snacks with your name on them. Figuratively. We used to personalize every individual nut and\r\n   pretzel, but they got inhaled too quickly for anyone to notice.\r\n</p> <p>Grab the Personalized Barware Crate today and ensure the world never forgets your name.</p>",
+      "Name": "Personalized Barware Crate",
+      "ConversionRate": 5.160026126714565,
+      "UniquePurchases": 158,
+      "ProductRevenue": 15798.42,
+      "Quantity": 158,
+      "AveragePrice": 99.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/884/large/pb_personalized_pint_giftset_for_beer_loving_guys__44982.jpg?1502411232",
+      "Margin": 77.25,
+      "TerrainScore": 0.4772399987347723,
+      "TERRAINRANK": 1
+    },
+    {
+      "SKU": "KTAM-0007-BAR",
+      "VariantName": "Personalized Pint Set Ammo Can",
+      "Price": 64.99,
+      "Inventory": 1779,
+      "VariantStatus": "sellable",
+      "ProductId": 20,
+      "VariantId": 20,
+      "Path": "personalized-pint-set-ammo-can",
+      "CanonicalUrl": "www.mancrates.com/store/products/personalized-pint-set-ammo-can",
+      "ContentsHTML": "<h4>Beer Buddies</h4> <ul>\r\n  <li>2 Laser-Etched Pint Glasses</li>\r\n  <li>Personalized .50 Cal Bottle Opener</li>\r\n</ul> <h4>Beef Sticks</h4> <ul>\r\n  <li>Peppered Jerky Stick</li>\r\n  <li>Original Jerky Stick</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "The World Is His Man Cave A man's insatiable appetite for adventure will lead him to Earth's highest peaks,\r\n   deepest caverns, and soon, neighboring planets--but none of these places adequately\r\n   cater to his second-most pressing appetite: beer.\r\n But we've built a gift\r\n   that lets him have it all. Whether he's crag climbing, spelunking, or riding a rocket\r\n   to the grand opening of Raging Waters: Mars, the Personalized Pint Set Ammo Can\r\n   will always ensure an awesome pint by his side.\r\n Go Forth And Drink With the Personalized Pint Set Ammo Can, he'll never have to endure the harsh\r\n   humiliation of asking, \"where can a man get a decent drink around here?\" because\r\n   he'll always have a pair of personalized, laser-etched pint glasses tucked safely\r\n   in the indestructible ammo can handcuffed to his wrist.\r\n There's only one\r\n   bottle opener that can withstand the intrepid demand of the adventurous man, and\r\n   that's the personalized bullet bottle opener. This .50 caliber bullet with his name\r\n   engraved on the side is the second coolest way to open a beer with a bullet. And\r\n   man cannot live on beer alone, which is where the two delicious beef sticks come\r\n   into play.\r\n The Personalized Pint Set Ammo Can has all the essentials he'll\r\n   need to get his beers and best buds out of the house and into the world.\r\n",
+      "Contents": "Beer Buddies \r\n  2 Laser-Etched Pint Glasses\r\n  Personalized .50 Cal Bottle Opener\r\n Beef Sticks \r\n  Peppered Jerky Stick\r\n  Original Jerky Stick\r\n\r\nNOTE: Personalized items require 48 hours of processing time.",
+      "LongDescriptionHTML": "<h4>The World Is His Man Cave</h4> <p>A man's insatiable appetite for adventure will lead him to Earth's highest peaks,\r\n   deepest caverns, and soon, neighboring planets--but none of these places adequately\r\n   cater to his second-most pressing appetite: beer.\r\n</p> <p>But we've built a gift\r\n   that lets him have it all. Whether he's crag climbing, spelunking, or riding a rocket\r\n   to the grand opening of Raging Waters: Mars, the Personalized Pint Set Ammo Can\r\n   will always ensure an awesome pint by his side.\r\n</p> <h4>Go Forth And Drink</h4> <p>With the Personalized Pint Set Ammo Can, he'll never have to endure the harsh\r\n   humiliation of asking, \"where can a man get a decent drink around here?\" because\r\n   he'll always have a pair of personalized, laser-etched pint glasses tucked safely\r\n   in the indestructible ammo can handcuffed to his wrist.\r\n</p> <p>There's only one\r\n   bottle opener that can withstand the intrepid demand of the adventurous man, and\r\n   that's the personalized bullet bottle opener. This .50 caliber bullet with his name\r\n   engraved on the side is the second coolest way to open a beer with a bullet. And\r\n   man cannot live on beer alone, which is where the two delicious beef sticks come\r\n   into play.\r\n</p> <p>The Personalized Pint Set Ammo Can has all the essentials he'll\r\n   need to get his beers and best buds out of the house and into the world.\r\n</p>",
+      "Name": "Personalized Barware Ammo Can",
+      "ConversionRate": 5.595116988809766,
+      "UniquePurchases": 275,
+      "ProductRevenue": 17872.25,
+      "Quantity": 275,
+      "AveragePrice": 64.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/420/large/ppsac_awesome-personalized-pint-pair-gift-for-men__88533.jpg?1502411051",
+      "Margin": 75.5,
+      "TerrainScore": 0.4303700831332449,
+      "TERRAINRANK": 2
+    },
+    {
+      "SKU": "KTCR-0018-GOL",
+      "VariantName": "The Golfer's Crate",
+      "Price": 99.99,
+      "Inventory": 402,
+      "VariantStatus": "unavailable",
+      "ProductId": 156,
+      "VariantId": 311,
+      "Path": "golfers-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/golfers-crate",
+      "ContentsHTML": "<h4>Fairway Armament</h4> <ul>\r\n  <li>Gopher Head Cover</li>\r\n  <li>DivPro 6-in-1 Golf Tool</li>\r\n  <li>Golf Towel</li>\r\n  <li>TaylorMade Distance+ Balls, 1 sleeve</li>\r\n  <li>Bag of Golf Tees</li>\r\n</ul> <h4>Pro Training Regimen</h4> <ul>\r\n  <li>Arnold Palmer Drink, 16 oz</li>\r\n  <li>BIGS Sunflower Seeds, 5 oz</li>\r\n  <li>Caddyshack DVD</li>\r\n</ul>",
+      "LongDescription": "Who Let These Guys on the Course? We're not pro golfers. We've never been on the amateur circuit, we've never won any charity tournaments,\r\n   and Michelle Wie's people won't return our phone calls. Hell, we'll even admit that when we first started R&amp;D\r\n   on the Golfer's Man Crate we were sloppy on the driving range and an embarrassment on the course.\r\n Luckily after weeks of sampling just about every golf product on the market and\r\n   many long days of practice, we're no worse off. We had tons of fun, but we're\r\n   still absolutely mediocre golfers.\r\n Expensive gadgets didn't make us better golfers any more than expensive boxing gloves would\r\n   make us better heavy-weight prize fighters. We've got no shortcuts to sell you\r\n   to improve your game, but we have gathered a few awesome items that make any golf\r\n   outing more fun.\r\n The Game Within A Game Whether your preferred sidebet is cold, hard, \"In God We Trust\" cash or the penalty of a shotgunned beer,\r\n   there is no purer way to celebrate living in a free capitalist society than by making\r\n   a handshake wager on a spur of the moment challenge. It's in the drama of these\r\n   small contests that heroes are born and legends are written.\r\n Enter the Chuck Rodent golf head cover. This stylish piece of golf haute\r\n   couture isn't just a beautifully functional adornment for your club, it's the trophy of a champion.\r\n   Wager Chuck Rodent on the next best-ball drive and the winner gets to carry him in his bag. The loser\r\n   becomes \"the gopher\", responsible for fetching lost balls and drinks until he can win or steal Chuck back.\r\n If you do end up having to shotgun that beer, the 6 Tool DivPro\r\n   will come in handy. It also comes in handy if you need to fix a divot, hold your club off the green, ash a\r\n   cigar, mark your ball, or clean your club heads. In short this tool is basically the golfer's equivalent to\r\n   the iPhone. Of all the tagalongs, gadgets and golf widgets we tried, the DivPro stood out as an incredibly\r\n   well-designed, practical item.\r\n A bag of tees, a sleeve of TaylorMade Long &amp; Softs, and an ever-useful golf towel round out the\r\n   practical items in the Golfer's Man Crate. Always have a towel. For sustenance on the course we've thrown\r\n   in some sunflower seeds and a classic Arnold Palmer.\r\n Bill Freakin' Murray We can't send you private golf lessons, but we will send you the definitive instructional DVD on the\r\n   golfer's way of life. Critics agree that Caddyshack is an absolutely\r\n  juvenile exploration of man's struggle to find his place in the world amidst the pressures of his\r\n   environment, fearsome wildlife, and cut-throat competition- one of the most rewatched comedies of all time.\r\n",
+      "Contents": "Fairway Armament \r\n  Gopher Head Cover\r\n  DivPro 6-in-1 Golf Tool\r\n  Golf Towel\r\n  TaylorMade Distance+ Balls, 1 sleeve\r\n  Bag of Golf Tees\r\n Pro Training Regimen \r\n  Arnold Palmer Drink, 16 oz\r\n  BIGS Sunflower Seeds, 5 oz\r\n  Caddyshack DVD\r\n",
+      "LongDescriptionHTML": "<h4>Who Let These Guys on the Course?</h4> <p>We're not pro golfers. We've never been on the amateur circuit, we've never won any charity tournaments,\r\n   and Michelle Wie's people won't return our phone calls. Hell, we'll even admit that when we first started R&amp;D\r\n   on the Golfer's Man Crate we were sloppy on the driving range and an embarrassment on the course.\r\n</p> <p>Luckily after weeks of sampling just about every golf product on the market and\r\n   many long days of practice, we're no worse off. We had tons of fun, but we're\r\n   still absolutely mediocre golfers.\r\n</p> <p>Expensive gadgets didn't make us better golfers any more than expensive boxing gloves would\r\n   make us better heavy-weight prize fighters. We've got no shortcuts to sell you\r\n   to improve your game, but we have gathered a few awesome items that make any golf\r\n   outing more fun.\r\n</p> <h4>The Game Within A Game</h4> <p>Whether your preferred sidebet is cold, hard, \"In God We Trust\" cash or the penalty of a shotgunned beer,\r\n   there is no purer way to celebrate living in a free capitalist society than by making\r\n   a handshake wager on a spur of the moment challenge. It's in the drama of these\r\n   small contests that heroes are born and legends are written.\r\n</p> <p>Enter the Chuck Rodent golf head cover. This stylish piece of golf haute\r\n   couture isn't just a beautifully functional adornment for your club, it's the trophy of a champion.\r\n   Wager Chuck Rodent on the next best-ball drive and the winner gets to carry him in his bag. The loser\r\n   becomes \"the gopher\", responsible for fetching lost balls and drinks until he can win or steal Chuck back.\r\n</p> <p>If you do end up having to shotgun that beer, the 6 Tool DivPro\r\n   will come in handy. It also comes in handy if you need to fix a divot, hold your club off the green, ash a\r\n   cigar, mark your ball, or clean your club heads. In short this tool is basically the golfer's equivalent to\r\n   the iPhone. Of all the tagalongs, gadgets and golf widgets we tried, the DivPro stood out as an incredibly\r\n   well-designed, practical item.\r\n</p> <p>A bag of tees, a sleeve of TaylorMade Long &amp; Softs, and an ever-useful golf towel round out the\r\n   practical items in the Golfer's Man Crate. Always have a towel. For sustenance on the course we've thrown\r\n   in some sunflower seeds and a classic Arnold Palmer.\r\n</p> <h4>Bill Freakin' Murray</h4> <p>We can't send you private golf lessons, but we will send you the definitive instructional DVD on the\r\n   golfer's way of life. Critics agree that Caddyshack is an absolutely\r\n  juvenile exploration of man's struggle to find his place in the world amidst the pressures of his\r\n   environment, fearsome wildlife, and cut-throat competition- one of the most rewatched comedies of all time.\r\n</p>",
+      "Name": "The Golfer's Crate",
+      "ConversionRate": 2.2794846382556986,
+      "UniquePurchases": 46,
+      "ProductRevenue": 4599.54,
+      "Quantity": 46,
+      "AveragePrice": 99.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/001/010/large/gc-the-golfers-crate_fun_golfer_gift_basket_for_men__24368.jpg?1502411278",
+      "Margin": 58.85,
+      "TerrainScore": 0.41149075565974025,
+      "TERRAINRANK": 3
+    },
+    {
+      "SKU": "KTCR-0054-GRW",
+      "VariantName": "Personalized Growler Crate",
+      "Price": 79.99,
+      "Inventory": 646,
+      "VariantStatus": "sellable",
+      "ProductId": 98,
+      "VariantId": 190,
+      "Path": "personalized-growler-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/personalized-growler-crate",
+      "ContentsHTML": "<h4>Exploration Equipment</h4> <ul>\r\n  <li>Personalized Mini-Keg Growler, 64 oz</li>\r\n  <li>White Chalk Pencil</li>\r\n  <li>(2) Classic Pint Glasses</li>\r\n</ul> <h4>Drinking Buddies</h4> <ul>\r\n  <li>33 Bottles Of Beer Tasting Journal</li>\r\n  <li>Brew Candy</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "Straight From The Source Some quests are more honorable than others, and with all due respect to men collecting\r\n   stamps and state quarters, we're focusing on a far loftier goal: the quest to enjoy\r\n   every microbrew in America straight from the source.\r\n This journey, while extremely delicious, is also extremely difficult. A devout band of drinking buddies\r\n   must canoe for miles, caravan for weeks, and forsake all adult responsibilities\r\n   to achieve the fullness of flavor.\r\n These brave souls are our modern-day keg-quistadors in search of the mythical Fountain of Booze. Jug Life A knight would never ride into battle without his trusty steed, sharpened steel, and self-righteous\r\n   sense of divine approval, and neither should you embark upon the quest for quenched\r\n   thirst without a personalized steel growler.\r\n The road between breweries is long and dry, and only 64 oz. of cool, carbonated brew will carry your\r\n   spirits onward. Top it off at each stop, chalk details directly onto the mini-keg with the white\r\n   chalk pencil, and share generously with fellow pilgrims along the way in a pair\r\n   of classic screenprinted pint glasses.\r\n Always remember, your quest is valiant, and the growler is laser-etched with your name, so carry it with\r\n   pride throughout the land.\r\n Drink Beers For \"Research\" Your thoroughly documented taste will live forever in the annals of time in the 33 Bottles of Beer Book.\r\n   Log textures and flavors as you sip, and present the book upon entrance to any brewery to ensure they bring\r\n   out the good stuff.\r\n Get ye quest for eternal refreshment underway with the Personalized Growler Crate.",
+      "Contents": "Exploration Equipment \r\n  Personalized Mini-Keg Growler, 64 oz\r\n  White Chalk Pencil\r\n  (2) Classic Pint Glasses\r\n Drinking Buddies \r\n  33 Bottles Of Beer Tasting Journal\r\n  Brew Candy\r\n\r\nNOTE: Personalized items require 48 hours of processing time.",
+      "LongDescriptionHTML": "<h4>Straight From The Source</h4> <p>Some quests are more honorable than others, and with all due respect to men collecting\r\n   stamps and state quarters, we're focusing on a far loftier goal: the quest to enjoy\r\n   every microbrew in America straight from the source.\r\n</p> <p>This journey, while extremely delicious, is also extremely difficult. A devout band of drinking buddies\r\n   must canoe for miles, caravan for weeks, and forsake all adult responsibilities\r\n   to achieve the fullness of flavor.\r\n</p> <p>These brave souls are our modern-day keg-quistadors in search of the mythical Fountain of Booze.</p> <h4>Jug Life</h4> <p>A knight would never ride into battle without his trusty steed, sharpened steel, and self-righteous\r\n   sense of divine approval, and neither should you embark upon the quest for quenched\r\n   thirst without a personalized steel growler.\r\n</p> <p>The road between breweries is long and dry, and only 64 oz. of cool, carbonated brew will carry your\r\n   spirits onward. Top it off at each stop, chalk details directly onto the mini-keg with the white\r\n   chalk pencil, and share generously with fellow pilgrims along the way in a pair\r\n   of classic screenprinted pint glasses.\r\n</p> <p>Always remember, your quest is valiant, and the growler is laser-etched with your name, so carry it with\r\n   pride throughout the land.\r\n</p> <h4>Drink Beers For \"Research\"</h4> <p>Your thoroughly documented taste will live forever in the annals of time in the 33 Bottles of Beer Book.\r\n   Log textures and flavors as you sip, and present the book upon entrance to any brewery to ensure they bring\r\n   out the good stuff.\r\n</p> <p>Get ye quest for eternal refreshment underway with the Personalized Growler Crate.</p>",
+      "Name": "Personalized Growler Crate",
+      "ConversionRate": 4.602803738317757,
+      "UniquePurchases": 197,
+      "ProductRevenue": 15758.03,
+      "Quantity": 197,
+      "AveragePrice": 79.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/748/large/pgc_personalized_growler_gifts_for_craft_beer_guys__01242.jpg?1502411176",
+      "Margin": 58.88,
+      "TerrainScore": 0.3837405597877712,
+      "TERRAINRANK": 4
+    },
+    {
+      "SKU": "KTCR-0048-INF",
+      "VariantName": "Booze-Infused Jerky Crate",
+      "Price": 99.99,
+      "Inventory": 253,
+      "VariantStatus": "sellable",
+      "ProductId": 109,
+      "VariantId": 231,
+      "Path": "booze-infused-jerky-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/booze-infused-jerky-crate",
+      "ContentsHTML": "<h4>Mixed Cow-tails</h4> <ul>\r\n  <li>Caribbean Rum Jerky</li>\r\n  <li>Cabernet Jerky</li>\r\n  <li>Bourbon Jerky</li>\r\n  <li>Whiskey BBQ Jerky</li>\r\n  <li>Chipotle Tequila Jerky</li>\r\n</ul> <h4>Beer-Bellied Beef</h4> <ul>\r\n  <li>IPA Beef Jerky</li>\r\n  <li>Dark Ale Jerky</li>\r\n  <li>Regrained IPA Bar</li>\r\n  <li>Regrained Coffee Stout Bar</li>\r\n</ul>",
+      "LongDescription": "Cowcaholics A-nom-nom-nonymous Alcohol affects people differently: some become more talkative, some funnier, and some friskier, but when\r\n   it comes to cows, alcohol just makes them more delicious...and maybe also friskier.\r\n We're not sure how they're getting their buzz on(unknown character)perhaps they're grazing on fermented veggies or maybe\r\n   their hooves have evolved to open bottles(unknown character)but we do know \"Cowcaholism\" on the range is as widespread as it\r\n   is udderly hilarious.\r\n If you thought cow-tipping was funny, imagine \"cow-tipsying,\" where a one-ton, hot mess of a cow topples\r\n   over of its own drunken accord. The fall of such docile beasts have given rise to our stampede of\r\n   inebriated beef, the Booze-Infused Jerky Crate.\r\n A Cow Walks Into A Bar... By weight, the average-sized cow can down 57 standard drinks per hour (almost 1 per minute) and still be\r\n   within the legal limits of operating a vehicle or motorized tractor.\r\n At maximum capacity, the average cow's four stomachs can hold upwards of 62 gallons of liquid,\r\n   more than a barrel of Jack Daniels (53 gallons). If only that were enough alcohol\r\n   to satiate their demons.\r\n The good news is, this means the tender beef of the Booze-Infused Jerky Crate has been marinating in a\r\n   saloon's worth of alcohol (from the inside-out) for the better half of a bovine lifetime. The results,\r\n   delicious, buzzed beef jerky.\r\n Go Home Beef Jerky, You're Drunk In curing Cowcaholism, we didn't just cure the easy-capture, beer-bellied beef bodies. We\r\n   herded up cows with diversified tastes from Whiskey BBQ to Pinot Noir for a wide\r\n   spectrum of alcohol flavors for your jerky fix.\r\n The full lineup of cattle intoxication includes: Caribbean Rum, IPA, Cabernet, Bourbon, Whiskey BBQ,\r\n   Chipotle Tequila, Dark Ale, and Regrained IPA and Coffee Stout bars to act as a quick brunch/hangover\r\n   cure.\r\n Throwdown a double-shot of beef and booze in one bite with the Booze-Infused Jerky Crate.",
+      "Contents": "Mixed Cow-tails \r\n  Caribbean Rum Jerky\r\n  Cabernet Jerky\r\n  Bourbon Jerky\r\n  Whiskey BBQ Jerky\r\n  Chipotle Tequila Jerky\r\n Beer-Bellied Beef \r\n  IPA Beef Jerky\r\n  Dark Ale Jerky\r\n  Regrained IPA Bar\r\n  Regrained Coffee Stout Bar\r\n",
+      "LongDescriptionHTML": "<h4>Cowcaholics A-nom-nom-nonymous</h4> <p>Alcohol affects people differently: some become more talkative, some funnier, and some friskier, but when\r\n   it comes to cows, alcohol just makes them more delicious...and maybe also friskier.\r\n</p> <p>We're not sure how they're getting their buzz on(unknown character)perhaps they're grazing on fermented veggies or maybe\r\n   their hooves have evolved to open bottles(unknown character)but we do know \"Cowcaholism\" on the range is as widespread as it\r\n   is udderly hilarious.\r\n</p> <p>If you thought cow-tipping was funny, imagine \"cow-tipsying,\" where a one-ton, hot mess of a cow topples\r\n   over of its own drunken accord. The fall of such docile beasts have given rise to our stampede of\r\n   inebriated beef, the Booze-Infused Jerky Crate.\r\n</p> <h4>A Cow Walks Into A Bar...</h4> <p>By weight, the average-sized cow can down 57 standard drinks per hour (almost 1 per minute) and still be\r\n   within the legal limits of operating a vehicle or motorized tractor.\r\n</p> <p>At maximum capacity, the average cow's four stomachs can hold upwards of 62 gallons of liquid,\r\n   more than a barrel of Jack Daniels (53 gallons). If only that were enough alcohol\r\n   to satiate their demons.\r\n</p> <p>The good news is, this means the tender beef of the Booze-Infused Jerky Crate has been marinating in a\r\n   saloon's worth of alcohol (from the inside-out) for the better half of a bovine lifetime. The results,\r\n   delicious, buzzed beef jerky.\r\n</p> <h4>Go Home Beef Jerky, You're Drunk</h4> <p>In curing Cowcaholism, we didn't just cure the easy-capture, beer-bellied beef bodies. We\r\n   herded up cows with diversified tastes from Whiskey BBQ to Pinot Noir for a wide\r\n   spectrum of alcohol flavors for your jerky fix.\r\n</p> <p>The full lineup of cattle intoxication includes: Caribbean Rum, IPA, Cabernet, Bourbon, Whiskey BBQ,\r\n   Chipotle Tequila, Dark Ale, and Regrained IPA and Coffee Stout bars to act as a quick brunch/hangover\r\n   cure.\r\n</p> <p>Throwdown a double-shot of beef and booze in one bite with the Booze-Infused Jerky Crate.</p>",
+      "Name": "Booze-Infused Jerky Crate",
+      "ConversionRate": 4.829123328380387,
+      "UniquePurchases": 195,
+      "ProductRevenue": 19498.05,
+      "Quantity": 195,
+      "AveragePrice": 99.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/798/large/bijc_booze_meat_gifts_to_make_his_head_spin__12809.jpg?1502411196",
+      "Margin": 57.64,
+      "TerrainScore": 0.3580908040686323,
+      "TERRAINRANK": 5
+    },
+    {
+      "SKU": "KTCR-0050-MOS",
+      "VariantName": "Moscow Mule Crate",
+      "Price": 79.99,
+      "Inventory": 421,
+      "VariantStatus": "sellable",
+      "ProductId": 146,
+      "VariantId": 272,
+      "Path": "moscow-mule-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/moscow-mule-crate",
+      "ContentsHTML": "<h4>The Classic Mule</h4> <ul>\n  <li>2 Copper Mugs (With Stainless Steel Lining)</li>\n  <li>Cock N' Bull Ginger Beer 4 pack</li>\n</ul> <h4>Bartending Tools</h4> <ul>\n  <li>Tovolo Perfect Cube Ice Tray</li>\n  <li>16 oz. Cocktail Shaker</li>\n  <li>Jigger</li>\n</ul>",
+      "LongDescription": "Kicks Like A Mule We love mixed drinks almost as much as we love America, so we were extra relieved to learn\n   the Moscow Mule was very American and not, as we initially suspected, a delicious\n   brainwashing potion created by a certain shirtless, horse-riding Russian overlord.\n Our research shows the Moscow Mule went from cellar dweller to celebrity socialite\n   overnight by combining ginger beer, vodka, lime, and good ol' American moxie.\n The Rise and Fall of the Moscow Mule In 1941, Vodka was unknown and unwanted in America. Smirnoff owner John Martin had to store his unsellable\n   alcohol in the Cock N' Bull, a bar owned by Martin's equally bland-named friend Jack Morgan.\n   In an effort to clear out the basement, the bartender began mixing Smirnoff with\n   Morgan's unpopular ginger beer in mugs from his girlfriend's failed copper factory.\n It was a risky move to toss a bunch of undesirable things together and re-sell\n   it (scientists call this The Hot Dog Phenomena), but the strategy was an overwhelming\n   success. Soon, every trendsetter in Tinseltown was posing for the Polaroid paparazzi\n   with a copper mug in hand.\n Sadly, nothing copper can stay, and when the Cold War hit in the 1950's, true blue Americans began\n   boycotting vodka, aka \"Communist Tap Water\". The Moscow Mule faded into obscurity.\n Three Cheers for Diplomacy! But today, over half a century later, the United States and Russia share a giant\n   orbiting timeshare in outer space, and the only thing remotely Communist about vodka\n   is how freely Smirnoff Ice bottles get shared on college campuses. The world is\n   ready for the return of the Moscow Mule.\n In addition to the original Cock N' Bull ginger beer, the Moscow Mule Crate includes a pair of authentic\n   copper drinking mugs, Tovolo ice cube mold, 16 oz. mixed drink shaker, and measuring jigger, so\n   you can enjoy one of America's finest, definitely-not-Russian mixed drinks.\n Mix it up the classy way, and taste the kick of the Moscow Mule.",
+      "Contents": "The Classic Mule \n  2 Copper Mugs (With Stainless Steel Lining)\n  Cock N' Bull Ginger Beer 4 pack\n Bartending Tools \n  Tovolo Perfect Cube Ice Tray\n  16 oz. Cocktail Shaker\n  Jigger\n",
+      "LongDescriptionHTML": "<h4>Kicks Like A Mule</h4> <p>We love mixed drinks almost as much as we love America, so we were extra relieved to learn\n   the Moscow Mule was very American and not, as we initially suspected, a delicious\n   brainwashing potion created by a certain shirtless, horse-riding Russian overlord.\n</p> <p>Our research shows the Moscow Mule went from cellar dweller to celebrity socialite\n   overnight by combining ginger beer, vodka, lime, and good ol' American moxie.\n</p> <h4>The Rise and Fall of the Moscow Mule</h4> <p>In 1941, Vodka was unknown and unwanted in America. Smirnoff owner John Martin had to store his unsellable\n   alcohol in the Cock N' Bull, a bar owned by Martin's equally bland-named friend Jack Morgan.\n   In an effort to clear out the basement, the bartender began mixing Smirnoff with\n   Morgan's unpopular ginger beer in mugs from his girlfriend's failed copper factory.\n</p> <p>It was a risky move to toss a bunch of undesirable things together and re-sell\n   it (scientists call this The Hot Dog Phenomena), but the strategy was an overwhelming\n   success. Soon, every trendsetter in Tinseltown was posing for the Polaroid paparazzi\n   with a copper mug in hand.\n</p> <p>Sadly, nothing copper can stay, and when the Cold War hit in the 1950's, true blue Americans began\n   boycotting vodka, aka \"Communist Tap Water\". The Moscow Mule faded into obscurity.\n</p> <h4>Three Cheers for Diplomacy!</h4> <p>But today, over half a century later, the United States and Russia share a giant\n   orbiting timeshare in outer space, and the only thing remotely Communist about vodka\n   is how freely Smirnoff Ice bottles get shared on college campuses. The world is\n   ready for the return of the Moscow Mule.\n</p> <p>In addition to the original Cock N' Bull ginger beer, the Moscow Mule Crate includes a pair of authentic\n   copper drinking mugs, Tovolo ice cube mold, 16 oz. mixed drink shaker, and measuring jigger, so\n   you can enjoy one of America's finest, definitely-not-Russian mixed drinks.\n</p> <p>Mix it up the classy way, and taste the kick of the Moscow Mule.</p>",
+      "Name": "The Moscow Mule Crate",
+      "ConversionRate": 3.6748329621380846,
+      "UniquePurchases": 66,
+      "ProductRevenue": 5279.34,
+      "Quantity": 66,
+      "AveragePrice": 79.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/964/large/mm_awesome_vodka_mixed_drink_gifts_for_guys__47185.jpg?1502411261",
+      "Margin": 55.91,
+      "TerrainScore": 0.34464866651187986,
+      "TERRAINRANK": 6
+    },
+    {
+      "SKU": "KTBX-0008-TFL",
+      "VariantName": "Tasting Flight",
+      "Price": 49.99,
+      "Inventory": 550,
+      "VariantStatus": "sellable",
+      "ProductId": 121,
+      "VariantId": 245,
+      "Path": "tasting-flight",
+      "CanonicalUrl": "www.mancrates.com/store/products/tasting-flight",
+      "ContentsHTML": "<h4>Taste Testers</h4> <ul>\n  <li>Barrel Stave<sup>*</sup>, Fits Four Glasses and Four Bottle Caps</li>\n  <li>Four Taster Glasses, 5 oz</li>\n</ul> <p>\n  <sup>*</sup>Note: Staves are re-purposed from oak distilling casks and may have slight character\n              imperfections from past use.\n</p>",
+      "LongDescription": "\"Maybe Just A Taste&\" There's an air of sophistication that accompanies the word tasting. If we were honest and\n   told our therapist we went wine tasting over the weekend, it would lead to a pleasant\n   adult conversation with words like tannic and silky.\n If we were slightly more honest and said we downed three bottles of wine, challenged multiple sommeliers\n   to a slap-duel, and somehow woke up in a horse stable, the ensuing conversation\n   would be a little different.\n The Beer Tasting Flight does for beer drinkers what a tour in Napa does for winos; it's the skinny column\n   of credibility that separates a respected appreciation of high-brow alcohol from just boozin' with the\n   boys.\n Prepare For A Bumpy Ride We have unusually high standards for where we rest our nice beers. It's why we chose this particular\n   tasting flight, and why our personal coaster's name is Jeffrey and has a B.A. in Hospitality.\n Re-purposed from the stave of an old, oak distilling cask, this tasting flight carries an impressive\n   resume of once holding 50+ gallons of alcohol. Some staves boast the cracks and\n   wear of authentic use, what those in the distilling industry refer to as \"character.\"\n   Now, they've been drilled to hold four bottle cap flavor indicators and four pristine\n   tasting glasses.\n Speaking of tasting glasses, this set of four 5 oz. Libbey glasses resemble tiny beer cans of glass and are\n   excellent for sipping and sampling beers in moderation(unknown character)lots of moderation.\n With the Beer Tasting Flight, any beer aficionado can sip clout and class straight from the glass.",
+      "Contents": "Taste Testers \n  Barrel Stave*, Fits Four Glasses and Four Bottle Caps\n  Four Taster Glasses, 5 oz\n \n  *Note: Staves are re-purposed from oak distilling casks and may have slight character\n              imperfections from past use.\n",
+      "LongDescriptionHTML": "<h4>\"Maybe Just A Taste&\"</h4> <p>There's an air of sophistication that accompanies the word tasting. If we were honest and\n   told our therapist we went wine tasting over the weekend, it would lead to a pleasant\n   adult conversation with words like tannic and silky.\n</p> <p>If we were slightly more honest and said we downed three bottles of wine, challenged multiple sommeliers\n   to a slap-duel, and somehow woke up in a horse stable, the ensuing conversation\n   would be a little different.\n</p> <p>The Beer Tasting Flight does for beer drinkers what a tour in Napa does for winos; it's the skinny column\n   of credibility that separates a respected appreciation of high-brow alcohol from just boozin' with the\n   boys.\n</p> <h4>Prepare For A Bumpy Ride</h4> <p>We have unusually high standards for where we rest our nice beers. It's why we chose this particular\n   tasting flight, and why our personal coaster's name is Jeffrey and has a B.A. in Hospitality.\n</p> <p>Re-purposed from the stave of an old, oak distilling cask, this tasting flight carries an impressive\n   resume of once holding 50+ gallons of alcohol. Some staves boast the cracks and\n   wear of authentic use, what those in the distilling industry refer to as \"character.\"\n   Now, they've been drilled to hold four bottle cap flavor indicators and four pristine\n   tasting glasses.\n</p> <p>Speaking of tasting glasses, this set of four 5 oz. Libbey glasses resemble tiny beer cans of glass and are\n   excellent for sipping and sampling beers in moderation(unknown character)lots of moderation.\n</p> <p>With the Beer Tasting Flight, any beer aficionado can sip clout and class straight from the glass.</p>",
+      "Name": "Tasting Flight",
+      "ConversionRate": 1.1019283746556474,
+      "UniquePurchases": 16,
+      "ProductRevenue": 799.84,
+      "Quantity": 16,
+      "AveragePrice": 49.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/851/large/tft-tasting-flight-awesome-gift-for-men-beer-drinking-hops-delicious-drinking-with-friends__75953.jpg?1502411220",
+      "Margin": 59.69,
+      "TerrainScore": 0.3410408833002826,
+      "TERRAINRANK": 7
+    },
+    {
+      "SKU": "KTCR-0036-STE",
+      "VariantName": "Personalized Oktoberfest Stein",
+      "Price": 69.99,
+      "Inventory": 355,
+      "VariantStatus": "sellable",
+      "ProductId": 64,
+      "VariantId": 136,
+      "Path": "personalized-oktoberfest-stein",
+      "CanonicalUrl": "www.mancrates.com/store/products/personalized-oktoberfest-stein",
+      "ContentsHTML": "<h4>Personal Beer Barrel</h4> <ul>\r\n  <li>Personalized Oktoberfest Stein</li>\r\n  <li>(2) Oktoberfest-Themed Coasters/Bottle Openers</li>\r\n</ul> <h4>Deutschland Delicacies</h4> <ul>\r\n  <li>Saverne Artisanal \"Craft Beer\" Kraut</li>\r\n  <li>Bavarian Salami Sausage</li>\r\n  <li>Bavarian Summer Sausage</li>\r\n  <li>Inglehoffer Stone Ground Mustard</li>\r\n  <li>East Shore Pretzel Bites</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "Oktober State of Mind Oktoberfest, the 17-day stein-clanking, pretzel-munching pride and joy of Germany, is actually\r\n   very American when you think about it. Nothing screams \"Freedom!\" louder than gorging\r\n   one's self on another culture's delicacies while drinking liters gallons of beer in a foreign land with friends\r\n   and festive strangers.\r\n In true American fashion, we've decided to do Oktoberfest better than the people who invented it by making\r\n   it last longer--much longer. The Oktoberfest Man Crate is America's greatest innovation: 365 Days of\r\n   Oktoberfest.\r\n Der Biermeister Say what you will about Germans, their outlandish haircuts, and complete inability to comprehend sarcasm\r\n   (and believe us, we do), but those Deutschlanders sure know how to appreciate a good brew. The glass\r\n   stein is reserved for the no-nonsense beer drinker.\r\n Forever unite yourself with the Spirit of Oktober by etching your name into a glass Oktoberfest stein.\r\n   And for the record, just because this mammoth of a mug can hold enough beer for\r\n   two does not mean you're obligated to share. Your name is permanently engraved on\r\n   it for a reason.\r\n The crate also contains two Oktoberfest stein-sized coaster/bottle openers. One to rest underneath your\r\n   personalized stein, and another to get your reload primed for pouring.\r\n Snacktober It's not Oktober unless you're importing Germany's finest traditional foods like Bavarian salami\r\n   and summer sausage, pretzels, and Inglehoffer Stone Ground Mustard straight into your chomper chamber. And\r\n   if you're looking for \"authentisch Sauerkraut\", Saverne's Artisanal \"Craft Beer\" Kraut is as authentically\r\n   German as a jolly mountaineer prancing around in Lederhosen yodeling David Hasselhoff's \"Looking for\r\n   Freedom\".\r\n Keep Oktober as your state of mind all the time with the Oktoberfest Crate.",
+      "Contents": "Personal Beer Barrel \r\n  Personalized Oktoberfest Stein\r\n  (2) Oktoberfest-Themed Coasters/Bottle Openers\r\n Deutschland Delicacies \r\n  Saverne Artisanal \"Craft Beer\" Kraut\r\n  Bavarian Salami Sausage\r\n  Bavarian Summer Sausage\r\n  Inglehoffer Stone Ground Mustard\r\n  East Shore Pretzel Bites\r\n\r\nNOTE: Personalized items require 48 hours of processing time.",
+      "LongDescriptionHTML": "<h4>Oktober State of Mind</h4> <p>Oktoberfest, the 17-day stein-clanking, pretzel-munching pride and joy of Germany, is actually\r\n   very American when you think about it. Nothing screams \"Freedom!\" louder than gorging\r\n   one's self on another culture's delicacies while drinking liters gallons of beer in a foreign land with friends\r\n   and festive strangers.\r\n</p> <p>In true American fashion, we've decided to do Oktoberfest better than the people who invented it by making\r\n   it last longer--much longer. The Oktoberfest Man Crate is America's greatest innovation: 365 Days of\r\n   Oktoberfest.\r\n</p> <h4>Der Biermeister</h4> <p>Say what you will about Germans, their outlandish haircuts, and complete inability to comprehend sarcasm\r\n   (and believe us, we do), but those Deutschlanders sure know how to appreciate a good brew. The glass\r\n   stein is reserved for the no-nonsense beer drinker.\r\n</p> <p>Forever unite yourself with the Spirit of Oktober by etching your name into a glass Oktoberfest stein.\r\n   And for the record, just because this mammoth of a mug can hold enough beer for\r\n   two does not mean you're obligated to share. Your name is permanently engraved on\r\n   it for a reason.\r\n</p> <p>The crate also contains two Oktoberfest stein-sized coaster/bottle openers. One to rest underneath your\r\n   personalized stein, and another to get your reload primed for pouring.\r\n</p> <h4>Snacktober</h4> <p>It's not Oktober unless you're importing Germany's finest traditional foods like Bavarian salami\r\n   and summer sausage, pretzels, and Inglehoffer Stone Ground Mustard straight into your chomper chamber. And\r\n   if you're looking for \"authentisch Sauerkraut\", Saverne's Artisanal \"Craft Beer\" Kraut is as authentically\r\n   German as a jolly mountaineer prancing around in Lederhosen yodeling David Hasselhoff's \"Looking for\r\n   Freedom\".\r\n</p> <p>Keep Oktober as your state of mind all the time with the Oktoberfest Crate.</p>",
+      "Name": "Personalized Oktoberfest Stein Crate",
+      "ConversionRate": 4.29553264604811,
+      "UniquePurchases": 150,
+      "ProductRevenue": 10498.5,
+      "Quantity": 150,
+      "AveragePrice": 69.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/599/large/okt-s-personalized-stein-and-snack-gifts-for-men__91353.jpg?1502411116",
+      "Margin": 57.42,
+      "TerrainScore": 0.3307729455951681,
+      "TERRAINRANK": 8
+    },
+    {
+      "SKU": "KTPR-0001-1BR",
+      "VariantName": "Micro Brewed Kit (1 gal)",
+      "Price": 74.99,
+      "Inventory": 242,
+      "VariantStatus": "sellable",
+      "ProductId": 97,
+      "VariantId": 189,
+      "Path": "micro-brewed-kit-1-gal",
+      "CanonicalUrl": "www.mancrates.com/store/products/micro-brewed-kit-1-gal",
+      "ContentsHTML": "<h4>Brewing Brouhaha</h4> <ul>\r\n  <li>Micro Brewing Instruction Manual</li>\r\n  <li>1 Gallon Carboy</li>\r\n  <li>Air Lock</li>\r\n  <li>Bottle Caps</li>\r\n  <li>SMaSH IPA Kit</li>\r\n  <li>Pump Siphon</li>\r\n  <li>Bottle Capper</li>\r\n  <li>Sanitizer</li>\r\n  <li>Bottle Filler</li>\r\n  <li>Tubing</li>\r\n  <li>Carbonation Drops</li>\r\n</ul>",
+      "LongDescription": "BYOB (Be Your Own Brewmaster) Beer is the Rosetta Stone of humanity, the one universally consumed and celebrated\r\n   thread tying every culture and era of civilization together. The Sumerians wrote\r\n   hymns to the exhilarating nature of beer, the Chinese experimented extensively with\r\n   rice fermentations, and there's even cursory evidence of beer predating human history.\r\n   (Those monkeys were crafty!)\r\n In past days, the brewers were the esteemed men of the world, the gatekeepers to the ethereal knowledge of\r\n   medicine, pleasure, and the divine. Nowadays, we've degraded the ancient craft to big industry corporations\r\n   and a shoddy baseball team in Milwaukee.\r\n The best way to restore rightful honor to the lost art of beer brewing, to bottle your impeccable taste on\r\n   the most intricate level, is to do it yourself.\r\n Get Weird With Your Beer Start stocking your well-curated home bar with well-aerated home beer brewed in your very\r\n   kitchen. The Micro Brewed project kit features the floral and citrusy aroma, balanced\r\n   flavors, and American pedigree of Centennial Hops and a SMASH (Single Malt and Single\r\n   Hop) Recipe that pulls everything out of the way to let the Centennial hops speak\r\n   unimpeded.\r\n And these hops have a lot to say. The 1.5 gallon Little Bubbler gives more head room than a topless Jeep Wrangler for the most robust of\r\n   beers, yet is small enough to fit comfortably in a Brooklyn wash closet of a studio\r\n   apartment. The one gallon batch size invites more freedom and creativity into your\r\n   recipes, so you can embrace your artistic genius unimpeded, with less pride to swallow\r\n   if your secret ingredient is less hit and more miss.\r\n Fermentation Activation! Racking, measuring, sanitizing, and bottling: all things you will soon be intimately\r\n   familiar with. Intimately. We've curated the ultimate collection of tubes and jib-jabs\r\n   to transform simple ingredients into a beer that will make friends and colleagues\r\n   enjoy, respect, and deeply envy your brewing expertise.\r\n Carry on the legacy of first-rate fermentation and inject some hoppiness into your happiness with the\r\n   Home Brewed project kit.\r\n",
+      "Contents": "Brewing Brouhaha \r\n  Micro Brewing Instruction Manual\r\n  1 Gallon Carboy\r\n  Air Lock\r\n  Bottle Caps\r\n  SMaSH IPA Kit\r\n  Pump Siphon\r\n  Bottle Capper\r\n  Sanitizer\r\n  Bottle Filler\r\n  Tubing\r\n  Carbonation Drops\r\n",
+      "LongDescriptionHTML": "<h4>BYOB (Be Your Own Brewmaster)</h4> <p>Beer is the Rosetta Stone of humanity, the one universally consumed and celebrated\r\n   thread tying every culture and era of civilization together. The Sumerians wrote\r\n   hymns to the exhilarating nature of beer, the Chinese experimented extensively with\r\n   rice fermentations, and there's even cursory evidence of beer predating human history.\r\n   (Those monkeys were crafty!)\r\n</p> <p>In past days, the brewers were the esteemed men of the world, the gatekeepers to the ethereal knowledge of\r\n   medicine, pleasure, and the divine. Nowadays, we've degraded the ancient craft to big industry corporations\r\n   and a shoddy baseball team in Milwaukee.\r\n</p> <p>The best way to restore rightful honor to the lost art of beer brewing, to bottle your impeccable taste on\r\n   the most intricate level, is to do it yourself.\r\n</p> <h4>Get Weird With Your Beer</h4> <p>Start stocking your well-curated home bar with well-aerated home beer brewed in your very\r\n   kitchen. The Micro Brewed project kit features the floral and citrusy aroma, balanced\r\n   flavors, and American pedigree of Centennial Hops and a SMASH (Single Malt and Single\r\n   Hop) Recipe that pulls everything out of the way to let the Centennial hops speak\r\n   unimpeded.\r\n</p> <p>And these hops have a lot to say.</p> <p>The 1.5 gallon Little Bubbler gives more head room than a topless Jeep Wrangler for the most robust of\r\n   beers, yet is small enough to fit comfortably in a Brooklyn wash closet of a studio\r\n   apartment. The one gallon batch size invites more freedom and creativity into your\r\n   recipes, so you can embrace your artistic genius unimpeded, with less pride to swallow\r\n   if your secret ingredient is less hit and more miss.\r\n</p> <h4>Fermentation Activation!</h4> <p>Racking, measuring, sanitizing, and bottling: all things you will soon be intimately\r\n   familiar with. Intimately. We've curated the ultimate collection of tubes and jib-jabs\r\n   to transform simple ingredients into a beer that will make friends and colleagues\r\n   enjoy, respect, and deeply envy your brewing expertise.\r\n</p> <p>Carry on the legacy of first-rate fermentation and inject some hoppiness into your happiness with the\r\n   Home Brewed project kit.\r\n</p>",
+      "Name": "Micro Brewed Kit (1 gal)",
+      "ConversionRate": 5.0024764735017335,
+      "UniquePurchases": 101,
+      "ProductRevenue": 7573.99,
+      "Quantity": 101,
+      "AveragePrice": 74.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/744/large/diymb-do-it-yourself-simple-home-brewing-gift-kit-for-men_w__01594.jpg?1502411174",
+      "Margin": 56.25,
+      "TerrainScore": 0.27489422860742385,
+      "TERRAINRANK": 9
+    },
+    {
+      "SKU": "KTCR-0060-CHI",
+      "VariantName": "Beer Can Chicken Crate",
+      "Price": 84.99,
+      "Inventory": 58,
+      "VariantStatus": "sellable",
+      "ProductId": 51,
+      "VariantId": 123,
+      "Path": "beer-can-chicken-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/beer-can-chicken-crate",
+      "ContentsHTML": "<h4>Malted Meat</h4> <ul>\n  <li>Beer Can Roaster</li>\n  <li>Ancho Chicken Rub</li>\n  <li>Any Day Chicken Rub</li>\n</ul> <h4>Crispy Craft Chicken</h4> <ul>\n  <li>Poultry Shears</li>\n  <li>Poultry Thermometer</li>\n</ul>",
+      "LongDescription": "Canned Chicken We Can Get Behind Some guys are master chefs who devote years to perfecting the culinary arts.\n   Other guys' cooking skills are limited to burning some charcoal and opening a beer.\n   Fortunately, that's all it takes to make some of the juiciest, most flavorful chicken\n   ever.\n \"Beer Can Chicken\" is a beloved grilling technique, which calls for\n   putting a brewski in a chicken where you'd put the stuffing in a Thanksgiving turkey.\n   It produces delicious crackly skin on the outside, plus extra moisture and taste\n   infusion on the inside.\n Granted, it may not be the most gourmet cooking method&until now. Cook-A-Doodle-Do! Many premium microbrews are found only in glass bottles, so the included flashy-and-functional canister\n   expands the options beyond mass-produced domestic lager. Barbecue with the complex flavors of craft\n   beer(unknown character)IPA hops, porter brown malt(unknown character)or even a nice chianti. It's also more stable than a regular aluminium can\n   and provides great exterior browning on all sides.\n The Just Cook® ancho chili rub and spice blend take it to the next level, proving\n   that Beer Can Chicken is far more than a party trick. We've also thrown in a Poultry\n   Button® thermometer and shears, so any ale-infused fowl will be perfectly fire-roasted,\n   split and served. Malt, meet meat.\n",
+      "Contents": "Malted Meat \n  Beer Can Roaster\n  Ancho Chicken Rub\n  Any Day Chicken Rub\n Crispy Craft Chicken \n  Poultry Shears\n  Poultry Thermometer\n",
+      "LongDescriptionHTML": "<h4>Canned Chicken We Can Get Behind</h4> <p>Some guys are master chefs who devote years to perfecting the culinary arts.\n   Other guys' cooking skills are limited to burning some charcoal and opening a beer.\n   Fortunately, that's all it takes to make some of the juiciest, most flavorful chicken\n   ever.\n</p> <p>\"Beer Can Chicken\" is a beloved grilling technique, which calls for\n   putting a brewski in a chicken where you'd put the stuffing in a Thanksgiving turkey.\n   It produces delicious crackly skin on the outside, plus extra moisture and taste\n   infusion on the inside.\n</p> <p>Granted, it may not be the most gourmet cooking method&until now.</p> <h4>Cook-A-Doodle-Do!</h4> <p>Many premium microbrews are found only in glass bottles, so the included flashy-and-functional canister\n   expands the options beyond mass-produced domestic lager. Barbecue with the complex flavors of craft\n   beer(unknown character)IPA hops, porter brown malt(unknown character)or even a nice chianti. It's also more stable than a regular aluminium can\n   and provides great exterior browning on all sides.\n</p> <p>The Just Cook® ancho chili rub and spice blend take it to the next level, proving\n   that Beer Can Chicken is far more than a party trick. We've also thrown in a Poultry\n   Button® thermometer and shears, so any ale-infused fowl will be perfectly fire-roasted,\n   split and served. Malt, meet meat.\n</p>",
+      "Name": "Beer Can Chicken Crate",
+      "ConversionRate": 6.3568010936432,
+      "UniquePurchases": 93,
+      "ProductRevenue": 7904.07,
+      "Quantity": 93,
+      "AveragePrice": 84.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/542/large/MBC_Beercan-Chkn_2018-6_WEB-7086-2.jpg?1528931282",
+      "Margin": 54.93,
+      "TerrainScore": 0.12960573299244965,
+      "TERRAINRANK": 10
+    }
+  ],
+  "outputDocs": [
+    {
+      "SKU": "KTCR-0007-BAR",
+      "VariantName": "Personalized Barware",
+      "Price": 99.99,
+      "ProductId": 129,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/personalized-barware-crate",
+      "Contents": "<h4>Home Bar Gear</h4> <ul>\r\n  <li>4 Personalized Pint Glasses</li>\r\n  <li>4 Personalized Wooden Coasters/Bottle Openers</li>\r\n</ul> <h4>Counter Chow</h4> <ul>\r\n  <li>Pistachios, 5 oz</li>\r\n  <li>BBQ Corn Nuggets, 4 oz</li>\r\n  <li>Beer Nuts Bar Mix, 3.25 oz</li>\r\n  <li>CB's Lightly Salted Ballpark Peanuts, 12 oz</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "<h4>Greatness Has A Name</h4> <p>When the first humans to scale Mount Everest reached the summit, they didn't\r\n   immediately update their wikipedia pages or take selfies with self-aggrandizing\r\n   hashtags. They celebrated their dominance over nature like true men--by cracking\r\n   open a beer and chiseling their names into the icy death they'd conquered.\r\n</p> <p>A man's name isn't just a label. It's a shorthand celebration of his greatest accomplishments.</p> <h4>This Time It's Personal</h4> <p>Sure, Barry from high school, voted \"Most Likely to Succeed,\" might drive a fancy European sports car to\r\n   his fat cat Wall Street job, but does Barry from high school have his own set of personalized pint glasses?\r\n</p> <p>Probably not. He probably drinks from non-personalized glasses like an uncultured chump. </p> <p>We've acquired that monstrous laser from \"Goldfinger\" and repurposed its settings from burning James Bond's\r\n   giblets to etching names into pint glasses with perfect precision.\r\n</p> <p>So while Barry's crying alone in his mansion over a frozen microwave dinner, you can be toasting real\r\n   success with three close buddies and four awesome personalized pint glasses.\r\n</p> <h4>The Man, The Myth, The Legendary Coasters</h4> <p>The matching set of personalized wooden coasters are classy and clean--like drying your tabletops with bear\r\n   skin napkins. Plus, they double as bottle-openers, which means less time scavenging in drawers and more\r\n   time swapping epic drinking stories. Like when you once wrestled a croc while wearing Crocs purely out of\r\n   hubris.\r\n</p> <p>And we've got snacks with your name on them. Figuratively. We used to personalize every individual nut and\r\n   pretzel, but they got inhaled too quickly for anyone to notice.\r\n</p> <p>Grab the Personalized Barware Crate today and ensure the world never forgets your name.</p>",
+      "Name": "Personalized Barware Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/884/large/pb_personalized_pint_giftset_for_beer_loving_guys__44982.jpg?1502411232",
+      "TERRAINRANK": 1
+    },
+    {
+      "SKU": "KTAM-0007-BAR",
+      "VariantName": "Personalized Pint Set Ammo Can",
+      "Price": 64.99,
+      "ProductId": 20,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/personalized-pint-set-ammo-can",
+      "Contents": "<h4>Beer Buddies</h4> <ul>\r\n  <li>2 Laser-Etched Pint Glasses</li>\r\n  <li>Personalized .50 Cal Bottle Opener</li>\r\n</ul> <h4>Beef Sticks</h4> <ul>\r\n  <li>Peppered Jerky Stick</li>\r\n  <li>Original Jerky Stick</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "<h4>The World Is His Man Cave</h4> <p>A man's insatiable appetite for adventure will lead him to Earth's highest peaks,\r\n   deepest caverns, and soon, neighboring planets--but none of these places adequately\r\n   cater to his second-most pressing appetite: beer.\r\n</p> <p>But we've built a gift\r\n   that lets him have it all. Whether he's crag climbing, spelunking, or riding a rocket\r\n   to the grand opening of Raging Waters: Mars, the Personalized Pint Set Ammo Can\r\n   will always ensure an awesome pint by his side.\r\n</p> <h4>Go Forth And Drink</h4> <p>With the Personalized Pint Set Ammo Can, he'll never have to endure the harsh\r\n   humiliation of asking, \"where can a man get a decent drink around here?\" because\r\n   he'll always have a pair of personalized, laser-etched pint glasses tucked safely\r\n   in the indestructible ammo can handcuffed to his wrist.\r\n</p> <p>There's only one\r\n   bottle opener that can withstand the intrepid demand of the adventurous man, and\r\n   that's the personalized bullet bottle opener. This .50 caliber bullet with his name\r\n   engraved on the side is the second coolest way to open a beer with a bullet. And\r\n   man cannot live on beer alone, which is where the two delicious beef sticks come\r\n   into play.\r\n</p> <p>The Personalized Pint Set Ammo Can has all the essentials he'll\r\n   need to get his beers and best buds out of the house and into the world.\r\n</p>",
+      "Name": "Personalized Barware Ammo Can",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/420/large/ppsac_awesome-personalized-pint-pair-gift-for-men__88533.jpg?1502411051",
+      "TERRAINRANK": 2
+    },
+    {
+      "SKU": "KTCR-0018-GOL",
+      "VariantName": "The Golfer's Crate",
+      "Price": 99.99,
+      "ProductId": 156,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/golfers-crate",
+      "Contents": "<h4>Fairway Armament</h4> <ul>\r\n  <li>Gopher Head Cover</li>\r\n  <li>DivPro 6-in-1 Golf Tool</li>\r\n  <li>Golf Towel</li>\r\n  <li>TaylorMade Distance+ Balls, 1 sleeve</li>\r\n  <li>Bag of Golf Tees</li>\r\n</ul> <h4>Pro Training Regimen</h4> <ul>\r\n  <li>Arnold Palmer Drink, 16 oz</li>\r\n  <li>BIGS Sunflower Seeds, 5 oz</li>\r\n  <li>Caddyshack DVD</li>\r\n</ul>",
+      "LongDescription": "<h4>Who Let These Guys on the Course?</h4> <p>We're not pro golfers. We've never been on the amateur circuit, we've never won any charity tournaments,\r\n   and Michelle Wie's people won't return our phone calls. Hell, we'll even admit that when we first started R&amp;D\r\n   on the Golfer's Man Crate we were sloppy on the driving range and an embarrassment on the course.\r\n</p> <p>Luckily after weeks of sampling just about every golf product on the market and\r\n   many long days of practice, we're no worse off. We had tons of fun, but we're\r\n   still absolutely mediocre golfers.\r\n</p> <p>Expensive gadgets didn't make us better golfers any more than expensive boxing gloves would\r\n   make us better heavy-weight prize fighters. We've got no shortcuts to sell you\r\n   to improve your game, but we have gathered a few awesome items that make any golf\r\n   outing more fun.\r\n</p> <h4>The Game Within A Game</h4> <p>Whether your preferred sidebet is cold, hard, \"In God We Trust\" cash or the penalty of a shotgunned beer,\r\n   there is no purer way to celebrate living in a free capitalist society than by making\r\n   a handshake wager on a spur of the moment challenge. It's in the drama of these\r\n   small contests that heroes are born and legends are written.\r\n</p> <p>Enter the Chuck Rodent golf head cover. This stylish piece of golf haute\r\n   couture isn't just a beautifully functional adornment for your club, it's the trophy of a champion.\r\n   Wager Chuck Rodent on the next best-ball drive and the winner gets to carry him in his bag. The loser\r\n   becomes \"the gopher\", responsible for fetching lost balls and drinks until he can win or steal Chuck back.\r\n</p> <p>If you do end up having to shotgun that beer, the 6 Tool DivPro\r\n   will come in handy. It also comes in handy if you need to fix a divot, hold your club off the green, ash a\r\n   cigar, mark your ball, or clean your club heads. In short this tool is basically the golfer's equivalent to\r\n   the iPhone. Of all the tagalongs, gadgets and golf widgets we tried, the DivPro stood out as an incredibly\r\n   well-designed, practical item.\r\n</p> <p>A bag of tees, a sleeve of TaylorMade Long &amp; Softs, and an ever-useful golf towel round out the\r\n   practical items in the Golfer's Man Crate. Always have a towel. For sustenance on the course we've thrown\r\n   in some sunflower seeds and a classic Arnold Palmer.\r\n</p> <h4>Bill Freakin' Murray</h4> <p>We can't send you private golf lessons, but we will send you the definitive instructional DVD on the\r\n   golfer's way of life. Critics agree that Caddyshack is an absolutely\r\n  juvenile exploration of man's struggle to find his place in the world amidst the pressures of his\r\n   environment, fearsome wildlife, and cut-throat competition- one of the most rewatched comedies of all time.\r\n</p>",
+      "Name": "The Golfer's Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/001/010/large/gc-the-golfers-crate_fun_golfer_gift_basket_for_men__24368.jpg?1502411278",
+      "TERRAINRANK": 3
+    },
+    {
+      "SKU": "KTCR-0054-GRW",
+      "VariantName": "Personalized Growler Crate",
+      "Price": 79.99,
+      "ProductId": 98,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/personalized-growler-crate",
+      "Contents": "<h4>Exploration Equipment</h4> <ul>\r\n  <li>Personalized Mini-Keg Growler, 64 oz</li>\r\n  <li>White Chalk Pencil</li>\r\n  <li>(2) Classic Pint Glasses</li>\r\n</ul> <h4>Drinking Buddies</h4> <ul>\r\n  <li>33 Bottles Of Beer Tasting Journal</li>\r\n  <li>Brew Candy</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "<h4>Straight From The Source</h4> <p>Some quests are more honorable than others, and with all due respect to men collecting\r\n   stamps and state quarters, we're focusing on a far loftier goal: the quest to enjoy\r\n   every microbrew in America straight from the source.\r\n</p> <p>This journey, while extremely delicious, is also extremely difficult. A devout band of drinking buddies\r\n   must canoe for miles, caravan for weeks, and forsake all adult responsibilities\r\n   to achieve the fullness of flavor.\r\n</p> <p>These brave souls are our modern-day keg-quistadors in search of the mythical Fountain of Booze.</p> <h4>Jug Life</h4> <p>A knight would never ride into battle without his trusty steed, sharpened steel, and self-righteous\r\n   sense of divine approval, and neither should you embark upon the quest for quenched\r\n   thirst without a personalized steel growler.\r\n</p> <p>The road between breweries is long and dry, and only 64 oz. of cool, carbonated brew will carry your\r\n   spirits onward. Top it off at each stop, chalk details directly onto the mini-keg with the white\r\n   chalk pencil, and share generously with fellow pilgrims along the way in a pair\r\n   of classic screenprinted pint glasses.\r\n</p> <p>Always remember, your quest is valiant, and the growler is laser-etched with your name, so carry it with\r\n   pride throughout the land.\r\n</p> <h4>Drink Beers For \"Research\"</h4> <p>Your thoroughly documented taste will live forever in the annals of time in the 33 Bottles of Beer Book.\r\n   Log textures and flavors as you sip, and present the book upon entrance to any brewery to ensure they bring\r\n   out the good stuff.\r\n</p> <p>Get ye quest for eternal refreshment underway with the Personalized Growler Crate.</p>",
+      "Name": "Personalized Growler Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/748/large/pgc_personalized_growler_gifts_for_craft_beer_guys__01242.jpg?1502411176",
+      "TERRAINRANK": 4
+    },
+    {
+      "SKU": "KTCR-0048-INF",
+      "VariantName": "Booze-Infused Jerky Crate",
+      "Price": 99.99,
+      "ProductId": 109,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/booze-infused-jerky-crate",
+      "Contents": "<h4>Mixed Cow-tails</h4> <ul>\r\n  <li>Caribbean Rum Jerky</li>\r\n  <li>Cabernet Jerky</li>\r\n  <li>Bourbon Jerky</li>\r\n  <li>Whiskey BBQ Jerky</li>\r\n  <li>Chipotle Tequila Jerky</li>\r\n</ul> <h4>Beer-Bellied Beef</h4> <ul>\r\n  <li>IPA Beef Jerky</li>\r\n  <li>Dark Ale Jerky</li>\r\n  <li>Regrained IPA Bar</li>\r\n  <li>Regrained Coffee Stout Bar</li>\r\n</ul>",
+      "LongDescription": "<h4>Cowcaholics A-nom-nom-nonymous</h4> <p>Alcohol affects people differently: some become more talkative, some funnier, and some friskier, but when\r\n   it comes to cows, alcohol just makes them more delicious...and maybe also friskier.\r\n</p> <p>We're not sure how they're getting their buzz on(unknown character)perhaps they're grazing on fermented veggies or maybe\r\n   their hooves have evolved to open bottles(unknown character)but we do know \"Cowcaholism\" on the range is as widespread as it\r\n   is udderly hilarious.\r\n</p> <p>If you thought cow-tipping was funny, imagine \"cow-tipsying,\" where a one-ton, hot mess of a cow topples\r\n   over of its own drunken accord. The fall of such docile beasts have given rise to our stampede of\r\n   inebriated beef, the Booze-Infused Jerky Crate.\r\n</p> <h4>A Cow Walks Into A Bar...</h4> <p>By weight, the average-sized cow can down 57 standard drinks per hour (almost 1 per minute) and still be\r\n   within the legal limits of operating a vehicle or motorized tractor.\r\n</p> <p>At maximum capacity, the average cow's four stomachs can hold upwards of 62 gallons of liquid,\r\n   more than a barrel of Jack Daniels (53 gallons). If only that were enough alcohol\r\n   to satiate their demons.\r\n</p> <p>The good news is, this means the tender beef of the Booze-Infused Jerky Crate has been marinating in a\r\n   saloon's worth of alcohol (from the inside-out) for the better half of a bovine lifetime. The results,\r\n   delicious, buzzed beef jerky.\r\n</p> <h4>Go Home Beef Jerky, You're Drunk</h4> <p>In curing Cowcaholism, we didn't just cure the easy-capture, beer-bellied beef bodies. We\r\n   herded up cows with diversified tastes from Whiskey BBQ to Pinot Noir for a wide\r\n   spectrum of alcohol flavors for your jerky fix.\r\n</p> <p>The full lineup of cattle intoxication includes: Caribbean Rum, IPA, Cabernet, Bourbon, Whiskey BBQ,\r\n   Chipotle Tequila, Dark Ale, and Regrained IPA and Coffee Stout bars to act as a quick brunch/hangover\r\n   cure.\r\n</p> <p>Throwdown a double-shot of beef and booze in one bite with the Booze-Infused Jerky Crate.</p>",
+      "Name": "Booze-Infused Jerky Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/798/large/bijc_booze_meat_gifts_to_make_his_head_spin__12809.jpg?1502411196",
+      "TERRAINRANK": 5
+    },
+    {
+      "SKU": "KTCR-0050-MOS",
+      "VariantName": "Moscow Mule Crate",
+      "Price": 79.99,
+      "ProductId": 146,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/moscow-mule-crate",
+      "Contents": "<h4>The Classic Mule</h4> <ul>\n  <li>2 Copper Mugs (With Stainless Steel Lining)</li>\n  <li>Cock N' Bull Ginger Beer 4 pack</li>\n</ul> <h4>Bartending Tools</h4> <ul>\n  <li>Tovolo Perfect Cube Ice Tray</li>\n  <li>16 oz. Cocktail Shaker</li>\n  <li>Jigger</li>\n</ul>",
+      "LongDescription": "<h4>Kicks Like A Mule</h4> <p>We love mixed drinks almost as much as we love America, so we were extra relieved to learn\n   the Moscow Mule was very American and not, as we initially suspected, a delicious\n   brainwashing potion created by a certain shirtless, horse-riding Russian overlord.\n</p> <p>Our research shows the Moscow Mule went from cellar dweller to celebrity socialite\n   overnight by combining ginger beer, vodka, lime, and good ol' American moxie.\n</p> <h4>The Rise and Fall of the Moscow Mule</h4> <p>In 1941, Vodka was unknown and unwanted in America. Smirnoff owner John Martin had to store his unsellable\n   alcohol in the Cock N' Bull, a bar owned by Martin's equally bland-named friend Jack Morgan.\n   In an effort to clear out the basement, the bartender began mixing Smirnoff with\n   Morgan's unpopular ginger beer in mugs from his girlfriend's failed copper factory.\n</p> <p>It was a risky move to toss a bunch of undesirable things together and re-sell\n   it (scientists call this The Hot Dog Phenomena), but the strategy was an overwhelming\n   success. Soon, every trendsetter in Tinseltown was posing for the Polaroid paparazzi\n   with a copper mug in hand.\n</p> <p>Sadly, nothing copper can stay, and when the Cold War hit in the 1950's, true blue Americans began\n   boycotting vodka, aka \"Communist Tap Water\". The Moscow Mule faded into obscurity.\n</p> <h4>Three Cheers for Diplomacy!</h4> <p>But today, over half a century later, the United States and Russia share a giant\n   orbiting timeshare in outer space, and the only thing remotely Communist about vodka\n   is how freely Smirnoff Ice bottles get shared on college campuses. The world is\n   ready for the return of the Moscow Mule.\n</p> <p>In addition to the original Cock N' Bull ginger beer, the Moscow Mule Crate includes a pair of authentic\n   copper drinking mugs, Tovolo ice cube mold, 16 oz. mixed drink shaker, and measuring jigger, so\n   you can enjoy one of America's finest, definitely-not-Russian mixed drinks.\n</p> <p>Mix it up the classy way, and taste the kick of the Moscow Mule.</p>",
+      "Name": "The Moscow Mule Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/964/large/mm_awesome_vodka_mixed_drink_gifts_for_guys__47185.jpg?1502411261",
+      "TERRAINRANK": 6
+    },
+    {
+      "SKU": "KTBX-0008-TFL",
+      "VariantName": "Tasting Flight",
+      "Price": 49.99,
+      "ProductId": 121,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/tasting-flight",
+      "Contents": "<h4>Taste Testers</h4> <ul>\n  <li>Barrel Stave<sup>*</sup>, Fits Four Glasses and Four Bottle Caps</li>\n  <li>Four Taster Glasses, 5 oz</li>\n</ul> <p>\n  <sup>*</sup>Note: Staves are re-purposed from oak distilling casks and may have slight character\n              imperfections from past use.\n</p>",
+      "LongDescription": "<h4>\"Maybe Just A Taste&\"</h4> <p>There's an air of sophistication that accompanies the word tasting. If we were honest and\n   told our therapist we went wine tasting over the weekend, it would lead to a pleasant\n   adult conversation with words like tannic and silky.\n</p> <p>If we were slightly more honest and said we downed three bottles of wine, challenged multiple sommeliers\n   to a slap-duel, and somehow woke up in a horse stable, the ensuing conversation\n   would be a little different.\n</p> <p>The Beer Tasting Flight does for beer drinkers what a tour in Napa does for winos; it's the skinny column\n   of credibility that separates a respected appreciation of high-brow alcohol from just boozin' with the\n   boys.\n</p> <h4>Prepare For A Bumpy Ride</h4> <p>We have unusually high standards for where we rest our nice beers. It's why we chose this particular\n   tasting flight, and why our personal coaster's name is Jeffrey and has a B.A. in Hospitality.\n</p> <p>Re-purposed from the stave of an old, oak distilling cask, this tasting flight carries an impressive\n   resume of once holding 50+ gallons of alcohol. Some staves boast the cracks and\n   wear of authentic use, what those in the distilling industry refer to as \"character.\"\n   Now, they've been drilled to hold four bottle cap flavor indicators and four pristine\n   tasting glasses.\n</p> <p>Speaking of tasting glasses, this set of four 5 oz. Libbey glasses resemble tiny beer cans of glass and are\n   excellent for sipping and sampling beers in moderation(unknown character)lots of moderation.\n</p> <p>With the Beer Tasting Flight, any beer aficionado can sip clout and class straight from the glass.</p>",
+      "Name": "Tasting Flight",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/851/large/tft-tasting-flight-awesome-gift-for-men-beer-drinking-hops-delicious-drinking-with-friends__75953.jpg?1502411220",
+      "TERRAINRANK": 7
+    },
+    {
+      "SKU": "KTCR-0036-STE",
+      "VariantName": "Personalized Oktoberfest Stein",
+      "Price": 69.99,
+      "ProductId": 64,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/personalized-oktoberfest-stein",
+      "Contents": "<h4>Personal Beer Barrel</h4> <ul>\r\n  <li>Personalized Oktoberfest Stein</li>\r\n  <li>(2) Oktoberfest-Themed Coasters/Bottle Openers</li>\r\n</ul> <h4>Deutschland Delicacies</h4> <ul>\r\n  <li>Saverne Artisanal \"Craft Beer\" Kraut</li>\r\n  <li>Bavarian Salami Sausage</li>\r\n  <li>Bavarian Summer Sausage</li>\r\n  <li>Inglehoffer Stone Ground Mustard</li>\r\n  <li>East Shore Pretzel Bites</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "<h4>Oktober State of Mind</h4> <p>Oktoberfest, the 17-day stein-clanking, pretzel-munching pride and joy of Germany, is actually\r\n   very American when you think about it. Nothing screams \"Freedom!\" louder than gorging\r\n   one's self on another culture's delicacies while drinking liters gallons of beer in a foreign land with friends\r\n   and festive strangers.\r\n</p> <p>In true American fashion, we've decided to do Oktoberfest better than the people who invented it by making\r\n   it last longer--much longer. The Oktoberfest Man Crate is America's greatest innovation: 365 Days of\r\n   Oktoberfest.\r\n</p> <h4>Der Biermeister</h4> <p>Say what you will about Germans, their outlandish haircuts, and complete inability to comprehend sarcasm\r\n   (and believe us, we do), but those Deutschlanders sure know how to appreciate a good brew. The glass\r\n   stein is reserved for the no-nonsense beer drinker.\r\n</p> <p>Forever unite yourself with the Spirit of Oktober by etching your name into a glass Oktoberfest stein.\r\n   And for the record, just because this mammoth of a mug can hold enough beer for\r\n   two does not mean you're obligated to share. Your name is permanently engraved on\r\n   it for a reason.\r\n</p> <p>The crate also contains two Oktoberfest stein-sized coaster/bottle openers. One to rest underneath your\r\n   personalized stein, and another to get your reload primed for pouring.\r\n</p> <h4>Snacktober</h4> <p>It's not Oktober unless you're importing Germany's finest traditional foods like Bavarian salami\r\n   and summer sausage, pretzels, and Inglehoffer Stone Ground Mustard straight into your chomper chamber. And\r\n   if you're looking for \"authentisch Sauerkraut\", Saverne's Artisanal \"Craft Beer\" Kraut is as authentically\r\n   German as a jolly mountaineer prancing around in Lederhosen yodeling David Hasselhoff's \"Looking for\r\n   Freedom\".\r\n</p> <p>Keep Oktober as your state of mind all the time with the Oktoberfest Crate.</p>",
+      "Name": "Personalized Oktoberfest Stein Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/599/large/okt-s-personalized-stein-and-snack-gifts-for-men__91353.jpg?1502411116",
+      "TERRAINRANK": 8
+    },
+    {
+      "SKU": "KTPR-0001-1BR",
+      "VariantName": "Micro Brewed Kit (1 gal)",
+      "Price": 74.99,
+      "ProductId": 97,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/micro-brewed-kit-1-gal",
+      "Contents": "<h4>Brewing Brouhaha</h4> <ul>\r\n  <li>Micro Brewing Instruction Manual</li>\r\n  <li>1 Gallon Carboy</li>\r\n  <li>Air Lock</li>\r\n  <li>Bottle Caps</li>\r\n  <li>SMaSH IPA Kit</li>\r\n  <li>Pump Siphon</li>\r\n  <li>Bottle Capper</li>\r\n  <li>Sanitizer</li>\r\n  <li>Bottle Filler</li>\r\n  <li>Tubing</li>\r\n  <li>Carbonation Drops</li>\r\n</ul>",
+      "LongDescription": "<h4>BYOB (Be Your Own Brewmaster)</h4> <p>Beer is the Rosetta Stone of humanity, the one universally consumed and celebrated\r\n   thread tying every culture and era of civilization together. The Sumerians wrote\r\n   hymns to the exhilarating nature of beer, the Chinese experimented extensively with\r\n   rice fermentations, and there's even cursory evidence of beer predating human history.\r\n   (Those monkeys were crafty!)\r\n</p> <p>In past days, the brewers were the esteemed men of the world, the gatekeepers to the ethereal knowledge of\r\n   medicine, pleasure, and the divine. Nowadays, we've degraded the ancient craft to big industry corporations\r\n   and a shoddy baseball team in Milwaukee.\r\n</p> <p>The best way to restore rightful honor to the lost art of beer brewing, to bottle your impeccable taste on\r\n   the most intricate level, is to do it yourself.\r\n</p> <h4>Get Weird With Your Beer</h4> <p>Start stocking your well-curated home bar with well-aerated home beer brewed in your very\r\n   kitchen. The Micro Brewed project kit features the floral and citrusy aroma, balanced\r\n   flavors, and American pedigree of Centennial Hops and a SMASH (Single Malt and Single\r\n   Hop) Recipe that pulls everything out of the way to let the Centennial hops speak\r\n   unimpeded.\r\n</p> <p>And these hops have a lot to say.</p> <p>The 1.5 gallon Little Bubbler gives more head room than a topless Jeep Wrangler for the most robust of\r\n   beers, yet is small enough to fit comfortably in a Brooklyn wash closet of a studio\r\n   apartment. The one gallon batch size invites more freedom and creativity into your\r\n   recipes, so you can embrace your artistic genius unimpeded, with less pride to swallow\r\n   if your secret ingredient is less hit and more miss.\r\n</p> <h4>Fermentation Activation!</h4> <p>Racking, measuring, sanitizing, and bottling: all things you will soon be intimately\r\n   familiar with. Intimately. We've curated the ultimate collection of tubes and jib-jabs\r\n   to transform simple ingredients into a beer that will make friends and colleagues\r\n   enjoy, respect, and deeply envy your brewing expertise.\r\n</p> <p>Carry on the legacy of first-rate fermentation and inject some hoppiness into your happiness with the\r\n   Home Brewed project kit.\r\n</p>",
+      "Name": "Micro Brewed Kit (1 gal)",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/744/large/diymb-do-it-yourself-simple-home-brewing-gift-kit-for-men_w__01594.jpg?1502411174",
+      "TERRAINRANK": 9
+    },
+    {
+      "SKU": "KTCR-0060-CHI",
+      "VariantName": "Beer Can Chicken Crate",
+      "Price": 84.99,
+      "ProductId": 51,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/beer-can-chicken-crate",
+      "Contents": "<h4>Malted Meat</h4> <ul>\n  <li>Beer Can Roaster</li>\n  <li>Ancho Chicken Rub</li>\n  <li>Any Day Chicken Rub</li>\n</ul> <h4>Crispy Craft Chicken</h4> <ul>\n  <li>Poultry Shears</li>\n  <li>Poultry Thermometer</li>\n</ul>",
+      "LongDescription": "<h4>Canned Chicken We Can Get Behind</h4> <p>Some guys are master chefs who devote years to perfecting the culinary arts.\n   Other guys' cooking skills are limited to burning some charcoal and opening a beer.\n   Fortunately, that's all it takes to make some of the juiciest, most flavorful chicken\n   ever.\n</p> <p>\"Beer Can Chicken\" is a beloved grilling technique, which calls for\n   putting a brewski in a chicken where you'd put the stuffing in a Thanksgiving turkey.\n   It produces delicious crackly skin on the outside, plus extra moisture and taste\n   infusion on the inside.\n</p> <p>Granted, it may not be the most gourmet cooking method&until now.</p> <h4>Cook-A-Doodle-Do!</h4> <p>Many premium microbrews are found only in glass bottles, so the included flashy-and-functional canister\n   expands the options beyond mass-produced domestic lager. Barbecue with the complex flavors of craft\n   beer(unknown character)IPA hops, porter brown malt(unknown character)or even a nice chianti. It's also more stable than a regular aluminium can\n   and provides great exterior browning on all sides.\n</p> <p>The Just Cook® ancho chili rub and spice blend take it to the next level, proving\n   that Beer Can Chicken is far more than a party trick. We've also thrown in a Poultry\n   Button® thermometer and shears, so any ale-infused fowl will be perfectly fire-roasted,\n   split and served. Malt, meet meat.\n</p>",
+      "Name": "Beer Can Chicken Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/542/large/MBC_Beercan-Chkn_2018-6_WEB-7086-2.jpg?1528931282",
+      "TERRAINRANK": 10
+    }
+  ],
+  "template": {
+    "id": 26,
+    "lastModified": "2018-07-24T19:32:29.256Z",
+    "createdAt": "2018-07-10T19:24:03.167Z",
+    "archived": false,
+    "templateName": "Beer - Iterable Export",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "SKU"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "VariantName"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "Price"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "Inventory"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "VariantStatus"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "ProductId"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "VariantId"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "Path"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "CanonicalUrl"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "ContentsHTML"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "LongDescription"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "Contents"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "12",
+                  "value": {
+                    "id": 12,
+                    "fields": [
+                      [
+                        "LongDescriptionHTML"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "13",
+                  "value": {
+                    "id": 13,
+                    "fields": [
+                      [
+                        "Name"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "14",
+                  "value": {
+                    "id": 14,
+                    "fields": [
+                      [
+                        "ConversionRate"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "15",
+                  "value": {
+                    "id": 15,
+                    "fields": [
+                      [
+                        "UniquePurchases"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "16",
+                  "value": {
+                    "id": 16,
+                    "fields": [
+                      [
+                        "ProductRevenue"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "17",
+                  "value": {
+                    "id": 17,
+                    "fields": [
+                      [
+                        "Quantity"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "18",
+                  "value": {
+                    "id": 18,
+                    "fields": [
+                      [
+                        "AveragePrice"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "19",
+                  "value": {
+                    "id": 19,
+                    "fields": [
+                      [
+                        "ImageLink"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "20",
+                  "value": {
+                    "id": 20,
+                    "fields": [
+                      [
+                        "Margin"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "21",
+                  "value": {
+                    "id": 21,
+                    "fields": [
+                      [
+                        "TERRAINRANK"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "22",
+                  "value": {
+                    "id": 22,
+                    "fields": [
+                      [
+                        "CanonicalUrl"
+                      ]
+                    ],
+                    "meta": {
+                      "value": "https://",
+                      "at": 0
+                    },
+                    "skipNulls": true,
+                    "typeCode": "InsertNode",
+                    "acceptedType": "string"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 22,
+            "uidNode": 23,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "Path"
+                ],
+                7
+              ],
+              [
+                [
+                  "Price"
+                ],
+                2
+              ],
+              [
+                [
+                  "Name"
+                ],
+                13
+              ],
+              [
+                [
+                  "LongDescriptionHTML"
+                ],
+                12
+              ],
+              [
+                [
+                  "VariantId"
+                ],
+                6
+              ],
+              [
+                [
+                  "LongDescription"
+                ],
+                10
+              ],
+              [
+                [
+                  "ProductRevenue"
+                ],
+                16
+              ],
+              [
+                [
+                  "ConversionRate"
+                ],
+                14
+              ],
+              [
+                [
+                  "Margin"
+                ],
+                20
+              ],
+              [
+                [
+                  "TERRAINRANK"
+                ],
+                21
+              ],
+              [
+                [
+                  "UniquePurchases"
+                ],
+                15
+              ],
+              [
+                [
+                  "ProductId"
+                ],
+                5
+              ],
+              [
+                [
+                  "SKU"
+                ],
+                0
+              ],
+              [
+                [
+                  "VariantStatus"
+                ],
+                4
+              ],
+              [
+                [
+                  "ContentsHTML"
+                ],
+                9
+              ],
+              [
+                [
+                  "CanonicalUrl"
+                ],
+                8
+              ],
+              [
+                [
+                  "ImageLink"
+                ],
+                19
+              ],
+              [
+                [
+                  "VariantName"
+                ],
+                1
+              ],
+              [
+                [
+                  "Quantity"
+                ],
+                17
+              ],
+              [
+                [
+                  "Contents"
+                ],
+                11
+              ],
+              [
+                [
+                  "AveragePrice"
+                ],
+                18
+              ],
+              [
+                [
+                  "Inventory"
+                ],
+                3
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "SKU"
+                ]
+              ],
+              [
+                1,
+                [
+                  "VariantName"
+                ]
+              ],
+              [
+                2,
+                [
+                  "Price"
+                ]
+              ],
+              [
+                3,
+                [
+                  "Inventory"
+                ]
+              ],
+              [
+                4,
+                [
+                  "VariantStatus"
+                ]
+              ],
+              [
+                5,
+                [
+                  "ProductId"
+                ]
+              ],
+              [
+                6,
+                [
+                  "VariantId"
+                ]
+              ],
+              [
+                7,
+                [
+                  "Path"
+                ]
+              ],
+              [
+                8,
+                [
+                  "CanonicalUrl"
+                ]
+              ],
+              [
+                9,
+                [
+                  "Contents"
+                ]
+              ],
+              [
+                10,
+                [
+                  "LongDescription2"
+                ]
+              ],
+              [
+                11,
+                [
+                  "Contents2"
+                ]
+              ],
+              [
+                12,
+                [
+                  "LongDescription"
+                ]
+              ],
+              [
+                13,
+                [
+                  "Name"
+                ]
+              ],
+              [
+                14,
+                [
+                  "ConversionRate"
+                ]
+              ],
+              [
+                15,
+                [
+                  "UniquePurchases"
+                ]
+              ],
+              [
+                16,
+                [
+                  "ProductRevenue"
+                ]
+              ],
+              [
+                17,
+                [
+                  "Quantity"
+                ]
+              ],
+              [
+                18,
+                [
+                  "AveragePrice"
+                ]
+              ],
+              [
+                19,
+                [
+                  "ImageLink"
+                ]
+              ],
+              [
+                20,
+                [
+                  "Margin"
+                ]
+              ],
+              [
+                21,
+                [
+                  "TERRAINRANK"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "string"
+              ],
+              [
+                2,
+                "number"
+              ],
+              [
+                3,
+                "number"
+              ],
+              [
+                4,
+                "string"
+              ],
+              [
+                5,
+                "number"
+              ],
+              [
+                6,
+                "number"
+              ],
+              [
+                7,
+                "string"
+              ],
+              [
+                8,
+                "string"
+              ],
+              [
+                9,
+                "string"
+              ],
+              [
+                10,
+                "string"
+              ],
+              [
+                11,
+                "string"
+              ],
+              [
+                12,
+                "string"
+              ],
+              [
+                13,
+                "string"
+              ],
+              [
+                14,
+                "number"
+              ],
+              [
+                15,
+                "number"
+              ],
+              [
+                16,
+                "number"
+              ],
+              [
+                17,
+                "number"
+              ],
+              [
+                18,
+                "number"
+              ],
+              [
+                19,
+                "string"
+              ],
+              [
+                20,
+                "number"
+              ],
+              [
+                21,
+                "number"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                true
+              ],
+              [
+                3,
+                false
+              ],
+              [
+                4,
+                false
+              ],
+              [
+                5,
+                true
+              ],
+              [
+                6,
+                false
+              ],
+              [
+                7,
+                false
+              ],
+              [
+                8,
+                true
+              ],
+              [
+                9,
+                true
+              ],
+              [
+                10,
+                false
+              ],
+              [
+                11,
+                false
+              ],
+              [
+                12,
+                true
+              ],
+              [
+                13,
+                true
+              ],
+              [
+                14,
+                false
+              ],
+              [
+                15,
+                false
+              ],
+              [
+                16,
+                false
+              ],
+              [
+                17,
+                false
+              ],
+              [
+                18,
+                false
+              ],
+              [
+                19,
+                true
+              ],
+              [
+                20,
+                false
+              ],
+              [
+                21,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                8,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                9,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                10,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                11,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                12,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                13,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                14,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                15,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                16,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                17,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                18,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                19,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                20,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                21,
+                {
+                  "etlType": "Integer"
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Algorithm",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "algorithmId": 20
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Fs",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": "Products.*",
+          "fieldOrdering": [
+            "SKU",
+            "VariantName",
+            "Price",
+            "ProductId",
+            "CanonicalUrl",
+            "Contents",
+            "LongDescription",
+            "Name",
+            "ImageLink",
+            "TERRAINRANK"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {},
+        "integrationId": 16,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ]
+        }
+      }
+    }
+  }
+}

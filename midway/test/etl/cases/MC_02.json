@@ -1,0 +1,512 @@
+{
+  "testName": "MC_02",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "name": "Beard Wrangler Mini Crate",
+      "sku": "KTMC-0002-BEA",
+      "path": "beard-wrangler-mini-crate"
+    },
+    {
+      "name": "Mezcal Crate",
+      "sku": "KTAL-0005-MEZ",
+      "path": "mezcal-crate"
+    },
+    {
+      "name": "Hot Sauce Making Project",
+      "sku": "KTPR-0007-HOT",
+      "path": "hot-sauce-making-kit"
+    },
+    {
+      "name": "Coffee Ammo Can",
+      "sku": "KTAM-0001-COF",
+      "path": "coffee-ammo-can"
+    },
+    {
+      "name": "The Bacon Crate",
+      "sku": "KTCR-0001-BAC",
+      "path": "bacon-crate"
+    },
+    {
+      "name": "Auto Care Crate",
+      "sku": "KTCR-0071-AUT",
+      "path": "auto-care-crate"
+    },
+    {
+      "name": "Exotic Meats Crate",
+      "sku": "KTCR-0017-EXO",
+      "path": "exotic-meats-crate"
+    },
+    {
+      "name": "Folding Knife Project",
+      "sku": "KTPR-0010-FKN",
+      "path": "folding-knife-making-kit"
+    },
+    {
+      "name": "Home Brewed Kit (5 gal)",
+      "sku": "KTPR-0002-5BR",
+      "path": "home-brewed-kit-5-gal"
+    },
+    {
+      "name": "Performance Sports Crate",
+      "sku": "KTCR-0026-PSP",
+      "path": "performance-sports-crate"
+    }
+  ],
+  "outputDocs": [
+    {
+      "SKU": "KTMC-0002-BEA",
+      "CanonicalUrl": "www.mancrates.com/store/products/beard-wrangler-mini-crate",
+      "Path": "beard-wrangler-mini-crate"
+    },
+    {
+      "SKU": "KTAL-0005-MEZ",
+      "CanonicalUrl": "www.mancrates.com/store/products/mezcal-crate",
+      "Path": "mezcal-crate"
+    },
+    {
+      "SKU": "KTPR-0007-HOT",
+      "CanonicalUrl": "www.mancrates.com/store/products/hot-sauce-making-kit",
+      "Path": "hot-sauce-making-kit"
+    },
+    {
+      "SKU": "KTAM-0001-COF",
+      "CanonicalUrl": "www.mancrates.com/store/products/coffee-ammo-can",
+      "Path": "coffee-ammo-can"
+    },
+    {
+      "SKU": "KTCR-0001-BAC",
+      "CanonicalUrl": "www.mancrates.com/store/products/bacon-crate",
+      "Path": "bacon-crate"
+    },
+    {
+      "SKU": "KTCR-0071-AUT",
+      "CanonicalUrl": "www.mancrates.com/store/products/auto-care-crate",
+      "Path": "auto-care-crate"
+    },
+    {
+      "SKU": "KTCR-0017-EXO",
+      "CanonicalUrl": "www.mancrates.com/store/products/exotic-meats-crate",
+      "Path": "exotic-meats-crate"
+    },
+    {
+      "SKU": "KTPR-0010-FKN",
+      "CanonicalUrl": "www.mancrates.com/store/products/folding-knife-making-kit",
+      "Path": "folding-knife-making-kit"
+    },
+    {
+      "SKU": "KTPR-0002-5BR",
+      "CanonicalUrl": "www.mancrates.com/store/products/home-brewed-kit-5-gal",
+      "Path": "home-brewed-kit-5-gal"
+    },
+    {
+      "SKU": "KTCR-0026-PSP",
+      "CanonicalUrl": "www.mancrates.com/store/products/performance-sports-crate",
+      "Path": "performance-sports-crate"
+    }
+  ],
+  "template": {
+    "id": 2,
+    "lastModified": "2018-07-11T23:09:51.199Z",
+    "createdAt": "2018-05-25T22:18:47.448Z",
+    "archived": false,
+    "templateName": "Mode Analytics - Skus and Urls Import Template",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "name"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "sku"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "path"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "path"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "CanonicalUrl"
+                        ]
+                      ]
+                    },
+                    "typeCode": "DuplicateNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "path"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "Path"
+                        ]
+                      ]
+                    },
+                    "typeCode": "DuplicateNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "_synthetic_rwbm1owmim",
+                        "CanonicalUrl"
+                      ]
+                    ],
+                    "meta": {
+                      "value": "www.mancrates.com/store/products/",
+                      "at": 0
+                    },
+                    "skipNulls": true,
+                    "typeCode": "InsertNode",
+                    "acceptedType": "string"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 5,
+            "uidNode": 6,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "name"
+                ],
+                0
+              ],
+              [
+                [
+                  "sku"
+                ],
+                1
+              ],
+              [
+                [
+                  "path"
+                ],
+                2
+              ],
+              [
+                [
+                  "_synthetic_rwbm1owmim",
+                  "CanonicalUrl"
+                ],
+                3
+              ],
+              [
+                [
+                  "_synthetic_91k1218vvie",
+                  "path"
+                ],
+                4
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "Name"
+                ]
+              ],
+              [
+                1,
+                [
+                  "SKU"
+                ]
+              ],
+              [
+                2,
+                [
+                  "_2ty4ezf36krpath"
+                ]
+              ],
+              [
+                3,
+                [
+                  "CanonicalUrl"
+                ]
+              ],
+              [
+                4,
+                [
+                  "Path"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "string"
+              ],
+              [
+                2,
+                "string"
+              ],
+              [
+                3,
+                "string"
+              ],
+              [
+                4,
+                "string"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                false
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                false
+              ],
+              [
+                3,
+                true
+              ],
+              [
+                4,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": true
+                  }
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  },
+                  "uiState": {
+                    "hidden": true
+                  }
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Http",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "csv",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "method": "GET"
+        },
+        "integrationId": 4,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Database",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": [
+            "SKU",
+            "Path",
+            "CanonicalUrl"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "language": "elastic",
+          "table": "data",
+          "serverId": "Mancrates ES",
+          "database": "mancrates_products"
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            4,
+            3
+          ]
+        }
+      }
+    }
+  }
+}

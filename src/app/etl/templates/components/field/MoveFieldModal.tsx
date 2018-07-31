@@ -45,19 +45,23 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires max-classes-per-file
 
+import * as classNames from 'classnames';
 import ListForm, { RowOptions } from 'common/components/ListForm';
 import TerrainComponent from 'common/components/TerrainComponent';
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
 import * as React from 'react';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 import { instanceFnDecorator } from 'shared/util/Classes';
-import { Colors, fontColor } from 'src/app/colors/Colors';
+import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
+const { List, Map } = Immutable;
 
 import Modal from 'common/components/Modal';
 import { TemplateField } from 'etl/templates/FieldTypes';
-import { validateRename } from 'shared/transformations/util/TransformationsUtil';
+import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './EditorFieldModal.less';
@@ -111,14 +115,14 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
   public computeStateFromProps(props)
   {
     return {
-      pathKP: this._field().outputKeyPath,
+      pathKP: this._field().fieldPath,
     };
   }
 
   @instanceFnDecorator(memoizeOne)
   public _validateKeyPath(engine, engineVersion, field, pathKP: KeyPath)
   {
-    return validateRename(engine, field.fieldId, pathKP);
+    return Utils.validation.canRename(engine, field.fieldId, pathKP);
   }
 
   public validateKeyPath(): { isValid: boolean, message: string }
@@ -132,7 +136,7 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
   @instanceFnDecorator(memoizeOne)
   public computeListProps(pathKP: KeyPath, field: TemplateField): { items: any[], computeOptions: (index) => RowOptions }
   {
-    const currentKp = field.outputKeyPath;
+    const currentKp = field.fieldPath;
     const lastNamed = currentKp.findLastIndex((value, index) => !field.isAncestorNamedField(index));
     const computeOptions = (index) =>
     {
