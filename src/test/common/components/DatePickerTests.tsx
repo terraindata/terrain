@@ -90,7 +90,7 @@ describe('DatePicker', () =>
   it('should render a calendar with the correct date', () =>
   {
     expect(datePickerComponent.find('.date-view-title')).toHaveLength(1);
-    expect(datePickerComponent.find('.date-view-label')).toHaveLength(1);
+    expect(datePickerComponent.find('.date-view-label')).toHaveLength(0);
     expect(datePickerComponent.find('.unselected-date-type')).toHaveLength(2);
     expect(datePickerComponent.find('.selected-date-type')).toHaveLength(1);
     expect(datePickerComponent.state()['dateViewType']).toEqual('calendar');
