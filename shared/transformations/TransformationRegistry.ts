@@ -47,6 +47,8 @@ THE SOFTWARE.
 
 import { AddTransformationInfo } from './nodes/AddTransformationNode';
 import { ArrayCountTransformationInfo } from './nodes/ArrayCountTransformationNode';
+import { ArrayMaxTransformationInfo } from './nodes/ArrayMaxTransformationNode';
+import { ArrayMinTransformationInfo } from './nodes/ArrayMinTransformationNode';
 import { ArraySumTransformationInfo } from './nodes/ArraySumTransformationNode';
 import { CaseTransformationInfo } from './nodes/CaseTransformationNode';
 import { CastTransformationInfo } from './nodes/CastTransformationNode';
@@ -85,6 +87,8 @@ const infos: {
   [TransformationNodeType.AddNode]: AddTransformationInfo,
   [TransformationNodeType.ArrayCountNode]: ArrayCountTransformationInfo,
   [TransformationNodeType.ArraySumNode]: ArraySumTransformationInfo,
+  [TransformationNodeType.ArrayMinNode]: ArrayMinTransformationInfo,
+  [TransformationNodeType.ArrayMaxNode]: ArrayMaxTransformationInfo,
   [TransformationNodeType.CaseNode]: CaseTransformationInfo,
   [TransformationNodeType.CastNode]: CastTransformationInfo,
   [TransformationNodeType.DecryptNode]: DecryptTransformationInfo,

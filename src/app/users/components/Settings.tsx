@@ -152,6 +152,7 @@ class Settings extends TerrainComponent<Props>
     this.props.userActions({
       actionType: 'change',
       user: newUser as UserTypes.User,
+      meta: {},
     });
   }
 
@@ -698,16 +699,27 @@ class Settings extends TerrainComponent<Props>
   //   lastEntry={true}
   //   />
 
-  public updateUserInfo(editingSections)
+  public updateUserInfo(editingSections, onSuccess?: () => any, onError?: (error) => any)
   {
     let newUser = this.props.users.users.get(this.props.users.currentUser.id);
+    const meta = {};
     for (const headerKey of Object.keys(editingSections))
     {
-      newUser = newUser.set(headerKey, editingSections[headerKey]);
+      if (newUser[headerKey] !== undefined)
+      {
+        newUser = newUser.set(headerKey, editingSections[headerKey]);
+      }
+      else
+      {
+        meta[headerKey] = editingSections[headerKey];
+      }
     }
     this.props.userActions({
       actionType: 'change',
-      user: newUser as UserTypes.User,
+      user: newUser,
+      meta,
+      onSave: onSuccess ? onSuccess : () => { },
+      onError: onError ? onError : () => { },
     });
     return true;
   }

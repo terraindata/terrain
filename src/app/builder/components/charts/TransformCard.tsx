@@ -511,11 +511,14 @@ class TransformCard extends TerrainComponent<Props>
         bar.percentage = bar.count / distances.length;
         bars[barNum] = bar;
       });
+      const newDomain = this.trimDomain(this.state.maxDomain, List([min, max]));
       this.setState({
         bars: List(bars),
-        maxDomain: List([min, max]),
-        chartDomain: List([min, max]),
+        maxDomain: newDomain,
+        chartDomain: newDomain,
       });
+      this.props.onChange(this._ikeyPath(this.props.keyPath, 'domain'), newDomain, true);
+      this.props.onChange(this._ikeyPath(this.props.keyPath, 'dataDomain'), newDomain, true);
     }
   }
   private handleElasticDomainAggregationResponse(resp: MidwayQueryResponse)
