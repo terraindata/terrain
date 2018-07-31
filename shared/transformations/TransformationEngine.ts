@@ -73,9 +73,9 @@ const ExecutionVisitor = new TransformationEngineNodeVisitor();
 
 interface TransformOptions
 {
-  cache?: boolean;
-  includeUnknown?: boolean;
-  removeEmptyObjects?: boolean;
+  cache?: boolean;               // whether or not to use the cached execution order (if it exists)
+  includeUnknown?: boolean;      // whether or not to transform on fields that aren't recognized by the engine
+  removeEmptyObjects?: boolean;  // whether or not to remove fields such as `foo: {}` from the end result
 }
 
 /**
@@ -152,20 +152,23 @@ export class TransformationEngine
   protected cachedOrder: number[];
 
   /**
-   * Constructor for `TransformationEngine`.
+   *  Constructor for `TransformationEngine`.
    */
   constructor()
   {
 
   }
 
+  /**
+   *  Return a deep copy of this transformation engine.
+   */
   public clone(): TransformationEngine
   {
     return TransformationEngine.load(JSON.stringify(this.toJSON()));
   }
 
   /**
-   * Checks whether a provides `TransformationEngine` is equal to the current `TransformationEngine` (`this`).
+   * Checks whether the provided (`other`) `TransformationEngine` is equal to the current `TransformationEngine` (`this`).
    * Performs a "deep equals" due to the complex nature of this type.
    *
    * NOTE: This feels rather inefficient and should be optimized in the future if it's used frequently
@@ -186,7 +189,7 @@ export class TransformationEngine
    * appended to the engine's transformation DAG in the appropriate place.
    *
    * @param {TransformationNodeType} nodeType    The type of transformation to create
-   * @param {Immutable.List<KeyPath>} inFields A list of field names or IDs
+   * @param {Immutable.List<KeyPath | number>} inFields A list of field names or IDs
    *                                             on which to apply the new transformation
    * @param {object} options                     Any options for the transformation;
    *                                             different transformation types have
@@ -243,6 +246,7 @@ export class TransformationEngine
    * Transform a document according to the current engine configuration.
    *
    * @param {object} doc The document to transform.
+   * @param {object} options See TransformOptions. TODO Refactor how caching works
    * @returns {object}   The transformed document, or possibly errors.
    */
   public transform(doc: object, options: TransformOptions = {}): object
@@ -328,8 +332,6 @@ export class TransformationEngine
   // TODO Need to make this traverse the dag properly
   public deleteField(id: number): void
   {
-    // Order matters!  Must do this first, else getTransformations can't work because
-    // it relies on the entry in fieldNameToIDMap.
     if (!Utils.fields.isOrganic(this, id))
     {
       throw new Error('Cannot delete synthetic field');
@@ -341,9 +343,10 @@ export class TransformationEngine
   }
 
   /**
+   * TODO This function should be refactored to traverse the DAG
    * Get the IDs of all transformations that act on a given field.
    *
-   * @param {KeyPath | number} field   The field whose associated transformations should be identified
+   * @param {number} field   The field whose associated transformations should be identified
    * @returns {Immutable.List<number>} A list of the associated transformations, sorted properly
    */
   public getTransformations(field: number): List<number>
@@ -390,8 +393,8 @@ export class TransformationEngine
   /**
    *  TODO make an 'EditTransformation' visitor to handle side effects
    *
-   * @param {number} transformationID Which transformation to update
-   * @param {object} options New options
+   * @param {number} transformationID  Which transformation to update
+   * @param {object} options           New options
    */
   public editTransformation(transformationID: number, options?: object): void
   {
@@ -438,17 +441,13 @@ export class TransformationEngine
     return this._getFieldIDCache(this.IDToPathMap).get(Utils.path.hash(path));
   }
 
-  @instanceFnDecorator(memoizeOne)
-  public _getFieldIDCache(pathMap: Map<number, KeyPath>): Map<string, number>
-  {
-    const reverseMap: { [k: string]: number } = {};
-    pathMap.forEach((path, id) =>
-    {
-      reverseMap[Utils.path.hash(path)] = id;
-    });
-    return Map<string, number>(reverseMap);
-  }
-
+  /**
+   * Rename a field
+   *
+   * @param {number} fieldID    The Field to rename
+   * @param {KeyPath} newPath   The path to move the field to
+   * @return {number}           The id of the rename transformation
+   */
   public renameField(fieldID: number, newPath: KeyPath): number
   {
     const oldPath = this.getFieldPath(fieldID);
@@ -491,6 +490,14 @@ export class TransformationEngine
     this.fieldProps = this.fieldProps.set(fieldID, newProps);
   }
 
+  /**
+   * Get all field IDs registered in this transformation engine.
+   *
+   * @param {boolean} includeDead    If true, return fields that don't exist in the engine's
+   *                                 understanding of what the end document should look like.
+   *                                 Defaults to false
+   * @return {List<number>}          A list of all the IDs
+   */
   public getAllFieldIDs(includeDead = false): List<number>
   {
     const filtered = includeDead ?
@@ -500,6 +507,12 @@ export class TransformationEngine
     return filtered.keySeq().toList();
   }
 
+  /**
+   * A field is dead if it is removed from a document by side effect of a transformation
+   *
+   * @param {number | KeyPath} field    The field path or id to check
+   * @return {boolean}                  True if the field is dead
+   */
   public isDead(field: KeyPath | number): boolean
   {
     let kp: KeyPath;
@@ -715,6 +728,17 @@ export class TransformationEngine
     });
 
     return output;
+  }
+
+  @instanceFnDecorator(memoizeOne)
+  protected _getFieldIDCache(pathMap: Map<number, KeyPath>): Map<string, number>
+  {
+    const reverseMap: { [k: string]: number } = {};
+    pathMap.forEach((path, id) =>
+    {
+      reverseMap[Utils.path.hash(path)] = id;
+    });
+    return Map<string, number>(reverseMap);
   }
 
   /*

@@ -332,6 +332,7 @@ export default abstract class ValidationUtil
     return true;
   }
 
+  // This function may be outdated
   public static canAddField(engine: TransformationEngine, fieldId: number, path: KeyPath): ValidInfo
   {
     if (path.last() === '')
@@ -367,6 +368,7 @@ export default abstract class ValidationUtil
     };
   }
 
+  // This function may be outdated
   public static canRename(engine: TransformationEngine, fieldId: number, path: KeyPath): ValidInfo
   {
     const existingKp = engine.getFieldPath(fieldId);

@@ -294,6 +294,9 @@ export function search(obj: object, path: KeyPath): ContextResult[]
   return results;
 }
 
+/*
+ *  A specialized set function that performs a set on non-wildcard keypaths
+ */
 export function setIn(obj: object, path: KeyPath, value): object
 {
   if (path.size === 0)
@@ -337,6 +340,9 @@ export function setIn(obj: object, path: KeyPath, value): object
   return obj;
 }
 
+/*
+ *  A specialized delete function that performs a delete on non-wildcard keypaths
+ */
 export function deleteIn(obj: object, path: KeyPath)
 {
   if (typeof obj !== 'object' || obj == null || path.size === 0)
@@ -406,10 +412,13 @@ function* explore(obj: any, path: KeyPath, options: TraverseOptions): IterableIt
 
 export interface TraverseOptions
 {
-  primitivesOnly: boolean; // yield only primitives?
+  primitivesOnly: boolean; // whether to yield only primitives
   arrayLimit: number; // limit exploration of arrays
 }
 
+/*
+ *  Perform a postorder traversal of the fields of an object with some special abilities
+ */
 export function traverse(obj: any, opts: Partial<TraverseOptions> = {}): IterableIterator<ContextResult>
 {
   const defaults: TraverseOptions = {

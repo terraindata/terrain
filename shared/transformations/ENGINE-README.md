@@ -19,7 +19,7 @@ The path `['foo', 'bar']` would guide us 'hello'. This field is unique and there
 
 The set of all keypaths in a Transformation Engine implicitly encodes their relationships (e.g. which fields are parents and which ones are children). Objects are naturally tree-like data structures, and so are the relationships between keypaths. We can tell at a glance that `['foo', 'bar']` is the child of `['foo']`, and that `['baz']` may contain many `['baz', -1, 'bar']` values.
 
-Keypaths are (almost) always unique. There may be 'nullish' paths, which represent fields that have been deleted from the document by a Transformation. This will be explained in more detail later.
+Keypaths are (almost) always unique. There may be 'nullish' paths, which represent fields that have been deleted from the document by a Transformation.
 
 ## Transformations
 Engines store a Directed Graph of Transformations. Transformations are any operation that can change an input object. Transformations can do lots of things! For example: we can rename fields, multiply them, find-replace text, combine fields together, or create entirely new ones. Transformations are nodes in this graph (which we will refer to as the DAG).
