@@ -62,7 +62,8 @@ import { TemplateVersion, updateTemplateIfNeeded } from 'shared/etl/migrations/T
 
 function addArchivedVersion(template: TemplateConfig)
 {
-  return new Promise<void>(async (resolve, reject) => {
+  return new Promise<void>(async (resolve, reject) =>
+  {
     const userList = await users.get();
     if (userList.length === 0)
     {
@@ -82,7 +83,8 @@ function genericMigrate(from: Version, to: Version)
     const templates = await templatesDb.get();
     for (const t of templates)
     {
-      try {
+      try
+      {
         const oldTemplate = _.cloneDeep(t);
         const { template, updated, message } = updateTemplateIfNeeded(t);
         if (updated)
@@ -115,4 +117,4 @@ const migrate5To5: Migrator = {
   migrate: genericMigrate,
 };
 
-export const templateMigrations = [ migrate4To5, migrate5To5 ];
+export const templateMigrations = [migrate4To5, migrate5To5];

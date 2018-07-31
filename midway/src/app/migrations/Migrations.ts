@@ -57,7 +57,7 @@ import { MigrationRecordConfig as MigrationRecord } from './MigrationRecordConfi
 import { templateMigrations } from '../etl/ETLMigrations';
 
 const registeredMigrations: Migrator[] = [
-  ... templateMigrations,
+  ...templateMigrations,
 ];
 
 export class Migrations
