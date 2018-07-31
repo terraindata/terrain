@@ -62,10 +62,15 @@ import { TemplateVersion, updateTemplateIfNeeded } from 'shared/etl/migrations/T
 
 function addArchivedVersion(template: TemplateConfig)
 {
-  return new Promise<number>(async (resolve, reject) => {
-    const adminUser = await users.get()[0];
-    const versionConfig = await versions.create(adminUser, 'templates', template.id, template);
-    resolve(versionConfig.id);
+  return new Promise<void>(async (resolve, reject) => {
+    const userList = await users.get();
+    if (userList.length === 0)
+    {
+      reject('could not find default user');
+    }
+    const adminUser = userList[0];
+    await versions.create(adminUser, 'templates', template.id, template);
+    return resolve();
   });
 }
 
@@ -85,8 +90,8 @@ function genericMigrate(from: Version, to: Version)
           await templatesDb.update(template);
           anyUpdated = true;
           winston.info(`Updated Template ${template.id}: ${message}.`);
-          const versionId = await addArchivedVersion(oldTemplate);
-          winston.info(`Previous Template Version archived with id ${versionId}`);
+          await addArchivedVersion(oldTemplate);
+          winston.info(`Previous Template Version archived`);
         }
       }
       catch (e)
