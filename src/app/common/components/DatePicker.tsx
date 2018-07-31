@@ -65,6 +65,7 @@ import { ColorsActions } from '../../colors/data/ColorsRedux';
 import FadeInOut from '../../common/components/FadeInOut';
 
 const TimeIcon = require('../../../images/icon_clock.svg?name=TimeIcon');
+const ScopeIcon = require('../../../images/icon_relativeCalendar.svg?name=ScopeIcon');
 
 const MINUTE_INTERVAL = 30;
 const MINUTE_RATIO = (60 / MINUTE_INTERVAL);
@@ -496,7 +497,8 @@ export class DatePickerUncontained extends TerrainComponent<Props>
           options={HOUR_OPTIONS}
           selectedIndex={this.dateToHourIndex(this.getDate())}
           onChange={this.handleHourChange}
-          iconLabel={<TimeIcon className='time-icon'/>}
+          iconLabel={<TimeIcon className='time-icon' />}
+          iconTooltip='Time'
           labelClass='time-icon-wrapper'
         />
       </div>
@@ -507,12 +509,14 @@ export class DatePickerUncontained extends TerrainComponent<Props>
   {
     return (
       <div className='labeled-row'>
-        <p className='date-view-label'>Scope</p>
         <Dropdown
           canEdit={this.props.canEdit}
           options={DateParameterOptions}
           selectedIndex={this.dateToDateParameterMapIndex()}
           onChange={this.handleDateParameterChange}
+          iconLabel={<ScopeIcon className='time-icon' />}
+          iconTooltip='One Week Scope'
+          labelClass='time-icon-wrapper'
         />
       </div>
     );

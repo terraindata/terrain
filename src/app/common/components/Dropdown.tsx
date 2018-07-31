@@ -84,8 +84,9 @@ export interface Props
   placeholder?: string;
   wrapperHeight?: string;
   icons?: Immutable.Map<any, any>;
-  iconLabel?: any;
+  iconLabel?: El;
   textLabel?: string;
+  iconTooltip?: string;
   labelClass?: string;
 
   action?: (keyPath, value) => void;
@@ -326,7 +327,7 @@ class Dropdown extends TerrainComponent<Props>
       <div
         className={this.props.labelClass}
       >
-        {this.props.iconLabel}
+        {tooltip(this.props.iconLabel, this.props.iconTooltip)}
         {this.props.textLabel}
       </div>
     );
