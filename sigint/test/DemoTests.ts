@@ -60,6 +60,7 @@ beforeAll(async (done) =>
       demo: true,
       db: 'http://127.0.0.1:9200',
       port: 43003,
+      instanceId: 'abc',
     };
 
     const app = new App(options);
