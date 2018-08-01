@@ -381,7 +381,8 @@ export default class Section extends TerrainComponent<Props>
     }
     else
     {
-      this.props.onChange(this.state.editingSections, () => {
+      this.props.onChange(this.state.editingSections, () =>
+      {
         this.setState(
           {
             isEditing: false,
