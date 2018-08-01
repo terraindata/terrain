@@ -136,7 +136,6 @@ class UserRedux extends TerrainRedux<UserActionTypes, UserState>
       {
         const { user } = action.payload;
         return state.setIn(['users', user.id], user)
-          .set('currentUser', user)
           .set('loading', false)
           .set('loaded', true);
       },
@@ -154,10 +153,15 @@ class UserRedux extends TerrainRedux<UserActionTypes, UserState>
       changeSuccess: (state, action) =>
       {
         const { user } = action.payload;
-        return state.setIn(['users', user.id], user)
-          .set('currentUser', user)
+        state = state.setIn(['users', user.id], user)
           .set('loading', false)
           .set('loaded', true);
+        if (user.id === state.currentUser.id)
+        {
+          state = state.set('currentUser', user);
+        }
+
+        return state;
       },
 
       changeFailure: (state, action) =>
