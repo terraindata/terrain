@@ -46,6 +46,7 @@ THE SOFTWARE.
 // tslint:disable:no-empty
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+import { responseToRecordConfig } from 'shared/util/Classes';
 import
 {
   ConstrainedMap,
@@ -53,62 +54,127 @@ import
   TerrainRedux,
   Unroll,
 } from 'store/TerrainRedux';
+import UserApi from 'users/UserApi';
 import { _User, _UserState, User, UserMap, UserState } from 'users/UserTypes';
-import Ajax from 'util/Ajax';
+import XHR from 'util/XHR';
 import { MidwayError } from '../../../../shared/error/MidwayError';
 
 export interface UserActionTypes
 {
-  change: {
+  create?: {
+    actionType: 'create';
+    user: Partial<User> & { password: string };
+  };
+  createStart: {
+    actionType: 'createStart';
+  };
+  createSuccess: {
+    actionType: 'createSuccess';
+    user: User;
+  };
+  createFailure: {
+    actionType: 'createFailure';
+  };
+
+  change?: {
     actionType: 'change';
     user: User;
     meta?: object;
-    onSave?: () => any;
-    onError?: (error: string) => any;
   };
-  fetch: {
-    actionType: 'fetch';
+  changeStart: {
+    actionType: 'changeStart';
   };
-  setUsers: {
-    actionType: 'setUsers';
+  changeSuccess: {
+    actionType: 'changeSuccess';
+    user: User;
+  };
+  changeFailure: {
+    actionType: 'changeFailure';
+  };
+
+  fetch?: {
+    actionType: 'fetch',
+  };
+  fetchStart: {
+    actionType: 'fetchStart';
+  };
+  fetchSuccess: {
+    actionType: 'fetchSuccess';
     users: Immutable.Map<ID, User>;
     currentUserId: ID;
   };
+  fetchFailure: {
+    actionType: 'fetchFailure';
+  };
+
+  changePassword?: {
+    actionType: 'changePassword';
+    userId: ID;
+    currentPassword: string;
+    newPassword: string;
+  };
+
   updateCurrentUser: {
     actionType: 'updateCurrentUser';
     id: ID;
-  };
-  completeTutorial: {
-    actionType: 'completeTutorial';
-    complete: boolean,
-    stepId: number,
   };
 }
 
 class UserRedux extends TerrainRedux<UserActionTypes, UserState>
 {
   public namespace: string = 'users';
+  public api: UserApi = new UserApi(XHR.getInstance());
 
   public reducers: ConstrainedMap<UserActionTypes, UserState> =
     {
-      change: (state, action) =>
-      {
-        const { user, meta, onSave, onError } = action.payload;
-        let newState = state.setIn(['users', user.id], user);
-        if (user.id === state.currentUser.id)
-        {
-          newState = newState.set('currentUser', user);
-        }
-        Ajax.saveUser({ user, meta }, onSave, onError);
-        return newState;
-      },
-
-      fetch: (state, action) =>
+      createStart: (state, action) =>
       {
         return state.set('loading', true);
       },
 
-      setUsers: (state, action) =>
+      createSuccess: (state, action) =>
+      {
+        const { user } = action.payload;
+        return state.setIn(['users', user.id], user)
+          .set('loading', false)
+          .set('loaded', true);
+      },
+
+      createFailure: (state, action) =>
+      {
+        return state;
+      },
+
+      changeStart: (state, action) =>
+      {
+        return state.set('loading', true);
+      },
+
+      changeSuccess: (state, action) =>
+      {
+        const { user } = action.payload;
+        state = state.setIn(['users', user.id], user)
+          .set('loading', false)
+          .set('loaded', true);
+        if (user.id === state.currentUser.id)
+        {
+          state = state.set('currentUser', user);
+        }
+
+        return state;
+      },
+
+      changeFailure: (state, action) =>
+      {
+        return state;
+      },
+
+      fetchStart: (state, action) =>
+      {
+        return state.set('loading', true);
+      },
+
+      fetchSuccess: (state, action) =>
       {
         return state.set('users', action.payload.users)
           .set('currentUser', action.payload.users.get(action.payload.currentUserId))
@@ -116,55 +182,131 @@ class UserRedux extends TerrainRedux<UserActionTypes, UserState>
           .set('loaded', true);
       },
 
+      fetchFailure: (state, action) =>
+      {
+        return state;
+      },
+
       // This currentUser reference is hacky, and we should change it.
       updateCurrentUser: (state, action) =>
         state.set('currentUser', state.getIn(['users', action.payload.id])),
-
-      completeTutorial: (state, action) =>
-      {
-        state = state.setIn(
-          ['users', state.currentUser.id, 'tutorialStepsCompleted', action.payload.stepId],
-          action.payload.complete,
-        );
-
-        const user = state.users.get(state.currentUser.id);
-        Ajax.saveUser(user, () => { }, () => { });
-
-        state = state.set('currentUser', user); // update the version of the current user reference
-        return state;
-      },
     };
 
-  public fetchAction(dispatch, getState)
+  public fetch(action, dispatch, getState)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     directDispatch({
       actionType: 'fetch',
     });
-    Ajax.getUsers((usersObj) =>
-    {
-      let users: UserMap = Immutable.Map<any, User>();
-      _.map(usersObj, (userObj, userId) =>
-      {
-        users = users.set(
-          +userId,
-          _User(userObj),
-        );
-      });
 
-      directDispatch({
-        actionType: 'setUsers',
-        users,
-        currentUserId: getState().get('auth').id,
+    return this.api.getUsers()
+      .then((usersResponse) =>
+      {
+        const usersObj = {};
+        usersResponse.data.map(
+          (user) =>
+          {
+            usersObj[user['id']] = responseToRecordConfig(user);
+          },
+        );
+
+        let users: UserMap = Immutable.Map<any, User>();
+        _.map(usersObj, (userObj, userId) =>
+        {
+          users = users.set(
+            +userId,
+            _User(userObj),
+          );
+        });
+
+        directDispatch({
+          actionType: 'fetchSuccess',
+          users,
+          currentUserId: getState().get('auth').id,
+        });
+
+        return Promise.resolve(users);
       });
+  }
+
+  public create(action, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'createStart',
     });
+
+    const { user } = action;
+
+    return this.api.createUser(user)
+      .then((response) =>
+      {
+        const createdUser = responseToRecordConfig(response.data[0]);
+        directDispatch({
+          actionType: 'createSuccess',
+          user: _User(createdUser),
+        });
+
+        return Promise.resolve(createdUser);
+      });
+  }
+
+  public change(action, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'changeStart',
+    });
+
+    const { user, meta } = action;
+
+    return this.api.saveUser({ user, meta })
+      .then((response) =>
+      {
+        const updatedUser = responseToRecordConfig(response.data[0]);
+        directDispatch({
+          actionType: 'changeSuccess',
+          user: _User(updatedUser),
+        });
+
+        return Promise.resolve(updatedUser);
+      });
+  }
+
+  public changePassword(action, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'changeStart',
+    });
+
+    const { userId, currentPassword, newPassword } = action;
+
+    return this.api.changePassword(userId, currentPassword, newPassword)
+      .then((response) =>
+      {
+        const updatedUser = responseToRecordConfig(response.data[0]);
+        directDispatch({
+          actionType: 'changeSuccess',
+          user: _User(updatedUser),
+        });
+
+        return Promise.resolve(updatedUser);
+      });
   }
 
   public overrideAct(action: Unroll<UserActionTypes>)
   {
-    if (action.actionType === 'fetch')
+    const asyncActions = [
+      'fetch',
+      'create',
+      'change',
+      'changePassword',
+    ];
+
+    if (asyncActions.indexOf(action.actionType) > -1)
     {
-      return this.fetchAction.bind(this);
+      return this[action.actionType].bind(this, action);
     }
   }
 }

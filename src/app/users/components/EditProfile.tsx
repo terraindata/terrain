@@ -72,8 +72,6 @@ export interface State
 {
   user: UserTypes.User;
   loading: boolean;
-  saving: boolean;
-  savingReq: any;
   showDropDown: boolean;
   errorModalOpen: boolean;
   errorModalMessage: string;
@@ -81,13 +79,9 @@ export interface State
 
 class Profile extends TerrainComponent<Props>
 {
-  public userUnsubscribe = null;
-
   public state: State = {
     user: null,
     loading: false,
-    saving: false,
-    savingReq: null,
     showDropDown: false,
     errorModalOpen: false,
     errorModalMessage: '',
@@ -139,12 +133,6 @@ class Profile extends TerrainComponent<Props>
     this.updateUser(this.props);
   }
 
-  public componentWillUnmount()
-  {
-    this.userUnsubscribe && this.userUnsubscribe();
-    this.state.savingReq && this.state.savingReq.abort();
-  }
-
   public componentWillReceiveProps(nextProps)
   {
     if ((this.props.auth !== nextProps.auth) ||
@@ -166,19 +154,10 @@ class Profile extends TerrainComponent<Props>
       actionType: 'change',
       user: newUser as UserTypes.User,
     });
-
-    this.setState({
-      saving: true,
-      savingReq: Ajax.saveUser(newUser, this.onSave, this.onSaveError),
-    });
   }
 
   public onSave()
   {
-    this.setState({
-      saving: false,
-      savingReq: null,
-    });
     this.browserHistory.push('/account/profile');
   }
 
@@ -188,11 +167,6 @@ class Profile extends TerrainComponent<Props>
       errorModalMessage: 'Error saving: ' + JSON.stringify(response),
     });
     this.toggleErrorModal();
-
-    this.setState({
-      saving: false,
-      savingReq: null,
-    });
   }
 
   public renderInfoItem(infoKey: { key: string, label: string, subText: string })
