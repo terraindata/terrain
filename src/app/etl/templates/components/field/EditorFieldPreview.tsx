@@ -109,6 +109,10 @@ class EditorFieldPreview extends TemplateEditorField<Props>
         text: 'Add a subfield',
         onClick: this.requestAddField,
       });
+      options.push({
+        text: 'Promote Inner Fields',
+        onClick: this.requestPromoteFields,
+      });
     }
     if (field.canMoveField())
     {
@@ -383,6 +387,16 @@ class EditorFieldPreview extends TemplateEditorField<Props>
       actionType: 'setDisplayState',
       state: {
         moveFieldId: this.props.fieldId,
+      },
+    });
+  }
+
+  public requestPromoteFields()
+  {
+    this.props.act({
+      actionType: 'setDisplayState',
+      state: {
+        promoteFieldRoot: this.props.fieldId,
       },
     });
   }
