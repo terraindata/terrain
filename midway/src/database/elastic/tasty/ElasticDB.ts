@@ -240,7 +240,7 @@ export class ElasticDB implements TastyDB
 
   public async putESMapping(index: string, type: string, mapping: object): Promise<object>
   {
-    const schema: TastySchema = await this.schema();
+    const schema: TastySchema = await this.schema(false);
     if (schema.databaseNames().indexOf(index) === -1)
     {
       await this.createIndex(index);
