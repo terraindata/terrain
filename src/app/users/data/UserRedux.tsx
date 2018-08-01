@@ -141,7 +141,8 @@ class UserRedux extends TerrainRedux<UserActionTypes, UserState>
           .set('loaded', true);
       },
 
-      createFailure: (state, action) => {
+      createFailure: (state, action) =>
+      {
         return state;
       },
 
@@ -159,7 +160,8 @@ class UserRedux extends TerrainRedux<UserActionTypes, UserState>
           .set('loaded', true);
       },
 
-      changeFailure: (state, action) => {
+      changeFailure: (state, action) =>
+      {
         return state;
       },
 
@@ -176,7 +178,8 @@ class UserRedux extends TerrainRedux<UserActionTypes, UserState>
           .set('loaded', true);
       },
 
-      fetchFailure: (state, action) => {
+      fetchFailure: (state, action) =>
+      {
         return state;
       },
 

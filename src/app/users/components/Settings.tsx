@@ -216,18 +216,18 @@ class Settings extends TerrainComponent<Props>
       currentPassword,
       newPassword,
     })
-    .then(() =>
-    {
-      notificationManager.addNotification('Success', 'Updated password', 'info', 4);
-    })
-    .catch((error) =>
-    {
-      this.setState({
-        modalMessage: 'Error changing your password: ' + MidwayError.fromJSON(error).getDetail(),
-        errorModal: true,
+      .then(() =>
+      {
+        notificationManager.addNotification('Success', 'Updated password', 'info', 4);
+      })
+      .catch((error) =>
+      {
+        this.setState({
+          modalMessage: 'Error changing your password: ' + MidwayError.fromJSON(error).getDetail(),
+          errorModal: true,
+        });
+        this.toggleModal();
       });
-      this.toggleModal();
-    });
   }
 
   public toggleShowPassword()
@@ -334,24 +334,24 @@ class Settings extends TerrainComponent<Props>
     });
 
     this.props.userActions(
-    {
-      actionType: 'changePassword',
-      userId: +userId,
-      currentPassword,
-      newPassword,
-    })
-    .then(() =>
-    {
-      notificationManager.addNotification('Success', 'Updated password', 'info', 4);
-    })
-    .catch((error) =>
-    {
-      this.setState({
-        modalMessage: 'Error changing your password: ' + String(errorToReadable(error)),
-        errorModal: true,
+      {
+        actionType: 'changePassword',
+        userId: +userId,
+        currentPassword,
+        newPassword,
+      })
+      .then(() =>
+      {
+        notificationManager.addNotification('Success', 'Updated password', 'info', 4);
+      })
+      .catch((error) =>
+      {
+        this.setState({
+          modalMessage: 'Error changing your password: ' + String(errorToReadable(error)),
+          errorModal: true,
+        });
+        this.toggleModal();
       });
-      this.toggleModal();
-    });
   }
 
   public setupAuthentication()
@@ -707,7 +707,7 @@ class Settings extends TerrainComponent<Props>
   //   lastEntry={true}
   //   />
 
-  public updateUserInfo(editingSections, onSuccess: () => any = () => {}, onError: (error) => any = () => {})
+  public updateUserInfo(editingSections, onSuccess: () => any = () => { }, onError: (error) => any = () => { })
   {
     let newUser = this.props.users.users.get(this.props.users.currentUser.id);
     const meta = {};
@@ -727,8 +727,8 @@ class Settings extends TerrainComponent<Props>
       user: newUser,
       meta,
     })
-    .then(() => onSuccess())
-    .catch((error) => onError(error));
+      .then(() => onSuccess())
+      .catch((error) => onError(error));
     return true;
   }
 

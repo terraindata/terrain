@@ -202,19 +202,19 @@ class Team extends TerrainComponent<Props>
         password,
       },
     })
-    .then(() =>
-    {
-      this.props.userActions({
-        actionType: 'fetch',
+      .then(() =>
+      {
+        this.props.userActions({
+          actionType: 'fetch',
+        });
+      })
+      .catch((error) =>
+      {
+        this.setState({
+          errorModalMessage: 'Error creating user: ' + JSON.stringify(error),
+        });
+        this.toggleErrorModal();
       });
-    })
-    .catch((error) =>
-    {
-      this.setState({
-        errorModalMessage: 'Error creating user: ' + JSON.stringify(error),
-      });
-      this.toggleErrorModal();
-    });
 
     return true;
   }
