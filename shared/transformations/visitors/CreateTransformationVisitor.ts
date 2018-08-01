@@ -237,20 +237,20 @@ export default class CreationVisitor
   {
     const sourcePath = Utils.path.convertIndices(engine.getFieldPath(sourceId));
     sourceId = engine.getFieldID(sourcePath);
-
+    const rootId = engine.getFieldID(rootPath);
     Utils.traversal.preorderFields(engine, sourceId, (childId) =>
     {
-      if (childId !== sourceId)
+      const pathAfterRoot = engine.getFieldPath(childId).slice(sourcePath.size);
+      const newFieldPath = rootPath.concat(pathAfterRoot).toList();
+      if (engine.getFieldID(newFieldPath) === undefined)
       {
-        const pathAfterRoot = engine.getFieldPath(childId).slice(sourcePath.size);
-        const newFieldPath = rootPath.concat(pathAfterRoot).toList();
         const newFieldId = Utils.fields.copyField(engine, childId, newFieldPath, node);
         const childEnd = Utils.traversal.findEndTransformation(engine, childId);
         Utils.traversal.prependNodeToField(engine, newFieldId, childEnd, EdgeTypes.Synthetic);
       }
       else
       {
-        Utils.fields.transferFieldData(sourceId, childId, engine, engine);
+        Utils.fields.transferFieldData(childId, rootId, engine, engine);
       }
     });
   }

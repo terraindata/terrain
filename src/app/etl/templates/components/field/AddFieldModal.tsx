@@ -106,22 +106,22 @@ interface FormState
 }
 
 const addFieldMap: InputDeclarationMap<FormState> =
-  {
-    name: {
-      type: DisplayType.TextBox,
-      displayName: 'Name',
-      group: 'file type',
+{
+  name: {
+    type: DisplayType.TextBox,
+    displayName: 'Name',
+    group: 'file type',
+  },
+  type: {
+    type: DisplayType.Pick,
+    displayName: 'Field Type',
+    options: {
+      pickOptions: (s) => etlFieldTypesList,
+      indexResolver: (value) => etlFieldTypesList.indexOf(value),
+      displayNames: (s) => etlFieldTypesNames,
     },
-    type: {
-      type: DisplayType.Pick,
-      displayName: 'Field Type',
-      options: {
-        pickOptions: (s) => etlFieldTypesList,
-        indexResolver: (value) => etlFieldTypesList.indexOf(value),
-        displayNames: (s) => etlFieldTypesNames,
-      },
-    },
-  };
+  },
+};
 
 // UI to add a new field underneath this field
 class AddFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
