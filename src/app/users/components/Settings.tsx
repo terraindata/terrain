@@ -289,7 +289,7 @@ class Settings extends TerrainComponent<Props>
     );
   }
 
-  public updateUserPassword(editingSections)
+  public updateUserPassword(editingSections, onSuccess)
   {
     const userId: number = localStorage['id'];
     const currentPassword: string = editingSections.currentPassword;
@@ -343,6 +343,7 @@ class Settings extends TerrainComponent<Props>
       .then(() =>
       {
         notificationManager.addNotification('Success', 'Updated password', 'info', 4);
+        onSuccess();
       })
       .catch((error) =>
       {

@@ -381,16 +381,14 @@ export default class Section extends TerrainComponent<Props>
     }
     else
     {
-      const saveSuccessful = this.props.onChange(this.state.editingSections);
-      if (saveSuccessful)
-      {
+      this.props.onChange(this.state.editingSections, () => {
         this.setState(
           {
             isEditing: false,
             editingSections: {},
           },
         );
-      }
+      });
     }
   }
 
