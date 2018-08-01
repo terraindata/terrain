@@ -46,12 +46,17 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file
 import * as _ from 'lodash';
 
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+
 import { List } from 'immutable';
 
 import TransformationNode from 'shared/transformations/TransformationNode';
-import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import Topology from 'shared/transformations/util/TopologyUtil';
+import TransformationVisitError from 'shared/transformations/visitors/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/visitors/TransformationVisitResult';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
@@ -83,7 +88,7 @@ export default abstract class ForkTransformationType extends TransformationNode
     {
       opts.newFieldKeyPaths.forEach((nfkp) =>
       {
-        if (valid && !Topology.areFieldsLocal(field, nfkp))
+        if (valid && !Topology.areFieldsLocal(field.path, nfkp))
         {
           valid = false;
         }
@@ -102,7 +107,7 @@ export default abstract class ForkTransformationType extends TransformationNode
     const errors = [];
     const opts = this.meta as NodeOptionsType<any>;
 
-    const field = this.fields.get(0);
+    const field = this.fields.get(0).path;
     const outputFields: List<KeyPath> = opts.newFieldKeyPaths;
     const matchCacheFn = _.memoize((newFieldIndex: number) =>
     {
@@ -126,7 +131,7 @@ export default abstract class ForkTransformationType extends TransformationNode
       for (const newField of newFields)
       {
         const newKP = matchCacheFn(newField.field)(location);
-        yadeep.set(doc, newKP, newField.value, { create: true });
+        yadeep.setIn(doc, newKP, newField.value);
       }
     }
 

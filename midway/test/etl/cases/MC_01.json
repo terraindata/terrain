@@ -1,0 +1,727 @@
+{
+  "testName": "MC_01",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "name": "Perfect Drink Scale",
+      "sku": "KTAD-0008-DSC",
+      "long_description": "<h4>Perfect Drink Scale 2.0</h4> <p>Stir up even more fun with 400+ amazing party cocktails scientifically engineered for\n   flavor optimization by the Perfect Drink Scale 2.0\n</p>",
+      "contents": "Perfect Drink Scale 2.0"
+    },
+    {
+      "name": "IPA Tasting Crate for 1",
+      "sku": "KTAL-0001-IP1",
+      "long_description": "<h4>When Life Gives You Pale Ale</h4> <p>Pale ale was once a highbrow brew reserved for the British elite, but when 79\n   barrels of pale India ale magically washed ashore in Lancashire after the Great\n   Storm of 1839, it became the malt of the masses.\n</p> <p>Some claim the wild winds, others, divine providence, but whatever caused the wreck of the India-bound\n   British cargo ship, with one tap, it was clear India Pale Ale was here to stay.\n</p> <p>Britain soon Britain-ized (aka made boring) IPAs by raising taxes and lowering alcohol content,\n   but luckily, America was there to rescue IPAs from unfair taxation and fun-degradation,\n   as we did with Liberty and Football. Today, the boldest and best IPAs are made in\n   America.\n</p> <h4>High-Quality Hops</h4> <p>We've scavenged the country for its finest cans of full-bodied IPAs, and our greatest discoveries are\n   highlighted in the IPA Solo Explorer Crate.\n</p> <p>This tour de force of delicious craft IPAs is heavy on hops and high in alcohol content, featuring: Ballast\n   Point's tart, citrus twist of Grapefruit Sculpin IPA; the bitter, tropical tones of Saint Archer's IPA;\n   21st Ammendment's dark malt Back in Black IPA; the sunny, passion fruit spices of Speakeasy's Baby Daddy\n   IPA; the piney, pungent hops of the Boulevard Brewing's Heavy Lifting IPA; and the Down Under-inspired\n   flowery flavors of Oskar Blue's IPA.\n</p> <h4>The Holy Grail of India Pale Ale</h4> <p>IPAs are brimming with character, and straight pint glasses just won't do them justice. The masterminds of\n   the Dogfish Head and Sierra Nevada Breweries put their nerdy beer brains together to create\n   the Spiegelau IPA Glass, a 19 oz. wingman to showcase the best of an IPA.\n</p> <p>The Spiegelau's handle ridges aerate the beer with more surface area and friction, and\n   the bowl shape top acts as an olfactory cannon that focuses aromatics toward the\n   nose for a rounder and fuller expression of flavor. We top it all off with a bag\n   of fresh hops, for your sniffing pleasure.\n</p> <p>Depart on a multi-sensory sample expedition into the heavenly majesty of heavy hops and malts with the IPA\n   Solo Explorer Crate.\n</p>",
+      "contents": "<h4>All-American IPAs</h4> <ul>\n  <li>Grapefruit Sculpin IPA by Ballast Point</li>\n  <li>Saint Archer's IPA</li>\n  <li>Back in Black IPA by 21st Amendment</li>\n  <li>Baby Daddy IPA by Speakeasy</li>\n  <li>Heavy Lifting IPA by Boulevard Brewing</li>\n  <li>Oskar Blue's IPA</li>\n</ul> <h4>Hops Helpers</h4> <ul>\n  <li>Spiegelau IPA Glass</li>\n  <li>Bag of fresh, dried hops</li>\n</ul>"
+    },
+    {
+      "name": "IPA Tasting Crate for 2",
+      "sku": "KTAL-0002-IP2",
+      "long_description": "<h4>When Life Gives You Pale Ale</h4> <p>Pale ale was once a highbrow brew reserved for the British elite, but when 79\n   barrels of pale India ale magically washed ashore in Lancashire after the Great\n   Storm of 1839, it became the malt of the masses.\n</p> <p>Some claim the wild winds,\n   others, divine providence, but whatever caused the wreck of the India-bound British\n   cargo ship, with one tap, it was clear India Pale Ale was here to stay.\n</p> <p>Britain\n   soon Britain-ized (aka made boring) IPAs by raising taxes and lowering alcohol content,\n   but luckily, America was there to rescue IPAs from unfair taxation and fun-degradation,\n   as we did with Liberty and Football. Today, the boldest and best IPAs are made in\n   America.\n</p> <h4>High-Quality Hops</h4> <p>We've scavenged the country for its finest\n   cans of full-bodied IPAs, and our greatest discoveries are highlighted in the IPA\n   Explorerers Crate.\n</p> <p>This tour de force of delicious craft IPAs is heavy on\n   hops and high in alcohol content, featuring: Ballast Point's tart,\n   citrus twist of Grapefruit Sculpin IPA; the bitter, tropical tones of Saint\n   Archer's IPA; 21st Ammendment's dark malt Back in Black\n   IPA; the sunny, passion fruit spices of Speakeasy's Baby Daddy\n   IPA; the piney, pungent hops of the Boulevard Brewing's Heavy Lifting\n   IPA; and the Down Under-inspired flowery flavors of Oskar Blue's\n   IPA.\n</p> <h4>The Holy Grail of India Pale Ale</h4> <p>IPAs are brimming with character,\n   and straight pint glasses just won't do them justice. The masterminds of the Dogfish\n   Head and Sierra Nevada Breweries put their nerdy beer brains together to create\n   the Spiegelau IPA Glass, a 19 oz. wingman to showcase the best of an IPA.\n</p> <p>The\n   Spiegelau's handle ridges aerate the beer with more surface area and friction, and\n   the bowl shape top acts as an olfactory cannon that focuses aromatics toward the\n   nose for a rounder and fuller expression of flavor. We top it all off with a bag\n   of fresh hops, for your sniffing pleasure.\n</p> <p>Grab a partner, or don't, and\n   depart on a multi-sensory sample expedition into the heavenly majesty of heavy hops\n   and malts with the IPA Explorers Crate.\n</p>",
+      "contents": "<h4>All-American IPAs</h4> <ul>\n  <li>2 Grapefruit Sculpin\n      IPAs by Ballast Point\n  </li>\n  <li>2 Saint Archer's IPAs</li>\n  <li>2 Back in Black IPAs\n      by 21st Amendment\n  </li>\n  <li>2 Baby Daddy IPAs by Speakeasy</li>\n  <li>2 Heavy Lifting\n      IPAs by Boulevard Brewing\n  </li>\n  <li>2 Oskar Blue's IPAs</li>\n</ul> <h4>Hops Helpers</h4> <ul>\n  <li>2 Spiegelau IPA Glasses</li>\n  <li>Bag of fresh, dried\n      hops\n  </li>\n</ul>"
+    },
+    {
+      "name": "Navy Strength Gin Crate",
+      "sku": "KTAL-0003-GIN",
+      "long_description": "<h4>Gin For The Win</h4> <p>In the days of the seafarer, the open waters played host to many crippling dangers: scurvy,\n   Disney ghost pirates, and the elusive Kraken, but no foe was more treacherous than\n   the shore-dwelling gin swindler.\n</p> <p>Sailors often purchased barrels of gin from these bullion-thirsty bandits, only to later find it had been\n   watered down worse than the Titanic post-iceberg. Unlike the good stuff, diluted gin was not flammable,\n   so if it sloshed onto the gunpowder, the stockpile was compromised.\n</p> <p>Thus, the British Royal Navy instituted a trial by fire: navy officers began pouring prospective\n   gin over black powder. If the powder ignited, they knew the gin was at least 114\n   proof; but if it failed to spark, it was off to the gallows for that filthy, diluting\n   crook.\n</p> <h4>Drink Like A Sailor</h4> <p>The Navy Strength Gin Crate honors the naval tradition of combustible, gunpowder-proof alcohol with a fifth\n   of Leopold's Navy Strength American Gin. The famed Leopold Bros. bolstered this gin's strength\n   and flavor by distilling each botanical separately, and then fusing it all into\n   a 57% abv hurricane of gin and spices.\n</p> <p>For those that believe gin is an old man's drink, this 750 mL of bottled fire is the weathered sea captain\n   in the corner of the bar who backs down from no man and refuses to be overpowered. A dash of lime\n   makes it the perfect anti-scurvy potion.\n</p> <h4>Release the Kraken</h4> <p>We've designed a pair of classic maritime drinking glasses for the heavy-swigging skipper.\n   The laser-etched Kraken attack is a visual symbol of the strength within each glass.\n</p> <p>And the octopus bottle stopper doesn't just prevent party fouls and evaporation,\n   its magical summoning properties can be used to conjure the protective aggression\n   of the Kraken in the event of a surprise pirate attack.\n</p> <p>The Navy Strength Gin Crate harnesses the power and prowess of the high seas into a strong sip of\n   American gin.\n</p>",
+      "contents": "<h4>The Gin Giant</h4> <ul>\n  <li>Leopold's Navy Strength American Gin (114 Proof)</li>\n</ul> <h4>Strength of the Seas</h4> <ul>\n  <li>2 Laser-etched Kraken gin glasses</li>\n  <li>Kraken Bottle Stopper</li>\n</ul>"
+    },
+    {
+      "name": "Lost Scotch Crate",
+      "sku": "KTAL-0004-SCO",
+      "long_description": "<h4>Legends Never Die</h4> <p>Like the dinosaurs, the Greeks, and all other once great behemoths of human history, over\n   half of Scotland's classic whisky distilleries have been buried by the sands of\n   time.\n</p> <p>But legends don't stay gone for too long; their greatness always resurfaces\n   in newly imagined ways. For the Greeks, it was the medieval Renaissance and \"healthy\"\n   yogurt; the dinosaurs had Jeff Goldblum and Co.; and the fallen scotch whisky distilleries\n   have The Lost Distillery.\n</p> <p>Despite sounding like an episode of the Hardy Boys, Lost Distillery is the preeminent name in historical\n   whisky reclamation. They chase their whisky with history to create \"present day expressions of legendary\n   whiskies\" nearly a century old; basically, they're sending your tastebuds back in time.\n</p> <h4>The Ghost Of Whisky Past</h4> <p>The Lost Distillery Company has made us privy to three 92 proof single malt whiskies from their Classic\n   Selection: Auchnagie (1812-1911), Gerston (1796-1882; 1886-1914), and Stratheden (1829-1926). We'll send\n   whichever whisky is best matured at the moment to showcase its legendary reputation.\n</p> <p>Auchnagie honors the original Perthshire distillery's local highland peats and high-mineral\n   stream with a mixture of honeysuckle, soft citrus, and peppery spices. Gerston combines\n   ripefruit, toffee, smokes, and spices to recreate the briny peat flavor and short\n   \"smuggler's\" still of the original Caithness distillery. And Stratheden utilizes\n   Sherry casks and sparkling water to commemorate the salty, earthy water of the Lover's\n   Pool in Stratheden.\n</p> <h4>Refined Whisky Companions</h4> <p>Scotland is so whisky-obsessed, they designed crystal glasses with a wide bowl and tapered mouth to best\n   mature every bit of the whisky's aroma and flavor. Drink whisky from anything but a Glencairn\n   glass in Scotland, and they will kick you clean out of the country.\n</p> <p>We're also including a Vinturi whisky aerator for proper aeration and a set of slate coasters\n   for classy presentation.\n</p> <p>The Scotch Whisky Crate reclaims the boldest and best of whisky past for the tasting pleasures of the\n   present.\n</p>",
+      "contents": "<h4>Crate Contains One of Either:</h4> <ul>\n  <li>Auchnagie (1812-1911; 92 Proof)</li>\n  <li>Gerston (1796-1882 &amp; 1886-1914; 92 Proof)</li>\n  <li>Stratheden (92 Proof)</li>\n</ul> <h4>Straight Shooters</h4> <ul>\n  <li>2 Glencairn Scotch Whisky Glasses</li>\n  <li>Vinturi Whisky Aerator</li>\n  <li>2 Slate Coasters</li>\n</ul>"
+    },
+    {
+      "name": "Mezcal Crate",
+      "sku": "KTAL-0005-MEZ",
+      "long_description": "<h4>The Mezcal of Honor</h4> <p>When most hear \"mezcal,\" they think of tequila: the official sponsor of spring break\n   debauchery and horrible hangovers, but tequila is the troublesome black sheep of\n   an otherwise esteemed mezcal family.\n</p> <p>Mezcal, traditional Mexican alcohol distilled from the native agave plant, includes blue agave tequila in\n   addition to 30 other agave species. So not all mezcals are tequila, but all tequilas are mezcals,\n   kind of like how not all demons are cats, but all cats are blood-thirsty hell-creatures.\n</p> <p>Tequila may have sold its soul to the monsters of mass production for a salted\n   shot in the limelight, but traditional mezcal continues its emphasis on small batch,\n   craft artisanal flavor.\n</p> <h4>The Black Mark of Mexico</h4> <p>Mezcal doesn't get more authentic than Marka Negra's Espadin variety, a double-distilled 750 mL\n   bottle that measures 102 proof and 100% Mexican mysticism. Instead of pandering\n   to the masses, Marka Negra mezcaleros (master distillers) craft the mezcal taste\n   to their local communities, in this case San Luis del Rio, Oaxaca, Mexico.\n</p> <p>Abel, the mezcalero of this particular espadin line, even served this mezcal at his wedding,\n   so every sip will be filled with authentic Oaxacan flavor and the warm spirit of\n   a massive party you weren't invited to.\n</p> <h4>Flavor The Firewater</h4> <p>For the straight shooters, we've included a pair of Himalayan shot glasses to help infuse\n   the mezcal with a strong, salty bite. These 3 inch rose-quartz salt glasses inject\n   natural flavor, need not be washed between use, and look much better on the bar\n   than piles of spilled salt.\n</p> <p>Or continue spinning round the mezcal carousel with the finest cocktail order south of the border: the\n   Oaxacan Old Fashioned (pronounced wah-hah-ken, you uncultured buffoon!). Mix in Bittermilk No. 6's cocoa\n   husk-aged cocktail mix of spices and chiles for a strong, bittersweet mezcal treat.\n</p> <p>Skip the cheap tequila and explore the traditional, artisanal flavors of Mexican spirits with the Mezcal\n   Crate.\n</p>",
+      "contents": "<h4>Elixir of the Gods</h4> <ul>\n  <li>Marka Negra Espadin Mezcal (102 Proof)</li>\n</ul> <h4>Straight Shooters</h4> <ul>\n  <li>2 Himalayan salt shot glasses</li>\n  <li>Bittermilk No. 6 mezcal mixer</li>\n</ul>"
+    },
+    {
+      "name": "Coffee Ammo Can",
+      "sku": "KTAM-0001-COF",
+      "long_description": "<h4>Fuel for the Front Lines</h4> <p>The modern professional environment is chock-full of hazard. It pays to be alert out\r\n   there. One misfired 'reply-all' can quickly escalate friendly email banter into a full-on legal battle.\r\n</p> <p>Don't be that guy. Be the guy that <span class=\"highlight\">hits the ground running</span> every morning\r\n   and handles your freakin' business.\r\n</p> <h4>Weekday Warriors</h4> <p>We've partnered with the veterans at <span class=\"highlight\">Alpha  Coffee</span>- battle hardended guys\r\n   that wage full scale war on sluggish Monday mornings, post-lunch food comas, and every other droopy-eyed\r\n   productivity gap that threatens the success of your mission. This canister ships with 12 oz of their\r\n   pre-ground, Warrior Select coffee. Combat tested and warrior selected, this is a delicious blend\r\n   of the best highland arabica beans available, with superior flavor that is winning hearts and minds all\r\n   over the world.\r\n</p> <p>Also includes two full-pot sample packs of LockNLoad's popular Double Barrel Black - dark roast and Smooth\r\n   Operator - light roast.\r\n</p> <h4>Operation Invincible Freshness</h4> <p>When freshness is the imperative you've got to go with a tried and true container. We ship these grinds in\r\n   a genuine <span class=\"highlight\">.30 cal NATO spec ammo case</span>- watertight, rock-solid,\r\n   and not available at your local mermaid-themed coffee shop. For the true warrior experience we recommend\r\n   enjoying your morning jolt from the lightweight, stainless steel carabiner mug.\r\n</p> <p>You've been briefed. Secure your supplies and get it done.</p>",
+      "contents": "<h4>Battleworthy Brews</h4> <ul>\r\n  <li>12oz Alpha Warrior Select Coffee</li>\r\n  <li>2 Full-Pot Packages</li>\r\n  <ul>\r\n    <li>Double Barrel Black - dark roast</li>\r\n    <li>Smooth Operator - light roast</li>\r\n  </ul>\r\n</ul> <h4>Hearty Rations</h4> <ul>\r\n  <li>Clif Bar</li>\r\n  <li>Kind Bar, Fruit &amp; Nut</li>\r\n  <li>Stainless Steel Carabiner Mug</li>\r\n</ul>"
+    },
+    {
+      "name": "Ammo Can Poker Set",
+      "sku": "KTAM-0002-POK",
+      "long_description": "<h4>Only One Way to Win</h4> <p>The river card misses, your hand is still just a four card straight and a four card flush-\r\n  you've got nothing but a busted draw. It's a three way hand with a lot of action-\r\n  there's only one way you're winning that huge pot. It's time to bluff, but even the best bluffers need a\r\n  poker set worthy of such a daring gambit.</p>\r\n<p>Introducing the brand-new, ammo can poker set - the most functional and\r\n  toughest 300-chip poker set ever designed, featuring custom artwork and custom cards\r\n  in a .30 cal ammo can.</p>\r\n<h4>A One-Of-A-Kind Poker Set</h4> <p>We set out to build the <b>most awesome poker set in the world</b>--better than\r\n  the thousands of briefcase-style poker sets out there. The top-loading, space efficient\r\n  chip housing is perfectly fit to a .30 cal US military ammo can. This design is\r\n  incredibly durable and provides easy access to the chips and cards without ever\r\n  spilling them.</p> <h4>Beautiful Design</h4> <p>Poker is dear to us- especially\r\n  the short-handed, no-limit hold'em games where the only way to win is to bet and\r\n  bluff aggressively. We wanted our set to be <span class=\"highlight\">as beautiful\r\n  as it is functional</span>, so we set out to find artwork that would pay homage\r\n  to the game and fit with the theme of the ammo case. We combined the sphinx from\r\n  Greek mythology with classic card elements and US symbology to create our insignia-\r\n  the mark of hyper-aggressive no-limit poker players.</p>\r\n<p><img class=\"__mce_add_custom__\"\r\n        title=\"The Sphinx- the definitive insignia of aggressive No-Limit poker players\"\r\n        src=\"http://www.mancrates.com/product_images/uploaded_images/sphinx-design.jpg\"\r\n        alt=\"The Sphinx- the definitive insignia of aggressive No-Limit poker players\"\r\n        width=\"600\"\r\n        height=\"415\"></p>\r\n<p>The sphinx forced travelers on the road to answer her riddles or be devoured- she embodies the poker player\r\n  that forces her opponents to make difficult decisions, often for all of their chips. The arrows are drawn\r\n  from the US seal, representing <span class=\"highlight\">readiness for war</span> on both fronts.\r\n  There is no olive branch in poker.</p>\r\n<h4>Custom Poker Cards</h4> <p>We wanted our poker set to reflect our love of the game, to match the military theme of the\r\n  poker case, and to make the set as beautiful as it was functional. We designed original\r\n  artwork for a set of two Sphinx-themed custom backed decks from\r\n  the U.S. Playing Card Company:</p>\r\n<img class=\"__mce_add_custom__\"\r\n     title=\"66b548fe0c8b9a04e452d73f43aedc20-large.jpg\"\r\n     src=\"http://www.mancrates.com/product_images/uploaded_images/66b548fe0c8b9a04e452d73f43aedc20-large.jpg\"\r\n     alt=\"66b548fe0c8b9a04e452d73f43aedc20-large.jpg\" width=\"584\"\r\n     height=\"415\">\r\n<h4>Official-Weight Custom Color Poker Chips</h4> <p>As longtime poker players with a slew of chip tricks, we refused to compromise on chip weight or feel, so\r\n  we sourced high quality, 11.5 gram composite poker chips in custom colors. This poker set includes 300\r\n  pro-style 11.5 gram composite poker chips.</p>",
+      "contents": "<h4>Gambler's Gauntlet</h4> <ul>\r\n  <li>2 decks of custom playing cards</li>\r\n  <li>300 casino-weight, 11.5 gram composite chips</li>\r\n  <li>Exclusive poker chip insert</li>\r\n</ul>"
+    },
+    {
+      "name": "Premium Jerky Ammo Can",
+      "sku": "KTAM-0003-JER",
+      "long_description": "<h4>Meet Beef Jerky</h4> <p>There are two types of men in the world- men who love beef jerky, and men who don't know\r\n   what beef jerky is.\r\n</p> <p>Here's a knowledge bomb- the jerky by the register at your gas station is peasant-fare. If you think you\r\n   don't like jerky, you've just never had the real thing.\r\n</p> <h4>Meat By Mail</h4> <p>Let us send you our meat. Seriously. We sampled dozens of jerkies and chose the absolute best brands and flavors. We consulted jerky experts and thousands of our customers\r\n   to create a balanced flavor profile- sweet, savory, and a hint of spice. We'll take your tastebuds on a\r\n   journey where you'll discover lean, savory cuts of beef marinated to perfection and then cured until succulent and tender.\r\n</p> <h4>Meat For Peace</h4> <p>This masterpiece ships in a genuine, decommissioned NATO .30 caliber ammo\r\n  case. Watertight, nearly indestructible, and totally badass, these glorious vessels serve their\r\n   second lives safely delivering our delicious jerky to you. If popping one of these doesn't make you a jerky\r\n   convert, nothing will.\r\n</p>",
+      "contents": "<h4>Choice Meats</h4><ul>\r\n  <li>Country Archer Beef Jerky, Crushed Red Pepper</li>\r\n  <li>Carnivore Candy Beef Jerky, Sweet Picante</li>\r\n  <li>Field Trip Beef Jerky, Original Flavor</li>\r\n</ul> <h4>Adventure Fuel</h4> <ul>\r\n  <li>Wonderful Almonds, Roasted & Salted</li>\r\n  <li>Millenium Energy Bar, Vanilla</li>\r\n  <li>Corn Nuggets, BBQ Flavor</li>\r\n  <li>Clif Bar</li>\r\n</ul>"
+    },
+    {
+      "name": "Outdoor Survival Ammo Can",
+      "sku": "KTAM-0004-SUR",
+      "long_description": "<h4>Luxury Breeds Complacency</h4> <p>Softened by summoning private taxis via iPhones, air conditioned cubicles, and the bounty\r\n   of Costco foods- the general population today would balk at eating squirrel.\r\n</p> <p>But not you.</p> <h4>Tools &amp; Knowledge</h4> <p>You know how to dig a lean-to, how to summon fire from flint, how to determine the cardinal directions from\r\n   the sun, the stars, and <span class=\"highlight\">moss on trees</span>. And you're equipped\r\n   with the carefully selected survival essentials we've packed into a watertight,\r\n   decommissioned .30 caliber ammo can, so that when worst comes to worst,\r\n  <span class=\"highlight\">you're ready to go</span>.\r\n</p> <h4>Can-Do</h4> <p>If Rambo had this kit, First Blood would have been an eight-season <span\r\n  class=\"highlight\">reality  TV show</span> instead of a 90 minute film. Castaway would have\r\n   been a <span class=\"highlight\">light-hearted</span> buddy comedy about a man and a volley ball if Tom Hanks\r\n   had the kit on hand. If the Donner Party had been outfitted with the Outdoor Survival Ammo Can, today\r\n   they'd be famous for their <span class=\"highlight\">poetic descriptions</span> of the Sierra Nevadas\r\n   instead of their darker nutritional decisions.\r\n</p> <p>\r\n  <span class=\"highlight\">Don't be the next Donner Party.</span>\r\n  Get your Outdoor Survival Can, and when you finish the premium energy packed snacks within,\r\n  go get your first squirrel.\r\n</p>",
+      "contents": "<h4>Rustic Rigging</h4> <ul>\r\n  <li>Waterproof, indestructible 30 cal ammo can</li>\r\n  <li>Collapsible shovel</li>\r\n  <li>Paracord knife with firestarter</li>\r\n  <li>Authentic FM21-76 Army Survival Field Manual</li>\r\n  <li>50 feet of paracord</li>\r\n  <li>Emergency survival blanket</li>\r\n  <li>Emergency glow stick</li>\r\n</ul> <h4>Back Country Consignment</h4> <ul>\r\n  <li>Pemmican Meal Bar</li>\r\n  <li>Clif Bar</li>\r\n  <li>Clif Bar Mojo</li>\r\n  <li>Field Trip Beef Jerky</li>\r\n</ul>"
+    }
+  ],
+  "outputDocs": [
+    {
+      "Name": "Perfect Drink Scale",
+      "SKU": "KTAD-0008-DSC",
+      "LongDescriptionHTML": "<h4>Perfect Drink Scale 2.0</h4> <p>Stir up even more fun with 400+ amazing party cocktails scientifically engineered for\n   flavor optimization by the Perfect Drink Scale 2.0\n</p>",
+      "LongDescription": "Perfect Drink Scale 2.0 Stir up even more fun with 400+ amazing party cocktails scientifically engineered for\n   flavor optimization by the Perfect Drink Scale 2.0\n",
+      "ContentsHTML": "Perfect Drink Scale 2.0",
+      "Contents": "Perfect Drink Scale 2.0"
+    },
+    {
+      "Name": "IPA Tasting Crate for 1",
+      "SKU": "KTAL-0001-IP1",
+      "LongDescriptionHTML": "<h4>When Life Gives You Pale Ale</h4> <p>Pale ale was once a highbrow brew reserved for the British elite, but when 79\n   barrels of pale India ale magically washed ashore in Lancashire after the Great\n   Storm of 1839, it became the malt of the masses.\n</p> <p>Some claim the wild winds, others, divine providence, but whatever caused the wreck of the India-bound\n   British cargo ship, with one tap, it was clear India Pale Ale was here to stay.\n</p> <p>Britain soon Britain-ized (aka made boring) IPAs by raising taxes and lowering alcohol content,\n   but luckily, America was there to rescue IPAs from unfair taxation and fun-degradation,\n   as we did with Liberty and Football. Today, the boldest and best IPAs are made in\n   America.\n</p> <h4>High-Quality Hops</h4> <p>We've scavenged the country for its finest cans of full-bodied IPAs, and our greatest discoveries are\n   highlighted in the IPA Solo Explorer Crate.\n</p> <p>This tour de force of delicious craft IPAs is heavy on hops and high in alcohol content, featuring: Ballast\n   Point's tart, citrus twist of Grapefruit Sculpin IPA; the bitter, tropical tones of Saint Archer's IPA;\n   21st Ammendment's dark malt Back in Black IPA; the sunny, passion fruit spices of Speakeasy's Baby Daddy\n   IPA; the piney, pungent hops of the Boulevard Brewing's Heavy Lifting IPA; and the Down Under-inspired\n   flowery flavors of Oskar Blue's IPA.\n</p> <h4>The Holy Grail of India Pale Ale</h4> <p>IPAs are brimming with character, and straight pint glasses just won't do them justice. The masterminds of\n   the Dogfish Head and Sierra Nevada Breweries put their nerdy beer brains together to create\n   the Spiegelau IPA Glass, a 19 oz. wingman to showcase the best of an IPA.\n</p> <p>The Spiegelau's handle ridges aerate the beer with more surface area and friction, and\n   the bowl shape top acts as an olfactory cannon that focuses aromatics toward the\n   nose for a rounder and fuller expression of flavor. We top it all off with a bag\n   of fresh hops, for your sniffing pleasure.\n</p> <p>Depart on a multi-sensory sample expedition into the heavenly majesty of heavy hops and malts with the IPA\n   Solo Explorer Crate.\n</p>",
+      "LongDescription": "When Life Gives You Pale Ale Pale ale was once a highbrow brew reserved for the British elite, but when 79\n   barrels of pale India ale magically washed ashore in Lancashire after the Great\n   Storm of 1839, it became the malt of the masses.\n Some claim the wild winds, others, divine providence, but whatever caused the wreck of the India-bound\n   British cargo ship, with one tap, it was clear India Pale Ale was here to stay.\n Britain soon Britain-ized (aka made boring) IPAs by raising taxes and lowering alcohol content,\n   but luckily, America was there to rescue IPAs from unfair taxation and fun-degradation,\n   as we did with Liberty and Football. Today, the boldest and best IPAs are made in\n   America.\n High-Quality Hops We've scavenged the country for its finest cans of full-bodied IPAs, and our greatest discoveries are\n   highlighted in the IPA Solo Explorer Crate.\n This tour de force of delicious craft IPAs is heavy on hops and high in alcohol content, featuring: Ballast\n   Point's tart, citrus twist of Grapefruit Sculpin IPA; the bitter, tropical tones of Saint Archer's IPA;\n   21st Ammendment's dark malt Back in Black IPA; the sunny, passion fruit spices of Speakeasy's Baby Daddy\n   IPA; the piney, pungent hops of the Boulevard Brewing's Heavy Lifting IPA; and the Down Under-inspired\n   flowery flavors of Oskar Blue's IPA.\n The Holy Grail of India Pale Ale IPAs are brimming with character, and straight pint glasses just won't do them justice. The masterminds of\n   the Dogfish Head and Sierra Nevada Breweries put their nerdy beer brains together to create\n   the Spiegelau IPA Glass, a 19 oz. wingman to showcase the best of an IPA.\n The Spiegelau's handle ridges aerate the beer with more surface area and friction, and\n   the bowl shape top acts as an olfactory cannon that focuses aromatics toward the\n   nose for a rounder and fuller expression of flavor. We top it all off with a bag\n   of fresh hops, for your sniffing pleasure.\n Depart on a multi-sensory sample expedition into the heavenly majesty of heavy hops and malts with the IPA\n   Solo Explorer Crate.\n",
+      "ContentsHTML": "<h4>All-American IPAs</h4> <ul>\n  <li>Grapefruit Sculpin IPA by Ballast Point</li>\n  <li>Saint Archer's IPA</li>\n  <li>Back in Black IPA by 21st Amendment</li>\n  <li>Baby Daddy IPA by Speakeasy</li>\n  <li>Heavy Lifting IPA by Boulevard Brewing</li>\n  <li>Oskar Blue's IPA</li>\n</ul> <h4>Hops Helpers</h4> <ul>\n  <li>Spiegelau IPA Glass</li>\n  <li>Bag of fresh, dried hops</li>\n</ul>",
+      "Contents": "All-American IPAs \n  Grapefruit Sculpin IPA by Ballast Point\n  Saint Archer's IPA\n  Back in Black IPA by 21st Amendment\n  Baby Daddy IPA by Speakeasy\n  Heavy Lifting IPA by Boulevard Brewing\n  Oskar Blue's IPA\n Hops Helpers \n  Spiegelau IPA Glass\n  Bag of fresh, dried hops\n"
+    },
+    {
+      "Name": "IPA Tasting Crate for 2",
+      "SKU": "KTAL-0002-IP2",
+      "LongDescriptionHTML": "<h4>When Life Gives You Pale Ale</h4> <p>Pale ale was once a highbrow brew reserved for the British elite, but when 79\n   barrels of pale India ale magically washed ashore in Lancashire after the Great\n   Storm of 1839, it became the malt of the masses.\n</p> <p>Some claim the wild winds,\n   others, divine providence, but whatever caused the wreck of the India-bound British\n   cargo ship, with one tap, it was clear India Pale Ale was here to stay.\n</p> <p>Britain\n   soon Britain-ized (aka made boring) IPAs by raising taxes and lowering alcohol content,\n   but luckily, America was there to rescue IPAs from unfair taxation and fun-degradation,\n   as we did with Liberty and Football. Today, the boldest and best IPAs are made in\n   America.\n</p> <h4>High-Quality Hops</h4> <p>We've scavenged the country for its finest\n   cans of full-bodied IPAs, and our greatest discoveries are highlighted in the IPA\n   Explorerers Crate.\n</p> <p>This tour de force of delicious craft IPAs is heavy on\n   hops and high in alcohol content, featuring: Ballast Point's tart,\n   citrus twist of Grapefruit Sculpin IPA; the bitter, tropical tones of Saint\n   Archer's IPA; 21st Ammendment's dark malt Back in Black\n   IPA; the sunny, passion fruit spices of Speakeasy's Baby Daddy\n   IPA; the piney, pungent hops of the Boulevard Brewing's Heavy Lifting\n   IPA; and the Down Under-inspired flowery flavors of Oskar Blue's\n   IPA.\n</p> <h4>The Holy Grail of India Pale Ale</h4> <p>IPAs are brimming with character,\n   and straight pint glasses just won't do them justice. The masterminds of the Dogfish\n   Head and Sierra Nevada Breweries put their nerdy beer brains together to create\n   the Spiegelau IPA Glass, a 19 oz. wingman to showcase the best of an IPA.\n</p> <p>The\n   Spiegelau's handle ridges aerate the beer with more surface area and friction, and\n   the bowl shape top acts as an olfactory cannon that focuses aromatics toward the\n   nose for a rounder and fuller expression of flavor. We top it all off with a bag\n   of fresh hops, for your sniffing pleasure.\n</p> <p>Grab a partner, or don't, and\n   depart on a multi-sensory sample expedition into the heavenly majesty of heavy hops\n   and malts with the IPA Explorers Crate.\n</p>",
+      "LongDescription": "When Life Gives You Pale Ale Pale ale was once a highbrow brew reserved for the British elite, but when 79\n   barrels of pale India ale magically washed ashore in Lancashire after the Great\n   Storm of 1839, it became the malt of the masses.\n Some claim the wild winds,\n   others, divine providence, but whatever caused the wreck of the India-bound British\n   cargo ship, with one tap, it was clear India Pale Ale was here to stay.\n Britain\n   soon Britain-ized (aka made boring) IPAs by raising taxes and lowering alcohol content,\n   but luckily, America was there to rescue IPAs from unfair taxation and fun-degradation,\n   as we did with Liberty and Football. Today, the boldest and best IPAs are made in\n   America.\n High-Quality Hops We've scavenged the country for its finest\n   cans of full-bodied IPAs, and our greatest discoveries are highlighted in the IPA\n   Explorerers Crate.\n This tour de force of delicious craft IPAs is heavy on\n   hops and high in alcohol content, featuring: Ballast Point's tart,\n   citrus twist of Grapefruit Sculpin IPA; the bitter, tropical tones of Saint\n   Archer's IPA; 21st Ammendment's dark malt Back in Black\n   IPA; the sunny, passion fruit spices of Speakeasy's Baby Daddy\n   IPA; the piney, pungent hops of the Boulevard Brewing's Heavy Lifting\n   IPA; and the Down Under-inspired flowery flavors of Oskar Blue's\n   IPA.\n The Holy Grail of India Pale Ale IPAs are brimming with character,\n   and straight pint glasses just won't do them justice. The masterminds of the Dogfish\n   Head and Sierra Nevada Breweries put their nerdy beer brains together to create\n   the Spiegelau IPA Glass, a 19 oz. wingman to showcase the best of an IPA.\n The\n   Spiegelau's handle ridges aerate the beer with more surface area and friction, and\n   the bowl shape top acts as an olfactory cannon that focuses aromatics toward the\n   nose for a rounder and fuller expression of flavor. We top it all off with a bag\n   of fresh hops, for your sniffing pleasure.\n Grab a partner, or don't, and\n   depart on a multi-sensory sample expedition into the heavenly majesty of heavy hops\n   and malts with the IPA Explorers Crate.\n",
+      "ContentsHTML": "<h4>All-American IPAs</h4> <ul>\n  <li>2 Grapefruit Sculpin\n      IPAs by Ballast Point\n  </li>\n  <li>2 Saint Archer's IPAs</li>\n  <li>2 Back in Black IPAs\n      by 21st Amendment\n  </li>\n  <li>2 Baby Daddy IPAs by Speakeasy</li>\n  <li>2 Heavy Lifting\n      IPAs by Boulevard Brewing\n  </li>\n  <li>2 Oskar Blue's IPAs</li>\n</ul> <h4>Hops Helpers</h4> <ul>\n  <li>2 Spiegelau IPA Glasses</li>\n  <li>Bag of fresh, dried\n      hops\n  </li>\n</ul>",
+      "Contents": "All-American IPAs \n  2 Grapefruit Sculpin\n      IPAs by Ballast Point\n  \n  2 Saint Archer's IPAs\n  2 Back in Black IPAs\n      by 21st Amendment\n  \n  2 Baby Daddy IPAs by Speakeasy\n  2 Heavy Lifting\n      IPAs by Boulevard Brewing\n  \n  2 Oskar Blue's IPAs\n Hops Helpers \n  2 Spiegelau IPA Glasses\n  Bag of fresh, dried\n      hops\n  \n"
+    },
+    {
+      "Name": "Navy Strength Gin Crate",
+      "SKU": "KTAL-0003-GIN",
+      "LongDescriptionHTML": "<h4>Gin For The Win</h4> <p>In the days of the seafarer, the open waters played host to many crippling dangers: scurvy,\n   Disney ghost pirates, and the elusive Kraken, but no foe was more treacherous than\n   the shore-dwelling gin swindler.\n</p> <p>Sailors often purchased barrels of gin from these bullion-thirsty bandits, only to later find it had been\n   watered down worse than the Titanic post-iceberg. Unlike the good stuff, diluted gin was not flammable,\n   so if it sloshed onto the gunpowder, the stockpile was compromised.\n</p> <p>Thus, the British Royal Navy instituted a trial by fire: navy officers began pouring prospective\n   gin over black powder. If the powder ignited, they knew the gin was at least 114\n   proof; but if it failed to spark, it was off to the gallows for that filthy, diluting\n   crook.\n</p> <h4>Drink Like A Sailor</h4> <p>The Navy Strength Gin Crate honors the naval tradition of combustible, gunpowder-proof alcohol with a fifth\n   of Leopold's Navy Strength American Gin. The famed Leopold Bros. bolstered this gin's strength\n   and flavor by distilling each botanical separately, and then fusing it all into\n   a 57% abv hurricane of gin and spices.\n</p> <p>For those that believe gin is an old man's drink, this 750 mL of bottled fire is the weathered sea captain\n   in the corner of the bar who backs down from no man and refuses to be overpowered. A dash of lime\n   makes it the perfect anti-scurvy potion.\n</p> <h4>Release the Kraken</h4> <p>We've designed a pair of classic maritime drinking glasses for the heavy-swigging skipper.\n   The laser-etched Kraken attack is a visual symbol of the strength within each glass.\n</p> <p>And the octopus bottle stopper doesn't just prevent party fouls and evaporation,\n   its magical summoning properties can be used to conjure the protective aggression\n   of the Kraken in the event of a surprise pirate attack.\n</p> <p>The Navy Strength Gin Crate harnesses the power and prowess of the high seas into a strong sip of\n   American gin.\n</p>",
+      "LongDescription": "Gin For The Win In the days of the seafarer, the open waters played host to many crippling dangers: scurvy,\n   Disney ghost pirates, and the elusive Kraken, but no foe was more treacherous than\n   the shore-dwelling gin swindler.\n Sailors often purchased barrels of gin from these bullion-thirsty bandits, only to later find it had been\n   watered down worse than the Titanic post-iceberg. Unlike the good stuff, diluted gin was not flammable,\n   so if it sloshed onto the gunpowder, the stockpile was compromised.\n Thus, the British Royal Navy instituted a trial by fire: navy officers began pouring prospective\n   gin over black powder. If the powder ignited, they knew the gin was at least 114\n   proof; but if it failed to spark, it was off to the gallows for that filthy, diluting\n   crook.\n Drink Like A Sailor The Navy Strength Gin Crate honors the naval tradition of combustible, gunpowder-proof alcohol with a fifth\n   of Leopold's Navy Strength American Gin. The famed Leopold Bros. bolstered this gin's strength\n   and flavor by distilling each botanical separately, and then fusing it all into\n   a 57% abv hurricane of gin and spices.\n For those that believe gin is an old man's drink, this 750 mL of bottled fire is the weathered sea captain\n   in the corner of the bar who backs down from no man and refuses to be overpowered. A dash of lime\n   makes it the perfect anti-scurvy potion.\n Release the Kraken We've designed a pair of classic maritime drinking glasses for the heavy-swigging skipper.\n   The laser-etched Kraken attack is a visual symbol of the strength within each glass.\n And the octopus bottle stopper doesn't just prevent party fouls and evaporation,\n   its magical summoning properties can be used to conjure the protective aggression\n   of the Kraken in the event of a surprise pirate attack.\n The Navy Strength Gin Crate harnesses the power and prowess of the high seas into a strong sip of\n   American gin.\n",
+      "ContentsHTML": "<h4>The Gin Giant</h4> <ul>\n  <li>Leopold's Navy Strength American Gin (114 Proof)</li>\n</ul> <h4>Strength of the Seas</h4> <ul>\n  <li>2 Laser-etched Kraken gin glasses</li>\n  <li>Kraken Bottle Stopper</li>\n</ul>",
+      "Contents": "The Gin Giant \n  Leopold's Navy Strength American Gin (114 Proof)\n Strength of the Seas \n  2 Laser-etched Kraken gin glasses\n  Kraken Bottle Stopper\n"
+    },
+    {
+      "Name": "Lost Scotch Crate",
+      "SKU": "KTAL-0004-SCO",
+      "LongDescriptionHTML": "<h4>Legends Never Die</h4> <p>Like the dinosaurs, the Greeks, and all other once great behemoths of human history, over\n   half of Scotland's classic whisky distilleries have been buried by the sands of\n   time.\n</p> <p>But legends don't stay gone for too long; their greatness always resurfaces\n   in newly imagined ways. For the Greeks, it was the medieval Renaissance and \"healthy\"\n   yogurt; the dinosaurs had Jeff Goldblum and Co.; and the fallen scotch whisky distilleries\n   have The Lost Distillery.\n</p> <p>Despite sounding like an episode of the Hardy Boys, Lost Distillery is the preeminent name in historical\n   whisky reclamation. They chase their whisky with history to create \"present day expressions of legendary\n   whiskies\" nearly a century old; basically, they're sending your tastebuds back in time.\n</p> <h4>The Ghost Of Whisky Past</h4> <p>The Lost Distillery Company has made us privy to three 92 proof single malt whiskies from their Classic\n   Selection: Auchnagie (1812-1911), Gerston (1796-1882; 1886-1914), and Stratheden (1829-1926). We'll send\n   whichever whisky is best matured at the moment to showcase its legendary reputation.\n</p> <p>Auchnagie honors the original Perthshire distillery's local highland peats and high-mineral\n   stream with a mixture of honeysuckle, soft citrus, and peppery spices. Gerston combines\n   ripefruit, toffee, smokes, and spices to recreate the briny peat flavor and short\n   \"smuggler's\" still of the original Caithness distillery. And Stratheden utilizes\n   Sherry casks and sparkling water to commemorate the salty, earthy water of the Lover's\n   Pool in Stratheden.\n</p> <h4>Refined Whisky Companions</h4> <p>Scotland is so whisky-obsessed, they designed crystal glasses with a wide bowl and tapered mouth to best\n   mature every bit of the whisky's aroma and flavor. Drink whisky from anything but a Glencairn\n   glass in Scotland, and they will kick you clean out of the country.\n</p> <p>We're also including a Vinturi whisky aerator for proper aeration and a set of slate coasters\n   for classy presentation.\n</p> <p>The Scotch Whisky Crate reclaims the boldest and best of whisky past for the tasting pleasures of the\n   present.\n</p>",
+      "LongDescription": "Legends Never Die Like the dinosaurs, the Greeks, and all other once great behemoths of human history, over\n   half of Scotland's classic whisky distilleries have been buried by the sands of\n   time.\n But legends don't stay gone for too long; their greatness always resurfaces\n   in newly imagined ways. For the Greeks, it was the medieval Renaissance and \"healthy\"\n   yogurt; the dinosaurs had Jeff Goldblum and Co.; and the fallen scotch whisky distilleries\n   have The Lost Distillery.\n Despite sounding like an episode of the Hardy Boys, Lost Distillery is the preeminent name in historical\n   whisky reclamation. They chase their whisky with history to create \"present day expressions of legendary\n   whiskies\" nearly a century old; basically, they're sending your tastebuds back in time.\n The Ghost Of Whisky Past The Lost Distillery Company has made us privy to three 92 proof single malt whiskies from their Classic\n   Selection: Auchnagie (1812-1911), Gerston (1796-1882; 1886-1914), and Stratheden (1829-1926). We'll send\n   whichever whisky is best matured at the moment to showcase its legendary reputation.\n Auchnagie honors the original Perthshire distillery's local highland peats and high-mineral\n   stream with a mixture of honeysuckle, soft citrus, and peppery spices. Gerston combines\n   ripefruit, toffee, smokes, and spices to recreate the briny peat flavor and short\n   \"smuggler's\" still of the original Caithness distillery. And Stratheden utilizes\n   Sherry casks and sparkling water to commemorate the salty, earthy water of the Lover's\n   Pool in Stratheden.\n Refined Whisky Companions Scotland is so whisky-obsessed, they designed crystal glasses with a wide bowl and tapered mouth to best\n   mature every bit of the whisky's aroma and flavor. Drink whisky from anything but a Glencairn\n   glass in Scotland, and they will kick you clean out of the country.\n We're also including a Vinturi whisky aerator for proper aeration and a set of slate coasters\n   for classy presentation.\n The Scotch Whisky Crate reclaims the boldest and best of whisky past for the tasting pleasures of the\n   present.\n",
+      "ContentsHTML": "<h4>Crate Contains One of Either:</h4> <ul>\n  <li>Auchnagie (1812-1911; 92 Proof)</li>\n  <li>Gerston (1796-1882 &amp; 1886-1914; 92 Proof)</li>\n  <li>Stratheden (92 Proof)</li>\n</ul> <h4>Straight Shooters</h4> <ul>\n  <li>2 Glencairn Scotch Whisky Glasses</li>\n  <li>Vinturi Whisky Aerator</li>\n  <li>2 Slate Coasters</li>\n</ul>",
+      "Contents": "Crate Contains One of Either: \n  Auchnagie (1812-1911; 92 Proof)\n  Gerston (1796-1882 &amp; 1886-1914; 92 Proof)\n  Stratheden (92 Proof)\n Straight Shooters \n  2 Glencairn Scotch Whisky Glasses\n  Vinturi Whisky Aerator\n  2 Slate Coasters\n"
+    },
+    {
+      "Name": "Mezcal Crate",
+      "SKU": "KTAL-0005-MEZ",
+      "LongDescriptionHTML": "<h4>The Mezcal of Honor</h4> <p>When most hear \"mezcal,\" they think of tequila: the official sponsor of spring break\n   debauchery and horrible hangovers, but tequila is the troublesome black sheep of\n   an otherwise esteemed mezcal family.\n</p> <p>Mezcal, traditional Mexican alcohol distilled from the native agave plant, includes blue agave tequila in\n   addition to 30 other agave species. So not all mezcals are tequila, but all tequilas are mezcals,\n   kind of like how not all demons are cats, but all cats are blood-thirsty hell-creatures.\n</p> <p>Tequila may have sold its soul to the monsters of mass production for a salted\n   shot in the limelight, but traditional mezcal continues its emphasis on small batch,\n   craft artisanal flavor.\n</p> <h4>The Black Mark of Mexico</h4> <p>Mezcal doesn't get more authentic than Marka Negra's Espadin variety, a double-distilled 750 mL\n   bottle that measures 102 proof and 100% Mexican mysticism. Instead of pandering\n   to the masses, Marka Negra mezcaleros (master distillers) craft the mezcal taste\n   to their local communities, in this case San Luis del Rio, Oaxaca, Mexico.\n</p> <p>Abel, the mezcalero of this particular espadin line, even served this mezcal at his wedding,\n   so every sip will be filled with authentic Oaxacan flavor and the warm spirit of\n   a massive party you weren't invited to.\n</p> <h4>Flavor The Firewater</h4> <p>For the straight shooters, we've included a pair of Himalayan shot glasses to help infuse\n   the mezcal with a strong, salty bite. These 3 inch rose-quartz salt glasses inject\n   natural flavor, need not be washed between use, and look much better on the bar\n   than piles of spilled salt.\n</p> <p>Or continue spinning round the mezcal carousel with the finest cocktail order south of the border: the\n   Oaxacan Old Fashioned (pronounced wah-hah-ken, you uncultured buffoon!). Mix in Bittermilk No. 6's cocoa\n   husk-aged cocktail mix of spices and chiles for a strong, bittersweet mezcal treat.\n</p> <p>Skip the cheap tequila and explore the traditional, artisanal flavors of Mexican spirits with the Mezcal\n   Crate.\n</p>",
+      "LongDescription": "The Mezcal of Honor When most hear \"mezcal,\" they think of tequila: the official sponsor of spring break\n   debauchery and horrible hangovers, but tequila is the troublesome black sheep of\n   an otherwise esteemed mezcal family.\n Mezcal, traditional Mexican alcohol distilled from the native agave plant, includes blue agave tequila in\n   addition to 30 other agave species. So not all mezcals are tequila, but all tequilas are mezcals,\n   kind of like how not all demons are cats, but all cats are blood-thirsty hell-creatures.\n Tequila may have sold its soul to the monsters of mass production for a salted\n   shot in the limelight, but traditional mezcal continues its emphasis on small batch,\n   craft artisanal flavor.\n The Black Mark of Mexico Mezcal doesn't get more authentic than Marka Negra's Espadin variety, a double-distilled 750 mL\n   bottle that measures 102 proof and 100% Mexican mysticism. Instead of pandering\n   to the masses, Marka Negra mezcaleros (master distillers) craft the mezcal taste\n   to their local communities, in this case San Luis del Rio, Oaxaca, Mexico.\n Abel, the mezcalero of this particular espadin line, even served this mezcal at his wedding,\n   so every sip will be filled with authentic Oaxacan flavor and the warm spirit of\n   a massive party you weren't invited to.\n Flavor The Firewater For the straight shooters, we've included a pair of Himalayan shot glasses to help infuse\n   the mezcal with a strong, salty bite. These 3 inch rose-quartz salt glasses inject\n   natural flavor, need not be washed between use, and look much better on the bar\n   than piles of spilled salt.\n Or continue spinning round the mezcal carousel with the finest cocktail order south of the border: the\n   Oaxacan Old Fashioned (pronounced wah-hah-ken, you uncultured buffoon!). Mix in Bittermilk No. 6's cocoa\n   husk-aged cocktail mix of spices and chiles for a strong, bittersweet mezcal treat.\n Skip the cheap tequila and explore the traditional, artisanal flavors of Mexican spirits with the Mezcal\n   Crate.\n",
+      "ContentsHTML": "<h4>Elixir of the Gods</h4> <ul>\n  <li>Marka Negra Espadin Mezcal (102 Proof)</li>\n</ul> <h4>Straight Shooters</h4> <ul>\n  <li>2 Himalayan salt shot glasses</li>\n  <li>Bittermilk No. 6 mezcal mixer</li>\n</ul>",
+      "Contents": "Elixir of the Gods \n  Marka Negra Espadin Mezcal (102 Proof)\n Straight Shooters \n  2 Himalayan salt shot glasses\n  Bittermilk No. 6 mezcal mixer\n"
+    },
+    {
+      "Name": "Coffee Ammo Can",
+      "SKU": "KTAM-0001-COF",
+      "LongDescriptionHTML": "<h4>Fuel for the Front Lines</h4> <p>The modern professional environment is chock-full of hazard. It pays to be alert out\r\n   there. One misfired 'reply-all' can quickly escalate friendly email banter into a full-on legal battle.\r\n</p> <p>Don't be that guy. Be the guy that <span class=\"highlight\">hits the ground running</span> every morning\r\n   and handles your freakin' business.\r\n</p> <h4>Weekday Warriors</h4> <p>We've partnered with the veterans at <span class=\"highlight\">Alpha  Coffee</span>- battle hardended guys\r\n   that wage full scale war on sluggish Monday mornings, post-lunch food comas, and every other droopy-eyed\r\n   productivity gap that threatens the success of your mission. This canister ships with 12 oz of their\r\n   pre-ground, Warrior Select coffee. Combat tested and warrior selected, this is a delicious blend\r\n   of the best highland arabica beans available, with superior flavor that is winning hearts and minds all\r\n   over the world.\r\n</p> <p>Also includes two full-pot sample packs of LockNLoad's popular Double Barrel Black - dark roast and Smooth\r\n   Operator - light roast.\r\n</p> <h4>Operation Invincible Freshness</h4> <p>When freshness is the imperative you've got to go with a tried and true container. We ship these grinds in\r\n   a genuine <span class=\"highlight\">.30 cal NATO spec ammo case</span>- watertight, rock-solid,\r\n   and not available at your local mermaid-themed coffee shop. For the true warrior experience we recommend\r\n   enjoying your morning jolt from the lightweight, stainless steel carabiner mug.\r\n</p> <p>You've been briefed. Secure your supplies and get it done.</p>",
+      "LongDescription": "Fuel for the Front Lines The modern professional environment is chock-full of hazard. It pays to be alert out\r\n   there. One misfired 'reply-all' can quickly escalate friendly email banter into a full-on legal battle.\r\n Don't be that guy. Be the guy that hits the ground running every morning\r\n   and handles your freakin' business.\r\n Weekday Warriors We've partnered with the veterans at Alpha  Coffee- battle hardended guys\r\n   that wage full scale war on sluggish Monday mornings, post-lunch food comas, and every other droopy-eyed\r\n   productivity gap that threatens the success of your mission. This canister ships with 12 oz of their\r\n   pre-ground, Warrior Select coffee. Combat tested and warrior selected, this is a delicious blend\r\n   of the best highland arabica beans available, with superior flavor that is winning hearts and minds all\r\n   over the world.\r\n Also includes two full-pot sample packs of LockNLoad's popular Double Barrel Black - dark roast and Smooth\r\n   Operator - light roast.\r\n Operation Invincible Freshness When freshness is the imperative you've got to go with a tried and true container. We ship these grinds in\r\n   a genuine .30 cal NATO spec ammo case- watertight, rock-solid,\r\n   and not available at your local mermaid-themed coffee shop. For the true warrior experience we recommend\r\n   enjoying your morning jolt from the lightweight, stainless steel carabiner mug.\r\n You've been briefed. Secure your supplies and get it done.",
+      "ContentsHTML": "<h4>Battleworthy Brews</h4> <ul>\r\n  <li>12oz Alpha Warrior Select Coffee</li>\r\n  <li>2 Full-Pot Packages</li>\r\n  <ul>\r\n    <li>Double Barrel Black - dark roast</li>\r\n    <li>Smooth Operator - light roast</li>\r\n  </ul>\r\n</ul> <h4>Hearty Rations</h4> <ul>\r\n  <li>Clif Bar</li>\r\n  <li>Kind Bar, Fruit &amp; Nut</li>\r\n  <li>Stainless Steel Carabiner Mug</li>\r\n</ul>",
+      "Contents": "Battleworthy Brews \r\n  12oz Alpha Warrior Select Coffee\r\n  2 Full-Pot Packages\r\n  \r\n    Double Barrel Black - dark roast\r\n    Smooth Operator - light roast\r\n  \r\n Hearty Rations \r\n  Clif Bar\r\n  Kind Bar, Fruit &amp; Nut\r\n  Stainless Steel Carabiner Mug\r\n"
+    },
+    {
+      "Name": "Ammo Can Poker Set",
+      "SKU": "KTAM-0002-POK",
+      "LongDescriptionHTML": "<h4>Only One Way to Win</h4> <p>The river card misses, your hand is still just a four card straight and a four card flush-\r\n  you've got nothing but a busted draw. It's a three way hand with a lot of action-\r\n  there's only one way you're winning that huge pot. It's time to bluff, but even the best bluffers need a\r\n  poker set worthy of such a daring gambit.</p>\r\n<p>Introducing the brand-new, ammo can poker set - the most functional and\r\n  toughest 300-chip poker set ever designed, featuring custom artwork and custom cards\r\n  in a .30 cal ammo can.</p>\r\n<h4>A One-Of-A-Kind Poker Set</h4> <p>We set out to build the <b>most awesome poker set in the world</b>--better than\r\n  the thousands of briefcase-style poker sets out there. The top-loading, space efficient\r\n  chip housing is perfectly fit to a .30 cal US military ammo can. This design is\r\n  incredibly durable and provides easy access to the chips and cards without ever\r\n  spilling them.</p> <h4>Beautiful Design</h4> <p>Poker is dear to us- especially\r\n  the short-handed, no-limit hold'em games where the only way to win is to bet and\r\n  bluff aggressively. We wanted our set to be <span class=\"highlight\">as beautiful\r\n  as it is functional</span>, so we set out to find artwork that would pay homage\r\n  to the game and fit with the theme of the ammo case. We combined the sphinx from\r\n  Greek mythology with classic card elements and US symbology to create our insignia-\r\n  the mark of hyper-aggressive no-limit poker players.</p>\r\n<p><img class=\"__mce_add_custom__\"\r\n        title=\"The Sphinx- the definitive insignia of aggressive No-Limit poker players\"\r\n        src=\"http://www.mancrates.com/product_images/uploaded_images/sphinx-design.jpg\"\r\n        alt=\"The Sphinx- the definitive insignia of aggressive No-Limit poker players\"\r\n        width=\"600\"\r\n        height=\"415\"></p>\r\n<p>The sphinx forced travelers on the road to answer her riddles or be devoured- she embodies the poker player\r\n  that forces her opponents to make difficult decisions, often for all of their chips. The arrows are drawn\r\n  from the US seal, representing <span class=\"highlight\">readiness for war</span> on both fronts.\r\n  There is no olive branch in poker.</p>\r\n<h4>Custom Poker Cards</h4> <p>We wanted our poker set to reflect our love of the game, to match the military theme of the\r\n  poker case, and to make the set as beautiful as it was functional. We designed original\r\n  artwork for a set of two Sphinx-themed custom backed decks from\r\n  the U.S. Playing Card Company:</p>\r\n<img class=\"__mce_add_custom__\"\r\n     title=\"66b548fe0c8b9a04e452d73f43aedc20-large.jpg\"\r\n     src=\"http://www.mancrates.com/product_images/uploaded_images/66b548fe0c8b9a04e452d73f43aedc20-large.jpg\"\r\n     alt=\"66b548fe0c8b9a04e452d73f43aedc20-large.jpg\" width=\"584\"\r\n     height=\"415\">\r\n<h4>Official-Weight Custom Color Poker Chips</h4> <p>As longtime poker players with a slew of chip tricks, we refused to compromise on chip weight or feel, so\r\n  we sourced high quality, 11.5 gram composite poker chips in custom colors. This poker set includes 300\r\n  pro-style 11.5 gram composite poker chips.</p>",
+      "LongDescription": "Only One Way to Win The river card misses, your hand is still just a four card straight and a four card flush-\r\n  you've got nothing but a busted draw. It's a three way hand with a lot of action-\r\n  there's only one way you're winning that huge pot. It's time to bluff, but even the best bluffers need a\r\n  poker set worthy of such a daring gambit.\r\nIntroducing the brand-new, ammo can poker set - the most functional and\r\n  toughest 300-chip poker set ever designed, featuring custom artwork and custom cards\r\n  in a .30 cal ammo can.\r\nA One-Of-A-Kind Poker Set We set out to build the most awesome poker set in the world--better than\r\n  the thousands of briefcase-style poker sets out there. The top-loading, space efficient\r\n  chip housing is perfectly fit to a .30 cal US military ammo can. This design is\r\n  incredibly durable and provides easy access to the chips and cards without ever\r\n  spilling them. Beautiful Design Poker is dear to us- especially\r\n  the short-handed, no-limit hold'em games where the only way to win is to bet and\r\n  bluff aggressively. We wanted our set to be as beautiful\r\n  as it is functional, so we set out to find artwork that would pay homage\r\n  to the game and fit with the theme of the ammo case. We combined the sphinx from\r\n  Greek mythology with classic card elements and US symbology to create our insignia-\r\n  the mark of hyper-aggressive no-limit poker players.\r\n\r\nThe sphinx forced travelers on the road to answer her riddles or be devoured- she embodies the poker player\r\n  that forces her opponents to make difficult decisions, often for all of their chips. The arrows are drawn\r\n  from the US seal, representing readiness for war on both fronts.\r\n  There is no olive branch in poker.\r\nCustom Poker Cards We wanted our poker set to reflect our love of the game, to match the military theme of the\r\n  poker case, and to make the set as beautiful as it was functional. We designed original\r\n  artwork for a set of two Sphinx-themed custom backed decks from\r\n  the U.S. Playing Card Company:\r\n\r\nOfficial-Weight Custom Color Poker Chips As longtime poker players with a slew of chip tricks, we refused to compromise on chip weight or feel, so\r\n  we sourced high quality, 11.5 gram composite poker chips in custom colors. This poker set includes 300\r\n  pro-style 11.5 gram composite poker chips.",
+      "ContentsHTML": "<h4>Gambler's Gauntlet</h4> <ul>\r\n  <li>2 decks of custom playing cards</li>\r\n  <li>300 casino-weight, 11.5 gram composite chips</li>\r\n  <li>Exclusive poker chip insert</li>\r\n</ul>",
+      "Contents": "Gambler's Gauntlet \r\n  2 decks of custom playing cards\r\n  300 casino-weight, 11.5 gram composite chips\r\n  Exclusive poker chip insert\r\n"
+    },
+    {
+      "Name": "Premium Jerky Ammo Can",
+      "SKU": "KTAM-0003-JER",
+      "LongDescriptionHTML": "<h4>Meet Beef Jerky</h4> <p>There are two types of men in the world- men who love beef jerky, and men who don't know\r\n   what beef jerky is.\r\n</p> <p>Here's a knowledge bomb- the jerky by the register at your gas station is peasant-fare. If you think you\r\n   don't like jerky, you've just never had the real thing.\r\n</p> <h4>Meat By Mail</h4> <p>Let us send you our meat. Seriously. We sampled dozens of jerkies and chose the absolute best brands and flavors. We consulted jerky experts and thousands of our customers\r\n   to create a balanced flavor profile- sweet, savory, and a hint of spice. We'll take your tastebuds on a\r\n   journey where you'll discover lean, savory cuts of beef marinated to perfection and then cured until succulent and tender.\r\n</p> <h4>Meat For Peace</h4> <p>This masterpiece ships in a genuine, decommissioned NATO .30 caliber ammo\r\n  case. Watertight, nearly indestructible, and totally badass, these glorious vessels serve their\r\n   second lives safely delivering our delicious jerky to you. If popping one of these doesn't make you a jerky\r\n   convert, nothing will.\r\n</p>",
+      "LongDescription": "Meet Beef Jerky There are two types of men in the world- men who love beef jerky, and men who don't know\r\n   what beef jerky is.\r\n Here's a knowledge bomb- the jerky by the register at your gas station is peasant-fare. If you think you\r\n   don't like jerky, you've just never had the real thing.\r\n Meat By Mail Let us send you our meat. Seriously. We sampled dozens of jerkies and chose the absolute best brands and flavors. We consulted jerky experts and thousands of our customers\r\n   to create a balanced flavor profile- sweet, savory, and a hint of spice. We'll take your tastebuds on a\r\n   journey where you'll discover lean, savory cuts of beef marinated to perfection and then cured until succulent and tender.\r\n Meat For Peace This masterpiece ships in a genuine, decommissioned NATO .30 caliber ammo\r\n  case. Watertight, nearly indestructible, and totally badass, these glorious vessels serve their\r\n   second lives safely delivering our delicious jerky to you. If popping one of these doesn't make you a jerky\r\n   convert, nothing will.\r\n",
+      "ContentsHTML": "<h4>Choice Meats</h4><ul>\r\n  <li>Country Archer Beef Jerky, Crushed Red Pepper</li>\r\n  <li>Carnivore Candy Beef Jerky, Sweet Picante</li>\r\n  <li>Field Trip Beef Jerky, Original Flavor</li>\r\n</ul> <h4>Adventure Fuel</h4> <ul>\r\n  <li>Wonderful Almonds, Roasted & Salted</li>\r\n  <li>Millenium Energy Bar, Vanilla</li>\r\n  <li>Corn Nuggets, BBQ Flavor</li>\r\n  <li>Clif Bar</li>\r\n</ul>",
+      "Contents": "Choice Meats\r\n  Country Archer Beef Jerky, Crushed Red Pepper\r\n  Carnivore Candy Beef Jerky, Sweet Picante\r\n  Field Trip Beef Jerky, Original Flavor\r\n Adventure Fuel \r\n  Wonderful Almonds, Roasted & Salted\r\n  Millenium Energy Bar, Vanilla\r\n  Corn Nuggets, BBQ Flavor\r\n  Clif Bar\r\n"
+    },
+    {
+      "Name": "Outdoor Survival Ammo Can",
+      "SKU": "KTAM-0004-SUR",
+      "LongDescriptionHTML": "<h4>Luxury Breeds Complacency</h4> <p>Softened by summoning private taxis via iPhones, air conditioned cubicles, and the bounty\r\n   of Costco foods- the general population today would balk at eating squirrel.\r\n</p> <p>But not you.</p> <h4>Tools &amp; Knowledge</h4> <p>You know how to dig a lean-to, how to summon fire from flint, how to determine the cardinal directions from\r\n   the sun, the stars, and <span class=\"highlight\">moss on trees</span>. And you're equipped\r\n   with the carefully selected survival essentials we've packed into a watertight,\r\n   decommissioned .30 caliber ammo can, so that when worst comes to worst,\r\n  <span class=\"highlight\">you're ready to go</span>.\r\n</p> <h4>Can-Do</h4> <p>If Rambo had this kit, First Blood would have been an eight-season <span\r\n  class=\"highlight\">reality  TV show</span> instead of a 90 minute film. Castaway would have\r\n   been a <span class=\"highlight\">light-hearted</span> buddy comedy about a man and a volley ball if Tom Hanks\r\n   had the kit on hand. If the Donner Party had been outfitted with the Outdoor Survival Ammo Can, today\r\n   they'd be famous for their <span class=\"highlight\">poetic descriptions</span> of the Sierra Nevadas\r\n   instead of their darker nutritional decisions.\r\n</p> <p>\r\n  <span class=\"highlight\">Don't be the next Donner Party.</span>\r\n  Get your Outdoor Survival Can, and when you finish the premium energy packed snacks within,\r\n  go get your first squirrel.\r\n</p>",
+      "LongDescription": "Luxury Breeds Complacency Softened by summoning private taxis via iPhones, air conditioned cubicles, and the bounty\r\n   of Costco foods- the general population today would balk at eating squirrel.\r\n But not you. Tools &amp; Knowledge You know how to dig a lean-to, how to summon fire from flint, how to determine the cardinal directions from\r\n   the sun, the stars, and moss on trees. And you're equipped\r\n   with the carefully selected survival essentials we've packed into a watertight,\r\n   decommissioned .30 caliber ammo can, so that when worst comes to worst,\r\n  you're ready to go.\r\n Can-Do If Rambo had this kit, First Blood would have been an eight-season reality  TV show instead of a 90 minute film. Castaway would have\r\n   been a light-hearted buddy comedy about a man and a volley ball if Tom Hanks\r\n   had the kit on hand. If the Donner Party had been outfitted with the Outdoor Survival Ammo Can, today\r\n   they'd be famous for their poetic descriptions of the Sierra Nevadas\r\n   instead of their darker nutritional decisions.\r\n \r\n  Don't be the next Donner Party.\r\n  Get your Outdoor Survival Can, and when you finish the premium energy packed snacks within,\r\n  go get your first squirrel.\r\n",
+      "ContentsHTML": "<h4>Rustic Rigging</h4> <ul>\r\n  <li>Waterproof, indestructible 30 cal ammo can</li>\r\n  <li>Collapsible shovel</li>\r\n  <li>Paracord knife with firestarter</li>\r\n  <li>Authentic FM21-76 Army Survival Field Manual</li>\r\n  <li>50 feet of paracord</li>\r\n  <li>Emergency survival blanket</li>\r\n  <li>Emergency glow stick</li>\r\n</ul> <h4>Back Country Consignment</h4> <ul>\r\n  <li>Pemmican Meal Bar</li>\r\n  <li>Clif Bar</li>\r\n  <li>Clif Bar Mojo</li>\r\n  <li>Field Trip Beef Jerky</li>\r\n</ul>",
+      "Contents": "Rustic Rigging \r\n  Waterproof, indestructible 30 cal ammo can\r\n  Collapsible shovel\r\n  Paracord knife with firestarter\r\n  Authentic FM21-76 Army Survival Field Manual\r\n  50 feet of paracord\r\n  Emergency survival blanket\r\n  Emergency glow stick\r\n Back Country Consignment \r\n  Pemmican Meal Bar\r\n  Clif Bar\r\n  Clif Bar Mojo\r\n  Field Trip Beef Jerky\r\n"
+    }
+  ],
+  "template": {
+    "id": 1,
+    "lastModified": "2018-07-11T23:09:51.140Z",
+    "createdAt": "2018-05-25T20:51:35.889Z",
+    "archived": false,
+    "templateName": "Mode Analytics - Product Descriptions Template",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "name"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "sku"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "long_description"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "contents"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "long_description"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "LongDescriptionHTML"
+                        ]
+                      ]
+                    },
+                    "typeCode": "DuplicateNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "long_description"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "LongDescription"
+                        ]
+                      ]
+                    },
+                    "typeCode": "DuplicateNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "_synthetic_2rz8qo9petx",
+                        "LongDescription"
+                      ]
+                    ],
+                    "meta": {
+                      "find": "<[^>]+>",
+                      "replace": "",
+                      "regex": true
+                    },
+                    "skipNulls": true,
+                    "typeCode": "FindReplaceNode",
+                    "acceptedType": "string"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "contents"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "ContentsHTML"
+                        ]
+                      ]
+                    },
+                    "typeCode": "DuplicateNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "contents"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "Contents"
+                        ]
+                      ]
+                    },
+                    "typeCode": "DuplicateNode"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "_synthetic_yrxeq690h9b",
+                        "Contents"
+                      ]
+                    ],
+                    "meta": {
+                      "find": "<[^>]+>",
+                      "replace": "",
+                      "regex": true
+                    },
+                    "skipNulls": true,
+                    "typeCode": "FindReplaceNode",
+                    "acceptedType": "string"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 8,
+            "uidNode": 12,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "name"
+                ],
+                0
+              ],
+              [
+                [
+                  "sku"
+                ],
+                1
+              ],
+              [
+                [
+                  "long_description"
+                ],
+                2
+              ],
+              [
+                [
+                  "contents"
+                ],
+                3
+              ],
+              [
+                [
+                  "_synthetic_o8ubzk0it8d",
+                  "LongDescriptionHTML"
+                ],
+                4
+              ],
+              [
+                [
+                  "_synthetic_2rz8qo9petx",
+                  "LongDescription"
+                ],
+                5
+              ],
+              [
+                [
+                  "_synthetic_dll3duh54cp",
+                  "ContentsHTML"
+                ],
+                6
+              ],
+              [
+                [
+                  "_synthetic_yrxeq690h9b",
+                  "Contents"
+                ],
+                7
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "Name"
+                ]
+              ],
+              [
+                1,
+                [
+                  "SKU"
+                ]
+              ],
+              [
+                2,
+                [
+                  "_l6bwgj4f909LongDescription"
+                ]
+              ],
+              [
+                3,
+                [
+                  "_o2q86eml78iContents"
+                ]
+              ],
+              [
+                4,
+                [
+                  "LongDescriptionHTML"
+                ]
+              ],
+              [
+                5,
+                [
+                  "LongDescription"
+                ]
+              ],
+              [
+                6,
+                [
+                  "ContentsHTML"
+                ]
+              ],
+              [
+                7,
+                [
+                  "Contents"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "string"
+              ],
+              [
+                2,
+                "string"
+              ],
+              [
+                3,
+                "string"
+              ],
+              [
+                4,
+                "string"
+              ],
+              [
+                5,
+                "string"
+              ],
+              [
+                6,
+                "string"
+              ],
+              [
+                7,
+                "string"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                false
+              ],
+              [
+                3,
+                false
+              ],
+              [
+                4,
+                true
+              ],
+              [
+                5,
+                true
+              ],
+              [
+                6,
+                true
+              ],
+              [
+                7,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": true
+                  }
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  },
+                  "uiState": {
+                    "hidden": true
+                  }
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  },
+                  "uiState": {
+                    "hidden": true
+                  }
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Http",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "csv",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "method": "GET"
+        },
+        "integrationId": 3,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Database",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": [
+            "Name",
+            "SKU",
+            "_l6bwgj4f909LongDescription",
+            "LongDescription",
+            "LongDescriptionHTML",
+            "_o2q86eml78iContents",
+            "Contents",
+            "ContentsHTML"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "serverId": "Mancrates ES",
+          "database": "mancrates_products",
+          "table": "data",
+          "language": "elastic"
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            5,
+            4,
+            3,
+            7,
+            6
+          ]
+        }
+      }
+    }
+  }
+}

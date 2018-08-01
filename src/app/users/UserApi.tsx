@@ -43,19 +43,62 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+import { AxiosInstance } from 'axios';
+import { recordForSave } from 'shared/util/Classes';
+import { User } from 'users/UserTypes';
 
-import TransformationNode from 'shared/transformations/TransformationNode';
-import TransformationNodeType from './TransformationNodeType';
-import TransformationNodeVisitor, { VisitorLookupMap } from './TransformationNodeVisitor';
-import TransformationVisitResult from './TransformationVisitResult';
-
-export default class TransformationEngineNodeVisitor
-  extends TransformationNodeVisitor<TransformationVisitResult, object>
+// making this an instance in case we want stateful things like cancelling ajax requests
+class UserApi
 {
-  public visitorLookup: VisitorLookupMap<TransformationVisitResult, object> = {};
+  public xhr: AxiosInstance = null;
 
-  public visitDefault(type: TransformationNodeType, node: TransformationNode, doc: object)
+  public constructor(xhr: AxiosInstance)
   {
-    return node.transform(doc);
+    this.xhr = xhr;
+  }
+
+  public getUsers()
+  {
+    return this.xhr.get('/users');
+  }
+
+  public saveUser(payload: { user: User, meta: object })
+  {
+    const userData: object = recordForSave(payload['user']);
+
+    if (payload.hasOwnProperty('meta'))
+    {
+      Object.assign(userData, payload['meta']);
+    }
+
+    return this.xhr.post(
+      `users/${payload['user']['id']}`,
+      { body: userData },
+    );
+  }
+
+  public changePassword(id: number, oldPassword: string, newPassword: string)
+  {
+    return this.xhr.post(
+      `users/${id}`,
+      {
+        body: {
+          oldPassword,
+          password: newPassword,
+        },
+      },
+    );
+  }
+
+  public createUser(user)
+  {
+    return this.xhr.post(
+      `users`,
+      {
+        body: user,
+      },
+    );
   }
 }
+
+export default UserApi;

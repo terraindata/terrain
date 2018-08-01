@@ -75,7 +75,6 @@ const TextIcon = require('./../../../../images/icon_text_12x18.svg?name=TextIcon
 const ImageIcon = require('./../../../../images/icon_profile_16x16.svg?name=ImageIcon');
 const HandleIcon = require('./../../../../images/icon_handle.svg?name=HandleIcon');
 const MarkerIcon = require('./../../../../images/icon_marker.svg?name=MarkerIcon');
-const DateIcon = require('images/icon_dateDropdown.svg?name=DateIcon');
 
 export interface Props
 {
@@ -105,6 +104,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     showingNestedConfig: boolean,
     nestedField: string,
     searchTerm: string,
+    allFields: List<string>
   } = {
       lastHover: { index: null, field: null },
       config: null,
@@ -112,6 +112,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
       showingNestedConfig: false,
       nestedField: '',
       searchTerm: '',
+      allFields: List(),
     };
 
   constructor(props: Props)
@@ -127,7 +128,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
       selector: '.results-config-field-gear',
       style: { fill: Colors().iconColor },
     });
-    this.getNestedFields(this.props);
+    this.getFields(this.props);
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -140,48 +141,77 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     }
     if (this.props.fields !== nextProps.fields)
     {
-      this.getNestedFields(nextProps);
+      this.getFields(nextProps);
     }
   }
 
-  public getNestedFields(props)
+  public getNestedAndObjectFields(columns, getType, getName): { nestedFields: List<string>, objectFields: List<string> }
+  {
+    const { sampleHit } = this.props;
+    let nestedFields: List<string> = List();
+    let objectFields: List<string> = List();
+    columns.forEach((col) =>
+    {
+      if (getType(col) === 'nested' || getType(col) === '')
+      {
+        const value = sampleHit.fields.get(getName(col));
+        if (List.isList(value) || value === null)
+        {
+          nestedFields = nestedFields.push(getName(col));
+        }
+        else
+        {
+          objectFields = objectFields.push(getName(col));
+        }
+      }
+    });
+    return { nestedFields, objectFields };
+  }
+
+  public getFields(props)
   {
     // Get the fields that are nested
-    let nestedFields;
+    let fields;
     // When columns is defined, we already are in a nested results config
     // and need to look at these columns to see what fields are nested
-    const { columns, builder, schema, dataSource } = props;
+    const { columns, builder, schema, dataSource, sampleHit } = props;
     if (columns !== undefined)
     {
       if (List.isList(columns))
       {
-        nestedFields = columns.filter((col) =>
-          col.datatype === 'nested',
-        ).map((col) => col.name).toList();
+        fields = this.getNestedAndObjectFields(columns, (col) => col.datatype, (col) => col.name);
       }
       else
       {
-        nestedFields = _.keys(columns).filter((key) =>
-        {
-          return columns[key].type === 'nested';
-        });
+        fields = this.getNestedAndObjectFields(_.keys(columns), (col) => columns[col].type, (col) => col);
       }
     }
     else
     {
-      nestedFields = props.fields.filter((field) =>
-      {
-        const type = ElasticBlockHelpers.getTypeOfField(
+      fields = this.getNestedAndObjectFields(
+        props.fields,
+        (field) => ElasticBlockHelpers.getTypeOfField(
           schema,
           builder,
           field,
           true,
-        );
-        return type === 'nested' || type === '';
-      }).toList();
+        ),
+        (field) => field,
+      );
     }
+    let allFields = props.fields;
+    fields.objectFields.forEach((field: string) =>
+    {
+      const subFields = ElasticBlockHelpers.getSubfields(
+        field,
+        schema,
+        builder && builder.query ? builder : builder.set('query', props.query),
+      );
+      allFields = allFields.concat(subFields).toList();
+    });
     this.setState({
-      nestedFields,
+      nestedFields: fields.nestedFields,
+      allFields: Util.orderFields(allFields, schema, props.builder.query.algorithmId, props.indexName, true),
     });
   }
 
@@ -464,7 +494,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
       backgroundColor(Colors().bg1),
     ];
 
-    const availableFields = this.getAvailableFields(this.props.fields, this.state.searchTerm);
+    const availableFields = this.getAvailableFields(this.state.allFields, this.state.searchTerm);
 
     return (
       <div className='results-config-wrapper'>
@@ -792,7 +822,6 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
     const { format, field } = this.props;
     const image = format && format.type === 'image';
     const map = format && format.type === 'map';
-    const date = format && format.type === 'date';
     // Check using the schema if it can be nested
     const selected: boolean = this.props.is !== null && this.props.isAvailableField;
     const mainStyle = [
@@ -859,10 +888,9 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
         <div className={classNames({
           'results-config-field-format': true,
           'results-config-field-format-showing': this.state.showFormat,
-          'results-config-field-format-text': !(image || map || date),
+          'results-config-field-format-text': !(image || map),
           'results-config-field-format-image': image,
           'results-config-field-format-map': map,
-          'results-config-field-format-date': date,
         })}>
           <div className='results-config-format-header'>
             <input
@@ -889,10 +917,10 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
               <div className='results-config-text-btn'
                 key={'text-btn-' + field}
                 onClick={this._fn(this.changeFormatType, 'text')}
-                style={(image || date) ? inactiveBtnStyle : activeBtnStyle}
+                style={(image) ? inactiveBtnStyle : activeBtnStyle}
               >
                 <TextIcon
-                  style={(image || date) ? { fill: Colors().iconColor } : { fill: Colors().fontWhite }}
+                  style={(image) ? { fill: Colors().iconColor } : { fill: Colors().fontWhite }}
                 />
                 Text
               </div>
@@ -906,16 +934,6 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
                 />
                 Image
                 </div>
-              <div className='results-config-date-btn'
-                key={'date-btn-' + field}
-                onClick={this._fn(this.changeFormatType, 'date')}
-                style={date ? activeBtnStyle : inactiveBtnStyle}
-              >
-                <DateIcon
-                  style={!date ? { fill: Colors().iconColor } : { fill: Colors().fontWhite }}
-                />
-                Date
-              </div>
             </div>
           }
           {

@@ -172,6 +172,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
           break;
         case 'Magento':
           endpoint = new MagentoEndpoint();
+          source.options['size'] = size;
           sourceStream = await endpoint.getSource(source) as stream.Readable;
           break;
         case 'Mysql':

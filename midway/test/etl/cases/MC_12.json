@@ -1,0 +1,1488 @@
+{
+  "testName": "MC_012",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "SKU": "KTCR-0003-GRI",
+      "VariantName": "Grill Master Crate",
+      "Price": 99.99,
+      "Inventory": 1014,
+      "VariantStatus": "sellable",
+      "ProductId": 14,
+      "VariantId": 14,
+      "Path": "grill-master-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/grill-master-crate",
+      "ContentsHTML": "<h4>Grilling Gadgetry</h4> <ul>\r\n  <li>Brass-knuckle Meat Tenderizer</li>\r\n  <li>Cast Iron Smoker Box</li>\r\n  <li>Set of 4 Steak Thermometers</li>\r\n  <li>Dried Hickory Wood Chips</li>\r\n</ul> <h4>Zesty Downpour</h4> <ul>\r\n  <li>Original BBQ Sauce</li>\r\n  <li>Carolina Bold BBQ Sauce</li>\r\n  <li>Premium Spice Blend</li>\r\n</ul>",
+      "LongDescription": "The Right Tools for the Job There's a line that separates the amateurs from the professionals. It's certainly\r\n   in the training and the experience, but folks often forget about the importance\r\n   of your equipment. Just like you can't win a NASCAR Cup in your grocery-getter,\r\n   can't crush a golf ball into orbit without a high-end driver, and aren't going\r\n   to take a trophy buck without a zeroed-in tack-driver, your grilling game will never\r\n   go next level without the right gear. You gotta have the right tools for the job.\r\n Like a Grill-ionaire Fortunately, you don't need to shell out a mountain of cash to get the equipment you need to get you to\r\n   grilling nirvana. We've included some of the best accessories that every man needs to get that Grillionaire\r\n   status.\r\n Our Grill Master Man Crate includes a cast-iron smoker\r\n  box and some hickory wood chips to get you started. Set the smoker box on\r\n   the grill as it warms up, soak the hickory in some water, and drop 'em into the\r\n   box as your meat grills. Take note, men: real flavor shouldn't come from a bottled\r\n   labeled \"liquid smoke.\"\r\n We threw in a set of four  steak thermometers, too. You may say, \"hey, Team\r\n   Man Crates, isn't that cheating?\" And we say, \"nay.\" There's no dishonor in knowing how done your steak\r\n   is. And when you cut into a perfectly-cooked slab of beef, you too shall understand that G.I. Joe wasn't\r\n   kidding when he said that Knowing Is Half the Battle.\r\n And because \"the right tool for every job\" means that sometimes you'll require some brute force, we've\r\n   included a brass-knuckle meat tenderizer. Nothing blows off the steam from a\r\n   long, hard day at work like beating your meat into submission.\r\n Bone Doctors We search tirelessly, every day, to find the best-in-class goods to put in our crates. Hundreds of sauces\r\n   came and went, the grills burned for weeks, until finally a victor emerged. An unexpected dark\r\n   horse, a little-known operation out of Virginia became the Cinderella story of the\r\n   Man Crates grilling taste-off. We proudly present Bone Doctors'\r\n  BBQ sauces, pair of masterpiece sauces and a brilliant spice blend.\r\n So fire up the grill, and call your agent: after all, you're about to go pro.",
+      "Contents": "Grilling Gadgetry \r\n  Brass-knuckle Meat Tenderizer\r\n  Cast Iron Smoker Box\r\n  Set of 4 Steak Thermometers\r\n  Dried Hickory Wood Chips\r\n Zesty Downpour \r\n  Original BBQ Sauce\r\n  Carolina Bold BBQ Sauce\r\n  Premium Spice Blend\r\n",
+      "LongDescriptionHTML": "<h4>The Right Tools for the Job</h4> <p>There's a line that separates the amateurs from the professionals. It's certainly\r\n   in the training and the experience, but folks often forget about the importance\r\n   of your equipment. Just like you can't win a NASCAR Cup in your grocery-getter,\r\n   can't crush a golf ball into orbit without a high-end driver, and aren't going\r\n   to take a trophy buck without a zeroed-in tack-driver, your grilling game will never\r\n   go next level without the right gear. You gotta have the right tools for the job.\r\n</p> <h4>Like a Grill-ionaire</h4> <p>Fortunately, you don't need to shell out a mountain of cash to get the equipment you need to get you to\r\n   grilling nirvana. We've included some of the best accessories that every man needs to get that Grillionaire\r\n   status.\r\n</p> <p>Our Grill Master Man Crate includes a cast-iron smoker\r\n  box and some hickory wood chips to get you started. Set the smoker box on\r\n   the grill as it warms up, soak the hickory in some water, and drop 'em into the\r\n   box as your meat grills. Take note, men: real flavor shouldn't come from a bottled\r\n   labeled \"liquid smoke.\"\r\n</p> <p>We threw in a set of four  steak thermometers, too. You may say, \"hey, Team\r\n   Man Crates, isn't that cheating?\" And we say, \"nay.\" There's no dishonor in knowing how done your steak\r\n   is. And when you cut into a perfectly-cooked slab of beef, you too shall understand that G.I. Joe wasn't\r\n   kidding when he said that Knowing Is Half the Battle.\r\n</p> <p>And because \"the right tool for every job\" means that sometimes you'll require some brute force, we've\r\n   included a brass-knuckle meat tenderizer. Nothing blows off the steam from a\r\n   long, hard day at work like beating your meat into submission.\r\n</p> <h4>Bone Doctors</h4> <p>We search tirelessly, every day, to find the best-in-class goods to put in our crates. Hundreds of sauces\r\n   came and went, the grills burned for weeks, until finally a victor emerged. An unexpected dark\r\n   horse, a little-known operation out of Virginia became the Cinderella story of the\r\n   Man Crates grilling taste-off. We proudly present Bone Doctors'\r\n  BBQ sauces, pair of masterpiece sauces and a brilliant spice blend.\r\n</p> <p>So fire up the grill, and call your agent: after all, you're about to go pro.</p>",
+      "Name": "Grill Master Crate",
+      "ConversionRate": 2.568634381995994,
+      "UniquePurchases": 218,
+      "ProductRevenue": 21797.82,
+      "Quantity": 218,
+      "AveragePrice": 99.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/399/large/gmc-grill-master-crate-awesome-gift-for-men__77984.jpg?1502411041",
+      "Margin": 64.07,
+      "TerrainScore": 0.6239323187359826,
+      "TERRAINRANK": 1
+    },
+    {
+      "SKU": "KTCR-0067-PAS",
+      "VariantName": "Pasta Craft Crate",
+      "Price": 99.99,
+      "Inventory": 391,
+      "VariantStatus": "sellable",
+      "ProductId": 92,
+      "VariantId": 184,
+      "Path": "pasta-craft-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/pasta-craft-crate",
+      "ContentsHTML": "<h4>Authentic Ingredients</h4> <ul>\n  <li>Pasta By Hand Cookbook</li>\n  <li>Mezzetta's Truffle, Porcini &amp; Cream Marinara Sauce</li>\n  <li>Passione Semolina Flour</li>\n</ul> <h4>Pasta Provisions</h4> <ul>\n  <li>Custom-Printed Pasta Apron</li>\n  <li>Potato Ricer</li>\n  <li>Gnocchi Board</li>\n  <li>Chopper/Scraper</li>\n</ul>",
+      "LongDescription": "La Resistenza di Pasta Pasta was once a great Sicilian art form celebrating and sustaining Italian heritage for hundreds\n   of years. Today, the closest pasta comes to art is in macaroni necklaces and creepy\n   linguini effigies of scorned ex-lovers.\n The hand-rolled artisan starches of old have been replaced with commercial conveyor\n   belts and massive machine molds. Hundreds of tons of flour a day are pounded, pressed,\n   packaged, and imprisoned on grocery shelves without even the slightest caress of\n   human contact.\n The Pasta Craft Crate declares freedom to gluten everywhere with masterful tools and\n   techniques for rolling and shaping fresh pasta at home.\n Carb Your Enthusiasm Jenn Louis' Pasta By Hand: A Collection of Italy's Regional Hand-Shaped Pasta is the\n   radical manifesto of the homemade pasta movement. With shaping lessons, not-too-long\n   history blurbs, and over 65 recipes from shells to sauces, Pasta By Hand incorporates\n   authentic Italian techniques and fancy Italian words for delicious, crafted cuisine.\n Mezzetta's Truffle, Porcini &amp; Cream Marina beckons forth the seasoning of Southern Italy,\n   and Passione's Semolina Flour is the godfather of authentic Italian flavor, ideal\n   for formation and flavor.\n Free the Gluten! We're sick of gluten being treated like a second-class storage protein. The custom-designed\n   cooking apron is the banner of the Flour Revolution, demanding all starches be freed\n   from their shackles and suspicions.\n Said revolution is armed with kitchen artillery for forming pasta pieces with flavor\n   and flair; a potato ricer, chop-scrape blade, and gnocchi board to groove pieces\n   for storing sauce.\n In a world where mass batches of pasta are hung out to dry by machines, the Pasta Craft\n   Crate takes a stand for authentic, artisanal pasta in every home.\n",
+      "Contents": "Authentic Ingredients \n  Pasta By Hand Cookbook\n  Mezzetta's Truffle, Porcini &amp; Cream Marinara Sauce\n  Passione Semolina Flour\n Pasta Provisions \n  Custom-Printed Pasta Apron\n  Potato Ricer\n  Gnocchi Board\n  Chopper/Scraper\n",
+      "LongDescriptionHTML": "<h4>La Resistenza di Pasta</h4> <p>Pasta was once a great Sicilian art form celebrating and sustaining Italian heritage for hundreds\n   of years. Today, the closest pasta comes to art is in macaroni necklaces and creepy\n   linguini effigies of scorned ex-lovers.\n</p> <p>The hand-rolled artisan starches of old have been replaced with commercial conveyor\n   belts and massive machine molds. Hundreds of tons of flour a day are pounded, pressed,\n   packaged, and imprisoned on grocery shelves without even the slightest caress of\n   human contact.\n</p> <p>The Pasta Craft Crate declares freedom to gluten everywhere with masterful tools and\n   techniques for rolling and shaping fresh pasta at home.\n</p> <h4>Carb Your Enthusiasm</h4> <p>Jenn Louis' Pasta By Hand: A Collection of Italy's Regional Hand-Shaped Pasta is the\n   radical manifesto of the homemade pasta movement. With shaping lessons, not-too-long\n   history blurbs, and over 65 recipes from shells to sauces, Pasta By Hand incorporates\n   authentic Italian techniques and fancy Italian words for delicious, crafted cuisine.\n</p> <p>Mezzetta's Truffle, Porcini &amp; Cream Marina beckons forth the seasoning of Southern Italy,\n   and Passione's Semolina Flour is the godfather of authentic Italian flavor, ideal\n   for formation and flavor.\n</p> <h4>Free the Gluten!</h4> <p>We're sick of gluten being treated like a second-class storage protein. The custom-designed\n   cooking apron is the banner of the Flour Revolution, demanding all starches be freed\n   from their shackles and suspicions.\n</p> <p>Said revolution is armed with kitchen artillery for forming pasta pieces with flavor\n   and flair; a potato ricer, chop-scrape blade, and gnocchi board to groove pieces\n   for storing sauce.\n</p> <p>In a world where mass batches of pasta are hung out to dry by machines, the Pasta Craft\n   Crate takes a stand for authentic, artisanal pasta in every home.\n</p>",
+      "Name": "Pasta-Craft Crate",
+      "ConversionRate": 3.395784543325527,
+      "UniquePurchases": 29,
+      "ProductRevenue": 2899.71,
+      "Quantity": 29,
+      "AveragePrice": 99.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/723/large/pph-pasta-party-crate__13398.jpg?1502411164",
+      "Margin": 56.68,
+      "TerrainScore": 0.614229861220727,
+      "TERRAINRANK": 2
+    },
+    {
+      "SKU": "KTPR-0008-DOV",
+      "VariantName": "Dutch Oven Kit",
+      "Price": 99.99,
+      "Inventory": 823,
+      "VariantStatus": "sellable",
+      "ProductId": 73,
+      "VariantId": 149,
+      "Path": "dutch-oven-kit",
+      "CanonicalUrl": "www.mancrates.com/store/products/dutch-oven-kit",
+      "ContentsHTML": "<h5>Cast-Iron Cookery</h5> <ul>\n  <li>Campmaid Dutch Oven</li>\n  <li>Campmaid Lid Lifter/Kickstand</li>\n  <li>Camp Chef Chainmail Scrubber</li>\n  <li>Camp Chef Cast Iron Conditioner</li>\n  <li>Man Crates Dutch Oven Cookbook</li>\n  <li>Pitt Mitts</li>\n</ul>",
+      "LongDescription": "Eat Well in the Wild \nThere are plenty of things in the Great Outdoors that could kill\n   a man; his own campfire cooking need not be one of those things.\n No camper, no matter how cooking-incompetent, should have to subsist on trail mix and fruit\n   scraps alone like some common tree squirrel. We developed the Dutch Oven Project\n   Kit to transform the average/below-average camping cook into a culinary master.\n Much Lovin' Dutch Oven The cast-iron Dutch Oven belongs to a storied tradition of five-star frontier flavor. Fun fact: Lewis and\n   Clark cooked with multiple Dutch Ovens during their western expedition. Less fun fact: they were probably\n   cooking Raccoon Ragout and Possum Porridge.\n The Dutch Oven we've selected is a pre-seasoned 12\" cast-iron pot that can stew, braise, roast, bake, boil,\n   fry, or poach 6-7 quarts of gourmet buffet. We've also included Campmaid's kickstand/lid-lifter ideal for\n   raising the roof when the pot gets hot, or propping up the oven to bait and trap curious forest critters.\n Rust-Free Recipes Like a veteran quarterback, a cast-iron pot requires tender care and attention to maintain any semblance of\n   a season. This kit includes a chain mail scrubber and cast iron conditioner to keep the oven tasty and\n   rust-free.\n The DIY Dutch Oven Guide includes Dutch Oven care methods, cooking techniques, and most importantly, five\n   amazing and simple Man Crates recipes for ultimate outdoor flavor. We'd risk scoliosis backpacking\n   a Dutch Oven to every campsite and cookout if it meant getting to enjoy meals like\n   the Tri-Animal Jambalaya or Classic Cobbler.\n For the guy who tends to make his feasts in the forest, the Dutch Oven is everything but the kitchen sink\n   to make the outdoors a tastier place.\n",
+      "Contents": "Cast-Iron Cookery \n  Campmaid Dutch Oven\n  Campmaid Lid Lifter/Kickstand\n  Camp Chef Chainmail Scrubber\n  Camp Chef Cast Iron Conditioner\n  Man Crates Dutch Oven Cookbook\n  Pitt Mitts\n",
+      "LongDescriptionHTML": "<h5>Eat Well in the Wild</h5> <iframe\n  src=\"https://www.youtube.com/embed/a9CHRrkVCQM\" width=\"640\" height=\"360\" frameborder=\"0\"></iframe>\n<p>There are plenty of things in the Great Outdoors that could kill\n   a man; his own campfire cooking need not be one of those things.\n</p> <p>No camper, no matter how cooking-incompetent, should have to subsist on trail mix and fruit\n   scraps alone like some common tree squirrel. We developed the Dutch Oven Project\n   Kit to transform the average/below-average camping cook into a culinary master.\n</p> <h5>Much Lovin' Dutch Oven</h5> <p>The cast-iron Dutch Oven belongs to a storied tradition of five-star frontier flavor. Fun fact: Lewis and\n   Clark cooked with multiple Dutch Ovens during their western expedition. Less fun fact: they were probably\n   cooking Raccoon Ragout and Possum Porridge.\n</p> <p>The Dutch Oven we've selected is a pre-seasoned 12\" cast-iron pot that can stew, braise, roast, bake, boil,\n   fry, or poach 6-7 quarts of gourmet buffet. We've also included Campmaid's kickstand/lid-lifter ideal for\n   raising the roof when the pot gets hot, or propping up the oven to bait and trap curious forest critters.\n</p> <h4>Rust-Free Recipes</h4> <p>Like a veteran quarterback, a cast-iron pot requires tender care and attention to maintain any semblance of\n   a season. This kit includes a chain mail scrubber and cast iron conditioner to keep the oven tasty and\n   rust-free.\n</p> <p>The DIY Dutch Oven Guide includes Dutch Oven care methods, cooking techniques, and most importantly, five\n   amazing and simple Man Crates recipes for ultimate outdoor flavor. We'd risk scoliosis backpacking\n   a Dutch Oven to every campsite and cookout if it meant getting to enjoy meals like\n   the Tri-Animal Jambalaya or Classic Cobbler.\n</p> <p>For the guy who tends to make his feasts in the forest, the Dutch Oven is everything but the kitchen sink\n   to make the outdoors a tastier place.\n</p>",
+      "Name": "Dutch Oven Kit",
+      "ConversionRate": 1.8050541516245486,
+      "UniquePurchases": 30,
+      "ProductRevenue": 2999.7,
+      "Quantity": 30,
+      "AveragePrice": 99.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/638/large/dok-dutch-oven-kit-components__80423.jpg?1502411133",
+      "Margin": 39.79,
+      "TerrainScore": 0.6141315038598403,
+      "TERRAINRANK": 3
+    },
+    {
+      "SKU": "KTCR-0039-PIG",
+      "VariantName": "Pit Master Crate",
+      "Price": 119.99,
+      "Inventory": 503,
+      "VariantStatus": "sellable",
+      "ProductId": 119,
+      "VariantId": 243,
+      "Path": "pit-master-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/pit-master-crate",
+      "ContentsHTML": "<h4>Pit Players</h4> <ul>\r\n  <li>Stainless Steel Meat Claws</li>\r\n  <li>Premium Leather Gloves</li>\r\n  <li>Collapsible Grill Fork</li>\r\n  <li>Silicone Basting Brush</li>\r\n  <li>Cast Iron Sauce Pot, 1.5 cup</li>\r\n</ul> <h4>Flavor Infusers</h4> <ul>\r\n  <li>Honey Sweet Sauce, 16 oz</li>\r\n  <li>Touch of Heat Sauce, 16 oz</li>\r\n  <li>Barbecue Meat Rub</li>\r\n  <li>Hickory Grill Wood Chips</li>\r\n  <li>Mesquite Grill Wood Chips</li>\r\n  \r\n</ul>",
+      "LongDescription": "Set Smoker To Beast Mode When the divine spirits of the Ancient World demanded animal sacrifices to satiate their\r\n   celestial hunger, it was never a quick, \"kill it and grill it\" job.\r\n Nay, they ordered full mammoth carcasses be slow-cooked for days over\r\n   glowing coals in a smoky trap of rubs and sauces. This great wisdom was called \"barbecue\", and it\r\n   pleased the gods so greatly that they indulged...perhaps a bit too much.\r\n The Woolies are long gone, but the archaic secrets of True Barbecue live on in the Pit Master Man Crate.  Heat, Eat, Repeat The Pit Master Crate is the Mr.  Miyagi of barbecue gear, your guiding\r\n   sensei on the road to fall-off-the-bone, \"low &amp; slow\" True Barbecue mastery.\r\n Meat Claws are the supreme tools for lifting and lugging huge roasts, whether you've dug a backyard pit to\r\n   \"go whole hog\" or drained and lined your swimming pool to \"go whole herd\". Knuckle up with these stainless\r\n   steel shredders, and you're just a few impassioned Wolverine impressions\r\n   away from pristine pulled pork.\r\n Keep your eyebrows intact with the collapsible barbecue fork, or go face to the fire with premium leather\r\n   gloves intended to handle the densest meat and most intense heat.\r\n Sauce Like A Boss A poorly executed saucing strategy can make or break your barbecue, and we're\r\n   firmly in the \"sauce while hot\" camp. Glaze right over the blaze with the silicone\r\n   basting brush, heat-safe to 550 degrees, and top off the cast-iron sauce pan with\r\n   fine selections from the  Sauce Boss himself, Mr. Rufus Teague.\r\n Teague's Honey Sweet and Touch of Heat flavors bring the bottled best of Kansas City to your cookout,\r\n   the perfect complement to a base-taste layer of his famed meat rub. Seal the deal\r\n   with a pro-style smokestack of hickory wood chips.\r\n Open up the pit with the Pit Master Crate, and unlock the secrets of True Barbecue.",
+      "Contents": "Pit Players \r\n  Stainless Steel Meat Claws\r\n  Premium Leather Gloves\r\n  Collapsible Grill Fork\r\n  Silicone Basting Brush\r\n  Cast Iron Sauce Pot, 1.5 cup\r\n Flavor Infusers \r\n  Honey Sweet Sauce, 16 oz\r\n  Touch of Heat Sauce, 16 oz\r\n  Barbecue Meat Rub\r\n  Hickory Grill Wood Chips\r\n  Mesquite Grill Wood Chips\r\n  \r\n",
+      "LongDescriptionHTML": "<h4>Set Smoker To Beast Mode</h4> <p>When the divine spirits of the Ancient World demanded animal sacrifices to satiate their\r\n   celestial hunger, it was never a quick, \"kill it and grill it\" job.\r\n</p> <p>Nay, they ordered full mammoth carcasses be slow-cooked for days over\r\n   glowing coals in a smoky trap of rubs and sauces. This great wisdom was called \"barbecue\", and it\r\n   pleased the gods so greatly that they indulged...perhaps a bit too much.\r\n</p> <p>The Woolies are long gone, but the archaic secrets of True Barbecue live on in the Pit Master Man Crate. </p> <h4>Heat, Eat, Repeat</h4> <p>The Pit Master Crate is the Mr.  Miyagi of barbecue gear, your guiding\r\n   sensei on the road to fall-off-the-bone, \"low &amp; slow\" True Barbecue mastery.\r\n</p> <p>Meat Claws are the supreme tools for lifting and lugging huge roasts, whether you've dug a backyard pit to\r\n   \"go whole hog\" or drained and lined your swimming pool to \"go whole herd\". Knuckle up with these stainless\r\n   steel shredders, and you're just a few impassioned Wolverine impressions\r\n   away from pristine pulled pork.\r\n</p> <p>Keep your eyebrows intact with the collapsible barbecue fork, or go face to the fire with premium leather\r\n   gloves intended to handle the densest meat and most intense heat.\r\n</p> <h4>Sauce Like A Boss</h4> <p>A poorly executed saucing strategy can make or break your barbecue, and we're\r\n   firmly in the \"sauce while hot\" camp. Glaze right over the blaze with the silicone\r\n   basting brush, heat-safe to 550 degrees, and top off the cast-iron sauce pan with\r\n   fine selections from the  Sauce Boss himself, Mr. Rufus Teague.\r\n</p> <p>Teague's Honey Sweet and Touch of Heat flavors bring the bottled best of Kansas City to your cookout,\r\n   the perfect complement to a base-taste layer of his famed meat rub. Seal the deal\r\n   with a pro-style smokestack of hickory wood chips.\r\n</p> <p>Open up the pit with the Pit Master Crate, and unlock the secrets of True Barbecue.</p>",
+      "Name": "Pit Master Crate",
+      "ConversionRate": 4.6162893266686265,
+      "UniquePurchases": 157,
+      "ProductRevenue": 18838.43,
+      "Quantity": 157,
+      "AveragePrice": 119.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/843/large/pm-awesome-barbecue-gifts-for-the-grilling-guy__39614.jpg?1502411217",
+      "Margin": 60.1,
+      "TerrainScore": 0.6018452657833433,
+      "TERRAINRANK": 4
+    },
+    {
+      "SKU": "KTPR-0019-SMK",
+      "VariantName": "Sausage Making Kit",
+      "Price": 79.99,
+      "Inventory": 625,
+      "VariantStatus": "sellable",
+      "ProductId": 236,
+      "VariantId": 437,
+      "ContentsHTML": "<ul>\r\n  <li>NorPro Delux Grinder/Mincer</li>\r\n  <li>Maple Apple Spice Blend, 4 oz </li>\r\n  <li>Merguez Spice Blend, 4 oz </li>\r\n  <li>Full Circle Home Detail Brush</li>\r\n  <li>Sausage Casings</li>\r\n  \r\n</ul>",
+      "LongDescription": "The Ultimate Cram Session\r\n\r\n  There's a certain type of guy who's just always had a strange obsession with stuffing things. As a lad, he couldn't shove enough pennies into those stripy paper coin sleeves. In his college years, he challenged the world record for most dirty clothes squished into a hamper. Today, he dances around dead set on shimmying his beefy calves into skinny jeans.\r\n  Now, thanks to not-so-modern Man Crates technology, he can pair his penchant for packing, pushing, and smushing with his love of encased meats. The Sausage Making Kit brings the age-old tradition of tubing up tasty beef, wild game, poultry, pork, and lamb right to his kitchen.\r\n  Once he starts cranking out fresh, handmade sausages, he'll have to cram \"Sausage King of the Neighborhood\" into his official title.\r\n\r\nA Link of His Own\r\n  \r\n\tHe'll be churning out chorizo like a champ with the Norpro Meat Grinder, which features a powerful suction cup for convenient countertop use. Grinding his gears is about to get fun.\r\n\tReportedly, local butchers are jealous that Whole Spice Napa Valley created the kit's Maple Apple Sausage Blend and Merquez Sausage Blend exclusively for Man Crates.\r\n\tSonoma Meat Company has supplied two packs of hog sausage casings so he can go hog wild stuffing his soft cylinders full of savory goodness.\r\n\t\r\n  ",
+      "Contents": "\r\n  NorPro Delux Grinder/Mincer\r\n  Maple Apple Spice Blend, 4 oz \r\n  Merguez Spice Blend, 4 oz \r\n  Full Circle Home Detail Brush\r\n  Sausage Casings\r\n  \r\n",
+      "LongDescriptionHTML": "<h4>The Ultimate Cram Session</h4>\r\n\r\n  <p>There's a certain type of guy who's just always had a strange obsession with stuffing things. As a lad, he couldn't shove enough pennies into those stripy paper coin sleeves. In his college years, he challenged the world record for most dirty clothes squished into a hamper. Today, he dances around dead set on shimmying his beefy calves into skinny jeans.</p>\r\n  <p>Now, thanks to not-so-modern Man Crates technology, he can pair his penchant for packing, pushing, and smushing with his love of encased meats. The Sausage Making Kit brings the age-old tradition of tubing up tasty beef, wild game, poultry, pork, and lamb right to his kitchen.</p>\r\n  <p>Once he starts cranking out fresh, handmade sausages, he'll have to cram \"Sausage King of the Neighborhood\" into his official title.</p>\r\n\r\n<h4>A Link of His Own</h4>\r\n  <ul>\r\n\t<li>He'll be churning out chorizo like a champ with the Norpro Meat Grinder, which features a powerful suction cup for convenient countertop use. Grinding his gears is about to get fun.</li>\r\n\t<li>Reportedly, local butchers are jealous that Whole Spice Napa Valley created the kit's Maple Apple Sausage Blend and Merquez Sausage Blend exclusively for Man Crates.</li>\r\n\t<li>Sonoma Meat Company has supplied two packs of hog sausage casings so he can go hog wild stuffing his soft cylinders full of savory goodness.</li>\r\n\t\r\n  </ul>",
+      "Name": "Sausage Making Project Kit",
+      "ConversionRate": 4.205900816070308,
+      "UniquePurchases": 67,
+      "ProductRevenue": 5359.33,
+      "Quantity": 67,
+      "AveragePrice": 79.99,
+      "Path": "sausage-making-project-kit",
+      "CanonicalUrl": "www.mancrates.com/store/products/sausage-making-project-kit",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/985/large/MBC_MC_2018-4_Sausage_WEB-1487.jpg?1527019456",
+      "Margin": 0,
+      "TerrainScore": 0.5639171246579973,
+      "TERRAINRANK": 5
+    },
+    {
+      "SKU": "KTCR-0017-EXO",
+      "VariantName": "Exotic Meats Crate",
+      "Price": 69.99,
+      "Inventory": 1579,
+      "VariantStatus": "sellable",
+      "ProductId": 7,
+      "VariantId": 7,
+      "Path": "exotic-meats-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/exotic-meats-crate",
+      "ContentsHTML": "<h4>Cured &amp; Cultured</h4> <ul>\r\n  <li>Venison Jerky, 2oz</li>\r\n  <li>Wild Boar Jerky, 2oz</li>\r\n  <li>Biltong Beef Jerky, 4oz</li>\r\n  <li>Elk Jerky, 2oz</li>\r\n  <li>Buffalo Jerky, 3oz</li>\r\n  <li>Alligator Jerky, 2oz</li>\r\n</ul> <h4>Safari Sticks</h4> <ul>\r\n  <li>Pheasant Jerky Stick, 1 oz</li>\r\n  <li>Maple Duck Jerky Stick, 1 oz</li>\r\n  <li>Ostrich Jerky Stick, 1 oz</li>\r\n  <li>Alligator Jerky Stick, 1 oz</li>\r\n  </ul>\r\n<p>\r\n  <p>\r\n    <p>\r\n<p><i>*Products may contain beef.</i></p>",
+      "LongDescription": "The Feast of Beast We've already compiled the pinnacle selection of meat samplers from three\r\n   continents in the Exotic Meats Jerkygram, and we\r\n   didn't want to reinvent the wheel. No, we wanted to snag three more wheels, toss 'em in a Lambo,\r\n   and burn victory lap donuts in the parking lot of every non-exotic meat factory in the land.\r\n The More, The Meatier The Exotic Meats Man Crate has so much deluxe animal poundage that we could\r\n   legally register it as an official safari park. We're talking enough spiced ostrich, alligator, duck,\r\n   pheasant, buffalo, elk, venison, and boar meat to make El Chupacabra wave his claws in surrender,\r\n   screaming, \"No mas, no mas!\"\r\n And this premium meat parade will fly first class to your doorstep in a sturdy wooden Man Crate. The Most Interesting Meat in the World We've also expanded the curation process to include Biltong, South Africa's treasured method of preserving\r\n   delicious meats. This thin-cut beef treat is the Meat Supreme in the dried\r\n   animal kingdom, and it literally means \"rump tongue\" in Dutch. Drop that knowledge bomb on your friends and\r\n   they'll swoon over your intelligence. Swoon, we say!\r\n Select this Feast of Beast and prepare to sample the safari!",
+      "Contents": "Cured &amp; Cultured \r\n  Venison Jerky, 2oz\r\n  Wild Boar Jerky, 2oz\r\n  Biltong Beef Jerky, 4oz\r\n  Elk Jerky, 2oz\r\n  Buffalo Jerky, 3oz\r\n  Alligator Jerky, 2oz\r\n Safari Sticks \r\n  Pheasant Jerky Stick, 1 oz\r\n  Maple Duck Jerky Stick, 1 oz\r\n  Ostrich Jerky Stick, 1 oz\r\n  Alligator Jerky Stick, 1 oz\r\n  \r\n\r\n  \r\n    \r\n*Products may contain beef.",
+      "LongDescriptionHTML": "<h4>The Feast of Beast</h4> <p>We've already compiled the pinnacle selection of meat samplers from three\r\n   continents in the <a href=\"https://www.mancrates.com/jerkygrams/exotic\">Exotic Meats Jerkygram</a>, and we\r\n   didn't want to reinvent the wheel. No, we wanted to snag three more wheels, toss 'em in a Lambo,\r\n   and burn victory lap donuts in the parking lot of every non-exotic meat factory in the land.\r\n</p> <h5>The More, The Meatier</h5> <p>The Exotic Meats Man Crate has so much deluxe animal poundage that we could\r\n   legally register it as an official safari park. We're talking enough spiced ostrich, alligator, duck,\r\n   pheasant, buffalo, elk, venison, and boar meat to make El Chupacabra wave his claws in surrender,\r\n   screaming, \"No mas, no mas!\"\r\n</p> <p>And this premium meat parade will fly first class to your doorstep in a sturdy wooden Man Crate.</p> <h5>The Most Interesting Meat in the World</h5> <p>We've also expanded the curation process to include Biltong, South Africa's treasured method of preserving\r\n   delicious meats. This thin-cut beef treat is the Meat Supreme in the dried\r\n   animal kingdom, and it literally means \"rump tongue\" in Dutch. Drop that knowledge bomb on your friends and\r\n   they'll swoon over your intelligence. Swoon, we say!\r\n</p> <p>Select this Feast of Beast and prepare to sample the safari!</p>",
+      "Name": "Exotic Meats Crate",
+      "ConversionRate": 5.401585448288576,
+      "UniquePurchases": 879,
+      "ProductRevenue": 67341.21,
+      "Quantity": 879,
+      "AveragePrice": 76.61116040955632,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/368/large/emc-exotic-meat-crate-awesome-gift-for-men__35920.jpg?1502411028",
+      "Margin": 57.42,
+      "TerrainScore": 0.4745027224619452,
+      "TERRAINRANK": 6
+    },
+    {
+      "SKU": "KTPR-0013-CHK",
+      "VariantName": "Chef Knife Making Kit",
+      "Price": 179.99,
+      "Inventory": 244,
+      "VariantStatus": "sellable",
+      "ProductId": 102,
+      "VariantId": 223,
+      "Path": "chef-knife-making-kit",
+      "CanonicalUrl": "www.mancrates.com/store/products/chef-knife-making-kit",
+      "ContentsHTML": "<h4>Blade Buddies</h4> <ul>\n  <li>VG-10 Damascus Chef Knife Blade Blank (Blade Length: 8.5\")</li>\n  <li>Black/Red Micarta Handle Scale Set</li>\n  <li>Mosaic Pins</li>\n</ul> <h4>Shape, Sand, and Finish</h4> <ul>\n  <li>Man Crates Chef Knife Making Guide</li>\n  <li>2-Ton Syringe Epoxy</li>\n  <li>Rasp &amp; File set</li>\n  <li>Graded Sandpaper Set</li>\n  <li>Bench Vise</li>\n  <li>Drill Bit</li>\n</ul>",
+      "LongDescription": "The Cutting Edge In a world boasting \"Seen on TV\" Slice n' Dice Machines, Wombo Combo Fruit Juicers, and self\n   sharpening spatulas, it can be tough to know which kitchen utensils are grade A\n   and which are woefully undercooked.\n But anyone who's seen MacGyver knows the only tools worth trusting are the ones built by hand —sometimes\n   two trembling hands dangling from a cliff or trapped in an elevator with a timebomb.\n And while most of us ditched our mullets by the late 90s, the wisdom still holds true.\n   The Chef Knife Making Kit proves that if you want something made right, meals included,\n   you've got to make it yourself.\n Knife to Meet You While MacGyver made do with coat hangers and chewing gum, the Chef Knife Making Kit opts for sharper,\n   more dependable materials. Forged of VG-10 Damascus steel, the mere sight of this\n   blade will cause a steak to carve itself out of fear.\n The stylish Micarta handles are ready to be sculpted into personalized, palm-gripping perfection. The\n   finished product will be as intricately layered as a fennel avocado bean dip, and\n   every bit as distinctive as the chef who made it.\n All Ingredients Included The kit comes stuffed with various rasps and files, a portable bench vise, and\n   enough sandpaper to take the green off a watermelon. It's also a great excuse to\n   dust off the ol' power tools hanging in the garage. And with our step-by-step instruction\n   booklet, crafting this knife will be as effortless as cooking with it.\n The Chef Knife Making Kit is just what the modern day Michelangelo of meat needs to\n   carve up the next five-star entree.\n",
+      "Contents": "Blade Buddies \n  VG-10 Damascus Chef Knife Blade Blank (Blade Length: 8.5\")\n  Black/Red Micarta Handle Scale Set\n  Mosaic Pins\n Shape, Sand, and Finish \n  Man Crates Chef Knife Making Guide\n  2-Ton Syringe Epoxy\n  Rasp &amp; File set\n  Graded Sandpaper Set\n  Bench Vise\n  Drill Bit\n",
+      "LongDescriptionHTML": "<h4>The Cutting Edge</h4> <p>In a world boasting \"Seen on TV\" Slice n' Dice Machines, Wombo Combo Fruit Juicers, and self\n   sharpening spatulas, it can be tough to know which kitchen utensils are grade A\n   and which are woefully undercooked.\n</p> <p>But anyone who's seen MacGyver knows the only tools worth trusting are the ones built by hand —sometimes\n   two trembling hands dangling from a cliff or trapped in an elevator with a timebomb.\n</p> <p>And while most of us ditched our mullets by the late 90s, the wisdom still holds true.\n   The Chef Knife Making Kit proves that if you want something made right, meals included,\n   you've got to make it yourself.\n</p> <h4>Knife to Meet You</h4> <p>While MacGyver made do with coat hangers and chewing gum, the Chef Knife Making Kit opts for sharper,\n   more dependable materials. Forged of VG-10 Damascus steel, the mere sight of this\n   blade will cause a steak to carve itself out of fear.\n</p> <p>The stylish Micarta handles are ready to be sculpted into personalized, palm-gripping perfection. The\n   finished product will be as intricately layered as a fennel avocado bean dip, and\n   every bit as distinctive as the chef who made it.\n</p> <h4>All Ingredients Included</h4> <p>The kit comes stuffed with various rasps and files, a portable bench vise, and\n   enough sandpaper to take the green off a watermelon. It's also a great excuse to\n   dust off the ol' power tools hanging in the garage. And with our step-by-step instruction\n   booklet, crafting this knife will be as effortless as cooking with it.\n</p> <p>The Chef Knife Making Kit is just what the modern day Michelangelo of meat needs to\n   carve up the next five-star entree.\n</p>",
+      "Name": "Chef Knife Making Kit",
+      "ConversionRate": 2.1654954825756487,
+      "UniquePurchases": 151,
+      "ProductRevenue": 27178.49,
+      "Quantity": 151,
+      "AveragePrice": 179.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/766/large/ckmk-chef-knife-making-kit-great-components-damascus__98473.jpg?1502411183",
+      "Margin": 55.97,
+      "TerrainScore": 0.4624028000130957,
+      "TERRAINRANK": 7
+    },
+    {
+      "SKU": "KTCR-0077-STK",
+      "VariantName": "Steaks on a Plate Crate",
+      "Price": 99.99,
+      "Inventory": 320,
+      "VariantStatus": "sellable",
+      "ProductId": 231,
+      "VariantId": 428,
+      "Path": "steaks-on-a-plate-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/steaks-on-a-plate-crate",
+      "ContentsHTML": "<ul>\r\n  <li>Crate</li>\r\n  <li>Crowbar</li>\r\n  <li>Jacobsen Salt Co., Tellecherry Peppercorn in Grinder, 2.1 oz</li>\r\n  <li>Jacobsen Salt Co., Steak Seasoning Salt, 5.6 oz</li>\r\n  <li>6 Steak Knives with Rosewood Handles</li>\r\n  <li>Steak Station Digital Thermometer</li>\r\n  <li>4 Stainless Steel Potato People</li>\r\n \r\n</ul>",
+      "LongDescription": "Shhh...Do You Hear That?\r\n\r\n  It’s the sound of several sizzling sssteaksss on the grill. For the avid barbecuer, guiding each perfectly charred Grade-A cut from grate to plate isn't just your typical meal preparation. It's a nonstop thrill ride from the moment the burners flare.\r\n  The Steaks on a Plate Crate will enhance his culinary craftsmanship, whether he's harnessing the heat at the grill or in the dining room on the edge of his seat. From digital meat thermometers to a steak knife set that's literally cutting edge, he'll be well-equipped to expertly gauge doneness and precisely slice his seasoned sirloin.\r\n  Once aboard this flight of flavor, he’ll never get tired of these supperloving steaks on these supperloving plates.\r\n\r\nElevating the Steaks\r\n  \r\n\tWhen we handpicked cutlery, only the set of six forged stainless steel Curtis Lloyd steak knives made the cut. They give diners a nice, clean slice with no tearing.\r\n\tHe’ll corral up to four pesky strips at once with the Charcoal Companion Steak Station, which has a digital display to ensure perfect meat preparation.\r\n\tThe Classic Steak Seasoning and Tellicherry Peppercorn from Portland's Jacobsen Salt will give his filets and T-bones a quick strike of savoriness.\r\n\tThe set of four tater-tilting Potato People will have his back to help save potatoes from scorchy peril. Stainless steel and dishwasher safe, these stands help cook his spuds without searing the skin.\r\n  ",
+      "Contents": "\r\n  Crate\r\n  Crowbar\r\n  Jacobsen Salt Co., Tellecherry Peppercorn in Grinder, 2.1 oz\r\n  Jacobsen Salt Co., Steak Seasoning Salt, 5.6 oz\r\n  6 Steak Knives with Rosewood Handles\r\n  Steak Station Digital Thermometer\r\n  4 Stainless Steel Potato People\r\n \r\n",
+      "LongDescriptionHTML": "<h4>Shhh...Do You Hear That?</h4>\r\n\r\n  <p>It’s the sound of several sizzling sssteaksss on the grill. For the avid barbecuer, guiding each perfectly charred Grade-A cut from grate to plate isn't just your typical meal preparation. It's a nonstop thrill ride from the moment the burners flare.</p>\r\n  <p>The Steaks on a Plate Crate will enhance his culinary craftsmanship, whether he's harnessing the heat at the grill or in the dining room on the edge of his seat. From digital meat thermometers to a steak knife set that's literally cutting edge, he'll be well-equipped to expertly gauge doneness and precisely slice his seasoned sirloin.</p>\r\n  <p>Once aboard this flight of flavor, he’ll never get tired of these supperloving steaks on these supperloving plates.</p>\r\n\r\n<h4>Elevating the Steaks</h4>\r\n  <ul>\r\n\t<li>When we handpicked cutlery, only the set of six forged stainless steel Curtis Lloyd steak knives made the cut. They give diners a nice, clean slice with no tearing.</li>\r\n\t<li>He’ll corral up to four pesky strips at once with the Charcoal Companion Steak Station, which has a digital display to ensure perfect meat preparation.</li>\r\n\t<li>The Classic Steak Seasoning and Tellicherry Peppercorn from Portland's Jacobsen Salt will give his filets and T-bones a quick strike of savoriness.</li>\r\n\t<li>The set of four tater-tilting Potato People will have his back to help save potatoes from scorchy peril. Stainless steel and dishwasher safe, these stands help cook his spuds without searing the skin.</li>\r\n  </ul>",
+      "Name": "Steaks on a Plate Crate",
+      "ConversionRate": 1.1907983761840324,
+      "UniquePurchases": 44,
+      "ProductRevenue": 4399.56,
+      "Quantity": 44,
+      "AveragePrice": 99.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/842/large/MBC_MC_2018-4_Steak-1_WEB-EDIT_V1ja.jpg?1528236041",
+      "Margin": 0,
+      "TerrainScore": 0.4549035890151315,
+      "TERRAINRANK": 8
+    },
+    {
+      "SKU": "KTAM-0001-COF",
+      "VariantName": "Coffee Ammo Can",
+      "Price": 59.99,
+      "Inventory": 484,
+      "VariantStatus": "sellable",
+      "ProductId": 4,
+      "VariantId": 4,
+      "Path": "coffee-ammo-can",
+      "CanonicalUrl": "www.mancrates.com/store/products/coffee-ammo-can",
+      "ContentsHTML": "<h4>Battleworthy Brews</h4> <ul>\r\n  <li>12oz Alpha Warrior Select Coffee</li>\r\n  <li>2 Full-Pot Packages</li>\r\n  <ul>\r\n    <li>Double Barrel Black - dark roast</li>\r\n    <li>Smooth Operator - light roast</li>\r\n  </ul>\r\n</ul> <h4>Hearty Rations</h4> <ul>\r\n  <li>Clif Bar</li>\r\n  <li>Kind Bar, Fruit &amp; Nut</li>\r\n  <li>Stainless Steel Carabiner Mug</li>\r\n</ul>",
+      "LongDescription": "Fuel for the Front Lines The modern professional environment is chock-full of hazard. It pays to be alert out\r\n   there. One misfired 'reply-all' can quickly escalate friendly email banter into a full-on legal battle.\r\n Don't be that guy. Be the guy that hits the ground running every morning\r\n   and handles your freakin' business.\r\n Weekday Warriors We've partnered with the veterans at Alpha  Coffee- battle hardended guys\r\n   that wage full scale war on sluggish Monday mornings, post-lunch food comas, and every other droopy-eyed\r\n   productivity gap that threatens the success of your mission. This canister ships with 12 oz of their\r\n   pre-ground, Warrior Select coffee. Combat tested and warrior selected, this is a delicious blend\r\n   of the best highland arabica beans available, with superior flavor that is winning hearts and minds all\r\n   over the world.\r\n Also includes two full-pot sample packs of LockNLoad's popular Double Barrel Black - dark roast and Smooth\r\n   Operator - light roast.\r\n Operation Invincible Freshness When freshness is the imperative you've got to go with a tried and true container. We ship these grinds in\r\n   a genuine .30 cal NATO spec ammo case- watertight, rock-solid,\r\n   and not available at your local mermaid-themed coffee shop. For the true warrior experience we recommend\r\n   enjoying your morning jolt from the lightweight, stainless steel carabiner mug.\r\n You've been briefed. Secure your supplies and get it done.",
+      "Contents": "Battleworthy Brews \r\n  12oz Alpha Warrior Select Coffee\r\n  2 Full-Pot Packages\r\n  \r\n    Double Barrel Black - dark roast\r\n    Smooth Operator - light roast\r\n  \r\n Hearty Rations \r\n  Clif Bar\r\n  Kind Bar, Fruit &amp; Nut\r\n  Stainless Steel Carabiner Mug\r\n",
+      "LongDescriptionHTML": "<h4>Fuel for the Front Lines</h4> <p>The modern professional environment is chock-full of hazard. It pays to be alert out\r\n   there. One misfired 'reply-all' can quickly escalate friendly email banter into a full-on legal battle.\r\n</p> <p>Don't be that guy. Be the guy that <span class=\"highlight\">hits the ground running</span> every morning\r\n   and handles your freakin' business.\r\n</p> <h4>Weekday Warriors</h4> <p>We've partnered with the veterans at <span class=\"highlight\">Alpha  Coffee</span>- battle hardended guys\r\n   that wage full scale war on sluggish Monday mornings, post-lunch food comas, and every other droopy-eyed\r\n   productivity gap that threatens the success of your mission. This canister ships with 12 oz of their\r\n   pre-ground, Warrior Select coffee. Combat tested and warrior selected, this is a delicious blend\r\n   of the best highland arabica beans available, with superior flavor that is winning hearts and minds all\r\n   over the world.\r\n</p> <p>Also includes two full-pot sample packs of LockNLoad's popular Double Barrel Black - dark roast and Smooth\r\n   Operator - light roast.\r\n</p> <h4>Operation Invincible Freshness</h4> <p>When freshness is the imperative you've got to go with a tried and true container. We ship these grinds in\r\n   a genuine <span class=\"highlight\">.30 cal NATO spec ammo case</span>- watertight, rock-solid,\r\n   and not available at your local mermaid-themed coffee shop. For the true warrior experience we recommend\r\n   enjoying your morning jolt from the lightweight, stainless steel carabiner mug.\r\n</p> <p>You've been briefed. Secure your supplies and get it done.</p>",
+      "Name": "Coffee Ammo Can",
+      "ConversionRate": 4.4491525423728815,
+      "UniquePurchases": 21,
+      "ProductRevenue": 1259.79,
+      "Quantity": 21,
+      "AveragePrice": 59.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/353/large/cac-coffee-ammo-can-great-coffee-gift-for-guys-on-the-go__49356.jpg?1502411023",
+      "Margin": 56.46,
+      "TerrainScore": 0.435411566496424,
+      "TERRAINRANK": 9
+    },
+    {
+      "SKU": "KTAM-0008-BRR",
+      "VariantName": "Breakfast Rations Ammo Can",
+      "Price": 54.99,
+      "Inventory": 710,
+      "VariantStatus": "sellable",
+      "ProductId": 229,
+      "VariantId": 426,
+      "Path": "breakfast-rations-ammo-can",
+      "CanonicalUrl": "www.mancrates.com/store/products/breakfast-rations-ammo-can",
+      "ContentsHTML": "<li>Ammo Can</li>\r\n<li>Callie's Buttermilk Biscuit Mix, 13 oz</li>\r\n<li>Callie's Grits, 1 lb</li>\r\n<li>Mike's Hot Honey, 12 oz</li>\r\n</ul>",
+      "LongDescription": "Battle of the Indulge\r\n\r\nThe troops have been roused at 0700 hours. A meager breakfast has been prepped, and he’s managed to get dressed for his board meeting in clothes that may or may not be inside out.\r\n\r\nEvery day is a battle, and those last-minute, sugary cereals aren’t going to help him survive those boardroom bombshells. Make sure he nourishes himself properly with these artisan biscuits and grits. And if he needs that extra kick, spice things up with Brooklyn-based Mike’s Hot Honey.\r\n\r\nIt takes more than a pocket protector to dodge that spreadsheet shrapnel. Help him stay energized all day with the Man Crates Breakfast Rations Ammo Can. \r\n\r\n\r\nFood Facts\r\nCallie’s Buttermilk Biscuit Mix is made by hand in the American South. Because if you want something done right...\r\nCallie’s Grits are stone ground on machines older than the workers using them.\r\nWhen not yelling at taxi drivers, New York bees are busy making Mike’s Hot Honey. A sweet and spicy, chili pepper-infused wildflower honey made in New York apiaries.\r\nThese rations come shipped in an air-tight, waterproof, and explosion-proof ammo can. We take breakfast seriously.\r\n\r\n",
+      "Contents": "Ammo Can\r\nCallie's Buttermilk Biscuit Mix, 13 oz\r\nCallie's Grits, 1 lb\r\nMike's Hot Honey, 12 oz\r\n",
+      "LongDescriptionHTML": "<h4>Battle of the Indulge</h4>\r\n\r\n<p>The troops have been roused at 0700 hours. A meager breakfast has been prepped, and he’s managed to get dressed for his board meeting in clothes that may or may not be inside out.</p>\r\n\r\n<p>Every day is a battle, and those last-minute, sugary cereals aren’t going to help him survive those boardroom bombshells. Make sure he nourishes himself properly with these artisan biscuits and grits. And if he needs that extra kick, spice things up with Brooklyn-based Mike’s Hot Honey.</p>\r\n\r\n<p>It takes more than a pocket protector to dodge that spreadsheet shrapnel. Help him stay energized all day with the Man Crates Breakfast Rations Ammo Can. \r\n</p>\r\n\r\n<h4>Food Facts</h4>\r\n<li>Callie’s Buttermilk Biscuit Mix is made by hand in the American South. Because if you want something done right...</li>\r\n<li>Callie’s Grits are stone ground on machines older than the workers using them.</li>\r\n<li>When not yelling at taxi drivers, New York bees are busy making Mike’s Hot Honey. A sweet and spicy, chili pepper-infused wildflower honey made in New York apiaries.</li>\r\n<li>These rations come shipped in an air-tight, waterproof, and explosion-proof ammo can. We take breakfast seriously.\r\n</li>\r\n</ul>",
+      "Name": "Breakfast Rations Ammo Can",
+      "ConversionRate": 2.9885057471264367,
+      "UniquePurchases": 39,
+      "ProductRevenue": 2144.61,
+      "Quantity": 39,
+      "AveragePrice": 54.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/828/large/MBC_MC_2018-4_Biscuit-Making_WEB-2160.jpg?1526331841",
+      "Margin": 0,
+      "TerrainScore": 0.3556881939141063,
+      "TERRAINRANK": 10
+    }
+  ],
+  "outputDocs": [
+    {
+      "SKU": "KTCR-0003-GRI",
+      "VariantName": "Grill Master Crate",
+      "Price": 99.99,
+      "ProductId": 14,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/grill-master-crate",
+      "Contents": "<h4>Grilling Gadgetry</h4> <ul>\r\n  <li>Brass-knuckle Meat Tenderizer</li>\r\n  <li>Cast Iron Smoker Box</li>\r\n  <li>Set of 4 Steak Thermometers</li>\r\n  <li>Dried Hickory Wood Chips</li>\r\n</ul> <h4>Zesty Downpour</h4> <ul>\r\n  <li>Original BBQ Sauce</li>\r\n  <li>Carolina Bold BBQ Sauce</li>\r\n  <li>Premium Spice Blend</li>\r\n</ul>",
+      "LongDescription": "<h4>The Right Tools for the Job</h4> <p>There's a line that separates the amateurs from the professionals. It's certainly\r\n   in the training and the experience, but folks often forget about the importance\r\n   of your equipment. Just like you can't win a NASCAR Cup in your grocery-getter,\r\n   can't crush a golf ball into orbit without a high-end driver, and aren't going\r\n   to take a trophy buck without a zeroed-in tack-driver, your grilling game will never\r\n   go next level without the right gear. You gotta have the right tools for the job.\r\n</p> <h4>Like a Grill-ionaire</h4> <p>Fortunately, you don't need to shell out a mountain of cash to get the equipment you need to get you to\r\n   grilling nirvana. We've included some of the best accessories that every man needs to get that Grillionaire\r\n   status.\r\n</p> <p>Our Grill Master Man Crate includes a cast-iron smoker\r\n  box and some hickory wood chips to get you started. Set the smoker box on\r\n   the grill as it warms up, soak the hickory in some water, and drop 'em into the\r\n   box as your meat grills. Take note, men: real flavor shouldn't come from a bottled\r\n   labeled \"liquid smoke.\"\r\n</p> <p>We threw in a set of four  steak thermometers, too. You may say, \"hey, Team\r\n   Man Crates, isn't that cheating?\" And we say, \"nay.\" There's no dishonor in knowing how done your steak\r\n   is. And when you cut into a perfectly-cooked slab of beef, you too shall understand that G.I. Joe wasn't\r\n   kidding when he said that Knowing Is Half the Battle.\r\n</p> <p>And because \"the right tool for every job\" means that sometimes you'll require some brute force, we've\r\n   included a brass-knuckle meat tenderizer. Nothing blows off the steam from a\r\n   long, hard day at work like beating your meat into submission.\r\n</p> <h4>Bone Doctors</h4> <p>We search tirelessly, every day, to find the best-in-class goods to put in our crates. Hundreds of sauces\r\n   came and went, the grills burned for weeks, until finally a victor emerged. An unexpected dark\r\n   horse, a little-known operation out of Virginia became the Cinderella story of the\r\n   Man Crates grilling taste-off. We proudly present Bone Doctors'\r\n  BBQ sauces, pair of masterpiece sauces and a brilliant spice blend.\r\n</p> <p>So fire up the grill, and call your agent: after all, you're about to go pro.</p>",
+      "Name": "Grill Master Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/399/large/gmc-grill-master-crate-awesome-gift-for-men__77984.jpg?1502411041",
+      "TERRAINRANK": 1
+    },
+    {
+      "SKU": "KTCR-0067-PAS",
+      "VariantName": "Pasta Craft Crate",
+      "Price": 99.99,
+      "ProductId": 92,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/pasta-craft-crate",
+      "Contents": "<h4>Authentic Ingredients</h4> <ul>\n  <li>Pasta By Hand Cookbook</li>\n  <li>Mezzetta's Truffle, Porcini &amp; Cream Marinara Sauce</li>\n  <li>Passione Semolina Flour</li>\n</ul> <h4>Pasta Provisions</h4> <ul>\n  <li>Custom-Printed Pasta Apron</li>\n  <li>Potato Ricer</li>\n  <li>Gnocchi Board</li>\n  <li>Chopper/Scraper</li>\n</ul>",
+      "LongDescription": "<h4>La Resistenza di Pasta</h4> <p>Pasta was once a great Sicilian art form celebrating and sustaining Italian heritage for hundreds\n   of years. Today, the closest pasta comes to art is in macaroni necklaces and creepy\n   linguini effigies of scorned ex-lovers.\n</p> <p>The hand-rolled artisan starches of old have been replaced with commercial conveyor\n   belts and massive machine molds. Hundreds of tons of flour a day are pounded, pressed,\n   packaged, and imprisoned on grocery shelves without even the slightest caress of\n   human contact.\n</p> <p>The Pasta Craft Crate declares freedom to gluten everywhere with masterful tools and\n   techniques for rolling and shaping fresh pasta at home.\n</p> <h4>Carb Your Enthusiasm</h4> <p>Jenn Louis' Pasta By Hand: A Collection of Italy's Regional Hand-Shaped Pasta is the\n   radical manifesto of the homemade pasta movement. With shaping lessons, not-too-long\n   history blurbs, and over 65 recipes from shells to sauces, Pasta By Hand incorporates\n   authentic Italian techniques and fancy Italian words for delicious, crafted cuisine.\n</p> <p>Mezzetta's Truffle, Porcini &amp; Cream Marina beckons forth the seasoning of Southern Italy,\n   and Passione's Semolina Flour is the godfather of authentic Italian flavor, ideal\n   for formation and flavor.\n</p> <h4>Free the Gluten!</h4> <p>We're sick of gluten being treated like a second-class storage protein. The custom-designed\n   cooking apron is the banner of the Flour Revolution, demanding all starches be freed\n   from their shackles and suspicions.\n</p> <p>Said revolution is armed with kitchen artillery for forming pasta pieces with flavor\n   and flair; a potato ricer, chop-scrape blade, and gnocchi board to groove pieces\n   for storing sauce.\n</p> <p>In a world where mass batches of pasta are hung out to dry by machines, the Pasta Craft\n   Crate takes a stand for authentic, artisanal pasta in every home.\n</p>",
+      "Name": "Pasta-Craft Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/723/large/pph-pasta-party-crate__13398.jpg?1502411164",
+      "TERRAINRANK": 2
+    },
+    {
+      "SKU": "KTPR-0008-DOV",
+      "VariantName": "Dutch Oven Kit",
+      "Price": 99.99,
+      "ProductId": 73,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/dutch-oven-kit",
+      "Contents": "<h5>Cast-Iron Cookery</h5> <ul>\n  <li>Campmaid Dutch Oven</li>\n  <li>Campmaid Lid Lifter/Kickstand</li>\n  <li>Camp Chef Chainmail Scrubber</li>\n  <li>Camp Chef Cast Iron Conditioner</li>\n  <li>Man Crates Dutch Oven Cookbook</li>\n  <li>Pitt Mitts</li>\n</ul>",
+      "LongDescription": "<h5>Eat Well in the Wild</h5> <iframe\n  src=\"https://www.youtube.com/embed/a9CHRrkVCQM\" width=\"640\" height=\"360\" frameborder=\"0\"></iframe>\n<p>There are plenty of things in the Great Outdoors that could kill\n   a man; his own campfire cooking need not be one of those things.\n</p> <p>No camper, no matter how cooking-incompetent, should have to subsist on trail mix and fruit\n   scraps alone like some common tree squirrel. We developed the Dutch Oven Project\n   Kit to transform the average/below-average camping cook into a culinary master.\n</p> <h5>Much Lovin' Dutch Oven</h5> <p>The cast-iron Dutch Oven belongs to a storied tradition of five-star frontier flavor. Fun fact: Lewis and\n   Clark cooked with multiple Dutch Ovens during their western expedition. Less fun fact: they were probably\n   cooking Raccoon Ragout and Possum Porridge.\n</p> <p>The Dutch Oven we've selected is a pre-seasoned 12\" cast-iron pot that can stew, braise, roast, bake, boil,\n   fry, or poach 6-7 quarts of gourmet buffet. We've also included Campmaid's kickstand/lid-lifter ideal for\n   raising the roof when the pot gets hot, or propping up the oven to bait and trap curious forest critters.\n</p> <h4>Rust-Free Recipes</h4> <p>Like a veteran quarterback, a cast-iron pot requires tender care and attention to maintain any semblance of\n   a season. This kit includes a chain mail scrubber and cast iron conditioner to keep the oven tasty and\n   rust-free.\n</p> <p>The DIY Dutch Oven Guide includes Dutch Oven care methods, cooking techniques, and most importantly, five\n   amazing and simple Man Crates recipes for ultimate outdoor flavor. We'd risk scoliosis backpacking\n   a Dutch Oven to every campsite and cookout if it meant getting to enjoy meals like\n   the Tri-Animal Jambalaya or Classic Cobbler.\n</p> <p>For the guy who tends to make his feasts in the forest, the Dutch Oven is everything but the kitchen sink\n   to make the outdoors a tastier place.\n</p>",
+      "Name": "Dutch Oven Kit",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/638/large/dok-dutch-oven-kit-components__80423.jpg?1502411133",
+      "TERRAINRANK": 3
+    },
+    {
+      "SKU": "KTCR-0039-PIG",
+      "VariantName": "Pit Master Crate",
+      "Price": 119.99,
+      "ProductId": 119,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/pit-master-crate",
+      "Contents": "<h4>Pit Players</h4> <ul>\r\n  <li>Stainless Steel Meat Claws</li>\r\n  <li>Premium Leather Gloves</li>\r\n  <li>Collapsible Grill Fork</li>\r\n  <li>Silicone Basting Brush</li>\r\n  <li>Cast Iron Sauce Pot, 1.5 cup</li>\r\n</ul> <h4>Flavor Infusers</h4> <ul>\r\n  <li>Honey Sweet Sauce, 16 oz</li>\r\n  <li>Touch of Heat Sauce, 16 oz</li>\r\n  <li>Barbecue Meat Rub</li>\r\n  <li>Hickory Grill Wood Chips</li>\r\n  <li>Mesquite Grill Wood Chips</li>\r\n  \r\n</ul>",
+      "LongDescription": "<h4>Set Smoker To Beast Mode</h4> <p>When the divine spirits of the Ancient World demanded animal sacrifices to satiate their\r\n   celestial hunger, it was never a quick, \"kill it and grill it\" job.\r\n</p> <p>Nay, they ordered full mammoth carcasses be slow-cooked for days over\r\n   glowing coals in a smoky trap of rubs and sauces. This great wisdom was called \"barbecue\", and it\r\n   pleased the gods so greatly that they indulged...perhaps a bit too much.\r\n</p> <p>The Woolies are long gone, but the archaic secrets of True Barbecue live on in the Pit Master Man Crate. </p> <h4>Heat, Eat, Repeat</h4> <p>The Pit Master Crate is the Mr.  Miyagi of barbecue gear, your guiding\r\n   sensei on the road to fall-off-the-bone, \"low &amp; slow\" True Barbecue mastery.\r\n</p> <p>Meat Claws are the supreme tools for lifting and lugging huge roasts, whether you've dug a backyard pit to\r\n   \"go whole hog\" or drained and lined your swimming pool to \"go whole herd\". Knuckle up with these stainless\r\n   steel shredders, and you're just a few impassioned Wolverine impressions\r\n   away from pristine pulled pork.\r\n</p> <p>Keep your eyebrows intact with the collapsible barbecue fork, or go face to the fire with premium leather\r\n   gloves intended to handle the densest meat and most intense heat.\r\n</p> <h4>Sauce Like A Boss</h4> <p>A poorly executed saucing strategy can make or break your barbecue, and we're\r\n   firmly in the \"sauce while hot\" camp. Glaze right over the blaze with the silicone\r\n   basting brush, heat-safe to 550 degrees, and top off the cast-iron sauce pan with\r\n   fine selections from the  Sauce Boss himself, Mr. Rufus Teague.\r\n</p> <p>Teague's Honey Sweet and Touch of Heat flavors bring the bottled best of Kansas City to your cookout,\r\n   the perfect complement to a base-taste layer of his famed meat rub. Seal the deal\r\n   with a pro-style smokestack of hickory wood chips.\r\n</p> <p>Open up the pit with the Pit Master Crate, and unlock the secrets of True Barbecue.</p>",
+      "Name": "Pit Master Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/843/large/pm-awesome-barbecue-gifts-for-the-grilling-guy__39614.jpg?1502411217",
+      "TERRAINRANK": 4
+    },
+    {
+      "SKU": "KTPR-0019-SMK",
+      "VariantName": "Sausage Making Kit",
+      "Price": 79.99,
+      "ProductId": 236,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/sausage-making-project-kit",
+      "Contents": "<ul>\r\n  <li>NorPro Delux Grinder/Mincer</li>\r\n  <li>Maple Apple Spice Blend, 4 oz </li>\r\n  <li>Merguez Spice Blend, 4 oz </li>\r\n  <li>Full Circle Home Detail Brush</li>\r\n  <li>Sausage Casings</li>\r\n  \r\n</ul>",
+      "LongDescription": "<h4>The Ultimate Cram Session</h4>\r\n\r\n  <p>There's a certain type of guy who's just always had a strange obsession with stuffing things. As a lad, he couldn't shove enough pennies into those stripy paper coin sleeves. In his college years, he challenged the world record for most dirty clothes squished into a hamper. Today, he dances around dead set on shimmying his beefy calves into skinny jeans.</p>\r\n  <p>Now, thanks to not-so-modern Man Crates technology, he can pair his penchant for packing, pushing, and smushing with his love of encased meats. The Sausage Making Kit brings the age-old tradition of tubing up tasty beef, wild game, poultry, pork, and lamb right to his kitchen.</p>\r\n  <p>Once he starts cranking out fresh, handmade sausages, he'll have to cram \"Sausage King of the Neighborhood\" into his official title.</p>\r\n\r\n<h4>A Link of His Own</h4>\r\n  <ul>\r\n\t<li>He'll be churning out chorizo like a champ with the Norpro Meat Grinder, which features a powerful suction cup for convenient countertop use. Grinding his gears is about to get fun.</li>\r\n\t<li>Reportedly, local butchers are jealous that Whole Spice Napa Valley created the kit's Maple Apple Sausage Blend and Merquez Sausage Blend exclusively for Man Crates.</li>\r\n\t<li>Sonoma Meat Company has supplied two packs of hog sausage casings so he can go hog wild stuffing his soft cylinders full of savory goodness.</li>\r\n\t\r\n  </ul>",
+      "Name": "Sausage Making Project Kit",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/985/large/MBC_MC_2018-4_Sausage_WEB-1487.jpg?1527019456",
+      "TERRAINRANK": 5
+    },
+    {
+      "SKU": "KTCR-0017-EXO",
+      "VariantName": "Exotic Meats Crate",
+      "Price": 69.99,
+      "ProductId": 7,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/exotic-meats-crate",
+      "Contents": "<h4>Cured &amp; Cultured</h4> <ul>\r\n  <li>Venison Jerky, 2oz</li>\r\n  <li>Wild Boar Jerky, 2oz</li>\r\n  <li>Biltong Beef Jerky, 4oz</li>\r\n  <li>Elk Jerky, 2oz</li>\r\n  <li>Buffalo Jerky, 3oz</li>\r\n  <li>Alligator Jerky, 2oz</li>\r\n</ul> <h4>Safari Sticks</h4> <ul>\r\n  <li>Pheasant Jerky Stick, 1 oz</li>\r\n  <li>Maple Duck Jerky Stick, 1 oz</li>\r\n  <li>Ostrich Jerky Stick, 1 oz</li>\r\n  <li>Alligator Jerky Stick, 1 oz</li>\r\n  </ul>\r\n<p>\r\n  <p>\r\n    <p>\r\n<p><i>*Products may contain beef.</i></p>",
+      "LongDescription": "<h4>The Feast of Beast</h4> <p>We've already compiled the pinnacle selection of meat samplers from three\r\n   continents in the <a href=\"https://www.mancrates.com/jerkygrams/exotic\">Exotic Meats Jerkygram</a>, and we\r\n   didn't want to reinvent the wheel. No, we wanted to snag three more wheels, toss 'em in a Lambo,\r\n   and burn victory lap donuts in the parking lot of every non-exotic meat factory in the land.\r\n</p> <h5>The More, The Meatier</h5> <p>The Exotic Meats Man Crate has so much deluxe animal poundage that we could\r\n   legally register it as an official safari park. We're talking enough spiced ostrich, alligator, duck,\r\n   pheasant, buffalo, elk, venison, and boar meat to make El Chupacabra wave his claws in surrender,\r\n   screaming, \"No mas, no mas!\"\r\n</p> <p>And this premium meat parade will fly first class to your doorstep in a sturdy wooden Man Crate.</p> <h5>The Most Interesting Meat in the World</h5> <p>We've also expanded the curation process to include Biltong, South Africa's treasured method of preserving\r\n   delicious meats. This thin-cut beef treat is the Meat Supreme in the dried\r\n   animal kingdom, and it literally means \"rump tongue\" in Dutch. Drop that knowledge bomb on your friends and\r\n   they'll swoon over your intelligence. Swoon, we say!\r\n</p> <p>Select this Feast of Beast and prepare to sample the safari!</p>",
+      "Name": "Exotic Meats Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/368/large/emc-exotic-meat-crate-awesome-gift-for-men__35920.jpg?1502411028",
+      "TERRAINRANK": 6
+    },
+    {
+      "SKU": "KTPR-0013-CHK",
+      "VariantName": "Chef Knife Making Kit",
+      "Price": 179.99,
+      "ProductId": 102,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/chef-knife-making-kit",
+      "Contents": "<h4>Blade Buddies</h4> <ul>\n  <li>VG-10 Damascus Chef Knife Blade Blank (Blade Length: 8.5\")</li>\n  <li>Black/Red Micarta Handle Scale Set</li>\n  <li>Mosaic Pins</li>\n</ul> <h4>Shape, Sand, and Finish</h4> <ul>\n  <li>Man Crates Chef Knife Making Guide</li>\n  <li>2-Ton Syringe Epoxy</li>\n  <li>Rasp &amp; File set</li>\n  <li>Graded Sandpaper Set</li>\n  <li>Bench Vise</li>\n  <li>Drill Bit</li>\n</ul>",
+      "LongDescription": "<h4>The Cutting Edge</h4> <p>In a world boasting \"Seen on TV\" Slice n' Dice Machines, Wombo Combo Fruit Juicers, and self\n   sharpening spatulas, it can be tough to know which kitchen utensils are grade A\n   and which are woefully undercooked.\n</p> <p>But anyone who's seen MacGyver knows the only tools worth trusting are the ones built by hand —sometimes\n   two trembling hands dangling from a cliff or trapped in an elevator with a timebomb.\n</p> <p>And while most of us ditched our mullets by the late 90s, the wisdom still holds true.\n   The Chef Knife Making Kit proves that if you want something made right, meals included,\n   you've got to make it yourself.\n</p> <h4>Knife to Meet You</h4> <p>While MacGyver made do with coat hangers and chewing gum, the Chef Knife Making Kit opts for sharper,\n   more dependable materials. Forged of VG-10 Damascus steel, the mere sight of this\n   blade will cause a steak to carve itself out of fear.\n</p> <p>The stylish Micarta handles are ready to be sculpted into personalized, palm-gripping perfection. The\n   finished product will be as intricately layered as a fennel avocado bean dip, and\n   every bit as distinctive as the chef who made it.\n</p> <h4>All Ingredients Included</h4> <p>The kit comes stuffed with various rasps and files, a portable bench vise, and\n   enough sandpaper to take the green off a watermelon. It's also a great excuse to\n   dust off the ol' power tools hanging in the garage. And with our step-by-step instruction\n   booklet, crafting this knife will be as effortless as cooking with it.\n</p> <p>The Chef Knife Making Kit is just what the modern day Michelangelo of meat needs to\n   carve up the next five-star entree.\n</p>",
+      "Name": "Chef Knife Making Kit",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/766/large/ckmk-chef-knife-making-kit-great-components-damascus__98473.jpg?1502411183",
+      "TERRAINRANK": 7
+    },
+    {
+      "SKU": "KTCR-0077-STK",
+      "VariantName": "Steaks on a Plate Crate",
+      "Price": 99.99,
+      "ProductId": 231,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/steaks-on-a-plate-crate",
+      "Contents": "<ul>\r\n  <li>Crate</li>\r\n  <li>Crowbar</li>\r\n  <li>Jacobsen Salt Co., Tellecherry Peppercorn in Grinder, 2.1 oz</li>\r\n  <li>Jacobsen Salt Co., Steak Seasoning Salt, 5.6 oz</li>\r\n  <li>6 Steak Knives with Rosewood Handles</li>\r\n  <li>Steak Station Digital Thermometer</li>\r\n  <li>4 Stainless Steel Potato People</li>\r\n \r\n</ul>",
+      "LongDescription": "<h4>Shhh...Do You Hear That?</h4>\r\n\r\n  <p>It’s the sound of several sizzling sssteaksss on the grill. For the avid barbecuer, guiding each perfectly charred Grade-A cut from grate to plate isn't just your typical meal preparation. It's a nonstop thrill ride from the moment the burners flare.</p>\r\n  <p>The Steaks on a Plate Crate will enhance his culinary craftsmanship, whether he's harnessing the heat at the grill or in the dining room on the edge of his seat. From digital meat thermometers to a steak knife set that's literally cutting edge, he'll be well-equipped to expertly gauge doneness and precisely slice his seasoned sirloin.</p>\r\n  <p>Once aboard this flight of flavor, he’ll never get tired of these supperloving steaks on these supperloving plates.</p>\r\n\r\n<h4>Elevating the Steaks</h4>\r\n  <ul>\r\n\t<li>When we handpicked cutlery, only the set of six forged stainless steel Curtis Lloyd steak knives made the cut. They give diners a nice, clean slice with no tearing.</li>\r\n\t<li>He’ll corral up to four pesky strips at once with the Charcoal Companion Steak Station, which has a digital display to ensure perfect meat preparation.</li>\r\n\t<li>The Classic Steak Seasoning and Tellicherry Peppercorn from Portland's Jacobsen Salt will give his filets and T-bones a quick strike of savoriness.</li>\r\n\t<li>The set of four tater-tilting Potato People will have his back to help save potatoes from scorchy peril. Stainless steel and dishwasher safe, these stands help cook his spuds without searing the skin.</li>\r\n  </ul>",
+      "Name": "Steaks on a Plate Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/842/large/MBC_MC_2018-4_Steak-1_WEB-EDIT_V1ja.jpg?1528236041",
+      "TERRAINRANK": 8
+    },
+    {
+      "SKU": "KTAM-0001-COF",
+      "VariantName": "Coffee Ammo Can",
+      "Price": 59.99,
+      "ProductId": 4,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/coffee-ammo-can",
+      "Contents": "<h4>Battleworthy Brews</h4> <ul>\r\n  <li>12oz Alpha Warrior Select Coffee</li>\r\n  <li>2 Full-Pot Packages</li>\r\n  <ul>\r\n    <li>Double Barrel Black - dark roast</li>\r\n    <li>Smooth Operator - light roast</li>\r\n  </ul>\r\n</ul> <h4>Hearty Rations</h4> <ul>\r\n  <li>Clif Bar</li>\r\n  <li>Kind Bar, Fruit &amp; Nut</li>\r\n  <li>Stainless Steel Carabiner Mug</li>\r\n</ul>",
+      "LongDescription": "<h4>Fuel for the Front Lines</h4> <p>The modern professional environment is chock-full of hazard. It pays to be alert out\r\n   there. One misfired 'reply-all' can quickly escalate friendly email banter into a full-on legal battle.\r\n</p> <p>Don't be that guy. Be the guy that <span class=\"highlight\">hits the ground running</span> every morning\r\n   and handles your freakin' business.\r\n</p> <h4>Weekday Warriors</h4> <p>We've partnered with the veterans at <span class=\"highlight\">Alpha  Coffee</span>- battle hardended guys\r\n   that wage full scale war on sluggish Monday mornings, post-lunch food comas, and every other droopy-eyed\r\n   productivity gap that threatens the success of your mission. This canister ships with 12 oz of their\r\n   pre-ground, Warrior Select coffee. Combat tested and warrior selected, this is a delicious blend\r\n   of the best highland arabica beans available, with superior flavor that is winning hearts and minds all\r\n   over the world.\r\n</p> <p>Also includes two full-pot sample packs of LockNLoad's popular Double Barrel Black - dark roast and Smooth\r\n   Operator - light roast.\r\n</p> <h4>Operation Invincible Freshness</h4> <p>When freshness is the imperative you've got to go with a tried and true container. We ship these grinds in\r\n   a genuine <span class=\"highlight\">.30 cal NATO spec ammo case</span>- watertight, rock-solid,\r\n   and not available at your local mermaid-themed coffee shop. For the true warrior experience we recommend\r\n   enjoying your morning jolt from the lightweight, stainless steel carabiner mug.\r\n</p> <p>You've been briefed. Secure your supplies and get it done.</p>",
+      "Name": "Coffee Ammo Can",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/353/large/cac-coffee-ammo-can-great-coffee-gift-for-guys-on-the-go__49356.jpg?1502411023",
+      "TERRAINRANK": 9
+    },
+    {
+      "SKU": "KTAM-0008-BRR",
+      "VariantName": "Breakfast Rations Ammo Can",
+      "Price": 54.99,
+      "ProductId": 229,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/breakfast-rations-ammo-can",
+      "Contents": "<li>Ammo Can</li>\r\n<li>Callie's Buttermilk Biscuit Mix, 13 oz</li>\r\n<li>Callie's Grits, 1 lb</li>\r\n<li>Mike's Hot Honey, 12 oz</li>\r\n</ul>",
+      "LongDescription": "<h4>Battle of the Indulge</h4>\r\n\r\n<p>The troops have been roused at 0700 hours. A meager breakfast has been prepped, and he’s managed to get dressed for his board meeting in clothes that may or may not be inside out.</p>\r\n\r\n<p>Every day is a battle, and those last-minute, sugary cereals aren’t going to help him survive those boardroom bombshells. Make sure he nourishes himself properly with these artisan biscuits and grits. And if he needs that extra kick, spice things up with Brooklyn-based Mike’s Hot Honey.</p>\r\n\r\n<p>It takes more than a pocket protector to dodge that spreadsheet shrapnel. Help him stay energized all day with the Man Crates Breakfast Rations Ammo Can. \r\n</p>\r\n\r\n<h4>Food Facts</h4>\r\n<li>Callie’s Buttermilk Biscuit Mix is made by hand in the American South. Because if you want something done right...</li>\r\n<li>Callie’s Grits are stone ground on machines older than the workers using them.</li>\r\n<li>When not yelling at taxi drivers, New York bees are busy making Mike’s Hot Honey. A sweet and spicy, chili pepper-infused wildflower honey made in New York apiaries.</li>\r\n<li>These rations come shipped in an air-tight, waterproof, and explosion-proof ammo can. We take breakfast seriously.\r\n</li>\r\n</ul>",
+      "Name": "Breakfast Rations Ammo Can",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/828/large/MBC_MC_2018-4_Biscuit-Making_WEB-2160.jpg?1526331841",
+      "TERRAINRANK": 10
+    }
+  ],
+  "template": {
+    "id": 32,
+    "lastModified": "2018-07-24T19:30:55.348Z",
+    "createdAt": "2018-07-10T20:18:10.030Z",
+    "archived": false,
+    "templateName": "Cooking - Iterable Export",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "SKU"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "VariantName"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "Price"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "Inventory"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "VariantStatus"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "ProductId"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "VariantId"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "Path"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "CanonicalUrl"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "ContentsHTML"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "LongDescription"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "Contents"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "12",
+                  "value": {
+                    "id": 12,
+                    "fields": [
+                      [
+                        "LongDescriptionHTML"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "13",
+                  "value": {
+                    "id": 13,
+                    "fields": [
+                      [
+                        "Name"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "14",
+                  "value": {
+                    "id": 14,
+                    "fields": [
+                      [
+                        "ConversionRate"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "15",
+                  "value": {
+                    "id": 15,
+                    "fields": [
+                      [
+                        "UniquePurchases"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "16",
+                  "value": {
+                    "id": 16,
+                    "fields": [
+                      [
+                        "ProductRevenue"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "17",
+                  "value": {
+                    "id": 17,
+                    "fields": [
+                      [
+                        "Quantity"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "18",
+                  "value": {
+                    "id": 18,
+                    "fields": [
+                      [
+                        "AveragePrice"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "19",
+                  "value": {
+                    "id": 19,
+                    "fields": [
+                      [
+                        "ImageLink"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "20",
+                  "value": {
+                    "id": 20,
+                    "fields": [
+                      [
+                        "Margin"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "21",
+                  "value": {
+                    "id": 21,
+                    "fields": [
+                      [
+                        "TERRAINRANK"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "22",
+                  "value": {
+                    "id": 22,
+                    "fields": [
+                      [
+                        "CanonicalUrl"
+                      ]
+                    ],
+                    "meta": {
+                      "value": "https://",
+                      "at": 0
+                    },
+                    "skipNulls": true,
+                    "typeCode": "InsertNode",
+                    "acceptedType": "string"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 22,
+            "uidNode": 23,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "Path"
+                ],
+                7
+              ],
+              [
+                [
+                  "Price"
+                ],
+                2
+              ],
+              [
+                [
+                  "Name"
+                ],
+                13
+              ],
+              [
+                [
+                  "LongDescriptionHTML"
+                ],
+                12
+              ],
+              [
+                [
+                  "VariantId"
+                ],
+                6
+              ],
+              [
+                [
+                  "LongDescription"
+                ],
+                10
+              ],
+              [
+                [
+                  "ProductRevenue"
+                ],
+                16
+              ],
+              [
+                [
+                  "ConversionRate"
+                ],
+                14
+              ],
+              [
+                [
+                  "Margin"
+                ],
+                20
+              ],
+              [
+                [
+                  "TERRAINRANK"
+                ],
+                21
+              ],
+              [
+                [
+                  "UniquePurchases"
+                ],
+                15
+              ],
+              [
+                [
+                  "ProductId"
+                ],
+                5
+              ],
+              [
+                [
+                  "SKU"
+                ],
+                0
+              ],
+              [
+                [
+                  "VariantStatus"
+                ],
+                4
+              ],
+              [
+                [
+                  "ContentsHTML"
+                ],
+                9
+              ],
+              [
+                [
+                  "CanonicalUrl"
+                ],
+                8
+              ],
+              [
+                [
+                  "ImageLink"
+                ],
+                19
+              ],
+              [
+                [
+                  "VariantName"
+                ],
+                1
+              ],
+              [
+                [
+                  "Quantity"
+                ],
+                17
+              ],
+              [
+                [
+                  "Contents"
+                ],
+                11
+              ],
+              [
+                [
+                  "AveragePrice"
+                ],
+                18
+              ],
+              [
+                [
+                  "Inventory"
+                ],
+                3
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "SKU"
+                ]
+              ],
+              [
+                1,
+                [
+                  "VariantName"
+                ]
+              ],
+              [
+                2,
+                [
+                  "Price"
+                ]
+              ],
+              [
+                3,
+                [
+                  "Inventory"
+                ]
+              ],
+              [
+                4,
+                [
+                  "VariantStatus"
+                ]
+              ],
+              [
+                5,
+                [
+                  "ProductId"
+                ]
+              ],
+              [
+                6,
+                [
+                  "VariantId"
+                ]
+              ],
+              [
+                7,
+                [
+                  "Path"
+                ]
+              ],
+              [
+                8,
+                [
+                  "CanonicalUrl"
+                ]
+              ],
+              [
+                9,
+                [
+                  "Contents"
+                ]
+              ],
+              [
+                10,
+                [
+                  "LongDescription2"
+                ]
+              ],
+              [
+                11,
+                [
+                  "Contents2"
+                ]
+              ],
+              [
+                12,
+                [
+                  "LongDescription"
+                ]
+              ],
+              [
+                13,
+                [
+                  "Name"
+                ]
+              ],
+              [
+                14,
+                [
+                  "ConversionRate"
+                ]
+              ],
+              [
+                15,
+                [
+                  "UniquePurchases"
+                ]
+              ],
+              [
+                16,
+                [
+                  "ProductRevenue"
+                ]
+              ],
+              [
+                17,
+                [
+                  "Quantity"
+                ]
+              ],
+              [
+                18,
+                [
+                  "AveragePrice"
+                ]
+              ],
+              [
+                19,
+                [
+                  "ImageLink"
+                ]
+              ],
+              [
+                20,
+                [
+                  "Margin"
+                ]
+              ],
+              [
+                21,
+                [
+                  "TERRAINRANK"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "string"
+              ],
+              [
+                2,
+                "number"
+              ],
+              [
+                3,
+                "number"
+              ],
+              [
+                4,
+                "string"
+              ],
+              [
+                5,
+                "number"
+              ],
+              [
+                6,
+                "number"
+              ],
+              [
+                7,
+                "string"
+              ],
+              [
+                8,
+                "string"
+              ],
+              [
+                9,
+                "string"
+              ],
+              [
+                10,
+                "string"
+              ],
+              [
+                11,
+                "string"
+              ],
+              [
+                12,
+                "string"
+              ],
+              [
+                13,
+                "string"
+              ],
+              [
+                14,
+                "number"
+              ],
+              [
+                15,
+                "number"
+              ],
+              [
+                16,
+                "number"
+              ],
+              [
+                17,
+                "number"
+              ],
+              [
+                18,
+                "number"
+              ],
+              [
+                19,
+                "string"
+              ],
+              [
+                20,
+                "number"
+              ],
+              [
+                21,
+                "number"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                true
+              ],
+              [
+                3,
+                false
+              ],
+              [
+                4,
+                false
+              ],
+              [
+                5,
+                true
+              ],
+              [
+                6,
+                false
+              ],
+              [
+                7,
+                false
+              ],
+              [
+                8,
+                true
+              ],
+              [
+                9,
+                true
+              ],
+              [
+                10,
+                false
+              ],
+              [
+                11,
+                false
+              ],
+              [
+                12,
+                true
+              ],
+              [
+                13,
+                true
+              ],
+              [
+                14,
+                false
+              ],
+              [
+                15,
+                false
+              ],
+              [
+                16,
+                false
+              ],
+              [
+                17,
+                false
+              ],
+              [
+                18,
+                false
+              ],
+              [
+                19,
+                true
+              ],
+              [
+                20,
+                false
+              ],
+              [
+                21,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                8,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                9,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                10,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                11,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                12,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                13,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                14,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                15,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                16,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                17,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                18,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                19,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                20,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                21,
+                {
+                  "etlType": "Integer"
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Algorithm",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "algorithmId": 29
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Fs",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": "Products.*",
+          "fieldOrdering": [
+            "SKU",
+            "VariantName",
+            "Price",
+            "ProductId",
+            "CanonicalUrl",
+            "Contents",
+            "LongDescription",
+            "Name",
+            "ImageLink",
+            "TERRAINRANK"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {},
+        "integrationId": 15,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ]
+        }
+      }
+    }
+  }
+}

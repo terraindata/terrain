@@ -45,11 +45,18 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
+
+const { List, Map } = Immutable;
+
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath } from 'shared/util/KeyPath';
 
 import SimpleTransformationType from 'shared/transformations/types/SimpleTransformationType';
 
@@ -87,11 +94,9 @@ class SetIfTransformationInfoC extends TransformationNodeInfo
   public editable = true;
   public creatable = true;
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    const type = EngineUtil.getRepresentedType(fieldId, engine);
-    return type === 'number' || type === 'string' || type === 'boolean';
-  }
+  protected availInfo = {
+    allowedTypes: [FieldTypes.Number, FieldTypes.Integer, FieldTypes.String],
+  };
 }
 
 export const SetIfTransformationInfo = new SetIfTransformationInfoC();

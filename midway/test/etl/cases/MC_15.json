@@ -1,0 +1,1488 @@
+{
+  "testName": "MC_015",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "SKU": "KTCR-0017-EXO",
+      "VariantName": "Exotic Meats Crate",
+      "Price": 69.99,
+      "Inventory": 1579,
+      "VariantStatus": "sellable",
+      "ProductId": 7,
+      "VariantId": 7,
+      "Path": "exotic-meats-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/exotic-meats-crate",
+      "ContentsHTML": "<h4>Cured &amp; Cultured</h4> <ul>\r\n  <li>Venison Jerky, 2oz</li>\r\n  <li>Wild Boar Jerky, 2oz</li>\r\n  <li>Biltong Beef Jerky, 4oz</li>\r\n  <li>Elk Jerky, 2oz</li>\r\n  <li>Buffalo Jerky, 3oz</li>\r\n  <li>Alligator Jerky, 2oz</li>\r\n</ul> <h4>Safari Sticks</h4> <ul>\r\n  <li>Pheasant Jerky Stick, 1 oz</li>\r\n  <li>Maple Duck Jerky Stick, 1 oz</li>\r\n  <li>Ostrich Jerky Stick, 1 oz</li>\r\n  <li>Alligator Jerky Stick, 1 oz</li>\r\n  </ul>\r\n<p>\r\n  <p>\r\n    <p>\r\n<p><i>*Products may contain beef.</i></p>",
+      "LongDescription": "The Feast of Beast We've already compiled the pinnacle selection of meat samplers from three\r\n   continents in the Exotic Meats Jerkygram, and we\r\n   didn't want to reinvent the wheel. No, we wanted to snag three more wheels, toss 'em in a Lambo,\r\n   and burn victory lap donuts in the parking lot of every non-exotic meat factory in the land.\r\n The More, The Meatier The Exotic Meats Man Crate has so much deluxe animal poundage that we could\r\n   legally register it as an official safari park. We're talking enough spiced ostrich, alligator, duck,\r\n   pheasant, buffalo, elk, venison, and boar meat to make El Chupacabra wave his claws in surrender,\r\n   screaming, \"No mas, no mas!\"\r\n And this premium meat parade will fly first class to your doorstep in a sturdy wooden Man Crate. The Most Interesting Meat in the World We've also expanded the curation process to include Biltong, South Africa's treasured method of preserving\r\n   delicious meats. This thin-cut beef treat is the Meat Supreme in the dried\r\n   animal kingdom, and it literally means \"rump tongue\" in Dutch. Drop that knowledge bomb on your friends and\r\n   they'll swoon over your intelligence. Swoon, we say!\r\n Select this Feast of Beast and prepare to sample the safari!",
+      "Contents": "Cured &amp; Cultured \r\n  Venison Jerky, 2oz\r\n  Wild Boar Jerky, 2oz\r\n  Biltong Beef Jerky, 4oz\r\n  Elk Jerky, 2oz\r\n  Buffalo Jerky, 3oz\r\n  Alligator Jerky, 2oz\r\n Safari Sticks \r\n  Pheasant Jerky Stick, 1 oz\r\n  Maple Duck Jerky Stick, 1 oz\r\n  Ostrich Jerky Stick, 1 oz\r\n  Alligator Jerky Stick, 1 oz\r\n  \r\n\r\n  \r\n    \r\n*Products may contain beef.",
+      "LongDescriptionHTML": "<h4>The Feast of Beast</h4> <p>We've already compiled the pinnacle selection of meat samplers from three\r\n   continents in the <a href=\"https://www.mancrates.com/jerkygrams/exotic\">Exotic Meats Jerkygram</a>, and we\r\n   didn't want to reinvent the wheel. No, we wanted to snag three more wheels, toss 'em in a Lambo,\r\n   and burn victory lap donuts in the parking lot of every non-exotic meat factory in the land.\r\n</p> <h5>The More, The Meatier</h5> <p>The Exotic Meats Man Crate has so much deluxe animal poundage that we could\r\n   legally register it as an official safari park. We're talking enough spiced ostrich, alligator, duck,\r\n   pheasant, buffalo, elk, venison, and boar meat to make El Chupacabra wave his claws in surrender,\r\n   screaming, \"No mas, no mas!\"\r\n</p> <p>And this premium meat parade will fly first class to your doorstep in a sturdy wooden Man Crate.</p> <h5>The Most Interesting Meat in the World</h5> <p>We've also expanded the curation process to include Biltong, South Africa's treasured method of preserving\r\n   delicious meats. This thin-cut beef treat is the Meat Supreme in the dried\r\n   animal kingdom, and it literally means \"rump tongue\" in Dutch. Drop that knowledge bomb on your friends and\r\n   they'll swoon over your intelligence. Swoon, we say!\r\n</p> <p>Select this Feast of Beast and prepare to sample the safari!</p>",
+      "Name": "Exotic Meats Crate",
+      "ConversionRate": 5.401585448288576,
+      "UniquePurchases": 879,
+      "ProductRevenue": 67341.21,
+      "Quantity": 879,
+      "AveragePrice": 76.61116040955632,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/368/large/emc-exotic-meat-crate-awesome-gift-for-men__35920.jpg?1502411028",
+      "Margin": 57.42,
+      "TerrainScore": 0.7180109244013174,
+      "TERRAINRANK": 1
+    },
+    {
+      "SKU": "KTCR-0001-BAC",
+      "VariantName": "The Bacon Crate",
+      "Price": 59.99,
+      "Inventory": 1185,
+      "VariantStatus": "sellable",
+      "ProductId": 5,
+      "VariantId": 5,
+      "Path": "bacon-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/bacon-crate",
+      "ContentsHTML": "<h4>Real Bacon</h4> <ul>\r\n  <li>Jeff's Jerky Honey Jalapeno Bacon, 2 oz</li>\r\n  <li>Jeff's Jerky Maple Bacon, 2 oz</li>\r\n</ul> <h4>Pork Euphoria</h4> <ul>\r\n  <li>Bacon Popcorn</li>\r\n  <li>Bourbon Bacon Seasoning Grinder, 3.7 oz</li>\r\n  <li>Sir Francis Bacon Peanut Brittle, 3 oz</li>\r\n  <li>Terrapin Ridge Farms Hot Pepper Bacon Jam, 11 oz</li>\r\n</ul>",
+      "LongDescription": "We Love You, Bacon \"Love\" is a strong word that's sometimes hard for men to say. Entangling, complicated emotional loops in our male brains can choke us up when we're trying to form that simple syllable, unless the next word is \"Bacon\". \r\nThere is no easier, more joyous pronouncement for us to make than to declare, unequivocally, that we love bacon.\r\n 50 Shades of Bacon We're not ashamed to say our love is untraditional. We love bacon in ways your parents might not approve of. We use bacon in ways that might not have crossed your mind. If you share our passion, then let this crate open your mind to seven new ways to express your love. \r\nStart with Jeff's Famous Bacon Jerky. Ready to have your mind blown? What if we told you bacon doesn't have to just be a staple at breakfast and on your sandwich? Bacon can be a portable, dangerously habit forming companion at your finger tips, 24/7. You might start hoarding and stashing. You might tape packs of Bacon Jerky below the conference room table, sew pockets into the inner lining of your long johns, and fill the side panels of your car with bacon jerky in case you ever break down. \r\nJust Add Bacon You can get your bacon fix from the bacon flavored snacks. This flavoring is the culinary equivalent of getting a tender, pen-written love letter on artisanal bacon-scented paper. Temporarily separated by space and time, carry this and bacon is with you, wherever you are. \r\nSurprise! It's Bacon \r\nBacon has always made straight A's for 'plays nicely with others.' We've gathered an assortment of awesome bacon-enhanced snacks from the obvious popcorn flavors to the exotic Sir Fancis Bacon Peanut Brittle. Want a deliciously twisted night in? Grab a bowl of bacon popcorn and put on Charlotte's Web. Want to impress your date with something better than chocolates? Sir Francis Bacon Peanut Brittle. If it doesn't work they're probably not a keeper. \r\nShare our love, don't judge us.",
+      "Contents": "Real Bacon \r\n  Jeff's Jerky Honey Jalapeno Bacon, 2 oz\r\n  Jeff's Jerky Maple Bacon, 2 oz\r\n Pork Euphoria \r\n  Bacon Popcorn\r\n  Bourbon Bacon Seasoning Grinder, 3.7 oz\r\n  Sir Francis Bacon Peanut Brittle, 3 oz\r\n  Terrapin Ridge Farms Hot Pepper Bacon Jam, 11 oz\r\n",
+      "LongDescriptionHTML": "<h4>We Love You, Bacon</h4> <p>\"Love\" is a strong word that's sometimes hard for men to say. Entangling, complicated emotional loops in our male brains can choke us up when we're trying to form that simple syllable, unless the next word is \"Bacon\".</p> \r\n<p>There is no easier, more joyous pronouncement for us to make than to declare, unequivocally, that we love bacon.\r\n</p> <h4>50 Shades of Bacon</h4> <p>We're not ashamed to say our love is untraditional. We love bacon in ways your parents might not approve of. We use bacon in ways that might not have crossed your mind. If you share our passion, then let this crate open your mind to seven new ways to express your love.</p> \r\n<p>Start with Jeff's Famous Bacon Jerky. Ready to have your mind blown? What if we told you bacon doesn't have to just be a staple at breakfast and on your sandwich? Bacon can be a portable, dangerously habit forming companion at your finger tips, 24/7. You might start hoarding and stashing. You might tape packs of Bacon Jerky below the conference room table, sew pockets into the inner lining of your long johns, and fill the side panels of your car with bacon jerky in case you ever break down.</p> \r\n<h4>Just Add Bacon</h4> <p>You can get your bacon fix from the bacon flavored snacks. This flavoring is the culinary equivalent of getting a tender, pen-written love letter on artisanal bacon-scented paper. Temporarily separated by space and time, carry this and bacon is with you, wherever you are.</p> \r\n<h4>Surprise! It's Bacon</h4> \r\n<p>Bacon has always made straight A's for 'plays nicely with others.' We've gathered an assortment of awesome bacon-enhanced snacks from the obvious popcorn flavors to the exotic Sir Fancis Bacon Peanut Brittle. Want a deliciously twisted night in? Grab a bowl of bacon popcorn and put on Charlotte's Web. Want to impress your date with something better than chocolates? Sir Francis Bacon Peanut Brittle. If it doesn't work they're probably not a keeper.</p> \r\n<p>Share our love, don't judge us.</p>",
+      "Name": "The Bacon Crate",
+      "ConversionRate": 8.26785104202255,
+      "UniquePurchases": 484,
+      "ProductRevenue": 29035.16,
+      "Quantity": 484,
+      "AveragePrice": 59.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/001/818/large/bc_bacon_popcorn_and_brittle-terrapin-ridge-farms-hot-pepper-jam-seasoning-grinder-jerky_guy_gifts.jpg?1505320326",
+      "Margin": 58.36,
+      "TerrainScore": 0.52111430882525,
+      "TERRAINRANK": 2
+    },
+    {
+      "SKU": "KTCR-0037-WHA",
+      "VariantName": "Whiskey Appreciation Crate",
+      "Price": 159.99,
+      "Inventory": 1021,
+      "VariantStatus": "sellable",
+      "ProductId": 137,
+      "VariantId": 263,
+      "Path": "whiskey-appreciation-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/whiskey-appreciation-crate",
+      "ContentsHTML": "<h4>Distinguished Gear</h4> <ul>\r\n  <li>Personalized Whiskey Decanter <br>(hand-made, may contain minor imperfections)</li>\r\n  <li>2 Personalized Heavy Bottom Rocks Glasses, 9 oz</li>\r\n  <li>2 Ice Sphere Molds</li>\r\n  <li>2 Slate Coasters</li>\r\n  <li>Whiskey Drinking Journal</li>\r\n</ul> <h4>Luxury Grub</h4> <ul>\r\n  <li>Spiced Peppercorn Peanuts</li>\r\n  <li>Salted Pistachios</li>\r\n  <li>Cranberry Pecans</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours to process.</i></p>",
+      "LongDescription": "An Executive Appreciation In 1797, George Washington, the Michael Jordan of being American, declined the free\r\n   world's greatest honor, a Presidential term three-peat, in order to build a whiskey\r\n   distillery in his basement. The Revolutionary War MVP and celebrity endorser of\r\n   the one dollar bill knew that no amount of prestige or accomplishments could rival\r\n   the warm satisfaction of a good glass of whiskey.\r\n In days past, a man's fondness for whiskey was admirably brandished in full home bars, but in modern times,\r\n   whiskey is hidden out of sight in cabinets and desk drawers like shameful secrets. The Whiskey Appreciation\r\n   Crate is here to restore honor to the once great bond between a man and his drink.\r\n Oh, yes we de-can! Etching your initials into a glass decanter is a public declaration of your affinity for whiskey.\r\n   It's like donning a trenchcoat and holding a boombox overhead blasting Peter Gabriel's\r\n   \"In Your Eyes\" outside of whiskey's house or barging past the TSA checkpoint to frantically\r\n   sprint through the airport terminal for a last second  whiskey\r\n   before boarding your plane.\r\n While the monogrammed decanter looks super classy when flanked by its matching pair of personalized\r\n   rocks tumblers, whiskey should be appraised by taste as well as  presentation. The decanter properly\r\n   aerates and settles your whiskey so you can settle down with a glass of good company anytime.\r\n Good Company Rounding out the Whiskey Appreciation Crate is the ultimate whiskey connoisseur collection: A pair of\r\n   Tovolo Ice Molds and slate coasters, a pocket-sized whiskey tasting journal, and the most important whiskey\r\n   accessory, premium savory snacks.\r\n Box up those dusty sports trophies and find a stud to hang your awkward family portraits, because the\r\n   Personalized Whiskey Decanter is reclaiming whiskey's proper place atop your mantel.\r\n",
+      "Contents": "Distinguished Gear \r\n  Personalized Whiskey Decanter (hand-made, may contain minor imperfections)\r\n  2 Personalized Heavy Bottom Rocks Glasses, 9 oz\r\n  2 Ice Sphere Molds\r\n  2 Slate Coasters\r\n  Whiskey Drinking Journal\r\n Luxury Grub \r\n  Spiced Peppercorn Peanuts\r\n  Salted Pistachios\r\n  Cranberry Pecans\r\n\r\nNOTE: Personalized items require 48 hours to process.",
+      "LongDescriptionHTML": "<h4>An Executive Appreciation</h4> <p>In 1797, George Washington, the Michael Jordan of being American, declined the free\r\n   world's greatest honor, a Presidential term three-peat, in order to build a whiskey\r\n   distillery in his basement. The Revolutionary War MVP and celebrity endorser of\r\n   the one dollar bill knew that no amount of prestige or accomplishments could rival\r\n   the warm satisfaction of a good glass of whiskey.\r\n</p> <p>In days past, a man's fondness for whiskey was admirably brandished in full home bars, but in modern times,\r\n   whiskey is hidden out of sight in cabinets and desk drawers like shameful secrets. The Whiskey Appreciation\r\n   Crate is here to restore honor to the once great bond between a man and his drink.\r\n</p> <h4>Oh, yes we de-can!</h4> <p>Etching your initials into a glass decanter is a public declaration of your affinity for whiskey.\r\n   It's like donning a trenchcoat and holding a boombox overhead blasting Peter Gabriel's\r\n   \"In Your Eyes\" outside of whiskey's house or barging past the TSA checkpoint to frantically\r\n   sprint through the airport terminal for a last second  whiskey\r\n   before boarding your plane.\r\n</p> <p>While the monogrammed decanter looks super classy when flanked by its matching pair of personalized\r\n   rocks tumblers, whiskey should be appraised by taste as well as  presentation. The decanter properly\r\n   aerates and settles your whiskey so you can settle down with a glass of good company anytime.\r\n</p> <h4>Good Company</h4> <p>Rounding out the Whiskey Appreciation Crate is the ultimate whiskey connoisseur collection: A pair of\r\n   Tovolo Ice Molds and slate coasters, a pocket-sized whiskey tasting journal, and the most important whiskey\r\n   accessory, premium savory snacks.\r\n</p> <p>Box up those dusty sports trophies and find a stud to hang your awkward family portraits, because the\r\n   Personalized Whiskey Decanter is reclaiming whiskey's proper place atop your mantel.\r\n</p>",
+      "Name": "Personalized Whiskey Appreciation Crate",
+      "ConversionRate": 2.988691437802908,
+      "UniquePurchases": 222,
+      "ProductRevenue": 35517.78,
+      "Quantity": 222,
+      "AveragePrice": 159.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/001/898/large/wa_engraved_whiskey_gift_collection_for_bold_men__89003.1479337561.1280.1280_copy.jpg?1505426047",
+      "Margin": 70.18,
+      "TerrainScore": 0.47215705737397473,
+      "TERRAINRANK": 3
+    },
+    {
+      "SKU": "KTCR-0003-GRI",
+      "VariantName": "Grill Master Crate",
+      "Price": 99.99,
+      "Inventory": 1014,
+      "VariantStatus": "sellable",
+      "ProductId": 14,
+      "VariantId": 14,
+      "Path": "grill-master-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/grill-master-crate",
+      "ContentsHTML": "<h4>Grilling Gadgetry</h4> <ul>\r\n  <li>Brass-knuckle Meat Tenderizer</li>\r\n  <li>Cast Iron Smoker Box</li>\r\n  <li>Set of 4 Steak Thermometers</li>\r\n  <li>Dried Hickory Wood Chips</li>\r\n</ul> <h4>Zesty Downpour</h4> <ul>\r\n  <li>Original BBQ Sauce</li>\r\n  <li>Carolina Bold BBQ Sauce</li>\r\n  <li>Premium Spice Blend</li>\r\n</ul>",
+      "LongDescription": "The Right Tools for the Job There's a line that separates the amateurs from the professionals. It's certainly\r\n   in the training and the experience, but folks often forget about the importance\r\n   of your equipment. Just like you can't win a NASCAR Cup in your grocery-getter,\r\n   can't crush a golf ball into orbit without a high-end driver, and aren't going\r\n   to take a trophy buck without a zeroed-in tack-driver, your grilling game will never\r\n   go next level without the right gear. You gotta have the right tools for the job.\r\n Like a Grill-ionaire Fortunately, you don't need to shell out a mountain of cash to get the equipment you need to get you to\r\n   grilling nirvana. We've included some of the best accessories that every man needs to get that Grillionaire\r\n   status.\r\n Our Grill Master Man Crate includes a cast-iron smoker\r\n  box and some hickory wood chips to get you started. Set the smoker box on\r\n   the grill as it warms up, soak the hickory in some water, and drop 'em into the\r\n   box as your meat grills. Take note, men: real flavor shouldn't come from a bottled\r\n   labeled \"liquid smoke.\"\r\n We threw in a set of four  steak thermometers, too. You may say, \"hey, Team\r\n   Man Crates, isn't that cheating?\" And we say, \"nay.\" There's no dishonor in knowing how done your steak\r\n   is. And when you cut into a perfectly-cooked slab of beef, you too shall understand that G.I. Joe wasn't\r\n   kidding when he said that Knowing Is Half the Battle.\r\n And because \"the right tool for every job\" means that sometimes you'll require some brute force, we've\r\n   included a brass-knuckle meat tenderizer. Nothing blows off the steam from a\r\n   long, hard day at work like beating your meat into submission.\r\n Bone Doctors We search tirelessly, every day, to find the best-in-class goods to put in our crates. Hundreds of sauces\r\n   came and went, the grills burned for weeks, until finally a victor emerged. An unexpected dark\r\n   horse, a little-known operation out of Virginia became the Cinderella story of the\r\n   Man Crates grilling taste-off. We proudly present Bone Doctors'\r\n  BBQ sauces, pair of masterpiece sauces and a brilliant spice blend.\r\n So fire up the grill, and call your agent: after all, you're about to go pro.",
+      "Contents": "Grilling Gadgetry \r\n  Brass-knuckle Meat Tenderizer\r\n  Cast Iron Smoker Box\r\n  Set of 4 Steak Thermometers\r\n  Dried Hickory Wood Chips\r\n Zesty Downpour \r\n  Original BBQ Sauce\r\n  Carolina Bold BBQ Sauce\r\n  Premium Spice Blend\r\n",
+      "LongDescriptionHTML": "<h4>The Right Tools for the Job</h4> <p>There's a line that separates the amateurs from the professionals. It's certainly\r\n   in the training and the experience, but folks often forget about the importance\r\n   of your equipment. Just like you can't win a NASCAR Cup in your grocery-getter,\r\n   can't crush a golf ball into orbit without a high-end driver, and aren't going\r\n   to take a trophy buck without a zeroed-in tack-driver, your grilling game will never\r\n   go next level without the right gear. You gotta have the right tools for the job.\r\n</p> <h4>Like a Grill-ionaire</h4> <p>Fortunately, you don't need to shell out a mountain of cash to get the equipment you need to get you to\r\n   grilling nirvana. We've included some of the best accessories that every man needs to get that Grillionaire\r\n   status.\r\n</p> <p>Our Grill Master Man Crate includes a cast-iron smoker\r\n  box and some hickory wood chips to get you started. Set the smoker box on\r\n   the grill as it warms up, soak the hickory in some water, and drop 'em into the\r\n   box as your meat grills. Take note, men: real flavor shouldn't come from a bottled\r\n   labeled \"liquid smoke.\"\r\n</p> <p>We threw in a set of four  steak thermometers, too. You may say, \"hey, Team\r\n   Man Crates, isn't that cheating?\" And we say, \"nay.\" There's no dishonor in knowing how done your steak\r\n   is. And when you cut into a perfectly-cooked slab of beef, you too shall understand that G.I. Joe wasn't\r\n   kidding when he said that Knowing Is Half the Battle.\r\n</p> <p>And because \"the right tool for every job\" means that sometimes you'll require some brute force, we've\r\n   included a brass-knuckle meat tenderizer. Nothing blows off the steam from a\r\n   long, hard day at work like beating your meat into submission.\r\n</p> <h4>Bone Doctors</h4> <p>We search tirelessly, every day, to find the best-in-class goods to put in our crates. Hundreds of sauces\r\n   came and went, the grills burned for weeks, until finally a victor emerged. An unexpected dark\r\n   horse, a little-known operation out of Virginia became the Cinderella story of the\r\n   Man Crates grilling taste-off. We proudly present Bone Doctors'\r\n  BBQ sauces, pair of masterpiece sauces and a brilliant spice blend.\r\n</p> <p>So fire up the grill, and call your agent: after all, you're about to go pro.</p>",
+      "Name": "Grill Master Crate",
+      "ConversionRate": 2.568634381995994,
+      "UniquePurchases": 218,
+      "ProductRevenue": 21797.82,
+      "Quantity": 218,
+      "AveragePrice": 99.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/399/large/gmc-grill-master-crate-awesome-gift-for-men__77984.jpg?1502411041",
+      "Margin": 64.07,
+      "TerrainScore": 0.44160952149005855,
+      "TERRAINRANK": 4
+    },
+    {
+      "SKU": "KTAM-0007-BAR",
+      "VariantName": "Personalized Pint Set Ammo Can",
+      "Price": 64.99,
+      "Inventory": 1779,
+      "VariantStatus": "sellable",
+      "ProductId": 20,
+      "VariantId": 20,
+      "Path": "personalized-pint-set-ammo-can",
+      "CanonicalUrl": "www.mancrates.com/store/products/personalized-pint-set-ammo-can",
+      "ContentsHTML": "<h4>Beer Buddies</h4> <ul>\r\n  <li>2 Laser-Etched Pint Glasses</li>\r\n  <li>Personalized .50 Cal Bottle Opener</li>\r\n</ul> <h4>Beef Sticks</h4> <ul>\r\n  <li>Peppered Jerky Stick</li>\r\n  <li>Original Jerky Stick</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "The World Is His Man Cave A man's insatiable appetite for adventure will lead him to Earth's highest peaks,\r\n   deepest caverns, and soon, neighboring planets--but none of these places adequately\r\n   cater to his second-most pressing appetite: beer.\r\n But we've built a gift\r\n   that lets him have it all. Whether he's crag climbing, spelunking, or riding a rocket\r\n   to the grand opening of Raging Waters: Mars, the Personalized Pint Set Ammo Can\r\n   will always ensure an awesome pint by his side.\r\n Go Forth And Drink With the Personalized Pint Set Ammo Can, he'll never have to endure the harsh\r\n   humiliation of asking, \"where can a man get a decent drink around here?\" because\r\n   he'll always have a pair of personalized, laser-etched pint glasses tucked safely\r\n   in the indestructible ammo can handcuffed to his wrist.\r\n There's only one\r\n   bottle opener that can withstand the intrepid demand of the adventurous man, and\r\n   that's the personalized bullet bottle opener. This .50 caliber bullet with his name\r\n   engraved on the side is the second coolest way to open a beer with a bullet. And\r\n   man cannot live on beer alone, which is where the two delicious beef sticks come\r\n   into play.\r\n The Personalized Pint Set Ammo Can has all the essentials he'll\r\n   need to get his beers and best buds out of the house and into the world.\r\n",
+      "Contents": "Beer Buddies \r\n  2 Laser-Etched Pint Glasses\r\n  Personalized .50 Cal Bottle Opener\r\n Beef Sticks \r\n  Peppered Jerky Stick\r\n  Original Jerky Stick\r\n\r\nNOTE: Personalized items require 48 hours of processing time.",
+      "LongDescriptionHTML": "<h4>The World Is His Man Cave</h4> <p>A man's insatiable appetite for adventure will lead him to Earth's highest peaks,\r\n   deepest caverns, and soon, neighboring planets--but none of these places adequately\r\n   cater to his second-most pressing appetite: beer.\r\n</p> <p>But we've built a gift\r\n   that lets him have it all. Whether he's crag climbing, spelunking, or riding a rocket\r\n   to the grand opening of Raging Waters: Mars, the Personalized Pint Set Ammo Can\r\n   will always ensure an awesome pint by his side.\r\n</p> <h4>Go Forth And Drink</h4> <p>With the Personalized Pint Set Ammo Can, he'll never have to endure the harsh\r\n   humiliation of asking, \"where can a man get a decent drink around here?\" because\r\n   he'll always have a pair of personalized, laser-etched pint glasses tucked safely\r\n   in the indestructible ammo can handcuffed to his wrist.\r\n</p> <p>There's only one\r\n   bottle opener that can withstand the intrepid demand of the adventurous man, and\r\n   that's the personalized bullet bottle opener. This .50 caliber bullet with his name\r\n   engraved on the side is the second coolest way to open a beer with a bullet. And\r\n   man cannot live on beer alone, which is where the two delicious beef sticks come\r\n   into play.\r\n</p> <p>The Personalized Pint Set Ammo Can has all the essentials he'll\r\n   need to get his beers and best buds out of the house and into the world.\r\n</p>",
+      "Name": "Personalized Barware Ammo Can",
+      "ConversionRate": 5.595116988809766,
+      "UniquePurchases": 275,
+      "ProductRevenue": 17872.25,
+      "Quantity": 275,
+      "AveragePrice": 64.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/420/large/ppsac_awesome-personalized-pint-pair-gift-for-men__88533.jpg?1502411051",
+      "Margin": 75.5,
+      "TerrainScore": 0.43110667112162127,
+      "TERRAINRANK": 5
+    },
+    {
+      "SKU": "KTCR-0056-CAV",
+      "VariantName": "Caveman Crate",
+      "Price": 84.99,
+      "Inventory": 1899,
+      "VariantStatus": "sellable",
+      "ProductId": 105,
+      "VariantId": 226,
+      "Path": "caveman-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/caveman-crate",
+      "ContentsHTML": "<h4>Prehistoric Meat</h4> <ul>\r\n  <li>Buffalo Jerky</li>\r\n  <li>Chef's Cut Beef Jerky</li>\r\n  <li>Field Trip Turkey Jerky</li>\r\n  <li>Crockett Creek Venison Jerky</li>\r\n</ul> <h4>Paleolithic Nuts</h4> <ul>\r\n  <li>Butter Toffee Almonds</li>\r\n  <li>Chili Citrus Cashews</li>\r\n</ul>",
+      "LongDescription": "The Fathers of Flavor The mainstream media and its biases toward hygiene, clear articulation, and pants have\r\n   always been a bit harsh on our cavemen ancestors. So their cave paintings weren't\r\n   intentionally \"abstract\", and sure, they couldn't count past five without setting\r\n   down their club, but cavemen weren't the total, no-brain nitwits they're constantly\r\n   perceived to be.\r\n The Caveman Crate celebrates our foreheaded forefathers' finest food contributions to modern humanity: the\r\n   discovery of nuts and meat.\r\n Prehistoric Taste Test There's a reason humans don't eat anything and everything in existence, and it's not for lack of trying.\r\n   It's because those \"crude, lumbering\" cavemen of old performed a thorough, detailed taste-analysis on every\r\n   species and substance on the planet: sorting the good from the gross, the safe from the poisonous, the\r\n   tasty from the soy-based, gluten-free vegan alternatives.\r\n The neanderthals were our nutritional trailblazers, hunting and sampling every creature to ensure no taste\r\n   was left untested. The best of beasts became the jerky bedrock for the developing civilization, namely:\r\n   buffalo, cattle, turkey, and deer.\r\n We've hand-selected four quality packs of seasoned jerky meat from these delicious\r\n   species to demonstrate how far mankind has progressed in flavor and to instill gratitude\r\n   toward the brave cavemen that brought us here.\r\n Nothing But Nuts Besides meat, our paleolithic parents also consumed wild almonds and cashews, with \"wild\"\r\n   being a flavor dependent upon the nearby water, weeds, and waste. While sending\r\n   these same primitive \"flavors\" would be the best way to fully appreciate the sacrifices\r\n   our cavefathers made, for safety and satisfaction reasons, we've opted to instead\r\n   include the best of the modern nut spectrum: Toffee Butter Almonds and Citrus Chili\r\n   Cashews.\r\n The Caveman Crate is our best way of paying homage to our food roots,\r\n   the original sustenance explorers that became our fathers of flavor.\r\n",
+      "Contents": "Prehistoric Meat \r\n  Buffalo Jerky\r\n  Chef's Cut Beef Jerky\r\n  Field Trip Turkey Jerky\r\n  Crockett Creek Venison Jerky\r\n Paleolithic Nuts \r\n  Butter Toffee Almonds\r\n  Chili Citrus Cashews\r\n",
+      "LongDescriptionHTML": "<h4>The Fathers of Flavor</h4> <p>The mainstream media and its biases toward hygiene, clear articulation, and pants have\r\n   always been a bit harsh on our cavemen ancestors. So their cave paintings weren't\r\n   intentionally \"abstract\", and sure, they couldn't count past five without setting\r\n   down their club, but cavemen weren't the total, no-brain nitwits they're constantly\r\n   perceived to be.\r\n</p> <p>The Caveman Crate celebrates our foreheaded forefathers' finest food contributions to modern humanity: the\r\n   discovery of nuts and meat.\r\n</p> <h4>Prehistoric Taste Test</h4> <p>There's a reason humans don't eat anything and everything in existence, and it's not for lack of trying.\r\n   It's because those \"crude, lumbering\" cavemen of old performed a thorough, detailed taste-analysis on every\r\n   species and substance on the planet: sorting the good from the gross, the safe from the poisonous, the\r\n   tasty from the soy-based, gluten-free vegan alternatives.\r\n</p> <p>The neanderthals were our nutritional trailblazers, hunting and sampling every creature to ensure no taste\r\n   was left untested. The best of beasts became the jerky bedrock for the developing civilization, namely:\r\n   buffalo, cattle, turkey, and deer.\r\n</p> <p>We've hand-selected four quality packs of seasoned jerky meat from these delicious\r\n   species to demonstrate how far mankind has progressed in flavor and to instill gratitude\r\n   toward the brave cavemen that brought us here.\r\n</p> <h4>Nothing But Nuts</h4> <p>Besides meat, our paleolithic parents also consumed wild almonds and cashews, with \"wild\"\r\n   being a flavor dependent upon the nearby water, weeds, and waste. While sending\r\n   these same primitive \"flavors\" would be the best way to fully appreciate the sacrifices\r\n   our cavefathers made, for safety and satisfaction reasons, we've opted to instead\r\n   include the best of the modern nut spectrum: Toffee Butter Almonds and Citrus Chili\r\n   Cashews.\r\n</p> <p>The Caveman Crate is our best way of paying homage to our food roots,\r\n   the original sustenance explorers that became our fathers of flavor.\r\n</p>",
+      "Name": "Caveman Crate",
+      "ConversionRate": 2.9016657710908116,
+      "UniquePurchases": 108,
+      "ProductRevenue": 9178.92,
+      "Quantity": 108,
+      "AveragePrice": 84.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/781/large/cmc-caveman-crate-Healthy_snacks_gift_pack_for_active_guys__55355.jpg?1502411189",
+      "Margin": 60.83,
+      "TerrainScore": 0.4289460638345047,
+      "TERRAINRANK": 6
+    },
+    {
+      "SKU": "KTCR-0061-PIZ",
+      "VariantName": "Pizza Grilling Crate",
+      "Price": 99.99,
+      "Inventory": 938,
+      "VariantStatus": "sellable",
+      "ProductId": 81,
+      "VariantId": 157,
+      "Path": "pizza-grilling-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/pizza-grilling-crate",
+      "ContentsHTML": "<h4>It's Pizza Time!</h4> <ul>\r\n  <li>(4) 7.5\" Pizza Stones</li>\r\n  <li>Passione Pizza Flour</li>\r\n  <li>Pizzacraft's Neopolitan Herb Blend</li>\r\n</ul> <h4>Backyard Pizzeria</h4> <ul>\r\n  <li>Foldable Pizza Peel</li>\r\n  <li>2-Sided Dough Roller</li>\r\n  <li>Pizzacraft Pizza Recipe Book</li>\r\n</ul>",
+      "LongDescription": "The History of Pizza (as told through catatstrophic events)* There's nothing original or appetizing about soggy, cardboard delivery pizza, and \"defrost\" is in no way an\r\n   authentic Italian culinary technique. History itself attests to the fact that the most delicious pizzas are\r\n   born of fire.\r\n The Great Fire of Rome in 64 A.D. led to the creation of pozzolanic\r\n   concrete, and thus, crispy flatbread crust. New York's 1835 brick building bonfire\r\n   inspired brick oven pizza, and deep dish style emerged after the widespread fear\r\n   of wood from the Great Chicago Fire of 1871.\r\n The Pizza Grilling Crate transforms the destructive flames of a backyard grill into the source of life for\r\n   delicious, stone-grilled pizza.\r\n From The Fire, We Feast! The Pizza Grilling Crate turns any ordinary grill into a flame-fueled furnace for crisp, smoky pizza.\r\n   The four cordierite baking stones bring the heat to any personal pizza party, but\r\n   can also be fitted together to grill pizza pies of all sizes and shapes, including\r\n   all seven Tetris shapes.\r\n For simple homemade, hand-tossed pizza crust, Passione is the dough you knead. This organic artisanal flour\r\n   ground from premium hard red wheat makes amazing pizza that will have every man kissing his fingers in a\r\n   grandiose manner, proclaiming \"Delizioso!\" in an exaggerated, possibly-offensive Italian accent.\r\n Hot Off The Blocks The double-down dough roller swiftly lays a level base for the whopping of toppings that can and should\r\n   cover the pizza. We're also including Pizzacraft's authentic Neapolitan herb blend and cookbook, the primer\r\n   on all things pizza with over 100 pages of recipes and resources.\r\n Finally, we've custom-designed a collapsible pizza peel that transfers piping hot pies from\r\n   the grill to the table with all toppings in tact.\r\n Like gold, steel, and the rest of civilization's most indispensable elements, pizza is best forged in fire.  *All historical accuracy subject to interpretation.",
+      "Contents": "It's Pizza Time! \r\n  (4) 7.5\" Pizza Stones\r\n  Passione Pizza Flour\r\n  Pizzacraft's Neopolitan Herb Blend\r\n Backyard Pizzeria \r\n  Foldable Pizza Peel\r\n  2-Sided Dough Roller\r\n  Pizzacraft Pizza Recipe Book\r\n",
+      "LongDescriptionHTML": "<h4>The History of Pizza (as told through catatstrophic events)<sup>*</sup></h4> <p>There's nothing original or appetizing about soggy, cardboard delivery pizza, and \"defrost\" is in no way an\r\n   authentic Italian culinary technique. History itself attests to the fact that the most delicious pizzas are\r\n   born of fire.\r\n</p> <p>The Great Fire of Rome in 64 A.D. led to the creation of pozzolanic\r\n   concrete, and thus, crispy flatbread crust. New York's 1835 brick building bonfire\r\n   inspired brick oven pizza, and deep dish style emerged after the widespread fear\r\n   of wood from the Great Chicago Fire of 1871.\r\n</p> <p>The Pizza Grilling Crate transforms the destructive flames of a backyard grill into the source of life for\r\n   delicious, stone-grilled pizza.\r\n</p> <h4>From The Fire, We Feast!</h4> <p>The Pizza Grilling Crate turns any ordinary grill into a flame-fueled furnace for crisp, smoky pizza.\r\n   The four cordierite baking stones bring the heat to any personal pizza party, but\r\n   can also be fitted together to grill pizza pies of all sizes and shapes, including\r\n   all seven Tetris shapes.\r\n</p> <p>For simple homemade, hand-tossed pizza crust, Passione is the dough you knead. This organic artisanal flour\r\n   ground from premium hard red wheat makes amazing pizza that will have every man kissing his fingers in a\r\n   grandiose manner, proclaiming \"Delizioso!\" in an exaggerated, possibly-offensive Italian accent.\r\n</p> <h4>Hot Off The Blocks</h4> <p>The double-down dough roller swiftly lays a level base for the whopping of toppings that can and should\r\n   cover the pizza. We're also including Pizzacraft's authentic Neapolitan herb blend and cookbook, the primer\r\n   on all things pizza with over 100 pages of recipes and resources.\r\n</p> <p>Finally, we've custom-designed a collapsible pizza peel that transfers piping hot pies from\r\n   the grill to the table with all toppings in tact.\r\n</p> <p>Like gold, steel, and the rest of civilization's most indispensable elements, pizza is best forged in fire. </p> <p><sup>*</sup>All historical accuracy subject to interpretation.</p>",
+      "Name": "Pizza Grilling Crate",
+      "ConversionRate": 4.303617876566564,
+      "UniquePurchases": 182,
+      "ProductRevenue": 18198.18,
+      "Quantity": 182,
+      "AveragePrice": 99.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/675/large/pg-cool-gift-for-guys-who-love-pizza-and-grilling__22425.jpg?1502411145",
+      "Margin": 63.59,
+      "TerrainScore": 0.4090764531096532,
+      "TERRAINRANK": 7
+    },
+    {
+      "SKU": "KTJV-0002-EXO",
+      "VariantName": "Exotic Meats Jerky Heart",
+      "Price": 39.99,
+      "Inventory": 949,
+      "VariantStatus": "sellable",
+      "ProductId": 108,
+      "VariantId": 230,
+      "Path": "exotic-meats-jerky-heart",
+      "CanonicalUrl": "www.mancrates.com/store/products/exotic-meats-jerky-heart",
+      "ContentsHTML": "<h4>Love At First Bite</h4> <ul>\r\n  <li>Gator Jerky, Classic, 0.5 oz</li>\r\n  <li>Gator Jerky, Black Pepper, 0.5 oz</li>\r\n  <li>Buffalo Jerky, Black Pepper, 0.5 oz</li>\r\n  <li>Buffalo Jerky, Garlic, 0.5 oz</li>\r\n  <li>Elk Jerky, Garlic, 0.5 oz</li>\r\n</ul> <h4>Eat Your Heart Out</h4> <ul>\r\n  <li>Elk Jerky, Honey Bourbon, 0.5 oz</li>\r\n  <li>Wild Boar Jerky, Honey Bourbon, 0.5 oz</li>\r\n  <li>Wild Boar Jerky, Root Beer Habanero, 0.5 oz</li>\r\n  <li>Venison Jerky, Honey Bourbon, 0.5 oz</li>\r\n  <li>Venison Jerky, Root Beer Habanero, 0.5 oz</li>\r\n</ul>",
+      "LongDescription": "Sorry, this product got so much love, we've run out until after Valentine's Day.\r\n\r\nOn Exotic Romance Some have called love a many splendored thing, others a battlefield. We call it confusing. It's not that we don't get romance; the thrill of being showered by sweet nothings\r\n   and also actual swoon-inducing gifts and makes total sense. It's just, we don't\r\n   get anything we find romantic. Truth be told, a tub of bubbles and a pocketful of\r\n   fancy chocolates doesn't really kickstart the ol' emotion-maker.\r\n But the tides of tender affection are turning, and the male heart can now be cut loose from\r\n   where it's been hanging high and dry all these years. The romanced man has a new\r\n   champion in the Exotic Jerky Heart.\r\n The Art of Meaty Romance The Exotic Jerky Heart is a wholly-savory, hyper-sensual meat surprise of affection\r\n   and flavor.\r\n Spring the perfect romantic rouse with a sappy, heart-shaped box suggesting the tiresome chocolates of\r\n   every year. But upon opening, his humdrum expectations and coarse, emotional exterior will be melted away\r\n   by a passionate gesture of jerky.\r\n There's no sentiment words can convey that exotic jerkies can't, but we'll still print your blush-worthy\r\n   message of tender affection inside the box--right next to ten knee-weakening flavors of tender exotic\r\n   animal strips like Honey Bourbon Elk, Black Pepper Gator, and Root Beer Habanero Venison.\r\n Put the \"man\" back in romance with a total heart-sweller that charms him in his most fluent language:\r\n   savory, seasoned beef jerky!\r\n",
+      "Contents": "Love At First Bite \r\n  Gator Jerky, Classic, 0.5 oz\r\n  Gator Jerky, Black Pepper, 0.5 oz\r\n  Buffalo Jerky, Black Pepper, 0.5 oz\r\n  Buffalo Jerky, Garlic, 0.5 oz\r\n  Elk Jerky, Garlic, 0.5 oz\r\n Eat Your Heart Out \r\n  Elk Jerky, Honey Bourbon, 0.5 oz\r\n  Wild Boar Jerky, Honey Bourbon, 0.5 oz\r\n  Wild Boar Jerky, Root Beer Habanero, 0.5 oz\r\n  Venison Jerky, Honey Bourbon, 0.5 oz\r\n  Venison Jerky, Root Beer Habanero, 0.5 oz\r\n",
+      "LongDescriptionHTML": "<h4>Sorry, this product got so much love, we've run out until after Valentine's Day.</h4>\r\n\r\n<h4>On Exotic Romance</h4> <p>Some have called love a many splendored thing, others a battlefield. We call it confusing.</p> <p>It's not that we don't get romance; the thrill of being showered by sweet nothings\r\n   and also actual swoon-inducing gifts and makes total sense. It's just, we don't\r\n   get anything we find romantic. Truth be told, a tub of bubbles and a pocketful of\r\n   fancy chocolates doesn't really kickstart the ol' emotion-maker.\r\n</p> <p>But the tides of tender affection are turning, and the male heart can now be cut loose from\r\n   where it's been hanging high and dry all these years. The romanced man has a new\r\n   champion in the Exotic Jerky Heart.\r\n</p> <h4>The Art of Meaty Romance</h4> <p>The Exotic Jerky Heart is a wholly-savory, hyper-sensual meat surprise of affection\r\n   and flavor.\r\n</p> <p>Spring the perfect romantic rouse with a sappy, heart-shaped box suggesting the tiresome chocolates of\r\n   every year. But upon opening, his humdrum expectations and coarse, emotional exterior will be melted away\r\n   by a passionate gesture of jerky.\r\n</p> <p>There's no sentiment words can convey that exotic jerkies can't, but we'll still print your blush-worthy\r\n   message of tender affection inside the box--right next to ten knee-weakening flavors of tender exotic\r\n   animal strips like Honey Bourbon Elk, Black Pepper Gator, and Root Beer Habanero Venison.\r\n</p> <p>Put the \"man\" back in romance with a total heart-sweller that charms him in his most fluent language:\r\n   savory, seasoned beef jerky!\r\n</p>",
+      "Name": "Exotic Jerky Heart",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/001/857/large/emjh_mens_valentines_day_exotic-meats-jerky_gift.jpg?1504132110",
+      "Margin": 61.42,
+      "ConversionRate": 5.357142857142857,
+      "UniquePurchases": 3,
+      "ProductRevenue": 119.97,
+      "Quantity": 3,
+      "AveragePrice": 39.99,
+      "TerrainScore": 0.31533574543873116,
+      "TERRAINRANK": 8
+    },
+    {
+      "SKU": "KTCR-0055-BLO",
+      "VariantName": "Bloody Mary Crate",
+      "Price": 89.99,
+      "Inventory": 876,
+      "VariantStatus": "sellable",
+      "ProductId": 53,
+      "VariantId": 125,
+      "Path": "bloody-mary-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/bloody-mary-crate",
+      "ContentsHTML": "<h4>Gourmet Garnishes</h4> <ul>\r\n  <li>Pepperoni Straws</li>\r\n  <li>Bacon Rimshot</li>\r\n  <li>(2) Infinium Plastic Pilsner Glasses</li>\r\n</ul> <h4>Flavor Foundation</h4> <ul>\r\n  <li>Demitri's Classic Seasoning</li>\r\n  <li>Demitri's Horseradish Seasoning</li>\r\n  <li>Demitri's Chilis and Peppers Seasoning</li>\r\n  <li>(6) Clamato Tomato Juice Cans</li>\r\n</ul>",
+      "LongDescription": "The Drink You Can Eat Some\r\n   drinks pair well with meat: a single malt scotch with slow-cooked ribs, Imperial\r\n   IPA with hand-cranked sausage, or pinot grigio (if you consider that a drink) with\r\n   tilapia (if you consider that meat).\r\n But the Bloody Mary does more than pair\r\n   well. It fully embraces the mighty flavors of meat, resulting in a delicious cocktail\r\n   that doubles as a balanced brunch. Introducing, the gourmet, meat-infused Bloody\r\n   Mary Crate.\r\n The Spice Specialist The Bloody Mary is the pizza of cocktails; it's best served cold on a Saturday morning while slouched over\r\n   the couch watching cartoons, and it can support a mountain of meaty toppings.\r\n Upgrade your Bloody Mary from its lesser vegetarian form with Demitri's Pepperoni Straws\r\n   and Bacon Rimshot. Slurp your cocktail through a literal sausage vortex, accent\r\n   the flavor with fanciful bacon crumbles, and start stacking other gourmet garnishes\r\n   with your own creative flair.\r\n But even the most delicious topping towers still requires a solid flavor foundation, and no one does spices\r\n   better than Demitri. Demitri, the Marco Polo of Bloody Marys, has been boldly exploring the exotic world\r\n   of spices, and we're sending three of his perfectly mixed flavors: Classic, Horseradish,\r\n   and Chilies and Peppers.\r\n Leaning Tower of Toppings Balancing skewered, top-heavy garnishes like fried chicken or a full stack of pancakes is an art, and\r\n   your first few endeavors will no doubt be accompanied by slips and spills. Hone your stacking skills with\r\n   this pair of infinium plastic Pilsner glasses that won't break when they topple over or are shot with a\r\n   firearm at close range (not legally-binding).\r\n Build a beast of a brunch beverage with the Bloody Mary Man Crate.",
+      "Contents": "Gourmet Garnishes \r\n  Pepperoni Straws\r\n  Bacon Rimshot\r\n  (2) Infinium Plastic Pilsner Glasses\r\n Flavor Foundation \r\n  Demitri's Classic Seasoning\r\n  Demitri's Horseradish Seasoning\r\n  Demitri's Chilis and Peppers Seasoning\r\n  (6) Clamato Tomato Juice Cans\r\n",
+      "LongDescriptionHTML": "<h4>The Drink You Can Eat</h4> <p>Some\r\n   drinks pair well with meat: a single malt scotch with slow-cooked ribs, Imperial\r\n   IPA with hand-cranked sausage, or pinot grigio (if you consider that a drink) with\r\n   tilapia (if you consider that meat).\r\n</p> <p>But the Bloody Mary does more than pair\r\n   well. It fully embraces the mighty flavors of meat, resulting in a delicious cocktail\r\n   that doubles as a balanced brunch. Introducing, the gourmet, meat-infused Bloody\r\n   Mary Crate.\r\n</p> <h4>The Spice Specialist</h4> <p>The Bloody Mary is the pizza of cocktails; it's best served cold on a Saturday morning while slouched over\r\n   the couch watching cartoons, and it can support a mountain of meaty toppings.\r\n</p> <p>Upgrade your Bloody Mary from its lesser vegetarian form with Demitri's Pepperoni Straws\r\n   and Bacon Rimshot. Slurp your cocktail through a literal sausage vortex, accent\r\n   the flavor with fanciful bacon crumbles, and start stacking other gourmet garnishes\r\n   with your own creative flair.\r\n</p> <p>But even the most delicious topping towers still requires a solid flavor foundation, and no one does spices\r\n   better than Demitri. Demitri, the Marco Polo of Bloody Marys, has been boldly exploring the exotic world\r\n   of spices, and we're sending three of his perfectly mixed flavors: Classic, Horseradish,\r\n   and Chilies and Peppers.\r\n</p> <h4>Leaning Tower of Toppings</h4> <p>Balancing skewered, top-heavy garnishes like fried chicken or a full stack of pancakes is an art, and\r\n   your first few endeavors will no doubt be accompanied by slips and spills. Hone your stacking skills with\r\n   this pair of infinium plastic Pilsner glasses that won't break when they topple over or are shot with a\r\n   firearm at close range (not legally-binding).\r\n</p> <p>Build a beast of a brunch beverage with the Bloody Mary Man Crate.</p>",
+      "Name": "Bloody Mary Crate",
+      "ConversionRate": 5.9625212947189095,
+      "UniquePurchases": 140,
+      "ProductRevenue": 12598.6,
+      "Quantity": 140,
+      "AveragePrice": 89.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/551/large/bm_demetris_bloody_mary_mix_gifts_for_men__95099.jpg?1502411096",
+      "Margin": 56.11,
+      "TerrainScore": 0.30544328245260144,
+      "TERRAINRANK": 9
+    },
+    {
+      "SKU": "KTHB-0001-FLV",
+      "VariantName": "Personalized Flask: Vampire Desires",
+      "Price": 39.99,
+      "Inventory": 918,
+      "VariantStatus": "sellable",
+      "ProductId": 117,
+      "VariantId": 239,
+      "Path": "secret-stash-personalized-flask",
+      "CanonicalUrl": "www.mancrates.com/store/products/secret-stash-personalized-flask",
+      "ContentsHTML": "<h4>Our Lasers Take Time</h4> \r\n<p>This Personalized item requires 1 day of processing time.</p>\r\n<br><br>\r\n\r\n\r\n\r\n<h4>Home Security System</h4> <ul>\r\n  <li>Personalized Flask</li>\r\n  <li>Secret Stash Book</li>\r\n  <li>Your Choice of a Custom Dust Jacket</li>\r\n</ul>",
+      "LongDescription": "A Brilliant Ruse Sometime books make great gifts, like the driving manual for a Jaguar F-Type with accompanying\r\n   vehicle. But most of the time, books gifts are boring and should be avoided.\r\n If it's a book you're certain he wants, then maybe. But if it's a book you just\r\n   think he'll like, there are cheaper ways to prop up a table. It's a celebration,\r\n   not a summer reading list.\r\n We've concocted a brilliant ruse that plays on humanity's widespread discomfort with the extremely longform\r\n   written word. The Secret Stash Personalized Flask takes him from dustjacket disappointment to actual lived\r\n   adventures with the simple turn of a page.\r\n An Intoxicating Story We've been told to judge a book not by its cover, but by the contents of its pages. Well,\r\n   these pages conceal a personalized drinking vessel, so it's basically an instant literary classic. Housed\r\n   within the pages itself is a sleek 6 oz. stainless steel flask.\r\n And we've penned our own literary masterpiece by lasering onto the matte black finish. The only thing about\r\n   this gift he'll have to read is his name.\r\n Best of all, the book can be re-used as a \"security-by-obscurity\" safety-deposit book. Too Good To Be True To up the outrage factor before the big reveal, we've created some phoney dust jackets that will raise far\r\n   more questions than answers. Choose which of these three terrible books he'll have to awkwardly pretend to\r\n   enjoy receiving:\r\n \r\n   Vampire Desires, a gripping romance-fantasy adventure of immortal love, loss, and lust;\r\n   Have You Seen My Keys, the latest installment of the unacclaimed and unrequested Sherluck Holmes\r\n       mystery series\r\n  \r\n   How to Hide Your Stuff, a simpleton's conspiracy theory/self-help book from the paranoid mind of one\r\n       Jedd Dangus\r\n  \r\n And if he has concerns about displaying any of these on his bookshelf, we've printed Plan B directly onto\r\n   the spine of the book. He can remove the dust jacket and hide in plain sight the inconspicuous book, Biting\r\n   Your Neighbor's Horse: and other confusing euphemisms.\r\n The Secret Stash Personalized Flask is an unforgettable gift of surprise and safekeeping.",
+      "Contents": "Our Lasers Take Time \r\nThis Personalized item requires 1 day of processing time.\r\n\r\n\r\n\r\n\r\nHome Security System \r\n  Personalized Flask\r\n  Secret Stash Book\r\n  Your Choice of a Custom Dust Jacket\r\n",
+      "LongDescriptionHTML": "<h4>A Brilliant Ruse</h4> <p>Sometime books make great gifts, like the driving manual for a Jaguar F-Type with accompanying\r\n   vehicle. But most of the time, books gifts are boring and should be avoided.\r\n</p> <p>If it's a book you're certain he wants, then maybe. But if it's a book you just\r\n   think he'll like, there are cheaper ways to prop up a table. It's a celebration,\r\n   not a summer reading list.\r\n</p> <p>We've concocted a brilliant ruse that plays on humanity's widespread discomfort with the extremely longform\r\n   written word. The Secret Stash Personalized Flask takes him from dustjacket disappointment to actual lived\r\n   adventures with the simple turn of a page.\r\n</p> <h4>An Intoxicating Story</h4> <p>We've been told to judge a book not by its cover, but by the contents of its pages. Well,\r\n   these pages conceal a personalized drinking vessel, so it's basically an instant literary classic. Housed\r\n   within the pages itself is a sleek 6 oz. stainless steel flask.\r\n</p> <p>And we've penned our own literary masterpiece by lasering onto the matte black finish. The only thing about\r\n   this gift he'll have to read is his name.\r\n</p> <p>Best of all, the book can be re-used as a \"security-by-obscurity\" safety-deposit book.</p> <h4>Too Good To Be True</h4> <p>To up the outrage factor before the big reveal, we've created some phoney dust jackets that will raise far\r\n   more questions than answers. Choose which of these three terrible books he'll have to awkwardly pretend to\r\n   enjoy receiving:\r\n</p> <ul>\r\n  <li> Vampire Desires, a gripping romance-fantasy adventure of immortal love, loss, and lust;</li>\r\n  <li> Have You Seen My Keys, the latest installment of the unacclaimed and unrequested Sherluck Holmes\r\n       mystery series\r\n  </li>\r\n  <li> How to Hide Your Stuff, a simpleton's conspiracy theory/self-help book from the paranoid mind of one\r\n       Jedd Dangus\r\n  </li>\r\n</ul> <p>And if he has concerns about displaying any of these on his bookshelf, we've printed Plan B directly onto\r\n   the spine of the book. He can remove the dust jacket and hide in plain sight the inconspicuous book, Biting\r\n   Your Neighbor's Horse: and other confusing euphemisms.\r\n</p> <p>The Secret Stash Personalized Flask is an unforgettable gift of surprise and safekeeping.</p>",
+      "Name": "Personalized Flask in Book Vampires",
+      "ConversionRate": 3.258145363408521,
+      "UniquePurchases": 39,
+      "ProductRevenue": 1559.61,
+      "Quantity": 39,
+      "AveragePrice": 39.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/833/large/Flask-Inside-book__41814.jpg?1502411212",
+      "Margin": 61.07,
+      "TerrainScore": 0.30294810418220053,
+      "TERRAINRANK": 10
+    }
+  ],
+  "outputDocs": [
+    {
+      "SKU": "KTCR-0017-EXO",
+      "VariantName": "Exotic Meats Crate",
+      "Price": 69.99,
+      "ProductId": 7,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/exotic-meats-crate",
+      "Contents": "<h4>Cured &amp; Cultured</h4> <ul>\r\n  <li>Venison Jerky, 2oz</li>\r\n  <li>Wild Boar Jerky, 2oz</li>\r\n  <li>Biltong Beef Jerky, 4oz</li>\r\n  <li>Elk Jerky, 2oz</li>\r\n  <li>Buffalo Jerky, 3oz</li>\r\n  <li>Alligator Jerky, 2oz</li>\r\n</ul> <h4>Safari Sticks</h4> <ul>\r\n  <li>Pheasant Jerky Stick, 1 oz</li>\r\n  <li>Maple Duck Jerky Stick, 1 oz</li>\r\n  <li>Ostrich Jerky Stick, 1 oz</li>\r\n  <li>Alligator Jerky Stick, 1 oz</li>\r\n  </ul>\r\n<p>\r\n  <p>\r\n    <p>\r\n<p><i>*Products may contain beef.</i></p>",
+      "LongDescription": "<h4>The Feast of Beast</h4> <p>We've already compiled the pinnacle selection of meat samplers from three\r\n   continents in the <a href=\"https://www.mancrates.com/jerkygrams/exotic\">Exotic Meats Jerkygram</a>, and we\r\n   didn't want to reinvent the wheel. No, we wanted to snag three more wheels, toss 'em in a Lambo,\r\n   and burn victory lap donuts in the parking lot of every non-exotic meat factory in the land.\r\n</p> <h5>The More, The Meatier</h5> <p>The Exotic Meats Man Crate has so much deluxe animal poundage that we could\r\n   legally register it as an official safari park. We're talking enough spiced ostrich, alligator, duck,\r\n   pheasant, buffalo, elk, venison, and boar meat to make El Chupacabra wave his claws in surrender,\r\n   screaming, \"No mas, no mas!\"\r\n</p> <p>And this premium meat parade will fly first class to your doorstep in a sturdy wooden Man Crate.</p> <h5>The Most Interesting Meat in the World</h5> <p>We've also expanded the curation process to include Biltong, South Africa's treasured method of preserving\r\n   delicious meats. This thin-cut beef treat is the Meat Supreme in the dried\r\n   animal kingdom, and it literally means \"rump tongue\" in Dutch. Drop that knowledge bomb on your friends and\r\n   they'll swoon over your intelligence. Swoon, we say!\r\n</p> <p>Select this Feast of Beast and prepare to sample the safari!</p>",
+      "Name": "Exotic Meats Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/368/large/emc-exotic-meat-crate-awesome-gift-for-men__35920.jpg?1502411028",
+      "TERRAINRANK": 1
+    },
+    {
+      "SKU": "KTCR-0001-BAC",
+      "VariantName": "The Bacon Crate",
+      "Price": 59.99,
+      "ProductId": 5,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/bacon-crate",
+      "Contents": "<h4>Real Bacon</h4> <ul>\r\n  <li>Jeff's Jerky Honey Jalapeno Bacon, 2 oz</li>\r\n  <li>Jeff's Jerky Maple Bacon, 2 oz</li>\r\n</ul> <h4>Pork Euphoria</h4> <ul>\r\n  <li>Bacon Popcorn</li>\r\n  <li>Bourbon Bacon Seasoning Grinder, 3.7 oz</li>\r\n  <li>Sir Francis Bacon Peanut Brittle, 3 oz</li>\r\n  <li>Terrapin Ridge Farms Hot Pepper Bacon Jam, 11 oz</li>\r\n</ul>",
+      "LongDescription": "<h4>We Love You, Bacon</h4> <p>\"Love\" is a strong word that's sometimes hard for men to say. Entangling, complicated emotional loops in our male brains can choke us up when we're trying to form that simple syllable, unless the next word is \"Bacon\".</p> \r\n<p>There is no easier, more joyous pronouncement for us to make than to declare, unequivocally, that we love bacon.\r\n</p> <h4>50 Shades of Bacon</h4> <p>We're not ashamed to say our love is untraditional. We love bacon in ways your parents might not approve of. We use bacon in ways that might not have crossed your mind. If you share our passion, then let this crate open your mind to seven new ways to express your love.</p> \r\n<p>Start with Jeff's Famous Bacon Jerky. Ready to have your mind blown? What if we told you bacon doesn't have to just be a staple at breakfast and on your sandwich? Bacon can be a portable, dangerously habit forming companion at your finger tips, 24/7. You might start hoarding and stashing. You might tape packs of Bacon Jerky below the conference room table, sew pockets into the inner lining of your long johns, and fill the side panels of your car with bacon jerky in case you ever break down.</p> \r\n<h4>Just Add Bacon</h4> <p>You can get your bacon fix from the bacon flavored snacks. This flavoring is the culinary equivalent of getting a tender, pen-written love letter on artisanal bacon-scented paper. Temporarily separated by space and time, carry this and bacon is with you, wherever you are.</p> \r\n<h4>Surprise! It's Bacon</h4> \r\n<p>Bacon has always made straight A's for 'plays nicely with others.' We've gathered an assortment of awesome bacon-enhanced snacks from the obvious popcorn flavors to the exotic Sir Fancis Bacon Peanut Brittle. Want a deliciously twisted night in? Grab a bowl of bacon popcorn and put on Charlotte's Web. Want to impress your date with something better than chocolates? Sir Francis Bacon Peanut Brittle. If it doesn't work they're probably not a keeper.</p> \r\n<p>Share our love, don't judge us.</p>",
+      "Name": "The Bacon Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/001/818/large/bc_bacon_popcorn_and_brittle-terrapin-ridge-farms-hot-pepper-jam-seasoning-grinder-jerky_guy_gifts.jpg?1505320326",
+      "TERRAINRANK": 2
+    },
+    {
+      "SKU": "KTCR-0037-WHA",
+      "VariantName": "Whiskey Appreciation Crate",
+      "Price": 159.99,
+      "ProductId": 137,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/whiskey-appreciation-crate",
+      "Contents": "<h4>Distinguished Gear</h4> <ul>\r\n  <li>Personalized Whiskey Decanter <br>(hand-made, may contain minor imperfections)</li>\r\n  <li>2 Personalized Heavy Bottom Rocks Glasses, 9 oz</li>\r\n  <li>2 Ice Sphere Molds</li>\r\n  <li>2 Slate Coasters</li>\r\n  <li>Whiskey Drinking Journal</li>\r\n</ul> <h4>Luxury Grub</h4> <ul>\r\n  <li>Spiced Peppercorn Peanuts</li>\r\n  <li>Salted Pistachios</li>\r\n  <li>Cranberry Pecans</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours to process.</i></p>",
+      "LongDescription": "<h4>An Executive Appreciation</h4> <p>In 1797, George Washington, the Michael Jordan of being American, declined the free\r\n   world's greatest honor, a Presidential term three-peat, in order to build a whiskey\r\n   distillery in his basement. The Revolutionary War MVP and celebrity endorser of\r\n   the one dollar bill knew that no amount of prestige or accomplishments could rival\r\n   the warm satisfaction of a good glass of whiskey.\r\n</p> <p>In days past, a man's fondness for whiskey was admirably brandished in full home bars, but in modern times,\r\n   whiskey is hidden out of sight in cabinets and desk drawers like shameful secrets. The Whiskey Appreciation\r\n   Crate is here to restore honor to the once great bond between a man and his drink.\r\n</p> <h4>Oh, yes we de-can!</h4> <p>Etching your initials into a glass decanter is a public declaration of your affinity for whiskey.\r\n   It's like donning a trenchcoat and holding a boombox overhead blasting Peter Gabriel's\r\n   \"In Your Eyes\" outside of whiskey's house or barging past the TSA checkpoint to frantically\r\n   sprint through the airport terminal for a last second  whiskey\r\n   before boarding your plane.\r\n</p> <p>While the monogrammed decanter looks super classy when flanked by its matching pair of personalized\r\n   rocks tumblers, whiskey should be appraised by taste as well as  presentation. The decanter properly\r\n   aerates and settles your whiskey so you can settle down with a glass of good company anytime.\r\n</p> <h4>Good Company</h4> <p>Rounding out the Whiskey Appreciation Crate is the ultimate whiskey connoisseur collection: A pair of\r\n   Tovolo Ice Molds and slate coasters, a pocket-sized whiskey tasting journal, and the most important whiskey\r\n   accessory, premium savory snacks.\r\n</p> <p>Box up those dusty sports trophies and find a stud to hang your awkward family portraits, because the\r\n   Personalized Whiskey Decanter is reclaiming whiskey's proper place atop your mantel.\r\n</p>",
+      "Name": "Personalized Whiskey Appreciation Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/001/898/large/wa_engraved_whiskey_gift_collection_for_bold_men__89003.1479337561.1280.1280_copy.jpg?1505426047",
+      "TERRAINRANK": 3
+    },
+    {
+      "SKU": "KTCR-0003-GRI",
+      "VariantName": "Grill Master Crate",
+      "Price": 99.99,
+      "ProductId": 14,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/grill-master-crate",
+      "Contents": "<h4>Grilling Gadgetry</h4> <ul>\r\n  <li>Brass-knuckle Meat Tenderizer</li>\r\n  <li>Cast Iron Smoker Box</li>\r\n  <li>Set of 4 Steak Thermometers</li>\r\n  <li>Dried Hickory Wood Chips</li>\r\n</ul> <h4>Zesty Downpour</h4> <ul>\r\n  <li>Original BBQ Sauce</li>\r\n  <li>Carolina Bold BBQ Sauce</li>\r\n  <li>Premium Spice Blend</li>\r\n</ul>",
+      "LongDescription": "<h4>The Right Tools for the Job</h4> <p>There's a line that separates the amateurs from the professionals. It's certainly\r\n   in the training and the experience, but folks often forget about the importance\r\n   of your equipment. Just like you can't win a NASCAR Cup in your grocery-getter,\r\n   can't crush a golf ball into orbit without a high-end driver, and aren't going\r\n   to take a trophy buck without a zeroed-in tack-driver, your grilling game will never\r\n   go next level without the right gear. You gotta have the right tools for the job.\r\n</p> <h4>Like a Grill-ionaire</h4> <p>Fortunately, you don't need to shell out a mountain of cash to get the equipment you need to get you to\r\n   grilling nirvana. We've included some of the best accessories that every man needs to get that Grillionaire\r\n   status.\r\n</p> <p>Our Grill Master Man Crate includes a cast-iron smoker\r\n  box and some hickory wood chips to get you started. Set the smoker box on\r\n   the grill as it warms up, soak the hickory in some water, and drop 'em into the\r\n   box as your meat grills. Take note, men: real flavor shouldn't come from a bottled\r\n   labeled \"liquid smoke.\"\r\n</p> <p>We threw in a set of four  steak thermometers, too. You may say, \"hey, Team\r\n   Man Crates, isn't that cheating?\" And we say, \"nay.\" There's no dishonor in knowing how done your steak\r\n   is. And when you cut into a perfectly-cooked slab of beef, you too shall understand that G.I. Joe wasn't\r\n   kidding when he said that Knowing Is Half the Battle.\r\n</p> <p>And because \"the right tool for every job\" means that sometimes you'll require some brute force, we've\r\n   included a brass-knuckle meat tenderizer. Nothing blows off the steam from a\r\n   long, hard day at work like beating your meat into submission.\r\n</p> <h4>Bone Doctors</h4> <p>We search tirelessly, every day, to find the best-in-class goods to put in our crates. Hundreds of sauces\r\n   came and went, the grills burned for weeks, until finally a victor emerged. An unexpected dark\r\n   horse, a little-known operation out of Virginia became the Cinderella story of the\r\n   Man Crates grilling taste-off. We proudly present Bone Doctors'\r\n  BBQ sauces, pair of masterpiece sauces and a brilliant spice blend.\r\n</p> <p>So fire up the grill, and call your agent: after all, you're about to go pro.</p>",
+      "Name": "Grill Master Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/399/large/gmc-grill-master-crate-awesome-gift-for-men__77984.jpg?1502411041",
+      "TERRAINRANK": 4
+    },
+    {
+      "SKU": "KTAM-0007-BAR",
+      "VariantName": "Personalized Pint Set Ammo Can",
+      "Price": 64.99,
+      "ProductId": 20,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/personalized-pint-set-ammo-can",
+      "Contents": "<h4>Beer Buddies</h4> <ul>\r\n  <li>2 Laser-Etched Pint Glasses</li>\r\n  <li>Personalized .50 Cal Bottle Opener</li>\r\n</ul> <h4>Beef Sticks</h4> <ul>\r\n  <li>Peppered Jerky Stick</li>\r\n  <li>Original Jerky Stick</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "<h4>The World Is His Man Cave</h4> <p>A man's insatiable appetite for adventure will lead him to Earth's highest peaks,\r\n   deepest caverns, and soon, neighboring planets--but none of these places adequately\r\n   cater to his second-most pressing appetite: beer.\r\n</p> <p>But we've built a gift\r\n   that lets him have it all. Whether he's crag climbing, spelunking, or riding a rocket\r\n   to the grand opening of Raging Waters: Mars, the Personalized Pint Set Ammo Can\r\n   will always ensure an awesome pint by his side.\r\n</p> <h4>Go Forth And Drink</h4> <p>With the Personalized Pint Set Ammo Can, he'll never have to endure the harsh\r\n   humiliation of asking, \"where can a man get a decent drink around here?\" because\r\n   he'll always have a pair of personalized, laser-etched pint glasses tucked safely\r\n   in the indestructible ammo can handcuffed to his wrist.\r\n</p> <p>There's only one\r\n   bottle opener that can withstand the intrepid demand of the adventurous man, and\r\n   that's the personalized bullet bottle opener. This .50 caliber bullet with his name\r\n   engraved on the side is the second coolest way to open a beer with a bullet. And\r\n   man cannot live on beer alone, which is where the two delicious beef sticks come\r\n   into play.\r\n</p> <p>The Personalized Pint Set Ammo Can has all the essentials he'll\r\n   need to get his beers and best buds out of the house and into the world.\r\n</p>",
+      "Name": "Personalized Barware Ammo Can",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/420/large/ppsac_awesome-personalized-pint-pair-gift-for-men__88533.jpg?1502411051",
+      "TERRAINRANK": 5
+    },
+    {
+      "SKU": "KTCR-0056-CAV",
+      "VariantName": "Caveman Crate",
+      "Price": 84.99,
+      "ProductId": 105,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/caveman-crate",
+      "Contents": "<h4>Prehistoric Meat</h4> <ul>\r\n  <li>Buffalo Jerky</li>\r\n  <li>Chef's Cut Beef Jerky</li>\r\n  <li>Field Trip Turkey Jerky</li>\r\n  <li>Crockett Creek Venison Jerky</li>\r\n</ul> <h4>Paleolithic Nuts</h4> <ul>\r\n  <li>Butter Toffee Almonds</li>\r\n  <li>Chili Citrus Cashews</li>\r\n</ul>",
+      "LongDescription": "<h4>The Fathers of Flavor</h4> <p>The mainstream media and its biases toward hygiene, clear articulation, and pants have\r\n   always been a bit harsh on our cavemen ancestors. So their cave paintings weren't\r\n   intentionally \"abstract\", and sure, they couldn't count past five without setting\r\n   down their club, but cavemen weren't the total, no-brain nitwits they're constantly\r\n   perceived to be.\r\n</p> <p>The Caveman Crate celebrates our foreheaded forefathers' finest food contributions to modern humanity: the\r\n   discovery of nuts and meat.\r\n</p> <h4>Prehistoric Taste Test</h4> <p>There's a reason humans don't eat anything and everything in existence, and it's not for lack of trying.\r\n   It's because those \"crude, lumbering\" cavemen of old performed a thorough, detailed taste-analysis on every\r\n   species and substance on the planet: sorting the good from the gross, the safe from the poisonous, the\r\n   tasty from the soy-based, gluten-free vegan alternatives.\r\n</p> <p>The neanderthals were our nutritional trailblazers, hunting and sampling every creature to ensure no taste\r\n   was left untested. The best of beasts became the jerky bedrock for the developing civilization, namely:\r\n   buffalo, cattle, turkey, and deer.\r\n</p> <p>We've hand-selected four quality packs of seasoned jerky meat from these delicious\r\n   species to demonstrate how far mankind has progressed in flavor and to instill gratitude\r\n   toward the brave cavemen that brought us here.\r\n</p> <h4>Nothing But Nuts</h4> <p>Besides meat, our paleolithic parents also consumed wild almonds and cashews, with \"wild\"\r\n   being a flavor dependent upon the nearby water, weeds, and waste. While sending\r\n   these same primitive \"flavors\" would be the best way to fully appreciate the sacrifices\r\n   our cavefathers made, for safety and satisfaction reasons, we've opted to instead\r\n   include the best of the modern nut spectrum: Toffee Butter Almonds and Citrus Chili\r\n   Cashews.\r\n</p> <p>The Caveman Crate is our best way of paying homage to our food roots,\r\n   the original sustenance explorers that became our fathers of flavor.\r\n</p>",
+      "Name": "Caveman Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/781/large/cmc-caveman-crate-Healthy_snacks_gift_pack_for_active_guys__55355.jpg?1502411189",
+      "TERRAINRANK": 6
+    },
+    {
+      "SKU": "KTCR-0061-PIZ",
+      "VariantName": "Pizza Grilling Crate",
+      "Price": 99.99,
+      "ProductId": 81,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/pizza-grilling-crate",
+      "Contents": "<h4>It's Pizza Time!</h4> <ul>\r\n  <li>(4) 7.5\" Pizza Stones</li>\r\n  <li>Passione Pizza Flour</li>\r\n  <li>Pizzacraft's Neopolitan Herb Blend</li>\r\n</ul> <h4>Backyard Pizzeria</h4> <ul>\r\n  <li>Foldable Pizza Peel</li>\r\n  <li>2-Sided Dough Roller</li>\r\n  <li>Pizzacraft Pizza Recipe Book</li>\r\n</ul>",
+      "LongDescription": "<h4>The History of Pizza (as told through catatstrophic events)<sup>*</sup></h4> <p>There's nothing original or appetizing about soggy, cardboard delivery pizza, and \"defrost\" is in no way an\r\n   authentic Italian culinary technique. History itself attests to the fact that the most delicious pizzas are\r\n   born of fire.\r\n</p> <p>The Great Fire of Rome in 64 A.D. led to the creation of pozzolanic\r\n   concrete, and thus, crispy flatbread crust. New York's 1835 brick building bonfire\r\n   inspired brick oven pizza, and deep dish style emerged after the widespread fear\r\n   of wood from the Great Chicago Fire of 1871.\r\n</p> <p>The Pizza Grilling Crate transforms the destructive flames of a backyard grill into the source of life for\r\n   delicious, stone-grilled pizza.\r\n</p> <h4>From The Fire, We Feast!</h4> <p>The Pizza Grilling Crate turns any ordinary grill into a flame-fueled furnace for crisp, smoky pizza.\r\n   The four cordierite baking stones bring the heat to any personal pizza party, but\r\n   can also be fitted together to grill pizza pies of all sizes and shapes, including\r\n   all seven Tetris shapes.\r\n</p> <p>For simple homemade, hand-tossed pizza crust, Passione is the dough you knead. This organic artisanal flour\r\n   ground from premium hard red wheat makes amazing pizza that will have every man kissing his fingers in a\r\n   grandiose manner, proclaiming \"Delizioso!\" in an exaggerated, possibly-offensive Italian accent.\r\n</p> <h4>Hot Off The Blocks</h4> <p>The double-down dough roller swiftly lays a level base for the whopping of toppings that can and should\r\n   cover the pizza. We're also including Pizzacraft's authentic Neapolitan herb blend and cookbook, the primer\r\n   on all things pizza with over 100 pages of recipes and resources.\r\n</p> <p>Finally, we've custom-designed a collapsible pizza peel that transfers piping hot pies from\r\n   the grill to the table with all toppings in tact.\r\n</p> <p>Like gold, steel, and the rest of civilization's most indispensable elements, pizza is best forged in fire. </p> <p><sup>*</sup>All historical accuracy subject to interpretation.</p>",
+      "Name": "Pizza Grilling Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/675/large/pg-cool-gift-for-guys-who-love-pizza-and-grilling__22425.jpg?1502411145",
+      "TERRAINRANK": 7
+    },
+    {
+      "SKU": "KTJV-0002-EXO",
+      "VariantName": "Exotic Meats Jerky Heart",
+      "Price": 39.99,
+      "ProductId": 108,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/exotic-meats-jerky-heart",
+      "Contents": "<h4>Love At First Bite</h4> <ul>\r\n  <li>Gator Jerky, Classic, 0.5 oz</li>\r\n  <li>Gator Jerky, Black Pepper, 0.5 oz</li>\r\n  <li>Buffalo Jerky, Black Pepper, 0.5 oz</li>\r\n  <li>Buffalo Jerky, Garlic, 0.5 oz</li>\r\n  <li>Elk Jerky, Garlic, 0.5 oz</li>\r\n</ul> <h4>Eat Your Heart Out</h4> <ul>\r\n  <li>Elk Jerky, Honey Bourbon, 0.5 oz</li>\r\n  <li>Wild Boar Jerky, Honey Bourbon, 0.5 oz</li>\r\n  <li>Wild Boar Jerky, Root Beer Habanero, 0.5 oz</li>\r\n  <li>Venison Jerky, Honey Bourbon, 0.5 oz</li>\r\n  <li>Venison Jerky, Root Beer Habanero, 0.5 oz</li>\r\n</ul>",
+      "LongDescription": "<h4>Sorry, this product got so much love, we've run out until after Valentine's Day.</h4>\r\n\r\n<h4>On Exotic Romance</h4> <p>Some have called love a many splendored thing, others a battlefield. We call it confusing.</p> <p>It's not that we don't get romance; the thrill of being showered by sweet nothings\r\n   and also actual swoon-inducing gifts and makes total sense. It's just, we don't\r\n   get anything we find romantic. Truth be told, a tub of bubbles and a pocketful of\r\n   fancy chocolates doesn't really kickstart the ol' emotion-maker.\r\n</p> <p>But the tides of tender affection are turning, and the male heart can now be cut loose from\r\n   where it's been hanging high and dry all these years. The romanced man has a new\r\n   champion in the Exotic Jerky Heart.\r\n</p> <h4>The Art of Meaty Romance</h4> <p>The Exotic Jerky Heart is a wholly-savory, hyper-sensual meat surprise of affection\r\n   and flavor.\r\n</p> <p>Spring the perfect romantic rouse with a sappy, heart-shaped box suggesting the tiresome chocolates of\r\n   every year. But upon opening, his humdrum expectations and coarse, emotional exterior will be melted away\r\n   by a passionate gesture of jerky.\r\n</p> <p>There's no sentiment words can convey that exotic jerkies can't, but we'll still print your blush-worthy\r\n   message of tender affection inside the box--right next to ten knee-weakening flavors of tender exotic\r\n   animal strips like Honey Bourbon Elk, Black Pepper Gator, and Root Beer Habanero Venison.\r\n</p> <p>Put the \"man\" back in romance with a total heart-sweller that charms him in his most fluent language:\r\n   savory, seasoned beef jerky!\r\n</p>",
+      "Name": "Exotic Jerky Heart",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/001/857/large/emjh_mens_valentines_day_exotic-meats-jerky_gift.jpg?1504132110",
+      "TERRAINRANK": 8
+    },
+    {
+      "SKU": "KTCR-0055-BLO",
+      "VariantName": "Bloody Mary Crate",
+      "Price": 89.99,
+      "ProductId": 53,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/bloody-mary-crate",
+      "Contents": "<h4>Gourmet Garnishes</h4> <ul>\r\n  <li>Pepperoni Straws</li>\r\n  <li>Bacon Rimshot</li>\r\n  <li>(2) Infinium Plastic Pilsner Glasses</li>\r\n</ul> <h4>Flavor Foundation</h4> <ul>\r\n  <li>Demitri's Classic Seasoning</li>\r\n  <li>Demitri's Horseradish Seasoning</li>\r\n  <li>Demitri's Chilis and Peppers Seasoning</li>\r\n  <li>(6) Clamato Tomato Juice Cans</li>\r\n</ul>",
+      "LongDescription": "<h4>The Drink You Can Eat</h4> <p>Some\r\n   drinks pair well with meat: a single malt scotch with slow-cooked ribs, Imperial\r\n   IPA with hand-cranked sausage, or pinot grigio (if you consider that a drink) with\r\n   tilapia (if you consider that meat).\r\n</p> <p>But the Bloody Mary does more than pair\r\n   well. It fully embraces the mighty flavors of meat, resulting in a delicious cocktail\r\n   that doubles as a balanced brunch. Introducing, the gourmet, meat-infused Bloody\r\n   Mary Crate.\r\n</p> <h4>The Spice Specialist</h4> <p>The Bloody Mary is the pizza of cocktails; it's best served cold on a Saturday morning while slouched over\r\n   the couch watching cartoons, and it can support a mountain of meaty toppings.\r\n</p> <p>Upgrade your Bloody Mary from its lesser vegetarian form with Demitri's Pepperoni Straws\r\n   and Bacon Rimshot. Slurp your cocktail through a literal sausage vortex, accent\r\n   the flavor with fanciful bacon crumbles, and start stacking other gourmet garnishes\r\n   with your own creative flair.\r\n</p> <p>But even the most delicious topping towers still requires a solid flavor foundation, and no one does spices\r\n   better than Demitri. Demitri, the Marco Polo of Bloody Marys, has been boldly exploring the exotic world\r\n   of spices, and we're sending three of his perfectly mixed flavors: Classic, Horseradish,\r\n   and Chilies and Peppers.\r\n</p> <h4>Leaning Tower of Toppings</h4> <p>Balancing skewered, top-heavy garnishes like fried chicken or a full stack of pancakes is an art, and\r\n   your first few endeavors will no doubt be accompanied by slips and spills. Hone your stacking skills with\r\n   this pair of infinium plastic Pilsner glasses that won't break when they topple over or are shot with a\r\n   firearm at close range (not legally-binding).\r\n</p> <p>Build a beast of a brunch beverage with the Bloody Mary Man Crate.</p>",
+      "Name": "Bloody Mary Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/551/large/bm_demetris_bloody_mary_mix_gifts_for_men__95099.jpg?1502411096",
+      "TERRAINRANK": 9
+    },
+    {
+      "SKU": "KTHB-0001-FLV",
+      "VariantName": "Personalized Flask: Vampire Desires",
+      "Price": 39.99,
+      "ProductId": 117,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/secret-stash-personalized-flask",
+      "Contents": "<h4>Our Lasers Take Time</h4> \r\n<p>This Personalized item requires 1 day of processing time.</p>\r\n<br><br>\r\n\r\n\r\n\r\n<h4>Home Security System</h4> <ul>\r\n  <li>Personalized Flask</li>\r\n  <li>Secret Stash Book</li>\r\n  <li>Your Choice of a Custom Dust Jacket</li>\r\n</ul>",
+      "LongDescription": "<h4>A Brilliant Ruse</h4> <p>Sometime books make great gifts, like the driving manual for a Jaguar F-Type with accompanying\r\n   vehicle. But most of the time, books gifts are boring and should be avoided.\r\n</p> <p>If it's a book you're certain he wants, then maybe. But if it's a book you just\r\n   think he'll like, there are cheaper ways to prop up a table. It's a celebration,\r\n   not a summer reading list.\r\n</p> <p>We've concocted a brilliant ruse that plays on humanity's widespread discomfort with the extremely longform\r\n   written word. The Secret Stash Personalized Flask takes him from dustjacket disappointment to actual lived\r\n   adventures with the simple turn of a page.\r\n</p> <h4>An Intoxicating Story</h4> <p>We've been told to judge a book not by its cover, but by the contents of its pages. Well,\r\n   these pages conceal a personalized drinking vessel, so it's basically an instant literary classic. Housed\r\n   within the pages itself is a sleek 6 oz. stainless steel flask.\r\n</p> <p>And we've penned our own literary masterpiece by lasering onto the matte black finish. The only thing about\r\n   this gift he'll have to read is his name.\r\n</p> <p>Best of all, the book can be re-used as a \"security-by-obscurity\" safety-deposit book.</p> <h4>Too Good To Be True</h4> <p>To up the outrage factor before the big reveal, we've created some phoney dust jackets that will raise far\r\n   more questions than answers. Choose which of these three terrible books he'll have to awkwardly pretend to\r\n   enjoy receiving:\r\n</p> <ul>\r\n  <li> Vampire Desires, a gripping romance-fantasy adventure of immortal love, loss, and lust;</li>\r\n  <li> Have You Seen My Keys, the latest installment of the unacclaimed and unrequested Sherluck Holmes\r\n       mystery series\r\n  </li>\r\n  <li> How to Hide Your Stuff, a simpleton's conspiracy theory/self-help book from the paranoid mind of one\r\n       Jedd Dangus\r\n  </li>\r\n</ul> <p>And if he has concerns about displaying any of these on his bookshelf, we've printed Plan B directly onto\r\n   the spine of the book. He can remove the dust jacket and hide in plain sight the inconspicuous book, Biting\r\n   Your Neighbor's Horse: and other confusing euphemisms.\r\n</p> <p>The Secret Stash Personalized Flask is an unforgettable gift of surprise and safekeeping.</p>",
+      "Name": "Personalized Flask in Book Vampires",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/833/large/Flask-Inside-book__41814.jpg?1502411212",
+      "TERRAINRANK": 10
+    }
+  ],
+  "template": {
+    "id": 34,
+    "lastModified": "2018-07-24T19:25:09.990Z",
+    "createdAt": "2018-07-24T19:25:01.631Z",
+    "archived": false,
+    "templateName": "Best Products - Iterable Export",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "SKU"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "VariantName"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "Price"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "Inventory"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "VariantStatus"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "ProductId"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "VariantId"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "Path"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "CanonicalUrl"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "ContentsHTML"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "LongDescription"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "Contents"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "12",
+                  "value": {
+                    "id": 12,
+                    "fields": [
+                      [
+                        "LongDescriptionHTML"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "13",
+                  "value": {
+                    "id": 13,
+                    "fields": [
+                      [
+                        "Name"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "14",
+                  "value": {
+                    "id": 14,
+                    "fields": [
+                      [
+                        "ConversionRate"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "15",
+                  "value": {
+                    "id": 15,
+                    "fields": [
+                      [
+                        "UniquePurchases"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "16",
+                  "value": {
+                    "id": 16,
+                    "fields": [
+                      [
+                        "ProductRevenue"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "17",
+                  "value": {
+                    "id": 17,
+                    "fields": [
+                      [
+                        "Quantity"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "18",
+                  "value": {
+                    "id": 18,
+                    "fields": [
+                      [
+                        "AveragePrice"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "19",
+                  "value": {
+                    "id": 19,
+                    "fields": [
+                      [
+                        "ImageLink"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "20",
+                  "value": {
+                    "id": 20,
+                    "fields": [
+                      [
+                        "Margin"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "21",
+                  "value": {
+                    "id": 21,
+                    "fields": [
+                      [
+                        "TERRAINRANK"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "22",
+                  "value": {
+                    "id": 22,
+                    "fields": [
+                      [
+                        "CanonicalUrl"
+                      ]
+                    ],
+                    "meta": {
+                      "value": "https://",
+                      "at": 0
+                    },
+                    "skipNulls": true,
+                    "typeCode": "InsertNode",
+                    "acceptedType": "string"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 22,
+            "uidNode": 23,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "Path"
+                ],
+                7
+              ],
+              [
+                [
+                  "Price"
+                ],
+                2
+              ],
+              [
+                [
+                  "Name"
+                ],
+                13
+              ],
+              [
+                [
+                  "LongDescriptionHTML"
+                ],
+                12
+              ],
+              [
+                [
+                  "VariantId"
+                ],
+                6
+              ],
+              [
+                [
+                  "LongDescription"
+                ],
+                10
+              ],
+              [
+                [
+                  "ProductRevenue"
+                ],
+                16
+              ],
+              [
+                [
+                  "ConversionRate"
+                ],
+                14
+              ],
+              [
+                [
+                  "Margin"
+                ],
+                20
+              ],
+              [
+                [
+                  "TERRAINRANK"
+                ],
+                21
+              ],
+              [
+                [
+                  "UniquePurchases"
+                ],
+                15
+              ],
+              [
+                [
+                  "ProductId"
+                ],
+                5
+              ],
+              [
+                [
+                  "SKU"
+                ],
+                0
+              ],
+              [
+                [
+                  "VariantStatus"
+                ],
+                4
+              ],
+              [
+                [
+                  "ContentsHTML"
+                ],
+                9
+              ],
+              [
+                [
+                  "CanonicalUrl"
+                ],
+                8
+              ],
+              [
+                [
+                  "ImageLink"
+                ],
+                19
+              ],
+              [
+                [
+                  "VariantName"
+                ],
+                1
+              ],
+              [
+                [
+                  "Quantity"
+                ],
+                17
+              ],
+              [
+                [
+                  "Contents"
+                ],
+                11
+              ],
+              [
+                [
+                  "AveragePrice"
+                ],
+                18
+              ],
+              [
+                [
+                  "Inventory"
+                ],
+                3
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "SKU"
+                ]
+              ],
+              [
+                1,
+                [
+                  "VariantName"
+                ]
+              ],
+              [
+                2,
+                [
+                  "Price"
+                ]
+              ],
+              [
+                3,
+                [
+                  "Inventory"
+                ]
+              ],
+              [
+                4,
+                [
+                  "VariantStatus"
+                ]
+              ],
+              [
+                5,
+                [
+                  "ProductId"
+                ]
+              ],
+              [
+                6,
+                [
+                  "VariantId"
+                ]
+              ],
+              [
+                7,
+                [
+                  "Path"
+                ]
+              ],
+              [
+                8,
+                [
+                  "CanonicalUrl"
+                ]
+              ],
+              [
+                9,
+                [
+                  "Contents"
+                ]
+              ],
+              [
+                10,
+                [
+                  "LongDescription2"
+                ]
+              ],
+              [
+                11,
+                [
+                  "Contents2"
+                ]
+              ],
+              [
+                12,
+                [
+                  "LongDescription"
+                ]
+              ],
+              [
+                13,
+                [
+                  "Name"
+                ]
+              ],
+              [
+                14,
+                [
+                  "ConversionRate"
+                ]
+              ],
+              [
+                15,
+                [
+                  "UniquePurchases"
+                ]
+              ],
+              [
+                16,
+                [
+                  "ProductRevenue"
+                ]
+              ],
+              [
+                17,
+                [
+                  "Quantity"
+                ]
+              ],
+              [
+                18,
+                [
+                  "AveragePrice"
+                ]
+              ],
+              [
+                19,
+                [
+                  "ImageLink"
+                ]
+              ],
+              [
+                20,
+                [
+                  "Margin"
+                ]
+              ],
+              [
+                21,
+                [
+                  "TERRAINRANK"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "string"
+              ],
+              [
+                2,
+                "number"
+              ],
+              [
+                3,
+                "number"
+              ],
+              [
+                4,
+                "string"
+              ],
+              [
+                5,
+                "number"
+              ],
+              [
+                6,
+                "number"
+              ],
+              [
+                7,
+                "string"
+              ],
+              [
+                8,
+                "string"
+              ],
+              [
+                9,
+                "string"
+              ],
+              [
+                10,
+                "string"
+              ],
+              [
+                11,
+                "string"
+              ],
+              [
+                12,
+                "string"
+              ],
+              [
+                13,
+                "string"
+              ],
+              [
+                14,
+                "number"
+              ],
+              [
+                15,
+                "number"
+              ],
+              [
+                16,
+                "number"
+              ],
+              [
+                17,
+                "number"
+              ],
+              [
+                18,
+                "number"
+              ],
+              [
+                19,
+                "string"
+              ],
+              [
+                20,
+                "number"
+              ],
+              [
+                21,
+                "number"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                true
+              ],
+              [
+                3,
+                false
+              ],
+              [
+                4,
+                false
+              ],
+              [
+                5,
+                true
+              ],
+              [
+                6,
+                false
+              ],
+              [
+                7,
+                false
+              ],
+              [
+                8,
+                true
+              ],
+              [
+                9,
+                true
+              ],
+              [
+                10,
+                false
+              ],
+              [
+                11,
+                false
+              ],
+              [
+                12,
+                true
+              ],
+              [
+                13,
+                true
+              ],
+              [
+                14,
+                false
+              ],
+              [
+                15,
+                false
+              ],
+              [
+                16,
+                false
+              ],
+              [
+                17,
+                false
+              ],
+              [
+                18,
+                false
+              ],
+              [
+                19,
+                true
+              ],
+              [
+                20,
+                false
+              ],
+              [
+                21,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                8,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                9,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                10,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                11,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                12,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                13,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                14,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                15,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                16,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                17,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                18,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                19,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                20,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                21,
+                {
+                  "etlType": "Integer"
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Algorithm",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "algorithmId": 16
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Fs",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": "Products.*",
+          "fieldOrdering": [
+            "SKU",
+            "VariantName",
+            "Price",
+            "ProductId",
+            "CanonicalUrl",
+            "Contents",
+            "LongDescription",
+            "Name",
+            "ImageLink",
+            "TERRAINRANK"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {},
+        "integrationId": 7,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ]
+        }
+      }
+    }
+  }
+}

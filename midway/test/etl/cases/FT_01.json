@@ -1,0 +1,795 @@
+{
+  "testName": "FT_01",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "ga:pagePath": "/",
+      "AvgTimeOnPage": "69.44204851752022",
+      "UniquePageviews": "9850",
+      "Pageviews": "12474"
+    },
+    {
+      "ga:pagePath": "/ gambar",
+      "AvgTimeOnPage": "149.0",
+      "UniquePageviews": "1",
+      "Pageviews": "3"
+    },
+    {
+      "ga:pagePath": "/ John Gessford/",
+      "AvgTimeOnPage": "0.0",
+      "UniquePageviews": "1",
+      "Pageviews": "1"
+    },
+    {
+      "ga:pagePath": "/?89317CAC-2735-4584-888B-4258A3982C09=",
+      "AvgTimeOnPage": "0.0",
+      "UniquePageviews": "1",
+      "Pageviews": "1"
+    },
+    {
+      "ga:pagePath": "/?advanced=1&display=Lancaster&areas[0]=city:Lancaster&fbts=2682759&beds=0&baths=0&min=0&max=100000000&minacres=0&maxacres=3000&minfootage=0&maxfootage=30000&walkscore=&styles[0]=&map=0&yearbuilt=0&options[0]=pool&sortby=listings.listingdate DESC&ppc=FB&addht=testhashtag&agency_photos=0",
+      "AvgTimeOnPage": "0.0",
+      "UniquePageviews": "1",
+      "Pageviews": "1"
+    },
+    {
+      "ga:pagePath": "/?cid=eml-2014-06-conssmartleads-customer2_website-customerinfo&identityID=&MID=_CE_Co-Broke_20140627&RID=5389977402",
+      "AvgTimeOnPage": "0.0",
+      "UniquePageviews": "1",
+      "Pageviews": "1"
+    },
+    {
+      "ga:pagePath": "/?customize_changeset_uuid=b644abfc-8cc0-4709-967b-c4a948c59d22&customize_theme=divi-child&customize_messenger_channel=preview-0",
+      "AvgTimeOnPage": "443.0",
+      "UniquePageviews": "1",
+      "Pageviews": "1"
+    },
+    {
+      "ga:pagePath": "/?customize_changeset_uuid=d044542f-f127-4de2-bb85-0d75dd37ce3f&customize_theme=divi-child&customize_messenger_channel=preview-0",
+      "AvgTimeOnPage": "1126.0",
+      "UniquePageviews": "1",
+      "Pageviews": "1"
+    },
+    {
+      "ga:pagePath": "/?et_fb=1",
+      "AvgTimeOnPage": "845.5",
+      "UniquePageviews": "2",
+      "Pageviews": "2"
+    },
+    {
+      "ga:pagePath": "/?flush_cache=1",
+      "AvgTimeOnPage": "74.0",
+      "UniquePageviews": "1",
+      "Pageviews": "1"
+    }
+  ],
+  "outputDocs": [
+    {
+      "PagePath": "/",
+      "AvgTimeOnPage": 69.44204851752022,
+      "UniquePageviews": 9850,
+      "Pageviews": 12474,
+      "MlsId": "NULL"
+    },
+    {
+      "PagePath": "/ gambar",
+      "AvgTimeOnPage": 149,
+      "UniquePageviews": 1,
+      "Pageviews": 3,
+      "MlsId": "NULL"
+    },
+    {
+      "PagePath": "/ John Gessford/",
+      "AvgTimeOnPage": 0,
+      "UniquePageviews": 1,
+      "Pageviews": 1,
+      "MlsId": "NULL"
+    },
+    {
+      "PagePath": "/?89317CAC-2735-4584-888B-4258A3982C09=",
+      "AvgTimeOnPage": 0,
+      "UniquePageviews": 1,
+      "Pageviews": 1,
+      "MlsId": "NULL"
+    },
+    {
+      "PagePath": "/?advanced=1&display=Lancaster&areas[0]=city:Lancaster&fbts=2682759&beds=0&baths=0&min=0&max=100000000&minacres=0&maxacres=3000&minfootage=0&maxfootage=30000&walkscore=&styles[0]=&map=0&yearbuilt=0&options[0]=pool&sortby=listings.listingdate DESC&ppc=FB&addht=testhashtag&agency_photos=0",
+      "AvgTimeOnPage": 0,
+      "UniquePageviews": 1,
+      "Pageviews": 1,
+      "MlsId": "NULL"
+    },
+    {
+      "PagePath": "/?cid=eml-2014-06-conssmartleads-customer2_website-customerinfo&identityID=&MID=_CE_Co-Broke_20140627&RID=5389977402",
+      "AvgTimeOnPage": 0,
+      "UniquePageviews": 1,
+      "Pageviews": 1,
+      "MlsId": "NULL"
+    },
+    {
+      "PagePath": "/?customize_changeset_uuid=b644abfc-8cc0-4709-967b-c4a948c59d22&customize_theme=divi-child&customize_messenger_channel=preview-0",
+      "AvgTimeOnPage": 443,
+      "UniquePageviews": 1,
+      "Pageviews": 1,
+      "MlsId": "NULL"
+    },
+    {
+      "PagePath": "/?customize_changeset_uuid=d044542f-f127-4de2-bb85-0d75dd37ce3f&customize_theme=divi-child&customize_messenger_channel=preview-0",
+      "AvgTimeOnPage": 1126,
+      "UniquePageviews": 1,
+      "Pageviews": 1,
+      "MlsId": "NULL"
+    },
+    {
+      "PagePath": "/?et_fb=1",
+      "AvgTimeOnPage": 845.5,
+      "UniquePageviews": 2,
+      "Pageviews": 2,
+      "MlsId": "NULL"
+    },
+    {
+      "PagePath": "/?flush_cache=1",
+      "AvgTimeOnPage": 74,
+      "UniquePageviews": 1,
+      "Pageviews": 1,
+      "MlsId": "NULL"
+    }
+  ],
+  "template": {
+    "id": 3,
+    "lastModified": "2018-07-10T00:29:19.449Z",
+    "createdAt": "2018-05-25T23:45:35.151Z",
+    "archived": false,
+    "templateName": "Google Analytics Listings Import Template",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "ga:pagePath"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "AvgTimeOnPage"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "UniquePageviews"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "Pageviews"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "ga:pagePath"
+                      ]
+                    ],
+                    "meta": {
+                      "find": "listing-cdar",
+                      "replace": "listing",
+                      "regex": false
+                    },
+                    "skipNulls": true,
+                    "typeCode": "FindReplaceNode",
+                    "acceptedType": "string"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "ga:pagePath"
+                      ]
+                    ],
+                    "meta": {
+                      "find": "listing-sandicor",
+                      "replace": "listing",
+                      "regex": false
+                    },
+                    "skipNulls": true,
+                    "typeCode": "FindReplaceNode",
+                    "acceptedType": "string"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "ga:pagePath"
+                      ]
+                    ],
+                    "meta": {
+                      "find": "listing-fbor",
+                      "replace": "listing",
+                      "regex": false
+                    },
+                    "skipNulls": true,
+                    "typeCode": "FindReplaceNode",
+                    "acceptedType": "string"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "ga:pagePath"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "Bad"
+                        ],
+                        [
+                          "Good"
+                        ]
+                      ],
+                      "delimiter": "listing/",
+                      "preserveOldFields": false,
+                      "regex": false
+                    },
+                    "skipNulls": true,
+                    "typeCode": "SplitNode",
+                    "acceptedType": "string"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "_synthetic_agz8ut3tb3d",
+                        "Good"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "MlsId"
+                        ],
+                        [
+                          "exclude"
+                        ]
+                      ],
+                      "delimiter": "-",
+                      "preserveOldFields": false,
+                      "regex": false
+                    },
+                    "skipNulls": true,
+                    "typeCode": "SplitNode",
+                    "acceptedType": "string"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "AvgTimeOnPage"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "UniquePageviews"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "Pageviews"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "12",
+                  "value": {
+                    "id": 12,
+                    "fields": [
+                      [
+                        "_synthetic_vnge7g6uiqn",
+                        "MlsId"
+                      ]
+                    ],
+                    "meta": {
+                      "filterNull": true,
+                      "filterNaN": false,
+                      "filterStringNull": false,
+                      "filterUndefined": true,
+                      "filterValue": "",
+                      "newValue": "null"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "SetIfNode"
+                  }
+                },
+                {
+                  "v": "13",
+                  "value": {
+                    "id": 13,
+                    "fields": [
+                      [
+                        "_synthetic_vnge7g6uiqn",
+                        "MlsId"
+                      ]
+                    ],
+                    "meta": {
+                      "format": "uppercase"
+                    },
+                    "skipNulls": true,
+                    "typeCode": "CaseNode",
+                    "acceptedType": "string"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 8,
+            "uidNode": 14,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "ga:pagePath"
+                ],
+                0
+              ],
+              [
+                [
+                  "AvgTimeOnPage"
+                ],
+                1
+              ],
+              [
+                [
+                  "UniquePageviews"
+                ],
+                2
+              ],
+              [
+                [
+                  "Pageviews"
+                ],
+                3
+              ],
+              [
+                [
+                  "_synthetic_otz9itwk4ws",
+                  "Bad"
+                ],
+                4
+              ],
+              [
+                [
+                  "_synthetic_agz8ut3tb3d",
+                  "Good"
+                ],
+                5
+              ],
+              [
+                [
+                  "_synthetic_vnge7g6uiqn",
+                  "MlsId"
+                ],
+                6
+              ],
+              [
+                [
+                  "_synthetic_q81xz9b1ls",
+                  "exclude"
+                ],
+                7
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "PagePath"
+                ]
+              ],
+              [
+                1,
+                [
+                  "AvgTimeOnPage"
+                ]
+              ],
+              [
+                2,
+                [
+                  "UniquePageviews"
+                ]
+              ],
+              [
+                3,
+                [
+                  "Pageviews"
+                ]
+              ],
+              [
+                4,
+                [
+                  "Bad"
+                ]
+              ],
+              [
+                5,
+                [
+                  "Good"
+                ]
+              ],
+              [
+                6,
+                [
+                  "MlsId"
+                ]
+              ],
+              [
+                7,
+                [
+                  "exclude"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "number"
+              ],
+              [
+                2,
+                "number"
+              ],
+              [
+                3,
+                "number"
+              ],
+              [
+                4,
+                "string"
+              ],
+              [
+                5,
+                "string"
+              ],
+              [
+                6,
+                "string"
+              ],
+              [
+                7,
+                "string"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                true
+              ],
+              [
+                3,
+                true
+              ],
+              [
+                4,
+                false
+              ],
+              [
+                5,
+                false
+              ],
+              [
+                6,
+                true
+              ],
+              [
+                7,
+                false
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": true
+                  }
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "GoogleAnalytics",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "dayInterval": 30
+        },
+        "integrationId": 3,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Database",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": [
+            "PagePath",
+            "Good",
+            "exclude",
+            "MlsId",
+            "Bad",
+            "AvgTimeOnPage",
+            "UniquePageviews",
+            "Pageviews"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "language": "elastic",
+          "table": "data",
+          "serverId": "FirstTeam ES",
+          "database": "listings"
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            5,
+            7,
+            6,
+            4,
+            1,
+            2,
+            3
+          ]
+        }
+      }
+    }
+  }
+}

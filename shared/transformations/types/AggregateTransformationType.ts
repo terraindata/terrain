@@ -45,11 +45,19 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 import Topology from 'shared/transformations/util/TopologyUtil';
 
+import { List } from 'immutable';
+
 import TransformationNode from 'shared/transformations/TransformationNode';
-import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import TransformationVisitError from 'shared/transformations/visitors/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/visitors/TransformationVisitResult';
+import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
 /*
@@ -69,7 +77,7 @@ export default abstract class AggregateTransformationType extends Transformation
     const errors = [];
     const opts = this.meta as NodeOptionsType<any>;
     const outputField = opts.newFieldKeyPaths.get(0);
-    const inputField = this.fields.get(0);
+    const inputField = this.fields.get(0).path;
 
     const matcherFn = Topology.createBasePathMatcher(inputField, outputField);
     for (const match of yadeep.search(doc, inputField))
@@ -83,7 +91,7 @@ export default abstract class AggregateTransformationType extends Transformation
       if (Array.isArray(value))
       {
         const aggregate = this.aggregator(value);
-        yadeep.set(doc, matcherFn(location), aggregate, { create: true });
+        yadeep.setIn(doc, matcherFn(location), aggregate);
       }
       else
       {

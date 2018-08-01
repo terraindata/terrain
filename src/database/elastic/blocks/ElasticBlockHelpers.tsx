@@ -113,7 +113,7 @@ export const ElasticBlockHelpers = {
     {
       col = schemaState.columns[key];
     }
-    if (col)
+    if (col && col.properties)
     {
       subFields = findSubfields(field, col.properties);
     }
@@ -273,14 +273,17 @@ export const ElasticBlockHelpers = {
     {
       return returnDatatype ? 'float' : FieldType.Numerical;
     }
-    if (!builderState.query && !overrideIndex)
+    if ((!builderState || !builderState.query) && !overrideIndex)
     {
       return '';
     }
-    const { source } = builderState.query.path;
-    let index = source && source.dataSource && source.dataSource.index ?
-      source.dataSource.index : getIndex('', builderState);
-    index = overrideIndex || index;
+    let index = overrideIndex;
+    if (builderState && builderState.query && !index)
+    {
+      const { source } = builderState.query.path;
+      index = source && source.dataSource && source.dataSource.index ?
+        source.dataSource.index : getIndex('', builderState);
+    }
     if (!index)
     {
       return undefined;

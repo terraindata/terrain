@@ -45,41 +45,46 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
-import { AddTransformationInfo } from './nodes/AddTransformationNode';
-import { ArrayCountTransformationInfo } from './nodes/ArrayCountTransformationNode';
-import { ArrayMaxTransformationInfo } from './nodes/ArrayMaxTransformationNode';
-import { ArrayMinTransformationInfo } from './nodes/ArrayMinTransformationNode';
-import { ArraySumTransformationInfo } from './nodes/ArraySumTransformationNode';
-import { CaseTransformationInfo } from './nodes/CaseTransformationNode';
-import { CastTransformationInfo } from './nodes/CastTransformationNode';
-import { DecryptTransformationInfo } from './nodes/DecryptTransformationNode';
-import { DifferenceTransformationInfo } from './nodes/DifferenceTransformationNode';
-import { DivideTransformationInfo } from './nodes/DivideTransformationNode';
-import { DuplicateTransformationInfo } from './nodes/DuplicateTransformationNode';
-import { EncryptTransformationInfo } from './nodes/EncryptTransformationNode';
-import { FilterArrayTransformationInfo } from './nodes/FilterArrayTransformationNode';
-import { FindReplaceTransformationInfo } from './nodes/FindReplaceTransformationNode';
-import { GroupByTransformationInfo } from './nodes/GroupByTransformationNode';
-import { HashTransformationInfo } from './nodes/HashTransformationNode';
-import { InsertTransformationInfo } from './nodes/InsertTransformationNode';
-import { JoinTransformationInfo } from './nodes/JoinTransformationNode';
-import { MultiplyTransformationInfo } from './nodes/MultiplyTransformationNode';
-import { ProductTransformationInfo } from './nodes/ProductTransformationNode';
-import { QuotientTransformationInfo } from './nodes/QuotientTransformationNode';
-import { RemoveDuplicatesTransformationInfo } from './nodes/RemoveDuplicatesTransformationNode';
-import { RoundTransformationInfo } from './nodes/RoundTransformationNode';
-import { SetIfTransformationInfo } from './nodes/SetIfTransformationNode';
-import { SplitTransformationInfo } from './nodes/SplitTransformationNode';
-import { SubstringTransformationInfo } from './nodes/SubstringTransformationNode';
-import { SubtractTransformationInfo } from './nodes/SubtractTransformationNode';
-import { SumTransformationInfo } from './nodes/SumTransformationNode';
-import { ZipcodeTransformationInfo } from './nodes/ZipcodeTransformationNode';
+import { AddTransformationInfo, AddTransformationNode } from './nodes/AddTransformationNode';
+import { ArrayCountTransformationInfo, ArrayCountTransformationNode } from './nodes/ArrayCountTransformationNode';
+import { ArrayMaxTransformationInfo, ArrayMaxTransformationNode } from './nodes/ArrayMaxTransformationNode';
+import { ArrayMinTransformationInfo, ArrayMinTransformationNode } from './nodes/ArrayMinTransformationNode';
+import { ArraySumTransformationInfo, ArraySumTransformationNode } from './nodes/ArraySumTransformationNode';
+import { CaseTransformationInfo, CaseTransformationNode } from './nodes/CaseTransformationNode';
+import { CastTransformationInfo, CastTransformationNode } from './nodes/CastTransformationNode';
+import { DecryptTransformationInfo, DecryptTransformationNode } from './nodes/DecryptTransformationNode';
+import { DeprecatedTransformationInfo, DeprecatedTransformationNode } from './nodes/DeprecatedTransformationNode';
+import { DifferenceTransformationInfo, DifferenceTransformationNode } from './nodes/DifferenceTransformationNode';
+import { DivideTransformationInfo, DivideTransformationNode } from './nodes/DivideTransformationNode';
+import { DuplicateTransformationInfo, DuplicateTransformationNode } from './nodes/DuplicateTransformationNode';
+import { EncryptTransformationInfo, EncryptTransformationNode } from './nodes/EncryptTransformationNode';
+import { FilterArrayTransformationInfo, FilterArrayTransformationNode } from './nodes/FilterArrayTransformationNode';
+import { FindReplaceTransformationInfo, FindReplaceTransformationNode } from './nodes/FindReplaceTransformationNode';
+import { GroupByTransformationInfo, GroupByTransformationNode } from './nodes/GroupByTransformationNode';
+import { HashTransformationInfo, HashTransformationNode } from './nodes/HashTransformationNode';
+import { IdentityTransformationInfo, IdentityTransformationNode } from './nodes/IdentityTransformationNode';
+import { InsertTransformationInfo, InsertTransformationNode } from './nodes/InsertTransformationNode';
+import { JoinTransformationInfo, JoinTransformationNode } from './nodes/JoinTransformationNode';
+import { MultiplyTransformationInfo, MultiplyTransformationNode } from './nodes/MultiplyTransformationNode';
+import { ParseTransformationInfo, ParseTransformationNode } from './nodes/ParseTransformationNode';
+import { ProductTransformationInfo, ProductTransformationNode } from './nodes/ProductTransformationNode';
+import { QuotientTransformationInfo, QuotientTransformationNode } from './nodes/QuotientTransformationNode';
+import { RemoveDuplicatesTransformationInfo, RemoveDuplicatesTransformationNode } from './nodes/RemoveDuplicatesTransformationNode';
+import { RenameTransformationInfo, RenameTransformationNode } from './nodes/RenameTransformationNode';
+import { RoundTransformationInfo, RoundTransformationNode } from './nodes/RoundTransformationNode';
+import { SetIfTransformationInfo, SetIfTransformationNode } from './nodes/SetIfTransformationNode';
+import { SplitTransformationInfo, SplitTransformationNode } from './nodes/SplitTransformationNode';
+import { StringifyTransformationInfo, StringifyTransformationNode } from './nodes/StringifyTransformationNode';
+import { SubstringTransformationInfo, SubstringTransformationNode } from './nodes/SubstringTransformationNode';
+import { SubtractTransformationInfo, SubtractTransformationNode } from './nodes/SubtractTransformationNode';
+import { SumTransformationInfo, SumTransformationNode } from './nodes/SumTransformationNode';
+import { ZipcodeTransformationInfo, ZipcodeTransformationNode } from './nodes/ZipcodeTransformationNode';
 
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import TransformationNodeVisitor, { VisitorLookupMap } from 'shared/transformations/TransformationNodeVisitor';
+import TransformationNodeVisitor, { VisitorLookupMap } from 'shared/transformations/visitors/TransformationNodeVisitor';
 
 const infos: {
   [k in TransformationNodeType]: TransformationNodeInfo & { typeCode: k }
@@ -92,6 +97,7 @@ const infos: {
   [TransformationNodeType.CaseNode]: CaseTransformationInfo,
   [TransformationNodeType.CastNode]: CastTransformationInfo,
   [TransformationNodeType.DecryptNode]: DecryptTransformationInfo,
+  [TransformationNodeType.DeprecatedNode]: DeprecatedTransformationInfo,
   [TransformationNodeType.DifferenceNode]: DifferenceTransformationInfo,
   [TransformationNodeType.DivideNode]: DivideTransformationInfo,
   [TransformationNodeType.DuplicateNode]: DuplicateTransformationInfo,
@@ -100,15 +106,19 @@ const infos: {
   [TransformationNodeType.FindReplaceNode]: FindReplaceTransformationInfo,
   [TransformationNodeType.GroupByNode]: GroupByTransformationInfo,
   [TransformationNodeType.HashNode]: HashTransformationInfo,
+  [TransformationNodeType.IdentityNode]: IdentityTransformationInfo,
   [TransformationNodeType.InsertNode]: InsertTransformationInfo,
   [TransformationNodeType.JoinNode]: JoinTransformationInfo,
   [TransformationNodeType.MultiplyNode]: MultiplyTransformationInfo,
+  [TransformationNodeType.ParseNode]: ParseTransformationInfo,
   [TransformationNodeType.ProductNode]: ProductTransformationInfo,
   [TransformationNodeType.QuotientNode]: QuotientTransformationInfo,
   [TransformationNodeType.RemoveDuplicatesNode]: RemoveDuplicatesTransformationInfo,
+  [TransformationNodeType.RenameNode]: RenameTransformationInfo,
   [TransformationNodeType.RoundNode]: RoundTransformationInfo,
   [TransformationNodeType.SetIfNode]: SetIfTransformationInfo,
   [TransformationNodeType.SplitNode]: SplitTransformationInfo,
+  [TransformationNodeType.StringifyNode]: StringifyTransformationInfo,
   [TransformationNodeType.SubstringNode]: SubstringTransformationInfo,
   [TransformationNodeType.SubtractNode]: SubtractTransformationInfo,
   [TransformationNodeType.SumNode]: SumTransformationInfo,
@@ -160,9 +170,14 @@ class TransformationRegistryLookup
     return registryVisitor.visit(type).description;
   }
 
-  public isAvailable(type: TransformationNodeType, engine: TransformationEngine, field: number)
+  public isAvailable(
+    type: TransformationNodeType,
+    engine: TransformationEngine,
+    field: number,
+    tree: ReturnType<TransformationEngine['createTree']>,
+  )
   {
-    return registryVisitor.visit(type).isAvailable(engine, field);
+    return registryVisitor.visit(type).isAvailable(engine, field, tree);
   }
 
   public canCreate(type: TransformationNodeType): boolean
@@ -175,14 +190,19 @@ class TransformationRegistryLookup
     return registryVisitor.visit(type).editable;
   }
 
+  public isVisible(type: TransformationNodeType): boolean
+  {
+    return registryVisitor.visit(type).visible;
+  }
+
   public getType(type: TransformationNodeType): any
   {
     return registryVisitor.visit(type).nodeClass;
   }
 
-  public getNewFieldType(type: TransformationNodeType): any
+  public getInfo(type: TransformationNodeType): TransformationNodeInfo
   {
-    return registryVisitor.visit(type).newFieldType;
+    return registryVisitor.visit(type);
   }
 }
 

@@ -44,11 +44,26 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires no-empty-interface max-classes-per-file
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
+import * as React from 'react';
 
-import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { instanceFnDecorator } from 'shared/util/Classes';
+
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { TransformationNode } from 'etl/templates/FieldTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import { TransformationForm } from './TransformationFormBase';
+import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
+
+import { DynamicForm } from 'common/components/DynamicForm';
+import { KeyPath as EnginePath } from 'shared/util/KeyPath';
+
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
 
 type FilterOptions = NodeOptionsType<TransformationNodeType.FilterArrayNode>;
 export class FilterArrayTFF extends TransformationForm<FilterOptions, TransformationNodeType.FilterArrayNode>

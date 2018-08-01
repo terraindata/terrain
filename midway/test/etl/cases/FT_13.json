@@ -1,0 +1,3941 @@
+{
+  "testName": "FT_13",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "PropertyImageUrl": "",
+      "SellingOfficeID": "B08610",
+      "MlsId": "16967999",
+      "SellingOfficeName": "Crosby Doe Associates  Inc.",
+      "Status": "SLD",
+      "AgentID": "X07846",
+      "PropertyTypeID": 1,
+      "CoListingAgentName": "Susan Blau",
+      "PropertyType": "HSE",
+      "CoListingAgentDRE": 569470,
+      "StreetAddress": "11468 DONA CECILIA DR",
+      "CoListingOfficeID": "X74052",
+      "UnitNumber": 0,
+      "CoListingOfficeName": "Keller Williams Studio City",
+      "Area": 1653,
+      "CoSellingAgentID": "C107263",
+      "SubArea": "",
+      "CoSellingAgentName": "Ilana Gafni",
+      "CityName": "Studio City",
+      "CoSellingAgentDRE": "",
+      "ZipCode": 91604,
+      "CoSellingOfficeID": "B08610",
+      "NumberBedrooms": 4,
+      "CoSellingOfficeName": "Crosby Doe Associates  Inc.",
+      "NumberBathrooms": 3,
+      "OffMarket": "2016-04-11T07:00:00.000Z",
+      "SquareFeet": 3886,
+      "DaysOnMarket": 132,
+      "YearBuilt": 1964,
+      "WithdrawnDate": "",
+      "ListPrice": 2695000,
+      "ExpiredDate": null,
+      "Price": 2475000,
+      "DateTransaction": "2016-06-10T07:00:00.000Z",
+      "isLease": 0,
+      "MLSBoard": "MRMLS2",
+      "isAdvertisedOnInternet": 1,
+      "Latitude": 34.12754,
+      "DateListed": "2016-01-02T08:00:00.000Z",
+      "Longitude": -118.38442,
+      "DatePending": "2016-04-11T07:00:00.000Z",
+      "Pricepersqft": 636,
+      "DateSold": "2016-05-26T07:00:00.000Z",
+      "ListingAgentid": "X85422",
+      "ListingAgentName": "Ben DI Benedetto",
+      "ListingAgentDRE": 1261338,
+      "ListingAgentHomePhone": "8183717718  ",
+      "ListingAgentCellPhone": 0,
+      "ListingAgentEmail": "blvdteam@homesinla.com",
+      "ListingOfficeName": "Keller Williams Studio City",
+      "SellingAgentID": "B34672",
+      "SellingAgentName": "Crosby Doe",
+      "SellingAgentDRE": 463731,
+      "pkey": "16967999-X07846",
+      "TerrainScore": 0,
+      "TERRAINRANK": 1
+    },
+    {
+      "PropertyImageUrl": "",
+      "SellingOfficeID": "F4320012",
+      "MlsId": "16968039PS",
+      "SellingOfficeName": "Coldwell Banker Residential B",
+      "Status": "SLD",
+      "AgentID": "48590",
+      "PropertyTypeID": 1,
+      "CoListingAgentName": "Michael Donato",
+      "PropertyType": "CONDO",
+      "CoListingAgentDRE": 1937391,
+      "StreetAddress": "911 S VILLAGE SQ",
+      "CoListingOfficeID": "4500",
+      "UnitNumber": 0,
+      "CoListingOfficeName": "Bennion Deville Homes",
+      "Area": 332,
+      "CoSellingAgentID": "",
+      "SubArea": "",
+      "CoSellingAgentName": "",
+      "CityName": "Palm Springs",
+      "CoSellingAgentDRE": "",
+      "ZipCode": 92262,
+      "CoSellingOfficeID": "",
+      "NumberBedrooms": 2,
+      "CoSellingOfficeName": "",
+      "NumberBathrooms": 2,
+      "OffMarket": "2016-01-07T08:00:00.000Z",
+      "SquareFeet": 1679,
+      "DaysOnMarket": 16,
+      "YearBuilt": 1985,
+      "WithdrawnDate": "",
+      "ListPrice": 299000,
+      "ExpiredDate": null,
+      "Price": 270000,
+      "DateTransaction": "2016-01-19T08:00:00.000Z",
+      "isLease": 0,
+      "MLSBoard": "MRMLS2",
+      "isAdvertisedOnInternet": 1,
+      "Latitude": 33.816276,
+      "DateListed": "2016-01-03T08:00:00.000Z",
+      "Longitude": -116.538505,
+      "DatePending": "2016-01-07T08:00:00.000Z",
+      "Pricepersqft": 160,
+      "DateSold": "2016-02-03T08:00:00.000Z",
+      "ListingAgentid": "40179",
+      "ListingAgentName": "Jeffrey Grohs",
+      "ListingAgentDRE": 1322967,
+      "ListingAgentHomePhone": "7609021960  ",
+      "ListingAgentCellPhone": 0,
+      "ListingAgentEmail": "jgrohsbdhomes@gmail.com",
+      "ListingOfficeName": "Bennion Deville Homes",
+      "SellingAgentID": "F207013189",
+      "SellingAgentName": "Stephen Pannesco",
+      "SellingAgentDRE": 1281276,
+      "pkey": "16968039PS-48590",
+      "TerrainScore": 0,
+      "TERRAINRANK": 2
+    },
+    {
+      "PropertyImageUrl": "http://propphoto.firstteam.com/ftwebmls/mrmls2.pix/a1061p4/16968083.jpg",
+      "SellingOfficeID": "",
+      "MlsId": "16968083",
+      "SellingOfficeName": "",
+      "Status": "ACT",
+      "CoListingAgentID": "CLW-X64154",
+      "PropertyTypeID": 4,
+      "CoListingAgentName": "J.J. Wallack",
+      "PropertyType": "LAND",
+      "CoListingAgentDRE": 1445924,
+      "StreetAddress": "2255 N Laurel Canyon Boulevard",
+      "CoListingOfficeID": "CLW-X74054",
+      "UnitNumber": 0,
+      "CoListingOfficeName": "Keller Williams Beverly Hills",
+      "Area": 1061,
+      "CoSellingAgentID": "",
+      "SubArea": "",
+      "CoSellingAgentName": "",
+      "CityName": "Los Angeles",
+      "CoSellingAgentDRE": "",
+      "ZipCode": 90046,
+      "CoSellingOfficeID": "",
+      "NumberBedrooms": 0,
+      "CoSellingOfficeName": "",
+      "NumberBathrooms": 0,
+      "OffMarket": null,
+      "SquareFeet": 0,
+      "DaysOnMarket": 914,
+      "YearBuilt": 0,
+      "WithdrawnDate": "",
+      "ListPrice": 150000,
+      "ExpiredDate": null,
+      "Price": 150000,
+      "DateTransaction": "2016-04-17T07:00:00.000Z",
+      "isLease": 0,
+      "MLSBoard": "MRMLS2",
+      "isAdvertisedOnInternet": 1,
+      "Latitude": 34.110866,
+      "DateListed": "2016-01-04T08:00:00.000Z",
+      "Longitude": -118.373456,
+      "DatePending": "2016-04-16T07:00:00.000Z",
+      "Pricepersqft": 0,
+      "DateSold": null,
+      "AgentID": "CLW-X64154",
+      "ListingAgentName": "J.J. Wallack",
+      "ListingAgentDRE": 1445924,
+      "ListingAgentHomePhone": "3109805999  ",
+      "ListingAgentCellPhone": 0,
+      "ListingAgentEmail": "JJ@Wallack.com",
+      "ListingOfficeName": "Keller Williams Beverly Hills",
+      "SellingAgentID": "",
+      "SellingAgentName": "",
+      "SellingAgentDRE": 0,
+      "pkey": "16968083-CLW-X64154",
+      "ListingAgentid": "CLW-X64154",
+      "TerrainScore": 0,
+      "TERRAINRANK": 3
+    },
+    {
+      "PropertyImageUrl": "",
+      "SellingOfficeID": "X76967",
+      "MlsId": "16968209",
+      "SellingOfficeName": "Exclusive Realty Inc.",
+      "Status": "SLD",
+      "CoListingAgentID": "X78894",
+      "PropertyTypeID": 3,
+      "CoListingAgentName": "Monique Kangarlou",
+      "PropertyType": "CONDO",
+      "CoListingAgentDRE": 1746665,
+      "StreetAddress": "5815 DOVERWOOD DR",
+      "CoListingOfficeID": "X76967",
+      "UnitNumber": 0,
+      "CoListingOfficeName": "Exclusive Realty Inc.",
+      "Area": 1083,
+      "CoSellingAgentID": "",
+      "SubArea": "",
+      "CoSellingAgentName": "",
+      "CityName": "Culver City",
+      "CoSellingAgentDRE": "",
+      "ZipCode": 90230,
+      "CoSellingOfficeID": "",
+      "NumberBedrooms": 2,
+      "CoSellingOfficeName": "",
+      "NumberBathrooms": 2,
+      "OffMarket": "2016-02-20T08:00:00.000Z",
+      "SquareFeet": 996,
+      "DaysOnMarket": 36,
+      "YearBuilt": 0,
+      "WithdrawnDate": "",
+      "ListPrice": 2275,
+      "ExpiredDate": null,
+      "Price": 2275,
+      "DateTransaction": "2016-02-20T08:00:00.000Z",
+      "isLease": 1,
+      "MLSBoard": "MRMLS2",
+      "isAdvertisedOnInternet": 1,
+      "Latitude": 33.98242,
+      "DateListed": "2016-01-15T08:00:00.000Z",
+      "Longitude": -118.38825,
+      "DatePending": "2016-02-20T08:00:00.000Z",
+      "Pricepersqft": 2,
+      "DateSold": "2016-02-20T08:00:00.000Z",
+      "ListingAgentid": "X97271",
+      "ListingAgentName": "Camille Bettis",
+      "ListingAgentDRE": 1844151,
+      "ListingAgentHomePhone": "3232280786  ",
+      "ListingAgentCellPhone": 0,
+      "ListingAgentEmail": "bettisrealtygroup@gmail.com",
+      "ListingOfficeName": "Bettis Realty Group  Inc.",
+      "AgentID": "X78894",
+      "SellingAgentName": "Monique Kangarlou",
+      "SellingAgentDRE": 1746665,
+      "pkey": "16968209-X78894",
+      "SellingAgentID": "X78894",
+      "TerrainScore": 0,
+      "TERRAINRANK": 4
+    },
+    {
+      "PropertyImageUrl": "",
+      "SellingOfficeID": "CLW-5477",
+      "MlsId": "16968225PS",
+      "SellingOfficeName": "Desert Cities Realtors",
+      "Status": "SLD",
+      "AgentID": "CDR-44142",
+      "PropertyTypeID": 3,
+      "CoListingAgentName": "Diana Wickler",
+      "PropertyType": "HSE",
+      "CoListingAgentDRE": 1743156,
+      "StreetAddress": "64443 PINEHURST Circle",
+      "CoListingOfficeID": "CLW-5477",
+      "UnitNumber": 0,
+      "CoListingOfficeName": "Desert Cities Realtors",
+      "Area": 341,
+      "CoSellingAgentID": "",
+      "SubArea": "",
+      "CoSellingAgentName": "",
+      "CityName": "Desert Hot Springs",
+      "CoSellingAgentDRE": "",
+      "ZipCode": 92240,
+      "CoSellingOfficeID": "",
+      "NumberBedrooms": 2,
+      "CoSellingOfficeName": "",
+      "NumberBathrooms": 2,
+      "OffMarket": "2016-02-01T08:00:00.000Z",
+      "SquareFeet": 1228,
+      "DaysOnMarket": 27,
+      "YearBuilt": 0,
+      "WithdrawnDate": "",
+      "ListPrice": 975,
+      "ExpiredDate": null,
+      "Price": 975,
+      "DateTransaction": "2016-02-08T08:00:00.000Z",
+      "isLease": 1,
+      "MLSBoard": "MRMLS2",
+      "isAdvertisedOnInternet": 1,
+      "Latitude": 33.982101,
+      "DateListed": "2016-01-04T08:00:00.000Z",
+      "Longitude": -116.535689,
+      "DatePending": "2016-02-01T08:00:00.000Z",
+      "Pricepersqft": 0,
+      "DateSold": "2016-02-01T08:00:00.000Z",
+      "ListingAgentid": "CLW-44142",
+      "ListingAgentName": "Diana Wickler",
+      "ListingAgentDRE": 1743156,
+      "ListingAgentHomePhone": "7605674031  ",
+      "ListingAgentCellPhone": 0,
+      "ListingAgentEmail": "diana@dianawickler.com",
+      "ListingOfficeName": "Desert Cities Realtors",
+      "SellingAgentID": "CLW-44142",
+      "SellingAgentName": "Diana Wickler",
+      "SellingAgentDRE": 1743156,
+      "pkey": "16968225PS-CDR-44142",
+      "TerrainScore": 0,
+      "TERRAINRANK": 5
+    },
+    {
+      "PropertyImageUrl": "",
+      "SellingOfficeID": "B08351",
+      "MlsId": "16968275",
+      "SellingOfficeName": "Nelson Shelton & Associates",
+      "Status": "SLD",
+      "AgentID": "L04197",
+      "PropertyTypeID": 3,
+      "CoListingAgentName": "Shel Kirshner",
+      "PropertyType": "CONDO",
+      "CoListingAgentDRE": 1113516,
+      "StreetAddress": "10790 WILSHIRE",
+      "CoListingOfficeID": "X7173804",
+      "UnitNumber": 0,
+      "CoListingOfficeName": "Rodeo Realty- Brentwood",
+      "Area": 1063,
+      "CoSellingAgentID": "",
+      "SubArea": "",
+      "CoSellingAgentName": "",
+      "CityName": "Los Angeles",
+      "CoSellingAgentDRE": "",
+      "ZipCode": 90024,
+      "CoSellingOfficeID": "",
+      "NumberBedrooms": 2,
+      "CoSellingOfficeName": "",
+      "NumberBathrooms": 2.5,
+      "OffMarket": "2016-01-09T08:00:00.000Z",
+      "SquareFeet": 1692,
+      "DaysOnMarket": 5,
+      "YearBuilt": 0,
+      "WithdrawnDate": "",
+      "ListPrice": 4000,
+      "ExpiredDate": null,
+      "Price": 4200,
+      "DateTransaction": "2016-01-12T08:00:00.000Z",
+      "isLease": 1,
+      "MLSBoard": "MRMLS2",
+      "isAdvertisedOnInternet": 1,
+      "Latitude": 34.05956,
+      "DateListed": "2016-01-04T08:00:00.000Z",
+      "Longitude": -118.43922,
+      "DatePending": "2016-01-09T08:00:00.000Z",
+      "Pricepersqft": 2,
+      "DateSold": "2016-01-09T08:00:00.000Z",
+      "ListingAgentid": "X66699",
+      "ListingAgentName": "Wendy Kirshner",
+      "ListingAgentDRE": 1317026,
+      "ListingAgentHomePhone": "3107410232  ",
+      "ListingAgentCellPhone": 0,
+      "ListingAgentEmail": "wendy@thekirshnergroup.com",
+      "ListingOfficeName": "Rodeo Realty- Brentwood",
+      "SellingAgentID": "L02048",
+      "SellingAgentName": "Pari Kohan-Zakay",
+      "SellingAgentDRE": 1096081,
+      "pkey": "16968275-L04197",
+      "TerrainScore": 0,
+      "TERRAINRANK": 6
+    },
+    {
+      "PropertyImageUrl": "",
+      "SellingOfficeID": "X7482701",
+      "MlsId": "16968293",
+      "SellingOfficeName": "Deasy Penner & Partners",
+      "Status": "SLD",
+      "AgentID": "C105340",
+      "PropertyTypeID": 1,
+      "CoListingAgentName": "Mike Deasy",
+      "PropertyType": "CONDO",
+      "CoListingAgentDRE": 1514230,
+      "StreetAddress": "257 S SPRIN",
+      "CoListingOfficeID": "X7482701",
+      "UnitNumber": null,
+      "CoListingOfficeName": "Deasy Penner & Partners",
+      "Area": 1093,
+      "CoSellingAgentID": "",
+      "SubArea": "",
+      "CoSellingAgentName": "",
+      "CityName": "Los Angeles",
+      "CoSellingAgentDRE": "",
+      "ZipCode": 90012,
+      "CoSellingOfficeID": "",
+      "NumberBedrooms": 2,
+      "CoSellingOfficeName": "",
+      "NumberBathrooms": 3,
+      "OffMarket": "2016-04-15T07:00:00.000Z",
+      "SquareFeet": 2100,
+      "DaysOnMarket": 234,
+      "YearBuilt": 1899,
+      "WithdrawnDate": "",
+      "ListPrice": 2100000,
+      "ExpiredDate": null,
+      "Price": 2050000,
+      "DateTransaction": "2016-09-04T07:00:00.000Z",
+      "isLease": 0,
+      "MLSBoard": "MRMLS2",
+      "isAdvertisedOnInternet": 1,
+      "Latitude": 34.05073,
+      "DateListed": "2016-01-12T08:00:00.000Z",
+      "Longitude": -118.24717,
+      "DatePending": "2016-04-15T07:00:00.000Z",
+      "Pricepersqft": 976,
+      "DateSold": "2016-09-02T07:00:00.000Z",
+      "ListingAgentid": "X73408",
+      "ListingAgentName": "Wayne A. Willbur",
+      "ListingAgentDRE": 1716358,
+      "ListingAgentHomePhone": "2135000254  ",
+      "ListingAgentCellPhone": 0,
+      "ListingAgentEmail": "WWillbur@DeasyPenner.com",
+      "ListingOfficeName": "Deasy Penner & Partners",
+      "SellingAgentID": "X73408",
+      "SellingAgentName": "Wayne A. Willbur",
+      "SellingAgentDRE": 1716358,
+      "pkey": "16968293-C105340",
+      "TerrainScore": 0,
+      "TERRAINRANK": 7
+    },
+    {
+      "PropertyImageUrl": "",
+      "SellingOfficeID": "",
+      "MlsId": "16968303",
+      "SellingOfficeName": "",
+      "Status": "WTH",
+      "AgentID": "X51646",
+      "PropertyTypeID": 1,
+      "CoListingAgentName": "Jennifer Chrisman",
+      "PropertyType": "HSE",
+      "CoListingAgentDRE": 1325526,
+      "StreetAddress": "19214 PACIFIC COAST HWY",
+      "CoListingOfficeID": "X7623401",
+      "UnitNumber": 0,
+      "CoListingOfficeName": "Partners Trust Malibu",
+      "Area": 1087,
+      "CoSellingAgentID": "",
+      "SubArea": "",
+      "CoSellingAgentName": "",
+      "CityName": "Malibu",
+      "CoSellingAgentDRE": "",
+      "ZipCode": 90265,
+      "CoSellingOfficeID": "",
+      "NumberBedrooms": 3,
+      "CoSellingOfficeName": "",
+      "NumberBathrooms": 2.75,
+      "OffMarket": "2016-04-22T07:00:00.000Z",
+      "SquareFeet": 2179,
+      "DaysOnMarket": 106,
+      "YearBuilt": 1948,
+      "WithdrawnDate": "",
+      "ListPrice": 4388000,
+      "ExpiredDate": null,
+      "Price": 4388000,
+      "DateTransaction": "2016-04-22T07:00:00.000Z",
+      "isLease": 0,
+      "MLSBoard": "MRMLS2",
+      "isAdvertisedOnInternet": 1,
+      "Latitude": 34.03968,
+      "DateListed": "2016-01-04T08:00:00.000Z",
+      "Longitude": -118.59416,
+      "DatePending": null,
+      "Pricepersqft": 2013,
+      "DateSold": null,
+      "ListingAgentid": "X65713",
+      "ListingAgentName": "Madison Hildebrand",
+      "ListingAgentDRE": 1413280,
+      "ListingAgentHomePhone": "            ",
+      "ListingAgentCellPhone": 0,
+      "ListingAgentEmail": "Team@TheMalibuLife.com",
+      "ListingOfficeName": "Partners Trust Malibu",
+      "SellingAgentID": "",
+      "SellingAgentName": "",
+      "SellingAgentDRE": 0,
+      "pkey": "16968303-X51646",
+      "TerrainScore": 0,
+      "TERRAINRANK": 8
+    },
+    {
+      "PropertyImageUrl": "",
+      "SellingOfficeID": "",
+      "MlsId": "16968361",
+      "SellingOfficeName": "",
+      "Status": "WTH",
+      "AgentID": "C123275",
+      "PropertyTypeID": 3,
+      "CoListingAgentName": "Laurence Zwirn",
+      "PropertyType": "HSE",
+      "CoListingAgentDRE": 1215522,
+      "StreetAddress": "357 N BONHILL RD",
+      "CoListingOfficeID": "X81551",
+      "UnitNumber": 0,
+      "CoListingOfficeName": "Laurence Zwirn",
+      "Area": 1064,
+      "CoSellingAgentID": "",
+      "SubArea": "",
+      "CoSellingAgentName": "",
+      "CityName": "Los Angeles",
+      "CoSellingAgentDRE": "",
+      "ZipCode": 90049,
+      "CoSellingOfficeID": "",
+      "NumberBedrooms": 4,
+      "CoSellingOfficeName": "",
+      "NumberBathrooms": 5,
+      "OffMarket": "2016-05-12T07:00:00.000Z",
+      "SquareFeet": 4251,
+      "DaysOnMarket": 129,
+      "YearBuilt": 0,
+      "WithdrawnDate": "",
+      "ListPrice": 18000,
+      "ExpiredDate": null,
+      "Price": 18000,
+      "DateTransaction": "2016-06-14T07:00:00.000Z",
+      "isLease": 1,
+      "MLSBoard": "MRMLS2",
+      "isAdvertisedOnInternet": 1,
+      "Latitude": 34.06499,
+      "DateListed": "2016-01-04T08:00:00.000Z",
+      "Longitude": -118.48263,
+      "DatePending": null,
+      "Pricepersqft": 4,
+      "DateSold": null,
+      "ListingAgentid": "X67178",
+      "ListingAgentName": "Josh Flagg",
+      "ListingAgentDRE": 1470467,
+      "ListingAgentHomePhone": "3107203524  ",
+      "ListingAgentCellPhone": 0,
+      "ListingAgentEmail": "Josh@JoshFlagg.com",
+      "ListingOfficeName": "Rodeo Realty - Beverly Hills",
+      "SellingAgentID": "",
+      "SellingAgentName": "",
+      "SellingAgentDRE": 0,
+      "pkey": "16968361-C123275",
+      "TerrainScore": 0,
+      "TERRAINRANK": 9
+    },
+    {
+      "PropertyImageUrl": "",
+      "SellingOfficeID": "",
+      "MlsId": "16968395",
+      "SellingOfficeName": "",
+      "Status": "EXP",
+      "AgentID": "CLW-C114876",
+      "PropertyTypeID": 1,
+      "CoListingAgentName": "Jimmy Heck",
+      "PropertyType": "HSE",
+      "CoListingAgentDRE": 1915056,
+      "StreetAddress": "10525 ILONA Avenue",
+      "CoListingOfficeID": "CLW-X7173802",
+      "UnitNumber": 0,
+      "CoListingOfficeName": "Rodeo Realty - Beverly Hills",
+      "Area": 1063,
+      "CoSellingAgentID": "",
+      "SubArea": "",
+      "CoSellingAgentName": "",
+      "CityName": "Los Angeles",
+      "CoSellingAgentDRE": "",
+      "ZipCode": 90064,
+      "CoSellingOfficeID": "",
+      "NumberBedrooms": 2,
+      "CoSellingOfficeName": "",
+      "NumberBathrooms": 1,
+      "OffMarket": "2017-01-04T08:00:00.000Z",
+      "SquareFeet": 946,
+      "DaysOnMarket": 92,
+      "YearBuilt": 1925,
+      "WithdrawnDate": "",
+      "ListPrice": 1449000,
+      "ExpiredDate": "2017-01-04T08:00:00.000Z",
+      "Price": 1449000,
+      "DateTransaction": "2017-01-05T08:00:00.000Z",
+      "isLease": 0,
+      "MLSBoard": "MRMLS2",
+      "isAdvertisedOnInternet": 1,
+      "Latitude": 34.046444,
+      "DateListed": "2016-01-26T08:00:00.000Z",
+      "Longitude": -118.42115,
+      "DatePending": null,
+      "Pricepersqft": 1531,
+      "DateSold": null,
+      "ListingAgentid": "CLW-C107071",
+      "ListingAgentName": "Jimmy Heck",
+      "ListingAgentDRE": 1910100,
+      "ListingAgentHomePhone": "3106501116  ",
+      "ListingAgentCellPhone": 0,
+      "ListingAgentEmail": "JimmyHeck@HeckandBergHomes.com",
+      "ListingOfficeName": "Rodeo Realty - Beverly Hills",
+      "SellingAgentID": "",
+      "SellingAgentName": "",
+      "SellingAgentDRE": 0,
+      "pkey": "16968395-CLW-C114876",
+      "TerrainScore": 0,
+      "TERRAINRANK": 10
+    }
+  ],
+  "outputDocs": [
+    {
+      "PropertyImageUrl": "",
+      "Price": 2475000,
+      "SellingOfficeID": "B08610",
+      "DateTransaction": "2016-06-10T07:00:00.000Z",
+      "MlsId": "16967999",
+      "isLease": 0,
+      "SellingOfficeName": "Crosby Doe Associates  Inc.",
+      "MLSBoard": "MRMLS2",
+      "Status": "SLD",
+      "isAdvertisedOnInternet": 1,
+      "Latitude": 34.12754,
+      "PropertyTypeID": 1,
+      "DateListed": "2016-01-02T08:00:00.000Z",
+      "CoListingAgentName": "Susan Blau",
+      "Longitude": -118.38442,
+      "PropertyType": "HSE",
+      "DatePending": "2016-04-11T07:00:00.000Z",
+      "CoListingAgentDRE": 569470,
+      "Pricepersqft": 636,
+      "StreetAddress": "11468 DONA CECILIA DR",
+      "DateSold": "2016-05-26T07:00:00.000Z",
+      "CoListingOfficeID": "X74052",
+      "AgentID": "X07846",
+      "UnitNumber": 0,
+      "ListingAgentName": "Ben DI Benedetto",
+      "CoListingOfficeName": "Keller Williams Studio City",
+      "ListingAgentDRE": 1261338,
+      "Area": 1653,
+      "ListingAgentHomePhone": "8183717718  ",
+      "CoSellingAgentID": "C107263",
+      "ListingAgentCellPhone": 0,
+      "SubArea": "",
+      "ListingAgentEmail": "blvdteam@homesinla.com",
+      "CoSellingAgentName": "Ilana Gafni",
+      "ListingOfficeName": "Keller Williams Studio City",
+      "CityName": "Studio City",
+      "SellingAgentID": "B34672",
+      "CoSellingAgentDRE": "",
+      "SellingAgentName": "Crosby Doe",
+      "ZipCode": 91604,
+      "SellingAgentDRE": 463731,
+      "CoSellingOfficeID": "B08610",
+      "pkey": "16967999-X07846",
+      "NumberBedrooms": 4,
+      "TerrainScore": 0,
+      "CoSellingOfficeName": "Crosby Doe Associates  Inc.",
+      "TERRAINRANK": 1,
+      "NumberBathrooms": 3,
+      "OffMarket": "2016-04-11T07:00:00.000Z",
+      "SquareFeet": 3886,
+      "DaysOnMarket": 132,
+      "YearBuilt": 1964,
+      "WithdrawnDate": "",
+      "ListPrice": 2695000,
+      "ExpiredDate": null
+    },
+    {
+      "PropertyImageUrl": "",
+      "Price": 270000,
+      "SellingOfficeID": "F4320012",
+      "DateTransaction": "2016-01-19T08:00:00.000Z",
+      "MlsId": "16968039PS",
+      "isLease": 0,
+      "SellingOfficeName": "Coldwell Banker Residential B",
+      "MLSBoard": "MRMLS2",
+      "Status": "SLD",
+      "isAdvertisedOnInternet": 1,
+      "Latitude": 33.816276,
+      "PropertyTypeID": 1,
+      "DateListed": "2016-01-03T08:00:00.000Z",
+      "CoListingAgentName": "Michael Donato",
+      "Longitude": -116.538505,
+      "PropertyType": "CONDO",
+      "DatePending": "2016-01-07T08:00:00.000Z",
+      "CoListingAgentDRE": 1937391,
+      "Pricepersqft": 160,
+      "StreetAddress": "911 S VILLAGE SQ",
+      "DateSold": "2016-02-03T08:00:00.000Z",
+      "CoListingOfficeID": "4500",
+      "AgentID": "48590",
+      "UnitNumber": 0,
+      "ListingAgentName": "Jeffrey Grohs",
+      "CoListingOfficeName": "Bennion Deville Homes",
+      "ListingAgentDRE": 1322967,
+      "Area": 332,
+      "ListingAgentHomePhone": "7609021960  ",
+      "CoSellingAgentID": "",
+      "ListingAgentCellPhone": 0,
+      "SubArea": "",
+      "ListingAgentEmail": "jgrohsbdhomes@gmail.com",
+      "CoSellingAgentName": "",
+      "ListingOfficeName": "Bennion Deville Homes",
+      "CityName": "Palm Springs",
+      "SellingAgentID": "F207013189",
+      "CoSellingAgentDRE": "",
+      "SellingAgentName": "Stephen Pannesco",
+      "ZipCode": 92262,
+      "SellingAgentDRE": 1281276,
+      "CoSellingOfficeID": "",
+      "pkey": "16968039PS-48590",
+      "NumberBedrooms": 2,
+      "TerrainScore": 0,
+      "CoSellingOfficeName": "",
+      "TERRAINRANK": 2,
+      "NumberBathrooms": 2,
+      "OffMarket": "2016-01-07T08:00:00.000Z",
+      "SquareFeet": 1679,
+      "DaysOnMarket": 16,
+      "YearBuilt": 1985,
+      "WithdrawnDate": "",
+      "ListPrice": 299000,
+      "ExpiredDate": null
+    },
+    {
+      "PropertyImageUrl": "http://propphoto.firstteam.com/ftwebmls/mrmls2.pix/a1061p4/16968083.jpg",
+      "Price": 150000,
+      "SellingOfficeID": "",
+      "DateTransaction": "2016-04-17T07:00:00.000Z",
+      "MlsId": "16968083",
+      "isLease": 0,
+      "SellingOfficeName": "",
+      "MLSBoard": "MRMLS2",
+      "Status": "ACT",
+      "isAdvertisedOnInternet": 1,
+      "CoListingAgentID": "CLW-X64154",
+      "Latitude": 34.110866,
+      "PropertyTypeID": 4,
+      "DateListed": "2016-01-04T08:00:00.000Z",
+      "CoListingAgentName": "J.J. Wallack",
+      "Longitude": -118.373456,
+      "PropertyType": "LAND",
+      "DatePending": "2016-04-16T07:00:00.000Z",
+      "CoListingAgentDRE": 1445924,
+      "Pricepersqft": 0,
+      "StreetAddress": "2255 N Laurel Canyon Boulevard",
+      "DateSold": null,
+      "CoListingOfficeID": "CLW-X74054",
+      "AgentID": "CLW-X64154",
+      "UnitNumber": 0,
+      "ListingAgentName": "J.J. Wallack",
+      "CoListingOfficeName": "Keller Williams Beverly Hills",
+      "ListingAgentDRE": 1445924,
+      "Area": 1061,
+      "ListingAgentHomePhone": "3109805999  ",
+      "CoSellingAgentID": "",
+      "ListingAgentCellPhone": 0,
+      "SubArea": "",
+      "ListingAgentEmail": "JJ@Wallack.com",
+      "CoSellingAgentName": "",
+      "ListingOfficeName": "Keller Williams Beverly Hills",
+      "CityName": "Los Angeles",
+      "SellingAgentID": "",
+      "CoSellingAgentDRE": "",
+      "SellingAgentName": "",
+      "ZipCode": 90046,
+      "SellingAgentDRE": 0,
+      "CoSellingOfficeID": "",
+      "pkey": "16968083-CLW-X64154",
+      "NumberBedrooms": 0,
+      "TerrainScore": 0,
+      "CoSellingOfficeName": "",
+      "TERRAINRANK": 3,
+      "NumberBathrooms": 0,
+      "OffMarket": null,
+      "SquareFeet": 0,
+      "DaysOnMarket": 914,
+      "YearBuilt": 0,
+      "WithdrawnDate": "",
+      "ListPrice": 150000,
+      "ExpiredDate": null
+    },
+    {
+      "PropertyImageUrl": "",
+      "Price": 2275,
+      "SellingOfficeID": "X76967",
+      "DateTransaction": "2016-02-20T08:00:00.000Z",
+      "MlsId": "16968209",
+      "isLease": 1,
+      "SellingOfficeName": "Exclusive Realty Inc.",
+      "MLSBoard": "MRMLS2",
+      "Status": "SLD",
+      "isAdvertisedOnInternet": 1,
+      "CoListingAgentID": "X78894",
+      "Latitude": 33.98242,
+      "PropertyTypeID": 3,
+      "DateListed": "2016-01-15T08:00:00.000Z",
+      "CoListingAgentName": "Monique Kangarlou",
+      "Longitude": -118.38825,
+      "PropertyType": "CONDO",
+      "DatePending": "2016-02-20T08:00:00.000Z",
+      "CoListingAgentDRE": 1746665,
+      "Pricepersqft": 2,
+      "StreetAddress": "5815 DOVERWOOD DR",
+      "DateSold": "2016-02-20T08:00:00.000Z",
+      "CoListingOfficeID": "X76967",
+      "AgentID": "X78894",
+      "UnitNumber": 0,
+      "ListingAgentName": "Camille Bettis",
+      "CoListingOfficeName": "Exclusive Realty Inc.",
+      "ListingAgentDRE": 1844151,
+      "Area": 1083,
+      "ListingAgentHomePhone": "3232280786  ",
+      "CoSellingAgentID": "",
+      "ListingAgentCellPhone": 0,
+      "SubArea": "",
+      "ListingAgentEmail": "bettisrealtygroup@gmail.com",
+      "CoSellingAgentName": "",
+      "ListingOfficeName": "Bettis Realty Group  Inc.",
+      "CityName": "Culver City",
+      "SellingAgentID": "X78894",
+      "CoSellingAgentDRE": "",
+      "SellingAgentName": "Monique Kangarlou",
+      "ZipCode": 90230,
+      "SellingAgentDRE": 1746665,
+      "CoSellingOfficeID": "",
+      "pkey": "16968209-X78894",
+      "NumberBedrooms": 2,
+      "TerrainScore": 0,
+      "CoSellingOfficeName": "",
+      "TERRAINRANK": 4,
+      "NumberBathrooms": 2,
+      "OffMarket": "2016-02-20T08:00:00.000Z",
+      "SquareFeet": 996,
+      "DaysOnMarket": 36,
+      "YearBuilt": 0,
+      "WithdrawnDate": "",
+      "ListPrice": 2275,
+      "ExpiredDate": null
+    },
+    {
+      "PropertyImageUrl": "",
+      "Price": 975,
+      "SellingOfficeID": "CLW-5477",
+      "DateTransaction": "2016-02-08T08:00:00.000Z",
+      "MlsId": "16968225PS",
+      "isLease": 1,
+      "SellingOfficeName": "Desert Cities Realtors",
+      "MLSBoard": "MRMLS2",
+      "Status": "SLD",
+      "isAdvertisedOnInternet": 1,
+      "Latitude": 33.982101,
+      "PropertyTypeID": 3,
+      "DateListed": "2016-01-04T08:00:00.000Z",
+      "CoListingAgentName": "Diana Wickler",
+      "Longitude": -116.535689,
+      "PropertyType": "HSE",
+      "DatePending": "2016-02-01T08:00:00.000Z",
+      "CoListingAgentDRE": 1743156,
+      "Pricepersqft": 0,
+      "StreetAddress": "64443 PINEHURST Circle",
+      "DateSold": "2016-02-01T08:00:00.000Z",
+      "CoListingOfficeID": "CLW-5477",
+      "AgentID": "CDR-44142",
+      "UnitNumber": 0,
+      "ListingAgentName": "Diana Wickler",
+      "CoListingOfficeName": "Desert Cities Realtors",
+      "ListingAgentDRE": 1743156,
+      "Area": 341,
+      "ListingAgentHomePhone": "7605674031  ",
+      "CoSellingAgentID": "",
+      "ListingAgentCellPhone": 0,
+      "SubArea": "",
+      "ListingAgentEmail": "diana@dianawickler.com",
+      "CoSellingAgentName": "",
+      "ListingOfficeName": "Desert Cities Realtors",
+      "CityName": "Desert Hot Springs",
+      "SellingAgentID": "CLW-44142",
+      "CoSellingAgentDRE": "",
+      "SellingAgentName": "Diana Wickler",
+      "ZipCode": 92240,
+      "SellingAgentDRE": 1743156,
+      "CoSellingOfficeID": "",
+      "pkey": "16968225PS-CDR-44142",
+      "NumberBedrooms": 2,
+      "TerrainScore": 0,
+      "CoSellingOfficeName": "",
+      "TERRAINRANK": 5,
+      "NumberBathrooms": 2,
+      "OffMarket": "2016-02-01T08:00:00.000Z",
+      "SquareFeet": 1228,
+      "DaysOnMarket": 27,
+      "YearBuilt": 0,
+      "WithdrawnDate": "",
+      "ListPrice": 975,
+      "ExpiredDate": null
+    },
+    {
+      "PropertyImageUrl": "",
+      "Price": 4200,
+      "SellingOfficeID": "B08351",
+      "DateTransaction": "2016-01-12T08:00:00.000Z",
+      "MlsId": "16968275",
+      "isLease": 1,
+      "SellingOfficeName": "Nelson Shelton & Associates",
+      "MLSBoard": "MRMLS2",
+      "Status": "SLD",
+      "isAdvertisedOnInternet": 1,
+      "Latitude": 34.05956,
+      "PropertyTypeID": 3,
+      "DateListed": "2016-01-04T08:00:00.000Z",
+      "CoListingAgentName": "Shel Kirshner",
+      "Longitude": -118.43922,
+      "PropertyType": "CONDO",
+      "DatePending": "2016-01-09T08:00:00.000Z",
+      "CoListingAgentDRE": 1113516,
+      "Pricepersqft": 2,
+      "StreetAddress": "10790 WILSHIRE",
+      "DateSold": "2016-01-09T08:00:00.000Z",
+      "CoListingOfficeID": "X7173804",
+      "AgentID": "L04197",
+      "UnitNumber": 0,
+      "ListingAgentName": "Wendy Kirshner",
+      "CoListingOfficeName": "Rodeo Realty- Brentwood",
+      "ListingAgentDRE": 1317026,
+      "Area": 1063,
+      "ListingAgentHomePhone": "3107410232  ",
+      "CoSellingAgentID": "",
+      "ListingAgentCellPhone": 0,
+      "SubArea": "",
+      "ListingAgentEmail": "wendy@thekirshnergroup.com",
+      "CoSellingAgentName": "",
+      "ListingOfficeName": "Rodeo Realty- Brentwood",
+      "CityName": "Los Angeles",
+      "SellingAgentID": "L02048",
+      "CoSellingAgentDRE": "",
+      "SellingAgentName": "Pari Kohan-Zakay",
+      "ZipCode": 90024,
+      "SellingAgentDRE": 1096081,
+      "CoSellingOfficeID": "",
+      "pkey": "16968275-L04197",
+      "NumberBedrooms": 2,
+      "TerrainScore": 0,
+      "CoSellingOfficeName": "",
+      "TERRAINRANK": 6,
+      "NumberBathrooms": 2.5,
+      "OffMarket": "2016-01-09T08:00:00.000Z",
+      "SquareFeet": 1692,
+      "DaysOnMarket": 5,
+      "YearBuilt": 0,
+      "WithdrawnDate": "",
+      "ListPrice": 4000,
+      "ExpiredDate": null
+    },
+    {
+      "PropertyImageUrl": "",
+      "Price": 2050000,
+      "SellingOfficeID": "X7482701",
+      "DateTransaction": "2016-09-04T07:00:00.000Z",
+      "MlsId": "16968293",
+      "isLease": 0,
+      "SellingOfficeName": "Deasy Penner & Partners",
+      "MLSBoard": "MRMLS2",
+      "Status": "SLD",
+      "isAdvertisedOnInternet": 1,
+      "Latitude": 34.05073,
+      "PropertyTypeID": 1,
+      "DateListed": "2016-01-12T08:00:00.000Z",
+      "CoListingAgentName": "Mike Deasy",
+      "Longitude": -118.24717,
+      "PropertyType": "CONDO",
+      "DatePending": "2016-04-15T07:00:00.000Z",
+      "CoListingAgentDRE": 1514230,
+      "Pricepersqft": 976,
+      "StreetAddress": "257 S SPRIN",
+      "DateSold": "2016-09-02T07:00:00.000Z",
+      "CoListingOfficeID": "X7482701",
+      "AgentID": "C105340",
+      "UnitNumber": null,
+      "ListingAgentName": "Wayne A. Willbur",
+      "CoListingOfficeName": "Deasy Penner & Partners",
+      "ListingAgentDRE": 1716358,
+      "Area": 1093,
+      "ListingAgentHomePhone": "2135000254  ",
+      "CoSellingAgentID": "",
+      "ListingAgentCellPhone": 0,
+      "SubArea": "",
+      "ListingAgentEmail": "WWillbur@DeasyPenner.com",
+      "CoSellingAgentName": "",
+      "ListingOfficeName": "Deasy Penner & Partners",
+      "CityName": "Los Angeles",
+      "SellingAgentID": "X73408",
+      "CoSellingAgentDRE": "",
+      "SellingAgentName": "Wayne A. Willbur",
+      "ZipCode": 90012,
+      "SellingAgentDRE": 1716358,
+      "CoSellingOfficeID": "",
+      "pkey": "16968293-C105340",
+      "NumberBedrooms": 2,
+      "TerrainScore": 0,
+      "CoSellingOfficeName": "",
+      "TERRAINRANK": 7,
+      "NumberBathrooms": 3,
+      "OffMarket": "2016-04-15T07:00:00.000Z",
+      "SquareFeet": 2100,
+      "DaysOnMarket": 234,
+      "YearBuilt": 1899,
+      "WithdrawnDate": "",
+      "ListPrice": 2100000,
+      "ExpiredDate": null
+    },
+    {
+      "PropertyImageUrl": "",
+      "Price": 4388000,
+      "SellingOfficeID": "",
+      "DateTransaction": "2016-04-22T07:00:00.000Z",
+      "MlsId": "16968303",
+      "isLease": 0,
+      "SellingOfficeName": "",
+      "MLSBoard": "MRMLS2",
+      "Status": "WTH",
+      "isAdvertisedOnInternet": 1,
+      "Latitude": 34.03968,
+      "PropertyTypeID": 1,
+      "DateListed": "2016-01-04T08:00:00.000Z",
+      "CoListingAgentName": "Jennifer Chrisman",
+      "Longitude": -118.59416,
+      "PropertyType": "HSE",
+      "DatePending": null,
+      "CoListingAgentDRE": 1325526,
+      "Pricepersqft": 2013,
+      "StreetAddress": "19214 PACIFIC COAST HWY",
+      "DateSold": null,
+      "CoListingOfficeID": "X7623401",
+      "AgentID": "X51646",
+      "UnitNumber": 0,
+      "ListingAgentName": "Madison Hildebrand",
+      "CoListingOfficeName": "Partners Trust Malibu",
+      "ListingAgentDRE": 1413280,
+      "Area": 1087,
+      "ListingAgentHomePhone": "            ",
+      "CoSellingAgentID": "",
+      "ListingAgentCellPhone": 0,
+      "SubArea": "",
+      "ListingAgentEmail": "Team@TheMalibuLife.com",
+      "CoSellingAgentName": "",
+      "ListingOfficeName": "Partners Trust Malibu",
+      "CityName": "Malibu",
+      "SellingAgentID": "",
+      "CoSellingAgentDRE": "",
+      "SellingAgentName": "",
+      "ZipCode": 90265,
+      "SellingAgentDRE": 0,
+      "CoSellingOfficeID": "",
+      "pkey": "16968303-X51646",
+      "NumberBedrooms": 3,
+      "TerrainScore": 0,
+      "CoSellingOfficeName": "",
+      "TERRAINRANK": 8,
+      "NumberBathrooms": 2.75,
+      "OffMarket": "2016-04-22T07:00:00.000Z",
+      "SquareFeet": 2179,
+      "DaysOnMarket": 106,
+      "YearBuilt": 1948,
+      "WithdrawnDate": "",
+      "ListPrice": 4388000,
+      "ExpiredDate": null
+    },
+    {
+      "PropertyImageUrl": "",
+      "Price": 18000,
+      "SellingOfficeID": "",
+      "DateTransaction": "2016-06-14T07:00:00.000Z",
+      "MlsId": "16968361",
+      "isLease": 1,
+      "SellingOfficeName": "",
+      "MLSBoard": "MRMLS2",
+      "Status": "WTH",
+      "isAdvertisedOnInternet": 1,
+      "Latitude": 34.06499,
+      "PropertyTypeID": 3,
+      "DateListed": "2016-01-04T08:00:00.000Z",
+      "CoListingAgentName": "Laurence Zwirn",
+      "Longitude": -118.48263,
+      "PropertyType": "HSE",
+      "DatePending": null,
+      "CoListingAgentDRE": 1215522,
+      "Pricepersqft": 4,
+      "StreetAddress": "357 N BONHILL RD",
+      "DateSold": null,
+      "CoListingOfficeID": "X81551",
+      "AgentID": "C123275",
+      "UnitNumber": 0,
+      "ListingAgentName": "Josh Flagg",
+      "CoListingOfficeName": "Laurence Zwirn",
+      "ListingAgentDRE": 1470467,
+      "Area": 1064,
+      "ListingAgentHomePhone": "3107203524  ",
+      "CoSellingAgentID": "",
+      "ListingAgentCellPhone": 0,
+      "SubArea": "",
+      "ListingAgentEmail": "Josh@JoshFlagg.com",
+      "CoSellingAgentName": "",
+      "ListingOfficeName": "Rodeo Realty - Beverly Hills",
+      "CityName": "Los Angeles",
+      "SellingAgentID": "",
+      "CoSellingAgentDRE": "",
+      "SellingAgentName": "",
+      "ZipCode": 90049,
+      "SellingAgentDRE": 0,
+      "CoSellingOfficeID": "",
+      "pkey": "16968361-C123275",
+      "NumberBedrooms": 4,
+      "TerrainScore": 0,
+      "CoSellingOfficeName": "",
+      "TERRAINRANK": 9,
+      "NumberBathrooms": 5,
+      "OffMarket": "2016-05-12T07:00:00.000Z",
+      "SquareFeet": 4251,
+      "DaysOnMarket": 129,
+      "YearBuilt": 0,
+      "WithdrawnDate": "",
+      "ListPrice": 18000,
+      "ExpiredDate": null
+    },
+    {
+      "PropertyImageUrl": "",
+      "Price": 1449000,
+      "SellingOfficeID": "",
+      "DateTransaction": "2017-01-05T08:00:00.000Z",
+      "MlsId": "16968395",
+      "isLease": 0,
+      "SellingOfficeName": "",
+      "MLSBoard": "MRMLS2",
+      "Status": "EXP",
+      "isAdvertisedOnInternet": 1,
+      "Latitude": 34.046444,
+      "PropertyTypeID": 1,
+      "DateListed": "2016-01-26T08:00:00.000Z",
+      "CoListingAgentName": "Jimmy Heck",
+      "Longitude": -118.42115,
+      "PropertyType": "HSE",
+      "DatePending": null,
+      "CoListingAgentDRE": 1915056,
+      "Pricepersqft": 1531,
+      "StreetAddress": "10525 ILONA Avenue",
+      "DateSold": null,
+      "CoListingOfficeID": "CLW-X7173802",
+      "AgentID": "CLW-C114876",
+      "UnitNumber": 0,
+      "ListingAgentName": "Jimmy Heck",
+      "CoListingOfficeName": "Rodeo Realty - Beverly Hills",
+      "ListingAgentDRE": 1910100,
+      "Area": 1063,
+      "ListingAgentHomePhone": "3106501116  ",
+      "CoSellingAgentID": "",
+      "ListingAgentCellPhone": 0,
+      "SubArea": "",
+      "ListingAgentEmail": "JimmyHeck@HeckandBergHomes.com",
+      "CoSellingAgentName": "",
+      "ListingOfficeName": "Rodeo Realty - Beverly Hills",
+      "CityName": "Los Angeles",
+      "SellingAgentID": "",
+      "CoSellingAgentDRE": "",
+      "SellingAgentName": "",
+      "ZipCode": 90064,
+      "SellingAgentDRE": 0,
+      "CoSellingOfficeID": "",
+      "pkey": "16968395-CLW-C114876",
+      "NumberBedrooms": 2,
+      "TerrainScore": 0,
+      "CoSellingOfficeName": "",
+      "TERRAINRANK": 10,
+      "NumberBathrooms": 1,
+      "OffMarket": "2017-01-04T08:00:00.000Z",
+      "SquareFeet": 946,
+      "DaysOnMarket": 92,
+      "YearBuilt": 1925,
+      "WithdrawnDate": "",
+      "ListPrice": 1449000,
+      "ExpiredDate": "2017-01-04T08:00:00.000Z"
+    }
+  ],
+  "template": {
+    "id": 57,
+    "lastModified": "2018-07-26T01:07:43.391Z",
+    "createdAt": "2018-07-23T23:35:47.967Z",
+    "archived": false,
+    "templateName": "Agents Import Step 5a",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "DateTransaction"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "date",
+                      "format": "ISOstring"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "DateListed"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "date",
+                      "format": "ISOstring"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "DatePending"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "date",
+                      "format": "ISOstring"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "OffMarket"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "date",
+                      "format": "ISOstring"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "DateSold"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "date",
+                      "format": "ISOstring"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "ExpiredDate"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "date",
+                      "format": "ISOstring"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "PropertyImageUrl"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "SubArea"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "Price"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "ListingAgentEmail"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "SellingOfficeID"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "CoSellingAgentName"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "12",
+                  "value": {
+                    "id": 12,
+                    "fields": [
+                      [
+                        "ListingOfficeName"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "13",
+                  "value": {
+                    "id": 13,
+                    "fields": [
+                      [
+                        "MlsId"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "14",
+                  "value": {
+                    "id": 14,
+                    "fields": [
+                      [
+                        "CityName"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "15",
+                  "value": {
+                    "id": 15,
+                    "fields": [
+                      [
+                        "isLease"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "16",
+                  "value": {
+                    "id": 16,
+                    "fields": [
+                      [
+                        "SellingAgentID"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "17",
+                  "value": {
+                    "id": 17,
+                    "fields": [
+                      [
+                        "SellingOfficeName"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "18",
+                  "value": {
+                    "id": 18,
+                    "fields": [
+                      [
+                        "CoSellingAgentDRE"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "19",
+                  "value": {
+                    "id": 19,
+                    "fields": [
+                      [
+                        "MLSBoard"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "20",
+                  "value": {
+                    "id": 20,
+                    "fields": [
+                      [
+                        "SellingAgentName"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "21",
+                  "value": {
+                    "id": 21,
+                    "fields": [
+                      [
+                        "Status"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "22",
+                  "value": {
+                    "id": 22,
+                    "fields": [
+                      [
+                        "ZipCode"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "23",
+                  "value": {
+                    "id": 23,
+                    "fields": [
+                      [
+                        "isAdvertisedOnInternet"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "24",
+                  "value": {
+                    "id": 24,
+                    "fields": [
+                      [
+                        "SellingAgentDRE"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "25",
+                  "value": {
+                    "id": 25,
+                    "fields": [
+                      [
+                        "CoListingAgentID"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "26",
+                  "value": {
+                    "id": 26,
+                    "fields": [
+                      [
+                        "CoSellingOfficeID"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "27",
+                  "value": {
+                    "id": 27,
+                    "fields": [
+                      [
+                        "Latitude"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "28",
+                  "value": {
+                    "id": 28,
+                    "fields": [
+                      [
+                        "pkey"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "29",
+                  "value": {
+                    "id": 29,
+                    "fields": [
+                      [
+                        "PropertyTypeID"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "30",
+                  "value": {
+                    "id": 30,
+                    "fields": [
+                      [
+                        "NumberBedrooms"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "31",
+                  "value": {
+                    "id": 31,
+                    "fields": [
+                      [
+                        "TerrainScore"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "32",
+                  "value": {
+                    "id": 32,
+                    "fields": [
+                      [
+                        "CoListingAgentName"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "33",
+                  "value": {
+                    "id": 33,
+                    "fields": [
+                      [
+                        "CoSellingOfficeName"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "34",
+                  "value": {
+                    "id": 34,
+                    "fields": [
+                      [
+                        "Longitude"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "35",
+                  "value": {
+                    "id": 35,
+                    "fields": [
+                      [
+                        "TERRAINRANK"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "36",
+                  "value": {
+                    "id": 36,
+                    "fields": [
+                      [
+                        "PropertyType"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "37",
+                  "value": {
+                    "id": 37,
+                    "fields": [
+                      [
+                        "NumberBathrooms"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "38",
+                  "value": {
+                    "id": 38,
+                    "fields": [
+                      [
+                        "CoListingAgentDRE"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "39",
+                  "value": {
+                    "id": 39,
+                    "fields": [
+                      [
+                        "SquareFeet"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "40",
+                  "value": {
+                    "id": 40,
+                    "fields": [
+                      [
+                        "Pricepersqft"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "41",
+                  "value": {
+                    "id": 41,
+                    "fields": [
+                      [
+                        "DaysOnMarket"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "42",
+                  "value": {
+                    "id": 42,
+                    "fields": [
+                      [
+                        "StreetAddress"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "43",
+                  "value": {
+                    "id": 43,
+                    "fields": [
+                      [
+                        "YearBuilt"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "44",
+                  "value": {
+                    "id": 44,
+                    "fields": [
+                      [
+                        "WithdrawnDate"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "45",
+                  "value": {
+                    "id": 45,
+                    "fields": [
+                      [
+                        "CoListingOfficeID"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "46",
+                  "value": {
+                    "id": 46,
+                    "fields": [
+                      [
+                        "ListPrice"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "47",
+                  "value": {
+                    "id": 47,
+                    "fields": [
+                      [
+                        "AgentID"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "48",
+                  "value": {
+                    "id": 48,
+                    "fields": [
+                      [
+                        "UnitNumber"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "49",
+                  "value": {
+                    "id": 49,
+                    "fields": [
+                      [
+                        "ListingAgentName"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "50",
+                  "value": {
+                    "id": 50,
+                    "fields": [
+                      [
+                        "CoListingOfficeName"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "51",
+                  "value": {
+                    "id": 51,
+                    "fields": [
+                      [
+                        "ListingAgentDRE"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "52",
+                  "value": {
+                    "id": 52,
+                    "fields": [
+                      [
+                        "Area"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "53",
+                  "value": {
+                    "id": 53,
+                    "fields": [
+                      [
+                        "ListingAgentHomePhone"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "54",
+                  "value": {
+                    "id": 54,
+                    "fields": [
+                      [
+                        "CoSellingAgentID"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "55",
+                  "value": {
+                    "id": 55,
+                    "fields": [
+                      [
+                        "ListingAgentCellPhone"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 56,
+            "uidNode": 56,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "CoSellingAgentDRE"
+                ],
+                38
+              ],
+              [
+                [
+                  "ExpiredDate"
+                ],
+                55
+              ],
+              [
+                [
+                  "NumberBathrooms"
+                ],
+                48
+              ],
+              [
+                [
+                  "Price"
+                ],
+                1
+              ],
+              [
+                [
+                  "PropertyTypeID"
+                ],
+                12
+              ],
+              [
+                [
+                  "OffMarket"
+                ],
+                49
+              ],
+              [
+                [
+                  "SellingAgentDRE"
+                ],
+                41
+              ],
+              [
+                [
+                  "MLSBoard"
+                ],
+                7
+              ],
+              [
+                [
+                  "CoListingAgentName"
+                ],
+                14
+              ],
+              [
+                [
+                  "Latitude"
+                ],
+                11
+              ],
+              [
+                [
+                  "ListingAgentCellPhone"
+                ],
+                31
+              ],
+              [
+                [
+                  "MlsId"
+                ],
+                4
+              ],
+              [
+                [
+                  "PropertyType"
+                ],
+                16
+              ],
+              [
+                [
+                  "DaysOnMarket"
+                ],
+                51
+              ],
+              [
+                [
+                  "WithdrawnDate"
+                ],
+                53
+              ],
+              [
+                [
+                  "ListingAgentHomePhone"
+                ],
+                29
+              ],
+              [
+                [
+                  "Pricepersqft"
+                ],
+                19
+              ],
+              [
+                [
+                  "TerrainScore"
+                ],
+                45
+              ],
+              [
+                [
+                  "pkey"
+                ],
+                43
+              ],
+              [
+                [
+                  "CoListingOfficeName"
+                ],
+                26
+              ],
+              [
+                [
+                  "NumberBedrooms"
+                ],
+                44
+              ],
+              [
+                [
+                  "TERRAINRANK"
+                ],
+                47
+              ],
+              [
+                [
+                  "SubArea"
+                ],
+                32
+              ],
+              [
+                [
+                  "PropertyImageUrl"
+                ],
+                0
+              ],
+              [
+                [
+                  "CoListingAgentDRE"
+                ],
+                18
+              ],
+              [
+                [
+                  "CoSellingAgentID"
+                ],
+                30
+              ],
+              [
+                [
+                  "YearBuilt"
+                ],
+                52
+              ],
+              [
+                [
+                  "DateListed"
+                ],
+                13
+              ],
+              [
+                [
+                  "AgentID"
+                ],
+                23
+              ],
+              [
+                [
+                  "CoSellingOfficeID"
+                ],
+                42
+              ],
+              [
+                [
+                  "isAdvertisedOnInternet"
+                ],
+                9
+              ],
+              [
+                [
+                  "isLease"
+                ],
+                5
+              ],
+              [
+                [
+                  "SellingAgentID"
+                ],
+                37
+              ],
+              [
+                [
+                  "DatePending"
+                ],
+                17
+              ],
+              [
+                [
+                  "CoListingAgentID"
+                ],
+                10
+              ],
+              [
+                [
+                  "Longitude"
+                ],
+                15
+              ],
+              [
+                [
+                  "ListPrice"
+                ],
+                54
+              ],
+              [
+                [
+                  "Status"
+                ],
+                8
+              ],
+              [
+                [
+                  "CoListingOfficeID"
+                ],
+                22
+              ],
+              [
+                [
+                  "SellingOfficeID"
+                ],
+                2
+              ],
+              [
+                [
+                  "SellingOfficeName"
+                ],
+                6
+              ],
+              [
+                [
+                  "SquareFeet"
+                ],
+                50
+              ],
+              [
+                [
+                  "ListingAgentName"
+                ],
+                25
+              ],
+              [
+                [
+                  "UnitNumber"
+                ],
+                24
+              ],
+              [
+                [
+                  "DateSold"
+                ],
+                21
+              ],
+              [
+                [
+                  "CoSellingAgentName"
+                ],
+                34
+              ],
+              [
+                [
+                  "ZipCode"
+                ],
+                40
+              ],
+              [
+                [
+                  "ListingOfficeName"
+                ],
+                35
+              ],
+              [
+                [
+                  "ListingAgentEmail"
+                ],
+                33
+              ],
+              [
+                [
+                  "StreetAddress"
+                ],
+                20
+              ],
+              [
+                [
+                  "CoSellingOfficeName"
+                ],
+                46
+              ],
+              [
+                [
+                  "SellingAgentName"
+                ],
+                39
+              ],
+              [
+                [
+                  "DateTransaction"
+                ],
+                3
+              ],
+              [
+                [
+                  "Area"
+                ],
+                28
+              ],
+              [
+                [
+                  "CityName"
+                ],
+                36
+              ],
+              [
+                [
+                  "ListingAgentDRE"
+                ],
+                27
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "PropertyImageUrl"
+                ]
+              ],
+              [
+                32,
+                [
+                  "SubArea"
+                ]
+              ],
+              [
+                1,
+                [
+                  "Price"
+                ]
+              ],
+              [
+                33,
+                [
+                  "ListingAgentEmail"
+                ]
+              ],
+              [
+                2,
+                [
+                  "SellingOfficeID"
+                ]
+              ],
+              [
+                34,
+                [
+                  "CoSellingAgentName"
+                ]
+              ],
+              [
+                3,
+                [
+                  "DateTransaction"
+                ]
+              ],
+              [
+                35,
+                [
+                  "ListingOfficeName"
+                ]
+              ],
+              [
+                4,
+                [
+                  "MlsId"
+                ]
+              ],
+              [
+                36,
+                [
+                  "CityName"
+                ]
+              ],
+              [
+                5,
+                [
+                  "isLease"
+                ]
+              ],
+              [
+                37,
+                [
+                  "SellingAgentID"
+                ]
+              ],
+              [
+                6,
+                [
+                  "SellingOfficeName"
+                ]
+              ],
+              [
+                38,
+                [
+                  "CoSellingAgentDRE"
+                ]
+              ],
+              [
+                7,
+                [
+                  "MLSBoard"
+                ]
+              ],
+              [
+                39,
+                [
+                  "SellingAgentName"
+                ]
+              ],
+              [
+                8,
+                [
+                  "Status"
+                ]
+              ],
+              [
+                40,
+                [
+                  "ZipCode"
+                ]
+              ],
+              [
+                9,
+                [
+                  "isAdvertisedOnInternet"
+                ]
+              ],
+              [
+                41,
+                [
+                  "SellingAgentDRE"
+                ]
+              ],
+              [
+                10,
+                [
+                  "CoListingAgentID"
+                ]
+              ],
+              [
+                42,
+                [
+                  "CoSellingOfficeID"
+                ]
+              ],
+              [
+                11,
+                [
+                  "Latitude"
+                ]
+              ],
+              [
+                43,
+                [
+                  "pkey"
+                ]
+              ],
+              [
+                12,
+                [
+                  "PropertyTypeID"
+                ]
+              ],
+              [
+                44,
+                [
+                  "NumberBedrooms"
+                ]
+              ],
+              [
+                13,
+                [
+                  "DateListed"
+                ]
+              ],
+              [
+                45,
+                [
+                  "TerrainScore"
+                ]
+              ],
+              [
+                14,
+                [
+                  "CoListingAgentName"
+                ]
+              ],
+              [
+                46,
+                [
+                  "CoSellingOfficeName"
+                ]
+              ],
+              [
+                15,
+                [
+                  "Longitude"
+                ]
+              ],
+              [
+                47,
+                [
+                  "TERRAINRANK"
+                ]
+              ],
+              [
+                16,
+                [
+                  "PropertyType"
+                ]
+              ],
+              [
+                48,
+                [
+                  "NumberBathrooms"
+                ]
+              ],
+              [
+                17,
+                [
+                  "DatePending"
+                ]
+              ],
+              [
+                49,
+                [
+                  "OffMarket"
+                ]
+              ],
+              [
+                18,
+                [
+                  "CoListingAgentDRE"
+                ]
+              ],
+              [
+                50,
+                [
+                  "SquareFeet"
+                ]
+              ],
+              [
+                19,
+                [
+                  "Pricepersqft"
+                ]
+              ],
+              [
+                51,
+                [
+                  "DaysOnMarket"
+                ]
+              ],
+              [
+                20,
+                [
+                  "StreetAddress"
+                ]
+              ],
+              [
+                52,
+                [
+                  "YearBuilt"
+                ]
+              ],
+              [
+                21,
+                [
+                  "DateSold"
+                ]
+              ],
+              [
+                53,
+                [
+                  "WithdrawnDate"
+                ]
+              ],
+              [
+                22,
+                [
+                  "CoListingOfficeID"
+                ]
+              ],
+              [
+                54,
+                [
+                  "ListPrice"
+                ]
+              ],
+              [
+                23,
+                [
+                  "AgentID"
+                ]
+              ],
+              [
+                55,
+                [
+                  "ExpiredDate"
+                ]
+              ],
+              [
+                24,
+                [
+                  "UnitNumber"
+                ]
+              ],
+              [
+                25,
+                [
+                  "ListingAgentName"
+                ]
+              ],
+              [
+                26,
+                [
+                  "CoListingOfficeName"
+                ]
+              ],
+              [
+                27,
+                [
+                  "ListingAgentDRE"
+                ]
+              ],
+              [
+                28,
+                [
+                  "Area"
+                ]
+              ],
+              [
+                29,
+                [
+                  "ListingAgentHomePhone"
+                ]
+              ],
+              [
+                30,
+                [
+                  "CoSellingAgentID"
+                ]
+              ],
+              [
+                31,
+                [
+                  "ListingAgentCellPhone"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                32,
+                "string"
+              ],
+              [
+                1,
+                "number"
+              ],
+              [
+                33,
+                "string"
+              ],
+              [
+                2,
+                "string"
+              ],
+              [
+                34,
+                "string"
+              ],
+              [
+                3,
+                "string"
+              ],
+              [
+                35,
+                "string"
+              ],
+              [
+                4,
+                "string"
+              ],
+              [
+                36,
+                "string"
+              ],
+              [
+                5,
+                "number"
+              ],
+              [
+                37,
+                "string"
+              ],
+              [
+                6,
+                "string"
+              ],
+              [
+                38,
+                "string"
+              ],
+              [
+                7,
+                "string"
+              ],
+              [
+                39,
+                "string"
+              ],
+              [
+                8,
+                "string"
+              ],
+              [
+                40,
+                "number"
+              ],
+              [
+                9,
+                "number"
+              ],
+              [
+                41,
+                "number"
+              ],
+              [
+                10,
+                "string"
+              ],
+              [
+                42,
+                "string"
+              ],
+              [
+                11,
+                "number"
+              ],
+              [
+                43,
+                "string"
+              ],
+              [
+                12,
+                "number"
+              ],
+              [
+                44,
+                "number"
+              ],
+              [
+                13,
+                "string"
+              ],
+              [
+                45,
+                "number"
+              ],
+              [
+                14,
+                "string"
+              ],
+              [
+                46,
+                "string"
+              ],
+              [
+                15,
+                "number"
+              ],
+              [
+                47,
+                "number"
+              ],
+              [
+                16,
+                "string"
+              ],
+              [
+                48,
+                "number"
+              ],
+              [
+                17,
+                "string"
+              ],
+              [
+                49,
+                "string"
+              ],
+              [
+                18,
+                "number"
+              ],
+              [
+                50,
+                "number"
+              ],
+              [
+                19,
+                "number"
+              ],
+              [
+                51,
+                "number"
+              ],
+              [
+                20,
+                "string"
+              ],
+              [
+                52,
+                "number"
+              ],
+              [
+                21,
+                "string"
+              ],
+              [
+                53,
+                "string"
+              ],
+              [
+                22,
+                "string"
+              ],
+              [
+                54,
+                "number"
+              ],
+              [
+                23,
+                "string"
+              ],
+              [
+                55,
+                "string"
+              ],
+              [
+                24,
+                "number"
+              ],
+              [
+                25,
+                "string"
+              ],
+              [
+                26,
+                "string"
+              ],
+              [
+                27,
+                "number"
+              ],
+              [
+                28,
+                "number"
+              ],
+              [
+                29,
+                "string"
+              ],
+              [
+                30,
+                "string"
+              ],
+              [
+                31,
+                "number"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                32,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                33,
+                true
+              ],
+              [
+                2,
+                true
+              ],
+              [
+                34,
+                true
+              ],
+              [
+                3,
+                true
+              ],
+              [
+                35,
+                true
+              ],
+              [
+                4,
+                true
+              ],
+              [
+                36,
+                true
+              ],
+              [
+                5,
+                true
+              ],
+              [
+                37,
+                true
+              ],
+              [
+                6,
+                true
+              ],
+              [
+                38,
+                true
+              ],
+              [
+                7,
+                true
+              ],
+              [
+                39,
+                true
+              ],
+              [
+                8,
+                true
+              ],
+              [
+                40,
+                true
+              ],
+              [
+                9,
+                true
+              ],
+              [
+                41,
+                true
+              ],
+              [
+                10,
+                true
+              ],
+              [
+                42,
+                true
+              ],
+              [
+                11,
+                true
+              ],
+              [
+                43,
+                true
+              ],
+              [
+                12,
+                true
+              ],
+              [
+                44,
+                true
+              ],
+              [
+                13,
+                true
+              ],
+              [
+                45,
+                true
+              ],
+              [
+                14,
+                true
+              ],
+              [
+                46,
+                true
+              ],
+              [
+                15,
+                true
+              ],
+              [
+                47,
+                true
+              ],
+              [
+                16,
+                true
+              ],
+              [
+                48,
+                true
+              ],
+              [
+                17,
+                true
+              ],
+              [
+                49,
+                true
+              ],
+              [
+                18,
+                true
+              ],
+              [
+                50,
+                true
+              ],
+              [
+                19,
+                true
+              ],
+              [
+                51,
+                true
+              ],
+              [
+                20,
+                true
+              ],
+              [
+                52,
+                true
+              ],
+              [
+                21,
+                true
+              ],
+              [
+                53,
+                true
+              ],
+              [
+                22,
+                true
+              ],
+              [
+                54,
+                true
+              ],
+              [
+                23,
+                true
+              ],
+              [
+                55,
+                true
+              ],
+              [
+                24,
+                true
+              ],
+              [
+                25,
+                true
+              ],
+              [
+                26,
+                true
+              ],
+              [
+                27,
+                true
+              ],
+              [
+                28,
+                true
+              ],
+              [
+                29,
+                true
+              ],
+              [
+                30,
+                true
+              ],
+              [
+                31,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                32,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                33,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                34,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "Date",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                35,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                36,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                37,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                38,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                39,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                8,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                40,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                9,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                41,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                10,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                42,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                11,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                43,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                12,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                44,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                13,
+                {
+                  "etlType": "Date",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                45,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                14,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                46,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                15,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                47,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                16,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                48,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                17,
+                {
+                  "etlType": "Date",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                49,
+                {
+                  "etlType": "Date",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                18,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                50,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                19,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                51,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                20,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                52,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                21,
+                {
+                  "etlType": "Date",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                53,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                22,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                54,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                23,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": true
+                  }
+                }
+              ],
+              [
+                55,
+                {
+                  "etlType": "Date",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                24,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                25,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                26,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                27,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                28,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                29,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                30,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                31,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Algorithm",
+        "name": "Source",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "algorithmId": 92
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Database",
+        "name": "Destination",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": [
+            "PropertyImageUrl",
+            "SubArea",
+            "Price",
+            "ListingAgentEmail",
+            "SellingOfficeID",
+            "CoSellingAgentName",
+            "DateTransaction",
+            "ListingOfficeName",
+            "MlsId",
+            "CityName",
+            "isLease",
+            "SellingAgentID",
+            "SellingOfficeName",
+            "CoSellingAgentDRE",
+            "MLSBoard",
+            "SellingAgentName",
+            "Status",
+            "ZipCode",
+            "isAdvertisedOnInternet",
+            "SellingAgentDRE",
+            "CoListingAgentID",
+            "CoSellingOfficeID",
+            "Latitude",
+            "pkey",
+            "PropertyTypeID",
+            "NumberBedrooms",
+            "DateListed",
+            "TerrainScore",
+            "CoListingAgentName",
+            "CoSellingOfficeName",
+            "Longitude",
+            "TERRAINRANK",
+            "PropertyType",
+            "NumberBathrooms",
+            "DatePending",
+            "OffMarket",
+            "CoListingAgentDRE",
+            "SquareFeet",
+            "Pricepersqft",
+            "DaysOnMarket",
+            "StreetAddress",
+            "YearBuilt",
+            "DateSold",
+            "WithdrawnDate",
+            "CoListingOfficeID",
+            "ListPrice",
+            "AgentID",
+            "ExpiredDate",
+            "UnitNumber",
+            "ListingAgentName",
+            "CoListingOfficeName",
+            "ListingAgentDRE",
+            "Area",
+            "ListingAgentHomePhone",
+            "CoSellingAgentID",
+            "ListingAgentCellPhone"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "serverId": "FirstTeam ES",
+          "database": "agents_import_temp_2",
+          "table": "data",
+          "language": "elastic"
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            32,
+            1,
+            33,
+            2,
+            34,
+            3,
+            35,
+            4,
+            36,
+            5,
+            37,
+            6,
+            38,
+            7,
+            39,
+            8,
+            40,
+            9,
+            41,
+            10,
+            42,
+            11,
+            43,
+            12,
+            44,
+            13,
+            45,
+            14,
+            46,
+            15,
+            47,
+            16,
+            48,
+            17,
+            49,
+            18,
+            50,
+            19,
+            51,
+            20,
+            52,
+            21,
+            53,
+            22,
+            54,
+            23,
+            55,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        }
+      }
+    }
+  }
+}

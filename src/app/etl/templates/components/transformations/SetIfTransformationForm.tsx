@@ -44,14 +44,28 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires no-empty-interface max-classes-per-file
+import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
+import * as React from 'react';
 
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+import * as Utils from 'shared/transformations/util/EngineUtils';
+import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { TransformationNode } from 'etl/templates/FieldTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import { TransformationForm } from './TransformationFormBase';
+import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
+
+import { DynamicForm } from 'common/components/DynamicForm';
+import { KeyPath as EnginePath } from 'shared/util/KeyPath';
+
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
 
 type SetOptions = NodeOptionsType<TransformationNodeType.SetIfNode>;
 export class SetIfTFF extends TransformationForm<SetOptions, TransformationNodeType.SetIfNode>
@@ -103,9 +117,15 @@ export class SetIfTFF extends TransformationForm<SetOptions, TransformationNodeT
     newValue: '',
   };
 
+  protected isNumber()
+  {
+    const type = Utils.fields.fieldType(this.props.fieldId, this.props.engine);
+    return type === FieldTypes.Number || type === FieldTypes.Integer;
+  }
+
   protected numberDisplayState(state: SetOptions)
   {
-    if (EngineUtil.getRepresentedType(this.props.fieldId, this.props.engine) === 'number')
+    if (this.isNumber())
     {
       return DisplayState.Active;
     }
@@ -117,7 +137,8 @@ export class SetIfTFF extends TransformationForm<SetOptions, TransformationNodeT
 
   protected stringDisplayState(state: SetOptions)
   {
-    if (EngineUtil.getRepresentedType(this.props.fieldId, this.props.engine) === 'string')
+    const type = Utils.fields.fieldType(this.props.fieldId, this.props.engine);
+    if (type === FieldTypes.String)
     {
       return DisplayState.Active;
     }
@@ -130,7 +151,7 @@ export class SetIfTFF extends TransformationForm<SetOptions, TransformationNodeT
   protected computeArgs()
   {
     const { newValue } = this.state;
-    const isNumber = EngineUtil.getRepresentedType(this.props.fieldId, this.props.engine) === 'number';
+    const isNumber = this.isNumber();
     const args = super.computeArgs();
     const options = _.extend({}, args.options, {
       newValue: isNumber ? Number(newValue) : newValue,

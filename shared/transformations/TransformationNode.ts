@@ -48,22 +48,22 @@ import { List } from 'immutable';
 
 import { KeyPath } from './../util/KeyPath';
 
-import TransformationNodeType from './TransformationNodeType';
-import TransformationNodeVisitor from './TransformationNodeVisitor';
-import TransformationVisitError from './TransformationVisitError';
-import TransformationVisitResult from './TransformationVisitResult';
+import TransformationNodeVisitor from 'shared/transformations/visitors/TransformationNodeVisitor';
+import TransformationVisitError from 'shared/transformations/visitors/TransformationVisitError';
+import TransformationVisitResult from 'shared/transformations/visitors/TransformationVisitResult';
+import TransformationNodeType, { CommonTransformationOptions } from './TransformationNodeType';
 
 export default abstract class TransformationNode
 {
   public id: number;
   public abstract typeCode: TransformationNodeType;
-  public fields: List<KeyPath>;
-  public meta: object;
+  public fields: List<{ path: KeyPath, id: number }>;
+  public meta: object & CommonTransformationOptions;
 
   // override this to only operate on a certain js type
   public readonly acceptedType: string;
 
-  public constructor(id: number, fields: List<KeyPath>, options: object = {})
+  public constructor(id: number, fields: List<{ path: KeyPath, id: number }>, options: object = {})
   {
     this.id = id;
     this.fields = fields;
@@ -92,7 +92,17 @@ export default abstract class TransformationNode
           ],
         } as TransformationVisitResult;
       }
-      return this.transformDocument(doc);
+      const result = this.transformDocument(doc);
+      if (result === undefined)
+      {
+        return {
+          document: doc,
+        };
+      }
+      else
+      {
+        return result;
+      }
     }
     catch (e)
     {

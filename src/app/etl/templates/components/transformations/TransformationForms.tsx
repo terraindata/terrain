@@ -46,8 +46,8 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires no-empty-interface max-classes-per-file
 
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import TransformationNodeVisitor, { VisitorLookupMap } from 'shared/transformations/TransformationNodeVisitor';
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
+import TransformationNodeVisitor, { VisitorLookupMap } from 'shared/transformations/visitors/TransformationNodeVisitor';
 import { TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
 import { List } from 'immutable';
@@ -60,6 +60,7 @@ import { GroupByTFF } from './GroupByTransformationForm';
 import { InsertTFF } from './InsertTransformationForm';
 import { JoinTFF } from './JoinTransformationForm';
 import { DifferenceTFF, ProductTFF, QuotientTFF, SumTFF } from './NumericOperationForms';
+import { ParseTFF } from './ParseTransformationForm';
 import { SetIfTFF } from './SetIfTransformationForm';
 import
 {
@@ -67,36 +68,39 @@ import
   HashTFF, MultiplyTFF, RemoveDuplicatesTFF, RoundTFF, SubstringTFF, SubtractTFF, ZipcodeTFF,
 } from './SimpleTransformations';
 import { SplitTFF } from './SplitTransformationForm';
+import { StringifyTFF } from './StringifyTransformationForm';
 
 const forms: Array<{ new(props): TransformationForm<any, any> }> = [
+  AddTFF,
   CaseTFF,
-  SubstringTFF,
-  DuplicateTFF,
-  SplitTFF,
-  JoinTFF,
   CastTFF,
+  DecryptTFF,
+  DifferenceTFF,
   HashTFF,
   ArraySumTFF,
   ArrayMinTFF,
   ArrayMaxTFF,
   ArrayCountTFF,
   RoundTFF,
-  AddTFF,
-  SubtractTFF,
-  MultiplyTFF,
   DivideTFF,
-  SetIfTFF,
+  DuplicateTFF,
+  EncryptTFF,
+  FilterArrayTFF,
   FindReplaceTFF,
+  GroupByTFF,
   InsertTFF,
-  SumTFF,
-  DifferenceTFF,
+  JoinTFF,
+  MultiplyTFF,
+  ParseTFF,
   ProductTFF,
   QuotientTFF,
-  EncryptTFF,
-  DecryptTFF,
-  GroupByTFF,
-  FilterArrayTFF,
   RemoveDuplicatesTFF,
+  SetIfTFF,
+  SplitTFF,
+  StringifyTFF,
+  SubstringTFF,
+  SubtractTFF,
+  SumTFF,
   ZipcodeTFF,
 ];
 

@@ -116,7 +116,7 @@ interface State
   indexName: string;
   resultsConfig?: any;
   nestedFields: List<string>;
-  fields: List<string>;
+  fieldTypes: Map<string, string>;
 }
 
 const MAP_MAX_HEIGHT = 300;
@@ -139,7 +139,7 @@ class HitsArea extends TerrainComponent<Props>
     indexName: '',
     resultsConfig: undefined,
     nestedFields: List([]),
-    fields: this.props.resultsState.fields,
+    fieldTypes: Map(),
   };
   public hitsFodderRange = _.range(0, 25);
   public locations = {};
@@ -169,7 +169,9 @@ class HitsArea extends TerrainComponent<Props>
         (nextProps.query.path.source.dataSource as any).index;
       this.setIndexAndResultsConfig(nextProps, indexChange);
     }
-    if (!_.isEqual(this.props.resultsState.fields, nextProps.resultsState.fields))
+    if (!_.isEqual(this.props.resultsState.fields, nextProps.resultsState.fields) ||
+      (!this.props.resultsState.hits && nextProps.resultsState.hits)
+    )
     {
       this.getFields(nextProps);
     }
@@ -196,7 +198,9 @@ class HitsArea extends TerrainComponent<Props>
   public getFields(props: Props, overrideConfig?)
   {
     const { builder, schema, resultsState } = props;
-    let nestedFields = resultsState.fields.filter((field) =>
+    let fieldTypes: Map<string, string> = Map();
+    let nestedFields: List<string> = List();
+    resultsState.fields.forEach((field) =>
     {
       const type = ElasticBlockHelpers.getTypeOfField(
         schema,
@@ -204,20 +208,30 @@ class HitsArea extends TerrainComponent<Props>
         field,
         true,
       );
-      return type === 'nested' || type === '';
-    }).toList();
+      if (type === 'nested' || type === '')
+      {
+        nestedFields = nestedFields.push(field);
+      }
+      fieldTypes = fieldTypes.set(field, type);
+      const subFields = ElasticBlockHelpers.getSubfields(field, schema, builder);
+      subFields.forEach((subField) =>
+      {
+        const subType = ElasticBlockHelpers.getTypeOfField(
+          schema,
+          builder && builder.query ? builder : builder.set('query', props.query),
+          subField,
+          true,
+        );
+        fieldTypes = fieldTypes.set(subField, subType);
+      });
+    });
     // Filter out anything that it is a single object, not a list of objects
-    let objectFields = List();
     if (resultsState.hits && resultsState.hits.size)
     {
-      // Fields that are simple objects {a: 1, b: 'hello'}
-      objectFields = nestedFields.filter((field) =>
-        !List.isList(resultsState.hits.get(0).fields.get(field)) &&
-        resultsState.hits.get(0).fields.get(field) != null,
-      ).toList();
       // Fields that are lists of objects [{obj1}, {obj1}]
       nestedFields = nestedFields.filter((field) =>
-        objectFields.indexOf(field) === -1,
+        List.isList(resultsState.hits.get(0).fields.get(field)) ||
+        resultsState.hits.get(0).fields.get(field) == null,
       ).toList();
     }
     // If there is a results config in use, only use nested fields in that config
@@ -228,20 +242,9 @@ class HitsArea extends TerrainComponent<Props>
         resultsConfig.fields.indexOf(field) !== -1,
       ).toList();
     }
-    // Take object fields and break them out into their subfields
-    let fields = resultsState.fields;
-    objectFields.forEach((field: string) =>
-    {
-      const subFields = ElasticBlockHelpers.getSubfields(
-        field,
-        schema,
-        builder && builder.query ? builder : builder.set('query', props.query),
-      );
-      fields = fields.concat(subFields).toList();
-    });
     this.setState({
       nestedFields,
-      fields,
+      fieldTypes,
     });
   }
 
@@ -348,6 +351,7 @@ class HitsArea extends TerrainComponent<Props>
           nestedFields={this.state.nestedFields}
           builder={this.props.builder}
           isVisible={true}
+          fieldTypes={this.state.fieldTypes}
         />
       </div>
     );
@@ -552,6 +556,7 @@ class HitsArea extends TerrainComponent<Props>
 
   public renderHits()
   {
+
     const { resultsState } = this.props;
     const { hits } = resultsState;
     const { resultsConfig } = this.state;
@@ -702,6 +707,7 @@ class HitsArea extends TerrainComponent<Props>
                 hitSize={this.state.hitSize}
                 nestedFields={this.state.nestedFields}
                 builder={this.props.builder}
+                fieldTypes={this.state.fieldTypes}
               />,
             )
           }
@@ -860,7 +866,7 @@ class HitsArea extends TerrainComponent<Props>
     if (this.state.showingConfig)
     {
       const { props, state } = this;
-      const fields = Util.orderFields(state.fields, props.schema,
+      const fields = Util.orderFields(props.resultsState.fields, props.schema,
         props.query.algorithmId, state.indexName, true);
       const { resultsConfig } = this.state;
       return <ResultsConfigComponent

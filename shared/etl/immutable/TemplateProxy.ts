@@ -46,22 +46,30 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file
 
 import * as Immutable from 'immutable';
-import { List } from 'immutable';
+import * as _ from 'lodash';
+const { List, Map } = Immutable;
 
-import { SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { _ReorderableSet, ReorderableSet } from 'shared/etl/immutable/ReorderableSet';
 import { ETLTemplate, SinksMap, SourcesMap } from 'shared/etl/immutable/TemplateRecords';
+import LanguageController from 'shared/etl/languages/LanguageControllers';
+import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import * as Utils from 'shared/transformations/util/EngineUtils';
+import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
 import
 {
   _ETLEdge,
   _ETLNode,
+  _ETLProcess,
   _MergeJoinOptions,
   ETLEdge,
   ETLNode,
   ETLProcess,
+  MergeJoinOptions,
 } from 'shared/etl/immutable/ETLProcessRecords';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 
@@ -146,13 +154,12 @@ export class TemplateProxy
     this.setEdgeTo(rightEdgeId, mergeNodeId);
 
     const newEdgeId = this.addEdge(mergeNodeId, leftEdge.to);
-    const newEngine = EngineUtil.mergeJoinEngines(
+    const newEngine = Utils.construction.mergeJoinEngines(
       leftEdge.transformations,
       rightEdge.transformations,
       options.outputKey,
     );
     this.setEdgeTransformations(newEdgeId, newEngine);
-    // this.performTypeDetection(newEdgeId);
   }
 
   // delete a source and its node
@@ -185,9 +192,8 @@ export class TemplateProxy
     return this.createEdge(edge);
   }
 
-  public createInitialEdgeEngine(edgeId: number, documents: List<object>)
+  public createInitialEdgeEngine(edgeId: number, documents: List<object>): string[]
   {
-    const { engine, warnings, softWarnings } = EngineUtil.createEngineFromDocuments(documents);
     let castStringsToPrimitives = false;
     const fromNode = this.template.getNode(this.template.getEdge(edgeId).from);
     if (fromNode.type === NodeTypes.Source)
@@ -202,14 +208,12 @@ export class TemplateProxy
         castStringsToPrimitives = true;
       }
     }
+
+    const { engine, errors } = Utils.construction.createEngineFromDocuments(documents, castStringsToPrimitives);
+    Utils.transformations.addInitialTypeCasts(engine);
     this.setEdgeTransformations(edgeId, engine);
-    this.performTypeDetection(edgeId,
-      {
-        documents,
-        castStringsToPrimitives,
-      });
     this.cleanFieldOrdering(edgeId);
-    return { warnings, softWarnings };
+    return errors;
   }
 
   public setEdgeTransformations(edgeId: number, transformations: TransformationEngine)
@@ -278,27 +282,14 @@ export class TemplateProxy
     {
       throw new Error(`No sink exists with key ${key}`);
     }
+
+    // Set the sink's field ordering to be the names of the root fields
+    // This is used for CSV and TSV exports
     const rootNames = order.ordering
-      .filter((id) => engine.getOutputKeyPath(id).size === 1 && engine.getFieldEnabled(id))
-      .map((id) => engine.getOutputKeyPath(id).last());
+      .filter((id) => engine.getFieldPath(id).size === 1 && engine.getFieldEnabled(id))
+      .map((id) => engine.getFieldPath(id).last());
     sink = sink.setIn(['fileConfig', 'fieldOrdering'], rootNames.toArray());
     this.setSink(key, sink);
-  }
-
-  // Add automatic type casts to fields, and apply language specific type checking
-  // if documentConfig is provided, do additional type checking / inference
-  private performTypeDetection(
-    edgeId: number,
-    documentConfig?: {
-      documents: List<object>,
-      castStringsToPrimitives?: boolean,
-    },
-  )
-  {
-    const engine = this.template.getTransformationEngine(edgeId);
-
-    EngineUtil.interpretETLTypes(engine, documentConfig);
-    EngineUtil.addInitialTypeCasts(engine);
   }
 
   private createNode(node: ETLNode): number

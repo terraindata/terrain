@@ -45,10 +45,30 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:max-line-length
 
-import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
+import * as _ from 'lodash';
+import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
+
+import isPrimitive = require('is-primitive');
 
 export default class TypeUtil
 {
+  public static getSimpleType(value: any): 'string' | 'number' | 'boolean' | 'array' | 'object' | 'null'
+  {
+    if (isPrimitive(value))
+    {
+      return value == null ? 'null' : typeof value as any;
+    }
+    else if (Array.isArray(value))
+    {
+      return 'array';
+    }
+    else
+    {
+      return 'object';
+    }
+  }
+
   // return the most specific primitive type of the provided values
   public static getCommonJsType(values: string[]): string
   {
@@ -75,11 +95,11 @@ export default class TypeUtil
     return type === null ? 'string' : type;
   }
 
-  public static getCommonETLStringType(values: string[]): ETLFieldTypes
+  public static getCommonETLStringType(values: string[]): FieldTypes
   {
     if (values.length === 0)
     {
-      return ETLFieldTypes.String;
+      return FieldTypes.String;
     }
 
     let allNull = true;
@@ -104,23 +124,23 @@ export default class TypeUtil
 
     if (allDate && !allNull)
     {
-      return ETLFieldTypes.Date;
+      return FieldTypes.Date;
     }
     else if (allGeo && !allNull)
     {
-      return ETLFieldTypes.GeoPoint;
+      return FieldTypes.GeoPoint;
     }
     else
     {
-      return ETLFieldTypes.String;
+      return FieldTypes.String;
     }
   }
 
-  public static getCommonETLNumberType(values: number[]): ETLFieldTypes
+  public static getCommonETLNumberType(values: number[]): FieldTypes
   {
     if (values.length === 0)
     {
-      return ETLFieldTypes.Number;
+      return FieldTypes.Number;
     }
 
     let allIntegers = true;
@@ -140,11 +160,11 @@ export default class TypeUtil
 
     if (allIntegers && !allNull)
     {
-      return ETLFieldTypes.Integer;
+      return FieldTypes.Integer;
     }
     else
     {
-      return ETLFieldTypes.Number;
+      return FieldTypes.Number;
     }
   }
 
@@ -175,23 +195,6 @@ export default class TypeUtil
     }
     return allGeopoints && someGeopoints;
   }
-
-  // public static areValuesNull(values: any[]): boolean
-  // {
-  //   if (values.length === 0)
-  //   {
-  //     return false;
-  //   }
-
-  //   let allNull = true;
-  //   for (const val of values)
-  //   {
-  //     if (val !== null)
-  //     {
-  //       allNull
-  //     }
-  //   }
-  // }
 
   public static numberIsInteger(value: number): boolean
   {

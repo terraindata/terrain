@@ -1,0 +1,1377 @@
+{
+  "testName": "MC_08",
+  "numDocs": 7,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "SKU": "KTPR-0019-SMK",
+      "VariantName": "Sausage Making Kit",
+      "Price": 79.99,
+      "Inventory": 625,
+      "VariantStatus": "sellable",
+      "ProductId": 236,
+      "VariantId": 437,
+      "ContentsHTML": "<ul>\r\n  <li>NorPro Delux Grinder/Mincer</li>\r\n  <li>Maple Apple Spice Blend, 4 oz </li>\r\n  <li>Merguez Spice Blend, 4 oz </li>\r\n  <li>Full Circle Home Detail Brush</li>\r\n  <li>Sausage Casings</li>\r\n  \r\n</ul>",
+      "LongDescription": "The Ultimate Cram Session\r\n\r\n  There's a certain type of guy who's just always had a strange obsession with stuffing things. As a lad, he couldn't shove enough pennies into those stripy paper coin sleeves. In his college years, he challenged the world record for most dirty clothes squished into a hamper. Today, he dances around dead set on shimmying his beefy calves into skinny jeans.\r\n  Now, thanks to not-so-modern Man Crates technology, he can pair his penchant for packing, pushing, and smushing with his love of encased meats. The Sausage Making Kit brings the age-old tradition of tubing up tasty beef, wild game, poultry, pork, and lamb right to his kitchen.\r\n  Once he starts cranking out fresh, handmade sausages, he'll have to cram \"Sausage King of the Neighborhood\" into his official title.\r\n\r\nA Link of His Own\r\n  \r\n\tHe'll be churning out chorizo like a champ with the Norpro Meat Grinder, which features a powerful suction cup for convenient countertop use. Grinding his gears is about to get fun.\r\n\tReportedly, local butchers are jealous that Whole Spice Napa Valley created the kit's Maple Apple Sausage Blend and Merquez Sausage Blend exclusively for Man Crates.\r\n\tSonoma Meat Company has supplied two packs of hog sausage casings so he can go hog wild stuffing his soft cylinders full of savory goodness.\r\n\t\r\n  ",
+      "Contents": "\r\n  NorPro Delux Grinder/Mincer\r\n  Maple Apple Spice Blend, 4 oz \r\n  Merguez Spice Blend, 4 oz \r\n  Full Circle Home Detail Brush\r\n  Sausage Casings\r\n  \r\n",
+      "LongDescriptionHTML": "<h4>The Ultimate Cram Session</h4>\r\n\r\n  <p>There's a certain type of guy who's just always had a strange obsession with stuffing things. As a lad, he couldn't shove enough pennies into those stripy paper coin sleeves. In his college years, he challenged the world record for most dirty clothes squished into a hamper. Today, he dances around dead set on shimmying his beefy calves into skinny jeans.</p>\r\n  <p>Now, thanks to not-so-modern Man Crates technology, he can pair his penchant for packing, pushing, and smushing with his love of encased meats. The Sausage Making Kit brings the age-old tradition of tubing up tasty beef, wild game, poultry, pork, and lamb right to his kitchen.</p>\r\n  <p>Once he starts cranking out fresh, handmade sausages, he'll have to cram \"Sausage King of the Neighborhood\" into his official title.</p>\r\n\r\n<h4>A Link of His Own</h4>\r\n  <ul>\r\n\t<li>He'll be churning out chorizo like a champ with the Norpro Meat Grinder, which features a powerful suction cup for convenient countertop use. Grinding his gears is about to get fun.</li>\r\n\t<li>Reportedly, local butchers are jealous that Whole Spice Napa Valley created the kit's Maple Apple Sausage Blend and Merquez Sausage Blend exclusively for Man Crates.</li>\r\n\t<li>Sonoma Meat Company has supplied two packs of hog sausage casings so he can go hog wild stuffing his soft cylinders full of savory goodness.</li>\r\n\t\r\n  </ul>",
+      "Name": "Sausage Making Project Kit",
+      "ConversionRate": 4.205900816070308,
+      "UniquePurchases": 67,
+      "ProductRevenue": 5359.33,
+      "Quantity": 67,
+      "AveragePrice": 79.99,
+      "Path": "sausage-making-project-kit",
+      "CanonicalUrl": "www.mancrates.com/store/products/sausage-making-project-kit",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/985/large/MBC_MC_2018-4_Sausage_WEB-1487.jpg?1527019456",
+      "Margin": 0,
+      "TerrainScore": 0.32712962243877797,
+      "TERRAINRANK": 1
+    },
+    {
+      "SKU": "KTPR-0015-BLT",
+      "VariantName": "Leather Belt Making Kit",
+      "Price": 59.99,
+      "Inventory": 449,
+      "VariantStatus": "sellable",
+      "ProductId": 218,
+      "VariantId": 416,
+      "Path": "leather-belt-making-kit",
+      "CanonicalUrl": "www.mancrates.com/store/products/leather-belt-making-kit",
+      "ContentsHTML": "<li>Man Crates Leather Belt Making Guide</li>\r\n<li>Buffalo Leather Belt - Blank</li>\r\n<li>Hole Punch</li>\r\n<li>Leather Belt Component Kit (includes two screw rivets, belt buckle, belt keeper, and 4\" x 4\" poly board)</li>\r\n</ul>",
+      "LongDescription": "Take His Slacks To The Max\r\n\r\nA good belt will keep his pants up, but a great belt will also uphold his keen sense of style. With belts, fashion is as important as fit, and if he’s going to be strutting his stuff all over town, he deserves the hippest of hip huggers. \r\n\r\nSure, you could roll the dice on a faux-leather, one-size-fits-none department store belt, but too much slack and you risk leaving him in a rather exposed predicament. No one knows the delicate contours of his waistline like he does, so it only makes sense he’d be the one to fashion his own fashion accessory. \r\n\r\nThe Leather Belt Making Kit gives him all the tools and guidance he’ll need for hands down the best pants-up experience imaginable.\r\n\r\nGet Him Waisted\r\n\r\nHeadlining the Leather Belt Making Kit is a 50-inch solid strip of oil-tanned, full-grain buffalo leather, our premier choice when showcasing the waist. The kit also includes a classic bar buckle, screw rivets for buckle swapability, a hole punch for leather puncturing, and a 4\" x 4\" poly board for countertop non-puncturing.\r\n\r\nWith a little elbow grease, imagination, and unwavering obedience to the Man Crates instruction guide, he’ll emerge from his workspace with a durable, high-quality belt that will have him constantly reminding oglers his eyes are “up here.”\r\n\r\nThe Leather Belt Making Kit is a fantastic introduction into both leatherwork and the world of fine fashion from the waist up.",
+      "Contents": "Man Crates Leather Belt Making Guide\r\nBuffalo Leather Belt - Blank\r\nHole Punch\r\nLeather Belt Component Kit (includes two screw rivets, belt buckle, belt keeper, and 4\" x 4\" poly board)\r\n",
+      "LongDescriptionHTML": "<h4>Take His Slacks To The Max</h4>\r\n\r\n<p>A good belt will keep his pants up, but a great belt will also uphold his keen sense of style. With belts, fashion is as important as fit, and if he’s going to be strutting his stuff all over town, he deserves the hippest of hip huggers.</p> \r\n\r\n<p>Sure, you could roll the dice on a faux-leather, one-size-fits-none department store belt, but too much slack and you risk leaving him in a rather exposed predicament. No one knows the delicate contours of his waistline like he does, so it only makes sense he’d be the one to fashion his own fashion accessory.</p> \r\n\r\n<p>The Leather Belt Making Kit gives him all the tools and guidance he’ll need for hands down the best pants-up experience imaginable.</p>\r\n\r\n<h4>Get Him Waisted</h4>\r\n\r\n<p>Headlining the Leather Belt Making Kit is a 50-inch solid strip of oil-tanned, full-grain buffalo leather, our premier choice when showcasing the waist. The kit also includes a classic bar buckle, screw rivets for buckle swapability, a hole punch for leather puncturing, and a 4\" x 4\" poly board for countertop non-puncturing.</p>\r\n\r\n<p>With a little elbow grease, imagination, and unwavering obedience to the Man Crates instruction guide, he’ll emerge from his workspace with a durable, high-quality belt that will have him constantly reminding oglers his eyes are “up here.”</p>\r\n\r\n<p>The Leather Belt Making Kit is a fantastic introduction into both leatherwork and the world of fine fashion from the waist up.</p>",
+      "Name": "Leather Belt Making Kit",
+      "ConversionRate": 3.605200945626478,
+      "UniquePurchases": 61,
+      "ProductRevenue": 3659.39,
+      "Quantity": 61,
+      "AveragePrice": 59.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/600/large/eb_mc_belt_web_20180109-_MG_6944_Edit.jpg?1517865156",
+      "Margin": 65.54,
+      "TerrainScore": 0.26942264137787597,
+      "TERRAINRANK": 2
+    },
+    {
+      "SKU": "KTBX-0004-UTL",
+      "VariantName": "Ultimate Tool Kit",
+      "Price": 19.99,
+      "Inventory": 3495,
+      "VariantStatus": "sellable",
+      "ProductId": 30,
+      "VariantId": 59,
+      "Path": "ultimate-tool-kit",
+      "CanonicalUrl": "www.mancrates.com/store/products/ultimate-tool-kit",
+      "ContentsHTML": "<h4>The Dynamic Duo</h4> <ul>\n  <li>WD-40</li>\n  <li>Duct Tape</li>\n</ul>",
+      "LongDescription": "Keep it Simple If it ain't broken, don't break it. Simple as that. But if it is broken, someone's going to\n   have to fix it, and the world of household repair is teeming with live wires and\n   dead ends.\n Every repair project poses its own unique challenges, and without the right tools, the only thing pure\n   elbow grease and optimism are building is frustration. And there is no single wonder-tool that can\n   magically fix any and every situation. There are two.\n No finicky appliance or faulty construction can escape the wondrous healing powers\n   of duct tape and WD-40.\n When Sticky Met Solvent The Ultimate Tool Kit is a two-piece tool chest that can at least temporarily solve\n   any household problem: squeaky hinges, leaky pipes, flaky wallpaper, chipped teeth,\n   exposed wiring, indigestion, pet hair everywhere, troubled feng shui, rude neighbors,\n   run-on sentences, and even cats trapped in the wall.\n We've even included a comprehensive flowchart to determine which of this dynamic duo will be most helpful\n   in any given situation. Does it move? Should it? Every repair, no matter how complex,\n   made stupidly simple.\n No task is too grimey and no challenge too strong to be solved by the all-encompassing\n   heroics of the Ultimate Tool Kit.\n",
+      "Contents": "The Dynamic Duo \n  WD-40\n  Duct Tape\n",
+      "LongDescriptionHTML": "<h4>Keep it Simple</h4> <p>If it ain't broken, don't break it. Simple as that. But if it is broken, someone's going to\n   have to fix it, and the world of household repair is teeming with live wires and\n   dead ends.\n</p> <p>Every repair project poses its own unique challenges, and without the right tools, the only thing pure\n   elbow grease and optimism are building is frustration. And there is no single wonder-tool that can\n   magically fix any and every situation. There are two.\n</p> <p>No finicky appliance or faulty construction can escape the wondrous healing powers\n   of duct tape and WD-40.\n</p> <h4>When Sticky Met Solvent</h4> <p>The Ultimate Tool Kit is a two-piece tool chest that can at least temporarily solve\n   any household problem: squeaky hinges, leaky pipes, flaky wallpaper, chipped teeth,\n   exposed wiring, indigestion, pet hair everywhere, troubled feng shui, rude neighbors,\n   run-on sentences, and even cats trapped in the wall.\n</p> <p>We've even included a comprehensive flowchart to determine which of this dynamic duo will be most helpful\n   in any given situation. Does it move? Should it? Every repair, no matter how complex,\n   made stupidly simple.\n</p> <p>No task is too grimey and no challenge too strong to be solved by the all-encompassing\n   heroics of the Ultimate Tool Kit.\n</p>",
+      "Name": "Ultimate Tool Kit",
+      "ConversionRate": 0.6786233640329618,
+      "UniquePurchases": 14,
+      "ProductRevenue": 279.86,
+      "Quantity": 14,
+      "AveragePrice": 19.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/452/large/utk-two-tools-fits-all-box-essentials__70922.jpg?1502411063",
+      "Margin": 36.22,
+      "TerrainScore": 0.25217903059474445,
+      "TERRAINRANK": 3
+    },
+    {
+      "SKU": "KTPR-0001-1BR",
+      "VariantName": "Micro Brewed Kit (1 gal)",
+      "Price": 74.99,
+      "Inventory": 242,
+      "VariantStatus": "sellable",
+      "ProductId": 97,
+      "VariantId": 189,
+      "Path": "micro-brewed-kit-1-gal",
+      "CanonicalUrl": "www.mancrates.com/store/products/micro-brewed-kit-1-gal",
+      "ContentsHTML": "<h4>Brewing Brouhaha</h4> <ul>\r\n  <li>Micro Brewing Instruction Manual</li>\r\n  <li>1 Gallon Carboy</li>\r\n  <li>Air Lock</li>\r\n  <li>Bottle Caps</li>\r\n  <li>SMaSH IPA Kit</li>\r\n  <li>Pump Siphon</li>\r\n  <li>Bottle Capper</li>\r\n  <li>Sanitizer</li>\r\n  <li>Bottle Filler</li>\r\n  <li>Tubing</li>\r\n  <li>Carbonation Drops</li>\r\n</ul>",
+      "LongDescription": "BYOB (Be Your Own Brewmaster) Beer is the Rosetta Stone of humanity, the one universally consumed and celebrated\r\n   thread tying every culture and era of civilization together. The Sumerians wrote\r\n   hymns to the exhilarating nature of beer, the Chinese experimented extensively with\r\n   rice fermentations, and there's even cursory evidence of beer predating human history.\r\n   (Those monkeys were crafty!)\r\n In past days, the brewers were the esteemed men of the world, the gatekeepers to the ethereal knowledge of\r\n   medicine, pleasure, and the divine. Nowadays, we've degraded the ancient craft to big industry corporations\r\n   and a shoddy baseball team in Milwaukee.\r\n The best way to restore rightful honor to the lost art of beer brewing, to bottle your impeccable taste on\r\n   the most intricate level, is to do it yourself.\r\n Get Weird With Your Beer Start stocking your well-curated home bar with well-aerated home beer brewed in your very\r\n   kitchen. The Micro Brewed project kit features the floral and citrusy aroma, balanced\r\n   flavors, and American pedigree of Centennial Hops and a SMASH (Single Malt and Single\r\n   Hop) Recipe that pulls everything out of the way to let the Centennial hops speak\r\n   unimpeded.\r\n And these hops have a lot to say. The 1.5 gallon Little Bubbler gives more head room than a topless Jeep Wrangler for the most robust of\r\n   beers, yet is small enough to fit comfortably in a Brooklyn wash closet of a studio\r\n   apartment. The one gallon batch size invites more freedom and creativity into your\r\n   recipes, so you can embrace your artistic genius unimpeded, with less pride to swallow\r\n   if your secret ingredient is less hit and more miss.\r\n Fermentation Activation! Racking, measuring, sanitizing, and bottling: all things you will soon be intimately\r\n   familiar with. Intimately. We've curated the ultimate collection of tubes and jib-jabs\r\n   to transform simple ingredients into a beer that will make friends and colleagues\r\n   enjoy, respect, and deeply envy your brewing expertise.\r\n Carry on the legacy of first-rate fermentation and inject some hoppiness into your happiness with the\r\n   Home Brewed project kit.\r\n",
+      "Contents": "Brewing Brouhaha \r\n  Micro Brewing Instruction Manual\r\n  1 Gallon Carboy\r\n  Air Lock\r\n  Bottle Caps\r\n  SMaSH IPA Kit\r\n  Pump Siphon\r\n  Bottle Capper\r\n  Sanitizer\r\n  Bottle Filler\r\n  Tubing\r\n  Carbonation Drops\r\n",
+      "LongDescriptionHTML": "<h4>BYOB (Be Your Own Brewmaster)</h4> <p>Beer is the Rosetta Stone of humanity, the one universally consumed and celebrated\r\n   thread tying every culture and era of civilization together. The Sumerians wrote\r\n   hymns to the exhilarating nature of beer, the Chinese experimented extensively with\r\n   rice fermentations, and there's even cursory evidence of beer predating human history.\r\n   (Those monkeys were crafty!)\r\n</p> <p>In past days, the brewers were the esteemed men of the world, the gatekeepers to the ethereal knowledge of\r\n   medicine, pleasure, and the divine. Nowadays, we've degraded the ancient craft to big industry corporations\r\n   and a shoddy baseball team in Milwaukee.\r\n</p> <p>The best way to restore rightful honor to the lost art of beer brewing, to bottle your impeccable taste on\r\n   the most intricate level, is to do it yourself.\r\n</p> <h4>Get Weird With Your Beer</h4> <p>Start stocking your well-curated home bar with well-aerated home beer brewed in your very\r\n   kitchen. The Micro Brewed project kit features the floral and citrusy aroma, balanced\r\n   flavors, and American pedigree of Centennial Hops and a SMASH (Single Malt and Single\r\n   Hop) Recipe that pulls everything out of the way to let the Centennial hops speak\r\n   unimpeded.\r\n</p> <p>And these hops have a lot to say.</p> <p>The 1.5 gallon Little Bubbler gives more head room than a topless Jeep Wrangler for the most robust of\r\n   beers, yet is small enough to fit comfortably in a Brooklyn wash closet of a studio\r\n   apartment. The one gallon batch size invites more freedom and creativity into your\r\n   recipes, so you can embrace your artistic genius unimpeded, with less pride to swallow\r\n   if your secret ingredient is less hit and more miss.\r\n</p> <h4>Fermentation Activation!</h4> <p>Racking, measuring, sanitizing, and bottling: all things you will soon be intimately\r\n   familiar with. Intimately. We've curated the ultimate collection of tubes and jib-jabs\r\n   to transform simple ingredients into a beer that will make friends and colleagues\r\n   enjoy, respect, and deeply envy your brewing expertise.\r\n</p> <p>Carry on the legacy of first-rate fermentation and inject some hoppiness into your happiness with the\r\n   Home Brewed project kit.\r\n</p>",
+      "Name": "Micro Brewed Kit (1 gal)",
+      "ConversionRate": 5.0024764735017335,
+      "UniquePurchases": 101,
+      "ProductRevenue": 7573.99,
+      "Quantity": 101,
+      "AveragePrice": 74.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/744/large/diymb-do-it-yourself-simple-home-brewing-gift-kit-for-men_w__01594.jpg?1502411174",
+      "Margin": 56.25,
+      "TerrainScore": 0.23932969639769988,
+      "TERRAINRANK": 4
+    },
+    {
+      "SKU": "KTPR-0011-GIN",
+      "VariantName": "Gin-Fusion Kit",
+      "Price": 59.99,
+      "Inventory": 276,
+      "VariantStatus": "sellable",
+      "ProductId": 151,
+      "VariantId": 277,
+      "Path": "gin-fusion-kit",
+      "CanonicalUrl": "www.mancrates.com/store/products/gin-fusion-kit",
+      "ContentsHTML": "<h4>Spice World</h4> <ul>\r\n  <li>Juniper Berries, 1.4 oz</li>\r\n  <li>Coriander Seeds, 0.6 oz</li>\r\n  <li>Angelica Root, 0.6 oz</li>\r\n  <li>Lavender, 0.2 oz</li>\r\n  <li>Citrus Peel, 0.6 oz</li>\r\n  <li>Grains of Paradise, 1.4 oz</li>\r\n  <li>Star Anise, 0.4 oz</li>\r\n  <li>Chamomile, 0.2 oz</li>\r\n  <li>Cardamom Pods, 0.8 oz</li>\r\n  <li>Allspice Berries, 1 oz</li>\r\n</ul> <h4>Ginstruments</h4> <ul>\r\n  <li>2 Glass Bottles, 375mL</li>\r\n  <li>2 Bartop Corks</li>\r\n  <li>Gin-Fusion Instruction/Recipe Booklet</li>\r\n</ul>",
+      "LongDescription": "Gin For the Win! As much as we enjoy the idea of distilling our own gin, we moreso enjoy keeping our eyesight,\r\n   bathtubs, and status as mostly law-abiding citizens intact. And while DIY spirit\r\n   distillation isn't as mischievous as Prohibition-era propaganda paints it, it'll\r\n   still earn a modern-day moonshiner a few free nights in the county lock-up.\r\n Thankfully, we've found a way to get in on gin without also getting a visit from\r\n   Johnny Law or his lesser known siblings Jimmy Firefighter and Jenny Emergency Ocular\r\n   Surgeon.\r\n Compound gin is our legal loophole. It infuses the spirit after\r\n   distillation and is an easy entry into the world of producing excellent, custom\r\n   cocktail spirits. The Gin-Fusion Kit is the perfect DIY process for the true gintleman.\r\n The Heart of Gin Juniper berries make up the base foundation for any gin, so we've included a healthy amount in the\r\n   Gin-Fusion Kit.\r\n We've also assembled a botanical dream team, nine flavor muses to infuse the gin with a unique\r\n   personality. These botanicals are the active ingredients responsible for every gin's\r\n   unique aroma and flavor.\r\n The Man Crates-exclusive gin-making instruction book comes with three recipes for a surefire success. It\r\n   also strongly encourages experimentation.\r\n Bottles on Bottles Good news! Making compound gin doesn't require slowly stealing lab equipment from a community college\r\n   chemistry class the way distilling gin does. These fancy glass bottles should do the trick.\r\n We're including two 375mL bottles for flavor infusion, which we hear can split\r\n   a 750mL bottle of vodka evenly. We can't know for sure since we were forcibly removed\r\n   from that community college chemistry class before fractions were covered.\r\n The Gin-Fusion Kit puts the fun and freedom of gin infusion into the hands of the everyman.",
+      "Contents": "Spice World \r\n  Juniper Berries, 1.4 oz\r\n  Coriander Seeds, 0.6 oz\r\n  Angelica Root, 0.6 oz\r\n  Lavender, 0.2 oz\r\n  Citrus Peel, 0.6 oz\r\n  Grains of Paradise, 1.4 oz\r\n  Star Anise, 0.4 oz\r\n  Chamomile, 0.2 oz\r\n  Cardamom Pods, 0.8 oz\r\n  Allspice Berries, 1 oz\r\n Ginstruments \r\n  2 Glass Bottles, 375mL\r\n  2 Bartop Corks\r\n  Gin-Fusion Instruction/Recipe Booklet\r\n",
+      "LongDescriptionHTML": "<h4>Gin For the Win!</h4> <p>As much as we enjoy the idea of distilling our own gin, we moreso enjoy keeping our eyesight,\r\n   bathtubs, and status as mostly law-abiding citizens intact. And while DIY spirit\r\n   distillation isn't as mischievous as Prohibition-era propaganda paints it, it'll\r\n   still earn a modern-day moonshiner a few free nights in the county lock-up.\r\n</p> <p>Thankfully, we've found a way to get in on gin without also getting a visit from\r\n   Johnny Law or his lesser known siblings Jimmy Firefighter and Jenny Emergency Ocular\r\n   Surgeon.\r\n</p> <p>Compound gin is our legal loophole. It infuses the spirit after\r\n   distillation and is an easy entry into the world of producing excellent, custom\r\n   cocktail spirits. The Gin-Fusion Kit is the perfect DIY process for the true gintleman.\r\n</p> <h4>The Heart of Gin</h4> <p>Juniper berries make up the base foundation for any gin, so we've included a healthy amount in the\r\n   Gin-Fusion Kit.\r\n</p> <p>We've also assembled a botanical dream team, nine flavor muses to infuse the gin with a unique\r\n   personality. These botanicals are the active ingredients responsible for every gin's\r\n   unique aroma and flavor.\r\n</p> <p>The Man Crates-exclusive gin-making instruction book comes with three recipes for a surefire success. It\r\n   also strongly encourages experimentation.\r\n</p> <h4>Bottles on Bottles</h4> <p>Good news! Making compound gin doesn't require slowly stealing lab equipment from a community college\r\n   chemistry class the way distilling gin does. These fancy glass bottles should do the trick.\r\n</p> <p>We're including two 375mL bottles for flavor infusion, which we hear can split\r\n   a 750mL bottle of vodka evenly. We can't know for sure since we were forcibly removed\r\n   from that community college chemistry class before fractions were covered.\r\n</p> <p>The Gin-Fusion Kit puts the fun and freedom of gin infusion into the hands of the everyman.</p>",
+      "Name": "Gin Making Project Kit",
+      "ConversionRate": 5.460750853242321,
+      "UniquePurchases": 80,
+      "ProductRevenue": 4799.2,
+      "Quantity": 80,
+      "AveragePrice": 59.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/985/large/gmk-gin-making-kit-awesome-craft-drinks-for-men-gift__98172.jpg?1502411268",
+      "Margin": 56.21,
+      "TerrainScore": 0.2258543420734704,
+      "TERRAINRANK": 5
+    },
+    {
+      "SKU": "KTPR-0013-CHK",
+      "VariantName": "Chef Knife Making Kit",
+      "Price": 179.99,
+      "Inventory": 244,
+      "VariantStatus": "sellable",
+      "ProductId": 102,
+      "VariantId": 223,
+      "Path": "chef-knife-making-kit",
+      "CanonicalUrl": "www.mancrates.com/store/products/chef-knife-making-kit",
+      "ContentsHTML": "<h4>Blade Buddies</h4> <ul>\n  <li>VG-10 Damascus Chef Knife Blade Blank (Blade Length: 8.5\")</li>\n  <li>Black/Red Micarta Handle Scale Set</li>\n  <li>Mosaic Pins</li>\n</ul> <h4>Shape, Sand, and Finish</h4> <ul>\n  <li>Man Crates Chef Knife Making Guide</li>\n  <li>2-Ton Syringe Epoxy</li>\n  <li>Rasp &amp; File set</li>\n  <li>Graded Sandpaper Set</li>\n  <li>Bench Vise</li>\n  <li>Drill Bit</li>\n</ul>",
+      "LongDescription": "The Cutting Edge In a world boasting \"Seen on TV\" Slice n' Dice Machines, Wombo Combo Fruit Juicers, and self\n   sharpening spatulas, it can be tough to know which kitchen utensils are grade A\n   and which are woefully undercooked.\n But anyone who's seen MacGyver knows the only tools worth trusting are the ones built by hand —sometimes\n   two trembling hands dangling from a cliff or trapped in an elevator with a timebomb.\n And while most of us ditched our mullets by the late 90s, the wisdom still holds true.\n   The Chef Knife Making Kit proves that if you want something made right, meals included,\n   you've got to make it yourself.\n Knife to Meet You While MacGyver made do with coat hangers and chewing gum, the Chef Knife Making Kit opts for sharper,\n   more dependable materials. Forged of VG-10 Damascus steel, the mere sight of this\n   blade will cause a steak to carve itself out of fear.\n The stylish Micarta handles are ready to be sculpted into personalized, palm-gripping perfection. The\n   finished product will be as intricately layered as a fennel avocado bean dip, and\n   every bit as distinctive as the chef who made it.\n All Ingredients Included The kit comes stuffed with various rasps and files, a portable bench vise, and\n   enough sandpaper to take the green off a watermelon. It's also a great excuse to\n   dust off the ol' power tools hanging in the garage. And with our step-by-step instruction\n   booklet, crafting this knife will be as effortless as cooking with it.\n The Chef Knife Making Kit is just what the modern day Michelangelo of meat needs to\n   carve up the next five-star entree.\n",
+      "Contents": "Blade Buddies \n  VG-10 Damascus Chef Knife Blade Blank (Blade Length: 8.5\")\n  Black/Red Micarta Handle Scale Set\n  Mosaic Pins\n Shape, Sand, and Finish \n  Man Crates Chef Knife Making Guide\n  2-Ton Syringe Epoxy\n  Rasp &amp; File set\n  Graded Sandpaper Set\n  Bench Vise\n  Drill Bit\n",
+      "LongDescriptionHTML": "<h4>The Cutting Edge</h4> <p>In a world boasting \"Seen on TV\" Slice n' Dice Machines, Wombo Combo Fruit Juicers, and self\n   sharpening spatulas, it can be tough to know which kitchen utensils are grade A\n   and which are woefully undercooked.\n</p> <p>But anyone who's seen MacGyver knows the only tools worth trusting are the ones built by hand —sometimes\n   two trembling hands dangling from a cliff or trapped in an elevator with a timebomb.\n</p> <p>And while most of us ditched our mullets by the late 90s, the wisdom still holds true.\n   The Chef Knife Making Kit proves that if you want something made right, meals included,\n   you've got to make it yourself.\n</p> <h4>Knife to Meet You</h4> <p>While MacGyver made do with coat hangers and chewing gum, the Chef Knife Making Kit opts for sharper,\n   more dependable materials. Forged of VG-10 Damascus steel, the mere sight of this\n   blade will cause a steak to carve itself out of fear.\n</p> <p>The stylish Micarta handles are ready to be sculpted into personalized, palm-gripping perfection. The\n   finished product will be as intricately layered as a fennel avocado bean dip, and\n   every bit as distinctive as the chef who made it.\n</p> <h4>All Ingredients Included</h4> <p>The kit comes stuffed with various rasps and files, a portable bench vise, and\n   enough sandpaper to take the green off a watermelon. It's also a great excuse to\n   dust off the ol' power tools hanging in the garage. And with our step-by-step instruction\n   booklet, crafting this knife will be as effortless as cooking with it.\n</p> <p>The Chef Knife Making Kit is just what the modern day Michelangelo of meat needs to\n   carve up the next five-star entree.\n</p>",
+      "Name": "Chef Knife Making Kit",
+      "ConversionRate": 2.1654954825756487,
+      "UniquePurchases": 151,
+      "ProductRevenue": 27178.49,
+      "Quantity": 151,
+      "AveragePrice": 179.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/766/large/ckmk-chef-knife-making-kit-great-components-damascus__98473.jpg?1502411183",
+      "Margin": 55.97,
+      "TerrainScore": 0.21903663114107896,
+      "TERRAINRANK": 6
+    },
+    {
+      "SKU": "KTPR-0017-KMS",
+      "VariantName": "Scrimshaw Knife Kit",
+      "Price": 129.99,
+      "Inventory": 107,
+      "VariantStatus": "sellable",
+      "ProductId": 222,
+      "VariantId": 420,
+      "Path": "scrimshaw-knife-kit",
+      "CanonicalUrl": "www.mancrates.com/store/products/scrimshaw-knife-kit",
+      "ContentsHTML": "<ul>\r\n  <li>Boker Gents Lockback White Knife</li>\r\n  <li>Scrimshaw Kit Includes:</li>\r\n      <ul>\r\n          <li>Steel Wool</li>\r\n          <li>Renaissance Wax, .25 oz</li>\r\n          <li>Higgins Black Ink</li>\r\n          <li>Lansky Dual Grit Sharpener</li>\r\n        <li>Scrimshaw Scribe</li>\r\n          <li>Golf Pencil</li>\r\n        <li>Cotton Tip Applicators</li>\r\n        <li>4 Carbon Sheets, 2\"x4\"</li>\r\n        <li>Practice Micarta Ivory, 1/8\"x2.5\"x5\"</li>\r\n          <li>Vellum Paper Stencil</li>\r\n\r\n \r\n</ul>",
+      "LongDescription": "Etch His Sketch\r\n\r\n  Working as a sailor has always been the most affordable way to see the world. But between ports, there's an awful lot of ocean to look at. And nary a jacuzzi, casino, or mini-golf course on deck. With plenty of free time on their hands, sailors got hands-on, making a mark with personalized knife handles.\r\n  The art of carving designs into bone knife handles is known as scrimshawing. It takes a steady hand and strong discipline, much like the seamanship required to steer a vessel through a white squall with 20-foot swells.\r\n  The Scrimshaw Knife Kit supplies the knife, tools, and instructions to make sure his maiden voyage is smooth sailing.\r\n\r\nScrim a Little Off the Sides\r\n  \r\n\tThe Boker Traditional Series Gentleman's Lockback Knife has a high-quality stainless steel blade and a white bone handle that's begging for an etching.\r\n\tA soup-to-nuts batch of scrimshawing supplies will set him up for success. There's a metal scribe, Higgins Black Ink, Renaissance Wax—even a slab of Micarta practicin' ivory.\r\n\tThe Lansky Dual Grit Sharpener gets right to the point, whether he's sharpening his blade, fishing hooks, or his wit. Maybe not that last one.\r\n\r\n  ",
+      "Contents": "\r\n  Boker Gents Lockback White Knife\r\n  Scrimshaw Kit Includes:\r\n      \r\n          Steel Wool\r\n          Renaissance Wax, .25 oz\r\n          Higgins Black Ink\r\n          Lansky Dual Grit Sharpener\r\n        Scrimshaw Scribe\r\n          Golf Pencil\r\n        Cotton Tip Applicators\r\n        4 Carbon Sheets, 2\"x4\"\r\n        Practice Micarta Ivory, 1/8\"x2.5\"x5\"\r\n          Vellum Paper Stencil\r\n\r\n \r\n",
+      "LongDescriptionHTML": "<h4>Etch His Sketch</h4>\r\n\r\n  <p>Working as a sailor has always been the most affordable way to see the world. But between ports, there's an awful lot of ocean to look at. And nary a jacuzzi, casino, or mini-golf course on deck. With plenty of free time on their hands, sailors got hands-on, making a mark with personalized knife handles.</p>\r\n  <p>The art of carving designs into bone knife handles is known as scrimshawing. It takes a steady hand and strong discipline, much like the seamanship required to steer a vessel through a white squall with 20-foot swells.</p>\r\n  <p>The Scrimshaw Knife Kit supplies the knife, tools, and instructions to make sure his maiden voyage is smooth sailing.</p>\r\n\r\n<h4>Scrim a Little Off the Sides</h4>\r\n  <ul>\r\n\t<li>The Boker Traditional Series Gentleman's Lockback Knife has a high-quality stainless steel blade and a white bone handle that's begging for an etching.</li>\r\n\t<li>A soup-to-nuts batch of scrimshawing supplies will set him up for success. There's a metal scribe, Higgins Black Ink, Renaissance Wax—even a slab of Micarta practicin' ivory.</li>\r\n\t<li>The Lansky Dual Grit Sharpener gets right to the point, whether he's sharpening his blade, fishing hooks, or his wit. Maybe not that last one.</li>\r\n\r\n  </ul>",
+      "Name": "Scrimshaw Knife Making Kit",
+      "ConversionRate": 2.5848765432098766,
+      "UniquePurchases": 67,
+      "ProductRevenue": 8709.33,
+      "Quantity": 67,
+      "AveragePrice": 129.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/906/large/MC_Scrimshaw_2018-3-28_WEB-0380_EDIT_V1ja.jpg?1526662262",
+      "Margin": 0,
+      "TerrainScore": 0.08299372369033171,
+      "TERRAINRANK": 7
+    }
+  ],
+  "outputDocs": [
+    {
+      "SKU": "KTPR-0019-SMK",
+      "VariantName": "Sausage Making Kit",
+      "Price": 79.99,
+      "ProductId": 236,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/sausage-making-project-kit",
+      "Contents": "<ul>\r\n  <li>NorPro Delux Grinder/Mincer</li>\r\n  <li>Maple Apple Spice Blend, 4 oz </li>\r\n  <li>Merguez Spice Blend, 4 oz </li>\r\n  <li>Full Circle Home Detail Brush</li>\r\n  <li>Sausage Casings</li>\r\n  \r\n</ul>",
+      "LongDescription": "<h4>The Ultimate Cram Session</h4>\r\n\r\n  <p>There's a certain type of guy who's just always had a strange obsession with stuffing things. As a lad, he couldn't shove enough pennies into those stripy paper coin sleeves. In his college years, he challenged the world record for most dirty clothes squished into a hamper. Today, he dances around dead set on shimmying his beefy calves into skinny jeans.</p>\r\n  <p>Now, thanks to not-so-modern Man Crates technology, he can pair his penchant for packing, pushing, and smushing with his love of encased meats. The Sausage Making Kit brings the age-old tradition of tubing up tasty beef, wild game, poultry, pork, and lamb right to his kitchen.</p>\r\n  <p>Once he starts cranking out fresh, handmade sausages, he'll have to cram \"Sausage King of the Neighborhood\" into his official title.</p>\r\n\r\n<h4>A Link of His Own</h4>\r\n  <ul>\r\n\t<li>He'll be churning out chorizo like a champ with the Norpro Meat Grinder, which features a powerful suction cup for convenient countertop use. Grinding his gears is about to get fun.</li>\r\n\t<li>Reportedly, local butchers are jealous that Whole Spice Napa Valley created the kit's Maple Apple Sausage Blend and Merquez Sausage Blend exclusively for Man Crates.</li>\r\n\t<li>Sonoma Meat Company has supplied two packs of hog sausage casings so he can go hog wild stuffing his soft cylinders full of savory goodness.</li>\r\n\t\r\n  </ul>",
+      "Name": "Sausage Making Project Kit",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/985/large/MBC_MC_2018-4_Sausage_WEB-1487.jpg?1527019456",
+      "TERRAINRANK": 1
+    },
+    {
+      "SKU": "KTPR-0015-BLT",
+      "VariantName": "Leather Belt Making Kit",
+      "Price": 59.99,
+      "ProductId": 218,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/leather-belt-making-kit",
+      "Contents": "<li>Man Crates Leather Belt Making Guide</li>\r\n<li>Buffalo Leather Belt - Blank</li>\r\n<li>Hole Punch</li>\r\n<li>Leather Belt Component Kit (includes two screw rivets, belt buckle, belt keeper, and 4\" x 4\" poly board)</li>\r\n</ul>",
+      "LongDescription": "<h4>Take His Slacks To The Max</h4>\r\n\r\n<p>A good belt will keep his pants up, but a great belt will also uphold his keen sense of style. With belts, fashion is as important as fit, and if he’s going to be strutting his stuff all over town, he deserves the hippest of hip huggers.</p> \r\n\r\n<p>Sure, you could roll the dice on a faux-leather, one-size-fits-none department store belt, but too much slack and you risk leaving him in a rather exposed predicament. No one knows the delicate contours of his waistline like he does, so it only makes sense he’d be the one to fashion his own fashion accessory.</p> \r\n\r\n<p>The Leather Belt Making Kit gives him all the tools and guidance he’ll need for hands down the best pants-up experience imaginable.</p>\r\n\r\n<h4>Get Him Waisted</h4>\r\n\r\n<p>Headlining the Leather Belt Making Kit is a 50-inch solid strip of oil-tanned, full-grain buffalo leather, our premier choice when showcasing the waist. The kit also includes a classic bar buckle, screw rivets for buckle swapability, a hole punch for leather puncturing, and a 4\" x 4\" poly board for countertop non-puncturing.</p>\r\n\r\n<p>With a little elbow grease, imagination, and unwavering obedience to the Man Crates instruction guide, he’ll emerge from his workspace with a durable, high-quality belt that will have him constantly reminding oglers his eyes are “up here.”</p>\r\n\r\n<p>The Leather Belt Making Kit is a fantastic introduction into both leatherwork and the world of fine fashion from the waist up.</p>",
+      "Name": "Leather Belt Making Kit",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/600/large/eb_mc_belt_web_20180109-_MG_6944_Edit.jpg?1517865156",
+      "TERRAINRANK": 2
+    },
+    {
+      "SKU": "KTBX-0004-UTL",
+      "VariantName": "Ultimate Tool Kit",
+      "Price": 19.99,
+      "ProductId": 30,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/ultimate-tool-kit",
+      "Contents": "<h4>The Dynamic Duo</h4> <ul>\n  <li>WD-40</li>\n  <li>Duct Tape</li>\n</ul>",
+      "LongDescription": "<h4>Keep it Simple</h4> <p>If it ain't broken, don't break it. Simple as that. But if it is broken, someone's going to\n   have to fix it, and the world of household repair is teeming with live wires and\n   dead ends.\n</p> <p>Every repair project poses its own unique challenges, and without the right tools, the only thing pure\n   elbow grease and optimism are building is frustration. And there is no single wonder-tool that can\n   magically fix any and every situation. There are two.\n</p> <p>No finicky appliance or faulty construction can escape the wondrous healing powers\n   of duct tape and WD-40.\n</p> <h4>When Sticky Met Solvent</h4> <p>The Ultimate Tool Kit is a two-piece tool chest that can at least temporarily solve\n   any household problem: squeaky hinges, leaky pipes, flaky wallpaper, chipped teeth,\n   exposed wiring, indigestion, pet hair everywhere, troubled feng shui, rude neighbors,\n   run-on sentences, and even cats trapped in the wall.\n</p> <p>We've even included a comprehensive flowchart to determine which of this dynamic duo will be most helpful\n   in any given situation. Does it move? Should it? Every repair, no matter how complex,\n   made stupidly simple.\n</p> <p>No task is too grimey and no challenge too strong to be solved by the all-encompassing\n   heroics of the Ultimate Tool Kit.\n</p>",
+      "Name": "Ultimate Tool Kit",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/452/large/utk-two-tools-fits-all-box-essentials__70922.jpg?1502411063",
+      "TERRAINRANK": 3
+    },
+    {
+      "SKU": "KTPR-0001-1BR",
+      "VariantName": "Micro Brewed Kit (1 gal)",
+      "Price": 74.99,
+      "ProductId": 97,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/micro-brewed-kit-1-gal",
+      "Contents": "<h4>Brewing Brouhaha</h4> <ul>\r\n  <li>Micro Brewing Instruction Manual</li>\r\n  <li>1 Gallon Carboy</li>\r\n  <li>Air Lock</li>\r\n  <li>Bottle Caps</li>\r\n  <li>SMaSH IPA Kit</li>\r\n  <li>Pump Siphon</li>\r\n  <li>Bottle Capper</li>\r\n  <li>Sanitizer</li>\r\n  <li>Bottle Filler</li>\r\n  <li>Tubing</li>\r\n  <li>Carbonation Drops</li>\r\n</ul>",
+      "LongDescription": "<h4>BYOB (Be Your Own Brewmaster)</h4> <p>Beer is the Rosetta Stone of humanity, the one universally consumed and celebrated\r\n   thread tying every culture and era of civilization together. The Sumerians wrote\r\n   hymns to the exhilarating nature of beer, the Chinese experimented extensively with\r\n   rice fermentations, and there's even cursory evidence of beer predating human history.\r\n   (Those monkeys were crafty!)\r\n</p> <p>In past days, the brewers were the esteemed men of the world, the gatekeepers to the ethereal knowledge of\r\n   medicine, pleasure, and the divine. Nowadays, we've degraded the ancient craft to big industry corporations\r\n   and a shoddy baseball team in Milwaukee.\r\n</p> <p>The best way to restore rightful honor to the lost art of beer brewing, to bottle your impeccable taste on\r\n   the most intricate level, is to do it yourself.\r\n</p> <h4>Get Weird With Your Beer</h4> <p>Start stocking your well-curated home bar with well-aerated home beer brewed in your very\r\n   kitchen. The Micro Brewed project kit features the floral and citrusy aroma, balanced\r\n   flavors, and American pedigree of Centennial Hops and a SMASH (Single Malt and Single\r\n   Hop) Recipe that pulls everything out of the way to let the Centennial hops speak\r\n   unimpeded.\r\n</p> <p>And these hops have a lot to say.</p> <p>The 1.5 gallon Little Bubbler gives more head room than a topless Jeep Wrangler for the most robust of\r\n   beers, yet is small enough to fit comfortably in a Brooklyn wash closet of a studio\r\n   apartment. The one gallon batch size invites more freedom and creativity into your\r\n   recipes, so you can embrace your artistic genius unimpeded, with less pride to swallow\r\n   if your secret ingredient is less hit and more miss.\r\n</p> <h4>Fermentation Activation!</h4> <p>Racking, measuring, sanitizing, and bottling: all things you will soon be intimately\r\n   familiar with. Intimately. We've curated the ultimate collection of tubes and jib-jabs\r\n   to transform simple ingredients into a beer that will make friends and colleagues\r\n   enjoy, respect, and deeply envy your brewing expertise.\r\n</p> <p>Carry on the legacy of first-rate fermentation and inject some hoppiness into your happiness with the\r\n   Home Brewed project kit.\r\n</p>",
+      "Name": "Micro Brewed Kit (1 gal)",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/744/large/diymb-do-it-yourself-simple-home-brewing-gift-kit-for-men_w__01594.jpg?1502411174",
+      "TERRAINRANK": 4
+    },
+    {
+      "SKU": "KTPR-0011-GIN",
+      "VariantName": "Gin-Fusion Kit",
+      "Price": 59.99,
+      "ProductId": 151,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/gin-fusion-kit",
+      "Contents": "<h4>Spice World</h4> <ul>\r\n  <li>Juniper Berries, 1.4 oz</li>\r\n  <li>Coriander Seeds, 0.6 oz</li>\r\n  <li>Angelica Root, 0.6 oz</li>\r\n  <li>Lavender, 0.2 oz</li>\r\n  <li>Citrus Peel, 0.6 oz</li>\r\n  <li>Grains of Paradise, 1.4 oz</li>\r\n  <li>Star Anise, 0.4 oz</li>\r\n  <li>Chamomile, 0.2 oz</li>\r\n  <li>Cardamom Pods, 0.8 oz</li>\r\n  <li>Allspice Berries, 1 oz</li>\r\n</ul> <h4>Ginstruments</h4> <ul>\r\n  <li>2 Glass Bottles, 375mL</li>\r\n  <li>2 Bartop Corks</li>\r\n  <li>Gin-Fusion Instruction/Recipe Booklet</li>\r\n</ul>",
+      "LongDescription": "<h4>Gin For the Win!</h4> <p>As much as we enjoy the idea of distilling our own gin, we moreso enjoy keeping our eyesight,\r\n   bathtubs, and status as mostly law-abiding citizens intact. And while DIY spirit\r\n   distillation isn't as mischievous as Prohibition-era propaganda paints it, it'll\r\n   still earn a modern-day moonshiner a few free nights in the county lock-up.\r\n</p> <p>Thankfully, we've found a way to get in on gin without also getting a visit from\r\n   Johnny Law or his lesser known siblings Jimmy Firefighter and Jenny Emergency Ocular\r\n   Surgeon.\r\n</p> <p>Compound gin is our legal loophole. It infuses the spirit after\r\n   distillation and is an easy entry into the world of producing excellent, custom\r\n   cocktail spirits. The Gin-Fusion Kit is the perfect DIY process for the true gintleman.\r\n</p> <h4>The Heart of Gin</h4> <p>Juniper berries make up the base foundation for any gin, so we've included a healthy amount in the\r\n   Gin-Fusion Kit.\r\n</p> <p>We've also assembled a botanical dream team, nine flavor muses to infuse the gin with a unique\r\n   personality. These botanicals are the active ingredients responsible for every gin's\r\n   unique aroma and flavor.\r\n</p> <p>The Man Crates-exclusive gin-making instruction book comes with three recipes for a surefire success. It\r\n   also strongly encourages experimentation.\r\n</p> <h4>Bottles on Bottles</h4> <p>Good news! Making compound gin doesn't require slowly stealing lab equipment from a community college\r\n   chemistry class the way distilling gin does. These fancy glass bottles should do the trick.\r\n</p> <p>We're including two 375mL bottles for flavor infusion, which we hear can split\r\n   a 750mL bottle of vodka evenly. We can't know for sure since we were forcibly removed\r\n   from that community college chemistry class before fractions were covered.\r\n</p> <p>The Gin-Fusion Kit puts the fun and freedom of gin infusion into the hands of the everyman.</p>",
+      "Name": "Gin Making Project Kit",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/985/large/gmk-gin-making-kit-awesome-craft-drinks-for-men-gift__98172.jpg?1502411268",
+      "TERRAINRANK": 5
+    },
+    {
+      "SKU": "KTPR-0013-CHK",
+      "VariantName": "Chef Knife Making Kit",
+      "Price": 179.99,
+      "ProductId": 102,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/chef-knife-making-kit",
+      "Contents": "<h4>Blade Buddies</h4> <ul>\n  <li>VG-10 Damascus Chef Knife Blade Blank (Blade Length: 8.5\")</li>\n  <li>Black/Red Micarta Handle Scale Set</li>\n  <li>Mosaic Pins</li>\n</ul> <h4>Shape, Sand, and Finish</h4> <ul>\n  <li>Man Crates Chef Knife Making Guide</li>\n  <li>2-Ton Syringe Epoxy</li>\n  <li>Rasp &amp; File set</li>\n  <li>Graded Sandpaper Set</li>\n  <li>Bench Vise</li>\n  <li>Drill Bit</li>\n</ul>",
+      "LongDescription": "<h4>The Cutting Edge</h4> <p>In a world boasting \"Seen on TV\" Slice n' Dice Machines, Wombo Combo Fruit Juicers, and self\n   sharpening spatulas, it can be tough to know which kitchen utensils are grade A\n   and which are woefully undercooked.\n</p> <p>But anyone who's seen MacGyver knows the only tools worth trusting are the ones built by hand —sometimes\n   two trembling hands dangling from a cliff or trapped in an elevator with a timebomb.\n</p> <p>And while most of us ditched our mullets by the late 90s, the wisdom still holds true.\n   The Chef Knife Making Kit proves that if you want something made right, meals included,\n   you've got to make it yourself.\n</p> <h4>Knife to Meet You</h4> <p>While MacGyver made do with coat hangers and chewing gum, the Chef Knife Making Kit opts for sharper,\n   more dependable materials. Forged of VG-10 Damascus steel, the mere sight of this\n   blade will cause a steak to carve itself out of fear.\n</p> <p>The stylish Micarta handles are ready to be sculpted into personalized, palm-gripping perfection. The\n   finished product will be as intricately layered as a fennel avocado bean dip, and\n   every bit as distinctive as the chef who made it.\n</p> <h4>All Ingredients Included</h4> <p>The kit comes stuffed with various rasps and files, a portable bench vise, and\n   enough sandpaper to take the green off a watermelon. It's also a great excuse to\n   dust off the ol' power tools hanging in the garage. And with our step-by-step instruction\n   booklet, crafting this knife will be as effortless as cooking with it.\n</p> <p>The Chef Knife Making Kit is just what the modern day Michelangelo of meat needs to\n   carve up the next five-star entree.\n</p>",
+      "Name": "Chef Knife Making Kit",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/766/large/ckmk-chef-knife-making-kit-great-components-damascus__98473.jpg?1502411183",
+      "TERRAINRANK": 6
+    },
+    {
+      "SKU": "KTPR-0017-KMS",
+      "VariantName": "Scrimshaw Knife Kit",
+      "Price": 129.99,
+      "ProductId": 222,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/scrimshaw-knife-kit",
+      "Contents": "<ul>\r\n  <li>Boker Gents Lockback White Knife</li>\r\n  <li>Scrimshaw Kit Includes:</li>\r\n      <ul>\r\n          <li>Steel Wool</li>\r\n          <li>Renaissance Wax, .25 oz</li>\r\n          <li>Higgins Black Ink</li>\r\n          <li>Lansky Dual Grit Sharpener</li>\r\n        <li>Scrimshaw Scribe</li>\r\n          <li>Golf Pencil</li>\r\n        <li>Cotton Tip Applicators</li>\r\n        <li>4 Carbon Sheets, 2\"x4\"</li>\r\n        <li>Practice Micarta Ivory, 1/8\"x2.5\"x5\"</li>\r\n          <li>Vellum Paper Stencil</li>\r\n\r\n \r\n</ul>",
+      "LongDescription": "<h4>Etch His Sketch</h4>\r\n\r\n  <p>Working as a sailor has always been the most affordable way to see the world. But between ports, there's an awful lot of ocean to look at. And nary a jacuzzi, casino, or mini-golf course on deck. With plenty of free time on their hands, sailors got hands-on, making a mark with personalized knife handles.</p>\r\n  <p>The art of carving designs into bone knife handles is known as scrimshawing. It takes a steady hand and strong discipline, much like the seamanship required to steer a vessel through a white squall with 20-foot swells.</p>\r\n  <p>The Scrimshaw Knife Kit supplies the knife, tools, and instructions to make sure his maiden voyage is smooth sailing.</p>\r\n\r\n<h4>Scrim a Little Off the Sides</h4>\r\n  <ul>\r\n\t<li>The Boker Traditional Series Gentleman's Lockback Knife has a high-quality stainless steel blade and a white bone handle that's begging for an etching.</li>\r\n\t<li>A soup-to-nuts batch of scrimshawing supplies will set him up for success. There's a metal scribe, Higgins Black Ink, Renaissance Wax—even a slab of Micarta practicin' ivory.</li>\r\n\t<li>The Lansky Dual Grit Sharpener gets right to the point, whether he's sharpening his blade, fishing hooks, or his wit. Maybe not that last one.</li>\r\n\r\n  </ul>",
+      "Name": "Scrimshaw Knife Making Kit",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/906/large/MC_Scrimshaw_2018-3-28_WEB-0380_EDIT_V1ja.jpg?1526662262",
+      "TERRAINRANK": 7
+    }
+  ],
+  "template": {
+    "id": 27,
+    "lastModified": "2018-07-24T19:59:28.262Z",
+    "createdAt": "2018-07-10T20:14:20.400Z",
+    "archived": false,
+    "templateName": "Kits - Iterable Export",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "SKU"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "VariantName"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "Price"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "Inventory"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "VariantStatus"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "ProductId"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "VariantId"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "Path"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "CanonicalUrl"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "ContentsHTML"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "LongDescription"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "Contents"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "12",
+                  "value": {
+                    "id": 12,
+                    "fields": [
+                      [
+                        "LongDescriptionHTML"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "13",
+                  "value": {
+                    "id": 13,
+                    "fields": [
+                      [
+                        "Name"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "14",
+                  "value": {
+                    "id": 14,
+                    "fields": [
+                      [
+                        "ConversionRate"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "15",
+                  "value": {
+                    "id": 15,
+                    "fields": [
+                      [
+                        "UniquePurchases"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "16",
+                  "value": {
+                    "id": 16,
+                    "fields": [
+                      [
+                        "ProductRevenue"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "17",
+                  "value": {
+                    "id": 17,
+                    "fields": [
+                      [
+                        "Quantity"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "18",
+                  "value": {
+                    "id": 18,
+                    "fields": [
+                      [
+                        "AveragePrice"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "19",
+                  "value": {
+                    "id": 19,
+                    "fields": [
+                      [
+                        "ImageLink"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "20",
+                  "value": {
+                    "id": 20,
+                    "fields": [
+                      [
+                        "Margin"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "21",
+                  "value": {
+                    "id": 21,
+                    "fields": [
+                      [
+                        "TERRAINRANK"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "22",
+                  "value": {
+                    "id": 22,
+                    "fields": [
+                      [
+                        "CanonicalUrl"
+                      ]
+                    ],
+                    "meta": {
+                      "value": "https://",
+                      "at": 0
+                    },
+                    "skipNulls": true,
+                    "typeCode": "InsertNode",
+                    "acceptedType": "string"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 22,
+            "uidNode": 23,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "Path"
+                ],
+                7
+              ],
+              [
+                [
+                  "Price"
+                ],
+                2
+              ],
+              [
+                [
+                  "Name"
+                ],
+                13
+              ],
+              [
+                [
+                  "LongDescriptionHTML"
+                ],
+                12
+              ],
+              [
+                [
+                  "VariantId"
+                ],
+                6
+              ],
+              [
+                [
+                  "LongDescription"
+                ],
+                10
+              ],
+              [
+                [
+                  "ProductRevenue"
+                ],
+                16
+              ],
+              [
+                [
+                  "ConversionRate"
+                ],
+                14
+              ],
+              [
+                [
+                  "Margin"
+                ],
+                20
+              ],
+              [
+                [
+                  "TERRAINRANK"
+                ],
+                21
+              ],
+              [
+                [
+                  "UniquePurchases"
+                ],
+                15
+              ],
+              [
+                [
+                  "ProductId"
+                ],
+                5
+              ],
+              [
+                [
+                  "SKU"
+                ],
+                0
+              ],
+              [
+                [
+                  "VariantStatus"
+                ],
+                4
+              ],
+              [
+                [
+                  "ContentsHTML"
+                ],
+                9
+              ],
+              [
+                [
+                  "CanonicalUrl"
+                ],
+                8
+              ],
+              [
+                [
+                  "ImageLink"
+                ],
+                19
+              ],
+              [
+                [
+                  "VariantName"
+                ],
+                1
+              ],
+              [
+                [
+                  "Quantity"
+                ],
+                17
+              ],
+              [
+                [
+                  "Contents"
+                ],
+                11
+              ],
+              [
+                [
+                  "AveragePrice"
+                ],
+                18
+              ],
+              [
+                [
+                  "Inventory"
+                ],
+                3
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "SKU"
+                ]
+              ],
+              [
+                1,
+                [
+                  "VariantName"
+                ]
+              ],
+              [
+                2,
+                [
+                  "Price"
+                ]
+              ],
+              [
+                3,
+                [
+                  "Inventory"
+                ]
+              ],
+              [
+                4,
+                [
+                  "VariantStatus"
+                ]
+              ],
+              [
+                5,
+                [
+                  "ProductId"
+                ]
+              ],
+              [
+                6,
+                [
+                  "VariantId"
+                ]
+              ],
+              [
+                7,
+                [
+                  "Path"
+                ]
+              ],
+              [
+                8,
+                [
+                  "CanonicalUrl"
+                ]
+              ],
+              [
+                9,
+                [
+                  "Contents"
+                ]
+              ],
+              [
+                10,
+                [
+                  "LongDescription2"
+                ]
+              ],
+              [
+                11,
+                [
+                  "Contents2"
+                ]
+              ],
+              [
+                12,
+                [
+                  "LongDescription"
+                ]
+              ],
+              [
+                13,
+                [
+                  "Name"
+                ]
+              ],
+              [
+                14,
+                [
+                  "ConversionRate"
+                ]
+              ],
+              [
+                15,
+                [
+                  "UniquePurchases"
+                ]
+              ],
+              [
+                16,
+                [
+                  "ProductRevenue"
+                ]
+              ],
+              [
+                17,
+                [
+                  "Quantity"
+                ]
+              ],
+              [
+                18,
+                [
+                  "AveragePrice"
+                ]
+              ],
+              [
+                19,
+                [
+                  "ImageLink"
+                ]
+              ],
+              [
+                20,
+                [
+                  "Margin"
+                ]
+              ],
+              [
+                21,
+                [
+                  "TERRAINRANK"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "string"
+              ],
+              [
+                2,
+                "number"
+              ],
+              [
+                3,
+                "number"
+              ],
+              [
+                4,
+                "string"
+              ],
+              [
+                5,
+                "number"
+              ],
+              [
+                6,
+                "number"
+              ],
+              [
+                7,
+                "string"
+              ],
+              [
+                8,
+                "string"
+              ],
+              [
+                9,
+                "string"
+              ],
+              [
+                10,
+                "string"
+              ],
+              [
+                11,
+                "string"
+              ],
+              [
+                12,
+                "string"
+              ],
+              [
+                13,
+                "string"
+              ],
+              [
+                14,
+                "number"
+              ],
+              [
+                15,
+                "number"
+              ],
+              [
+                16,
+                "number"
+              ],
+              [
+                17,
+                "number"
+              ],
+              [
+                18,
+                "number"
+              ],
+              [
+                19,
+                "string"
+              ],
+              [
+                20,
+                "number"
+              ],
+              [
+                21,
+                "number"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                true
+              ],
+              [
+                3,
+                false
+              ],
+              [
+                4,
+                false
+              ],
+              [
+                5,
+                true
+              ],
+              [
+                6,
+                false
+              ],
+              [
+                7,
+                false
+              ],
+              [
+                8,
+                true
+              ],
+              [
+                9,
+                true
+              ],
+              [
+                10,
+                false
+              ],
+              [
+                11,
+                false
+              ],
+              [
+                12,
+                true
+              ],
+              [
+                13,
+                true
+              ],
+              [
+                14,
+                false
+              ],
+              [
+                15,
+                false
+              ],
+              [
+                16,
+                false
+              ],
+              [
+                17,
+                false
+              ],
+              [
+                18,
+                false
+              ],
+              [
+                19,
+                true
+              ],
+              [
+                20,
+                false
+              ],
+              [
+                21,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                8,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                9,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                10,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                11,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                12,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                13,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                14,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                15,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                16,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                17,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                18,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                19,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                20,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                21,
+                {
+                  "etlType": "Integer"
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Algorithm",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "algorithmId": 24
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Fs",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": "Products.*",
+          "fieldOrdering": [
+            "SKU",
+            "VariantName",
+            "Price",
+            "ProductId",
+            "CanonicalUrl",
+            "Contents",
+            "LongDescription",
+            "Name",
+            "ImageLink",
+            "TERRAINRANK"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {},
+        "integrationId": 19,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ]
+        }
+      }
+    }
+  }
+}

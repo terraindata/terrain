@@ -43,30 +43,44 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import TransformationNode from 'shared/transformations/TransformationNode';
-import TransformationNodeType from './TransformationNodeType';
+// tslint:disable:no-var-requires no-empty-interface max-classes-per-file
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
+import * as React from 'react';
 
-export type VisitorFn<ReturnT, ArgsT = any> = (type: TransformationNodeType, node?: TransformationNode, args?: ArgsT) => ReturnT;
-export type VisitorLookupMap<ReturnT, ArgsT = any> = {
-  [K in TransformationNodeType]?: VisitorFn<ReturnT, ArgsT>;
-};
+import * as Utils from 'shared/transformations/util/EngineUtils';
+import { instanceFnDecorator } from 'shared/util/Classes';
 
-export default abstract class TransformationNodeVisitor<ReturnT, ArgsT = any>
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { TransformationNode } from 'etl/templates/FieldTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
+
+import { DynamicForm } from 'common/components/DynamicForm';
+import { KeyPath as EnginePath } from 'shared/util/KeyPath';
+
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
+
+const TYPECODE = TransformationNodeType.StringifyNode;
+
+type Options = NodeOptionsType<typeof TYPECODE>;
+export class StringifyTFF extends TransformationForm<Options, typeof TYPECODE>
 {
-  public abstract visitorLookup: VisitorLookupMap<ReturnT, ArgsT>;
+  protected readonly type = TYPECODE;
+  protected readonly inputMap: InputDeclarationMap<Options> = {
+    pretty: {
+      type: DisplayType.CheckBox,
+      displayName: 'Prettify',
+    },
+  };
 
-  public abstract visitDefault(type: TransformationNodeType, node?: TransformationNode, args?: ArgsT): ReturnT;
-
-  public visit(type: TransformationNodeType, node?: TransformationNode, args?: ArgsT): ReturnT
-  {
-    const visitor = this.visitorLookup[type];
-    if (visitor === undefined)
-    {
-      return this.visitDefault(type, node, args);
-    }
-    else
-    {
-      return visitor(type, node, args);
-    }
-  }
+  protected readonly initialState: Options = {
+    pretty: false,
+  };
 }

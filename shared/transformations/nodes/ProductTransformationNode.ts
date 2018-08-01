@@ -45,11 +45,19 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as yadeep from 'shared/util/yadeep';
+
+const { List, Map } = Immutable;
+
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeInfo from 'shared/transformations/TransformationNodeInfo';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
 
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import TransformationNode from 'shared/transformations/TransformationNode';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath } from 'shared/util/KeyPath';
 
 import CombineTransformationType from 'shared/transformations/types/CombineTransformationType';
 
@@ -87,15 +95,12 @@ class ProductTransformationInfoC extends TransformationNodeInfo
 
   public editable = false;
   public creatable = true;
-  public newFieldType = 'number';
+  protected newType = FieldTypes.Number;
 
-  public isAvailable(engine: TransformationEngine, fieldId: number)
-  {
-    return (
-      EngineUtil.getRepresentedType(fieldId, engine) === 'number' &&
-      EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
-    );
-  }
+  protected availInfo = {
+    allowedTypes: [FieldTypes.Number, FieldTypes.Integer],
+    isNamed: true,
+  };
 }
 
 export const ProductTransformationInfo = new ProductTransformationInfoC();

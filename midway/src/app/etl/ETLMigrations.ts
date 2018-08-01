@@ -44,33 +44,77 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { MidwayLogger } from '../log/MidwayLogger';
+import * as assert from 'assert';
+import * as _ from 'lodash';
+import * as winston from 'winston';
 
-import { Migrator } from '../AppVersion';
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
+import { users } from '../users/UserRouter';
+import { versions } from '../versions/VersionRouter';
+
+import { CURRENT_VERSION, FIRST_VERSION, Migrator, Version } from '../AppVersion';
+import { MigrationRecordConfig as MigrationRecord } from '../migrations/MigrationRecordConfig';
+import { TemplateConfig } from './TemplateConfig';
 import { templates as templatesDb } from './TemplateRouter';
 
-import { updateTemplateIfNeeded } from 'shared/etl/migrations/TemplateVersions';
+import { TemplateVersion, updateTemplateIfNeeded } from 'shared/etl/migrations/TemplateVersions';
 
-export const defaultETLMigration: Migrator = {
-  fromVersion: 'v4',
-  toVersion: 'v5',
-  migrate: (from, to) =>
+function addArchivedVersion(template: TemplateConfig)
+{
+  return new Promise<void>(async (resolve, reject) =>
   {
-    return new Promise<boolean>(async (resolve, reject) =>
+    const userList = await users.get();
+    if (userList.length === 0)
     {
-      let anyUpdated = false;
-      const templates = await templatesDb.get();
-      for (const t of templates)
+      reject('could not find default user');
+    }
+    const adminUser = userList[0];
+    await versions.create(adminUser, 'templates', template.id, template);
+    return resolve();
+  });
+}
+
+function genericMigrate(from: Version, to: Version)
+{
+  return new Promise<boolean>(async (resolve, reject) =>
+  {
+    let anyUpdated = false;
+    const templates = await templatesDb.get();
+    for (const t of templates)
+    {
+      try
       {
+        const oldTemplate = _.cloneDeep(t);
         const { template, updated, message } = updateTemplateIfNeeded(t);
-        await templatesDb.update(template);
         if (updated)
         {
+          await templatesDb.update(template);
           anyUpdated = true;
-          MidwayLogger.debug(`Updated Template ${template.id}: ${message}`);
+          winston.info(`Updated Template ${template.id}: ${message}.`);
+          await addArchivedVersion(oldTemplate);
+          winston.info(`Previous Template Version archived`);
         }
       }
-      resolve(anyUpdated);
-    });
-  },
+      catch (e)
+      {
+        winston.error(`Error while Migrating Template ${t.id}: ${e}`);
+      }
+    }
+    resolve(anyUpdated);
+  });
+}
+
+const migrate4To5: Migrator = {
+  fromVersion: 'v4',
+  toVersion: 'v5',
+  migrate: genericMigrate,
 };
+
+const migrate5To5: Migrator = {
+  fromVersion: 'v5',
+  toVersion: 'v5',
+  migrate: genericMigrate,
+};
+
+export const templateMigrations = [migrate4To5, migrate5To5];

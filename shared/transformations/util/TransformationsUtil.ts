@@ -43,135 +43,81 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+const { List, Map } = Immutable;
 
+import { DateFormats, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
-import Topology from 'shared/transformations/util/TopologyUtil';
-import { KeyPath } from 'shared/util/KeyPath';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 
-// return true if the given keypath would be a valid new child field under provided fieldId
-// if fieldId is not provided or -1, then it does not consider the new field as a child field
-// (e.g. a root level field)
-export function validateNewFieldName(
-  engine: TransformationEngine,
-  fieldId: number,
-  newKeyPath: KeyPath,
-):
-  {
-    isValid: boolean,
-    message: string,
-  }
+export default abstract class TransformationsUtil
 {
-  if (newKeyPath.last() === '')
+  // shortcut to cast the field to the specified type (or the field's current type if type is not specified)
+  public static castField(engine: TransformationEngine, fieldId: number, type?: FieldTypes, format?: DateFormats)
   {
-    return {
-      isValid: false,
-      message: 'Invalid Name. Names cannot be empty',
-    };
-  }
-  if (newKeyPath.last() === -1)
-  {
-    return {
-      isValid: false,
-      message: 'Invalid Name. Name cannot be \'*\'',
-    };
-  }
-  const otherId = engine.getOutputFieldID(newKeyPath);
-  if (otherId !== undefined && otherId !== fieldId)
-  {
-    return {
-      isValid: false,
-      message: 'Invalid Name. This field already exists',
-    };
-  }
+    const etlType: FieldTypes = type === undefined ? Utils.fields.fieldType(fieldId, engine) : type;
 
-  if (fieldId !== undefined && fieldId !== -1)
-  {
-    const parentType = engine.getFieldType(fieldId);
-    if (parentType !== 'object' && parentType !== 'array')
+    if (etlType === FieldTypes.Date && format === undefined)
     {
-      return {
-        isValid: false,
-        message: 'Invalid Rename. Parent fields is not a nested object',
-      };
+      format = DateFormats.ISOstring;
     }
+
+    const transformOptions: NodeOptionsType<TransformationNodeType.CastNode> = {
+      toTypename: etlType,
+      format,
+    };
+
+    engine.appendTransformation(TransformationNodeType.CastNode, List([fieldId]), transformOptions);
   }
 
-  return {
-    isValid: true,
-    message: '',
-  };
-}
-
-export function validateRename(
-  engine: TransformationEngine,
-  fieldId: number,
-  newKeyPath: KeyPath,
-):
+  // shortcut to parse a string field into an object / array
+  public static parseField(engine: TransformationEngine, fieldId: number, to: FieldTypes.Array | FieldTypes.Object)
   {
-    isValid: boolean,
-    message: string,
-  }
-{
-  const existingKp = engine.getOutputKeyPath(fieldId);
-  const failIndex = newKeyPath.findIndex((value) => value === '');
-  if (failIndex !== -1)
-  {
-    return {
-      isValid: false,
-      message: 'Invalid Rename. Names cannot be empty',
-    };
-  }
-  if (typeof newKeyPath.last() === 'number')
-  {
-    return {
-      isValid: false,
-      message: 'Invalid Rename. Name cannot end with a number',
-    };
-  }
-  const otherId = engine.getOutputFieldID(newKeyPath);
-  if (otherId !== undefined && otherId !== fieldId)
-  {
-    return {
-      isValid: false,
-      message: 'Invalid Rename. This field already exists',
-    };
-  }
-  else if (!EngineUtil.isNamedField(existingKp))
-  {
-    return {
-      isValid: false,
-      message: 'Invalid Rename. Cannot rename a dynamic field',
-    };
-  }
-
-  if (!Topology.areFieldsLocal(existingKp, newKeyPath))
-  {
-    return {
-      isValid: false,
-      message: 'Invalid Rename. Cannot move field between array levels',
-    };
-  }
-
-  for (let i = 1; i < newKeyPath.size; i++)
-  {
-    const kpToTest = newKeyPath.slice(0, i).toList();
-    const parentId = engine.getOutputFieldID(kpToTest);
-    if (parentId !== undefined)
+    const currentType = Utils.fields.fieldType(fieldId, engine);
+    if (currentType !== FieldTypes.String)
     {
-      const parentType = engine.getFieldType(parentId);
-      if (parentType !== 'object' && parentType !== 'array')
+      throw new Error('Cannot add transformation to parse from a non-string');
+    }
+    const options: NodeOptionsType<TransformationNodeType.ParseNode> = {
+      to,
+    };
+    engine.appendTransformation(TransformationNodeType.ParseNode, List([fieldId]), options);
+  }
+
+  // shortcut to stringify an object or array into a string
+  public static stringifyField(engine: TransformationEngine, fieldId: number, pretty = false)
+  {
+    const currentType = Utils.fields.fieldType(fieldId, engine);
+    if (currentType !== FieldTypes.Array && currentType !== FieldTypes.Object)
+    {
+      throw new Error('Cannot add transformation to stringify a non-array or object field');
+    }
+    const options: NodeOptionsType<TransformationNodeType.StringifyNode> = {
+      pretty,
+    };
+    engine.appendTransformation(TransformationNodeType.StringifyNode, List([fieldId]), options);
+  }
+
+  // add initial casts to all fields
+  public static addInitialTypeCasts(engine: TransformationEngine)
+  {
+    engine.getAllFieldIDs().forEach((id) =>
+    {
+      const firstCastIndex = engine.getTransformations(id).findIndex((transformId) =>
       {
-        return {
-          isValid: false,
-          message: 'Invalid Rename. One of the ancestor fields is not a nested object',
-        };
-      }
-    }
-  }
+        const node = engine.getTransformationInfo(transformId);
+        return node.typeCode === TransformationNodeType.CastNode;
+      });
 
-  return {
-    isValid: true,
-    message: '',
-  };
+      // do not perform casts if there is already a cast
+      if (firstCastIndex !== -1)
+      {
+        return;
+      }
+
+      TransformationsUtil.castField(engine, id);
+    });
+  }
 }

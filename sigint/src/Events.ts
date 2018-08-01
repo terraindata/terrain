@@ -69,8 +69,8 @@ export interface EventConfig
   hash: string;
 }
 
-export const indexName = 'abc.terrain-analytics';
-export const typeName = 'data';
+export let indexName: string = '';
+export const typeName: string = 'data';
 
 export class Events
 {
@@ -83,6 +83,7 @@ export class Events
     this.client = new Elastic.Client({
       host: config.db,
     });
+    indexName = `${config.instanceId}.terrain-analytics`;
   }
 
   public async initialize()

@@ -44,12 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
+import * as _ from 'lodash';
 
 import { TemplateVersion } from 'shared/etl/migrations/TemplateVersions';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { SinkConfig, SourceConfig } from './EndpointTypes';
 
 import * as Immutable from 'immutable';
-import { List } from 'immutable';
+const { List, Map } = Immutable;
 
 // languages and filetypes don't follow the same capitalization conventions because of legacy reasons (?)
 export enum Languages
@@ -97,10 +99,9 @@ export type TemplateObject = {
   [k in keyof TemplateBase]: any;
 };
 
-export type FieldTypes = 'array' | 'object' | 'string' | 'number' | 'boolean';
-export const validJSTypes: FieldTypes[] = ['array', 'object', 'string', 'number', 'boolean'];
+type JSTypes = 'array' | 'object' | 'string' | 'number' | 'boolean';
 
-export enum ETLFieldTypes
+export enum FieldTypes
 {
   Array = 'Array',
   Object = 'Object',
@@ -114,55 +115,26 @@ export enum ETLFieldTypes
 
 // Displayed in the order they appear
 export const etlFieldTypesList = List([
-  ETLFieldTypes.String,
-  ETLFieldTypes.Number,
-  ETLFieldTypes.Integer,
-  ETLFieldTypes.Boolean,
-  ETLFieldTypes.Date,
-  ETLFieldTypes.Array,
-  ETLFieldTypes.Object,
-  ETLFieldTypes.GeoPoint,
+  FieldTypes.String,
+  FieldTypes.Number,
+  FieldTypes.Integer,
+  FieldTypes.Boolean,
+  FieldTypes.Date,
+  FieldTypes.Array,
+  FieldTypes.Object,
+  FieldTypes.GeoPoint,
 ]);
 
 export const etlFieldTypesNames = Immutable.Map<string, string>({
-  [ETLFieldTypes.Array]: 'Array',
-  [ETLFieldTypes.Object]: 'Nested',
-  [ETLFieldTypes.String]: 'Text',
-  [ETLFieldTypes.Number]: 'Number',
-  [ETLFieldTypes.Boolean]: 'Boolean',
-  [ETLFieldTypes.Date]: 'Date',
-  [ETLFieldTypes.Integer]: 'Integer',
-  [ETLFieldTypes.GeoPoint]: 'Geo Point',
+  [FieldTypes.Array]: 'Array',
+  [FieldTypes.Object]: 'Nested',
+  [FieldTypes.String]: 'Text',
+  [FieldTypes.Number]: 'Number',
+  [FieldTypes.Boolean]: 'Boolean',
+  [FieldTypes.Date]: 'Date',
+  [FieldTypes.Integer]: 'Integer',
+  [FieldTypes.GeoPoint]: 'Geo Point',
 });
-
-export const JSToETLType: {
-  [k in FieldTypes]: ETLFieldTypes;
-} = {
-  array: ETLFieldTypes.Array,
-  object: ETLFieldTypes.Object,
-  string: ETLFieldTypes.String,
-  number: ETLFieldTypes.Number,
-  boolean: ETLFieldTypes.Boolean,
-};
-
-// its an array because geo point could eventually also be a string
-export const ETLToJSType: {
-  [k in ETLFieldTypes]: FieldTypes[]
-} = {
-  [ETLFieldTypes.Array]: ['array'],
-  [ETLFieldTypes.Object]: ['object'],
-  [ETLFieldTypes.String]: ['string'],
-  [ETLFieldTypes.Number]: ['number'],
-  [ETLFieldTypes.Boolean]: ['boolean'],
-  [ETLFieldTypes.Date]: ['string'],
-  [ETLFieldTypes.Integer]: ['number'],
-  [ETLFieldTypes.GeoPoint]: ['object'],
-};
-
-export function getJSFromETL(type: ETLFieldTypes): FieldTypes
-{
-  return ETLToJSType[type][0];
-}
 
 export enum NodeTypes
 {

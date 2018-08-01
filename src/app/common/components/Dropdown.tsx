@@ -84,6 +84,10 @@ export interface Props
   placeholder?: string;
   wrapperHeight?: string;
   icons?: Immutable.Map<any, any>;
+  iconLabel?: El;
+  textLabel?: string;
+  iconTooltip?: string;
+  labelClass?: string;
 
   action?: (keyPath, value) => void;
   floatingLabel?: string;
@@ -317,6 +321,18 @@ class Dropdown extends TerrainComponent<Props>
     return name;
   }
 
+  public renderDropdownLabel()
+  {
+    return (
+      <div
+        className={this.props.labelClass}
+      >
+        {tooltip(this.props.iconLabel, this.props.iconTooltip)}
+        {this.props.textLabel}
+      </div>
+    );
+  }
+
   handleFocus()
   {
     this.setState({
@@ -400,108 +416,111 @@ class Dropdown extends TerrainComponent<Props>
       this.getOptionName(options.get(selectedIndex), selectedIndex);
 
     return (
-      <div
-        onClick={this.toggleOpen}
-        onMouseDown={this.onMouseDown}
-        className={classNames({
-          'dropdown-wrapper': true,
-          'altBg': true,
-          'dropdown-up': this.state.up,
-          'dropdown-open': this.state.open,
-          'dropdown-disabled': !this.props.canEdit,
-          'dropdown-center': this.props.centerAlign,
-          'dropdown-wrapper-larger': hasFloatingLabel,
-          [this.props.className]: !!this.props.className,
-        })}
-        key='dropdown-body'
-        style={borderColor('transparent')}
-      >
-        {
-          this.state.up && this.state.open
-          && optionsEl
-        }
-        {tooltip(
-          <div
-            className={classNames({
-              'dropdown-value': true,
-              'dropdown-value-larger': hasFloatingLabel,
-            })}
-            ref='value'
-            style={[
+      <div className='dropdown-row'>
+        {this.renderDropdownLabel()}
+        <div
+          onClick={this.toggleOpen}
+          onMouseDown={this.onMouseDown}
+          className={classNames({
+            'dropdown-wrapper': true,
+            'altBg': true,
+            'dropdown-up': this.state.up,
+            'dropdown-open': this.state.open,
+            'dropdown-disabled': !this.props.canEdit,
+            'dropdown-center': this.props.centerAlign,
+            'dropdown-wrapper-larger': hasFloatingLabel,
+            [this.props.className]: !!this.props.className,
+          })}
+          key='dropdown-body'
+          style={borderColor('transparent')}
+        >
+          {
+            this.state.up && this.state.open
+            && optionsEl
+          }
+          {tooltip(
+            <div
+              className={classNames({
+                'dropdown-value': true,
+                'dropdown-value-larger': hasFloatingLabel,
+              })}
+              ref='value'
+              style={[
+                {
+                  width: this.props.width,
+                  background: Colors().bg,
+                },
+                ...dropdownValueStyle,
+              ]}
+              key='dropdown-value'
+            >
               {
-                width: this.props.width,
-                background: Colors().bg,
-              },
-              ...dropdownValueStyle,
-            ]}
-            key='dropdown-value'
-          >
-            {
-              // map through all of the options so that the dropdown takes the width of the longest one
-              //  CSS hides all but the selected option
-              options && options.map((option, index) =>
+                // map through all of the options so that the dropdown takes the width of the longest one
+                //  CSS hides all but the selected option
+                options && options.map((option, index) =>
+                  <div
+                    key={index}
+                    className={classNames({
+                      'dropdown-option-inner': true,
+                      'dropdown-option-value-selected': index === selectedIndex && !hasFloatingLabel,
+                      'dropdown-option-inner-hidden': this.props.icons !== undefined,
+                    })}
+                    style={this.props.icons ? { paddingTop: 6 } : {}}
+                  >
+                    {
+                      this.getOptionName(option, index)
+                    }
+                  </div>,
+                )
+              }
+              {
+                placeholder && !hasFloatingLabel &&
                 <div
-                  key={index}
+                  key={-1}
                   className={classNames({
                     'dropdown-option-inner': true,
-                    'dropdown-option-value-selected': index === selectedIndex && !hasFloatingLabel,
-                    'dropdown-option-inner-hidden': this.props.icons !== undefined,
+                    'dropdown-option-value-selected': -1 === selectedIndex,
+                    'dropdown-option-placeholder': true,
                   })}
-                  style={this.props.icons ? { paddingTop: 6 } : {}}
+                  style={fontColor(Colors().text3)}
                 >
                   {
-                    this.getOptionName(option, index)
+                    placeholder
                   }
-                </div>,
-              )
-            }
-            {
-              placeholder && !hasFloatingLabel &&
-              <div
-                key={-1}
-                className={classNames({
-                  'dropdown-option-inner': true,
-                  'dropdown-option-value-selected': -1 === selectedIndex,
-                  'dropdown-option-placeholder': true,
-                })}
-                style={fontColor(Colors().text3)}
-              >
-                {
-                  placeholder
-                }
-              </div>
-            }
+                </div>
+              }
 
+              {
+                hasFloatingLabel &&
+                <FloatingInput
+                  label={floatingLabel}
+                  value={floatingInputValue}
+                  isTextInput={false /* TODO try to use this to input Other text */}
+                  canEdit={this.props.canEdit}
+                  onClick={_.noop}
+                  noBorder={true}
+                />
+              }
+            </div>,
             {
-              hasFloatingLabel &&
-              <FloatingInput
-                label={floatingLabel}
-                value={floatingInputValue}
-                isTextInput={false /* TODO try to use this to input Other text */}
-                canEdit={this.props.canEdit}
-                onClick={_.noop}
-                noBorder={true}
-              />
-            }
-          </div>,
+              title: this.props.wrapperTooltip,
+              position: 'right',
+            },
+          )}
           {
-            title: this.props.wrapperTooltip,
-            position: 'right',
-          },
-        )}
-        {
-          !this.state.up && this.state.open
-          && optionsEl
-        }
-        <KeyboardFocus
-          onFocus={this.handleFocus}
-          onFocusLost={this.handleFocusLost}
-          index={this.state.focusedIndex}
-          onIndexChange={this.handleFocusedIndexChange}
-          length={options && options.size}
-          onSelect={this.handleKeyboardSelect}
-          focusOverride={this.state.open}
-        />
+            !this.state.up && this.state.open
+            && optionsEl
+          }
+          <KeyboardFocus
+            onFocus={this.handleFocus}
+            onFocusLost={this.handleFocusLost}
+            index={this.state.focusedIndex}
+            onIndexChange={this.handleFocusedIndexChange}
+            length={options && options.size}
+            onSelect={this.handleKeyboardSelect}
+            focusOverride={this.state.open}
+          />
+        </div>
       </div>
     );
   }

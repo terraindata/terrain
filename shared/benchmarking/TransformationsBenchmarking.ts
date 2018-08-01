@@ -47,8 +47,6 @@ THE SOFTWARE.
 import { List } from 'immutable';
 import * as yadeep from 'shared/util/yadeep';
 
-import EngineUtil from 'shared/transformations/util/EngineUtil';
-
 /*
  *  Using Date.now() as a placeholder until we figure out an actual package to do benchmarking
  */
@@ -157,25 +155,6 @@ export default class Benchmarking
     const testSearch = (path) => yadeep.search(testDoc, path);
     const testPaths = [simplePath, arrayPath, complexPath1, complexPath2, complexPath3];
     const runs = Benchmarking.weave(testGet, testSearch, testPaths, chunk, minTime);
-    return runs;
-  }
-
-  public static transformationBenchmark(chunk: number = 100, minTime: number = 1000)
-  {
-    const documents = List([Benchmarking.doc1]);
-    const engine1 = EngineUtil.createEngineFromDocuments(documents).engine;
-    const engine2 = EngineUtil.createEngineFromDocuments(documents).engine;
-
-    EngineUtil.interpretETLTypes(engine2, {
-      documents,
-    });
-    EngineUtil.addInitialTypeCasts(engine2);
-
-    const testEngine1 = (doc) => engine1.transform(doc);
-    const testEngine2 = (doc) => engine2.transform(doc);
-
-    const testDocs = [Benchmarking.doc1];
-    const runs = Benchmarking.weave(testEngine1, testEngine2, testDocs, chunk, minTime);
     return runs;
   }
 }
