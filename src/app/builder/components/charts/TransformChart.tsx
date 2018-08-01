@@ -58,6 +58,7 @@ import * as $ from 'jquery';
 import * as _ from 'lodash';
 
 import ElasticBlockHelpers from '../../../../database/elastic/blocks/ElasticBlockHelpers';
+import MapUtil from '../../../util/MapUtil';
 import TransformUtil, { NUM_CURVE_POINTS } from '../../../util/TransformUtil';
 import Util from '../../../util/Util';
 
@@ -179,7 +180,8 @@ const TransformChart = {
     this._draw(el, scales, barsData, state.pointsData, state.onMove, state.onRelease,
       state.spotlights, state.inputKey, state.onLineClick, state.onLineMove, state.onSelect,
       state.onCreate, state.onDelete, state.onPointMoveStart, state.width, state.height,
-      state.canEdit, state.domain, state.mode, state.colors, state.schema, state.builder, state.index);
+      state.canEdit, state.domain, state.mode, state.colors, state.schema, state.builder,
+      state.index, state.distanceValue, state.inputs);
 
     d3.select(el).select('.inner-svg').on('mousedown', () =>
     {
@@ -435,16 +437,22 @@ const TransformChart = {
     overlay.on('mouseover', this._overlayMouseoverFactory(el));
   },
 
-  _drawAxes(el, scales, width, height, inputKey, isDate)
+  _drawAxes(el, scales, width, height, inputKey, isDate, isGeo)
   {
     const numSideTicks = height > 200 ? 10 : 5;
     let numBottomTicks = width > 500 ? 6 : 4;
     let bottomTickFormatFn = Util.formatNumber;
-
+    let bottomAxesName = () => inputKey === '_score' ? 'Match Quality' : inputKey;
     if (isDate)
     {
       numBottomTicks = 3;
       bottomTickFormatFn = (n: number): string => moment(new Date(n)).format('YYYY-MM-DD');
+    }
+
+    if (isGeo)
+    {
+      bottomTickFormatFn = (n: number): string => Util.formatNumber(n) + ' mi';
+      bottomAxesName = () => 'Distance from ' + inputKey;
     }
 
     const yLeftAxis = d3.svg.axis()
@@ -501,7 +509,7 @@ const TransformChart = {
       .attr('text-anchor', 'middle')
       .attr('transform', 'translate(' + width / 2 + ',80)')
       .style('fill', Colors().fontColorLightest)
-      .text(inputKey === '_score' ? 'Match Quality' : inputKey);
+      .text(bottomAxesName);
 
     d3.select(el).select('.yLeftAxis')
       .append('text')
@@ -601,7 +609,8 @@ const TransformChart = {
     bar.exit().remove();
   },
 
-  _drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData, pointFn, mode, domainMin, domainMax, isDate)
+  _drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData,
+    pointFn, mode, domainMin, domainMax, isDate, isGeo, distanceValue, inputs)
   {
     const g = d3.select(el).selectAll('.spotlights');
 
@@ -628,6 +637,56 @@ const TransformChart = {
       if (isDate)
       {
         return Util.valueMinMax(Date.parse(d['fields'][inputKey]), minX, maxX);
+      }
+      else if (isGeo)
+      {
+        if (!distanceValue)
+        {
+          return minX;
+        }
+        const loc = MapUtil.getCoordinatesFromGeopoint(d['fields'][inputKey]);
+        if (distanceValue.address && distanceValue.address.charAt(0) === '@')
+        {
+          if (inputs[distanceValue.address])
+          {
+            const distance = MapUtil.distance(
+              loc,
+              MapUtil.getCoordinatesFromGeopoint(inputs[distanceValue.address]),
+            );
+            return Util.valueMinMax(distance, minX, maxX);
+          }
+          else
+          {
+            // Maybe its a parent field, try getting field from parent obj
+            const keyPath = distanceValue.address.split('.');
+            if (keyPath.length > 1)
+            {
+              let parentLoc = d['parentHit'];
+              for (let i = 1; i < keyPath.length; i++)
+              {
+                if (!parentLoc)
+                {
+                  break;
+                }
+                parentLoc = parentLoc[keyPath[i]];
+              }
+              if (parentLoc !== null && parentLoc !== undefined)
+              {
+                const distance = MapUtil.distance(
+                  loc,
+                  MapUtil.getCoordinatesFromGeopoint(parentLoc),
+                );
+                return Util.valueMinMax(distance, minX, maxX);
+              }
+            }
+          }
+        }
+        if (distanceValue.location)
+        {
+          const distance = MapUtil.distance(loc, distanceValue.location);
+          return Util.valueMinMax(distance, minX, maxX);
+        }
+        return minX;
       }
       return Util.valueMinMax(d['fields'][inputKey], minX, maxX);
     };
@@ -1788,15 +1847,18 @@ const TransformChart = {
   _draw(el, scales, barsData, pointsData, onMove,
     onRelease, spotlights, inputKey, onLineClick,
     onLineMove, onSelect, onCreate, onDelete, onPointMoveStart,
-    width, height, canEdit, domain, mode, colors, schema, builder, index)
+    width, height, canEdit, domain, mode, colors, schema, builder,
+    index, distanceValue, inputs)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
       .attr('height', scaleMin(scales.realBarY));
 
     this._drawBg(el, scales);
-    const isDate = ElasticBlockHelpers.getTypeOfField(schema, builder, inputKey, true, index) === 'date';
-    this._drawAxes(el, scales, width, height, inputKey, isDate);
+    const fieldType = ElasticBlockHelpers.getTypeOfField(schema, builder, inputKey, true, index);
+    const isDate = fieldType === 'date';
+    const isGeo = fieldType === 'geo_point';
+    this._drawAxes(el, scales, width, height, inputKey, isDate, isGeo);
 
     if (inputKey === '' || inputKey === undefined)
     {
@@ -1839,7 +1901,8 @@ const TransformChart = {
     {
       this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
     }
-    this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData, pointFn, mode, domain.x[0], domain.x[1], isDate);
+    this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData,
+      pointFn, mode, domain.x[0], domain.x[1], isDate, isGeo, distanceValue, inputs);
 
     if (mode === 'linear'
       || (mode === 'exponential' && numPoints === NUM_CURVE_POINTS.exponential)

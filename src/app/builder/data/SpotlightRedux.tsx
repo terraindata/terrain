@@ -76,8 +76,8 @@ class SpotlightRedux extends TerrainRedux<SpotlightActionTypes, SpotlightState>
     {
       spotlightAction: (state, action) =>
       {
-        const { id, hit } = action.payload;
-        return state.setIn(['spotlights', id], _.extend({}, hit, { id }));
+        const { id, hit, parentHit } = action.payload;
+        return state.setIn(['spotlights', id], _.extend({}, hit, { id }, { parentHit }));
       },
       clearSpotlightAction: (state, action) =>
       {

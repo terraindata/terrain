@@ -185,7 +185,7 @@ fullstack-screenshot-http-import:
     when: on_failure
     expire_in: 1 week
     paths:
-    - rr/test/etl/__image_snapshots__/__diff_output__
+    - rr/test/etl-http-import/__image_snapshots__/__diff_output__
   after_script:
     - tail -n20 ./midwayConsole.log || true
     - timeout 240 yarn test-fullstack-teardown

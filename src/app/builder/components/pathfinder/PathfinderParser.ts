@@ -116,7 +116,6 @@ export function parsePath(path: Path, inputs, nestedPath: boolean = false, index
   // (originalShould) => originalShould.concat(baseQuery.getIn(['query', 'bool', 'should'])));
 
   // Scores
-
   if ((path.score.type !== 'terrain' && path.score.type !== 'linear') || path.score.lines.size)
   {
     let sortObj = parseScore(path.score, true);
@@ -126,9 +125,16 @@ export function parsePath(path: Path, inputs, nestedPath: boolean = false, index
     }
     else
     {
-      sortObj = sortObj['function_score']['query'] = queryBody.query;
-      queryBody.query = sortObj;
       delete queryBody['sort'];
+      sortObj = {
+        function_score: {
+          query: queryBody.query,
+          random_score: {
+            seed: path.score.seed,
+          },
+        },
+      };
+      queryBody.query = sortObj;
     }
     sortObj._annotation = indexPath.concat('score');
   }
@@ -312,12 +318,28 @@ function parseTerrainScore(score: Score, simpleParser: boolean = false)
       ranges = data.ranges;
       outputs = data.outputs;
     }
+    const { distanceValue } = line.transformData;
+    let lat: string | number = 0;
+    let lon: string | number = 0;
+    if (distanceValue && distanceValue.location)
+    {
+      lat = distanceValue.location[0];
+      lon = distanceValue.location[1];
+    }
+    if (distanceValue && distanceValue.address && distanceValue.address.charAt(0) === '@')
+    {
+      lat = distanceValue.address + '.lat';
+      lon = distanceValue.address + '.lon';
+    }
     if (simpleParser)
     {
       return {
         a: 0,
         b: 1,
         mode: line.transformData.mode,
+        isDistance: line.fieldType === FieldType.Geopoint,
+        lat,
+        lon,
         visiblePoints: {
           ranges: line.transformData.visiblePoints.map((scorePt) => scorePt.value).toArray(),
           outputs: line.transformData.visiblePoints.map((scorePt) => scorePt.score).toArray(),
@@ -338,6 +360,9 @@ function parseTerrainScore(score: Score, simpleParser: boolean = false)
       scorePoints: line.transformData.scorePoints,
       visiblePoints: line.transformData.visiblePoints,
       weight: line.weight,
+      isDistance: line.fieldType === FieldType.Geopoint,
+      lat: distanceValue && distanceValue.location ? line.transformData.distanceValue.location[0] : 0,
+      lon: distanceValue && distanceValue.location ? line.transformData.distanceValue.location[1] : 0,
     };
   }).toArray();
   sortObj._script.script.params.factors = factors;
@@ -613,7 +638,7 @@ function filterLineToQuery(line: FilterLine, indexPath, annotateQuery: boolean =
   let query = {};
   let field = line.field;
   // If the value is an empty string then set field to field.keyword
-  if (line.fieldType === FieldType.Text && (line.value === '' || line.value === null))
+  if (line.fieldType === FieldType.Text && (line.value === '' || line.value === null || line.value === '""'))
   {
     field = field + '.keyword';
   }

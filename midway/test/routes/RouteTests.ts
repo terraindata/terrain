@@ -87,7 +87,7 @@ beforeAll(async (done) =>
           host: 'http://127.0.0.1:9200',
           isAnalytics: true,
           analyticsIndex: 'terrain-analytics',
-          analyticsType: 'events',
+          analyticsType: 'data',
           indexPrefix: 'abc.',
           isProtected: true,
         },
@@ -1278,7 +1278,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['bestMovies3'].length).toEqual(4);
+        expect(respData['bestMovies3'].length).toEqual(6);
       });
   });
 
@@ -1306,7 +1306,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['bestMovies3'].length).toEqual(8);
+        expect(respData['bestMovies3'].length).toEqual(11);
       });
   });
 

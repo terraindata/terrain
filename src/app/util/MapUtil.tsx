@@ -371,5 +371,22 @@ const MapUtil = {
     return [bottomRight, topLeft];
   },
 
+  // Return distance between 2 geopoints in miles
+  distance(point1: number[], point2: number[]): number
+  {
+    const lat1 = point1[0];
+    const lon1 = point1[1];
+    const lat2 = point2[0];
+    const lon2 = point2[1];
+    const radLat1 = Math.PI * lat1 / 180;
+    const radLat2 = Math.PI * lat2 / 180;
+    const theta = lon1 - lon2;
+    const radTheta = Math.PI * theta / 180;
+    let distance = Math.sin(radLat1) * Math.sin(radLat2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.cos(radTheta);
+    distance = Math.min(distance, 1);
+    distance = Math.acos(distance);
+    distance = distance * 180 / Math.PI * 60 * 1.1515;
+    return distance;
+  },
 };
 export default MapUtil;

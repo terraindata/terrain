@@ -53,6 +53,7 @@ import FadeInOut from 'app/common/components/FadeInOut';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import { BuilderState } from 'builder/data/BuilderState';
 import { List } from 'immutable';
+import * as _ from 'lodash';
 import * as TerrainLog from 'loglevel';
 import * as Radium from 'radium';
 import * as React from 'react';
@@ -95,7 +96,15 @@ class PathfinderArea extends TerrainComponent<Props>
 {
   public state = {
     pathfinderContext: _PathfinderContext(this.getPathfinderContext(this.props)),
+    valueOptions: null,
   };
+
+  public componentDidMount()
+  {
+    this.setState({
+      valueOptions: this.getValueOptions(this.props),
+    });
+  }
 
   public componentWillReceiveProps(nextProps: Props)
   {
@@ -115,6 +124,46 @@ class PathfinderArea extends TerrainComponent<Props>
           this.getPathfinderContext(nextProps)),
       });
     }
+    // If inputs changes, or parent query data source changes, update value possibilities
+    if (this.shouldUpdateValueOptions(nextProps))
+    {
+      this.setState({
+        valueOptions: this.getValueOptions(nextProps),
+      });
+    }
+  }
+
+  public shouldUpdateValueOptions(nextProps): boolean
+  {
+    const { pathfinderContext } = this.state;
+    const queryChange = nextProps.builder.query &&
+      pathfinderContext.builderState.query &&
+      (
+        nextProps.builder.query.inputs !==
+        pathfinderContext.builderState.query.inputs ||
+        !_.isEqual(nextProps.parentSource,
+          this.state.pathfinderContext.parentSource) ||
+        nextProps.parentName !==
+        this.state.pathfinderContext.parentName
+      );
+    const schemaChange = pathfinderContext.schemaState !== nextProps.schema;
+    return queryChange || schemaChange;
+  }
+
+  public getValueOptions(props: Props)
+  {
+    const { keyPath } = props;
+    const { pathfinderContext } = this.state;
+    const { source } = pathfinderContext;
+    const valueOptions = source.dataSource.getChoiceOptions({
+      type: 'input',
+      source: pathfinderContext.parentSource,
+      builderState: props.builder,
+      schemaState: props.schema,
+      isNested: keyPath.includes('nested'),
+      parentName: pathfinderContext.parentName,
+    });
+    return valueOptions;
   }
 
   public handlePastePathString(evt)
@@ -311,6 +360,7 @@ class PathfinderArea extends TerrainComponent<Props>
                 onAddScript={this.handleAddScript}
                 onDeleteScript={this.handleDeleteScript}
                 onUpdateScript={this.handleUpdateScript}
+                valueOptions={this.state.valueOptions}
               />
             }
             {
@@ -325,6 +375,7 @@ class PathfinderArea extends TerrainComponent<Props>
                 onAddScript={this.handleAddScript}
                 onDeleteScript={this.handleDeleteScript}
                 onUpdateScript={this.handleUpdateScript}
+                valueOptions={this.state.valueOptions}
               />
             }
             {
@@ -333,6 +384,7 @@ class PathfinderArea extends TerrainComponent<Props>
                 score={path.score}
                 keyPath={this._ikeyPath(keyPath, 'score')}
                 onStepChange={this.incrementStep}
+                valueOptions={this.state.valueOptions}
               />
             }
             <PathfinderMoreSection

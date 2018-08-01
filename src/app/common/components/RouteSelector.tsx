@@ -54,7 +54,7 @@ import * as classNames from 'classnames';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { List, Map } from 'immutable';
 import * as React from 'react';
-import { _ResultsConfig } from 'shared/results/types/ResultsConfig';
+import { _ResultsConfig, ResultsConfig } from 'shared/results/types/ResultsConfig';
 import * as _ from 'underscore';
 import Util from 'util/Util';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
@@ -146,7 +146,7 @@ export class RouteSelector extends TerrainComponent<Props>
 
     columnRefs: Map<number, any>({}),
     pickerRef: null,
-    resultsConfig: Map({}),
+    resultsConfig: Map<string, ResultsConfig>(),
     optionSets: List<RouteSelectorOptionSet>([]),
     // optionRefs: Map({}), // not needed for now, but keeping some logic around
 
@@ -209,7 +209,14 @@ export class RouteSelector extends TerrainComponent<Props>
         optionSets: nextProps.optionSets,
         showBoxValues: true,
         // ditto
-      });
+      },
+        () =>
+        {
+          if (this.state.optionSets.get(0) && !this.state.optionSets.get(0).hideSampleData)
+          {
+            this.getResultConfigs(this.state.optionSets.get(0).options);
+          }
+        });
     }
   }
 
@@ -1041,7 +1048,7 @@ export class RouteSelector extends TerrainComponent<Props>
     let resultsConfig = Map();
     options.forEach((option, i) =>
     {
-      Ajax.getResultsConfig(option.value, (resp) =>
+      Ajax.getResultsConfig(option.value.split('/')[1], (resp) =>
       {
         if (resp.length > 0)
         {
@@ -1067,7 +1074,7 @@ export class RouteSelector extends TerrainComponent<Props>
     return (
       <Hit
         hit={data}
-        resultsConfig={config && _ResultsConfig(config) || undefined}
+        resultsConfig={config || undefined}
         index={index}
         dataIndex={dataIndex}
         primaryKey={data._id}

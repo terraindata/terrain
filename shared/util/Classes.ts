@@ -136,7 +136,7 @@ export class BaseClass
   }
 }
 
-const AllRecordMap: { [class_name: string]: Immutable.Record.Class } = {};
+export const AllRecordMap: { [class_name: string]: Immutable.Record.Class } = {};
 let AllRecordArray = [];
 export const AllRecordNameArray = [];
 export let RecordsSerializer = Serialize.immutable(Immutable, []);

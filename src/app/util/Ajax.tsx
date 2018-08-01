@@ -224,11 +224,18 @@ export const Ajax =
         if (axios.isCancel(err))
         {
           // Added for testing, can be removed.
-          TerrainLog.debug('isCanceled', err.getDetail());
+          if (err.getDetail)
+          {
+            TerrainLog.debug('isCanceled', err.getDetail());
+          }
+          else
+          {
+            TerrainLog.debug('isCanceled', 'Error has no function getDetail, raw error is ' + err);
+          }
         }
         // TODO: process this routeError via the Promise catch interface.
         // pass the error to the error handler if there is one.
-        TerrainLog.debug('Midway Route Error: ' + err.getDetail());
+        TerrainLog.debug('Midway Route Error: ' + err);
         config && config.onError && config.onError(err);
       });
 
@@ -282,15 +289,19 @@ export const Ajax =
     );
   },
 
-  saveUser(user: UserTypes.User,
+  saveUser(payload: object,
     onSave: (response: any) => void,
     onError: (response: any) => void)
   {
-    const userData = recordForSave(user);
-
+    let userData: object;
+    userData = recordForSave(payload['user']);
+    if (payload.hasOwnProperty('meta'))
+    {
+      Object.assign(userData, payload['meta']);
+    }
     return Ajax.req(
       'post',
-      `users/${user.id}`,
+      `users/${payload['user']['id']}`,
       userData,
       onSave,
       {

@@ -91,6 +91,7 @@ export interface Props
   className?: string;
   noFooterPadding?: boolean; // TODO: find better way
   inputClassName?: string;
+  inputType?: string;
 }
 
 @Radium
@@ -275,7 +276,9 @@ class Modal extends TerrainComponent<Props>
                 {
                   this.props.showTextbox &&
                   <input
-                    type='text'
+                    type={
+                      this.props.inputType ? this.props.inputType : 'text'
+                    }
                     className={classNames({
                       'standard-input': true,
                       [this.props.inputClassName]: this.props.inputClassName !== undefined && this.props.inputClassName !== '',

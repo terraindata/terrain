@@ -1,6 +1,4 @@
 {
-  "empty query" : {
-  },
   "simple query" : {
     "from" : 0,
     "size" : 10
@@ -115,7 +113,6 @@
     }
   },
   "sort query 1" : {
-    "query" : {},
     "sort" : [
       {
         "revenue" : "desc"
@@ -435,7 +432,6 @@
     }
   },
   "search-9" : {
-    "query" : {},
     "sort" : [
       {
         "revenue" : "desc"
