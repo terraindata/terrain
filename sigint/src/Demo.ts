@@ -42,14 +42,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2017-2018 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
 
+import { Config } from './Config';
 import { logger } from './Logging';
 
-export const index = 'abc.movies';
-export const type = 'data';
+export let index: string = '';
+export const type: string = 'data';
 
 export interface Request
 {
@@ -59,7 +60,19 @@ export interface Request
   v: string; // variant id
 }
 
-export async function search(req: Request): Promise<object[]>
+export class Demo
+{
+
+    private config: Config;
+
+constructor(config: Config)
+{
+    this.config = config;
+
+    index = `${this.config.instanceId}.movies`;
+}
+
+public async search(req: Request): Promise<object[]>
 {
   const client = new Elastic.Client({
     host: req.s,
@@ -79,8 +92,8 @@ export async function search(req: Request): Promise<object[]>
 
   try
   {
-    const from = Number(req.p) * 30;
-    const size = 30;
+    const from: number = Number(req.p) * 30;
+    const size: number = 30;
 
     let resp;
     if (req.v === undefined || req.v === 'MovieDemoAlgorithm')
@@ -128,4 +141,6 @@ export async function search(req: Request): Promise<object[]>
     logger.error('querying ES: ' + String(req.q) + ': ' + String(e));
     return [];
   }
+}
+
 }

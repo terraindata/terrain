@@ -51,19 +51,22 @@ import * as _ from 'lodash';
 import stringHash = require('string-hash');
 
 import { Config } from './Config';
-import * as Demo from './Demo';
+import { Demo } from './Demo';
 import { EventConfig, Events } from './Events';
+import { logger } from './Logging';
 
 export class Router
 {
   private router: KoaRouter;
   private appRouter: KoaRouter;
   private events: Events;
+  private demo: Demo;
 
   constructor(config: Config)
   {
     this.router = new KoaRouter();
     this.events = new Events(config);
+    this.demo = new Demo(config);
 
     /**
      * @api {post} / Track analytics event(s) (POST)
@@ -167,7 +170,7 @@ export class Router
      */
     this.appRouter.get('/demo/search', async (ctx, next) =>
     {
-      ctx.body = await Demo.search(ctx.request.query);
+      ctx.body = await this.demo.search(ctx.request.query);
     });
 
     this.appRouter.use('/v1', this.router.routes(), this.router.allowedMethods());
@@ -181,18 +184,6 @@ export class Router
   public routes(): any
   {
     return this.appRouter.routes();
-  }
-
-  private logError(error: string)
-  {
-    if (process.env.NODE_ENV === 'production')
-    {
-      return;
-    }
-    else
-    {
-      throw new Error(error);
-    }
   }
 
   private async prepareEvent(request: any, event: any): Promise<EventConfig>
@@ -232,7 +223,7 @@ export class Router
     const unexpectedFields = _.difference(Object.keys(event), Object.keys(ev).concat(['id', 'accessToken', 'batch']));
     if (unexpectedFields.length > 0)
     {
-      this.logError('storing analytics event: unexpected fields encountered ' + JSON.stringify(unexpectedFields));
+      logger.error('storing analytics event: unexpected fields encountered ' + JSON.stringify(unexpectedFields));
     }
 
     return ev;
@@ -243,7 +234,7 @@ export class Router
     if (request.body !== undefined && Object.keys(request.body).length > 0 &&
       request.query !== undefined && Object.keys(request.query).length > 0)
     {
-      return this.logError('Both request query and body cannot be set.');
+      return logger.error('Both request query and body cannot be set.');
     }
 
     if ((request.body === undefined ||
@@ -251,7 +242,7 @@ export class Router
       (request.query === undefined ||
         request.query !== undefined && Object.keys(request.query).length === 0))
     {
-      return this.logError('Either request query or body parameters are required.');
+      return logger.error('Either request query or body parameters are required.');
     }
 
     let event: object = request.body;
@@ -275,13 +266,17 @@ export class Router
       // insert batched events
       if (!Array.isArray(events))
       {
-        return this.logError('Expected batch parameter to be an array.');
+        return logger.error('Expected batch parameter to be an array.');
       }
 
       const promises: Array<Promise<EventConfig>> = [];
       events.forEach((ev) => promises.push(this.prepareEvent(request, ev)));
       const evs = await Promise.all(promises);
-      await this.events.storeBulk(evs);
+      const r = await this.events.storeBulk(evs);
+      if (r['errors'] === true)
+      {
+        logger.error('Elastic reported errors when storing events.  Full response object: ' + JSON.stringify(r));
+      }
     }
     else
     {
@@ -292,7 +287,7 @@ export class Router
       }
       catch (e)
       {
-        this.logError('storing analytics event: ' + JSON.stringify(e));
+        logger.error('storing analytics event: ' + JSON.stringify(e));
       }
     }
   }
